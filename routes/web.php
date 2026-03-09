@@ -2,22 +2,23 @@
 
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\Dashboard\AdminMembershipPlanController;
 use App\Http\Controllers\Dashboard\AgreementLogPageController;
 use App\Http\Controllers\Dashboard\BookingPageController;
 use App\Http\Controllers\Dashboard\ChatPageController;
 use App\Http\Controllers\Dashboard\EventPageController;
+use App\Http\Controllers\Dashboard\MembershipPlanPageController;
 use App\Http\Controllers\Dashboard\MessagePageController;
 use App\Http\Controllers\Dashboard\PermissionPageController;
 use App\Http\Controllers\Dashboard\RolePageController;
 use App\Http\Controllers\Dashboard\UserAccessPageController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\MessageAttachmentController;
 use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', LandingPageController::class)->name('landing');
 
 Auth::routes();
 
@@ -56,6 +57,18 @@ Route::middleware('auth')->group(function () {
     // Legacy messages redirect
     Route::redirect('/app/messages', '/app/chat');
     Route::post('/app/messages', [MessagePageController::class, 'store'])->middleware('permission:messages.create')->name('app.messages.store');
+
+    // Membership Plans (all authenticated users with permission)
+    Route::get('/app/membership-plans', [MembershipPlanPageController::class, 'index'])->middleware('permission:membership_plans.view_any')->name('app.membership-plans.index');
+    Route::post('/app/membership-plans/{membership_plan}/subscribe', [MembershipPlanPageController::class, 'subscribe'])->middleware('permission:membership_plans.subscribe')->name('app.membership-plans.subscribe');
+    Route::post('/app/membership-plans/cancel', [MembershipPlanPageController::class, 'cancel'])->middleware('permission:membership_plans.subscribe')->name('app.membership-plans.cancel');
+    Route::get('/app/membership-plans/history', [MembershipPlanPageController::class, 'history'])->middleware('permission:membership_plans.view_any')->name('app.membership-plans.history');
+
+    // Admin Membership Plan Management
+    Route::get('/app/admin/membership-plans', [AdminMembershipPlanController::class, 'index'])->middleware('permission:membership_plans.create')->name('app.admin.membership-plans.index');
+    Route::post('/app/admin/membership-plans', [AdminMembershipPlanController::class, 'store'])->middleware('permission:membership_plans.create')->name('app.admin.membership-plans.store');
+    Route::patch('/app/admin/membership-plans/{membership_plan}', [AdminMembershipPlanController::class, 'update'])->middleware('permission:membership_plans.update')->name('app.admin.membership-plans.update');
+    Route::delete('/app/admin/membership-plans/{membership_plan}', [AdminMembershipPlanController::class, 'destroy'])->middleware('permission:membership_plans.delete')->name('app.admin.membership-plans.destroy');
 
     Route::get('/app/agreement-log', [AgreementLogPageController::class, 'index'])->middleware('permission:agreement_log.view_any')->name('app.agreement-log.index');
 

@@ -71,6 +71,26 @@
                         </li>
                     @endcan
 
+                    @can('membership_plans.view_any')
+                        <li class="nav-item">
+                            <a href="{{ route('app.membership-plans.index') }}"
+                                class="nav-link {{ request()->routeIs('app.membership-plans.*') ? 'active' : '' }}">
+                                <i class="link-icon" data-lucide="crown"></i>
+                                <span class="link-title">Membership Plans</span>
+                            </a>
+                        </li>
+                    @endcan
+
+                    @can('membership_plans.create')
+                        <li class="nav-item">
+                            <a href="{{ route('app.admin.membership-plans.index') }}"
+                                class="nav-link {{ request()->routeIs('app.admin.membership-plans.*') ? 'active' : '' }}">
+                                <i class="link-icon" data-lucide="settings-2"></i>
+                                <span class="link-title">Manage Plans</span>
+                            </a>
+                        </li>
+                    @endcan
+
                     @can('agreement_log.view_any')
                         <li class="nav-item">
                             <a href="{{ route('app.agreement-log.index') }}"

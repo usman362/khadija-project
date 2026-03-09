@@ -10,10 +10,12 @@ use App\Domain\Messaging\Listeners\LogMessageInserted;
 use App\Models\Booking as BookingModel;
 use App\Models\Conversation as ConversationModel;
 use App\Models\Event as EventModel;
+use App\Models\MembershipPlan as MembershipPlanModel;
 use App\Models\Message as MessageModel;
 use App\Policies\BookingPolicy;
 use App\Policies\ConversationPolicy;
 use App\Policies\EventPolicy;
+use App\Policies\MembershipPlanPolicy;
 use App\Policies\MessagePolicy;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
@@ -45,5 +47,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(BookingModel::class, BookingPolicy::class);
         Gate::policy(MessageModel::class, MessagePolicy::class);
         Gate::policy(ConversationModel::class, ConversationPolicy::class);
+        Gate::policy(MembershipPlanModel::class, MembershipPlanPolicy::class);
     }
 }

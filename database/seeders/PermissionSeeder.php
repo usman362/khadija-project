@@ -44,6 +44,11 @@ class PermissionSeeder extends Seeder
             'permissions.create',
             'permissions.update',
             'permissions.delete',
+            'membership_plans.view_any',
+            'membership_plans.subscribe',
+            'membership_plans.create',
+            'membership_plans.update',
+            'membership_plans.delete',
         ];
     }
 

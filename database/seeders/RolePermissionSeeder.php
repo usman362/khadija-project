@@ -37,6 +37,8 @@ class RolePermissionSeeder extends Seeder
             'messages.view',
             'messages.create',
             'agreement_log.view_any',
+            'membership_plans.view_any',
+            'membership_plans.subscribe',
         ];
 
         $supplierPermissions = [
@@ -51,6 +53,8 @@ class RolePermissionSeeder extends Seeder
             'messages.view',
             'messages.create',
             'agreement_log.view_any',
+            'membership_plans.view_any',
+            'membership_plans.subscribe',
         ];
 
         $clientRole->syncPermissions(
