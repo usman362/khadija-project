@@ -1,0 +1,16 @@
+<?php
+
+namespace App\Domain\Messaging\Events;
+
+use App\Models\Message;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class MessageInserted
+{
+    use Dispatchable, SerializesModels;
+
+    public function __construct(public Message $message)
+    {
+    }
+}
