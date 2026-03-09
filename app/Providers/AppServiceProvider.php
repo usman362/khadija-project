@@ -8,9 +8,11 @@ use App\Domain\Auth\Enums\RoleName;
 use App\Domain\Messaging\Events\MessageInserted;
 use App\Domain\Messaging\Listeners\LogMessageInserted;
 use App\Models\Booking as BookingModel;
+use App\Models\Conversation as ConversationModel;
 use App\Models\Event as EventModel;
 use App\Models\Message as MessageModel;
 use App\Policies\BookingPolicy;
+use App\Policies\ConversationPolicy;
 use App\Policies\EventPolicy;
 use App\Policies\MessagePolicy;
 use Illuminate\Support\Facades\Event;
@@ -42,5 +44,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(EventModel::class, EventPolicy::class);
         Gate::policy(BookingModel::class, BookingPolicy::class);
         Gate::policy(MessageModel::class, MessagePolicy::class);
+        Gate::policy(ConversationModel::class, ConversationPolicy::class);
     }
 }

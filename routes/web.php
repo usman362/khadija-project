@@ -1,14 +1,17 @@
 <?php
 
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\Dashboard\AgreementLogPageController;
 use App\Http\Controllers\Dashboard\BookingPageController;
+use App\Http\Controllers\Dashboard\ChatPageController;
 use App\Http\Controllers\Dashboard\EventPageController;
 use App\Http\Controllers\Dashboard\MessagePageController;
 use App\Http\Controllers\Dashboard\PermissionPageController;
 use App\Http\Controllers\Dashboard\RolePageController;
 use App\Http\Controllers\Dashboard\UserAccessPageController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\MessageAttachmentController;
 use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,7 +39,22 @@ Route::middleware('auth')->group(function () {
     Route::post('/app/bookings', [BookingPageController::class, 'store'])->middleware('permission:bookings.create')->name('app.bookings.store');
     Route::patch('/app/bookings/{booking}/status', [BookingPageController::class, 'updateStatus'])->middleware('permission:bookings.update')->name('app.bookings.update-status');
 
-    Route::get('/app/messages', [MessagePageController::class, 'index'])->middleware('permission:messages.view_any')->name('app.messages.index');
+    // Chat (messenger-style) — replaces old table-based messages
+    Route::get('/app/chat', [ChatPageController::class, 'index'])->middleware('permission:messages.view_any')->name('app.chat.index');
+    Route::get('/app/chat/{conversation}', [ChatPageController::class, 'show'])->middleware('permission:messages.view')->name('app.chat.show');
+
+    // Conversation API
+    Route::resource('conversations', ConversationController::class)->only(['index', 'store', 'show'])->middleware('permission:messages.view_any');
+    Route::post('/conversations/{conversation}/messages', [ConversationController::class, 'storeMessage'])->middleware('permission:messages.create')->name('conversations.messages.store');
+    Route::post('/conversations/{conversation}/read', [ConversationController::class, 'markAsRead'])->middleware('permission:messages.view')->name('conversations.mark-read');
+    Route::post('/conversations/{conversation}/typing', [ConversationController::class, 'typing'])->middleware('permission:messages.view')->name('conversations.typing');
+
+    // Attachments
+    Route::post('/attachments', [MessageAttachmentController::class, 'store'])->middleware('permission:messages.create')->name('attachments.store');
+    Route::get('/attachments/{attachment}/download', [MessageAttachmentController::class, 'download'])->name('attachments.download');
+
+    // Legacy messages redirect
+    Route::redirect('/app/messages', '/app/chat');
     Route::post('/app/messages', [MessagePageController::class, 'store'])->middleware('permission:messages.create')->name('app.messages.store');
 
     Route::get('/app/agreement-log', [AgreementLogPageController::class, 'index'])->middleware('permission:agreement_log.view_any')->name('app.agreement-log.index');

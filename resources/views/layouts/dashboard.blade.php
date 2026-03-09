@@ -63,10 +63,10 @@
 
                     @can('messages.view_any')
                         <li class="nav-item">
-                            <a href="{{ route('app.messages.index') }}"
-                                class="nav-link {{ request()->routeIs('app.messages.*') ? 'active' : '' }}">
-                                <i class="link-icon" data-lucide="messages-square"></i>
-                                <span class="link-title">Messages</span>
+                            <a href="{{ route('app.chat.index') }}"
+                                class="nav-link {{ request()->routeIs('app.chat.*') ? 'active' : '' }}">
+                                <i class="link-icon" data-lucide="message-circle"></i>
+                                <span class="link-title">Chat</span>
                             </a>
                         </li>
                     @endcan
