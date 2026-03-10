@@ -86,6 +86,67 @@ class SettingsService
     }
 
     /**
+     * Get all OpenAI settings as a structured array.
+     */
+    public function getOpenAISettings(): array
+    {
+        return [
+            'api_key' => $this->get('openai.api_key'),
+            'model' => $this->get('openai.model', 'gpt-4o-mini'),
+            'max_tokens' => $this->get('openai.max_tokens', '4000'),
+            'temperature' => $this->get('openai.temperature', '0.3'),
+        ];
+    }
+
+    /**
+     * Save OpenAI settings from the admin form.
+     */
+    public function saveOpenAISettings(array $data): void
+    {
+        $mappings = [
+            'api_key' => ['group' => 'openai', 'type' => 'encrypted'],
+            'model' => ['group' => 'openai', 'type' => 'string'],
+            'max_tokens' => ['group' => 'openai', 'type' => 'string'],
+            'temperature' => ['group' => 'openai', 'type' => 'string'],
+        ];
+
+        foreach ($mappings as $field => $meta) {
+            if (array_key_exists($field, $data)) {
+                $this->set(
+                    "openai.{$field}",
+                    $data[$field],
+                    $meta['group'],
+                    $meta['type'],
+                );
+            }
+        }
+    }
+
+    /**
+     * Check if OpenAI is configured (DB setting or .env fallback).
+     */
+    public function isOpenAIConfigured(): bool
+    {
+        return ! empty($this->get('openai.api_key')) || ! empty(config('services.openai.key'));
+    }
+
+    /**
+     * Get the resolved OpenAI API key (DB first, then .env fallback).
+     */
+    public function getOpenAIKey(): ?string
+    {
+        return $this->get('openai.api_key') ?: config('services.openai.key');
+    }
+
+    /**
+     * Get the resolved OpenAI model (DB first, then .env fallback).
+     */
+    public function getOpenAIModel(): string
+    {
+        return $this->get('openai.model') ?: config('services.openai.model', 'gpt-4o-mini');
+    }
+
+    /**
      * Check if payment gateway is configured.
      */
     public function isGatewayConfigured(string $gateway): bool

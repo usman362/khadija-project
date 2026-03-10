@@ -47,4 +47,35 @@ class AdminSettingsController extends Controller
 
         return back()->with('status', 'Payment settings updated successfully.');
     }
+
+    /**
+     * Display the OpenAI settings page.
+     */
+    public function openaiSettings(): View
+    {
+        $openaiSettings = $this->settings->getOpenAISettings();
+
+        return view('dashboard.settings.openai', [
+            'settings' => $openaiSettings,
+            'isConfigured' => $this->settings->isOpenAIConfigured(),
+            'envFallback' => ! empty(config('services.openai.key')),
+        ]);
+    }
+
+    /**
+     * Update OpenAI settings.
+     */
+    public function updateOpenAISettings(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'api_key' => 'nullable|string|max:500',
+            'model' => 'required|string|max:100',
+            'max_tokens' => 'required|integer|min:100|max:16000',
+            'temperature' => 'required|numeric|min:0|max:2',
+        ]);
+
+        $this->settings->saveOpenAISettings($validated);
+
+        return back()->with('status', 'OpenAI settings updated successfully.');
+    }
 }

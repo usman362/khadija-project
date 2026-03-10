@@ -198,6 +198,12 @@
                                             Payment Settings
                                         </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('app.admin.settings.openai') }}"
+                                            class="nav-link {{ request()->routeIs('app.admin.settings.openai*') ? 'active' : '' }}">
+                                            OpenAI Settings
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
                         </li>

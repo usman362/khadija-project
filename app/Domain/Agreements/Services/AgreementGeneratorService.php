@@ -6,6 +6,7 @@ use App\Models\Agreement;
 use App\Models\Booking;
 use App\Models\Conversation;
 use App\Models\User;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -99,7 +100,7 @@ class AgreementGeneratorService
      */
     private function callAI(array $context, string $chatHistory): array
     {
-        $apiKey = config('services.openai.key');
+        $apiKey = Setting::get('openai.api_key') ?: config('services.openai.key');
 
         $prompt = $this->buildPrompt($context, $chatHistory);
 
@@ -127,7 +128,7 @@ class AgreementGeneratorService
             'Authorization' => 'Bearer ' . $apiKey,
             'Content-Type' => 'application/json',
         ])->timeout(60)->post('https://api.openai.com/v1/chat/completions', [
-            'model' => config('services.openai.model', 'gpt-4o-mini'),
+            'model' => Setting::get('openai.model') ?: config('services.openai.model', 'gpt-4o-mini'),
             'messages' => [
                 [
                     'role' => 'system',
@@ -138,8 +139,8 @@ class AgreementGeneratorService
                     'content' => $prompt,
                 ],
             ],
-            'temperature' => 0.3,
-            'max_tokens' => 4000,
+            'temperature' => (float) (Setting::get('openai.temperature') ?: 0.3),
+            'max_tokens' => (int) (Setting::get('openai.max_tokens') ?: 4000),
             'response_format' => ['type' => 'json_object'],
         ]);
 
