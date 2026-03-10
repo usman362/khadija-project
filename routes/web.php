@@ -79,7 +79,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/app/admin/settings/payments', [AdminSettingsController::class, 'updatePaymentSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.payments.update');
 
     // Payment Flow
-    Route::post('/app/payments/initiate/{membership_plan}', [PaymentPageController::class, 'initiate'])->middleware('permission:membership_plans.subscribe')->name('app.payments.initiate');
+    Route::match(['get', 'post'], '/app/payments/initiate/{plan}', [PaymentPageController::class, 'initiate'])->middleware('permission:membership_plans.subscribe')->name('app.payments.initiate');
     Route::get('/app/payments/success', [PaymentPageController::class, 'success'])->name('app.payments.success');
     Route::get('/app/payments/cancel', [PaymentPageController::class, 'cancel'])->name('app.payments.cancel');
     Route::get('/app/payments/history', [PaymentPageController::class, 'history'])->middleware('permission:payments.view')->name('app.payments.history');
