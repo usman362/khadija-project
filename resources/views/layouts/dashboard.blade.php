@@ -32,6 +32,8 @@
 
             <div class="sidebar-body">
                 <ul class="nav" id="sidebarNav">
+
+                    {{-- ── Dashboard ──────────────────────────── --}}
                     <li class="nav-item nav-category">Main</li>
                     <li class="nav-item">
                         <a href="{{ route('dashboard') }}"
@@ -40,6 +42,9 @@
                             <span class="link-title">Dashboard</span>
                         </a>
                     </li>
+
+                    {{-- ── Event Management ───────────────────── --}}
+                    <li class="nav-item nav-category">Event Management</li>
 
                     @can('events.view_any')
                         <li class="nav-item">
@@ -61,6 +66,16 @@
                         </li>
                     @endcan
 
+                    @can('agreements.view_any')
+                        <li class="nav-item">
+                            <a href="{{ route('app.agreements.index') }}"
+                                class="nav-link {{ request()->routeIs('app.agreements.*') ? 'active' : '' }}">
+                                <i class="link-icon" data-lucide="file-signature"></i>
+                                <span class="link-title">AI Agreements</span>
+                            </a>
+                        </li>
+                    @endcan
+
                     @can('messages.view_any')
                         <li class="nav-item">
                             <a href="{{ route('app.chat.index') }}"
@@ -70,6 +85,9 @@
                             </a>
                         </li>
                     @endcan
+
+                    {{-- ── Billing & Plans ────────────────────── --}}
+                    <li class="nav-item nav-category">Billing</li>
 
                     @can('membership_plans.view_any')
                         <li class="nav-item">
@@ -81,22 +99,27 @@
                         </li>
                     @endcan
 
-                    @can('membership_plans.create')
+                    @can('payments.view')
                         <li class="nav-item">
-                            <a href="{{ route('app.admin.membership-plans.index') }}"
-                                class="nav-link {{ request()->routeIs('app.admin.membership-plans.*') ? 'active' : '' }}">
-                                <i class="link-icon" data-lucide="settings-2"></i>
-                                <span class="link-title">Manage Plans</span>
+                            <a href="{{ route('app.payments.history') }}"
+                                class="nav-link {{ request()->routeIs('app.payments.*') ? 'active' : '' }}">
+                                <i class="link-icon" data-lucide="credit-card"></i>
+                                <span class="link-title">Payment History</span>
                             </a>
                         </li>
                     @endcan
 
-                    @can('agreements.view_any')
+                    {{-- ── Administration (admin-only) ────────── --}}
+                    @canany(['users.view_any', 'roles.view_any', 'permissions.view_any', 'membership_plans.create', 'agreement_log.view_any', 'payment_settings.manage'])
+                        <li class="nav-item nav-category">Administration</li>
+                    @endcanany
+
+                    @can('membership_plans.create')
                         <li class="nav-item">
-                            <a href="{{ route('app.agreements.index') }}"
-                                class="nav-link {{ request()->routeIs('app.agreements.*') ? 'active' : '' }}">
-                                <i class="link-icon" data-lucide="file-signature"></i>
-                                <span class="link-title">AI Agreements</span>
+                            <a href="{{ route('app.admin.membership-plans.index') }}"
+                                class="nav-link {{ request()->routeIs('app.admin.membership-plans.*') ? 'active' : '' }}">
+                                <i class="link-icon" data-lucide="package"></i>
+                                <span class="link-title">Manage Plans</span>
                             </a>
                         </li>
                     @endcan
@@ -115,7 +138,7 @@
                         <li class="nav-item">
                             <a href="{{ route('app.users.index') }}"
                                 class="nav-link {{ request()->routeIs('app.users.*') ? 'active' : '' }}">
-                                <i class="link-icon" data-lucide="shield-check"></i>
+                                <i class="link-icon" data-lucide="users"></i>
                                 <span class="link-title">Users</span>
                             </a>
                         </li>
@@ -137,16 +160,6 @@
                                 class="nav-link {{ request()->routeIs('app.permissions.*') ? 'active' : '' }}">
                                 <i class="link-icon" data-lucide="key-round"></i>
                                 <span class="link-title">Permissions</span>
-                            </a>
-                        </li>
-                    @endcan
-
-                    @can('payments.view')
-                        <li class="nav-item">
-                            <a href="{{ route('app.payments.history') }}"
-                                class="nav-link {{ request()->routeIs('app.payments.*') ? 'active' : '' }}">
-                                <i class="link-icon" data-lucide="credit-card"></i>
-                                <span class="link-title">Payment History</span>
                             </a>
                         </li>
                     @endcan
@@ -173,6 +186,7 @@
                             </div>
                         </li>
                     @endcan
+
                 </ul>
             </div>
         </nav>
