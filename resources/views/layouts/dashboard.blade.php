@@ -16,6 +16,22 @@
     <link rel="stylesheet" href="https://nobleui.com/html/template/assets/vendors/core/core.css">
     <link rel="stylesheet" href="https://nobleui.com/html/template/assets/css/demo1/style.css">
     <link rel="shortcut icon" href="https://nobleui.com/html/template/assets/images/favicon.png" />
+
+    <style>
+        .sidebar .nav-link svg.ic-primary { color: #818cf8 !important; stroke: #818cf8 !important; }
+        .sidebar .nav-link svg.ic-blue    { color: #60a5fa !important; stroke: #60a5fa !important; }
+        .sidebar .nav-link svg.ic-cyan    { color: #22d3ee !important; stroke: #22d3ee !important; }
+        .sidebar .nav-link svg.ic-green   { color: #34d399 !important; stroke: #34d399 !important; }
+        .sidebar .nav-link svg.ic-emerald { color: #6ee7b7 !important; stroke: #6ee7b7 !important; }
+        .sidebar .nav-link svg.ic-yellow  { color: #fbbf24 !important; stroke: #fbbf24 !important; }
+        .sidebar .nav-link svg.ic-orange  { color: #fb923c !important; stroke: #fb923c !important; }
+        .sidebar .nav-link svg.ic-rose    { color: #fb7185 !important; stroke: #fb7185 !important; }
+        .sidebar .nav-link svg.ic-pink    { color: #f472b6 !important; stroke: #f472b6 !important; }
+        .sidebar .nav-link svg.ic-purple  { color: #c084fc !important; stroke: #c084fc !important; }
+        .sidebar .nav-link svg.ic-violet  { color: #a78bfa !important; stroke: #a78bfa !important; }
+        .sidebar .nav-link svg.ic-red     { color: #f87171 !important; stroke: #f87171 !important; }
+        .sidebar .nav-link svg.ic-slate   { color: #94a3b8 !important; stroke: #94a3b8 !important; }
+    </style>
 </head>
 
 <body>
@@ -38,7 +54,7 @@
                     <li class="nav-item">
                         <a href="{{ route('dashboard') }}"
                             class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                            <i class="link-icon" data-lucide="layout-dashboard"></i>
+                            <i class="link-icon ic-primary" data-lucide="layout-dashboard"></i>
                             <span class="link-title">Dashboard</span>
                         </a>
                     </li>
@@ -50,7 +66,7 @@
                         <li class="nav-item">
                             <a href="{{ route('app.events.index') }}"
                                 class="nav-link {{ request()->routeIs('app.events.*') ? 'active' : '' }}">
-                                <i class="link-icon" data-lucide="calendar-days"></i>
+                                <i class="link-icon ic-blue" data-lucide="calendar-days"></i>
                                 <span class="link-title">Events</span>
                             </a>
                         </li>
@@ -60,7 +76,7 @@
                         <li class="nav-item">
                             <a href="{{ route('app.bookings.index') }}"
                                 class="nav-link {{ request()->routeIs('app.bookings.*') ? 'active' : '' }}">
-                                <i class="link-icon" data-lucide="book-check"></i>
+                                <i class="link-icon ic-cyan" data-lucide="book-check"></i>
                                 <span class="link-title">Bookings</span>
                             </a>
                         </li>
@@ -70,7 +86,7 @@
                         <li class="nav-item">
                             <a href="{{ route('app.agreements.index') }}"
                                 class="nav-link {{ request()->routeIs('app.agreements.*') ? 'active' : '' }}">
-                                <i class="link-icon" data-lucide="file-signature"></i>
+                                <i class="link-icon ic-purple" data-lucide="file-signature"></i>
                                 <span class="link-title">AI Agreements</span>
                             </a>
                         </li>
@@ -80,7 +96,7 @@
                         <li class="nav-item">
                             <a href="{{ route('app.chat.index') }}"
                                 class="nav-link {{ request()->routeIs('app.chat.*') ? 'active' : '' }}">
-                                <i class="link-icon" data-lucide="message-circle"></i>
+                                <i class="link-icon ic-green" data-lucide="message-circle"></i>
                                 <span class="link-title">Chat</span>
                             </a>
                         </li>
@@ -93,7 +109,7 @@
                         <li class="nav-item">
                             <a href="{{ route('app.membership-plans.index') }}"
                                 class="nav-link {{ request()->routeIs('app.membership-plans.*') ? 'active' : '' }}">
-                                <i class="link-icon" data-lucide="crown"></i>
+                                <i class="link-icon ic-yellow" data-lucide="crown"></i>
                                 <span class="link-title">Membership Plans</span>
                             </a>
                         </li>
@@ -103,7 +119,7 @@
                         <li class="nav-item">
                             <a href="{{ route('app.payments.history') }}"
                                 class="nav-link {{ request()->routeIs('app.payments.*') ? 'active' : '' }}">
-                                <i class="link-icon" data-lucide="credit-card"></i>
+                                <i class="link-icon ic-emerald" data-lucide="credit-card"></i>
                                 <span class="link-title">Payment History</span>
                             </a>
                         </li>
@@ -118,7 +134,7 @@
                         <li class="nav-item">
                             <a href="{{ route('app.admin.membership-plans.index') }}"
                                 class="nav-link {{ request()->routeIs('app.admin.membership-plans.*') ? 'active' : '' }}">
-                                <i class="link-icon" data-lucide="package"></i>
+                                <i class="link-icon ic-orange" data-lucide="package"></i>
                                 <span class="link-title">Manage Plans</span>
                             </a>
                         </li>
@@ -128,7 +144,7 @@
                         <li class="nav-item">
                             <a href="{{ route('app.agreement-log.index') }}"
                                 class="nav-link {{ request()->routeIs('app.agreement-log.*') ? 'active' : '' }}">
-                                <i class="link-icon" data-lucide="scroll-text"></i>
+                                <i class="link-icon ic-violet" data-lucide="scroll-text"></i>
                                 <span class="link-title">Agreement Log</span>
                             </a>
                         </li>
@@ -138,7 +154,7 @@
                         <li class="nav-item">
                             <a href="{{ route('app.users.index') }}"
                                 class="nav-link {{ request()->routeIs('app.users.*') ? 'active' : '' }}">
-                                <i class="link-icon" data-lucide="users"></i>
+                                <i class="link-icon ic-rose" data-lucide="users"></i>
                                 <span class="link-title">Users</span>
                             </a>
                         </li>
@@ -148,7 +164,7 @@
                         <li class="nav-item">
                             <a href="{{ route('app.roles.index') }}"
                                 class="nav-link {{ request()->routeIs('app.roles.*') ? 'active' : '' }}">
-                                <i class="link-icon" data-lucide="shield"></i>
+                                <i class="link-icon ic-pink" data-lucide="shield"></i>
                                 <span class="link-title">Roles</span>
                             </a>
                         </li>
@@ -158,7 +174,7 @@
                         <li class="nav-item">
                             <a href="{{ route('app.permissions.index') }}"
                                 class="nav-link {{ request()->routeIs('app.permissions.*') ? 'active' : '' }}">
-                                <i class="link-icon" data-lucide="key-round"></i>
+                                <i class="link-icon ic-red" data-lucide="key-round"></i>
                                 <span class="link-title">Permissions</span>
                             </a>
                         </li>
@@ -170,7 +186,7 @@
                                 data-bs-toggle="collapse" href="#settingsSubmenu" role="button"
                                 aria-expanded="{{ request()->routeIs('app.admin.settings.*') ? 'true' : 'false' }}"
                                 aria-controls="settingsSubmenu">
-                                <i class="link-icon" data-lucide="settings"></i>
+                                <i class="link-icon ic-slate" data-lucide="settings"></i>
                                 <span class="link-title">Settings</span>
                                 <i class="link-arrow" data-lucide="chevron-down"></i>
                             </a>
