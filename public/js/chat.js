@@ -81,6 +81,32 @@
 
         document.getElementById('create-conversation-btn').addEventListener('click', createConversation);
 
+        // Toggle booking/event selectors based on type
+        document.getElementById('new-conv-type').addEventListener('change', function () {
+            const type = this.value;
+            document.getElementById('booking-group').classList.toggle('d-none', type !== 'booking');
+            document.getElementById('event-group').classList.toggle('d-none', type !== 'event');
+            // For booking type, auto-select participant when a booking is chosen
+            if (type === 'booking') {
+                document.getElementById('participant-group').classList.add('d-none');
+            } else {
+                document.getElementById('participant-group').classList.remove('d-none');
+            }
+        });
+
+        // Auto-select participant when booking is selected
+        document.getElementById('new-conv-booking').addEventListener('change', function () {
+            const option = this.options[this.selectedIndex];
+            if (!option.value) return;
+            const currentUserId = parseInt(dom.app.dataset.userId);
+            const clientId = parseInt(option.dataset.client);
+            const supplierId = parseInt(option.dataset.supplier);
+            // The other party is the participant
+            const otherPartyId = (clientId === currentUserId) ? supplierId : clientId;
+            const participantSelect = document.getElementById('new-conv-participant');
+            participantSelect.value = otherPartyId;
+        });
+
         // Filter tabs
         document.querySelectorAll('.chat-filter-tabs [data-filter]').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -531,17 +557,49 @@
     async function createConversation() {
         const type = document.getElementById('new-conv-type').value;
         const participantId = document.getElementById('new-conv-participant').value;
+        const bookingId = document.getElementById('new-conv-booking').value;
+        const eventId = document.getElementById('new-conv-event').value;
 
-        if (!participantId) {
+        if (!participantId && type === 'direct') {
             alert('Please select a participant');
             return;
         }
 
+        if (type === 'booking' && !bookingId) {
+            alert('Please select a booking');
+            return;
+        }
+
+        if (type === 'event' && !eventId) {
+            alert('Please select an event');
+            return;
+        }
+
+        // Build payload
+        const payload = {
+            type,
+            participant_ids: participantId ? [parseInt(participantId)] : [],
+        };
+
+        if (type === 'booking' && bookingId) {
+            payload.booking_id = parseInt(bookingId);
+            // Auto-resolve participant from booking if not manually set
+            if (!participantId) {
+                const opt = document.getElementById('new-conv-booking').options[document.getElementById('new-conv-booking').selectedIndex];
+                const currentUserId = parseInt(dom.app.dataset.userId);
+                const clientId = parseInt(opt.dataset.client);
+                const supplierId = parseInt(opt.dataset.supplier);
+                const otherPartyId = (clientId === currentUserId) ? supplierId : clientId;
+                payload.participant_ids = [otherPartyId];
+            }
+        }
+
+        if (type === 'event' && eventId) {
+            payload.event_id = parseInt(eventId);
+        }
+
         try {
-            const data = await api('POST', '/conversations', {
-                type,
-                participant_ids: [parseInt(participantId)],
-            });
+            const data = await api('POST', '/conversations', payload);
 
             state.conversations.set(data.id, data);
             renderConversationList();
@@ -550,7 +608,7 @@
             bootstrap.Modal.getInstance(document.getElementById('newConversationModal')).hide();
         } catch (err) {
             console.error('Failed to create conversation:', err);
-            alert('Failed to create conversation');
+            alert(err.message || 'Failed to create conversation');
         }
     }
 

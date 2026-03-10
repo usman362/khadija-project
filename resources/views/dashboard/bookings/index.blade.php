@@ -70,6 +70,15 @@
                             @can('update', $booking)
                                 <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editBookingModal{{ $booking->id }}">Edit</button>
                             @endcan
+                            @if($booking->status !== 'completed' && $booking->status !== 'cancelled')
+                                <form method="POST" action="{{ route('app.agreements.generate', $booking) }}" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-info" title="Generate AI Agreement"
+                                        onclick="return confirm('Generate an AI agreement from the chat for this booking?')">
+                                        AI Agreement
+                                    </button>
+                                </form>
+                            @endif
                         </td>
                     </tr>
 

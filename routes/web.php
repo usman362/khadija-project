@@ -4,11 +4,14 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\Dashboard\AdminMembershipPlanController;
 use App\Http\Controllers\Dashboard\AgreementLogPageController;
+use App\Http\Controllers\Dashboard\AgreementPageController;
 use App\Http\Controllers\Dashboard\BookingPageController;
 use App\Http\Controllers\Dashboard\ChatPageController;
+use App\Http\Controllers\Dashboard\AdminSettingsController;
 use App\Http\Controllers\Dashboard\EventPageController;
 use App\Http\Controllers\Dashboard\MembershipPlanPageController;
 use App\Http\Controllers\Dashboard\MessagePageController;
+use App\Http\Controllers\Dashboard\PaymentPageController;
 use App\Http\Controllers\Dashboard\PermissionPageController;
 use App\Http\Controllers\Dashboard\RolePageController;
 use App\Http\Controllers\Dashboard\UserAccessPageController;
@@ -16,6 +19,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\MessageAttachmentController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\Webhook\PaymentWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', LandingPageController::class)->name('landing');
@@ -70,6 +74,24 @@ Route::middleware('auth')->group(function () {
     Route::patch('/app/admin/membership-plans/{membership_plan}', [AdminMembershipPlanController::class, 'update'])->middleware('permission:membership_plans.update')->name('app.admin.membership-plans.update');
     Route::delete('/app/admin/membership-plans/{membership_plan}', [AdminMembershipPlanController::class, 'destroy'])->middleware('permission:membership_plans.delete')->name('app.admin.membership-plans.destroy');
 
+    // Admin Settings
+    Route::get('/app/admin/settings/payments', [AdminSettingsController::class, 'paymentSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.payments');
+    Route::post('/app/admin/settings/payments', [AdminSettingsController::class, 'updatePaymentSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.payments.update');
+
+    // Payment Flow
+    Route::post('/app/payments/initiate/{membership_plan}', [PaymentPageController::class, 'initiate'])->middleware('permission:membership_plans.subscribe')->name('app.payments.initiate');
+    Route::get('/app/payments/success', [PaymentPageController::class, 'success'])->name('app.payments.success');
+    Route::get('/app/payments/cancel', [PaymentPageController::class, 'cancel'])->name('app.payments.cancel');
+    Route::get('/app/payments/history', [PaymentPageController::class, 'history'])->middleware('permission:payments.view')->name('app.payments.history');
+
+    // AI Agreements
+    Route::get('/app/agreements', [AgreementPageController::class, 'index'])->middleware('permission:agreements.view_any')->name('app.agreements.index');
+    Route::get('/app/agreements/{agreement}', [AgreementPageController::class, 'show'])->middleware('permission:agreements.view_any')->name('app.agreements.show');
+    Route::post('/app/agreements/generate/{booking}', [AgreementPageController::class, 'generate'])->middleware('permission:agreements.generate')->name('app.agreements.generate');
+    Route::post('/app/agreements/{agreement}/accept', [AgreementPageController::class, 'accept'])->middleware('permission:agreements.accept')->name('app.agreements.accept');
+    Route::post('/app/agreements/{agreement}/reject', [AgreementPageController::class, 'reject'])->middleware('permission:agreements.accept')->name('app.agreements.reject');
+    Route::post('/app/agreements/regenerate/{booking}', [AgreementPageController::class, 'regenerate'])->middleware('permission:agreements.generate')->name('app.agreements.regenerate');
+
     Route::get('/app/agreement-log', [AgreementLogPageController::class, 'index'])->middleware('permission:agreement_log.view_any')->name('app.agreement-log.index');
 
     Route::get('/app/users', [UserAccessPageController::class, 'index'])->middleware('permission:users.view_any')->name('app.users.index');
@@ -96,3 +118,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('bookings', BookingController::class)->only(['index', 'store', 'show', 'update']);
     Route::resource('messages', MessageController::class)->only(['index', 'store', 'show']);
 });
+
+// Payment Webhooks (no auth, no CSRF — verified via gateway signatures)
+Route::post('/webhooks/stripe', [PaymentWebhookController::class, 'stripe'])->name('webhooks.stripe');
+Route::post('/webhooks/paypal', [PaymentWebhookController::class, 'paypal'])->name('webhooks.paypal');

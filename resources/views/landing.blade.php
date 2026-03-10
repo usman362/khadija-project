@@ -973,6 +973,7 @@
             <li><a href="#features">Features</a></li>
             <li><a href="#categories">Categories</a></li>
             <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#ai-agreement">AI Agreements</a></li>
             <li><a href="#pricing">Pricing</a></li>
         </ul>
 
@@ -1203,8 +1204,118 @@
     </div>
 </section>
 
+<!-- ─── AI AGREEMENT ──────────────────────────── -->
+<section class="section" id="ai-agreement">
+    <div class="container">
+        <div class="section-header">
+            <h2>AI-Powered <span class="gradient-text">Smart Agreements</span></h2>
+            <p>Our AI reads your conversation, extracts key terms, and generates a professional service agreement — before the final booking confirmation.</p>
+        </div>
+
+        <div style="max-width: 900px; margin: 0 auto;">
+            {{-- Process Flow --}}
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 48px; text-align: center;">
+                <div>
+                    <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(139,92,246,0.2)); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 2px solid rgba(59,130,246,0.3);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Chat</div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted);">Discuss terms with vendor</div>
+                </div>
+                <div>
+                    <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(236,72,153,0.2)); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 2px solid rgba(139,92,246,0.3);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M12 2a4 4 0 0 0-4 4v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-2V6a4 4 0 0 0-4-4z"/></svg>
+                    </div>
+                    <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">AI Generates</div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted);">Smart agreement created</div>
+                </div>
+                <div>
+                    <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(249,115,22,0.2)); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 2px solid rgba(245,158,11,0.3);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </div>
+                    <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Review</div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted);">Both parties review terms</div>
+                </div>
+                <div>
+                    <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(16,185,129,0.2)); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 2px solid rgba(34,197,94,0.3);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                    <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Accept</div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted);">Booking auto-confirmed</div>
+                </div>
+            </div>
+
+            {{-- Mockup Agreement Preview --}}
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 32px; position: relative;">
+                <div style="position: absolute; top: -14px; left: 24px; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); color: #fff; font-size: 0.7rem; font-weight: 700; padding: 4px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;">AI Generated</div>
+
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0;">Service Agreement</h3>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin: 4px 0 0;">AGR-20260310-4821 &middot; Generated from conversation</p>
+                    </div>
+                    <span style="background: rgba(245,158,11,0.15); color: #f59e0b; padding: 4px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600;">Pending Review</span>
+                </div>
+
+                {{-- Extracted Terms --}}
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 24px;">
+                    <div style="padding: 12px; background: rgba(59,130,246,0.06); border-radius: 8px; border: 1px solid var(--border-color);">
+                        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600;">Event</div>
+                        <div style="font-size: 0.85rem; font-weight: 500; margin-top: 2px;">Annual Gala 2026</div>
+                    </div>
+                    <div style="padding: 12px; background: rgba(59,130,246,0.06); border-radius: 8px; border: 1px solid var(--border-color);">
+                        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600;">Price</div>
+                        <div style="font-size: 0.85rem; font-weight: 500; margin-top: 2px;">$2,500</div>
+                    </div>
+                    <div style="padding: 12px; background: rgba(59,130,246,0.06); border-radius: 8px; border: 1px solid var(--border-color);">
+                        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600;">Date</div>
+                        <div style="font-size: 0.85rem; font-weight: 500; margin-top: 2px;">Apr 15, 2026</div>
+                    </div>
+                    <div style="padding: 12px; background: rgba(59,130,246,0.06); border-radius: 8px; border: 1px solid var(--border-color);">
+                        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600;">Deliverables</div>
+                        <div style="font-size: 0.85rem; font-weight: 500; margin-top: 2px;">Full photography</div>
+                    </div>
+                </div>
+
+                {{-- Agreement Preview Snippet --}}
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; margin-bottom: 20px; font-size: 0.85rem; color: var(--text-light); line-height: 1.7;">
+                    <p style="margin: 0 0 8px;"><strong>1. PARTIES</strong> — This Agreement is entered between <em>Sarah K. (Client)</em> and <em>Ahmed J. (Vendor)</em>...</p>
+                    <p style="margin: 0 0 8px;"><strong>2. SCOPE</strong> — Full event photography coverage including pre-event portraits, ceremony, and reception...</p>
+                    <p style="margin: 0; color: var(--text-muted);">...and 6 more sections auto-generated from your conversation</p>
+                </div>
+
+                {{-- Acceptance Status --}}
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px; padding: 14px; border-radius: 10px; border: 1.5px solid #22c55e; background: rgba(34,197,94,0.06); display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 28px; height: 28px; border-radius: 50%; background: #22c55e; display: flex; align-items: center; justify-content: center;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.85rem; font-weight: 600;">Client Accepted</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted);">Mar 10, 2026</div>
+                        </div>
+                    </div>
+                    <div style="flex: 1; min-width: 200px; padding: 14px; border-radius: 10px; border: 1.5px solid var(--border-color); display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--border-color); display: flex; align-items: center; justify-content: center;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.85rem; font-weight: 600;">Vendor Pending</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted);">Awaiting acceptance</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 32px;">
+                <a href="{{ Route::has('register') ? route('register') : '#' }}" class="btn btn-primary btn-lg">Try AI Agreements Free</a>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- ─── PRICING ───────────────────────────────── -->
-<section class="section" id="pricing">
+<section class="section section-alt" id="pricing">
     <div class="container">
         <div class="section-header">
             <h2>Flexible Pricing for Every Need</h2>

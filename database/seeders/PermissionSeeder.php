@@ -49,6 +49,11 @@ class PermissionSeeder extends Seeder
             'membership_plans.create',
             'membership_plans.update',
             'membership_plans.delete',
+            'agreements.view_any',
+            'agreements.generate',
+            'agreements.accept',
+            'payment_settings.manage',
+            'payments.view',
         ];
     }
 

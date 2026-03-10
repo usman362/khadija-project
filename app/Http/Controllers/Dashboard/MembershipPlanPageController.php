@@ -32,10 +32,16 @@ class MembershipPlanPageController extends Controller
 
     /**
      * Subscribe the current user to a plan.
+     * Free plans are activated instantly; paid plans redirect to the payment flow.
      */
     public function subscribe(Request $request, MembershipPlan $membership_plan): RedirectResponse
     {
         $this->authorize('subscribe', $membership_plan);
+
+        // Paid plans → redirect to payment gateway
+        if ($membership_plan->price > 0) {
+            return redirect()->route('app.payments.initiate', $membership_plan);
+        }
 
         $user = $request->user();
 
@@ -57,7 +63,7 @@ class MembershipPlanPageController extends Controller
             'status' => 'active',
             'starts_at' => $startsAt,
             'expires_at' => $expiresAt,
-            'amount_paid' => $membership_plan->price,
+            'amount_paid' => 0,
         ]);
 
         return back()->with('status', 'Successfully subscribed to ' . $membership_plan->name . ' plan!');

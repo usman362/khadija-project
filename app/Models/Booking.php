@@ -64,4 +64,19 @@ class Booking extends Model
     {
         return $this->hasMany(AgreementLog::class, 'subject_id')->where('subject_type', 'booking');
     }
+
+    public function agreements(): HasMany
+    {
+        return $this->hasMany(Agreement::class);
+    }
+
+    public function latestAgreement(): HasOne
+    {
+        return $this->hasOne(Agreement::class)->latestOfMany('version');
+    }
+
+    public function activeAgreement(): HasOne
+    {
+        return $this->hasOne(Agreement::class)->where('status', '!=', 'rejected')->latestOfMany('version');
+    }
 }

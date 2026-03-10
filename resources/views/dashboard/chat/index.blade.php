@@ -107,12 +107,34 @@
                             <option value="event">Event Chat</option>
                         </select>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3" id="participant-group">
                         <label class="form-label">Participant</label>
                         <select class="form-select" id="new-conv-participant">
                             <option value="">Select user...</option>
                             @foreach($users as $user)
                                 <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3 d-none" id="booking-group">
+                        <label class="form-label">Booking</label>
+                        <select class="form-select" id="new-conv-booking">
+                            <option value="">Select booking...</option>
+                            @foreach($bookings as $booking)
+                                <option value="{{ $booking->id }}"
+                                    data-client="{{ $booking->client_id }}"
+                                    data-supplier="{{ $booking->supplier_id }}">
+                                    #{{ $booking->id }} — {{ $booking->event->title ?? 'N/A' }} ({{ ucfirst($booking->status) }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3 d-none" id="event-group">
+                        <label class="form-label">Event</label>
+                        <select class="form-select" id="new-conv-event">
+                            <option value="">Select event...</option>
+                            @foreach($events as $event)
+                                <option value="{{ $event->id }}">{{ $event->title }}</option>
                             @endforeach
                         </select>
                     </div>

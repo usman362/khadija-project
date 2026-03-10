@@ -91,6 +91,16 @@
                         </li>
                     @endcan
 
+                    @can('agreements.view_any')
+                        <li class="nav-item">
+                            <a href="{{ route('app.agreements.index') }}"
+                                class="nav-link {{ request()->routeIs('app.agreements.*') ? 'active' : '' }}">
+                                <i class="link-icon" data-lucide="file-signature"></i>
+                                <span class="link-title">AI Agreements</span>
+                            </a>
+                        </li>
+                    @endcan
+
                     @can('agreement_log.view_any')
                         <li class="nav-item">
                             <a href="{{ route('app.agreement-log.index') }}"
@@ -128,6 +138,39 @@
                                 <i class="link-icon" data-lucide="key-round"></i>
                                 <span class="link-title">Permissions</span>
                             </a>
+                        </li>
+                    @endcan
+
+                    @can('payments.view')
+                        <li class="nav-item">
+                            <a href="{{ route('app.payments.history') }}"
+                                class="nav-link {{ request()->routeIs('app.payments.*') ? 'active' : '' }}">
+                                <i class="link-icon" data-lucide="credit-card"></i>
+                                <span class="link-title">Payment History</span>
+                            </a>
+                        </li>
+                    @endcan
+
+                    @can('payment_settings.manage')
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('app.admin.settings.*') ? '' : 'collapsed' }}"
+                                data-bs-toggle="collapse" href="#settingsSubmenu" role="button"
+                                aria-expanded="{{ request()->routeIs('app.admin.settings.*') ? 'true' : 'false' }}"
+                                aria-controls="settingsSubmenu">
+                                <i class="link-icon" data-lucide="settings"></i>
+                                <span class="link-title">Settings</span>
+                                <i class="link-arrow" data-lucide="chevron-down"></i>
+                            </a>
+                            <div class="collapse {{ request()->routeIs('app.admin.settings.*') ? 'show' : '' }}" id="settingsSubmenu">
+                                <ul class="nav sub-menu">
+                                    <li class="nav-item">
+                                        <a href="{{ route('app.admin.settings.payments') }}"
+                                            class="nav-link {{ request()->routeIs('app.admin.settings.payments*') ? 'active' : '' }}">
+                                            Payment Settings
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
                     @endcan
                 </ul>
