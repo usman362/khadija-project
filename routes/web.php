@@ -28,7 +28,34 @@ Auth::routes();
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
-        return view('dashboard.index');
+        $user = auth()->user();
+
+        // Stats for admin
+        $stats = [];
+        if ($user->hasRole('admin')) {
+            $stats = [
+                'total_users' => \App\Models\User::count(),
+                'total_events' => \App\Models\Event::count(),
+                'total_bookings' => \App\Models\Booking::count(),
+                'active_plans' => \App\Models\UserSubscription::where('status', 'active')->count(),
+            ];
+        }
+
+        // Recent events (visible to all)
+        $recentEvents = \App\Models\Event::latest()->take(5)->get();
+
+        // User's own bookings
+        $myBookings = \App\Models\Booking::where(function ($q) use ($user) {
+            $q->where('client_id', $user->id)->orWhere('supplier_id', $user->id);
+        })->latest()->take(5)->get();
+
+        // User's subscription
+        $subscription = \App\Models\UserSubscription::where('user_id', $user->id)
+            ->where('status', 'active')
+            ->with('membershipPlan')
+            ->first();
+
+        return view('dashboard.index', compact('stats', 'recentEvents', 'myBookings', 'subscription'));
     })->middleware('permission:dashboard.view')->name('dashboard');
 
     Route::redirect('/home', '/dashboard')->name('home');

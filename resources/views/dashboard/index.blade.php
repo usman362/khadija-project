@@ -3,629 +3,230 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    @unless(auth()->user()?->hasRole('admin'))
-        <div class="alert alert-info d-flex align-items-center mb-3" role="alert">
-            <span class="me-2">ℹ️</span>
-            <div>
-                You are logged in as <strong>{{ auth()->user()?->name }}</strong>. Some modules (Users, Roles, Permissions) are only visible to admins.
-                To test with full access, log in as <strong>admin@example.com</strong> / <strong>password</strong>. See <code>docs/testing-dashboard.md</code> for details.
-            </div>
-        </div>
-    @endunless
-
-    <div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+    <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
         <div>
-            <h4 class="mb-3 mb-md-0">Welcome to Dashboard</h4>
-        </div>
-        <div class="d-flex align-items-center flex-wrap text-nowrap">
-            <div class="input-group flatpickr w-200px me-2 mb-2 mb-md-0" id="dashboardDate">
-                <span class="input-group-text input-group-addon bg-transparent border-primary" data-toggle><i
-                        data-lucide="calendar" class="text-primary"></i></span>
-                <input type="text" class="form-control bg-transparent border-primary" placeholder="Select date"
-                    data-input />
-            </div>
-            <button type="button" class="btn btn-outline-primary btn-icon-text me-2 mb-2 mb-md-0">
-                <i class="btn-icon-prepend" data-lucide="printer"></i>
-                Print
-            </button>
-            <button type="button" class="btn btn-primary btn-icon-text mb-2 mb-md-0">
-                <i class="btn-icon-prepend" data-lucide="download-cloud"></i>
-                Download Report
-            </button>
+            <h4 class="mb-1">Welcome back, {{ auth()->user()?->name }}!</h4>
+            <p class="text-secondary mb-0">Here's what's happening with your account.</p>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-12 col-xl-12 stretch-card">
-            <div class="row flex-grow-1">
-                <div class="col-md-4 grid-margin stretch-card">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-baseline">
-                                <h6 class="card-title mb-0">
-                                    New Customers
-                                </h6>
-                                <div class="dropdown mb-2">
-                                    <a type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true"
-                                        aria-expanded="false">
-                                        <i class="icon-lg text-secondary pb-3px" data-lucide="more-horizontal"></i>
-                                    </a>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                                data-lucide="eye" class="icon-sm me-2"></i>
-                                            <span class="">View</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                                data-lucide="edit-2" class="icon-sm me-2"></i>
-                                            <span class="">Edit</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                                data-lucide="trash" class="icon-sm me-2"></i>
-                                            <span class="">Delete</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                                data-lucide="printer" class="icon-sm me-2"></i>
-                                            <span class="">Print</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                                data-lucide="download" class="icon-sm me-2"></i>
-                                            <span class="">Download</span></a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-6 col-md-12 col-xl-5">
-                                    <h3 class="mb-2">3,897</h3>
-                                    <div class="d-flex align-items-baseline">
-                                        <p class="text-success">
-                                            <span>+3.3%</span>
-                                            <i data-lucide="arrow-up" class="icon-sm mb-1"></i>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="col-6 col-md-12 col-xl-7">
-                                    <div id="customersChart" class="mt-md-3 mt-xl-0"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 grid-margin stretch-card">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-baseline">
-                                <h6 class="card-title mb-0">
-                                    New Orders
-                                </h6>
-                                <div class="dropdown mb-2">
-                                    <a type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
-                                        aria-haspopup="true" aria-expanded="false">
-                                        <i class="icon-lg text-secondary pb-3px" data-lucide="more-horizontal"></i>
-                                    </a>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                                data-lucide="eye" class="icon-sm me-2"></i>
-                                            <span class="">View</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                                data-lucide="edit-2" class="icon-sm me-2"></i>
-                                            <span class="">Edit</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                                data-lucide="trash" class="icon-sm me-2"></i>
-                                            <span class="">Delete</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                                data-lucide="printer" class="icon-sm me-2"></i>
-                                            <span class="">Print</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                                data-lucide="download" class="icon-sm me-2"></i>
-                                            <span class="">Download</span></a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-6 col-md-12 col-xl-5">
-                                    <h3 class="mb-2">35,084</h3>
-                                    <div class="d-flex align-items-baseline">
-                                        <p class="text-danger">
-                                            <span>-2.8%</span>
-                                            <i data-lucide="arrow-down" class="icon-sm mb-1"></i>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="col-6 col-md-12 col-xl-7">
-                                    <div id="ordersChart" class="mt-md-3 mt-xl-0"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 grid-margin stretch-card">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-baseline">
-                                <h6 class="card-title mb-0">
-                                    Growth
-                                </h6>
-                                <div class="dropdown mb-2">
-                                    <a type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown"
-                                        aria-haspopup="true" aria-expanded="false">
-                                        <i class="icon-lg text-secondary pb-3px" data-lucide="more-horizontal"></i>
-                                    </a>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                                data-lucide="eye" class="icon-sm me-2"></i>
-                                            <span class="">View</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                                data-lucide="edit-2" class="icon-sm me-2"></i>
-                                            <span class="">Edit</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                                data-lucide="trash" class="icon-sm me-2"></i>
-                                            <span class="">Delete</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                                data-lucide="printer" class="icon-sm me-2"></i>
-                                            <span class="">Print</span></a>
-                                        <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                                data-lucide="download" class="icon-sm me-2"></i>
-                                            <span class="">Download</span></a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-6 col-md-12 col-xl-5">
-                                    <h3 class="mb-2">89.87%</h3>
-                                    <div class="d-flex align-items-baseline">
-                                        <p class="text-success">
-                                            <span>+2.8%</span>
-                                            <i data-lucide="arrow-up" class="icon-sm mb-1"></i>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="col-6 col-md-12 col-xl-7">
-                                    <div id="growthChart" class="mt-md-3 mt-xl-0"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- row -->
-
-    <div class="row">
-        <div class="col-12 col-xl-12 grid-margin stretch-card">
-            <div class="card overflow-hidden">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-baseline mb-4 mb-md-3">
-                        <h6 class="card-title mb-0">Revenue</h6>
-                        <div class="dropdown">
-                            <a type="button" id="dropdownMenuButton3" data-bs-toggle="dropdown" aria-haspopup="true"
-                                aria-expanded="false">
-                                <i class="icon-lg text-secondary pb-3px" data-lucide="more-horizontal"></i>
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton3">
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="eye" class="icon-sm me-2"></i>
-                                    <span class="">View</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="edit-2" class="icon-sm me-2"></i>
-                                    <span class="">Edit</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="trash" class="icon-sm me-2"></i>
-                                    <span class="">Delete</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="printer" class="icon-sm me-2"></i>
-                                    <span class="">Print</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="download" class="icon-sm me-2"></i>
-                                    <span class="">Download</span></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row align-items-start">
-                        <div class="col-md-7">
-                            <p class="text-secondary fs-13px mb-3 mb-md-0">
-                                Revenue is the income that a
-                                business has from its normal
-                                business activities, usually
-                                from the sale of goods and
-                                services to customers.
-                            </p>
-                        </div>
-                        <div class="col-md-5 d-flex justify-content-md-end">
-                            <div class="btn-group mb-3 mb-md-0" role="group" aria-label="Basic example">
-                                <button type="button" class="btn btn-outline-primary">
-                                    Today
-                                </button>
-                                <button type="button" class="btn btn-outline-primary d-none d-md-block">
-                                    Week
-                                </button>
-                                <button type="button" class="btn btn-primary">
-                                    Month
-                                </button>
-                                <button type="button" class="btn btn-outline-primary">
-                                    Year
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="revenueChart"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- row -->
-
-    <div class="row">
-        <div class="col-lg-7 col-xl-8 grid-margin stretch-card">
+    {{-- Admin Stats Cards --}}
+    @if(auth()->user()?->hasRole('admin') && !empty($stats))
+    <div class="row mb-4">
+        <div class="col-md-3 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-baseline mb-2">
-                        <h6 class="card-title mb-0">
-                            Monthly sales
-                        </h6>
-                        <div class="dropdown mb-2">
-                            <a type="button" id="dropdownMenuButton4" data-bs-toggle="dropdown" aria-haspopup="true"
-                                aria-expanded="false">
-                                <i class="icon-lg text-secondary pb-3px" data-lucide="more-horizontal"></i>
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton4">
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="eye" class="icon-sm me-2"></i>
-                                    <span class="">View</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="edit-2" class="icon-sm me-2"></i>
-                                    <span class="">Edit</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="trash" class="icon-sm me-2"></i>
-                                    <span class="">Delete</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="printer" class="icon-sm me-2"></i>
-                                    <span class="">Print</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="download" class="icon-sm me-2"></i>
-                                    <span class="">Download</span></a>
-                            </div>
+                    <div class="d-flex align-items-center">
+                        <div class="w-40px h-40px rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center me-3">
+                            <i data-lucide="users" class="text-primary" style="width:20px;height:20px"></i>
+                        </div>
+                        <div>
+                            <p class="text-secondary mb-1">Total Users</p>
+                            <h4 class="mb-0">{{ number_format($stats['total_users']) }}</h4>
                         </div>
                     </div>
-                    <p class="text-secondary">
-                        Sales are activities related to selling
-                        or the number of goods or services sold
-                        in a given time period.
-                    </p>
-                    <div id="monthlySalesChart"></div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-5 col-xl-4 grid-margin stretch-card">
+        <div class="col-md-3 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-baseline">
-                        <h6 class="card-title mb-0">
-                            Cloud storage
-                        </h6>
-                        <div class="dropdown mb-2">
-                            <a type="button" id="dropdownMenuButton5" data-bs-toggle="dropdown" aria-haspopup="true"
-                                aria-expanded="false">
-                                <i class="icon-lg text-secondary pb-3px" data-lucide="more-horizontal"></i>
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton5">
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="eye" class="icon-sm me-2"></i>
-                                    <span class="">View</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="edit-2" class="icon-sm me-2"></i>
-                                    <span class="">Edit</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="trash" class="icon-sm me-2"></i>
-                                    <span class="">Delete</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="printer" class="icon-sm me-2"></i>
-                                    <span class="">Print</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="download" class="icon-sm me-2"></i>
-                                    <span class="">Download</span></a>
-                            </div>
+                    <div class="d-flex align-items-center">
+                        <div class="w-40px h-40px rounded-circle bg-info bg-opacity-10 d-flex align-items-center justify-content-center me-3">
+                            <i data-lucide="calendar-days" class="text-info" style="width:20px;height:20px"></i>
+                        </div>
+                        <div>
+                            <p class="text-secondary mb-1">Total Events</p>
+                            <h4 class="mb-0">{{ number_format($stats['total_events']) }}</h4>
                         </div>
                     </div>
-                    <div id="storageChart"></div>
-                    <div class="row mb-3">
-                        <div class="col-6 d-flex justify-content-end">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="w-40px h-40px rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center me-3">
+                            <i data-lucide="book-check" class="text-success" style="width:20px;height:20px"></i>
+                        </div>
+                        <div>
+                            <p class="text-secondary mb-1">Total Bookings</p>
+                            <h4 class="mb-0">{{ number_format($stats['total_bookings']) }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="w-40px h-40px rounded-circle bg-warning bg-opacity-10 d-flex align-items-center justify-content-center me-3">
+                            <i data-lucide="crown" class="text-warning" style="width:20px;height:20px"></i>
+                        </div>
+                        <div>
+                            <p class="text-secondary mb-1">Active Subscriptions</p>
+                            <h4 class="mb-0">{{ number_format($stats['active_plans']) }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <div class="row">
+        {{-- Current Subscription --}}
+        <div class="col-lg-4 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">My Subscription</h6>
+                    @if($subscription)
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="w-45px h-45px rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center me-3">
+                                <i data-lucide="crown" class="text-primary" style="width:22px;height:22px"></i>
+                            </div>
                             <div>
-                                <label
-                                    class="d-flex align-items-center justify-content-end fs-10px text-uppercase fw-bolder">Total
-                                    storage
-                                    <span class="p-1 ms-1 rounded-circle bg-secondary"></span></label>
-                                <h5 class="fw-bolder mb-0 text-end">
-                                    8TB
-                                </h5>
+                                <h5 class="mb-0">{{ $subscription->membershipPlan->name ?? 'Plan' }}</h5>
+                                <span class="badge bg-success">Active</span>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <div>
-                                <label class="d-flex align-items-center fs-10px text-uppercase fw-bolder"><span
-                                        class="p-1 me-1 rounded-circle bg-primary"></span>
-                                    Used storage</label>
-                                <h5 class="fw-bolder mb-0">
-                                    ~5TB
-                                </h5>
-                            </div>
+                        <p class="text-secondary mb-1">Started: {{ $subscription->started_at?->format('M d, Y') ?? 'N/A' }}</p>
+                        @if($subscription->expires_at)
+                            <p class="text-secondary mb-0">Expires: {{ $subscription->expires_at->format('M d, Y') }}</p>
+                        @else
+                            <p class="text-secondary mb-0">No expiry date</p>
+                        @endif
+                    @else
+                        <div class="text-center py-3">
+                            <i data-lucide="crown" class="text-secondary mb-2" style="width:40px;height:40px"></i>
+                            <p class="text-secondary">No active subscription</p>
+                            @can('membership_plans.view_any')
+                                <a href="{{ route('app.membership-plans.index') }}" class="btn btn-sm btn-primary">Browse Plans</a>
+                            @endcan
                         </div>
-                    </div>
-                    <div class="d-grid">
-                        <button class="btn btn-primary">
-                            Upgrade storage
-                        </button>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        {{-- Quick Links --}}
+        <div class="col-lg-8 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Quick Actions</h6>
+                    <div class="row g-3">
+                        @can('events.view_any')
+                        <div class="col-md-4">
+                            <a href="{{ route('app.events.index') }}" class="card border text-decoration-none h-100">
+                                <div class="card-body text-center py-4">
+                                    <i data-lucide="calendar-days" class="text-primary mb-2" style="width:28px;height:28px"></i>
+                                    <p class="mb-0 fw-bold">View Events</p>
+                                </div>
+                            </a>
+                        </div>
+                        @endcan
+                        @can('bookings.view_any')
+                        <div class="col-md-4">
+                            <a href="{{ route('app.bookings.index') }}" class="card border text-decoration-none h-100">
+                                <div class="card-body text-center py-4">
+                                    <i data-lucide="book-check" class="text-success mb-2" style="width:28px;height:28px"></i>
+                                    <p class="mb-0 fw-bold">My Bookings</p>
+                                </div>
+                            </a>
+                        </div>
+                        @endcan
+                        @can('messages.view_any')
+                        <div class="col-md-4">
+                            <a href="{{ route('app.chat.index') }}" class="card border text-decoration-none h-100">
+                                <div class="card-body text-center py-4">
+                                    <i data-lucide="message-circle" class="text-info mb-2" style="width:28px;height:28px"></i>
+                                    <p class="mb-0 fw-bold">Open Chat</p>
+                                </div>
+                            </a>
+                        </div>
+                        @endcan
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- row -->
 
     <div class="row">
-        <div class="col-lg-5 col-xl-4 grid-margin grid-margin-lg-0 stretch-card">
+        {{-- Recent Bookings --}}
+        <div class="col-lg-7 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-baseline mb-2">
-                        <h6 class="card-title mb-0">Inbox</h6>
-                        <div class="dropdown mb-2">
-                            <a type="button" id="dropdownMenuButton6" data-bs-toggle="dropdown" aria-haspopup="true"
-                                aria-expanded="false">
-                                <i class="icon-lg text-secondary pb-3px" data-lucide="more-horizontal"></i>
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton6">
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="eye" class="icon-sm me-2"></i>
-                                    <span class="">View</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="edit-2" class="icon-sm me-2"></i>
-                                    <span class="">Edit</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="trash" class="icon-sm me-2"></i>
-                                    <span class="">Delete</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="printer" class="icon-sm me-2"></i>
-                                    <span class="">Print</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="download" class="icon-sm me-2"></i>
-                                    <span class="">Download</span></a>
-                            </div>
+                    <h6 class="card-title">Recent Bookings</h6>
+                    @if($myBookings->count())
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="pt-0">Event</th>
+                                        <th class="pt-0">Status</th>
+                                        <th class="pt-0">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($myBookings as $booking)
+                                    <tr>
+                                        <td>{{ $booking->event?->title ?? 'N/A' }}</td>
+                                        <td>
+                                            @php
+                                                $badgeClass = match($booking->status) {
+                                                    'confirmed' => 'bg-success',
+                                                    'pending' => 'bg-warning',
+                                                    'cancelled' => 'bg-danger',
+                                                    default => 'bg-secondary',
+                                                };
+                                            @endphp
+                                            <span class="badge {{ $badgeClass }}">{{ ucfirst($booking->status) }}</span>
+                                        </td>
+                                        <td>{{ $booking->created_at?->format('M d, Y') }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
-                    </div>
-                    <div class="d-flex flex-column">
-                        <a href="javascript:;" class="d-flex align-items-center border-bottom pb-3">
-                            <div class="me-3">
-                                <img src="https://nobleui.com/html/template/assets/images/faces/face2.jpg"
-                                    class="rounded-circle w-35px" alt="user" />
-                            </div>
-                            <div class="w-100">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="text-body mb-2">
-                                        Leonardo Payne
-                                    </h6>
-                                    <p class="text-secondary fs-12px">
-                                        12.30 PM
-                                    </p>
-                                </div>
-                                <p class="text-secondary fs-13px">
-                                    Hey! there I'm available...
-                                </p>
-                            </div>
-                        </a>
-                        <a href="javascript:;" class="d-flex align-items-center border-bottom py-3">
-                            <div class="me-3">
-                                <img src="https://nobleui.com/html/template/assets/images/faces/face3.jpg"
-                                    class="rounded-circle w-35px" alt="user" />
-                            </div>
-                            <div class="w-100">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="text-body mb-2">
-                                        Carl Henson
-                                    </h6>
-                                    <p class="text-secondary fs-12px">
-                                        02.14 AM
-                                    </p>
-                                </div>
-                                <p class="text-secondary fs-13px">
-                                    I've finished it! See you
-                                    so..
-                                </p>
-                            </div>
-                        </a>
-                        <a href="javascript:;" class="d-flex align-items-center border-bottom py-3">
-                            <div class="me-3">
-                                <img src="https://nobleui.com/html/template/assets/images/faces/face4.jpg"
-                                    class="rounded-circle w-35px" alt="user" />
-                            </div>
-                            <div class="w-100">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="text-body mb-2">
-                                        Jensen Combs
-                                    </h6>
-                                    <p class="text-secondary fs-12px">
-                                        08.22 PM
-                                    </p>
-                                </div>
-                                <p class="text-secondary fs-13px">
-                                    This template is awesome!
-                                </p>
-                            </div>
-                        </a>
-                        <a href="javascript:;" class="d-flex align-items-center border-bottom py-3">
-                            <div class="me-3">
-                                <img src="https://nobleui.com/html/template/assets/images/faces/face5.jpg"
-                                    class="rounded-circle w-35px" alt="user" />
-                            </div>
-                            <div class="w-100">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="text-body mb-2">
-                                        Amiah Burton
-                                    </h6>
-                                    <p class="text-secondary fs-12px">
-                                        05.49 AM
-                                    </p>
-                                </div>
-                                <p class="text-secondary fs-13px">
-                                    Nice to meet you
-                                </p>
-                            </div>
-                        </a>
-                        <a href="javascript:;" class="d-flex align-items-center border-bottom py-3">
-                            <div class="me-3">
-                                <img src="https://nobleui.com/html/template/assets/images/faces/face6.jpg"
-                                    class="rounded-circle w-35px" alt="user" />
-                            </div>
-                            <div class="w-100">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="text-body mb-2">
-                                        Yaretzi Mayo
-                                    </h6>
-                                    <p class="text-secondary fs-12px">
-                                        01.19 AM
-                                    </p>
-                                </div>
-                                <p class="text-secondary fs-13px">
-                                    Hey! there I'm available...
-                                </p>
-                            </div>
-                        </a>
-                    </div>
+                    @else
+                        <div class="text-center py-4">
+                            <i data-lucide="book-check" class="text-secondary mb-2" style="width:36px;height:36px"></i>
+                            <p class="text-secondary mb-0">No bookings yet.</p>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
-        <div class="col-lg-7 col-xl-8 stretch-card">
+
+        {{-- Recent Events --}}
+        <div class="col-lg-5 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-baseline mb-2">
-                        <h6 class="card-title mb-0">
-                            Projects
-                        </h6>
-                        <div class="dropdown mb-2">
-                            <a type="button" id="dropdownMenuButton7" data-bs-toggle="dropdown" aria-haspopup="true"
-                                aria-expanded="false">
-                                <i class="icon-lg text-secondary pb-3px" data-lucide="more-horizontal"></i>
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton7">
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="eye" class="icon-sm me-2"></i>
-                                    <span class="">View</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="edit-2" class="icon-sm me-2"></i>
-                                    <span class="">Edit</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="trash" class="icon-sm me-2"></i>
-                                    <span class="">Delete</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="printer" class="icon-sm me-2"></i>
-                                    <span class="">Print</span></a>
-                                <a class="dropdown-item d-flex align-items-center" href="javascript:;"><i
-                                        data-lucide="download" class="icon-sm me-2"></i>
-                                    <span class="">Download</span></a>
+                    <h6 class="card-title">Latest Events</h6>
+                    @if($recentEvents->count())
+                        <div class="d-flex flex-column">
+                            @foreach($recentEvents as $event)
+                            <div class="d-flex align-items-center {{ !$loop->last ? 'border-bottom pb-3 mb-3' : '' }}">
+                                <div class="w-40px h-40px rounded bg-primary bg-opacity-10 d-flex align-items-center justify-content-center me-3 flex-shrink-0">
+                                    <i data-lucide="calendar" class="text-primary" style="width:18px;height:18px"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <p class="fw-bold mb-0">{{ $event->title }}</p>
+                                    <p class="text-secondary fs-12px mb-0">{{ $event->created_at?->diffForHumans() }}</p>
+                                </div>
                             </div>
+                            @endforeach
                         </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th class="pt-0">#</th>
-                                    <th class="pt-0">
-                                        Project Name
-                                    </th>
-                                    <th class="pt-0">
-                                        Start Date
-                                    </th>
-                                    <th class="pt-0">
-                                        Due Date
-                                    </th>
-                                    <th class="pt-0">Status</th>
-                                    <th class="pt-0">Assign</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>NobleUI jQuery</td>
-                                    <td>01/01/2026</td>
-                                    <td>26/04/2026</td>
-                                    <td>
-                                        <span class="badge bg-danger">Released</span>
-                                    </td>
-                                    <td>Leonardo Payne</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>NobleUI Angular</td>
-                                    <td>01/01/2026</td>
-                                    <td>26/04/2026</td>
-                                    <td>
-                                        <span class="badge bg-success">Review</span>
-                                    </td>
-                                    <td>Carl Henson</td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>NobleUI ReactJs</td>
-                                    <td>01/05/2026</td>
-                                    <td>10/09/2026</td>
-                                    <td>
-                                        <span class="badge bg-info">Pending</span>
-                                    </td>
-                                    <td>Jensen Combs</td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>NobleUI VueJs</td>
-                                    <td>01/01/2026</td>
-                                    <td>31/11/2026</td>
-                                    <td>
-                                        <span class="badge bg-warning">Work in
-                                            Progress</span>
-                                    </td>
-                                    <td>Amiah Burton</td>
-                                </tr>
-                                <tr>
-                                    <td>5</td>
-                                    <td>NobleUI Laravel</td>
-                                    <td>01/01/2026</td>
-                                    <td>31/12/2026</td>
-                                    <td>
-                                        <span class="badge bg-danger">Coming soon</span>
-                                    </td>
-                                    <td>Yaretzi Mayo</td>
-                                </tr>
-                                <tr>
-                                    <td>6</td>
-                                    <td>NobleUI NodeJs</td>
-                                    <td>01/01/2026</td>
-                                    <td>31/12/2026</td>
-                                    <td>
-                                        <span class="badge bg-primary">Coming soon</span>
-                                    </td>
-                                    <td>Carl Henson</td>
-                                </tr>
-                                <tr>
-                                    <td class="border-bottom">
-                                        3
-                                    </td>
-                                    <td class="border-bottom">
-                                        NobleUI EmberJs
-                                    </td>
-                                    <td class="border-bottom">
-                                        01/05/2026
-                                    </td>
-                                    <td class="border-bottom">
-                                        10/11/2026
-                                    </td>
-                                    <td class="border-bottom">
-                                        <span class="badge bg-info">Pending</span>
-                                    </td>
-                                    <td class="border-bottom">
-                                        Jensen Combs
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    @else
+                        <div class="text-center py-4">
+                            <i data-lucide="calendar-days" class="text-secondary mb-2" style="width:36px;height:36px"></i>
+                            <p class="text-secondary mb-0">No events yet.</p>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
-    <!-- row -->
 @endsection
