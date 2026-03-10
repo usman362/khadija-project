@@ -31,6 +31,10 @@
         .sidebar .nav-link svg.ic-violet  { color: #a78bfa !important; stroke: #a78bfa !important; }
         .sidebar .nav-link svg.ic-red     { color: #f87171 !important; stroke: #f87171 !important; }
         .sidebar .nav-link svg.ic-slate   { color: #94a3b8 !important; stroke: #94a3b8 !important; }
+        /* Hide NobleUI template promo buttons */
+        .buy-now-wrapper, .buy-now-btn, .demo-customizer, .template-customizer,
+        a[href*="nobleui.com"]:not(link), .btn-purchase,
+        [class*="buy-now"], [class*="customizer-toggle"] { display: none !important; }
     </style>
 </head>
 
