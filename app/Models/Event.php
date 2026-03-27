@@ -23,6 +23,7 @@ class Event extends Model
         'client_id',
         'supplier_id',
         'source',
+        'category_id',
     ];
 
     protected function casts(): array
@@ -33,6 +34,11 @@ class Event extends Model
             'published_at' => 'datetime',
             'is_published' => 'boolean',
         ];
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function creator(): BelongsTo

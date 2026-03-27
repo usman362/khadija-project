@@ -66,18 +66,21 @@
         }
 
         .navbar-brand {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 1.75rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .navbar-brand span {
+            color: var(--primary);
         }
 
         .navbar-links {
             display: flex;
             align-items: center;
-            gap: 32px;
+            gap: 28px;
             list-style: none;
         }
 
@@ -127,6 +130,36 @@
         .btn-primary:hover {
             opacity: 0.9;
             transform: translateY(-1px);
+        }
+
+        .btn-blue {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            font-weight: 700;
+        }
+
+        .btn-blue:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .btn-red {
+            background: #dc2626;
+            color: #fff;
+            border: none;
+            font-weight: 700;
+        }
+
+        .btn-red:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 8px 18px;
+            font-size: 0.82rem;
+            border-radius: 8px;
         }
 
         .btn-lg {
@@ -938,6 +971,150 @@
             color: var(--text-muted);
         }
 
+        /* ─── ABOUT US ───────────────────────── */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .about-content h3 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .about-content h2 {
+            font-size: clamp(1.75rem, 3vw, 2.25rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .about-content p {
+            color: var(--text-light);
+            line-height: 1.8;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+        }
+
+        .about-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .about-stat {
+            text-align: center;
+            padding: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+        }
+
+        .about-stat h4 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .about-stat p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .about-image {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            height: 420px;
+        }
+
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .about-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            border: 2px solid rgba(59,130,246,0.2);
+        }
+
+        /* ─── FAQ ────────────────────────────── */
+        .faq-grid {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            background: var(--bg-card);
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 20px 24px;
+            background: transparent;
+            color: var(--text-white);
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .faq-question:hover {
+            color: var(--primary);
+        }
+
+        .faq-question .faq-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active .faq-question .faq-icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .faq-answer-inner {
+            padding: 0 24px 20px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+        }
+
         /* ─── RESPONSIVE ──────────────────────── */
         @media (max-width: 1024px) {
             .cta-banner { grid-template-columns: 1fr; }
@@ -947,6 +1124,7 @@
 
         @media (max-width: 768px) {
             .navbar-links { display: none; }
+            .navbar-actions .btn-blue, .navbar-actions .btn-red { display: none; }
             .mobile-menu-btn { display: block; }
             .trust-badges { grid-template-columns: repeat(2, 1fr); }
             .steps-grid { grid-template-columns: 1fr; }
@@ -959,6 +1137,9 @@
             .hero h1 { font-size: 2.2rem; }
             .cta-banner { padding: 40px 24px; }
             .hero-buttons { flex-direction: column; align-items: center; }
+            .about-grid { grid-template-columns: 1fr; gap: 32px; }
+            .about-image { height: 280px; }
+            .about-stats { grid-template-columns: repeat(3, 1fr); gap: 12px; }
         }
     </style>
 </head>
@@ -967,57 +1148,51 @@
 <!-- ─── NAVBAR ───────────────────────────────── -->
 <nav class="navbar">
     <div class="container">
-        <a href="/" class="navbar-brand">{{ config('app.name', 'Khadija') }}</a>
+        <a href="/" class="navbar-brand">GIGS<span>.</span></a>
 
         <ul class="navbar-links">
+            <li><a href="#about">About Us</a></li>
             <li><a href="#features">Features</a></li>
-            <li><a href="#categories">Categories</a></li>
             <li><a href="#how-it-works">How It Works</a></li>
-            <li><a href="#ai-agreement">AI Agreements</a></li>
             <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#faq">FAQ</a></li>
         </ul>
 
         <div class="navbar-actions">
             @auth
-                <a href="{{ url('/dashboard') }}" class="btn btn-primary">Dashboard</a>
+                <a href="{{ url('/dashboard') }}" class="btn btn-primary btn-sm">Dashboard</a>
             @else
+                <a href="{{ route('register') }}" class="btn btn-blue btn-sm">Join as Professional</a>
+                <a href="{{ route('register') }}" class="btn btn-red btn-sm">Hire a Professional</a>
                 @if (Route::has('login'))
-                    <a href="{{ route('login') }}" class="btn btn-outline">Log in</a>
-                @endif
-                @if (Route::has('register'))
-                    <a href="{{ route('register') }}" class="btn btn-primary">Sign Up Free</a>
+                    <a href="{{ route('login') }}" class="btn btn-outline btn-sm">Log in</a>
                 @endif
             @endauth
         </div>
 
         <button class="mobile-menu-btn" onclick="this.nextElementSibling.classList.toggle('show')" aria-label="Menu">&#9776;</button>
-        <div class="mobile-nav" style="display:none;"><!-- expandable mobile nav could go here --></div>
+        <div class="mobile-nav" style="display:none;"></div>
     </div>
 </nav>
 
 <!-- ─── HERO ─────────────────────────────────── -->
 <section class="hero">
     <div class="hero-bg">
-        <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1600&q=80" alt="Concert crowd" loading="eager">
+        <img src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1600&q=80" alt="Outdoor event festival with colorful lights and staging" loading="eager">
     </div>
     <div class="container">
-        <h1>Host Unforgettable<br>Events With <span class="gradient-text">Confidence</span></h1>
+        <h1>Find The Right<br><span class="gradient-text">Professional</span> For<br>Every Event</h1>
         <p class="hero-subtitle">
-            {{ config('app.name', 'Khadija') }} is your all-in-one platform to connect with top-tier
-            professionals, manage logistics, and create memorable experiences seamlessly.
+            GIGS connects event organizers with verified professionals. Book photographers, DJs, caterers,
+            decorators, and more &mdash; all in one platform.
         </p>
         <div class="hero-buttons">
             @auth
                 <a href="{{ url('/dashboard') }}" class="btn btn-primary btn-lg">Go to Dashboard</a>
             @else
-                <a href="{{ route('register') }}" class="btn btn-primary btn-lg">Get Started Free</a>
+                <a href="{{ route('register') }}" class="btn btn-blue btn-lg">Join as Professional</a>
+                <a href="{{ route('register') }}" class="btn btn-red btn-lg">Hire Now</a>
             @endauth
-            <a href="#how-it-works" class="btn btn-outline btn-lg">How It Works &rarr;</a>
-        </div>
-
-        <div class="hero-search">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" placeholder="Search for professionals, venues, services...">
         </div>
 
         <div class="trust-badges">
@@ -1053,8 +1228,47 @@
     </div>
 </section>
 
+<!-- ─── ABOUT US ─────────────────────────────── -->
+<section class="section" id="about">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-content">
+                <h3>About Us</h3>
+                <h2>We Connect <span class="gradient-text">Talent</span> With Opportunity</h2>
+                <p>
+                    GIGS is a next-generation marketplace designed to bridge the gap between skilled event
+                    professionals and clients who need them. Whether you're planning a wedding, corporate event,
+                    or private celebration, we make it effortless to find, book, and collaborate with top-tier talent.
+                </p>
+                <p>
+                    Our platform handles everything from discovery to secure payments, real-time messaging,
+                    and professional service agreements &mdash; so you can focus on what matters: creating
+                    unforgettable experiences.
+                </p>
+                <div class="about-stats">
+                    <div class="about-stat">
+                        <h4>500+</h4>
+                        <p>Professionals</p>
+                    </div>
+                    <div class="about-stat">
+                        <h4>1,200+</h4>
+                        <p>Events Booked</p>
+                    </div>
+                    <div class="about-stat">
+                        <h4>98%</h4>
+                        <p>Satisfaction</p>
+                    </div>
+                </div>
+            </div>
+            <div class="about-image">
+                <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80" alt="Event planning team" loading="lazy">
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- ─── FEATURES ─────────────────────────────── -->
-<section class="section" id="features">
+<section class="section section-alt" id="features">
     <div class="container">
         <div class="section-header">
             <h2>Make it Real with <span class="gradient-text">{{ config('app.name', 'Khadija') }}</span></h2>
@@ -1088,7 +1302,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 </div>
                 <h3>Smart Booking</h3>
-                <p>Manage event timelines, bookings, and agreements all in one place with our streamlined dashboard.</p>
+                <p>Manage event timelines and bookings all in one place with our streamlined dashboard.</p>
             </div>
         </div>
     </div>
@@ -1199,116 +1413,6 @@
             </div>
             <div class="cta-image">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ─── AI AGREEMENT ──────────────────────────── -->
-<section class="section" id="ai-agreement">
-    <div class="container">
-        <div class="section-header">
-            <h2>AI-Powered <span class="gradient-text">Smart Agreements</span></h2>
-            <p>Our AI reads your conversation, extracts key terms, and generates a professional service agreement — before the final booking confirmation.</p>
-        </div>
-
-        <div style="max-width: 900px; margin: 0 auto;">
-            {{-- Process Flow --}}
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 48px; text-align: center;">
-                <div>
-                    <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(139,92,246,0.2)); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 2px solid rgba(59,130,246,0.3);">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    </div>
-                    <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Chat</div>
-                    <div style="font-size: 0.78rem; color: var(--text-muted);">Discuss terms with vendor</div>
-                </div>
-                <div>
-                    <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(236,72,153,0.2)); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 2px solid rgba(139,92,246,0.3);">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M12 2a4 4 0 0 0-4 4v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-2V6a4 4 0 0 0-4-4z"/></svg>
-                    </div>
-                    <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">AI Generates</div>
-                    <div style="font-size: 0.78rem; color: var(--text-muted);">Smart agreement created</div>
-                </div>
-                <div>
-                    <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(249,115,22,0.2)); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 2px solid rgba(245,158,11,0.3);">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    </div>
-                    <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Review</div>
-                    <div style="font-size: 0.78rem; color: var(--text-muted);">Both parties review terms</div>
-                </div>
-                <div>
-                    <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(16,185,129,0.2)); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; border: 2px solid rgba(34,197,94,0.3);">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                    </div>
-                    <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px;">Accept</div>
-                    <div style="font-size: 0.78rem; color: var(--text-muted);">Booking auto-confirmed</div>
-                </div>
-            </div>
-
-            {{-- Mockup Agreement Preview --}}
-            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 32px; position: relative;">
-                <div style="position: absolute; top: -14px; left: 24px; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); color: #fff; font-size: 0.7rem; font-weight: 700; padding: 4px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;">AI Generated</div>
-
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
-                    <div>
-                        <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0;">Service Agreement</h3>
-                        <p style="color: var(--text-muted); font-size: 0.85rem; margin: 4px 0 0;">AGR-20260310-4821 &middot; Generated from conversation</p>
-                    </div>
-                    <span style="background: rgba(245,158,11,0.15); color: #f59e0b; padding: 4px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600;">Pending Review</span>
-                </div>
-
-                {{-- Extracted Terms --}}
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 24px;">
-                    <div style="padding: 12px; background: rgba(59,130,246,0.06); border-radius: 8px; border: 1px solid var(--border-color);">
-                        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600;">Event</div>
-                        <div style="font-size: 0.85rem; font-weight: 500; margin-top: 2px;">Annual Gala 2026</div>
-                    </div>
-                    <div style="padding: 12px; background: rgba(59,130,246,0.06); border-radius: 8px; border: 1px solid var(--border-color);">
-                        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600;">Price</div>
-                        <div style="font-size: 0.85rem; font-weight: 500; margin-top: 2px;">$2,500</div>
-                    </div>
-                    <div style="padding: 12px; background: rgba(59,130,246,0.06); border-radius: 8px; border: 1px solid var(--border-color);">
-                        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600;">Date</div>
-                        <div style="font-size: 0.85rem; font-weight: 500; margin-top: 2px;">Apr 15, 2026</div>
-                    </div>
-                    <div style="padding: 12px; background: rgba(59,130,246,0.06); border-radius: 8px; border: 1px solid var(--border-color);">
-                        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600;">Deliverables</div>
-                        <div style="font-size: 0.85rem; font-weight: 500; margin-top: 2px;">Full photography</div>
-                    </div>
-                </div>
-
-                {{-- Agreement Preview Snippet --}}
-                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; margin-bottom: 20px; font-size: 0.85rem; color: var(--text-light); line-height: 1.7;">
-                    <p style="margin: 0 0 8px;"><strong>1. PARTIES</strong> — This Agreement is entered between <em>Sarah K. (Client)</em> and <em>Ahmed J. (Vendor)</em>...</p>
-                    <p style="margin: 0 0 8px;"><strong>2. SCOPE</strong> — Full event photography coverage including pre-event portraits, ceremony, and reception...</p>
-                    <p style="margin: 0; color: var(--text-muted);">...and 6 more sections auto-generated from your conversation</p>
-                </div>
-
-                {{-- Acceptance Status --}}
-                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 200px; padding: 14px; border-radius: 10px; border: 1.5px solid #22c55e; background: rgba(34,197,94,0.06); display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 28px; height: 28px; border-radius: 50%; background: #22c55e; display: flex; align-items: center; justify-content: center;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.85rem; font-weight: 600;">Client Accepted</div>
-                            <div style="font-size: 0.72rem; color: var(--text-muted);">Mar 10, 2026</div>
-                        </div>
-                    </div>
-                    <div style="flex: 1; min-width: 200px; padding: 14px; border-radius: 10px; border: 1.5px solid var(--border-color); display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--border-color); display: flex; align-items: center; justify-content: center;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.85rem; font-weight: 600;">Vendor Pending</div>
-                            <div style="font-size: 0.72rem; color: var(--text-muted);">Awaiting acceptance</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div style="text-align: center; margin-top: 32px;">
-                <a href="{{ Route::has('register') ? route('register') : '#' }}" class="btn btn-primary btn-lg">Try AI Agreements Free</a>
             </div>
         </div>
     </div>
@@ -1484,8 +1588,44 @@
     </div>
 </section>
 
+<!-- ─── FAQ ───────────────────────────────────── -->
+<section class="section" id="faq">
+    <div class="container">
+        <div class="section-header">
+            <h2>Frequently Asked <span class="gradient-text">Questions</span></h2>
+            <p>Everything you need to know about using GIGS.</p>
+        </div>
+        <div class="faq-grid">
+            @forelse($faqs as $faq)
+                <div class="faq-item {{ $loop->first ? 'active' : '' }}">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        <span>{{ $faq->question }}</span>
+                        <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">{!! $faq->answer !!}</div>
+                    </div>
+                </div>
+            @empty
+                {{-- Fallback if no FAQs in database yet --}}
+                <div class="faq-item active">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        <span>How does GIGS work?</span>
+                        <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            GIGS connects event organizers (clients) with verified service professionals (suppliers). Simply create an account, browse available professionals by category, send booking requests, discuss details through our built-in chat, and confirm your booking.
+                        </div>
+                    </div>
+                </div>
+            @endforelse
+        </div>
+    </div>
+</section>
+
 <!-- ─── NEWSLETTER ─────────────────────────────── -->
-<section class="section newsletter">
+<section class="section section-alt newsletter">
     <div class="container">
         <h2>Get Eventful Updates!</h2>
         <p>Subscribe to our newsletter for the latest industry news, planning tips, and exclusive offers.</p>
@@ -1501,10 +1641,10 @@
     <div class="container">
         <div class="footer-grid">
             <div>
-                <div class="footer-brand">{{ config('app.name', 'Khadija') }}</div>
+                <div class="footer-brand">GIGS<span style="-webkit-text-fill-color: var(--primary);">.</span></div>
                 <p class="footer-desc">
                     Connecting Professionals & Clients for Perfect Events.
-                    Create unforgettable experiences with our curated network of professionals.
+                    Create unforgettable experiences with our curated network of verified experts.
                 </p>
                 <div class="footer-socials">
                     <a href="#" class="footer-social">
@@ -1521,33 +1661,40 @@
             <div class="footer-col">
                 <h4>Explore</h4>
                 <ul>
+                    <li><a href="#about">About Us</a></li>
                     <li><a href="#features">Features</a></li>
-                    <li><a href="#categories">Categories</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
                     <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="#faq">FAQ</a></li>
                 </ul>
             </div>
             <div class="footer-col">
-                <h4>Resources</h4>
+                <h4>Get Started</h4>
                 <ul>
-                    <li><a href="#how-it-works">How It Works</a></li>
-                    <li><a href="#">Blog</a></li>
-                    <li><a href="#">About Us</a></li>
+                    @guest
+                        <li><a href="{{ route('register') }}">Join as Professional</a></li>
+                        <li><a href="{{ route('register') }}">Hire Talent</a></li>
+                        <li><a href="{{ route('login') }}">Log In</a></li>
+                    @else
+                        <li><a href="{{ url('/dashboard') }}">Dashboard</a></li>
+                    @endguest
                 </ul>
             </div>
             <div class="footer-col">
                 <h4>Policies</h4>
                 <ul>
-                    <li><a href="#">Cancellation & Refund</a></li>
-                    <li><a href="#">Payment Policy</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Last Agreement Rules</a></li>
+                    <li><a href="{{ route('privacy-policy') }}">Privacy Policy</a></li>
+                    <li><a href="{{ route('payment-policy') }}">Payment Policy</a></li>
+                    <li><a href="{{ route('cancellation-policy') }}">Cancellation & Refund</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <span>&copy; {{ date('Y') }} {{ config('app.name', 'Khadija') }}. All rights reserved.</span>
+            <span>&copy; {{ date('Y') }} GIGS. All rights reserved.</span>
             <span>
-                <a href="#" style="color: var(--text-muted);">Cookie Policy</a>
+                <a href="{{ route('privacy-policy') }}" style="color: var(--text-muted);">Privacy</a> &middot;
+                <a href="{{ route('payment-policy') }}" style="color: var(--text-muted);">Payment</a> &middot;
+                <a href="{{ route('cancellation-policy') }}" style="color: var(--text-muted);">Cancellation</a>
             </span>
         </div>
     </div>
@@ -1572,6 +1719,14 @@
             this.classList.add('active');
         });
     });
+
+    // FAQ accordion
+    function toggleFaq(btn) {
+        const item = btn.parentElement;
+        const isActive = item.classList.contains('active');
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+        if (!isActive) item.classList.add('active');
+    }
 </script>
 
 </body>

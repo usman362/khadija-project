@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Faq;
 use App\Models\MembershipPlan;
 use Illuminate\View\View;
 
@@ -15,6 +16,8 @@ class LandingPageController extends Controller
             ->with('features')
             ->get();
 
-        return view('landing', compact('plans'));
+        $faqs = Faq::active()->ordered()->get();
+
+        return view('landing', compact('plans', 'faqs'));
     }
 }

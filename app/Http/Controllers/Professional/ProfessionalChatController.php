@@ -1,0 +1,60 @@
+<?php
+
+namespace App\Http\Controllers\Professional;
+
+use App\Http\Controllers\Controller;
+use App\Models\Booking;
+use App\Models\Conversation;
+use App\Models\Event;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+
+class ProfessionalChatController extends Controller
+{
+    public function index(Request $request): View
+    {
+        return view('professional.chat.index', $this->viewData($request));
+    }
+
+    public function show(Request $request, Conversation $conversation): View
+    {
+        $this->authorize('view', $conversation);
+
+        return view('professional.chat.index', array_merge(
+            $this->viewData($request),
+            ['initialConversationId' => $conversation->id],
+        ));
+    }
+
+    private function viewData(Request $request): array
+    {
+        $user = $request->user();
+
+        $users = User::where('id', '!=', $user->id)
+            ->select('id', 'name', 'email')
+            ->orderBy('name')
+            ->get();
+
+        $bookings = Booking::with('event:id,title')
+            ->where(fn ($q) => $q->where('client_id', $user->id)->orWhere('supplier_id', $user->id))
+            ->whereIn('status', ['requested', 'confirmed'])
+            ->latest()
+            ->get(['id', 'event_id', 'client_id', 'supplier_id', 'status']);
+
+        $events = Event::where(fn ($q) => $q->where('client_id', $user->id)
+                ->orWhere('supplier_id', $user->id)
+                ->orWhere('created_by', $user->id))
+            ->where('is_published', true)
+            ->latest()
+            ->get(['id', 'title']);
+
+        return [
+            'currentUser' => $user,
+            'users' => $users,
+            'bookings' => $bookings,
+            'events' => $events,
+            'initialConversationId' => null,
+        ];
+    }
+}

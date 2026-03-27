@@ -1,12 +1,26 @@
 <?php
 
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\Client\ClientBookingController;
+use App\Http\Controllers\Client\ClientChatController;
+use App\Http\Controllers\Client\ClientDashboardController;
+use App\Http\Controllers\Client\ClientEventController;
+use App\Http\Controllers\Professional\ProfessionalChatController;
+use App\Http\Controllers\Professional\ProfessionalDashboardController;
+use App\Http\Controllers\Professional\ProfessionalEarningsController;
+use App\Http\Controllers\Professional\ProfessionalGigController;
+use App\Http\Controllers\Professional\ProfessionalProposalController;
+use App\Http\Controllers\Professional\ProfessionalReviewController;
+use App\Http\Controllers\Professional\ProfessionalTransactionController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\Dashboard\AdminMembershipPlanController;
 use App\Http\Controllers\Dashboard\AgreementLogPageController;
 use App\Http\Controllers\Dashboard\AgreementPageController;
 use App\Http\Controllers\Dashboard\BookingPageController;
 use App\Http\Controllers\Dashboard\ChatPageController;
+use App\Http\Controllers\Dashboard\AdminCategoryController;
+use App\Http\Controllers\Dashboard\AdminEventController;
+use App\Http\Controllers\Dashboard\AdminFaqController;
 use App\Http\Controllers\Dashboard\AdminSettingsController;
 use App\Http\Controllers\Dashboard\EventPageController;
 use App\Http\Controllers\Dashboard\MembershipPlanPageController;
@@ -24,11 +38,24 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', LandingPageController::class)->name('landing');
 
+// Policy pages
+Route::view('/privacy-policy', 'policies.privacy')->name('privacy-policy');
+Route::view('/payment-policy', 'policies.payment')->name('payment-policy');
+Route::view('/cancellation-policy', 'policies.cancellation')->name('cancellation-policy');
+
 Auth::routes();
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         $user = auth()->user();
+
+        // Redirect client/supplier users to their own dashboard
+        if ($user->hasRole('supplier')) {
+            return redirect()->route('professional.dashboard');
+        }
+        if ($user->hasRole('client')) {
+            return redirect()->route('client.dashboard');
+        }
 
         // Stats for admin
         $stats = [];
@@ -59,6 +86,51 @@ Route::middleware('auth')->group(function () {
     })->middleware('permission:dashboard.view')->name('dashboard');
 
     Route::redirect('/home', '/dashboard')->name('home');
+
+    // ── Client Panel ──────────────────────────────────────────────
+    Route::prefix('client')->middleware('permission:dashboard.view')->group(function () {
+        Route::get('/dashboard', [ClientDashboardController::class, 'index'])->name('client.dashboard');
+
+        Route::get('/events', [ClientEventController::class, 'index'])->middleware('permission:events.view_any')->name('client.events.index');
+        Route::post('/events', [ClientEventController::class, 'store'])->middleware('permission:events.create')->name('client.events.store');
+        Route::get('/events/{event}', [ClientEventController::class, 'show'])->middleware('permission:events.view')->name('client.events.show');
+        Route::patch('/events/{event}', [ClientEventController::class, 'update'])->middleware('permission:events.update')->name('client.events.update');
+        Route::post('/events/{event}/publish', [ClientEventController::class, 'publish'])->middleware('permission:events.publish')->name('client.events.publish');
+
+        // Client Bookings
+        Route::get('/bookings', [ClientBookingController::class, 'index'])->middleware('permission:bookings.view_any')->name('client.bookings.index');
+        Route::patch('/bookings/{booking}/status', [ClientBookingController::class, 'updateStatus'])->middleware('permission:bookings.update')->name('client.bookings.update-status');
+
+        // Client Messages (Chat)
+        Route::get('/messages', [ClientChatController::class, 'index'])->middleware('permission:messages.view_any')->name('client.chat.index');
+        Route::get('/messages/{conversation}', [ClientChatController::class, 'show'])->middleware('permission:messages.view')->name('client.chat.show');
+    });
+
+    // ── Professional Panel ──────────────────────────────────────────
+    Route::prefix('professional')->middleware('permission:dashboard.view')->group(function () {
+        Route::get('/dashboard', [ProfessionalDashboardController::class, 'index'])->name('professional.dashboard');
+
+        // My Gigs (Events assigned to professional)
+        Route::get('/gigs', [ProfessionalGigController::class, 'index'])->middleware('permission:events.view_any')->name('professional.gigs.index');
+        Route::get('/gigs/{event}', [ProfessionalGigController::class, 'show'])->middleware('permission:events.view')->name('professional.gigs.show');
+
+        // Proposals (Bookings from professional's perspective)
+        Route::get('/proposals', [ProfessionalProposalController::class, 'index'])->middleware('permission:bookings.view_any')->name('professional.proposals.index');
+        Route::patch('/proposals/{booking}/status', [ProfessionalProposalController::class, 'updateStatus'])->middleware('permission:bookings.update')->name('professional.proposals.update-status');
+
+        // Earnings
+        Route::get('/earnings', [ProfessionalEarningsController::class, 'index'])->name('professional.earnings.index');
+
+        // Messages (Chat)
+        Route::get('/messages', [ProfessionalChatController::class, 'index'])->middleware('permission:messages.view_any')->name('professional.chat.index');
+        Route::get('/messages/{conversation}', [ProfessionalChatController::class, 'show'])->middleware('permission:messages.view')->name('professional.chat.show');
+
+        // Reviews
+        Route::get('/reviews', [ProfessionalReviewController::class, 'index'])->name('professional.reviews.index');
+
+        // Transactions
+        Route::get('/transactions', [ProfessionalTransactionController::class, 'index'])->name('professional.transactions.index');
+    });
 
     // Dashboard UI pages
     Route::get('/app/events', [EventPageController::class, 'index'])->middleware('permission:events.view_any')->name('app.events.index');
@@ -106,6 +178,27 @@ Route::middleware('auth')->group(function () {
     Route::post('/app/admin/settings/payments', [AdminSettingsController::class, 'updatePaymentSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.payments.update');
     Route::get('/app/admin/settings/openai', [AdminSettingsController::class, 'openaiSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.openai');
     Route::post('/app/admin/settings/openai', [AdminSettingsController::class, 'updateOpenAISettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.openai.update');
+
+    // Admin All Events
+    Route::get('/app/admin/events', [AdminEventController::class, 'index'])->middleware('permission:events.view_any')->name('app.admin.events.index');
+    Route::post('/app/admin/events', [AdminEventController::class, 'store'])->middleware('permission:events.create')->name('app.admin.events.store');
+    Route::patch('/app/admin/events/{event}', [AdminEventController::class, 'update'])->middleware('permission:events.update')->name('app.admin.events.update');
+    Route::delete('/app/admin/events/{event}', [AdminEventController::class, 'destroy'])->middleware('permission:events.delete')->name('app.admin.events.destroy');
+
+    // Admin Categories
+    Route::get('/app/admin/categories', [AdminCategoryController::class, 'index'])->middleware('permission:events.view_any')->name('app.admin.categories.index');
+    Route::get('/app/admin/categories/create', [AdminCategoryController::class, 'create'])->middleware('permission:events.create')->name('app.admin.categories.create');
+    Route::post('/app/admin/categories', [AdminCategoryController::class, 'store'])->middleware('permission:events.create')->name('app.admin.categories.store');
+    Route::get('/app/admin/categories/{category}/edit', [AdminCategoryController::class, 'edit'])->middleware('permission:events.update')->name('app.admin.categories.edit');
+    Route::patch('/app/admin/categories/{category}', [AdminCategoryController::class, 'update'])->middleware('permission:events.update')->name('app.admin.categories.update');
+    Route::delete('/app/admin/categories/{category}', [AdminCategoryController::class, 'destroy'])->middleware('permission:events.delete')->name('app.admin.categories.destroy');
+
+    // Admin FAQ Management
+    Route::get('/app/admin/faqs', [AdminFaqController::class, 'index'])->name('app.admin.faqs.index');
+    Route::post('/app/admin/faqs', [AdminFaqController::class, 'store'])->name('app.admin.faqs.store');
+    Route::patch('/app/admin/faqs/{faq}', [AdminFaqController::class, 'update'])->name('app.admin.faqs.update');
+    Route::delete('/app/admin/faqs/{faq}', [AdminFaqController::class, 'destroy'])->name('app.admin.faqs.destroy');
+    Route::patch('/app/admin/faqs/{faq}/toggle', [AdminFaqController::class, 'toggleStatus'])->name('app.admin.faqs.toggle');
 
     // Payment Flow
     Route::match(['get', 'post'], '/app/payments/initiate/{plan}', [PaymentPageController::class, 'initiate'])->middleware('permission:membership_plans.subscribe')->name('app.payments.initiate');

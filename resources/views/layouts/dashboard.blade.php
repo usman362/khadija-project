@@ -101,7 +101,7 @@
                             <a href="{{ route('app.chat.index') }}"
                                 class="nav-link {{ request()->routeIs('app.chat.*') ? 'active' : '' }}">
                                 <i class="link-icon ic-green" data-lucide="message-circle"></i>
-                                <span class="link-title">Chat</span>
+                                <span class="link-title">Messages</span>
                             </a>
                         </li>
                     @endcan
@@ -133,6 +133,38 @@
                     @canany(['users.view_any', 'roles.view_any', 'permissions.view_any', 'membership_plans.create', 'agreement_log.view_any', 'payment_settings.manage'])
                         <li class="nav-item nav-category">Administration</li>
                     @endcanany
+
+                    @can('events.view_any')
+                        <li class="nav-item">
+                            <a href="{{ route('app.admin.events.index') }}"
+                                class="nav-link {{ request()->routeIs('app.admin.events.*') ? 'active' : '' }}">
+                                <i class="link-icon ic-cyan" data-lucide="calendar-range"></i>
+                                <span class="link-title">All Events</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('app.admin.categories.*') ? 'active' : '' }}"
+                                data-bs-toggle="collapse" href="#categoriesMenu" role="button"
+                                aria-expanded="{{ request()->routeIs('app.admin.categories.*') ? 'true' : 'false' }}">
+                                <i class="link-icon ic-emerald" data-lucide="layers"></i>
+                                <span class="link-title">Categories</span>
+                                <i class="link-arrow" data-lucide="chevron-down"></i>
+                            </a>
+                            <div class="collapse {{ request()->routeIs('app.admin.categories.*') ? 'show' : '' }}" id="categoriesMenu">
+                                <ul class="nav sub-menu">
+                                    <li class="nav-item">
+                                        <a href="{{ route('app.admin.categories.index') }}"
+                                            class="nav-link {{ request()->routeIs('app.admin.categories.index') ? 'active' : '' }}">Categories</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('app.admin.categories.create') }}"
+                                            class="nav-link {{ request()->routeIs('app.admin.categories.create') ? 'active' : '' }}">Add Categories</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    @endcan
 
                     @can('membership_plans.create')
                         <li class="nav-item">
@@ -183,6 +215,14 @@
                             </a>
                         </li>
                     @endcan
+
+                    <li class="nav-item">
+                        <a href="{{ route('app.admin.faqs.index') }}"
+                            class="nav-link {{ request()->routeIs('app.admin.faqs.*') ? 'active' : '' }}">
+                            <i class="link-icon ic-cyan" data-lucide="help-circle"></i>
+                            <span class="link-title">FAQ Management</span>
+                        </a>
+                    </li>
 
                     @can('payment_settings.manage')
                         <li class="nav-item">
