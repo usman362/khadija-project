@@ -56,20 +56,7 @@
             display: none !important;
         }
 
-        /* Fix: Remove active indicator from all nav items, only show on .active */
-        .sidebar .nav > .nav-item > .nav-link::before { display: none !important; }
-        .sidebar .nav > .nav-item > .nav-link.active::before {
-            display: block !important;
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 3px;
-            height: 24px;
-            background: #6571ff;
-            border-radius: 0 3px 3px 0;
-        }
+        /* Active indicator is handled by NobleUI default CSS + Blade routeIs() classes */
     </style>
 </head>
 
@@ -93,9 +80,8 @@
 
                     {{-- ── Dashboard ──────────────────────────── --}}
                     <li class="nav-item nav-category">Main</li>
-                    <li class="nav-item">
-                        <a href="{{ route('dashboard') }}"
-                            class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <li class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                        <a href="{{ route('dashboard') }}" class="nav-link">
                             <i class="link-icon ic-primary" data-lucide="layout-dashboard"></i>
                             <span class="link-title">Dashboard</span>
                         </a>
@@ -105,9 +91,8 @@
                     <li class="nav-item nav-category">Event Management</li>
 
                     @can('events.view_any')
-                        <li class="nav-item">
-                            <a href="{{ route('app.events.index') }}"
-                                class="nav-link {{ request()->routeIs('app.events.*') ? 'active' : '' }}">
+                        <li class="nav-item {{ request()->routeIs('app.events.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.events.index') }}" class="nav-link">
                                 <i class="link-icon ic-blue" data-lucide="calendar-days"></i>
                                 <span class="link-title">Events</span>
                             </a>
@@ -115,9 +100,8 @@
                     @endcan
 
                     @can('bookings.view_any')
-                        <li class="nav-item">
-                            <a href="{{ route('app.bookings.index') }}"
-                                class="nav-link {{ request()->routeIs('app.bookings.*') ? 'active' : '' }}">
+                        <li class="nav-item {{ request()->routeIs('app.bookings.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.bookings.index') }}" class="nav-link">
                                 <i class="link-icon ic-cyan" data-lucide="book-check"></i>
                                 <span class="link-title">Bookings</span>
                             </a>
@@ -125,9 +109,8 @@
                     @endcan
 
                     @can('agreements.view_any')
-                        <li class="nav-item">
-                            <a href="{{ route('app.agreements.index') }}"
-                                class="nav-link {{ request()->routeIs('app.agreements.*') ? 'active' : '' }}">
+                        <li class="nav-item {{ request()->routeIs('app.agreements.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.agreements.index') }}" class="nav-link">
                                 <i class="link-icon ic-purple" data-lucide="file-signature"></i>
                                 <span class="link-title">AI Agreements</span>
                             </a>
@@ -135,9 +118,8 @@
                     @endcan
 
                     @can('messages.view_any')
-                        <li class="nav-item">
-                            <a href="{{ route('app.chat.index') }}"
-                                class="nav-link {{ request()->routeIs('app.chat.*') ? 'active' : '' }}">
+                        <li class="nav-item {{ request()->routeIs('app.chat.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.chat.index') }}" class="nav-link">
                                 <i class="link-icon ic-green" data-lucide="message-circle"></i>
                                 <span class="link-title">Messages</span>
                             </a>
@@ -148,9 +130,8 @@
                     <li class="nav-item nav-category">Billing</li>
 
                     @can('membership_plans.view_any')
-                        <li class="nav-item">
-                            <a href="{{ route('app.membership-plans.index') }}"
-                                class="nav-link {{ request()->routeIs('app.membership-plans.*') ? 'active' : '' }}">
+                        <li class="nav-item {{ request()->routeIs('app.membership-plans.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.membership-plans.index') }}" class="nav-link">
                                 <i class="link-icon ic-yellow" data-lucide="crown"></i>
                                 <span class="link-title">Membership Plans</span>
                             </a>
@@ -158,9 +139,8 @@
                     @endcan
 
                     @can('payments.view')
-                        <li class="nav-item">
-                            <a href="{{ route('app.payments.history') }}"
-                                class="nav-link {{ request()->routeIs('app.payments.*') ? 'active' : '' }}">
+                        <li class="nav-item {{ request()->routeIs('app.payments.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.payments.history') }}" class="nav-link">
                                 <i class="link-icon ic-emerald" data-lucide="credit-card"></i>
                                 <span class="link-title">Payment History</span>
                             </a>
@@ -173,17 +153,15 @@
                     @endcanany
 
                     @can('events.view_any')
-                        <li class="nav-item">
-                            <a href="{{ route('app.admin.events.index') }}"
-                                class="nav-link {{ request()->routeIs('app.admin.events.*') ? 'active' : '' }}">
+                        <li class="nav-item {{ request()->routeIs('app.admin.events.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.admin.events.index') }}" class="nav-link">
                                 <i class="link-icon ic-cyan" data-lucide="calendar-range"></i>
                                 <span class="link-title">All Events</span>
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('app.admin.categories.*') ? 'active' : '' }}"
-                                data-bs-toggle="collapse" href="#categoriesMenu" role="button"
+                        <li class="nav-item {{ request()->routeIs('app.admin.categories.*') ? 'active' : '' }}">
+                            <a class="nav-link" data-bs-toggle="collapse" href="#categoriesMenu" role="button"
                                 aria-expanded="{{ request()->routeIs('app.admin.categories.*') ? 'true' : 'false' }}">
                                 <i class="link-icon ic-emerald" data-lucide="layers"></i>
                                 <span class="link-title">Categories</span>
@@ -205,9 +183,8 @@
                     @endcan
 
                     @can('membership_plans.create')
-                        <li class="nav-item">
-                            <a href="{{ route('app.admin.membership-plans.index') }}"
-                                class="nav-link {{ request()->routeIs('app.admin.membership-plans.*') ? 'active' : '' }}">
+                        <li class="nav-item {{ request()->routeIs('app.admin.membership-plans.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.admin.membership-plans.index') }}" class="nav-link">
                                 <i class="link-icon ic-orange" data-lucide="package"></i>
                                 <span class="link-title">Manage Plans</span>
                             </a>
@@ -215,9 +192,8 @@
                     @endcan
 
                     @can('agreement_log.view_any')
-                        <li class="nav-item">
-                            <a href="{{ route('app.agreement-log.index') }}"
-                                class="nav-link {{ request()->routeIs('app.agreement-log.*') ? 'active' : '' }}">
+                        <li class="nav-item {{ request()->routeIs('app.agreement-log.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.agreement-log.index') }}" class="nav-link">
                                 <i class="link-icon ic-violet" data-lucide="scroll-text"></i>
                                 <span class="link-title">Agreement Log</span>
                             </a>
@@ -225,9 +201,8 @@
                     @endcan
 
                     @can('users.view_any')
-                        <li class="nav-item">
-                            <a href="{{ route('app.users.index') }}"
-                                class="nav-link {{ request()->routeIs('app.users.*') ? 'active' : '' }}">
+                        <li class="nav-item {{ request()->routeIs('app.users.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.users.index') }}" class="nav-link">
                                 <i class="link-icon ic-rose" data-lucide="users"></i>
                                 <span class="link-title">Users</span>
                             </a>
@@ -235,9 +210,8 @@
                     @endcan
 
                     @can('roles.view_any')
-                        <li class="nav-item">
-                            <a href="{{ route('app.roles.index') }}"
-                                class="nav-link {{ request()->routeIs('app.roles.*') ? 'active' : '' }}">
+                        <li class="nav-item {{ request()->routeIs('app.roles.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.roles.index') }}" class="nav-link">
                                 <i class="link-icon ic-pink" data-lucide="shield"></i>
                                 <span class="link-title">Roles</span>
                             </a>
@@ -245,25 +219,23 @@
                     @endcan
 
                     @can('permissions.view_any')
-                        <li class="nav-item">
-                            <a href="{{ route('app.permissions.index') }}"
-                                class="nav-link {{ request()->routeIs('app.permissions.*') ? 'active' : '' }}">
+                        <li class="nav-item {{ request()->routeIs('app.permissions.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.permissions.index') }}" class="nav-link">
                                 <i class="link-icon ic-red" data-lucide="key-round"></i>
                                 <span class="link-title">Permissions</span>
                             </a>
                         </li>
                     @endcan
 
-                    <li class="nav-item">
-                        <a href="{{ route('app.admin.faqs.index') }}"
-                            class="nav-link {{ request()->routeIs('app.admin.faqs.*') ? 'active' : '' }}">
+                    <li class="nav-item {{ request()->routeIs('app.admin.faqs.*') ? 'active' : '' }}">
+                        <a href="{{ route('app.admin.faqs.index') }}" class="nav-link">
                             <i class="link-icon ic-cyan" data-lucide="help-circle"></i>
                             <span class="link-title">FAQ Management</span>
                         </a>
                     </li>
 
                     @can('payment_settings.manage')
-                        <li class="nav-item">
+                        <li class="nav-item {{ request()->routeIs('app.admin.settings.*') ? 'active' : '' }}">
                             <a class="nav-link {{ request()->routeIs('app.admin.settings.*') ? '' : 'collapsed' }}"
                                 data-bs-toggle="collapse" href="#settingsSubmenu" role="button"
                                 aria-expanded="{{ request()->routeIs('app.admin.settings.*') ? 'true' : 'false' }}"
