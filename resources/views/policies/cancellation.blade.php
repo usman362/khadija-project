@@ -63,17 +63,17 @@
         }
 
         .header-brand {
-            font-size: 1.375rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            display: flex;
+            align-items: center;
         }
 
         .header-brand a {
-            color: inherit;
-            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-brand img {
+            height: 32px;
         }
 
         .header-brand a:hover {
@@ -249,7 +249,7 @@
     <header>
         <div class="container">
             <div class="header-brand">
-                <a href="/">{{ config('app.name', 'GIGS') }}</a>
+                <a href="/"><img src="{{ asset('logos/logo-gradient.png') }}" alt="GigResource"></a>
             </div>
             <nav class="header-nav">
                 <a href="/">← Back</a>

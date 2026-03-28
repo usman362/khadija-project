@@ -208,31 +208,18 @@
             text-decoration: none;
         }
 
-        .cl-sidebar-brand .brand-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 16px;
-            color: #fff;
-            flex-shrink: 0;
+        .cl-sidebar-brand .brand-logo-img {
+            height: 30px;
         }
-
-        .cl-sidebar-brand .brand-text {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.3px;
-        }
+        .cl-sidebar-brand .brand-logo-light { display: block; }
+        .cl-sidebar-brand .brand-logo-dark { display: none; }
+        [data-theme="light"] .cl-sidebar-brand .brand-logo-light { display: none; }
+        [data-theme="light"] .cl-sidebar-brand .brand-logo-dark { display: block; }
 
         .cl-sidebar-brand .brand-sub {
             font-size: 11px;
             color: var(--text-muted);
-            margin-top: 1px;
+            margin-top: 4px;
         }
 
         .cl-sidebar-nav {
@@ -786,9 +773,9 @@
     {{-- Sidebar --}}
     <aside class="cl-sidebar" id="sidebar">
         <a href="{{ route('client.dashboard') }}" class="cl-sidebar-brand">
-            <div class="brand-icon">G</div>
             <div>
-                <div class="brand-text">{{ config('app.name', 'GigResource') }}</div>
+                <img src="{{ asset('logos/logo-light.png') }}" alt="GigResource" class="brand-logo-img brand-logo-light">
+                <img src="{{ asset('logos/logo-primary.png') }}" alt="GigResource" class="brand-logo-img brand-logo-dark">
                 <div class="brand-sub">{{ ucfirst(auth()->user()?->roles?->first()?->name ?? 'Client') }} Account</div>
             </div>
         </a>

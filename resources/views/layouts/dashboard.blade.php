@@ -42,7 +42,7 @@
     <div class="main-wrapper">
         <nav class="sidebar">
             <div class="sidebar-header">
-                <a href="{{ route('dashboard') }}" class="sidebar-brand">{{ config('app.name', 'App') }}</a>
+                <a href="{{ route('dashboard') }}" class="sidebar-brand"><img src="{{ asset('logos/logo-light.png') }}" alt="GigResource" style="height: 28px;"></a>
                 <div class="sidebar-toggler">
                     <span></span>
                     <span></span>

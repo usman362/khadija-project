@@ -1224,7 +1224,7 @@
 <!-- ─── NAVBAR ───────────────────────────────── -->
 <nav class="navbar">
     <div class="container">
-        <a href="/" class="navbar-brand">GIGS<span>.</span></a>
+        <a href="/" class="navbar-brand"><img src="{{ asset('logos/logo-light.png') }}" alt="GigResource" style="height: 36px;"></a>
 
         <ul class="navbar-links">
             <li><a href="#about">About Us</a></li>
@@ -1259,7 +1259,7 @@
     <div class="container">
         <h1>Find The Right<br><span class="gradient-text">Professional</span> For<br>Every Event</h1>
         <p class="hero-subtitle">
-            GIGS connects event organizers with verified professionals. Book photographers, DJs, caterers,
+            GigResource connects event organizers with verified professionals. Book photographers, DJs, caterers,
             decorators, and more &mdash; all in one platform.
         </p>
         <div class="hero-buttons">
@@ -1312,7 +1312,7 @@
                 <h3>About Us</h3>
                 <h2>We Connect <span class="gradient-text">Talent</span> With Opportunity</h2>
                 <p>
-                    GIGS is a next-generation marketplace designed to bridge the gap between skilled event
+                    GigResource is a next-generation marketplace designed to bridge the gap between skilled event
                     professionals and clients who need them. Whether you're planning a wedding, corporate event,
                     or private celebration, we make it effortless to find, book, and collaborate with top-tier talent.
                 </p>
@@ -1669,7 +1669,7 @@
     <div class="container">
         <div class="section-header">
             <h2>Frequently Asked <span class="gradient-text">Questions</span></h2>
-            <p>Everything you need to know about using GIGS.</p>
+            <p>Everything you need to know about using GigResource.</p>
         </div>
         <div class="faq-grid">
             @forelse($faqs as $faq)
@@ -1686,12 +1686,12 @@
                 {{-- Fallback if no FAQs in database yet --}}
                 <div class="faq-item active">
                     <button class="faq-question" onclick="toggleFaq(this)">
-                        <span>How does GIGS work?</span>
+                        <span>How does GigResource work?</span>
                         <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-inner">
-                            GIGS connects event organizers (clients) with verified service professionals (suppliers). Simply create an account, browse available professionals by category, send booking requests, discuss details through our built-in chat, and confirm your booking.
+                            GigResource connects event organizers (clients) with verified service professionals (suppliers). Simply create an account, browse available professionals by category, send booking requests, discuss details through our built-in chat, and confirm your booking.
                         </div>
                     </div>
                 </div>
@@ -1717,7 +1717,7 @@
     <div class="container">
         <div class="footer-grid">
             <div>
-                <div class="footer-brand">GIGS<span style="-webkit-text-fill-color: var(--primary);">.</span></div>
+                <div class="footer-brand"><img src="{{ asset('logos/logo-light.png') }}" alt="GigResource" style="height: 32px;"></div>
                 <p class="footer-desc">
                     Connecting Professionals & Clients for Perfect Events.
                     Create unforgettable experiences with our curated network of verified experts.
@@ -1766,7 +1766,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <span>&copy; {{ date('Y') }} GIGS. All rights reserved.</span>
+            <span>&copy; {{ date('Y') }} GigResource. All rights reserved.</span>
             <span>
                 <a href="{{ route('privacy-policy') }}" style="color: var(--text-muted);">Privacy</a> &middot;
                 <a href="{{ route('payment-policy') }}" style="color: var(--text-muted);">Payment</a> &middot;

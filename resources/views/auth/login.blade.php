@@ -55,9 +55,9 @@
             display: flex; align-items: center; justify-content: space-between;
         }
         .auth-logo {
-            font-size: 1.5rem; font-weight: 900; color: #fff; letter-spacing: -0.5px;
+            display: flex; align-items: center;
         }
-        .auth-logo span { color: var(--primary); }
+        .auth-logo img { height: 34px; }
         .auth-nav-links { display: flex; gap: 20px; align-items: center; }
         .auth-nav-link {
             font-size: 14px; color: var(--text-muted); font-weight: 500; transition: color 0.2s;
@@ -229,7 +229,7 @@
 <!-- ── NAVBAR ── -->
 <nav class="auth-navbar">
     <div class="auth-navbar-inner">
-        <a href="{{ url('/') }}" class="auth-logo">GIGS<span>.</span></a>
+        <a href="{{ url('/') }}" class="auth-logo"><img src="{{ asset('logos/logo-light.png') }}" alt="GigResource"></a>
         <div class="auth-nav-links">
             <a href="{{ url('/') }}" class="auth-nav-link">Home</a>
             <a href="{{ route('register') }}" class="auth-nav-btn">Sign Up</a>
