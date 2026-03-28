@@ -35,6 +35,41 @@
         .buy-now-wrapper, .buy-now-btn, .demo-customizer, .template-customizer,
         a[href*="nobleui.com"]:not(link), .btn-purchase,
         [class*="buy-now"], [class*="customizer-toggle"] { display: none !important; }
+
+        /* Fix sidebar brand logo — sidebar is always dark in NobleUI */
+        .sidebar-header .sidebar-brand,
+        .sidebar .sidebar-header .sidebar-brand {
+            display: flex !important;
+            align-items: center !important;
+            font-size: 0 !important;
+            line-height: normal !important;
+            overflow: visible !important;
+        }
+        .sidebar-header .sidebar-brand img,
+        .sidebar .sidebar-header .sidebar-brand img {
+            height: 34px !important;
+            width: auto !important;
+            max-width: 170px !important;
+            object-fit: contain !important;
+        }
+        .sidebar-brand .logo-hidden {
+            display: none !important;
+        }
+
+        /* Fix: Remove active indicator from all nav items, only show on .active */
+        .sidebar .nav > .nav-item > .nav-link::before { display: none !important; }
+        .sidebar .nav > .nav-item > .nav-link.active::before {
+            display: block !important;
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 24px;
+            background: #6571ff;
+            border-radius: 0 3px 3px 0;
+        }
     </style>
 </head>
 
@@ -42,7 +77,10 @@
     <div class="main-wrapper">
         <nav class="sidebar">
             <div class="sidebar-header">
-                <a href="{{ route('dashboard') }}" class="sidebar-brand"><img src="{{ asset('logos/logo-light.png') }}" alt="GigResource" style="height: 28px;"></a>
+                <a href="{{ route('dashboard') }}" class="sidebar-brand">
+                    <img src="{{ asset('logos/logo-light.png') }}" alt="GigResource" id="brand-logo-light">
+                    <img src="{{ asset('logos/logo-primary.png') }}" alt="GigResource" id="brand-logo-dark" class="logo-hidden">
+                </a>
                 <div class="sidebar-toggler">
                     <span></span>
                     <span></span>
@@ -526,6 +564,32 @@
 
     <script src="https://nobleui.com/html/template/assets/vendors/core/core.js"></script>
     <script src="{{asset('assets/js/app.js')}}"></script>
+    <script>
+        // Theme-aware logo switcher for admin sidebar
+        (function() {
+            function updateLogo() {
+                var theme = document.documentElement.getAttribute('data-bs-theme') || 'dark';
+                var lightLogo = document.getElementById('brand-logo-light');
+                var darkLogo = document.getElementById('brand-logo-dark');
+                if (lightLogo && darkLogo) {
+                    if (theme === 'light') {
+                        lightLogo.classList.add('logo-hidden');
+                        darkLogo.classList.remove('logo-hidden');
+                    } else {
+                        lightLogo.classList.remove('logo-hidden');
+                        darkLogo.classList.add('logo-hidden');
+                    }
+                }
+            }
+            updateLogo();
+            var observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(m) {
+                    if (m.attributeName === 'data-bs-theme') updateLogo();
+                });
+            });
+            observer.observe(document.documentElement, { attributes: true });
+        })();
+    </script>
     @stack('scripts')
 </body>
 
