@@ -43,6 +43,9 @@ Route::view('/privacy-policy', 'policies.privacy')->name('privacy-policy');
 Route::view('/payment-policy', 'policies.payment')->name('payment-policy');
 Route::view('/cancellation-policy', 'policies.cancellation')->name('cancellation-policy');
 
+// About Us
+Route::view('/about-us', 'about')->name('about-us');
+
 Auth::routes();
 
 Route::middleware('auth')->group(function () {
