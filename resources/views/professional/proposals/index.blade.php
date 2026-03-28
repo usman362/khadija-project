@@ -109,7 +109,7 @@
             <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">My Proposals</h2>
             <p style="color: var(--text-muted); font-size: 14px;">Manage your submitted and received proposals</p>
         </div>
-        <a href="{{ route('professional.gigs.index') }}" class="cl-btn cl-btn-primary">
+        <a href="{{ route('professional.gigs.index', ['view' => 'browse']) }}" class="cl-btn cl-btn-primary">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>
             Browse Event Jobs
         </a>
@@ -305,7 +305,7 @@
                     <div class="cl-empty-title">No {{ $tabs[$tab]['label'] ?? ucfirst($tab) }} Proposals</div>
                     <div class="cl-empty-text">No proposals with this status found.</div>
                 @endif
-                <a href="{{ route('professional.gigs.index') }}" class="cl-btn cl-btn-primary cl-btn-sm" style="margin-top: 8px;">Browse Event Jobs</a>
+                <a href="{{ route('professional.gigs.index', ['view' => 'browse']) }}" class="cl-btn cl-btn-primary cl-btn-sm" style="margin-top: 8px;">Browse Event Jobs</a>
             </div>
         </div>
     @endif

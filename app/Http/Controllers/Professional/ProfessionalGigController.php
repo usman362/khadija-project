@@ -13,37 +13,58 @@ class ProfessionalGigController extends Controller
     public function index(Request $request): View
     {
         $user = $request->user();
+        $view = $request->string('view')->toString() ?: 'my-gigs';
 
-        $query = Event::where('supplier_id', $user->id)
+        // ── My Gigs (assigned to this supplier) ──
+        $myGigsQuery = Event::where('supplier_id', $user->id)
             ->with(['category:id,name,icon', 'supplier:id,name', 'client:id,name', 'bookings'])
             ->latest();
 
-        // Search filter
-        if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->string('search') . '%');
+        if ($request->filled('search') && $view === 'my-gigs') {
+            $myGigsQuery->where('title', 'like', '%' . $request->string('search') . '%');
+        }
+        if ($request->filled('status') && $view === 'my-gigs') {
+            $myGigsQuery->where('status', $request->string('status')->toString());
+        }
+        if ($request->filled('category') && $view === 'my-gigs') {
+            $myGigsQuery->where('category_id', $request->integer('category'));
         }
 
-        // Status filter
-        if ($request->filled('status')) {
-            $query->where('status', $request->string('status')->toString());
-        }
+        $myGigs = $myGigsQuery->paginate(12, ['*'], 'my_page')->withQueryString();
 
-        // Category filter
-        if ($request->filled('category')) {
-            $query->where('category_id', $request->integer('category'));
-        }
-
-        $events = $query->paginate(12)->withQueryString();
-
-        // Stats
+        // My Gigs Stats
         $stats = [
             'total' => Event::where('supplier_id', $user->id)->count(),
             'active' => Event::where('supplier_id', $user->id)->whereIn('status', ['pending', 'published', 'confirmed', 'in_progress'])->count(),
             'upcoming' => Event::where('supplier_id', $user->id)->where('starts_at', '>', now())->count(),
-            'total_budget' => 0,  // placeholder
+            'completed' => Event::where('supplier_id', $user->id)->where('status', 'completed')->count(),
         ];
 
-        // Calendar data: events for current month
+        // ── Browse Available Events (published by clients, not yet assigned to this supplier) ──
+        $browseQuery = Event::where('status', 'published')
+            ->where(function ($q) use ($user) {
+                $q->whereNull('supplier_id')
+                  ->orWhere('supplier_id', '!=', $user->id);
+            })
+            ->with(['category:id,name,icon', 'client:id,name'])
+            ->latest();
+
+        if ($request->filled('search') && $view === 'browse') {
+            $browseQuery->where('title', 'like', '%' . $request->string('search') . '%');
+        }
+        if ($request->filled('category') && $view === 'browse') {
+            $browseQuery->where('category_id', $request->integer('category'));
+        }
+
+        $browseEvents = $browseQuery->paginate(12, ['*'], 'browse_page')->withQueryString();
+
+        $browseStats = [
+            'total' => Event::where('status', 'published')->where(function ($q) use ($user) {
+                $q->whereNull('supplier_id')->orWhere('supplier_id', '!=', $user->id);
+            })->count(),
+        ];
+
+        // Calendar data: events for current month (my gigs)
         $month = $request->integer('month', (int) now()->format('m'));
         $year = $request->integer('year', (int) now()->format('Y'));
         $calendarEvents = Event::where('supplier_id', $user->id)
@@ -54,13 +75,14 @@ class ProfessionalGigController extends Controller
 
         $categories = Category::active()->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
 
-        return view('professional.gigs.index', compact('events', 'stats', 'calendarEvents', 'categories', 'month', 'year'));
+        return view('professional.gigs.index', compact(
+            'myGigs', 'stats', 'browseEvents', 'browseStats',
+            'calendarEvents', 'categories', 'month', 'year', 'view'
+        ));
     }
 
     public function show(Request $request, Event $event): View
     {
-        $this->authorize('view', $event);
-
         $event->load([
             'category:id,name',
             'client:id,name,email',

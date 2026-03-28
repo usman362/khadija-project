@@ -14,6 +14,8 @@ class Event extends Model
     protected $fillable = [
         'title',
         'description',
+        'budget',
+        'location',
         'status',
         'is_published',
         'published_at',
@@ -33,6 +35,7 @@ class Event extends Model
             'ends_at' => 'datetime',
             'published_at' => 'datetime',
             'is_published' => 'boolean',
+            'budget' => 'decimal:2',
         ];
     }
 

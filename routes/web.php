@@ -116,6 +116,7 @@ Route::middleware('auth')->group(function () {
 
         // Proposals (Bookings from professional's perspective)
         Route::get('/proposals', [ProfessionalProposalController::class, 'index'])->middleware('permission:bookings.view_any')->name('professional.proposals.index');
+        Route::post('/proposals/send/{event}', [ProfessionalProposalController::class, 'sendProposal'])->middleware('permission:bookings.create')->name('professional.proposals.send');
         Route::patch('/proposals/{booking}/status', [ProfessionalProposalController::class, 'updateStatus'])->middleware('permission:bookings.update')->name('professional.proposals.update-status');
 
         // Earnings
@@ -244,3 +245,60 @@ Route::middleware('auth')->group(function () {
 // Payment Webhooks (no auth, no CSRF — verified via gateway signatures)
 Route::post('/webhooks/stripe', [PaymentWebhookController::class, 'stripe'])->name('webhooks.stripe');
 Route::post('/webhooks/paypal', [PaymentWebhookController::class, 'paypal'])->name('webhooks.paypal');
+
+// ── Deploy Helper Routes (public, no auth) ──────────────────────────────
+Route::get('/deploy/git-pull', function () {
+    $output = [];
+    exec('cd ' . base_path() . ' && git pull 2>&1', $output, $returnCode);
+    return response()->json([
+        'success' => $returnCode === 0,
+        'output' => implode("\n", $output),
+    ]);
+});
+
+Route::get('/deploy/migrate', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        $output = \Illuminate\Support\Facades\Artisan::output();
+        return response()->json([
+            'success' => true,
+            'output' => $output,
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+});
+
+Route::get('/deploy/seed/{seeder?}', function (?string $seeder = null) {
+    try {
+        $params = ['--force' => true];
+        if ($seeder) {
+            $params['--class'] = $seeder;
+        }
+        \Illuminate\Support\Facades\Artisan::call('db:seed', $params);
+        $output = \Illuminate\Support\Facades\Artisan::output();
+        return response()->json([
+            'success' => true,
+            'output' => $output,
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+});
+
+Route::get('/deploy/cache-clear', function () {
+    \Illuminate\Support\Facades\Artisan::call('cache:clear');
+    \Illuminate\Support\Facades\Artisan::call('config:clear');
+    \Illuminate\Support\Facades\Artisan::call('route:clear');
+    \Illuminate\Support\Facades\Artisan::call('view:clear');
+    return response()->json([
+        'success' => true,
+        'output' => 'All caches cleared.',
+    ]);
+});

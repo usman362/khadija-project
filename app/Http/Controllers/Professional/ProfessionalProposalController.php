@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Professional;
 use App\Http\Controllers\Controller;
 use App\Models\AgreementLog;
 use App\Models\Booking;
+use App\Models\Event;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -64,6 +65,58 @@ class ProfessionalProposalController extends Controller
         $bookings = $query->paginate(12)->withQueryString();
 
         return view('professional.proposals.index', compact('stats', 'bookings', 'tab'));
+    }
+
+    /**
+     * Professional sends a proposal (booking request) to a published event.
+     */
+    public function sendProposal(Request $request, Event $event): RedirectResponse
+    {
+        $user = $request->user();
+
+        // Validate event is published and open for proposals
+        if ($event->status !== 'published') {
+            return back()->with('error', 'This event is no longer accepting proposals.');
+        }
+
+        // Prevent duplicate proposals
+        $existingProposal = Booking::where('event_id', $event->id)
+            ->where('supplier_id', $user->id)
+            ->whereIn('status', ['requested', 'confirmed'])
+            ->first();
+
+        if ($existingProposal) {
+            return back()->with('error', 'You have already submitted a proposal for this event.');
+        }
+
+        $validated = $request->validate([
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        // Create a booking (proposal) from professional side
+        $booking = Booking::create([
+            'event_id' => $event->id,
+            'client_id' => $event->client_id,
+            'supplier_id' => $user->id,
+            'created_by' => $user->id,
+            'status' => 'requested',
+            'notes' => $validated['notes'] ?? null,
+            'booked_at' => now(),
+            'source' => 'professional_proposal',
+        ]);
+
+        // Log the proposal
+        AgreementLog::create([
+            'subject_type' => 'booking',
+            'subject_id' => $booking->id,
+            'from_status' => null,
+            'to_status' => 'requested',
+            'changed_by' => $user->id,
+        ]);
+
+        return redirect()
+            ->route('professional.proposals.index')
+            ->with('status', 'Proposal sent successfully! The client will review your request.');
     }
 
     public function updateStatus(Request $request, Booking $booking): RedirectResponse

@@ -168,6 +168,81 @@
             border-radius: 12px;
         }
 
+        .btn-orange {
+            background: #f97316;
+            color: #fff;
+            border: none;
+            font-weight: 700;
+        }
+        .btn-orange:hover {
+            background: #ea580c;
+            transform: translateY(-1px);
+        }
+
+        /* ── Join dropdown ── */
+        .join-dropdown {
+            position: relative;
+        }
+        .join-dropdown-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            border: 1.5px solid var(--primary);
+            color: var(--text-white);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .join-dropdown-btn:hover { background: rgba(59,130,246,0.1); }
+        .join-dropdown-btn svg { transition: transform 0.2s; }
+        .join-dropdown.open .join-dropdown-btn svg { transform: rotate(180deg); }
+
+        .join-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 200px;
+            background: #1a2440;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 8px 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.2s;
+            z-index: 100;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+        .join-dropdown.open .join-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .join-dropdown-item {
+            display: block;
+            padding: 10px 18px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-light);
+            transition: all 0.15s;
+        }
+        .join-dropdown-item:hover {
+            background: rgba(255,255,255,0.06);
+            color: var(--text-white);
+        }
+        .navbar-login-link {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: color 0.2s;
+        }
+        .navbar-login-link:hover { color: var(--text-white); }
+
         .mobile-menu-btn {
             display: none;
             background: transparent;
@@ -1124,6 +1199,7 @@
 
         @media (max-width: 768px) {
             .navbar-links { display: none; }
+            .navbar-actions .join-dropdown, .navbar-actions .navbar-login-link { display: none; }
             .navbar-actions .btn-blue, .navbar-actions .btn-red { display: none; }
             .mobile-menu-btn { display: block; }
             .trust-badges { grid-template-columns: repeat(2, 1fr); }
@@ -1162,8 +1238,8 @@
             @auth
                 <a href="{{ url('/dashboard') }}" class="btn btn-primary btn-sm">Dashboard</a>
             @else
-                <a href="{{ route('register') }}" class="btn btn-blue btn-sm">Join as Professional</a>
-                <a href="{{ route('register') }}" class="btn btn-red btn-sm">Hire a Professional</a>
+                <a href="{{ route('register', ['role' => 'supplier']) }}" class="btn btn-blue btn-sm">Join as Professional</a>
+                <a href="{{ route('register', ['role' => 'client']) }}" class="btn btn-red btn-sm">Hire a Professional</a>
                 @if (Route::has('login'))
                     <a href="{{ route('login') }}" class="btn btn-outline btn-sm">Log in</a>
                 @endif
@@ -1190,8 +1266,8 @@
             @auth
                 <a href="{{ url('/dashboard') }}" class="btn btn-primary btn-lg">Go to Dashboard</a>
             @else
-                <a href="{{ route('register') }}" class="btn btn-blue btn-lg">Join as Professional</a>
-                <a href="{{ route('register') }}" class="btn btn-red btn-lg">Hire Now</a>
+                <a href="{{ route('register', ['role' => 'supplier']) }}" class="btn btn-blue btn-lg">Join as Professional</a>
+                <a href="{{ route('register', ['role' => 'client']) }}" class="btn btn-red btn-lg">Hire Now</a>
             @endauth
         </div>
 
@@ -1727,6 +1803,12 @@
         document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
         if (!isActive) item.classList.add('active');
     }
+
+    // Close join dropdown on outside click
+    document.addEventListener('click', function(e) {
+        const dd = document.getElementById('joinDropdown');
+        if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+    });
 </script>
 
 </body>

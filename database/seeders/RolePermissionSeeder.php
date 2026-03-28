@@ -52,6 +52,7 @@ class RolePermissionSeeder extends Seeder
             'events.update',
             'bookings.view_any',
             'bookings.view',
+            'bookings.create',
             'bookings.update',
             'messages.view_any',
             'messages.view',

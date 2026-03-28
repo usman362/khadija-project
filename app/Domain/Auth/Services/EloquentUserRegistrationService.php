@@ -21,7 +21,12 @@ class EloquentUserRegistrationService implements UserRegistrationServiceInterfac
                 'password' => Hash::make($data->password),
             ]);
 
-            $user->assignRole(RoleName::CLIENT->value);
+            // Assign role based on registration choice (client or supplier)
+            $role = $data->role === 'supplier'
+                ? RoleName::SUPPLIER->value
+                : RoleName::CLIENT->value;
+
+            $user->assignRole($role);
 
             UserRegistered::dispatch($user);
 

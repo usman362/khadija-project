@@ -6,65 +6,50 @@ use App\Domain\Auth\Contracts\UserRegistrationServiceInterface;
 use App\Domain\Auth\DataTransferObjects\RegisterUserData;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Register Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users as well as their
-    | validation and creation. By default this controller uses a trait to
-    | provide this functionality without requiring any additional code.
-    |
-    */
-
     use RegistersUsers;
 
-    /**
-     * Where to redirect users after registration.
-     *
-     * @var string
-     */
     protected $redirectTo = '/dashboard';
 
-    /**
-     * Create a new controller instance.
-     */
     public function __construct(private readonly UserRegistrationServiceInterface $userRegistrationService)
     {
         $this->middleware('guest');
     }
 
     /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
+     * Show the registration form.
      */
+    public function showRegistrationForm(Request $request)
+    {
+        $role = $request->query('role', 'client');
+
+        return view('auth.register', compact('role'));
+    }
+
     protected function validator(array $data)
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'role' => ['sometimes', 'string', 'in:client,supplier'],
         ]);
     }
 
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param  array<string, mixed>  $data
-     */
     protected function create(array $data)
     {
+        $role = $data['role'] ?? 'client';
+
         return $this->userRegistrationService->register(
             new RegisterUserData(
                 name: (string) $data['name'],
                 email: (string) $data['email'],
                 password: (string) $data['password'],
+                role: (string) $role,
             )
         );
     }
