@@ -1,5 +1,5 @@
 @foreach($categories as $cat)
-    <div class="mb-1" style="{{ $depth > 0 ? 'margin-left: 16px; border-left: 1px solid rgba(255,255,255,0.08); padding-left: 10px;' : '' }}">
+    <div class="mb-1" style="{{ $depth > 0 ? 'margin-left: 16px; border-left: 1px solid rgba(128,128,128,0.2); padding-left: 10px;' : '' }}">
         <div class="d-flex align-items-center py-1">
             <i data-lucide="{{ $cat->icon ?: 'folder' }}"
                class="{{ $depth === 0 ? 'text-warning' : ($depth === 1 ? 'text-info' : 'text-secondary') }} me-2"

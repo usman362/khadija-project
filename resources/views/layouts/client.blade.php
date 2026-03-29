@@ -144,6 +144,78 @@
         [data-theme="light"] .cl-tabs {
             background: rgba(0, 0, 0, 0.03);
         }
+        /* ─── Additional light-mode overrides (all remaining hardcoded rgba(255…) hover/bg) ─── */
+        [data-theme="light"] .cl-sidebar {
+            background: #ffffff;
+            border-right-color: rgba(0, 0, 0, 0.08);
+        }
+        [data-theme="light"] .cl-sidebar-brand {
+            border-bottom-color: rgba(0, 0, 0, 0.08);
+        }
+        [data-theme="light"] .cl-content {
+            color: #1e293b;
+        }
+        [data-theme="light"] .cl-stat-card,
+        [data-theme="light"] .cl-card {
+            background: #ffffff;
+            border-color: rgba(0, 0, 0, 0.08);
+            color: #1e293b;
+        }
+        [data-theme="light"] .cl-stat-card:hover,
+        [data-theme="light"] .cl-card:hover {
+            background: #fafafa;
+        }
+        [data-theme="light"] .cl-stat-label,
+        [data-theme="light"] .cl-card-subtitle {
+            color: #475569;
+        }
+        [data-theme="light"] .cl-stat-value,
+        [data-theme="light"] .cl-card-title,
+        [data-theme="light"] .cl-page-title {
+            color: #1e293b;
+        }
+        [data-theme="light"] .cl-booking-card,
+        [data-theme="light"] .cl-event-card,
+        [data-theme="light"] .cl-list-card {
+            background: #ffffff;
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+        [data-theme="light"] .cl-booking-card:hover,
+        [data-theme="light"] .cl-event-card:hover,
+        [data-theme="light"] .cl-list-card:hover {
+            background: #fafafa;
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+        [data-theme="light"] .cl-section-title,
+        [data-theme="light"] .cl-heading,
+        [data-theme="light"] h1, [data-theme="light"] h2,
+        [data-theme="light"] h3, [data-theme="light"] h4 {
+            color: #1e293b;
+        }
+        [data-theme="light"] .cl-badge {
+            color: #1e293b;
+        }
+        [data-theme="light"] .cl-table th {
+            color: #475569;
+            background: rgba(0, 0, 0, 0.02);
+        }
+        [data-theme="light"] .cl-table td {
+            color: #1e293b;
+            border-color: rgba(0, 0, 0, 0.06);
+        }
+        [data-theme="light"] .cl-detail-label {
+            color: #64748b;
+        }
+        [data-theme="light"] .cl-detail-value {
+            color: #1e293b;
+        }
+        [data-theme="light"] .cl-sidebar-footer {
+            border-top-color: rgba(0, 0, 0, 0.08);
+        }
+        [data-theme="light"] .cl-dropdown,
+        [data-theme="light"] .cl-modal-overlay .cl-modal {
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+        }
 
         /* ═══════════════════════ THEME TOGGLE ═══════════════════════ */
         .cl-theme-toggle {
