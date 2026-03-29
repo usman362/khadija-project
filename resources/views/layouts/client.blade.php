@@ -63,7 +63,7 @@
             --border-glow: rgba(99, 102, 241, 0.2);
             --text-primary: #1e293b;
             --text-secondary: #475569;
-            --text-muted: #94a3b8;
+            --text-muted: #64748b;
             --accent-blue: #6366f1;
             --accent-blue-soft: rgba(99, 102, 241, 0.1);
             --accent-green: #10b981;
@@ -215,6 +215,48 @@
         [data-theme="light"] .cl-dropdown,
         [data-theme="light"] .cl-modal-overlay .cl-modal {
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+        }
+        [data-theme="light"] .cl-nav-link {
+            color: #475569;
+        }
+        [data-theme="light"] .cl-nav-link:hover {
+            background: rgba(0, 0, 0, 0.04);
+            color: #1e293b;
+        }
+        [data-theme="light"] .cl-nav-link.active {
+            color: var(--accent-blue);
+            background: rgba(99, 102, 241, 0.08);
+        }
+        [data-theme="light"] .cl-user-card {
+            background: rgba(0, 0, 0, 0.03);
+        }
+        [data-theme="light"] .cl-user-card:hover {
+            background: rgba(0, 0, 0, 0.06);
+        }
+        [data-theme="light"] .cl-empty-title {
+            color: #334155;
+        }
+        [data-theme="light"] .cl-empty-text {
+            color: #64748b;
+        }
+        [data-theme="light"] .cl-pagination a:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: #1e293b;
+        }
+        [data-theme="light"] .cl-calendar-day {
+            background: rgba(0, 0, 0, 0.02);
+        }
+        [data-theme="light"] .cl-calendar-day:hover {
+            background: rgba(0, 0, 0, 0.04);
+        }
+        [data-theme="light"] p,
+        [data-theme="light"] span,
+        [data-theme="light"] td,
+        [data-theme="light"] li {
+            color: inherit;
+        }
+        [data-theme="light"] .cl-content p {
+            color: #334155;
         }
 
         /* ═══════════════════════ THEME TOGGLE ═══════════════════════ */
