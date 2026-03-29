@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Events & Categories - {{ config('app.name', 'GigResource') }}</title>
+    <title>Events - {{ config('app.name', 'GigResource') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -668,7 +668,7 @@
 
         <ul class="navbar-links">
             <li><a href="{{ route('about-us') }}">About Us</a></li>
-            <li><a href="{{ route('events-categories') }}" style="color: var(--text-white);">Events & Categories</a></li>
+            <li><a href="{{ route('events-categories') }}" style="color: var(--text-white);">Events</a></li>
             <li><a href="/#how-it-works">How It Works</a></li>
             <li><a href="/#pricing">Pricing</a></li>
             <li><a href="/#faq">FAQ</a></li>
@@ -1014,7 +1014,7 @@
                 <h4>Explore</h4>
                 <ul>
                     <li><a href="{{ route('about-us') }}">About Us</a></li>
-                    <li><a href="{{ route('events-categories') }}">Events & Categories</a></li>
+                    <li><a href="{{ route('events-categories') }}">Events</a></li>
                     <li><a href="/#how-it-works">How It Works</a></li>
                     <li><a href="/#pricing">Pricing</a></li>
                     <li><a href="/#faq">FAQ</a></li>

@@ -1119,7 +1119,7 @@
 
         <ul class="navbar-links">
             <li><a href="{{ route('about-us') }}">About Us</a></li>
-            <li><a href="{{ route('events-categories') }}">Events & Categories</a></li>
+            <li><a href="{{ route('events-categories') }}">Events</a></li>
             <li><a href="#how-it-works">How It Works</a></li>
             <li><a href="#pricing">Pricing</a></li>
             <li><a href="#faq">FAQ</a></li>
@@ -1554,7 +1554,7 @@
                 <h4>Explore</h4>
                 <ul>
                     <li><a href="{{ route('about-us') }}">About Us</a></li>
-                    <li><a href="{{ route('events-categories') }}">Events & Categories</a></li>
+                    <li><a href="{{ route('events-categories') }}">Events</a></li>
                     <li><a href="#how-it-works">How It Works</a></li>
                     <li><a href="#pricing">Pricing</a></li>
                     <li><a href="#faq">FAQ</a></li>
