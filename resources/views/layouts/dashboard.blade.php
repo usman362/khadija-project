@@ -234,6 +234,13 @@
                         </a>
                     </li>
 
+                    <li class="nav-item {{ request()->routeIs('app.admin.policies.*') ? 'active' : '' }}">
+                        <a href="{{ route('app.admin.policies.index') }}" class="nav-link">
+                            <i class="link-icon ic-purple" data-lucide="file-text"></i>
+                            <span class="link-title">Policy Pages</span>
+                        </a>
+                    </li>
+
                     @can('payment_settings.manage')
                         <li class="nav-item {{ request()->routeIs('app.admin.settings.*') ? 'active' : '' }}">
                             <a class="nav-link {{ request()->routeIs('app.admin.settings.*') ? '' : 'collapsed' }}"

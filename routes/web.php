@@ -21,6 +21,7 @@ use App\Http\Controllers\Dashboard\ChatPageController;
 use App\Http\Controllers\Dashboard\AdminCategoryController;
 use App\Http\Controllers\Dashboard\AdminEventController;
 use App\Http\Controllers\Dashboard\AdminFaqController;
+use App\Http\Controllers\Dashboard\AdminPolicyController;
 use App\Http\Controllers\Dashboard\AdminSettingsController;
 use App\Http\Controllers\Dashboard\EventPageController;
 use App\Http\Controllers\Dashboard\MembershipPlanPageController;
@@ -39,9 +40,20 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', LandingPageController::class)->name('landing');
 
 // Policy pages
-Route::view('/privacy-policy', 'policies.privacy')->name('privacy-policy');
-Route::view('/payment-policy', 'policies.payment')->name('payment-policy');
-Route::view('/cancellation-policy', 'policies.cancellation')->name('cancellation-policy');
+Route::get('/privacy-policy', function () {
+    $policy = \App\Models\PolicyPage::findBySlug('privacy-policy');
+    return view('policies.show', ['policy' => $policy, 'fallbackTitle' => 'Privacy Policy']);
+})->name('privacy-policy');
+
+Route::get('/payment-policy', function () {
+    $policy = \App\Models\PolicyPage::findBySlug('payment-policy');
+    return view('policies.show', ['policy' => $policy, 'fallbackTitle' => 'Payment Policy']);
+})->name('payment-policy');
+
+Route::get('/cancellation-policy', function () {
+    $policy = \App\Models\PolicyPage::findBySlug('cancellation-policy');
+    return view('policies.show', ['policy' => $policy, 'fallbackTitle' => 'Cancellation & Refund Policy']);
+})->name('cancellation-policy');
 
 // About Us
 Route::view('/about-us', 'about')->name('about-us');
@@ -206,6 +218,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/app/admin/faqs/{faq}', [AdminFaqController::class, 'update'])->name('app.admin.faqs.update');
     Route::delete('/app/admin/faqs/{faq}', [AdminFaqController::class, 'destroy'])->name('app.admin.faqs.destroy');
     Route::patch('/app/admin/faqs/{faq}/toggle', [AdminFaqController::class, 'toggleStatus'])->name('app.admin.faqs.toggle');
+
+    // Admin Policy Pages
+    Route::get('/app/admin/policies', [AdminPolicyController::class, 'index'])->name('app.admin.policies.index');
+    Route::get('/app/admin/policies/{policy}/edit', [AdminPolicyController::class, 'edit'])->name('app.admin.policies.edit');
+    Route::patch('/app/admin/policies/{policy}', [AdminPolicyController::class, 'update'])->name('app.admin.policies.update');
 
     // Payment Flow
     Route::match(['get', 'post'], '/app/payments/initiate/{plan}', [PaymentPageController::class, 'initiate'])->middleware('permission:membership_plans.subscribe')->name('app.payments.initiate');
