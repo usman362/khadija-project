@@ -127,6 +127,17 @@
                     @endcan
 
                     {{-- ── Billing & Plans ────────────────────── --}}
+                    <li class="nav-item nav-category">Account</li>
+
+                    @role('admin')
+                        <li class="nav-item {{ request()->routeIs('app.admin.profile.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.admin.profile.index') }}" class="nav-link">
+                                <i class="link-icon ic-indigo" data-lucide="user-circle"></i>
+                                <span class="link-title">My Profile</span>
+                            </a>
+                        </li>
+                    @endrole
+
                     <li class="nav-item nav-category">Billing</li>
 
                     @can('membership_plans.view_any')
@@ -148,11 +159,9 @@
                     @endcan
 
                     {{-- ── Administration (admin-only) ────────── --}}
-                    @canany(['users.view_any', 'roles.view_any', 'permissions.view_any', 'membership_plans.create', 'agreement_log.view_any', 'payment_settings.manage'])
+                    @role('admin')
                         <li class="nav-item nav-category">Administration</li>
-                    @endcanany
 
-                    @can('events.view_any')
                         <li class="nav-item {{ request()->routeIs('app.admin.events.*') ? 'active' : '' }}">
                             <a href="{{ route('app.admin.events.index') }}" class="nav-link">
                                 <i class="link-icon ic-cyan" data-lucide="calendar-range"></i>
@@ -180,68 +189,56 @@
                                 </ul>
                             </div>
                         </li>
-                    @endcan
 
-                    @can('membership_plans.create')
                         <li class="nav-item {{ request()->routeIs('app.admin.membership-plans.*') ? 'active' : '' }}">
                             <a href="{{ route('app.admin.membership-plans.index') }}" class="nav-link">
                                 <i class="link-icon ic-orange" data-lucide="package"></i>
                                 <span class="link-title">Manage Plans</span>
                             </a>
                         </li>
-                    @endcan
 
-                    @can('agreement_log.view_any')
                         <li class="nav-item {{ request()->routeIs('app.agreement-log.*') ? 'active' : '' }}">
                             <a href="{{ route('app.agreement-log.index') }}" class="nav-link">
                                 <i class="link-icon ic-violet" data-lucide="scroll-text"></i>
                                 <span class="link-title">Agreement Log</span>
                             </a>
                         </li>
-                    @endcan
 
-                    @can('users.view_any')
                         <li class="nav-item {{ request()->routeIs('app.users.*') ? 'active' : '' }}">
                             <a href="{{ route('app.users.index') }}" class="nav-link">
                                 <i class="link-icon ic-rose" data-lucide="users"></i>
                                 <span class="link-title">Users</span>
                             </a>
                         </li>
-                    @endcan
 
-                    @can('roles.view_any')
                         <li class="nav-item {{ request()->routeIs('app.roles.*') ? 'active' : '' }}">
                             <a href="{{ route('app.roles.index') }}" class="nav-link">
                                 <i class="link-icon ic-pink" data-lucide="shield"></i>
                                 <span class="link-title">Roles</span>
                             </a>
                         </li>
-                    @endcan
 
-                    @can('permissions.view_any')
                         <li class="nav-item {{ request()->routeIs('app.permissions.*') ? 'active' : '' }}">
                             <a href="{{ route('app.permissions.index') }}" class="nav-link">
                                 <i class="link-icon ic-red" data-lucide="key-round"></i>
                                 <span class="link-title">Permissions</span>
                             </a>
                         </li>
-                    @endcan
 
-                    <li class="nav-item {{ request()->routeIs('app.admin.faqs.*') ? 'active' : '' }}">
-                        <a href="{{ route('app.admin.faqs.index') }}" class="nav-link">
-                            <i class="link-icon ic-cyan" data-lucide="help-circle"></i>
-                            <span class="link-title">FAQ Management</span>
-                        </a>
-                    </li>
+                        <li class="nav-item {{ request()->routeIs('app.admin.faqs.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.admin.faqs.index') }}" class="nav-link">
+                                <i class="link-icon ic-cyan" data-lucide="help-circle"></i>
+                                <span class="link-title">FAQ Management</span>
+                            </a>
+                        </li>
 
-                    <li class="nav-item {{ request()->routeIs('app.admin.policies.*') ? 'active' : '' }}">
-                        <a href="{{ route('app.admin.policies.index') }}" class="nav-link">
-                            <i class="link-icon ic-purple" data-lucide="file-text"></i>
-                            <span class="link-title">Policy Pages</span>
-                        </a>
-                    </li>
+                        <li class="nav-item {{ request()->routeIs('app.admin.policies.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.admin.policies.index') }}" class="nav-link">
+                                <i class="link-icon ic-purple" data-lucide="file-text"></i>
+                                <span class="link-title">Policy Pages</span>
+                            </a>
+                        </li>
 
-                    @can('payment_settings.manage')
                         <li class="nav-item {{ request()->routeIs('app.admin.settings.*') ? 'active' : '' }}">
                             <a class="nav-link {{ request()->routeIs('app.admin.settings.*') ? '' : 'collapsed' }}"
                                 data-bs-toggle="collapse" href="#settingsSubmenu" role="button"
@@ -268,7 +265,7 @@
                                 </ul>
                             </div>
                         </li>
-                    @endcan
+                    @endrole
 
                 </ul>
             </div>

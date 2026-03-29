@@ -85,7 +85,7 @@
                         @foreach($recentEvents as $event)
                         <tr>
                             <td style="color: var(--text-primary); font-weight: 500;">{{ $event->title }}</td>
-                            <td>{{ $event->category?->name ?? '—' }}</td>
+                            <td>{{ $event->categories->pluck('name')->join(', ') ?: '—' }}</td>
                             <td><span class="cl-badge cl-badge-{{ $event->status }}">{{ ucfirst(str_replace('_', ' ', $event->status)) }}</span></td>
                             <td>{{ $event->starts_at?->format('M d, Y') ?? '—' }}</td>
                         </tr>

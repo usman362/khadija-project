@@ -17,8 +17,10 @@
                     @if($event->is_published)
                         <span class="cl-badge cl-badge-published">Published</span>
                     @endif
-                    @if($event->category)
-                        <span style="font-size: 13px; color: var(--text-muted);">{{ $event->category->name }}</span>
+                    @if($event->categories->count())
+                        @foreach($event->categories as $cat)
+                            <span style="font-size: 13px; color: var(--text-muted);">{{ $cat->name }}</span>
+                        @endforeach
                     @endif
                 </div>
             </div>
@@ -78,10 +80,14 @@
                         <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">End Date</div>
                         <div style="font-size: 14px; font-weight: 500;">{{ $event->ends_at?->format('M d, Y h:i A') ?? '—' }}</div>
                     </div>
-                    @if($event->category)
+                    @if($event->categories->count())
                     <div>
-                        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Category</div>
-                        <div style="font-size: 14px; font-weight: 500;">{{ $event->category->name }}</div>
+                        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Categories</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                            @foreach($event->categories as $cat)
+                                <span class="cl-badge" style="font-size: 12px;">{{ $cat->name }}</span>
+                            @endforeach
+                        </div>
                     </div>
                     @endif
                     <div>

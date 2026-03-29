@@ -155,7 +155,7 @@ class AdminCategoryController extends Controller
     public function destroy(Category $category): RedirectResponse
     {
         $category->children()->update(['parent_id' => null]);
-        $category->events()->update(['category_id' => null]);
+        $category->events()->detach();
         $category->delete();
 
         return redirect()->route('app.admin.categories.index')->with('status', 'Category deleted successfully.');

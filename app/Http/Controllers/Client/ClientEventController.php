@@ -16,7 +16,7 @@ class ClientEventController extends Controller
         $user = $request->user();
 
         $query = Event::where('client_id', $user->id)
-            ->with(['category:id,name,icon', 'supplier:id,name', 'bookings'])
+            ->with(['categories:id,name,icon', 'supplier:id,name', 'bookings'])
             ->latest();
 
         // Search filter
@@ -31,7 +31,11 @@ class ClientEventController extends Controller
 
         // Category filter
         if ($request->filled('category')) {
-            $query->where('category_id', $request->integer('category'));
+            $catId = $request->integer('category');
+            $query->where(function ($q) use ($catId) {
+                $q->where('category_id', $catId)
+                  ->orWhereHas('categories', fn($q2) => $q2->where('categories.id', $catId));
+            });
         }
 
         $events = $query->paginate(12)->withQueryString();
@@ -67,11 +71,12 @@ class ClientEventController extends Controller
             'description' => ['nullable', 'string'],
             'starts_at' => ['nullable', 'date'],
             'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
-            'category_id' => ['nullable', 'exists:categories,id'],
+            'category_ids' => ['nullable', 'array'],
+            'category_ids.*' => ['exists:categories,id'],
             'location' => ['nullable', 'string', 'max:255'],
         ]);
 
-        Event::create([
+        $event = Event::create([
             'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
             'status' => 'pending',
@@ -79,10 +84,15 @@ class ClientEventController extends Controller
             'ends_at' => $validated['ends_at'] ?? null,
             'created_by' => $request->user()->id,
             'client_id' => $request->user()->id,
-            'category_id' => $validated['category_id'] ?? null,
+            'location' => $validated['location'] ?? null,
             'is_published' => false,
             'source' => 'user',
         ]);
+
+        // Sync categories via pivot table
+        if (!empty($validated['category_ids'])) {
+            $event->categories()->sync($validated['category_ids']);
+        }
 
         return redirect()->route('client.events.index')->with('status', 'Event created successfully!');
     }
@@ -92,7 +102,7 @@ class ClientEventController extends Controller
         $this->authorize('view', $event);
 
         $event->load([
-            'category:id,name',
+            'categories:id,name',
             'client:id,name,email',
             'supplier:id,name,email',
             'bookings.supplier:id,name',
@@ -112,10 +122,20 @@ class ClientEventController extends Controller
             'description' => ['nullable', 'string'],
             'starts_at' => ['nullable', 'date'],
             'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
-            'category_id' => ['nullable', 'exists:categories,id'],
+            'category_ids' => ['nullable', 'array'],
+            'category_ids.*' => ['exists:categories,id'],
+            'location' => ['nullable', 'string', 'max:255'],
         ]);
 
-        $event->update($validated);
+        $event->update([
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'starts_at' => $validated['starts_at'] ?? null,
+            'ends_at' => $validated['ends_at'] ?? null,
+            'location' => $validated['location'] ?? null,
+        ]);
+
+        $event->categories()->sync($validated['category_ids'] ?? []);
 
         return back()->with('status', 'Event updated successfully.');
     }

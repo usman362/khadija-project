@@ -96,6 +96,143 @@
 
     .cl-tab-content { display: none; }
     .cl-tab-content.active { display: block; }
+
+    /* ── Multi-Select Category Dropdown ── */
+    .cl-multiselect-wrap {
+        position: relative;
+    }
+    .cl-multiselect-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-color);
+        background: rgba(255,255,255,0.03);
+        color: var(--text-primary);
+        cursor: pointer;
+        font-size: 14px;
+        min-height: 44px;
+        flex-wrap: wrap;
+        gap: 6px;
+        transition: var(--transition);
+    }
+    [data-theme="light"] .cl-multiselect-toggle {
+        background: rgba(0,0,0,0.02);
+    }
+    .cl-multiselect-toggle:hover {
+        border-color: var(--accent-blue);
+    }
+    .cl-multiselect-placeholder {
+        color: var(--text-muted);
+    }
+    .cl-multiselect-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        flex: 1;
+    }
+    .cl-multiselect-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        border-radius: 20px;
+        background: var(--accent-blue-soft);
+        color: var(--accent-blue);
+        font-size: 12px;
+        font-weight: 500;
+    }
+    .cl-multiselect-tag .tag-remove {
+        cursor: pointer;
+        opacity: 0.7;
+        display: flex;
+    }
+    .cl-multiselect-tag .tag-remove:hover { opacity: 1; }
+    .cl-multiselect-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        margin-top: 4px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        z-index: 100;
+        max-height: 280px;
+        overflow: hidden;
+        display: none;
+        flex-direction: column;
+    }
+    .cl-multiselect-wrap.open .cl-multiselect-dropdown {
+        display: flex;
+    }
+    .cl-multiselect-search {
+        padding: 8px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .cl-multiselect-search input {
+        width: 100%;
+        padding: 8px 12px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-color);
+        background: transparent;
+        color: var(--text-primary);
+        font-size: 13px;
+        outline: none;
+    }
+    .cl-multiselect-search input:focus {
+        border-color: var(--accent-blue);
+    }
+    .cl-multiselect-options {
+        overflow-y: auto;
+        max-height: 220px;
+        padding: 4px;
+    }
+    .cl-multiselect-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-size: 14px;
+        color: var(--text-primary);
+        transition: background 0.15s;
+    }
+    .cl-multiselect-option:hover {
+        background: rgba(99,102,241,0.08);
+    }
+    .cl-multiselect-option input[type="checkbox"] {
+        display: none;
+    }
+    .cl-multiselect-check {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        border: 2px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: all 0.15s;
+    }
+    .cl-multiselect-check svg {
+        display: none;
+    }
+    .cl-multiselect-option input:checked + .cl-multiselect-check {
+        background: var(--accent-blue);
+        border-color: var(--accent-blue);
+    }
+    .cl-multiselect-option input:checked + .cl-multiselect-check svg {
+        display: block;
+        stroke: #fff;
+    }
+    .cl-multiselect-option.hidden {
+        display: none;
+    }
 </style>
 @endpush
 
@@ -300,11 +437,13 @@
                         <div class="cl-event-info">
                             <div class="cl-event-title">{{ $event->title }}</div>
                             <div class="cl-event-meta">
-                                @if($event->category)
-                                    <span>
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                                        {{ $event->category->name }}
-                                    </span>
+                                @if($event->categories->count())
+                                    @foreach($event->categories as $cat)
+                                        <span>
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                                            {{ $cat->name }}
+                                        </span>
+                                    @endforeach
                                 @endif
                                 <span>
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -400,20 +539,35 @@
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <div class="cl-form-group">
-                            <label class="cl-form-label">Category</label>
-                            <select name="category_id" class="cl-form-select">
-                                <option value="">Select a category</option>
-                                @foreach ($categories as $cat)
-                                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                                @endforeach
-                            </select>
+                    <div class="cl-form-group">
+                        <label class="cl-form-label">Categories <span style="font-weight:400; color: var(--text-muted);">(select one or more)</span></label>
+                        <div class="cl-multiselect-wrap" id="categoryMultiselect">
+                            <div class="cl-multiselect-toggle" onclick="this.parentElement.classList.toggle('open')">
+                                <span class="cl-multiselect-placeholder">Select categories...</span>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                            </div>
+                            <div class="cl-multiselect-dropdown">
+                                <div class="cl-multiselect-search">
+                                    <input type="text" placeholder="Search categories..." oninput="filterCategories(this.value)">
+                                </div>
+                                <div class="cl-multiselect-options">
+                                    @foreach ($categories as $cat)
+                                        <label class="cl-multiselect-option" data-name="{{ strtolower($cat->name) }}">
+                                            <input type="checkbox" name="category_ids[]" value="{{ $cat->id }}">
+                                            <span class="cl-multiselect-check">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                                            </span>
+                                            <span>{{ $cat->name }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
                         </div>
-                        <div class="cl-form-group">
-                            <label class="cl-form-label">Location</label>
-                            <input type="text" name="location" class="cl-form-input" placeholder="City, Venue, or Address">
-                        </div>
+                    </div>
+
+                    <div class="cl-form-group">
+                        <label class="cl-form-label">Location</label>
+                        <input type="text" name="location" class="cl-form-input" placeholder="City, Venue, or Address">
                     </div>
                 </div>
                 <div class="cl-modal-footer">
@@ -459,7 +613,67 @@
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             document.getElementById('postEventModal').classList.remove('show');
+            document.querySelectorAll('.cl-multiselect-wrap.open').forEach(el => el.classList.remove('open'));
         }
+    });
+
+    // ── Multi-Select Category Logic ──
+    function updateMultiselectDisplay() {
+        const wrap = document.getElementById('categoryMultiselect');
+        const toggle = wrap.querySelector('.cl-multiselect-toggle');
+        const checked = wrap.querySelectorAll('input[type="checkbox"]:checked');
+        const placeholder = toggle.querySelector('.cl-multiselect-placeholder');
+
+        // Remove existing tags
+        toggle.querySelectorAll('.cl-multiselect-tags').forEach(el => el.remove());
+
+        if (checked.length === 0) {
+            if (placeholder) placeholder.style.display = '';
+        } else {
+            if (placeholder) placeholder.style.display = 'none';
+            const tagsContainer = document.createElement('div');
+            tagsContainer.className = 'cl-multiselect-tags';
+            checked.forEach(cb => {
+                const name = cb.closest('.cl-multiselect-option').querySelector('span:last-child').textContent;
+                const tag = document.createElement('span');
+                tag.className = 'cl-multiselect-tag';
+                tag.innerHTML = name + ' <span class="tag-remove" data-id="' + cb.value + '"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>';
+                tagsContainer.appendChild(tag);
+            });
+            toggle.insertBefore(tagsContainer, toggle.querySelector('svg:last-child'));
+        }
+    }
+
+    // Checkbox change handler
+    document.querySelectorAll('#categoryMultiselect input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', updateMultiselectDisplay);
+    });
+
+    // Tag remove handler (delegated)
+    document.addEventListener('click', function(e) {
+        const removeBtn = e.target.closest('.tag-remove');
+        if (removeBtn) {
+            e.stopPropagation();
+            const id = removeBtn.dataset.id;
+            const cb = document.querySelector('#categoryMultiselect input[value="' + id + '"]');
+            if (cb) { cb.checked = false; updateMultiselectDisplay(); }
+        }
+    });
+
+    // Search/filter categories
+    function filterCategories(query) {
+        const q = query.toLowerCase();
+        document.querySelectorAll('#categoryMultiselect .cl-multiselect-option').forEach(opt => {
+            const name = opt.dataset.name;
+            opt.classList.toggle('hidden', q && !name.includes(q));
+        });
+    }
+
+    // Close multiselect on outside click
+    document.addEventListener('click', function(e) {
+        document.querySelectorAll('.cl-multiselect-wrap.open').forEach(wrap => {
+            if (!wrap.contains(e.target)) wrap.classList.remove('open');
+        });
     });
 </script>
 @endpush

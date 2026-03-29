@@ -23,9 +23,9 @@
             --bg-sidebar: #0d1321;
             --border-color: rgba(255, 255, 255, 0.06);
             --border-glow: rgba(99, 102, 241, 0.15);
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
             --accent-blue: #6366f1;
             --accent-blue-soft: rgba(99, 102, 241, 0.12);
             --accent-green: #10b981;
@@ -62,8 +62,8 @@
             --border-color: rgba(0, 0, 0, 0.08);
             --border-glow: rgba(99, 102, 241, 0.2);
             --text-primary: #1e293b;
-            --text-secondary: #475569;
-            --text-muted: #64748b;
+            --text-secondary: #334155;
+            --text-muted: #475569;
             --accent-blue: #6366f1;
             --accent-blue-soft: rgba(99, 102, 241, 0.1);
             --accent-green: #10b981;
@@ -230,10 +230,10 @@
             background: rgba(0, 0, 0, 0.06);
         }
         [data-theme="light"] .cl-empty-title {
-            color: #334155;
+            color: #1e293b;
         }
         [data-theme="light"] .cl-empty-text {
-            color: #64748b;
+            color: #475569;
         }
         [data-theme="light"] .cl-pagination a:hover {
             background: rgba(0, 0, 0, 0.05);
@@ -945,9 +945,9 @@
 
                 <li class="cl-nav-label">Account</li>
                 <li class="cl-nav-item">
-                    <a href="#" class="cl-nav-link">
-                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-                        Settings
+                    <a href="{{ route('professional.profile.index') }}" class="cl-nav-link {{ request()->routeIs('professional.profile.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Profile & Settings
                     </a>
                 </li>
             </ul>

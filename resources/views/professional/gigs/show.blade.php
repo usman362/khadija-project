@@ -127,8 +127,10 @@
                 <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">{{ $event->title }}</h2>
                 <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                     <span class="cl-badge cl-badge-{{ $event->status }}">{{ ucfirst(str_replace('_', ' ', $event->status)) }}</span>
-                    @if($event->category)
-                        <span style="font-size: 13px; color: var(--text-muted);">{{ $event->category->name }}</span>
+                    @if($event->categories->count())
+                        @foreach($event->categories as $cat)
+                            <span style="font-size: 13px; color: var(--text-muted);">{{ $cat->name }}</span>
+                        @endforeach
                     @endif
                     @if($event->budget)
                         <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700;background:var(--accent-green-soft);color:var(--accent-green);">
@@ -231,14 +233,14 @@
                         </div>
                     </div>
                     @endif
-                    @if($event->category)
+                    @if($event->categories->count())
                     <div class="gig-detail-row">
                         <div class="gig-detail-icon" style="background: var(--accent-blue-soft); color: var(--accent-blue);">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                         </div>
                         <div>
-                            <div class="gig-detail-label">Category</div>
-                            <div class="gig-detail-value">{{ $event->category->name }}</div>
+                            <div class="gig-detail-label">Categories</div>
+                            <div class="gig-detail-value">{{ $event->categories->pluck('name')->join(', ') }}</div>
                         </div>
                     </div>
                     @endif

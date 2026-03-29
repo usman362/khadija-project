@@ -30,7 +30,7 @@ class ClientBookingController extends Controller
 
         // Build query with filters
         $query = Booking::where('client_id', $user->id)
-            ->with(['event:id,title,starts_at,ends_at,category_id', 'event.category:id,name', 'supplier:id,name'])
+            ->with(['event:id,title,starts_at,ends_at', 'event.categories:id,name', 'supplier:id,name'])
             ->latest();
 
         // Status tab filter

@@ -14,7 +14,7 @@ class AdminEventController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Event::query()->with(['client:id,name', 'supplier:id,name', 'creator:id,name']);
+        $query = Event::query()->with(['client:id,name', 'supplier:id,name', 'creator:id,name', 'categories:id,name']);
 
         // Search by title or description
         if ($request->filled('search')) {
@@ -104,6 +104,8 @@ class AdminEventController extends Controller
             'client_id' => ['required', 'exists:users,id'],
             'supplier_id' => ['nullable', 'exists:users,id'],
             'category_id' => ['nullable', 'exists:categories,id'],
+            'category_ids' => ['nullable', 'array'],
+            'category_ids.*' => ['exists:categories,id'],
             'is_published' => ['nullable', 'boolean'],
         ]);
 
@@ -122,6 +124,13 @@ class AdminEventController extends Controller
             'source' => 'user',
         ]);
 
+        // Sync categories via pivot
+        if (!empty($validated['category_ids'])) {
+            $event->categories()->sync($validated['category_ids']);
+        } elseif (!empty($validated['category_id'])) {
+            $event->categories()->sync([$validated['category_id']]);
+        }
+
         return redirect()->route('app.admin.events.index')->with('status', 'Event created successfully.');
     }
 
@@ -136,6 +145,8 @@ class AdminEventController extends Controller
             'client_id' => ['required', 'exists:users,id'],
             'supplier_id' => ['nullable', 'exists:users,id'],
             'category_id' => ['nullable', 'exists:categories,id'],
+            'category_ids' => ['nullable', 'array'],
+            'category_ids.*' => ['exists:categories,id'],
             'is_published' => ['nullable', 'boolean'],
         ]);
 
@@ -148,6 +159,11 @@ class AdminEventController extends Controller
             'is_published' => $nowPublished,
             'published_at' => (!$wasPublished && $nowPublished) ? now() : $event->published_at,
         ]);
+
+        // Sync categories via pivot
+        if (isset($validated['category_ids'])) {
+            $event->categories()->sync($validated['category_ids']);
+        }
 
         return redirect()->route('app.admin.events.index')->with('status', 'Event updated successfully.');
     }

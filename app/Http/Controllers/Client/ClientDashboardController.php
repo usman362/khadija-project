@@ -27,7 +27,7 @@ class ClientDashboardController extends Controller
 
         // Recent events
         $recentEvents = Event::where('client_id', $user->id)
-            ->with(['category:id,name', 'supplier:id,name'])
+            ->with(['categories:id,name', 'supplier:id,name'])
             ->latest()
             ->take(5)
             ->get();

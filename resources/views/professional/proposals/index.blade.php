@@ -226,11 +226,13 @@
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                                 {{ $counterparty }}
                             </span>
-                            @if($booking->event?->category)
-                                <span>
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>
-                                    {{ $booking->event->category->name }}
-                                </span>
+                            @if($booking->event?->categories?->count())
+                                @foreach($booking->event->categories as $cat)
+                                    <span>
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>
+                                        {{ $cat->name }}
+                                    </span>
+                                @endforeach
                             @endif
                             @if($booking->event?->starts_at)
                                 <span>

@@ -17,7 +17,7 @@ class ProfessionalGigController extends Controller
 
         // ── My Gigs (assigned to this supplier) ──
         $myGigsQuery = Event::where('supplier_id', $user->id)
-            ->with(['category:id,name,icon', 'supplier:id,name', 'client:id,name', 'bookings'])
+            ->with(['categories:id,name,icon', 'supplier:id,name', 'client:id,name', 'bookings'])
             ->latest();
 
         if ($request->filled('search') && $view === 'my-gigs') {
@@ -27,7 +27,11 @@ class ProfessionalGigController extends Controller
             $myGigsQuery->where('status', $request->string('status')->toString());
         }
         if ($request->filled('category') && $view === 'my-gigs') {
-            $myGigsQuery->where('category_id', $request->integer('category'));
+            $catId = $request->integer('category');
+            $myGigsQuery->where(function ($q) use ($catId) {
+                $q->where('category_id', $catId)
+                  ->orWhereHas('categories', fn($q2) => $q2->where('categories.id', $catId));
+            });
         }
 
         $myGigs = $myGigsQuery->paginate(12, ['*'], 'my_page')->withQueryString();
@@ -46,14 +50,18 @@ class ProfessionalGigController extends Controller
                 $q->whereNull('supplier_id')
                   ->orWhere('supplier_id', '!=', $user->id);
             })
-            ->with(['category:id,name,icon', 'client:id,name'])
+            ->with(['categories:id,name,icon', 'client:id,name'])
             ->latest();
 
         if ($request->filled('search') && $view === 'browse') {
             $browseQuery->where('title', 'like', '%' . $request->string('search') . '%');
         }
         if ($request->filled('category') && $view === 'browse') {
-            $browseQuery->where('category_id', $request->integer('category'));
+            $catId = $request->integer('category');
+            $browseQuery->where(function ($q) use ($catId) {
+                $q->where('category_id', $catId)
+                  ->orWhereHas('categories', fn($q2) => $q2->where('categories.id', $catId));
+            });
         }
 
         $browseEvents = $browseQuery->paginate(12, ['*'], 'browse_page')->withQueryString();
@@ -84,7 +92,7 @@ class ProfessionalGigController extends Controller
     public function show(Request $request, Event $event): View
     {
         $event->load([
-            'category:id,name',
+            'categories:id,name',
             'client:id,name,email',
             'supplier:id,name,email',
             'bookings.supplier:id,name',

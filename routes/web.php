@@ -5,11 +5,13 @@ use App\Http\Controllers\Client\ClientBookingController;
 use App\Http\Controllers\Client\ClientChatController;
 use App\Http\Controllers\Client\ClientDashboardController;
 use App\Http\Controllers\Client\ClientEventController;
+use App\Http\Controllers\Client\ClientProfileController;
 use App\Http\Controllers\Professional\ProfessionalChatController;
 use App\Http\Controllers\Professional\ProfessionalDashboardController;
 use App\Http\Controllers\Professional\ProfessionalEarningsController;
 use App\Http\Controllers\Professional\ProfessionalGigController;
 use App\Http\Controllers\Professional\ProfessionalProposalController;
+use App\Http\Controllers\Professional\ProfessionalProfileController;
 use App\Http\Controllers\Professional\ProfessionalReviewController;
 use App\Http\Controllers\Professional\ProfessionalTransactionController;
 use App\Http\Controllers\ConversationController;
@@ -20,6 +22,7 @@ use App\Http\Controllers\Dashboard\BookingPageController;
 use App\Http\Controllers\Dashboard\ChatPageController;
 use App\Http\Controllers\Dashboard\AdminCategoryController;
 use App\Http\Controllers\Dashboard\AdminEventController;
+use App\Http\Controllers\Dashboard\AdminProfileController;
 use App\Http\Controllers\Dashboard\AdminFaqController;
 use App\Http\Controllers\Dashboard\AdminPolicyController;
 use App\Http\Controllers\Dashboard\AdminSettingsController;
@@ -122,6 +125,16 @@ Route::middleware('auth')->group(function () {
         // Client Messages (Chat)
         Route::get('/messages', [ClientChatController::class, 'index'])->middleware('permission:messages.view_any')->name('client.chat.index');
         Route::get('/messages/{conversation}', [ClientChatController::class, 'show'])->middleware('permission:messages.view')->name('client.chat.show');
+
+        // Client Profile & Settings
+        Route::get('/profile', [ClientProfileController::class, 'index'])->name('client.profile.index');
+        Route::patch('/profile/general', [ClientProfileController::class, 'updateGeneral'])->name('client.profile.update.general');
+        Route::patch('/profile/company', [ClientProfileController::class, 'updateCompany'])->name('client.profile.update.company');
+        Route::patch('/profile/social', [ClientProfileController::class, 'updateSocial'])->name('client.profile.update.social');
+        Route::patch('/profile/password', [ClientProfileController::class, 'updatePassword'])->name('client.profile.update.password');
+        Route::patch('/profile/notifications', [ClientProfileController::class, 'updateNotifications'])->name('client.profile.update.notifications');
+        Route::post('/profile/avatar', [ClientProfileController::class, 'updateAvatar'])->name('client.profile.avatar');
+        Route::delete('/profile/avatar', [ClientProfileController::class, 'removeAvatar'])->name('client.profile.avatar.remove');
     });
 
     // ── Professional Panel ──────────────────────────────────────────
@@ -149,6 +162,17 @@ Route::middleware('auth')->group(function () {
 
         // Transactions
         Route::get('/transactions', [ProfessionalTransactionController::class, 'index'])->name('professional.transactions.index');
+
+        // Professional Profile & Settings
+        Route::get('/profile', [ProfessionalProfileController::class, 'index'])->name('professional.profile.index');
+        Route::patch('/profile/general', [ProfessionalProfileController::class, 'updateGeneral'])->name('professional.profile.update.general');
+        Route::patch('/profile/professional', [ProfessionalProfileController::class, 'updateProfessional'])->name('professional.profile.update.professional');
+        Route::patch('/profile/portfolio', [ProfessionalProfileController::class, 'updatePortfolio'])->name('professional.profile.update.portfolio');
+        Route::patch('/profile/social', [ProfessionalProfileController::class, 'updateSocial'])->name('professional.profile.update.social');
+        Route::patch('/profile/password', [ProfessionalProfileController::class, 'updatePassword'])->name('professional.profile.update.password');
+        Route::patch('/profile/notifications', [ProfessionalProfileController::class, 'updateNotifications'])->name('professional.profile.update.notifications');
+        Route::post('/profile/avatar', [ProfessionalProfileController::class, 'updateAvatar'])->name('professional.profile.avatar');
+        Route::delete('/profile/avatar', [ProfessionalProfileController::class, 'removeAvatar'])->name('professional.profile.avatar.remove');
     });
 
     // Dashboard UI pages
@@ -186,43 +210,55 @@ Route::middleware('auth')->group(function () {
     Route::post('/app/membership-plans/cancel', [MembershipPlanPageController::class, 'cancel'])->middleware('permission:membership_plans.subscribe')->name('app.membership-plans.cancel');
     Route::get('/app/membership-plans/history', [MembershipPlanPageController::class, 'history'])->middleware('permission:membership_plans.view_any')->name('app.membership-plans.history');
 
-    // Admin Membership Plan Management
-    Route::get('/app/admin/membership-plans', [AdminMembershipPlanController::class, 'index'])->middleware('permission:membership_plans.create')->name('app.admin.membership-plans.index');
-    Route::post('/app/admin/membership-plans', [AdminMembershipPlanController::class, 'store'])->middleware('permission:membership_plans.create')->name('app.admin.membership-plans.store');
-    Route::patch('/app/admin/membership-plans/{membership_plan}', [AdminMembershipPlanController::class, 'update'])->middleware('permission:membership_plans.update')->name('app.admin.membership-plans.update');
-    Route::delete('/app/admin/membership-plans/{membership_plan}', [AdminMembershipPlanController::class, 'destroy'])->middleware('permission:membership_plans.delete')->name('app.admin.membership-plans.destroy');
+    // ── Admin Panel (role:admin required) ──────────────────────────────
+    Route::prefix('app/admin')->middleware('role:admin')->group(function () {
+        // Admin Profile
+        Route::get('/profile', [AdminProfileController::class, 'index'])->name('app.admin.profile.index');
+        Route::patch('/profile/general', [AdminProfileController::class, 'updateGeneral'])->name('app.admin.profile.update.general');
+        Route::patch('/profile/social', [AdminProfileController::class, 'updateSocial'])->name('app.admin.profile.update.social');
+        Route::patch('/profile/password', [AdminProfileController::class, 'updatePassword'])->name('app.admin.profile.update.password');
+        Route::patch('/profile/notifications', [AdminProfileController::class, 'updateNotifications'])->name('app.admin.profile.update.notifications');
+        Route::post('/profile/avatar', [AdminProfileController::class, 'updateAvatar'])->name('app.admin.profile.avatar');
+        Route::delete('/profile/avatar', [AdminProfileController::class, 'removeAvatar'])->name('app.admin.profile.avatar.remove');
 
-    // Admin Settings
-    Route::get('/app/admin/settings/payments', [AdminSettingsController::class, 'paymentSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.payments');
-    Route::post('/app/admin/settings/payments', [AdminSettingsController::class, 'updatePaymentSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.payments.update');
-    Route::get('/app/admin/settings/openai', [AdminSettingsController::class, 'openaiSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.openai');
-    Route::post('/app/admin/settings/openai', [AdminSettingsController::class, 'updateOpenAISettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.openai.update');
+        // Membership Plan Management
+        Route::get('/membership-plans', [AdminMembershipPlanController::class, 'index'])->middleware('permission:membership_plans.create')->name('app.admin.membership-plans.index');
+        Route::post('/membership-plans', [AdminMembershipPlanController::class, 'store'])->middleware('permission:membership_plans.create')->name('app.admin.membership-plans.store');
+        Route::patch('/membership-plans/{membership_plan}', [AdminMembershipPlanController::class, 'update'])->middleware('permission:membership_plans.update')->name('app.admin.membership-plans.update');
+        Route::delete('/membership-plans/{membership_plan}', [AdminMembershipPlanController::class, 'destroy'])->middleware('permission:membership_plans.delete')->name('app.admin.membership-plans.destroy');
 
-    // Admin All Events
-    Route::get('/app/admin/events', [AdminEventController::class, 'index'])->middleware('permission:events.view_any')->name('app.admin.events.index');
-    Route::post('/app/admin/events', [AdminEventController::class, 'store'])->middleware('permission:events.create')->name('app.admin.events.store');
-    Route::patch('/app/admin/events/{event}', [AdminEventController::class, 'update'])->middleware('permission:events.update')->name('app.admin.events.update');
-    Route::delete('/app/admin/events/{event}', [AdminEventController::class, 'destroy'])->middleware('permission:events.delete')->name('app.admin.events.destroy');
+        // Settings
+        Route::get('/settings/payments', [AdminSettingsController::class, 'paymentSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.payments');
+        Route::post('/settings/payments', [AdminSettingsController::class, 'updatePaymentSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.payments.update');
+        Route::get('/settings/openai', [AdminSettingsController::class, 'openaiSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.openai');
+        Route::post('/settings/openai', [AdminSettingsController::class, 'updateOpenAISettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.openai.update');
 
-    // Admin Categories
-    Route::get('/app/admin/categories', [AdminCategoryController::class, 'index'])->middleware('permission:events.view_any')->name('app.admin.categories.index');
-    Route::get('/app/admin/categories/create', [AdminCategoryController::class, 'create'])->middleware('permission:events.create')->name('app.admin.categories.create');
-    Route::post('/app/admin/categories', [AdminCategoryController::class, 'store'])->middleware('permission:events.create')->name('app.admin.categories.store');
-    Route::get('/app/admin/categories/{category}/edit', [AdminCategoryController::class, 'edit'])->middleware('permission:events.update')->name('app.admin.categories.edit');
-    Route::patch('/app/admin/categories/{category}', [AdminCategoryController::class, 'update'])->middleware('permission:events.update')->name('app.admin.categories.update');
-    Route::delete('/app/admin/categories/{category}', [AdminCategoryController::class, 'destroy'])->middleware('permission:events.delete')->name('app.admin.categories.destroy');
+        // All Events
+        Route::get('/events', [AdminEventController::class, 'index'])->middleware('permission:events.view_any')->name('app.admin.events.index');
+        Route::post('/events', [AdminEventController::class, 'store'])->middleware('permission:events.create')->name('app.admin.events.store');
+        Route::patch('/events/{event}', [AdminEventController::class, 'update'])->middleware('permission:events.update')->name('app.admin.events.update');
+        Route::delete('/events/{event}', [AdminEventController::class, 'destroy'])->middleware('permission:events.delete')->name('app.admin.events.destroy');
 
-    // Admin FAQ Management
-    Route::get('/app/admin/faqs', [AdminFaqController::class, 'index'])->name('app.admin.faqs.index');
-    Route::post('/app/admin/faqs', [AdminFaqController::class, 'store'])->name('app.admin.faqs.store');
-    Route::patch('/app/admin/faqs/{faq}', [AdminFaqController::class, 'update'])->name('app.admin.faqs.update');
-    Route::delete('/app/admin/faqs/{faq}', [AdminFaqController::class, 'destroy'])->name('app.admin.faqs.destroy');
-    Route::patch('/app/admin/faqs/{faq}/toggle', [AdminFaqController::class, 'toggleStatus'])->name('app.admin.faqs.toggle');
+        // Categories
+        Route::get('/categories', [AdminCategoryController::class, 'index'])->middleware('permission:events.view_any')->name('app.admin.categories.index');
+        Route::get('/categories/create', [AdminCategoryController::class, 'create'])->middleware('permission:events.create')->name('app.admin.categories.create');
+        Route::post('/categories', [AdminCategoryController::class, 'store'])->middleware('permission:events.create')->name('app.admin.categories.store');
+        Route::get('/categories/{category}/edit', [AdminCategoryController::class, 'edit'])->middleware('permission:events.update')->name('app.admin.categories.edit');
+        Route::patch('/categories/{category}', [AdminCategoryController::class, 'update'])->middleware('permission:events.update')->name('app.admin.categories.update');
+        Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->middleware('permission:events.delete')->name('app.admin.categories.destroy');
 
-    // Admin Policy Pages
-    Route::get('/app/admin/policies', [AdminPolicyController::class, 'index'])->name('app.admin.policies.index');
-    Route::get('/app/admin/policies/{policy}/edit', [AdminPolicyController::class, 'edit'])->name('app.admin.policies.edit');
-    Route::patch('/app/admin/policies/{policy}', [AdminPolicyController::class, 'update'])->name('app.admin.policies.update');
+        // FAQ Management
+        Route::get('/faqs', [AdminFaqController::class, 'index'])->name('app.admin.faqs.index');
+        Route::post('/faqs', [AdminFaqController::class, 'store'])->name('app.admin.faqs.store');
+        Route::patch('/faqs/{faq}', [AdminFaqController::class, 'update'])->name('app.admin.faqs.update');
+        Route::delete('/faqs/{faq}', [AdminFaqController::class, 'destroy'])->name('app.admin.faqs.destroy');
+        Route::patch('/faqs/{faq}/toggle', [AdminFaqController::class, 'toggleStatus'])->name('app.admin.faqs.toggle');
+
+        // Policy Pages
+        Route::get('/policies', [AdminPolicyController::class, 'index'])->name('app.admin.policies.index');
+        Route::get('/policies/{policy}/edit', [AdminPolicyController::class, 'edit'])->name('app.admin.policies.edit');
+        Route::patch('/policies/{policy}', [AdminPolicyController::class, 'update'])->name('app.admin.policies.update');
+    });
 
     // Payment Flow
     Route::match(['get', 'post'], '/app/payments/initiate/{plan}', [PaymentPageController::class, 'initiate'])->middleware('permission:membership_plans.subscribe')->name('app.payments.initiate');
@@ -240,20 +276,20 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/app/agreement-log', [AgreementLogPageController::class, 'index'])->middleware('permission:agreement_log.view_any')->name('app.agreement-log.index');
 
-    Route::get('/app/users', [UserAccessPageController::class, 'index'])->middleware('permission:users.view_any')->name('app.users.index');
-    Route::post('/app/users', [UserAccessPageController::class, 'store'])->middleware('permission:users.create')->name('app.users.store');
-    Route::patch('/app/users/{user}', [UserAccessPageController::class, 'update'])->middleware('permission:users.update')->name('app.users.update');
-    Route::delete('/app/users/{user}', [UserAccessPageController::class, 'destroy'])->middleware('permission:users.delete')->name('app.users.destroy');
+    Route::get('/app/users', [UserAccessPageController::class, 'index'])->middleware(['role:admin', 'permission:users.view_any'])->name('app.users.index');
+    Route::post('/app/users', [UserAccessPageController::class, 'store'])->middleware(['role:admin', 'permission:users.create'])->name('app.users.store');
+    Route::patch('/app/users/{user}', [UserAccessPageController::class, 'update'])->middleware(['role:admin', 'permission:users.update'])->name('app.users.update');
+    Route::delete('/app/users/{user}', [UserAccessPageController::class, 'destroy'])->middleware(['role:admin', 'permission:users.delete'])->name('app.users.destroy');
 
-    Route::get('/app/roles', [RolePageController::class, 'index'])->middleware('permission:roles.view_any')->name('app.roles.index');
-    Route::post('/app/roles', [RolePageController::class, 'store'])->middleware('permission:roles.create')->name('app.roles.store');
-    Route::patch('/app/roles/{role}', [RolePageController::class, 'update'])->middleware('permission:roles.update')->name('app.roles.update');
-    Route::delete('/app/roles/{role}', [RolePageController::class, 'destroy'])->middleware('permission:roles.delete')->name('app.roles.destroy');
+    Route::get('/app/roles', [RolePageController::class, 'index'])->middleware(['role:admin', 'permission:roles.view_any'])->name('app.roles.index');
+    Route::post('/app/roles', [RolePageController::class, 'store'])->middleware(['role:admin', 'permission:roles.create'])->name('app.roles.store');
+    Route::patch('/app/roles/{role}', [RolePageController::class, 'update'])->middleware(['role:admin', 'permission:roles.update'])->name('app.roles.update');
+    Route::delete('/app/roles/{role}', [RolePageController::class, 'destroy'])->middleware(['role:admin', 'permission:roles.delete'])->name('app.roles.destroy');
 
-    Route::get('/app/permissions', [PermissionPageController::class, 'index'])->middleware('permission:permissions.view_any')->name('app.permissions.index');
-    Route::post('/app/permissions', [PermissionPageController::class, 'store'])->middleware('permission:permissions.create')->name('app.permissions.store');
-    Route::patch('/app/permissions/{permission}', [PermissionPageController::class, 'update'])->middleware('permission:permissions.update')->name('app.permissions.update');
-    Route::delete('/app/permissions/{permission}', [PermissionPageController::class, 'destroy'])->middleware('permission:permissions.delete')->name('app.permissions.destroy');
+    Route::get('/app/permissions', [PermissionPageController::class, 'index'])->middleware(['role:admin', 'permission:permissions.view_any'])->name('app.permissions.index');
+    Route::post('/app/permissions', [PermissionPageController::class, 'store'])->middleware(['role:admin', 'permission:permissions.create'])->name('app.permissions.store');
+    Route::patch('/app/permissions/{permission}', [PermissionPageController::class, 'update'])->middleware(['role:admin', 'permission:permissions.update'])->name('app.permissions.update');
+    Route::delete('/app/permissions/{permission}', [PermissionPageController::class, 'destroy'])->middleware(['role:admin', 'permission:permissions.delete'])->name('app.permissions.destroy');
 
     // Core APIs
     Route::resource('events', EventController::class)

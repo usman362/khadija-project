@@ -257,13 +257,13 @@
                                                                 </select>
                                                             </div>
                                                             <div class="col-md-4 mb-3">
-                                                                <label class="form-label">Category</label>
-                                                                <select name="category_id" class="form-select">
-                                                                    <option value="">No Category</option>
+                                                                <label class="form-label">Categories</label>
+                                                                <select name="category_ids[]" class="form-select" multiple size="4">
                                                                     @foreach($categories as $cat)
-                                                                        <option value="{{ $cat->id }}" {{ $event->category_id == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                                                        <option value="{{ $cat->id }}" {{ $event->categories->contains('id', $cat->id) ? 'selected' : '' }}>{{ $cat->name }}</option>
                                                                     @endforeach
                                                                 </select>
+                                                                <small class="text-muted">Hold Ctrl/Cmd to select multiple</small>
                                                             </div>
                                                             <div class="col-md-4 mb-3">
                                                                 <label class="form-label">Status <span class="text-danger">*</span></label>
@@ -359,13 +359,13 @@
                                 </select>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Category</label>
-                                <select name="category_id" class="form-select">
-                                    <option value="">No Category</option>
+                                <label class="form-label">Categories</label>
+                                <select name="category_ids[]" class="form-select" multiple size="4">
                                     @foreach($categories as $cat)
                                         <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                                     @endforeach
                                 </select>
+                                <small class="text-muted">Hold Ctrl/Cmd to select multiple</small>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Status <span class="text-danger">*</span></label>
