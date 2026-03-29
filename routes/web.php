@@ -46,6 +46,9 @@ Route::view('/cancellation-policy', 'policies.cancellation')->name('cancellation
 // About Us
 Route::view('/about-us', 'about')->name('about-us');
 
+// Events & Categories
+Route::view('/events-categories', 'events-categories')->name('events-categories');
+
 Auth::routes();
 
 Route::middleware('auth')->group(function () {

@@ -420,115 +420,6 @@
             margin: 0 auto;
         }
 
-        /* ─── FEATURES (Make it Real) ─────────── */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-        }
-
-        .feature-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 32px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
-        }
-
-        .feature-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .feature-icon svg {
-            width: 28px;
-            height: 28px;
-            color: var(--primary);
-        }
-
-        .feature-card h3 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .feature-card p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
-
-        /* ─── CATEGORIES ──────────────────────── */
-        .categories-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .category-card {
-            position: relative;
-            border-radius: 16px;
-            overflow: hidden;
-            height: 200px;
-            cursor: pointer;
-        }
-
-        .category-card .overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.8) 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 20px;
-            transition: background 0.3s;
-        }
-
-        .category-card:hover .overlay {
-            background: linear-gradient(180deg, transparent 10%, rgba(59,130,246,0.6) 100%);
-        }
-
-        .category-card .cat-bg {
-            width: 100%;
-            height: 100%;
-            background: var(--bg-card);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .category-card .cat-bg svg {
-            width: 48px;
-            height: 48px;
-            color: var(--text-muted);
-            opacity: 0.3;
-        }
-
-        .category-card h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            position: relative;
-            z-index: 2;
-        }
-
-        .category-card span {
-            font-size: 0.8rem;
-            color: var(--text-light);
-            position: relative;
-            z-index: 2;
-        }
-
         /* ─── HOW IT WORKS ────────────────────── */
         .steps-grid {
             display: grid;
@@ -1228,7 +1119,7 @@
 
         <ul class="navbar-links">
             <li><a href="{{ route('about-us') }}">About Us</a></li>
-            <li><a href="#features">Features</a></li>
+            <li><a href="{{ route('events-categories') }}">Events & Categories</a></li>
             <li><a href="#how-it-works">How It Works</a></li>
             <li><a href="#pricing">Pricing</a></li>
             <li><a href="#faq">FAQ</a></li>
@@ -1339,81 +1230,6 @@
             <div class="about-image">
                 <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80" alt="Event planning team" loading="lazy">
             </div>
-        </div>
-    </div>
-</section>
-
-<!-- ─── FEATURES ─────────────────────────────── -->
-<section class="section section-alt" id="features">
-    <div class="container">
-        <div class="section-header">
-            <h2>Make it Real with <span class="gradient-text">{{ config('app.name', 'Khadija') }}</span></h2>
-            <p>We've built a platform that simplifies every step of event planning, connecting you to the most amazing professionals and tools to bring your vision to life.</p>
-        </div>
-
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                </div>
-                <h3>Best Talent</h3>
-                <p>Browse and choose from our curated list of top professionals, from musicians and photographers to caterers and decorators.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                </div>
-                <h3>Post Gigs</h3>
-                <p>Post your event requirements and let professionals come to you with proposals, portfolios, and competitive quotes.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                </div>
-                <h3>Real-time Chat</h3>
-                <p>Communicate directly with your booked professionals through our built-in messenger for seamless coordination.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                </div>
-                <h3>Smart Booking</h3>
-                <p>Manage event timelines and bookings all in one place with our streamlined dashboard.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ─── CATEGORIES ────────────────────────────── -->
-<section class="section section-alt" id="categories">
-    <div class="container">
-        <div class="section-header">
-            <h2>Explore Our Service Categories</h2>
-            <p>Whatever the occasion, find the perfect professionals for your event.</p>
-        </div>
-
-        <div class="categories-grid">
-            @php
-                $categories = [
-                    ['name' => 'Baby Shower', 'count' => '45+ professionals'],
-                    ['name' => 'Wedding', 'count' => '120+ professionals'],
-                    ['name' => 'Corporate Event', 'count' => '80+ professionals'],
-                    ['name' => 'Birthday Party', 'count' => '60+ professionals'],
-                    ['name' => 'Conference', 'count' => '35+ professionals'],
-                    ['name' => 'Music Concert', 'count' => '90+ professionals'],
-                ];
-            @endphp
-            @foreach($categories as $cat)
-                <div class="category-card">
-                    <div class="cat-bg">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    </div>
-                    <div class="overlay">
-                        <h3>{{ $cat['name'] }}</h3>
-                        <span>{{ $cat['count'] }}</span>
-                    </div>
-                </div>
-            @endforeach
         </div>
     </div>
 </section>
@@ -1738,7 +1554,7 @@
                 <h4>Explore</h4>
                 <ul>
                     <li><a href="{{ route('about-us') }}">About Us</a></li>
-                    <li><a href="#features">Features</a></li>
+                    <li><a href="{{ route('events-categories') }}">Events & Categories</a></li>
                     <li><a href="#how-it-works">How It Works</a></li>
                     <li><a href="#pricing">Pricing</a></li>
                     <li><a href="#faq">FAQ</a></li>
