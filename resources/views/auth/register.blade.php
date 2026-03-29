@@ -104,7 +104,10 @@
             display: flex; align-items: center; gap: 8px;
             font-size: 14px; color: var(--text-light); font-weight: 500;
         }
-        .signup-hero-badge svg { color: var(--success); flex-shrink: 0; }
+        .signup-hero-badge:nth-child(1) svg { color: #22c55e; filter: drop-shadow(0 0 4px rgba(34,197,94,0.4)); flex-shrink: 0; }
+        .signup-hero-badge:nth-child(2) svg { color: #f59e0b; filter: drop-shadow(0 0 4px rgba(245,158,11,0.4)); flex-shrink: 0; }
+        .signup-hero-badge:nth-child(3) svg { color: #8b5cf6; filter: drop-shadow(0 0 4px rgba(139,92,246,0.4)); flex-shrink: 0; }
+        .signup-hero-badge svg { flex-shrink: 0; }
 
         /* ── MAIN CONTENT ── */
         .signup-main {

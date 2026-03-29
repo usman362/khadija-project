@@ -366,20 +366,27 @@
         }
 
         .trust-badge .badge-icon {
-            width: 40px;
-            height: 40px;
-            margin: 0 auto 8px;
-            border-radius: 10px;
-            background: rgba(59, 130, 246, 0.15);
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 10px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
 
+        .trust-badge:nth-child(1) .badge-icon { background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 4px 15px rgba(34,197,94,0.3); }
+        .trust-badge:nth-child(2) .badge-icon { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 15px rgba(245,158,11,0.3); }
+        .trust-badge:nth-child(3) .badge-icon { background: linear-gradient(135deg, #8b5cf6, #7c3aed); box-shadow: 0 4px 15px rgba(139,92,246,0.3); }
+        .trust-badge:nth-child(4) .badge-icon { background: linear-gradient(135deg, #ec4899, #db2777); box-shadow: 0 4px 15px rgba(236,72,153,0.3); }
+
+        .trust-badge:hover .badge-icon { transform: translateY(-3px) scale(1.05); }
+
         .trust-badge .badge-icon svg {
-            width: 20px;
-            height: 20px;
-            color: var(--primary);
+            width: 22px;
+            height: 22px;
+            color: #fff;
         }
 
         .trust-badge h4 {
@@ -434,7 +441,12 @@
             border: 1px solid var(--border-color);
             border-radius: 16px;
             position: relative;
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
         }
+
+        .step-card:nth-child(1):hover { border-color: rgba(59,130,246,0.4); box-shadow: 0 8px 30px rgba(59,130,246,0.1); transform: translateY(-4px); }
+        .step-card:nth-child(2):hover { border-color: rgba(249,115,22,0.4); box-shadow: 0 8px 30px rgba(249,115,22,0.1); transform: translateY(-4px); }
+        .step-card:nth-child(3):hover { border-color: rgba(34,197,94,0.4); box-shadow: 0 8px 30px rgba(34,197,94,0.1); transform: translateY(-4px); }
 
         .step-number {
             width: 60px;
@@ -450,17 +462,23 @@
         }
 
         .step-icon {
-            width: 64px;
-            height: 64px;
-            border-radius: 16px;
-            background: rgba(59,130,246,0.1);
+            width: 68px;
+            height: 68px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 16px;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
 
-        .step-icon svg { width: 28px; height: 28px; color: var(--primary); }
+        .step-card:nth-child(1) .step-icon { background: linear-gradient(135deg, #3b82f6, #6366f1); box-shadow: 0 6px 20px rgba(59,130,246,0.35); }
+        .step-card:nth-child(2) .step-icon { background: linear-gradient(135deg, #f97316, #ef4444); box-shadow: 0 6px 20px rgba(249,115,22,0.35); }
+        .step-card:nth-child(3) .step-icon { background: linear-gradient(135deg, #22c55e, #14b8a6); box-shadow: 0 6px 20px rgba(34,197,94,0.35); }
+
+        .step-card:hover .step-icon { transform: translateY(-4px) scale(1.08); }
+
+        .step-icon svg { width: 30px; height: 30px; color: #fff; }
 
         .step-card h3 {
             font-size: 1.1rem;
@@ -981,16 +999,31 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 12px;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
 
-        .about-stat h4 {
-            font-size: 1.75rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .about-stat:hover { transform: translateY(-3px); }
+
+        .about-stat:nth-child(1) h4 {
+            font-size: 1.75rem; font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
+        .about-stat:nth-child(1):hover { box-shadow: 0 6px 20px rgba(59,130,246,0.15); }
+
+        .about-stat:nth-child(2) h4 {
+            font-size: 1.75rem; font-weight: 800;
+            background: linear-gradient(135deg, #f97316, #f59e0b);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .about-stat:nth-child(2):hover { box-shadow: 0 6px 20px rgba(249,115,22,0.15); }
+
+        .about-stat:nth-child(3) h4 {
+            font-size: 1.75rem; font-weight: 800;
+            background: linear-gradient(135deg, #22c55e, #14b8a6);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .about-stat:nth-child(3):hover { box-shadow: 0 6px 20px rgba(34,197,94,0.15); }
 
         .about-stat p {
             font-size: 0.8rem;

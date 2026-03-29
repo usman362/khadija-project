@@ -109,7 +109,8 @@
             display: flex; align-items: center; gap: 6px;
             font-size: 13px; font-weight: 600; color: var(--text-light);
         }
-        .login-image-badge svg { color: var(--success); }
+        .login-image-badge:nth-child(1) svg { color: #22c55e; filter: drop-shadow(0 0 4px rgba(34,197,94,0.4)); }
+        .login-image-badge:nth-child(2) svg { color: #f59e0b; filter: drop-shadow(0 0 4px rgba(245,158,11,0.4)); }
 
         /* ── FORM SIDE ── */
         .login-form-side {
@@ -133,8 +134,11 @@
         }
         .form-input-icon {
             position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-            color: var(--text-muted); pointer-events: none;
+            color: var(--primary); pointer-events: none; opacity: 0.8;
         }
+        .form-group:nth-child(1) .form-input-icon { color: #3b82f6; }
+        .form-group:nth-child(2) .form-input-icon { color: #f59e0b; }
+        .form-input:focus ~ .form-input-icon, .form-input-wrap:focus-within .form-input-icon { opacity: 1; }
         .form-input {
             width: 100%; padding: 12px 16px 12px 42px; border-radius: 10px;
             border: 1.5px solid var(--border-color); background: var(--bg-input);
