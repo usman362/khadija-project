@@ -285,6 +285,19 @@
             .role-tab { padding: 10px 20px; font-size: 14px; }
         }
     </style>
+    @php
+        $recaptchaSettings = app(\App\Domain\Settings\Services\SettingsService::class);
+        $showRecaptcha = $recaptchaSettings->isRecaptchaEnabledFor('register');
+        $recaptchaSiteKey = $recaptchaSettings->getRecaptchaSiteKey();
+        $recaptchaVersion = $recaptchaSettings->get('recaptcha.version', 'v2');
+    @endphp
+    @if($showRecaptcha && $recaptchaSiteKey)
+        @if($recaptchaVersion === 'v3')
+            <script src="https://www.google.com/recaptcha/api.js?render={{ $recaptchaSiteKey }}"></script>
+        @else
+            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        @endif
+    @endif
 </head>
 <body>
 
@@ -434,7 +447,19 @@
                         <input type="password" name="password_confirmation" class="form-input" placeholder="Re-enter your password" required>
                     </div>
 
-                    <button type="submit" class="form-submit client-submit">Create Client Account</button>
+                    @if($showRecaptcha && $recaptchaSiteKey)
+                        @if($recaptchaVersion === 'v2')
+                            <div style="margin-bottom: 16px;">
+                                <div class="g-recaptcha" data-sitekey="{{ $recaptchaSiteKey }}" data-theme="dark" id="recaptcha-client"></div>
+                                @error('g-recaptcha-response') @if(old('role') === 'client') <div style="color: #ef4444; font-size: 13px; margin-top: 6px;">{{ $message }}</div> @endif @enderror
+                            </div>
+                        @else
+                            <input type="hidden" name="g-recaptcha-response" id="recaptcha-token-client">
+                            @error('g-recaptcha-response') @if(old('role') === 'client') <div style="color: #ef4444; font-size: 13px; margin-bottom: 12px;">{{ $message }}</div> @endif @enderror
+                        @endif
+                    @endif
+
+                    <button type="submit" class="form-submit client-submit" @if($showRecaptcha && $recaptchaSiteKey && $recaptchaVersion === 'v3') data-recaptcha-form="client" @endif>Create Client Account</button>
                 </form>
 
                 <div class="form-footer">
@@ -538,7 +563,19 @@
                         <input type="password" name="password_confirmation" class="form-input" placeholder="Re-enter your password" required>
                     </div>
 
-                    <button type="submit" class="form-submit pro-submit">Create Professional Account</button>
+                    @if($showRecaptcha && $recaptchaSiteKey)
+                        @if($recaptchaVersion === 'v2')
+                            <div style="margin-bottom: 16px;">
+                                <div class="g-recaptcha" data-sitekey="{{ $recaptchaSiteKey }}" data-theme="dark" id="recaptcha-pro"></div>
+                                @error('g-recaptcha-response') @if(old('role') === 'supplier') <div style="color: #ef4444; font-size: 13px; margin-top: 6px;">{{ $message }}</div> @endif @enderror
+                            </div>
+                        @else
+                            <input type="hidden" name="g-recaptcha-response" id="recaptcha-token-pro">
+                            @error('g-recaptcha-response') @if(old('role') === 'supplier') <div style="color: #ef4444; font-size: 13px; margin-bottom: 12px;">{{ $message }}</div> @endif @enderror
+                        @endif
+                    @endif
+
+                    <button type="submit" class="form-submit pro-submit" @if($showRecaptcha && $recaptchaSiteKey && $recaptchaVersion === 'v3') data-recaptcha-form="pro" @endif>Create Professional Account</button>
                 </form>
 
                 <div class="form-footer">
@@ -576,6 +613,22 @@ function togglePw(btn) {
 // If validation errors, show correct panel
 @if(old('role') === 'supplier')
     switchRole('supplier');
+@endif
+
+@if($showRecaptcha && $recaptchaSiteKey && $recaptchaVersion === 'v3')
+// reCAPTCHA v3 - auto-fill token on form submit
+document.querySelectorAll('[data-recaptcha-form]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        var formType = btn.getAttribute('data-recaptcha-form');
+        grecaptcha.ready(function() {
+            grecaptcha.execute('{{ $recaptchaSiteKey }}', {action: 'register'}).then(function(token) {
+                document.getElementById('recaptcha-token-' + formType).value = token;
+                btn.closest('form').submit();
+            });
+        });
+    });
+});
 @endif
 </script>
 

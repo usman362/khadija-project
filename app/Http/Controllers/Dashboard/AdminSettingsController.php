@@ -78,4 +78,36 @@ class AdminSettingsController extends Controller
 
         return back()->with('status', 'OpenAI settings updated successfully.');
     }
+
+    /**
+     * Display the reCAPTCHA settings page.
+     */
+    public function recaptchaSettings(): View
+    {
+        $recaptchaSettings = $this->settings->getRecaptchaSettings();
+
+        return view('dashboard.settings.recaptcha', [
+            'settings' => $recaptchaSettings,
+            'isConfigured' => $this->settings->isRecaptchaEnabled(),
+        ]);
+    }
+
+    /**
+     * Update reCAPTCHA settings.
+     */
+    public function updateRecaptchaSettings(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'enabled' => 'required|in:0,1',
+            'site_key' => 'nullable|string|max:500',
+            'secret_key' => 'nullable|string|max:500',
+            'version' => 'required|in:v2,v3',
+            'enable_login' => 'required|in:0,1',
+            'enable_register' => 'required|in:0,1',
+        ]);
+
+        $this->settings->saveRecaptchaSettings($validated);
+
+        return back()->with('status', 'reCAPTCHA settings updated successfully.');
+    }
 }

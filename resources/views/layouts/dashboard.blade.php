@@ -262,6 +262,12 @@
                                             OpenAI Settings
                                         </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('app.admin.settings.recaptcha') }}"
+                                            class="nav-link {{ request()->routeIs('app.admin.settings.recaptcha*') ? 'active' : '' }}">
+                                            reCAPTCHA Settings
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
                         </li>

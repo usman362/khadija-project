@@ -147,6 +147,85 @@ class SettingsService
     }
 
     /**
+     * Get all reCAPTCHA settings as a structured array.
+     */
+    public function getRecaptchaSettings(): array
+    {
+        return [
+            'enabled' => $this->get('recaptcha.enabled', '0'),
+            'site_key' => $this->get('recaptcha.site_key'),
+            'secret_key' => $this->get('recaptcha.secret_key'),
+            'version' => $this->get('recaptcha.version', 'v2'),
+            'enable_login' => $this->get('recaptcha.enable_login', '1'),
+            'enable_register' => $this->get('recaptcha.enable_register', '1'),
+        ];
+    }
+
+    /**
+     * Save reCAPTCHA settings from the admin form.
+     */
+    public function saveRecaptchaSettings(array $data): void
+    {
+        $mappings = [
+            'enabled' => ['group' => 'recaptcha', 'type' => 'string'],
+            'site_key' => ['group' => 'recaptcha', 'type' => 'encrypted'],
+            'secret_key' => ['group' => 'recaptcha', 'type' => 'encrypted'],
+            'version' => ['group' => 'recaptcha', 'type' => 'string'],
+            'enable_login' => ['group' => 'recaptcha', 'type' => 'string'],
+            'enable_register' => ['group' => 'recaptcha', 'type' => 'string'],
+        ];
+
+        foreach ($mappings as $field => $meta) {
+            if (array_key_exists($field, $data)) {
+                $this->set(
+                    "recaptcha.{$field}",
+                    $data[$field],
+                    $meta['group'],
+                    $meta['type'],
+                );
+            }
+        }
+    }
+
+    /**
+     * Check if reCAPTCHA is enabled and configured.
+     */
+    public function isRecaptchaEnabled(): bool
+    {
+        return $this->get('recaptcha.enabled', '0') === '1'
+            && ! empty($this->get('recaptcha.site_key'))
+            && ! empty($this->get('recaptcha.secret_key'));
+    }
+
+    /**
+     * Check if reCAPTCHA should show on a specific form.
+     */
+    public function isRecaptchaEnabledFor(string $form): bool
+    {
+        if (! $this->isRecaptchaEnabled()) {
+            return false;
+        }
+
+        return $this->get("recaptcha.enable_{$form}", '1') === '1';
+    }
+
+    /**
+     * Get the reCAPTCHA site key.
+     */
+    public function getRecaptchaSiteKey(): ?string
+    {
+        return $this->get('recaptcha.site_key');
+    }
+
+    /**
+     * Get the reCAPTCHA secret key.
+     */
+    public function getRecaptchaSecretKey(): ?string
+    {
+        return $this->get('recaptcha.secret_key');
+    }
+
+    /**
      * Check if payment gateway is configured.
      */
     public function isGatewayConfigured(string $gateway): bool

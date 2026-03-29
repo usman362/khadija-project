@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Domain\Auth\Contracts\UserRegistrationServiceInterface;
 use App\Domain\Auth\DataTransferObjects\RegisterUserData;
 use App\Http\Controllers\Controller;
+use App\Rules\Recaptcha;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -37,6 +38,7 @@ class RegisterController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role' => ['sometimes', 'string', 'in:client,supplier'],
+            'g-recaptcha-response' => [new Recaptcha('register')],
         ]);
     }
 

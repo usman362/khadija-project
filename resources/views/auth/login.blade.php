@@ -227,6 +227,19 @@
             .social-buttons { flex-direction: column; }
         }
     </style>
+    @php
+        $recaptchaSettings = app(\App\Domain\Settings\Services\SettingsService::class);
+        $showRecaptcha = $recaptchaSettings->isRecaptchaEnabledFor('login');
+        $recaptchaSiteKey = $recaptchaSettings->getRecaptchaSiteKey();
+        $recaptchaVersion = $recaptchaSettings->get('recaptcha.version', 'v2');
+    @endphp
+    @if($showRecaptcha && $recaptchaSiteKey)
+        @if($recaptchaVersion === 'v3')
+            <script src="https://www.google.com/recaptcha/api.js?render={{ $recaptchaSiteKey }}"></script>
+        @else
+            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        @endif
+    @endif
 </head>
 <body>
 
@@ -315,7 +328,19 @@
                     @endif
                 </div>
 
-                <button type="submit" class="login-btn">Sign In</button>
+                @if($showRecaptcha && $recaptchaSiteKey)
+                    @if($recaptchaVersion === 'v2')
+                        <div style="margin-bottom: 16px;">
+                            <div class="g-recaptcha" data-sitekey="{{ $recaptchaSiteKey }}" data-theme="dark"></div>
+                            @error('g-recaptcha-response') <div style="color: #ef4444; font-size: 13px; margin-top: 6px;">{{ $message }}</div> @enderror
+                        </div>
+                    @else
+                        <input type="hidden" name="g-recaptcha-response" id="recaptcha-token-login">
+                        @error('g-recaptcha-response') <div style="color: #ef4444; font-size: 13px; margin-bottom: 12px;">{{ $message }}</div> @enderror
+                    @endif
+                @endif
+
+                <button type="submit" class="login-btn" @if($showRecaptcha && $recaptchaSiteKey && $recaptchaVersion === 'v3') id="login-submit-btn" @endif>Sign In</button>
             </form>
 
             <div class="form-divider">Or continue with</div>
@@ -343,6 +368,19 @@ function toggleLoginPw() {
     const input = document.getElementById('login-password');
     input.type = input.type === 'password' ? 'text' : 'password';
 }
+
+@if($showRecaptcha && $recaptchaSiteKey && $recaptchaVersion === 'v3')
+// reCAPTCHA v3 - auto-fill token on form submit
+document.getElementById('login-submit-btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    grecaptcha.ready(function() {
+        grecaptcha.execute('{{ $recaptchaSiteKey }}', {action: 'login'}).then(function(token) {
+            document.getElementById('recaptcha-token-login').value = token;
+            e.target.closest('form').submit();
+        });
+    });
+});
+@endif
 </script>
 
 </body>

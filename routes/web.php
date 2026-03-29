@@ -232,6 +232,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/settings/payments', [AdminSettingsController::class, 'updatePaymentSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.payments.update');
         Route::get('/settings/openai', [AdminSettingsController::class, 'openaiSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.openai');
         Route::post('/settings/openai', [AdminSettingsController::class, 'updateOpenAISettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.openai.update');
+        Route::get('/settings/recaptcha', [AdminSettingsController::class, 'recaptchaSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.recaptcha');
+        Route::post('/settings/recaptcha', [AdminSettingsController::class, 'updateRecaptchaSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.recaptcha.update');
 
         // All Events
         Route::get('/events', [AdminEventController::class, 'index'])->middleware('permission:events.view_any')->name('app.admin.events.index');
