@@ -364,10 +364,14 @@
                             Current Plan
                         </div>
                     @else
-                        <form method="POST" action="{{ route('app.membership-plans.subscribe', $plan) }}">
+                        <form method="POST" action="{{ route('app.membership-plans.subscribe', $plan) }}" id="subscribeForm{{ $plan->id }}">
                             @csrf
-                            <button type="submit" class="mp-subscribe-btn {{ $plan->is_featured ? 'featured-btn' : 'default-btn' }}"
-                                onclick="return confirm('Subscribe to {{ $plan->name }} plan for {{ $plan->formattedPrice() }}{{ $plan->billingLabel() }}?')">
+                            <button type="button" class="mp-subscribe-btn {{ $plan->is_featured ? 'featured-btn' : 'default-btn' }}"
+                                data-mp-subscribe
+                                data-plan-name="{{ $plan->name }}"
+                                data-plan-price="{{ $plan->formattedPrice() }}{{ $plan->billingLabel() }}"
+                                data-plan-free="{{ $plan->isFree() ? '1' : '0' }}"
+                                data-form-id="subscribeForm{{ $plan->id }}">
                                 @if($plan->isFree())
                                     Get Started Free
                                 @elseif($activeSubscription)
@@ -401,10 +405,10 @@
                             <a href="{{ route('app.membership-plans.history') }}" class="btn btn-sm btn-outline-secondary">
                                 Subscription History
                             </a>
-                            <form method="POST" action="{{ route('app.membership-plans.cancel') }}" class="d-inline">
+                            <form method="POST" action="{{ route('app.membership-plans.cancel') }}" class="d-inline" id="cancelSubForm">
                                 @csrf
-                                <button type="submit" class="btn btn-sm btn-outline-danger"
-                                    onclick="return confirm('Are you sure you want to cancel your subscription?')">
+                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                    data-mp-cancel>
                                     Cancel Plan
                                 </button>
                             </form>
@@ -415,4 +419,201 @@
         </div>
     @endif
 </div>
+
+{{-- ── Subscribe Confirmation Modal ─────────────────────── --}}
+<div id="mpModal" class="mpm-backdrop">
+    <div class="mpm-card">
+        <button type="button" class="mpm-close" data-mpm-close>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+
+        <div class="mpm-icon" id="mpmIcon"></div>
+        <h3 class="mpm-title" id="mpmTitle"></h3>
+        <p class="mpm-desc" id="mpmDesc"></p>
+
+        <div class="mpm-actions">
+            <button type="button" class="mpm-btn mpm-btn-cancel" data-mpm-close>Cancel</button>
+            <button type="button" class="mpm-btn mpm-btn-confirm" id="mpmConfirm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span id="mpmConfirmLabel">Confirm</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .mpm-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.75);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 20px;
+    }
+    .mpm-backdrop.open { display: flex; }
+    .mpm-card {
+        position: relative;
+        max-width: 460px;
+        width: 100%;
+        background: var(--mp-card-bg, #111827);
+        border: 1px solid var(--mp-border, rgba(255,255,255,0.08));
+        border-radius: 20px;
+        padding: 40px 36px 32px;
+        text-align: center;
+        box-shadow: 0 25px 80px rgba(0,0,0,0.6);
+        animation: mpmSlideIn 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    @keyframes mpmSlideIn {
+        from { transform: translateY(24px) scale(0.96); opacity: 0; }
+        to   { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .mpm-close {
+        position: absolute; top: 14px; right: 14px;
+        width: 34px; height: 34px; border-radius: 50%;
+        background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+        color: var(--mp-text-muted, #94a3b8); cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .mpm-close:hover { background: rgba(239,68,68,0.12); color: #ef4444; }
+    .mpm-icon {
+        width: 76px; height: 76px; margin: 0 auto 20px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .mpm-icon.subscribe {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        box-shadow: 0 12px 40px rgba(99,102,241,0.35);
+    }
+    .mpm-icon.cancel-sub {
+        background: linear-gradient(135deg, #ef4444, #f97316);
+        box-shadow: 0 12px 40px rgba(239,68,68,0.3);
+    }
+    .mpm-icon svg { width: 34px; height: 34px; color: #fff; }
+    .mpm-title {
+        font-size: 1.35rem; font-weight: 800;
+        color: var(--mp-text, #fff); margin: 0 0 10px;
+    }
+    .mpm-desc {
+        font-size: 0.9rem; color: var(--mp-text-muted, #94a3b8);
+        line-height: 1.65; margin: 0 0 28px;
+    }
+    .mpm-actions { display: flex; gap: 12px; }
+    .mpm-btn {
+        flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 13px 20px; border-radius: 12px; font-size: 0.9rem; font-weight: 700;
+        cursor: pointer; border: none; font-family: inherit; transition: all 0.2s;
+    }
+    .mpm-btn-cancel {
+        background: transparent; color: var(--mp-text-muted, #94a3b8);
+        border: 1.5px solid var(--mp-border, rgba(255,255,255,0.1));
+    }
+    .mpm-btn-cancel:hover { background: rgba(255,255,255,0.04); color: var(--mp-text, #fff); }
+    .mpm-btn-confirm {
+        color: #fff; background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        box-shadow: 0 6px 20px rgba(99,102,241,0.35);
+    }
+    .mpm-btn-confirm:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(99,102,241,0.45); }
+    .mpm-btn-confirm.danger {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        box-shadow: 0 6px 20px rgba(239,68,68,0.35);
+    }
+    .mpm-btn-confirm.danger:hover { box-shadow: 0 10px 28px rgba(239,68,68,0.45); }
+    @media (max-width: 480px) {
+        .mpm-card { padding: 32px 24px 24px; }
+        .mpm-actions { flex-direction: column-reverse; }
+    }
+</style>
+
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    const modal      = document.getElementById('mpModal');
+    const iconEl     = document.getElementById('mpmIcon');
+    const titleEl    = document.getElementById('mpmTitle');
+    const descEl     = document.getElementById('mpmDesc');
+    const confirmBtn = document.getElementById('mpmConfirm');
+    const confirmLbl = document.getElementById('mpmConfirmLabel');
+    let pendingFormId = null;
+
+    function open(config) {
+        iconEl.className  = 'mpm-icon ' + config.iconClass;
+        iconEl.innerHTML  = config.iconSvg;
+        titleEl.textContent    = config.title;
+        descEl.textContent     = config.desc;
+        confirmLbl.textContent = config.confirmLabel;
+        confirmBtn.className   = 'mpm-btn mpm-btn-confirm ' + (config.btnDanger ? 'danger' : '');
+        pendingFormId          = config.formId;
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => confirmBtn.focus(), 50);
+    }
+
+    function close() {
+        modal.classList.remove('open');
+        document.body.style.overflow = '';
+        pendingFormId = null;
+    }
+
+    // Subscribe button trigger
+    document.addEventListener('click', function (e) {
+        const sub = e.target.closest('[data-mp-subscribe]');
+        if (sub) {
+            e.preventDefault();
+            const name  = sub.getAttribute('data-plan-name');
+            const price = sub.getAttribute('data-plan-price');
+            const free  = sub.getAttribute('data-plan-free') === '1';
+            open({
+                title: free ? 'Get Started Free' : 'Switch to ' + name,
+                desc: free
+                    ? 'You are about to activate the ' + name + ' plan. No payment required — get started immediately!'
+                    : 'You are about to subscribe to the ' + name + ' plan for ' + price + '. You will be redirected to a secure payment page.',
+                confirmLabel: free ? 'Activate Free Plan' : 'Proceed to Payment',
+                iconClass: 'subscribe',
+                iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>',
+                btnDanger: false,
+                formId: sub.getAttribute('data-form-id'),
+            });
+            return;
+        }
+
+        // Cancel subscription trigger
+        const cancel = e.target.closest('[data-mp-cancel]');
+        if (cancel) {
+            e.preventDefault();
+            open({
+                title: 'Cancel Your Subscription?',
+                desc: 'Your current plan features will remain active until the end of your billing period. After that, your account will revert to the free tier.',
+                confirmLabel: 'Yes, Cancel Plan',
+                iconClass: 'cancel-sub',
+                iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+                btnDanger: true,
+                formId: 'cancelSubForm',
+            });
+            return;
+        }
+
+        // Close
+        if (e.target === modal || e.target.closest('[data-mpm-close]')) {
+            close();
+        }
+    });
+
+    // Confirm — submit the pending form
+    confirmBtn.addEventListener('click', function () {
+        if (pendingFormId) {
+            document.getElementById(pendingFormId).submit();
+        }
+    });
+
+    // ESC
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('open')) close();
+    });
+})();
+</script>
+@endpush

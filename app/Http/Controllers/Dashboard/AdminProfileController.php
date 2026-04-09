@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Domain\ActivityLog\Services\ActivityLogger;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -84,9 +85,13 @@ class AdminProfileController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        $request->user()->update([
+        $user = $request->user();
+
+        $user->update([
             'password' => Hash::make($validated['password']),
         ]);
+
+        ActivityLogger::log(ActivityLogger::ACTION_PASSWORD_CHANGED, $user);
 
         return back()->with('status', 'Password changed successfully.');
     }

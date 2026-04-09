@@ -114,6 +114,14 @@ class StripeGateway implements PaymentGatewayInterface
             return;
         }
 
+        // Branch: is this a membership payment or an account reactivation payment?
+        $purpose = $session['metadata']['purpose'] ?? null;
+
+        if ($purpose === 'account_reactivation') {
+            $this->handleReactivationCompleted($session);
+            return;
+        }
+
         $payment = Payment::where('gateway_session_id', $sessionId)->first();
 
         if (! $payment || $payment->isCompleted()) {
@@ -129,6 +137,26 @@ class StripeGateway implements PaymentGatewayInterface
         Log::info('Stripe payment completed', [
             'payment_id' => $payment->id,
             'session_id' => $sessionId,
+        ]);
+    }
+
+    private function handleReactivationCompleted(array $session): void
+    {
+        $sessionId = $session['id'] ?? null;
+        $payment   = \App\Models\AccountReactivationPayment::where('gateway_session_id', $sessionId)->first();
+
+        if (! $payment || $payment->isCompleted()) {
+            return;
+        }
+
+        $paymentIntentId = $session['payment_intent'] ?? null;
+
+        app(\App\Domain\Payments\Services\AccountReactivationService::class)
+            ->complete($payment, $paymentIntentId);
+
+        Log::info('Account reactivation payment completed via Stripe webhook', [
+            'payment_id' => $payment->id,
+            'user_id'    => $payment->user_id,
         ]);
     }
 

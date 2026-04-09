@@ -80,6 +80,40 @@ class AdminSettingsController extends Controller
     }
 
     /**
+     * Display the account deletion / reactivation settings page.
+     */
+    public function accountDeletionSettings(): View
+    {
+        return view('dashboard.settings.account-deletion', [
+            'settings' => [
+                'enabled'  => (bool) $this->settings->get('account_reactivation.enabled', true),
+                'fee'      => (float) $this->settings->get('account_reactivation.fee', 4.99),
+                'currency' => strtoupper((string) $this->settings->get('account_reactivation.currency',
+                    $this->settings->get('payment.currency', 'USD')
+                )),
+            ],
+        ]);
+    }
+
+    /**
+     * Update account deletion / reactivation settings.
+     */
+    public function updateAccountDeletionSettings(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'enabled'  => ['required', 'in:0,1'],
+            'fee'      => ['required', 'numeric', 'min:0', 'max:9999'],
+            'currency' => ['required', 'string', 'size:3'],
+        ]);
+
+        $this->settings->set('account_reactivation.enabled',  (bool) $validated['enabled'], 'account_reactivation', 'boolean');
+        $this->settings->set('account_reactivation.fee',      (float) $validated['fee'],     'account_reactivation', 'string');
+        $this->settings->set('account_reactivation.currency', strtoupper($validated['currency']), 'account_reactivation', 'string');
+
+        return back()->with('status', 'Account deletion settings updated successfully.');
+    }
+
+    /**
      * Display the reCAPTCHA settings page.
      */
     public function recaptchaSettings(): View

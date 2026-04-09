@@ -19,6 +19,8 @@ class Booking extends Model
         'created_by',
         'status',
         'notes',
+        'price',
+        'currency',
         'booked_at',
         'source',
     ];
@@ -27,6 +29,7 @@ class Booking extends Model
     {
         return [
             'booked_at' => 'datetime',
+            'price' => 'decimal:2',
         ];
     }
 

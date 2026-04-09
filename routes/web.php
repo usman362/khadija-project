@@ -37,25 +37,50 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\MessageAttachmentController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\AccountDeletionController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\Dashboard\AdminBlogCategoryController;
+use App\Http\Controllers\Dashboard\AdminBlogPostController;
+use App\Http\Controllers\PolicySignatureController;
+use App\Http\Controllers\RoleSwitchController;
 use App\Http\Controllers\Webhook\PaymentWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', LandingPageController::class)->name('landing');
 
+// ── Influencer Module ─────────────────────────────────────────────────
+Route::get('/join-as-influencer', [\App\Http\Controllers\Influencer\JoinAsInfluencerController::class, 'show'])->name('influencer.join');
+Route::post('/join-as-influencer', [\App\Http\Controllers\Influencer\JoinAsInfluencerController::class, 'store'])->name('influencer.join.submit');
+Route::get('/ref/{code}', \App\Http\Controllers\Influencer\ReferralLandingController::class)->name('influencer.referral');
+
 // Policy pages
 Route::get('/privacy-policy', function () {
     $policy = \App\Models\PolicyPage::findBySlug('privacy-policy');
-    return view('policies.show', ['policy' => $policy, 'fallbackTitle' => 'Privacy Policy']);
+    $existingSignature = auth()->check()
+        ? \App\Models\PolicySignature::where('user_id', auth()->id())->where('policy_type', 'privacy_policy')->latest()->first()
+        : null;
+    return view('policies.show', ['policy' => $policy, 'fallbackTitle' => 'Privacy Policy', 'policyType' => 'privacy_policy', 'existingSignature' => $existingSignature]);
 })->name('privacy-policy');
+
+Route::get('/ai-agreement', function () {
+    $policy = \App\Models\PolicyPage::findBySlug('ai-usage-agreement');
+    $existingSignature = auth()->check()
+        ? \App\Models\PolicySignature::where('user_id', auth()->id())->where('policy_type', 'ai_usage_agreement')->latest()->first()
+        : null;
+    return view('policies.show', ['policy' => $policy, 'fallbackTitle' => 'AI Usage Agreement', 'policyType' => 'ai_usage_agreement', 'existingSignature' => $existingSignature]);
+})->name('ai-agreement');
 
 Route::get('/payment-policy', function () {
     $policy = \App\Models\PolicyPage::findBySlug('payment-policy');
-    return view('policies.show', ['policy' => $policy, 'fallbackTitle' => 'Payment Policy']);
+    $existingSignature = auth()->check()
+        ? \App\Models\PolicySignature::where('user_id', auth()->id())->where('policy_type', 'terms_of_service')->latest()->first()
+        : null;
+    return view('policies.show', ['policy' => $policy, 'fallbackTitle' => 'Payment Policy', 'policyType' => null, 'existingSignature' => null]);
 })->name('payment-policy');
 
 Route::get('/cancellation-policy', function () {
     $policy = \App\Models\PolicyPage::findBySlug('cancellation-policy');
-    return view('policies.show', ['policy' => $policy, 'fallbackTitle' => 'Cancellation & Refund Policy']);
+    return view('policies.show', ['policy' => $policy, 'fallbackTitle' => 'Cancellation & Refund Policy', 'policyType' => null, 'existingSignature' => null]);
 })->name('cancellation-policy');
 
 // About Us
@@ -64,17 +89,42 @@ Route::view('/about-us', 'about')->name('about-us');
 // Events & Categories
 Route::view('/events-categories', 'events-categories')->name('events-categories');
 
+// Public Blog
+Route::get('/blog',          [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{post}',   [BlogController::class, 'show'])->name('blog.show');
+
 Auth::routes();
+
+// Policy E-Signature (auth required)
+Route::post('/policy/sign', [PolicySignatureController::class, 'sign'])->middleware('auth')->name('policy.sign');
+
+// Role Switching (auth required)
+Route::middleware('auth')->group(function () {
+    Route::post('/role/switch', [RoleSwitchController::class, 'switch'])->name('role.switch');
+    Route::post('/role/enable', [RoleSwitchController::class, 'enable'])->name('role.enable');
+});
+
+// Account Deletion (auth required)
+Route::middleware('auth')->group(function () {
+    Route::post('/account/deletion/request', [AccountDeletionController::class, 'request'])->name('account.deletion.request');
+    Route::get('/account/deletion/restore',  [AccountDeletionController::class, 'showRestore'])->name('account.deletion.restore.show');
+    Route::post('/account/deletion/restore', [AccountDeletionController::class, 'restore'])->name('account.deletion.restore');
+
+    // Account Reactivation Payment callbacks
+    Route::get('/account/reactivation/success', [AccountDeletionController::class, 'reactivationSuccess'])->name('account.reactivation.success');
+    Route::get('/account/reactivation/cancel',  [AccountDeletionController::class, 'reactivationCancel'])->name('account.reactivation.cancel');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         $user = auth()->user();
 
-        // Redirect client/supplier users to their own dashboard
-        if ($user->hasRole('supplier')) {
+        // Redirect client/supplier users based on active mode (session) with fallback
+        $active = $user->activeRole();
+        if ($active === 'supplier') {
             return redirect()->route('professional.dashboard');
         }
-        if ($user->hasRole('client')) {
+        if ($active === 'client') {
             return redirect()->route('client.dashboard');
         }
 
@@ -107,6 +157,36 @@ Route::middleware('auth')->group(function () {
     })->middleware('permission:dashboard.view')->name('dashboard');
 
     Route::redirect('/home', '/dashboard')->name('home');
+
+    // ── Influencer Dashboard ──────────────────────────────────────
+    Route::prefix('influencer')->name('influencer.')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Influencer\InfluencerDashboardController::class, 'index'])
+            ->middleware('permission:influencer.dashboard.view')->name('dashboard');
+        Route::get('/referrals', [\App\Http\Controllers\Influencer\InfluencerDashboardController::class, 'referrals'])
+            ->middleware('permission:influencer.referrals.view')->name('dashboard.referrals');
+        Route::get('/payouts', [\App\Http\Controllers\Influencer\InfluencerDashboardController::class, 'payouts'])
+            ->middleware('permission:influencer.payouts.view')->name('dashboard.payouts');
+        Route::post('/payouts', [\App\Http\Controllers\Influencer\InfluencerDashboardController::class, 'requestPayout'])
+            ->middleware('permission:influencer.payouts.request')->name('dashboard.payouts.request');
+    });
+
+    // ── Admin Influencer Management ───────────────────────────────
+    Route::prefix('app/influencers')->name('app.influencers.')->middleware('role:admin')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Dashboard\AdminInfluencerController::class, 'index'])
+            ->middleware('permission:influencers.view_any')->name('index');
+        Route::get('/payouts', [\App\Http\Controllers\Dashboard\AdminInfluencerController::class, 'payouts'])
+            ->middleware('permission:influencers.manage_payouts')->name('payouts');
+        Route::post('/payouts/{payoutRequest}/paid', [\App\Http\Controllers\Dashboard\AdminInfluencerController::class, 'markPayoutPaid'])
+            ->middleware('permission:influencers.manage_payouts')->name('payouts.paid');
+        Route::post('/payouts/{payoutRequest}/reject', [\App\Http\Controllers\Dashboard\AdminInfluencerController::class, 'rejectPayout'])
+            ->middleware('permission:influencers.manage_payouts')->name('payouts.reject');
+        Route::get('/{influencer}', [\App\Http\Controllers\Dashboard\AdminInfluencerController::class, 'show'])
+            ->middleware('permission:influencers.view')->name('show');
+        Route::post('/{influencer}/approve', [\App\Http\Controllers\Dashboard\AdminInfluencerController::class, 'approve'])
+            ->middleware('permission:influencers.approve')->name('approve');
+        Route::post('/{influencer}/reject', [\App\Http\Controllers\Dashboard\AdminInfluencerController::class, 'reject'])
+            ->middleware('permission:influencers.reject')->name('reject');
+    });
 
     // ── Client Panel ──────────────────────────────────────────────
     Route::prefix('client')->middleware('permission:dashboard.view')->group(function () {
@@ -234,6 +314,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/settings/openai', [AdminSettingsController::class, 'updateOpenAISettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.openai.update');
         Route::get('/settings/recaptcha', [AdminSettingsController::class, 'recaptchaSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.recaptcha');
         Route::post('/settings/recaptcha', [AdminSettingsController::class, 'updateRecaptchaSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.recaptcha.update');
+        Route::get('/settings/account-deletion', [AdminSettingsController::class, 'accountDeletionSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.account-deletion');
+        Route::post('/settings/account-deletion', [AdminSettingsController::class, 'updateAccountDeletionSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.account-deletion.update');
 
         // All Events
         Route::get('/events', [AdminEventController::class, 'index'])->middleware('permission:events.view_any')->name('app.admin.events.index');
@@ -277,6 +359,34 @@ Route::middleware('auth')->group(function () {
     Route::post('/app/agreements/regenerate/{booking}', [AgreementPageController::class, 'regenerate'])->middleware('permission:agreements.generate')->name('app.agreements.regenerate');
 
     Route::get('/app/agreement-log', [AgreementLogPageController::class, 'index'])->middleware('permission:agreement_log.view_any')->name('app.agreement-log.index');
+
+    // ── Admin Deletion Requests ──────────────────────────────
+    Route::prefix('app/admin/deletion-requests')->name('app.admin.deletion-requests.')->middleware('role:admin')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Dashboard\AdminUserDeletionController::class, 'index'])->name('index');
+        Route::post('/{user}/cancel', [\App\Http\Controllers\Dashboard\AdminUserDeletionController::class, 'cancel'])->name('cancel');
+    });
+
+    // ── Admin Activity Log ──────────────────────────────────
+    Route::get('/app/admin/activity-logs', [\App\Http\Controllers\Dashboard\AdminActivityLogController::class, 'index'])
+        ->middleware('role:admin')
+        ->name('app.admin.activity-logs.index');
+
+    // ── Admin Blog Management ───────────────────────────────
+    Route::prefix('app/admin/blog')->name('app.admin.blog.')->middleware('role:admin')->group(function () {
+        // Categories
+        Route::get('/categories',             [AdminBlogCategoryController::class, 'index'])->name('categories.index');
+        Route::post('/categories',            [AdminBlogCategoryController::class, 'store'])->name('categories.store');
+        Route::patch('/categories/{category}', [AdminBlogCategoryController::class, 'update'])->name('categories.update');
+        Route::delete('/categories/{category}',[AdminBlogCategoryController::class, 'destroy'])->name('categories.destroy');
+
+        // Posts
+        Route::get('/posts',                  [AdminBlogPostController::class, 'index'])->name('posts.index');
+        Route::get('/posts/create',           [AdminBlogPostController::class, 'create'])->name('posts.create');
+        Route::post('/posts',                 [AdminBlogPostController::class, 'store'])->name('posts.store');
+        Route::get('/posts/{post}/edit',      [AdminBlogPostController::class, 'edit'])->name('posts.edit');
+        Route::patch('/posts/{post}',         [AdminBlogPostController::class, 'update'])->name('posts.update');
+        Route::delete('/posts/{post}',        [AdminBlogPostController::class, 'destroy'])->name('posts.destroy');
+    });
 
     Route::get('/app/users', [UserAccessPageController::class, 'index'])->middleware(['role:admin', 'permission:users.view_any'])->name('app.users.index');
     Route::post('/app/users', [UserAccessPageController::class, 'store'])->middleware(['role:admin', 'permission:users.create'])->name('app.users.store');

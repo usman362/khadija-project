@@ -1,367 +1,278 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $policy->title ?? $fallbackTitle }} - {{ config('app.name', 'GigResource') }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+@extends('layouts.public')
 
-        :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --accent: #8b5cf6;
-            --bg-dark: #0b0f1a;
-            --bg-section: #0f1629;
-            --bg-card: #151d35;
-            --bg-card-hover: #1a2440;
-            --text-white: #ffffff;
-            --text-light: #c8cdd8;
-            --text-muted: #7a829a;
-            --border-color: #1e2d4a;
-            --gradient-start: #3b82f6;
-            --gradient-end: #8b5cf6;
-        }
+@section('title', ($policy->title ?? $fallbackTitle) . ' - ' . config('app.name', 'Khadija'))
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-white);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
+@push('styles')
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+    /* ─── POLICY CONTENT ──────────────────────────── */
+    .policy-hero {
+        padding: 120px 0 40px;
+        text-align: center;
+    }
 
-        a { text-decoration: none; color: inherit; }
-        img { max-width: 100%; height: auto; }
-        button { cursor: pointer; border: none; font-family: inherit; }
+    .policy-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
+    .policy-hero h1 .gradient-text {
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
 
-        /* ─── NAVBAR (same as landing) ──────────────────────────── */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: rgba(11, 15, 26, 0.85);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding: 0 24px;
-        }
+    .policy-date {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
 
-        .navbar .container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 72px;
-        }
+    .policy-body {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 40px 24px 80px;
+    }
 
-        .navbar-brand {
-            font-size: 1.75rem;
-            font-weight: 900;
-            letter-spacing: -0.5px;
-            color: #fff;
-            text-decoration: none;
-        }
+    .policy-body h2 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-top: 36px;
+        margin-bottom: 14px;
+        color: var(--text-white);
+    }
 
-        .navbar-links {
-            display: flex;
-            align-items: center;
-            gap: 28px;
-            list-style: none;
-        }
+    .policy-body h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        color: var(--text-light);
+    }
 
-        .navbar-links a {
-            font-size: 0.9rem;
-            color: var(--text-light);
-            font-weight: 500;
-            transition: color 0.2s;
-        }
+    .policy-body p {
+        color: var(--text-light);
+        margin-bottom: 14px;
+        line-height: 1.75;
+    }
 
-        .navbar-links a:hover { color: var(--text-white); }
+    .policy-body ul, .policy-body ol {
+        margin: 14px 0 14px 24px;
+        color: var(--text-light);
+    }
 
-        .navbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+    .policy-body li {
+        margin-bottom: 8px;
+        line-height: 1.7;
+    }
 
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 24px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
+    .policy-body strong { color: var(--text-white); }
+    .policy-body a { color: var(--primary); }
+    .policy-body a:hover { text-decoration: underline; }
 
-        .btn-outline {
-            border: 1.5px solid rgba(255,255,255,0.2);
-            color: var(--text-white);
-            background: transparent;
-        }
+    .policy-body .highlight-box {
+        background: var(--bg-card);
+        border-left: 4px solid var(--primary);
+        padding: 20px;
+        margin: 24px 0;
+        border-radius: 4px;
+    }
 
-        .btn-outline:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
+    .policy-body .highlight-box p { margin: 0; }
 
-        .btn-blue {
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            font-weight: 700;
-        }
+    /* ─── E-SIGNATURE SECTION ──────────────────────────── */
+    .esign-section {
+        max-width: 820px;
+        margin: 0 auto 60px;
+        padding: 0 24px;
+    }
+    .esign-box {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 36px 40px;
+    }
+    .esign-box.signed {
+        border-color: rgba(16,185,129,0.4);
+        background: rgba(16,185,129,0.05);
+    }
+    .esign-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-white);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .esign-title svg { width: 22px; height: 22px; flex-shrink: 0; }
+    .esign-desc {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        margin-bottom: 28px;
+        line-height: 1.6;
+    }
+    .esign-tabs {
+        display: flex;
+        gap: 0;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 24px;
+        width: fit-content;
+    }
+    .esign-tab {
+        padding: 10px 24px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        background: transparent;
+        color: var(--text-muted);
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+    }
+    .esign-tab.active {
+        background: var(--primary);
+        color: #fff;
+    }
+    .esign-tab:not(.active):hover { color: var(--text-white); }
+    .esign-panel { display: none; }
+    .esign-panel.active { display: block; }
+    .esign-input {
+        width: 100%;
+        padding: 14px 18px;
+        background: rgba(255,255,255,0.04);
+        border: 1.5px solid var(--border-color);
+        border-radius: 10px;
+        color: var(--text-white);
+        font-size: 1.1rem;
+        font-family: 'Caveat', 'Inter', cursive;
+        letter-spacing: 0.5px;
+        transition: border-color 0.2s;
+        outline: none;
+    }
+    .esign-input:focus { border-color: var(--primary); }
+    .esign-input::placeholder { color: var(--text-muted); font-size: 0.95rem; font-family: 'Inter', sans-serif; }
+    .esign-canvas-wrap {
+        position: relative;
+        border: 1.5px solid var(--border-color);
+        border-radius: 10px;
+        overflow: hidden;
+        background: rgba(255,255,255,0.03);
+    }
+    .esign-canvas {
+        display: block;
+        width: 100%;
+        height: 140px;
+        cursor: crosshair;
+        touch-action: none;
+    }
+    .esign-canvas-hint {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        pointer-events: none;
+        user-select: none;
+    }
+    .esign-canvas-clear {
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        background: rgba(239,68,68,0.15);
+        border: 1px solid rgba(239,68,68,0.3);
+        color: #ef4444;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    .esign-canvas-clear:hover { background: rgba(239,68,68,0.25); }
+    .esign-meta {
+        margin-top: 16px;
+        padding: 12px 16px;
+        background: rgba(255,255,255,0.03);
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    .esign-meta span { display: flex; align-items: center; gap: 6px; }
+    .esign-meta svg { width: 14px; height: 14px; }
+    .esign-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 20px;
+        padding: 12px 32px;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .esign-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .esign-btn svg { width: 18px; height: 18px; }
+    .esign-error {
+        margin-top: 10px;
+        font-size: 0.82rem;
+        color: #f87171;
+    }
+    /* Signed state */
+    .esign-signed-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(16,185,129,0.12);
+        border: 1px solid rgba(16,185,129,0.3);
+        color: #10b981;
+        padding: 8px 18px;
+        border-radius: 30px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+    .esign-signed-badge svg { width: 18px; height: 18px; }
+    .esign-signed-details {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.7;
+    }
+    .esign-signed-details strong { color: var(--text-light); }
+    /* Login prompt */
+    .esign-login-prompt {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 20px 24px;
+        background: rgba(59,130,246,0.07);
+        border: 1px solid rgba(59,130,246,0.2);
+        border-radius: 12px;
+    }
+    .esign-login-prompt svg { width: 28px; height: 28px; color: var(--primary); flex-shrink: 0; }
+    .esign-login-prompt p { font-size: 0.9rem; color: var(--text-light); margin: 0; }
+    .esign-login-prompt a { color: var(--primary); font-weight: 600; }
 
-        .btn-blue:hover {
-            background: #1d4ed8;
-            transform: translateY(-1px);
-        }
+    /* ─── RESPONSIVE ──────────────────────────── */
+    @media (max-width: 768px) {
+        .policy-hero h1 { font-size: 1.75rem; }
+        .policy-hero { padding: 100px 0 30px; }
+        .esign-box { padding: 24px 20px; }
+    }
+</style>
+@endpush
 
-        .btn-red {
-            background: #dc2626;
-            color: #fff;
-            border: none;
-            font-weight: 700;
-        }
-
-        .btn-red:hover {
-            background: #b91c1c;
-            transform: translateY(-1px);
-        }
-
-        .btn-sm {
-            padding: 8px 18px;
-            font-size: 0.82rem;
-            border-radius: 8px;
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            background: transparent;
-            color: #fff;
-            font-size: 1.5rem;
-            padding: 8px;
-        }
-
-        /* ─── POLICY CONTENT ──────────────────────────── */
-        .policy-hero {
-            padding: 120px 0 40px;
-            text-align: center;
-        }
-
-        .policy-hero h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .policy-hero h1 .gradient-text {
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .policy-date {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        .policy-body {
-            max-width: 820px;
-            margin: 0 auto;
-            padding: 40px 24px 80px;
-        }
-
-        .policy-body h2 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-top: 36px;
-            margin-bottom: 14px;
-            color: var(--text-white);
-        }
-
-        .policy-body h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            color: var(--text-light);
-        }
-
-        .policy-body p {
-            color: var(--text-light);
-            margin-bottom: 14px;
-            line-height: 1.75;
-        }
-
-        .policy-body ul, .policy-body ol {
-            margin: 14px 0 14px 24px;
-            color: var(--text-light);
-        }
-
-        .policy-body li {
-            margin-bottom: 8px;
-            line-height: 1.7;
-        }
-
-        .policy-body strong {
-            color: var(--text-white);
-        }
-
-        .policy-body a {
-            color: var(--primary);
-        }
-
-        .policy-body a:hover {
-            text-decoration: underline;
-        }
-
-        .policy-body .highlight-box {
-            background: var(--bg-card);
-            border-left: 4px solid var(--primary);
-            padding: 20px;
-            margin: 24px 0;
-            border-radius: 4px;
-        }
-
-        .policy-body .highlight-box p {
-            margin: 0;
-        }
-
-        /* ─── FOOTER (same as landing) ──────────────────────────── */
-        .footer {
-            border-top: 1px solid var(--border-color);
-            padding: 60px 0 32px;
-            background: #060912;
-            margin-top: 0;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .footer-brand {
-            font-size: 1.5rem;
-            font-weight: 800;
-            margin-bottom: 12px;
-        }
-
-        .footer-desc {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .footer-socials {
-            display: flex;
-            gap: 12px;
-        }
-
-        .footer-social {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            background: var(--bg-card);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--border-color);
-            color: var(--text-light);
-            transition: background 0.2s;
-        }
-
-        .footer-social:hover { background: var(--primary); }
-        .footer-social svg { width: 16px; height: 16px; }
-
-        .footer-col h4 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .footer-col ul { list-style: none; }
-        .footer-col li { margin-bottom: 10px; }
-
-        .footer-col a {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            transition: color 0.2s;
-        }
-
-        .footer-col a:hover { color: var(--text-white); }
-
-        .footer-bottom {
-            border-top: 1px solid var(--border-color);
-            padding-top: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        /* ─── RESPONSIVE ──────────────────────────── */
-        @media (max-width: 1024px) {
-            .footer-grid { grid-template-columns: 1fr 1fr; }
-        }
-
-        @media (max-width: 768px) {
-            .navbar-links { display: none; }
-            .navbar-actions .btn-blue, .navbar-actions .btn-red { display: none; }
-            .mobile-menu-btn { display: block; }
-            .footer-grid { grid-template-columns: 1fr; }
-            .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
-            .policy-hero h1 { font-size: 1.75rem; }
-            .policy-hero { padding: 100px 0 30px; }
-        }
-    </style>
-</head>
-<body>
-
-<!-- ─── NAVBAR ───────────────────────────────── -->
-<nav class="navbar">
-    <div class="container">
-        <a href="/" class="navbar-brand"><img src="{{ asset('logos/logo-light.png') }}" alt="GigResource" style="height: 36px;"></a>
-
-        <ul class="navbar-links">
-            <li><a href="{{ route('about-us') }}">About Us</a></li>
-            <li><a href="{{ route('events-categories') }}">Events</a></li>
-            <li><a href="/#how-it-works">How It Works</a></li>
-            <li><a href="/#pricing">Pricing</a></li>
-            <li><a href="/#faq">FAQ</a></li>
-        </ul>
-
-        <div class="navbar-actions">
-            @auth
-                <a href="{{ url('/dashboard') }}" class="btn btn-primary btn-sm">Dashboard</a>
-            @else
-                <a href="{{ route('register', ['role' => 'supplier']) }}" class="btn btn-blue btn-sm">Join as Professional</a>
-                <a href="{{ route('register', ['role' => 'client']) }}" class="btn btn-red btn-sm">Hire a Professional</a>
-                @if (Route::has('login'))
-                    <a href="{{ route('login') }}" class="btn btn-outline btn-sm">Log in</a>
-                @endif
-            @endauth
-        </div>
-
-        <button class="mobile-menu-btn" onclick="this.nextElementSibling.classList.toggle('show')" aria-label="Menu">&#9776;</button>
-        <div class="mobile-nav" style="display:none;"></div>
-    </div>
-</nav>
+@section('content')
 
 <!-- ─── HERO ───────────────────────────────── -->
 <section class="policy-hero">
@@ -380,69 +291,196 @@
     @endif
 </div>
 
-<!-- ─── FOOTER ─────────────────────────────────── -->
-<footer class="footer">
-    <div class="container">
-        <div class="footer-grid">
-            <div>
-                <div class="footer-brand"><img src="{{ asset('logos/logo-light.png') }}" alt="GigResource" style="height: 32px;"></div>
-                <p class="footer-desc">
-                    Connecting Professionals & Clients for Perfect Events.
-                    Create unforgettable experiences with our curated network of verified experts.
-                </p>
-                <div class="footer-socials">
-                    <a href="https://www.facebook.com/gigresource/" target="_blank" class="footer-social" title="Facebook">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                    </a>
-                    <a href="https://www.instagram.com/gigresource2025/" target="_blank" class="footer-social" title="Instagram">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-                    </a>
-                    <a href="https://www.tiktok.com/@gigresource123/" target="_blank" class="footer-social" title="TikTok">
-                        <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.71a8.21 8.21 0 0 0 4.76 1.52V6.69h-1z"/></svg>
-                    </a>
+@if(!empty($policyType))
+<!-- ─── E-SIGNATURE ───────────────────────────────── -->
+<section class="esign-section">
+    @php
+        $policyLabels  = ['privacy_policy' => 'Privacy Policy', 'ai_usage_agreement' => 'AI Usage Agreement', 'terms_of_service' => 'Terms of Service'];
+        $policyLabel   = $policyLabels[$policyType] ?? 'Policy';
+        $policyVersion = $policy?->updated_at?->format('Y.m') ?? '1.0';
+    @endphp
+
+    @auth
+        @if(session('sign_status') === 'signed')
+            <div class="esign-box signed">
+                <div class="esign-signed-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Successfully Signed
+                </div>
+                <div class="esign-signed-details">
+                    You have officially signed the <strong>{{ $policyLabel }}</strong>.<br>
+                    Your e-signature has been recorded and can be referenced for compliance purposes.
                 </div>
             </div>
-            <div class="footer-col">
-                <h4>Explore</h4>
-                <ul>
-                    <li><a href="{{ route('about-us') }}">About Us</a></li>
-                    <li><a href="{{ route('events-categories') }}">Events</a></li>
-                    <li><a href="/#how-it-works">How It Works</a></li>
-                    <li><a href="/#pricing">Pricing</a></li>
-                    <li><a href="/#faq">FAQ</a></li>
-                </ul>
+        @elseif(!empty($existingSignature))
+            <div class="esign-box signed">
+                <div class="esign-title" style="color:#10b981;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    You have already signed this policy
+                </div>
+                <div class="esign-signed-details">
+                    Signed by: <strong>{{ auth()->user()->name }}</strong><br>
+                    Date: <strong>{{ $existingSignature->signed_at->format('F j, Y \a\t g:i A') }}</strong><br>
+                    Method: <strong>{{ ucfirst($existingSignature->signature_type) }} Signature</strong><br>
+                    Version: <strong>{{ $existingSignature->policy_version }}</strong>
+                </div>
             </div>
-            <div class="footer-col">
-                <h4>Get Started</h4>
-                <ul>
-                    @guest
-                        <li><a href="{{ route('register') }}">Join as Professional</a></li>
-                        <li><a href="{{ route('register') }}">Hire Talent</a></li>
-                        <li><a href="{{ route('login') }}">Log In</a></li>
-                    @else
-                        <li><a href="{{ url('/dashboard') }}">Dashboard</a></li>
-                    @endguest
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4>Policies</h4>
-                <ul>
-                    <li><a href="{{ route('privacy-policy') }}">Privacy Policy</a></li>
-                    <li><a href="{{ route('payment-policy') }}">Payment Policy</a></li>
-                    <li><a href="{{ route('cancellation-policy') }}">Cancellation & Refund</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <span>&copy; {{ date('Y') }} GigResource. All rights reserved.</span>
-            <span>
-                <a href="{{ route('privacy-policy') }}" style="color: var(--text-muted);">Privacy</a> &middot;
-                <a href="{{ route('payment-policy') }}" style="color: var(--text-muted);">Payment</a> &middot;
-                <a href="{{ route('cancellation-policy') }}" style="color: var(--text-muted);">Cancellation</a>
-            </span>
-        </div>
-    </div>
-</footer>
+        @else
+            <div class="esign-box">
+                <div class="esign-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Sign This {{ $policyLabel }}
+                </div>
+                <p class="esign-desc">
+                    By signing below, you confirm that you have read, understood, and agree to the terms of this
+                    <strong style="color:var(--text-white);">{{ $policyLabel }}</strong>. Your electronic signature is legally binding.
+                </p>
 
-</body>
-</html>
+                {{-- Error display --}}
+                @if($errors->has('signature_data'))
+                    <div class="esign-error">{{ $errors->first('signature_data') }}</div>
+                @endif
+
+                {{-- Tab switcher --}}
+                <div class="esign-tabs">
+                    <button type="button" class="esign-tab active" onclick="switchTab('typed', this)">Type Signature</button>
+                    <button type="button" class="esign-tab" onclick="switchTab('drawn', this)">Draw Signature</button>
+                </div>
+
+                <form action="{{ route('policy.sign') }}" method="POST" id="signForm">
+                    @csrf
+                    <input type="hidden" name="policy_type"    value="{{ $policyType }}">
+                    <input type="hidden" name="policy_version" value="{{ $policyVersion }}">
+                    <input type="hidden" name="signature_type" id="sigType" value="typed">
+                    <input type="hidden" name="signature_data" id="sigData">
+
+                    {{-- Typed panel --}}
+                    <div class="esign-panel active" id="panel-typed">
+                        <input type="text" id="typedInput" class="esign-input"
+                               placeholder="Type your full name here..."
+                               autocomplete="name" value="{{ auth()->user()->name }}">
+                    </div>
+
+                    {{-- Drawn panel --}}
+                    <div class="esign-panel" id="panel-drawn">
+                        <div class="esign-canvas-wrap">
+                            <canvas id="sigCanvas" class="esign-canvas"></canvas>
+                            <span class="esign-canvas-hint" id="canvasHint">Draw your signature here</span>
+                            <button type="button" class="esign-canvas-clear" onclick="clearCanvas()">Clear</button>
+                        </div>
+                    </div>
+
+                    {{-- Metadata strip --}}
+                    <div class="esign-meta">
+                        <span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            {{ auth()->user()->name }}
+                        </span>
+                        <span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            {{ now()->format('F j, Y') }}
+                        </span>
+                        <span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            v{{ $policyVersion }}
+                        </span>
+                    </div>
+
+                    <button type="submit" class="esign-btn" onclick="return prepareSubmit()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        I Agree &amp; Sign
+                    </button>
+                </form>
+            </div>
+        @endif
+    @else
+        <div class="esign-box">
+            <div class="esign-login-prompt">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                <p>
+                    Want to officially sign this {{ $policyLabel }}?
+                    <a href="{{ route('login') }}?intended={{ urlencode(request()->fullUrl()) }}">Log in to your account</a>
+                    to add your e-signature and keep a record of your acceptance.
+                </p>
+            </div>
+        </div>
+    @endauth
+</section>
+@endif
+
+@endsection
+
+@if(!empty($policyType))
+@push('scripts')
+<script>
+    // ── Canvas drawing ──
+    const canvas = document.getElementById('sigCanvas');
+    let ctx, drawing = false, hasDrawn = false;
+
+    function resizeCanvas() {
+        if (!canvas) return;
+        const rect = canvas.parentElement.getBoundingClientRect();
+        if (rect.width === 0) return; // panel still hidden, skip
+        canvas.width  = rect.width;
+        canvas.height = 140;
+        if (!ctx) ctx = canvas.getContext('2d');
+        ctx.strokeStyle = '#a5b4fc';
+        ctx.lineWidth   = 2.5;
+        ctx.lineCap     = 'round';
+        ctx.lineJoin    = 'round';
+    }
+
+    // ── Tab switching ──
+    function switchTab(tab, btn) {
+        document.querySelectorAll('.esign-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.esign-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('panel-' + tab).classList.add('active');
+        document.getElementById('sigType').value = tab;
+
+        // Canvas needs resize after panel becomes visible
+        if (tab === 'drawn') {
+            setTimeout(resizeCanvas, 50);
+        }
+    }
+
+    if (canvas) {
+        ctx = canvas.getContext('2d');
+        window.addEventListener('resize', resizeCanvas);
+
+        function getPos(e) {
+            const r = canvas.getBoundingClientRect();
+            const src = e.touches ? e.touches[0] : e;
+            return { x: src.clientX - r.left, y: src.clientY - r.top };
+        }
+
+        canvas.addEventListener('mousedown',  e => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); });
+        canvas.addEventListener('mousemove',  e => { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasDrawn = true; document.getElementById('canvasHint').style.display = 'none'; });
+        canvas.addEventListener('mouseup',    () => drawing = false);
+        canvas.addEventListener('mouseleave', () => drawing = false);
+        canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); }, {passive:false});
+        canvas.addEventListener('touchmove',  e => { e.preventDefault(); if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasDrawn = true; document.getElementById('canvasHint').style.display = 'none'; }, {passive:false});
+        canvas.addEventListener('touchend',   () => drawing = false);
+    }
+
+    function clearCanvas() {
+        if (ctx) { ctx.clearRect(0, 0, canvas.width, canvas.height); hasDrawn = false; document.getElementById('canvasHint').style.display = ''; }
+    }
+
+    // ── Form submission ──
+    function prepareSubmit() {
+        const type = document.getElementById('sigType').value;
+
+        if (type === 'typed') {
+            const val = document.getElementById('typedInput').value.trim();
+            if (!val) { alert('Please type your full name to sign.'); return false; }
+            document.getElementById('sigData').value = val;
+        } else {
+            if (!hasDrawn) { alert('Please draw your signature before submitting.'); return false; }
+            document.getElementById('sigData').value = canvas.toDataURL('image/png');
+        }
+        return true;
+    }
+</script>
+@endpush
+@endif

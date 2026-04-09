@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Domain\Auth\Contracts\UserRegistrationServiceInterface;
 use App\Domain\Auth\DataTransferObjects\RegisterUserData;
+use App\Domain\Influencer\Contracts\InfluencerServiceInterface;
 use App\Http\Controllers\Controller;
 use App\Rules\Recaptcha;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -46,7 +47,7 @@ class RegisterController extends Controller
     {
         $role = $data['role'] ?? 'client';
 
-        return $this->userRegistrationService->register(
+        $user = $this->userRegistrationService->register(
             new RegisterUserData(
                 name: (string) $data['name'],
                 email: (string) $data['email'],
@@ -54,5 +55,14 @@ class RegisterController extends Controller
                 role: (string) $role,
             )
         );
+
+        // Attribute signup to an influencer if referral cookie is present
+        $cookieName = (string) config('influencer.cookie_name', 'khadija_ref');
+        $code = request()->cookie($cookieName);
+        if ($code) {
+            app(InfluencerServiceInterface::class)->attributeSignup($user, (string) $code);
+        }
+
+        return $user;
     }
 }

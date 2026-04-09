@@ -251,6 +251,14 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 Change Password
             </a>
+            <a href="{{ route('client.profile.index', ['tab' => 'modes']) }}" class="pf-tab-link {{ $tab === 'modes' ? 'active' : '' }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                Account Modes
+            </a>
+            <a href="{{ route('client.profile.index', ['tab' => 'danger']) }}" class="pf-tab-link {{ $tab === 'danger' ? 'active' : '' }}" style="color:#f87171;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Danger Zone
+            </a>
         </div>
     </div>
 
@@ -481,6 +489,161 @@
                 </div>
                 <div style="margin-top: 20px;">
                     <button type="submit" class="pf-btn">Update Password</button>
+                </div>
+            </form>
+        </div>
+        @endif
+
+        {{-- Account Modes --}}
+        @if($tab === 'modes')
+        @php
+            $hasClient    = $user->hasRole(\App\Domain\Auth\Enums\RoleName::CLIENT->value);
+            $hasSupplier  = $user->hasRole(\App\Domain\Auth\Enums\RoleName::SUPPLIER->value);
+            $activeMode   = $user->activeRole();
+        @endphp
+        <div class="pf-card">
+            <div class="pf-card-title">Account Modes</div>
+            <div class="pf-card-desc">
+                Enable dual-mode on your account — act as a Client to post events, or as a Professional to offer your services.
+                You can switch between modes anytime from the top navigation bar.
+            </div>
+
+            @if(session('error'))
+                <div style="padding:12px 16px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444;border-radius:var(--radius-sm);font-size:13px;margin-bottom:16px;">{{ session('error') }}</div>
+            @endif
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                {{-- Client mode card --}}
+                <div style="background:{{ $hasClient ? 'rgba(59,130,246,0.06)' : 'var(--bg-primary)' }};border:1.5px solid {{ $hasClient ? 'rgba(59,130,246,0.3)' : 'var(--border-color)' }};border-radius:var(--radius);padding:22px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#06b6d4);display:flex;align-items:center;justify-content:center;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
+                            <div>
+                                <div style="font-size:15px;font-weight:700;color:var(--text-primary);">Client Mode</div>
+                                <div style="font-size:12px;color:var(--text-muted);">Post events, hire pros</div>
+                            </div>
+                        </div>
+                        @if($activeMode === 'client')
+                            <span style="padding:3px 10px;background:rgba(16,185,129,0.15);color:#10b981;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;">Active</span>
+                        @endif
+                    </div>
+                    @if($hasClient)
+                        <div style="font-size:12.5px;color:var(--text-secondary);padding:10px 0;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3" style="display:inline-block;vertical-align:middle;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>
+                            Enabled
+                        </div>
+                        @if($activeMode !== 'client')
+                            <form action="{{ route('role.switch') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="role" value="client">
+                                <button type="submit" class="pf-btn" style="width:100%;">Switch to Client Mode</button>
+                            </form>
+                        @endif
+                    @else
+                        <form action="{{ route('role.enable') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="role" value="client">
+                            <button type="submit" class="pf-btn" style="width:100%;background:linear-gradient(135deg,#3b82f6,#06b6d4);">Enable Client Mode</button>
+                        </form>
+                    @endif
+                </div>
+
+                {{-- Professional mode card --}}
+                <div style="background:{{ $hasSupplier ? 'rgba(16,185,129,0.06)' : 'var(--bg-primary)' }};border:1.5px solid {{ $hasSupplier ? 'rgba(16,185,129,0.3)' : 'var(--border-color)' }};border-radius:var(--radius);padding:22px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            </div>
+                            <div>
+                                <div style="font-size:15px;font-weight:700;color:var(--text-primary);">Professional Mode</div>
+                                <div style="font-size:12px;color:var(--text-muted);">Offer services, get hired</div>
+                            </div>
+                        </div>
+                        @if($activeMode === 'supplier')
+                            <span style="padding:3px 10px;background:rgba(16,185,129,0.15);color:#10b981;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;">Active</span>
+                        @endif
+                    </div>
+                    @if($hasSupplier)
+                        <div style="font-size:12.5px;color:var(--text-secondary);padding:10px 0;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3" style="display:inline-block;vertical-align:middle;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>
+                            Enabled
+                        </div>
+                        @if($activeMode !== 'supplier')
+                            <form action="{{ route('role.switch') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="role" value="supplier">
+                                <button type="submit" class="pf-btn" style="width:100%;">Switch to Professional Mode</button>
+                            </form>
+                        @endif
+                    @else
+                        <button type="button" class="pf-btn" data-role-enable="supplier"
+                                style="width:100%;background:linear-gradient(135deg,#10b981,#059669);">
+                            Become a Professional
+                        </button>
+                    @endif
+                </div>
+            </div>
+
+            <div style="margin-top:20px;padding:14px 18px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:var(--radius-sm);">
+                <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.6;">
+                    <strong style="color:var(--text-primary);">💡 How it works:</strong>
+                    Once you enable both modes, a quick-switch button appears in your top navigation bar.
+                    Your data, messages, and bookings stay separate between modes — just like Freelancer or Upwork.
+                </div>
+            </div>
+        </div>
+        @endif
+
+        {{-- Danger Zone --}}
+        @if($tab === 'danger')
+        <div class="pf-card" style="border-color: rgba(239,68,68,0.3);">
+            <div class="pf-card-title" style="color:#ef4444;">Delete Account</div>
+            <div class="pf-card-desc">
+                Once you submit a deletion request, your account will be locked and scheduled for permanent removal in
+                <strong style="color:var(--text-primary);">60 days</strong>. You can cancel the request anytime during the grace period by
+                logging back in.
+            </div>
+
+            <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px; padding: 16px 20px; margin-bottom: 24px;">
+                <div style="font-size:13px; font-weight:600; color:#f87171; margin-bottom:8px;">What happens next?</div>
+                <ul style="font-size:12.5px; color:var(--text-secondary); line-height:1.8; padding-left:18px; margin:0;">
+                    <li>Your account is immediately locked — no further actions possible.</li>
+                    <li>You will be signed out on your next request.</li>
+                    <li>You have 60 days to restore the account by simply logging in.</li>
+                    <li>After 60 days, your personal data is permanently anonymized.</li>
+                    <li>Bookings and transaction records are kept for legal/audit purposes but anonymized.</li>
+                </ul>
+            </div>
+
+            @if(session('error'))
+                <div style="padding:12px 16px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#ef4444; border-radius:var(--radius-sm); font-size:13px; margin-bottom:16px;">{{ session('error') }}</div>
+            @endif
+
+            <form action="{{ route('account.deletion.request') }}" method="POST" onsubmit="return confirm('Are you absolutely sure? This will schedule your account for deletion.');">
+                @csrf
+                <div class="pf-form-grid">
+                    <div class="pf-form-full">
+                        <label class="pf-label">Reason for leaving (optional)</label>
+                        <textarea name="reason" class="pf-textarea" placeholder="Help us improve — why are you deleting your account?" maxlength="1000">{{ old('reason') }}</textarea>
+                    </div>
+                    <div class="pf-form-full">
+                        <label class="pf-label">Current Password *</label>
+                        <input type="password" name="current_password" class="pf-input" required>
+                        @error('current_password') <div class="pf-error">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="pf-form-full">
+                        <label class="pf-label">Type <strong style="color:#ef4444;">DELETE</strong> to confirm *</label>
+                        <input type="text" name="confirm_text" class="pf-input" required placeholder="DELETE" autocomplete="off">
+                        @error('confirm_text') <div class="pf-error">{{ $message }}</div> @enderror
+                    </div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="pf-btn" style="background:#ef4444;">
+                        Request Account Deletion
+                    </button>
                 </div>
             </form>
         </div>

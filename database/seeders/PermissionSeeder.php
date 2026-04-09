@@ -54,6 +54,16 @@ class PermissionSeeder extends Seeder
             'agreements.accept',
             'payment_settings.manage',
             'payments.view',
+            // Influencer module
+            'influencers.view_any',
+            'influencers.view',
+            'influencers.approve',
+            'influencers.reject',
+            'influencers.manage_payouts',
+            'influencer.dashboard.view',
+            'influencer.referrals.view',
+            'influencer.payouts.request',
+            'influencer.payouts.view',
         ];
     }
 

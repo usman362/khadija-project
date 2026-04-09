@@ -16,6 +16,7 @@ class RolePermissionSeeder extends Seeder
         $adminRole = Role::findOrCreate(RoleName::ADMIN->value, 'web');
         $clientRole = Role::findOrCreate(RoleName::CLIENT->value, 'web');
         $supplierRole = Role::findOrCreate(RoleName::SUPPLIER->value, 'web');
+        $influencerRole = Role::findOrCreate(RoleName::INFLUENCER->value, 'web');
 
         $adminRole->syncPermissions(
             Permission::query()->where('guard_name', 'web')->whereIn('name', $permissions)->get()
@@ -72,6 +73,18 @@ class RolePermissionSeeder extends Seeder
 
         $supplierRole->syncPermissions(
             Permission::query()->where('guard_name', 'web')->whereIn('name', $supplierPermissions)->get()
+        );
+
+        $influencerPermissions = [
+            'dashboard.view',
+            'influencer.dashboard.view',
+            'influencer.referrals.view',
+            'influencer.payouts.request',
+            'influencer.payouts.view',
+        ];
+
+        $influencerRole->syncPermissions(
+            Permission::query()->where('guard_name', 'web')->whereIn('name', $influencerPermissions)->get()
         );
     }
 }

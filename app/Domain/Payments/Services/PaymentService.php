@@ -6,10 +6,14 @@ use App\Domain\Payments\Contracts\PaymentGatewayInterface;
 use App\Domain\Payments\Gateways\PayPalGateway;
 use App\Domain\Payments\Gateways\StripeGateway;
 use App\Domain\Settings\Services\SettingsService;
+use App\Mail\PaymentConfirmation;
 use App\Models\MembershipPlan;
 use App\Models\Payment;
 use App\Models\User;
 use App\Models\UserSubscription;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class PaymentService
 {
@@ -91,6 +95,19 @@ class PaymentService
         if ($previousSubId) {
             $oldSub = UserSubscription::find($previousSubId);
             $oldSub?->cancel('Switched to new plan');
+        }
+
+        // Send confirmation email to the customer (non-blocking)
+        $email = $payment->user?->email;
+        if ($email) {
+            try {
+                Mail::to($email)->send(new PaymentConfirmation($payment->fresh()));
+            } catch (Throwable $e) {
+                Log::warning('Failed to send payment confirmation email', [
+                    'payment_id' => $payment->id,
+                    'error'      => $e->getMessage(),
+                ]);
+            }
         }
     }
 

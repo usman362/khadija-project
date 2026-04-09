@@ -7,6 +7,7 @@ use App\Domain\Auth\Listeners\LogUserRegistered;
 use App\Domain\Auth\Enums\RoleName;
 use App\Domain\Messaging\Events\MessageInserted;
 use App\Domain\Messaging\Listeners\LogMessageInserted;
+use App\Listeners\LogAuthEvents;
 use App\Models\Booking as BookingModel;
 use App\Models\Conversation as ConversationModel;
 use App\Models\Event as EventModel;
@@ -46,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
 
         Event::listen(UserRegistered::class, LogUserRegistered::class);
         Event::listen(MessageInserted::class, LogMessageInserted::class);
+        Event::subscribe(LogAuthEvents::class);
         Gate::policy(EventModel::class, EventPolicy::class);
         Gate::policy(BookingModel::class, BookingPolicy::class);
         Gate::policy(MessageModel::class, MessagePolicy::class);

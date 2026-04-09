@@ -58,6 +58,7 @@
 
         /* Active indicator is handled by NobleUI default CSS + Blade routeIs() classes */
     </style>
+    @stack('styles')
 </head>
 
 <body>
@@ -91,12 +92,23 @@
                     <li class="nav-item nav-category">Event Management</li>
 
                     @can('events.view_any')
-                        <li class="nav-item {{ request()->routeIs('app.events.*') ? 'active' : '' }}">
-                            <a href="{{ route('app.events.index') }}" class="nav-link">
-                                <i class="link-icon ic-blue" data-lucide="calendar-days"></i>
-                                <span class="link-title">Events</span>
-                            </a>
-                        </li>
+                        @role('admin')
+                            {{-- Admin: go directly to full CRUD (AdminEventController) --}}
+                            <li class="nav-item {{ request()->routeIs('app.admin.events.*') ? 'active' : '' }}">
+                                <a href="{{ route('app.admin.events.index') }}" class="nav-link">
+                                    <i class="link-icon ic-blue" data-lucide="calendar-days"></i>
+                                    <span class="link-title">Events</span>
+                                </a>
+                            </li>
+                        @else
+                            {{-- Client / supplier: role-filtered shared page --}}
+                            <li class="nav-item {{ request()->routeIs('app.events.*') ? 'active' : '' }}">
+                                <a href="{{ route('app.events.index') }}" class="nav-link">
+                                    <i class="link-icon ic-blue" data-lucide="calendar-days"></i>
+                                    <span class="link-title">Events</span>
+                                </a>
+                            </li>
+                        @endrole
                     @endcan
 
                     @can('bookings.view_any')
@@ -107,6 +119,15 @@
                             </a>
                         </li>
                     @endcan
+
+                    @role('admin')
+                        <li class="nav-item {{ request()->routeIs('app.admin.categories.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.admin.categories.index') }}" class="nav-link">
+                                <i class="link-icon ic-emerald" data-lucide="layers"></i>
+                                <span class="link-title">Event Categories</span>
+                            </a>
+                        </li>
+                    @endrole
 
                     @can('agreements.view_any')
                         <li class="nav-item {{ request()->routeIs('app.agreements.*') ? 'active' : '' }}">
@@ -162,34 +183,6 @@
                     @role('admin')
                         <li class="nav-item nav-category">Administration</li>
 
-                        <li class="nav-item {{ request()->routeIs('app.admin.events.*') ? 'active' : '' }}">
-                            <a href="{{ route('app.admin.events.index') }}" class="nav-link">
-                                <i class="link-icon ic-cyan" data-lucide="calendar-range"></i>
-                                <span class="link-title">All Events</span>
-                            </a>
-                        </li>
-
-                        <li class="nav-item {{ request()->routeIs('app.admin.categories.*') ? 'active' : '' }}">
-                            <a class="nav-link" data-bs-toggle="collapse" href="#categoriesMenu" role="button"
-                                aria-expanded="{{ request()->routeIs('app.admin.categories.*') ? 'true' : 'false' }}">
-                                <i class="link-icon ic-emerald" data-lucide="layers"></i>
-                                <span class="link-title">Categories</span>
-                                <i class="link-arrow" data-lucide="chevron-down"></i>
-                            </a>
-                            <div class="collapse {{ request()->routeIs('app.admin.categories.*') ? 'show' : '' }}" id="categoriesMenu">
-                                <ul class="nav sub-menu">
-                                    <li class="nav-item">
-                                        <a href="{{ route('app.admin.categories.index') }}"
-                                            class="nav-link {{ request()->routeIs('app.admin.categories.index') ? 'active' : '' }}">Categories</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('app.admin.categories.create') }}"
-                                            class="nav-link {{ request()->routeIs('app.admin.categories.create') ? 'active' : '' }}">Add Categories</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-
                         <li class="nav-item {{ request()->routeIs('app.admin.membership-plans.*') ? 'active' : '' }}">
                             <a href="{{ route('app.admin.membership-plans.index') }}" class="nav-link">
                                 <i class="link-icon ic-orange" data-lucide="package"></i>
@@ -208,6 +201,34 @@
                             <a href="{{ route('app.users.index') }}" class="nav-link">
                                 <i class="link-icon ic-rose" data-lucide="users"></i>
                                 <span class="link-title">Users</span>
+                            </a>
+                        </li>
+
+                        @role('admin')
+                        @php
+                            $pendingDeletionsCount = \App\Models\User::pendingDeletion()->count();
+                        @endphp
+                        <li class="nav-item {{ request()->routeIs('app.admin.deletion-requests.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.admin.deletion-requests.index') }}" class="nav-link">
+                                <i class="link-icon ic-red" data-lucide="user-x"></i>
+                                <span class="link-title">Deletion Requests</span>
+                                @if($pendingDeletionsCount > 0)
+                                    <span class="badge bg-danger ms-auto">{{ $pendingDeletionsCount }}</span>
+                                @endif
+                            </a>
+                        </li>
+                        <li class="nav-item {{ request()->routeIs('app.admin.activity-logs.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.admin.activity-logs.index') }}" class="nav-link">
+                                <i class="link-icon ic-blue" data-lucide="activity"></i>
+                                <span class="link-title">Activity Log</span>
+                            </a>
+                        </li>
+                        @endrole
+
+                        <li class="nav-item {{ request()->routeIs('app.influencers.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.influencers.index') }}" class="nav-link">
+                                <i class="link-icon ic-yellow" data-lucide="award"></i>
+                                <span class="link-title">Influencers</span>
                             </a>
                         </li>
 
@@ -239,6 +260,35 @@
                             </a>
                         </li>
 
+                        @role('admin')
+                        <li class="nav-item {{ request()->routeIs('app.admin.blog.*') ? 'active' : '' }}">
+                            <a class="nav-link {{ request()->routeIs('app.admin.blog.*') ? '' : 'collapsed' }}"
+                                data-bs-toggle="collapse" href="#blogSubmenu" role="button"
+                                aria-expanded="{{ request()->routeIs('app.admin.blog.*') ? 'true' : 'false' }}"
+                                aria-controls="blogSubmenu">
+                                <i class="link-icon ic-orange" data-lucide="pen-tool"></i>
+                                <span class="link-title">Blog Management</span>
+                                <i class="link-arrow" data-lucide="chevron-down"></i>
+                            </a>
+                            <div class="collapse {{ request()->routeIs('app.admin.blog.*') ? 'show' : '' }}" id="blogSubmenu">
+                                <ul class="nav sub-menu">
+                                    <li class="nav-item">
+                                        <a href="{{ route('app.admin.blog.posts.index') }}"
+                                            class="nav-link {{ request()->routeIs('app.admin.blog.posts.*') ? 'active' : '' }}">
+                                            Posts
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('app.admin.blog.categories.index') }}"
+                                            class="nav-link {{ request()->routeIs('app.admin.blog.categories.*') ? 'active' : '' }}">
+                                            Categories
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        @endrole
+
                         <li class="nav-item {{ request()->routeIs('app.admin.settings.*') ? 'active' : '' }}">
                             <a class="nav-link {{ request()->routeIs('app.admin.settings.*') ? '' : 'collapsed' }}"
                                 data-bs-toggle="collapse" href="#settingsSubmenu" role="button"
@@ -268,8 +318,35 @@
                                             reCAPTCHA Settings
                                         </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('app.admin.settings.account-deletion') }}"
+                                            class="nav-link {{ request()->routeIs('app.admin.settings.account-deletion*') ? 'active' : '' }}">
+                                            Account Deletion
+                                    </li>
                                 </ul>
                             </div>
+                        </li>
+                    @endrole
+
+                    @role('influencer')
+                        <li class="nav-item nav-category">Influencer</li>
+                        <li class="nav-item {{ request()->routeIs('influencer.dashboard') ? 'active' : '' }}">
+                            <a href="{{ route('influencer.dashboard') }}" class="nav-link">
+                                <i class="link-icon ic-yellow" data-lucide="award"></i>
+                                <span class="link-title">My Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item {{ request()->routeIs('influencer.dashboard.referrals') ? 'active' : '' }}">
+                            <a href="{{ route('influencer.dashboard.referrals') }}" class="nav-link">
+                                <i class="link-icon ic-cyan" data-lucide="users"></i>
+                                <span class="link-title">My Referrals</span>
+                            </a>
+                        </li>
+                        <li class="nav-item {{ request()->routeIs('influencer.dashboard.payouts') ? 'active' : '' }}">
+                            <a href="{{ route('influencer.dashboard.payouts') }}" class="nav-link">
+                                <i class="link-icon ic-green" data-lucide="dollar-sign"></i>
+                                <span class="link-title">Payouts</span>
+                            </a>
                         </li>
                     @endrole
 
