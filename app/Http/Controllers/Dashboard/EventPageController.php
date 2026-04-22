@@ -67,7 +67,7 @@ class EventPageController extends Controller
             'starts_at' => $validated['starts_at'] ?? null,
             'ends_at' => $validated['ends_at'] ?? null,
             'created_by' => $request->user()->id,
-            'client_id' => $request->user()->isAdmin() ? ($request->user()->id) : $request->user()->id,
+            'client_id' => $request->user()->id,
             'supplier_id' => $validated['supplier_id'] ?? null,
             'is_published' => false,
             'source' => 'user',
@@ -105,5 +105,22 @@ class EventPageController extends Controller
         ]);
 
         return back()->with('status', 'Event published.');
+    }
+
+    /**
+     * Admin-only moderation: unpublish (pull from discovery) a bad event
+     * without deleting its history. Keeps bookings intact — admins cancel
+     * those separately if needed via BookingPageController::forceCancel.
+     */
+    public function unpublish(Request $request, Event $event): RedirectResponse
+    {
+        abort_unless($request->user()->isAdmin(), 403);
+
+        $event->update([
+            'is_published' => false,
+            'status'       => $event->status === 'published' ? 'pending' : $event->status,
+        ]);
+
+        return back()->with('status', 'Event unpublished.');
     }
 }

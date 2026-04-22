@@ -305,10 +305,14 @@ Route::middleware('auth')->group(function () {
     Route::patch('/app/events/{event}', [EventPageController::class, 'update'])->middleware('permission:events.update')->name('app.events.update');
     Route::get('/app/events/{event}', [EventPageController::class, 'show'])->middleware('permission:events.view')->name('app.events.show');
     Route::post('/app/events/{event}/publish', [EventPageController::class, 'publish'])->middleware('permission:events.publish')->name('app.events.publish');
+    // Admin moderation: pull a bad event from discovery without deleting it.
+    Route::post('/app/events/{event}/unpublish', [EventPageController::class, 'unpublish'])->middleware('permission:events.publish')->name('app.events.unpublish');
 
     Route::get('/app/bookings', [BookingPageController::class, 'index'])->middleware('permission:bookings.view_any')->name('app.bookings.index');
     Route::post('/app/bookings', [BookingPageController::class, 'store'])->middleware('permission:bookings.create')->name('app.bookings.store');
     Route::patch('/app/bookings/{booking}/status', [BookingPageController::class, 'updateStatus'])->middleware('permission:bookings.update')->name('app.bookings.update-status');
+    // Admin moderation: force-cancel a booking regardless of status.
+    Route::post('/app/bookings/{booking}/force-cancel', [BookingPageController::class, 'forceCancel'])->middleware('permission:bookings.update')->name('app.bookings.force-cancel');
 
     // Chat (messenger-style) — replaces old table-based messages
     Route::get('/app/chat', [ChatPageController::class, 'index'])->middleware('permission:messages.view_any')->name('app.chat.index');

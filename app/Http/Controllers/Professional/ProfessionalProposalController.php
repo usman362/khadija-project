@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\AgreementLog;
 use App\Models\Booking;
 use App\Models\Event;
+use App\Models\User;
+use App\Notifications\BookingCompleted;
+use App\Notifications\ProposalCancelled;
+use App\Notifications\ProposalReceived;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -114,6 +118,11 @@ class ProfessionalProposalController extends Controller
             'changed_by' => $user->id,
         ]);
 
+        // Notify the client that a new proposal landed on their event.
+        if ($client = User::find($event->client_id)) {
+            $client->notify(new ProposalReceived($booking));
+        }
+
         return redirect()
             ->route('professional.proposals.index')
             ->with('status', 'Proposal sent successfully! The client will review your request.');
@@ -127,17 +136,38 @@ class ProfessionalProposalController extends Controller
             'status' => ['required', 'in:requested,confirmed,cancelled,completed'],
         ]);
 
-        $previousStatus = $booking->status;
-        $booking->update(['status' => $validated['status']]);
+        $user     = $request->user();
+        $previous = $booking->status;
+        $next     = $validated['status'];
 
-        if ($previousStatus !== $validated['status']) {
+        // State-machine guard: a supplier may cancel a request/confirmed job
+        // and mark a confirmed job `completed`, but never accept their own
+        // proposal — that's a client-only transition.
+        if ($previous !== $next && ! $booking->canActorTransition($user, $next)) {
+            return back()->withErrors([
+                'status' => "Invalid transition: you can't move this booking from {$previous} to {$next}.",
+            ]);
+        }
+
+        $booking->update(['status' => $next]);
+
+        if ($previous !== $next) {
             AgreementLog::create([
                 'subject_type' => 'booking',
-                'subject_id' => $booking->id,
-                'from_status' => $previousStatus,
-                'to_status' => $validated['status'],
-                'changed_by' => $request->user()->id,
+                'subject_id'   => $booking->id,
+                'from_status'  => $previous,
+                'to_status'    => $next,
+                'changed_by'   => $user->id,
             ]);
+
+            // Notify the affected party. Supplier-driven transitions here are:
+            //   • confirmed → completed  → notify client (review prompt)
+            //   • any       → cancelled  → notify client (the other side)
+            if ($next === 'completed' && $booking->client) {
+                $booking->client->notify(new BookingCompleted($booking));
+            } elseif ($next === 'cancelled' && $booking->client) {
+                $booking->client->notify(new ProposalCancelled($booking, $user));
+            }
         }
 
         return back()->with('status', 'Booking status updated.');

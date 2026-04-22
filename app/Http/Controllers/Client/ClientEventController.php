@@ -74,6 +74,7 @@ class ClientEventController extends Controller
             'category_ids' => ['nullable', 'array'],
             'category_ids.*' => ['exists:categories,id'],
             'location' => ['nullable', 'string', 'max:255'],
+            'budget' => ['nullable', 'numeric', 'min:0', 'max:9999999.99'],
         ]);
 
         $event = Event::create([
@@ -85,6 +86,7 @@ class ClientEventController extends Controller
             'created_by' => $request->user()->id,
             'client_id' => $request->user()->id,
             'location' => $validated['location'] ?? null,
+            'budget' => $validated['budget'] ?? null,
             'is_published' => false,
             'source' => 'user',
         ]);
@@ -125,6 +127,7 @@ class ClientEventController extends Controller
             'category_ids' => ['nullable', 'array'],
             'category_ids.*' => ['exists:categories,id'],
             'location' => ['nullable', 'string', 'max:255'],
+            'budget' => ['nullable', 'numeric', 'min:0', 'max:9999999.99'],
         ]);
 
         $event->update([
@@ -133,6 +136,7 @@ class ClientEventController extends Controller
             'starts_at' => $validated['starts_at'] ?? null,
             'ends_at' => $validated['ends_at'] ?? null,
             'location' => $validated['location'] ?? null,
+            'budget' => $validated['budget'] ?? null,
         ]);
 
         $event->categories()->sync($validated['category_ids'] ?? []);

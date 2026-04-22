@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AgreementLog;
 use App\Models\Booking;
 use App\Models\Event;
+use App\Notifications\ProposalCancelled;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -81,19 +82,64 @@ class BookingPageController extends Controller
             'status' => ['required', 'in:requested,confirmed,cancelled,completed'],
         ]);
 
-        $previousStatus = $booking->status;
-        $booking->update(['status' => $validated['status']]);
+        $user     = $request->user();
+        $previous = $booking->status;
+        $next     = $validated['status'];
 
-        if ($previousStatus !== $validated['status']) {
+        // Admin may bypass the graph for non-admin transitions via forceCancel
+        // below; this endpoint still respects the state-machine to keep the
+        // audit trail clean (no silent `requested`→`completed` skips).
+        if ($previous !== $next && ! $booking->canActorTransition($user, $next)) {
+            return back()->withErrors([
+                'status' => "Invalid transition: can't move booking from {$previous} to {$next}.",
+            ]);
+        }
+
+        $booking->update(['status' => $next]);
+
+        if ($previous !== $next) {
             AgreementLog::query()->create([
                 'subject_type' => 'booking',
                 'subject_id' => $booking->id,
-                'from_status' => $previousStatus,
-                'to_status' => $validated['status'],
-                'changed_by' => $request->user()->id,
+                'from_status' => $previous,
+                'to_status' => $next,
+                'changed_by' => $user->id,
             ]);
         }
 
         return back()->with('status', 'Booking status updated.');
+    }
+
+    /**
+     * Admin-only moderation: force-cancel a booking regardless of its current
+     * status (terminal bookings included — useful to void a completed booking
+     * that turned out fraudulent). Notifies both participants.
+     */
+    public function forceCancel(Request $request, Booking $booking): RedirectResponse
+    {
+        $user = $request->user();
+        abort_unless($user->isAdmin(), 403);
+
+        if ($booking->status === 'cancelled') {
+            return back()->with('status', 'Booking is already cancelled.');
+        }
+
+        $previous = $booking->status;
+        $booking->update(['status' => 'cancelled']);
+
+        AgreementLog::query()->create([
+            'subject_type' => 'booking',
+            'subject_id'   => $booking->id,
+            'from_status'  => $previous,
+            'to_status'    => 'cancelled',
+            'changed_by'   => $user->id,
+        ]);
+
+        // Let both sides know an admin intervened.
+        $booking->loadMissing(['client', 'supplier']);
+        if ($booking->client)   $booking->client->notify(new ProposalCancelled($booking, $user));
+        if ($booking->supplier) $booking->supplier->notify(new ProposalCancelled($booking, $user));
+
+        return back()->with('status', 'Booking force-cancelled.');
     }
 }

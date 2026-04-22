@@ -91,6 +91,21 @@ class ProfessionalGigController extends Controller
 
     public function show(Request $request, Event $event): View
     {
+        $user = $request->user();
+
+        // A pro may only see an event detail page if one of these is true:
+        //   1. The event is assigned to them (their own gig)
+        //   2. They've already submitted a proposal on it (ongoing conversation)
+        //   3. The event is published AND open for proposals (discovery)
+        // Any other case — draft events, events assigned to someone else —
+        // is a 404 so we don't leak existence.
+        $isOwnGig       = $event->supplier_id === $user->id;
+        $hasProposal    = $event->bookings()->where('supplier_id', $user->id)->exists();
+        $isOpenForProps = $event->status === 'published'
+            && ($event->supplier_id === null || $event->supplier_id === $user->id);
+
+        abort_unless($isOwnGig || $hasProposal || $isOpenForProps, 404);
+
         $event->load([
             'categories:id,name',
             'client:id,name,email',

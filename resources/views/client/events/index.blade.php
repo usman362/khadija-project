@@ -565,9 +565,15 @@
                         </div>
                     </div>
 
-                    <div class="cl-form-group">
-                        <label class="cl-form-label">Location</label>
-                        <input type="text" name="location" class="cl-form-input" placeholder="City, Venue, or Address">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="cl-form-group">
+                            <label class="cl-form-label">Location</label>
+                            <input type="text" name="location" class="cl-form-input" placeholder="City, Venue, or Address">
+                        </div>
+                        <div class="cl-form-group">
+                            <label class="cl-form-label">Budget <span style="opacity:.6;font-weight:400">(USD, optional)</span></label>
+                            <input type="number" name="budget" class="cl-form-input" placeholder="e.g. 2500" min="0" step="0.01">
+                        </div>
                     </div>
                 </div>
                 <div class="cl-modal-footer">
