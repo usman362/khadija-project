@@ -7,9 +7,51 @@
 <style>
     /* ─── POLICY CONTENT ──────────────────────────── */
     .policy-hero {
-        padding: 120px 0 40px;
+        position: relative;
+        padding: 140px 0 60px;
         text-align: center;
+        overflow: hidden;
     }
+    .policy-hero-bg {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+    }
+    .policy-hero-bg img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.18;
+    }
+    .policy-hero-bg::after {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(180deg, rgba(11,15,26,0.7) 0%, rgba(11,15,26,0.95) 80%, var(--bg-dark) 100%);
+    }
+    .policy-hero .container { position: relative; z-index: 1; }
+    .policy-hero::before {
+        content: '';
+        position: absolute;
+        top: -30%; left: 50%; transform: translateX(-50%);
+        width: 600px; height: 600px;
+        background: radial-gradient(circle, rgba(59,130,246,0.1), transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 1;
+    }
+    .policy-hero-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 20px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(59,130,246,0.18), rgba(139,92,246,0.18));
+        border: 1px solid rgba(59,130,246,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+    }
+    .policy-hero-icon svg { width: 30px; height: 30px; }
 
     .policy-hero h1 {
         font-size: 2.5rem;
@@ -276,7 +318,13 @@
 
 <!-- ─── HERO ───────────────────────────────── -->
 <section class="policy-hero">
+    <div class="policy-hero-bg">
+        <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1600&q=80&auto=format&fit=crop" alt="Documents and papers" loading="eager">
+    </div>
     <div class="container">
+        <div class="policy-hero-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
         <h1><span class="gradient-text">{{ $policy->title ?? $fallbackTitle }}</span></h1>
         <p class="policy-date">Last updated: {{ $policy ? $policy->updated_at->format('F j, Y') : now()->format('F j, Y') }}</p>
     </div>

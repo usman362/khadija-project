@@ -30,6 +30,7 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar',
+        'cover_image',
         'phone',
         'referred_by_influencer_id',
         'referral_attributed_at',
@@ -94,9 +95,89 @@ class User extends Authenticatable
         return "https://ui-avatars.com/api/?name={$name}&size=200&background=6366f1&color=fff&bold=true";
     }
 
+    /**
+     * Public URL for the profile cover banner. Returns null when the user
+     * hasn't uploaded one — the view decides what placeholder to render
+     * (Freelancer-style default gradient).
+     */
+    public function getCoverImageUrlAttribute(): ?string
+    {
+        return $this->cover_image ? asset('storage/' . $this->cover_image) : null;
+    }
+
     public function createdEvents(): HasMany
     {
         return $this->hasMany(Event::class, 'created_by');
+    }
+
+    // ── Reviews ────────────────────────────────────────────────
+    /** Reviews written BY this user (as the reviewer). */
+    public function reviewsWritten(): HasMany
+    {
+        return $this->hasMany(Review::class, 'reviewer_id');
+    }
+
+    /** Reviews received ABOUT this user (as the reviewee). */
+    public function reviewsReceived(): HasMany
+    {
+        return $this->hasMany(Review::class, 'reviewee_id');
+    }
+
+    /**
+     * Public-safe rollup of this user's incoming reviews.
+     *
+     *   [
+     *     'count'     => 3152,   // total visible reviews
+     *     'average'   => 4.8,    // rounded to 1 decimal
+     *     'histogram' => [5=>2960, 4=>64, 3=>17, 2=>37, 1=>51],
+     *   ]
+     *
+     * Uses a single grouped query so the histogram + count come free.
+     * Returns a zeroed struct when there are no reviews — callers never
+     * have to null-check.
+     */
+    public function reviewStats(): array
+    {
+        $rows = Review::visible()
+            ->about($this->id)
+            ->selectRaw('rating, COUNT(*) as c')
+            ->groupBy('rating')
+            ->pluck('c', 'rating')
+            ->all();
+
+        $histogram = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+        foreach ($rows as $star => $count) {
+            $histogram[(int) $star] = (int) $count;
+        }
+
+        $count = array_sum($histogram);
+        $sum   = 0;
+        foreach ($histogram as $star => $c) {
+            $sum += $star * $c;
+        }
+        $average = $count > 0 ? round($sum / $count, 1) : 0.0;
+
+        return [
+            'count'     => $count,
+            'average'   => $average,
+            'histogram' => $histogram,
+        ];
+    }
+
+    /**
+     * "Top Rated" derived badge — our platform-level equivalent of the
+     * brochure's "Best Pick Guaranteed" seal. Awarded automatically to
+     * pros with strong ratings, enough sample size, AND all three
+     * verification badges stamped.
+     */
+    public function isTopRated(): bool
+    {
+        $stats = $this->reviewStats();
+        if ($stats['count'] < 5 || $stats['average'] < 4.5) {
+            return false;
+        }
+        $profile = $this->profile;
+        return $profile && count($profile->verifiedBadges()) === count(\App\Models\UserProfile::BADGES);
     }
 
     public function clientEvents(): HasMany
@@ -240,5 +321,59 @@ class User extends Authenticatable
         return $query->whereNotNull('deletion_requested_at')
             ->whereNotNull('deletion_scheduled_at')
             ->where('deletion_scheduled_at', '>', now());
+    }
+
+    // ── AI Feature Access (plan-gated) ─────────────────────────
+
+    /**
+     * Lookup the plan_feature matching a feature code on the user's active subscription.
+     * Admins always have access and unlimited quota.
+     * Returns: ['enabled' => bool, 'quota' => int (0=unlimited, -1=not found)]
+     */
+    public function aiFeatureAccess(string $featureCode): array
+    {
+        if ($this->isAdmin()) {
+            return ['enabled' => true, 'quota' => 0]; // unlimited
+        }
+
+        $sub = $this->activeSubscription();
+        if (!$sub || !$sub->plan) {
+            return ['enabled' => false, 'quota' => -1];
+        }
+
+        $feature = \App\Models\PlanFeature::where('membership_plan_id', $sub->plan->id)
+            ->where('feature_code', $featureCode)
+            ->where('is_included', true)
+            ->first();
+
+        if (!$feature) {
+            return ['enabled' => false, 'quota' => -1];
+        }
+
+        return [
+            'enabled' => true,
+            'quota'   => (int) ($feature->quota_monthly ?? 0),
+        ];
+    }
+
+    public function canUseAiFeature(string $featureCode): bool
+    {
+        return $this->aiFeatureAccess($featureCode)['enabled'];
+    }
+
+    public function aiFeatureUsageThisMonth(string $featureCode): int
+    {
+        return \App\Models\AiFeatureUsage::where('user_id', $this->id)
+            ->where('feature_code', $featureCode)
+            ->where('created_at', '>=', now()->startOfMonth())
+            ->count();
+    }
+
+    public function aiFeatureRemaining(string $featureCode): int
+    {
+        $access = $this->aiFeatureAccess($featureCode);
+        if (!$access['enabled']) return 0;
+        if ($access['quota'] === 0) return PHP_INT_MAX;
+        return max(0, $access['quota'] - $this->aiFeatureUsageThisMonth($featureCode));
     }
 }

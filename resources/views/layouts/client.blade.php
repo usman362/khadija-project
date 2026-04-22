@@ -936,6 +936,26 @@
                     </a>
                 </li>
 
+                <li class="cl-nav-label">AI Tools</li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('ai-tools.budget-allocator') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.budget-allocator*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        Budget Allocator
+                    </a>
+                </li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('ai-tools.vendor-matchmaking') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.vendor-matchmaking*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                        Vendor Matchmaking
+                    </a>
+                </li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('ai-tools.review-writer') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.review-writer*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                        Review Writer
+                    </a>
+                </li>
+
                 <li class="cl-nav-label">Billing</li>
                 <li class="cl-nav-item">
                     <a href="{{ route('app.membership-plans.index') }}" class="cl-nav-link {{ request()->routeIs('app.membership-plans.*') ? 'active' : '' }}">
@@ -1023,6 +1043,9 @@
 
     {{-- Shared role enable confirmation modal --}}
     @include('partials._role_enable_modal')
+
+    {{-- AI Chatbot floating widget --}}
+    @include('partials._ai_chatbot_widget')
 
     <script>
         // Close sidebar on mobile when clicking outside

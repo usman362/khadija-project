@@ -57,7 +57,7 @@
                             @endif
                         </td>
                         <td>{{ $plan->formattedPrice() }}</td>
-                        <td>{{ ucfirst($plan->billing_cycle) }}</td>
+                        <td>{{ $plan->contractTermLabel() }}</td>
                         <td>
                             <small>
                                 Events: {{ $plan->max_events ?? '∞' }}<br>

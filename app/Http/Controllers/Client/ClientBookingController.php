@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AgreementLog;
 use App\Models\Booking;
 use App\Models\Event;
+use App\Models\Review;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -66,7 +67,14 @@ class ClientBookingController extends Controller
 
         $bookings = $query->paginate(12)->withQueryString();
 
-        return view('client.bookings.index', compact('stats', 'bookings', 'tab'));
+        // Which bookings on this page has the client already reviewed? Keeps
+        // the "Leave a Review" CTA from appearing twice on the same card.
+        $reviewedBookingIds = Review::where('reviewer_id', $user->id)
+            ->whereIn('booking_id', $bookings->pluck('id'))
+            ->pluck('booking_id')
+            ->all();
+
+        return view('client.bookings.index', compact('stats', 'bookings', 'tab', 'reviewedBookingIds'));
     }
 
     public function updateStatus(Request $request, Booking $booking): RedirectResponse

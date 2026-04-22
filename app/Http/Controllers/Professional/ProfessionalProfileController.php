@@ -205,4 +205,102 @@ class ProfessionalProfileController extends Controller
 
         return back()->with('status', 'Profile photo removed.');
     }
+
+    /**
+     * Upload the profile cover banner (Freelancer.com-style wide banner above
+     * the avatar). Larger max than avatar since cover images are wider.
+     */
+    public function updateCover(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'cover_image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
+        ]);
+
+        $user = $request->user();
+
+        if ($user->cover_image) {
+            Storage::disk('public')->delete($user->cover_image);
+        }
+
+        $path = $request->file('cover_image')->store('covers', 'public');
+        $user->update(['cover_image' => $path]);
+
+        return back()->with('status', 'Cover photo updated.');
+    }
+
+    public function removeCover(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        if ($user->cover_image) {
+            Storage::disk('public')->delete($user->cover_image);
+            $user->update(['cover_image' => null]);
+        }
+
+        return back()->with('status', 'Cover photo removed.');
+    }
+
+    /**
+     * Submit a verification document for one of three badge types:
+     * trade_license | liability_insurance | workers_comp.
+     *
+     * Uploading replaces any existing doc AND clears the verified_at stamp —
+     * so a re-upload goes back into the admin review queue.
+     */
+    public function submitVerification(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'badge' => ['required', 'in:trade_license,liability_insurance,workers_comp'],
+            'number' => ['nullable', 'string', 'max:100'],
+            'document' => ['required', 'file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:5120'], // 5MB
+        ]);
+
+        $profile = $request->user()->getOrCreateProfile();
+        $badge = $validated['badge'];
+        $docCol = "{$badge}_doc";
+        $numberCol = "{$badge}_number";
+        $verifiedCol = "{$badge}_verified_at";
+
+        // Clean up old doc if replacing
+        if ($profile->$docCol) {
+            Storage::disk('public')->delete($profile->$docCol);
+        }
+
+        $path = $validated['document']->store("verification/{$badge}", 'public');
+
+        $profile->update([
+            $docCol => $path,
+            $numberCol => $validated['number'] ?? null,
+            $verifiedCol => null, // always re-enters review queue
+        ]);
+
+        return back()->with('status', ucfirst(str_replace('_', ' ', $badge)) . ' submitted for verification. Our team will review it shortly.');
+    }
+
+    /**
+     * Pro withdraws a submission before verification — clears file + number
+     * + any approval stamp.
+     */
+    public function removeVerification(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'badge' => ['required', 'in:trade_license,liability_insurance,workers_comp'],
+        ]);
+
+        $profile = $request->user()->getOrCreateProfile();
+        $badge = $validated['badge'];
+        $docCol = "{$badge}_doc";
+
+        if ($profile->$docCol) {
+            Storage::disk('public')->delete($profile->$docCol);
+        }
+
+        $profile->update([
+            $docCol => null,
+            "{$badge}_number" => null,
+            "{$badge}_verified_at" => null,
+        ]);
+
+        return back()->with('status', 'Verification document removed.');
+    }
 }

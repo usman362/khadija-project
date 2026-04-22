@@ -15,25 +15,94 @@
         .pf-sidebar { width: 100%; }
     }
 
-    /* ── Avatar Card ── */
+    /* ── Avatar Card (Freelancer.com-style cover + avatar) ──
+       The card is now a two-zone layout:
+         1. Cover banner (wide top image / gradient) with an upload hotspot
+            in the top-right corner.
+         2. Body below, with the circular avatar pulled up by negative
+            margin so it overlaps the cover — classic social-profile look.
+       overflow: hidden lets the cover image respect the card's rounded
+       corners without bleeding past them. */
     .pf-avatar-card {
         background: var(--bg-secondary);
         border: 1px solid var(--border-color);
         border-radius: var(--radius);
-        padding: 24px;
-        text-align: center;
         margin-bottom: 16px;
+        overflow: hidden;
+        position: relative;
     }
-    .pf-avatar-wrap { position: relative; display: inline-block; margin-bottom: 16px; }
+
+    .pf-cover-banner {
+        position: relative;
+        height: 96px;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+        background-size: cover;
+        background-position: center;
+    }
+    .pf-cover-banner.has-image { background-image: var(--cover-bg); }
+    .pf-cover-banner::after {
+        /* Subtle gradient overlay so the upload button stays legible
+           against any uploaded photo. */
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0.18));
+        pointer-events: none;
+    }
+    .pf-cover-upload {
+        position: absolute;
+        top: 8px; right: 8px;
+        z-index: 2;
+        width: 30px; height: 30px;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.55);
+        color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        backdrop-filter: blur(4px);
+    }
+    .pf-cover-upload:hover { background: rgba(0,0,0,0.75); transform: scale(1.05); }
+    .pf-cover-upload input { display: none; }
+    .pf-cover-remove {
+        position: absolute;
+        top: 8px; right: 46px;
+        z-index: 2;
+        height: 30px;
+        padding: 0 10px;
+        border-radius: 15px;
+        background: rgba(0,0,0,0.55);
+        color: #fff;
+        border: none;
+        font-size: 11px;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex; align-items: center;
+        backdrop-filter: blur(4px);
+        transition: var(--transition);
+    }
+    .pf-cover-remove:hover { background: rgba(239,68,68,0.85); }
+
+    .pf-avatar-body {
+        padding: 0 24px 24px;
+        text-align: center;
+    }
+    .pf-avatar-wrap {
+        position: relative;
+        display: inline-block;
+        margin-top: -52px;   /* pulls avatar up over the cover */
+        margin-bottom: 12px;
+    }
     .pf-avatar-img {
-        width: 120px; height: 120px;
+        width: 104px; height: 104px;
         border-radius: 50%;
         object-fit: cover;
-        border: 3px solid var(--accent-blue);
+        border: 4px solid var(--bg-secondary);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        background: var(--bg-secondary);
     }
     .pf-avatar-upload {
-        position: absolute; bottom: 4px; right: 4px;
-        width: 34px; height: 34px;
+        position: absolute; bottom: 2px; right: 2px;
+        width: 32px; height: 32px;
         border-radius: 50%;
         background: var(--accent-blue);
         color: #fff;
@@ -240,35 +309,56 @@
     {{-- ── Sidebar ── --}}
     <div class="pf-sidebar">
         <div class="pf-avatar-card">
-            <div class="pf-avatar-wrap">
-                <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="pf-avatar-img" id="avatarPreview">
-                <form action="{{ route('professional.profile.avatar') }}" method="POST" enctype="multipart/form-data" id="avatarForm">
+            {{-- Cover banner: Freelancer.com-style wide header image.
+                 Falls back to a branded gradient when no cover is set. --}}
+            <div class="pf-cover-banner {{ $user->cover_image_url ? 'has-image' : '' }}"
+                 @if($user->cover_image_url) style="--cover-bg: url('{{ $user->cover_image_url }}');" @endif>
+                @if($user->cover_image)
+                    <form action="{{ route('professional.profile.cover.remove') }}" method="POST" style="display:inline;">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="pf-cover-remove" title="Remove cover photo">Remove</button>
+                    </form>
+                @endif
+                <form action="{{ route('professional.profile.cover') }}" method="POST" enctype="multipart/form-data" id="coverForm">
                     @csrf
-                    <label class="pf-avatar-upload" title="Change Photo">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                        <input type="file" name="avatar" accept="image/*" onchange="document.getElementById('avatarForm').submit()">
+                    <label class="pf-cover-upload" title="Change cover photo">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        <input type="file" name="cover_image" accept="image/*" onchange="document.getElementById('coverForm').submit()">
                     </label>
                 </form>
             </div>
-            <div class="pf-avatar-name">{{ $user->name }}</div>
-            @if($profile->headline)
-                <div class="pf-avatar-headline">{{ $profile->headline }}</div>
-            @endif
-            <div class="pf-avatar-email">{{ $user->email }}</div>
-            <div>
-                <span class="pf-avatar-role">Professional</span>
-                @if($profile->availability)
-                    <span class="pf-availability-badge {{ $profile->availability }}">{{ ucfirst(str_replace('_', ' ', $profile->availability)) }}</span>
-                @endif
-            </div>
-            @if($user->avatar)
-                <div class="pf-avatar-actions">
-                    <form action="{{ route('professional.profile.avatar.remove') }}" method="POST">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="pf-avatar-remove">Remove photo</button>
+
+            <div class="pf-avatar-body">
+                <div class="pf-avatar-wrap">
+                    <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="pf-avatar-img" id="avatarPreview">
+                    <form action="{{ route('professional.profile.avatar') }}" method="POST" enctype="multipart/form-data" id="avatarForm">
+                        @csrf
+                        <label class="pf-avatar-upload" title="Change Photo">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                            <input type="file" name="avatar" accept="image/*" onchange="document.getElementById('avatarForm').submit()">
+                        </label>
                     </form>
                 </div>
-            @endif
+                <div class="pf-avatar-name">{{ $user->name }}</div>
+                @if($profile->headline)
+                    <div class="pf-avatar-headline">{{ $profile->headline }}</div>
+                @endif
+                <div class="pf-avatar-email">{{ $user->email }}</div>
+                <div>
+                    <span class="pf-avatar-role">Professional</span>
+                    @if($profile->availability)
+                        <span class="pf-availability-badge {{ $profile->availability }}">{{ ucfirst(str_replace('_', ' ', $profile->availability)) }}</span>
+                    @endif
+                </div>
+                @if($user->avatar)
+                    <div class="pf-avatar-actions">
+                        <form action="{{ route('professional.profile.avatar.remove') }}" method="POST">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="pf-avatar-remove">Remove photo</button>
+                        </form>
+                    </div>
+                @endif
+            </div>
         </div>
 
         <div class="pf-tabs">
@@ -283,6 +373,15 @@
             <a href="{{ route('professional.profile.index', ['tab' => 'portfolio']) }}" class="pf-tab-link {{ $tab === 'portfolio' ? 'active' : '' }}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
                 Portfolio & Certs
+            </a>
+            <a href="{{ route('professional.profile.index', ['tab' => 'verification']) }}" class="pf-tab-link {{ $tab === 'verification' ? 'active' : '' }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Verification
+                @if($profile->hasAnyVerifiedBadge())
+                    <span style="margin-left:auto;background:#10b981;color:#fff;font-size:10px;padding:2px 6px;border-radius:10px;font-weight:600;">{{ count($profile->verifiedBadges()) }} ✓</span>
+                @elseif($profile->hasPendingVerification())
+                    <span style="margin-left:auto;background:#f59e0b;color:#fff;font-size:10px;padding:2px 6px;border-radius:10px;font-weight:600;">Pending</span>
+                @endif
             </a>
             <a href="{{ route('professional.profile.index', ['tab' => 'social']) }}" class="pf-tab-link {{ $tab === 'social' ? 'active' : '' }}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
@@ -540,6 +639,108 @@
                     <button type="submit" class="pf-btn">Save Portfolio & Certs</button>
                 </div>
             </form>
+        </div>
+        @endif
+
+        {{-- Verification Badges --}}
+        @if($tab === 'verification')
+        <div class="pf-card">
+            <div class="pf-card-title">Trust & Verification Badges</div>
+            <div class="pf-card-desc">
+                Upload proof of your credentials. Verified badges appear on your public profile and in search results, helping clients trust you faster — inspired by platforms like BestPickPro.
+            </div>
+
+            @php
+                $badgeMeta = [
+                    'trade_license' => [
+                        'label' => 'Trade License',
+                        'blurb' => 'Proof you are licensed to operate in your trade.',
+                        'numberLabel' => 'License Number',
+                    ],
+                    'liability_insurance' => [
+                        'label' => 'General Liability Insurance',
+                        'blurb' => 'Coverage that protects clients if something goes wrong on the job.',
+                        'numberLabel' => 'Policy Number',
+                    ],
+                    'workers_comp' => [
+                        'label' => "Workers' Compensation",
+                        'blurb' => 'Coverage for any staff working on-site with you.',
+                        'numberLabel' => 'Policy Number',
+                    ],
+                ];
+            @endphp
+
+            @foreach($badgeMeta as $key => $meta)
+                @php
+                    $status = $profile->badgeStatus($key);
+                    $doc = $profile->{"{$key}_doc"};
+                    $number = $profile->{"{$key}_number"};
+                    $verifiedAt = $profile->{"{$key}_verified_at"};
+                @endphp
+                <div style="border:1px solid rgba(99,102,241,0.15); border-radius:12px; padding:18px; margin-top:16px;">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2" style="margin-bottom:8px;">
+                        <div>
+                            <div style="font-size:15px; font-weight:600; color: var(--text-primary); display:flex; align-items:center; gap:8px;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                {{ $meta['label'] }}
+                            </div>
+                            <div style="font-size:13px; color: var(--text-muted); margin-top:2px;">{{ $meta['blurb'] }}</div>
+                        </div>
+                        <div>
+                            @if($status === 'verified')
+                                <span style="background:#10b981; color:#fff; font-size:11px; padding:4px 10px; border-radius:12px; font-weight:700; letter-spacing:0.3px;">✓ VERIFIED</span>
+                            @elseif($status === 'pending')
+                                <span style="background:#f59e0b; color:#fff; font-size:11px; padding:4px 10px; border-radius:12px; font-weight:700;">PENDING REVIEW</span>
+                            @else
+                                <span style="background:rgba(148,163,184,0.2); color:#64748b; font-size:11px; padding:4px 10px; border-radius:12px; font-weight:600;">NOT SUBMITTED</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    @if($status === 'verified')
+                        <div style="background:rgba(16,185,129,0.08); border-left:3px solid #10b981; padding:10px 14px; border-radius:6px; margin-top:10px; font-size:13px;">
+                            Verified on {{ $verifiedAt->format('M d, Y') }}
+                            @if($number) · <span style="color:var(--text-muted);">#{{ $number }}</span> @endif
+                            · <a href="{{ asset('storage/' . $doc) }}" target="_blank" style="color:#10b981;">View document</a>
+                        </div>
+                    @elseif($status === 'pending')
+                        <div style="background:rgba(245,158,11,0.08); border-left:3px solid #f59e0b; padding:10px 14px; border-radius:6px; margin-top:10px; font-size:13px;">
+                            Submitted — admin review in progress.
+                            @if($number) · <span style="color:var(--text-muted);">#{{ $number }}</span> @endif
+                            · <a href="{{ asset('storage/' . $doc) }}" target="_blank" style="color:#f59e0b;">View submitted document</a>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('professional.profile.verification.submit') }}" method="POST" enctype="multipart/form-data" style="margin-top:14px;">
+                        @csrf
+                        <input type="hidden" name="badge" value="{{ $key }}">
+                        <div class="pf-form-grid">
+                            <div>
+                                <label class="pf-label">{{ $meta['numberLabel'] }}</label>
+                                <input type="text" name="number" class="pf-input" value="{{ $number }}" maxlength="100" placeholder="Optional">
+                            </div>
+                            <div>
+                                <label class="pf-label">Upload Proof (PDF or image, max 5MB) *</label>
+                                <input type="file" name="document" class="pf-input" accept=".pdf,.jpg,.jpeg,.png,.webp" {{ $status === 'none' ? 'required' : '' }}>
+                            </div>
+                        </div>
+                        <div style="margin-top:12px; display:flex; gap:8px;">
+                            <button type="submit" class="pf-btn pf-btn-sm">
+                                {{ $status === 'none' ? 'Submit for Verification' : 'Replace & Re-submit' }}
+                            </button>
+                            @if($status !== 'none')
+                                <button type="submit"
+                                    formaction="{{ route('professional.profile.verification.remove') }}"
+                                    formmethod="POST"
+                                    class="pf-btn pf-btn-outline pf-btn-sm"
+                                    onclick="return confirm('Remove this verification document? You will need to re-upload to get verified again.')">
+                                    Remove
+                                </button>
+                            @endif
+                        </div>
+                    </form>
+                </div>
+            @endforeach
         </div>
         @endif
 

@@ -11,12 +11,13 @@
         </div>
     </div>
     <div class="col-md-3 mb-3">
-        <label class="form-label">Billing Cycle <span class="text-danger">*</span></label>
+        <label class="form-label">Contract Term <span class="text-danger">*</span></label>
         <select name="billing_cycle" class="form-select" required>
-            @foreach(['monthly' => 'Monthly', 'quarterly' => 'Quarterly', 'yearly' => 'Yearly', 'one_time' => 'One Time'] as $val => $label)
-                <option value="{{ $val }}" {{ ($plan?->billing_cycle ?? 'monthly') === $val ? 'selected' : '' }}>{{ $label }}</option>
+            @foreach(['6_month' => '6 Months', '12_month' => '12 Months', '18_month' => '18 Months'] as $val => $label)
+                <option value="{{ $val }}" {{ ($plan?->billing_cycle ?? '12_month') === $val ? 'selected' : '' }}>{{ $label }}</option>
             @endforeach
         </select>
+        <small class="text-muted">Flat contract — no monthly rebills.</small>
     </div>
     <div class="col-12 mb-3">
         <label class="form-label">Description</label>
@@ -79,22 +80,91 @@
 
 <div class="features-container">
     <div class="d-flex justify-content-between align-items-center mb-2">
-        <label class="form-label mb-0"><strong>Plan Features</strong></label>
+        <div>
+            <label class="form-label mb-0"><strong>Plan Features</strong></label>
+            <div class="small text-secondary">Add a description for each row. Optionally link it to a programmatic <code>feature_code</code> and set a monthly quota (0 = unlimited).</div>
+        </div>
         <button type="button" class="btn btn-sm btn-outline-primary add-feature-btn">+ Add Feature</button>
     </div>
+
+    @php
+        $aiFeatureCodes = \App\Domain\AiFeatures\AiFeatureCode::all();
+    @endphp
+
     <div class="features-list">
         @if($plan && $plan->features->count())
             @foreach($plan->features as $feature)
-                <div class="d-flex gap-2 mb-2 align-items-center">
-                    <input type="text" name="features[]" class="form-control form-control-sm" value="{{ $feature->feature }}">
-                    <button type="button" class="btn btn-sm btn-outline-danger remove-feature-btn">&times;</button>
+                <div class="row g-2 mb-2 align-items-center feature-row">
+                    <div class="col-md-5">
+                        <input type="text" name="features[]" class="form-control form-control-sm" value="{{ $feature->feature }}" placeholder="Feature description">
+                    </div>
+                    <div class="col-md-4">
+                        <select name="feature_codes[]" class="form-select form-select-sm">
+                            <option value="">— No gate —</option>
+                            @foreach($aiFeatureCodes as $code)
+                                <option value="{{ $code }}" @selected($feature->feature_code === $code)>{{ \App\Domain\AiFeatures\AiFeatureCode::label($code) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" name="feature_quotas[]" class="form-control form-control-sm" value="{{ $feature->quota_monthly }}" placeholder="Quota/mo" min="0" max="999999" title="Monthly quota (0 = unlimited, empty = not applicable)">
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-feature-btn w-100">&times;</button>
+                    </div>
                 </div>
             @endforeach
         @else
-            <div class="d-flex gap-2 mb-2 align-items-center">
-                <input type="text" name="features[]" class="form-control form-control-sm" placeholder="Feature description">
-                <button type="button" class="btn btn-sm btn-outline-danger remove-feature-btn">&times;</button>
+            <div class="row g-2 mb-2 align-items-center feature-row">
+                <div class="col-md-5">
+                    <input type="text" name="features[]" class="form-control form-control-sm" placeholder="Feature description">
+                </div>
+                <div class="col-md-4">
+                    <select name="feature_codes[]" class="form-select form-select-sm">
+                        <option value="">— No gate —</option>
+                        @foreach($aiFeatureCodes as $code)
+                            <option value="{{ $code }}">{{ \App\Domain\AiFeatures\AiFeatureCode::label($code) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="number" name="feature_quotas[]" class="form-control form-control-sm" placeholder="Quota/mo" min="0" max="999999">
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-feature-btn w-100">&times;</button>
+                </div>
             </div>
         @endif
     </div>
 </div>
+
+@push('scripts')
+<script>
+(function () {
+    const container = document.querySelector('.features-container');
+    if (!container) return;
+    const list = container.querySelector('.features-list');
+    const addBtn = container.querySelector('.add-feature-btn');
+
+    addBtn?.addEventListener('click', () => {
+        const first = list.querySelector('.feature-row');
+        if (!first) return;
+        const clone = first.cloneNode(true);
+        clone.querySelectorAll('input').forEach(i => { i.value = ''; });
+        clone.querySelectorAll('select').forEach(s => { s.selectedIndex = 0; });
+        list.appendChild(clone);
+    });
+
+    list.addEventListener('click', e => {
+        const btn = e.target.closest('.remove-feature-btn');
+        if (!btn) return;
+        if (list.querySelectorAll('.feature-row').length > 1) {
+            btn.closest('.feature-row').remove();
+        } else {
+            btn.closest('.feature-row').querySelectorAll('input').forEach(i => i.value = '');
+            btn.closest('.feature-row').querySelector('select').selectedIndex = 0;
+        }
+    });
+})();
+</script>
+@endpush

@@ -38,6 +38,10 @@ use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\MessageAttachmentController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\AccountDeletionController;
+use App\Http\Controllers\AiBudgetAllocatorController;
+use App\Http\Controllers\AiChatbotController;
+use App\Http\Controllers\AiReviewWriterController;
+use App\Http\Controllers\AiVendorMatchmakingController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\Dashboard\AdminBlogCategoryController;
 use App\Http\Controllers\Dashboard\AdminBlogPostController;
@@ -47,6 +51,18 @@ use App\Http\Controllers\Webhook\PaymentWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', LandingPageController::class)->name('landing');
+
+// ── Public Professional Profile ───────────────────────────────────────
+// The "store front" a visitor lands on when browsing a pro. No auth.
+Route::get('/pro/{user}', [\App\Http\Controllers\Public\ProfessionalProfileShowController::class, 'show'])
+    ->name('public.professional.show');
+
+// ── Reviews (authenticated participants of completed bookings) ────────
+Route::middleware('auth')->group(function () {
+    Route::post('/reviews', [\App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
+    Route::delete('/reviews/{review}', [\App\Http\Controllers\ReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::patch('/reviews/{review}/respond', [\App\Http\Controllers\ReviewController::class, 'respond'])->name('reviews.respond');
+});
 
 // ── Influencer Module ─────────────────────────────────────────────────
 Route::get('/join-as-influencer', [\App\Http\Controllers\Influencer\JoinAsInfluencerController::class, 'show'])->name('influencer.join');
@@ -113,6 +129,26 @@ Route::middleware('auth')->group(function () {
     // Account Reactivation Payment callbacks
     Route::get('/account/reactivation/success', [AccountDeletionController::class, 'reactivationSuccess'])->name('account.reactivation.success');
     Route::get('/account/reactivation/cancel',  [AccountDeletionController::class, 'reactivationCancel'])->name('account.reactivation.cancel');
+
+    // AI Chatbot (user-facing)
+    Route::prefix('ai-chatbot')->name('ai-chatbot.')->group(function () {
+        Route::post('/chat',                        [AiChatbotController::class, 'chat'])->name('chat');
+        Route::get('/conversations',                [AiChatbotController::class, 'conversations'])->name('conversations');
+        Route::get('/conversations/{conversation}', [AiChatbotController::class, 'show'])->name('show');
+        Route::delete('/conversations/{conversation}', [AiChatbotController::class, 'destroy'])->name('destroy');
+    });
+
+    // AI Budget Allocator (plan-gated)
+    Route::get('/ai-tools/budget-allocator',  [AiBudgetAllocatorController::class, 'show'])->name('ai-tools.budget-allocator');
+    Route::post('/ai-tools/budget-allocator', [AiBudgetAllocatorController::class, 'allocate'])->name('ai-tools.budget-allocator.allocate');
+
+    // AI Vendor Matchmaking (plan-gated)
+    Route::get('/ai-tools/vendor-matchmaking',  [AiVendorMatchmakingController::class, 'show'])->name('ai-tools.vendor-matchmaking');
+    Route::post('/ai-tools/vendor-matchmaking', [AiVendorMatchmakingController::class, 'match'])->name('ai-tools.vendor-matchmaking.match');
+
+    // AI Review Writer (plan-gated)
+    Route::get('/ai-tools/review-writer',  [AiReviewWriterController::class, 'show'])->name('ai-tools.review-writer');
+    Route::post('/ai-tools/review-writer', [AiReviewWriterController::class, 'compose'])->name('ai-tools.review-writer.compose');
 });
 
 Route::middleware('auth')->group(function () {
@@ -242,6 +278,8 @@ Route::middleware('auth')->group(function () {
 
         // Transactions
         Route::get('/transactions', [ProfessionalTransactionController::class, 'index'])->name('professional.transactions.index');
+        Route::get('/transactions/export/csv', [ProfessionalTransactionController::class, 'exportCsv'])->name('professional.transactions.export.csv');
+        Route::get('/transactions/export/pdf', [ProfessionalTransactionController::class, 'exportPdf'])->name('professional.transactions.export.pdf');
 
         // Professional Profile & Settings
         Route::get('/profile', [ProfessionalProfileController::class, 'index'])->name('professional.profile.index');
@@ -253,6 +291,12 @@ Route::middleware('auth')->group(function () {
         Route::patch('/profile/notifications', [ProfessionalProfileController::class, 'updateNotifications'])->name('professional.profile.update.notifications');
         Route::post('/profile/avatar', [ProfessionalProfileController::class, 'updateAvatar'])->name('professional.profile.avatar');
         Route::delete('/profile/avatar', [ProfessionalProfileController::class, 'removeAvatar'])->name('professional.profile.avatar.remove');
+        Route::post('/profile/cover', [ProfessionalProfileController::class, 'updateCover'])->name('professional.profile.cover');
+        Route::delete('/profile/cover', [ProfessionalProfileController::class, 'removeCover'])->name('professional.profile.cover.remove');
+
+        // Verification badge uploads (trade license, insurance, workers' comp)
+        Route::post('/profile/verification', [ProfessionalProfileController::class, 'submitVerification'])->name('professional.profile.verification.submit');
+        Route::post('/profile/verification/remove', [ProfessionalProfileController::class, 'removeVerification'])->name('professional.profile.verification.remove');
     });
 
     // Dashboard UI pages
@@ -317,6 +361,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/settings/account-deletion', [AdminSettingsController::class, 'accountDeletionSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.account-deletion');
         Route::post('/settings/account-deletion', [AdminSettingsController::class, 'updateAccountDeletionSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.account-deletion.update');
 
+        // AI Chatbot settings & logs (admin)
+        Route::get('/settings/chatbot',       [\App\Http\Controllers\Dashboard\AdminAiChatbotController::class, 'settings'])->name('app.admin.settings.chatbot');
+        Route::post('/settings/chatbot',      [\App\Http\Controllers\Dashboard\AdminAiChatbotController::class, 'updateSettings'])->name('app.admin.settings.chatbot.update');
+        Route::get('/chatbot-logs',           [\App\Http\Controllers\Dashboard\AdminAiChatbotController::class, 'logs'])->name('app.admin.chatbot-logs.index');
+        Route::get('/chatbot-logs/{conversation}', [\App\Http\Controllers\Dashboard\AdminAiChatbotController::class, 'showConversation'])->name('app.admin.chatbot-logs.show');
+
         // All Events
         Route::get('/events', [AdminEventController::class, 'index'])->middleware('permission:events.view_any')->name('app.admin.events.index');
         Route::post('/events', [AdminEventController::class, 'store'])->middleware('permission:events.create')->name('app.admin.events.store');
@@ -337,6 +387,11 @@ Route::middleware('auth')->group(function () {
         Route::patch('/faqs/{faq}', [AdminFaqController::class, 'update'])->name('app.admin.faqs.update');
         Route::delete('/faqs/{faq}', [AdminFaqController::class, 'destroy'])->name('app.admin.faqs.destroy');
         Route::patch('/faqs/{faq}/toggle', [AdminFaqController::class, 'toggleStatus'])->name('app.admin.faqs.toggle');
+
+        // Professional Verifications (trade license / insurance / workers' comp)
+        Route::get('/verifications', [\App\Http\Controllers\Dashboard\AdminVerificationController::class, 'index'])->name('app.admin.verifications.index');
+        Route::post('/verifications/{profile}/approve', [\App\Http\Controllers\Dashboard\AdminVerificationController::class, 'approve'])->name('app.admin.verifications.approve');
+        Route::post('/verifications/{profile}/reject', [\App\Http\Controllers\Dashboard\AdminVerificationController::class, 'reject'])->name('app.admin.verifications.reject');
 
         // Policy Pages
         Route::get('/policies', [AdminPolicyController::class, 'index'])->name('app.admin.policies.index');

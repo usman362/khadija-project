@@ -5,19 +5,107 @@
 @push('styles')
 <style>
     .inf-hero {
-        padding: 140px 0 80px;
+        padding: 160px 0 100px;
         background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
         text-align: center;
         position: relative;
         overflow: hidden;
+    }
+    .inf-hero-bg {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+    }
+    .inf-hero-bg img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.25;
+    }
+    .inf-hero-bg::after {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(180deg, rgba(30,27,75,0.65) 0%, rgba(30,27,75,0.9) 100%);
     }
     .inf-hero::before {
         content: '';
         position: absolute; inset: 0;
         background: radial-gradient(circle at 20% 30%, rgba(59,130,246,0.25), transparent 60%),
                     radial-gradient(circle at 80% 70%, rgba(139,92,246,0.25), transparent 60%);
+        z-index: 1;
     }
-    .inf-hero .container { position: relative; z-index: 1; }
+    .inf-hero .container { position: relative; z-index: 2; }
+
+    .inf-hero-avatars {
+        display: flex;
+        justify-content: center;
+        gap: -10px;
+        margin: 32px auto 0;
+    }
+    .inf-hero-avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        border: 3px solid rgba(255,255,255,0.2);
+        overflow: hidden;
+        margin-left: -14px;
+        background: var(--bg-card);
+    }
+    .inf-hero-avatar:first-child { margin-left: 0; }
+    .inf-hero-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .inf-hero-stat {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 20px;
+        padding: 10px 18px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 999px;
+        backdrop-filter: blur(8px);
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.92);
+    }
+    .inf-hero-stat strong { color: #fff; font-weight: 700; }
+
+    /* ─── SHOWCASE BANNER ─────────── */
+    .inf-showcase {
+        padding: 60px 0;
+        background: var(--bg-dark);
+    }
+    .inf-showcase-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+    .inf-showcase-tile {
+        position: relative;
+        border-radius: 14px;
+        overflow: hidden;
+        aspect-ratio: 4 / 3;
+    }
+    .inf-showcase-tile img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s;
+    }
+    .inf-showcase-tile:hover img { transform: scale(1.05); }
+    .inf-showcase-tile::after {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(180deg, rgba(0,0,0,0), rgba(11,15,26,0.7));
+    }
+    .inf-showcase-label {
+        position: absolute;
+        left: 16px; bottom: 14px;
+        color: #fff;
+        font-weight: 600;
+        z-index: 2;
+        font-size: 0.95rem;
+    }
+    @media (max-width: 800px) { .inf-showcase-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 500px) { .inf-showcase-grid { grid-template-columns: 1fr; } }
     .inf-hero-badge {
         display: inline-block;
         padding: 6px 16px;
@@ -192,11 +280,42 @@
 
 @section('content')
 <section class="inf-hero">
+    <div class="inf-hero-bg">
+        <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1600&q=80&auto=format&fit=crop" alt="Vibrant celebration" loading="eager">
+    </div>
     <div class="container">
         <span class="inf-hero-badge">✨ Partner Program</span>
         <h1>Turn your network into income</h1>
         <p>Become a {{ config('app.name', 'Khadija') }} Influencer and earn up to 30% commission by helping others create amazing events.</p>
         <a href="#apply" class="inf-btn-cta">Join the Program →</a>
+        <div class="inf-hero-avatars">
+            <div class="inf-hero-avatar"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&q=80&auto=format&fit=crop&crop=faces" alt=""></div>
+            <div class="inf-hero-avatar"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&q=80&auto=format&fit=crop&crop=faces" alt=""></div>
+            <div class="inf-hero-avatar"><img src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=150&q=80&auto=format&fit=crop&crop=faces" alt=""></div>
+            <div class="inf-hero-avatar"><img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&q=80&auto=format&fit=crop&crop=faces" alt=""></div>
+            <div class="inf-hero-avatar"><img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&q=80&auto=format&fit=crop&crop=faces" alt=""></div>
+        </div>
+        <div><span class="inf-hero-stat"><strong>500+</strong> active influencers already earning</span></div>
+    </div>
+</section>
+
+<!-- ─── SHOWCASE STRIP ──────────── -->
+<section class="inf-showcase">
+    <div class="container">
+        <div class="inf-showcase-grid">
+            <div class="inf-showcase-tile">
+                <img src="https://images.unsplash.com/photo-1524863479829-916d8e77f114?w=700&q=80&auto=format&fit=crop" alt="Content creator filming" loading="lazy">
+                <span class="inf-showcase-label">Content creators</span>
+            </div>
+            <div class="inf-showcase-tile">
+                <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=700&q=80&auto=format&fit=crop" alt="Event influencer posing" loading="lazy">
+                <span class="inf-showcase-label">Event promoters</span>
+            </div>
+            <div class="inf-showcase-tile">
+                <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=700&q=80&auto=format&fit=crop" alt="Social media lifestyle" loading="lazy">
+                <span class="inf-showcase-label">Lifestyle creators</span>
+            </div>
+        </div>
     </div>
 </section>
 

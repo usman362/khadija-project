@@ -67,9 +67,14 @@ class AgreementPageController extends Controller
     {
         $booking->load(['event', 'client', 'supplier', 'conversation']);
 
-        // Check: must have a conversation with messages
-        if (!$booking->conversation || $booking->conversation->messages()->count() === 0) {
-            return back()->with('error', 'Please start a conversation with the other party before generating an agreement. The AI needs chat history to create a meaningful agreement.');
+        // Client controls whether the chat transcript is fed to the AI.
+        // Default true so existing "Generate" buttons keep working.
+        $includeChat = $request->boolean('include_chat', true);
+
+        // Only require a conversation when the client actually wants the AI to
+        // reference it — skipping chat means booking-context-only is fine.
+        if ($includeChat && (!$booking->conversation || $booking->conversation->messages()->count() === 0)) {
+            return back()->with('error', 'Please start a conversation with the other party before generating a chat-aware agreement — or uncheck "Include pro chat" to generate from booking details only.');
         }
 
         // Check: no fully accepted agreement exists
@@ -79,7 +84,7 @@ class AgreementPageController extends Controller
         }
 
         $service = new AgreementGeneratorService();
-        $agreement = $service->generate($booking, $request->user());
+        $agreement = $service->generate($booking, $request->user(), $includeChat);
 
         // Log the generation
         AgreementLog::create([
@@ -88,7 +93,8 @@ class AgreementPageController extends Controller
             'from_status' => null,
             'to_status' => 'pending_review',
             'changed_by' => $request->user()->id,
-            'notes' => 'AI agreement generated (v' . $agreement->version . ')',
+            'notes' => 'AI agreement generated (v' . $agreement->version . ')'
+                . ($includeChat ? ' — chat included' : ' — booking context only'),
         ]);
 
         return redirect()->route('app.agreements.show', $agreement)

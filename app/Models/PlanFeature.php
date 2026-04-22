@@ -10,6 +10,8 @@ class PlanFeature extends Model
     protected $fillable = [
         'membership_plan_id',
         'feature',
+        'feature_code',
+        'quota_monthly',
         'is_included',
         'sort_order',
     ];
@@ -17,7 +19,8 @@ class PlanFeature extends Model
     protected function casts(): array
     {
         return [
-            'is_included' => 'boolean',
+            'is_included'   => 'boolean',
+            'quota_monthly' => 'integer',
         ];
     }
 

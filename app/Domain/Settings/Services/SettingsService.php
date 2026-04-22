@@ -138,6 +138,56 @@ class SettingsService
         return $this->get('openai.api_key') ?: config('services.openai.key');
     }
 
+    // ── AI Chatbot Settings ───────────────────────────────────
+
+    public function getChatbotSettings(): array
+    {
+        return [
+            'enabled'      => (bool) $this->get('chatbot.enabled', true),
+            'model'        => (string) $this->get('chatbot.model', 'gpt-4o-mini'),
+            'max_tokens'   => (int) $this->get('chatbot.max_tokens', 800),
+            'temperature'  => (float) $this->get('chatbot.temperature', 0.5),
+            'daily_limit'  => (int) $this->get('chatbot.daily_limit', 30),
+            'system_prompt'=> (string) $this->get('chatbot.system_prompt', $this->defaultChatbotSystemPrompt()),
+        ];
+    }
+
+    public function saveChatbotSettings(array $data): void
+    {
+        $mappings = [
+            'enabled'       => 'boolean',
+            'model'         => 'string',
+            'max_tokens'    => 'integer',
+            'temperature'   => 'string',
+            'daily_limit'   => 'integer',
+            'system_prompt' => 'string',
+        ];
+
+        foreach ($mappings as $field => $type) {
+            if (array_key_exists($field, $data)) {
+                $this->set("chatbot.{$field}", $data[$field], 'chatbot', $type);
+            }
+        }
+    }
+
+    public function defaultChatbotSystemPrompt(): string
+    {
+        return "You are the AI assistant for " . config('app.name', 'GigResource') . ", an event booking marketplace. "
+            . "You help users with:\n"
+            . "1. Platform questions (how to post events, bookings, payments, etc.)\n"
+            . "2. Navigating features (profile, dual-mode client/professional switching, influencer program, policies)\n"
+            . "3. Writing better event descriptions when requested\n\n"
+            . "Key platform facts:\n"
+            . "- Clients post events and hire professionals\n"
+            . "- Professionals offer services and submit proposals\n"
+            . "- Influencers earn \$5 per signup + 15-30% commission on referred bookings (tiers: Starter 15%, Rising 20%, Pro 25%, Elite 30%)\n"
+            . "- Minimum payout: \$50\n"
+            . "- Account deletion has a 60-day grace period with \$4.99 reactivation fee\n"
+            . "- Payments via Stripe or PayPal\n"
+            . "- Privacy Policy and AI Agreement require e-signature\n\n"
+            . "Be concise, friendly, and helpful. If you don't know something specific, say so and suggest contacting support. Never make up features or pricing.";
+    }
+
     /**
      * Get the resolved OpenAI model (DB first, then .env fallback).
      */

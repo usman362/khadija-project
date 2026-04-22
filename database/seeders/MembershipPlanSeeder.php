@@ -13,10 +13,13 @@ class MembershipPlanSeeder extends Seeder
             [
                 'name' => 'Starter',
                 'slug' => 'starter',
-                'description' => 'Perfect for getting started with basic event planning.',
-                'price' => 0,
-                'billing_cycle' => 'monthly',
-                'duration_days' => null,
+                // Priced at $1 (not free) on purpose — a nominal card charge is
+                // enough friction to discourage throwaway / fraudulent accounts
+                // while staying effectively free for real users.
+                'description' => 'Get started for just $1 — full access to core features for 6 months.',
+                'price' => 1,
+                'billing_cycle' => '6_month',
+                'duration_days' => 180,
                 'max_events' => 3,
                 'max_bookings' => 5,
                 'has_chat' => true,
@@ -37,10 +40,10 @@ class MembershipPlanSeeder extends Seeder
             [
                 'name' => 'Professional',
                 'slug' => 'professional',
-                'description' => 'Ideal for growing businesses with more event needs.',
-                'price' => 29.99,
-                'billing_cycle' => 'monthly',
-                'duration_days' => 30,
+                'description' => 'Ideal for growing businesses — 12-month partnership.',
+                'price' => 299.99,
+                'billing_cycle' => '12_month',
+                'duration_days' => 365,
                 'max_events' => 25,
                 'max_bookings' => 50,
                 'has_chat' => true,
@@ -63,10 +66,10 @@ class MembershipPlanSeeder extends Seeder
             [
                 'name' => 'Enterprise',
                 'slug' => 'enterprise',
-                'description' => 'For large organizations needing unlimited access.',
-                'price' => 99.99,
-                'billing_cycle' => 'monthly',
-                'duration_days' => 30,
+                'description' => 'For large organizations — 18-month commitment with unlimited access.',
+                'price' => 1499.99,
+                'billing_cycle' => '18_month',
+                'duration_days' => 540,
                 'max_events' => null,
                 'max_bookings' => null,
                 'has_chat' => true,

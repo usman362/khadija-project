@@ -38,7 +38,7 @@ class AdminMembershipPlanController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'price' => ['required', 'numeric', 'min:0'],
-            'billing_cycle' => ['required', 'in:monthly,quarterly,yearly,one_time'],
+            'billing_cycle' => ['required', 'in:6_month,12_month,18_month'],
             'duration_days' => ['nullable', 'integer', 'min:1'],
             'max_events' => ['nullable', 'integer', 'min:1'],
             'max_bookings' => ['nullable', 'integer', 'min:1'],
@@ -51,6 +51,10 @@ class AdminMembershipPlanController extends Controller
             'badge_color' => ['nullable', 'string', 'max:20'],
             'features' => ['nullable', 'array'],
             'features.*' => ['string', 'max:255'],
+            'feature_codes' => ['nullable', 'array'],
+            'feature_codes.*' => ['nullable', 'string', 'max:60'],
+            'feature_quotas' => ['nullable', 'array'],
+            'feature_quotas.*' => ['nullable', 'integer', 'min:0', 'max:999999'],
         ]);
 
         $plan = MembershipPlan::create([
@@ -72,19 +76,37 @@ class AdminMembershipPlanController extends Controller
         ]);
 
         // Save features
-        if (!empty($validated['features'])) {
-            foreach ($validated['features'] as $index => $feature) {
-                if (trim($feature) !== '') {
-                    $plan->features()->create([
-                        'feature' => trim($feature),
-                        'is_included' => true,
-                        'sort_order' => $index,
-                    ]);
-                }
-            }
-        }
+        $this->syncFeatures($plan, $validated);
 
         return back()->with('status', 'Membership plan created successfully.');
+    }
+
+    /**
+     * Parallel arrays: features[], feature_codes[], feature_quotas[].
+     * Each feature row may optionally be tied to a programmatic code + monthly quota.
+     */
+    private function syncFeatures(MembershipPlan $plan, array $validated): void
+    {
+        if (empty($validated['features'])) {
+            return;
+        }
+
+        foreach ($validated['features'] as $index => $feature) {
+            if (trim($feature) === '') {
+                continue;
+            }
+
+            $code  = $validated['feature_codes'][$index]  ?? null;
+            $quota = $validated['feature_quotas'][$index] ?? null;
+
+            $plan->features()->create([
+                'feature'       => trim($feature),
+                'feature_code'  => $code ? trim($code) : null,
+                'quota_monthly' => $quota !== null && $quota !== '' ? (int) $quota : null,
+                'is_included'   => true,
+                'sort_order'    => $index,
+            ]);
+        }
     }
 
     /**
@@ -98,7 +120,7 @@ class AdminMembershipPlanController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'price' => ['required', 'numeric', 'min:0'],
-            'billing_cycle' => ['required', 'in:monthly,quarterly,yearly,one_time'],
+            'billing_cycle' => ['required', 'in:6_month,12_month,18_month'],
             'duration_days' => ['nullable', 'integer', 'min:1'],
             'max_events' => ['nullable', 'integer', 'min:1'],
             'max_bookings' => ['nullable', 'integer', 'min:1'],
@@ -111,6 +133,10 @@ class AdminMembershipPlanController extends Controller
             'badge_color' => ['nullable', 'string', 'max:20'],
             'features' => ['nullable', 'array'],
             'features.*' => ['string', 'max:255'],
+            'feature_codes' => ['nullable', 'array'],
+            'feature_codes.*' => ['nullable', 'string', 'max:60'],
+            'feature_quotas' => ['nullable', 'array'],
+            'feature_quotas.*' => ['nullable', 'integer', 'min:0', 'max:999999'],
         ]);
 
         $membership_plan->update([
@@ -133,17 +159,7 @@ class AdminMembershipPlanController extends Controller
 
         // Replace features
         $membership_plan->features()->delete();
-        if (!empty($validated['features'])) {
-            foreach ($validated['features'] as $index => $feature) {
-                if (trim($feature) !== '') {
-                    $membership_plan->features()->create([
-                        'feature' => trim($feature),
-                        'is_included' => true,
-                        'sort_order' => $index,
-                    ]);
-                }
-            }
-        }
+        $this->syncFeatures($membership_plan, $validated);
 
         return back()->with('status', 'Membership plan updated successfully.');
     }

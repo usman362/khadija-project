@@ -320,6 +320,11 @@
                         <span class="mp-price-cycle">{{ $plan->billingLabel() }}</span>
                     @endif
                 </div>
+                @if(!$plan->isFree() && in_array($plan->billing_cycle, ['6_month', '12_month', '18_month']))
+                    <div class="mp-price-note text-muted" style="font-size:12px;margin-top:-6px;margin-bottom:10px;">
+                        One-time charge &middot; {{ $plan->contractTermLabel() }}
+                    </div>
+                @endif
 
                 <hr class="mp-divider">
 

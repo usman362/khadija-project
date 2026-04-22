@@ -13,14 +13,24 @@ use Illuminate\Support\Facades\Log;
 class AgreementGeneratorService
 {
     /**
-     * Generate an AI agreement based on chat conversation and booking details.
+     * Generate an AI agreement based on booking details, optionally enriched
+     * with the client ↔ professional chat conversation.
+     *
+     * @param  bool  $includeChat  When true, the chat transcript is injected
+     *                             into the prompt so the AI can reference
+     *                             specific things discussed (price, dates,
+     *                             deliverables). When false, only booking
+     *                             context is used — produces a cleaner,
+     *                             less-repetitive generic agreement.
      */
-    public function generate(Booking $booking, User $requestedBy): Agreement
+    public function generate(Booking $booking, User $requestedBy, bool $includeChat = true): Agreement
     {
         $booking->load(['event', 'client', 'supplier', 'conversation.messages.sender']);
 
         $conversation = $booking->conversation;
-        $chatHistory = $this->extractChatHistory($conversation);
+        $chatHistory = $includeChat
+            ? $this->extractChatHistory($conversation)
+            : null;
         $bookingContext = $this->buildBookingContext($booking);
 
         // Determine version
@@ -38,6 +48,7 @@ class AgreementGeneratorService
             'extracted_terms' => $aiResult['terms'],
             'status' => 'pending_review',
             'source' => 'ai',
+            'include_chat' => $includeChat,
             'version' => $latestVersion + 1,
             'ai_model_used' => $aiResult['model'],
             'ai_prompt_summary' => $aiResult['prompt_summary'],
@@ -97,8 +108,11 @@ class AgreementGeneratorService
 
     /**
      * Call external AI API (OpenAI) or fall back to template generation.
+     *
+     * $chatHistory is nullable — null means the client opted out of including
+     * chat, so we build a booking-only prompt.
      */
-    private function callAI(array $context, string $chatHistory): array
+    private function callAI(array $context, ?string $chatHistory): array
     {
         $apiKey = Setting::get('openai.api_key') ?: config('services.openai.key');
 
@@ -116,7 +130,7 @@ class AgreementGeneratorService
         }
 
         // Fallback: Smart template generation based on context + chat
-        return $this->generateFromTemplate($context, $chatHistory, $prompt);
+        return $this->generateFromTemplate($context, $chatHistory ?? '', $prompt);
     }
 
     /**
@@ -155,17 +169,21 @@ class AgreementGeneratorService
             'content' => $parsed['agreement_html'] ?? $this->generateFallbackContent($context),
             'terms' => $parsed['extracted_terms'] ?? $this->extractTermsFromChat($context),
             'model' => $data['model'] ?? 'gpt-4o-mini',
-            'prompt_summary' => 'Generated from booking context + ' . strlen($prompt) . ' chars of chat history',
+            'prompt_summary' => 'Prompt size: ' . strlen($prompt) . ' chars',
         ];
     }
 
     /**
      * Build the prompt for AI generation.
+     *
+     * When $chatHistory is null, the client excluded the chat — we tell the AI
+     * to rely solely on booking context and use sensible [TO BE CONFIRMED]
+     * placeholders.
      */
-    private function buildPrompt(array $context, string $chatHistory): string
+    private function buildPrompt(array $context, ?string $chatHistory): string
     {
-        return <<<PROMPT
-Generate a professional service agreement based on the following booking details and conversation between the client and supplier.
+        $header = <<<HEAD
+Generate a professional service agreement based on the following booking details.
 
 ## Booking Details:
 - Event: {$context['event_title']}
@@ -177,19 +195,41 @@ Generate a professional service agreement based on the following booking details
 - Booking Status: {$context['booking_status']}
 - Booking Notes: {$context['booking_notes']}
 
-## Conversation History:
+HEAD;
+
+        if ($chatHistory !== null) {
+            $header .= <<<CHAT
+
+## Conversation History (between the client and professional):
 {$chatHistory}
 
 ## Instructions:
 1. Generate the agreement in HTML format with proper headings, sections, and styling.
-2. Extract any specific terms discussed (prices, dates, deliverables, cancellation policy, etc.) from the conversation.
+2. Extract any specific terms discussed (prices, dates, deliverables, cancellation policy, etc.) from the conversation above — prefer chat details over generic defaults.
 3. Include standard clauses: scope of services, payment terms, cancellation policy, liability, and signatures section.
 4. If specific terms aren't discussed in the chat, use reasonable defaults marked with [TO BE CONFIRMED].
+
+CHAT;
+        } else {
+            $header .= <<<NOCHAT
+
+## Instructions:
+1. The client chose NOT to include the chat transcript — generate a clean, standard agreement from the booking details only. Do NOT invent or reference specific conversational terms.
+2. Generate the agreement in HTML format with proper headings, sections, and styling.
+3. Include standard clauses: scope of services, payment terms, cancellation policy, liability, and signatures section.
+4. For any specifics not present in the booking details (price, deliverables, payment schedule), use reasonable defaults marked with [TO BE CONFIRMED] so the parties can fill them in.
+
+NOCHAT;
+        }
+
+        $header .= <<<TAIL
 
 Return JSON with two fields:
 - "agreement_html": The full HTML agreement
 - "extracted_terms": An object with keys like "price", "deliverables", "cancellation_policy", "payment_schedule", "special_requests"
-PROMPT;
+TAIL;
+
+        return $header;
     }
 
     /**

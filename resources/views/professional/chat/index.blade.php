@@ -150,7 +150,12 @@
 </div>
 
 <style>
-/* ===== Dark Theme Variables ===== */
+/* ===== Theme Variables ─────────────────────────────────
+   The chat UI has its own palette tokens so the component can live on
+   any page background. Dark is the default; the [data-theme="light"]
+   override below swaps every token — all chat CSS consumes the vars,
+   so no further rule-by-rule light-mode work is needed.
+====================================================== */
 .chat-container {
     --chat-bg: #0c1427;
     --chat-sidebar-bg: #111a2e;
@@ -175,6 +180,45 @@
     --chat-file-received-text: #d1d5db;
     --chat-empty-icon: 0.15;
     --chat-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    --chat-modal-bg: #111a2e;
+    --chat-modal-border: #1e2d44;
+    --chat-ghost-bg: rgba(255,255,255,0.06);
+    --chat-ghost-hover-bg: rgba(255,255,255,0.1);
+    --chat-filter-hover-bg: rgba(255,255,255,0.04);
+}
+
+/* Light-mode token swap — triggered by the root data-theme="light" that
+   the layout toggles. Mirrors the palette used by .cl-* components:
+   white cards on a soft slate page, slate-700 text, slate-200 borders. */
+[data-theme="light"] .chat-container {
+    --chat-bg: #ffffff;
+    --chat-sidebar-bg: #f8fafc;
+    --chat-border: #e2e8f0;
+    --chat-hover: #f1f5f9;
+    --chat-active: #e0e7ff;
+    --chat-item-border: #e2e8f0;
+    --chat-text: #0f172a;
+    --chat-text-muted: #64748b;
+    --chat-text-subtle: #94a3b8;
+    --chat-received-bg: #f1f5f9;
+    --chat-received-text: #0f172a;
+    --chat-sent-bg: #3b82f6;
+    --chat-sent-text: #ffffff;
+    --chat-date-bg: #f1f5f9;
+    --chat-date-text: #64748b;
+    --chat-input-bg: #ffffff;
+    --chat-input-border: #cbd5e1;
+    --chat-input-text: #0f172a;
+    --chat-attachment-bg: #f1f5f9;
+    --chat-file-link-bg: rgba(15,23,42,0.06);
+    --chat-file-received-text: #0f172a;
+    --chat-empty-icon: 0.25;
+    --chat-shadow: 0 1px 4px rgba(15,23,42,0.08);
+    --chat-modal-bg: #ffffff;
+    --chat-modal-border: #e2e8f0;
+    --chat-ghost-bg: rgba(15,23,42,0.04);
+    --chat-ghost-hover-bg: rgba(15,23,42,0.08);
+    --chat-filter-hover-bg: rgba(15,23,42,0.04);
 }
 
 /* ===== Utility ===== */
@@ -216,11 +260,11 @@
 .chat-btn-primary:hover { background: #2563eb; }
 .chat-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 .chat-btn-ghost {
-    background: rgba(255,255,255,0.06);
+    background: var(--chat-ghost-bg);
     border-color: var(--chat-border);
     color: var(--chat-text-muted);
 }
-.chat-btn-ghost:hover { background: rgba(255,255,255,0.1); color: var(--chat-text); }
+.chat-btn-ghost:hover { background: var(--chat-ghost-hover-bg); color: var(--chat-text); }
 .chat-btn-sm { padding: 6px 10px; font-size: 13px; }
 
 /* ===== Chat Form Controls ===== */
@@ -298,7 +342,7 @@
     font-family: inherit;
 }
 .chat-filter-btn:not(:last-child) { border-right: 1px solid var(--chat-border); }
-.chat-filter-btn:hover { background: rgba(255,255,255,0.04); }
+.chat-filter-btn:hover { background: var(--chat-filter-hover-bg); }
 .chat-filter-btn.active { background: var(--chat-active); color: var(--chat-text); }
 .conversation-list { flex: 1; overflow-y: auto; }
 
@@ -461,19 +505,20 @@
 }
 .chat-modal-overlay.show { display: flex; }
 .chat-modal {
-    background: #111a2e;
-    border: 1px solid #1e2d44;
+    background: var(--chat-modal-bg);
+    border: 1px solid var(--chat-modal-border);
     border-radius: 12px;
     width: 480px;
     max-width: 90%;
     color: var(--chat-text);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
 }
 .chat-modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 16px 20px;
-    border-bottom: 1px solid #1e2d44;
+    border-bottom: 1px solid var(--chat-modal-border);
 }
 .chat-modal-header h5 { font-size: 16px; font-weight: 600; margin: 0; }
 .chat-modal-close {
@@ -486,7 +531,7 @@
 .chat-modal-footer {
     display: flex; gap: 8px; justify-content: flex-end;
     padding: 12px 20px;
-    border-top: 1px solid #1e2d44;
+    border-top: 1px solid var(--chat-modal-border);
 }
 
 /* ===== Mobile ===== */

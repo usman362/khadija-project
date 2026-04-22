@@ -39,7 +39,7 @@ class MembershipPlanTest extends TestCase
             'slug' => 'test-plan',
             'description' => 'A test plan',
             'price' => 19.99,
-            'billing_cycle' => 'monthly',
+            'billing_cycle' => '12_month',
             'duration_days' => 30,
             'max_events' => 10,
             'max_bookings' => 20,
@@ -102,7 +102,7 @@ class MembershipPlanTest extends TestCase
             'name' => 'Premium Plan',
             'slug' => 'premium-plan',
             'price' => 49.99,
-            'billing_cycle' => 'monthly',
+            'billing_cycle' => '12_month',
             'duration_days' => 30,
             'is_active' => true,
             'sort_order' => 2,
@@ -152,7 +152,7 @@ class MembershipPlanTest extends TestCase
             ->post('/app/admin/membership-plans', [
                 'name' => 'New Plan',
                 'price' => 9.99,
-                'billing_cycle' => 'monthly',
+                'billing_cycle' => '12_month',
                 'has_chat' => true,
                 'is_active' => true,
                 'features' => ['Feature A', 'Feature B'],
@@ -176,7 +176,7 @@ class MembershipPlanTest extends TestCase
             ->patch("/app/admin/membership-plans/{$this->plan->id}", [
                 'name' => 'Updated Plan',
                 'price' => 29.99,
-                'billing_cycle' => 'yearly',
+                'billing_cycle' => '18_month',
                 'has_chat' => true,
                 'is_active' => true,
                 'features' => ['Updated Feature'],
@@ -187,7 +187,7 @@ class MembershipPlanTest extends TestCase
         $this->plan->refresh();
         $this->assertEquals('Updated Plan', $this->plan->name);
         $this->assertEquals(29.99, $this->plan->price);
-        $this->assertEquals('yearly', $this->plan->billing_cycle);
+        $this->assertEquals('18_month', $this->plan->billing_cycle);
         $this->assertEquals(1, $this->plan->features()->count());
     }
 

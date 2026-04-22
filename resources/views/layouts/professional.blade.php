@@ -1029,6 +1029,9 @@
     {{-- Shared role enable confirmation modal --}}
     @include('partials._role_enable_modal')
 
+    {{-- AI Chatbot floating widget --}}
+    @include('partials._ai_chatbot_widget')
+
     <script>
         // Close sidebar on mobile when clicking outside
         document.addEventListener('click', function(e) {

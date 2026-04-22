@@ -223,6 +223,12 @@
                                 <span class="link-title">Activity Log</span>
                             </a>
                         </li>
+                        <li class="nav-item {{ request()->routeIs('app.admin.chatbot-logs.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.admin.chatbot-logs.index') }}" class="nav-link">
+                                <i class="link-icon ic-purple" data-lucide="message-square"></i>
+                                <span class="link-title">Chatbot Logs</span>
+                            </a>
+                        </li>
                         @endrole
 
                         <li class="nav-item {{ request()->routeIs('app.influencers.*') ? 'active' : '' }}">
@@ -231,6 +237,15 @@
                                 <span class="link-title">Influencers</span>
                             </a>
                         </li>
+
+                        @role('admin')
+                        <li class="nav-item {{ request()->routeIs('app.admin.verifications.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.admin.verifications.index') }}" class="nav-link">
+                                <i class="link-icon ic-green" data-lucide="shield-check"></i>
+                                <span class="link-title">Pro Verifications</span>
+                            </a>
+                        </li>
+                        @endrole
 
                         <li class="nav-item {{ request()->routeIs('app.roles.*') ? 'active' : '' }}">
                             <a href="{{ route('app.roles.index') }}" class="nav-link">
@@ -319,9 +334,16 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
+                                        <a href="{{ route('app.admin.settings.chatbot') }}"
+                                            class="nav-link {{ request()->routeIs('app.admin.settings.chatbot*') ? 'active' : '' }}">
+                                            AI Chatbot
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
                                         <a href="{{ route('app.admin.settings.account-deletion') }}"
                                             class="nav-link {{ request()->routeIs('app.admin.settings.account-deletion*') ? 'active' : '' }}">
                                             Account Deletion
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
@@ -651,6 +673,9 @@
         })();
     </script>
     @stack('scripts')
+
+    {{-- AI Chatbot floating widget --}}
+    @include('partials._ai_chatbot_widget')
 </body>
 
 </html>

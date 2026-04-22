@@ -35,13 +35,18 @@ class PaymentService
         // Cancel any existing active subscription (will be reactivated on payment success)
         $existingActive = $user->subscriptions()->active()->first();
 
-        // Create a pending subscription
+        // Compute expiry. For new 6/12/18-month contract plans, prefer the
+        // cycle-derived duration (180/365/540) so admins no longer have to
+        // hand-fill duration_days for every plan. Explicit duration_days
+        // still wins when set.
+        $expiryDays = $plan->duration_days ?: $plan->cycleDurationDays();
+
         $subscription = UserSubscription::create([
             'user_id' => $user->id,
             'membership_plan_id' => $plan->id,
             'status' => 'pending',
             'starts_at' => now(),
-            'expires_at' => $plan->duration_days ? now()->addDays($plan->duration_days) : null,
+            'expires_at' => $expiryDays > 0 ? now()->addDays($expiryDays) : null,
             'amount_paid' => $plan->price,
         ]);
 

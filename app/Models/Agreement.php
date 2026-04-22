@@ -21,6 +21,7 @@ class Agreement extends Model
         'rejected_by',
         'rejection_reason',
         'source',
+        'include_chat',
         'version',
         'ai_model_used',
         'ai_prompt_summary',
@@ -30,6 +31,7 @@ class Agreement extends Model
     {
         return [
             'extracted_terms' => 'array',
+            'include_chat' => 'boolean',
             'client_accepted_at' => 'datetime',
             'supplier_accepted_at' => 'datetime',
             'rejected_at' => 'datetime',

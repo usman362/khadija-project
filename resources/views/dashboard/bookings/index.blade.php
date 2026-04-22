@@ -71,16 +71,55 @@
                                 <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editBookingModal{{ $booking->id }}">Edit</button>
                             @endcan
                             @if($booking->status !== 'completed' && $booking->status !== 'cancelled')
-                                <form method="POST" action="{{ route('app.agreements.generate', $booking) }}" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-outline-info" title="Generate AI Agreement"
-                                        onclick="return confirm('Generate an AI agreement from the chat for this booking?')">
-                                        AI Agreement
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-sm btn-outline-info"
+                                    title="Generate AI Agreement"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#aiAgreementModal{{ $booking->id }}">
+                                    AI Agreement
+                                </button>
                             @endif
                         </td>
                     </tr>
+
+                    @if($booking->status !== 'completed' && $booking->status !== 'cancelled')
+                    <div class="modal fade" id="aiAgreementModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-md modal-dialog-centered">
+                            <div class="modal-content">
+                                <form method="POST" action="{{ route('app.agreements.generate', $booking) }}">
+                                    @csrf
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Generate AI Agreement</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p class="text-muted small mb-3">
+                                            We'll use OpenAI to draft a service agreement for <strong>{{ $booking->event?->title ?? 'this booking' }}</strong>.
+                                            Review carefully before accepting.
+                                        </p>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                value="1" checked
+                                                name="include_chat"
+                                                id="includeChat{{ $booking->id }}">
+                                            <label class="form-check-label" for="includeChat{{ $booking->id }}">
+                                                <strong>Include pro chat in my agreement</strong>
+                                            </label>
+                                            <div class="form-text">
+                                                The AI will use your conversation with the pro when building your final document — pulling in dates, prices, and specifics you discussed. Uncheck to generate a clean, standard agreement from booking details only.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-info">
+                                            <i class="bi bi-stars me-1"></i> Generate Agreement
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
 
                     @can('update', $booking)
                     <div class="modal fade" id="editBookingModal{{ $booking->id }}" tabindex="-1" aria-hidden="true">

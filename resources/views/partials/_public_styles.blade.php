@@ -47,14 +47,32 @@
             background: rgba(11, 15, 26, 0.85);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding: 0 24px;
+            padding: 0;
         }
 
-        .navbar .container {
+        /* Row 1: logo + auth/CTA buttons. */
+        .navbar-row-top {
+            padding: 0 24px;
+        }
+        .navbar-row-top .container {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 72px;
+            height: 64px;
+        }
+
+        /* Row 2: nav links (including the "All Categories" mega trigger).
+           Slightly darker strip so it visually reads as a sub-bar, like
+           Alibaba's category rail. */
+        .navbar-row-links {
+            padding: 0 24px;
+            background: rgba(0, 0, 0, 0.22);
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .navbar-row-links .container {
+            display: flex;
+            align-items: center;
+            height: 48px;
         }
 
         .navbar-brand {
@@ -84,6 +102,191 @@
         }
 
         .navbar-links a:hover { color: var(--text-white); }
+
+        /* ─── NAV MEGA MENU (Alibaba-style All Categories) ─── */
+        /*
+         * .nav-mega is an <li> in the nav. It uses `position: static` so
+         * the big dropdown panel can anchor to the parent .navbar (which
+         * is position: fixed) and span the full width below it.
+         * Hover + focus + click all trigger .open; see navbar.blade.php
+         * for the small JS controller.
+         */
+        .nav-mega {
+            position: static;
+            display: flex;
+            align-items: center;
+        }
+        .nav-mega-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(139,92,246,0.12));
+            border: 1px solid rgba(59,130,246,0.25);
+            color: var(--text-white);
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .nav-mega-trigger:hover {
+            background: linear-gradient(135deg, rgba(59,130,246,0.22), rgba(139,92,246,0.22));
+            border-color: rgba(59,130,246,0.45);
+        }
+        .nav-mega-trigger .nmt-burger { width: 16px; height: 16px; }
+        .nav-mega-trigger .nmt-chev   { width: 12px; height: 12px; transition: transform 0.2s; }
+        .nav-mega.open .nav-mega-trigger .nmt-chev { transform: rotate(180deg); }
+
+        /* The big flyout panel.
+           Anchors to .navbar (position: fixed → its own containing block)
+           and sits flush against the bottom edge of the links row — no
+           visual gap, so the cursor can transit from trigger into the
+           panel without passing through dead space (which was causing
+           mouseleave to fire prematurely). A transparent padding-top
+           extension gives a little hover-safety buffer as well. */
+        .nav-mega-panel {
+            position: absolute;
+            top: 100%;
+            left: 24px;
+            right: 24px;
+            max-width: 1240px;
+            margin: 0 auto;
+            background: rgba(15, 20, 34, 0.98);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            max-height: min(640px, calc(100vh - 96px));
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-6px);
+            pointer-events: none;
+            transition: opacity 0.18s ease, transform 0.18s ease;
+        }
+        .nav-mega.open .nav-mega-panel {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        /* Invisible hover bridge: a transparent strip above the panel
+           that covers any visual seam between the nav row and the panel.
+           Keeps :hover continuous as the cursor transits down. */
+        .nav-mega-panel::before {
+            content: '';
+            position: absolute;
+            top: -10px; left: 0; right: 0;
+            height: 10px;
+            background: transparent;
+        }
+
+        /* LEFT rail: scrollable list of main categories. */
+        .nmp-rail {
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.015);
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        .nmp-rail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 16px;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+        }
+        .nmp-rail-item > svg:first-child { width: 18px; height: 18px; color: var(--primary); flex-shrink: 0; }
+        .nmp-rail-item .rail-caret { width: 14px; height: 14px; margin-left: auto; opacity: 0.3; transition: opacity 0.15s; }
+        .nmp-rail-item:hover,
+        .nmp-rail-item.active {
+            background: linear-gradient(90deg, rgba(59,130,246,0.14), transparent 80%);
+            color: var(--text-white);
+            border-left-color: var(--primary);
+        }
+        .nmp-rail-item.active .rail-caret { opacity: 0.8; }
+
+        /* RIGHT showcase: only one .nmp-panel shows at a time. */
+        .nmp-showcase {
+            padding: 24px 28px;
+            overflow-y: auto;
+        }
+        .nmp-panel { display: none; }
+        .nmp-panel.active { display: block; animation: nmpFade 0.2s ease; }
+        @keyframes nmpFade {
+            from { opacity: 0; transform: translateY(4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .nmp-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin: 0 0 18px;
+            color: var(--text-white);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nmp-title span {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Circular bubble grid — this is the "Categories for you" block. */
+        .nmp-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px 16px;
+        }
+        .nmp-tile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--text-light);
+            transition: transform 0.2s, color 0.2s;
+        }
+        .nmp-tile:hover {
+            transform: translateY(-3px);
+            color: var(--text-white);
+        }
+        .nmp-bubble {
+            position: relative;
+            width: 84px; height: 84px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .nmp-tile:hover .nmp-bubble {
+            border-color: rgba(59,130,246,0.5);
+            box-shadow: 0 6px 20px rgba(59,130,246,0.25);
+        }
+        .nmp-bubble img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s;
+        }
+        .nmp-tile:hover .nmp-bubble img { transform: scale(1.08); }
+
+        .nmp-label {
+            font-size: 0.78rem;
+            font-weight: 500;
+            text-align: center;
+            line-height: 1.3;
+        }
 
         .navbar-actions {
             display: flex;
@@ -420,67 +623,187 @@
         }
 
         /* ─── HOW IT WORKS ────────────────────── */
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 32px;
-        }
-
-        .step-card {
-            text-align: center;
-            padding: 40px 24px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
+        /*
+         * Journey layout: a zig-zag of four steps connected by a dashed
+         * "path" that runs behind the numbered medallions. Unlike the old
+         * three-card row (which collapsed into a flat stack on mobile and
+         * read as "thumbnails"), each step here claims a real row on its
+         * own, with the copy and the illustration sharing horizontal space.
+         *
+         * Desktop: zig-zag (odd rows illustration-right, even rows
+         *          illustration-left) with a vertical dashed line that
+         *          threads through all four numbered badges.
+         * Mobile:  single column, dashed line pulled to the left, badges
+         *          sitting on the line like mile markers.
+         */
+        .journey {
             position: relative;
-            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px 0;
         }
 
-        .step-card:nth-child(1):hover { border-color: rgba(59,130,246,0.4); box-shadow: 0 8px 30px rgba(59,130,246,0.1); transform: translateY(-4px); }
-        .step-card:nth-child(2):hover { border-color: rgba(249,115,22,0.4); box-shadow: 0 8px 30px rgba(249,115,22,0.1); transform: translateY(-4px); }
-        .step-card:nth-child(3):hover { border-color: rgba(34,197,94,0.4); box-shadow: 0 8px 30px rgba(34,197,94,0.1); transform: translateY(-4px); }
+        /* The dashed path. Positioned absolutely so content can flow over
+           it; `top/bottom: 60px` pulls it in from the first/last medallion
+           so it doesn't overshoot. */
+        .journey::before {
+            content: '';
+            position: absolute;
+            top: 60px;
+            bottom: 60px;
+            left: 50%;
+            width: 0;
+            border-left: 2px dashed rgba(139, 92, 246, 0.35);
+            transform: translateX(-1px);
+            pointer-events: none;
+        }
 
-        .step-number {
-            width: 60px;
-            height: 60px;
+        .journey-step {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 120px 1fr;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+        .journey-step:last-child { margin-bottom: 0; }
+
+        /* Numbered medallion sits in the center column, over the dashed
+           line. Color is themed per step via the --step-color var set on
+           each .journey-step below. */
+        .journey-num {
+            grid-column: 2;
+            width: 76px;
+            height: 76px;
+            margin: 0 auto;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            background: var(--step-gradient);
+            color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 800;
-            margin: 0 auto 20px;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 10px 30px var(--step-shadow), 0 0 0 8px var(--bg-primary);
+            position: relative;
+            z-index: 2;
+            transition: transform 0.3s ease;
         }
+        .journey-step:hover .journey-num { transform: scale(1.08) rotate(-4deg); }
 
-        .step-icon {
+        /* The two side panels: copy on one side, illustration on the
+           other. We swap their columns on even rows to make the zig-zag. */
+        .journey-copy,
+        .journey-art {
+            min-width: 0;
+        }
+        .journey-step:nth-child(odd) .journey-copy { grid-column: 1; text-align: right; }
+        .journey-step:nth-child(odd) .journey-art  { grid-column: 3; }
+        .journey-step:nth-child(even) .journey-art  { grid-column: 1; text-align: right; }
+        .journey-step:nth-child(even) .journey-copy { grid-column: 3; text-align: left; }
+
+        .journey-copy h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin: 0 0 8px;
+            color: var(--text-primary);
+        }
+        .journey-copy p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0 0 12px;
+        }
+        .journey-meta {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--step-color);
+            background: var(--step-tint);
+            padding: 4px 12px;
+            border-radius: 999px;
+        }
+        .journey-meta svg { width: 14px; height: 14px; }
+
+        /* Illustration tile: a soft tinted square with a big icon and
+           decorative corner dots so it doesn't read as a stock thumbnail. */
+        .journey-art {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            max-width: 220px;
+            border-radius: 22px;
+            background: var(--step-tint);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: transform 0.35s ease;
+        }
+        .journey-step:nth-child(odd) .journey-art  { margin-left: auto; margin-right: 0; }
+        .journey-step:nth-child(even) .journey-art { margin-right: auto; margin-left: 0; }
+        .journey-step:hover .journey-art { transform: translateY(-4px) rotate(-2deg); }
+
+        .journey-art::before,
+        .journey-art::after {
+            content: '';
+            position: absolute;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: var(--step-color);
+            opacity: 0.22;
+        }
+        .journey-art::before { top: 16px; left: 16px; }
+        .journey-art::after  { bottom: 20px; right: 18px; width: 10px; height: 10px; }
+
+        .journey-art svg {
             width: 68px;
             height: 68px;
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-            transition: transform 0.3s, box-shadow 0.3s;
+            color: var(--step-color);
+            stroke-width: 1.75;
+            position: relative;
+            z-index: 1;
         }
 
-        .step-card:nth-child(1) .step-icon { background: linear-gradient(135deg, #3b82f6, #6366f1); box-shadow: 0 6px 20px rgba(59,130,246,0.35); }
-        .step-card:nth-child(2) .step-icon { background: linear-gradient(135deg, #f97316, #ef4444); box-shadow: 0 6px 20px rgba(249,115,22,0.35); }
-        .step-card:nth-child(3) .step-icon { background: linear-gradient(135deg, #22c55e, #14b8a6); box-shadow: 0 6px 20px rgba(34,197,94,0.35); }
+        /* Per-step color theming. Each row picks its own hue so the
+           timeline feels like progress, not repetition. */
+        .journey-step.step-1 { --step-color: #3b82f6; --step-gradient: linear-gradient(135deg, #3b82f6, #6366f1); --step-tint: rgba(59,130,246,0.10); --step-shadow: rgba(59,130,246,0.35); }
+        .journey-step.step-2 { --step-color: #f97316; --step-gradient: linear-gradient(135deg, #f97316, #ef4444); --step-tint: rgba(249,115,22,0.10); --step-shadow: rgba(249,115,22,0.35); }
+        .journey-step.step-3 { --step-color: #8b5cf6; --step-gradient: linear-gradient(135deg, #8b5cf6, #d946ef); --step-tint: rgba(139,92,246,0.10); --step-shadow: rgba(139,92,246,0.35); }
+        .journey-step.step-4 { --step-color: #22c55e; --step-gradient: linear-gradient(135deg, #22c55e, #14b8a6); --step-tint: rgba(34,197,94,0.10); --step-shadow: rgba(34,197,94,0.35); }
 
-        .step-card:hover .step-icon { transform: translateY(-4px) scale(1.08); }
-
-        .step-icon svg { width: 30px; height: 30px; color: #fff; }
-
-        .step-card h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .step-card p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
+        /* Mobile: the dashed line shifts to the left gutter and every
+           step becomes illustration-above, copy-below — with the medallion
+           sitting on the path. This looks deliberate instead of "two
+           thumbnails stacked". */
+        @media (max-width: 768px) {
+            .journey { padding-left: 18px; }
+            .journey::before { left: 38px; top: 40px; bottom: 40px; }
+            .journey-step {
+                grid-template-columns: 60px 1fr;
+                gap: 16px;
+                margin-bottom: 36px;
+                text-align: left !important;
+            }
+            .journey-num {
+                grid-column: 1 !important;
+                width: 60px; height: 60px;
+                font-size: 1.3rem;
+                box-shadow: 0 6px 20px var(--step-shadow), 0 0 0 6px var(--bg-primary);
+            }
+            .journey-copy,
+            .journey-step:nth-child(odd) .journey-copy,
+            .journey-step:nth-child(even) .journey-copy {
+                grid-column: 2 !important;
+                text-align: left !important;
+            }
+            .journey-art,
+            .journey-step:nth-child(odd) .journey-art,
+            .journey-step:nth-child(even) .journey-art {
+                display: none; /* keep mobile tight — the icon isn't needed next to the copy */
+            }
         }
 
         /* ─── CTA BANNER ──────────────────────── */
@@ -1115,11 +1438,13 @@
 
         @media (max-width: 768px) {
             .navbar-links { display: none; }
+            /* Second row collapses entirely on mobile — hamburger opens
+               the full nav instead. */
+            .navbar-row-links { display: none; }
             .navbar-actions .join-dropdown, .navbar-actions .navbar-login-link { display: none; }
             .navbar-actions .btn-blue, .navbar-actions .btn-red { display: none; }
             .mobile-menu-btn { display: block; }
             .trust-badges { grid-template-columns: repeat(2, 1fr); }
-            .steps-grid { grid-template-columns: 1fr; }
             .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
             .pricing-card.featured { transform: none; }
             .pricing-card.featured:hover { transform: translateY(-4px); }

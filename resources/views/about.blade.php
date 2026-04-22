@@ -7,10 +7,29 @@
     /* ─── HERO SECTION ──────────────────────────── */
     .about-hero {
         position: relative;
-        padding: 140px 0 80px;
+        padding: 160px 0 100px;
         text-align: center;
         overflow: hidden;
     }
+
+    .about-hero-bg {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+    }
+    .about-hero-bg img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.35;
+    }
+    .about-hero-bg::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(11,15,26,0.6) 0%, rgba(11,15,26,0.85) 70%, var(--bg-dark) 100%);
+    }
+    .about-hero .container { position: relative; z-index: 1; }
 
     .about-hero::before {
         content: '';
@@ -20,9 +39,10 @@
         transform: translateX(-50%);
         width: 800px;
         height: 800px;
-        background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, rgba(139,92,246,0.08) 40%, transparent 70%);
+        background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(139,92,246,0.1) 40%, transparent 70%);
         border-radius: 50%;
         pointer-events: none;
+        z-index: 1;
     }
 
     .about-hero::after {
@@ -130,6 +150,88 @@
         align-items: center;
     }
 
+    /* Prevent grid children from overflowing their column due to
+       the default min-width: auto on grid items. */
+    .mission-grid > * { min-width: 0; }
+
+    .mission-image-wrap {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        aspect-ratio: 16 / 10;
+        max-height: 360px;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+    }
+    .mission-image-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .mission-image-badge {
+        position: absolute;
+        left: 20px;
+        bottom: 20px;
+        padding: 14px 20px;
+        background: rgba(11,15,26,0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #fff;
+    }
+    .mission-image-badge-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .mission-image-badge-icon svg { width: 20px; height: 20px; color: #fff; }
+    .mission-image-badge-text { font-size: 0.85rem; }
+    .mission-image-badge-text strong { display: block; font-weight: 700; font-size: 1rem; }
+    .mission-image-badge-text span { color: var(--text-muted); }
+
+    /* ─── TEAM / VALUES ──────────────────────────── */
+    .team-section { padding: 80px 0; background: var(--bg-section); }
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+    }
+    .team-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 18px;
+        overflow: hidden;
+        transition: all 0.3s;
+    }
+    .team-card:hover {
+        transform: translateY(-6px);
+        border-color: rgba(59,130,246,0.3);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+    .team-photo {
+        position: relative;
+        aspect-ratio: 1;
+        overflow: hidden;
+    }
+    .team-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s;
+    }
+    .team-card:hover .team-photo img { transform: scale(1.06); }
+    .team-info { padding: 18px 20px; }
+    .team-info h4 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+    .team-info span { font-size: 0.85rem; color: var(--text-muted); }
+    @media (max-width: 900px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 500px) { .team-grid { grid-template-columns: 1fr; } }
+
     .mission-content h2 {
         font-size: 2rem;
         font-weight: 700;
@@ -161,7 +263,10 @@
         border: 1px solid var(--border-color);
         border-radius: 12px;
         transition: all 0.3s;
+        width: 100%;
     }
+
+    .mission-feature > div:last-child { min-width: 0; flex: 1; }
 
     .mission-feature:hover {
         border-color: rgba(59,130,246,0.3);
@@ -477,6 +582,9 @@
 
 <!-- ─── HERO ───────────────────────────────── -->
 <section class="about-hero">
+    <div class="about-hero-bg">
+        <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=1600&q=80&auto=format&fit=crop" alt="Elegant event setup" loading="eager">
+    </div>
     <div class="container">
         <div class="fade-up">
             <div class="hero-badge">
@@ -513,6 +621,18 @@
     <div class="container">
         <div class="mission-grid">
             <div class="mission-content fade-left">
+                <div class="mission-image-wrap" style="margin-bottom: 28px;">
+                    <img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=900&q=80&auto=format&fit=crop" alt="Event planners collaborating" loading="lazy">
+                    <div class="mission-image-badge">
+                        <div class="mission-image-badge-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <div class="mission-image-badge-text">
+                            <strong>98% Satisfaction</strong>
+                            <span>Across 1,200+ events</span>
+                        </div>
+                    </div>
+                </div>
                 <h2>Our Mission: <span class="gradient-text">Empowering the Event Industry</span></h2>
                 <p>The {{ config('app.name', 'GigResource') }} platform is designed to create seamless interactions between clients, professionals, and influencers. We bring together the best talent in the industry with the clients who need them most.</p>
                 <p>Whether you're planning a wedding, corporate event, birthday party, or any special occasion — we make finding and booking the right professionals effortless.</p>
@@ -697,6 +817,54 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                 </div>
                 <div class="timeline-spacer"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── TEAM / PEOPLE ───────────────────────────────── -->
+<section class="team-section">
+    <div class="container">
+        <div class="section-header fade-up">
+            <h2>The People <span class="gradient-text">Behind GigResource</span></h2>
+            <p>A small, passionate team dedicated to making event planning effortless and rewarding.</p>
+        </div>
+        <div class="team-grid">
+            <div class="team-card fade-up">
+                <div class="team-photo">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&q=80&auto=format&fit=crop" alt="Team member" loading="lazy">
+                </div>
+                <div class="team-info">
+                    <h4>Khadija Rahman</h4>
+                    <span>Founder &amp; CEO</span>
+                </div>
+            </div>
+            <div class="team-card fade-up" style="transition-delay:0.08s;">
+                <div class="team-photo">
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=500&q=80&auto=format&fit=crop" alt="Team member" loading="lazy">
+                </div>
+                <div class="team-info">
+                    <h4>David Chen</h4>
+                    <span>Head of Product</span>
+                </div>
+            </div>
+            <div class="team-card fade-up" style="transition-delay:0.16s;">
+                <div class="team-photo">
+                    <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=500&q=80&auto=format&fit=crop" alt="Team member" loading="lazy">
+                </div>
+                <div class="team-info">
+                    <h4>Priya Nair</h4>
+                    <span>Community Lead</span>
+                </div>
+            </div>
+            <div class="team-card fade-up" style="transition-delay:0.24s;">
+                <div class="team-photo">
+                    <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=500&q=80&auto=format&fit=crop" alt="Team member" loading="lazy">
+                </div>
+                <div class="team-info">
+                    <h4>Marcus Bell</h4>
+                    <span>Trust &amp; Safety</span>
+                </div>
             </div>
         </div>
     </div>

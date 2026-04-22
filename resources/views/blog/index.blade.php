@@ -6,20 +6,54 @@
 <style>
     /* ── Blog list page ── */
     .blog-hero {
-        padding: 130px 0 60px;
+        padding: 150px 0 70px;
         text-align: center;
         position: relative;
         overflow: hidden;
     }
+    .blog-hero-bg {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+    }
+    .blog-hero-bg img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.22;
+    }
+    .blog-hero-bg::after {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(180deg, rgba(11,15,26,0.65) 0%, rgba(11,15,26,0.92) 80%, var(--bg-dark) 100%);
+    }
+    .blog-hero .container { position: relative; z-index: 1; }
     .blog-hero::before {
         content: '';
         position: absolute;
         top: -40%; left: 50%; transform: translateX(-50%);
         width: 700px; height: 700px;
-        background: radial-gradient(circle, rgba(59,130,246,0.1), transparent 70%);
+        background: radial-gradient(circle, rgba(59,130,246,0.12), transparent 70%);
         border-radius: 50%;
         pointer-events: none;
+        z-index: 1;
     }
+    .blog-hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        background: rgba(59,130,246,0.12);
+        border: 1px solid rgba(59,130,246,0.25);
+        border-radius: 50px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #a5b4fc;
+        margin-bottom: 20px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+    .blog-hero-badge svg { width: 14px; height: 14px; }
     .blog-hero h1 {
         font-size: 3rem;
         font-weight: 800;
@@ -282,7 +316,14 @@
 
 <!-- ─── HERO ───────────────────────────────── -->
 <section class="blog-hero">
+    <div class="blog-hero-bg">
+        <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1600&q=80&auto=format&fit=crop" alt="Writing on laptop" loading="eager">
+    </div>
     <div class="container">
+        <span class="blog-hero-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            The GigResource Blog
+        </span>
         <h1>Latest <span class="gradient-text">Insights</span></h1>
         <p>Stories, tips, and updates from the {{ config('app.name', 'Khadija') }} community.</p>
 
