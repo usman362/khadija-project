@@ -87,11 +87,77 @@
         }
         .signup-hero::before {
             content: '';
-            position: absolute; top: 64px; left: 0; right: 0; height: 300px;
-            background: url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1600&q=60') center/cover;
-            opacity: 0.12;
+            position: absolute; top: 64px; left: 0; right: 0; height: 340px;
+            background:
+                radial-gradient(800px 300px at 20% 0%, rgba(59,130,246,0.22), transparent 60%),
+                radial-gradient(700px 300px at 80% 10%, rgba(139,92,246,0.22), transparent 60%);
+            pointer-events: none;
         }
         .signup-hero-content { position: relative; z-index: 1; padding: 60px 24px 0; }
+
+        /* ── STEP INDICATOR ── */
+        .signup-steps {
+            display: flex; justify-content: center; align-items: center; gap: 0;
+            max-width: 560px; margin: 0 auto 28px;
+            flex-wrap: wrap;
+        }
+        .signup-step {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 13px; font-weight: 600;
+        }
+        .signup-step-num {
+            width: 30px; height: 30px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700;
+            background: rgba(255,255,255,0.06); color: var(--text-muted);
+            border: 1.5px solid var(--border-color); flex-shrink: 0;
+            transition: all 0.3s;
+        }
+        .signup-step.is-active .signup-step-num {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: #fff; border-color: transparent;
+            box-shadow: 0 0 0 4px rgba(139,92,246,0.15);
+        }
+        .signup-step.is-done .signup-step-num {
+            background: var(--success); color: #fff; border-color: var(--success);
+        }
+        .signup-step-label { color: var(--text-muted); }
+        .signup-step.is-active .signup-step-label { color: var(--text-white); }
+        .signup-step-connector {
+            width: 48px; height: 1.5px; margin: 0 14px;
+            background: var(--border-color);
+        }
+        @media (max-width: 600px) {
+            .signup-step-label { display: none; }
+            .signup-step-connector { width: 28px; margin: 0 8px; }
+        }
+
+        /* ── TRUST STRIP ── */
+        .signup-trust-strip {
+            display: flex; justify-content: center; align-items: center;
+            flex-wrap: wrap; gap: 22px;
+            padding: 14px 20px; border-radius: 999px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            max-width: 760px; margin: 0 auto 8px;
+            backdrop-filter: blur(8px);
+        }
+        .signup-trust-item {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; color: var(--text-light); font-weight: 500;
+        }
+        .signup-trust-item strong {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+        .signup-trust-sep {
+            width: 1px; height: 16px; background: rgba(255,255,255,0.08);
+        }
+        @media (max-width: 640px) {
+            .signup-trust-sep { display: none; }
+            .signup-trust-strip { flex-direction: column; border-radius: 16px; }
+        }
         .signup-hero h1 {
             font-size: 2.5rem; font-weight: 800; margin-bottom: 12px; line-height: 1.2;
         }
@@ -336,6 +402,48 @@
 
 <!-- ── MAIN ── -->
 <div class="signup-main">
+
+    <!-- Step Indicator -->
+    <div class="signup-steps" aria-label="Sign-up progress">
+        <div class="signup-step is-active">
+            <div class="signup-step-num">1</div>
+            <div class="signup-step-label">Choose role</div>
+        </div>
+        <div class="signup-step-connector"></div>
+        <div class="signup-step">
+            <div class="signup-step-num">2</div>
+            <div class="signup-step-label">Create account</div>
+        </div>
+        <div class="signup-step-connector"></div>
+        <div class="signup-step">
+            <div class="signup-step-num">3</div>
+            <div class="signup-step-label">Get started</div>
+        </div>
+    </div>
+
+    <!-- Trust Strip -->
+    <div class="signup-trust-strip">
+        <div class="signup-trust-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <strong>10,000+</strong> professionals
+        </div>
+        <div class="signup-trust-sep"></div>
+        <div class="signup-trust-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#fbbf24" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <strong>4.8</strong> avg rating
+        </div>
+        <div class="signup-trust-sep"></div>
+        <div class="signup-trust-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Secure payments
+        </div>
+        <div class="signup-trust-sep"></div>
+        <div class="signup-trust-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Approval in <strong>24h</strong>
+        </div>
+    </div>
+
     <div class="signup-section-header">
         <h2>Choose How You Want to Get Started</h2>
         <p>Select the option that best describes what you're looking for</p>

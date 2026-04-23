@@ -216,6 +216,624 @@
         border-radius: 50%;
         pointer-events: none;
     }
+
+    /* ══════════════════════════════════════════════════════
+       GIGSALAD-INSPIRED ADDITIONS
+       Hero trust pill + search + category chips, mock booking
+       card for "How It Works", and the A-Z category expander.
+       Dark theme is preserved — warm coral/peach is used as
+       the playful accent against the existing navy base.
+       ══════════════════════════════════════════════════════ */
+    :root {
+        --warm-coral: #ff7a59;
+        --warm-coral-dark: #e8583a;
+        --warm-peach: #ffb08a;
+        --warm-cream: #fff4eb;
+    }
+
+    /* Trust pill — frosted glass chip. Heavier blur, thinner bg,
+       subtle inset highlight on the top edge (classic glass trick),
+       white text held up by a soft text-shadow so it reads on any
+       image behind it. Coral is reserved for a whisper-thin ring. */
+    .hero-trust-pill {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1.5px solid rgba(255, 122, 89, 0.55);
+        backdrop-filter: blur(20px) saturate(1.4);
+        -webkit-backdrop-filter: blur(20px) saturate(1.4);
+        border-radius: 999px;
+        font-size: 0.92rem;
+        font-weight: 500;
+        letter-spacing: 0.2px;
+        color: #fff;
+        margin-bottom: 24px;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.22),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.08),
+            0 0 0 4px rgba(255, 122, 89, 0.1),
+            0 8px 28px rgba(0, 0, 0, 0.25);
+        text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+    }
+    .hero-trust-pill .stars {
+        display: inline-flex;
+        gap: 2px;
+        padding-right: 8px;
+        border-right: 1px solid rgba(255, 122, 89, 0.3);
+    }
+    .hero-trust-pill .stars svg {
+        width: 13px; height: 13px;
+        fill: #ffc15c;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+    }
+    .hero-trust-pill > svg:not(.stars svg) {
+        width: 15px; height: 15px;
+        color: #ffc15c;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+    }
+
+    /* Unified search + category chip strip in hero */
+    .hero-finder {
+        margin-top: 36px;
+        max-width: 720px;
+    }
+    .hero-finder-search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1.5px solid rgba(255, 255, 255, 0.16);
+        backdrop-filter: blur(16px);
+        border-radius: 16px;
+        padding: 8px 8px 8px 20px;
+        transition: border-color 0.2s, background 0.2s;
+    }
+    .hero-finder-search:focus-within {
+        border-color: var(--warm-coral);
+        background: rgba(255, 255, 255, 0.12);
+    }
+    .hero-finder-search svg.search-icon {
+        width: 20px; height: 20px;
+        color: rgba(255, 255, 255, 0.6);
+        flex-shrink: 0;
+    }
+    .hero-finder-search input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: #fff;
+        font-size: 1rem;
+        padding: 14px 4px;
+        font-family: inherit;
+    }
+    .hero-finder-search input::placeholder { color: rgba(255, 255, 255, 0.55); }
+    .hero-finder-search button {
+        background: linear-gradient(135deg, var(--warm-coral), var(--warm-coral-dark));
+        color: #fff;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        flex-shrink: 0;
+    }
+    .hero-finder-search button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 24px rgba(255, 122, 89, 0.35);
+    }
+    .hero-finder-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+    }
+    .hero-finder-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 999px;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .hero-finder-chip:hover {
+        background: rgba(255, 122, 89, 0.18);
+        border-color: rgba(255, 122, 89, 0.5);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+    .hero-finder-chip svg { width: 14px; height: 14px; }
+
+    /* Photo-collage strip for hero — floating tiles, GigSalad's signature */
+    .hero-collage {
+        position: absolute;
+        right: -40px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: grid;
+        grid-template-columns: 160px 160px;
+        grid-auto-rows: 200px;
+        gap: 16px;
+        pointer-events: none;
+        opacity: 0.9;
+        max-width: 380px;
+    }
+    .hero-collage .tile {
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .hero-collage .tile img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .hero-collage .tile.t1 { transform: rotate(-3deg); }
+    .hero-collage .tile.t2 { transform: rotate(4deg) translateY(20px); }
+    .hero-collage .tile.t3 { transform: rotate(2deg) translateY(-10px); }
+    .hero-collage .tile.t4 { transform: rotate(-5deg) translateY(10px); }
+    @media (max-width: 1100px) { .hero-collage { display: none; } }
+
+    /* ── HOW IT WORKS — 3 steps with mock booking card ── */
+    .hiw-steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 32px;
+        margin-top: 48px;
+    }
+    @media (max-width: 900px) { .hiw-steps { grid-template-columns: 1fr; } }
+
+    .hiw-step {
+        background: var(--bg-card);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 20px;
+        padding: 28px;
+        position: relative;
+        overflow: hidden;
+    }
+    .hiw-step-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        background: rgba(255, 122, 89, 0.15);
+        color: var(--warm-peach);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        border-radius: 6px;
+        margin-bottom: 14px;
+    }
+    .hiw-step h3 {
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    .hiw-step p {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        line-height: 1.55;
+        margin-bottom: 20px;
+    }
+    .hiw-step-art {
+        background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(139,92,246,0.08));
+        border-radius: 14px;
+        padding: 20px;
+        min-height: 180px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* Mini pro cards inside Step 1 */
+    .hiw-mini-cards { display: flex; flex-direction: column; gap: 10px; }
+    .hiw-mini-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 10px 12px;
+    }
+    .hiw-mini-card .avatar {
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--warm-coral), var(--warm-peach));
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+    .hiw-mini-card .body { flex: 1; min-width: 0; }
+    .hiw-mini-card .name { font-weight: 600; font-size: 0.9rem; color: #fff; }
+    .hiw-mini-card .loc { font-size: 0.78rem; color: var(--text-muted); }
+    .hiw-mini-card .rating { display: flex; align-items: center; gap: 3px; color: #ffb648; font-size: 0.78rem; font-weight: 600; }
+
+    /* The signature mock-receipt booking card in Step 2 */
+    .hiw-receipt {
+        background: #fff;
+        color: #1a1f2e;
+        border-radius: 12px;
+        padding: 18px;
+        font-family: inherit;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .hiw-receipt-head { display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid #eef0f4; }
+    .hiw-receipt-head .avatar {
+        width: 44px; height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--warm-coral), var(--warm-peach));
+        color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700;
+    }
+    .hiw-receipt-head .name { font-weight: 700; font-size: 0.95rem; }
+    .hiw-receipt-head .role { font-size: 0.8rem; color: #6b7280; }
+    .hiw-receipt-row {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 10px 0;
+        font-size: 0.82rem;
+    }
+    .hiw-receipt-row .k { color: #6b7280; }
+    .hiw-receipt-row .v { font-weight: 600; color: #1a1f2e; }
+    .hiw-receipt-total {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 14px 0 4px;
+        border-top: 1px solid #eef0f4;
+        margin-top: 6px;
+    }
+    .hiw-receipt-total .k { font-size: 0.78rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+    .hiw-receipt-total .v { font-size: 1.35rem; font-weight: 800; color: #1a1f2e; }
+    .hiw-receipt-btn {
+        width: 100%;
+        padding: 10px;
+        background: linear-gradient(135deg, var(--warm-coral), var(--warm-coral-dark));
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+
+    /* Celebration visual for Step 3 — a polaroid-style "memory card"
+       with a 5-star review snippet, floating confetti, and a soft glow.
+       Matches the receipt card vibe from Step 2 (white premium card on
+       dark section) so the three steps visually harmonise. */
+    .hiw-celebrate {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        min-height: 220px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    /* Soft warm glow behind the card */
+    .hiw-celebrate::before {
+        content: '';
+        position: absolute;
+        inset: 10% 15%;
+        background: radial-gradient(circle, rgba(255, 122, 89, 0.22), transparent 70%);
+        filter: blur(24px);
+        pointer-events: none;
+    }
+    .hiw-memory {
+        position: relative;
+        width: 100%;
+        max-width: 260px;
+        background: #fff;
+        border-radius: 14px;
+        padding: 10px 10px 14px;
+        box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.25),
+            0 2px 6px rgba(0, 0, 0, 0.15);
+        transform: rotate(-3deg);
+        transition: transform 0.3s ease;
+    }
+    .hiw-memory:hover { transform: rotate(0deg) translateY(-4px); }
+    .hiw-memory-photo {
+        width: 100%;
+        height: 140px;
+        border-radius: 10px;
+        background-image:
+            linear-gradient(135deg, rgba(255, 122, 89, 0.25), rgba(139, 92, 246, 0.35)),
+            url('https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .hiw-memory-photo::after {
+        /* sparkle in top-right of photo */
+        content: '✨';
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        font-size: 1.1rem;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    }
+    .hiw-memory-body {
+        padding: 12px 6px 2px;
+    }
+    .hiw-memory-stars {
+        display: flex;
+        gap: 2px;
+        color: #ffb648;
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+    }
+    .hiw-memory-quote {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        font-style: italic;
+        font-size: 0.88rem;
+        color: #1a1f2e;
+        line-height: 1.4;
+        margin-bottom: 8px;
+    }
+    .hiw-memory-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.72rem;
+        color: #6b7280;
+        padding-top: 8px;
+        border-top: 1px dashed #e5e7eb;
+    }
+    .hiw-memory-foot .who { font-weight: 600; color: #374151; }
+
+    /* Confetti dots scattered around the memory card. Each dot gets a
+       unique position + color + rotation via inline style in the markup. */
+    .hiw-confetti-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+    }
+    .hiw-confetti-layer .dot {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        opacity: 0.9;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+    .hiw-confetti-layer .dot.round { border-radius: 50%; }
+    .hiw-confetti-layer .dot.streak {
+        width: 3px;
+        height: 14px;
+        border-radius: 2px;
+    }
+
+    /* ── A-Z CATEGORY BROWSE GRID ── */
+    .az-section { padding: 100px 0; position: relative; overflow: hidden; }
+    .az-section::before {
+        content: '';
+        position: absolute;
+        top: -200px; left: -200px;
+        width: 500px; height: 500px;
+        background: radial-gradient(circle, rgba(255, 122, 89, 0.08), transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .az-section::after {
+        content: '';
+        position: absolute;
+        bottom: -200px; right: -200px;
+        width: 500px; height: 500px;
+        background: radial-gradient(circle, rgba(139, 92, 246, 0.06), transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .az-section .container { position: relative; z-index: 1; }
+    .az-section .section-header { text-align: center; margin-bottom: 56px; }
+    .az-section h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 14px;
+        max-width: 820px;
+        margin-left: auto; margin-right: auto;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+    }
+    .az-section h2 .gradient-text {
+        background: linear-gradient(135deg, var(--warm-coral), var(--warm-peach));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .az-section .section-header p { color: var(--text-muted); font-size: 1.05rem; }
+
+    .az-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+    @media (max-width: 1100px) { .az-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; } }
+    @media (max-width: 600px) { .az-grid { grid-template-columns: 1fr; } }
+
+    /* Per-column accent hues cycle through coral / violet / teal / amber
+       so each card has its own personality without drifting from brand. */
+    .az-column {
+        position: relative;
+        background: linear-gradient(180deg, var(--bg-card) 0%, rgba(15, 22, 41, 0.5) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 22px;
+        padding: 28px 24px 20px;
+        overflow: hidden;
+        transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1),
+                    border-color 0.3s,
+                    box-shadow 0.3s;
+    }
+    .az-column::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--az-accent, var(--warm-coral)), transparent);
+        opacity: 0.85;
+    }
+    .az-column::after {
+        content: '';
+        position: absolute;
+        top: -40px; right: -40px;
+        width: 120px; height: 120px;
+        background: radial-gradient(circle, var(--az-accent, var(--warm-coral)) 0%, transparent 70%);
+        opacity: 0.12;
+        pointer-events: none;
+        transition: opacity 0.3s, transform 0.3s;
+    }
+    .az-column:hover {
+        transform: translateY(-6px);
+        border-color: rgba(255, 255, 255, 0.16);
+        box-shadow:
+            0 16px 40px rgba(0, 0, 0, 0.35),
+            0 0 0 1px var(--az-accent, var(--warm-coral));
+    }
+    .az-column:hover::after { opacity: 0.25; transform: scale(1.1); }
+
+    /* Color tokens per column index — cycled via :nth-child */
+    .az-column:nth-child(1) { --az-accent: #ff7a59; }   /* coral */
+    .az-column:nth-child(2) { --az-accent: #8b5cf6; }   /* violet */
+    .az-column:nth-child(3) { --az-accent: #06b6d4; }   /* teal */
+    .az-column:nth-child(4) { --az-accent: #f59e0b; }   /* amber */
+
+    .az-column-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 18px;
+        margin-bottom: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .az-column-head .ic {
+        width: 44px; height: 44px;
+        border-radius: 12px;
+        background: color-mix(in srgb, var(--az-accent, #ff7a59) 18%, transparent);
+        border: 1px solid color-mix(in srgb, var(--az-accent, #ff7a59) 35%, transparent);
+        display: flex; align-items: center; justify-content: center;
+        color: var(--az-accent, #ff7a59);
+        font-weight: 800;
+        font-size: 0.95rem;
+        letter-spacing: 0.5px;
+        flex-shrink: 0;
+    }
+    .az-column-head .meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .az-column-head .label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .az-column-head .range {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .az-links {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    .az-links a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        margin: 0 -12px;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 0.93rem;
+        font-weight: 500;
+        text-decoration: none;
+        border-radius: 10px;
+        transition: background 0.18s, color 0.18s, transform 0.18s;
+    }
+    .az-links a .name {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+    }
+    .az-links a .name .emoji {
+        width: 26px;
+        height: 26px;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0;
+        line-height: 1;
+        color: color-mix(in srgb, var(--az-accent, #ff7a59) 90%, #fff);
+        background: color-mix(in srgb, var(--az-accent, #ff7a59) 14%, transparent);
+        border: 1px solid color-mix(in srgb, var(--az-accent, #ff7a59) 28%, transparent);
+        border-radius: 7px;
+        overflow: hidden;
+        text-transform: uppercase;
+    }
+    .az-links a:hover .name .emoji {
+        background: color-mix(in srgb, var(--az-accent, #ff7a59) 24%, transparent);
+        border-color: color-mix(in srgb, var(--az-accent, #ff7a59) 45%, transparent);
+    }
+    .az-links a .name .label-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .az-links a .arrow {
+        opacity: 0;
+        transform: translateX(-4px);
+        color: var(--az-accent, var(--warm-coral));
+        transition: opacity 0.18s, transform 0.18s;
+        flex-shrink: 0;
+    }
+    .az-links a:hover {
+        background: color-mix(in srgb, var(--az-accent, #ff7a59) 10%, transparent);
+        color: #fff;
+    }
+    .az-links a:hover .arrow {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .az-column-foot {
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        text-align: right;
+    }
+    .az-column-foot a {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--az-accent, var(--warm-coral));
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: gap 0.18s;
+    }
+    .az-column-foot a:hover { gap: 8px; }
 </style>
 @endpush
 
@@ -227,13 +845,58 @@
     <div class="hero-bg">
         <img src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1600&q=80&auto=format&fit=crop" alt="Outdoor event festival with colorful lights and staging" loading="eager">
     </div>
-    <div class="container">
+    <div class="container" style="position: relative;">
+        {{-- Trust pill — GigSalad's signature opener. Uses REAL review count
+             from the DB so it's never a lie. Falls back to a generic line
+             until the first few reviews land. --}}
+        @if($stats['reviews_count'] >= 5)
+            <div class="hero-trust-pill">
+                <span class="stars">
+                    @for($i = 0; $i < 5; $i++)
+                        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    @endfor
+                </span>
+                Over {{ number_format($stats['reviews_count']) }} five-star reviews
+            </div>
+        @else
+            <div class="hero-trust-pill">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Verified professionals, secure bookings
+            </div>
+        @endif
+
         <h1>Find The Right<br><span class="gradient-text">Professional</span> For<br>Every Event</h1>
         <p class="hero-subtitle">
             GigResource connects event organizers with verified professionals. Book photographers, DJs, caterers,
             decorators, and more &mdash; all in one platform.
         </p>
-        <div class="hero-buttons">
+
+        {{-- GigSalad-style search: big unified bar + category quick-pick
+             chips. The form submits to the public categories page with a
+             search query so discovery still works even without JS. --}}
+        <form class="hero-finder" action="{{ route('public.browse') }}" method="GET">
+            <div class="hero-finder-search">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" name="q" placeholder="Find photographers, DJs, caterers, venues..." autocomplete="off">
+                <button type="submit">Search</button>
+            </div>
+            @if($categories->isNotEmpty())
+                <div class="hero-finder-chips">
+                    @foreach($categories->take(6) as $cat)
+                        <a href="{{ route('public.browse', ['q' => $cat->name]) }}" class="hero-finder-chip">
+                            @if($cat->icon)
+                                <span style="font-size: 0.95rem;">{{ $cat->icon }}</span>
+                            @else
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            @endif
+                            {{ $cat->name }}
+                        </a>
+                    @endforeach
+                </div>
+            @endif
+        </form>
+
+        <div class="hero-buttons" style="margin-top: 32px;">
             @auth
                 <a href="{{ url('/dashboard') }}" class="btn btn-primary btn-lg">Go to Dashboard</a>
             @else
@@ -398,77 +1061,205 @@
     </div>
 </section>
 
+<!-- ─── A–Z CATEGORY EXPANDER ────────────────── -->
+{{--
+    GigSalad's signature "browse by category" strip, adapted to our
+    Category model. We chunk the active categories into 4 columns so
+    the grid reads like a directory — big SEO + discovery win.
+    Hidden completely if the database has no active categories.
+--}}
+@if($categoryBuckets->isNotEmpty() && $categories->count() > 0)
+<section class="az-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>From <span class="gradient-text">acoustic sets to zero-waste catering</span>, we've got every booking need covered.</h2>
+            <p>Browse our full directory of event professionals, A to Z.</p>
+        </div>
+        <div class="az-grid">
+            @foreach($categoryBuckets as $bucket)
+                @php
+                    $firstLetter = strtoupper($bucket->first()->name[0] ?? 'A');
+                    $lastLetter  = strtoupper($bucket->last()->name[0] ?? 'Z');
+                    $rangeLabel  = $firstLetter === $lastLetter ? $firstLetter : "{$firstLetter}–{$lastLetter}";
+                @endphp
+                <div class="az-column">
+                    <div class="az-column-head">
+                        <span class="ic">{{ $rangeLabel }}</span>
+                        <div class="meta">
+                            <span class="label">Categories</span>
+                            <span class="range">{{ $bucket->count() }} {{ Str::plural('type', $bucket->count()) }}</span>
+                        </div>
+                    </div>
+                    <ul class="az-links">
+                        @foreach($bucket->take(6) as $cat)
+                            <li>
+                                <a href="{{ route('public.browse', ['q' => $cat->name]) }}">
+                                    <span class="name">
+                                        <span class="emoji">{{ strtoupper(mb_substr($cat->name, 0, 1)) }}</span>
+                                        <span class="label-text">{{ $cat->name }}</span>
+                                    </span>
+                                    <span class="arrow">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                                    </span>
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                    @if($bucket->count() > 6)
+                        <div class="az-column-foot">
+                            <a href="{{ route('public.browse') }}">
+                                See all {{ $bucket->count() }}
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                            </a>
+                        </div>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="{{ route('public.browse') }}" class="btn btn-outline btn-lg">Browse all professionals</a>
+        </div>
+    </div>
+</section>
+@endif
+
 <!-- ─── HOW IT WORKS ──────────────────────────── -->
+{{--
+    Three-step flow inspired by GigSalad. Each card has supporting visual
+    art that previews the actual product experience:
+      • Step 1 — mini pro cards (what browsing feels like)
+      • Step 2 — a mock booking receipt card (signature trust move)
+      • Step 3 — celebration confetti (payoff)
+--}}
 <section class="section" id="how-it-works">
     <div class="container">
         <div class="section-header">
-            <h2>Getting Started is Easy</h2>
-            <p>A simple, transparent process for planners and professionals.</p>
+            <h2>How it <span class="gradient-text">works</span></h2>
+            <p>Book the best. Exceptional professionals are just a few clicks away.</p>
         </div>
 
-        {{--
-            Journey layout: four numbered steps threaded by a dashed path,
-            with illustration and copy alternating sides. See `.journey*`
-            rules in _public_styles.blade.php for responsive behaviour.
-        --}}
-        <div class="journey">
-            <div class="journey-step step-1">
-                <div class="journey-copy">
-                    <h3>Post Your Event</h3>
-                    <p>Tell us what you're planning — dates, venue, guest count, the vibe. We'll translate that into a brief the right pros can actually respond to.</p>
-                    <span class="journey-meta">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        Takes about 2 minutes
-                    </span>
-                </div>
-                <div class="journey-num">1</div>
-                <div class="journey-art" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-                </div>
-            </div>
-
-            <div class="journey-step step-2">
-                <div class="journey-copy">
-                    <h3>Get Matched</h3>
-                    <p>Our AI matchmaking surfaces pros who fit your budget, date, and style — with verified trade licenses, liability insurance, and real reviews right on the card.</p>
-                    <span class="journey-meta">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.5 6.5L21 9l-5 4.5L17.5 21 12 17.5 6.5 21 8 13.5 3 9l6.5-.5z"/></svg>
-                        AI-powered suggestions
-                    </span>
-                </div>
-                <div class="journey-num">2</div>
-                <div class="journey-art" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                </div>
-            </div>
-
-            <div class="journey-step step-3">
-                <div class="journey-copy">
-                    <h3>Chat &amp; Agree</h3>
-                    <p>Message pros in real time, share references, and let our AI turn the conversation into a professional service agreement — no lawyer required.</p>
-                    <span class="journey-meta">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                        Built-in agreements
-                    </span>
-                </div>
-                <div class="journey-num">3</div>
-                <div class="journey-art" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <div class="hiw-steps">
+            <!-- Step 1: Browse and compare -->
+            <div class="hiw-step">
+                <span class="hiw-step-badge">Step 1</span>
+                <h3>Browse &amp; compare</h3>
+                <p>Discover verified event pros in your city. Compare ratings, portfolios, pricing — all on one card.</p>
+                <div class="hiw-step-art">
+                    <div class="hiw-mini-cards">
+                        <div class="hiw-mini-card">
+                            <div class="avatar">EB</div>
+                            <div class="body">
+                                <div class="name">Emma — Wedding Photographer</div>
+                                <div class="loc">Los Angeles, CA</div>
+                            </div>
+                            <div class="rating">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                4.9
+                            </div>
+                        </div>
+                        <div class="hiw-mini-card">
+                            <div class="avatar">MC</div>
+                            <div class="body">
+                                <div class="name">Marcus — Event DJ</div>
+                                <div class="loc">Austin, TX</div>
+                            </div>
+                            <div class="rating">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                4.8
+                            </div>
+                        </div>
+                        <div class="hiw-mini-card">
+                            <div class="avatar">SR</div>
+                            <div class="body">
+                                <div class="name">Sophia — Caterer</div>
+                                <div class="loc">Miami, FL</div>
+                            </div>
+                            <div class="rating">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                5.0
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="journey-step step-4">
-                <div class="journey-copy">
-                    <h3>Book Safely</h3>
-                    <p>Pay securely through the platform, keep every message and file in one place, and get payout protection on every confirmed booking.</p>
-                    <span class="journey-meta">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-                        Escrow-style protection
-                    </span>
+            <!-- Step 2: Book securely (mock receipt) -->
+            <div class="hiw-step">
+                <span class="hiw-step-badge">Step 2</span>
+                <h3>Book securely</h3>
+                <p>Confirm your booking with payment protection, real-time messaging, and hassle-free cancellation.</p>
+                <div class="hiw-step-art">
+                    <div class="hiw-receipt">
+                        <div class="hiw-receipt-head">
+                            <div class="avatar">EB</div>
+                            <div>
+                                <div class="name">Emma B.</div>
+                                <div class="role">Wedding Photographer</div>
+                            </div>
+                        </div>
+                        <div class="hiw-receipt-row">
+                            <span class="k">Date</span>
+                            <span class="v">Sat, Jun 14</span>
+                        </div>
+                        <div class="hiw-receipt-row">
+                            <span class="k">Time</span>
+                            <span class="v">4:00 PM – 9:00 PM</span>
+                        </div>
+                        <div class="hiw-receipt-row">
+                            <span class="k">Location</span>
+                            <span class="v">Los Angeles, CA</span>
+                        </div>
+                        <div class="hiw-receipt-total">
+                            <span class="k">Total due</span>
+                            <span class="v">$555</span>
+                        </div>
+                        <button type="button" class="hiw-receipt-btn">Confirm booking</button>
+                    </div>
                 </div>
-                <div class="journey-num">4</div>
-                <div class="journey-art" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+            </div>
+
+            <!-- Step 3: Enjoy your event -->
+            <div class="hiw-step">
+                <span class="hiw-step-badge">Step 3</span>
+                <h3>Enjoy your event</h3>
+                <p>Watch your moment come to life. Leave a review after — help the next planner book with confidence.</p>
+                <div class="hiw-step-art">
+                    <div class="hiw-celebrate">
+                        {{-- Scattered confetti dots behind + around the card --}}
+                        <div class="hiw-confetti-layer" aria-hidden="true">
+                            @php
+                                $confetti = [
+                                    ['top' => '6%',  'left' => '8%',  'color' => '#ff7a59', 'shape' => '',       'rot' => 18],
+                                    ['top' => '14%', 'left' => '88%', 'color' => '#8b5cf6', 'shape' => 'round',  'rot' => 0],
+                                    ['top' => '3%',  'left' => '52%', 'color' => '#ffb648', 'shape' => 'streak', 'rot' => -12],
+                                    ['top' => '30%', 'left' => '2%',  'color' => '#06b6d4', 'shape' => 'round',  'rot' => 0],
+                                    ['top' => '52%', 'left' => '94%', 'color' => '#ec4899', 'shape' => '',       'rot' => 32],
+                                    ['top' => '80%', 'left' => '6%',  'color' => '#22c55e', 'shape' => 'streak', 'rot' => 24],
+                                    ['top' => '88%', 'left' => '78%', 'color' => '#ff7a59', 'shape' => 'round',  'rot' => 0],
+                                    ['top' => '68%', 'left' => '92%', 'color' => '#ffb08a', 'shape' => '',       'rot' => -18],
+                                    ['top' => '92%', 'left' => '42%', 'color' => '#8b5cf6', 'shape' => 'streak', 'rot' => 60],
+                                    ['top' => '22%', 'left' => '18%', 'color' => '#f59e0b', 'shape' => 'round',  'rot' => 0],
+                                ];
+                            @endphp
+                            @foreach($confetti as $c)
+                                <span class="dot {{ $c['shape'] }}"
+                                      style="top: {{ $c['top'] }}; left: {{ $c['left'] }}; background: {{ $c['color'] }}; transform: rotate({{ $c['rot'] }}deg);"></span>
+                            @endforeach
+                        </div>
+
+                        {{-- The polaroid memory card with 5-star review --}}
+                        <div class="hiw-memory">
+                            <div class="hiw-memory-photo"></div>
+                            <div class="hiw-memory-body">
+                                <div class="hiw-memory-stars" aria-label="5 out of 5 stars">★★★★★</div>
+                                <p class="hiw-memory-quote">"Absolutely magical night — couldn't have asked for more."</p>
+                                <div class="hiw-memory-foot">
+                                    <span class="who">Emma &amp; Jake</span>
+                                    <span>Wedding · 2025</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -477,8 +1268,8 @@
             @auth
                 <a href="{{ url('/dashboard') }}" class="btn btn-primary btn-lg">Go to Dashboard</a>
             @else
-                <a href="{{ route('register') }}" class="btn btn-primary btn-lg">Join as Professional</a>
-                <a href="{{ route('register') }}" class="btn btn-outline btn-lg">Hire a Professional</a>
+                <a href="{{ route('register', ['role' => 'client']) }}" class="btn btn-primary btn-lg">Start planning</a>
+                <a href="{{ route('register', ['role' => 'supplier']) }}" class="btn btn-outline btn-lg">List your services</a>
             @endauth
         </div>
     </div>
@@ -632,9 +1423,32 @@
 <section class="section section-alt">
     <div class="container">
         <div class="section-header">
-            <h2>Trusted by Planners & Professionals</h2>
-            <p>Here's what our community says about {{ config('app.name', 'Khadija') }}.</p>
+            <h2>What our customers are saying</h2>
+            <p>Real reviews from planners and pros — straight from the platform.</p>
         </div>
+
+        {{-- If we have a real 5-star review in the DB, surface it as the
+             big pull-quote above the hand-written fallback cards. The
+             comment gets truncated to avoid a wall of text, and we fall
+             back gracefully if the column is empty. --}}
+        @if($featuredReview)
+            <div class="testimonial-card" style="max-width: 720px; margin: 0 auto 48px; text-align: center;">
+                <div class="testimonial-stars" style="justify-content: center;">
+                    @for($i = 0; $i < 5; $i++)
+                        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    @endfor
+                </div>
+                <blockquote style="font-size: 1.2rem; line-height: 1.55;">
+                    &ldquo;{{ \Illuminate\Support\Str::limit($featuredReview->comment, 240) }}&rdquo;
+                </blockquote>
+                <div class="testimonial-author" style="justify-content: center;">
+                    <div>
+                        <div class="testimonial-author-name">{{ $featuredReview->reviewer?->name ?? 'A GigResource customer' }}</div>
+                        <div class="testimonial-author-role">on booking with {{ $featuredReview->reviewee?->name ?? 'a pro' }}</div>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         <div class="testimonials-grid">
             <div class="testimonial-card">
@@ -680,10 +1494,10 @@
                 <blockquote>"As a DJ, I've doubled my bookings since joining. The platform makes it easy to showcase my work and connect with clients directly."</blockquote>
                 <div class="testimonial-author">
                     <div class="testimonial-avatar real-avatar">
-                        <img src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=200&q=80&auto=format&fit=crop&crop=faces" alt="Ahmed J.">
+                        <img src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=200&q=80&auto=format&fit=crop&crop=faces" alt="James T.">
                     </div>
                     <div>
-                        <div class="testimonial-author-name">Ahmed J.</div>
+                        <div class="testimonial-author-name">James T.</div>
                         <div class="testimonial-author-role">Professional DJ & Musician</div>
                     </div>
                 </div>

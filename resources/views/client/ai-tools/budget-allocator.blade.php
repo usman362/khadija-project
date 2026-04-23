@@ -372,11 +372,10 @@
                     <div class="bat-input-group">
                         <select name="currency" class="bat-currency">
                             <option value="USD">USD</option>
+                            <option value="CAD">CAD</option>
                             <option value="EUR">EUR</option>
                             <option value="GBP">GBP</option>
-                            <option value="PKR">PKR</option>
-                            <option value="INR">INR</option>
-                            <option value="AED">AED</option>
+                            <option value="AUD">AUD</option>
                         </select>
                         <input type="number" name="total_budget" class="bat-input" min="1" step="0.01" required placeholder="e.g. 5000">
                     </div>
@@ -384,7 +383,7 @@
 
                 <div>
                     <label class="bat-label">Location (optional)</label>
-                    <input type="text" name="location" class="bat-input" maxlength="200" placeholder="e.g. Karachi, Pakistan">
+                    <input type="text" name="location" class="bat-input" maxlength="200" placeholder="e.g. Austin, TX">
                 </div>
                 <div>
                     <label class="bat-label">Event Date (optional)</label>

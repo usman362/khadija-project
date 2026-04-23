@@ -658,7 +658,6 @@
                     <div class="mega-subs">
                         <a class="mega-sub-tile" href="#"><div class="mega-sub-thumb"><img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&q=80&auto=format&fit=crop" alt="Floral"></div><h4>Floral &amp; Decor</h4><span class="sub-count">42 pros</span></a>
                         <a class="mega-sub-tile" href="#"><div class="mega-sub-thumb"><img src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&q=80&auto=format&fit=crop" alt="Photographer"></div><h4>Wedding Photography</h4><span class="sub-count">75 pros</span></a>
-                        <a class="mega-sub-tile" href="#"><div class="mega-sub-thumb"><img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&q=80&auto=format&fit=crop" alt="Makeup"></div><h4>Bridal Makeup</h4><span class="sub-count">48 pros</span></a>
                         <a class="mega-sub-tile" href="#"><div class="mega-sub-thumb"><img src="https://images.unsplash.com/photo-1555244162-803834f70033?w=400&q=80&auto=format&fit=crop" alt="Catering"></div><h4>Reception Catering</h4><span class="sub-count">55 pros</span></a>
                         <a class="mega-sub-tile" href="#"><div class="mega-sub-thumb"><img src="https://images.unsplash.com/photo-1571266028243-e1d11d2c01a8?w=400&q=80&auto=format&fit=crop" alt="DJ"></div><h4>Wedding DJs</h4><span class="sub-count">90 pros</span></a>
                         <a class="mega-sub-tile" href="#"><div class="mega-sub-thumb"><img src="https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=400&q=80&auto=format&fit=crop" alt="Planner"></div><h4>Wedding Planners</h4><span class="sub-count">60 pros</span></a>
@@ -701,7 +700,6 @@
                         <a class="mega-sub-tile" href="#"><div class="mega-sub-thumb"><img src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&q=80&auto=format&fit=crop" alt="Photo"></div><h4>Lifestyle Photography</h4><span class="sub-count">20 pros</span></a>
                         <a class="mega-sub-tile" href="#"><div class="mega-sub-thumb"><img src="https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=400&q=80&auto=format&fit=crop" alt="Planner"></div><h4>Shower Planners</h4><span class="sub-count">15 pros</span></a>
                         <a class="mega-sub-tile" href="#"><div class="mega-sub-thumb"><img src="https://images.unsplash.com/photo-1567360425618-1594206637d2?w=400&q=80&auto=format&fit=crop" alt="Favors"></div><h4>Party Favors</h4><span class="sub-count">10 pros</span></a>
-                        <a class="mega-sub-tile" href="#"><div class="mega-sub-thumb"><img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&q=80&auto=format&fit=crop" alt="Makeup"></div><h4>Mama Makeup</h4><span class="sub-count">8 pros</span></a>
                     </div>
                 </div>
 
@@ -869,14 +867,6 @@
                     <span class="ts-tile-tag">Popular</span>
                     <h3>Catering</h3>
                     <div class="ts-tile-meta"><span>55+ pros</span><span class="price">from $25/head</span></div>
-                </div>
-            </a>
-            <a class="ts-tile fade-up" href="#" data-tag="featured" data-name="makeup beauty bridal">
-                <div class="ts-tile-img"><img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600&q=80&auto=format&fit=crop" alt="Makeup"></div>
-                <div class="ts-tile-overlay">
-                    <span class="ts-tile-tag tag-featured">Featured</span>
-                    <h3>Makeup &amp; Beauty</h3>
-                    <div class="ts-tile-meta"><span>48+ pros</span><span class="price">from $120</span></div>
                 </div>
             </a>
             <a class="ts-tile fade-up" href="#" data-tag="new" data-name="floral decor flowers">

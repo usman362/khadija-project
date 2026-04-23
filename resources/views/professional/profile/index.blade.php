@@ -279,7 +279,7 @@
     .pf-switch input:checked + .pf-switch-slider { background: var(--accent-blue); }
     .pf-switch input:checked + .pf-switch-slider::before { transform: translateX(20px); }
 
-    /* ── Portfolio & Certs Repeatable ── */
+    /* ── Portfolio & Certifications Repeatable ── */
     .pf-repeatable-item {
         padding: 16px;
         border: 1px solid var(--border-color);
@@ -372,7 +372,7 @@
             </a>
             <a href="{{ route('professional.profile.index', ['tab' => 'portfolio']) }}" class="pf-tab-link {{ $tab === 'portfolio' ? 'active' : '' }}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                Portfolio & Certs
+                Portfolio & Certifications
             </a>
             <a href="{{ route('professional.profile.index', ['tab' => 'verification']) }}" class="pf-tab-link {{ $tab === 'verification' ? 'active' : '' }}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -433,7 +433,7 @@
                     </div>
                     <div>
                         <label class="pf-label">Phone Number</label>
-                        <input type="text" name="phone" class="pf-input" value="{{ old('phone', $user->phone) }}" placeholder="+92 300 1234567">
+                        <input type="text" name="phone" class="pf-input" value="{{ old('phone', $user->phone) }}" placeholder="+1 (555) 123-4567">
                     </div>
                     <div>
                         <label class="pf-label">Professional Headline</label>
@@ -596,21 +596,21 @@
                     <div class="pf-card-desc">Add professional certifications and qualifications.</div>
                 </div>
 
-                <div id="certItems">
-                    @forelse(($profile->certifications ?? []) as $j => $cert)
+                <div id="certificationItems">
+                    @forelse(($profile->certifications ?? []) as $j => $certification)
                         <div class="pf-repeatable-item" data-index="{{ $j }}">
                             <div class="pf-form-grid">
                                 <div>
                                     <label class="pf-label">Certification Name</label>
-                                    <input type="text" name="certifications[{{ $j }}][name]" class="pf-input" value="{{ $cert['name'] ?? '' }}">
+                                    <input type="text" name="certifications[{{ $j }}][name]" class="pf-input" value="{{ $certification['name'] ?? '' }}">
                                 </div>
                                 <div>
                                     <label class="pf-label">Issuing Organization</label>
-                                    <input type="text" name="certifications[{{ $j }}][issuer]" class="pf-input" value="{{ $cert['issuer'] ?? '' }}">
+                                    <input type="text" name="certifications[{{ $j }}][issuer]" class="pf-input" value="{{ $certification['issuer'] ?? '' }}">
                                 </div>
                                 <div>
                                     <label class="pf-label">Year</label>
-                                    <input type="number" name="certifications[{{ $j }}][year]" class="pf-input" value="{{ $cert['year'] ?? '' }}" min="1950" max="2030">
+                                    <input type="number" name="certifications[{{ $j }}][year]" class="pf-input" value="{{ $certification['year'] ?? '' }}" min="1950" max="2030">
                                 </div>
                             </div>
                         </div>
@@ -633,10 +633,10 @@
                         </div>
                     @endforelse
                 </div>
-                <button type="button" class="pf-btn pf-btn-outline pf-btn-sm" onclick="addCertItem()" style="margin-top: 8px;">+ Add Certification</button>
+                <button type="button" class="pf-btn pf-btn-outline pf-btn-sm" onclick="addCertificationItem()" style="margin-top: 8px;">+ Add Certification</button>
 
                 <div style="margin-top: 20px;">
-                    <button type="submit" class="pf-btn">Save Portfolio & Certs</button>
+                    <button type="submit" class="pf-btn">Save Portfolio & Certifications</button>
                 </div>
             </form>
         </div>
@@ -1024,7 +1024,7 @@
 @push('scripts')
 <script>
 let portfolioIdx = {{ count($profile->portfolio ?? []) ?: 1 }};
-let certIdx = {{ count($profile->certifications ?? []) ?: 1 }};
+let certificationIdx = {{ count($profile->certifications ?? []) ?: 1 }};
 
 function addPortfolioItem() {
     const html = `<div class="pf-repeatable-item">
@@ -1038,16 +1038,16 @@ function addPortfolioItem() {
     portfolioIdx++;
 }
 
-function addCertItem() {
+function addCertificationItem() {
     const html = `<div class="pf-repeatable-item">
         <div class="pf-form-grid">
-            <div><label class="pf-label">Certification Name</label><input type="text" name="certifications[${certIdx}][name]" class="pf-input"></div>
-            <div><label class="pf-label">Issuing Organization</label><input type="text" name="certifications[${certIdx}][issuer]" class="pf-input"></div>
-            <div><label class="pf-label">Year</label><input type="number" name="certifications[${certIdx}][year]" class="pf-input" min="1950" max="2030"></div>
+            <div><label class="pf-label">Certification Name</label><input type="text" name="certifications[${certificationIdx}][name]" class="pf-input"></div>
+            <div><label class="pf-label">Issuing Organization</label><input type="text" name="certifications[${certificationIdx}][issuer]" class="pf-input"></div>
+            <div><label class="pf-label">Year</label><input type="number" name="certifications[${certificationIdx}][year]" class="pf-input" min="1950" max="2030"></div>
         </div>
     </div>`;
-    document.getElementById('certItems').insertAdjacentHTML('beforeend', html);
-    certIdx++;
+    document.getElementById('certificationItems').insertAdjacentHTML('beforeend', html);
+    certificationIdx++;
 }
 </script>
 @endpush

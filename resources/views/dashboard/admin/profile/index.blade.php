@@ -310,7 +310,7 @@
                     </div>
                     <div>
                         <label class="pf-label">Phone Number</label>
-                        <input type="text" name="phone" class="pf-input" value="{{ old('phone', $user->phone) }}" placeholder="+92 300 1234567">
+                        <input type="text" name="phone" class="pf-input" value="{{ old('phone', $user->phone) }}" placeholder="+1 (555) 123-4567">
                         @error('phone') <div class="pf-error">{{ $message }}</div> @enderror
                     </div>
                     <div>
@@ -346,19 +346,19 @@
                     </div>
                     <div>
                         <label class="pf-label">City</label>
-                        <input type="text" name="city" class="pf-input" value="{{ old('city', $profile->city) }}" placeholder="Lahore">
+                        <input type="text" name="city" class="pf-input" value="{{ old('city', $profile->city) }}" placeholder="Los Angeles">
                     </div>
                     <div>
                         <label class="pf-label">State / Province</label>
-                        <input type="text" name="state" class="pf-input" value="{{ old('state', $profile->state) }}" placeholder="Punjab">
+                        <input type="text" name="state" class="pf-input" value="{{ old('state', $profile->state) }}" placeholder="California">
                     </div>
                     <div>
                         <label class="pf-label">Country</label>
-                        <input type="text" name="country" class="pf-input" value="{{ old('country', $profile->country) }}" placeholder="Pakistan">
+                        <input type="text" name="country" class="pf-input" value="{{ old('country', $profile->country) }}" placeholder="United States">
                     </div>
                     <div>
                         <label class="pf-label">ZIP / Postal Code</label>
-                        <input type="text" name="zip_code" class="pf-input" value="{{ old('zip_code', $profile->zip_code) }}" placeholder="54000">
+                        <input type="text" name="zip_code" class="pf-input" value="{{ old('zip_code', $profile->zip_code) }}" placeholder="90001">
                     </div>
                 </div>
                 <div style="margin-top: 24px;">

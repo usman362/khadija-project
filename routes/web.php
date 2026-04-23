@@ -57,6 +57,19 @@ Route::get('/', LandingPageController::class)->name('landing');
 Route::get('/pro/{user}', [\App\Http\Controllers\Public\ProfessionalProfileShowController::class, 'show'])
     ->name('public.professional.show');
 
+// ── Public Browse (filterable professional directory) ─────────────────
+// Where the landing-page hero search, A-Z chips, and events-categories
+// mega-panel all converge. Supports ?q= ?city= ?rating_min= ?verified=
+// ?sort= query params.
+Route::get('/browse', [\App\Http\Controllers\Public\BrowseProfessionalsController::class, 'index'])
+    ->name('public.browse');
+
+// ── How It Works (standalone explainer page) ──────────────────────────
+// Dual-audience explainer with client/pro flows, comparison table, and
+// FAQ. The navbar "How It Works" link points here.
+Route::view('/how-it-works', 'public.how-it-works')
+    ->name('public.how-it-works');
+
 // ── Reviews (authenticated participants of completed bookings) ────────
 Route::middleware('auth')->group(function () {
     Route::post('/reviews', [\App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');

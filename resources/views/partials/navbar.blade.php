@@ -12,7 +12,52 @@
 
             <div class="navbar-actions">
                 @auth
+                    @php
+                        $unreadCount = auth()->user()->unreadNotifications->count();
+                    @endphp
+
+                    {{-- Notifications bell. Count bubble only shows when > 0. --}}
+                    <a href="{{ url('/dashboard') }}" class="nav-icon-btn" aria-label="Notifications" title="Notifications">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        @if($unreadCount > 0)
+                            <span class="nav-icon-badge">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
+                        @endif
+                    </a>
+
                     <a href="{{ url('/dashboard') }}" class="btn btn-primary btn-sm">Dashboard</a>
+
+                    {{-- User avatar dropdown. Shows name + role, quick links, logout. --}}
+                    <div class="user-dropdown" id="userDropdown">
+                        <button type="button" class="user-dropdown-btn" onclick="document.getElementById('userDropdown').classList.toggle('open')" aria-label="Account menu">
+                            <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="user-dropdown-avatar">
+                            <svg class="user-dropdown-chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <div class="user-dropdown-menu">
+                            <div class="user-dropdown-head">
+                                <img src="{{ auth()->user()->avatar_url }}" alt="" class="user-dropdown-head-avatar">
+                                <div class="user-dropdown-head-info">
+                                    <div class="user-dropdown-head-name">{{ auth()->user()->name }}</div>
+                                    <div class="user-dropdown-head-email">{{ auth()->user()->email }}</div>
+                                </div>
+                            </div>
+                            <a href="{{ url('/dashboard') }}" class="user-dropdown-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                                Dashboard
+                            </a>
+                            <a href="{{ url('/dashboard') }}" class="user-dropdown-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                Profile
+                            </a>
+                            <div class="user-dropdown-divider"></div>
+                            <form action="{{ route('logout') }}" method="POST" class="user-dropdown-logout-form">
+                                @csrf
+                                <button type="submit" class="user-dropdown-item user-dropdown-item-danger">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                    Log out
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 @else
                     <div class="join-dropdown" id="joinDropdown">
                         <button type="button" class="join-dropdown-btn" onclick="document.getElementById('joinDropdown').classList.toggle('open')">
@@ -116,7 +161,6 @@
                                 <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Photography</span></a>
                                 <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1571266028243-e1d11d2c01a8?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Wedding DJs</span></a>
                                 <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Floral Design</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Bridal Makeup</span></a>
                                 <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1555244162-803834f70033?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Catering</span></a>
                                 <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Venues</span></a>
                                 <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Planners</span></a>
@@ -160,7 +204,6 @@
                                 <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Photographers</span></a>
                                 <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Shower Planners</span></a>
                                 <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1567360425618-1594206637d2?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Party Favors</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Mama Makeup</span></a>
                                 <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1464347744102-11db6282f854?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Balloons</span></a>
                                 <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Gift Boxes</span></a>
                             </div>
@@ -189,7 +232,6 @@
                                 <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Drone Shoots</span></a>
                                 <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Photo Booths</span></a>
                                 <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Lifestyle</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Headshots</span></a>
                                 <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Livestreaming</span></a>
                             </div>
                         </div>
@@ -240,10 +282,11 @@
                 </div>
             </li>
 
-            <li><a href="{{ route('about-us') }}">About Us</a></li>
-            <li><a href="{{ route('events-categories') }}">Events</a></li>
-            <li><a href="{{ route('blog.index') }}">Blog</a></li>
-            <li><a href="{{ route('landing') }}#how-it-works">How It Works</a></li>
+            <li><a href="{{ route('public.browse') }}" class="{{ request()->routeIs('public.browse') ? 'is-active' : '' }}">Browse Pros</a></li>
+            <li><a href="{{ route('about-us') }}" class="{{ request()->routeIs('about-us') ? 'is-active' : '' }}">About Us</a></li>
+            <li><a href="{{ route('events-categories') }}" class="{{ request()->routeIs('events-categories') ? 'is-active' : '' }}">Events</a></li>
+            <li><a href="{{ route('blog.index') }}" class="{{ request()->routeIs('blog.*') ? 'is-active' : '' }}">Blog</a></li>
+            <li><a href="{{ route('public.how-it-works') }}" class="{{ request()->routeIs('public.how-it-works') ? 'is-active' : '' }}">How It Works</a></li>
             <li><a href="{{ route('landing') }}#pricing">Pricing</a></li>
             <li><a href="{{ route('landing') }}#faq">FAQ</a></li>
         </ul>
@@ -262,6 +305,47 @@
     gets it without touching each layout's @push('scripts').
 --}}
 <script>
+/* Scrolled-state toggle: stronger shadow + deeper bg once the user
+   leaves the hero. Uses rAF throttling so we never churn the layout. */
+(function () {
+    var bar = document.querySelector('.navbar');
+    if (!bar) return;
+    var ticking = false;
+    function update() {
+        bar.classList.toggle('is-scrolled', window.scrollY > 12);
+        ticking = false;
+    }
+    window.addEventListener('scroll', function () {
+        if (!ticking) {
+            window.requestAnimationFrame(update);
+            ticking = true;
+        }
+    }, { passive: true });
+    update();
+})();
+
+/* Close the user + join dropdowns when the user clicks anywhere outside
+   them. Each button has an inline onclick that toggles .open, so we just
+   need to cover the dismiss case here. */
+(function () {
+    document.addEventListener('click', function (e) {
+        ['userDropdown', 'joinDropdown'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el && el.classList.contains('open') && !el.contains(e.target)) {
+                el.classList.remove('open');
+            }
+        });
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            ['userDropdown', 'joinDropdown'].forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) el.classList.remove('open');
+            });
+        }
+    });
+})();
+
 (function () {
     var mega     = document.getElementById('navMega');
     if (!mega) return;

@@ -289,7 +289,7 @@
                     </div>
                     <div>
                         <label class="pf-label">Phone Number</label>
-                        <input type="text" name="phone" class="pf-input" value="{{ old('phone', $user->phone) }}" placeholder="+92 300 1234567">
+                        <input type="text" name="phone" class="pf-input" value="{{ old('phone', $user->phone) }}" placeholder="+1 (555) 123-4567">
                         @error('phone') <div class="pf-error">{{ $message }}</div> @enderror
                     </div>
                     <div>

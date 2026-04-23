@@ -85,32 +85,126 @@
             .login-image-side { display: none; }
         }
 
-        /* ── IMAGE SIDE ── */
+        /* ── TESTIMONIAL SIDE ── */
         .login-image-side {
             position: relative; min-height: 560px;
-            background: url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80') center/cover;
+            background:
+                radial-gradient(1200px 600px at 0% 0%, rgba(59,130,246,0.18) 0%, transparent 55%),
+                radial-gradient(900px 500px at 100% 100%, rgba(139,92,246,0.20) 0%, transparent 60%),
+                linear-gradient(160deg, #101832 0%, #0b0f1a 100%);
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            padding: 44px 36px 32px;
+            color: #fff;
         }
-        .login-image-overlay {
+        .login-image-side::before {
+            content: ''; position: absolute; top: -40%; right: -30%;
+            width: 420px; height: 420px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(139,92,246,0.35), transparent 70%);
+            filter: blur(40px); pointer-events: none;
+        }
+        .login-image-side::after {
+            content: ''; position: absolute; bottom: -30%; left: -20%;
+            width: 380px; height: 380px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(59,130,246,0.30), transparent 70%);
+            filter: blur(40px); pointer-events: none;
+        }
+        .ti-brand-row {
+            position: relative; z-index: 1;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.75);
+            letter-spacing: 0.8px; text-transform: uppercase;
+        }
+        .ti-brand-row .ti-brand-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            box-shadow: 0 0 8px rgba(139,92,246,0.6);
+        }
+        .ti-headline {
+            position: relative; z-index: 1;
+            font-size: 1.55rem; font-weight: 800; line-height: 1.25;
+            margin: 14px 0 18px;
+        }
+        .ti-headline .grad {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .ti-carousel {
+            position: relative; z-index: 1; flex: 1;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .ti-stage {
+            position: relative; min-height: 220px;
+        }
+        .ti-slide {
             position: absolute; inset: 0;
-            background: linear-gradient(180deg, rgba(11,15,26,0.3) 0%, rgba(11,15,26,0.85) 100%);
-            display: flex; flex-direction: column; justify-content: flex-end;
-            padding: 40px 32px;
+            opacity: 0; transform: translateY(8px);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+            pointer-events: none;
         }
-        .login-image-overlay h2 {
-            font-size: 1.5rem; font-weight: 800; margin-bottom: 8px;
+        .ti-slide.is-active { opacity: 1; transform: none; pointer-events: auto; }
+        .ti-stars {
+            color: #fbbf24; font-size: 15px; letter-spacing: 2px;
+            filter: drop-shadow(0 0 6px rgba(251,191,36,0.35));
+            margin-bottom: 12px;
         }
-        .login-image-overlay p {
-            font-size: 14px; color: var(--text-light); line-height: 1.6; margin-bottom: 16px;
+        .ti-quote {
+            font-size: 1rem; line-height: 1.65; color: #e8ebf3;
+            font-weight: 500; margin-bottom: 20px;
         }
-        .login-image-badges {
-            display: flex; gap: 20px;
+        .ti-quote::before {
+            content: '"'; font-family: Georgia, serif;
+            font-size: 3rem; line-height: 0; color: rgba(139,92,246,0.45);
+            vertical-align: -0.45em; margin-right: 4px; font-weight: 900;
         }
-        .login-image-badge {
-            display: flex; align-items: center; gap: 6px;
-            font-size: 13px; font-weight: 600; color: var(--text-light);
+        .ti-person {
+            display: flex; align-items: center; gap: 12px;
         }
-        .login-image-badge:nth-child(1) svg { color: #22c55e; filter: drop-shadow(0 0 4px rgba(34,197,94,0.4)); }
-        .login-image-badge:nth-child(2) svg { color: #f59e0b; filter: drop-shadow(0 0 4px rgba(245,158,11,0.4)); }
+        .ti-avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 15px; color: #fff;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.35), 0 0 0 2px rgba(255,255,255,0.08);
+        }
+        .ti-avatar.bg-0 { background: linear-gradient(135deg, #f97316, #f59e0b); }
+        .ti-avatar.bg-1 { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+        .ti-avatar.bg-2 { background: linear-gradient(135deg, #22c55e, #059669); }
+        .ti-person-meta { display: flex; flex-direction: column; gap: 2px; }
+        .ti-person-name { font-size: 14px; font-weight: 700; color: #fff; }
+        .ti-person-role { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        .ti-person-role .dot { display: inline-block; width: 3px; height: 3px; border-radius: 50%; background: var(--text-muted); vertical-align: middle; margin: 0 6px; }
+
+        .ti-dots {
+            position: relative; z-index: 1;
+            display: flex; gap: 8px; margin-top: 18px;
+        }
+        .ti-dot {
+            width: 22px; height: 4px; border-radius: 2px;
+            background: rgba(255,255,255,0.18); border: none; cursor: pointer;
+            transition: background 0.3s, width 0.3s;
+        }
+        .ti-dot:hover { background: rgba(255,255,255,0.3); }
+        .ti-dot.is-active {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            width: 36px;
+        }
+
+        .ti-stats {
+            position: relative; z-index: 1;
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 12px; margin-top: 28px; padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .ti-stat-value {
+            font-size: 1.1rem; font-weight: 800;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+        }
+        .ti-stat-label {
+            font-size: 11px; color: var(--text-muted); font-weight: 500;
+            letter-spacing: 0.3px; margin-top: 4px;
+        }
 
         /* ── FORM SIDE ── */
         .login-form-side {
@@ -257,20 +351,70 @@
 <!-- ── LOGIN CARD ── -->
 <div class="login-container">
     <div class="login-grid">
-        <!-- Image Side -->
+        <!-- Testimonial Side -->
         <div class="login-image-side">
-            <div class="login-image-overlay">
-                <h2>Welcome back to GigResource</h2>
-                <p>Connect with thousands of professionals and create unforgettable events.</p>
-                <div class="login-image-badges">
-                    <div class="login-image-badge">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                        Verified Professionals
+            <div class="ti-brand-row">
+                <span class="ti-brand-dot"></span> Trusted by 10,000+ pros
+            </div>
+
+            <h2 class="ti-headline">Welcome back —<br>your next <span class="grad">great booking</span> is waiting.</h2>
+
+            <div class="ti-carousel" id="tiCarousel">
+                <div class="ti-stage">
+                    <div class="ti-slide is-active">
+                        <div class="ti-stars">★★★★★</div>
+                        <p class="ti-quote">Found a wedding photographer in under an hour. The verified badge gave me confidence and the final photos were stunning.</p>
+                        <div class="ti-person">
+                            <div class="ti-avatar bg-0">EB</div>
+                            <div class="ti-person-meta">
+                                <div class="ti-person-name">Emma Bennett</div>
+                                <div class="ti-person-role">Client<span class="dot"></span>Austin, TX</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="login-image-badge">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                        Secure Platform
+                    <div class="ti-slide">
+                        <div class="ti-stars">★★★★★</div>
+                        <p class="ti-quote">GigResource tripled my bookings in three months. The review system is honest and clients come in already informed.</p>
+                        <div class="ti-person">
+                            <div class="ti-avatar bg-1">MC</div>
+                            <div class="ti-person-meta">
+                                <div class="ti-person-name">Marcus Cole</div>
+                                <div class="ti-person-role">Event DJ<span class="dot"></span>Nashville, TN</div>
+                            </div>
+                        </div>
                     </div>
+                    <div class="ti-slide">
+                        <div class="ti-stars">★★★★★</div>
+                        <p class="ti-quote">Secure payments, real verification, zero drama. This is how every marketplace should run.</p>
+                        <div class="ti-person">
+                            <div class="ti-avatar bg-2">SR</div>
+                            <div class="ti-person-meta">
+                                <div class="ti-person-name">Sophia Rivera</div>
+                                <div class="ti-person-role">Caterer<span class="dot"></span>Miami, FL</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ti-dots" role="tablist">
+                    <button type="button" class="ti-dot is-active" data-ti="0" aria-label="Testimonial 1"></button>
+                    <button type="button" class="ti-dot" data-ti="1" aria-label="Testimonial 2"></button>
+                    <button type="button" class="ti-dot" data-ti="2" aria-label="Testimonial 3"></button>
+                </div>
+            </div>
+
+            <div class="ti-stats">
+                <div>
+                    <div class="ti-stat-value">10,000+</div>
+                    <div class="ti-stat-label">Verified Pros</div>
+                </div>
+                <div>
+                    <div class="ti-stat-value">4.8★</div>
+                    <div class="ti-stat-label">Average Rating</div>
+                </div>
+                <div>
+                    <div class="ti-stat-value">48h</div>
+                    <div class="ti-stat-label">Avg Response</div>
                 </div>
             </div>
         </div>
@@ -368,6 +512,33 @@ function toggleLoginPw() {
     const input = document.getElementById('login-password');
     input.type = input.type === 'password' ? 'text' : 'password';
 }
+
+// Testimonial carousel — auto-rotate + click-to-jump
+(function() {
+    const carousel = document.getElementById('tiCarousel');
+    if (!carousel) return;
+    const slides = carousel.querySelectorAll('.ti-slide');
+    const dots   = carousel.querySelectorAll('.ti-dot');
+    if (!slides.length) return;
+
+    let index = 0;
+    let timer = null;
+
+    function go(i) {
+        index = (i + slides.length) % slides.length;
+        slides.forEach((s, n) => s.classList.toggle('is-active', n === index));
+        dots.forEach((d, n) => d.classList.toggle('is-active', n === index));
+    }
+    function start() { timer = setInterval(() => go(index + 1), 6000); }
+    function stop()  { if (timer) { clearInterval(timer); timer = null; } }
+
+    dots.forEach(d => d.addEventListener('click', () => {
+        stop(); go(parseInt(d.dataset.ti, 10)); start();
+    }));
+
+    // Respect prefers-reduced-motion
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) start();
+})();
 
 @if($showRecaptcha && $recaptchaSiteKey && $recaptchaVersion === 'v3')
 // reCAPTCHA v3 - auto-fill token on form submit

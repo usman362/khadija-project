@@ -303,7 +303,7 @@
                 </div>
                 <div>
                     <label class="vm-label">Location (optional)</label>
-                    <input type="text" name="location" class="vm-input" maxlength="200" placeholder="e.g. Karachi">
+                    <input type="text" name="location" class="vm-input" maxlength="200" placeholder="e.g. Austin, TX">
                 </div>
                 <div class="vm-full">
                     <label class="vm-label">Event Date (optional)</label>

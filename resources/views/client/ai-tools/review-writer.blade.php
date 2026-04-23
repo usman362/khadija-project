@@ -242,7 +242,7 @@
             <div class="rw-form-grid">
                 <div>
                     <label class="rw-label">Professional / Service Provider *</label>
-                    <input type="text" name="professional_name" class="rw-input" maxlength="120" required placeholder="e.g. Sarah Ahmed Photography">
+                    <input type="text" name="professional_name" class="rw-input" maxlength="120" required placeholder="e.g. Sarah Bennett Photography">
                 </div>
                 <div>
                     <label class="rw-label">Service Type (optional)</label>

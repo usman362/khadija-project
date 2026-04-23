@@ -44,10 +44,18 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            background: rgba(11, 15, 26, 0.85);
-            backdrop-filter: blur(20px);
+            background: rgba(11, 15, 26, 0.72);
+            backdrop-filter: blur(24px) saturate(1.4);
+            -webkit-backdrop-filter: blur(24px) saturate(1.4);
             border-bottom: 1px solid rgba(255,255,255,0.06);
             padding: 0;
+            transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+        /* Stronger shadow + deeper bg once the user scrolls past the hero. */
+        .navbar.is-scrolled {
+            background: rgba(8, 12, 22, 0.92);
+            border-bottom-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
         }
 
         /* Row 1: logo + auth/CTA buttons. */
@@ -58,21 +66,35 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 64px;
+            height: 68px;
         }
 
         /* Row 2: nav links (including the "All Categories" mega trigger).
            Slightly darker strip so it visually reads as a sub-bar, like
-           Alibaba's category rail. */
+           Alibaba's category rail. A thin gradient line separates the
+           two rows for a bit of luxury. */
         .navbar-row-links {
             padding: 0 24px;
             background: rgba(0, 0, 0, 0.22);
-            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            position: relative;
+        }
+        .navbar-row-links::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(59, 130, 246, 0.25) 30%,
+                rgba(139, 92, 246, 0.25) 70%,
+                transparent 100%
+            );
         }
         .navbar-row-links .container {
             display: flex;
             align-items: center;
-            height: 48px;
+            height: 50px;
         }
 
         .navbar-brand {
@@ -81,6 +103,19 @@
             letter-spacing: -0.5px;
             color: #fff;
             text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: transform 0.2s ease, filter 0.2s ease;
+        }
+        .navbar-brand img {
+            filter: drop-shadow(0 2px 8px rgba(59, 130, 246, 0.25));
+            transition: filter 0.2s ease;
+        }
+        .navbar-brand:hover {
+            transform: translateY(-1px);
+        }
+        .navbar-brand:hover img {
+            filter: drop-shadow(0 4px 14px rgba(59, 130, 246, 0.45));
         }
 
         .navbar-brand span {
@@ -90,18 +125,47 @@
         .navbar-links {
             display: flex;
             align-items: center;
-            gap: 28px;
+            gap: 4px;
             list-style: none;
         }
 
-        .navbar-links a {
-            font-size: 0.9rem;
+        .navbar-links > li > a {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.88rem;
             color: var(--text-light);
             font-weight: 500;
-            transition: color 0.2s;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: color 0.2s ease, background 0.2s ease;
         }
-
-        .navbar-links a:hover { color: var(--text-white); }
+        .navbar-links > li > a::after {
+            content: '';
+            position: absolute;
+            left: 14px;
+            right: 14px;
+            bottom: 2px;
+            height: 2px;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            opacity: 0;
+            transform: scaleX(0.4);
+            transform-origin: center;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .navbar-links > li > a:hover {
+            color: var(--text-white);
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .navbar-links > li > a:hover::after,
+        .navbar-links > li > a.is-active::after {
+            opacity: 1;
+            transform: scaleX(1);
+        }
+        .navbar-links > li > a.is-active {
+            color: var(--text-white);
+        }
 
         /* ─── NAV MEGA MENU (Alibaba-style All Categories) ─── */
         /*
@@ -120,20 +184,32 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(139,92,246,0.12));
-            border: 1px solid rgba(59,130,246,0.25);
+            background: linear-gradient(135deg, rgba(59,130,246,0.14), rgba(139,92,246,0.14));
+            border: 1px solid rgba(59,130,246,0.28);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.06),
+                0 2px 10px rgba(59, 130, 246, 0.1);
             color: var(--text-white);
             font-family: inherit;
             font-size: 0.85rem;
             font-weight: 600;
-            padding: 8px 14px;
+            padding: 9px 16px;
+            margin-right: 20px;
             border-radius: 10px;
             cursor: pointer;
-            transition: background 0.2s, border-color 0.2s;
+            transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
         }
         .nav-mega-trigger:hover {
-            background: linear-gradient(135deg, rgba(59,130,246,0.22), rgba(139,92,246,0.22));
-            border-color: rgba(59,130,246,0.45);
+            background: linear-gradient(135deg, rgba(59,130,246,0.26), rgba(139,92,246,0.26));
+            border-color: rgba(59,130,246,0.5);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 4px 16px rgba(59, 130, 246, 0.25);
+            transform: translateY(-1px);
+        }
+        .nav-mega.open .nav-mega-trigger {
+            background: linear-gradient(135deg, rgba(59,130,246,0.32), rgba(139,92,246,0.32));
+            border-color: rgba(139, 92, 246, 0.55);
         }
         .nav-mega-trigger .nmt-burger { width: 16px; height: 16px; }
         .nav-mega-trigger .nmt-chev   { width: 12px; height: 12px; transition: transform 0.2s; }
@@ -374,44 +450,69 @@
             transform: translateY(-1px);
         }
 
-        /* ── Join dropdown ── */
+        /* ── Join dropdown ── Primary CTA with gradient fill + glow. */
         .join-dropdown {
             position: relative;
         }
         .join-dropdown-btn {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 8px 18px;
-            border-radius: 8px;
-            font-size: 0.82rem;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 0.85rem;
             font-weight: 700;
-            border: 1.5px solid var(--primary);
-            color: var(--text-white);
-            background: transparent;
+            border: 1px solid transparent;
+            color: #fff;
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.18),
+                0 6px 20px rgba(59, 130, 246, 0.32);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
             font-family: inherit;
+            letter-spacing: 0.1px;
         }
-        .join-dropdown-btn:hover { background: rgba(59,130,246,0.1); }
+        .join-dropdown-btn::before {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'/><circle cx='8.5' cy='7' r='4'/><line x1='20' y1='8' x2='20' y2='14'/><line x1='23' y1='11' x2='17' y2='11'/></svg>") center/contain no-repeat;
+            flex-shrink: 0;
+        }
+        .join-dropdown-btn:hover {
+            transform: translateY(-1px);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.22),
+                0 10px 28px rgba(59, 130, 246, 0.45);
+            filter: brightness(1.08);
+        }
         .join-dropdown-btn svg { transition: transform 0.2s; }
         .join-dropdown.open .join-dropdown-btn svg { transform: rotate(180deg); }
+        .join-dropdown.open .join-dropdown-btn {
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.22),
+                0 8px 22px rgba(139, 92, 246, 0.4);
+        }
 
         .join-dropdown-menu {
             position: absolute;
-            top: calc(100% + 8px);
+            top: calc(100% + 10px);
             right: 0;
-            min-width: 200px;
-            background: #1a2440;
+            min-width: 220px;
+            background: rgba(20, 26, 46, 0.96);
+            backdrop-filter: blur(20px) saturate(1.4);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 8px 0;
+            border-radius: 12px;
+            padding: 8px;
             opacity: 0;
             visibility: hidden;
             transform: translateY(-8px);
-            transition: all 0.2s;
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
             z-index: 100;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+            box-shadow: 0 20px 48px rgba(0,0,0,0.55);
         }
         .join-dropdown.open .join-dropdown-menu {
             opacity: 1;
@@ -420,15 +521,17 @@
         }
         .join-dropdown-item {
             display: block;
-            padding: 10px 18px;
-            font-size: 0.85rem;
+            padding: 10px 14px;
+            font-size: 0.88rem;
             font-weight: 500;
             color: var(--text-light);
-            transition: all 0.15s;
+            border-radius: 8px;
+            transition: background 0.15s, color 0.15s, padding-left 0.15s;
         }
         .join-dropdown-item:hover {
-            background: rgba(255,255,255,0.06);
+            background: linear-gradient(90deg, rgba(59,130,246,0.12), rgba(139,92,246,0.08));
             color: var(--text-white);
+            padding-left: 18px;
         }
         .navbar-login-link {
             font-size: 0.85rem;
@@ -437,6 +540,198 @@
             transition: color 0.2s;
         }
         .navbar-login-link:hover { color: var(--text-white); }
+
+        /* ── Notifications bell ── */
+        .nav-icon-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-light);
+            transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+        }
+        .nav-icon-btn svg { width: 18px; height: 18px; }
+        .nav-icon-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.18);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+        .nav-icon-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.45);
+            border: 2px solid rgba(11, 15, 26, 0.95);
+            line-height: 1;
+        }
+
+        /* ── User avatar dropdown ── */
+        .user-dropdown {
+            position: relative;
+        }
+        .user-dropdown-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px 4px 4px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, transform 0.2s;
+            font-family: inherit;
+        }
+        .user-dropdown-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+        .user-dropdown.open .user-dropdown-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(139, 92, 246, 0.4);
+        }
+        .user-dropdown-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+        .user-dropdown-chev {
+            transition: transform 0.2s;
+            color: var(--text-light);
+        }
+        .user-dropdown.open .user-dropdown-chev { transform: rotate(180deg); }
+
+        .user-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            min-width: 260px;
+            background: rgba(20, 26, 46, 0.96);
+            backdrop-filter: blur(20px) saturate(1.4);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+            z-index: 100;
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55);
+        }
+        .user-dropdown.open .user-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .user-dropdown-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px 14px;
+            margin-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .user-dropdown-head-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .user-dropdown-head-info { min-width: 0; flex: 1; }
+        .user-dropdown-head-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .user-dropdown-head-email {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .user-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 9px 12px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-light);
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.15s, color 0.15s, padding-left 0.15s;
+        }
+        .user-dropdown-item svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            opacity: 0.7;
+        }
+        .user-dropdown-item:hover {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.12), rgba(139, 92, 246, 0.08));
+            color: #fff;
+            padding-left: 16px;
+        }
+        .user-dropdown-item:hover svg { opacity: 1; }
+        .user-dropdown-item-danger { color: #fca5a5; }
+        .user-dropdown-item-danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #fecaca;
+        }
+        .user-dropdown-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.08);
+            margin: 6px 4px;
+        }
+        .user-dropdown-logout-form { margin: 0; }
+
+        /* Log in button — refined glass outline instead of plain border. */
+        .navbar-actions .btn-outline.btn-sm {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            font-weight: 600;
+            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+        .navbar-actions .btn-outline.btn-sm:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.28);
+            color: #fff;
+            transform: translateY(-1px);
+        }
 
         .mobile-menu-btn {
             display: none;
