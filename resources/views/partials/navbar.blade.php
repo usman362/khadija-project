@@ -282,13 +282,13 @@
                 </div>
             </li>
 
-            <li><a href="{{ route('public.browse') }}" class="{{ request()->routeIs('public.browse') ? 'is-active' : '' }}">Browse Pros</a></li>
+            <li><a href="{{ route('public.browse') }}" class="{{ request()->routeIs('public.browse') ? 'is-active' : '' }}">Browse Professionals</a></li>
             <li><a href="{{ route('about-us') }}" class="{{ request()->routeIs('about-us') ? 'is-active' : '' }}">About Us</a></li>
             <li><a href="{{ route('events-categories') }}" class="{{ request()->routeIs('events-categories') ? 'is-active' : '' }}">Events</a></li>
             <li><a href="{{ route('blog.index') }}" class="{{ request()->routeIs('blog.*') ? 'is-active' : '' }}">Blog</a></li>
             <li><a href="{{ route('public.how-it-works') }}" class="{{ request()->routeIs('public.how-it-works') ? 'is-active' : '' }}">How It Works</a></li>
             <li><a href="{{ route('landing') }}#pricing">Pricing</a></li>
-            <li><a href="{{ route('landing') }}#faq">FAQ</a></li>
+            <li><a href="{{ route('public.faq') }}" class="{{ request()->routeIs('public.faq') ? 'is-active' : '' }}">FAQ</a></li>
         </ul>
         </div>
     </div>

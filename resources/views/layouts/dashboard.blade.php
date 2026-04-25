@@ -242,7 +242,7 @@
                         <li class="nav-item {{ request()->routeIs('app.admin.verifications.*') ? 'active' : '' }}">
                             <a href="{{ route('app.admin.verifications.index') }}" class="nav-link">
                                 <i class="link-icon ic-green" data-lucide="shield-check"></i>
-                                <span class="link-title">Pro Verifications</span>
+                                <span class="link-title">Professional Verifications</span>
                             </a>
                         </li>
                         @endrole

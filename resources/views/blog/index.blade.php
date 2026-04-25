@@ -6,7 +6,7 @@
 <style>
     /* ── Blog list page ── */
     .blog-hero {
-        padding: 150px 0 70px;
+        padding: 180px 0 70px;
         text-align: center;
         position: relative;
         overflow: hidden;
@@ -305,7 +305,7 @@
     }
     @media (max-width: 640px) {
         .blog-hero h1  { font-size: 2rem; }
-        .blog-hero     { padding: 110px 0 40px; }
+        .blog-hero     { padding: 140px 0 40px; }
         .blog-grid     { grid-template-columns: 1fr; }
         .featured-grid { grid-template-columns: 1fr; }
     }

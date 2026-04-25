@@ -5,58 +5,80 @@
 @push('styles')
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">
 <style>
-    /* ─── POLICY CONTENT ──────────────────────────── */
+    /* ─── POLICY HERO BANNER ─────────────────────────────────────
+       Larger trust-forward hero with photographic background +
+       layered radial glows + gradient overlay. The eyebrow pill
+       reinforces the legal/document context. */
     .policy-hero {
         position: relative;
-        padding: 140px 0 60px;
+        padding: 180px 0 90px;
         text-align: center;
         overflow: hidden;
+        margin-bottom: 20px;
     }
     .policy-hero-bg {
-        position: absolute;
-        inset: 0;
+        position: absolute; inset: 0;
         z-index: 0;
     }
     .policy-hero-bg img {
-        width: 100%;
-        height: 100%;
+        width: 100%; height: 100%;
         object-fit: cover;
-        opacity: 0.18;
+        opacity: 0.26;
     }
     .policy-hero-bg::after {
         content: '';
         position: absolute; inset: 0;
-        background: linear-gradient(180deg, rgba(11,15,26,0.7) 0%, rgba(11,15,26,0.95) 80%, var(--bg-dark) 100%);
+        background:
+            radial-gradient(900px 400px at 18% 10%, rgba(59,130,246,0.20), transparent 55%),
+            radial-gradient(800px 380px at 85% 0%, rgba(139,92,246,0.20), transparent 55%),
+            linear-gradient(180deg, rgba(11,15,26,0.55) 0%, rgba(11,15,26,0.92) 80%, var(--bg-dark) 100%);
     }
     .policy-hero .container { position: relative; z-index: 1; }
     .policy-hero::before {
         content: '';
         position: absolute;
         top: -30%; left: 50%; transform: translateX(-50%);
-        width: 600px; height: 600px;
-        background: radial-gradient(circle, rgba(59,130,246,0.1), transparent 70%);
+        width: 700px; height: 700px;
+        background: radial-gradient(circle, rgba(59,130,246,0.12), transparent 70%);
         border-radius: 50%;
         pointer-events: none;
         z-index: 1;
     }
+    .policy-eyebrow {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 6px 16px; border-radius: 999px;
+        background: rgba(59,130,246,0.14);
+        border: 1px solid rgba(59,130,246,0.32);
+        font-size: 11px; font-weight: 800; letter-spacing: 1.2px;
+        text-transform: uppercase; color: #93c5fd;
+        margin-bottom: 22px;
+    }
+    .policy-eyebrow .dot {
+        width: 6px; height: 6px; border-radius: 50%;
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        box-shadow: 0 0 8px rgba(139,92,246,0.6);
+    }
     .policy-hero-icon {
-        width: 64px;
-        height: 64px;
-        margin: 0 auto 20px;
-        border-radius: 16px;
-        background: linear-gradient(135deg, rgba(59,130,246,0.18), rgba(139,92,246,0.18));
-        border: 1px solid rgba(59,130,246,0.3);
+        width: 72px;
+        height: 72px;
+        margin: 0 auto 22px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, rgba(59,130,246,0.25), rgba(139,92,246,0.25));
+        border: 1px solid rgba(139,92,246,0.40);
+        box-shadow: 0 14px 36px rgba(59,130,246,0.30);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--primary);
+        color: #c4b5fd;
     }
-    .policy-hero-icon svg { width: 30px; height: 30px; }
+    .policy-hero-icon svg { width: 34px; height: 34px; }
 
     .policy-hero h1 {
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin-bottom: 8px;
+        font-size: 2.8rem;
+        font-weight: 900;
+        letter-spacing: -0.02em;
+        margin-bottom: 14px;
+        line-height: 1.1;
     }
 
     .policy-hero h1 .gradient-text {
@@ -66,10 +88,25 @@
         background-clip: text;
     }
 
-    .policy-date {
-        color: var(--text-muted);
-        font-size: 0.9rem;
+    .policy-hero p.subtitle {
+        max-width: 580px;
+        margin: 0 auto 18px;
+        color: rgba(255,255,255,0.75);
+        font-size: 1rem;
+        line-height: 1.6;
     }
+
+    .policy-date {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 6px 14px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 999px;
+        color: var(--text-light);
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
+    .policy-date svg { width: 14px; height: 14px; opacity: 0.7; }
 
     .policy-body {
         max-width: 820px;
@@ -307,8 +344,11 @@
 
     /* ─── RESPONSIVE ──────────────────────────── */
     @media (max-width: 768px) {
-        .policy-hero h1 { font-size: 1.75rem; }
-        .policy-hero { padding: 100px 0 30px; }
+        .policy-hero h1 { font-size: 1.85rem; }
+        .policy-hero { padding: 140px 16px 60px; }
+        .policy-hero-icon { width: 60px; height: 60px; border-radius: 16px; }
+        .policy-hero-icon svg { width: 28px; height: 28px; }
+        .policy-hero p.subtitle { font-size: 0.9rem; }
         .esign-box { padding: 24px 20px; }
     }
 </style>
@@ -317,16 +357,39 @@
 @section('content')
 
 <!-- ─── HERO ───────────────────────────────── -->
+@php
+    // Per-policy hero subtitle and contextual eyebrow label so each
+    // legal page feels distinct rather than a generic shell.
+    $policyMeta = [
+        'privacy_policy'      => ['eyebrow' => 'Privacy Policy',     'subtitle' => 'Transparent details on what we collect, how we use it, and the choices you have over your data.'],
+        'ai_usage_agreement'  => ['eyebrow' => 'AI Usage Agreement', 'subtitle' => 'How GigResource uses AI features responsibly — and the rules every user agrees to before using them.'],
+        'terms_of_service'    => ['eyebrow' => 'Terms of Service',   'subtitle' => 'The rules of engagement for clients, GigProfessionals, and Influencers using the platform.'],
+        'payment_policy'      => ['eyebrow' => 'Payment Policy',     'subtitle' => 'How payments, refunds, and disputes are handled across bookings and memberships.'],
+        'cancellation_policy' => ['eyebrow' => 'Cancellation & Refund', 'subtitle' => 'When and how clients and professionals can cancel — and what happens to the funds in escrow.'],
+    ];
+    $meta = $policyMeta[$policyType ?? ''] ?? [
+        'eyebrow'  => 'Legal Document',
+        'subtitle' => 'Please read this document carefully to understand your rights and responsibilities on the platform.',
+    ];
+@endphp
+
 <section class="policy-hero">
     <div class="policy-hero-bg">
-        <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1600&q=80&auto=format&fit=crop" alt="Documents and papers" loading="eager">
+        <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1600&q=80&auto=format&fit=crop" alt="" loading="eager">
     </div>
     <div class="container">
+        <div class="policy-eyebrow">
+            <span class="dot"></span> {{ $meta['eyebrow'] }}
+        </div>
         <div class="policy-hero-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <h1><span class="gradient-text">{{ $policy->title ?? $fallbackTitle }}</span></h1>
-        <p class="policy-date">Last updated: {{ $policy ? $policy->updated_at->format('F j, Y') : now()->format('F j, Y') }}</p>
+        <p class="subtitle">{{ $meta['subtitle'] }}</p>
+        <span class="policy-date">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Last updated: {{ $policy ? $policy->updated_at->format('F j, Y') : now()->format('F j, Y') }}
+        </span>
     </div>
 </section>
 

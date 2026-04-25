@@ -891,7 +891,7 @@
                             </div>
                             <div>
                                 <div style="font-size:15px;font-weight:700;color:var(--text-primary);">Client Mode</div>
-                                <div style="font-size:12px;color:var(--text-muted);">Post events, hire pros</div>
+                                <div style="font-size:12px;color:var(--text-muted);">Post events, hire professionals</div>
                             </div>
                         </div>
                         @if($activeMode === 'client')

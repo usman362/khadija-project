@@ -4,61 +4,85 @@
 
 @push('styles')
 <style>
+    /* ─── HERO BANNER ────────────────────────────────────────────
+       Magazine-style cover: featured image fills the banner with
+       darkening gradient + dual radial glows so the title stays
+       legible. Falls back to a coloured gradient when there's no
+       featured image. */
     .post-hero {
-        padding: 120px 0 40px;
-        max-width: 820px;
-        margin: 0 auto;
+        position: relative;
+        padding: 180px 0 70px;
         text-align: center;
+        overflow: hidden;
+        margin-bottom: 40px;
+    }
+    .post-hero-bg {
+        position: absolute; inset: 0;
+        z-index: 0;
+        background: #0b0f1a;
+    }
+    .post-hero-bg img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        opacity: 0.35;
+        filter: saturate(1.05);
+    }
+    .post-hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        z-index: 1;
+        background:
+            radial-gradient(900px 400px at 18% 0%, rgba(59,130,246,0.28), transparent 55%),
+            radial-gradient(800px 380px at 85% 0%, rgba(139,92,246,0.28), transparent 55%),
+            linear-gradient(180deg, rgba(11,15,26,0.55) 0%, rgba(11,15,26,0.78) 70%, var(--bg-dark) 100%);
+        pointer-events: none;
+    }
+    .post-hero .container {
+        position: relative; z-index: 2;
+        max-width: 880px; margin: 0 auto;
     }
     .post-cat {
         display: inline-block;
-        padding: 4px 14px;
-        background: rgba(99,102,241,0.15);
-        color: #a5b4fc;
-        border-radius: 30px;
+        padding: 6px 16px;
+        background: rgba(139,92,246,0.18);
+        color: #c4b5fd;
+        border: 1px solid rgba(139,92,246,0.35);
+        border-radius: 999px;
         font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 16px;
-    }
-    .post-hero h1 {
-        font-size: 2.5rem;
         font-weight: 800;
-        line-height: 1.2;
-        letter-spacing: -1px;
-        color: var(--text-white);
-        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 22px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .post-cat:hover { background: rgba(139,92,246,0.30); transform: translateY(-1px); }
+    .post-hero h1 {
+        font-size: 3rem;
+        font-weight: 900;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+        color: #fff;
+        margin-bottom: 26px;
+        text-shadow: 0 4px 30px rgba(0,0,0,0.5);
     }
     .post-meta {
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 20px;
+        gap: 16px;
         flex-wrap: wrap;
-        font-size: 0.85rem;
-        color: var(--text-muted);
+        font-size: 0.9rem;
+        color: rgba(255,255,255,0.85);
     }
-    .post-meta-item { display: flex; align-items: center; gap: 6px; }
+    .post-meta-item { display: flex; align-items: center; gap: 8px; }
     .post-meta-item svg { width: 14px; height: 14px; }
+    .post-meta > span { color: rgba(255,255,255,0.4); }
     .post-author-img {
-        width: 28px; height: 28px;
+        width: 30px; height: 30px;
         border-radius: 50%;
         object-fit: cover;
-    }
-
-    .post-featured {
-        max-width: 1000px;
-        margin: 40px auto 0;
-        padding: 0 24px;
-    }
-    .post-featured img {
-        width: 100%;
-        height: auto;
-        max-height: 500px;
-        object-fit: cover;
-        border-radius: 20px;
-        border: 1px solid var(--border-color);
+        border: 2px solid rgba(255,255,255,0.25);
     }
 
     .post-body {
@@ -191,8 +215,9 @@
     }
 
     @media (max-width: 768px) {
-        .post-hero     { padding: 100px 20px 30px; }
-        .post-hero h1  { font-size: 1.75rem; }
+        .post-hero     { padding: 140px 20px 50px; margin-bottom: 24px; }
+        .post-hero h1  { font-size: 1.85rem; }
+        .post-meta     { gap: 10px; font-size: 0.82rem; }
         .post-body     { padding: 40px 20px 60px; font-size: 0.95rem; }
         .related-grid  { grid-template-columns: 1fr; }
     }
@@ -202,6 +227,14 @@
 @section('content')
 
 <section class="post-hero">
+    {{-- Featured image as the banner background. Falls back to a
+         clean coloured gradient when the post has no image set. --}}
+    @if($post->featured_image)
+        <div class="post-hero-bg">
+            <img src="{{ $post->featuredImageUrl() }}" alt="" loading="eager">
+        </div>
+    @endif
+
     <div class="container">
         @if($post->category)
             <a href="{{ route('blog.index', ['category' => $post->category->slug]) }}" class="post-cat">{{ $post->category->name }}</a>
@@ -210,7 +243,7 @@
         <div class="post-meta">
             @if($post->author)
                 <div class="post-meta-item">
-                    <img src="{{ $post->author->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode($post->author->name) }}" class="post-author-img">
+                    <img src="{{ $post->author->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode($post->author->name) }}" class="post-author-img" alt="">
                     <span>{{ $post->author->name }}</span>
                 </div>
                 <span>·</span>
@@ -232,12 +265,6 @@
         </div>
     </div>
 </section>
-
-@if($post->featured_image)
-<div class="post-featured">
-    <img src="{{ $post->featuredImageUrl() }}" alt="{{ $post->title }}">
-</div>
-@endif
 
 <article class="post-body">
     {!! $post->content !!}

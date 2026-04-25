@@ -5,7 +5,7 @@
 @push('styles')
 <style>
     .inf-hero {
-        padding: 160px 0 100px;
+        padding: 180px 0 100px;
         background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
         text-align: center;
         position: relative;
@@ -148,6 +148,7 @@
     }
     @media (max-width: 560px) {
         .inf-grid-4 { grid-template-columns: 1fr; }
+        .inf-hero { padding: 140px 0 70px; }
     }
 
     .inf-card {

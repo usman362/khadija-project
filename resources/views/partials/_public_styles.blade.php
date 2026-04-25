@@ -747,7 +747,9 @@
             min-height: 100vh;
             display: flex;
             align-items: center;
-            padding-top: 72px;
+            /* Bumped from 72px so the eyebrow/headline never sits flush
+               against the fixed 68px navbar even at short viewports. */
+            padding-top: 110px;
             overflow: hidden;
         }
 

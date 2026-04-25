@@ -395,7 +395,7 @@
                         <label class="rv-label" for="rv-comment">Your Review</label>
                         <textarea class="rv-textarea" id="rv-comment" name="comment" rows="5" required
                                   minlength="10" maxlength="2000"
-                                  placeholder="What went well? Would you hire this pro again?"></textarea>
+                                  placeholder="What went well? Would you hire this professional again?"></textarea>
                     </div>
                     <div class="rv-modal-foot">
                         <button type="button" class="cl-btn cl-btn-ghost cl-btn-sm" onclick="closeReviewModal()">Cancel</button>

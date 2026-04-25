@@ -596,7 +596,7 @@
     <nav class="pp-breadcrumb" aria-label="Breadcrumb">
         <a href="{{ route('landing') }}">Home</a>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        <a href="{{ route('public.browse') }}">Browse Pros</a>
+        <a href="{{ route('public.browse') }}">Browse Professionals</a>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         <span class="current">{{ $pro->name }}</span>
     </nav>
@@ -924,7 +924,7 @@
             <div class="pp-similar-head">
                 <h2>
                     @if($profile->city)
-                        Other pros in {{ $profile->city }}
+                        Other professionals in {{ $profile->city }}
                     @else
                         Similar professionals
                     @endif

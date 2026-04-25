@@ -354,7 +354,7 @@
         <!-- Testimonial Side -->
         <div class="login-image-side">
             <div class="ti-brand-row">
-                <span class="ti-brand-dot"></span> Trusted by 10,000+ pros
+                <span class="ti-brand-dot"></span> Trusted by 10,000+ professionals
             </div>
 
             <h2 class="ti-headline">Welcome back —<br>your next <span class="grad">great booking</span> is waiting.</h2>
@@ -406,7 +406,7 @@
             <div class="ti-stats">
                 <div>
                     <div class="ti-stat-value">10,000+</div>
-                    <div class="ti-stat-label">Verified Pros</div>
+                    <div class="ti-stat-label">Verified Professionals</div>
                 </div>
                 <div>
                     <div class="ti-stat-value">4.8★</div>

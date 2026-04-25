@@ -122,6 +122,15 @@ Route::view('/events-categories', 'events-categories')->name('events-categories'
 Route::get('/blog',          [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{post}',   [BlogController::class, 'show'])->name('blog.show');
 
+// Public FAQ — pulls active FAQs from the same store the admin manages.
+Route::get('/faq', function () {
+    $faqs = \App\Models\Faq::active()->ordered()->get();
+    // Group by category so the page can render category sections.
+    // Items without a category fall under "General".
+    $grouped = $faqs->groupBy(fn ($f) => $f->category ?: 'General');
+    return view('public.faq', compact('faqs', 'grouped'));
+})->name('public.faq');
+
 Auth::routes();
 
 // Policy E-Signature (auth required)

@@ -205,22 +205,10 @@
         object-fit: cover;
     }
 
-    /* ─── HOW IT WORKS BG ─────────────────── */
-    #how-it-works { position: relative; overflow: hidden; }
-    #how-it-works::before {
-        content: '';
-        position: absolute;
-        top: 10%; right: -200px;
-        width: 500px; height: 500px;
-        background: radial-gradient(circle, rgba(139,92,246,0.08), transparent 70%);
-        border-radius: 50%;
-        pointer-events: none;
-    }
-
     /* ══════════════════════════════════════════════════════
        GIGSALAD-INSPIRED ADDITIONS
-       Hero trust pill + search + category chips, mock booking
-       card for "How It Works", and the A-Z category expander.
+       Hero trust pill + search + category chips, and the
+       A-Z category expander.
        Dark theme is preserved — warm coral/peach is used as
        the playful accent against the existing navy base.
        ══════════════════════════════════════════════════════ */
@@ -384,240 +372,6 @@
     .hero-collage .tile.t3 { transform: rotate(2deg) translateY(-10px); }
     .hero-collage .tile.t4 { transform: rotate(-5deg) translateY(10px); }
     @media (max-width: 1100px) { .hero-collage { display: none; } }
-
-    /* ── HOW IT WORKS — 3 steps with mock booking card ── */
-    .hiw-steps {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 32px;
-        margin-top: 48px;
-    }
-    @media (max-width: 900px) { .hiw-steps { grid-template-columns: 1fr; } }
-
-    .hiw-step {
-        background: var(--bg-card);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 20px;
-        padding: 28px;
-        position: relative;
-        overflow: hidden;
-    }
-    .hiw-step-badge {
-        display: inline-block;
-        padding: 4px 12px;
-        background: rgba(255, 122, 89, 0.15);
-        color: var(--warm-peach);
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        border-radius: 6px;
-        margin-bottom: 14px;
-    }
-    .hiw-step h3 {
-        font-size: 1.35rem;
-        font-weight: 700;
-        margin-bottom: 10px;
-    }
-    .hiw-step p {
-        color: var(--text-muted);
-        font-size: 0.95rem;
-        line-height: 1.55;
-        margin-bottom: 20px;
-    }
-    .hiw-step-art {
-        background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(139,92,246,0.08));
-        border-radius: 14px;
-        padding: 20px;
-        min-height: 180px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    /* Mini pro cards inside Step 1 */
-    .hiw-mini-cards { display: flex; flex-direction: column; gap: 10px; }
-    .hiw-mini-card {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        padding: 10px 12px;
-    }
-    .hiw-mini-card .avatar {
-        width: 36px; height: 36px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--warm-coral), var(--warm-peach));
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        font-weight: 700;
-        font-size: 0.85rem;
-    }
-    .hiw-mini-card .body { flex: 1; min-width: 0; }
-    .hiw-mini-card .name { font-weight: 600; font-size: 0.9rem; color: #fff; }
-    .hiw-mini-card .loc { font-size: 0.78rem; color: var(--text-muted); }
-    .hiw-mini-card .rating { display: flex; align-items: center; gap: 3px; color: #ffb648; font-size: 0.78rem; font-weight: 600; }
-
-    /* The signature mock-receipt booking card in Step 2 */
-    .hiw-receipt {
-        background: #fff;
-        color: #1a1f2e;
-        border-radius: 12px;
-        padding: 18px;
-        font-family: inherit;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    }
-    .hiw-receipt-head { display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid #eef0f4; }
-    .hiw-receipt-head .avatar {
-        width: 44px; height: 44px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--warm-coral), var(--warm-peach));
-        color: #fff;
-        display: flex; align-items: center; justify-content: center;
-        font-weight: 700;
-    }
-    .hiw-receipt-head .name { font-weight: 700; font-size: 0.95rem; }
-    .hiw-receipt-head .role { font-size: 0.8rem; color: #6b7280; }
-    .hiw-receipt-row {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 10px 0;
-        font-size: 0.82rem;
-    }
-    .hiw-receipt-row .k { color: #6b7280; }
-    .hiw-receipt-row .v { font-weight: 600; color: #1a1f2e; }
-    .hiw-receipt-total {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 14px 0 4px;
-        border-top: 1px solid #eef0f4;
-        margin-top: 6px;
-    }
-    .hiw-receipt-total .k { font-size: 0.78rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
-    .hiw-receipt-total .v { font-size: 1.35rem; font-weight: 800; color: #1a1f2e; }
-    .hiw-receipt-btn {
-        width: 100%;
-        padding: 10px;
-        background: linear-gradient(135deg, var(--warm-coral), var(--warm-coral-dark));
-        color: #fff;
-        border: none;
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        margin-top: 10px;
-        cursor: pointer;
-    }
-
-    /* Celebration visual for Step 3 — a polaroid-style "memory card"
-       with a 5-star review snippet, floating confetti, and a soft glow.
-       Matches the receipt card vibe from Step 2 (white premium card on
-       dark section) so the three steps visually harmonise. */
-    .hiw-celebrate {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        min-height: 220px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    /* Soft warm glow behind the card */
-    .hiw-celebrate::before {
-        content: '';
-        position: absolute;
-        inset: 10% 15%;
-        background: radial-gradient(circle, rgba(255, 122, 89, 0.22), transparent 70%);
-        filter: blur(24px);
-        pointer-events: none;
-    }
-    .hiw-memory {
-        position: relative;
-        width: 100%;
-        max-width: 260px;
-        background: #fff;
-        border-radius: 14px;
-        padding: 10px 10px 14px;
-        box-shadow:
-            0 20px 40px rgba(0, 0, 0, 0.25),
-            0 2px 6px rgba(0, 0, 0, 0.15);
-        transform: rotate(-3deg);
-        transition: transform 0.3s ease;
-    }
-    .hiw-memory:hover { transform: rotate(0deg) translateY(-4px); }
-    .hiw-memory-photo {
-        width: 100%;
-        height: 140px;
-        border-radius: 10px;
-        background-image:
-            linear-gradient(135deg, rgba(255, 122, 89, 0.25), rgba(139, 92, 246, 0.35)),
-            url('https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80&auto=format&fit=crop');
-        background-size: cover;
-        background-position: center;
-        position: relative;
-        overflow: hidden;
-    }
-    .hiw-memory-photo::after {
-        /* sparkle in top-right of photo */
-        content: '✨';
-        position: absolute;
-        top: 8px;
-        right: 10px;
-        font-size: 1.1rem;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
-    }
-    .hiw-memory-body {
-        padding: 12px 6px 2px;
-    }
-    .hiw-memory-stars {
-        display: flex;
-        gap: 2px;
-        color: #ffb648;
-        font-size: 0.85rem;
-        margin-bottom: 4px;
-    }
-    .hiw-memory-quote {
-        font-family: 'Georgia', 'Times New Roman', serif;
-        font-style: italic;
-        font-size: 0.88rem;
-        color: #1a1f2e;
-        line-height: 1.4;
-        margin-bottom: 8px;
-    }
-    .hiw-memory-foot {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 0.72rem;
-        color: #6b7280;
-        padding-top: 8px;
-        border-top: 1px dashed #e5e7eb;
-    }
-    .hiw-memory-foot .who { font-weight: 600; color: #374151; }
-
-    /* Confetti dots scattered around the memory card. Each dot gets a
-       unique position + color + rotation via inline style in the markup. */
-    .hiw-confetti-layer {
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-    }
-    .hiw-confetti-layer .dot {
-        position: absolute;
-        width: 8px;
-        height: 8px;
-        border-radius: 2px;
-        opacity: 0.9;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    }
-    .hiw-confetti-layer .dot.round { border-radius: 50%; }
-    .hiw-confetti-layer .dot.streak {
-        width: 3px;
-        height: 14px;
-        border-radius: 2px;
-    }
 
     /* ── A-Z CATEGORY BROWSE GRID ── */
     .az-section { padding: 100px 0; position: relative; overflow: hidden; }
@@ -900,8 +654,8 @@
             @auth
                 <a href="{{ url('/dashboard') }}" class="btn btn-primary btn-lg">Go to Dashboard</a>
             @else
-                <a href="{{ route('register', ['role' => 'supplier']) }}" class="btn btn-blue btn-lg">Join as Professional</a>
-                <a href="{{ route('register', ['role' => 'client']) }}" class="btn btn-red btn-lg">Hire Now</a>
+                <a href="{{ route('register', ['role' => 'client']) }}" class="btn btn-blue btn-lg">Start Planning</a>
+                <a href="{{ route('register', ['role' => 'supplier']) }}" class="btn btn-red btn-lg">List Your Services</a>
             @endauth
         </div>
 
@@ -1123,158 +877,6 @@
 </section>
 @endif
 
-<!-- ─── HOW IT WORKS ──────────────────────────── -->
-{{--
-    Three-step flow inspired by GigSalad. Each card has supporting visual
-    art that previews the actual product experience:
-      • Step 1 — mini pro cards (what browsing feels like)
-      • Step 2 — a mock booking receipt card (signature trust move)
-      • Step 3 — celebration confetti (payoff)
---}}
-<section class="section" id="how-it-works">
-    <div class="container">
-        <div class="section-header">
-            <h2>How it <span class="gradient-text">works</span></h2>
-            <p>Book the best. Exceptional professionals are just a few clicks away.</p>
-        </div>
-
-        <div class="hiw-steps">
-            <!-- Step 1: Browse and compare -->
-            <div class="hiw-step">
-                <span class="hiw-step-badge">Step 1</span>
-                <h3>Browse &amp; compare</h3>
-                <p>Discover verified event pros in your city. Compare ratings, portfolios, pricing — all on one card.</p>
-                <div class="hiw-step-art">
-                    <div class="hiw-mini-cards">
-                        <div class="hiw-mini-card">
-                            <div class="avatar">EB</div>
-                            <div class="body">
-                                <div class="name">Emma — Wedding Photographer</div>
-                                <div class="loc">Los Angeles, CA</div>
-                            </div>
-                            <div class="rating">
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                4.9
-                            </div>
-                        </div>
-                        <div class="hiw-mini-card">
-                            <div class="avatar">MC</div>
-                            <div class="body">
-                                <div class="name">Marcus — Event DJ</div>
-                                <div class="loc">Austin, TX</div>
-                            </div>
-                            <div class="rating">
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                4.8
-                            </div>
-                        </div>
-                        <div class="hiw-mini-card">
-                            <div class="avatar">SR</div>
-                            <div class="body">
-                                <div class="name">Sophia — Caterer</div>
-                                <div class="loc">Miami, FL</div>
-                            </div>
-                            <div class="rating">
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                5.0
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 2: Book securely (mock receipt) -->
-            <div class="hiw-step">
-                <span class="hiw-step-badge">Step 2</span>
-                <h3>Book securely</h3>
-                <p>Confirm your booking with payment protection, real-time messaging, and hassle-free cancellation.</p>
-                <div class="hiw-step-art">
-                    <div class="hiw-receipt">
-                        <div class="hiw-receipt-head">
-                            <div class="avatar">EB</div>
-                            <div>
-                                <div class="name">Emma B.</div>
-                                <div class="role">Wedding Photographer</div>
-                            </div>
-                        </div>
-                        <div class="hiw-receipt-row">
-                            <span class="k">Date</span>
-                            <span class="v">Sat, Jun 14</span>
-                        </div>
-                        <div class="hiw-receipt-row">
-                            <span class="k">Time</span>
-                            <span class="v">4:00 PM – 9:00 PM</span>
-                        </div>
-                        <div class="hiw-receipt-row">
-                            <span class="k">Location</span>
-                            <span class="v">Los Angeles, CA</span>
-                        </div>
-                        <div class="hiw-receipt-total">
-                            <span class="k">Total due</span>
-                            <span class="v">$555</span>
-                        </div>
-                        <button type="button" class="hiw-receipt-btn">Confirm booking</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Step 3: Enjoy your event -->
-            <div class="hiw-step">
-                <span class="hiw-step-badge">Step 3</span>
-                <h3>Enjoy your event</h3>
-                <p>Watch your moment come to life. Leave a review after — help the next planner book with confidence.</p>
-                <div class="hiw-step-art">
-                    <div class="hiw-celebrate">
-                        {{-- Scattered confetti dots behind + around the card --}}
-                        <div class="hiw-confetti-layer" aria-hidden="true">
-                            @php
-                                $confetti = [
-                                    ['top' => '6%',  'left' => '8%',  'color' => '#ff7a59', 'shape' => '',       'rot' => 18],
-                                    ['top' => '14%', 'left' => '88%', 'color' => '#8b5cf6', 'shape' => 'round',  'rot' => 0],
-                                    ['top' => '3%',  'left' => '52%', 'color' => '#ffb648', 'shape' => 'streak', 'rot' => -12],
-                                    ['top' => '30%', 'left' => '2%',  'color' => '#06b6d4', 'shape' => 'round',  'rot' => 0],
-                                    ['top' => '52%', 'left' => '94%', 'color' => '#ec4899', 'shape' => '',       'rot' => 32],
-                                    ['top' => '80%', 'left' => '6%',  'color' => '#22c55e', 'shape' => 'streak', 'rot' => 24],
-                                    ['top' => '88%', 'left' => '78%', 'color' => '#ff7a59', 'shape' => 'round',  'rot' => 0],
-                                    ['top' => '68%', 'left' => '92%', 'color' => '#ffb08a', 'shape' => '',       'rot' => -18],
-                                    ['top' => '92%', 'left' => '42%', 'color' => '#8b5cf6', 'shape' => 'streak', 'rot' => 60],
-                                    ['top' => '22%', 'left' => '18%', 'color' => '#f59e0b', 'shape' => 'round',  'rot' => 0],
-                                ];
-                            @endphp
-                            @foreach($confetti as $c)
-                                <span class="dot {{ $c['shape'] }}"
-                                      style="top: {{ $c['top'] }}; left: {{ $c['left'] }}; background: {{ $c['color'] }}; transform: rotate({{ $c['rot'] }}deg);"></span>
-                            @endforeach
-                        </div>
-
-                        {{-- The polaroid memory card with 5-star review --}}
-                        <div class="hiw-memory">
-                            <div class="hiw-memory-photo"></div>
-                            <div class="hiw-memory-body">
-                                <div class="hiw-memory-stars" aria-label="5 out of 5 stars">★★★★★</div>
-                                <p class="hiw-memory-quote">"Absolutely magical night — couldn't have asked for more."</p>
-                                <div class="hiw-memory-foot">
-                                    <span class="who">Emma &amp; Jake</span>
-                                    <span>Wedding · 2025</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div style="text-align: center; margin-top: 48px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
-            @auth
-                <a href="{{ url('/dashboard') }}" class="btn btn-primary btn-lg">Go to Dashboard</a>
-            @else
-                <a href="{{ route('register', ['role' => 'client']) }}" class="btn btn-primary btn-lg">Start planning</a>
-                <a href="{{ route('register', ['role' => 'supplier']) }}" class="btn btn-outline btn-lg">List your services</a>
-            @endauth
-        </div>
-    </div>
-</section>
-
 <!-- ─── CTA BANNER ────────────────────────────── -->
 <section class="section section-alt">
     <div class="container">
@@ -1424,7 +1026,7 @@
     <div class="container">
         <div class="section-header">
             <h2>What our customers are saying</h2>
-            <p>Real reviews from planners and pros — straight from the platform.</p>
+            <p>Real reviews from planners and professionals — straight from the platform.</p>
         </div>
 
         {{-- If we have a real 5-star review in the DB, surface it as the
@@ -1444,7 +1046,7 @@
                 <div class="testimonial-author" style="justify-content: center;">
                     <div>
                         <div class="testimonial-author-name">{{ $featuredReview->reviewer?->name ?? 'A GigResource customer' }}</div>
-                        <div class="testimonial-author-role">on booking with {{ $featuredReview->reviewee?->name ?? 'a pro' }}</div>
+                        <div class="testimonial-author-role">on booking with {{ $featuredReview->reviewee?->name ?? 'a professional' }}</div>
                     </div>
                 </div>
             </div>

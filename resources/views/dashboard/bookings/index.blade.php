@@ -102,7 +102,7 @@
                                                 name="include_chat"
                                                 id="includeChat{{ $booking->id }}">
                                             <label class="form-check-label" for="includeChat{{ $booking->id }}">
-                                                <strong>Include pro chat in my agreement</strong>
+                                                <strong>Include professional chat in my agreement</strong>
                                             </label>
                                             <div class="form-text">
                                                 The AI will use your conversation with the pro when building your final document — pulling in dates, prices, and specifics you discussed. Uncheck to generate a clean, standard agreement from booking details only.

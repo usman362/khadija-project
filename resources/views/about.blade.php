@@ -7,7 +7,7 @@
     /* ─── HERO SECTION ──────────────────────────── */
     .about-hero {
         position: relative;
-        padding: 160px 0 100px;
+        padding: 180px 0 100px;
         text-align: center;
         overflow: hidden;
     }
@@ -557,7 +557,7 @@
 
     @media (max-width: 768px) {
         .about-hero h1 { font-size: 2.25rem; }
-        .about-hero { padding: 110px 0 50px; }
+        .about-hero { padding: 140px 0 50px; }
         .about-hero p { font-size: 1rem; }
         .stats-bar { grid-template-columns: repeat(2, 1fr); border-radius: 12px; }
         .stat-item { padding: 20px 12px; }

@@ -22,13 +22,13 @@
             <div class="footer-col">
                 <h4>Explore</h4>
                 <ul>
-                    <li><a href="{{ route('public.browse') }}">Browse Pros</a></li>
+                    <li><a href="{{ route('public.browse') }}">Browse Professionals</a></li>
                     <li><a href="{{ route('about-us') }}">About Us</a></li>
                     <li><a href="{{ route('events-categories') }}">Events</a></li>
                     <li><a href="{{ route('blog.index') }}">Blog</a></li>
                     <li><a href="{{ route('public.how-it-works') }}">How It Works</a></li>
                     <li><a href="{{ route('landing') }}#pricing">Pricing</a></li>
-                    <li><a href="{{ route('landing') }}#faq">FAQ</a></li>
+                    <li><a href="{{ route('public.faq') }}">FAQ</a></li>
                 </ul>
             </div>
             <div class="footer-col">
