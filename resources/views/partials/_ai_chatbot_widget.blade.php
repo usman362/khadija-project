@@ -46,10 +46,34 @@
             <div class="aic-welcome-title">Hi {{ auth()->user()->name }}! 👋</div>
             <div class="aic-welcome-text">How can I help you today?</div>
             <div class="aic-suggestions">
-                <button type="button" class="aic-suggestion" data-msg="How do I post an event?">How do I post an event?</button>
-                <button type="button" class="aic-suggestion" data-msg="How does the influencer program work?">How does the influencer program work?</button>
-                <button type="button" class="aic-suggestion" data-msg="What are the commission tiers?">What are the commission tiers?</button>
-                <button type="button" class="aic-suggestion" data-msg="How do I switch between client and professional mode?">Switch between client/professional mode</button>
+                <button type="button" class="aic-suggestion" data-msg="How do I post a wedding event?">
+                    <span class="aic-suggestion-emoji">💍</span>
+                    <span class="aic-suggestion-text">How do I post a wedding event?</span>
+                </button>
+                <button type="button" class="aic-suggestion" data-msg="What categories of professionals can I find?">
+                    <span class="aic-suggestion-emoji">🎉</span>
+                    <span class="aic-suggestion-text">What categories of professionals can I find?</span>
+                </button>
+                <button type="button" class="aic-suggestion" data-msg="How does the influencer program work?">
+                    <span class="aic-suggestion-emoji">📣</span>
+                    <span class="aic-suggestion-text">How does the influencer program work?</span>
+                </button>
+                <button type="button" class="aic-suggestion" data-msg="What are the commission tiers?">
+                    <span class="aic-suggestion-emoji">💰</span>
+                    <span class="aic-suggestion-text">What are the commission tiers?</span>
+                </button>
+                <button type="button" class="aic-suggestion" data-msg="How do I plan a corporate event?">
+                    <span class="aic-suggestion-emoji">🏢</span>
+                    <span class="aic-suggestion-text">How do I plan a corporate event?</span>
+                </button>
+                <button type="button" class="aic-suggestion" data-msg="Help me find a DJ for my birthday party">
+                    <span class="aic-suggestion-emoji">🎂</span>
+                    <span class="aic-suggestion-text">Find a DJ for my birthday party</span>
+                </button>
+                <button type="button" class="aic-suggestion" data-msg="How do I switch between client and professional mode?">
+                    <span class="aic-suggestion-emoji">🔄</span>
+                    <span class="aic-suggestion-text">Switch between client/professional mode</span>
+                </button>
             </div>
         </div>
         <div id="aicMessages" class="aic-messages"></div>
@@ -69,7 +93,38 @@
     </div>
 
     <div class="aic-footer">
+        {{-- Attached file/photo previews live above the input row.
+             Each preview chip can be removed individually before send. --}}
+        <div class="aic-attachments" id="aicAttachments" hidden></div>
+
+        {{-- Emoji picker — appears above the input when toggled. --}}
+        <div class="aic-emoji-panel" id="aicEmojiPanel" aria-hidden="true">
+            <div class="aic-emoji-tabs" id="aicEmojiTabs">
+                <button type="button" class="aic-emoji-tab is-active" data-emoji-cat="events" title="Events">🎉</button>
+                <button type="button" class="aic-emoji-tab" data-emoji-cat="people" title="People">😊</button>
+                <button type="button" class="aic-emoji-tab" data-emoji-cat="food" title="Food">🍰</button>
+                <button type="button" class="aic-emoji-tab" data-emoji-cat="symbols" title="Symbols">❤️</button>
+                <button type="button" class="aic-emoji-tab" data-emoji-cat="objects" title="Objects">🎁</button>
+            </div>
+            <div class="aic-emoji-grid" id="aicEmojiGrid">
+                {{-- Populated by JS based on active category --}}
+            </div>
+        </div>
+
         <div class="aic-input-row">
+            {{-- File / photo upload trigger (hidden file input + visible button) --}}
+            <input type="file" id="aicFileInput" multiple
+                   accept="image/*,.pdf,.doc,.docx,.txt"
+                   style="display:none;">
+            <button type="button" class="aic-icon-action" id="aicAttachBtn" title="Attach file or photo" aria-label="Attach file or photo">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+            </button>
+
+            {{-- Emoji picker trigger --}}
+            <button type="button" class="aic-icon-action" id="aicEmojiBtn" title="Emoji" aria-label="Insert emoji" aria-expanded="false">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </button>
+
             <textarea id="aicInput" class="aic-input" rows="1" placeholder="Type your message…" maxlength="4000"></textarea>
             <button type="button" class="aic-send-btn" id="aicSendBtn" disabled>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
@@ -184,6 +239,7 @@
     .aic-welcome-text { font-size: 13px; color: #94a3b8; margin-bottom: 20px; }
     .aic-suggestions { display: flex; flex-direction: column; gap: 8px; }
     .aic-suggestion {
+        display: flex; align-items: center; gap: 10px;
         padding: 10px 14px;
         background: rgba(255,255,255,0.04);
         border: 1px solid rgba(255,255,255,0.08);
@@ -192,13 +248,29 @@
         font-size: 12.5px;
         text-align: left;
         cursor: pointer;
-        transition: all 0.15s;
+        transition: all 0.18s;
         font-family: inherit;
+        width: 100%;
     }
+    .aic-suggestion-emoji {
+        font-size: 18px; line-height: 1;
+        flex-shrink: 0;
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 30px; height: 30px;
+        border-radius: 8px;
+        background: rgba(99,102,241,0.10);
+        transition: transform 0.18s, background 0.18s;
+    }
+    .aic-suggestion-text { flex: 1; }
     .aic-suggestion:hover {
-        background: rgba(99,102,241,0.1);
+        background: rgba(99,102,241,0.10);
         border-color: rgba(99,102,241,0.35);
         color: #fff;
+        transform: translateX(2px);
+    }
+    .aic-suggestion:hover .aic-suggestion-emoji {
+        background: rgba(99,102,241,0.20);
+        transform: scale(1.10);
     }
     [data-theme="light"] .aic-suggestion,
     [data-bs-theme="light"] .aic-suggestion {
@@ -327,6 +399,145 @@
     }
     [data-theme="light"] .aic-footer,
     [data-bs-theme="light"] .aic-footer { border-color: rgba(0,0,0,0.08); }
+    /* Icon action buttons (attach + emoji) sit beside the input */
+    .aic-icon-action {
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.04);
+        color: #94a3b8;
+        cursor: pointer;
+        display: inline-flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+        transition: all 0.15s;
+    }
+    .aic-icon-action:hover {
+        background: rgba(99,102,241,0.12);
+        border-color: rgba(99,102,241,0.35);
+        color: #fff;
+    }
+    .aic-icon-action[aria-expanded="true"] {
+        background: rgba(99,102,241,0.20);
+        border-color: rgba(99,102,241,0.50);
+        color: #fff;
+    }
+    [data-theme="light"] .aic-icon-action,
+    [data-bs-theme="light"] .aic-icon-action {
+        background: #f8fafc; border-color: rgba(0,0,0,0.08); color: #64748b;
+    }
+
+    /* Attachment chips strip */
+    .aic-attachments {
+        display: flex; flex-wrap: wrap; gap: 8px;
+        padding: 0 0 10px;
+    }
+    .aic-attachment {
+        position: relative;
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 6px 12px 6px 6px;
+        background: rgba(99,102,241,0.10);
+        border: 1px solid rgba(99,102,241,0.30);
+        border-radius: 999px;
+        font-size: 12px;
+        color: #cbd5e1;
+        max-width: 220px;
+    }
+    .aic-attachment-thumb {
+        width: 28px; height: 28px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.10);
+        background-size: cover;
+        background-position: center;
+        flex-shrink: 0;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 12px;
+    }
+    .aic-attachment-name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1;
+        min-width: 0;
+    }
+    .aic-attachment-x {
+        width: 18px; height: 18px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.10);
+        border: none;
+        color: #fff;
+        cursor: pointer;
+        flex-shrink: 0;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 12px; line-height: 1;
+        font-family: inherit;
+    }
+    .aic-attachment-x:hover { background: rgba(239,68,68,0.30); }
+
+    /* Emoji picker panel */
+    .aic-emoji-panel {
+        display: none;
+        margin-bottom: 10px;
+        background: rgba(15,23,42,0.96);
+        border: 1px solid rgba(255,255,255,0.10);
+        border-radius: 14px;
+        overflow: hidden;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+    .aic-emoji-panel.is-open { display: block; }
+    [data-theme="light"] .aic-emoji-panel,
+    [data-bs-theme="light"] .aic-emoji-panel {
+        background: #ffffff; border-color: rgba(0,0,0,0.10);
+    }
+    .aic-emoji-tabs {
+        display: flex; gap: 2px;
+        padding: 6px 8px;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        background: rgba(255,255,255,0.02);
+    }
+    .aic-emoji-tab {
+        flex: 1;
+        padding: 6px;
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 18px;
+        line-height: 1;
+        opacity: 0.55;
+        transition: all 0.15s;
+    }
+    .aic-emoji-tab:hover { opacity: 0.85; background: rgba(255,255,255,0.04); }
+    .aic-emoji-tab.is-active {
+        opacity: 1;
+        background: rgba(99,102,241,0.15);
+    }
+    .aic-emoji-grid {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 2px;
+        padding: 8px;
+        max-height: 160px;
+        overflow-y: auto;
+    }
+    @media (max-width: 480px) {
+        .aic-emoji-grid { grid-template-columns: repeat(7, 1fr); }
+    }
+    .aic-emoji-btn {
+        background: transparent;
+        border: none;
+        border-radius: 6px;
+        padding: 4px;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+        transition: background 0.12s, transform 0.12s;
+    }
+    .aic-emoji-btn:hover {
+        background: rgba(99,102,241,0.20);
+        transform: scale(1.15);
+    }
+
     .aic-input-row { display: flex; gap: 8px; align-items: flex-end; }
     .aic-input {
         flex: 1;
@@ -398,6 +609,13 @@
     const sendBtn    = document.getElementById('aicSendBtn');
     const statusEl   = document.getElementById('aicStatus');
     const limitEl    = document.getElementById('aicLimit');
+    const emojiBtn   = document.getElementById('aicEmojiBtn');
+    const emojiPanel = document.getElementById('aicEmojiPanel');
+    const emojiGrid  = document.getElementById('aicEmojiGrid');
+    const emojiTabs  = document.getElementById('aicEmojiTabs');
+    const attachBtn  = document.getElementById('aicAttachBtn');
+    const fileInput  = document.getElementById('aicFileInput');
+    const attachWrap = document.getElementById('aicAttachments');
 
     let currentConvId = null;
     let isSending     = false;
@@ -430,6 +648,13 @@
         input.focus();
         statusEl.textContent = 'Here to help';
         closeHistory();
+        // Clear staged attachments + close emoji panel for a clean slate
+        if (typeof attachments !== 'undefined') {
+            attachments.forEach(a => a.previewUrl && URL.revokeObjectURL(a.previewUrl));
+            attachments = [];
+            renderAttachments();
+        }
+        if (emojiPanel?.classList.contains('is-open')) toggleEmojiPanel(false);
     });
 
     // ── History toggle ──
@@ -516,6 +741,181 @@
             sendMessage();
         });
     });
+
+    // ════════════════════════════════════════════════════════════════
+    // ── Emoji picker ──
+    // Categorised emoji set leaning into the event-services theme
+    // (weddings, parties, food, music). Click an emoji → insert at the
+    // current caret position in the textarea.
+    // ════════════════════════════════════════════════════════════════
+    const EMOJI_SETS = {
+        events: ['🎉','🎊','🥂','🍾','💍','💒','👰','🤵','💐','🎂','🎈','🎁','🎆','🎇','🪩','✨','🥳','💃','🕺','🎵','🎶','🎤','🎸','🎷','🪗','🎻','🥁','🎺','📸','🎬','🪅','🎀','🎗️','🏆','🌟','⭐','🌠','🎆'],
+        people:  ['😊','😀','😁','😄','😍','🥰','😎','🤩','😘','😇','🙂','🙃','😉','🤗','🤔','🙏','👏','🙌','🤝','💪','👍','👎','✌️','🤞','👌','💁','🙋','💃','🕺','👰','🤵','👨‍🍳','🧑‍💼','👨‍🎤','🧑‍🎨','👮'],
+        food:    ['🍰','🎂','🧁','🍪','🍩','🍫','🍬','🍭','🍦','🍨','🍮','🍯','🍕','🍔','🍟','🌭','🥪','🌮','🌯','🥗','🍝','🍜','🍣','🍤','🍱','🥟','🍢','🍡','🍵','☕','🥤','🧃','🍾','🥂','🍷','🍸','🍹','🍻'],
+        symbols: ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','💖','💗','💓','💞','💕','💟','❣️','💯','✅','✔️','❌','⭕','🆗','🆒','🔥','💎','🌈','☀️','🌙','⭐','✨','💫','⚡','🌸','🌺','🌹','🌷','🌻','🌼','💐'],
+        objects: ['🎁','🎈','🎀','🎗️','🎟️','🎫','🎪','🪩','🪅','🎊','🎉','🪄','🎯','🏆','🥇','🥈','🥉','🏅','🎖️','📷','📸','🎥','🎬','🎞️','📺','📻','🎙️','🎚️','🎛️','💌','💝','📦','📨','📩','📍','📌','🗓️','⏰'],
+    };
+
+    let activeEmojiCat = 'events';
+
+    function renderEmojiGrid() {
+        if (!emojiGrid) return;
+        emojiGrid.innerHTML = (EMOJI_SETS[activeEmojiCat] || []).map(em =>
+            `<button type="button" class="aic-emoji-btn" data-emoji="${em}" aria-label="Insert ${em}">${em}</button>`
+        ).join('');
+    }
+
+    function insertAtCursor(text) {
+        if (!input) return;
+        const start = input.selectionStart || 0;
+        const end   = input.selectionEnd || 0;
+        const value = input.value;
+        input.value = value.slice(0, start) + text + value.slice(end);
+        // Move caret to the end of inserted text
+        const caret = start + text.length;
+        input.focus();
+        input.setSelectionRange(caret, caret);
+        // Trigger input event so the resize + send-state update fire
+        input.dispatchEvent(new Event('input'));
+    }
+
+    function toggleEmojiPanel(forceState) {
+        if (!emojiPanel || !emojiBtn) return;
+        const open = typeof forceState === 'boolean' ? forceState : !emojiPanel.classList.contains('is-open');
+        emojiPanel.classList.toggle('is-open', open);
+        emojiPanel.setAttribute('aria-hidden', open ? 'false' : 'true');
+        emojiBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) renderEmojiGrid();
+    }
+
+    if (emojiBtn) {
+        emojiBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            toggleEmojiPanel();
+        });
+    }
+
+    // Tab clicks → switch category and re-render the grid
+    if (emojiTabs) {
+        emojiTabs.addEventListener('click', e => {
+            const tab = e.target.closest('.aic-emoji-tab');
+            if (!tab) return;
+            emojiTabs.querySelectorAll('.aic-emoji-tab').forEach(t => t.classList.remove('is-active'));
+            tab.classList.add('is-active');
+            activeEmojiCat = tab.dataset.emojiCat;
+            renderEmojiGrid();
+        });
+    }
+
+    // Emoji click → insert at caret (event delegation since grid re-renders)
+    if (emojiGrid) {
+        emojiGrid.addEventListener('click', e => {
+            const btn = e.target.closest('.aic-emoji-btn');
+            if (!btn) return;
+            insertAtCursor(btn.dataset.emoji);
+        });
+    }
+
+    // Close emoji panel on outside click or Escape
+    document.addEventListener('click', e => {
+        if (!emojiPanel || !emojiBtn) return;
+        if (e.target.closest('#aicEmojiPanel') || e.target.closest('#aicEmojiBtn')) return;
+        if (emojiPanel.classList.contains('is-open')) toggleEmojiPanel(false);
+    });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && emojiPanel?.classList.contains('is-open')) toggleEmojiPanel(false);
+    });
+
+    // ════════════════════════════════════════════════════════════════
+    // ── File / photo attachments ──
+    // Pure client-side preview right now — the chips persist until the
+    // user removes them or hits send. Backend upload wiring can be added
+    // when the chat API supports multipart payloads.
+    // ════════════════════════════════════════════════════════════════
+    let attachments = []; // {id, file, name, size, type, isImage, previewUrl}
+    const MAX_ATTACHMENTS = 5;
+    const MAX_FILE_BYTES  = 10 * 1024 * 1024; // 10 MB per file
+
+    function formatBytes(b) {
+        if (b < 1024) return b + ' B';
+        if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+        return (b / 1024 / 1024).toFixed(1) + ' MB';
+    }
+
+    function fileIconFor(type) {
+        if (type.startsWith('image/'))      return '🖼️';
+        if (type === 'application/pdf')      return '📄';
+        if (type.includes('word'))           return '📝';
+        if (type.startsWith('text/'))        return '📃';
+        return '📎';
+    }
+
+    function renderAttachments() {
+        if (!attachWrap) return;
+        if (attachments.length === 0) {
+            attachWrap.hidden = true;
+            attachWrap.innerHTML = '';
+            return;
+        }
+        attachWrap.hidden = false;
+        attachWrap.innerHTML = attachments.map(a => `
+            <div class="aic-attachment" data-att-id="${a.id}">
+                <span class="aic-attachment-thumb"
+                      ${a.isImage ? `style="background-image:url('${a.previewUrl}')"` : ''}>
+                    ${a.isImage ? '' : fileIconFor(a.type)}
+                </span>
+                <span class="aic-attachment-name" title="${escapeHtml(a.name)}">${escapeHtml(a.name)}</span>
+                <button type="button" class="aic-attachment-x" data-remove="${a.id}" aria-label="Remove ${escapeHtml(a.name)}">&times;</button>
+            </div>
+        `).join('');
+    }
+
+    if (attachBtn) {
+        attachBtn.addEventListener('click', () => fileInput?.click());
+    }
+
+    if (fileInput) {
+        fileInput.addEventListener('change', e => {
+            const files = Array.from(e.target.files || []);
+            for (const file of files) {
+                if (attachments.length >= MAX_ATTACHMENTS) {
+                    alert(`You can attach up to ${MAX_ATTACHMENTS} files at once.`);
+                    break;
+                }
+                if (file.size > MAX_FILE_BYTES) {
+                    alert(`"${file.name}" is too large (max 10 MB).`);
+                    continue;
+                }
+                const isImage = file.type.startsWith('image/');
+                const att = {
+                    id:         Math.random().toString(36).slice(2, 10),
+                    file:       file,
+                    name:       file.name,
+                    size:       file.size,
+                    type:       file.type || 'application/octet-stream',
+                    isImage:    isImage,
+                    previewUrl: isImage ? URL.createObjectURL(file) : null,
+                };
+                attachments.push(att);
+            }
+            renderAttachments();
+            // Reset so picking the same file again still triggers change
+            fileInput.value = '';
+        });
+    }
+
+    if (attachWrap) {
+        attachWrap.addEventListener('click', e => {
+            const btn = e.target.closest('.aic-attachment-x');
+            if (!btn) return;
+            const id = btn.dataset.remove;
+            const att = attachments.find(a => a.id === id);
+            if (att && att.previewUrl) URL.revokeObjectURL(att.previewUrl);
+            attachments = attachments.filter(a => a.id !== id);
+            renderAttachments();
+        });
+    }
+    // ════════════════════════════════════════════════════════════════
 
     // ── Input handling ──
     input.addEventListener('input', () => {

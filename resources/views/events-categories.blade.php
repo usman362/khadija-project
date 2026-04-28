@@ -1180,11 +1180,16 @@
                         ['v' => 'guests-medium',       'l' => 'Medium (75 – 200)'],
                         ['v' => 'guests-large',        'l' => 'Large (200+)'],
                     ]],
-                    ['title' => 'Event Category', 'opts' => [
-                        ['v' => 'cat-wedding',         'l' => 'Wedding'],
-                        ['v' => 'cat-corporate',       'l' => 'Corporate / Networking'],
-                        ['v' => 'cat-social',          'l' => 'Social (Birthday/Anniversary)'],
-                        ['v' => 'cat-community',       'l' => 'Community / Non-Profit'],
+                    // Renamed from "Event Category" → "Event Reason" per client.
+                    // These options eventually become the answers a client picks
+                    // when posting a gig and a pro lists on their profile, so
+                    // filtering on either side maps cleanly to a stored value.
+                    ['title' => 'Event Reason', 'opts' => [
+                        ['v' => 'reason-corporate',    'l' => 'Corporate &amp; Professional Conferences'],
+                        ['v' => 'reason-social',       'l' => 'Social &amp; Private'],
+                        ['v' => 'reason-community',    'l' => 'Community &amp; Public Fundraisers'],
+                        ['v' => 'reason-sports',       'l' => 'Sports &amp; Athletics'],
+                        ['v' => 'reason-b2b',          'l' => 'Business to Business'],
                     ]],
                 ],
             ],
