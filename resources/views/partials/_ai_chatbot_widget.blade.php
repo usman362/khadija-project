@@ -237,39 +237,50 @@
     }
     .aic-welcome-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
     .aic-welcome-text { font-size: 13px; color: #94a3b8; margin-bottom: 20px; }
-    .aic-suggestions { display: flex; flex-direction: column; gap: 8px; }
+    /* Suggestion pills — bricks layout, multiple per row, rounded badge style */
+    .aic-suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+    }
     .aic-suggestion {
-        display: flex; align-items: center; gap: 10px;
-        padding: 10px 14px;
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 7px 12px 7px 8px;
         background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.10);
+        border-radius: 999px;
         color: #cbd5e1;
-        font-size: 12.5px;
-        text-align: left;
+        font-size: 12px;
+        line-height: 1.2;
         cursor: pointer;
         transition: all 0.18s;
         font-family: inherit;
-        width: 100%;
+        white-space: nowrap;
+        max-width: 100%;
     }
     .aic-suggestion-emoji {
-        font-size: 18px; line-height: 1;
+        font-size: 14px; line-height: 1;
         flex-shrink: 0;
         display: inline-flex; align-items: center; justify-content: center;
-        width: 30px; height: 30px;
-        border-radius: 8px;
-        background: rgba(99,102,241,0.10);
+        width: 22px; height: 22px;
+        border-radius: 50%;
+        background: rgba(99,102,241,0.12);
         transition: transform 0.18s, background 0.18s;
     }
-    .aic-suggestion-text { flex: 1; }
+    .aic-suggestion-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
     .aic-suggestion:hover {
-        background: rgba(99,102,241,0.10);
-        border-color: rgba(99,102,241,0.35);
+        background: rgba(99,102,241,0.14);
+        border-color: rgba(99,102,241,0.40);
         color: #fff;
-        transform: translateX(2px);
+        transform: translateY(-1px);
     }
     .aic-suggestion:hover .aic-suggestion-emoji {
-        background: rgba(99,102,241,0.20);
+        background: rgba(99,102,241,0.25);
         transform: scale(1.10);
     }
     [data-theme="light"] .aic-suggestion,
