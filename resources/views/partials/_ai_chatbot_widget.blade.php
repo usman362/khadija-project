@@ -46,33 +46,43 @@
             <div class="aic-welcome-title">Hi {{ auth()->user()->name }}! 👋</div>
             <div class="aic-welcome-text">How can I help you today?</div>
             <div class="aic-suggestions">
+                {{-- Visible label is short for the bricks layout, but data-msg
+                     carries the full question so the AI gets proper context. --}}
                 <button type="button" class="aic-suggestion" data-msg="How do I post a wedding event?">
                     <span class="aic-suggestion-emoji">💍</span>
-                    <span class="aic-suggestion-text">How do I post a wedding event?</span>
+                    <span class="aic-suggestion-text">Post a wedding</span>
                 </button>
-                <button type="button" class="aic-suggestion" data-msg="What categories of professionals can I find?">
+                <button type="button" class="aic-suggestion" data-msg="What categories of professionals can I find on the platform?">
                     <span class="aic-suggestion-emoji">🎉</span>
-                    <span class="aic-suggestion-text">What categories of professionals can I find?</span>
+                    <span class="aic-suggestion-text">Categories</span>
                 </button>
                 <button type="button" class="aic-suggestion" data-msg="How does the influencer program work?">
                     <span class="aic-suggestion-emoji">📣</span>
-                    <span class="aic-suggestion-text">How does the influencer program work?</span>
+                    <span class="aic-suggestion-text">Influencer program</span>
                 </button>
-                <button type="button" class="aic-suggestion" data-msg="What are the commission tiers?">
+                <button type="button" class="aic-suggestion" data-msg="What are the commission tiers for influencers?">
                     <span class="aic-suggestion-emoji">💰</span>
-                    <span class="aic-suggestion-text">What are the commission tiers?</span>
+                    <span class="aic-suggestion-text">Commission tiers</span>
                 </button>
                 <button type="button" class="aic-suggestion" data-msg="How do I plan a corporate event?">
                     <span class="aic-suggestion-emoji">🏢</span>
-                    <span class="aic-suggestion-text">How do I plan a corporate event?</span>
+                    <span class="aic-suggestion-text">Corporate event</span>
                 </button>
                 <button type="button" class="aic-suggestion" data-msg="Help me find a DJ for my birthday party">
                     <span class="aic-suggestion-emoji">🎂</span>
-                    <span class="aic-suggestion-text">Find a DJ for my birthday party</span>
+                    <span class="aic-suggestion-text">Find a DJ</span>
+                </button>
+                <button type="button" class="aic-suggestion" data-msg="How does pricing work for the platform?">
+                    <span class="aic-suggestion-emoji">💳</span>
+                    <span class="aic-suggestion-text">Pricing</span>
                 </button>
                 <button type="button" class="aic-suggestion" data-msg="How do I switch between client and professional mode?">
                     <span class="aic-suggestion-emoji">🔄</span>
-                    <span class="aic-suggestion-text">Switch between client/professional mode</span>
+                    <span class="aic-suggestion-text">Switch mode</span>
+                </button>
+                <button type="button" class="aic-suggestion" data-msg="What is the photo upload limit on my profile?">
+                    <span class="aic-suggestion-emoji">📸</span>
+                    <span class="aic-suggestion-text">Photo limit</span>
                 </button>
             </div>
         </div>
@@ -237,7 +247,7 @@
     }
     .aic-welcome-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
     .aic-welcome-text { font-size: 13px; color: #94a3b8; margin-bottom: 20px; }
-    /* Suggestion pills — bricks layout, multiple per row, rounded badge style */
+    /* Suggestion pills — compact bricks layout, multiple per row */
     .aic-suggestions {
         display: flex;
         flex-wrap: wrap;
@@ -245,34 +255,29 @@
         justify-content: center;
     }
     .aic-suggestion {
-        display: inline-flex; align-items: center; gap: 6px;
-        padding: 7px 12px 7px 8px;
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 6px 11px 6px 6px;
         background: rgba(255,255,255,0.04);
         border: 1px solid rgba(255,255,255,0.10);
         border-radius: 999px;
         color: #cbd5e1;
-        font-size: 12px;
+        font-size: 11.5px;
         line-height: 1.2;
         cursor: pointer;
         transition: all 0.18s;
         font-family: inherit;
         white-space: nowrap;
-        max-width: 100%;
     }
     .aic-suggestion-emoji {
-        font-size: 14px; line-height: 1;
+        font-size: 12px; line-height: 1;
         flex-shrink: 0;
         display: inline-flex; align-items: center; justify-content: center;
-        width: 22px; height: 22px;
+        width: 18px; height: 18px;
         border-radius: 50%;
-        background: rgba(99,102,241,0.12);
+        background: rgba(99,102,241,0.14);
         transition: transform 0.18s, background 0.18s;
     }
-    .aic-suggestion-text {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+    .aic-suggestion-text { white-space: nowrap; }
     .aic-suggestion:hover {
         background: rgba(99,102,241,0.14);
         border-color: rgba(99,102,241,0.40);
