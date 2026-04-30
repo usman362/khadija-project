@@ -1081,5 +1081,8 @@
 
     {{-- Inline form validation: live blur/submit messages on data-validate inputs --}}
     @include('partials._form_validation')
+
+    {{-- Styled datepicker (Flatpickr) for all <input type="date"> --}}
+    @include('partials._datepicker')
 </body>
 </html>

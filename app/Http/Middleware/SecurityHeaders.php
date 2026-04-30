@@ -56,10 +56,10 @@ class SecurityHeaders
                 // Scripts: 'unsafe-inline' is needed because the Blade views
                 // ship inline scripts. CDNs whitelisted: reCAPTCHA, gstatic,
                 // GTM, NobleUI dashboard template, cdnjs (font-awesome/etc).
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://nobleui.com https://cdnjs.cloudflare.com",
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://nobleui.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net",
                 // Styles: inline <style> blocks live in layouts. CDNs needed
                 // by the dashboard template + font services.
-                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net https://nobleui.com https://cdnjs.cloudflare.com",
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net https://nobleui.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net",
                 // Fonts: Google + Bunny + cdnjs (Font Awesome ships fonts).
                 "font-src 'self' data: https://fonts.gstatic.com https://fonts.bunny.net https://cdnjs.cloudflare.com https://nobleui.com",
                 // Images: allow data URIs (icons), Unsplash (banners), and our own hosts.

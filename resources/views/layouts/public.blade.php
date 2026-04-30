@@ -74,5 +74,9 @@
      globally so every public form auto-picks up data-validate attributes
      without the page having to remember to import the partial. --}}
 @include('partials._form_validation')
+
+{{-- Styled datepicker (Flatpickr) — replaces native <input type="date">
+     across the site for a consistent, branded date-picking UX. --}}
+@include('partials._datepicker')
 </body>
 </html>
