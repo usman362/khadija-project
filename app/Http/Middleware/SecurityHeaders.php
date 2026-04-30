@@ -54,12 +54,14 @@ class SecurityHeaders
             implode('; ', [
                 "default-src 'self'",
                 // Scripts: 'unsafe-inline' is needed because the Blade views
-                // ship inline scripts. reCAPTCHA + GTM also need their CDNs.
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://www.googletagmanager.com",
-                // Styles: same — inline <style> blocks live in the layout.
-                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-                // Fonts loaded from Google Fonts CDN.
-                "font-src 'self' data: https://fonts.gstatic.com",
+                // ship inline scripts. CDNs whitelisted: reCAPTCHA, gstatic,
+                // GTM, NobleUI dashboard template, cdnjs (font-awesome/etc).
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://nobleui.com https://cdnjs.cloudflare.com",
+                // Styles: inline <style> blocks live in layouts. CDNs needed
+                // by the dashboard template + font services.
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net https://nobleui.com https://cdnjs.cloudflare.com",
+                // Fonts: Google + Bunny + cdnjs (Font Awesome ships fonts).
+                "font-src 'self' data: https://fonts.gstatic.com https://fonts.bunny.net https://cdnjs.cloudflare.com https://nobleui.com",
                 // Images: allow data URIs (icons), Unsplash (banners), and our own hosts.
                 "img-src 'self' data: https: blob:",
                 // Media (videos): allow same origin + Unsplash for hero promos.

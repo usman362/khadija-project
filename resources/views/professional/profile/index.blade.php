@@ -459,7 +459,9 @@
                     </div>
                     <div>
                         <label class="pf-label">Website</label>
-                        <input type="url" name="website" class="pf-input" value="{{ old('website', $profile- data-validate="url" data-error-url="Please enter a valid URL (http:// or https://).">website) }}" placeholder="https://yourportfolio.com">
+                        <input type="url" name="website" class="pf-input" value="{{ old('website', $profile->website) }}" placeholder="https://yourportfolio.com"
+                               data-validate="url"
+                               data-error-url="Please enter a valid URL (http:// or https://).">
                     </div>
 
                     <div class="pf-form-full" style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 4px;">
@@ -755,19 +757,27 @@
                 <div class="pf-form-grid">
                     <div>
                         <label class="pf-label">LinkedIn</label>
-                        <input type="url" name="linkedin" class="pf-input" value="{{ old('linkedin', $profile- data-validate="url" data-error-url="Please enter a valid URL (http:// or https://).">social_links['linkedin'] ?? '') }}" placeholder="https://linkedin.com/in/yourname">
+                        <input type="url" name="linkedin" class="pf-input" value="{{ old('linkedin', $profile->social_links['linkedin'] ?? '') }}" placeholder="https://linkedin.com/in/yourname"
+                               data-validate="url"
+                               data-error-url="Please enter a valid URL (http:// or https://).">
                     </div>
                     <div>
                         <label class="pf-label">Twitter / X</label>
-                        <input type="url" name="twitter" class="pf-input" value="{{ old('twitter', $profile- data-validate="url" data-error-url="Please enter a valid URL (http:// or https://).">social_links['twitter'] ?? '') }}" placeholder="https://twitter.com/yourhandle">
+                        <input type="url" name="twitter" class="pf-input" value="{{ old('twitter', $profile->social_links['twitter'] ?? '') }}" placeholder="https://twitter.com/yourhandle"
+                               data-validate="url"
+                               data-error-url="Please enter a valid URL (http:// or https://).">
                     </div>
                     <div>
                         <label class="pf-label">Facebook</label>
-                        <input type="url" name="facebook" class="pf-input" value="{{ old('facebook', $profile- data-validate="url" data-error-url="Please enter a valid URL (http:// or https://).">social_links['facebook'] ?? '') }}" placeholder="https://facebook.com/yourpage">
+                        <input type="url" name="facebook" class="pf-input" value="{{ old('facebook', $profile->social_links['facebook'] ?? '') }}" placeholder="https://facebook.com/yourpage"
+                               data-validate="url"
+                               data-error-url="Please enter a valid URL (http:// or https://).">
                     </div>
                     <div>
                         <label class="pf-label">Instagram</label>
-                        <input type="url" name="instagram" class="pf-input" value="{{ old('instagram', $profile- data-validate="url" data-error-url="Please enter a valid URL (http:// or https://).">social_links['instagram'] ?? '') }}" placeholder="https://instagram.com/yourhandle">
+                        <input type="url" name="instagram" class="pf-input" value="{{ old('instagram', $profile->social_links['instagram'] ?? '') }}" placeholder="https://instagram.com/yourhandle"
+                               data-validate="url"
+                               data-error-url="Please enter a valid URL (http:// or https://).">
                     </div>
                 </div>
                 <div style="margin-top: 20px;">
