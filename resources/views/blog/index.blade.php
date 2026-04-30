@@ -362,7 +362,7 @@
     <div class="featured-grid">
         @foreach($featured as $f)
             <a href="{{ route('blog.show', $f) }}" class="featured-item">
-                <img src="{{ $f->featuredImageUrl() }}" alt="">
+                <img loading="lazy" src="{{ $f->featuredImageUrl() }}" alt="">
                 <div>
                     <h4>{{ \Illuminate\Support\Str::limit($f->title, 65) }}</h4>
                     <div class="meta">{{ number_format($f->views_count) }} views · {{ $f->published_at?->format('M j, Y') }}</div>
@@ -381,7 +381,7 @@
                 @foreach($posts as $post)
                     <article class="blog-card">
                         <a href="{{ route('blog.show', $post) }}">
-                            <img src="{{ $post->featuredImageUrl() }}" alt="{{ $post->title }}" class="blog-card-img">
+                            <img loading="lazy" src="{{ $post->featuredImageUrl() }}" alt="{{ $post->title }}" class="blog-card-img">
                         </a>
                         <div class="blog-card-body">
                             <div class="blog-card-meta">

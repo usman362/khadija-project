@@ -1195,7 +1195,7 @@
                             {{-- Body --}}
                             <div class="pro-card-body">
                                 <div class="pro-card-avatar-wrap">
-                                    <img src="{{ $pro->avatar_url }}" alt="{{ $pro->name }}" class="pro-card-avatar" loading="lazy">
+                                    <img loading="lazy" src="{{ $pro->avatar_url }}" alt="{{ $pro->name }}" class="pro-card-avatar" loading="lazy">
                                     <span class="pro-card-online" aria-label="Recently active"></span>
                                 </div>
 

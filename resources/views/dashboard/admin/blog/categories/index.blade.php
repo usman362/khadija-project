@@ -13,7 +13,7 @@
 </div>
 
 @if(session('status'))
-    <div class="alert alert-success alert-dismissible fade show">{{ session('status') }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    <div class="alert alert-success alert-dismissible fade show">{{ session('status') }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
 @endif
 
 <div class="row g-3">
@@ -107,7 +107,7 @@
                                     @csrf @method('PATCH')
                                     <div class="modal-header">
                                         <h5 class="modal-title">Edit Category</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
                                         <div class="mb-3">

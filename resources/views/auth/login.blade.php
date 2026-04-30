@@ -445,7 +445,10 @@
                         <div class="form-input-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
                         </div>
-                        <input type="email" name="email" class="form-input {{ $errors->has('email') ? 'is-invalid' : '' }}" value="{{ old('email') }}" placeholder="Enter your email" required autofocus>
+                        <input type="email" name="email" class="form-input {{ $errors->has('email') ? 'is-invalid' : '' }}" value="{{ old('email') }}" placeholder="Enter your email" required autofocus
+       data-validate="required|email"
+       data-error-required="Please enter your email."
+       data-error-email="That doesn't look like a valid email address.">
                     </div>
                 </div>
 
@@ -455,8 +458,11 @@
                         <div class="form-input-icon">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                         </div>
-                        <input type="password" name="password" id="login-password" class="form-input" placeholder="Enter your password" required>
-                        <button type="button" class="password-toggle-btn" onclick="toggleLoginPw()">
+                        <input type="password" name="password" id="login-password" class="form-input" placeholder="Enter your password" required
+       data-validate="required|min:8"
+       data-error-required="Please enter your password."
+       data-error-min="Passwords are at least 8 characters.">
+                        <button type="button" class="password-toggle-btn" onclick="toggleLoginPw()" aria-label="Show or hide password">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
@@ -553,6 +559,9 @@ document.getElementById('login-submit-btn').addEventListener('click', function(e
 });
 @endif
 </script>
+
+{{-- Inline form validation: red borders + helpful messages on blur/submit --}}
+@include('partials._form_validation')
 
 </body>
 </html>

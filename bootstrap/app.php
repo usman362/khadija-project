@@ -19,9 +19,17 @@ return Application::configure(basePath: dirname(__DIR__))
             'check.deletion.status'   => \App\Http\Middleware\CheckAccountDeletionStatus::class,
         ]);
 
+        // Run canonical-host redirect FIRST (before anything else) so a
+        // dashboard.* hit doesn't waste a session lookup or auth check
+        // before being sent to gigresource.com.
+        $middleware->web(prepend: [
+            \App\Http\Middleware\CanonicalDomainRedirect::class,
+        ]);
+
         // Automatically gate every authenticated request through the deletion check
         $middleware->web(append: [
             \App\Http\Middleware\CheckAccountDeletionStatus::class,
+            \App\Http\Middleware\SecurityHeaders::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [

@@ -1078,5 +1078,8 @@
         })();
     </script>
     @stack('scripts')
+
+    {{-- Inline form validation: live blur/submit messages on data-validate inputs --}}
+    @include('partials._form_validation')
 </body>
 </html>

@@ -300,17 +300,24 @@
                 <div class="pf-form-grid">
                     <div>
                         <label class="pf-label">Full Name *</label>
-                        <input type="text" name="name" class="pf-input" value="{{ old('name', $user->name) }}" required>
+                        <input type="text" name="name" class="pf-input" value="{{ old('name', $user->name) }}" required
+                               data-validate="required|min:2|max:120"
+                               data-error-required="Please enter your full name.">
                         @error('name') <div class="pf-error">{{ $message }}</div> @enderror
                     </div>
                     <div>
                         <label class="pf-label">Email Address *</label>
-                        <input type="email" name="email" class="pf-input" value="{{ old('email', $user->email) }}" required>
+                        <input type="email" name="email" class="pf-input" value="{{ old('email', $user->email) }}" required
+                               data-validate="required|email"
+                               data-error-required="Email is required."
+                               data-error-email="Please enter a valid email address.">
                         @error('email') <div class="pf-error">{{ $message }}</div> @enderror
                     </div>
                     <div>
                         <label class="pf-label">Phone Number</label>
-                        <input type="text" name="phone" class="pf-input" value="{{ old('phone', $user->phone) }}" placeholder="+1 (555) 123-4567">
+                        <input type="text" name="phone" class="pf-input" value="{{ old('phone', $user->phone) }}" placeholder="+1 (555) 123-4567"
+                               data-validate="tel"
+                               data-error-tel="Please enter a valid phone number.">
                         @error('phone') <div class="pf-error">{{ $message }}</div> @enderror
                     </div>
                     <div>
@@ -329,7 +336,9 @@
                     </div>
                     <div>
                         <label class="pf-label">Website</label>
-                        <input type="url" name="website" class="pf-input" value="{{ old('website', $profile->website) }}" placeholder="https://yourwebsite.com">
+                        <input type="url" name="website" class="pf-input" value="{{ old('website', $profile->website) }}" placeholder="https://yourwebsite.com"
+                               data-validate="url"
+                               data-error-url="Please enter a valid URL (http:// or https://).">
                     </div>
                     <div class="pf-form-full">
                         <label class="pf-label">Bio</label>
@@ -488,17 +497,23 @@
                 <div class="pf-form-grid">
                     <div class="pf-form-full">
                         <label class="pf-label">Current Password *</label>
-                        <input type="password" name="current_password" class="pf-input" required>
+                        <input type="password" name="current_password" class="pf-input" required data-validate="required" data-error-required="Current password is required.">
                         @error('current_password') <div class="pf-error">{{ $message }}</div> @enderror
                     </div>
                     <div>
                         <label class="pf-label">New Password *</label>
-                        <input type="password" name="password" class="pf-input" required minlength="8">
+                        <input type="password" name="password" class="pf-input" required minlength="8"
+                               data-validate="required|min:8"
+                               data-error-required="Please enter a new password."
+                               data-error-min="Use at least 8 characters for security.">
                         @error('password') <div class="pf-error">{{ $message }}</div> @enderror
                     </div>
                     <div>
                         <label class="pf-label">Confirm New Password *</label>
-                        <input type="password" name="password_confirmation" class="pf-input" required>
+                        <input type="password" name="password_confirmation" class="pf-input" required
+                               data-validate="required|match:password"
+                               data-error-required="Please confirm your new password."
+                               data-error-match="Passwords do not match.">
                     </div>
                 </div>
                 <p style="font-size: 12px; color: var(--bs-secondary-color); margin-top: 12px;">

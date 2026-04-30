@@ -38,7 +38,7 @@
                 <div class="modal fade" id="editRoleModal{{ $role->id }}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-xl modal-dialog-centered"><div class="modal-content">
                         <form method="POST" action="{{ route('app.roles.update', $role) }}">@csrf @method('PATCH')
-                            <div class="modal-header"><h5 class="modal-title">Edit Role</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                            <div class="modal-header"><h5 class="modal-title">Edit Role</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
                             <div class="modal-body">
                                 <div class="mb-3"><label class="form-label">Name</label><input name="name" class="form-control" value="{{ $role->name }}" required></div>
                                 <div class="row">
@@ -69,7 +69,7 @@
 <div class="modal fade" id="addRoleModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered"><div class="modal-content">
         <form method="POST" action="{{ route('app.roles.store') }}">@csrf
-            <div class="modal-header"><h5 class="modal-title">Add Role</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-header"><h5 class="modal-title">Add Role</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
             <div class="modal-body">
                 <div class="mb-3"><label class="form-label">Name</label><input name="name" class="form-control" required></div>
                 <div class="row">

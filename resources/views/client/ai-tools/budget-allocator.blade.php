@@ -377,7 +377,7 @@
                             <option value="GBP">GBP</option>
                             <option value="AUD">AUD</option>
                         </select>
-                        <input type="number" name="total_budget" class="bat-input" min="1" step="0.01" required placeholder="e.g. 5000">
+                        <input type="number" name="total_budget" class="bat-input" min="1" step="0.01" required placeholder="e.g. 5000" data-validate="required" data-error-required="Please enter your total budget.">
                     </div>
                 </div>
 

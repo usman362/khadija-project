@@ -420,6 +420,93 @@
     @media (max-width: 1100px) { .az-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; } }
     @media (max-width: 600px) { .az-grid { grid-template-columns: 1fr; } }
 
+    /* ════════════════════════════════════════════════════════════
+       MOBILE BREAKPOINTS — landing-page-specific responsive fixes.
+       Targets the hero search bar, category chips, trust pill,
+       buttons, badges, and hero typography. The global navbar +
+       structural responsiveness lives in _public_styles.
+       ════════════════════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+        /* Hero search: stack the input + button vertically so neither gets
+           crushed at narrow widths. The button becomes full-width pill. */
+        .hero-finder { margin-top: 24px; }
+        .hero-finder-search {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+            padding: 12px;
+            border-radius: 14px;
+        }
+        .hero-finder-search svg.search-icon { display: none; }
+        .hero-finder-search input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 15px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 10px;
+        }
+        .hero-finder-search button {
+            width: 100%;
+            padding: 13px 24px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+        }
+
+        /* Category chips: smaller padding so multiple still fit per row;
+           horizontal scroll fallback if they still overflow. */
+        .hero-finder-chips {
+            gap: 6px;
+            margin-top: 14px;
+            justify-content: flex-start;
+        }
+        .hero-finder-chip {
+            padding: 6px 12px;
+            font-size: 0.78rem;
+            gap: 6px;
+        }
+        .hero-finder-chip svg { width: 12px; height: 12px; }
+
+        /* Trust pill: shrink padding + font, allow wrapping if content
+           gets too wide for the viewport. */
+        .hero-trust-pill {
+            padding: 8px 14px !important;
+            font-size: 12px !important;
+            gap: 8px !important;
+            flex-wrap: wrap;
+            justify-content: center;
+            text-align: center;
+        }
+        .hero-trust-pill .stars svg { width: 12px; height: 12px; }
+
+        /* Hero typography — tighter at small widths */
+        .hero h1 { font-size: 1.85rem !important; line-height: 1.18 !important; letter-spacing: -0.01em !important; }
+        .hero-subtitle { font-size: 0.95rem !important; line-height: 1.55 !important; }
+
+        /* Hero buttons — already stack via global styles, just tighten gap */
+        .hero-buttons { gap: 10px !important; width: 100%; max-width: 320px; margin-left: auto; margin-right: auto; }
+        .hero-buttons .btn { width: 100%; }
+
+        /* Trust badges row — keep the existing 2-col grid from _public_styles
+           but tighten padding so badges don't crowd each other */
+        .trust-badges { gap: 10px !important; padding: 0 8px; }
+    }
+
+    @media (max-width: 480px) {
+        /* Extra-small phones: even tighter typography + stacking */
+        .hero h1 { font-size: 1.6rem !important; }
+        .hero-subtitle { font-size: 0.9rem !important; }
+        .hero-finder-chips {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            scrollbar-width: none;
+            margin: 14px -16px 0;
+            padding: 0 16px 4px;
+        }
+        .hero-finder-chips::-webkit-scrollbar { display: none; }
+        .hero-finder-chip { flex-shrink: 0; }
+    }
+
     /* Per-column accent hues cycle through coral / violet / teal / amber
        so each card has its own personality without drifting from brand. */
     .az-column {
@@ -1062,7 +1149,7 @@
                 <blockquote>"{{ config('app.name') }} revolutionized how I manage events. It's intuitive, fast, and I found the perfect photographer for a last-minute wedding."</blockquote>
                 <div class="testimonial-author">
                     <div class="testimonial-avatar real-avatar">
-                        <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&q=80&auto=format&fit=crop&crop=faces" alt="Sarah K.">
+                        <img loading="lazy" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&q=80&auto=format&fit=crop&crop=faces" alt="Sarah K.">
                     </div>
                     <div>
                         <div class="testimonial-author-name">Sarah K.</div>
@@ -1079,7 +1166,7 @@
                 <blockquote>"The quality of professionals here is unmatched. The hiring process is as fair as it can get and it was flawless from start to finish."</blockquote>
                 <div class="testimonial-author">
                     <div class="testimonial-avatar real-avatar">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80&auto=format&fit=crop&crop=faces" alt="Mike R.">
+                        <img loading="lazy" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80&auto=format&fit=crop&crop=faces" alt="Mike R.">
                     </div>
                     <div>
                         <div class="testimonial-author-name">Mike R.</div>
@@ -1096,7 +1183,7 @@
                 <blockquote>"As a DJ, I've doubled my bookings since joining. The platform makes it easy to showcase my work and connect with clients directly."</blockquote>
                 <div class="testimonial-author">
                     <div class="testimonial-avatar real-avatar">
-                        <img src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=200&q=80&auto=format&fit=crop&crop=faces" alt="James T.">
+                        <img loading="lazy" src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=200&q=80&auto=format&fit=crop&crop=faces" alt="James T.">
                     </div>
                     <div>
                         <div class="testimonial-author-name">James T.</div>
@@ -1151,7 +1238,9 @@
                         <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     </button>
                     <div class="faq-answer">
-                        <div class="faq-answer-inner">{!! $faq->answer !!}</div>
+                        {{-- Escape user/admin input then preserve line breaks.
+                             Prevents XSS if a malicious answer ever lands in DB. --}}
+                        <div class="faq-answer-inner">{!! nl2br(e($faq->answer)) !!}</div>
                     </div>
                 </div>
             @empty

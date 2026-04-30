@@ -17,7 +17,7 @@
     @if(session('status'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('status') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
@@ -28,7 +28,7 @@
                     <li>{{ $error }}</li>
                 @endforeach
             </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
@@ -171,7 +171,7 @@
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title"><i data-lucide="plus" class="me-2" style="width:18px;height:18px;"></i> Add New FAQ</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
@@ -224,7 +224,7 @@
                         @csrf @method('PATCH')
                         <div class="modal-header">
                             <h5 class="modal-title"><i data-lucide="pencil" class="me-2" style="width:18px;height:18px;"></i> Edit FAQ #{{ $faq->id }}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <div class="mb-3">

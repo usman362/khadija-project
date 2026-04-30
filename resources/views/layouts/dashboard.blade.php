@@ -674,6 +674,11 @@
     </script>
     @stack('scripts')
 
+    {{-- Inline form validation (live blur/submit messages) — included
+         once globally so every dashboard form auto-picks up
+         data-validate attributes. --}}
+    @include('partials._form_validation')
+
     {{-- AI Chatbot floating widget --}}
     @include('partials._ai_chatbot_widget')
 </body>

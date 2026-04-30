@@ -532,19 +532,29 @@
 
                     <div class="form-group">
                         <label class="form-label">Full Name</label>
-                        <input type="text" name="name" class="form-input {{ $errors->has('name') && old('role') === 'client' ? 'is-invalid' : '' }}" placeholder="John Doe" value="{{ old('role') === 'client' ? old('name') : '' }}" required>
+                        <input type="text" name="name" class="form-input {{ $errors->has('name') && old('role') === 'client' ? 'is-invalid' : '' }}" placeholder="John Doe" value="{{ old('role') === 'client' ? old('name') : '' }}" required
+       data-validate="required|min:2|max:120"
+       data-error-required="Please enter your full name."
+       data-error-min="Your name is too short."
+       data-error-max="That's longer than the platform allows.">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Email</label>
-                        <input type="email" name="email" class="form-input {{ $errors->has('email') && old('role') === 'client' ? 'is-invalid' : '' }}" placeholder="you@example.com" value="{{ old('role') === 'client' ? old('email') : '' }}" required>
+                        <input type="email" name="email" class="form-input {{ $errors->has('email') && old('role') === 'client' ? 'is-invalid' : '' }}" placeholder="you@example.com" value="{{ old('role') === 'client' ? old('email') : '' }}" required
+       data-validate="required|email"
+       data-error-required="We need an email to send your booking updates."
+       data-error-email="That doesn't look like a valid email.">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Password</label>
                         <div class="password-wrapper">
-                            <input type="password" name="password" class="form-input {{ $errors->has('password') && old('role') === 'client' ? 'is-invalid' : '' }}" placeholder="Min. 8 characters" required>
-                            <button type="button" class="password-toggle" onclick="togglePw(this)">
+                            <input type="password" name="password" class="form-input {{ $errors->has('password') && old('role') === 'client' ? 'is-invalid' : '' }}" placeholder="Min. 8 characters" required
+       data-validate="required|min:8"
+       data-error-required="Please create a password."
+       data-error-min="Use at least 8 characters for security.">
+                            <button type="button" class="password-toggle" onclick="togglePw(this)" aria-label="Show or hide password">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             </button>
                         </div>
@@ -552,7 +562,10 @@
 
                     <div class="form-group">
                         <label class="form-label">Confirm Password</label>
-                        <input type="password" name="password_confirmation" class="form-input" placeholder="Re-enter your password" required>
+                        <input type="password" name="password_confirmation" class="form-input" placeholder="Re-enter your password" required
+                               data-validate="required|match:password"
+                               data-error-required="Please confirm your password."
+                               data-error-match="Passwords don't match.">
                     </div>
 
                     @if($showRecaptcha && $recaptchaSiteKey)
@@ -648,19 +661,29 @@
 
                     <div class="form-group">
                         <label class="form-label">Full Name</label>
-                        <input type="text" name="name" class="form-input {{ $errors->has('name') && old('role') === 'supplier' ? 'is-invalid' : '' }}" placeholder="John Smith" value="{{ old('role') === 'supplier' ? old('name') : '' }}" required>
+                        <input type="text" name="name" class="form-input {{ $errors->has('name') && old('role') === 'supplier' ? 'is-invalid' : '' }}" placeholder="John Smith" value="{{ old('role') === 'supplier' ? old('name') : '' }}" required
+       data-validate="required|min:2|max:120"
+       data-error-required="Please enter your full name."
+       data-error-min="Your name is too short."
+       data-error-max="That's longer than the platform allows.">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Email</label>
-                        <input type="email" name="email" class="form-input {{ $errors->has('email') && old('role') === 'supplier' ? 'is-invalid' : '' }}" placeholder="you@company.com" value="{{ old('role') === 'supplier' ? old('email') : '' }}" required>
+                        <input type="email" name="email" class="form-input {{ $errors->has('email') && old('role') === 'supplier' ? 'is-invalid' : '' }}" placeholder="you@company.com" value="{{ old('role') === 'supplier' ? old('email') : '' }}" required
+       data-validate="required|email"
+       data-error-required="We need an email to send your booking updates."
+       data-error-email="That doesn't look like a valid email.">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Password</label>
                         <div class="password-wrapper">
-                            <input type="password" name="password" class="form-input {{ $errors->has('password') && old('role') === 'supplier' ? 'is-invalid' : '' }}" placeholder="Min. 8 characters" required>
-                            <button type="button" class="password-toggle" onclick="togglePw(this)">
+                            <input type="password" name="password" class="form-input {{ $errors->has('password') && old('role') === 'supplier' ? 'is-invalid' : '' }}" placeholder="Min. 8 characters" required
+       data-validate="required|min:8"
+       data-error-required="Please create a password."
+       data-error-min="Use at least 8 characters for security.">
+                            <button type="button" class="password-toggle" onclick="togglePw(this)" aria-label="Show or hide password">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             </button>
                         </div>
@@ -668,7 +691,10 @@
 
                     <div class="form-group">
                         <label class="form-label">Confirm Password</label>
-                        <input type="password" name="password_confirmation" class="form-input" placeholder="Re-enter your password" required>
+                        <input type="password" name="password_confirmation" class="form-input" placeholder="Re-enter your password" required
+                               data-validate="required|match:password"
+                               data-error-required="Please confirm your password."
+                               data-error-match="Passwords don't match.">
                     </div>
 
                     @if($showRecaptcha && $recaptchaSiteKey)
@@ -739,6 +765,9 @@ document.querySelectorAll('[data-recaptcha-form]').forEach(function(btn) {
 });
 @endif
 </script>
+
+{{-- Inline form validation: red borders + helpful messages on blur/submit --}}
+@include('partials._form_validation')
 
 </body>
 </html>

@@ -1527,7 +1527,7 @@
                 @foreach($megaPanels as $i => $panel)
                     <div class="mega-panel {{ $i === 0 ? 'active' : '' }}" data-panel="{{ $panel['slug'] }}">
                         <a class="mega-hero" href="#">
-                            <img src="{{ $panel['cover'] }}" alt="{{ strip_tags($panel['title']) }}">
+                            <img loading="lazy" src="{{ $panel['cover'] }}" alt="{{ strip_tags($panel['title']) }}">
                             <div class="mega-hero-overlay">
                                 <h3>{!! $panel['title'] !!}</h3>
                                 <p>{!! $panel['desc'] !!}</p>
@@ -1555,7 +1555,7 @@
                             <div class="mega-subs">
                                 @foreach($panel['subs'] as $sub)
                                     <a class="mega-sub-tile" href="#" data-tags="{{ implode(' ', $sub['tags']) }}">
-                                        <div class="mega-sub-thumb"><img src="{{ $sub['img'] }}" alt="{{ strip_tags($sub['name']) }}"></div>
+                                        <div class="mega-sub-thumb"><img loading="lazy" src="{{ $sub['img'] }}" alt="{{ strip_tags($sub['name']) }}"></div>
                                         <h4>{!! $sub['name'] !!}</h4>
                                         <span class="sub-count">{{ $sub['count'] }} professionals</span>
                                     </a>
@@ -1588,7 +1588,7 @@
 
         <div class="ts-grid" id="tsGrid">
             <a class="ts-tile fade-up" href="#" data-tag="hot" data-name="dj services music">
-                <div class="ts-tile-img"><img src="https://images.unsplash.com/photo-1571266028243-e1d11d2c01a8?w=600&q=80&auto=format&fit=crop" alt="DJ"></div>
+                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1571266028243-e1d11d2c01a8?w=600&q=80&auto=format&fit=crop" alt="DJ"></div>
                 <div class="ts-tile-overlay">
                     <span class="ts-tile-tag tag-hot">Hot</span>
                     <h3>DJ Services</h3>
@@ -1596,7 +1596,7 @@
                 </div>
             </a>
             <a class="ts-tile fade-up" href="#" data-tag="featured" data-name="photography wedding">
-                <div class="ts-tile-img"><img src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=600&q=80&auto=format&fit=crop" alt="Photography"></div>
+                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=600&q=80&auto=format&fit=crop" alt="Photography"></div>
                 <div class="ts-tile-overlay">
                     <span class="ts-tile-tag tag-featured">Featured</span>
                     <h3>Photography</h3>
@@ -1604,7 +1604,7 @@
                 </div>
             </a>
             <a class="ts-tile fade-up" href="#" data-tag="all" data-name="catering food">
-                <div class="ts-tile-img"><img src="https://images.unsplash.com/photo-1555244162-803834f70033?w=600&q=80&auto=format&fit=crop" alt="Catering"></div>
+                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1555244162-803834f70033?w=600&q=80&auto=format&fit=crop" alt="Catering"></div>
                 <div class="ts-tile-overlay">
                     <span class="ts-tile-tag">Popular</span>
                     <h3>Catering</h3>
@@ -1612,7 +1612,7 @@
                 </div>
             </a>
             <a class="ts-tile fade-up" href="#" data-tag="new" data-name="floral decor flowers">
-                <div class="ts-tile-img"><img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&q=80&auto=format&fit=crop" alt="Floral"></div>
+                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&q=80&auto=format&fit=crop" alt="Floral"></div>
                 <div class="ts-tile-overlay">
                     <span class="ts-tile-tag tag-new">New</span>
                     <h3>Floral Design</h3>
@@ -1620,7 +1620,7 @@
                 </div>
             </a>
             <a class="ts-tile fade-up" href="#" data-tag="all" data-name="event planner coordination">
-                <div class="ts-tile-img"><img src="https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=600&q=80&auto=format&fit=crop" alt="Planner"></div>
+                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=600&q=80&auto=format&fit=crop" alt="Planner"></div>
                 <div class="ts-tile-overlay">
                     <span class="ts-tile-tag">Reliable</span>
                     <h3>Event Planning</h3>
@@ -1628,7 +1628,7 @@
                 </div>
             </a>
             <a class="ts-tile fade-up" href="#" data-tag="hot" data-name="live band music entertainment">
-                <div class="ts-tile-img"><img src="https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=600&q=80&auto=format&fit=crop" alt="Live band"></div>
+                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=600&q=80&auto=format&fit=crop" alt="Live band"></div>
                 <div class="ts-tile-overlay">
                     <span class="ts-tile-tag tag-hot">Hot</span>
                     <h3>Live Bands</h3>
@@ -1636,7 +1636,7 @@
                 </div>
             </a>
             <a class="ts-tile fade-up" href="#" data-tag="new" data-name="awards branding gifting recognition">
-                <div class="ts-tile-img"><img src="https://images.unsplash.com/photo-1567360425618-1594206637d2?w=600&q=80&auto=format&fit=crop" alt="Awards"></div>
+                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1567360425618-1594206637d2?w=600&q=80&auto=format&fit=crop" alt="Awards"></div>
                 <div class="ts-tile-overlay">
                     <span class="ts-tile-tag tag-new">New</span>
                     <h3>Awards &amp; Gifting</h3>

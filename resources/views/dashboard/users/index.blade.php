@@ -46,7 +46,7 @@
                 <div class="modal fade" id="editUserModal{{ $user->id }}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-xl modal-dialog-centered"><div class="modal-content">
                         <form method="POST" action="{{ route('app.users.update', $user) }}">@csrf @method('PATCH')
-                            <div class="modal-header"><h5 class="modal-title">Edit User: {{ $user->name }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                            <div class="modal-header"><h5 class="modal-title">Edit User: {{ $user->name }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
                             <div class="modal-body">
                                 <div class="row">
                                     <div class="col-md-4 mb-3"><label class="form-label">Name</label><input name="name" class="form-control" value="{{ $user->name }}" required></div>
@@ -100,7 +100,7 @@
 <div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered"><div class="modal-content">
         <form method="POST" action="{{ route('app.users.store') }}">@csrf
-            <div class="modal-header"><h5 class="modal-title">Add User</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-header"><h5 class="modal-title">Add User</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-4 mb-3"><label class="form-label">Name</label><input name="name" class="form-control" required></div>

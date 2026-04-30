@@ -279,17 +279,24 @@
                 <div class="pf-form-grid">
                     <div>
                         <label class="pf-label">Full Name *</label>
-                        <input type="text" name="name" class="pf-input" value="{{ old('name', $user->name) }}" required>
+                        <input type="text" name="name" class="pf-input" value="{{ old('name', $user->name) }}" required
+                               data-validate="required|min:2|max:120"
+                               data-error-required="Please enter your full name.">
                         @error('name') <div class="pf-error">{{ $message }}</div> @enderror
                     </div>
                     <div>
                         <label class="pf-label">Email Address *</label>
-                        <input type="email" name="email" class="pf-input" value="{{ old('email', $user->email) }}" required>
+                        <input type="email" name="email" class="pf-input" value="{{ old('email', $user->email) }}" required
+                               data-validate="required|email"
+                               data-error-required="Email is required."
+                               data-error-email="Please enter a valid email address.">
                         @error('email') <div class="pf-error">{{ $message }}</div> @enderror
                     </div>
                     <div>
                         <label class="pf-label">Phone Number</label>
-                        <input type="text" name="phone" class="pf-input" value="{{ old('phone', $user->phone) }}" placeholder="+1 (555) 123-4567">
+                        <input type="text" name="phone" class="pf-input" value="{{ old('phone', $user->phone) }}" placeholder="+1 (555) 123-4567"
+                               data-validate="tel"
+                               data-error-tel="Please enter a valid phone number.">
                         @error('phone') <div class="pf-error">{{ $message }}</div> @enderror
                     </div>
                     <div>
@@ -308,7 +315,7 @@
                     </div>
                     <div>
                         <label class="pf-label">Website</label>
-                        <input type="url" name="website" class="pf-input" value="{{ old('website', $profile->website) }}" placeholder="https://yourwebsite.com">
+                        <input type="url" name="website" class="pf-input" value="{{ old('website', $profile- data-validate="url" data-error-url="Please enter a valid URL (http:// or https://).">website) }}" placeholder="https://yourwebsite.com">
                     </div>
                     <div class="pf-form-full">
                         <label class="pf-label">Bio</label>
@@ -365,7 +372,7 @@
                     </div>
                     <div class="pf-form-full">
                         <label class="pf-label">Company Website</label>
-                        <input type="url" name="company_website" class="pf-input" value="{{ old('company_website', $profile->company_website) }}" placeholder="https://yourcompany.com">
+                        <input type="url" name="company_website" class="pf-input" value="{{ old('company_website', $profile- data-validate="url" data-error-url="Please enter a valid URL (http:// or https://).">company_website) }}" placeholder="https://yourcompany.com">
                     </div>
                 </div>
                 <div style="margin-top: 20px;">
@@ -386,19 +393,19 @@
                 <div class="pf-form-grid">
                     <div>
                         <label class="pf-label">LinkedIn</label>
-                        <input type="url" name="linkedin" class="pf-input" value="{{ old('linkedin', $profile->social_links['linkedin'] ?? '') }}" placeholder="https://linkedin.com/in/yourname">
+                        <input type="url" name="linkedin" class="pf-input" value="{{ old('linkedin', $profile- data-validate="url" data-error-url="Please enter a valid URL (http:// or https://).">social_links['linkedin'] ?? '') }}" placeholder="https://linkedin.com/in/yourname">
                     </div>
                     <div>
                         <label class="pf-label">Twitter / X</label>
-                        <input type="url" name="twitter" class="pf-input" value="{{ old('twitter', $profile->social_links['twitter'] ?? '') }}" placeholder="https://twitter.com/yourhandle">
+                        <input type="url" name="twitter" class="pf-input" value="{{ old('twitter', $profile- data-validate="url" data-error-url="Please enter a valid URL (http:// or https://).">social_links['twitter'] ?? '') }}" placeholder="https://twitter.com/yourhandle">
                     </div>
                     <div>
                         <label class="pf-label">Facebook</label>
-                        <input type="url" name="facebook" class="pf-input" value="{{ old('facebook', $profile->social_links['facebook'] ?? '') }}" placeholder="https://facebook.com/yourpage">
+                        <input type="url" name="facebook" class="pf-input" value="{{ old('facebook', $profile- data-validate="url" data-error-url="Please enter a valid URL (http:// or https://).">social_links['facebook'] ?? '') }}" placeholder="https://facebook.com/yourpage">
                     </div>
                     <div>
                         <label class="pf-label">Instagram</label>
-                        <input type="url" name="instagram" class="pf-input" value="{{ old('instagram', $profile->social_links['instagram'] ?? '') }}" placeholder="https://instagram.com/yourhandle">
+                        <input type="url" name="instagram" class="pf-input" value="{{ old('instagram', $profile- data-validate="url" data-error-url="Please enter a valid URL (http:// or https://).">social_links['instagram'] ?? '') }}" placeholder="https://instagram.com/yourhandle">
                     </div>
                 </div>
                 <div style="margin-top: 20px;">
@@ -474,17 +481,23 @@
                 <div class="pf-form-grid">
                     <div class="pf-form-full">
                         <label class="pf-label">Current Password *</label>
-                        <input type="password" name="current_password" class="pf-input" required>
+                        <input type="password" name="current_password" class="pf-input" required data-validate="required" data-error-required="Current password is required.">
                         @error('current_password') <div class="pf-error">{{ $message }}</div> @enderror
                     </div>
                     <div>
                         <label class="pf-label">New Password *</label>
-                        <input type="password" name="password" class="pf-input" required minlength="8">
+                        <input type="password" name="password" class="pf-input" required minlength="8"
+                               data-validate="required|min:8"
+                               data-error-required="Please enter a new password."
+                               data-error-min="Use at least 8 characters for security.">
                         @error('password') <div class="pf-error">{{ $message }}</div> @enderror
                     </div>
                     <div>
                         <label class="pf-label">Confirm New Password *</label>
-                        <input type="password" name="password_confirmation" class="pf-input" required>
+                        <input type="password" name="password_confirmation" class="pf-input" required
+                               data-validate="required|match:password"
+                               data-error-required="Please confirm your new password."
+                               data-error-match="Passwords do not match.">
                     </div>
                 </div>
                 <div style="margin-top: 20px;">
@@ -631,12 +644,15 @@
                     </div>
                     <div class="pf-form-full">
                         <label class="pf-label">Current Password *</label>
-                        <input type="password" name="current_password" class="pf-input" required>
+                        <input type="password" name="current_password" class="pf-input" required data-validate="required" data-error-required="Current password is required.">
                         @error('current_password') <div class="pf-error">{{ $message }}</div> @enderror
                     </div>
                     <div class="pf-form-full">
                         <label class="pf-label">Type <strong style="color:#ef4444;">DELETE</strong> to confirm *</label>
-                        <input type="text" name="confirm_text" class="pf-input" required placeholder="DELETE" autocomplete="off">
+                        <input type="text" name="confirm_text" class="pf-input" required placeholder="DELETE" autocomplete="off"
+                               data-validate="required|pattern:^DELETE$"
+                               data-error-required="Type DELETE to confirm."
+                               data-error-pattern="Please type DELETE in capital letters to confirm.">
                         @error('confirm_text') <div class="pf-error">{{ $message }}</div> @enderror
                     </div>
                 </div>

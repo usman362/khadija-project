@@ -37,7 +37,7 @@
                 <div class="modal fade" id="editPermissionModal{{ $permission->id }}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-md modal-dialog-centered"><div class="modal-content">
                         <form method="POST" action="{{ route('app.permissions.update', $permission) }}">@csrf @method('PATCH')
-                            <div class="modal-header"><h5 class="modal-title">Edit Permission</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                            <div class="modal-header"><h5 class="modal-title">Edit Permission</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
                             <div class="modal-body"><label class="form-label">Name</label><input name="name" class="form-control" value="{{ $permission->name }}" required></div>
                             <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary">Save</button></div>
                         </form>
@@ -58,7 +58,7 @@
 <div class="modal fade" id="addPermissionModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-md modal-dialog-centered"><div class="modal-content">
         <form method="POST" action="{{ route('app.permissions.store') }}">@csrf
-            <div class="modal-header"><h5 class="modal-title">Add Permission</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-header"><h5 class="modal-title">Add Permission</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
             <div class="modal-body"><label class="form-label">Name</label><input name="name" class="form-control" required></div>
             <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary">Create</button></div>
         </form>

@@ -332,6 +332,15 @@ class User extends Authenticatable
      */
     public function aiFeatureAccess(string $featureCode): array
     {
+        // Test/launch override — when AI_FEATURES_FREE_FOR_ALL=true is set
+        // in .env, every authenticated user gets unlimited access to all
+        // AI features regardless of their plan. Useful for client UAT
+        // and the soft-launch period before the membership/Stripe layer
+        // is wired up. Flip back to false once paid plans go live.
+        if (filter_var(env('AI_FEATURES_FREE_FOR_ALL', false), FILTER_VALIDATE_BOOLEAN)) {
+            return ['enabled' => true, 'quota' => 0]; // unlimited
+        }
+
         if ($this->isAdmin()) {
             return ['enabled' => true, 'quota' => 0]; // unlimited
         }

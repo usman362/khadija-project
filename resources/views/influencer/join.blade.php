@@ -290,11 +290,11 @@
         <p>Become a {{ config('app.name', 'Khadija') }} Influencer and earn up to 30% commission by helping others create amazing events.</p>
         <a href="#apply" class="inf-btn-cta">Join the Program →</a>
         <div class="inf-hero-avatars">
-            <div class="inf-hero-avatar"><img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&q=80&auto=format&fit=crop&crop=faces" alt=""></div>
-            <div class="inf-hero-avatar"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&q=80&auto=format&fit=crop&crop=faces" alt=""></div>
-            <div class="inf-hero-avatar"><img src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=150&q=80&auto=format&fit=crop&crop=faces" alt=""></div>
-            <div class="inf-hero-avatar"><img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&q=80&auto=format&fit=crop&crop=faces" alt=""></div>
-            <div class="inf-hero-avatar"><img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&q=80&auto=format&fit=crop&crop=faces" alt=""></div>
+            <div class="inf-hero-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&q=80&auto=format&fit=crop&crop=faces" alt=""></div>
+            <div class="inf-hero-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&q=80&auto=format&fit=crop&crop=faces" alt=""></div>
+            <div class="inf-hero-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?w=150&q=80&auto=format&fit=crop&crop=faces" alt=""></div>
+            <div class="inf-hero-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&q=80&auto=format&fit=crop&crop=faces" alt=""></div>
+            <div class="inf-hero-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&q=80&auto=format&fit=crop&crop=faces" alt=""></div>
         </div>
         <div><span class="inf-hero-stat"><strong>500+</strong> active influencers already earning</span></div>
     </div>

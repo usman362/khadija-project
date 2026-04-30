@@ -1,4 +1,4 @@
-<nav class="navbar">
+<nav class="navbar" aria-label="Main navigation">
     {{--
         Two-row nav (Alibaba-style):
           Row 1 — logo on the left, auth/CTA buttons on the right.
@@ -8,7 +8,9 @@
     --}}
     <div class="navbar-row navbar-row-top">
         <div class="container">
-            <a href="{{ route('landing') }}" class="navbar-brand"><img src="{{ asset('logos/logo-light.png') }}" alt="{{ config('app.name') }}" style="height: 36px;"></a>
+            <a href="{{ route('landing') }}" class="navbar-brand">
+                <img src="{{ asset('logos/logo-light.png') }}" alt="{{ config('app.name') }}" class="navbar-logo">
+            </a>
 
             <div class="navbar-actions">
                 @auth
@@ -76,8 +78,81 @@
                 @endauth
             </div>
 
-            <button class="mobile-menu-btn" onclick="this.nextElementSibling.classList.toggle('show')" aria-label="Menu">&#9776;</button>
-            <div class="mobile-nav" style="display:none;"></div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+
+            {{--
+                Mobile navigation drawer.
+                Slides in from the right when the hamburger button is tapped.
+                Mirrors the full desktop nav so mobile users have the same
+                access to All Categories, Browse Professionals, etc.
+            --}}
+            <div class="mobile-nav" id="mobileNav" aria-hidden="true">
+                <div class="mobile-nav-head">
+                    <a href="{{ route('landing') }}" class="mobile-nav-brand">{{ config('app.name', 'GigResource') }}</a>
+                    <button type="button" class="mobile-nav-close" id="mobileNavClose" aria-label="Close menu">&times;</button>
+                </div>
+
+                <div class="mobile-nav-body">
+                    {{-- Quick search --}}
+                    <form action="{{ route('public.browse') }}" method="GET" class="mobile-nav-search">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" name="q" placeholder="Find professionals…">
+                    </form>
+
+                    {{-- Primary nav links --}}
+                    <div class="mobile-nav-section">
+                        <h4>Explore</h4>
+                        <a href="{{ route('events-categories') }}" class="mobile-nav-link">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                            All Categories
+                        </a>
+                        <a href="{{ route('public.browse') }}" class="mobile-nav-link">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            Browse Professionals
+                        </a>
+                        <a href="{{ route('events-categories') }}" class="mobile-nav-link">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+                            Events
+                        </a>
+                        <a href="{{ route('public.how-it-works') }}" class="mobile-nav-link">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            How It Works
+                        </a>
+                        <a href="{{ route('about-us') }}" class="mobile-nav-link">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            About Us
+                        </a>
+                        <a href="{{ route('blog.index') }}" class="mobile-nav-link">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            Blog
+                        </a>
+                        <a href="{{ route('public.faq') }}" class="mobile-nav-link">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            FAQ
+                        </a>
+                        <a href="{{ route('landing') }}#pricing" class="mobile-nav-link">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            Pricing
+                        </a>
+                    </div>
+
+                    {{-- Auth actions --}}
+                    <div class="mobile-nav-section mobile-nav-auth">
+                        @auth
+                            <a href="{{ url('/dashboard') }}" class="mobile-nav-btn primary">Dashboard</a>
+                            <form action="{{ route('logout') }}" method="POST" style="margin:0;">
+                                @csrf
+                                <button type="submit" class="mobile-nav-btn ghost">Log out</button>
+                            </form>
+                        @else
+                            <a href="{{ route('login') }}" class="mobile-nav-btn ghost">Log in</a>
+                            <a href="{{ route('register', ['role' => 'client']) }}" class="mobile-nav-btn primary">Start Planning</a>
+                            <a href="{{ route('register', ['role' => 'supplier']) }}" class="mobile-nav-btn coral">List Your Services</a>
+                        @endauth
+                    </div>
+                </div>
+            </div>
+            <div class="mobile-nav-backdrop" id="mobileNavBackdrop"></div>
         </div>
     </div>
 
@@ -305,6 +380,43 @@
     gets it without touching each layout's @push('scripts').
 --}}
 <script>
+/* ── Mobile navigation drawer ─────────────────────────────────────
+   Hamburger opens a right-side slide-in drawer with the full nav.
+   Body scroll locks while open. Click backdrop / Escape to close.
+*/
+(function () {
+    var btn      = document.getElementById('mobileMenuBtn');
+    var nav      = document.getElementById('mobileNav');
+    var closeBtn = document.getElementById('mobileNavClose');
+    var backdrop = document.getElementById('mobileNavBackdrop');
+    if (!btn || !nav) return;
+
+    function open() {
+        nav.classList.add('is-open');
+        nav.setAttribute('aria-hidden', 'false');
+        btn.setAttribute('aria-expanded', 'true');
+        if (backdrop) backdrop.classList.add('is-visible');
+        document.body.style.overflow = 'hidden';
+    }
+    function close() {
+        nav.classList.remove('is-open');
+        nav.setAttribute('aria-hidden', 'true');
+        btn.setAttribute('aria-expanded', 'false');
+        if (backdrop) backdrop.classList.remove('is-visible');
+        document.body.style.overflow = '';
+    }
+
+    btn.addEventListener('click', open);
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    if (backdrop) backdrop.addEventListener('click', close);
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && nav.classList.contains('is-open')) close();
+    });
+    // Auto-close when crossing the breakpoint to desktop
+    var mq = window.matchMedia('(min-width: 769px)');
+    if (mq.addEventListener) mq.addEventListener('change', function (e) { if (e.matches) close(); });
+})();
+
 /* Scrolled-state toggle: stronger shadow + deeper bg once the user
    leaves the hero. Uses rAF throttling so we never churn the layout. */
 (function () {

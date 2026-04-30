@@ -1,6 +1,76 @@
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+        /* ─── ACCESSIBILITY FOUNDATIONS ────────────────────────────
+           WCAG 2.1 baseline that applies to every public page:
+             • Skip-to-content link visible on focus
+             • :focus-visible outline so keyboard users always know
+               where they are without showing the ring on mouse clicks
+             • Honour prefers-reduced-motion for users who request it
+             • Selection highlight uses brand colour
+        */
+        :focus { outline: none; }                /* default — replaced below */
+        :focus-visible {
+            outline: 2px solid #a78bfa;
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+        /* Some custom controls swallow outline; fall back to a glow ring */
+        button:focus-visible,
+        a:focus-visible,
+        input:focus-visible,
+        textarea:focus-visible,
+        select:focus-visible,
+        [role="button"]:focus-visible,
+        [tabindex]:focus-visible {
+            outline: 2px solid #a78bfa;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.25);
+        }
+
+        ::selection { background: rgba(139, 92, 246, 0.45); color: #fff; }
+
+        /* Skip link — invisible until keyboard-focused */
+        .skip-to-content {
+            position: absolute;
+            top: 0; left: 0;
+            z-index: 9999;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            border-radius: 0 0 12px 0;
+            transform: translateY(-110%);
+            transition: transform 0.2s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.40);
+        }
+        .skip-to-content:focus {
+            transform: translateY(0);
+        }
+
+        /* Visually-hidden helper — content visible to screen readers only */
+        .sr-only {
+            position: absolute;
+            width: 1px; height: 1px;
+            padding: 0; margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Respect users who request reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
         :root {
             --primary: #3b82f6;
             --primary-dark: #2563eb;
@@ -106,8 +176,17 @@
             display: inline-flex;
             align-items: center;
             transition: transform 0.2s ease, filter 0.2s ease;
+            flex-shrink: 0;
+            min-width: 0;
         }
-        .navbar-brand img {
+        /* Logo image is now driven by a class instead of inline style so we
+           can scale it down on mobile without touching the markup. */
+        .navbar-brand img,
+        .navbar-logo {
+            height: 36px;
+            width: auto;
+            max-width: 100%;
+            display: block;
             filter: drop-shadow(0 2px 8px rgba(59, 130, 246, 0.25));
             transition: filter 0.2s ease;
         }
@@ -739,7 +818,177 @@
             color: #fff;
             font-size: 1.5rem;
             padding: 8px;
+            border: none;
+            cursor: pointer;
         }
+
+        /* ── Mobile slide-in drawer ──────────────────────────────────
+           Hidden by default. Slides in from the right when .is-open is
+           added by the hamburger button JS. Backdrop locks body scroll.
+        */
+        .mobile-nav {
+            position: fixed;
+            top: 0; right: 0; bottom: 0;
+            width: 88%; max-width: 360px;
+            background: linear-gradient(180deg, rgba(15,21,41,0.98), rgba(11,15,26,0.98));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255,255,255,0.08);
+            box-shadow: -30px 0 80px rgba(0,0,0,0.50);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1100;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            visibility: hidden;
+        }
+        .mobile-nav.is-open {
+            transform: translateX(0);
+            visibility: visible;
+        }
+        .mobile-nav-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(5,8,15,0.65);
+            backdrop-filter: blur(4px);
+            z-index: 1099;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .mobile-nav-backdrop.is-visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .mobile-nav-head {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 22px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            flex-shrink: 0;
+        }
+        .mobile-nav-brand {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: -0.01em;
+        }
+        .mobile-nav-close {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.75);
+            font-size: 28px; line-height: 1;
+            padding: 4px 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.15s, color 0.15s;
+        }
+        .mobile-nav-close:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .mobile-nav-body {
+            padding: 16px 22px 24px;
+            overflow-y: auto;
+            flex: 1;
+            -webkit-overflow-scrolling: touch;
+        }
+        .mobile-nav-search {
+            position: relative;
+            display: flex; align-items: center;
+            margin-bottom: 22px;
+        }
+        .mobile-nav-search svg {
+            position: absolute; left: 14px;
+            width: 18px; height: 18px;
+            color: rgba(255,255,255,0.5);
+            pointer-events: none;
+        }
+        .mobile-nav-search input {
+            width: 100%;
+            padding: 12px 14px 12px 42px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .mobile-nav-search input::placeholder { color: rgba(255,255,255,0.45); }
+        .mobile-nav-search input:focus {
+            border-color: rgba(139,92,246,0.45);
+            background: rgba(139,92,246,0.06);
+        }
+        .mobile-nav-section {
+            display: flex; flex-direction: column;
+            gap: 2px;
+            margin-bottom: 22px;
+        }
+        .mobile-nav-section h4 {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.4px;
+            color: rgba(255,255,255,0.45);
+            margin: 0 0 8px;
+            padding-left: 8px;
+        }
+        .mobile-nav-link {
+            display: flex; align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 14.5px;
+            font-weight: 600;
+            transition: background 0.15s, color 0.15s, transform 0.15s;
+        }
+        .mobile-nav-link svg {
+            color: rgba(139,92,246,0.85);
+            flex-shrink: 0;
+        }
+        .mobile-nav-link:hover,
+        .mobile-nav-link:active {
+            background: rgba(139,92,246,0.10);
+            color: #fff;
+            transform: translateX(2px);
+        }
+        .mobile-nav-auth {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 18px;
+            gap: 8px;
+        }
+        .mobile-nav-btn {
+            display: block;
+            width: 100%;
+            padding: 13px 18px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 14px;
+            font-family: inherit;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .mobile-nav-btn.primary {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: #fff;
+            box-shadow: 0 8px 22px rgba(139,92,246,0.30);
+        }
+        .mobile-nav-btn.primary:hover { transform: translateY(-1px); }
+        .mobile-nav-btn.coral {
+            background: linear-gradient(135deg, #f97316, #f59e0b);
+            color: #fff;
+            box-shadow: 0 8px 22px rgba(249,115,22,0.30);
+        }
+        .mobile-nav-btn.coral:hover { transform: translateY(-1px); }
+        .mobile-nav-btn.ghost {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: #fff;
+        }
+        .mobile-nav-btn.ghost:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.20); }
 
         /* ─── HERO ────────────────────────────── */
         .hero {
@@ -1734,6 +1983,9 @@
         }
 
         @media (max-width: 768px) {
+            /* Prevent horizontal scroll on mobile across every public page */
+            html, body { overflow-x: hidden; max-width: 100vw; }
+
             .navbar-links { display: none; }
             /* Second row collapses entirely on mobile — hamburger opens
                the full nav instead. */
@@ -1741,6 +1993,15 @@
             .navbar-actions .join-dropdown, .navbar-actions .navbar-login-link { display: none; }
             .navbar-actions .btn-blue, .navbar-actions .btn-red { display: none; }
             .mobile-menu-btn { display: block; }
+
+            /* Logo scales down so it fits next to the hamburger comfortably */
+            .navbar-logo, .navbar-brand img { height: 30px; }
+
+            /* Tighter container + row padding on mobile */
+            .navbar-row-top .container,
+            .navbar-row-links .container { padding-left: 16px; padding-right: 16px; }
+            .navbar-actions { gap: 6px; }
+
             .trust-badges { grid-template-columns: repeat(2, 1fr); }
             .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
             .pricing-card.featured { transform: none; }
@@ -1754,5 +2015,16 @@
             .about-grid { grid-template-columns: 1fr; gap: 32px; }
             .about-image { height: 280px; }
             .about-stats { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+            /* Section / container padding tightens on mobile so content
+               doesn't push against viewport edges. */
+            .section { padding: 60px 0 !important; }
+            .container { padding-left: 16px; padding-right: 16px; }
+        }
+        @media (max-width: 480px) {
+            /* Even tighter logo + actions on tiny phones */
+            .navbar-logo, .navbar-brand img { height: 26px; }
+            .navbar-actions { gap: 4px; }
+            .navbar-actions .user-avatar { width: 32px; height: 32px; }
         }
     </style>
