@@ -23,15 +23,15 @@
     .policy-hero-bg img {
         width: 100%; height: 100%;
         object-fit: cover;
-        opacity: 0.26;
+        opacity: 1;
     }
     .policy-hero-bg::after {
         content: '';
         position: absolute; inset: 0;
         background:
-            radial-gradient(900px 400px at 18% 10%, rgba(59,130,246,0.20), transparent 55%),
-            radial-gradient(800px 380px at 85% 0%, rgba(139,92,246,0.20), transparent 55%),
-            linear-gradient(180deg, rgba(11,15,26,0.55) 0%, rgba(11,15,26,0.92) 80%, var(--bg-dark) 100%);
+            radial-gradient(900px 400px at 18% 10%, rgba(59,130,246,0.10), transparent 55%),
+            radial-gradient(800px 380px at 85% 0%, rgba(139,92,246,0.10), transparent 55%),
+            linear-gradient(180deg, rgba(11,15,26,0.10) 0%, rgba(11,15,26,0.35) 65%, var(--bg-dark) 100%);
     }
     .policy-hero .container { position: relative; z-index: 1; }
     .policy-hero::before {
@@ -375,7 +375,7 @@
 
 <section class="policy-hero">
     <div class="policy-hero-bg">
-        <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1600&q=80&auto=format&fit=crop" alt="" loading="eager">
+        <img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=1800&q=85&auto=format&fit=crop" alt="Bridal bouquet of fresh flowers" loading="eager">
     </div>
     <div class="container">
         <div class="policy-eyebrow">

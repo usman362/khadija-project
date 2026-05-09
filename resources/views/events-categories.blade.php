@@ -31,11 +31,11 @@
         overflow: hidden;
     }
     .ec-hero-bg { position: absolute; inset: 0; z-index: 0; }
-    .ec-hero-bg img { width: 100%; height: 100%; object-fit: cover; opacity: 0.28; }
+    .ec-hero-bg img { width: 100%; height: 100%; object-fit: cover; opacity: 1; }
     .ec-hero-bg::after {
         content: '';
         position: absolute; inset: 0;
-        background: linear-gradient(180deg, rgba(11,15,26,0.55) 0%, rgba(11,15,26,0.9) 80%, var(--bg-dark) 100%);
+        background: linear-gradient(180deg, rgba(11,15,26,0.10) 0%, rgba(11,15,26,0.35) 65%, var(--bg-dark) 100%);
     }
     .ec-hero .container { position: relative; z-index: 1; }
     .ec-hero::before {
@@ -971,7 +971,7 @@
 <!-- ─── HERO ───────────────────────────────── -->
 <section class="ec-hero">
     <div class="ec-hero-bg">
-        <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1600&q=80&auto=format&fit=crop" alt="Event celebration confetti" loading="eager">
+        <img src="https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=1800&q=85&auto=format&fit=crop" alt="Live band performing on stage at an event" loading="eager">
     </div>
     <div class="container">
         <div class="fade-up">

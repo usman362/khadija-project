@@ -21,13 +21,13 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
-        opacity: 0.35;
+        opacity: 1;
     }
     .about-hero-bg::after {
         content: '';
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(11,15,26,0.6) 0%, rgba(11,15,26,0.85) 70%, var(--bg-dark) 100%);
+        background: linear-gradient(180deg, rgba(11,15,26,0.10) 0%, rgba(11,15,26,0.35) 65%, var(--bg-dark) 100%);
     }
     .about-hero .container { position: relative; z-index: 1; }
 
@@ -583,7 +583,7 @@
 <!-- ─── HERO ───────────────────────────────── -->
 <section class="about-hero">
     <div class="about-hero-bg">
-        <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=1600&q=80&auto=format&fit=crop" alt="Elegant event setup" loading="eager">
+        <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1800&q=85&auto=format&fit=crop" alt="Bride and groom in a sunlit field" loading="eager">
     </div>
     <div class="container">
         <div class="fade-up">

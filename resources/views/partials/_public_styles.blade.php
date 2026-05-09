@@ -1009,13 +1009,15 @@
         }
 
         .hero-bg::before {
+            /* Soft bottom-fade only — wedding image shows clearly through.
+               Top stays nearly transparent so the photo isn't darkened. */
             content: '';
             position: absolute;
             inset: 0;
             background: linear-gradient(180deg,
-                rgba(11,15,26,0.3) 0%,
-                rgba(11,15,26,0.6) 40%,
-                rgba(11,15,26,0.95) 100%
+                rgba(11,15,26,0.05) 0%,
+                rgba(11,15,26,0.20) 50%,
+                rgba(11,15,26,0.55) 100%
             );
             z-index: 1;
         }

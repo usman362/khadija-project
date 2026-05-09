@@ -20,12 +20,12 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
-        opacity: 0.22;
+        opacity: 1;
     }
     .blog-hero-bg::after {
         content: '';
         position: absolute; inset: 0;
-        background: linear-gradient(180deg, rgba(11,15,26,0.65) 0%, rgba(11,15,26,0.92) 80%, var(--bg-dark) 100%);
+        background: linear-gradient(180deg, rgba(11,15,26,0.10) 0%, rgba(11,15,26,0.35) 65%, var(--bg-dark) 100%);
     }
     .blog-hero .container { position: relative; z-index: 1; }
     .blog-hero::before {
@@ -317,7 +317,7 @@
 <!-- ─── HERO ───────────────────────────────── -->
 <section class="blog-hero">
     <div class="blog-hero-bg">
-        <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1600&q=80&auto=format&fit=crop" alt="Writing on laptop" loading="eager">
+        <img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=1800&q=85&auto=format&fit=crop" alt="Wedding decor and floral arrangements" loading="eager">
     </div>
     <div class="container">
         <span class="blog-hero-badge">

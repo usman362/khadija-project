@@ -1084,5 +1084,9 @@
 
     {{-- Styled datepicker (Flatpickr) for all <input type="date"> --}}
     @include('partials._datepicker')
+
+    {{-- Universal mobile-friendly fixes (sidebar backdrop, scroll lock,
+         table scroll, grid stacking, responsive padding) --}}
+    @include('partials._mobile_fixes')
 </body>
 </html>

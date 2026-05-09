@@ -20,12 +20,12 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
-        opacity: 0.25;
+        opacity: 1;
     }
     .inf-hero-bg::after {
         content: '';
         position: absolute; inset: 0;
-        background: linear-gradient(180deg, rgba(30,27,75,0.65) 0%, rgba(30,27,75,0.9) 100%);
+        background: linear-gradient(180deg, rgba(30,27,75,0.10) 0%, rgba(30,27,75,0.35) 65%, var(--bg-dark) 100%);
     }
     .inf-hero::before {
         content: '';
@@ -282,7 +282,7 @@
 @section('content')
 <section class="inf-hero">
     <div class="inf-hero-bg">
-        <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1600&q=80&auto=format&fit=crop" alt="Vibrant celebration" loading="eager">
+        <img src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1800&q=85&auto=format&fit=crop" alt="Energetic festival crowd with lights" loading="eager">
     </div>
     <div class="container">
         <span class="inf-hero-badge">✨ Partner Program</span>

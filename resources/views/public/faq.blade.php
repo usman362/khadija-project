@@ -25,16 +25,15 @@
     .faq-hero-bg img {
         width: 100%; height: 100%;
         object-fit: cover;
-        opacity: 0.28;
+        opacity: 1;
     }
     .faq-hero-bg::after {
         content: '';
         position: absolute; inset: 0;
         background:
-            radial-gradient(900px 420px at 18% 10%, rgba(59,130,246,0.22), transparent 55%),
-            radial-gradient(800px 400px at 85% 0%, rgba(139,92,246,0.22), transparent 55%),
-            radial-gradient(700px 300px at 50% 100%, rgba(249,115,22,0.10), transparent 60%),
-            linear-gradient(180deg, rgba(11,15,26,0.55) 0%, rgba(11,15,26,0.92) 80%, var(--bg-dark) 100%);
+            radial-gradient(900px 420px at 18% 10%, rgba(59,130,246,0.10), transparent 55%),
+            radial-gradient(800px 400px at 85% 0%, rgba(139,92,246,0.10), transparent 55%),
+            linear-gradient(180deg, rgba(11,15,26,0.10) 0%, rgba(11,15,26,0.35) 65%, var(--bg-dark) 100%);
     }
     .faq-hero .container { position: relative; z-index: 1; }
     .faq-eyebrow {
@@ -245,7 +244,7 @@
     {{-- Cover banner: a wedding decor / florals scene that ties the
          FAQ page back to the platform's event-services context. --}}
     <div class="faq-hero-bg">
-        <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1800&q=80&auto=format&fit=crop" alt="" loading="eager">
+        <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=1800&q=85&auto=format&fit=crop" alt="Wedding reception table setup" loading="eager">
     </div>
     <div class="container">
         <div class="faq-eyebrow">

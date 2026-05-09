@@ -684,7 +684,7 @@
 <!-- ─── HERO ─────────────────────────────────── -->
 <section class="hero">
     <div class="hero-bg">
-        <img src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1600&q=80&auto=format&fit=crop" alt="Outdoor event festival with colorful lights and staging" loading="eager">
+        <img src="https://images.unsplash.com/photo-1606216794074-735e91aa5c92?w=1800&q=85&auto=format&fit=crop" alt="Wedding ceremony aisle with floral arch" loading="eager">
     </div>
     <div class="container" style="position: relative;">
         {{-- Trust pill — GigSalad's signature opener. Uses REAL review count

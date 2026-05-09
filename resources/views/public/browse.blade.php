@@ -25,16 +25,17 @@
     .browse-hero-bg img {
         width: 100%; height: 100%;
         object-fit: cover;
-        opacity: 0.30;
+        /* Image shows clearly — only a soft bottom fade keeps the lower
+           edge readable against the rest of the page. */
+        opacity: 1;
     }
     .browse-hero-bg::after {
         content: '';
         position: absolute; inset: 0;
         background:
-            radial-gradient(900px 420px at 18% 10%, rgba(59,130,246,0.24), transparent 55%),
-            radial-gradient(800px 400px at 85% 0%, rgba(139,92,246,0.24), transparent 55%),
-            radial-gradient(600px 300px at 50% 100%, rgba(249,115,22,0.12), transparent 60%),
-            linear-gradient(180deg, rgba(11,15,26,0.55) 0%, rgba(11,15,26,0.90) 80%, var(--bg-dark) 100%);
+            radial-gradient(900px 420px at 18% 10%, rgba(59,130,246,0.10), transparent 55%),
+            radial-gradient(800px 400px at 85% 0%, rgba(139,92,246,0.10), transparent 55%),
+            linear-gradient(180deg, rgba(11,15,26,0.10) 0%, rgba(11,15,26,0.35) 65%, var(--bg-dark) 100%);
     }
     .browse-hero .container { position: relative; z-index: 1; }
     .browse-eyebrow {
@@ -927,7 +928,7 @@
     {{-- Cover banner: a wedding reception / celebration scene that
          previews exactly what a verified professional helps create. --}}
     <div class="browse-hero-bg">
-        <img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=1800&q=80&auto=format&fit=crop" alt="" loading="eager">
+        <img src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=1800&q=85&auto=format&fit=crop" alt="Wedding photographer at work capturing moments" loading="eager">
     </div>
     <div class="container">
         <div class="browse-eyebrow">
