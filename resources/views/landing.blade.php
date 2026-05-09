@@ -812,7 +812,7 @@
                 </div>
             </div>
             <div class="about-image">
-                <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80" alt="Event planning team" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1606216794074-735e91aa5c92?w=800&q=80" alt="Event planning team" loading="lazy">
             </div>
         </div>
     </div>
@@ -839,7 +839,7 @@
                 </div>
             </a>
             <a href="{{ route('events-categories') }}" class="cat-tile">
-                <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80&auto=format&fit=crop" alt="Corporate conference" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1606216794074-735e91aa5c92?w=800&q=80&auto=format&fit=crop" alt="Corporate conference" loading="lazy">
                 <div class="cat-tile-gradient"></div>
                 <div class="cat-tile-content">
                     <span class="cat-tile-tag" style="background: rgba(139,92,246,0.9);">Corporate</span>
@@ -851,7 +851,7 @@
                 </div>
             </a>
             <a href="{{ route('events-categories') }}" class="cat-tile">
-                <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&q=80&auto=format&fit=crop" alt="Birthday party with balloons" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=800&q=80&auto=format&fit=crop" alt="Birthday party with balloons" loading="lazy">
                 <div class="cat-tile-gradient"></div>
                 <div class="cat-tile-content">
                     <span class="cat-tile-tag" style="background: rgba(236,72,153,0.9);">Popular</span>
@@ -863,7 +863,7 @@
                 </div>
             </a>
             <a href="{{ route('events-categories') }}" class="cat-tile">
-                <img src="https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=800&q=80&auto=format&fit=crop" alt="Music concert stage lights" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80&auto=format&fit=crop" alt="Music concert stage lights" loading="lazy">
                 <div class="cat-tile-gradient"></div>
                 <div class="cat-tile-content">
                     <span class="cat-tile-tag" style="background: rgba(6,182,212,0.9);">Live</span>
@@ -875,7 +875,7 @@
                 </div>
             </a>
             <a href="{{ route('events-categories') }}" class="cat-tile">
-                <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800&q=80&auto=format&fit=crop" alt="Graduation ceremony caps in the air" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800&q=80&auto=format&fit=crop" alt="Graduation ceremony caps in the air" loading="lazy">
                 <div class="cat-tile-gradient"></div>
                 <div class="cat-tile-content">
                     <span class="cat-tile-tag" style="background: rgba(245,158,11,0.9);">Milestone</span>
@@ -887,7 +887,7 @@
                 </div>
             </a>
             <a href="{{ route('events-categories') }}" class="cat-tile">
-                <img src="https://images.unsplash.com/photo-1507924538820-ede94a04019d?w=800&q=80&auto=format&fit=crop" alt="Holiday celebration dinner" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&q=80&auto=format&fit=crop" alt="Holiday celebration dinner" loading="lazy">
                 <div class="cat-tile-gradient"></div>
                 <div class="cat-tile-content">
                     <span class="cat-tile-tag" style="background: rgba(34,197,94,0.9);">Seasonal</span>
@@ -989,7 +989,7 @@
             </div>
             <div class="cta-image">
                 <div class="cta-image-wrap">
-                    <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=900&q=80&auto=format&fit=crop" alt="Event professionals collaborating" loading="lazy">
+                    <img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=900&q=80&auto=format&fit=crop" alt="Event professionals collaborating" loading="lazy">
                 </div>
             </div>
         </div>
@@ -1204,7 +1204,7 @@
         </div>
         <div class="moments-grid">
             <div class="moment moment--wide moment--tall">
-                <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=900&q=80&auto=format&fit=crop" alt="Graduation celebration" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&q=80&auto=format&fit=crop" alt="Graduation celebration" loading="lazy">
                 <span class="moment-label">Graduation ceremonies</span>
             </div>
             <div class="moment">
@@ -1216,7 +1216,7 @@
                 <span class="moment-label">Decor &amp; florals</span>
             </div>
             <div class="moment moment--wide">
-                <img src="https://images.unsplash.com/photo-1540317580384-e5d43616b9aa?w=900&q=80&auto=format&fit=crop" alt="Catering spread" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=900&q=80&auto=format&fit=crop" alt="Catering spread" loading="lazy">
                 <span class="moment-label">Gourmet catering</span>
             </div>
         </div>
