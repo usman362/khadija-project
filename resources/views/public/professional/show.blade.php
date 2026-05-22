@@ -27,10 +27,13 @@
 .pp-page {
     max-width: 1180px;
     margin: 0 auto;
-    padding: 100px 24px 120px;
+    /* Top padding bumped from 100px → 160px so the breadcrumb clears
+       the two-row sticky navbar (~140px tall on desktop) without
+       requiring the user to scroll. */
+    padding: 160px 24px 120px;
     color: var(--text-primary, #1f2937);
 }
-@media (max-width: 720px) { .pp-page { padding: 90px 16px 90px; } }
+@media (max-width: 720px) { .pp-page { padding: 130px 16px 90px; } }
 
 /* ── Breadcrumb ───────────────────────────────────────────── */
 .pp-breadcrumb {
@@ -172,6 +175,16 @@
     font-weight: 700;
 }
 .pp-tag.rating .star { color: #f59e0b; }
+.pp-tag.verified {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: #065f46;
+    font-weight: 600;
+}
+.pp-tag.new-vendor {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: #1e40af;
+    font-weight: 600;
+}
 
 /* Primary / secondary / ghost CTAs */
 .pp-hero-cta {
@@ -661,10 +674,10 @@
                         <span class="pp-tag top">★ Top Rated Pro</span>
                     @endif
                     @if($isVerified)
-                        <span class="pp-tag">✓ Verified</span>
+                        <span class="pp-tag verified">✓ Verified</span>
                     @endif
                     @if($isNew)
-                        <span class="pp-tag">New Vendor</span>
+                        <span class="pp-tag new-vendor">✨ New Vendor</span>
                     @endif
                 </div>
             </div>

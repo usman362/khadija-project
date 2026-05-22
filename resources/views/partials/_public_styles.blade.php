@@ -30,10 +30,13 @@
 
         ::selection { background: rgba(139, 92, 246, 0.45); color: #fff; }
 
-        /* Skip link — invisible until keyboard-focused */
+        /* Skip link — invisible until keyboard-focused. Uses `top: -200px`
+           plus `clip` so even on browsers that round transforms imprecisely
+           it can never poke into the viewport. WCAG-compliant: still in DOM
+           and announced by screen readers; first Tab press brings it on. */
         .skip-to-content {
             position: absolute;
-            top: 0; left: 0;
+            top: -200px; left: 0;
             z-index: 9999;
             padding: 12px 20px;
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
@@ -42,12 +45,12 @@
             font-size: 14px;
             text-decoration: none;
             border-radius: 0 0 12px 0;
-            transform: translateY(-110%);
-            transition: transform 0.2s ease;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.40);
+            transition: top 0.2s ease;
         }
-        .skip-to-content:focus {
-            transform: translateY(0);
+        .skip-to-content:focus,
+        .skip-to-content:focus-visible {
+            top: 0;
         }
 
         /* Visually-hidden helper — content visible to screen readers only */
