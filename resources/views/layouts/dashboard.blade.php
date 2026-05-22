@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', config('app.name') . ' Dashboard')</title>
+    @php($seoNoIndex = $seoNoIndex ?? true)
+    @include('partials._seo_meta')
 
     <script src="https://nobleui.com/html/template/assets/js/color-modes.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com/">
@@ -58,6 +59,7 @@
 
         /* Active indicator is handled by NobleUI default CSS + Blade routeIs() classes */
     </style>
+    @include('partials._a11y')
     @stack('styles')
 </head>
 
@@ -681,6 +683,9 @@
 
     {{-- Styled datepicker (Flatpickr) for all <input type="date"> --}}
     @include('partials._datepicker')
+
+    {{-- Voice search progressive-enhancement (mic button on [data-voice-search] inputs) --}}
+    @include('partials._voice_search')
 
     {{-- Universal mobile-friendly fixes (sidebar backdrop, scroll lock,
          table scroll, grid stacking, responsive padding) --}}

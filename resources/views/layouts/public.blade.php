@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', config('app.name', 'Khadija'))</title>
+    @include('partials._seo_meta')
     @stack('meta')
 
     {{-- Preconnect to remote origins so the first request to each is
@@ -22,6 +22,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     @include('partials._public_styles')
+    @include('partials._a11y')
     @stack('styles')
 </head>
 <body>
@@ -38,6 +39,10 @@
 </main>
 
 @include('partials.footer')
+
+{{-- Voice search — progressively enhances any input with [data-voice-search]
+     into a tap-to-talk mic button. Silent no-op on unsupported browsers. --}}
+@include('partials._voice_search')
 
 <script>
     /* Bottom-of-body inline script — runs after the DOM is parsed.
@@ -78,5 +83,9 @@
 {{-- Styled datepicker (Flatpickr) — replaces native <input type="date">
      across the site for a consistent, branded date-picking UX. --}}
 @include('partials._datepicker')
+
+{{-- Universal mobile-friendly fixes (table scroll, grid stacking,
+     responsive padding, horizontal-scroll prevention) --}}
+@include('partials._mobile_fixes')
 </body>
 </html>

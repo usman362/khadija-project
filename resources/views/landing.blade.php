@@ -1,6 +1,10 @@
 @extends('layouts.public')
 
-@section('title', config('app.name', 'Khadija') . ' - Host Unforgettable Events With Confidence')
+@php
+    $seoTitle       = 'Hire Trusted Event Professionals';
+    $seoDescription = 'GigResource is the all-in-one marketplace for event pros — photographers, caterers, DJs, planners, venues. Get quotes, sign contracts, and pay securely in one place.';
+    $seoKeywords    = 'event planners, wedding vendors, hire DJ, hire photographer, event marketplace, book caterer';
+@endphp
 
 @push('styles')
 <style>
@@ -718,7 +722,7 @@
         <form class="hero-finder" action="{{ route('public.browse') }}" method="GET">
             <div class="hero-finder-search">
                 <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" name="q" placeholder="Find photographers, DJs, caterers, venues..." autocomplete="off">
+                <input type="text" name="q" placeholder="Find photographers, DJs, caterers, venues..." autocomplete="off" data-voice-search>
                 <button type="submit">Search</button>
             </div>
             @if($categories->isNotEmpty())

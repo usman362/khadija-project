@@ -1,6 +1,9 @@
 @extends('layouts.public')
 
-@section('title', 'About Us - ' . config('app.name', 'Khadija'))
+@php
+    $seoTitle       = 'About GigResource';
+    $seoDescription = 'Built to make booking event professionals as easy as ordering a coffee. Learn how GigResource verifies pros, escrows payments, and protects both sides of every gig.';
+@endphp
 
 @push('styles')
 <style>

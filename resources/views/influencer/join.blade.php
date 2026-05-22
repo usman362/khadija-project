@@ -282,7 +282,7 @@
 @section('content')
 <section class="inf-hero">
     <div class="inf-hero-bg">
-        <img src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=1800&q=85&auto=format&fit=crop" alt="Energetic festival crowd with lights" loading="eager">
+        <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1800&q=85&auto=format&fit=crop" alt="Couple celebrating together at sunset" loading="eager">
     </div>
     <div class="container">
         <span class="inf-hero-badge">✨ Partner Program</span>

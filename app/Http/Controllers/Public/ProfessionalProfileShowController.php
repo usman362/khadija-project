@@ -57,10 +57,8 @@ class ProfessionalProfileShowController extends Controller
         // Trust signals: estimated response time and reply rate. Without a
         // message-response table yet these are derived defaults — verified
         // pros get the stronger numbers, new pros get gentler placeholders.
-        $isFullyVerified = $profile
-            && $profile->trade_license_verified_at
-            && $profile->liability_insurance_verified_at
-            && $profile->workers_comp_verified_at;
+        // Uses centralized User::isVerified() (all three docs approved).
+        $isFullyVerified = $user->isVerified();
 
         $responseSignals = [
             'response_time' => $isFullyVerified ? 'Within 2 hours'  : 'Within 24 hours',

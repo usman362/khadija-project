@@ -13,3 +13,10 @@ Schedule::command('users:purge-expired')
     ->dailyAt('03:10')
     ->withoutOverlapping()
     ->onOneServer();
+
+// Daily at 03:20, delete cached agreement PDFs older than 60 days.
+// Pairs with AgreementPdfService::RETENTION_DAYS.
+Schedule::command('agreements:purge-old-pdfs')
+    ->dailyAt('03:20')
+    ->withoutOverlapping()
+    ->onOneServer();

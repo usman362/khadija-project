@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', config('app.name') . ' — Dashboard')</title>
+    @php($seoNoIndex = $seoNoIndex ?? true)
+    @include('partials._seo_meta')
 
     <link rel="preconnect" href="https://fonts.googleapis.com/">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
@@ -891,6 +892,7 @@
         /* ═══════════════════════ LOGOUT FORM ═══════════════════════ */
         .cl-logout-form { display: none; }
     </style>
+    @include('partials._a11y')
     @stack('styles')
 </head>
 
@@ -1081,6 +1083,9 @@
 
     {{-- Inline form validation: live blur/submit messages on data-validate inputs --}}
     @include('partials._form_validation')
+
+    {{-- Voice search progressive-enhancement (mic button on [data-voice-search] inputs) --}}
+    @include('partials._voice_search')
 
     {{-- Styled datepicker (Flatpickr) for all <input type="date"> --}}
     @include('partials._datepicker')

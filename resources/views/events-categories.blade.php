@@ -1,6 +1,9 @@
 @extends('layouts.public')
 
-@section('title', 'Browse Categories - ' . config('app.name', 'Khadija'))
+@php
+    $seoTitle       = 'Event Categories';
+    $seoDescription = 'Explore every event category we cover — weddings, corporate events, birthdays, festivals, conferences, and more. Find specialists for every occasion.';
+@endphp
 
 @push('styles')
 {{--

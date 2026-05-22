@@ -1,6 +1,9 @@
 @extends('layouts.public')
 
-@section('title', 'How It Works | ' . config('app.name'))
+@php
+    $seoTitle       = 'How GigResource Works';
+    $seoDescription = 'From posting a gig to signing the contract — see exactly how GigResource pairs you with vetted event pros, holds funds in escrow, and releases payment on delivery.';
+@endphp
 
 @push('styles')
 <style>
@@ -427,7 +430,7 @@
          signals the kind of event GigResource professionals deliver.
          Dimmed via .hiw-hero-bg::after for legibility. --}}
     <div class="hiw-hero-bg">
-        <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=1800&q=85&auto=format&fit=crop" alt="Joyful event celebration with guests" loading="eager">
+        <img src="https://images.unsplash.com/photo-1525772764200-be829a350797?w=1800&q=85&auto=format&fit=crop" alt="Wedding rings on textured fabric" loading="eager">
     </div>
     <div class="container">
         <div class="hiw-eyebrow">

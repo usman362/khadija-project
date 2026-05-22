@@ -1,6 +1,9 @@
 @extends('layouts.public')
 
-@section('title', 'Frequently Asked Questions | ' . config('app.name'))
+@php
+    $seoTitle       = 'Frequently Asked Questions';
+    $seoDescription = 'Answers about booking on GigResource — payments and escrow, contracts, dispute resolution, vendor verification, and the GigResource Guarantee.';
+@endphp
 
 @push('styles')
 <style>

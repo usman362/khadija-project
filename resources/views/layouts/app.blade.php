@@ -7,12 +7,14 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    @php($seoNoIndex = $seoNoIndex ?? true)
+    @include('partials._seo_meta')
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 
+    @include('partials._a11y')
 </head>
 <body>
     <div id="app">

@@ -1,6 +1,9 @@
 @extends('layouts.public')
 
-@section('title', 'Browse Professionals | ' . config('app.name'))
+@php
+    $seoTitle       = 'Browse Event Professionals';
+    $seoDescription = 'Browse verified event professionals — photographers, caterers, DJs, planners, venues. Filter by category, city, and rating. Read reviews. Book with confidence.';
+@endphp
 
 @push('styles')
 <style>
@@ -940,7 +943,7 @@
         <form method="GET" action="{{ route('public.browse') }}" class="browse-mega-search" id="megaSearchForm">
             <div class="search-field">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" name="q" value="{{ $filters['q'] }}" placeholder="Try 'wedding photographer' or 'live band'…" autocomplete="off">
+                <input type="text" name="q" value="{{ $filters['q'] }}" placeholder="Try 'wedding photographer' or 'live band'…" autocomplete="off" data-voice-search>
             </div>
             <span class="search-divider"></span>
             <select name="city" class="city-select" aria-label="City">
@@ -1155,12 +1158,11 @@
                     @foreach($pros as $pro)
                         @php
                             $p = $pro->profile;
-                            $isVerified = $p
-                                && $p->trade_license_verified_at
-                                && $p->liability_insurance_verified_at
-                                && $p->workers_comp_verified_at;
-                            $isTop = (float) ($pro->reviews_avg ?? 0) >= 4.5 && (int) ($pro->reviews_count ?? 0) >= 5;
-                            $isNew = $pro->created_at && $pro->created_at->gt(now()->subDays(30));
+                            // Centralized badge derivation — single source of truth on User model.
+                            // Auto-assigned from reviews + booking + verification doc state.
+                            $isVerified = $pro->isVerified();
+                            $isTop      = $pro->isTopRated();
+                            $isNew      = $pro->isNewVendor();
                             $loc   = $p ? collect([$p->city, $p->state])->filter()->implode(', ') : null;
                             // Skills come back as a JSON array on UserProfile — show up to 3 chips.
                             $skills = is_array($p?->skills) ? array_slice($p->skills, 0, 3) : [];

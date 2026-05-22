@@ -282,9 +282,20 @@
         @endif
 
         @if($agreement->isFullyAccepted())
-            <div class="alert alert-success mt-3 mb-0">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align: -3px; margin-right: 6px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                <strong>Agreement fully accepted by both parties!</strong> The booking has been confirmed.
+            <div class="alert alert-success mt-3 mb-0 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align: -3px; margin-right: 6px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    <strong>Agreement fully accepted by both parties!</strong> The booking has been confirmed.
+                </div>
+                {{-- Downloadable PDF contract — timestamped, both parties named.
+                     Available only after both sides accept. Cached on disk for
+                     60 days (auto-purged), then regenerated on next request. --}}
+                <a href="{{ route('app.agreements.download', $agreement) }}"
+                   class="btn btn-success btn-sm"
+                   title="Download timestamped PDF contract">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download PDF Contract
+                </a>
             </div>
         @endif
 

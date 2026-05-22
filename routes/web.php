@@ -115,8 +115,138 @@ Route::get('/cancellation-policy', function () {
 // About Us
 Route::view('/about-us', 'about')->name('about-us');
 
+// Internal — designer page inventory (printable PDF spec).
+// Not linked from navbar; share the URL only with the design team.
+Route::view('/design-spec', 'design-spec')->name('design-spec');
+
+// Internal — design scope breakdown (custom vs dev-handled split).
+// Companion doc for clarifying budget with the client.
+Route::view('/design-breakdown', 'design-breakdown')->name('design-breakdown');
+
+// Internal — custom-design-only spec (28 pages the designer mocks up).
+Route::view('/design-spec-custom', 'design-spec-custom')->name('design-spec-custom');
+
 // Events & Categories
 Route::view('/events-categories', 'events-categories')->name('events-categories');
+
+// Per-category landing page — SEO-friendly URL that highlights featured
+// pros and links into /browse for full results.
+Route::get('/category/{slug}', [\App\Http\Controllers\Public\CategoryLandingController::class, 'show'])
+    ->name('public.category');
+
+// XML sitemap — generated on the fly so newly-added pros / blog posts show
+// up the next time a crawler hits /sitemap.xml. Cached for an hour to keep
+// the DB query out of every robot ping.
+Route::get('/sitemap.xml', function () {
+    $xml = \Illuminate\Support\Facades\Cache::remember('sitemap.xml', 3600, function () {
+        $urls = [];
+        // Static public pages
+        foreach ([
+            ['url' => route('landing'),             'priority' => '1.0', 'changefreq' => 'weekly'],
+            ['url' => route('public.browse'),       'priority' => '0.9', 'changefreq' => 'daily'],
+            ['url' => route('events-categories'),   'priority' => '0.8', 'changefreq' => 'weekly'],
+            ['url' => route('public.how-it-works'), 'priority' => '0.7', 'changefreq' => 'monthly'],
+            ['url' => route('public.faq'),          'priority' => '0.6', 'changefreq' => 'monthly'],
+            ['url' => route('blog.index'),          'priority' => '0.7', 'changefreq' => 'weekly'],
+        ] as $row) {
+            $urls[] = $row;
+        }
+        // Active category landing pages
+        \App\Models\Category::active()->select('slug', 'updated_at')->get()->each(function ($cat) use (&$urls) {
+            $urls[] = [
+                'url'        => route('public.category', $cat->slug),
+                'priority'   => '0.7',
+                'changefreq' => 'weekly',
+                'lastmod'    => $cat->updated_at?->toAtomString(),
+            ];
+        });
+
+        // Published professional profiles
+        \App\Models\User::query()
+            ->whereHas('roles', fn ($r) => $r->where('name', \App\Domain\Auth\Enums\RoleName::SUPPLIER->value))
+            ->select('id', 'updated_at')
+            ->chunk(500, function ($pros) use (&$urls) {
+                foreach ($pros as $pro) {
+                    $urls[] = [
+                        'url'        => route('public.professional.show', $pro),
+                        'priority'   => '0.6',
+                        'changefreq' => 'weekly',
+                        'lastmod'    => $pro->updated_at?->toAtomString(),
+                    ];
+                }
+            });
+        // Published blog posts
+        if (class_exists(\App\Models\Post::class)) {
+            \App\Models\Post::query()
+                ->when(\Illuminate\Support\Facades\Schema::hasColumn('posts', 'published_at'),
+                       fn ($q) => $q->whereNotNull('published_at'))
+                ->select('id', 'slug', 'updated_at')
+                ->chunk(500, function ($posts) use (&$urls) {
+                    foreach ($posts as $post) {
+                        $urls[] = [
+                            'url'        => route('blog.show', $post->slug ?? $post->id),
+                            'priority'   => '0.5',
+                            'changefreq' => 'monthly',
+                            'lastmod'    => $post->updated_at?->toAtomString(),
+                        ];
+                    }
+                });
+        }
+
+        $xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        foreach ($urls as $u) {
+            $xml .= '  <url>' . "\n";
+            $xml .= '    <loc>' . htmlspecialchars($u['url']) . '</loc>' . "\n";
+            if (!empty($u['lastmod'])) {
+                $xml .= '    <lastmod>' . $u['lastmod'] . '</lastmod>' . "\n";
+            }
+            $xml .= '    <changefreq>' . ($u['changefreq'] ?? 'weekly') . '</changefreq>' . "\n";
+            $xml .= '    <priority>' . ($u['priority'] ?? '0.5') . '</priority>' . "\n";
+            $xml .= '  </url>' . "\n";
+        }
+        $xml .= '</urlset>';
+        return $xml;
+    });
+
+    return response($xml, 200, ['Content-Type' => 'application/xml']);
+})->name('sitemap');
+
+// Health check endpoint for external uptime monitoring (UptimeRobot,
+// Better Stack, Pingdom). Returns 200 with a JSON body when the app is
+// healthy; 503 if a critical dependency (database) is unreachable. The
+// built-in /up still works for a lightweight ping; /health is the deep
+// check we point monitors at.
+Route::get('/health', function () {
+    $checks = [];
+    $status = 200;
+
+    // DB ping
+    try {
+        \Illuminate\Support\Facades\DB::connection()->getPdo();
+        $checks['database'] = 'ok';
+    } catch (\Throwable $e) {
+        $checks['database'] = 'fail';
+        $status = 503;
+    }
+
+    // Cache round-trip
+    try {
+        \Illuminate\Support\Facades\Cache::put('__health', '1', 5);
+        $checks['cache'] = \Illuminate\Support\Facades\Cache::get('__health') === '1' ? 'ok' : 'fail';
+        if ($checks['cache'] !== 'ok') $status = 503;
+    } catch (\Throwable $e) {
+        $checks['cache'] = 'fail';
+        $status = 503;
+    }
+
+    return response()->json([
+        'status'    => $status === 200 ? 'ok' : 'degraded',
+        'checks'    => $checks,
+        'version'   => config('app.version', '1.0'),
+        'timestamp' => now()->toIso8601String(),
+    ], $status);
+})->name('health');
 
 // Public Blog
 Route::get('/blog',          [BlogController::class, 'index'])->name('blog.index');
@@ -434,6 +564,7 @@ Route::middleware('auth')->group(function () {
     // AI Agreements
     Route::get('/app/agreements', [AgreementPageController::class, 'index'])->middleware('permission:agreements.view_any')->name('app.agreements.index');
     Route::get('/app/agreements/{agreement}', [AgreementPageController::class, 'show'])->middleware('permission:agreements.view_any')->name('app.agreements.show');
+    Route::get('/app/agreements/{agreement}/download', [AgreementPageController::class, 'download'])->middleware('permission:agreements.view_any')->name('app.agreements.download');
     Route::post('/app/agreements/generate/{booking}', [AgreementPageController::class, 'generate'])->middleware('permission:agreements.generate')->name('app.agreements.generate');
     Route::post('/app/agreements/{agreement}/accept', [AgreementPageController::class, 'accept'])->middleware('permission:agreements.accept')->name('app.agreements.accept');
     Route::post('/app/agreements/{agreement}/reject', [AgreementPageController::class, 'reject'])->middleware('permission:agreements.accept')->name('app.agreements.reject');

@@ -1,6 +1,13 @@
 @extends('layouts.public')
 
-@section('title', $pro->name . ' — Professional Profile')
+@php
+    $seoTitle       = $pro->name . ' — ' . ($profile->headline ?? 'Event Professional');
+    $seoDescription = $profile->bio
+        ? \Illuminate\Support\Str::limit(strip_tags($profile->bio), 155)
+        : $pro->name . ' is a verified event professional on GigResource. View reviews, portfolio, and rates — request a quote in minutes.';
+    $seoImage       = $pro->cover_image_url ?: $pro->avatar_url;
+    $seoType        = 'profile';
+@endphp
 
 @push('styles')
 <style>
@@ -586,7 +593,9 @@
 
 @section('content')
 @php
-    $topRated = $pro->isTopRated();
+    $topRated   = $pro->isTopRated();
+    $isVerified = $pro->isVerified();
+    $isNew      = $pro->isNewVendor();
     $primaryHref = auth()->check() ? route('client.chat.index', ['to' => $pro->id]) : route('login');
 @endphp
 
@@ -650,6 +659,12 @@
                     @endif
                     @if($topRated)
                         <span class="pp-tag top">★ Top Rated Pro</span>
+                    @endif
+                    @if($isVerified)
+                        <span class="pp-tag">✓ Verified</span>
+                    @endif
+                    @if($isNew)
+                        <span class="pp-tag">New Vendor</span>
                     @endif
                 </div>
             </div>

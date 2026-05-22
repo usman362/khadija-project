@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Domain\Agreements\Services\AgreementGeneratorService;
+use App\Domain\Agreements\Services\AgreementPdfService;
 use App\Http\Controllers\Controller;
 use App\Models\Agreement;
 use App\Models\AgreementLog;
@@ -10,9 +11,42 @@ use App\Models\Booking;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AgreementPageController extends Controller
 {
+    /**
+     * Stream the agreement as a downloadable PDF contract.
+     * Only allowed once the agreement is fully accepted by both parties.
+     */
+    public function download(Request $request, Agreement $agreement, AgreementPdfService $pdf): StreamedResponse|RedirectResponse
+    {
+        $user = $request->user();
+
+        // Authorization — admin OR a party on the booking
+        $isParty = $agreement->booking
+            && ($agreement->booking->client_id === $user->id || $agreement->booking->supplier_id === $user->id);
+        abort_unless($user->isAdmin() || $isParty, 403, 'Not your agreement');
+
+        // Block PDF until both sides have accepted
+        if (! $agreement->isFullyAccepted()) {
+            return redirect()
+                ->route('app.agreements.show', $agreement)
+                ->with('error', 'PDF download is available only after both parties accept the agreement.');
+        }
+
+        AgreementLog::create([
+            'subject_type' => 'agreement',
+            'subject_id'   => $agreement->id,
+            'from_status'  => $agreement->status,
+            'to_status'    => $agreement->status,
+            'changed_by'   => $user->id,
+            'notes'        => 'PDF contract downloaded',
+        ]);
+
+        return $pdf->download($agreement);
+    }
+
     /**
      * List all agreements visible to the user.
      */

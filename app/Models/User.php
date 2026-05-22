@@ -180,6 +180,48 @@ class User extends Authenticatable
         return $profile && count($profile->verifiedBadges()) === count(\App\Models\UserProfile::BADGES);
     }
 
+    /**
+     * "Verified" derived badge — all three doc verifications approved.
+     * Trade license + liability insurance + workers' comp.
+     */
+    public function isVerified(): bool
+    {
+        $profile = $this->profile;
+        return $profile && count($profile->verifiedBadges()) === count(\App\Models\UserProfile::BADGES);
+    }
+
+    /**
+     * "New Vendor" derived badge — account created within the last 30
+     * days AND fewer than 3 completed reviews. Helps clients spot
+     * fresh talent and gives newcomers a visible boost.
+     *
+     * Mutually exclusive in the UI with Top Rated (a brand-new account
+     * can't satisfy the 5-review minimum anyway).
+     */
+    public function isNewVendor(): bool
+    {
+        if (!$this->created_at || $this->created_at->lt(now()->subDays(30))) {
+            return false;
+        }
+        return $this->reviewStats()['count'] < 3;
+    }
+
+    /**
+     * Single accessor returning every active badge for this pro, in
+     * display priority order. Views can iterate this instead of
+     * checking each badge method individually.
+     *
+     * @return array<int, string>  e.g. ['top_rated', 'verified']
+     */
+    public function activeBadges(): array
+    {
+        $badges = [];
+        if ($this->isTopRated())  { $badges[] = 'top_rated'; }
+        if ($this->isVerified())  { $badges[] = 'verified'; }
+        if ($this->isNewVendor()) { $badges[] = 'new_vendor'; }
+        return $badges;
+    }
+
     public function clientEvents(): HasMany
     {
         return $this->hasMany(Event::class, 'client_id');

@@ -37,5 +37,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Forward all unhandled exceptions to Sentry. The integration is a
+        // no-op until SENTRY_LARAVEL_DSN is set in .env — so safe to keep
+        // active across local/staging/production. We strip a few noisy
+        // exception types so the dashboard isn't polluted with expected
+        // 404/validation/auth failures.
+        \Sentry\Laravel\Integration::handles($exceptions);
     })->create();
