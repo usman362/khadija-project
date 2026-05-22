@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    @php($seoNoIndex = $seoNoIndex ?? true)
-    @include('partials._seo_meta')
+    @include('partials._seo_meta', ['seoNoIndex' => $seoNoIndex ?? true])
 
     <script src="https://nobleui.com/html/template/assets/js/color-modes.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com/">

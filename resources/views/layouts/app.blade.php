@@ -7,8 +7,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    @php($seoNoIndex = $seoNoIndex ?? true)
-    @include('partials._seo_meta')
+    @include('partials._seo_meta', ['seoNoIndex' => $seoNoIndex ?? true])
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
