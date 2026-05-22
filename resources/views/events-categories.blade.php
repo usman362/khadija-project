@@ -966,6 +966,71 @@
         cursor: pointer;
     }
     .adv-active-clear:hover { background: rgba(239,68,68,0.10); border-style: solid; }
+
+    /* ─── Explore by category (live DB grid) ─────────────────── */
+    .ec-explore { padding: 56px 0 32px; }
+    .ec-explore-head { text-align: center; margin-bottom: 28px; }
+    .ec-explore-head h2 {
+        font-size: 1.75rem; font-weight: 800;
+        color: var(--text-white, #fff);
+        margin: 0 0 8px;
+    }
+    .ec-explore-head p {
+        color: var(--text-muted, #7a829a);
+        margin: 0; font-size: 0.98rem;
+    }
+    .ec-explore-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 14px;
+    }
+    .ec-explore-card {
+        display: flex; align-items: center; gap: 12px;
+        padding: 16px 18px;
+        background: var(--bg-card, #151d35);
+        border: 1px solid var(--border-color, #1e2d4a);
+        border-radius: 14px;
+        text-decoration: none;
+        color: var(--text-light, #c8cdd8);
+        transition: border-color 0.15s, transform 0.15s, background 0.15s;
+    }
+    .ec-explore-card:hover {
+        border-color: rgba(139, 92, 246, 0.55);
+        background: var(--bg-card-hover, #1a2440);
+        transform: translateY(-2px);
+        color: #fff;
+    }
+    .ec-explore-icon {
+        font-size: 22px;
+        line-height: 1;
+        flex-shrink: 0;
+    }
+    .ec-explore-name {
+        font-weight: 700;
+        font-size: 14.5px;
+        color: var(--text-white, #fff);
+        flex: 1;
+        min-width: 0;
+    }
+    .ec-explore-sub {
+        font-size: 11.5px;
+        color: var(--text-muted, #7a829a);
+        margin-left: 8px;
+    }
+    .ec-explore-arrow {
+        width: 16px; height: 16px;
+        color: var(--text-muted, #7a829a);
+        flex-shrink: 0;
+        transition: transform 0.15s, color 0.15s;
+    }
+    .ec-explore-card:hover .ec-explore-arrow {
+        transform: translateX(3px);
+        color: #c4b5fd;
+    }
+    @media (max-width: 640px) {
+        .ec-explore { padding: 40px 0 24px; }
+        .ec-explore-grid { grid-template-columns: 1fr; }
+    }
 </style>
 @endpush
 
@@ -990,6 +1055,37 @@
         </div>
     </div>
 </section>
+
+<!-- ─── EXPLORE BY CATEGORY (live DB) ───────────────────────────── -->
+{{-- Pulls active categories from the DB so users can click into the
+     dedicated /category/{slug} landing pages. Without this section,
+     those URLs were only reachable by typing the address manually. --}}
+@if(isset($allCategories) && $allCategories->isNotEmpty())
+<section class="ec-explore">
+    <div class="container">
+        <div class="ec-explore-head">
+            <h2>Explore by category</h2>
+            <p>Pick a category to see featured pros, reviews, and pricing on a dedicated page.</p>
+        </div>
+        <div class="ec-explore-grid">
+            @foreach($allCategories as $cat)
+                <a href="{{ route('public.category', $cat->slug) }}" class="ec-explore-card">
+                    @if($cat->icon)
+                        <span class="ec-explore-icon">{{ $cat->icon }}</span>
+                    @endif
+                    <span class="ec-explore-name">{{ $cat->name }}</span>
+                    @if($cat->children && $cat->children->count())
+                        <span class="ec-explore-sub">{{ $cat->children->count() }} sub-categories</span>
+                    @endif
+                    <svg class="ec-explore-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
 
 <!-- ═══════════════════════════════════════════════════════════════════
      ADVANCED FILTERS — sits ABOVE the main category mega-panel.
