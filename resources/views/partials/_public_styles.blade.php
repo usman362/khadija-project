@@ -1009,15 +1009,16 @@
         }
 
         .hero-bg::before {
-            /* Soft bottom-fade only — wedding image shows clearly through.
-               Top stays nearly transparent so the photo isn't darkened. */
+            /* Stronger overlay — bright wedding photos were making the
+               headline unreadable. We still want the image visible, just
+               sat behind enough scrim that white text passes WCAG 4.5:1. */
             content: '';
             position: absolute;
             inset: 0;
             background: linear-gradient(180deg,
-                rgba(11,15,26,0.05) 0%,
-                rgba(11,15,26,0.20) 50%,
-                rgba(11,15,26,0.55) 100%
+                rgba(11,15,26,0.55) 0%,
+                rgba(11,15,26,0.65) 50%,
+                rgba(11,15,26,0.85) 100%
             );
             z-index: 1;
         }

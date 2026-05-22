@@ -79,10 +79,13 @@
     }
 
     /* ── Link contrast hardening ─────────────────────────────────
-       Plain underlined links on white backgrounds need at least
-       4.5:1 contrast. Force a darker indigo on text-only links so
-       they pass the AA check without redesigning every page. */
-    a:not([class]):not(:hover) { color: #4338ca; }
+       Plain underlined links inside body content need 4.5:1 contrast
+       (WCAG 1.4.3). Scope this to article/prose containers only —
+       applying it sitewide bricked the navbar Pricing link which
+       lacks a class attribute. */
+    article a:not([class]):not(:hover),
+    .prose a:not([class]):not(:hover),
+    .blog-content a:not([class]):not(:hover) { color: #4338ca; }
 
     /* ── Focus inside dialogs ────────────────────────────────────
        Trap-style modals get a heavier ring so screen-reader users

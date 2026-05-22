@@ -688,7 +688,7 @@
 <!-- ─── HERO ─────────────────────────────────── -->
 <section class="hero">
     <div class="hero-bg">
-        <img src="https://images.unsplash.com/photo-1606216794074-735e91aa5c92?w=1800&q=85&auto=format&fit=crop" alt="Wedding ceremony aisle with floral arch" loading="eager">
+        <img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=1800&q=85&auto=format&fit=crop" alt="Wedding ceremony aisle with floral arch" loading="eager">
     </div>
     <div class="container" style="position: relative;">
         {{-- Trust pill — GigSalad's signature opener. Uses REAL review count
@@ -816,7 +816,7 @@
                 </div>
             </div>
             <div class="about-image">
-                <img src="https://images.unsplash.com/photo-1606216794074-735e91aa5c92?w=800&q=80" alt="Event planning team" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1542665952-14513db15293?w=800&q=80&auto=format&fit=crop" alt="Grand event ballroom venue" loading="lazy">
             </div>
         </div>
     </div>
@@ -831,7 +831,7 @@
         </div>
         <div class="cats-grid">
             <a href="{{ route('events-categories') }}" class="cat-tile">
-                <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80&auto=format&fit=crop" alt="Elegant wedding reception" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1525772764200-be829a350797?w=800&q=80&auto=format&fit=crop" alt="Wedding centerpiece with roses" loading="lazy">
                 <div class="cat-tile-gradient"></div>
                 <div class="cat-tile-content">
                     <span class="cat-tile-tag">Trending</span>
@@ -843,7 +843,7 @@
                 </div>
             </a>
             <a href="{{ route('events-categories') }}" class="cat-tile">
-                <img src="https://images.unsplash.com/photo-1606216794074-735e91aa5c92?w=800&q=80&auto=format&fit=crop" alt="Corporate conference" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800&q=80&auto=format&fit=crop" alt="Elegant ballroom venue" loading="lazy">
                 <div class="cat-tile-gradient"></div>
                 <div class="cat-tile-content">
                     <span class="cat-tile-tag" style="background: rgba(139,92,246,0.9);">Corporate</span>
@@ -855,7 +855,7 @@
                 </div>
             </a>
             <a href="{{ route('events-categories') }}" class="cat-tile">
-                <img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=800&q=80&auto=format&fit=crop" alt="Birthday party with balloons" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1532712938310-34cb3982ef74?w=800&q=80&auto=format&fit=crop" alt="Bride and groom outdoor celebration" loading="lazy">
                 <div class="cat-tile-gradient"></div>
                 <div class="cat-tile-content">
                     <span class="cat-tile-tag" style="background: rgba(236,72,153,0.9);">Popular</span>
@@ -867,7 +867,7 @@
                 </div>
             </a>
             <a href="{{ route('events-categories') }}" class="cat-tile">
-                <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80&auto=format&fit=crop" alt="Music concert stage lights" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80&auto=format&fit=crop" alt="Bride and groom backlit with bouquet" loading="lazy">
                 <div class="cat-tile-gradient"></div>
                 <div class="cat-tile-content">
                     <span class="cat-tile-tag" style="background: rgba(6,182,212,0.9);">Live</span>
@@ -879,7 +879,7 @@
                 </div>
             </a>
             <a href="{{ route('events-categories') }}" class="cat-tile">
-                <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800&q=80&auto=format&fit=crop" alt="Graduation ceremony caps in the air" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800&q=80&auto=format&fit=crop" alt="Wedding rings and bouquet on couple's hands" loading="lazy">
                 <div class="cat-tile-gradient"></div>
                 <div class="cat-tile-content">
                     <span class="cat-tile-tag" style="background: rgba(245,158,11,0.9);">Milestone</span>
@@ -891,7 +891,7 @@
                 </div>
             </a>
             <a href="{{ route('events-categories') }}" class="cat-tile">
-                <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&q=80&auto=format&fit=crop" alt="Holiday celebration dinner" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&q=80&auto=format&fit=crop" alt="Wedding reception table with florals" loading="lazy">
                 <div class="cat-tile-gradient"></div>
                 <div class="cat-tile-content">
                     <span class="cat-tile-tag" style="background: rgba(34,197,94,0.9);">Seasonal</span>
@@ -1208,7 +1208,7 @@
         </div>
         <div class="moments-grid">
             <div class="moment moment--wide moment--tall">
-                <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&q=80&auto=format&fit=crop" alt="Graduation celebration" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=900&q=80&auto=format&fit=crop" alt="Bride and groom celebration" loading="lazy">
                 <span class="moment-label">Graduation ceremonies</span>
             </div>
             <div class="moment">
@@ -1216,11 +1216,11 @@
                 <span class="moment-label">Reception nights</span>
             </div>
             <div class="moment">
-                <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&q=80&auto=format&fit=crop" alt="Floral decor" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1530023367847-a683933f4172?w=600&q=80&auto=format&fit=crop" alt="Floral decor" loading="lazy">
                 <span class="moment-label">Decor &amp; florals</span>
             </div>
             <div class="moment moment--wide">
-                <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=900&q=80&auto=format&fit=crop" alt="Catering spread" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=900&q=80&auto=format&fit=crop" alt="Wedding reception decor" loading="lazy">
                 <span class="moment-label">Gourmet catering</span>
             </div>
         </div>

@@ -38,7 +38,7 @@
     .ec-hero-bg::after {
         content: '';
         position: absolute; inset: 0;
-        background: linear-gradient(180deg, rgba(11,15,26,0.10) 0%, rgba(11,15,26,0.35) 65%, var(--bg-dark) 100%);
+        background: linear-gradient(180deg, rgba(11,15,26,0.55) 0%, rgba(11,15,26,0.75) 65%, var(--bg-dark) 100%);
     }
     .ec-hero .container { position: relative; z-index: 1; }
     .ec-hero::before {
@@ -974,7 +974,7 @@
 <!-- ─── HERO ───────────────────────────────── -->
 <section class="ec-hero">
     <div class="ec-hero-bg">
-        <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=1800&q=85&auto=format&fit=crop" alt="Live band performing on stage at an event" loading="eager">
+        <img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=1800&q=85&auto=format&fit=crop" alt="Live band performing on stage at an event" loading="eager">
     </div>
     <div class="container">
         <div class="fade-up">
@@ -1384,7 +1384,7 @@
                             ['name' => 'Floral &amp; Decor',     'count' => 42, 'img' => 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Wedding Photography',    'count' => 75, 'img' => 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
                             ['name' => 'Reception Catering',     'count' => 55, 'img' => 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
-                            ['name' => 'Wedding DJs',            'count' => 90, 'img' => 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
+                            ['name' => 'Wedding DJs',            'count' => 90, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Wedding Planners',       'count' => 60, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','newest']],
                         ],
                     ],
@@ -1394,9 +1394,9 @@
                         'title' => 'Corporate Events &amp; Conferences',
                         'desc'  => 'Meetings, product launches, team off-sites — with AV, staffing, and venues handled end-to-end.',
                         'count' => 80,
-                        'cover' => 'https://images.unsplash.com/photo-1606216794074-735e91aa5c92?w=900&q=80&auto=format&fit=crop',
+                        'cover' => 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=900&q=80&auto=format&fit=crop',
                         'subs'  => [
-                            ['name' => 'Conference AV',          'count' => 22, 'img' => 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','trending']],
+                            ['name' => 'Conference AV',          'count' => 22, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','trending']],
                             ['name' => 'Event Planners',         'count' => 60, 'img' => 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
                             ['name' => 'Event Staff',            'count' => 30, 'img' => 'https://images.unsplash.com/photo-1525772764200-be829a350797?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Awards &amp; Branding',  'count' => 22, 'img' => 'https://images.unsplash.com/photo-1525772764200-be829a350797?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
@@ -1427,12 +1427,12 @@
                         'count' => 60,
                         'cover' => 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=900&q=80&auto=format&fit=crop',
                         'subs'  => [
-                            ['name' => 'Party DJs',              'count' => 30, 'img' => 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
+                            ['name' => 'Party DJs',              'count' => 30, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Birthday Cakes',         'count' => 18, 'img' => 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
-                            ['name' => 'Photo Booths',           'count' => 14, 'img' => 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest','trending']],
+                            ['name' => 'Photo Booths',           'count' => 14, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest','trending']],
                             ['name' => 'Balloon Decor',          'count' => 22, 'img' => 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','trending']],
                             ['name' => 'Entertainers',           'count' => 16, 'img' => 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
-                            ['name' => 'Party Planners',         'count' => 10, 'img' => 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
+                            ['name' => 'Party Planners',         'count' => 10, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
                         ],
                     ],
                     [
@@ -1441,13 +1441,13 @@
                         'title' => 'Music &amp; Entertainment',
                         'desc'  => 'DJs, live bands, string quartets, emcees — hire the people who make the room move.',
                         'count' => 128,
-                        'cover' => 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=900&q=80&auto=format&fit=crop',
+                        'cover' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=900&q=80&auto=format&fit=crop',
                         'subs'  => [
-                            ['name' => 'DJ Services',            'count' => 90, 'img' => 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
+                            ['name' => 'DJ Services',            'count' => 90, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Live Bands',             'count' => 38, 'img' => 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Solo Artists',           'count' => 24, 'img' => 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
-                            ['name' => 'Emcees / Hosts',         'count' => 20, 'img' => 'https://images.unsplash.com/photo-1606216794074-735e91aa5c92?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','trending']],
-                            ['name' => 'Sound &amp; AV',         'count' => 18, 'img' => 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
+                            ['name' => 'Emcees / Hosts',         'count' => 20, 'img' => 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','trending']],
+                            ['name' => 'Sound &amp; AV',         'count' => 18, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
                             ['name' => 'String Quartets',        'count' => 12, 'img' => 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
                         ],
                     ],
@@ -1462,8 +1462,8 @@
                             ['name' => 'Wedding Photography',    'count' => 30, 'img' => 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Corporate Video',        'count' => 18, 'img' => 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
                             ['name' => 'Event Photography',      'count' => 22, 'img' => 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','trending']],
-                            ['name' => 'Drone / Aerial',         'count' =>  9, 'img' => 'https://images.unsplash.com/photo-1606216794074-735e91aa5c92?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest','trending']],
-                            ['name' => 'Photo Booths',           'count' => 14, 'img' => 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
+                            ['name' => 'Drone / Aerial',         'count' =>  9, 'img' => 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest','trending']],
+                            ['name' => 'Photo Booths',           'count' => 14, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
                             ['name' => 'Lifestyle Shoots',       'count' => 11, 'img' => 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
                         ],
                     ],
@@ -1477,7 +1477,7 @@
                         'subs'  => [
                             ['name' => 'Full-Service Catering',  'count' => 20, 'img' => 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
                             ['name' => 'Bartending',             'count' => 12, 'img' => 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','trending']],
-                            ['name' => 'Food Trucks',            'count' =>  9, 'img' => 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest','trending']],
+                            ['name' => 'Food Trucks',            'count' =>  9, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest','trending']],
                             ['name' => 'Cakes &amp; Desserts',   'count' => 14, 'img' => 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
                             ['name' => 'Coffee &amp; Espresso',  'count' =>  7, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
                             ['name' => 'Private Chefs',          'count' =>  6, 'img' => 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest','top-rated']],
@@ -1493,8 +1493,8 @@
                         'subs'  => [
                             ['name' => 'Florists',               'count' => 18, 'img' => 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Balloon Artists',        'count' => 10, 'img' => 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
-                            ['name' => 'Backdrops',              'count' =>  8, 'img' => 'https://images.unsplash.com/photo-1606216794074-735e91aa5c92?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest','trending']],
-                            ['name' => 'Event Lighting',         'count' => 12, 'img' => 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
+                            ['name' => 'Backdrops',              'count' =>  8, 'img' => 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest','trending']],
+                            ['name' => 'Event Lighting',         'count' => 12, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
                             ['name' => 'Table &amp; Chair Rentals','count' => 9, 'img' => 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
                             ['name' => 'Custom Signage',         'count' =>  5, 'img' => 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
                         ],
@@ -1505,13 +1505,13 @@
                         'title' => 'Planners &amp; Staff',
                         'desc'  => 'Day-of coordinators, servers, security, registration teams — the crew that keeps it moving.',
                         'count' => 90,
-                        'cover' => 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=900&q=80&auto=format&fit=crop',
+                        'cover' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=900&q=80&auto=format&fit=crop',
                         'subs'  => [
                             ['name' => 'Event Planners',         'count' => 60, 'img' => 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
                             ['name' => 'Servers &amp; Staff',    'count' => 30, 'img' => 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Event Security',         'count' => 14, 'img' => 'https://images.unsplash.com/photo-1525772764200-be829a350797?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','trending']],
                             ['name' => 'Registration Desks',     'count' =>  8, 'img' => 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
-                            ['name' => 'Day-Of Coordinators',    'count' => 25, 'img' => 'https://images.unsplash.com/photo-1606216794074-735e91aa5c92?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
+                            ['name' => 'Day-Of Coordinators',    'count' => 25, 'img' => 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Valet Services',         'count' =>  6, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
                         ],
                     ],
@@ -1591,7 +1591,7 @@
 
         <div class="ts-grid" id="tsGrid">
             <a class="ts-tile fade-up" href="#" data-tag="hot" data-name="dj services music">
-                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=600&q=80&auto=format&fit=crop" alt="DJ"></div>
+                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=600&q=80&auto=format&fit=crop" alt="DJ"></div>
                 <div class="ts-tile-overlay">
                     <span class="ts-tile-tag tag-hot">Hot</span>
                     <h3>DJ Services</h3>
@@ -1631,7 +1631,7 @@
                 </div>
             </a>
             <a class="ts-tile fade-up" href="#" data-tag="hot" data-name="live band music entertainment">
-                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=600&q=80&auto=format&fit=crop" alt="Live band"></div>
+                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=600&q=80&auto=format&fit=crop" alt="Live band"></div>
                 <div class="ts-tile-overlay">
                     <span class="ts-tile-tag tag-hot">Hot</span>
                     <h3>Live Bands</h3>
@@ -1706,7 +1706,7 @@
             </div>
             <div class="event-tile fade-up" style="transition-delay:0.25s;">
                 <div class="event-tile-bg">
-                    <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&q=80&auto=format&fit=crop" alt="Holiday celebration" loading="lazy">
+                    <img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=800&q=80&auto=format&fit=crop" alt="Holiday celebration" loading="lazy">
                 </div>
                 <div class="event-tile-overlay">
                     <h3>Holiday Celebrations</h3>

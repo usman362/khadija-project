@@ -38,7 +38,7 @@ class SecurityHeaders
 
         $response->headers->set(
             'Permissions-Policy',
-            'camera=(), microphone=(), geolocation=(self), payment=(self), usb=(), interest-cohort=()'
+            'camera=(), microphone=(self), geolocation=(self), payment=(self), usb=(), interest-cohort=()'
         );
 
         // HSTS — only on HTTPS so we don't lock local dev into an https-only state.

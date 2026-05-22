@@ -31,7 +31,7 @@
         background:
             radial-gradient(900px 400px at 18% 10%, rgba(59,130,246,0.10), transparent 55%),
             radial-gradient(800px 380px at 85% 0%, rgba(139,92,246,0.10), transparent 55%),
-            linear-gradient(180deg, rgba(11,15,26,0.10) 0%, rgba(11,15,26,0.35) 65%, var(--bg-dark) 100%);
+            linear-gradient(180deg, rgba(11,15,26,0.55) 0%, rgba(11,15,26,0.75) 65%, var(--bg-dark) 100%);
     }
     .policy-hero .container { position: relative; z-index: 1; }
     .policy-hero::before {
