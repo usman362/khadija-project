@@ -63,8 +63,8 @@
 {{-- JSON-LD Organization schema — helps Google show the rich sitelink box --}}
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
-    "@type": "Organization",
+    "@@context": "https://schema.org",
+    "@@type": "Organization",
     "name": "{{ $brand }}",
     "url": "{{ url('/') }}",
     "logo": "{{ asset('images/logo.png') }}",

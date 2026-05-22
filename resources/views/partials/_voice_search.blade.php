@@ -13,38 +13,52 @@
     load it inside @include('partials._voice_search') in the footer.
 --}}
 <style>
-    .vs-mic-btn {
-        position: absolute;
-        right: 110px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        background: rgba(99, 102, 241, 0.1);
-        border: none;
-        color: #6366f1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: background 0.15s, transform 0.15s;
-        z-index: 2;
+    /* Reset every host-page button rule that might leak in. All declarations
+       use !important because some host containers (the landing hero in
+       particular) have very high-specificity button styling. */
+    button.vs-mic-btn {
+        all: unset !important;
+        box-sizing: border-box !important;
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
+        min-height: 38px !important;
+        flex: 0 0 38px !important;
+        padding: 0 !important;
+        margin: 0 6px !important;
+        border-radius: 50% !important;
+        background: rgba(99, 102, 241, 0.12) !important;
+        color: #6366f1 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        transition: background 0.15s, transform 0.15s !important;
+        position: relative !important;
+        z-index: 2 !important;
+        line-height: 1 !important;
+        font: inherit !important;
     }
-    .vs-mic-btn:hover { background: rgba(99, 102, 241, 0.18); }
-    .vs-mic-btn:focus-visible {
-        outline: 2px solid #6366f1;
-        outline-offset: 2px;
+    button.vs-mic-btn:hover { background: rgba(99, 102, 241, 0.22) !important; }
+    button.vs-mic-btn:focus-visible {
+        outline: 2px solid #6366f1 !important;
+        outline-offset: 2px !important;
     }
-    .vs-mic-btn.is-listening {
-        background: #ef4444;
-        color: #fff;
+    button.vs-mic-btn.is-listening {
+        background: #ef4444 !important;
+        color: #fff !important;
         animation: vsMicPulse 1.2s ease-in-out infinite;
     }
-    .vs-mic-btn svg { width: 18px; height: 18px; }
+    button.vs-mic-btn svg {
+        width: 18px !important;
+        height: 18px !important;
+        stroke: currentColor !important;
+        fill: none !important;
+        display: block !important;
+    }
     @keyframes vsMicPulse {
-        0%, 100% { transform: translateY(-50%) scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
-        50%      { transform: translateY(-50%) scale(1.08); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+        0%, 100% { transform: scale(1);   box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+        50%      { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
     }
     .vs-toast {
         position: fixed;
