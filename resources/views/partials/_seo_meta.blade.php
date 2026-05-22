@@ -12,12 +12,8 @@
       $seoNoIndex      — true to emit <meta name="robots" content="noindex,nofollow">
       $seoType         — og:type override (default "website"; use "article" on blog/posts)
 
-    Pages set these via Blade @php blocks at the top of their content:
-
-        @php
-            $seoTitle       = 'Hire Wedding Photographers';
-            $seoDescription = 'Browse vetted wedding photographers...';
-        @endphp
+    Pages set these via Blade {at}php blocks at the top of their content
+    ({at}php ... {at}endphp — replace {at} with the @ symbol).
 --}}
 @php
     $brand        = 'GigResource';
