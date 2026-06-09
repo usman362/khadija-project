@@ -22,3 +22,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Design reference assets — Khadija's JPEG/PDF mockups kept locally
+# for development reference only. Not committed to keep repo size down.
+/docs/designs/

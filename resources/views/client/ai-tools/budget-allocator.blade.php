@@ -2,6 +2,7 @@
 
 @section('title', 'AI Budget Allocator')
 @section('page-title', 'AI Budget Allocator')
+@section('page-subtitle', 'Let AI break down your event budget into smart category allocations and a complete spending plan.')
 
 @push('styles')
 <style>
@@ -18,7 +19,7 @@
     .bat-hero-icon {
         width: 56px; height: 56px;
         border-radius: 16px;
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        background: linear-gradient(135deg, #f97316, #ea580c);
         display: flex; align-items: center; justify-content: center;
         color: #fff;
         flex-shrink: 0;
@@ -123,7 +124,7 @@
         align-items: center;
         gap: 8px;
         padding: 12px 26px;
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        background: linear-gradient(135deg, #f97316, #ea580c);
         color: #fff;
         border: none;
         border-radius: var(--radius-sm);

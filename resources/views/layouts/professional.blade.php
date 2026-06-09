@@ -26,8 +26,8 @@
             --text-primary: #ffffff;
             --text-secondary: #e2e8f0;
             --text-muted: #94a3b8;
-            --accent-blue: #6366f1;
-            --accent-blue-soft: rgba(99, 102, 241, 0.12);
+            --accent-blue: #2563eb;
+            --accent-blue-soft: rgba(37, 99, 235, 0.12);
             --accent-green: #10b981;
             --accent-green-soft: rgba(16, 185, 129, 0.12);
             --accent-yellow: #f59e0b;
@@ -42,7 +42,7 @@
             --accent-red-soft: rgba(239, 68, 68, 0.12);
             --accent-purple: #a855f7;
             --accent-purple-soft: rgba(168, 85, 247, 0.12);
-            --sidebar-width: 260px;
+            --sidebar-width: 236px;
             --sidebar-collapsed: 72px;
             --navbar-height: 64px;
             --radius: 12px;
@@ -54,18 +54,18 @@
         }
 
         [data-theme="light"] {
-            --bg-primary: #f1f5f9;
+            --bg-primary: #ffffff;
             --bg-secondary: #ffffff;
-            --bg-card: rgba(255, 255, 255, 0.9);
-            --bg-card-hover: rgba(241, 245, 249, 0.9);
+            --bg-card: #ffffff;
+            --bg-card-hover: #f1f5f9;
             --bg-sidebar: #ffffff;
             --border-color: rgba(0, 0, 0, 0.08);
             --border-glow: rgba(99, 102, 241, 0.2);
             --text-primary: #1e293b;
             --text-secondary: #334155;
             --text-muted: #475569;
-            --accent-blue: #6366f1;
-            --accent-blue-soft: rgba(99, 102, 241, 0.1);
+            --accent-blue: #2563eb;
+            --accent-blue-soft: rgba(37, 99, 235, 0.1);
             --accent-green: #10b981;
             --accent-green-soft: rgba(16, 185, 129, 0.1);
             --accent-yellow: #f59e0b;
@@ -343,12 +343,12 @@
         .cl-sidebar-nav::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
 
         .cl-nav-label {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1.2px;
+            letter-spacing: 1px;
             color: var(--text-muted);
-            padding: 16px 12px 8px;
+            padding: 12px 11px 5px;
         }
 
         .cl-nav-item {
@@ -358,16 +358,17 @@
         .cl-nav-link {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
+            gap: 10px;
+            padding: 7px 11px;
             border-radius: var(--radius-sm);
             color: var(--text-secondary);
             text-decoration: none;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 500;
             transition: var(--transition);
             position: relative;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
+            white-space: nowrap;
         }
 
         .cl-nav-link:hover {
@@ -393,8 +394,8 @@
         }
 
         .cl-nav-icon {
-            width: 20px;
-            height: 20px;
+            width: 17px;
+            height: 17px;
             flex-shrink: 0;
             opacity: 0.85;
             transition: opacity 0.2s, transform 0.2s;
@@ -403,15 +404,12 @@
         .cl-nav-link:hover .cl-nav-icon { opacity: 1; transform: scale(1.1); }
         .cl-nav-link.active .cl-nav-icon { opacity: 1; }
 
-        /* Colorful nav icons */
-        .cl-nav-item:nth-child(1) .cl-nav-icon { color: var(--accent-blue); }
-        .cl-nav-item:nth-child(3) .cl-nav-icon { color: var(--accent-orange, #f97316); }
-        .cl-nav-item:nth-child(4) .cl-nav-icon { color: var(--accent-purple, #a855f7); }
-        .cl-nav-item:nth-child(6) .cl-nav-icon { color: var(--accent-green); }
-        .cl-nav-item:nth-child(8) .cl-nav-icon { color: var(--accent-pink); }
-        .cl-nav-item:nth-child(10) .cl-nav-icon { color: var(--accent-yellow); }
-        .cl-nav-item:nth-child(11) .cl-nav-icon { color: var(--accent-cyan, #06b6d4); }
-        .cl-nav-item:nth-child(13) .cl-nav-icon { color: var(--accent-cyan, #06b6d4); }
+        /* Uniform muted nav icons; active item turns blue */
+        .cl-nav-icon { color: var(--text-muted); }
+        .cl-nav-link.active .cl-nav-icon { color: var(--accent-blue); }
+        /* nav count badge + urgent pill */
+        .pro-nav-badge { margin-left: auto; background: var(--accent-blue); color: #fff; font-size: 9.5px; font-weight: 800; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .pro-nav-urgent { margin-left: auto; background: rgba(239,68,68,0.14); color: #ef4444; font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 5px; letter-spacing: 0.5px; flex-shrink: 0; }
 
         .cl-sidebar-footer {
             padding: 16px;
@@ -471,6 +469,47 @@
         }
 
         .cl-navbar-left { display: flex; align-items: center; gap: 16px; }
+
+        /* ══════ Professional topbar — blue welcome banner ══════ */
+        .pro-topbar { display: flex; align-items: flex-start; gap: 16px; padding: 14px 26px 4px; position: sticky; top: 0; z-index: 100; background: var(--bg-primary); }
+        .pro-banner { flex: 1; min-width: 0; display: flex; align-items: center; gap: 16px; background: linear-gradient(120deg, #1e3a8a 0%, #2563eb 55%, #1d4ed8 100%); border-radius: 14px; padding: 13px 18px; box-shadow: 0 6px 20px rgba(37,99,235,0.22); }
+        .pro-banner-avatar { width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 16px; }
+        .pro-banner-text { flex-shrink: 0; }
+        .pro-banner-text h1 { font-size: 17px; font-weight: 800; color: #fff; margin: 0; }
+        .pro-banner-text p { font-size: 11.5px; color: rgba(255,255,255,0.82); margin: 2px 0 0; }
+        .pro-banner-search { flex: 1; min-width: 120px; position: relative; margin-left: 6px; }
+        .pro-banner-search > svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); }
+        .pro-banner-search input { width: 100%; height: 42px; border-radius: 10px; border: none; padding: 0 44px 0 40px; background: #fff; font-size: 13px; color: #1e293b; outline: none; }
+        .pro-banner-search kbd { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 10px; color: var(--text-muted); background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 5px; padding: 2px 6px; }
+
+        .pro-topbar-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
+        .pro-topbar-controls { display: flex; align-items: center; gap: 12px; }
+        .pro-avail { display: inline-flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 800; color: #16a34a; letter-spacing: 0.5px; cursor: pointer; }
+        .pro-avail .dot { width: 7px; height: 7px; border-radius: 50%; background: #16a34a; }
+        .pro-toggle { position: relative; width: 34px; height: 18px; display: inline-block; }
+        .pro-toggle input { display: none; }
+        .pro-toggle .track { position: absolute; inset: 0; background: #16a34a; border-radius: 999px; transition: 0.2s; }
+        .pro-toggle .track::after { content: ''; position: absolute; top: 2px; left: 18px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: 0.2s; }
+        .pro-icon-btn { position: relative; width: 38px; height: 38px; border-radius: 10px; border: none; background: transparent; color: var(--text-secondary); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; }
+        .pro-icon-btn:hover { background: var(--bg-card-hover); }
+        .pro-icon-btn svg { width: 18px; height: 18px; }
+        .pro-icon-badge { position: absolute; top: -5px; right: -5px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: #2563eb; color: #fff; font-size: 9.5px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+        .pro-icon-badge.red { background: #ef4444; }
+        .pro-avatar-chip { display: inline-flex; align-items: center; gap: 8px; padding: 3px 8px 3px 3px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-card); cursor: pointer; }
+        .pro-avatar-img { width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg,#2563eb,#1d4ed8); color: #fff; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+        .pro-avatar-meta { display: flex; flex-direction: column; line-height: 1.2; }
+        .pro-avatar-meta b { font-size: 12px; color: var(--text-primary); font-weight: 700; white-space: nowrap; }
+        .pro-avatar-meta span { font-size: 9px; font-weight: 800; color: #2563eb; letter-spacing: 0.5px; }
+        .pro-avatar-chip > svg { width: 13px; height: 13px; color: var(--text-muted); }
+
+        .pro-topbar-actions { display: flex; gap: 10px; }
+        .pro-btn-ghost, .pro-btn-primary { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 16px; border-radius: 10px; font-size: 12.5px; font-weight: 700; cursor: pointer; text-decoration: none; }
+        .pro-btn-ghost svg, .pro-btn-primary svg { width: 15px; height: 15px; }
+        .pro-btn-ghost { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); }
+        .pro-btn-primary { background: #2563eb; border: none; color: #fff; }
+        .pro-btn-primary:hover { background: #1d4ed8; }
+        @media (max-width: 1200px) { .pro-banner-text { display: none; } }
+        @media (max-width: 860px) { .pro-topbar { flex-direction: column; } .pro-topbar-right { flex-direction: row; align-items: center; width: 100%; justify-content: space-between; flex-wrap: wrap; } .pro-avatar-meta { display: none; } }
 
         .cl-mobile-toggle {
             display: none;
@@ -899,63 +938,142 @@
             <div>
                 <img src="{{ asset('logos/logo-light.png') }}" alt="GigResource" class="brand-logo-img brand-logo-light">
                 <img src="{{ asset('logos/logo-primary.png') }}" alt="GigResource" class="brand-logo-img brand-logo-dark">
-                <div class="brand-sub">Professional Account</div>
+                <div class="brand-sub">Professional Portal</div>
             </div>
         </a>
 
         <nav class="cl-sidebar-nav">
             <ul style="list-style:none; padding:0;">
+                {{-- ── MAIN ── --}}
+                <li class="cl-nav-label">Main</li>
                 <li class="cl-nav-item">
                     <a href="{{ route('professional.dashboard') }}" class="cl-nav-link {{ request()->routeIs('professional.dashboard') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                         Dashboard
                     </a>
                 </li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('professional.priority.index') }}" class="cl-nav-link {{ request()->routeIs('professional.priority.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                        Priority Actions
+                    </a>
+                </li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('professional.bid-intelligence.index') }}" class="cl-nav-link {{ request()->routeIs('professional.bid-intelligence.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                        Bid Intelligence
+                    </a>
+                </li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('professional.multi-service.index') }}" class="cl-nav-link {{ request()->routeIs('professional.multi-service.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+                        Multi-Service Requests
+                    </a>
+                </li>
 
-                <li class="cl-nav-label">Work</li>
+                {{-- ── OPERATIONS ── --}}
+                <li class="cl-nav-label">Operations</li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('professional.contracts.index') }}" class="cl-nav-link {{ request()->routeIs('professional.contracts.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+                        Contracts
+                    </a>
+                </li>
                 <li class="cl-nav-item">
                     <a href="{{ route('professional.gigs.index') }}" class="cl-nav-link {{ request()->routeIs('professional.gigs.*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 4V2M8 4V2M2 11h20"/></svg>
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                         My Gigs
                     </a>
                 </li>
                 <li class="cl-nav-item">
-                    <a href="{{ route('professional.proposals.index') }}" class="cl-nav-link {{ request()->routeIs('professional.proposals.*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
-                        Proposals
+                    <a href="{{ route('professional.gig-hub.index') }}" class="cl-nav-link {{ request()->routeIs('professional.gig-hub.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><line x1="2" y1="13" x2="22" y2="13"/></svg>
+                        Gig Operations Hub
                     </a>
                 </li>
-
-                <li class="cl-nav-label">Finance</li>
                 <li class="cl-nav-item">
-                    <a href="{{ route('professional.earnings.index') }}" class="cl-nav-link {{ request()->routeIs('professional.earnings.*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><path d="M12 1v6m0 6v6"/><path d="M4.22 4.22l4.24 4.24m5.08 0l4.24-4.24M4.22 19.78l4.24-4.24m5.08 0l4.24 4.24"/></svg>
-                        Earnings
+                    <a href="{{ route('professional.calendar.index') }}" class="cl-nav-link {{ request()->routeIs('professional.calendar.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        Calendar
                     </a>
                 </li>
-
-                <li class="cl-nav-label">Communication</li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('professional.team.index') }}" class="cl-nav-link {{ request()->routeIs('professional.team.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        Team & Workforce
+                    </a>
+                </li>
                 <li class="cl-nav-item">
                     <a href="{{ route('professional.chat.index') }}" class="cl-nav-link {{ request()->routeIs('professional.chat.*') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                         Messages
                     </a>
                 </li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('professional.threads.index') }}" class="cl-nav-link {{ request()->routeIs('professional.threads.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 6.1H3"/><path d="M21 12.1H3"/><path d="M15.1 18H3"/></svg>
+                        Threads
+                    </a>
+                </li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('professional.earnings.index') }}" class="cl-nav-link {{ request()->routeIs('professional.earnings.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        Escrow & Payouts
+                    </a>
+                </li>
 
-                <li class="cl-nav-label">Feedback</li>
+                {{-- ── SALES ── --}}
+                <li class="cl-nav-label">Sales</li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('professional.leads.index') }}" class="cl-nav-link {{ request()->routeIs('professional.leads.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+                        Leads CRM
+                    </a>
+                </li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('professional.proposals.index') }}" class="cl-nav-link {{ request()->routeIs('professional.proposals.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+                        Proposals / Bids
+                    </a>
+                </li>
+
+                {{-- ── AI TOOLS ── --}}
+                <li class="cl-nav-label">AI Tools</li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('ai-tools.proposal-writer') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.proposal-writer*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+                        AI Proposal Writer
+                    </a>
+                </li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('ai-tools.pricing-assistant') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.pricing-assistant*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        AI Pricing Assistant
+                    </a>
+                </li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('ai-tools.staffing-planner') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.staffing-planner*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                        AI Staffing Planner
+                    </a>
+                </li>
+
+                {{-- ── BUSINESS ── --}}
+                <li class="cl-nav-label">Business</li>
                 <li class="cl-nav-item">
                     <a href="{{ route('professional.reviews.index') }}" class="cl-nav-link {{ request()->routeIs('professional.reviews.*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 10.26 23 10.27 17 16.14 19.09 23.95 12 18.54 4.91 23.95 6.91 16.14 1 10.27 8.91 10.26 12 2"/></svg>
-                        Reviews
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        Reviews & Reputation
                     </a>
                 </li>
                 <li class="cl-nav-item">
                     <a href="{{ route('professional.transactions.index') }}" class="cl-nav-link {{ request()->routeIs('professional.transactions.*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-                        Transactions
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="14" y2="12"/></svg>
+                        Invoices
                     </a>
                 </li>
 
+                {{-- ── ACCOUNT ── --}}
                 <li class="cl-nav-label">Account</li>
                 <li class="cl-nav-item">
                     <a href="{{ route('professional.profile.index') }}" class="cl-nav-link {{ request()->routeIs('professional.profile.*') ? 'active' : '' }}">
@@ -981,26 +1099,54 @@
 
     {{-- Main Content --}}
     <main class="cl-main">
-        <header class="cl-navbar">
-            <div class="cl-navbar-left">
-                <button class="cl-mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                </button>
-                <h1 class="cl-page-title">@yield('page-title', 'Dashboard')</h1>
+        <header class="pro-topbar">
+            <button class="cl-mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+
+            {{-- hidden theme toggle kept so the theme-switch JS still has its target --}}
+            <button class="cl-theme-toggle" id="theme-toggle" title="Toggle theme" style="position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden;">
+                <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+
+            <div class="pro-banner">
+                <div class="pro-banner-avatar">{{ strtoupper(substr(auth()->user()?->name ?? 'P', 0, 1)) }}</div>
+                <div class="pro-banner-text">
+                    <h1>Welcome back, {{ auth()->user()?->name ?? 'Professional User' }}! 👋</h1>
+                    <p>Here's your business overview for today, {{ now()->format('M d, Y') }}.</p>
+                </div>
+                <div class="pro-banner-search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" placeholder="Search gigs, events, services, or professionals...">
+                    <kbd>⌘K</kbd>
+                </div>
             </div>
-            <div class="cl-navbar-right">
-                @include('partials._role_switcher')
-                <button class="cl-theme-toggle" id="theme-toggle" title="Toggle theme">
-                    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                </button>
-                <a href="{{ route('professional.chat.index') }}" class="cl-nav-btn" title="Messages">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    <span class="badge-dot"></span>
-                </a>
-                <button class="cl-nav-btn" title="Notifications">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                </button>
+
+            <div class="pro-topbar-right">
+                <div class="pro-topbar-controls">
+                    <label class="pro-avail" title="Availability">
+                        <span class="dot"></span> AVAILABLE
+                        <span class="pro-toggle"><input type="checkbox" checked><span class="track"></span></span>
+                    </label>
+                    <button class="pro-icon-btn" title="Notifications">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <span class="pro-icon-badge">3</span>
+                    </button>
+                    <a href="{{ route('professional.chat.index') }}" class="pro-icon-btn" title="Messages">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <span class="pro-icon-badge red">5</span>
+                    </a>
+                    <div class="pro-avatar-chip" onclick="window.location.href='{{ route('professional.profile.index') }}'" title="Account">
+                        <div class="pro-avatar-img">{{ strtoupper(substr(auth()->user()?->name ?? 'P', 0, 1)) }}</div>
+                        <div class="pro-avatar-meta"><b>{{ auth()->user()?->name ?? 'Professional User' }}</b><span>PRO</span></div>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                </div>
+                <div class="pro-topbar-actions">
+                    <button class="pro-btn-ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add New</button>
+                    <a href="{{ route('professional.gigs.index') }}" class="pro-btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Find Gigs</a>
+                </div>
             </div>
         </header>
 

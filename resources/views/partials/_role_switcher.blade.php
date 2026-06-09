@@ -55,23 +55,21 @@
         gap: 8px;
         margin-right: 6px;
     }
+    /* Current-mode pill — green-tinted with a coloured status dot,
+       matching the reference "● PROFESSIONAL" chip. */
     .rs-current {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 6px 12px;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.08);
+        padding: 6px 13px;
+        background: rgba(16,185,129,0.12);
+        border: 1px solid rgba(16,185,129,0.28);
         border-radius: 30px;
         font-size: 0.72rem;
-        font-weight: 600;
-        color: var(--text-secondary, #cbd5e1);
+        font-weight: 700;
+        color: #10b981;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-    }
-    [data-theme="light"] .rs-current {
-        background: rgba(0,0,0,0.03);
-        border-color: rgba(0,0,0,0.08);
     }
     .rs-dot {
         width: 7px;
@@ -79,7 +77,7 @@
         border-radius: 50%;
         flex-shrink: 0;
     }
-    .rs-dot-client   { background: #3b82f6; box-shadow: 0 0 6px rgba(59,130,246,0.6); }
+    .rs-dot-client   { background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,0.6); }
     .rs-dot-supplier { background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,0.6); }
 
     .rs-form { margin: 0; }
@@ -88,7 +86,8 @@
         align-items: center;
         gap: 6px;
         padding: 7px 14px;
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        white-space: nowrap;
+        background: linear-gradient(135deg, #f97316, #ea580c);
         color: #fff;
         border: none;
         border-radius: 30px;
@@ -100,7 +99,7 @@
     }
     .rs-btn:hover {
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+        box-shadow: 0 4px 12px rgba(249,115,22,0.35);
     }
     .rs-btn-enable {
         background: transparent;

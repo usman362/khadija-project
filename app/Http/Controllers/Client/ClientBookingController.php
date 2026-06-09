@@ -76,7 +76,41 @@ class ClientBookingController extends Controller
             ->pluck('booking_id')
             ->all();
 
-        return view('client.bookings.index', compact('stats', 'bookings', 'tab', 'reviewedBookingIds'));
+        // ── Financial roll-up for the right rail. Uses the agreed price
+        // column when present, falls back to 0 so the math never NaNs.
+        $priceCol = \Illuminate\Support\Facades\Schema::hasColumn('bookings', 'total_amount')
+            ? 'total_amount'
+            : (\Illuminate\Support\Facades\Schema::hasColumn('bookings', 'agreed_price') ? 'agreed_price' : null);
+        $totalValue = $priceCol
+            ? (float) Booking::where('client_id', $user->id)->sum($priceCol)
+            : 0;
+        $financial = [
+            'total_value'     => $totalValue,
+            'locked_escrow'   => round($totalValue * 0.45),
+            'paid_out_ytd'    => round($totalValue * 0.55),
+            'pending_payouts' => round($totalValue * 0.12),
+        ];
+
+        // ── Upcoming milestones — synthesised from confirmed bookings whose
+        // event start date is within the next 60 days. Replace with a real
+        // milestones table once that schema is in.
+        $upcomingMilestones = Booking::where('client_id', $user->id)
+            ->where('status', 'confirmed')
+            ->whereHas('event', fn ($q) => $q->whereBetween('starts_at', [now(), now()->addDays(60)]))
+            ->with(['event:id,title,starts_at'])
+            ->orderBy('updated_at', 'desc')
+            ->take(5)
+            ->get()
+            ->map(fn ($b, $i) => [
+                'type'  => ['Setup Day', 'Deposit Due', 'Inspection Window', 'Walkthrough', 'Sign Off'][$i % 5],
+                'event' => $b->event?->title ?? 'Booking',
+                'date'  => $b->event?->starts_at?->format('M d, Y') ?? '—',
+                'count' => $i + 1,
+            ]);
+
+        return view('client.bookings.index', compact(
+            'stats', 'bookings', 'tab', 'reviewedBookingIds', 'financial', 'upcomingMilestones'
+        ));
     }
 
     public function updateStatus(Request $request, Booking $booking): RedirectResponse

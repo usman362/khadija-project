@@ -310,6 +310,22 @@ Route::middleware('auth')->group(function () {
     // AI Review Writer (plan-gated)
     Route::get('/ai-tools/review-writer',  [AiReviewWriterController::class, 'show'])->name('ai-tools.review-writer');
     Route::post('/ai-tools/review-writer', [AiReviewWriterController::class, 'compose'])->name('ai-tools.review-writer.compose');
+
+    // AI Pricing Assistant (deterministic calculator — not plan-gated)
+    Route::get('/ai-tools/pricing-assistant',  [\App\Http\Controllers\AiPricingAssistantController::class, 'show'])->name('ai-tools.pricing-assistant');
+    Route::post('/ai-tools/pricing-assistant/calculate', [\App\Http\Controllers\AiPricingAssistantController::class, 'calculate'])->name('ai-tools.pricing-assistant.calculate');
+
+    // AI Proposal Writer (deterministic template generator — not plan-gated)
+    Route::get('/ai-tools/proposal-writer',  [\App\Http\Controllers\AiProposalWriterController::class, 'show'])->name('ai-tools.proposal-writer');
+    Route::post('/ai-tools/proposal-writer/generate', [\App\Http\Controllers\AiProposalWriterController::class, 'generate'])->name('ai-tools.proposal-writer.generate');
+
+    // AI Staffing Planner (deterministic staffing planner — not plan-gated)
+    Route::get('/ai-tools/staffing-planner',  [\App\Http\Controllers\AiStaffingPlannerController::class, 'show'])->name('ai-tools.staffing-planner');
+    Route::post('/ai-tools/staffing-planner/generate', [\App\Http\Controllers\AiStaffingPlannerController::class, 'generate'])->name('ai-tools.staffing-planner.generate');
+
+    // Integrated Cancellation & Rejection Wizard (agreement reject/renegotiate flow)
+    Route::get('/cancellation-wizard/{agreement?}',  [\App\Http\Controllers\CancellationWizardController::class, 'show'])->name('cancellation-wizard.show');
+    Route::post('/cancellation-wizard/resolve/{agreement?}', [\App\Http\Controllers\CancellationWizardController::class, 'resolve'])->name('cancellation-wizard.resolve');
 });
 
 Route::middleware('auth')->group(function () {
@@ -389,6 +405,37 @@ Route::middleware('auth')->group(function () {
     Route::prefix('client')->middleware('permission:dashboard.view')->group(function () {
         Route::get('/dashboard', [ClientDashboardController::class, 'index'])->name('client.dashboard');
 
+        // Client-context professional search — reuses /browse data but
+        // frames it with the client's active project + budget rail.
+        Route::get('/search', [\App\Http\Controllers\Client\ClientSearchController::class, 'index'])
+            ->name('client.search.index');
+
+        // Proposals — supplier responses to the client's events.
+        Route::get('/proposals', [\App\Http\Controllers\Client\ClientProposalController::class, 'index'])
+            ->middleware('permission:bookings.view_any')
+            ->name('client.proposals.index');
+
+        // Multi-Service Request for Proposal (RFP wizard).
+        Route::get('/multi-service', [\App\Http\Controllers\Client\ClientMultiServiceController::class, 'index'])
+            ->name('client.multi-service.index');
+
+        // Reviews the client has written about hired professionals.
+        Route::get('/reviews', [\App\Http\Controllers\Client\ClientReviewController::class, 'index'])
+            ->name('client.reviews.index');
+
+        // Finance — Payments ledger + Earnings (project financial dashboard).
+        Route::get('/payments', [\App\Http\Controllers\Client\ClientFinanceController::class, 'payments'])
+            ->name('client.payments.index');
+        Route::get('/earnings', [\App\Http\Controllers\Client\ClientFinanceController::class, 'earnings'])
+            ->name('client.earnings.index');
+
+        // Virtual & Hybrid Hub (new feature scaffold).
+        Route::get('/virtual-hub', [\App\Http\Controllers\Client\ClientVirtualHubController::class, 'index'])
+            ->name('client.virtual-hub.index');
+        // Virtual & Hybrid Event Brief — dedicated posting form.
+        Route::get('/virtual-hub/brief', [\App\Http\Controllers\Client\ClientVirtualHubController::class, 'brief'])
+            ->name('client.virtual-hub.brief');
+
         Route::get('/events', [ClientEventController::class, 'index'])->middleware('permission:events.view_any')->name('client.events.index');
         Route::post('/events', [ClientEventController::class, 'store'])->middleware('permission:events.create')->name('client.events.store');
         Route::get('/events/{event}', [ClientEventController::class, 'show'])->middleware('permission:events.view')->name('client.events.show');
@@ -418,6 +465,33 @@ Route::middleware('auth')->group(function () {
     Route::prefix('professional')->middleware('permission:dashboard.view')->group(function () {
         Route::get('/dashboard', [ProfessionalDashboardController::class, 'index'])->name('professional.dashboard');
 
+        // Contracts hub (contracts, proposals, earnings, gig opportunities, bids pipeline)
+        Route::get('/contracts', [\App\Http\Controllers\Professional\ProfessionalContractController::class, 'index'])->name('professional.contracts.index');
+
+        // Multi-Service Requests (browse & bid on multi-service event postings)
+        Route::get('/multi-service', [\App\Http\Controllers\Professional\ProfessionalMultiServiceController::class, 'index'])->name('professional.multi-service.index');
+
+        // Priority Actions (aggregated urgent items the pro must act on)
+        Route::get('/priority-actions', [\App\Http\Controllers\Professional\ProfessionalPriorityController::class, 'index'])->name('professional.priority.index');
+
+        // Gig Operations Hub (gigs overview hub — links to My Gigs for the full list)
+        Route::get('/gig-hub', [\App\Http\Controllers\Professional\ProfessionalGigHubController::class, 'index'])->name('professional.gig-hub.index');
+
+        // Lead Pipeline (Leads CRM — inquiry → proposal → negotiation → booked)
+        Route::get('/leads', [\App\Http\Controllers\Professional\ProfessionalLeadController::class, 'index'])->name('professional.leads.index');
+
+        // My Calendar (schedule home — agenda + month grid + availability)
+        Route::get('/calendar', [\App\Http\Controllers\Professional\ProfessionalCalendarController::class, 'index'])->name('professional.calendar.index');
+
+        // Bid Intelligence (bid pipeline performance — invited→submitted→viewed→won/lost)
+        Route::get('/bid-intelligence', [\App\Http\Controllers\Professional\ProfessionalBidIntelligenceController::class, 'index'])->name('professional.bid-intelligence.index');
+
+        // Team & Staffing (crew + shifts subsystem)
+        Route::get('/team', [\App\Http\Controllers\Professional\ProfessionalTeamController::class, 'index'])->name('professional.team.index');
+        Route::post('/team/staff', [\App\Http\Controllers\Professional\ProfessionalTeamController::class, 'storeStaff'])->name('professional.team.staff.store');
+        Route::post('/team/shifts', [\App\Http\Controllers\Professional\ProfessionalTeamController::class, 'storeShift'])->name('professional.team.shifts.store');
+        Route::post('/team/shifts/{shift}/fill', [\App\Http\Controllers\Professional\ProfessionalTeamController::class, 'fillShift'])->name('professional.team.shifts.fill');
+
         // My Gigs (Events assigned to professional)
         Route::get('/gigs', [ProfessionalGigController::class, 'index'])->middleware('permission:events.view_any')->name('professional.gigs.index');
         Route::get('/gigs/{event}', [ProfessionalGigController::class, 'show'])->middleware('permission:events.view')->name('professional.gigs.show');
@@ -434,8 +508,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/messages', [ProfessionalChatController::class, 'index'])->middleware('permission:messages.view_any')->name('professional.chat.index');
         Route::get('/messages/{conversation}', [ProfessionalChatController::class, 'show'])->middleware('permission:messages.view')->name('professional.chat.show');
 
+        // Threads (per-conversation deep view + AI extracted commitments)
+        Route::get('/threads', [\App\Http\Controllers\Professional\ProfessionalThreadController::class, 'index'])->middleware('permission:messages.view_any')->name('professional.threads.index');
+        Route::get('/threads/{conversation}', [\App\Http\Controllers\Professional\ProfessionalThreadController::class, 'show'])->middleware('permission:messages.view')->name('professional.threads.show');
+
         // Reviews
         Route::get('/reviews', [ProfessionalReviewController::class, 'index'])->name('professional.reviews.index');
+        Route::post('/reviews', [ProfessionalReviewController::class, 'store'])->name('professional.reviews.store');
 
         // Transactions
         Route::get('/transactions', [ProfessionalTransactionController::class, 'index'])->name('professional.transactions.index');

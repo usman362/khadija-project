@@ -1,549 +1,263 @@
 @extends('layouts.client')
 
-@section('title', 'Messages')
-@section('page-title', 'Messages')
+@section('title', 'Messages — Inbox')
+@section('page-title', 'Messages — Inbox')
+@section('page-subtitle', 'All your conversations, event updates, documents, and payments — organized in one place.')
+
+{{-- Client Messages — Inbox. Server-rendered, orange client theme. Live send +
+     polling + read receipts via partials._chat_live. --}}
+
+@php
+    $money = fn ($n) => '$' . number_format((float) $n, 0);
+    $tagColors = ['green' => ['#059669','rgba(16,185,129,0.12)'], 'amber' => ['#d97706','rgba(217,119,6,0.12)'], 'red' => ['#dc2626','rgba(220,38,38,0.12)'], 'blue' => ['#2563eb','rgba(37,99,235,0.12)']];
+@endphp
+
+@push('styles')
+<style>
+    .cm { --cm: #ea580c; padding-top: 6px; }
+    .cm-top { display: grid; grid-template-columns: minmax(0,1fr) 210px; gap: 16px; align-items: start; margin-bottom: 18px; }
+    .cm-stats { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 12px; }
+    .cm-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; }
+    .cm-stat-h { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 700; color: var(--text-muted); }
+    .cm-stat-ico { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .cm-stat-ico svg { width: 14px; height: 14px; }
+    .cm-stat .v { font-size: 23px; font-weight: 800; color: var(--text-primary); margin: 7px 0 2px; }
+    .cm-stat .s { font-size: 11px; color: var(--text-muted); }
+    .cm-actions { display: flex; flex-direction: column; gap: 10px; }
+    .cm-btn-primary { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px; border: none; border-radius: 11px; background: linear-gradient(135deg, #fb923c, #ea580c); color: #fff; font-size: 13.5px; font-weight: 800; cursor: pointer; font-family: inherit; }
+    .cm-btn-primary svg { width: 15px; height: 15px; }
+    .cm-btn-ghost { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 11px; background: var(--bg-card); color: var(--text-secondary); font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .cm-btn-ghost svg { width: 14px; height: 14px; color: #ea580c; }
+
+    .cm-main { display: grid; grid-template-columns: minmax(0,340px) minmax(0,1fr); gap: 16px; align-items: start; }
+    .cm-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; }
+    .cm-tabs { display: flex; gap: 4px; padding: 12px 14px 0; border-bottom: 1px solid var(--border-color); }
+    .cm-tab { display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; font-size: 12.5px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .cm-tab.on { color: var(--cm); border-bottom-color: var(--cm); }
+    .cm-tab .ct { font-size: 10px; background: var(--cm); color: #fff; border-radius: 999px; padding: 1px 6px; }
+    .cm-search { display: flex; gap: 8px; padding: 12px 14px; }
+    .cm-search-box { flex: 1; position: relative; }
+    .cm-search-box svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--text-muted); }
+    .cm-search-box input { width: 100%; box-sizing: border-box; padding: 9px 12px 9px 34px; border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-primary); font-size: 13px; font-family: inherit; }
+    .cm-list { max-height: 600px; overflow-y: auto; }
+    .cm-conv { display: flex; gap: 11px; padding: 13px 14px; border-top: 1px solid var(--border-color); cursor: pointer; text-decoration: none; }
+    .cm-conv:hover { background: var(--bg-card-hover); }
+    .cm-conv.active { background: rgba(234,88,12,0.06); border-left: 3px solid var(--cm); padding-left: 11px; }
+    .cm-conv-av { width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; font-weight: 800; background: #ea580c; }
+    .cm-conv-mid { flex: 1; min-width: 0; }
+    .cm-conv-name { font-size: 13.5px; font-weight: 800; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cm-conv-name span { font-weight: 500; color: var(--text-muted); font-size: 12px; }
+    .cm-conv-subj { font-size: 12px; font-weight: 700; color: var(--text-secondary); margin: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cm-conv-prev { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cm-conv-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+    .cm-tag { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+    .cm-conv-meta { text-align: right; flex-shrink: 0; }
+    .cm-conv-time { font-size: 11px; color: var(--text-muted); }
+    .cm-conv-badge { display: inline-block; min-width: 18px; height: 18px; line-height: 18px; text-align: center; background: #ef4444; color: #fff; font-size: 10px; font-weight: 800; border-radius: 999px; margin-top: 8px; padding: 0 5px; }
+    .cm-pager { padding: 12px 14px; border-top: 1px solid var(--border-color); font-size: 11.5px; color: var(--text-muted); }
+
+    .cm-thread { display: flex; flex-direction: column; min-height: 600px; }
+    .cm-th-head { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--border-color); }
+    .cm-th-av { width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; font-weight: 800; background: #ea580c; }
+    .cm-th-mid { flex: 1; min-width: 0; }
+    .cm-th-name { font-size: 16px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+    .cm-open { font-size: 10px; font-weight: 800; color: #059669; background: rgba(16,185,129,0.12); border-radius: 5px; padding: 2px 7px; }
+    .cm-th-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .cm-msgs { flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; max-height: 440px; }
+    .cm-msg { display: flex; gap: 11px; max-width: 78%; }
+    .cm-msg.me { flex-direction: row-reverse; margin-left: auto; }
+    .cm-msg-av { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 800; }
+    .cm-msg-body { min-width: 0; }
+    .cm-msg-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+    .cm-msg.me .cm-msg-meta { text-align: right; }
+    .cm-bubble { background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 13px; font-size: 13px; color: var(--text-primary); line-height: 1.5; word-break: break-word; }
+    .cm-msg.me .cm-bubble { background: rgba(234,88,12,0.1); border-color: rgba(234,88,12,0.2); }
+    .cm-att { display: flex; gap: 9px; margin-top: 8px; flex-wrap: wrap; }
+    .cm-att-item { display: flex; align-items: center; gap: 8px; border: 1px solid var(--border-color); border-radius: 9px; padding: 8px 11px; background: var(--bg-card); }
+    .cm-att-item svg { width: 16px; height: 16px; color: #dc2626; }
+    .cm-att-item b { font-size: 12px; color: var(--text-primary); display: block; }
+    .cm-att-item span { font-size: 10.5px; color: var(--text-muted); }
+    .cm-compose { border-top: 1px solid var(--border-color); padding: 14px 18px 16px; }
+    .cm-c-box textarea { width: 100%; box-sizing: border-box; min-height: 56px; padding: 11px 13px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); color: var(--text-primary); font-size: 13px; font-family: inherit; resize: vertical; outline: none; }
+    .cm-c-box textarea:focus { border-color: var(--cm); }
+    .cm-c-row { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 10px; }
+    .cm-send { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border: none; border-radius: 9px; background: linear-gradient(135deg, #fb923c, #ea580c); color: #fff; font-size: 13.5px; font-weight: 800; cursor: pointer; font-family: inherit; }
+    .cm-send svg { width: 14px; height: 14px; }
+    .cm-empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text-muted); padding: 60px; text-align: center; font-size: 13px; }
+
+    @media (max-width: 1100px) { .cm-top { grid-template-columns: 1fr; } .cm-stats { grid-template-columns: repeat(3, minmax(0,1fr)); } .cm-main { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) { .cm-stats { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+</style>
+@endpush
 
 @section('content')
-<div id="chat-app" class="chat-container" data-user-id="{{ $currentUser->id }}" data-user-name="{{ $currentUser->name }}" @if($initialConversationId) data-initial-conversation="{{ $initialConversationId }}" @endif>
-
-    {{-- Left: Conversations List --}}
-    <div class="chat-sidebar" id="chat-sidebar">
-        <div class="chat-sidebar-header">
-            <h5 class="chat-h5">Chats</h5>
-            <button class="chat-btn chat-btn-primary chat-btn-sm" id="new-conversation-btn" title="New Conversation">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            </button>
+<div class="cm">
+    {{-- stats + actions --}}
+    <div class="cm-top">
+        <div class="cm-stats">
+            <div class="cm-stat"><div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(234,88,12,0.12);color:#ea580c;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Unread</div><div class="v">{{ $stats['unread'] }}</div><div class="s">of {{ max($stats['total'], $stats['unread']) }}</div></div>
+            <div class="cm-stat"><div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(217,119,6,0.12);color:#d97706;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>Priority</div><div class="v">{{ $stats['priority'] }}</div><div class="s">Needs attention</div></div>
+            <div class="cm-stat"><div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(16,185,129,0.12);color:#059669;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></span>Response Time</div><div class="v">{{ $stats['response'] }}</div><div class="s" style="color:#059669;">↓ 9% vs last 30 days</div></div>
+            <div class="cm-stat"><div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(220,38,38,0.12);color:#dc2626;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>Compliance</div><div class="v">{{ $stats['compliance'] }}</div><div class="s">Action required</div></div>
+            <div class="cm-stat"><div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(234,88,12,0.12);color:#ea580c;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>Escrow Locked</div><div class="v">{{ $money($stats['escrow']) }}</div><div class="s">Across {{ $stats['escrow_convos'] }} conversations</div></div>
         </div>
-
-        {{-- Search --}}
-        <div class="chat-search">
-            <input type="text" class="chat-form-control" id="conversation-search" placeholder="Search conversations...">
-        </div>
-
-        {{-- Filter Tabs --}}
-        <div class="chat-filter-tabs">
-            <div class="chat-btn-group" role="group">
-                <button type="button" class="chat-filter-btn active" data-filter="all">All</button>
-                <button type="button" class="chat-filter-btn" data-filter="direct">Direct</button>
-                <button type="button" class="chat-filter-btn" data-filter="booking">Booking</button>
-                <button type="button" class="chat-filter-btn" data-filter="event">Event</button>
-            </div>
-        </div>
-
-        {{-- Conversation List --}}
-        <div class="conversation-list" id="conversation-list">
-            <div class="chat-loading" id="conversations-loading">
-                <div class="chat-spinner"></div>
-                <div class="chat-loading-text">Loading conversations...</div>
-            </div>
+        <div class="cm-actions">
+            <button type="button" class="cm-btn-primary" id="cm-create"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Message</button>
+            <button type="button" class="cm-btn-ghost" id="cm-ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>AI Compose</button>
         </div>
     </div>
 
-    {{-- Right: Chat Window --}}
-    <div class="chat-main" id="chat-main">
-        {{-- Empty State --}}
-        <div class="chat-empty-state" id="chat-empty-state">
-            <div class="chat-empty-content">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.15"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                <h5 class="chat-empty-title">Select a conversation</h5>
-                <p class="chat-empty-text">Or start a new one to begin chatting</p>
+    <div class="cm-main">
+        {{-- list --}}
+        <div class="cm-card">
+            <div class="cm-tabs">
+                <span class="cm-tab on" data-tab="inbox">Inbox <span class="ct">{{ $tabCounts['unread'] }}</span></span>
+                <span class="cm-tab" data-tab="sent">Sent @if($tabCounts['sent'])<span class="ct">{{ $tabCounts['sent'] }}</span>@endif</span>
+                <span class="cm-tab" data-tab="drafts">Drafts</span>
+                <span class="cm-tab" data-tab="archived">Archived</span>
             </div>
+            <div class="cm-search"><div class="cm-search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="cm-search" placeholder="Search messages..."></div></div>
+            <div class="cm-list" id="cm-list">
+                @forelse($conversations as $c)
+                    <a href="{{ route('client.chat.show', $c['id']) }}" class="cm-conv {{ ($thread && $thread['id'] === $c['id']) ? 'active' : '' }}" data-name="{{ \Illuminate\Support\Str::lower($c['name'].' '.$c['subject']) }}" data-lastfrom="{{ $c['lastFromMe'] ? 'me' : 'them' }}">
+                        <span class="cm-conv-av">{{ $c['initials'] }}</span>
+                        <div class="cm-conv-mid">
+                            <div class="cm-conv-name">{{ $c['name'] }} <span>({{ $c['role'] }})</span></div>
+                            <div class="cm-conv-subj">{{ $c['subject'] }}</div>
+                            <div class="cm-conv-prev">{{ $c['preview'] }}</div>
+                            <div class="cm-conv-tags">
+                                @foreach($c['tags'] as [$tname, $tcol])
+                                    <span class="cm-tag" style="color:{{ ($tagColors[$tcol] ?? $tagColors['blue'])[0] }};background:{{ ($tagColors[$tcol] ?? $tagColors['blue'])[1] }};">{{ $tname }}</span>
+                                @endforeach
+                            </div>
+                        </div>
+                        <div class="cm-conv-meta"><div class="cm-conv-time">{{ $c['time'] }}</div>@if($c['unread'] > 0)<span class="cm-conv-badge">{{ $c['unread'] }}</span>@endif</div>
+                    </a>
+                @empty
+                    <div style="padding:40px 16px;text-align:center;color:var(--text-muted);font-size:13px;">No conversations yet.</div>
+                @endforelse
+                <div id="cm-list-empty" style="display:none;padding:40px 16px;text-align:center;color:var(--text-muted);font-size:13px;"></div>
+            </div>
+            <div class="cm-pager">Showing {{ count($conversations) }} of {{ $stats['total'] }} conversations</div>
         </div>
 
-        {{-- Chat Header (hidden initially) --}}
-        <div class="chat-header d-none" id="chat-header">
-            <button class="chat-btn chat-btn-ghost chat-btn-sm chat-back-btn" id="back-to-list">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-            </button>
-            <div class="chat-header-info">
-                <h6 class="chat-header-name" id="chat-header-name"></h6>
-                <small class="chat-header-context" id="chat-header-context"></small>
-            </div>
-        </div>
-
-        {{-- Messages Area (hidden initially) --}}
-        <div class="chat-messages d-none" id="chat-messages">
-            <div class="chat-loading d-none" id="messages-loading">
-                <div class="chat-spinner"></div>
-            </div>
-            <div id="messages-container"></div>
-            <div class="typing-indicator d-none" id="typing-indicator">
-                <span class="typing-name"></span> is typing
-                <span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>
-            </div>
-        </div>
-
-        {{-- Input Area (hidden initially) --}}
-        <div class="chat-input d-none" id="chat-input">
-            {{-- Attachment Preview --}}
-            <div class="attachment-preview d-none" id="attachment-preview"></div>
-
-            <div class="chat-input-row">
-                <button class="chat-btn chat-btn-ghost chat-btn-sm" id="attach-btn" title="Attach file">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                </button>
-                <input type="file" id="file-input" class="d-none" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.mp4,.webm">
-                <textarea id="message-input" class="chat-form-control chat-textarea" rows="1" placeholder="Type a message..." maxlength="5000"></textarea>
-                <button class="chat-btn chat-btn-primary chat-btn-sm" id="send-btn" disabled title="Send">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    {{-- New Conversation Modal --}}
-    <div class="chat-modal-overlay" id="newConversationModal">
-        <div class="chat-modal">
-            <div class="chat-modal-header">
-                <h5>New Conversation</h5>
-                <button type="button" class="chat-modal-close" onclick="document.getElementById('newConversationModal').classList.remove('show')">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-            </div>
-            <div class="chat-modal-body">
-                <div class="chat-form-group">
-                    <label class="chat-form-label">Type</label>
-                    <select class="chat-form-select" id="new-conv-type">
-                        <option value="direct">Direct Message</option>
-                        <option value="booking">Booking Chat</option>
-                        <option value="event">Event Chat</option>
-                    </select>
+        {{-- thread --}}
+        <div class="cm-card cm-thread">
+            @if($thread)
+                <div class="cm-th-head">
+                    <span class="cm-th-av">{{ $thread['initials'] }}</span>
+                    <div class="cm-th-mid"><div class="cm-th-name">{{ $thread['name'] }} <span class="cm-open">OPEN</span></div><div class="cm-th-sub">{{ $thread['subject'] }}@if($thread['date']) · {{ $thread['date'] }}@endif</div></div>
                 </div>
-                <div class="chat-form-group" id="participant-group">
-                    <label class="chat-form-label">Participant</label>
-                    <select class="chat-form-select" id="new-conv-participant">
-                        <option value="">Select user...</option>
-                        @foreach($users as $user)
-                            <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
-                        @endforeach
-                    </select>
+                <div class="cm-msgs" id="cm-msgs">
+                    @forelse($thread['messages'] as $m)
+                        <div class="cm-msg {{ $m['mine'] ? 'me' : '' }}">
+                            <span class="cm-msg-av" style="background:{{ $m['mine'] ? '#1e293b' : '#ea580c' }};">{{ strtoupper(substr($m['sender'], 0, 1)) }}</span>
+                            <div class="cm-msg-body">
+                                <div class="cm-msg-meta">{{ $m['mine'] ? 'You' : $m['sender'] }} · {{ $m['time'] }}</div>
+                                <div class="cm-bubble">{{ $m['body'] }}</div>
+                                @if(!empty($m['attachments']))<div class="cm-att">@foreach($m['attachments'] as $a)<div class="cm-att-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div><b>{{ $a['name'] }}</b><span>{{ $a['size'] }}</span></div></div>@endforeach</div>@endif
+                            </div>
+                        </div>
+                    @empty
+                        <div style="text-align:center;color:var(--text-muted);font-size:13px;margin:auto;">No messages yet — start the conversation below.</div>
+                    @endforelse
                 </div>
-                <div class="chat-form-group d-none" id="booking-group">
-                    <label class="chat-form-label">Booking</label>
-                    <select class="chat-form-select" id="new-conv-booking">
-                        <option value="">Select booking...</option>
-                        @foreach($bookings as $booking)
-                            <option value="{{ $booking->id }}"
-                                data-client="{{ $booking->client_id }}"
-                                data-supplier="{{ $booking->supplier_id }}">
-                                #{{ $booking->id }} — {{ $booking->event->title ?? 'N/A' }} ({{ ucfirst($booking->status) }})
-                            </option>
-                        @endforeach
-                    </select>
+                <div class="cm-compose">
+                    <form class="cm-c-box" id="cm-form">
+                        <textarea id="cm-input" placeholder="Type your message..."></textarea>
+                        <div class="cm-c-row"><button type="submit" class="cm-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Send</button></div>
+                    </form>
                 </div>
-                <div class="chat-form-group d-none" id="event-group">
-                    <label class="chat-form-label">Event</label>
-                    <select class="chat-form-select" id="new-conv-event">
-                        <option value="">Select event...</option>
-                        @foreach($events as $event)
-                            <option value="{{ $event->id }}">{{ $event->title }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            <div class="chat-modal-footer">
-                <button type="button" class="chat-btn chat-btn-ghost" onclick="document.getElementById('newConversationModal').classList.remove('show')">Cancel</button>
-                <button type="button" class="chat-btn chat-btn-primary" id="create-conversation-btn">Start Chat</button>
-            </div>
+            @else
+                <div class="cm-empty">Select a conversation to view the thread.</div>
+            @endif
         </div>
     </div>
 </div>
 
-<style>
-/* ===== Dark Theme Variables ===== */
-.chat-container {
-    --chat-bg: #0c1427;
-    --chat-sidebar-bg: #111a2e;
-    --chat-border: #1e2d44;
-    --chat-hover: #182541;
-    --chat-active: #1a3058;
-    --chat-item-border: #1e2d44;
-    --chat-text: #e1e5eb;
-    --chat-text-muted: #8a94a6;
-    --chat-text-subtle: #5a6577;
-    --chat-received-bg: #1e2d44;
-    --chat-received-text: #d1d5db;
-    --chat-sent-bg: #3b82f6;
-    --chat-sent-text: #ffffff;
-    --chat-date-bg: #1a2540;
-    --chat-date-text: #5a6577;
-    --chat-input-bg: #111a2e;
-    --chat-input-border: #1e2d44;
-    --chat-input-text: #e1e5eb;
-    --chat-attachment-bg: #1e2d44;
-    --chat-file-link-bg: rgba(255,255,255,0.08);
-    --chat-file-received-text: #d1d5db;
-    --chat-empty-icon: 0.15;
-    --chat-shadow: 0 1px 4px rgba(0,0,0,0.3);
-}
+{{-- New Message modal --}}
+<div id="cm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:16px;padding:24px;width:380px;max-width:90vw;">
+        <h3 style="font-size:17px;font-weight:800;color:var(--text-primary);margin:0 0 4px;">New Message</h3>
+        <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 16px;">Start a conversation with a professional or contact.</p>
+        <label style="font-size:12px;font-weight:700;color:var(--text-primary);display:block;margin-bottom:6px;">Recipient</label>
+        <select id="cm-modal-recipient" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--border-color);border-radius:9px;background:var(--bg-card);color:var(--text-primary);font-size:13px;margin-bottom:16px;font-family:inherit;">
+            @foreach($recipients as $r)<option value="{{ $r->id }}">{{ $r->name }}</option>@endforeach
+        </select>
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button type="button" id="cm-modal-cancel" style="padding:10px 16px;border:1px solid var(--border-color);border-radius:9px;background:var(--bg-card);color:var(--text-secondary);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Cancel</button>
+            <button type="button" id="cm-modal-start" style="padding:10px 18px;border:none;border-radius:9px;background:linear-gradient(135deg,#fb923c,#ea580c);color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">Start Conversation</button>
+        </div>
+    </div>
+</div>
 
-/* ===== Utility ===== */
-.d-none { display: none !important; }
-
-/* ===== Chat Layout ===== */
-.chat-container {
-    display: flex;
-    height: calc(100vh - var(--navbar-height, 64px) - 24px);
-    background: var(--chat-bg);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: var(--chat-shadow);
-}
-
-/* ===== Chat Buttons (standalone, no Bootstrap) ===== */
-.chat-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 8px 16px;
-    border-radius: 8px;
-    border: 1px solid transparent;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-    font-family: inherit;
-    text-decoration: none;
-    background: transparent;
-    color: var(--chat-text);
-}
-.chat-btn-primary {
-    background: #3b82f6;
-    color: #fff;
-    border-color: #3b82f6;
-}
-.chat-btn-primary:hover { background: #2563eb; }
-.chat-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-.chat-btn-ghost {
-    background: rgba(255,255,255,0.06);
-    border-color: var(--chat-border);
-    color: var(--chat-text-muted);
-}
-.chat-btn-ghost:hover { background: rgba(255,255,255,0.1); color: var(--chat-text); }
-.chat-btn-sm { padding: 6px 10px; font-size: 13px; }
-
-/* ===== Chat Form Controls ===== */
-.chat-form-control {
-    width: 100%;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--chat-input-border);
-    background: var(--chat-input-bg);
-    color: var(--chat-input-text);
-    font-size: 14px;
-    font-family: inherit;
-    outline: none;
-    transition: border-color 0.15s;
-}
-.chat-form-control:focus { border-color: #3b82f6; }
-.chat-form-control::placeholder { color: var(--chat-text-subtle); }
-.chat-form-select {
-    width: 100%;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--chat-input-border);
-    background: var(--chat-input-bg);
-    color: var(--chat-input-text);
-    font-size: 14px;
-    font-family: inherit;
-    outline: none;
-    appearance: auto;
-}
-.chat-form-group { margin-bottom: 16px; }
-.chat-form-label { display: block; font-size: 13px; font-weight: 500; color: var(--chat-text-muted); margin-bottom: 6px; }
-.chat-textarea {
-    resize: none;
-    max-height: 120px;
-    border-radius: 20px;
-    padding: 8px 16px;
-}
-.chat-h5 { font-size: 18px; font-weight: 600; margin: 0; }
-
-/* ===== Sidebar ===== */
-.chat-sidebar {
-    width: 340px;
-    min-width: 340px;
-    border-right: 1px solid var(--chat-border);
-    display: flex;
-    flex-direction: column;
-    background: var(--chat-sidebar-bg);
-}
-.chat-sidebar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 16px 8px;
-    color: var(--chat-text);
-}
-.chat-search { padding: 0 12px 8px; }
-.chat-filter-tabs { padding: 0 12px 8px; }
-.chat-btn-group {
-    display: flex;
-    width: 100%;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid var(--chat-border);
-}
-.chat-filter-btn {
-    flex: 1;
-    padding: 6px 8px;
-    font-size: 12px;
-    font-weight: 500;
-    border: none;
-    background: transparent;
-    color: var(--chat-text-muted);
-    cursor: pointer;
-    transition: all 0.15s;
-    font-family: inherit;
-}
-.chat-filter-btn:not(:last-child) { border-right: 1px solid var(--chat-border); }
-.chat-filter-btn:hover { background: rgba(255,255,255,0.04); }
-.chat-filter-btn.active { background: var(--chat-active); color: var(--chat-text); }
-.conversation-list { flex: 1; overflow-y: auto; }
-
-/* ===== Conversation Item ===== */
-.conversation-item {
-    display: flex;
-    align-items: center;
-    padding: 12px 16px;
-    cursor: pointer;
-    border-bottom: 1px solid var(--chat-item-border);
-    transition: background 0.15s;
-}
-.conversation-item:hover { background: var(--chat-hover); }
-.conversation-item.active { background: var(--chat-active); }
-.conv-avatar {
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    background: #6c757d; color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 600; font-size: 16px;
-    flex-shrink: 0; margin-right: 12px;
-}
-.conv-avatar.direct { background: #0d6efd; }
-.conv-avatar.booking { background: #198754; }
-.conv-avatar.event { background: #6f42c1; }
-.conv-info { flex: 1; min-width: 0; }
-.conv-name { font-weight: 600; font-size: 14px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--chat-text); }
-.conv-preview { font-size: 12px; color: var(--chat-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.conv-meta { text-align: right; flex-shrink: 0; margin-left: 8px; }
-.conv-time { font-size: 11px; color: var(--chat-text-subtle); display: block; }
-.conv-unread {
-    display: inline-flex; align-items: center; justify-content: center;
-    background: #0d6efd; color: #fff; border-radius: 10px;
-    min-width: 20px; height: 20px; font-size: 11px; font-weight: 600;
-    padding: 0 6px; margin-top: 4px;
-}
-
-/* ===== Main Chat ===== */
-.chat-main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    background: var(--chat-bg);
-}
-.chat-empty-state {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--chat-text-muted);
-}
-.chat-empty-content { text-align: center; }
-.chat-empty-title { font-size: 18px; font-weight: 600; margin-top: 12px; color: var(--chat-text-muted); }
-.chat-empty-text { font-size: 13px; color: var(--chat-text-subtle); margin-top: 4px; }
-.chat-header {
-    display: flex;
-    align-items: center;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--chat-border);
-    background: var(--chat-bg);
-}
-.chat-back-btn { display: none; margin-right: 8px; }
-.chat-header-info h6, .chat-header-name { font-size: 15px; font-weight: 600; color: var(--chat-text); margin: 0; }
-.chat-header-context { font-size: 12px; color: var(--chat-text-muted); }
-
-/* ===== Messages ===== */
-.chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    background: var(--chat-bg);
-}
-#messages-container { display: flex; flex-direction: column; gap: 4px; }
-
-/* Message Bubbles */
-.message-row { display: flex; margin-bottom: 2px; }
-.message-row.sent { justify-content: flex-end; }
-.message-row.received { justify-content: flex-start; }
-.message-bubble {
-    max-width: 65%;
-    padding: 8px 14px;
-    border-radius: 16px;
-    font-size: 14px;
-    line-height: 1.4;
-    word-wrap: break-word;
-    position: relative;
-}
-.message-row.sent .message-bubble { background: var(--chat-sent-bg); color: var(--chat-sent-text); border-bottom-right-radius: 4px; }
-.message-row.received .message-bubble { background: var(--chat-received-bg); color: var(--chat-received-text); border-bottom-left-radius: 4px; }
-.message-sender { font-size: 11px; font-weight: 600; margin-bottom: 2px; color: var(--chat-text-muted); }
-.message-row.received .message-sender { color: #6ea8fe; }
-.message-meta { font-size: 10px; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
-.message-row.sent .message-meta { color: rgba(255,255,255,0.7); justify-content: flex-end; }
-.message-row.received .message-meta { color: var(--chat-text-subtle); }
-.read-receipt { font-size: 12px; }
-.read-receipt.read { color: rgba(255,255,255,0.9); }
-
-/* Date Separator */
-.date-separator { text-align: center; margin: 12px 0; font-size: 12px; color: var(--chat-date-text); }
-.date-separator span { background: var(--chat-date-bg); padding: 2px 12px; border-radius: 10px; }
-
-/* Attachment in bubble */
-.message-attachment { margin-top: 6px; }
-.message-attachment img { max-width: 240px; max-height: 180px; border-radius: 8px; cursor: pointer; }
-.message-attachment .file-link {
-    display: flex; align-items: center; gap: 6px;
-    padding: 6px 10px; background: var(--chat-file-link-bg);
-    border-radius: 8px; font-size: 12px; text-decoration: none;
-}
-.message-row.sent .file-link { color: #fff; }
-.message-row.received .file-link { color: var(--chat-file-received-text); }
-
-/* Typing */
-.typing-indicator { font-size: 12px; color: var(--chat-text-muted); padding: 4px 0; }
-.typing-dots span { animation: typingDot 1.4s infinite; }
-.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes typingDot { 0%, 60%, 100% { opacity: 0.2; } 30% { opacity: 1; } }
-
-/* ===== Input Area ===== */
-.chat-input {
-    padding: 12px 16px;
-    border-top: 1px solid var(--chat-border);
-    background: var(--chat-bg);
-}
-.chat-input-row { display: flex; align-items: flex-end; gap: 8px; }
-.attachment-preview { display: flex; gap: 8px; padding-bottom: 8px; flex-wrap: wrap; }
-.attachment-preview-item {
-    position: relative; padding: 6px 10px;
-    background: var(--chat-attachment-bg); border-radius: 8px;
-    font-size: 12px; display: flex; align-items: center; gap: 6px; color: var(--chat-text);
-}
-.attachment-preview-item .remove-attachment { cursor: pointer; color: #dc3545; font-weight: bold; }
-
-/* ===== Loading ===== */
-.chat-loading { text-align: center; padding: 16px; color: var(--chat-text-muted); }
-.chat-loading-text { font-size: 12px; margin-top: 8px; }
-.chat-spinner {
-    width: 20px; height: 20px;
-    border: 2px solid var(--chat-border);
-    border-top-color: #3b82f6;
-    border-radius: 50%;
-    animation: chatSpin 0.6s linear infinite;
-    margin: 0 auto;
-}
-@keyframes chatSpin { to { transform: rotate(360deg); } }
-
-/* ===== Modal ===== */
-.chat-modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-}
-.chat-modal-overlay.show { display: flex; }
-.chat-modal {
-    background: #111a2e;
-    border: 1px solid #1e2d44;
-    border-radius: 12px;
-    width: 480px;
-    max-width: 90%;
-    color: var(--chat-text);
-}
-.chat-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid #1e2d44;
-}
-.chat-modal-header h5 { font-size: 16px; font-weight: 600; margin: 0; }
-.chat-modal-close {
-    background: none; border: none; cursor: pointer;
-    color: var(--chat-text-muted); padding: 4px;
-    display: flex; align-items: center; justify-content: center;
-}
-.chat-modal-close:hover { color: var(--chat-text); }
-.chat-modal-body { padding: 20px; }
-.chat-modal-footer {
-    display: flex; gap: 8px; justify-content: flex-end;
-    padding: 12px 20px;
-    border-top: 1px solid #1e2d44;
-}
-
-/* ===== Mobile ===== */
-@media (max-width: 768px) {
-    .chat-sidebar { width: 100%; min-width: 100%; }
-    .chat-main { display: none; }
-    .chat-container.chat-active .chat-sidebar { display: none; }
-    .chat-container.chat-active .chat-main { display: flex; }
-    .chat-back-btn { display: flex; }
-}
-</style>
-@endsection
-
-@push('scripts')
 <script>
-    // Bootstrap compatibility shim — chat.js uses Bootstrap modal API
-    // We implement a lightweight replacement
-    (function() {
-        // Handle new conversation button — open our custom modal
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('newConversationModal');
-            const newBtn = document.getElementById('new-conversation-btn');
-            if (newBtn && modal) {
-                newBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    modal.classList.add('show');
-                });
-            }
-            // Close modal on overlay click
-            if (modal) {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === this) this.classList.remove('show');
-                });
-            }
-            // Close on Escape
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && modal) modal.classList.remove('show');
-            });
-
-            // Bootstrap Modal stub so chat.js doesn't crash
-            if (typeof bootstrap === 'undefined') {
-                window.bootstrap = {
-                    Modal: function(el) {
-                        this.el = el;
-                        this.show = function() { el.classList.add('show'); };
-                        this.hide = function() { el.classList.remove('show'); };
-                    }
-                };
-                window.bootstrap.Modal.getInstance = function(el) {
-                    return new window.bootstrap.Modal(el);
-                };
-                window.bootstrap.Modal.getOrCreateInstance = function(el) {
-                    return new window.bootstrap.Modal(el);
-                };
-            }
+(function () {
+    const $ = (id) => document.getElementById(id);
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    const s = $('cm-search');
+    let activeTab = 'inbox';
+    function applyFilters() {
+        const q = (s ? s.value : '').toLowerCase();
+        let shown = 0;
+        document.querySelectorAll('#cm-list .cm-conv').forEach((el) => {
+            let ok = (el.dataset.name || '').includes(q);
+            if (activeTab === 'sent') ok = ok && el.dataset.lastfrom === 'me';
+            else if (activeTab === 'drafts' || activeTab === 'archived') ok = false;
+            el.style.display = ok ? '' : 'none';
+            if (ok) shown++;
         });
-    })();
+        const empty = $('cm-list-empty');
+        if (empty) {
+            if (shown === 0) { empty.style.display = ''; empty.textContent = activeTab === 'drafts' ? 'No drafts.' : (activeTab === 'archived' ? 'No archived conversations.' : 'No matching conversations.'); }
+            else empty.style.display = 'none';
+        }
+    }
+    if (s) s.addEventListener('input', applyFilters);
+    document.querySelectorAll('.cm-tab').forEach((t) => t.addEventListener('click', function () {
+        document.querySelectorAll('.cm-tab').forEach((x) => x.classList.remove('on')); this.classList.add('on');
+        activeTab = this.dataset.tab || 'inbox'; applyFilters();
+    }));
+
+    // Create Message → start a real conversation.
+    const modal = $('cm-modal');
+    if ($('cm-create')) $('cm-create').addEventListener('click', () => { if (modal) modal.style.display = 'flex'; });
+    if ($('cm-modal-cancel')) $('cm-modal-cancel').addEventListener('click', () => { if (modal) modal.style.display = 'none'; });
+    if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+    if ($('cm-modal-start')) $('cm-modal-start').addEventListener('click', async function () {
+        const rid = $('cm-modal-recipient') ? $('cm-modal-recipient').value : null;
+        if (!rid) return;
+        this.disabled = true; this.style.opacity = '0.7';
+        try {
+            const res = await fetch(@json(route('conversations.store')), { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }, body: JSON.stringify({ type: 'direct', participant_ids: [parseInt(rid, 10)] }) });
+            if (res.ok) { const c = await res.json(); window.location.href = @json(url('/client/messages')) + '/' + c.id; return; }
+        } catch (e) {}
+        this.disabled = false; this.style.opacity = '';
+    });
+
+    // AI Compose → drop a polished draft into the active thread.
+    if ($('cm-ai')) $('cm-ai').addEventListener('click', () => {
+        const i = $('cm-input');
+        if (i) { i.value = "Hi! Following up on our event — could you please confirm the final details and timeline? Happy to share anything you need from my side. Thank you!"; i.focus(); }
+        else if (modal) modal.style.display = 'flex';
+    });
+})();
 </script>
-<script src="{{ asset('js/chat.js') }}" defer></script>
-@endpush
+
+@if($thread)
+<script>
+window.CHAT_LIVE = {
+    box: '#cm-msgs', form: '#cm-form', input: '#cm-input',
+    sendUrl: @json($thread['sendUrl']), showUrl: @json($thread['showUrl']), readUrl: @json($thread['readUrl']),
+    meId: @json($thread['meId']), seen: @json(array_column($thread['messages'], 'id')),
+    bubble: function (m, mine) {
+        const esc = (x) => { const d = document.createElement('div'); d.textContent = x == null ? '' : x; return d.innerHTML; };
+        const name = mine ? 'You' : ((m.sender && m.sender.name) || 'User');
+        let t = ''; try { t = new Date(m.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }); } catch (e) {}
+        return '<div class="cm-msg ' + (mine ? 'me' : '') + '"><span class="cm-msg-av" style="background:' + (mine ? '#1e293b' : '#ea580c') + ';">' + esc(name.charAt(0).toUpperCase()) + '</span><div class="cm-msg-body"><div class="cm-msg-meta">' + esc(name) + ' · ' + t + '</div><div class="cm-bubble">' + esc(m.body) + '</div></div></div>';
+    },
+};
+</script>
+@include('partials._chat_live')
+@endif
+@endsection

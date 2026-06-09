@@ -2,6 +2,7 @@
 
 @section('title', 'Account Settings')
 @section('page-title', 'Account Settings')
+@section('page-subtitle', 'Manage your profile, notifications, security and preferences.')
 
 @push('styles')
 <style>
@@ -29,13 +30,13 @@
         width: 120px; height: 120px;
         border-radius: 50%;
         object-fit: cover;
-        border: 3px solid var(--accent-blue);
+        border: 3px solid #f97316;
     }
     .pf-avatar-upload {
         position: absolute; bottom: 4px; right: 4px;
         width: 34px; height: 34px;
         border-radius: 50%;
-        background: var(--accent-blue);
+        background: #f97316;
         color: #fff;
         border: 2px solid var(--bg-secondary);
         display: flex; align-items: center; justify-content: center;
@@ -53,7 +54,7 @@
         font-size: 12px;
         font-weight: 600;
         background: var(--accent-blue-soft);
-        color: var(--accent-blue);
+        color: #f97316;
     }
     .pf-avatar-actions { margin-top: 12px; display: flex; gap: 8px; justify-content: center; }
     .pf-avatar-remove {
@@ -80,11 +81,11 @@
         transition: var(--transition);
     }
     .pf-tab-link:last-child { border-bottom: none; }
-    .pf-tab-link:hover { background: rgba(99,102,241,0.05); color: var(--text-primary); }
+    .pf-tab-link:hover { background: rgba(249,115,22,0.05); color: var(--text-primary); }
     .pf-tab-link.active {
-        background: rgba(99,102,241,0.1);
-        color: var(--accent-blue);
-        border-left: 3px solid var(--accent-blue);
+        background: rgba(249,115,22,0.1);
+        color: #f97316;
+        border-left: 3px solid #f97316;
     }
     .pf-tab-link svg { width: 18px; height: 18px; flex-shrink: 0; }
 
@@ -130,15 +131,15 @@
     }
     .pf-input:focus, .pf-select:focus, .pf-textarea:focus {
         outline: none;
-        border-color: var(--accent-blue);
-        box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+        border-color: #f97316;
+        box-shadow: 0 0 0 3px rgba(249,115,22,0.15);
     }
     .pf-textarea { resize: vertical; min-height: 100px; }
     .pf-select { appearance: auto; }
     .pf-btn {
         display: inline-flex; align-items: center; gap: 8px;
         padding: 10px 24px;
-        background: var(--accent-blue);
+        background: #f97316;
         color: #fff;
         border: none;
         border-radius: var(--radius-sm);
@@ -152,7 +153,7 @@
         color: var(--text-secondary);
         border: 1px solid var(--border-color);
     }
-    .pf-btn-outline:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+    .pf-btn-outline:hover { border-color: #f97316; color: #f97316; }
     .pf-error { color: #ef4444; font-size: 12px; margin-top: 4px; }
     .pf-success {
         padding: 12px 16px;
@@ -195,7 +196,7 @@
         border-radius: 50%;
         transition: var(--transition);
     }
-    .pf-switch input:checked + .pf-switch-slider { background: var(--accent-blue); }
+    .pf-switch input:checked + .pf-switch-slider { background: #f97316; }
     .pf-switch input:checked + .pf-switch-slider::before { transform: translateX(20px); }
 </style>
 @endpush
@@ -600,7 +601,7 @@
                 </div>
             </div>
 
-            <div style="margin-top:20px;padding:14px 18px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:var(--radius-sm);">
+            <div style="margin-top:20px;padding:14px 18px;background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.2);border-radius:var(--radius-sm);">
                 <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.6;">
                     <strong style="color:var(--text-primary);">💡 How it works:</strong>
                     Once you enable both modes, a quick-switch button appears in your top navigation bar.

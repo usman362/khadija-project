@@ -136,6 +136,44 @@
         background: var(--agr-border);
         color: var(--agr-muted);
     }
+
+    /* ── Coral-accent restyle (matches client redesign) ──────── */
+    .agr-page-head {
+        display: flex; align-items: center; gap: 12px;
+        max-width: 900px; margin: 0 auto 16px;
+        flex-wrap: wrap;
+    }
+    .agr-page-title { font-size: 22px; font-weight: 800; color: var(--agr-text); }
+    .agr-pending-pill {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 11px; font-weight: 800;
+        padding: 4px 11px; border-radius: 999px;
+        background: rgba(245,158,11,0.15); color: #d97706;
+        text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .agr-pending-pill svg { width: 12px; height: 12px; }
+    /* Bootstrap primary → coral inside the agreement wrapper only */
+    .agreement-wrapper .btn-outline-primary { color: #f97316; border-color: #f97316; }
+    .agreement-wrapper .btn-outline-primary:hover { background: #f97316; color: #fff; }
+    .agreement-wrapper .btn-primary { background: #f97316; border-color: #f97316; }
+    .agreement-wrapper .btn-primary:hover { background: #ea580c; border-color: #ea580c; }
+
+    /* AI Contract Assistant — placeholder rail (feature pending backend) */
+    .agr-ai-rail {
+        max-width: 900px; margin: 0 auto 20px;
+        background: var(--agr-bg);
+        border: 1px solid var(--agr-border);
+        border-radius: 12px; padding: 18px 20px;
+    }
+    .agr-ai-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .agr-ai-ico { width: 34px; height: 34px; border-radius: 9px; background: rgba(249,115,22,0.12); color: #f97316; display: flex; align-items: center; justify-content: center; }
+    .agr-ai-ico svg { width: 18px; height: 18px; }
+    .agr-ai-title { font-size: 14px; font-weight: 800; color: var(--agr-text); }
+    .agr-ai-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: rgba(16,185,129,0.12); color: #10b981; }
+    .agr-ai-src { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 12px; }
+    .agr-ai-src span { font-size: 12px; color: var(--agr-muted); display: inline-flex; align-items: center; gap: 6px; }
+    .agr-ai-src svg { width: 13px; height: 13px; color: #10b981; }
+    .agr-ai-soon { font-size: 11.5px; color: var(--agr-muted); font-style: italic; }
 </style>
 
 @if(session('status'))
@@ -145,6 +183,36 @@
 @if(session('error'))
     <div class="alert alert-danger">{{ session('error') }}</div>
 @endif
+
+{{-- Page header (coral redesign) --}}
+<div class="agr-page-head">
+    <span class="agr-page-title">AI Agreement Detail</span>
+    @unless($agreement->isFullyAccepted())
+        <span class="agr-pending-pill">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+            Pending Signatures
+        </span>
+    @endunless
+</div>
+
+{{-- AI Contract Assistant — source-data summary. The full assistant
+     (prompt console + per-section regeneration) is a planned feature
+     that needs its own backend; this rail shows the evaluated sources. --}}
+<div class="agr-ai-rail">
+    <div class="agr-ai-head">
+        <div class="agr-ai-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 0-4 4v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-2V6a4 4 0 0 0-4-4z"/><circle cx="9" cy="13" r="1"/><circle cx="15" cy="13" r="1"/></svg></div>
+        <span class="agr-ai-title">AI Contract Assistant</span>
+        <span class="agr-ai-badge">{{ ucfirst($agreement->source) }} Generated</span>
+    </div>
+    <div class="agr-ai-src">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified Event Brief</span>
+        @if($agreement->include_chat)
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Evaluated chat logs</span>
+        @endif
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Cross-referenced marketplace fees</span>
+    </div>
+    <div class="agr-ai-soon">AI prompt console &amp; per-section regeneration coming soon.</div>
+</div>
 
 <div class="agreement-wrapper">
     {{-- Header Card --}}

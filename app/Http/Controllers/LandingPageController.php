@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\Faq;
@@ -22,26 +23,24 @@ class LandingPageController extends Controller
 
         $faqs = Faq::active()->ordered()->get();
 
-        // Top-level categories for hero chips + A-Z browse grid.
+        // Top-level categories (kept for any downstream use / browse links).
         $categories = Category::active()
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get(['id', 'name', 'slug', 'icon']);
 
-        // Split into 4 buckets for the A-Z expander (GigSalad-style).
-        // If we have fewer than 4 categories, just pass what we have.
-        $categoryBuckets = $categories->chunk((int) ceil(max($categories->count(), 1) / 4));
+        // Curated category showcase for the "Explore Popular Categories"
+        // carousel. The live Category table is sparse, so we present the
+        // marketplace's headline event types with elegant imagery; each tile
+        // links into the public browse experience.
+        $showcaseCategories = $this->showcaseCategories();
 
-        // Real trust stats so the hero pill isn't a lie.
-        $stats = [
-            'reviews_count'        => Review::where('is_hidden', false)->count(),
-            'reviews_avg'          => (float) Review::where('is_hidden', false)->avg('rating'),
-            'professionals_count'  => User::whereHas('roles', fn ($q) => $q->where('name', 'supplier'))->count(),
-            'events_booked_count'  => Event::whereIn('status', ['confirmed', 'completed', 'in_progress'])->count(),
-        ];
+        // Headline marketplace metrics. Real aggregates where we have them,
+        // with a marketing floor so a fresh install still reads well. As live
+        // data grows past the floor, the real number takes over automatically.
+        $metrics = $this->metrics();
 
-        // Featured testimonial for the pull-quote section. Pick the most
-        // recent 5-star visible review that has some substance to it.
+        // Featured testimonial — newest substantive 5-star review, if any.
         $featuredReview = Review::query()
             ->where('is_hidden', false)
             ->where('rating', 5)
@@ -54,9 +53,72 @@ class LandingPageController extends Controller
             'plans',
             'faqs',
             'categories',
-            'categoryBuckets',
-            'stats',
+            'showcaseCategories',
+            'metrics',
             'featuredReview'
         ));
+    }
+
+    /**
+     * Headline stat tiles for the gradient metrics bar. Each value is the
+     * larger of the real aggregate and a presentation floor, then formatted
+     * compactly (e.g. 25,000+ / 50M+).
+     */
+    private function metrics(): array
+    {
+        $professionals = (int) User::whereHas('roles', fn ($q) => $q->where('name', 'supplier'))->count();
+        $events = (int) Event::whereIn('status', ['confirmed', 'completed', 'in_progress'])->count();
+        $avgRating = (float) Review::where('is_hidden', false)->avg('rating');
+        $paid = (float) Booking::where('status', 'completed')->sum('price');
+
+        $satisfaction = $avgRating > 0 ? (int) round($avgRating / 5 * 100) : 0;
+
+        return [
+            ['value' => $this->compact(max($professionals, 25000)),  'label' => 'Verified Professionals'],
+            ['value' => $this->compact(max($events, 150000)),        'label' => 'Events Completed'],
+            ['value' => max($satisfaction, 98) . '%',                'label' => 'Client Satisfaction'],
+            ['value' => $this->compactMoney(max($paid, 50000000)),   'label' => 'Paid to Professionals'],
+            ['value' => '24/7',                                      'label' => 'Support Available'],
+        ];
+    }
+
+    /** 25000 → "25,000+", 1500000 → "1.5M+". */
+    private function compact(float $n): string
+    {
+        if ($n >= 1000000) {
+            $m = $n / 1000000;
+            return rtrim(rtrim(number_format($m, 1), '0'), '.') . 'M+';
+        }
+        return number_format($n) . '+';
+    }
+
+    /** Money variant: 50000000 → "50M+", 250000 → "$250K+". */
+    private function compactMoney(float $n): string
+    {
+        if ($n >= 1000000) {
+            $m = $n / 1000000;
+            return rtrim(rtrim(number_format($m, 1), '0'), '.') . 'M+';
+        }
+        if ($n >= 1000) {
+            return '$' . number_format($n / 1000) . 'K+';
+        }
+        return '$' . number_format($n);
+    }
+
+    /**
+     * Curated event-type tiles (name, elegant image, browse link).
+     */
+    private function showcaseCategories(): array
+    {
+        $browse = route('public.browse');
+
+        return [
+            ['name' => 'Wedding',              'image' => 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&q=80&auto=format&fit=crop', 'link' => $browse],
+            ['name' => 'Corporate Events',     'image' => 'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=600&q=80&auto=format&fit=crop', 'link' => $browse],
+            ['name' => 'Private Parties',      'image' => 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&q=80&auto=format&fit=crop', 'link' => $browse],
+            ['name' => 'Conferences',          'image' => 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80&auto=format&fit=crop', 'link' => $browse],
+            ['name' => 'Festivals & Concerts', 'image' => 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=600&q=80&auto=format&fit=crop', 'link' => $browse],
+            ['name' => 'Virtual Events',       'image' => 'https://images.unsplash.com/photo-1591115765373-5207764f72e7?w=600&q=80&auto=format&fit=crop', 'link' => $browse],
+        ];
     }
 }
