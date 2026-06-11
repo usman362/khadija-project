@@ -45,15 +45,15 @@
 
     /* center: thread */
     .th-thread { display: flex; flex-direction: column; }
-    .th-th-head { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--border-color); }
+    .th-th-head { display: flex; align-items: center; gap: 14px; padding: 18px 20px; border-bottom: 1px solid var(--border-color); }
     .th-th-av { width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; font-weight: 800; }
     .th-th-mid { flex: 1; min-width: 0; }
     .th-th-name { font-size: 16px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
     .th-verified { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 800; color: #059669; background: rgba(16,185,129,0.12); border-radius: 5px; padding: 2px 7px; }
     .th-verified svg { width: 11px; height: 11px; }
-    .th-th-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; display: flex; align-items: center; gap: 7px; }
+    .th-th-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .th-th-sub .star { color: #f59e0b; font-weight: 800; }
-    .th-th-actions { display: flex; align-items: center; gap: 7px; }
+    .th-th-actions { display: flex; align-items: center; gap: 9px; }
     .th-icon-btn { width: 34px; height: 34px; border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; }
     .th-icon-btn svg { width: 16px; height: 16px; }
     .th-profile-btn { padding: 8px 14px; border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-secondary); font-size: 12.5px; font-weight: 700; cursor: pointer; }
@@ -65,7 +65,7 @@
     .th-booking .bk .v.green { color: #059669; }
     .th-booking-btn { margin-left: auto; padding: 8px 14px; border: 1px solid var(--th); border-radius: 9px; background: var(--bg-card); color: var(--th); font-size: 12px; font-weight: 800; cursor: pointer; text-decoration: none; }
 
-    .th-msgs { padding: 18px; display: flex; flex-direction: column; gap: 14px; min-height: 240px; max-height: 420px; overflow-y: auto; }
+    .th-msgs { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-height: 240px; max-height: 420px; overflow-y: auto; }
     .th-day { text-align: center; font-size: 11px; color: var(--text-muted); font-weight: 700; }
     .th-msg { max-width: 74%; }
     .th-msg.me { margin-left: auto; }

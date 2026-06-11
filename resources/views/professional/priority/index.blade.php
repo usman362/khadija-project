@@ -79,8 +79,8 @@
 
     /* What happens cards */
     .pa-wh-title { font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 18px 0 12px; }
-    .pa-whs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    .pa-wh { border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; }
+    .pa-whs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: stretch; }
+    .pa-wh { border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; }
     .pa-wh.c1 { background: rgba(239,68,68,0.04); } .pa-wh.c2 { background: rgba(249,115,22,0.04); }
     .pa-wh.c3 { background: rgba(37,99,235,0.04); } .pa-wh.c4 { background: rgba(16,185,129,0.04); }
     .pa-wh-h { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
@@ -88,7 +88,7 @@
     .pa-wh-ico svg { width: 15px; height: 15px; }
     .pa-wh-nm { font-size: 12px; font-weight: 800; color: var(--text-primary); line-height: 1.2; }
     .pa-wh p { font-size: 10.5px; color: var(--text-muted); line-height: 1.4; margin: 0 0 9px; }
-    .pa-wh-meta { font-size: 11px; font-weight: 700; color: var(--text-primary); margin-bottom: 9px; }
+    .pa-wh-meta { font-size: 11px; font-weight: 700; color: var(--text-primary); margin-bottom: 9px; margin-top: auto; }
     .pa-wh-btn { display: block; text-align: center; padding: 8px; border-radius: 8px; color: #fff; border: none; font-size: 11px; font-weight: 800; cursor: pointer; text-decoration: none; }
 
     .pa-short { display: flex; align-items: center; gap: 14px; background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.18); border-radius: 12px; padding: 15px 18px; margin-top: 16px; }
@@ -247,7 +247,6 @@
                         <div class="pa-bullet"><span class="d" style="background:#10b981;"></span><b style="color:var(--text-primary);">Accept</b> – Take the offer</div>
                         <div class="pa-bullet"><span class="d" style="background:#f59e0b;"></span><b style="color:var(--text-primary);">Counter</b> – Make your own offer</div>
                         <div class="pa-bullet"><span class="d" style="background:#ef4444;"></span><b style="color:var(--text-primary);">Decline</b> – Politely say no</div>
-                        <div class="pa-bullet"><span class="d" style="background:#2563eb;"></span><b style="color:var(--text-primary);">Create New Job</b> – Post your own gig</div>
                     </div>
                     <div class="pa-ex">
                         <div class="pa-ex-h">Example:</div>
@@ -259,7 +258,7 @@
                 <div class="pa-hiw-title">HOW IT WORKS FOR PROFESSIONALS</div>
                 <div class="pa-steps">
                     @php
-                        $steps = [['bell','1. Get Notified',"You'll be alerted when a priority action arrives."],['target','2. Review Details','Check the what, why, and extras.'],['clip','3. Take Action','Accept, counter, decline, or create a job.'],['shield','4. Client Reviews','The client reviews and awards the job.'],['trophy','5. You Win & Deliver','You deliver great work and get paid!']];
+                        $steps = [['bell','1. Get Notified',"You'll be alerted when a priority action arrives."],['target','2. Review Details','Check the what, why, and extras.'],['clip','3. Take Action','Accept, counter, or decline the offer.'],['shield','4. Client Reviews','The client reviews and awards the job.'],['trophy','5. You Win & Deliver','You deliver great work and get paid!']];
                     @endphp
                     @foreach($steps as $i => $s)
                         <div class="pa-step">
@@ -339,7 +338,6 @@
                         <div class="pa-li-body"><div class="pa-li-t">The EXTRAS (Offer &amp; Urgency)</div><div class="pa-li-d">Offer: {{ $spotlight?->price ? $money($spotlight->price) : '$300.00' }} · Expires in 4h 32m</div></div>
                         <span class="pa-li-btn b-decline">Decline</span>
                     </div>
-                    <a href="{{ route('professional.proposals.index') }}" class="pa-create"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create New Job</a>
                     <div class="pa-live-foot"><a href="{{ route('professional.proposals.index') }}">View All Actions →</a></div>
                 </div>
             </div>
@@ -355,7 +353,7 @@
             <div class="pa-notif">
                 <h4>Ready to Win More Gigs?</h4>
                 <p>Enable smart notifications and stay ahead of the competition.</p>
-                <a href="{{ route('professional.profile.index') }}">Go to Notification Settings →</a>
+                <a href="{{ route('professional.profile.index', ['tab' => 'notifications']) }}">Go to Notification Settings →</a>
             </div>
         </div>
     </div>

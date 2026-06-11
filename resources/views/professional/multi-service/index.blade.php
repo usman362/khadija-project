@@ -129,7 +129,7 @@
     .pm-cta .ic svg { width: 20px; height: 20px; }
     .pm-cta-txt { flex: 1; color: #fff; }
     .pm-cta-txt b { font-size: 14px; font-weight: 800; }
-    .pm-cta-txt p { font-size: 12px; opacity: 0.85; margin: 2px 0 0; }
+    .pm-cta-txt p { font-size: 12px; color: rgba(255,255,255,0.9); margin: 2px 0 0; }
     .pm-cta-btn { display: inline-flex; align-items: center; gap: 8px; background: #fff; color: #1e40af; font-size: 13px; font-weight: 800; padding: 11px 20px; border-radius: 10px; text-decoration: none; white-space: nowrap; }
     .pm-cta-btn svg { width: 15px; height: 15px; }
 

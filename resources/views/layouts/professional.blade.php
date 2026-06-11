@@ -924,8 +924,10 @@
         .cl-pagination .active span { background: var(--accent-blue); color: #fff; border-color: var(--accent-blue); }
         .cl-pagination .disabled span { opacity: 0.3; cursor: not-allowed; }
 
-        /* ═══════════════════════ LOGOUT FORM ═══════════════════════ */
-        .cl-logout-form { display: none; }
+        /* ═══════════════════════ LOGOUT BUTTON ═══════════════════════ */
+        .cl-logout-form { margin: 8px 0 0; }
+        .cl-logout-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 12px; background: rgba(239,68,68,0.08); color: #ef4444; border: 1px solid rgba(239,68,68,0.22); border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background .15s; }
+        .cl-logout-btn:hover { background: rgba(239,68,68,0.16); }
     </style>
     @include('partials._a11y')
     @stack('styles')
@@ -1085,15 +1087,19 @@
         </nav>
 
         <div class="cl-sidebar-footer">
-            <div class="cl-user-card" onclick="document.getElementById('logout-form').submit();">
+            <a href="{{ route('professional.profile.index') }}" class="cl-user-card" title="View profile">
                 <div class="cl-user-avatar">{{ strtoupper(substr(auth()->user()?->name ?? 'U', 0, 1)) }}</div>
                 <div class="cl-user-info">
                     <div class="cl-user-name">{{ auth()->user()?->name }}</div>
                     <div class="cl-user-role">Professional</div>
                 </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            </div>
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="cl-logout-form">@csrf</form>
+            </a>
+            <form action="{{ route('logout') }}" method="POST" class="cl-logout-form">@csrf
+                <button type="submit" class="cl-logout-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Log Out
+                </button>
+            </form>
         </div>
     </aside>
 
@@ -1102,12 +1108,6 @@
         <header class="pro-topbar">
             <button class="cl-mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            </button>
-
-            {{-- hidden theme toggle kept so the theme-switch JS still has its target --}}
-            <button class="cl-theme-toggle" id="theme-toggle" title="Toggle theme" style="position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden;">
-                <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
             </button>
 
             <div class="pro-banner">
@@ -1137,6 +1137,10 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                         <span class="pro-icon-badge red">5</span>
                     </a>
+                    <button class="cl-theme-toggle" id="theme-toggle" title="Toggle light / dark theme" aria-label="Toggle theme">
+                        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    </button>
                     <div class="pro-avatar-chip" onclick="window.location.href='{{ route('professional.profile.index') }}'" title="Account">
                         <div class="pro-avatar-img">{{ strtoupper(substr(auth()->user()?->name ?? 'P', 0, 1)) }}</div>
                         <div class="pro-avatar-meta"><b>{{ auth()->user()?->name ?? 'Professional User' }}</b><span>PRO</span></div>

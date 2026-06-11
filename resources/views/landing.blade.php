@@ -159,14 +159,16 @@
     .lp-testi-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
     .lp-testi-dots i.on { width: 20px; border-radius: 99px; background: var(--blue); }
 
-    /* ── METRICS BAR ────────────────────────────────── */
+    /* ── VALUE BAND (5 value tiles, no unverified numbers) ─────── */
     .lp-metrics-wrap { padding: 36px 0; }
-    .lp-metrics { background: linear-gradient(100deg, #1d4ed8 0%, #2563eb 45%, #ea580c 100%); border-radius: 22px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 32px 0; box-shadow: var(--shadow-lg); }
-    .lp-metric { text-align: center; padding: 6px 14px; border-right: 1px solid rgba(255,255,255,0.18); display: flex; flex-direction: column; align-items: center; gap: 6px; }
-    .lp-metric:last-child { border-right: none; }
-    .lp-metric svg { width: 24px; height: 24px; color: rgba(255,255,255,0.9); }
-    .lp-metric b { font-size: 30px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
-    .lp-metric span { font-size: 12.5px; color: rgba(255,255,255,0.88); font-weight: 600; }
+    .lp-valueband { background: linear-gradient(100deg, #1d4ed8 0%, #2563eb 45%, #ea580c 100%); border-radius: 22px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 34px 0; box-shadow: var(--shadow-lg); }
+    .lp-vb-tile { text-align: center; padding: 4px 18px; border-right: 1px solid rgba(255,255,255,0.2); display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .lp-vb-tile:last-child { border-right: none; }
+    .lp-vb-ic { width: 44px; height: 44px; border-radius: 13px; background: rgba(255,255,255,0.16); display: flex; align-items: center; justify-content: center; margin-bottom: 5px; box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.25); }
+    .lp-vb-ic svg { width: 22px; height: 22px; color: #fff; }
+    .lp-vb-tile b { font-size: 21px; font-weight: 800; color: #fff; letter-spacing: 0.2px; line-height: 1; }
+    .lp-vb-label { font-size: 13px; color: #fff; font-weight: 700; }
+    .lp-vb-sub { font-size: 11.5px; color: rgba(255,255,255,0.82); line-height: 1.35; max-width: 170px; }
 
     /* ── PRICING ────────────────────────────────────── */
     .lp-pricing-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; align-items: stretch; max-width: 1020px; margin: 0 auto; }
@@ -208,8 +210,8 @@
         .lp-step-line { display: none; }
         .lp-assist-grid { grid-template-columns: 1fr; }
         .lp-why-grid { grid-template-columns: 1fr; }
-        .lp-metrics { grid-template-columns: 1fr 1fr 1fr; gap: 18px 0; }
-        .lp-metric:nth-child(3) { border-right: none; }
+        .lp-valueband { grid-template-columns: 1fr 1fr 1fr; gap: 22px 0; }
+        .lp-vb-tile:nth-child(3) { border-right: none; }
         .lp-pricing-grid { grid-template-columns: 1fr; max-width: 420px; }
         .lp-plan.pop { transform: none; }
         .lp-h1 { font-size: 40px; }
@@ -257,7 +259,7 @@
                     <img src="https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=80&q=80&auto=format&fit=crop" alt="">
                     <span>+</span>
                 </div>
-                <p><b>Trusted by event professionals &amp; clients</b><br>in 100+ countries worldwide</p>
+                <p><b>Trusted by event professionals &amp; clients</b><br>around the world</p>
             </div>
         </div>
 
@@ -480,7 +482,7 @@
                 <div class="play"><span><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></span></div>
                 <div class="lp-video-badge">
                     <span class="vic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
-                    <div><b>50M+ Events Powering Celebrations</b><small>Weddings, conferences, concerts &amp; more</small></div>
+                    <div><b>Powering Unforgettable Celebrations</b><small>Weddings, conferences, concerts &amp; more</small></div>
                 </div>
             </div>
 
@@ -510,24 +512,25 @@
     </div>
 </section>
 
-{{-- ════════════ METRICS BAR ════════════ --}}
+{{-- ════════════ VALUE BAND (value-driven — no unverified metrics; client-approved design) ════════════ --}}
 <div class="lp-metrics-wrap">
     <div class="lp-container">
-        <div class="lp-metrics">
+        <div class="lp-valueband">
             @php
-                $metricIcons = [
-                    '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
-                    '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
-                    '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
-                    '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
-                    '<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>',
+                $vbTiles = [
+                    ['<path d="M9 12l2 2 4-4"/><path d="M21 12c0 1.66-.45 3.2-1.24 4.5C18.5 18.7 15.6 21 12 21s-6.5-2.3-7.76-4.5A8.94 8.94 0 0 1 3 12V5l9-3 9 3z"/>', 'VERIFIED', 'Professionals', 'Trust badges &amp; background checks'],
+                    ['<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>', 'ALL EVENTS', 'Event Solutions', 'Solutions for events of any size'],
+                    ['<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>', '3 LEVELS', 'Assistance', 'Manual · Semi-Assisted · Maximum'],
+                    ['<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>', 'SECURE', 'Payments &amp; Contracts', 'Escrow protection &amp; e-signatures'],
+                    ['<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>', 'SUPPORT', 'Help Center', '24/7 assurance, when you need it'],
                 ];
             @endphp
-            @foreach($metrics as $i => $m)
-                <div class="lp-metric">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">{!! $metricIcons[$i] ?? $metricIcons[0] !!}</svg>
-                    <b>{{ $m['value'] }}</b>
-                    <span>{{ $m['label'] }}</span>
+            @foreach($vbTiles as [$icon, $word, $label, $sub])
+                <div class="lp-vb-tile">
+                    <span class="lp-vb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">{!! $icon !!}</svg></span>
+                    <b>{{ $word }}</b>
+                    <span class="lp-vb-label">{!! $label !!}</span>
+                    <span class="lp-vb-sub">{!! $sub !!}</span>
                 </div>
             @endforeach
         </div>

@@ -79,8 +79,9 @@
     .pg-bd-cta svg { width: 15px; height: 15px; }
 
     /* Click-a-gig cards */
-    .pg-cc { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
-    .pg-cc-card { border: 1px solid var(--border-color); border-radius: 12px; padding: 13px; background: var(--bg-card); }
+    .pg-cc { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; align-items: stretch; }
+    .pg-cc-card { border: 1px solid var(--border-color); border-radius: 12px; padding: 13px; background: var(--bg-card); display: flex; flex-direction: column; }
+    .pg-cc-card > :last-child { margin-top: auto; }
     .pg-cc-h { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
     .pg-cc-h svg { width: 15px; height: 15px; color: #2563eb; flex-shrink: 0; }
     .pg-cc-h b { font-size: 11.5px; font-weight: 800; color: var(--text-primary); }
