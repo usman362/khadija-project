@@ -220,7 +220,7 @@
 <div class="print-bar no-print" onclick="window.print()">📄  Save as PDF (Cmd+P)</div>
 
 @php
-    $BASE = 'https://dashboard.gigresource.com';
+    $BASE = 'https://gigresource.com';
 
     $sections = [
         [

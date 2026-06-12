@@ -264,12 +264,12 @@
      * Full page inventory grouped by section. Each entry:
      *   id:        unique short code (e.g. WEB-01)
      *   title:     designer-facing page name
-     *   url:       path relative to dashboard.gigresource.com
+     *   url:       path relative to gigresource.com
      *   purpose:   one-line designer brief
      *   elements:  bullet list of key components to design
      *   access:    who sees it
      */
-    $BASE = 'https://dashboard.gigresource.com';
+    $BASE = 'https://gigresource.com';
 
     $sections = [
         // ─── 1. PUBLIC WEBSITE ─────────────────────────────────────
