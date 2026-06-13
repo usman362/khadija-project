@@ -319,11 +319,11 @@
     <div class="lp-trust">
         @php
             $trust = [
-                ['#2563eb', '<path d="M9 12l2 2 4-4"/><path d="M21 12c0 1.66-.45 3.2-1.24 4.5C18.5 18.7 15.6 21 12 21s-6.5-2.3-7.76-4.5A8.94 8.94 0 0 1 3 12V5l9-3 9 3z"/>', 'Verified Professionals', 'Background-checked &amp; reviewed'],
+                ['#2563eb', '<path d="M9 12l2 2 4-4"/><path d="M21 12c0 1.66-.45 3.2-1.24 4.5C18.5 18.7 15.6 21 12 21s-6.5-2.3-7.76-4.5A8.94 8.94 0 0 1 3 12V5l9-3 9 3z"/>', 'Verified Professionals', 'Profile &amp; business verification'],
                 ['#0ea5e9', '<rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>', 'Secure Payments', 'Escrow protected transactions'],
-                ['#8b5cf6', '<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>', '24/7 Support', 'Real humans, always here'],
-                ['#10b981', '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>', 'Data Privacy', 'Your data is safe and private'],
-                ['#f97316', '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>', 'Success Guaranteed', 'We help you deliver amazing events'],
+                ['#8b5cf6', '<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>', 'AI-Powered Support', 'Smart help at every step'],
+                ['#10b981', '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>', 'Privacy Controls', 'You choose what you share'],
+                ['#f97316', '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>', 'Built for Events', 'Smart tools to plan with confidence'],
             ];
         @endphp
         @foreach($trust as [$col, $path, $title, $desc])
@@ -400,7 +400,7 @@
     <div class="lp-container">
         <div class="lp-head">
             <h2 class="lp-h2">Choose Your Level of Assistance</h2>
-            <p class="lp-lead">You're in control. We adapt to how hands-on you want to be.</p>
+            <p class="lp-lead">You're in control. Each level brings more AI into your planning — from fully manual to AI-powered.</p>
         </div>
         <div class="lp-assist-grid">
             <div class="lp-acard">
@@ -422,13 +422,13 @@
             <div class="lp-acard">
                 <div class="lp-acard-top">
                     <span class="lp-acard-ic" style="background:linear-gradient(135deg,#60a5fa,#2563eb);box-shadow:0 8px 16px rgba(37,99,235,0.32),inset 0 1.5px 0 rgba(255,255,255,0.4);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-                    <div><h3>Semi-Assisted</h3><span class="tagline">We guide the way.</span></div>
+                    <div><h3>Semi-Assisted</h3><span class="tagline">AI guides the way.</span></div>
                     <img class="lp-acard-img" src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=300&q=80&auto=format&fit=crop" alt="">
                 </div>
                 <div class="lp-acard-body">
                     <ul>
                         <li><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Smart suggestions</li>
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Expert recommendations</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI recommendations</li>
                         <li><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Templates &amp; best practices</li>
                     </ul>
                     <a href="{{ route('register', ['role' => 'client']) }}" class="lp-acard-foot" style="color:var(--blue);">Best for growing planners
@@ -438,14 +438,14 @@
             <div class="lp-acard">
                 <div class="lp-acard-top">
                     <span class="lp-acard-ic" style="background:linear-gradient(135deg,#fb923c,#ea580c);box-shadow:0 8px 16px rgba(234,88,12,0.32),inset 0 1.5px 0 rgba(255,255,255,0.4);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20l-2-9-4 3-4-7-4 7-4-3-2 9z"/></svg></span>
-                    <div><h3>Maximum Assistance</h3><span class="tagline">We handle the details.</span></div>
+                    <div><h3>Maximum Assistance</h3><span class="tagline">AI handles the details.</span></div>
                     <img class="lp-acard-img" src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=300&q=80&auto=format&fit=crop" alt="">
                 </div>
                 <div class="lp-acard-body">
                     <ul>
                         <li><svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI matches &amp; outreach</li>
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>We manage negotiations</li>
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>End-to-end booking support</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI negotiation assistant</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI-powered booking workflows</li>
                     </ul>
                     <a href="{{ route('register', ['role' => 'client']) }}" class="lp-acard-foot" style="color:var(--orange-dark);">Best for busy professionals &amp; clients
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
@@ -518,11 +518,11 @@
         <div class="lp-valueband">
             @php
                 $vbTiles = [
-                    ['<path d="M9 12l2 2 4-4"/><path d="M21 12c0 1.66-.45 3.2-1.24 4.5C18.5 18.7 15.6 21 12 21s-6.5-2.3-7.76-4.5A8.94 8.94 0 0 1 3 12V5l9-3 9 3z"/>', 'VERIFIED', 'Professionals', 'Trust badges &amp; background checks'],
+                    ['<path d="M9 12l2 2 4-4"/><path d="M21 12c0 1.66-.45 3.2-1.24 4.5C18.5 18.7 15.6 21 12 21s-6.5-2.3-7.76-4.5A8.94 8.94 0 0 1 3 12V5l9-3 9 3z"/>', 'VERIFIED', 'Professionals', 'Trust badges &amp; profile verification'],
                     ['<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>', 'ALL EVENTS', 'Event Solutions', 'Solutions for events of any size'],
                     ['<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>', '3 LEVELS', 'Assistance', 'Manual · Semi-Assisted · Maximum'],
                     ['<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>', 'SECURE', 'Payments &amp; Contracts', 'Escrow protection &amp; e-signatures'],
-                    ['<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>', 'SUPPORT', 'Help Center', '24/7 assurance, when you need it'],
+                    ['<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>', 'SUPPORT', 'Help Center', 'Guides &amp; help when you need it'],
                 ];
             @endphp
             @foreach($vbTiles as [$icon, $word, $label, $sub])

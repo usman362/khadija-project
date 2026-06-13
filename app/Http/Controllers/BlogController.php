@@ -14,39 +14,55 @@ class BlogController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = BlogPost::published()
-            ->with(['category:id,name,slug', 'author:id,name'])
-            ->orderByDesc('published_at');
+        $activeCategory = $request->input('category');
+        $search         = trim((string) $request->input('q', ''));
+        $sort           = $request->input('sort', 'latest');
+        $isFiltering    = $activeCategory || $search !== '';
 
-        if ($request->filled('category')) {
-            $category = BlogCategory::where('slug', $request->input('category'))->first();
+        // Editorial hero — most-viewed published post. Only shown on the
+        // default (unfiltered) view so search/category results read cleanly.
+        $featured = $isFiltering ? null : BlogPost::published()
+            ->with(['category:id,name,slug'])
+            ->orderByDesc('views_count')
+            ->orderByDesc('published_at')
+            ->first();
+
+        $query = BlogPost::published()
+            ->with(['category:id,name,slug', 'author:id,name']);
+
+        match ($sort) {
+            'oldest'  => $query->orderBy('published_at'),
+            'popular' => $query->orderByDesc('views_count')->orderByDesc('published_at'),
+            default   => $query->orderByDesc('published_at'),
+        };
+
+        if ($featured) {
+            $query->where('id', '!=', $featured->id);
+        }
+
+        if ($activeCategory) {
+            $category = BlogCategory::where('slug', $activeCategory)->first();
             if ($category) {
                 $query->where('blog_category_id', $category->id);
             }
         }
 
-        if ($request->filled('q')) {
-            $s = $request->input('q');
-            $query->where(function ($q) use ($s) {
-                $q->where('title', 'like', "%{$s}%")
-                  ->orWhere('excerpt', 'like', "%{$s}%");
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('excerpt', 'like', "%{$search}%");
             });
         }
 
-        $posts      = $query->paginate(9)->withQueryString();
+        $posts = $query->paginate(9)->withQueryString();
+
         $categories = BlogCategory::active()
             ->withCount(['posts' => fn($q) => $q->published()])
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get();
 
-        $featured = BlogPost::published()
-            ->with(['category:id,name,slug'])
-            ->orderByDesc('views_count')
-            ->take(3)
-            ->get();
-
-        return view('blog.index', compact('posts', 'categories', 'featured'));
+        return view('blog.index', compact('posts', 'categories', 'featured', 'activeCategory', 'search', 'sort'));
     }
 
     /**

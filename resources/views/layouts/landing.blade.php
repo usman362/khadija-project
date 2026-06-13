@@ -292,7 +292,8 @@
             <span>
                 <a href="{{ route('privacy-policy') }}">Privacy Policy</a> &middot;
                 <a href="{{ route('payment-policy') }}">Terms of Service</a> &middot;
-                <a href="{{ route('cancellation-policy') }}">Trust &amp; Safety</a>
+                <a href="{{ route('cancellation-policy') }}">Trust &amp; Safety</a> &middot;
+                <a href="{{ route('dmca-policy') }}">DMCA</a>
             </span>
         </div>
     </div>

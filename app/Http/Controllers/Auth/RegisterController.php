@@ -34,12 +34,28 @@ class RegisterController extends Controller
 
     protected function validator(array $data)
     {
+        $role = $data['role'] ?? 'client';
+
+        // Geo-restriction (Feedback v1.1 §7.1): platform is limited to 7
+        // launch states. Professionals pick from a hardcoded dropdown;
+        // clients are validated by zip code → state prefix mapping. Both
+        // are free Layer-1 checks (no paid API).
+        $geoRules = $role === 'supplier'
+            ? ['state' => ['required', 'string', 'in:' . implode(',', array_keys(config('geo.allowed_states', [])))]]
+            : ['zip_code' => ['required', 'regex:/^\d{5}(-\d{4})?$/', function ($attribute, $value, $fail) {
+                $prefix = substr((string) $value, 0, 3);
+                if (! array_key_exists($prefix, config('geo.zip_prefixes', []))) {
+                    $fail('GigResource is currently available in Maryland, Virginia, Washington D.C., Delaware, Pennsylvania, New Jersey, and New York. This zip code is outside our service area.');
+                }
+            }]];
+
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role' => ['sometimes', 'string', 'in:client,supplier'],
             'g-recaptcha-response' => [new Recaptcha('register')],
+            ...$geoRules,
         ]);
     }
 
@@ -55,6 +71,20 @@ class RegisterController extends Controller
                 role: (string) $role,
             )
         );
+
+        // Persist launch-state info captured at signup (§7.1). Professionals
+        // give their state; clients give a zip we map to its state.
+        $state = $data['state'] ?? null;
+        $zip   = $data['zip_code'] ?? null;
+        if ($zip && ! $state) {
+            $state = config('geo.zip_prefixes', [])[substr((string) $zip, 0, 3)] ?? null;
+        }
+        if ($state || $zip) {
+            $user->getOrCreateProfile()->update(array_filter([
+                'state'    => $state,
+                'zip_code' => $zip,
+            ]));
+        }
 
         // Attribute signup to an influencer if referral cookie is present
         $cookieName = (string) config('influencer.cookie_name', 'khadija_ref');

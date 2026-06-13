@@ -35,6 +35,8 @@ class UserProfile extends Model
         'notify_email_messages',
         'notify_email_events',
         'notify_email_marketing',
+        'notify_push',
+        'notify_sms',
         // Verification badges
         'trade_license_number',
         'trade_license_doc',
@@ -62,6 +64,8 @@ class UserProfile extends Model
             'notify_email_messages' => 'boolean',
             'notify_email_events' => 'boolean',
             'notify_email_marketing' => 'boolean',
+            'notify_push' => 'boolean',
+            'notify_sms' => 'boolean',
             'trade_license_verified_at' => 'datetime',
             'liability_insurance_verified_at' => 'datetime',
             'workers_comp_verified_at' => 'datetime',

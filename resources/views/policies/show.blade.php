@@ -402,6 +402,48 @@
     @endif
 </div>
 
+@if(request()->routeIs('dmca-policy'))
+<!-- ─── DMCA TAKEDOWN NOTICE FORM ───────────────────────────── -->
+<section class="esign-section" id="report">
+    <div class="esign-box">
+        <div class="esign-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Submit a DMCA Takedown Notice
+        </div>
+        <p class="esign-desc">If you believe content on GigResource infringes your copyright, complete the form below. Valid notices are reviewed by our team, and flagged content is logged with a timestamp for the audit trail.</p>
+
+        @if(session('status'))
+            <div class="esign-signed-badge" style="margin-bottom:18px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                {{ session('status') }}
+            </div>
+        @endif
+        @if($errors->any())
+            <div class="esign-error" style="margin-bottom:14px;">{{ $errors->first() }}</div>
+        @endif
+
+        <form action="{{ route('dmca-policy.report') }}" method="POST">
+            @csrf
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <input type="text" name="reporter_name" value="{{ old('reporter_name') }}" required placeholder="Your full legal name" class="esign-input" style="font-family:'Inter',sans-serif;font-size:0.95rem;">
+                <input type="email" name="reporter_email" value="{{ old('reporter_email') }}" required placeholder="Your email address" class="esign-input" style="font-family:'Inter',sans-serif;font-size:0.95rem;">
+            </div>
+            <input type="url" name="content_url" value="{{ old('content_url') }}" required placeholder="URL of the infringing content on GigResource" class="esign-input" style="font-family:'Inter',sans-serif;font-size:0.95rem;margin-top:14px;">
+            <textarea name="original_work" required placeholder="Identify the original copyrighted work (description or URL)" class="esign-input" rows="3" style="font-family:'Inter',sans-serif;font-size:0.95rem;margin-top:14px;resize:vertical;">{{ old('original_work') }}</textarea>
+            <textarea name="statement" placeholder="Additional details (optional)" class="esign-input" rows="2" style="font-family:'Inter',sans-serif;font-size:0.95rem;margin-top:14px;resize:vertical;">{{ old('statement') }}</textarea>
+            <label style="display:flex;gap:10px;align-items:flex-start;margin-top:16px;font-size:0.85rem;color:var(--text-light);line-height:1.6;cursor:pointer;">
+                <input type="checkbox" name="good_faith" required style="margin-top:3px;flex-shrink:0;">
+                I have a good-faith belief that the use of this material is not authorized by the copyright owner, its agent, or the law — and I declare, under penalty of perjury, that this notice is accurate and that I am (or am authorized to act for) the copyright owner.
+            </label>
+            <button type="submit" class="esign-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Submit Notice
+            </button>
+        </form>
+    </div>
+</section>
+@endif
+
 @if(!empty($policyType))
 <!-- ─── E-SIGNATURE ───────────────────────────────── -->
 <section class="esign-section">

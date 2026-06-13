@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -171,6 +172,8 @@ class ProfessionalProfileController extends Controller
             'notify_email_messages' => $request->boolean('notify_email_messages'),
             'notify_email_events' => $request->boolean('notify_email_events'),
             'notify_email_marketing' => $request->boolean('notify_email_marketing'),
+            'notify_push' => $request->boolean('notify_push'),
+            'notify_sms' => $request->boolean('notify_sms'),
         ]);
 
         return back()->with('status', 'Notification preferences updated.');
@@ -190,6 +193,11 @@ class ProfessionalProfileController extends Controller
 
         $path = $request->file('avatar')->store('avatars', 'public');
         $user->update(['avatar' => $path]);
+
+        // DMCA audit trail (Feedback v1.1 §1.3): every image upload is
+        // logged with user ID + timestamp; the uploader confirmed rights
+        // at the point of upload.
+        Log::info('Image upload (rights confirmed)', ['type' => 'avatar', 'path' => $path, 'user_id' => $user->id, 'at' => now()->toIso8601String()]);
 
         return back()->with('status', 'Profile photo updated.');
     }
@@ -224,6 +232,8 @@ class ProfessionalProfileController extends Controller
 
         $path = $request->file('cover_image')->store('covers', 'public');
         $user->update(['cover_image' => $path]);
+
+        Log::info('Image upload (rights confirmed)', ['type' => 'cover', 'path' => $path, 'user_id' => $user->id, 'at' => now()->toIso8601String()]);
 
         return back()->with('status', 'Cover photo updated.');
     }

@@ -1,874 +1,276 @@
-@extends('layouts.public')
+@extends('layouts.landing')
 
 @php
-    $seoTitle       = 'How GigResource Works';
-    $seoDescription = 'From posting a gig to signing the contract — see exactly how GigResource pairs you with vetted event pros, holds funds in escrow, and releases payment on delivery.';
+    $seoTitle       = 'How It Works — Simple Steps, Unforgettable Events | GigResource';
+    $seoDescription = 'See how GigResource works: find the right event professionals, connect and discuss, book and pay securely, and bring your event to life.';
 @endphp
+
+@section('content')
 
 @push('styles')
 <style>
-    /* ───────────────────────────────────────────────────────────
-       HOW IT WORKS — official explainer page.
-       Walks through Registration → Browsing → Referrals →
-       Booking → Memberships → Commissions → Support → Reviews.
-       Three audiences are highlighted: GigProfessionals, Clients,
-       and Influencers.
-       ─────────────────────────────────────────────────────────── */
+    /* ════════ How It Works (light) — page-scoped ════════ */
+    .hw-section { padding: 64px 0; }
+    .hw-head { text-align: center; max-width: 640px; margin: 0 auto 48px; }
+    .hw-eyebrow { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 800; letter-spacing: 1.3px; text-transform: uppercase; }
+    .hw-eyebrow.orange { color: var(--orange-dark); }
+    .hw-eyebrow.pill { background: var(--bg-soft-2); color: var(--blue); padding: 6px 14px; border-radius: 999px; }
+    .hw-eyebrow.pill.orange { background: rgba(249,115,22,0.1); color: var(--orange-dark); }
+    .hw-h2 { font-size: 34px; font-weight: 800; letter-spacing: -0.6px; color: var(--ink); line-height: 1.15; margin-top: 14px; }
+    .hw-lead { font-size: 15.5px; color: var(--muted); line-height: 1.6; margin: 14px auto 0; max-width: 520px; }
 
-    /* ─── HERO ─── */
-    .hiw-hero {
-        padding: 180px 0 50px;
-        position: relative;
-        overflow: hidden;
-    }
-    /* Photographic cover image behind the hero, dimmed and overlaid
-       with a vertical gradient so the eyebrow/title stay legible. */
-    .hiw-hero-bg {
-        position: absolute; inset: 0; z-index: 0;
-    }
-    .hiw-hero-bg img {
-        width: 100%; height: 100%;
-        object-fit: cover;
-        opacity: 1;
-    }
-    .hiw-hero-bg::after {
-        content: '';
-        position: absolute; inset: 0;
-        background:
-            radial-gradient(900px 420px at 18% 10%, rgba(59,130,246,0.10), transparent 55%),
-            radial-gradient(800px 400px at 85% 0%, rgba(139,92,246,0.10), transparent 55%),
-            linear-gradient(180deg, rgba(11,15,26,0.55) 0%, rgba(11,15,26,0.75) 65%, var(--bg-dark) 100%);
-    }
-    .hiw-hero .container { position: relative; z-index: 1; text-align: center; }
-    .hiw-eyebrow {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 6px 14px; border-radius: 999px;
-        background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.28);
-        font-size: 12px; font-weight: 700; letter-spacing: 1px;
-        text-transform: uppercase; color: #c4b5fd;
-        margin-bottom: 20px;
-    }
-    .hiw-eyebrow .dot {
-        width: 6px; height: 6px; border-radius: 50%;
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        box-shadow: 0 0 8px rgba(139,92,246,0.6);
-    }
-    .hiw-hero h1 {
-        font-size: 3rem; font-weight: 900;
-        letter-spacing: -0.02em; margin-bottom: 18px;
-        line-height: 1.1;
-    }
-    .hiw-hero h1 .grad {
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .hiw-hero p.lede {
-        font-size: 1.05rem; color: var(--text-muted);
-        max-width: 760px; margin: 0 auto 26px;
-        line-height: 1.7;
-    }
-    .hiw-audiences {
-        display: inline-flex; flex-wrap: wrap; gap: 10px;
-        justify-content: center;
-    }
-    .hiw-aud-pill {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 8px 18px; border-radius: 999px;
-        font-size: 13px; font-weight: 700;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.10);
-        color: var(--text-light);
-    }
-    .hiw-aud-pill .swatch { width: 8px; height: 8px; border-radius: 50%; }
-    .hiw-aud-pill.is-pro    .swatch { background: #f97316; box-shadow: 0 0 8px rgba(249,115,22,0.6); }
-    .hiw-aud-pill.is-client .swatch { background: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,0.6); }
-    .hiw-aud-pill.is-influ  .swatch { background: #8b5cf6; box-shadow: 0 0 8px rgba(139,92,246,0.6); }
+    /* ── HERO ───────────────────────────────────────── */
+    .hw-hero { padding: 50px 0 44px; position: relative; overflow: hidden; }
+    .hw-hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, var(--bg-soft-2) 0%, transparent 100%); z-index: 0; }
+    .hw-hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 46px; align-items: center; }
+    .hw-h1 { font-size: 52px; font-weight: 800; letter-spacing: -1.4px; line-height: 1.06; color: var(--ink); margin: 14px 0 0; }
+    .hw-h1 .o { color: var(--orange); }
+    .hw-h1 .b { color: var(--blue); }
+    .hw-hero p.sub { font-size: 16.5px; color: var(--muted); line-height: 1.65; margin: 22px 0 0; max-width: 440px; }
 
-    /* ─── STICKY STEPPER NAV ─── */
-    .hiw-stepper-wrap {
-        position: sticky; top: 70px; z-index: 50;
-        background: rgba(8, 11, 22, 0.85);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-top: 1px solid rgba(255,255,255,0.06);
-        border-bottom: 1px solid rgba(255,255,255,0.06);
-        padding: 14px 0;
-        margin: 0 0 40px;
-    }
-    .hiw-stepper {
-        display: flex; align-items: center;
-        gap: 0; max-width: 1100px; margin: 0 auto;
-        padding: 0 16px;
-        overflow-x: auto;
-        scrollbar-width: none;
-    }
-    .hiw-stepper::-webkit-scrollbar { display: none; }
-    .hiw-step-link {
-        display: inline-flex; flex-direction: column; align-items: center;
-        flex: 1 0 auto;
-        padding: 6px 10px;
-        text-decoration: none;
-        position: relative;
-        min-width: 88px;
-    }
-    .hiw-step-link .num {
-        width: 30px; height: 30px; border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 13px; font-weight: 800; color: #fff;
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.12);
-        margin-bottom: 6px;
-        transition: all 0.25s;
-    }
-    .hiw-step-link.is-active .num,
-    .hiw-step-link:hover .num {
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        border-color: transparent;
-        box-shadow: 0 6px 16px rgba(139,92,246,0.4);
-        transform: scale(1.05);
-    }
-    .hiw-step-link .lbl {
-        font-size: 11px; font-weight: 700;
-        color: var(--text-muted);
-        white-space: nowrap;
-        letter-spacing: 0.2px;
-        transition: color 0.2s;
-    }
-    .hiw-step-link.is-active .lbl,
-    .hiw-step-link:hover .lbl { color: #fff; }
-    /* Connector lines between step pills */
-    .hiw-step-link:not(:last-child)::after {
-        content: '';
-        position: absolute;
-        right: -8px; top: 21px;
-        width: 16px; height: 2px;
-        background: rgba(255,255,255,0.10);
+    /* hero illustration */
+    .hw-hero-art { position: relative; min-height: 360px; }
+    .hw-art-dots { position: absolute; top: 26px; right: 0; width: 110px; height: 110px; opacity: 0.5; background-image: radial-gradient(var(--blue) 1.6px, transparent 1.6px); background-size: 16px 16px; z-index: 0; }
+    .hw-window { position: relative; z-index: 2; background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow-lg); padding: 18px; max-width: 420px; margin-left: auto; }
+    .hw-window-bar { display: flex; gap: 6px; margin-bottom: 16px; }
+    .hw-window-bar i { width: 9px; height: 9px; border-radius: 50%; }
+    .hw-window-bar .l1 { background: #ff5f57; } .hw-window-bar .l2 { background: #febc2e; } .hw-window-bar .l3 { background: #28c840; }
+    .hw-profile { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px; }
+    .hw-profile img { width: 64px; height: 64px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
+    .hw-profile .stars { color: #f59e0b; font-size: 15px; letter-spacing: 2px; }
+    .hw-profile .ln { height: 9px; border-radius: 5px; background: var(--bg-soft-2); margin-top: 9px; }
+    .hw-profile .ln.s { max-width: 65%; }
+    .hw-window .check { position: absolute; right: 30px; top: 96px; width: 30px; height: 30px; border-radius: 50%; background: var(--blue); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 12px rgba(37,99,235,0.45); border: 3px solid #fff; }
+    .hw-window .check svg { width: 15px; height: 15px; }
+    .hw-hire { display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, var(--blue-light), var(--blue-dark)); color: #fff; font-weight: 800; font-size: 14px; padding: 13px; border-radius: 11px; box-shadow: 0 10px 20px rgba(37,99,235,0.3); }
+    .hw-3d { position: absolute; z-index: 3; }
+    .hw-3d-chat { left: -20px; top: 30px; width: 60px; height: 60px; filter: drop-shadow(0 12px 20px rgba(37,99,235,0.28)); }
+    .hw-3d-cal { left: -24px; bottom: 30px; width: 70px; height: 70px; filter: drop-shadow(0 12px 20px rgba(37,99,235,0.25)); }
+    .hw-3d-plant { right: -8px; bottom: -8px; width: 76px; height: 96px; z-index: 1; filter: drop-shadow(0 12px 18px rgba(15,27,53,0.12)); }
+
+    /* ── PROCESS STEPS ──────────────────────────────── */
+    .hw-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; position: relative; }
+    .hw-step { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 30px 22px 26px; text-align: center; position: relative; box-shadow: var(--shadow-sm); transition: transform .2s, box-shadow .2s; }
+    .hw-step:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
+    .hw-step-num { position: absolute; top: -16px; left: 50%; transform: translateX(-50%); width: 34px; height: 34px; border-radius: 50%; color: #fff; font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 4px solid var(--bg); box-shadow: 0 6px 14px rgba(15,27,53,0.18); }
+    .hw-step-ic { width: 76px; height: 76px; border-radius: 20px; margin: 10px auto 18px; display: flex; align-items: center; justify-content: center; }
+    .hw-step-ic svg { width: 34px; height: 34px; }
+    .hw-step h4 { font-size: 16.5px; font-weight: 800; color: var(--ink); margin-bottom: 10px; }
+    .hw-step p { font-size: 13px; color: var(--muted); line-height: 1.6; margin: 0; }
+    @media (min-width: 981px) {
+        .hw-step:not(:last-child)::after { content: ''; position: absolute; top: 64px; right: -11px; width: 22px; border-top: 2px dashed #cbd5e1; z-index: 1; }
     }
 
-    /* ─── STEP PANELS ─── */
-    .hiw-steps-section { padding: 0 0 40px; }
-    .hiw-step-panel {
-        position: relative;
-        scroll-margin-top: 160px;
-        max-width: 1080px;
-        margin: 0 auto 28px;
-        padding: 36px 32px;
-        border-radius: 24px;
-        background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-        border: 1px solid rgba(255,255,255,0.08);
-        backdrop-filter: blur(8px);
-        overflow: hidden;
-    }
-    /* Left edge accent stripe — color depends on the audience of each step */
-    .hiw-step-panel::before {
-        content: '';
-        position: absolute;
-        left: 0; top: 0; bottom: 0;
-        width: 5px;
-        background: linear-gradient(180deg, var(--gradient-start), var(--gradient-end));
-        opacity: 0.85;
-    }
-    .hiw-step-panel.aud-pro::before    { background: linear-gradient(180deg, #f97316, #f59e0b); }
-    .hiw-step-panel.aud-client::before { background: linear-gradient(180deg, #3b82f6, #06b6d4); }
-    .hiw-step-panel.aud-influ::before  { background: linear-gradient(180deg, #8b5cf6, #6366f1); }
-    .hiw-step-panel.aud-mixed::before  { background: linear-gradient(180deg, #f97316, #8b5cf6); }
-    .hiw-step-panel.aud-all::before    { background: linear-gradient(180deg, #22c55e, #14b8a6); }
+    /* ── TRUST BANNER ───────────────────────────────── */
+    .hw-trust-wrap { padding: 16px 0; }
+    .hw-trust { background: linear-gradient(120deg, #eaf1fe, #f3f7ff); border: 1px solid rgba(37,99,235,0.12); border-radius: var(--radius-lg); padding: 30px 38px; display: flex; align-items: center; gap: 26px; }
+    .hw-trust-ic { width: 84px; height: 84px; flex-shrink: 0; filter: drop-shadow(0 12px 20px rgba(37,99,235,0.28)); }
+    .hw-trust-txt { flex: 1; min-width: 0; }
+    .hw-trust-txt h3 { font-size: 22px; font-weight: 800; color: var(--ink); }
+    .hw-trust-txt p { font-size: 14px; color: var(--muted); margin: 8px 0 0; max-width: 560px; line-height: 1.55; }
+    .hw-trust a { flex-shrink: 0; }
 
-    /* Down-arrow connector between step panels */
-    .hiw-connector {
-        display: flex; align-items: center; justify-content: center;
-        margin: 0 auto 28px;
-        width: 40px; height: 40px;
-        border-radius: 50%;
-        background: rgba(139,92,246,0.10);
-        border: 1px solid rgba(139,92,246,0.25);
-        color: #a78bfa;
-    }
+    /* ── WHY CHOOSE ─────────────────────────────────── */
+    .hw-why { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px; }
+    .hw-why-item { display: flex; gap: 14px; align-items: flex-start; }
+    .hw-why-ic { width: 52px; height: 52px; border-radius: 14px; background: var(--bg-soft-2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .hw-why-ic svg { width: 24px; height: 24px; color: var(--blue); }
+    .hw-why-item h4 { font-size: 15px; font-weight: 800; color: var(--ink); margin-bottom: 6px; }
+    .hw-why-item p { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin: 0; }
 
-    /* Two-column header inside each panel */
-    .hiw-panel-head {
-        display: grid;
-        grid-template-columns: 130px 1fr;
-        gap: 24px;
-        align-items: center;
-        margin-bottom: 24px;
-    }
-    @media (max-width: 700px) {
-        .hiw-step-panel { padding: 28px 22px; }
-        .hiw-panel-head { grid-template-columns: 1fr; gap: 12px; }
-    }
-    .hiw-step-num {
-        width: 110px; height: 110px;
-        border-radius: 24px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 3rem; font-weight: 900; color: #fff;
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        box-shadow: 0 18px 40px rgba(139,92,246,0.35);
-        letter-spacing: -2px;
-        position: relative;
-        font-family: 'Inter', system-ui, sans-serif;
-    }
-    .hiw-step-panel.aud-pro    .hiw-step-num { background: linear-gradient(135deg, #f97316, #f59e0b); box-shadow: 0 18px 40px rgba(249,115,22,0.35); }
-    .hiw-step-panel.aud-client .hiw-step-num { background: linear-gradient(135deg, #3b82f6, #06b6d4); box-shadow: 0 18px 40px rgba(59,130,246,0.35); }
-    .hiw-step-panel.aud-influ  .hiw-step-num { background: linear-gradient(135deg, #8b5cf6, #6366f1); box-shadow: 0 18px 40px rgba(139,92,246,0.35); }
-    .hiw-step-panel.aud-mixed  .hiw-step-num { background: linear-gradient(135deg, #f97316, #8b5cf6); box-shadow: 0 18px 40px rgba(139,92,246,0.35); }
-    .hiw-step-panel.aud-all    .hiw-step-num { background: linear-gradient(135deg, #22c55e, #14b8a6); box-shadow: 0 18px 40px rgba(34,197,94,0.30); }
+    /* ── READY CTA ──────────────────────────────────── */
+    .hw-cta-wrap { padding: 14px 0 80px; }
+    .hw-cta { background: linear-gradient(120deg, #eaf1fe 0%, #f4f7ff 55%, #fff3ea 100%); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 34px 40px; display: flex; align-items: center; gap: 24px; position: relative; overflow: hidden; }
+    .hw-cta-env { width: 86px; height: 86px; flex-shrink: 0; filter: drop-shadow(0 12px 20px rgba(37,99,235,0.25)); }
+    .hw-cta-txt { flex: 1; min-width: 0; }
+    .hw-cta-txt h2 { font-size: 25px; font-weight: 800; color: var(--ink); letter-spacing: -0.4px; }
+    .hw-cta-txt p { font-size: 14px; color: var(--muted); margin: 8px 0 0; max-width: 380px; line-height: 1.5; }
+    .hw-cta-btns { display: flex; gap: 13px; flex-shrink: 0; flex-wrap: wrap; }
+    .hw-cta-plane { position: absolute; right: 26px; bottom: 18px; width: 56px; height: 56px; opacity: 0.9; }
 
-    .hiw-step-num small {
-        position: absolute; top: 12px; left: 14px;
-        font-size: 0.65rem; font-weight: 700; letter-spacing: 1px;
-        text-transform: uppercase;
-        opacity: 0.7;
-    }
-
-    .hiw-panel-title { min-width: 0; }
-    .hiw-panel-title .audience-tags {
-        display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;
-    }
-    .hiw-aud-tag {
-        display: inline-flex; align-items: center; gap: 6px;
-        padding: 4px 10px; border-radius: 999px;
-        font-size: 11px; font-weight: 800; letter-spacing: 0.5px;
-        text-transform: uppercase;
-    }
-    .hiw-aud-tag .swatch { width: 6px; height: 6px; border-radius: 50%; }
-    .hiw-aud-tag.tag-pro    { color: #fdba74; background: rgba(249,115,22,0.10); border: 1px solid rgba(249,115,22,0.30); }
-    .hiw-aud-tag.tag-pro    .swatch { background: #f97316; }
-    .hiw-aud-tag.tag-client { color: #93c5fd; background: rgba(59,130,246,0.10); border: 1px solid rgba(59,130,246,0.30); }
-    .hiw-aud-tag.tag-client .swatch { background: #3b82f6; }
-    .hiw-aud-tag.tag-influ  { color: #c4b5fd; background: rgba(139,92,246,0.10); border: 1px solid rgba(139,92,246,0.30); }
-    .hiw-aud-tag.tag-influ  .swatch { background: #8b5cf6; }
-    .hiw-aud-tag.tag-all    { color: #86efac; background: rgba(34,197,94,0.10); border: 1px solid rgba(34,197,94,0.28); }
-    .hiw-aud-tag.tag-all    .swatch { background: #22c55e; }
-
-    .hiw-panel-title h2 {
-        font-size: 1.75rem; font-weight: 800;
-        margin-bottom: 6px; letter-spacing: -0.01em;
-        color: #fff;
-    }
-    .hiw-panel-title p.tag-line {
-        color: var(--text-muted); font-size: 14px;
-        line-height: 1.6;
-        margin: 0;
-    }
-
-    /* The detail-block grid inside each panel */
-    .hiw-detail-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-    }
-    .hiw-detail-grid.is-single { grid-template-columns: 1fr; }
-    .hiw-detail-grid.is-three  { grid-template-columns: repeat(3, 1fr); }
-    @media (max-width: 900px) {
-        .hiw-detail-grid,
-        .hiw-detail-grid.is-three { grid-template-columns: 1fr; }
-    }
-
-    .hiw-detail {
-        position: relative;
-        padding: 22px 22px 22px 64px;
-        background: rgba(255,255,255,0.025);
-        border: 1px solid rgba(255,255,255,0.06);
-        border-radius: 16px;
-        transition: border-color 0.2s, background 0.2s;
-    }
-    .hiw-detail:hover {
-        border-color: rgba(139,92,246,0.30);
-        background: rgba(139,92,246,0.05);
-    }
-    .hiw-detail-num {
-        position: absolute; left: 18px; top: 22px;
-        width: 32px; height: 32px; border-radius: 10px;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 13px; font-weight: 800; color: #fff;
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        box-shadow: 0 5px 14px rgba(139,92,246,0.35);
-    }
-    .hiw-step-panel.aud-pro    .hiw-detail-num { background: linear-gradient(135deg, #f97316, #f59e0b); box-shadow: 0 5px 14px rgba(249,115,22,0.30); }
-    .hiw-step-panel.aud-client .hiw-detail-num { background: linear-gradient(135deg, #3b82f6, #06b6d4); box-shadow: 0 5px 14px rgba(59,130,246,0.30); }
-    .hiw-step-panel.aud-influ  .hiw-detail-num { background: linear-gradient(135deg, #8b5cf6, #6366f1); box-shadow: 0 5px 14px rgba(139,92,246,0.30); }
-    .hiw-step-panel.aud-mixed.aud-mixed-tone-pro    .hiw-detail-num { background: linear-gradient(135deg, #f97316, #f59e0b); }
-    .hiw-step-panel.aud-mixed.aud-mixed-tone-influ  .hiw-detail-num { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
-    .hiw-detail.detail-pro    .hiw-detail-num { background: linear-gradient(135deg, #f97316, #f59e0b); }
-    .hiw-detail.detail-influ  .hiw-detail-num { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
-    .hiw-detail.detail-client .hiw-detail-num { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
-    .hiw-step-panel.aud-all    .hiw-detail-num { background: linear-gradient(135deg, #22c55e, #14b8a6); box-shadow: 0 5px 14px rgba(34,197,94,0.30); }
-
-    .hiw-detail h3 {
-        font-size: 1rem; font-weight: 800;
-        margin-bottom: 6px; color: #fff;
-    }
-    .hiw-detail p {
-        color: var(--text-muted); font-size: 13.5px;
-        line-height: 1.65; margin: 0;
-    }
-
-    /* Audience sub-headers when a panel splits content by audience */
-    .hiw-audience-block { margin-bottom: 22px; }
-    .hiw-audience-block:last-child { margin-bottom: 0; }
-    .hiw-audience-header {
-        display: flex; align-items: center; gap: 10px;
-        margin-bottom: 12px;
-        padding-bottom: 10px;
-        border-bottom: 1px dashed rgba(255,255,255,0.08);
-    }
-    .hiw-audience-header h4 {
-        font-size: 0.95rem; font-weight: 800;
-        margin: 0; color: #fff;
-        text-transform: uppercase; letter-spacing: 1px;
-    }
-
-    /* Stat tiles for section 6 */
-    .hiw-stats {
-        display: grid; grid-template-columns: repeat(3, 1fr);
-        gap: 14px; margin-top: 20px;
-    }
-    @media (max-width: 720px) { .hiw-stats { grid-template-columns: 1fr; } }
-    .hiw-stat {
-        padding: 22px 22px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, rgba(139,92,246,0.10), rgba(59,130,246,0.10));
-        border: 1px solid rgba(139,92,246,0.22);
-        text-align: center;
-    }
-    .hiw-stat .v {
-        font-size: 1.9rem; font-weight: 900;
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        line-height: 1; margin-bottom: 8px;
-    }
-    .hiw-stat .k {
-        font-size: 12px; font-weight: 700;
-        color: var(--text-muted); letter-spacing: 0.5px;
-        text-transform: uppercase;
-    }
-
-    /* ─── CLOSING SUMMARY + CTA ─── */
-    .hiw-final-cta {
-        padding: 60px 0 110px;
-        text-align: center;
-        position: relative;
-    }
-    .hiw-final-cta::before {
-        content: ''; position: absolute; inset: 0;
-        background:
-            radial-gradient(700px 320px at 50% 30%, rgba(139,92,246,0.14), transparent 60%),
-            radial-gradient(560px 280px at 20% 80%, rgba(249,115,22,0.10), transparent 60%);
-        pointer-events: none;
-    }
-    .hiw-final-cta .container { position: relative; z-index: 1; }
-    .hiw-final-cta h2 {
-        font-size: 2.2rem; font-weight: 900; margin-bottom: 14px;
-        letter-spacing: -0.01em;
-    }
-    .hiw-final-cta h2 .grad {
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .hiw-final-cta p {
-        color: var(--text-muted); font-size: 16px;
-        max-width: 640px; margin: 0 auto 28px;
-        line-height: 1.65;
-    }
-    .hiw-btn {
-        display: inline-flex; align-items: center; gap: 10px;
-        padding: 14px 28px; border-radius: 12px;
-        font-weight: 700; font-size: 15px; text-decoration: none;
-        transition: all 0.2s; cursor: pointer; border: none;
-        font-family: inherit;
-    }
-    .hiw-btn-primary {
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        color: #fff; box-shadow: 0 10px 26px rgba(139,92,246,0.35);
-    }
-    .hiw-btn-primary:hover { transform: translateY(-1px); opacity: 0.95; }
-    .hiw-btn-coral {
-        background: linear-gradient(135deg, #f97316, #f59e0b);
-        color: #fff; box-shadow: 0 10px 26px rgba(249,115,22,0.35);
-    }
-    .hiw-btn-coral:hover { transform: translateY(-1px); opacity: 0.95; }
-    .hiw-btn-ghost {
-        background: rgba(255,255,255,0.04);
-        border: 1.5px solid rgba(255,255,255,0.15); color: #fff;
-    }
-    .hiw-btn-ghost:hover { border-color: #8b5cf6; background: rgba(139,92,246,0.08); }
-    .hiw-final-cta .btn-row {
-        display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;
-    }
-
-    /* ─── RESPONSIVE TYPOGRAPHY ─── */
-    @media (max-width: 700px) {
-        .hiw-step-num { width: 80px; height: 80px; font-size: 2rem; border-radius: 18px; margin: 0 auto; }
-        .hiw-panel-title { text-align: center; }
-        .hiw-panel-title .audience-tags { justify-content: center; }
-        .hiw-stepper-wrap { top: 60px; padding: 10px 0; }
-        .hiw-step-link { min-width: 70px; }
-        .hiw-step-link .lbl { font-size: 10px; }
+    @media (max-width: 980px) {
+        .hw-hero-grid { grid-template-columns: 1fr; gap: 30px; }
+        .hw-hero-art { display: none; }
+        .hw-steps { grid-template-columns: 1fr 1fr; gap: 30px 18px; }
+        .hw-trust { flex-direction: column; text-align: center; }
+        .hw-why { grid-template-columns: 1fr 1fr; gap: 26px 20px; }
+        .hw-cta { flex-direction: column; text-align: center; }
+        .hw-cta-plane { display: none; }
+        .hw-h1 { font-size: 40px; }
+        .hw-h2 { font-size: 28px; }
     }
     @media (max-width: 560px) {
-        .hiw-hero { padding: 140px 0 40px; }
-        .hiw-hero h1 { font-size: 2rem; }
-        .hiw-hero p.lede { font-size: 15px; }
-        .hiw-panel-title h2 { font-size: 1.35rem; }
-        .hiw-final-cta h2 { font-size: 1.6rem; }
-        .hiw-detail { padding: 18px 18px 18px 56px; }
-        .hiw-detail-num { left: 14px; top: 18px; width: 28px; height: 28px; font-size: 12px; }
+        .hw-steps, .hw-why { grid-template-columns: 1fr; }
     }
 </style>
 @endpush
 
-@push('meta')
-    <meta name="description" content="How GigResource works — the platform that connects event service providers (GigProfessionals) with clients and Influencers. Registration, browsing, referrals, bookings, memberships, commissions, and support — all in one place.">
-@endpush
-
-@section('content')
-
-<!-- ── HERO ──────────────────────────────────────────────────── -->
-<section class="hiw-hero">
-    {{-- Cover banner: a wedding ceremony scene — bride & groom — that
-         signals the kind of event GigResource professionals deliver.
-         Dimmed via .hiw-hero-bg::after for legibility. --}}
-    <div class="hiw-hero-bg">
-        <img src="https://images.unsplash.com/photo-1525772764200-be829a350797?w=1800&q=85&auto=format&fit=crop" alt="Wedding rings on textured fabric" loading="eager">
-    </div>
-    <div class="container">
-        <div class="hiw-eyebrow">
-            <span class="dot"></span> How GigResource Works
+{{-- ════════════ HERO ════════════ --}}
+<section class="hw-hero">
+    <div class="lp-container hw-hero-grid">
+        <div class="hw-hero-left">
+            <span class="hw-eyebrow orange">How It Works</span>
+            <h1 class="hw-h1">Simple Steps.<br><span class="o">Unforgettable</span> <span class="b">Events.</span></h1>
+            <p class="sub">GigResource makes it easy to connect with trusted event professionals and get things done—faster, smarter, and more efficiently.</p>
         </div>
-        <h1>How <span class="grad">it works</span></h1>
-        <p class="lede">
-            The GigResource platform connects event service providers (referred to as &ldquo;GigProfessionals&rdquo;) with clients and businesses seeking their services. Our comprehensive system simplifies the process of finding and hiring suitable professionals for various events, from weddings to corporate functions. Below is a detailed overview of how the GigResource website functions, promoting seamless interaction between Influencers, vendors, and clients.
-        </p>
 
-        <div class="hiw-audiences" aria-label="Audiences served">
-            <span class="hiw-aud-pill is-pro"><span class="swatch"></span>GigProfessionals</span>
-            <span class="hiw-aud-pill is-client"><span class="swatch"></span>Clients</span>
-            <span class="hiw-aud-pill is-influ"><span class="swatch"></span>Influencers</span>
+        <div class="hw-hero-art">
+            <span class="hw-art-dots"></span>
+            <svg class="hw-3d hw-3d-chat" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs><linearGradient id="hwChat" x1="0" y1="0" x2="60" y2="60" gradientUnits="userSpaceOnUse"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs>
+                <path d="M11 7h38a5 5 0 0 1 5 5v21a5 5 0 0 1-5 5H25L14 47V38h-3a5 5 0 0 1-5-5V12a5 5 0 0 1 5-5Z" fill="url(#hwChat)"/>
+                <circle cx="20" cy="22" r="3.2" fill="#fff"/><circle cx="30" cy="22" r="3.2" fill="#fff"/><circle cx="40" cy="22" r="3.2" fill="#fff"/>
+            </svg>
+
+            <div class="hw-window">
+                <div class="hw-window-bar"><i class="l1"></i><i class="l2"></i><i class="l3"></i></div>
+                <div class="hw-profile">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=140&q=80&auto=format&fit=crop" alt="">
+                    <div style="flex:1;min-width:0;">
+                        <div class="stars">★★★★★</div>
+                        <div class="ln"></div>
+                        <div class="ln s"></div>
+                    </div>
+                </div>
+                <span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                <div class="ln" style="height:9px;border-radius:5px;background:var(--bg-soft-2);margin-bottom:8px;"></div>
+                <div class="ln" style="height:9px;border-radius:5px;background:var(--bg-soft-2);max-width:80%;margin-bottom:16px;"></div>
+                <div class="hw-hire">Hire Professional</div>
+            </div>
+
+            <svg class="hw-3d hw-3d-cal" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs><linearGradient id="hwCal" x1="0" y1="0" x2="70" y2="70" gradientUnits="userSpaceOnUse"><stop stop-color="#60a5fa"/><stop offset="1" stop-color="#2563eb"/></linearGradient></defs>
+                <rect x="9" y="16" width="52" height="48" rx="10" fill="url(#hwCal)"/>
+                <rect x="9" y="16" width="52" height="15" rx="10" fill="#1d4ed8"/>
+                <rect x="20" y="9" width="6" height="13" rx="3" fill="#1e293b"/><rect x="44" y="9" width="6" height="13" rx="3" fill="#1e293b"/>
+                <rect x="18" y="37" width="10" height="9" rx="2.5" fill="#fff" opacity=".95"/><rect x="32" y="37" width="10" height="9" rx="2.5" fill="#fff" opacity=".55"/><rect x="46" y="37" width="7" height="9" rx="2.5" fill="#fff" opacity=".55"/>
+                <rect x="18" y="49" width="10" height="9" rx="2.5" fill="#fff" opacity=".55"/><rect x="32" y="49" width="10" height="9" rx="2.5" fill="#fbbf24"/>
+            </svg>
+            <svg class="hw-3d hw-3d-plant" viewBox="0 0 76 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M38 52C32 42 23 38 15 40c2 9 11 15 23 15Z" fill="#10b981"/>
+                <path d="M38 52c5-13 15-18 23-15-2 10-13 17-23 17Z" fill="#34d399"/>
+                <path d="M38 54c-2-15 4-26 10-29 3 11-1 24-10 29Z" fill="#059669"/>
+                <path d="M23 58h30l-4 28a4 4 0 0 1-4 3.5H31a4 4 0 0 1-4-3.5L23 58Z" fill="#fff" stroke="#e2e8f0"/>
+                <path d="M21 54h34v6H21z" fill="#cbd5e1"/>
+            </svg>
         </div>
     </div>
 </section>
 
-<!-- ── STICKY STEPPER NAV ────────────────────────────────────── -->
-<div class="hiw-stepper-wrap" id="hiwStepperWrap" role="navigation" aria-label="Steps navigation">
-    <div class="hiw-stepper">
-        <a href="#step-1" class="hiw-step-link is-active" data-step="1"><span class="num">1</span><span class="lbl">Registration</span></a>
-        <a href="#step-2" class="hiw-step-link" data-step="2"><span class="num">2</span><span class="lbl">Browsing</span></a>
-        <a href="#step-3" class="hiw-step-link" data-step="3"><span class="num">3</span><span class="lbl">Referrals</span></a>
-        <a href="#step-4" class="hiw-step-link" data-step="4"><span class="num">4</span><span class="lbl">Booking</span></a>
-        <a href="#step-5" class="hiw-step-link" data-step="5"><span class="num">5</span><span class="lbl">Memberships</span></a>
-        <a href="#step-6" class="hiw-step-link" data-step="6"><span class="num">6</span><span class="lbl">Commissions</span></a>
-        <a href="#step-7" class="hiw-step-link" data-step="7"><span class="num">7</span><span class="lbl">Support</span></a>
-        <a href="#step-8" class="hiw-step-link" data-step="8"><span class="num">8</span><span class="lbl">Reviews</span></a>
+{{-- ════════════ THE PROCESS ════════════ --}}
+<section class="hw-section">
+    <div class="lp-container">
+        <div class="hw-head">
+            <span class="hw-eyebrow pill">The Process</span>
+            <h2 class="hw-h2">How GigResource Works</h2>
+            <p class="hw-lead">From finding the right talent to getting the job done, we make the process seamless.</p>
+        </div>
+        <div class="hw-steps">
+            @php
+                $steps = [
+                    ['#2563eb', 'blue',   '1', 'Find What You Need',  'Browse gigs or professionals by category, location, or specialty and find the perfect match for your event.',
+                        '<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>'],
+                    ['#ea580c', 'orange', '2', 'Connect &amp; Discuss', 'Send messages, discuss details, and get quotes. Clarify expectations and choose the best fit.',
+                        '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>'],
+                    ['#2563eb', 'blue',   '3', 'Book &amp; Pay Securely', 'Book with confidence using our secure payment system that protects both clients and professionals.',
+                        '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/>'],
+                    ['#ea580c', 'orange', '4', 'Get It Done',         'Collaborate, communicate, and bring your event to life with verified professionals you can trust.',
+                        '<path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3h.01"/><path d="M22 8h.01"/><path d="M15 2h.01"/><path d="M22 20h.01"/><path d="m22 2-2.24.75a2.9 2.9 0 0 0-1.96 3.12c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L12 10"/><path d="m22 13-.82-.33c-.86-.34-1.82.2-1.98 1.11-.11.7-.72 1.22-1.43 1.22H17"/><path d="m11 2 .33.82c.34.86-.2 1.82-1.11 1.98C9.52 4.9 9 5.52 9 6.23V7"/>'],
+                ];
+            @endphp
+            @foreach($steps as [$col, $tint, $num, $title, $desc, $icon])
+                <div class="hw-step">
+                    <span class="hw-step-num" style="background:{{ $col }};">{{ $num }}</span>
+                    <span class="hw-step-ic" style="background:{{ $tint === 'blue' ? 'rgba(37,99,235,0.1)' : 'rgba(249,115,22,0.1)' }};">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="{{ $col }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $icon !!}</svg>
+                    </span>
+                    <h4>{!! $title !!}</h4>
+                    <p>{{ $desc }}</p>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+{{-- ════════════ TRUST BANNER ════════════ --}}
+<div class="hw-trust-wrap">
+    <div class="lp-container">
+        <div class="hw-trust">
+            <svg class="hw-trust-ic" viewBox="0 0 84 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs><linearGradient id="hwSh" x1="0" y1="0" x2="84" y2="84" gradientUnits="userSpaceOnUse"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs>
+                <path d="M42 8l26 10v19c0 16-11 27-26 33-15-6-26-17-26-33V18L42 8Z" fill="url(#hwSh)"/>
+                <path d="M42 8l26 10v19c0 16-11 27-26 33V8Z" fill="#1d4ed8" opacity=".3"/>
+                <path d="M42 24l4.2 8.6 9.5 1.2-7 6.7 1.7 9.4L42 55.1l-8.4 4.4 1.7-9.4-7-6.7 9.5-1.2L42 24Z" fill="#fbbf24"/>
+                <circle cx="62" cy="56" r="11" fill="#10b981" stroke="#fff" stroke-width="3"/>
+                <path d="M57 56l3.5 3.5 6-6.5" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div class="hw-trust-txt">
+                <h3>Safe. Secure. Trusted.</h3>
+                <p>Your safety and satisfaction are our top priorities. That's why we verify professionals, protect payments, and support you every step of the way.</p>
+            </div>
+            <a href="{{ route('about-us') }}" class="lp-btn lp-btn-outline">Learn More
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+        </div>
     </div>
 </div>
 
-<!-- ── 8 STEP PANELS ─────────────────────────────────────────── -->
-<section class="hiw-steps-section">
-    <div class="container">
-
-        {{-- ── 1. REGISTRATION ── --}}
-        <article class="hiw-step-panel aud-mixed" id="step-1">
-            <div class="hiw-panel-head">
-                <div class="hiw-step-num"><small>Step</small>01</div>
-                <div class="hiw-panel-title">
-                    <div class="audience-tags">
-                        <span class="hiw-aud-tag tag-pro"><span class="swatch"></span>For GigProfessionals</span>
-                        <span class="hiw-aud-tag tag-influ"><span class="swatch"></span>For Influencers</span>
-                    </div>
-                    <h2>Registration</h2>
-                    <p class="tag-line">Two distinct sign-up paths — one for the professionals offering services, and one for the influencers who help promote them.</p>
-                </div>
-            </div>
-
-            <div class="hiw-audience-block">
-                <div class="hiw-audience-header">
-                    <span class="hiw-aud-tag tag-pro"><span class="swatch"></span>For GigProfessionals</span>
-                </div>
-                <div class="hiw-detail-grid">
-                    <div class="hiw-detail detail-pro">
-                        <div class="hiw-detail-num">A</div>
-                        <h3>Sign Up</h3>
-                        <p>GigProfessionals create an account by completing a registration form that includes basic information such as name, business type, contact details, and service offerings.</p>
-                    </div>
-                    <div class="hiw-detail detail-pro">
-                        <div class="hiw-detail-num">B</div>
-                        <h3>Profile Setup</h3>
-                        <p>After registration, vendors set up profiles with services, rates, availability, and any relevant certifications or accolades. They can also upload photos or showcase previous work.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="hiw-audience-block">
-                <div class="hiw-audience-header">
-                    <span class="hiw-aud-tag tag-influ"><span class="swatch"></span>For Influencers</span>
-                </div>
-                <div class="hiw-detail-grid">
-                    <div class="hiw-detail detail-influ">
-                        <div class="hiw-detail-num">A</div>
-                        <h3>Join the Influencer Program</h3>
-                        <p>Individuals interested in becoming Influencers can register on the platform by providing their email address and payment methods for receiving commissions.</p>
-                    </div>
-                    <div class="hiw-detail detail-influ">
-                        <div class="hiw-detail-num">B</div>
-                        <h3>Access to Tools</h3>
-                        <p>Once registered, Influencers receive access to a personalized Influencer Dashboard with their unique referral link, tracking metrics, and promotional resources.</p>
-                    </div>
-                </div>
-            </div>
-        </article>
-
-        <div class="hiw-connector" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+{{-- ════════════ WHY CHOOSE ════════════ --}}
+<section class="hw-section">
+    <div class="lp-container">
+        <div class="hw-head">
+            <span class="hw-eyebrow pill orange">Why Choose Us</span>
+            <h2 class="hw-h2">Built for Event Success</h2>
+            <p class="hw-lead">GigResource is designed to save you time, reduce stress, and help you create unforgettable events.</p>
         </div>
-
-        {{-- ── 2. BROWSING AND SEARCHING ── --}}
-        <article class="hiw-step-panel aud-client" id="step-2">
-            <div class="hiw-panel-head">
-                <div class="hiw-step-num"><small>Step</small>02</div>
-                <div class="hiw-panel-title">
-                    <div class="audience-tags">
-                        <span class="hiw-aud-tag tag-client"><span class="swatch"></span>For Clients</span>
-                    </div>
-                    <h2>Browsing and Searching</h2>
-                    <p class="tag-line">The discovery flow that lets clients find the right professional for any event in just a few clicks.</p>
-                </div>
+        <div class="hw-why">
+            <div class="hw-why-item">
+                <span class="hw-why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.5 13.5L17 22l-5-3-5 3 1.5-8.5"/></svg></span>
+                <div><h4>Verified Professionals</h4><p>Only trusted, reviewed, and verified event experts.</p></div>
             </div>
-
-            <div class="hiw-detail-grid">
-                <div class="hiw-detail">
-                    <div class="hiw-detail-num">A</div>
-                    <h3>Search Functionality</h3>
-                    <p>Clients can easily navigate the website to find service providers based on their event needs. Filters allow users to search by location, service category (such as DJs, caterers, photographers, etc.), and availability.</p>
-                </div>
-                <div class="hiw-detail">
-                    <div class="hiw-detail-num">B</div>
-                    <h3>Professional Profiles</h3>
-                    <p>Each professional has a dedicated profile showcasing their services, pricing, customer reviews, and contact information. Clients can read reviews and assess the experience and suitability of the service providers.</p>
-                </div>
+            <div class="hw-why-item">
+                <span class="hw-why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>
+                <div><h4>Secure Payments</h4><p>Safe transactions and money protection.</p></div>
             </div>
-        </article>
-
-        <div class="hiw-connector" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-
-        {{-- ── 3. MAKING REFERRALS ── --}}
-        <article class="hiw-step-panel aud-influ" id="step-3">
-            <div class="hiw-panel-head">
-                <div class="hiw-step-num"><small>Step</small>03</div>
-                <div class="hiw-panel-title">
-                    <div class="audience-tags">
-                        <span class="hiw-aud-tag tag-influ"><span class="swatch"></span>For Influencers</span>
-                    </div>
-                    <h2>Making Referrals</h2>
-                    <p class="tag-line">How Influencers turn their reach into real revenue through unique tracked links.</p>
-                </div>
+            <div class="hw-why-item">
+                <span class="hw-why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></span>
+                <div><h4>Save Time</h4><p>Quick search, easy booking, and efficient communication.</p></div>
             </div>
-
-            <div class="hiw-detail-grid">
-                <div class="hiw-detail">
-                    <div class="hiw-detail-num">A</div>
-                    <h3>Promote Services</h3>
-                    <p>Influencers can share their unique referral links through social media, email marketing, and other channels to attract potential clients to GigResource.</p>
-                </div>
-                <div class="hiw-detail">
-                    <div class="hiw-detail-num">B</div>
-                    <h3>Tracking Referrals</h3>
-                    <p>Influencer earnings are tracked through cookies and referral codes embedded in their shared links, allowing the platform to identify successful referrals accurately.</p>
-                </div>
+            <div class="hw-why-item">
+                <span class="hw-why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span>
+                <div><h4>Dedicated Support</h4><p>Our team is here to help you succeed.</p></div>
             </div>
-        </article>
-
-        <div class="hiw-connector" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-
-        {{-- ── 4. BOOKING SERVICES ── --}}
-        <article class="hiw-step-panel aud-client" id="step-4">
-            <div class="hiw-panel-head">
-                <div class="hiw-step-num"><small>Step</small>04</div>
-                <div class="hiw-panel-title">
-                    <div class="audience-tags">
-                        <span class="hiw-aud-tag tag-client"><span class="swatch"></span>For Clients</span>
-                    </div>
-                    <h2>Booking Services</h2>
-                    <p class="tag-line">From initial inquiry to confirmed booking — secure communication and payment, every step of the way.</p>
-                </div>
-            </div>
-
-            <div class="hiw-detail-grid">
-                <div class="hiw-detail">
-                    <div class="hiw-detail-num">A</div>
-                    <h3>Inquiry Submission</h3>
-                    <p>Clients can submit inquiries or requests for quotes directly to vendors they&rsquo;re interested in. This facilitates direct communication between clients and providers to discuss details, pricing, and availability.</p>
-                </div>
-                <div class="hiw-detail">
-                    <div class="hiw-detail-num">B</div>
-                    <h3>Booking Confirmation</h3>
-                    <p>Once both parties agree on terms, clients can finalize bookings through a secure payment system on the platform. This typically involves payment for a free trial or a qualifying membership plan.</p>
-                </div>
-            </div>
-        </article>
-
-        <div class="hiw-connector" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-
-        {{-- ── 5. MEMBERSHIP PLANS ── --}}
-        <article class="hiw-step-panel aud-pro" id="step-5">
-            <div class="hiw-panel-head">
-                <div class="hiw-step-num"><small>Step</small>05</div>
-                <div class="hiw-panel-title">
-                    <div class="audience-tags">
-                        <span class="hiw-aud-tag tag-pro"><span class="swatch"></span>For GigProfessionals</span>
-                    </div>
-                    <h2>Membership Plans</h2>
-                    <p class="tag-line">GigProfessionals choose how prominent they want to be — and unlock the tools that match their growth stage.</p>
-                </div>
-            </div>
-
-            <div class="hiw-detail-grid">
-                <div class="hiw-detail">
-                    <div class="hiw-detail-num">A</div>
-                    <h3>Membership Options</h3>
-                    <p>GigProfessionals can choose from various membership plans that offer different levels of visibility and features on the platform.</p>
-                </div>
-                <div class="hiw-detail">
-                    <div class="hiw-detail-num">B</div>
-                    <h3>Features Included</h3>
-                    <p>Memberships may include premium features such as enhanced profile visibility, promotional opportunities, and access to analytics about service performance.</p>
-                </div>
-            </div>
-        </article>
-
-        <div class="hiw-connector" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-
-        {{-- ── 6. COMMISSION STRUCTURE ── --}}
-        <article class="hiw-step-panel aud-influ" id="step-6">
-            <div class="hiw-panel-head">
-                <div class="hiw-step-num"><small>Step</small>06</div>
-                <div class="hiw-panel-title">
-                    <div class="audience-tags">
-                        <span class="hiw-aud-tag tag-influ"><span class="swatch"></span>For Influencers</span>
-                    </div>
-                    <h2>Commission Structure for Influencers</h2>
-                    <p class="tag-line">Influencers earn commissions based on successfully referred vendors who purchase paid memberships.</p>
-                </div>
-            </div>
-
-            <div class="hiw-detail-grid is-three">
-                <div class="hiw-detail">
-                    <div class="hiw-detail-num">A</div>
-                    <h3>Base Commission</h3>
-                    <p>Influencers earn for each vendor who signs up and completes a paid membership. The specific rate depends on the monthly number of referred vendors.</p>
-                </div>
-                <div class="hiw-detail">
-                    <div class="hiw-detail-num">B</div>
-                    <h3>Tiered Bonuses</h3>
-                    <p>Influencers may qualify for tiered bonuses for higher referral numbers, earning additional commissions based on performance.</p>
-                </div>
-                <div class="hiw-detail">
-                    <div class="hiw-detail-num">C</div>
-                    <h3>Payout Process</h3>
-                    <p>Influencers must meet the payout threshold of $150 in commissions to receive payments, which are processed within 14 business days.</p>
-                </div>
-            </div>
-
-            <div class="hiw-stats">
-                <div class="hiw-stat">
-                    <div class="v">$150</div>
-                    <div class="k">Payout threshold</div>
-                </div>
-                <div class="hiw-stat">
-                    <div class="v">14 days</div>
-                    <div class="k">Business-day processing</div>
-                </div>
-                <div class="hiw-stat">
-                    <div class="v">Tiered</div>
-                    <div class="k">Bonus structure</div>
-                </div>
-            </div>
-        </article>
-
-        <div class="hiw-connector" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-
-        {{-- ── 7. SUPPORT AND RESOURCES ── --}}
-        <article class="hiw-step-panel aud-all" id="step-7">
-            <div class="hiw-panel-head">
-                <div class="hiw-step-num"><small>Step</small>07</div>
-                <div class="hiw-panel-title">
-                    <div class="audience-tags">
-                        <span class="hiw-aud-tag tag-all"><span class="swatch"></span>For All Users</span>
-                    </div>
-                    <h2>Support and Resources</h2>
-                    <p class="tag-line">Help, learning, and community — available to every user across the platform.</p>
-                </div>
-            </div>
-
-            <div class="hiw-detail-grid is-three">
-                <div class="hiw-detail">
-                    <div class="hiw-detail-num">A</div>
-                    <h3>Help Center</h3>
-                    <p>GigResource provides a comprehensive help center that includes FAQs and contact options for customer support.</p>
-                </div>
-                <div class="hiw-detail">
-                    <div class="hiw-detail-num">B</div>
-                    <h3>Training and Webinars</h3>
-                    <p>The platform offers training resources and optional webinars for both Influencers and GigProfessionals to improve their marketing strategies and service offerings.</p>
-                </div>
-                <div class="hiw-detail">
-                    <div class="hiw-detail-num">C</div>
-                    <h3>Community Engagement</h3>
-                    <p>Users can engage with others in the community through forums or events and gain insights into best practices for promoting their services or leveraging influencer marketing.</p>
-                </div>
-            </div>
-        </article>
-
-        <div class="hiw-connector" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-
-        {{-- ── 8. FEEDBACK AND REVIEWS ── --}}
-        <article class="hiw-step-panel aud-all" id="step-8">
-            <div class="hiw-panel-head">
-                <div class="hiw-step-num"><small>Step</small>08</div>
-                <div class="hiw-panel-title">
-                    <div class="audience-tags">
-                        <span class="hiw-aud-tag tag-all"><span class="swatch"></span>For All Users</span>
-                    </div>
-                    <h2>Feedback and Reviews</h2>
-                    <p class="tag-line">The two-way feedback loop that keeps quality high and helps every future client choose with confidence.</p>
-                </div>
-            </div>
-
-            <div class="hiw-detail-grid is-single">
-                <div class="hiw-detail">
-                    <div class="hiw-detail-num">★</div>
-                    <h3>Leave honest reviews after every booking</h3>
-                    <p>All users are encouraged to leave reviews and feedback after utilizing services. This information not only helps improve overall quality but also assists potential clients in making informed choices when selecting vendors.</p>
-                </div>
-            </div>
-        </article>
-
-    </div>
-</section>
-
-<!-- ── CLOSING SUMMARY + CTA ─────────────────────────────────── -->
-<section class="hiw-final-cta">
-    <div class="container">
-        <h2>Designed for <span class="grad">every event, every role.</span></h2>
-        <p>
-            The GigResource platform is designed to facilitate effective connections between event service providers and clients while empowering Influencers to generate income through referrals. By offering a streamlined process for searching, booking, and managing vendor services, GigResource enhances the overall experience of planning any event — ensuring clients find the perfect match for their specific needs.
-        </p>
-        <div class="btn-row">
-            <a href="{{ route('public.browse') }}" class="hiw-btn hiw-btn-primary">
-                Browse professionals
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </a>
-            <a href="{{ route('register', ['role' => 'supplier']) }}" class="hiw-btn hiw-btn-coral">
-                Become a GigProfessional
-            </a>
-            <a href="{{ route('register') }}" class="hiw-btn hiw-btn-ghost">
-                Join as Influencer
-            </a>
         </div>
     </div>
 </section>
+
+{{-- ════════════ READY CTA ════════════ --}}
+<div class="hw-cta-wrap">
+    <div class="lp-container">
+        <div class="hw-cta">
+            <svg class="hw-cta-env" viewBox="0 0 86 86" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs><linearGradient id="hwEnv" x1="0" y1="0" x2="86" y2="86" gradientUnits="userSpaceOnUse"><stop stop-color="#60a5fa"/><stop offset="1" stop-color="#2563eb"/></linearGradient></defs>
+                <rect x="11" y="25" width="64" height="46" rx="8" fill="url(#hwEnv)"/>
+                <path d="M11 31l32 22 32-22" stroke="#fff" stroke-width="3.5" fill="none" stroke-linejoin="round"/>
+                <path d="M11 31l32 22 32-22v-2a4 4 0 0 0-4-4H15a4 4 0 0 0-4 4v2Z" fill="#1d4ed8"/>
+                <circle cx="66" cy="28" r="12" fill="#2563eb" stroke="#fff" stroke-width="2.5"/>
+                <path d="M66 22l1.7 3.5 3.8.5-2.8 2.7.7 3.8L66 30.8l-3.4 1.7.7-3.8-2.8-2.7 3.8-.5L66 22Z" fill="#fbbf24"/>
+            </svg>
+            <div class="hw-cta-txt">
+                <h2>Ready to Get Started?</h2>
+                <p>Join thousands of event professionals and clients creating amazing experiences together.</p>
+            </div>
+            <div class="hw-cta-btns">
+                <a href="{{ route('public.browse') }}" class="lp-btn lp-btn-outline">Find Gigs</a>
+                <a href="{{ route('register') }}" class="lp-btn lp-btn-orange">Sign Up Now
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+            </div>
+            <svg class="hw-cta-plane" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M51 5L5 25l17 5 5 18 24-43Z" fill="#3b82f6"/>
+                <path d="M51 5L22 30l5 18 24-43Z" fill="#1d4ed8"/>
+                <path d="M51 5L22 30 5 25 51 5Z" fill="#60a5fa"/>
+            </svg>
+        </div>
+    </div>
+</div>
 
 @endsection
-
-@push('scripts')
-<script>
-    // Sticky stepper — highlight the active step as the user scrolls.
-    // Uses IntersectionObserver so it stays smooth even on long pages.
-    (function() {
-        const links = document.querySelectorAll('.hiw-step-link');
-        const panels = document.querySelectorAll('.hiw-step-panel');
-        if (!links.length || !panels.length) return;
-
-        // Smooth scroll for stepper clicks (with sticky-nav offset)
-        links.forEach(link => {
-            link.addEventListener('click', (e) => {
-                const id = link.getAttribute('href');
-                const target = document.querySelector(id);
-                if (!target) return;
-                e.preventDefault();
-                const navOffset = 150;
-                const top = target.getBoundingClientRect().top + window.scrollY - navOffset;
-                window.scrollTo({ top, behavior: 'smooth' });
-            });
-        });
-
-        // Highlight the link whose panel is currently in view
-        const setActive = (stepId) => {
-            links.forEach(l => l.classList.toggle('is-active', l.dataset.step === stepId));
-        };
-
-        const io = new IntersectionObserver((entries) => {
-            // Pick the entry closest to the top of the viewport
-            const visible = entries
-                .filter(e => e.isIntersecting)
-                .sort((a, b) => Math.abs(a.boundingClientRect.top) - Math.abs(b.boundingClientRect.top));
-            if (visible.length) {
-                const id = visible[0].target.id;     // e.g. "step-3"
-                const num = id.split('-')[1];
-                setActive(num);
-            }
-        }, { rootMargin: '-30% 0px -55% 0px', threshold: 0 });
-
-        panels.forEach(p => io.observe(p));
-    })();
-</script>
-
-{{-- ─── SEO: Structured Data (JSON-LD) ────────────────────────────
-     Organization + HowTo schema so search engines understand the
-     full 8-step process documented on this page.
-
-     The `@` keys (`@context`, `@type`) collide with Laravel 12's
-     new Blade directives. Concatenate them at runtime so Blade
-     never sees a bare `@directive`.
------------------------------------------------------------------}}
-@php
-    $_ctx = '@' . 'context';
-    $_typ = '@' . 'type';
-
-    $orgSchema = [
-        $_ctx         => 'https://schema.org',
-        $_typ         => 'Organization',
-        'name'        => config('app.name'),
-        'url'         => url('/'),
-        'logo'        => asset('logos/logo-light.png'),
-        'description' => 'GigResource connects event service providers (GigProfessionals) with clients and Influencers — a comprehensive platform for finding, booking, and promoting event services.',
-        'sameAs'      => [
-            'https://www.facebook.com/gigresource/',
-            'https://www.instagram.com/gigresource2025/',
-            'https://www.tiktok.com/@gigresource123/',
-        ],
-    ];
-
-    $howToSchema = [
-        $_ctx         => 'https://schema.org',
-        $_typ         => 'HowTo',
-        'name'        => 'How GigResource works',
-        'description' => 'The eight-step overview of how the GigResource platform connects GigProfessionals, Clients, and Influencers.',
-        'step' => [
-            [$_typ => 'HowToStep', 'position' => 1, 'name' => 'Registration',                          'text' => 'GigProfessionals sign up and set up their profile. Influencers join the program and gain access to the Influencer Dashboard with a unique referral link.'],
-            [$_typ => 'HowToStep', 'position' => 2, 'name' => 'Browsing and Searching',                'text' => 'Clients use filters by location, category, and availability to find the right professional. Each professional profile shows services, pricing, reviews, and contact info.'],
-            [$_typ => 'HowToStep', 'position' => 3, 'name' => 'Making Referrals',                      'text' => 'Influencers share their unique referral link across channels. Earnings are tracked accurately via cookies and referral codes.'],
-            [$_typ => 'HowToStep', 'position' => 4, 'name' => 'Booking Services',                      'text' => 'Clients submit inquiries directly to vendors and finalize bookings through a secure payment system once both parties agree on terms.'],
-            [$_typ => 'HowToStep', 'position' => 5, 'name' => 'Membership Plans',                      'text' => 'GigProfessionals choose from membership tiers that offer different levels of visibility, promotional opportunities, and analytics access.'],
-            [$_typ => 'HowToStep', 'position' => 6, 'name' => 'Commission Structure for Influencers',  'text' => 'Influencers earn base commission per paid-member vendor, qualify for tiered bonuses, and receive payouts after reaching $150 — processed within 14 business days.'],
-            [$_typ => 'HowToStep', 'position' => 7, 'name' => 'Support and Resources',                 'text' => 'A help center, training and webinars, and community forums are available to all users.'],
-            [$_typ => 'HowToStep', 'position' => 8, 'name' => 'Feedback and Reviews',                  'text' => 'All users are encouraged to leave honest reviews after every booking — improving quality and helping future clients choose wisely.'],
-        ],
-    ];
-@endphp
-
-<script type="application/ld+json">{!! json_encode($orgSchema,   JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
-<script type="application/ld+json">{!! json_encode($howToSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
-@endpush

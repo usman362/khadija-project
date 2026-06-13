@@ -20,27 +20,29 @@ return [
     'cookie_name' => 'khadija_ref',
     'cookie_days' => 30,
 
-    // Commission tiers — auto-upgraded based on total successful referrals
-    // keyed from lowest to highest
+    // Commission tiers — auto-upgraded based on total successful referrals,
+    // keyed from lowest to highest. Rates per Peter Zylstra (June 2026,
+    // Developer Feedback v1.1 §8.2): reduced to control acquisition costs
+    // while conversion data is gathered.
     'tiers' => [
         'starter' => [
             'label' => 'Starter',
-            'rate' => 15, // percent
+            'rate' => 5, // percent
             'min_referrals' => 0,
         ],
         'rising' => [
             'label' => 'Rising',
-            'rate' => 20,
+            'rate' => 7.5,
             'min_referrals' => 11,
         ],
         'pro' => [
             'label' => 'Pro',
-            'rate' => 25,
+            'rate' => 10,
             'min_referrals' => 26,
         ],
         'elite' => [
             'label' => 'Elite',
-            'rate' => 30,
+            'rate' => 12.5,
             'min_referrals' => 51,
         ],
     ],

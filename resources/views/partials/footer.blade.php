@@ -50,6 +50,7 @@
                     <li><a href="{{ route('privacy-policy') }}">Privacy Policy</a></li>
                     <li><a href="{{ route('payment-policy') }}">Payment Policy</a></li>
                     <li><a href="{{ route('cancellation-policy') }}">Cancellation & Refund</a></li>
+                    <li><a href="{{ route('dmca-policy') }}">DMCA Takedown Policy</a></li>
                 </ul>
             </div>
         </div>

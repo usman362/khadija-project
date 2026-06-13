@@ -123,7 +123,10 @@ class BlogPost extends Model
     public function featuredImageUrl(): string
     {
         if ($this->featured_image) {
-            return asset('storage/' . $this->featured_image);
+            // Support both uploaded images (storage path) and full external URLs.
+            return Str::startsWith($this->featured_image, ['http://', 'https://'])
+                ? $this->featured_image
+                : asset('storage/' . $this->featured_image);
         }
 
         // Nice-looking Unsplash fallbacks rotated deterministically by post id,

@@ -112,6 +112,14 @@ Route::get('/cancellation-policy', function () {
     return view('policies.show', ['policy' => $policy, 'fallbackTitle' => 'Cancellation & Refund Policy', 'policyType' => null, 'existingSignature' => null]);
 })->name('cancellation-policy');
 
+Route::get('/dmca-policy', function () {
+    $policy = \App\Models\PolicyPage::findBySlug('dmca-policy');
+    return view('policies.show', ['policy' => $policy, 'fallbackTitle' => 'DMCA Takedown Policy', 'policyType' => null, 'existingSignature' => null]);
+})->name('dmca-policy');
+
+Route::post('/dmca-policy/report', [\App\Http\Controllers\DmcaReportController::class, 'store'])
+    ->middleware('throttle:5,60')->name('dmca-policy.report');
+
 // About Us
 Route::view('/about-us', 'about')->name('about-us');
 

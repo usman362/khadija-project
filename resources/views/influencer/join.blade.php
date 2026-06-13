@@ -287,7 +287,8 @@
     <div class="container">
         <span class="inf-hero-badge">✨ Partner Program</span>
         <h1>Turn your network into income</h1>
-        <p>Become a {{ config('app.name', 'Khadija') }} Influencer and earn up to 30% commission by helping others create amazing events.</p>
+        @php($maxRate = rtrim(rtrim(number_format(collect(config('influencer.tiers'))->max('rate'), 1), '0'), '.'))
+        <p>Become a {{ config('app.name', 'Khadija') }} Influencer and earn up to {{ $maxRate }}% commission by helping others create amazing events.</p>
         <a href="#apply" class="inf-btn-cta">Join the Program →</a>
         <div class="inf-hero-avatars">
             <div class="inf-hero-avatar"><img loading="lazy" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&q=80&auto=format&fit=crop&crop=faces" alt=""></div>
@@ -327,8 +328,8 @@
             <p>Everything you need to earn recurring income.</p>
         </div>
         <div class="inf-grid-4">
-            <div class="inf-card"><div class="inf-card-icon">💰</div><h3>High Commissions</h3><p>Earn up to 30% on every referral</p></div>
-            <div class="inf-card"><div class="inf-card-icon">🌐</div><h3>Growing Network</h3><p>Join 500+ active influencers</p></div>
+            <div class="inf-card"><div class="inf-card-icon">💰</div><h3>Tiered Commissions</h3><p>Earn up to {{ $maxRate }}% on every referral</p></div>
+            <div class="inf-card"><div class="inf-card-icon">🌐</div><h3>Growing Network</h3><p>Join our community of event influencers</p></div>
             <div class="inf-card"><div class="inf-card-icon">🔄</div><h3>Recurring Income</h3><p>Earn on every booking, not just signups</p></div>
             <div class="inf-card"><div class="inf-card-icon">⭐</div><h3>Premium Support</h3><p>Dedicated team to help you grow</p></div>
         </div>

@@ -213,7 +213,7 @@
                     @csrf
                     <label class="pf-avatar-upload" title="Change Photo">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                        <input type="file" name="avatar" accept="image/*" onchange="document.getElementById('avatarForm').submit()">
+                        <input type="file" name="avatar" accept="image/*" onchange="if (confirm('I confirm I own the rights to this image or have permission from the copyright holder.')) { document.getElementById('avatarForm').submit(); } else { this.value = ''; }">
                     </label>
                 </form>
             </div>
@@ -420,7 +420,7 @@
         @if($tab === 'notifications')
         <div class="pf-card">
             <div class="pf-card-title">Notification Preferences</div>
-            <div class="pf-card-desc">Choose what email notifications you'd like to receive.</div>
+            <div class="pf-card-desc">Choose what you're notified about — and through which channels (email, push, SMS).</div>
 
             <form action="{{ route('client.profile.update.notifications') }}" method="POST">
                 @csrf @method('PATCH')
@@ -461,6 +461,28 @@
                     </div>
                     <label class="pf-switch">
                         <input type="checkbox" name="notify_email_marketing" value="1" {{ $profile->notify_email_marketing ? 'checked' : '' }}>
+                        <span class="pf-switch-slider"></span>
+                    </label>
+                </div>
+
+                <div class="pf-card-title" style="margin-top: 26px; font-size: 14px;">Channels</div>
+                <div class="pf-toggle-row">
+                    <div class="pf-toggle-info">
+                        <div class="pf-toggle-title">Push Notifications</div>
+                        <div class="pf-toggle-desc">In-browser push alerts for time-sensitive updates.</div>
+                    </div>
+                    <label class="pf-switch">
+                        <input type="checkbox" name="notify_push" value="1" {{ $profile->notify_push ? 'checked' : '' }}>
+                        <span class="pf-switch-slider"></span>
+                    </label>
+                </div>
+                <div class="pf-toggle-row">
+                    <div class="pf-toggle-info">
+                        <div class="pf-toggle-title">SMS Notifications</div>
+                        <div class="pf-toggle-desc">Text alerts to your phone for urgent items (carrier rates may apply).</div>
+                    </div>
+                    <label class="pf-switch">
+                        <input type="checkbox" name="notify_sms" value="1" {{ $profile->notify_sms ? 'checked' : '' }}>
                         <span class="pf-switch-slider"></span>
                     </label>
                 </div>

@@ -489,7 +489,7 @@
                     <div class="benefit-icon">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     </div>
-                    24/7 customer support
+                    Responsive customer support
                 </div>
                 <div class="benefit-item">
                     <div class="benefit-icon">
@@ -545,6 +545,17 @@
        data-validate="required|email"
        data-error-required="We need an email to send your booking updates."
        data-error-email="That doesn't look like a valid email.">
+                    </div>
+
+                    {{-- Geo-restriction (§7.1): clients validated by zip code
+                         against the 7 launch states. --}}
+                    <div class="form-group">
+                        <label class="form-label">Zip Code</label>
+                        <input type="text" name="zip_code" inputmode="numeric" maxlength="10" class="form-input {{ $errors->has('zip_code') && old('role') === 'client' ? 'is-invalid' : '' }}" placeholder="e.g. 21201" value="{{ old('role') === 'client' ? old('zip_code') : '' }}" required
+       data-validate="required"
+       data-error-required="Please enter your zip code.">
+                        @error('zip_code') @if(old('role') === 'client') <div style="color: #ef4444; font-size: 13px; margin-top: 6px;">{{ $message }}</div> @endif @enderror
+                        <div style="font-size: 12px; color: var(--text-muted, #7a829a); margin-top: 6px;">Currently serving MD, VA, DC, DE, PA, NJ &amp; NY.</div>
                     </div>
 
                     <div class="form-group">
@@ -618,7 +629,7 @@
                     <div class="benefit-icon">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     </div>
-                    24/7 dedicated support team
+                    Dedicated support team
                 </div>
                 <div class="benefit-item">
                     <div class="benefit-icon">
@@ -674,6 +685,20 @@
        data-validate="required|email"
        data-error-required="We need an email to send your booking updates."
        data-error-email="That doesn't look like a valid email.">
+                    </div>
+
+                    {{-- Geo-restriction (§7.1): professionals pick from a
+                         hardcoded dropdown of the 7 launch states. --}}
+                    <div class="form-group">
+                        <label class="form-label">State</label>
+                        <select name="state" class="form-input {{ $errors->has('state') && old('role') === 'supplier' ? 'is-invalid' : '' }}" required>
+                            <option value="" disabled {{ old('role') !== 'supplier' || !old('state') ? 'selected' : '' }}>Select your state</option>
+                            @foreach(config('geo.allowed_states', []) as $code => $label)
+                                <option value="{{ $code }}" {{ old('role') === 'supplier' && old('state') === $code ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        @error('state') @if(old('role') === 'supplier') <div style="color: #ef4444; font-size: 13px; margin-top: 6px;">{{ $message }}</div> @endif @enderror
+                        <div style="font-size: 12px; color: var(--text-muted, #7a829a); margin-top: 6px;">Currently serving MD, VA, DC, DE, PA, NJ &amp; NY.</div>
                     </div>
 
                     <div class="form-group">
