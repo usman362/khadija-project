@@ -28,6 +28,11 @@ class PayPalGateway implements PaymentGatewayInterface
      */
     public function createSession(User $user, UserSubscription $subscription, MembershipPlan $plan): array
     {
+        // Pre-launch lock: live PayPal is blocked until PAYMENTS_GO_LIVE=true.
+        \App\Domain\Payments\PaymentGuard::assertLiveChargeAllowed(
+            $this->settings->get('payment.mode', 'test')
+        );
+
         $accessToken = $this->getAccessToken();
         $currency = $this->settings->get('payment.currency', 'USD');
 

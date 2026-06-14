@@ -34,6 +34,12 @@ class StripeGateway implements PaymentGatewayInterface
             throw new \RuntimeException('Stripe secret key is not configured. Please set it in Payment Settings.');
         }
 
+        // Pre-launch lock: refuse real charges until PAYMENTS_GO_LIVE=true.
+        \App\Domain\Payments\PaymentGuard::assertLiveChargeAllowed(
+            $this->settings->get('payment.mode', 'test'),
+            $secretKey
+        );
+
         $stripe = new \Stripe\StripeClient($secretKey);
 
         $session = $stripe->checkout->sessions->create([

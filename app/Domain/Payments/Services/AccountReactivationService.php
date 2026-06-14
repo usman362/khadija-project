@@ -176,6 +176,12 @@ class AccountReactivationService
             throw new RuntimeException('Stripe is not configured. Please contact support.');
         }
 
+        // Pre-launch lock: refuse real charges until PAYMENTS_GO_LIVE=true.
+        \App\Domain\Payments\PaymentGuard::assertLiveChargeAllowed(
+            $this->settings->get('payment.mode', 'test'),
+            $secretKey
+        );
+
         $stripe = new \Stripe\StripeClient($secretKey);
 
         $session = $stripe->checkout->sessions->create([
@@ -213,6 +219,9 @@ class AccountReactivationService
         $clientId = $this->settings->get('payment.paypal_client_id');
         $secret   = $this->settings->get('payment.paypal_secret');
         $mode     = $this->settings->get('payment.mode', 'test');
+
+        // Pre-launch lock: live PayPal is blocked until PAYMENTS_GO_LIVE=true.
+        \App\Domain\Payments\PaymentGuard::assertLiveChargeAllowed($mode);
 
         if (empty($clientId) || empty($secret)) {
             throw new RuntimeException('PayPal is not configured. Please contact support.');
