@@ -3,6 +3,22 @@
 @section('title', 'Manage Membership Plans')
 
 @section('content')
+<style>
+    /* Plan modals are tall (all fields + every feature row). This admin theme
+       breaks Bootstrap's modal-dialog-scrollable height chain (it relies on a
+       100% height cascade), so the modal overflowed the viewport with no
+       internal scroll and the footer (Save/Cancel) became unreachable. Cap the
+       body with viewport units so it scrolls and the footer stays visible. */
+    #addPlanModal .modal-body,
+    [id^="editPlanModal"] .modal-body {
+        max-height: calc(100vh - 210px);
+        overflow-y: auto;
+    }
+    #addPlanModal .modal-content,
+    [id^="editPlanModal"] .modal-content {
+        max-height: calc(100vh - 2rem);
+    }
+</style>
 @if(session('status'))
     <div class="alert alert-success">{{ session('status') }}</div>
 @endif
@@ -89,29 +105,6 @@
                             @endif
                         </td>
                     </tr>
-
-                    {{-- Edit Modal --}}
-                    <div class="modal fade" id="editPlanModal{{ $plan->id }}" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                            <div class="modal-content">
-                                <form method="POST" action="{{ route('app.admin.membership-plans.update', $plan) }}">
-                                    @csrf
-                                    @method('PATCH')
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Edit Plan: {{ $plan->name }}</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        @include('dashboard.membership-plans._form', ['plan' => $plan])
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                                        <button type="submit" class="btn btn-primary">Save Changes</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
                 @empty
                     <tr>
                         <td colspan="9" class="text-muted">No membership plans found. Create one to get started.</td>
@@ -122,6 +115,35 @@
         </div>
     </div>
 </div>
+
+{{-- Edit Plan Modals — rendered OUTSIDE the <table>. A <form> placed inside
+     <table>/<tbody> is foster-parented out by the HTML parser, which orphans
+     the form's inputs (input.form === null) so the form submits empty and
+     nothing saves. Keeping the modals at page level (like the Add modal) fixes
+     the form-control association. --}}
+@foreach($plans as $plan)
+    <div class="modal fade" id="editPlanModal{{ $plan->id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <form method="POST" action="{{ route('app.admin.membership-plans.update', $plan) }}">
+                    @csrf
+                    @method('PATCH')
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Plan: {{ $plan->name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @include('dashboard.membership-plans._form', ['plan' => $plan])
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@endforeach
 
 {{-- Add Plan Modal --}}
 <div class="modal fade" id="addPlanModal" tabindex="-1" aria-hidden="true">
