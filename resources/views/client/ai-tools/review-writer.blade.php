@@ -182,6 +182,8 @@
 @section('content')
 <div class="rw" data-compose-url="{{ route('ai-tools.review-writer.compose') }}">
 
+    @include('partials._ai_quota_badge', ['status' => $status, 'tool' => 'AI Review Writer'])
+
     {{-- hero --}}
     <div class="rw-hero">
         <span class="rw-hero-ico">

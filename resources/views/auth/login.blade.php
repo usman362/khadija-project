@@ -340,7 +340,7 @@
 <!-- ── NAVBAR ── -->
 <nav class="auth-navbar">
     <div class="auth-navbar-inner">
-        <a href="{{ url('/') }}" class="auth-logo"><img src="{{ asset('logos/logo-light.png') }}" alt="GigResource"></a>
+        <a href="{{ url('/') }}" class="auth-logo"><img src="{{ asset('gigresource-logos/gigresource-logo-dark.png') }}" alt="GigResource"></a>
         <div class="auth-nav-links">
             <a href="{{ url('/') }}" class="auth-nav-link">Home</a>
             <a href="{{ route('register') }}" class="auth-nav-btn">Sign Up</a>

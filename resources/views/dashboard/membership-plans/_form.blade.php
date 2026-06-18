@@ -137,34 +137,7 @@
         @endif
     </div>
 </div>
-
-@push('scripts')
-<script>
-(function () {
-    const container = document.querySelector('.features-container');
-    if (!container) return;
-    const list = container.querySelector('.features-list');
-    const addBtn = container.querySelector('.add-feature-btn');
-
-    addBtn?.addEventListener('click', () => {
-        const first = list.querySelector('.feature-row');
-        if (!first) return;
-        const clone = first.cloneNode(true);
-        clone.querySelectorAll('input').forEach(i => { i.value = ''; });
-        clone.querySelectorAll('select').forEach(s => { s.selectedIndex = 0; });
-        list.appendChild(clone);
-    });
-
-    list.addEventListener('click', e => {
-        const btn = e.target.closest('.remove-feature-btn');
-        if (!btn) return;
-        if (list.querySelectorAll('.feature-row').length > 1) {
-            btn.closest('.feature-row').remove();
-        } else {
-            btn.closest('.feature-row').querySelectorAll('input').forEach(i => i.value = '');
-            btn.closest('.feature-row').querySelector('select').selectedIndex = 0;
-        }
-    });
-})();
-</script>
-@endpush
+{{-- Add/remove feature-row behaviour is handled once, via delegation, in
+     admin.blade.php — NOT here. This partial is @included once per plan modal,
+     so a @push('scripts') here would duplicate the handler N times and (with a
+     singular querySelector) only ever wire the first modal. --}}

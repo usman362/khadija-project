@@ -35,6 +35,10 @@ class MembershipPlanSeeder extends Seeder
                     'Basic chat support',
                     'Email notifications',
                     'Standard templates',
+                    // AI tools (Developer Feedback v1.1 §8.3). Higher tiers unlock more.
+                    ['feature' => 'AI Review Writer (10 / month)', 'feature_code' => 'ai.review_writer', 'quota_monthly' => 10],
+                    ['feature' => 'AI Budget Allocator', 'feature_code' => 'ai.budget_allocator', 'is_included' => false],
+                    ['feature' => 'AI Vendor Matchmaking', 'feature_code' => 'ai.vendor_matchmaking', 'is_included' => false],
                 ],
             ],
             [
@@ -61,6 +65,10 @@ class MembershipPlanSeeder extends Seeder
                     'Custom templates',
                     'Analytics dashboard',
                     'Export reports',
+                    // AI tools (Developer Feedback v1.1 §8.3).
+                    ['feature' => 'AI Review Writer (unlimited)', 'feature_code' => 'ai.review_writer', 'quota_monthly' => 0],
+                    ['feature' => 'AI Budget Allocator (30 / month)', 'feature_code' => 'ai.budget_allocator', 'quota_monthly' => 30],
+                    ['feature' => 'AI Vendor Matchmaking (30 / month)', 'feature_code' => 'ai.vendor_matchmaking', 'quota_monthly' => 30],
                 ],
             ],
             [
@@ -83,13 +91,17 @@ class MembershipPlanSeeder extends Seeder
                     'Unlimited events',
                     'Unlimited bookings',
                     'Full chat with attachments',
-                    'Priority support 24/7',
+                    'Priority support',
                     'Email, SMS & push notifications',
                     'Custom templates & branding',
                     'Advanced analytics',
                     'Export reports (PDF, Excel)',
                     'API access',
                     'Dedicated account manager',
+                    // AI tools (Developer Feedback v1.1 §8.3) — full unlimited suite.
+                    ['feature' => 'AI Review Writer (unlimited)', 'feature_code' => 'ai.review_writer', 'quota_monthly' => 0],
+                    ['feature' => 'AI Budget Allocator (unlimited)', 'feature_code' => 'ai.budget_allocator', 'quota_monthly' => 0],
+                    ['feature' => 'AI Vendor Matchmaking (unlimited)', 'feature_code' => 'ai.vendor_matchmaking', 'quota_monthly' => 0],
                 ],
             ],
         ];
@@ -103,14 +115,20 @@ class MembershipPlanSeeder extends Seeder
                 $planData
             );
 
-            // Clear existing features and re-create
+            // Clear existing features and re-create. A feature entry is either a
+            // plain string (human-readable, always included) or an array carrying
+            // an AI feature_code + quota_monthly so the AiFeatureGate can read it
+            // (Developer Feedback v1.1 §8.3 — AI tools assigned to tiers).
             $plan->features()->delete();
             foreach ($features as $index => $feature) {
-                $plan->features()->create([
-                    'feature' => $feature,
-                    'is_included' => true,
-                    'sort_order' => $index,
-                ]);
+                $row = is_array($feature) ? $feature : ['feature' => $feature];
+
+                $plan->features()->create(array_merge([
+                    'is_included'   => true,
+                    'feature_code'  => null,
+                    'quota_monthly' => null,
+                    'sort_order'    => $index,
+                ], $row));
             }
         }
     }

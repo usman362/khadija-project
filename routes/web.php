@@ -120,6 +120,12 @@ Route::get('/dmca-policy', function () {
 Route::post('/dmca-policy/report', [\App\Http\Controllers\DmcaReportController::class, 'store'])
     ->middleware('throttle:5,60')->name('dmca-policy.report');
 
+// Platform Disclaimer — Peter's confirmed platform limitations (Developer Feedback v1.1 §1.2)
+Route::get('/platform-disclaimer', function () {
+    $policy = \App\Models\PolicyPage::findBySlug('platform-disclaimer');
+    return view('policies.show', ['policy' => $policy, 'fallbackTitle' => 'Platform Disclaimer', 'policyType' => null, 'existingSignature' => null]);
+})->name('platform-disclaimer');
+
 // About Us
 Route::view('/about-us', 'about')->name('about-us');
 
@@ -458,6 +464,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/messages', [ClientChatController::class, 'index'])->middleware('permission:messages.view_any')->name('client.chat.index');
         Route::get('/messages/{conversation}', [ClientChatController::class, 'show'])->middleware('permission:messages.view')->name('client.chat.show');
 
+        // Notification Preferences (dedicated page — Email / Push / SMS)
+        Route::get('/notifications', [ClientProfileController::class, 'notifications'])->name('client.notifications.index');
+
         // Client Profile & Settings
         Route::get('/profile', [ClientProfileController::class, 'index'])->name('client.profile.index');
         Route::patch('/profile/general', [ClientProfileController::class, 'updateGeneral'])->name('client.profile.update.general');
@@ -528,6 +537,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/transactions', [ProfessionalTransactionController::class, 'index'])->name('professional.transactions.index');
         Route::get('/transactions/export/csv', [ProfessionalTransactionController::class, 'exportCsv'])->name('professional.transactions.export.csv');
         Route::get('/transactions/export/pdf', [ProfessionalTransactionController::class, 'exportPdf'])->name('professional.transactions.export.pdf');
+
+        // Notification Preferences (dedicated page — Email / Push / SMS)
+        Route::get('/notifications', [ProfessionalProfileController::class, 'notifications'])->name('professional.notifications.index');
+
+        // Address verification (§7.3 — risk-based; paid call launch-gated)
+        Route::post('/profile/verify-address', [ProfessionalProfileController::class, 'verifyAddress'])->name('professional.profile.verify-address');
 
         // Professional Profile & Settings
         Route::get('/profile', [ProfessionalProfileController::class, 'index'])->name('professional.profile.index');

@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\AiFeatures\AiFeatureCode;
+use App\Domain\AiFeatures\Services\AiFeatureGate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Throwable;
 
 /**
  * AI Vendor Matchmaking — a client-portal AI Toolkit tool that matches the
@@ -20,13 +23,19 @@ use Illuminate\View\View;
  *
  * NOTE on data: the platform's live supplier records are still sparse, so the
  * pool is a representative vendor catalogue. The scoring + filtering is real;
- * as real vendors onboard they slot into the same engine. Not plan-gated.
+ * as real vendors onboard they slot into the same engine.
+ *
+ * Plan-gated (Developer Feedback v1.1 §8.3): available on Professional & Enterprise
+ * tiers. Enforcement is centralised in AiFeatureGate and only bites once
+ * AI_FEATURES_FREE_FOR_ALL is flipped off at launch.
  *
  * Routes: GET  /ai-tools/vendor-matchmaking         (show)
  *         POST /ai-tools/vendor-matchmaking/match    (refine → JSON)
  */
 class AiVendorMatchmakingController extends Controller
 {
+    public function __construct(private AiFeatureGate $gate) {}
+
     /** name, category, tags, price, rating, reviews, themes, base, why, grad. */
     private const VENDORS = [
         ['DJ Sunny Beats',          'DJ',          ['DJ', 'Beach Party'],      450, 4.5, 124, ['tropical', 'beach', 'party'],   98, 'Great reviews for beach & tropical vibes. Available on your date and fits your budget.', '#8b5cf6,#6d28d9'],
@@ -62,11 +71,18 @@ class AiVendorMatchmakingController extends Controller
             'analyzed'      => count(self::VENDORS),
             'categories'    => $this->categoryList(),
             'budgetOptions' => self::MAX_BUDGET_OPTIONS,
+            'status'        => $this->gate->status($request->user(), AiFeatureCode::VENDOR_MATCHMAKING),
         ]);
     }
 
     public function match(Request $request): JsonResponse
     {
+        try {
+            $this->gate->authorize($request->user(), AiFeatureCode::VENDOR_MATCHMAKING);
+        } catch (Throwable $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        }
+
         $data = $request->validate([
             'theme'      => ['nullable', 'string', 'max:120'],
             'category'   => ['nullable', 'string', 'in:' . implode(',', array_keys($this->categoryList()))],
@@ -82,12 +98,15 @@ class AiVendorMatchmakingController extends Controller
         $all     = $this->rank($this->keywords($theme), $category, $budget, $minMatch);
         $matches = array_slice($all, 0, 3);
 
+        $this->gate->recordUsage($request->user(), AiFeatureCode::VENDOR_MATCHMAKING);
+
         return response()->json([
             'success'   => true,
             'matches'   => $matches,
             'moreCount' => max(0, count($all) - 3),
             'analyzed'  => count(self::VENDORS),
             'budget'    => $budget,
+            'status'    => $this->gate->status($request->user(), AiFeatureCode::VENDOR_MATCHMAKING),
         ]);
     }
 

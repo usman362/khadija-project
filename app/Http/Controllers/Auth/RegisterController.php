@@ -84,6 +84,10 @@ class RegisterController extends Controller
                 'state'    => $state,
                 'zip_code' => $zip,
             ]));
+
+            // §7.2 Step 1 — remember the launch state in the session so later
+            // visits skip IP guessing.
+            app(\App\Domain\Geolocation\GeolocationService::class)->rememberState($state);
         }
 
         // Attribute signup to an influencer if referral cookie is present

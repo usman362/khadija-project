@@ -370,7 +370,7 @@
 <!-- ── NAVBAR ── -->
 <nav class="auth-navbar">
     <div class="auth-navbar-inner">
-        <a href="{{ url('/') }}" class="auth-logo"><img src="{{ asset('logos/logo-light.png') }}" alt="GigResource"></a>
+        <a href="{{ url('/') }}" class="auth-logo"><img src="{{ asset('gigresource-logos/gigresource-logo-dark.png') }}" alt="GigResource"></a>
         <div class="auth-nav-links">
             <a href="{{ url('/') }}" class="auth-nav-link">Home</a>
             <a href="{{ route('login') }}" class="auth-nav-btn">Log In</a>
@@ -591,6 +591,8 @@
                         @endif
                     @endif
 
+                    @include('partials._onboarding_disclaimer')
+
                     <button type="submit" class="form-submit client-submit" @if($showRecaptcha && $recaptchaSiteKey && $recaptchaVersion === 'v3') data-recaptcha-form="client" @endif>Create Client Account</button>
                 </form>
 
@@ -733,6 +735,8 @@
                             @error('g-recaptcha-response') @if(old('role') === 'supplier') <div style="color: #ef4444; font-size: 13px; margin-bottom: 12px;">{{ $message }}</div> @endif @enderror
                         @endif
                     @endif
+
+                    @include('partials._onboarding_disclaimer')
 
                     <button type="submit" class="form-submit pro-submit" @if($showRecaptcha && $recaptchaSiteKey && $recaptchaVersion === 'v3') data-recaptcha-form="pro" @endif>Create Professional Account</button>
                 </form>

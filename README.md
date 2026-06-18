@@ -21,6 +21,9 @@ composer run dev
 ## Architecture docs
 - `docs/architecture.md`
 - `docs/db-high-level-design.md`
+- `docs/button-style-guide.md` — role-based button colours (client = orange, professional = blue), variants & sizes
+- `docs/ai-tools-by-tier.md` — which AI tools unlock at each membership tier + the `AI_FEATURES_FREE_FOR_ALL` launch switch
+- `docs/address-verification.md` — risk-based address verification + hybrid geolocation (free filter live; paid provider go-live-gated)
 
 ## Roles & middleware
 - Seeded roles: `admin`, `manager`, `staff`, `customer`

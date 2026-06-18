@@ -165,6 +165,40 @@ class ProfessionalProfileController extends Controller
         return back()->with('status', 'Password changed successfully.');
     }
 
+    public function notifications(Request $request): View
+    {
+        $user = $request->user();
+        $profile = $user->getOrCreateProfile();
+
+        return view('professional.notifications.index', compact('user', 'profile'));
+    }
+
+    /**
+     * Run risk-based address verification on the professional's saved business
+     * address (Developer Feedback v1.1 §7.3). Free Layer-1 filtering runs now;
+     * the paid provider call is launch-gated by AddressVerificationGuard.
+     */
+    public function verifyAddress(Request $request, \App\Domain\AddressVerification\AddressVerificationService $service): RedirectResponse
+    {
+        $profile = $request->user()->getOrCreateProfile();
+
+        if (trim((string) $profile->address) === '') {
+            return back(303)->with('error', 'Please add and save your business address first, then verify it.');
+        }
+
+        $result = $service->verifyBusiness($request->user(), [
+            'line1' => (string) $profile->address,
+            'city'  => (string) $profile->city,
+            'state' => (string) $profile->state,
+            'zip'   => (string) $profile->zip_code,
+        ]);
+
+        $message = 'Address status: ' . $result['label']
+            . ($result['reason'] ? ' — ' . $result['reason'] : '');
+
+        return back(303)->with('status', $message);
+    }
+
     public function updateNotifications(Request $request): RedirectResponse
     {
         $request->user()->getOrCreateProfile()->update([

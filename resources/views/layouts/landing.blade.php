@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/png" href="{{ asset('gigresource-logos/gigresource-icon.png') }}">
     @include('partials._seo_meta')
     @stack('meta')
 
@@ -53,7 +54,7 @@
         a { text-decoration: none; color: inherit; }
         img { max-width: 100%; display: block; }
         h1, h2, h3, h4 { font-family: var(--ff-head); color: var(--ink); margin: 0; line-height: 1.15; }
-        .lp-container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        .lp-container { max-width: 1320px; margin: 0 auto; padding: 0 24px; }
         .skip-to-content { position: absolute; left: -9999px; top: 0; background: var(--blue); color: #fff; padding: 10px 16px; border-radius: 0 0 8px 0; z-index: 2000; }
         .skip-to-content:focus { left: 0; }
 
@@ -61,6 +62,8 @@
         .lpn { position: sticky; top: 0; z-index: 900; background: rgba(255, 255, 255, 0.9); backdrop-filter: saturate(180%) blur(14px); border-bottom: 1px solid var(--line); }
         .lpn-inner { display: flex; align-items: center; gap: 26px; height: 74px; }
         .lpn-brand { display: flex; align-items: center; gap: 11px; flex-shrink: 0; }
+        .lpn-logo-img { height: 50px; width: auto; display: block; }
+        .lpf-logo-img { height: 50px; width: auto; display: block; }
         .lpn-mark { width: 40px; height: 44px; flex-shrink: 0; }
         .lpn-word { display: flex; flex-direction: column; line-height: 1; }
         .lpn-word b { font-family: var(--ff-head); font-size: 20px; font-weight: 800; color: var(--ink); letter-spacing: -0.4px; }
@@ -68,7 +71,7 @@
         .lpn-word span { font-size: 8.5px; font-weight: 700; letter-spacing: 1.6px; color: var(--faint); margin-top: 3px; }
         .lpn-links { display: flex; align-items: center; gap: 4px; margin-left: 8px; }
         .lpn-item { position: relative; }
-        .lpn-link { display: inline-flex; align-items: center; gap: 5px; padding: 9px 13px; font-size: 14.5px; font-weight: 600; color: var(--ink-2); border-radius: 9px; cursor: pointer; transition: background .15s, color .15s; }
+        .lpn-link { display: inline-flex; align-items: center; gap: 5px; padding: 9px 12px; font-size: 14.5px; font-weight: 600; color: var(--ink-2); border-radius: 9px; cursor: pointer; transition: background .15s, color .15s; white-space: nowrap; }
         .lpn-link:hover { background: var(--bg-soft-2); color: var(--blue); }
         .lpn-link svg { width: 13px; height: 13px; opacity: .7; transition: transform .18s; }
         .lpn-item:hover .lpn-link svg { transform: rotate(180deg); }
@@ -90,7 +93,13 @@
         .lp-btn-orange:hover { box-shadow: 0 10px 26px rgba(234, 88, 12, 0.38); }
         .lp-btn-blue { background: linear-gradient(135deg, var(--blue-light), var(--blue-dark)); color: #fff; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28); }
         .lp-btn-blue:hover { box-shadow: 0 10px 26px rgba(37, 99, 235, 0.38); }
-        .lpn-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); }
+        .lpn-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); display: block; }
+        .lpn-avatar-btn { background: none; border: none; padding: 0; cursor: pointer; display: flex; border-radius: 50%; }
+        .lpn-avatar-btn:hover .lpn-avatar { border-color: var(--blue); }
+        .lpn-menu-right { left: auto; right: 0; min-width: 180px; }
+        .lpn-menu-logout { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 11px; border-radius: 9px; font-size: 13.5px; font-weight: 600; color: #ef4444; background: none; border: none; font-family: inherit; cursor: pointer; text-align: left; }
+        .lpn-menu-logout:hover { background: rgba(239,68,68,0.08); }
+        .lpn-menu-logout svg { width: 16px; height: 16px; color: #ef4444; flex-shrink: 0; }
         .lpn-burger { display: none; background: none; border: 1px solid var(--line); border-radius: 9px; width: 42px; height: 40px; font-size: 20px; color: var(--ink); cursor: pointer; }
 
         /* ── Footer ───────────────────────────────────────────── */
@@ -146,8 +155,7 @@
 <nav class="lpn" aria-label="Main navigation">
     <div class="lp-container lpn-inner">
         <a href="{{ route('landing') }}" class="lpn-brand" aria-label="{{ config('app.name') }} home">
-            {!! $lpMark !!}
-            <span class="lpn-word"><b>Gig<i>Resource</i></b><span>EVENT PROFESSIONAL MARKETPLACE</span></span>
+            <img src="{{ asset('gigresource-logos/gigresource-logo-light.png') }}" alt="{{ config('app.name') }}" class="lpn-logo-img">
         </a>
 
         <div class="lpn-links">
@@ -156,23 +164,21 @@
                 <div class="lpn-menu">
                     <a href="{{ route('public.browse') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Browse Open Gigs</a>
                     <a href="{{ route('register', ['role' => 'supplier']) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Become a Professional</a>
-                    <a href="{{ route('public.how-it-works') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>How It Works</a>
                 </div>
             </div>
             <div class="lpn-item">
                 <span class="lpn-link">Find Professionals <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg></span>
                 <div class="lpn-menu">
                     <a href="{{ route('public.browse') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Browse Professionals</a>
-                    <a href="{{ route('events-categories') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>By Category</a>
                     <a href="{{ route('register', ['role' => 'client']) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Post Your Event</a>
                 </div>
             </div>
             <div class="lpn-item">
                 <span class="lpn-link">Categories <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg></span>
                 <div class="lpn-menu">
-                    <a href="{{ route('public.browse') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.35-7-10a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.65-7 10-7 10z"/></svg>Weddings</a>
-                    <a href="{{ route('public.browse') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Corporate Events</a>
-                    <a href="{{ route('public.browse') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Festivals &amp; Concerts</a>
+                    <a href="{{ route('public.browse', ['q' => 'Wedding']) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.35-7-10a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.65-7 10-7 10z"/></svg>Weddings</a>
+                    <a href="{{ route('public.browse', ['q' => 'Corporate']) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Corporate Events</a>
+                    <a href="{{ route('public.browse', ['q' => 'Festival']) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Festivals &amp; Concerts</a>
                     <a href="{{ route('events-categories') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>View All Categories</a>
                 </div>
             </div>
@@ -200,8 +206,18 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     <span>Messages</span>
                 </a>
-                <a href="{{ url('/dashboard') }}" class="lp-btn lp-btn-blue">Dashboard</a>
-                <a href="{{ url('/dashboard') }}"><img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="lpn-avatar"></a>
+                <div class="lpn-item lpn-profile">
+                    <button type="button" class="lpn-avatar-btn" aria-label="Account menu" aria-haspopup="true">
+                        <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="lpn-avatar">
+                    </button>
+                    <div class="lpn-menu lpn-menu-right">
+                        <a href="{{ url('/dashboard') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+                        <form action="{{ route('logout') }}" method="POST" style="margin:0;">
+                            @csrf
+                            <button type="submit" class="lpn-menu-logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</button>
+                        </form>
+                    </div>
+                </div>
             @else
                 <a href="{{ route('login') }}" class="lpn-ic" title="Favorites">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -236,15 +252,13 @@
         <div class="lpf-grid">
             <div>
                 <div class="lpf-brand-mark">
-                    {!! $lpMark !!}
-                    <span class="lpn-word"><b>Gig<i style="color:var(--blue-light)">Resource</i></b><span>EVENT PROFESSIONAL MARKETPLACE</span></span>
+                    <img src="{{ asset('gigresource-logos/gigresource-logo-dark.png') }}" alt="{{ config('app.name') }}" class="lpf-logo-img">
                 </div>
                 <p class="lpf-about">The all-in-one marketplace connecting clients with verified event professionals to plan, manage, and deliver unforgettable experiences.</p>
                 <div class="lpf-socials">
                     <a href="https://www.facebook.com/gigresource/" target="_blank" rel="noopener" class="lpf-social" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
                     <a href="https://www.instagram.com/gigresource2025/" target="_blank" rel="noopener" class="lpf-social" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
                     <a href="https://www.linkedin.com/company/gigresource/" target="_blank" rel="noopener" class="lpf-social" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM10 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V21h-4v-5.4c0-1.3 0-3-1.8-3s-2.1 1.4-2.1 2.9V21h-4z"/></svg></a>
-                    <a href="https://www.youtube.com/@gigresource" target="_blank" rel="noopener" class="lpf-social" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M23 12s0-3.9-.5-5.6a2.9 2.9 0 0 0-2-2C18.7 4 12 4 12 4s-6.7 0-8.5.4a2.9 2.9 0 0 0-2 2C1 8.1 1 12 1 12s0 3.9.5 5.6a2.9 2.9 0 0 0 2 2C5.3 20 12 20 12 20s6.7 0 8.5-.4a2.9 2.9 0 0 0 2-2C23 15.9 23 12 23 12zM10 15.5v-7l6 3.5z"/></svg></a>
                     <a href="https://www.tiktok.com/@gigresource123/" target="_blank" rel="noopener" class="lpf-social" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 1 1 .79-5.68v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 1 0 15.81 15V8.71a8.21 8.21 0 0 0 4.76 1.52V6.69h-.98z"/></svg></a>
                 </div>
             </div>
@@ -291,9 +305,10 @@
             <span>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</span>
             <span>
                 <a href="{{ route('privacy-policy') }}">Privacy Policy</a> &middot;
-                <a href="{{ route('payment-policy') }}">Terms of Service</a> &middot;
-                <a href="{{ route('cancellation-policy') }}">Trust &amp; Safety</a> &middot;
-                <a href="{{ route('dmca-policy') }}">DMCA</a>
+                <a href="{{ route('payment-policy') }}">Payment Policy</a> &middot;
+                <a href="{{ route('cancellation-policy') }}">Cancellation &amp; Refund</a> &middot;
+                <a href="{{ route('dmca-policy') }}">DMCA</a> &middot;
+                <a href="{{ route('platform-disclaimer') }}">Disclaimer</a>
             </span>
         </div>
     </div>
@@ -322,6 +337,14 @@
                 });
             }
         });
+        // Profile avatar dropdown — toggle on click (works on desktop + touch).
+        var profileBtn = document.querySelector('.lpn-avatar-btn');
+        if (profileBtn) {
+            profileBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                profileBtn.closest('.lpn-item').classList.toggle('open');
+            });
+        }
         document.addEventListener('click', function (e) {
             document.querySelectorAll('.lpn-item.open').forEach(function (i) {
                 if (!i.contains(e.target)) i.classList.remove('open');

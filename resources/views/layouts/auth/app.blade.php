@@ -15,7 +15,7 @@
 
     <link rel="stylesheet" href="https://nobleui.com/html/template/assets/vendors/core/core.css">
     <link rel="stylesheet" href="https://nobleui.com/html/template/assets/css/demo1/style.css">
-    <link rel="shortcut icon" href="https://nobleui.com/html/template/assets/images/favicon.png" />
+    <link rel="shortcut icon" href="{{ asset('gigresource-logos/gigresource-icon.png') }}" />
     <style>
         .buy-now-wrapper, .buy-now-btn, .demo-customizer, .template-customizer,
         a[href*="nobleui.com"]:not(link), .btn-purchase,

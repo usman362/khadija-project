@@ -353,7 +353,7 @@
             <div class="pa-notif">
                 <h4>Ready to Win More Gigs?</h4>
                 <p>Enable smart notifications and stay ahead of the competition.</p>
-                <a href="{{ route('professional.profile.index', ['tab' => 'notifications']) }}">Go to Notification Settings →</a>
+                <a href="{{ route('professional.notifications.index') }}">Go to Notification Settings →</a>
             </div>
         </div>
     </div>

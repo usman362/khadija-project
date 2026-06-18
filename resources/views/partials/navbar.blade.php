@@ -9,7 +9,7 @@
     <div class="navbar-row navbar-row-top">
         <div class="container">
             <a href="{{ route('landing') }}" class="navbar-brand">
-                <img src="{{ asset('logos/logo-light.png') }}" alt="{{ config('app.name') }}" class="navbar-logo">
+                <img src="{{ asset('gigresource-logos/gigresource-logo-dark.png') }}" alt="{{ config('app.name') }}" class="navbar-logo">
             </a>
 
             <div class="navbar-actions">

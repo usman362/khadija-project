@@ -110,6 +110,14 @@ class ClientProfileController extends Controller
         return back()->with('status', 'Password changed successfully.');
     }
 
+    public function notifications(Request $request): View
+    {
+        $user = $request->user();
+        $profile = $user->getOrCreateProfile();
+
+        return view('client.notifications.index', compact('user', 'profile'));
+    }
+
     public function updateNotifications(Request $request): RedirectResponse
     {
         $request->user()->getOrCreateProfile()->update([

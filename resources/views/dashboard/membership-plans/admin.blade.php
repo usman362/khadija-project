@@ -148,29 +148,44 @@
 
 @push('scripts')
 <script>
-    // Dynamic feature fields
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.add-feature-btn').forEach(function(btn) {
-            btn.addEventListener('click', function () {
-                const container = this.closest('.features-container');
-                const list = container.querySelector('.features-list');
-                const index = list.children.length;
-                const div = document.createElement('div');
-                div.className = 'd-flex gap-2 mb-2 align-items-center';
-                div.innerHTML = '<input type="text" name="features[]" class="form-control form-control-sm" placeholder="Feature description">' +
-                    '<button type="button" class="btn btn-sm btn-outline-danger remove-feature-btn">&times;</button>';
-                list.appendChild(div);
-                div.querySelector('.remove-feature-btn').addEventListener('click', function() {
-                    div.remove();
-                });
-            });
-        });
+    /*
+     * Dynamic plan-feature rows — ONE delegated handler for every modal
+     * (each plan's Edit modal + the Add modal). Using delegation on document
+     * avoids the previous bugs: a per-include script that double-bound and a
+     * singular querySelector that only wired the first modal. New rows are full
+     * clones of an existing .feature-row (description + feature_code select +
+     * quota), so the parallel features[]/feature_codes[]/feature_quotas[] arrays
+     * the server receives always stay the same length and aligned.
+     */
+    document.addEventListener('click', function (e) {
+        var addBtn = e.target.closest('.add-feature-btn');
+        if (addBtn) {
+            var container = addBtn.closest('.features-container');
+            if (!container) return;
+            var list = container.querySelector('.features-list');
+            var rows = list.querySelectorAll('.feature-row');
+            var template = rows[rows.length - 1];
+            if (!template) return;
+            var clone = template.cloneNode(true);
+            clone.querySelectorAll('input').forEach(function (i) { i.value = ''; });
+            clone.querySelectorAll('select').forEach(function (s) { s.selectedIndex = 0; });
+            list.appendChild(clone);
+            return;
+        }
 
-        document.querySelectorAll('.remove-feature-btn').forEach(function(btn) {
-            btn.addEventListener('click', function () {
-                this.closest('.d-flex').remove();
-            });
-        });
+        var rmBtn = e.target.closest('.remove-feature-btn');
+        if (rmBtn) {
+            var c = rmBtn.closest('.features-container');
+            var list2 = c ? c.querySelector('.features-list') : null;
+            var row = rmBtn.closest('.feature-row');
+            if (!row || !list2) return;
+            if (list2.querySelectorAll('.feature-row').length > 1) {
+                row.remove();
+            } else {
+                row.querySelectorAll('input').forEach(function (i) { i.value = ''; });
+                var sel = row.querySelector('select'); if (sel) { sel.selectedIndex = 0; }
+            }
+        }
     });
 </script>
 @endpush

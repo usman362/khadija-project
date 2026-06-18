@@ -244,7 +244,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                 Social Links
             </a>
-            <a href="{{ route('client.profile.index', ['tab' => 'notifications']) }}" class="pf-tab-link {{ $tab === 'notifications' ? 'active' : '' }}">
+            <a href="{{ route('client.notifications.index') }}" class="pf-tab-link">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                 Notifications
             </a>
@@ -411,83 +411,6 @@
                 </div>
                 <div style="margin-top: 20px;">
                     <button type="submit" class="pf-btn">Save Social Links</button>
-                </div>
-            </form>
-        </div>
-        @endif
-
-        {{-- Notifications --}}
-        @if($tab === 'notifications')
-        <div class="pf-card">
-            <div class="pf-card-title">Notification Preferences</div>
-            <div class="pf-card-desc">Choose what you're notified about — and through which channels (email, push, SMS).</div>
-
-            <form action="{{ route('client.profile.update.notifications') }}" method="POST">
-                @csrf @method('PATCH')
-                <div class="pf-toggle-row">
-                    <div class="pf-toggle-info">
-                        <div class="pf-toggle-title">Booking Updates</div>
-                        <div class="pf-toggle-desc">Get notified about new proposals, confirmations, and status changes.</div>
-                    </div>
-                    <label class="pf-switch">
-                        <input type="checkbox" name="notify_email_bookings" value="1" {{ $profile->notify_email_bookings ? 'checked' : '' }}>
-                        <span class="pf-switch-slider"></span>
-                    </label>
-                </div>
-                <div class="pf-toggle-row">
-                    <div class="pf-toggle-info">
-                        <div class="pf-toggle-title">New Messages</div>
-                        <div class="pf-toggle-desc">Receive email when someone sends you a message.</div>
-                    </div>
-                    <label class="pf-switch">
-                        <input type="checkbox" name="notify_email_messages" value="1" {{ $profile->notify_email_messages ? 'checked' : '' }}>
-                        <span class="pf-switch-slider"></span>
-                    </label>
-                </div>
-                <div class="pf-toggle-row">
-                    <div class="pf-toggle-info">
-                        <div class="pf-toggle-title">Event Reminders</div>
-                        <div class="pf-toggle-desc">Get reminders about upcoming events and deadlines.</div>
-                    </div>
-                    <label class="pf-switch">
-                        <input type="checkbox" name="notify_email_events" value="1" {{ $profile->notify_email_events ? 'checked' : '' }}>
-                        <span class="pf-switch-slider"></span>
-                    </label>
-                </div>
-                <div class="pf-toggle-row">
-                    <div class="pf-toggle-info">
-                        <div class="pf-toggle-title">Marketing & Offers</div>
-                        <div class="pf-toggle-desc">Receive promotions, tips, and platform updates.</div>
-                    </div>
-                    <label class="pf-switch">
-                        <input type="checkbox" name="notify_email_marketing" value="1" {{ $profile->notify_email_marketing ? 'checked' : '' }}>
-                        <span class="pf-switch-slider"></span>
-                    </label>
-                </div>
-
-                <div class="pf-card-title" style="margin-top: 26px; font-size: 14px;">Channels</div>
-                <div class="pf-toggle-row">
-                    <div class="pf-toggle-info">
-                        <div class="pf-toggle-title">Push Notifications</div>
-                        <div class="pf-toggle-desc">In-browser push alerts for time-sensitive updates.</div>
-                    </div>
-                    <label class="pf-switch">
-                        <input type="checkbox" name="notify_push" value="1" {{ $profile->notify_push ? 'checked' : '' }}>
-                        <span class="pf-switch-slider"></span>
-                    </label>
-                </div>
-                <div class="pf-toggle-row">
-                    <div class="pf-toggle-info">
-                        <div class="pf-toggle-title">SMS Notifications</div>
-                        <div class="pf-toggle-desc">Text alerts to your phone for urgent items (carrier rates may apply).</div>
-                    </div>
-                    <label class="pf-switch">
-                        <input type="checkbox" name="notify_sms" value="1" {{ $profile->notify_sms ? 'checked' : '' }}>
-                        <span class="pf-switch-slider"></span>
-                    </label>
-                </div>
-                <div style="margin-top: 20px;">
-                    <button type="submit" class="pf-btn">Save Preferences</button>
                 </div>
             </form>
         </div>

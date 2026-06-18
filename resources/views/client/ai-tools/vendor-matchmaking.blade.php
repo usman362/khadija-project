@@ -124,6 +124,8 @@
 @section('content')
 <div class="vm" data-match-url="{{ route('ai-tools.vendor-matchmaking.match') }}" data-budget="{{ $event['budget'] }}">
 
+    @include('partials._ai_quota_badge', ['status' => $status, 'tool' => 'AI Vendor Matchmaking'])
+
     {{-- header --}}
     <div class="vm-head">
         <div class="vm-head-l">

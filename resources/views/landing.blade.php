@@ -266,45 +266,6 @@
         <div class="lp-hero-right">
             <img class="lp-hero-photo" src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=900&q=80&auto=format&fit=crop" alt="Elegant event venue">
 
-            {{-- Top Match floating card --}}
-            <div class="lp-fcard lp-fc-match">
-                <span class="lp-fc-tag">Top Match for You</span>
-                <div class="row">
-                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&q=80&auto=format&fit=crop" alt="">
-                    <div style="flex:1;min-width:0;">
-                        <b>David Morgan</b>
-                        <small>Event Planner · New York, NY</small>
-                        <div class="stars">★ 4.9 <span style="color:var(--muted);font-weight:600;">(128)</span><span class="rated">Top Rated</span></div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Budget floating card --}}
-            <div class="lp-fcard lp-fc-budget">
-                <div class="top">
-                    <div><small>Event Budget</small><b>$15,000</b></div>
-                    <span class="ok">On Track</span>
-                </div>
-                <svg viewBox="0 0 230 46" preserveAspectRatio="none" fill="none">
-                    <defs><linearGradient id="lpArea" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#60a5fa" stop-opacity="0.5"/><stop offset="1" stop-color="#60a5fa" stop-opacity="0"/></linearGradient></defs>
-                    <path d="M0 38 L38 30 L76 33 L114 20 L152 24 L190 11 L230 6 L230 46 L0 46 Z" fill="url(#lpArea)"/>
-                    <path d="M0 38 L38 30 L76 33 L114 20 L152 24 L190 11 L230 6" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
-
-            {{-- Event Snapshot floating card --}}
-            <div class="lp-fcard lp-fc-snap">
-                <div class="sh">
-                    <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=120&q=80&auto=format&fit=crop" alt="">
-                    <div><b>Luxury Wedding</b><small>June 14, 2026 · 150 Guests</small></div>
-                </div>
-                <div class="lp-fc-row" style="border-top:none;"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span>Planning</span><em>2/6 Completed</em></div>
-                <div class="lp-fc-row"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span>Bookings</span><em>8/12 Confirmed</em></div>
-                <div class="lp-fc-row"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span><span>Payments</span><em>On Track</em></div>
-                <a href="{{ route('register', ['role' => 'client']) }}" class="vd">View Dashboard
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
-            </div>
-
             {{-- Booking confirmed pill --}}
             <div class="lp-fcard lp-fc-confirm">
                 <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
@@ -549,21 +510,26 @@
                 @php
                     $pop = (bool) $plan->is_featured;
                     $accent = $pop ? '#2563eb' : ($loop->last ? '#ea580c' : '#2563eb');
-                    $priceInt = (int) floor($plan->price);
-                    if ($pop)        { $ctaLabel = 'Start Free Trial'; $ctaClass = 'lp-btn-blue';    $ctaRole = 'supplier'; }
-                    elseif ($loop->last) { $ctaLabel = 'Contact Sales'; $ctaClass = 'lp-btn-outline'; $ctaRole = null; }
-                    else             { $ctaLabel = 'Get Started';     $ctaClass = 'lp-btn-outline'; $ctaRole = 'client'; }
+                    $isFree = $plan->price <= 0;
+                    $priceDisplay = $isFree ? 'Free' : '$' . rtrim(rtrim(number_format($plan->price, 2), '0'), '.');
+                    $priceSuffix = $isFree ? '' : trim($plan->billingLabel());
+                    // Badge + colour come from the plan module's own fields (admin-managed).
+                    $badgeMap = ['primary' => '#2563eb', 'success' => '#10b981', 'warning' => '#f59e0b', 'danger' => '#ef4444', 'info' => '#0ea5e9', 'secondary' => '#64748b', 'orange' => '#f97316'];
+                    $badgeColor = $badgeMap[$plan->badge_color] ?? '#2563eb';
+                    if ($pop)            { $ctaLabel = 'Start Free Trial'; $ctaClass = 'lp-btn-blue';    $ctaRole = 'supplier'; }
+                    elseif ($loop->last) { $ctaLabel = 'Contact Sales';    $ctaClass = 'lp-btn-outline'; $ctaRole = null; }
+                    else                 { $ctaLabel = 'Get Started';      $ctaClass = 'lp-btn-outline'; $ctaRole = 'supplier'; }
                     $ctaHref = $ctaRole ? route('register', ['role' => $ctaRole]) : route('about-us');
                 @endphp
                 <div class="lp-plan {{ $pop ? 'pop' : '' }}">
-                    @if($pop)<span class="lp-plan-badge">MOST POPULAR</span>@endif
+                    @if($plan->badge_text)<span class="lp-plan-badge" style="background:{{ $badgeColor }};">{{ strtoupper($plan->badge_text) }}</span>@endif
                     <h3>{{ $plan->name }}</h3>
-                    <p class="pdesc">{{ \Illuminate\Support\Str::limit($plan->description, 60) }}</p>
+                    <p class="pdesc">{{ \Illuminate\Support\Str::limit($plan->description, 72) }}</p>
                     <div class="lp-plan-price">
-                        <b>${{ $priceInt }}</b><span>/mo</span>
+                        <b>{{ $priceDisplay }}</b>@if($priceSuffix)<span>{{ $priceSuffix }}</span>@endif
                     </div>
                     <ul>
-                        @forelse($plan->features->where('is_included', true)->take(5) as $f)
+                        @forelse($plan->features->where('is_included', true) as $f)
                             <li><svg viewBox="0 0 24 24" fill="none" stroke="{{ $accent }}" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>{{ $f->feature }}</li>
                         @empty
                             <li><svg viewBox="0 0 24 24" fill="none" stroke="{{ $accent }}" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>{{ $plan->contractTermLabel() }}</li>

@@ -47,6 +47,13 @@ class UserProfile extends Model
         'workers_comp_number',
         'workers_comp_doc',
         'workers_comp_verified_at',
+        // Address verification (§7.3–7.5)
+        'address_status',
+        'address_verification_attempts',
+        'address_flagged_home',
+        'address_verified_at',
+        'address_locked_at',
+        'address_verification_meta',
     ];
 
     protected function casts(): array
@@ -69,6 +76,11 @@ class UserProfile extends Model
             'trade_license_verified_at' => 'datetime',
             'liability_insurance_verified_at' => 'datetime',
             'workers_comp_verified_at' => 'datetime',
+            'address_flagged_home' => 'boolean',
+            'address_verification_attempts' => 'integer',
+            'address_verified_at' => 'datetime',
+            'address_locked_at' => 'datetime',
+            'address_verification_meta' => 'array',
         ];
     }
 

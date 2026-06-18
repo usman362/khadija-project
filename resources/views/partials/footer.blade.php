@@ -2,7 +2,7 @@
     <div class="container">
         <div class="footer-grid">
             <div>
-                <div class="footer-brand"><img src="{{ asset('logos/logo-light.png') }}" alt="{{ config('app.name') }}" style="height: 32px;"></div>
+                <div class="footer-brand"><img src="{{ asset('gigresource-logos/gigresource-logo-dark.png') }}" alt="{{ config('app.name') }}" style="height: 46px;"></div>
                 <p class="footer-desc">
                     Connecting Professionals & Clients for Perfect Events.
                     Create unforgettable experiences with our curated network of verified experts.
@@ -51,6 +51,7 @@
                     <li><a href="{{ route('payment-policy') }}">Payment Policy</a></li>
                     <li><a href="{{ route('cancellation-policy') }}">Cancellation & Refund</a></li>
                     <li><a href="{{ route('dmca-policy') }}">DMCA Takedown Policy</a></li>
+                    <li><a href="{{ route('platform-disclaimer') }}">Platform Disclaimer</a></li>
                 </ul>
             </div>
         </div>

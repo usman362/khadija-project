@@ -387,7 +387,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                 Social Links
             </a>
-            <a href="{{ route('professional.profile.index', ['tab' => 'notifications']) }}" class="pf-tab-link {{ $tab === 'notifications' ? 'active' : '' }}">
+            <a href="{{ route('professional.notifications.index') }}" class="pf-tab-link">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                 Notifications
             </a>
@@ -492,6 +492,44 @@
                     <button type="submit" class="pf-btn">Save Changes</button>
                 </div>
             </form>
+        </div>
+
+        {{-- Business Address Verification (Developer Feedback v1.1 §7.3) --}}
+        @php
+            $avStatus = $profile->address_status ?: \App\Domain\AddressVerification\AddressStatus::PENDING;
+            $avLabel  = \App\Domain\AddressVerification\AddressStatus::label($avStatus);
+            $avColor  = \App\Domain\AddressVerification\AddressStatus::color($avStatus);
+            $avPalette = [
+                'green' => ['#10b981', 'rgba(16,185,129,0.12)', 'rgba(16,185,129,0.3)'],
+                'amber' => ['#f59e0b', 'rgba(245,158,11,0.12)', 'rgba(245,158,11,0.3)'],
+                'red'   => ['#ef4444', 'rgba(239,68,68,0.12)', 'rgba(239,68,68,0.3)'],
+                'blue'  => ['#2563eb', 'rgba(37,99,235,0.12)', 'rgba(37,99,235,0.3)'],
+                'gray'  => ['#64748b', 'rgba(100,116,139,0.12)', 'rgba(100,116,139,0.3)'],
+            ];
+            $avC = $avPalette[$avColor] ?? $avPalette['gray'];
+        @endphp
+        <div class="pf-card">
+            <div class="pf-card-title">Business Address Verification</div>
+            <div class="pf-card-desc">We verify your business address before you go live — this builds client trust. PO Boxes aren't accepted; home-based businesses are reviewed individually.</div>
+
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:14px 0;">
+                <div>
+                    <div style="font-size:12px; color:var(--text-muted); margin-bottom:6px;">Current status</div>
+                    <span style="display:inline-flex; align-items:center; gap:7px; padding:6px 14px; border-radius:999px; font-size:13px; font-weight:700; color:{{ $avC[0] }}; background:{{ $avC[1] }}; border:1px solid {{ $avC[2] }};">
+                        {{ $avLabel }}
+                    </span>
+                    @if($profile->address_flagged_home)
+                        <div style="font-size:12px; color:var(--text-muted); margin-top:8px;">Flagged as a possible home address — a business license or state registration may be requested.</div>
+                    @endif
+                    @if($profile->address_locked_at)
+                        <div style="font-size:12px; color:#ef4444; margin-top:8px;">Attempt limit reached — please open a support ticket with proof (utility bill or business license).</div>
+                    @endif
+                </div>
+                <form action="{{ route('professional.profile.verify-address') }}" method="POST" style="margin:0;">
+                    @csrf
+                    <button type="submit" class="pf-btn" @if($profile->address_locked_at) disabled style="opacity:.5; cursor:not-allowed;" @endif>Verify Address</button>
+                </form>
+            </div>
         </div>
         @endif
 
@@ -782,83 +820,6 @@
                 </div>
                 <div style="margin-top: 20px;">
                     <button type="submit" class="pf-btn">Save Social Links</button>
-                </div>
-            </form>
-        </div>
-        @endif
-
-        {{-- Notifications --}}
-        @if($tab === 'notifications')
-        <div class="pf-card">
-            <div class="pf-card-title">Notification Preferences</div>
-            <div class="pf-card-desc">Choose what you're notified about — and through which channels (email, push, SMS).</div>
-
-            <form action="{{ route('professional.profile.update.notifications') }}" method="POST">
-                @csrf @method('PATCH')
-                <div class="pf-toggle-row">
-                    <div class="pf-toggle-info">
-                        <div class="pf-toggle-title">Booking Updates</div>
-                        <div class="pf-toggle-desc">Get notified about new bookings, approvals, and status changes.</div>
-                    </div>
-                    <label class="pf-switch">
-                        <input type="checkbox" name="notify_email_bookings" value="1" {{ $profile->notify_email_bookings ? 'checked' : '' }}>
-                        <span class="pf-switch-slider"></span>
-                    </label>
-                </div>
-                <div class="pf-toggle-row">
-                    <div class="pf-toggle-info">
-                        <div class="pf-toggle-title">New Messages</div>
-                        <div class="pf-toggle-desc">Receive email when a client sends you a message.</div>
-                    </div>
-                    <label class="pf-switch">
-                        <input type="checkbox" name="notify_email_messages" value="1" {{ $profile->notify_email_messages ? 'checked' : '' }}>
-                        <span class="pf-switch-slider"></span>
-                    </label>
-                </div>
-                <div class="pf-toggle-row">
-                    <div class="pf-toggle-info">
-                        <div class="pf-toggle-title">New Event Opportunities</div>
-                        <div class="pf-toggle-desc">Get notified when new events matching your skills are posted.</div>
-                    </div>
-                    <label class="pf-switch">
-                        <input type="checkbox" name="notify_email_events" value="1" {{ $profile->notify_email_events ? 'checked' : '' }}>
-                        <span class="pf-switch-slider"></span>
-                    </label>
-                </div>
-                <div class="pf-toggle-row">
-                    <div class="pf-toggle-info">
-                        <div class="pf-toggle-title">Marketing & Offers</div>
-                        <div class="pf-toggle-desc">Receive promotions, tips, and platform updates.</div>
-                    </div>
-                    <label class="pf-switch">
-                        <input type="checkbox" name="notify_email_marketing" value="1" {{ $profile->notify_email_marketing ? 'checked' : '' }}>
-                        <span class="pf-switch-slider"></span>
-                    </label>
-                </div>
-
-                <div class="pf-card-title" style="margin-top: 26px; font-size: 14px;">Channels</div>
-                <div class="pf-toggle-row">
-                    <div class="pf-toggle-info">
-                        <div class="pf-toggle-title">Push Notifications</div>
-                        <div class="pf-toggle-desc">In-browser push alerts for time-sensitive updates.</div>
-                    </div>
-                    <label class="pf-switch">
-                        <input type="checkbox" name="notify_push" value="1" {{ $profile->notify_push ? 'checked' : '' }}>
-                        <span class="pf-switch-slider"></span>
-                    </label>
-                </div>
-                <div class="pf-toggle-row">
-                    <div class="pf-toggle-info">
-                        <div class="pf-toggle-title">SMS Notifications</div>
-                        <div class="pf-toggle-desc">Text alerts to your phone for urgent items (carrier rates may apply).</div>
-                    </div>
-                    <label class="pf-switch">
-                        <input type="checkbox" name="notify_sms" value="1" {{ $profile->notify_sms ? 'checked' : '' }}>
-                        <span class="pf-switch-slider"></span>
-                    </label>
-                </div>
-                <div style="margin-top: 20px;">
-                    <button type="submit" class="pf-btn">Save Preferences</button>
                 </div>
             </form>
         </div>

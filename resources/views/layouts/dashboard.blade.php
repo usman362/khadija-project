@@ -15,7 +15,7 @@
 
     <link rel="stylesheet" href="https://nobleui.com/html/template/assets/vendors/core/core.css">
     <link rel="stylesheet" href="https://nobleui.com/html/template/assets/css/demo1/style.css">
-    <link rel="shortcut icon" href="https://nobleui.com/html/template/assets/images/favicon.png" />
+    <link rel="shortcut icon" href="{{ asset('gigresource-logos/gigresource-icon.png') }}" />
 
     <style>
         .sidebar .nav-link svg.ic-primary { color: #818cf8 !important; stroke: #818cf8 !important; }
@@ -67,8 +67,8 @@
         <nav class="sidebar">
             <div class="sidebar-header">
                 <a href="{{ route('dashboard') }}" class="sidebar-brand">
-                    <img src="{{ asset('logos/logo-light.png') }}" alt="GigResource" id="brand-logo-light">
-                    <img src="{{ asset('logos/logo-primary.png') }}" alt="GigResource" id="brand-logo-dark" class="logo-hidden">
+                    <img src="{{ asset('gigresource-logos/gigresource-logo-dark.png') }}" alt="GigResource" id="brand-logo-light">
+                    <img src="{{ asset('gigresource-logos/gigresource-logo-light.png') }}" alt="GigResource" id="brand-logo-dark" class="logo-hidden">
                 </a>
                 <div class="sidebar-toggler">
                     <span></span>

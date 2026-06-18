@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/png" href="{{ asset('gigresource-logos/gigresource-icon.png') }}">
     @include('partials._seo_meta', ['seoNoIndex' => $seoNoIndex ?? true])
 
     <link rel="preconnect" href="https://fonts.googleapis.com/">
@@ -1156,8 +1157,8 @@
     <aside class="cl-sidebar" id="sidebar">
         <a href="{{ route('client.dashboard') }}" class="cl-sidebar-brand">
             <div>
-                <img src="{{ asset('logos/logo-light.png') }}" alt="GigResource" class="brand-logo-img brand-logo-light">
-                <img src="{{ asset('logos/logo-primary.png') }}" alt="GigResource" class="brand-logo-img brand-logo-dark">
+                <img src="{{ asset('gigresource-logos/gigresource-logo-dark.png') }}" alt="GigResource" class="brand-logo-img brand-logo-light">
+                <img src="{{ asset('gigresource-logos/gigresource-logo-light.png') }}" alt="GigResource" class="brand-logo-img brand-logo-dark">
                 <div class="brand-sub">Event Planner Account</div>
             </div>
         </a>

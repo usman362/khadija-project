@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\AiFeatures\AiFeatureCode;
+use App\Domain\AiFeatures\Services\AiFeatureGate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Throwable;
 
 /**
  * AI Review Writer — a portal AI Toolkit tool that turns a rating + a few
@@ -14,13 +17,20 @@ use Illuminate\View\View;
  * Deterministic generator (no LLM, no quota): it parses the provider, event,
  * rating, tone and keywords and assembles a review in six formats (Short,
  * Detailed, Social, Google, LinkedIn, Custom) in one pass, so the format tabs
- * switch instantly. Every input meaningfully changes the output. Not plan-gated.
+ * switch instantly. Every input meaningfully changes the output.
+ *
+ * Plan-gated (Developer Feedback v1.1 §8.3): the entry-level AI tool — included on
+ * every tier (Starter capped at 10/month, Professional & Enterprise unlimited).
+ * Enforcement is centralised in AiFeatureGate and only bites once
+ * AI_FEATURES_FREE_FOR_ALL is flipped off at launch.
  *
  * Routes: GET  /ai-tools/review-writer          (show)
  *         POST /ai-tools/review-writer/compose   (regenerate → JSON)
  */
 class AiReviewWriterController extends Controller
 {
+    public function __construct(private AiFeatureGate $gate) {}
+
     public const TONES = ['friendly' => 'Friendly & Warm', 'balanced' => 'Balanced', 'professional' => 'Professional'];
 
     public const FORMATS = ['short', 'detailed', 'social', 'google', 'linkedin', 'custom'];
@@ -47,11 +57,18 @@ class AiReviewWriterController extends Controller
             'keywords' => self::SUGGESTED_KEYWORDS,
             'review'   => $review,
             'metrics'  => $this->metrics(),
+            'status'   => $this->gate->status($request->user(), AiFeatureCode::REVIEW_WRITER),
         ]);
     }
 
     public function compose(Request $request): JsonResponse
     {
+        try {
+            $this->gate->authorize($request->user(), AiFeatureCode::REVIEW_WRITER);
+        } catch (Throwable $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        }
+
         $data = $request->validate([
             'provider' => ['nullable', 'string', 'max:160'],
             'service'  => ['nullable', 'string', 'max:160'],
@@ -70,7 +87,13 @@ class AiReviewWriterController extends Controller
             'thoughts' => $data['thoughts'] ?: '',
         ];
 
-        return response()->json(['success' => true, 'review' => $this->composeAll($input)]);
+        $this->gate->recordUsage($request->user(), AiFeatureCode::REVIEW_WRITER);
+
+        return response()->json([
+            'success' => true,
+            'review'  => $this->composeAll($input),
+            'status'  => $this->gate->status($request->user(), AiFeatureCode::REVIEW_WRITER),
+        ]);
     }
 
     /**
