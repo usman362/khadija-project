@@ -26,6 +26,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use RuntimeException;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Throwable;
 
 class EloquentInfluencerService implements InfluencerServiceInterface
@@ -65,14 +68,45 @@ class EloquentInfluencerService implements InfluencerServiceInterface
                 'admin_notes' => $notes ?: $influencer->admin_notes,
             ]);
 
-            if ($influencer->user && ! $influencer->user->hasRole(RoleName::INFLUENCER->value)) {
-                $influencer->user->assignRole(RoleName::INFLUENCER->value);
+            if ($influencer->user) {
+                // Self-heal: make sure the influencer role + its permissions exist
+                // before assigning, so approval never fails on a fresh/un-seeded DB.
+                $this->ensureInfluencerRoleConfigured();
+
+                if (! $influencer->user->hasRole(RoleName::INFLUENCER->value)) {
+                    $influencer->user->assignRole(RoleName::INFLUENCER->value);
+                }
             }
 
             InfluencerApproved::dispatch($influencer);
 
             return $influencer->fresh();
         });
+    }
+
+    /**
+     * Guarantee the `influencer` role exists (guard web) and carries the
+     * permissions the portal needs. Idempotent — safe to call on every approval.
+     * This makes approvals resilient even if RolePermissionSeeder never ran.
+     */
+    private function ensureInfluencerRoleConfigured(): void
+    {
+        $permissions = [
+            'dashboard.view',
+            'influencer.dashboard.view',
+            'influencer.referrals.view',
+            'influencer.payouts.view',
+            'influencer.payouts.request',
+        ];
+
+        foreach ($permissions as $permission) {
+            Permission::findOrCreate($permission, 'web');
+        }
+
+        $role = Role::findOrCreate(RoleName::INFLUENCER->value, 'web');
+        $role->givePermissionTo($permissions);
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
     public function reject(Influencer $influencer, ?User $admin = null, ?string $notes = null): Influencer
