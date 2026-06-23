@@ -37,7 +37,25 @@ class InfluencerDashboardController extends Controller
         $recentReferrals = $influencer->referrals()->latest()->limit(10)->get();
         $recentPayouts = $influencer->payoutRequests()->latest()->limit(5)->get();
 
-        return view('influencer.dashboard.index', compact('influencer', 'stats', 'recentReferrals', 'recentPayouts'));
+        // Earnings this month + a 6-month series for the performance chart.
+        $earned = ['earned', 'paid'];
+        $monthlyEarnings = (float) $influencer->referrals()
+            ->whereIn('status', $earned)
+            ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
+            ->sum('commission_amount');
+
+        $earningsSeries = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $m = now()->subMonths($i);
+            $earningsSeries[$m->format('M')] = (float) $influencer->referrals()
+                ->whereIn('status', $earned)
+                ->whereYear('created_at', $m->year)->whereMonth('created_at', $m->month)
+                ->sum('commission_amount');
+        }
+
+        return view('influencer.dashboard.index', compact(
+            'influencer', 'stats', 'recentReferrals', 'recentPayouts', 'monthlyEarnings', 'earningsSeries'
+        ));
     }
 
     public function referrals(): View|RedirectResponse

@@ -18,9 +18,13 @@ class Influencer extends Model
         'user_id',
         'full_name',
         'email',
+        'analytics_meta',
         'social_media_links',
         'audience_description',
         'monthly_reach',
+        'followers_count',
+        'engagement_rate',
+        'profile_score',
         'referral_code',
         'commission_tier',
         'status',
@@ -38,6 +42,9 @@ class Influencer extends Model
         return [
             'social_media_links' => 'array',
             'monthly_reach' => 'integer',
+            'followers_count' => 'integer',
+            'engagement_rate' => 'decimal:2',
+            'profile_score' => 'integer',
             'total_earnings' => 'decimal:2',
             'available_balance' => 'decimal:2',
             'paid_out' => 'decimal:2',
@@ -46,6 +53,7 @@ class Influencer extends Model
             'commission_tier' => CommissionTier::class,
             'approved_at' => 'datetime',
             'rejected_at' => 'datetime',
+            'analytics_meta' => 'array',
         ];
     }
 
@@ -71,6 +79,21 @@ class Influencer extends Model
     public function payoutRequests(): HasMany
     {
         return $this->hasMany(InfluencerPayoutRequest::class);
+    }
+
+    public function campaigns(): HasMany
+    {
+        return $this->hasMany(InfluencerCampaign::class);
+    }
+
+    public function content(): HasMany
+    {
+        return $this->hasMany(InfluencerContent::class);
+    }
+
+    public function dailyStats(): HasMany
+    {
+        return $this->hasMany(InfluencerDailyStat::class);
     }
 
     public function referredUsers(): HasMany

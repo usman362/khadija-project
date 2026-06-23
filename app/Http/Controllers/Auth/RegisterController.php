@@ -53,9 +53,13 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'agree' => ['accepted'],
             'role' => ['sometimes', 'string', 'in:client,supplier'],
             'g-recaptcha-response' => [new Recaptcha('register')],
             ...$geoRules,
+        ], [
+            'agree.accepted' => 'Please accept the Terms of Service and Privacy Policy to continue.',
         ]);
     }
 
@@ -71,6 +75,11 @@ class RegisterController extends Controller
                 role: (string) $role,
             )
         );
+
+        // Phone captured at signup (optional) — stored on the user.
+        if (! empty($data['phone'])) {
+            $user->update(['phone' => $data['phone']]);
+        }
 
         // Persist launch-state info captured at signup (§7.1). Professionals
         // give their state; clients give a zip we map to its state.

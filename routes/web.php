@@ -286,6 +286,19 @@ Route::get('/faq', function () {
 
 Auth::routes();
 
+// Role-themed login pages — separate URL per audience, all posting to the
+// same /login handler (auth is role-agnostic; only the look differs).
+//   /login                 → Client  (orange, default — defined by Auth::routes)
+//   /professional/login    → Professional (blue)
+//   /affiliate/login       → Affiliate (orange)
+//   /admin/login           → Admin (dark "Admin Portal")
+Route::get('/professional/login', fn () => view('auth.login', ['loginRole' => 'supplier']))
+    ->middleware('guest')->name('login.professional');
+Route::get('/affiliate/login', fn () => view('auth.login', ['loginRole' => 'influencer']))
+    ->middleware('guest')->name('login.affiliate');
+Route::get('/admin/login', fn () => view('auth.admin-login'))
+    ->middleware('guest')->name('admin.login');
+
 // Policy E-Signature (auth required)
 Route::post('/policy/sign', [PolicySignatureController::class, 'sign'])->middleware('auth')->name('policy.sign');
 
@@ -395,6 +408,60 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:influencer.payouts.view')->name('dashboard.payouts');
         Route::post('/payouts', [\App\Http\Controllers\Influencer\InfluencerDashboardController::class, 'requestPayout'])
             ->middleware('permission:influencer.payouts.request')->name('dashboard.payouts.request');
+
+        // Badges & Tiers section
+        Route::middleware('permission:influencer.dashboard.view')->group(function () {
+            $b = \App\Http\Controllers\Influencer\InfluencerBadgesController::class;
+            Route::get('/badges/tiers', [$b, 'tiers'])->name('badges.tiers');
+            Route::get('/badges/current', [$b, 'current'])->name('badges.current');
+            Route::get('/badges/progress', [$b, 'progress'])->name('badges.progress');
+            Route::get('/badges/all', [$b, 'badges'])->name('badges.all');
+            Route::get('/badges/benefits', [$b, 'benefits'])->name('badges.benefits');
+        });
+
+        // Invite & Earn More section
+        Route::middleware('permission:influencer.dashboard.view')->group(function () {
+            $i = \App\Http\Controllers\Influencer\InfluencerInviteController::class;
+            Route::get('/invite/tools', [$i, 'tools'])->name('invite.tools');
+            Route::get('/invite/earn', [$i, 'earn'])->name('invite.earn');
+            Route::get('/invite/promote', [$i, 'promote'])->name('invite.promote');
+            Route::get('/invite/become', [$i, 'become'])->name('invite.become');
+            Route::get('/invite/onboarding', [$i, 'onboarding'])->name('invite.onboarding');
+            Route::get('/invite/success-stories', [$i, 'stories'])->name('invite.stories');
+            Route::get('/invite/faqs', [$i, 'faqs'])->name('invite.faqs');
+            Route::get('/invite/apply', fn () => redirect()->route('influencer.join'))->name('invite.apply');
+        });
+
+        // Analytics section
+        Route::middleware('permission:influencer.dashboard.view')->group(function () {
+            $a = \App\Http\Controllers\Influencer\InfluencerAnalyticsController::class;
+            Route::get('/analytics/performance', [$a, 'performance'])->name('analytics.performance');
+            Route::get('/analytics/campaigns', [$a, 'campaigns'])->name('analytics.campaigns');
+            Route::get('/analytics/audience', [$a, 'audience'])->name('analytics.audience');
+            Route::get('/analytics/content', [$a, 'content'])->name('analytics.content');
+            Route::get('/analytics/reports', [$a, 'reports'])->name('analytics.reports');
+            Route::get('/analytics/getting-started', [$a, 'gettingStarted'])->name('analytics.getting-started');
+            Route::get('/analytics/export', [$a, 'export'])->name('analytics.export');
+        });
+
+        // Resources section
+        Route::middleware('permission:influencer.dashboard.view')->group(function () {
+            $r = \App\Http\Controllers\Influencer\InfluencerResourceController::class;
+            Route::get('/resources/library', [$r, 'library'])->name('resources.library');
+            Route::get('/resources/academy', [$r, 'academy'])->name('resources.academy');
+            Route::get('/resources/tutorials', [$r, 'tutorials'])->name('resources.tutorials');
+            Route::get('/resources/articles', [$r, 'articles'])->name('resources.articles');
+            Route::get('/resources/getting-started', [$r, 'gettingStarted'])->name('resources.getting-started');
+        });
+
+        // Program sections: Referral Center, Marketing, Leaderboards, Commissions
+        Route::middleware('permission:influencer.dashboard.view')->group(function () {
+            $p = \App\Http\Controllers\Influencer\InfluencerProgramController::class;
+            Route::get('/referral-center', [$p, 'referralCenter'])->name('referral-center');
+            Route::get('/marketing', [$p, 'marketing'])->name('marketing');
+            Route::get('/leaderboards', [$p, 'leaderboards'])->name('leaderboards');
+            Route::get('/commissions', [$p, 'commissions'])->name('commissions');
+        });
     });
 
     // ── Admin Influencer Management ───────────────────────────────
