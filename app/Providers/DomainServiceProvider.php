@@ -6,7 +6,9 @@ use App\Domain\Auth\Contracts\UserRegistrationServiceInterface;
 use App\Domain\Auth\Services\EloquentUserRegistrationService;
 use App\Domain\Influencer\Contracts\InfluencerServiceInterface;
 use App\Domain\Influencer\Events\InfluencerApplied;
+use App\Domain\Influencer\Events\InfluencerApproved;
 use App\Domain\Influencer\Listeners\LogInfluencerApplied;
+use App\Domain\Influencer\Listeners\SendInfluencerApprovalEmail;
 use App\Domain\Influencer\Services\EloquentInfluencerService;
 use App\Models\Booking;
 use App\Observers\BookingEmailObserver;
@@ -28,6 +30,7 @@ class DomainServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Event::listen(InfluencerApplied::class, LogInfluencerApplied::class);
+        Event::listen(InfluencerApproved::class, SendInfluencerApprovalEmail::class);
         Booking::observe(BookingInfluencerObserver::class);
         Booking::observe(BookingEmailObserver::class);
     }

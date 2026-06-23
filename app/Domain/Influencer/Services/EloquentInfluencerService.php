@@ -13,6 +13,7 @@ use App\Domain\Influencer\Enums\ReferralType;
 use App\Domain\Influencer\Events\InfluencerApplied;
 use App\Domain\Influencer\Events\InfluencerApproved;
 use App\Domain\Influencer\Events\ReferralAttributed;
+use App\Mail\InfluencerApplicationReceived;
 use App\Mail\PayoutPaid;
 use App\Mail\PayoutRejected;
 use App\Mail\PayoutRequested;
@@ -31,9 +32,9 @@ class EloquentInfluencerService implements InfluencerServiceInterface
 {
     public function apply(InfluencerApplicationData $data): Influencer
     {
-        return DB::transaction(function () use ($data) {
+        $influencer = DB::transaction(function () use ($data) {
             $influencer = Influencer::create([
-                'user_id' => auth()->id(),
+                'user_id' => $data->userId ?? auth()->id(),
                 'full_name' => $data->fullName,
                 'email' => $data->email,
                 'social_media_links' => $data->socialMediaLinks,
@@ -48,6 +49,11 @@ class EloquentInfluencerService implements InfluencerServiceInterface
 
             return $influencer;
         });
+
+        // Confirmation email to the applicant — never block the application on mail failure.
+        $this->notifyInfluencer($influencer, fn ($email) => Mail::to($email)->send(new InfluencerApplicationReceived($influencer)));
+
+        return $influencer;
     }
 
     public function approve(Influencer $influencer, ?User $admin = null, ?string $notes = null): Influencer

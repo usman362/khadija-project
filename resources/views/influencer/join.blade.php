@@ -26,6 +26,14 @@
 
     <div class="apx-or">OR</div>
 
+    @if (session('status'))
+        <div class="apx-alert apx-alert-success">{{ session('status') }}</div>
+    @endif
+
+    @if (session('error'))
+        <div class="apx-alert apx-alert-error">{{ session('error') }}</div>
+    @endif
+
     @if ($errors->any())
         <div class="apx-alert apx-alert-error">
             @foreach ($errors->all() as $error)
@@ -41,7 +49,7 @@
             <label class="apx-label">Full Name</label>
             <div class="apx-input-wrap">
                 <svg class="apx-ic-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <input type="text" name="full_name" class="apx-input {{ $errors->has('full_name') ? 'is-invalid' : '' }}" value="{{ old('full_name', auth()->check() ? auth()->user()->name : '') }}" placeholder="Enter your full name" required
+                <input type="text" name="full_name" class="apx-input {{ $errors->has('full_name') ? 'is-invalid' : '' }}" value="{{ old('full_name') }}" placeholder="Enter your full name" required
                        data-validate="required|min:2" data-error-required="Please enter your full name.">
             </div>
         </div>
@@ -50,8 +58,33 @@
             <label class="apx-label">Email Address</label>
             <div class="apx-input-wrap">
                 <svg class="apx-ic-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
-                <input type="email" name="email" class="apx-input {{ $errors->has('email') ? 'is-invalid' : '' }}" value="{{ old('email', auth()->check() ? auth()->user()->email : '') }}" placeholder="Enter your email address" required
+                <input type="email" name="email" class="apx-input {{ $errors->has('email') ? 'is-invalid' : '' }}" value="{{ old('email') }}" placeholder="Enter your email address" required
                        data-validate="required|email" data-error-required="We need an email to reach you." data-error-email="That doesn't look like a valid email.">
+            </div>
+        </div>
+
+        <div class="apx-field">
+            <label class="apx-label">Password</label>
+            <div class="apx-input-wrap">
+                <svg class="apx-ic-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input type="password" name="password" id="apxPw" class="apx-input {{ $errors->has('password') ? 'is-invalid' : '' }}" placeholder="Create a strong password" required
+                       data-validate="required|min:8" data-error-required="Please create a password." data-error-min="Use at least 8 characters.">
+                <button type="button" class="apx-eye" data-eye="apxPw" aria-label="Show or hide password">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+            </div>
+            <div class="apx-hint">Minimum 8 characters — you'll use this to log in.</div>
+        </div>
+
+        <div class="apx-field">
+            <label class="apx-label">Confirm Password</label>
+            <div class="apx-input-wrap">
+                <svg class="apx-ic-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input type="password" name="password_confirmation" id="apxPw2" class="apx-input" placeholder="Confirm your password" required
+                       data-validate="required|match:password" data-error-required="Please confirm your password." data-error-match="Passwords don't match.">
+                <button type="button" class="apx-eye" data-eye="apxPw2" aria-label="Show or hide password">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
             </div>
         </div>
 
@@ -74,11 +107,11 @@
         </div>
 
         <label class="apx-agree">
-            <input type="checkbox" required>
+            <input type="checkbox" name="agree" value="1" {{ old('agree') ? 'checked' : '' }} required>
             <span>I agree to the <a href="{{ route('platform-disclaimer') }}" target="_blank">Terms of Service</a> and <a href="{{ route('privacy-policy') }}" target="_blank">Privacy Policy</a></span>
         </label>
 
-        <button type="submit" class="apx-submit">Submit Application</button>
+        <button type="submit" class="apx-submit">Create Account &amp; Apply</button>
     </form>
 
     <div class="apx-foot">

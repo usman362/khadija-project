@@ -80,6 +80,9 @@ Route::middleware('auth')->group(function () {
 // ── Influencer Module ─────────────────────────────────────────────────
 Route::get('/join-as-influencer', [\App\Http\Controllers\Influencer\JoinAsInfluencerController::class, 'show'])->name('influencer.join');
 Route::post('/join-as-influencer', [\App\Http\Controllers\Influencer\JoinAsInfluencerController::class, 'store'])->name('influencer.join.submit');
+// Affiliate application status (logged-in, before/without portal access — NOT permission-gated)
+Route::get('/affiliate/status', [\App\Http\Controllers\Influencer\JoinAsInfluencerController::class, 'status'])
+    ->middleware('auth')->name('influencer.status');
 Route::get('/ref/{code}', \App\Http\Controllers\Influencer\ReferralLandingController::class)->name('influencer.referral');
 
 // Policy pages

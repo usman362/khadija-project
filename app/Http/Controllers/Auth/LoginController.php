@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Domain\Auth\Enums\RoleName;
 use App\Http\Controllers\Controller;
 use App\Rules\Recaptcha;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class LoginController extends Controller
@@ -41,5 +43,28 @@ class LoginController extends Controller
         $rules['g-recaptcha-response'] = [new Recaptcha('login')];
 
         $request->validate($rules);
+    }
+
+    /**
+     * Route affiliate-only accounts to the right place after login:
+     * approved → portal, otherwise → application status page.
+     */
+    protected function authenticated(Request $request, $user): ?RedirectResponse
+    {
+        $isStandardUser = $user->hasAnyRole([
+            RoleName::ADMIN->value,
+            RoleName::CLIENT->value,
+            RoleName::SUPPLIER->value,
+        ]);
+
+        if (! $isStandardUser && $user->influencer) {
+            if ($user->influencer->isApproved() && $user->hasRole(RoleName::INFLUENCER->value)) {
+                return redirect()->route('influencer.dashboard');
+            }
+
+            return redirect()->route('influencer.status');
+        }
+
+        return null;
     }
 }

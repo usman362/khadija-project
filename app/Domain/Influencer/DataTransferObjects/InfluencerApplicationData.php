@@ -13,6 +13,7 @@ final class InfluencerApplicationData
         public readonly array $socialMediaLinks,
         public readonly ?string $audienceDescription,
         public readonly int $monthlyReach,
+        public readonly ?int $userId = null,
     ) {
     }
 
@@ -27,6 +28,7 @@ final class InfluencerApplicationData
             socialMediaLinks: (array) ($data['social_media_links'] ?? []),
             audienceDescription: isset($data['audience_description']) ? (string) $data['audience_description'] : null,
             monthlyReach: (int) ($data['monthly_reach'] ?? 0),
+            userId: isset($data['user_id']) ? (int) $data['user_id'] : null,
         );
     }
 }
