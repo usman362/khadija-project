@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Event Planner — Concept</title>
+<style>
+  :root{
+    --ink:#0f172a; --text:#334155; --muted:#64748b; --line:#e8eaf0; --card:#fff; --bg:#f6f7fb;
+    --or:#ea580c; --or2:#f97316; --or-soft:#fff4ec; --or-ring:#fed7aa;
+    --blue:#2563eb; --blue-soft:#eff4ff; --green:#16a34a; --green-soft:#ecfdf3; --purple:#7c3aed; --purple-soft:#f3efff;
+    --ff:'Poppins',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --ff-body:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);font-family:var(--ff-body);color:var(--text);-webkit-font-smoothing:antialiased;padding:26px}
+  .wrap{max-width:1080px;margin:0 auto}
+  /* concept ribbon */
+  .ribbon{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--muted);margin-bottom:16px}
+  .ribbon .logo{display:flex;align-items:center;gap:7px;font-family:var(--ff);font-weight:700;color:var(--ink);font-size:15px}
+  .ribbon .dot{width:9px;height:9px;border-radius:3px;background:var(--or)}
+  .ribbon .crumb{padding:3px 10px;background:#fff;border:1px solid var(--line);border-radius:20px}
+  .ribbon .tag{margin-left:auto;background:#fef3c7;color:#b45309;font-weight:700;font-size:11px;padding:4px 11px;border-radius:20px;letter-spacing:.03em}
+
+  /* hero */
+  .hero{display:flex;align-items:center;gap:18px;background:linear-gradient(100deg,var(--or-soft),#fff);border:1px solid var(--or-ring);border-radius:18px;padding:22px 24px;margin-bottom:18px}
+  .hero .ico{width:58px;height:58px;border-radius:16px;background:var(--or);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .hero .ico svg{width:30px;height:30px;color:#fff}
+  .hero h1{font-family:var(--ff);font-size:22px;font-weight:800;color:var(--ink)}
+  .hero p{font-size:13.5px;color:var(--text);margin-top:4px;max-width:62ch}
+  .hero .pill{margin-left:auto;display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--or-ring);color:var(--or);font-family:var(--ff);font-weight:700;font-size:11.5px;padding:7px 13px;border-radius:20px;align-self:flex-start}
+  .hero .pill svg{width:14px;height:14px}
+
+  /* stat cards */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px}
+  .stat .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+  .stat .ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+  .stat .ic svg{width:17px;height:17px}
+  .stat .v{font-family:var(--ff);font-size:22px;font-weight:800;color:var(--ink);line-height:1}
+  .stat .l{font-size:12px;color:var(--muted);margin-top:4px}
+  .stat .ring{font-family:var(--ff);font-weight:800;font-size:12px}
+
+  .grid{display:grid;grid-template-columns:1.05fr 1fr;gap:18px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+  .sec-h{display:flex;align-items:center;gap:10px;margin-bottom:5px}
+  .sec-h .n{width:24px;height:24px;border-radius:8px;background:var(--or);color:#fff;font-family:var(--ff);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+  .sec-h b{font-family:var(--ff);font-size:16px;font-weight:700;color:var(--ink)}
+  .sec-sub{font-size:12.5px;color:var(--muted);margin:0 0 16px 34px}
+
+  .fld{margin-bottom:14px}
+  .fld label{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:6px}
+  .fld label .opt{color:var(--muted);font-weight:400}
+  .inp{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--ink);font-family:var(--ff-body);background:#fbfcfe}
+  .inp.ph{color:var(--muted)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 13px;font-size:12.5px;color:var(--text);display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+  .chip.on{border-color:var(--or);background:var(--or-soft);color:var(--or)}
+  .chip svg{width:14px;height:14px}
+  .gen{margin-top:6px;width:100%;background:var(--or);color:#fff;border:none;border-radius:11px;padding:13px;font-family:var(--ff);font-weight:700;font-size:13.5px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
+  .gen svg{width:16px;height:16px}
+
+  /* AI output */
+  .ai-h{display:flex;align-items:center;gap:9px;margin-bottom:4px}
+  .ai-h .spark{width:26px;height:26px;border-radius:8px;background:var(--purple-soft);color:var(--purple);display:flex;align-items:center;justify-content:center}
+  .ai-h .spark svg{width:15px;height:15px}
+  .ai-h b{font-family:var(--ff);font-size:15px;font-weight:700;color:var(--ink)}
+  .ai-h .conf{margin-left:auto;font-size:11px;font-weight:700;color:var(--green);background:var(--green-soft);padding:4px 10px;border-radius:20px}
+  .ai-sub{font-size:12px;color:var(--muted);margin:0 0 15px 35px}
+
+  .phase{border:1px solid var(--line);border-left:3px solid var(--p);border-radius:0 12px 12px 0;padding:12px 14px;margin-bottom:11px}
+  .phase .ph-top{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+  .phase .badge{font-family:var(--ff);font-weight:700;font-size:11px;color:#fff;background:var(--p);padding:3px 9px;border-radius:7px}
+  .phase .when{font-size:12px;color:var(--muted);margin-left:auto}
+  .task{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:12.5px;color:var(--text)}
+  .task .box{width:16px;height:16px;border-radius:5px;border:1.6px solid var(--line);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  .task.done .box{background:var(--green);border-color:var(--green)}
+  .task.done .box svg{width:10px;height:10px;color:#fff}
+  .task.done span{color:var(--muted);text-decoration:line-through}
+
+  .note{display:flex;gap:9px;align-items:flex-start;background:var(--blue-soft);border:1px solid #cfe0ff;border-radius:11px;padding:11px 13px;font-size:12px;color:#1e40af;line-height:1.5;margin-top:4px}
+  .note svg{width:16px;height:16px;flex-shrink:0;margin-top:1px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="ribbon">
+    <span class="logo"><span class="dot"></span>GigResource</span>
+    <span>›</span><span class="crumb">Client · AI Tools</span><span>›</span><span class="crumb">AI Event Planner</span>
+    <span class="tag">CONCEPT — NOT YET BUILT</span>
+  </div>
+
+  <div class="hero">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></span>
+    <div>
+      <h1>AI Event Planner</h1>
+      <p>Tell us about your event and our AI builds a complete plan — timeline, tasks, and the right vendors — from first idea through to the big day.</p>
+    </div>
+    <span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>AI-POWERED</span>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="top"><div><div class="v">78%</div><div class="l">Event Readiness</div></div><span class="ic" style="background:var(--or-soft);color:var(--or)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span></div></div>
+    <div class="stat"><div class="top"><div><div class="v">45</div><div class="l">Days to Event</div></div><span class="ic" style="background:var(--blue-soft);color:var(--blue)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span></div></div>
+    <div class="stat"><div class="top"><div><div class="v">18<span style="font-size:14px;color:var(--muted)">/31</span></div><div class="l">Tasks Done</div></div><span class="ic" style="background:var(--green-soft);color:var(--green)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span></div></div>
+    <div class="stat"><div class="top"><div><div class="v" style="color:var(--green)">On Track</div><div class="l">Budget Status</div></div><span class="ic" style="background:var(--purple-soft);color:var(--purple)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span></div></div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <div class="sec-h"><span class="n">1</span><b>Tell us about your event</b></div>
+      <p class="sec-sub">A few details are enough — the AI handles the rest.</p>
+
+      <div class="two">
+        <div class="fld"><label>Event Type</label><input class="inp" value="Wedding Reception"></div>
+        <div class="fld"><label>Event Date</label><input class="inp" value="Aug 16, 2026"></div>
+      </div>
+      <div class="two">
+        <div class="fld"><label>Guests <span class="opt">(approx.)</span></label><input class="inp" value="150"></div>
+        <div class="fld"><label>Budget Range</label><input class="inp" value="$8,000 – $12,000"></div>
+      </div>
+      <div class="fld"><label>Venue / Location <span class="opt">(optional)</span></label><input class="inp" value="The Grand Garden Estate, Miami FL"></div>
+      <div class="fld">
+        <label>Services you'll need</label>
+        <div class="chips">
+          <span class="chip on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>Photography</span>
+          <span class="chip on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>DJ / Music</span>
+          <span class="chip on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l18-5v12L3 13z"/></svg>Catering</span>
+          <span class="chip">Decor</span>
+          <span class="chip">Lighting</span>
+          <span class="chip">+ Add</span>
+        </div>
+      </div>
+      <button class="gen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Generate My Event Plan</button>
+    </div>
+
+    <div class="panel">
+      <div class="ai-h"><span class="spark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 5.8H20l-4.9 3.6 1.9 5.8L12 13.6 7 17.2l1.9-5.8L4 7.8h6.1z"/></svg></span><b>AI-Generated Plan</b><span class="conf">94% confidence</span></div>
+      <p class="ai-sub">A phased timeline built for your wedding on Aug 16.</p>
+
+      <div class="phase" style="--p:var(--purple)">
+        <div class="ph-top"><span class="badge">PHASE 1</span><b style="font-family:var(--ff);font-size:13px;color:var(--ink)">Foundations</b><span class="when">12+ weeks out</span></div>
+        <div class="task done"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span>Lock venue &amp; date</span></div>
+        <div class="task done"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span>Set guest count &amp; budget</span></div>
+        <div class="task"><span class="box"></span>Book photographer &amp; DJ</div>
+      </div>
+
+      <div class="phase" style="--p:var(--blue)">
+        <div class="ph-top"><span class="badge">PHASE 2</span><b style="font-family:var(--ff);font-size:13px;color:var(--ink)">Build-out</b><span class="when">8 weeks out</span></div>
+        <div class="task done"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span>Finalize catering menu</span></div>
+        <div class="task"><span class="box"></span>Confirm décor &amp; floor plan</div>
+        <div class="task"><span class="box"></span>Send invitations</div>
+      </div>
+
+      <div class="phase" style="--p:var(--or)">
+        <div class="ph-top"><span class="badge">PHASE 3</span><b style="font-family:var(--ff);font-size:13px;color:var(--ink)">Final week</b><span class="when">7 days out</span></div>
+        <div class="task"><span class="box"></span>Confirm timings with all vendors</div>
+        <div class="task"><span class="box"></span>Share day-of schedule</div>
+      </div>
+
+      <div class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span><b>AI tip:</b> Based on 150 guests, book your photographer &amp; DJ now — top vendors for August dates are ~80% booked already.</span></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
