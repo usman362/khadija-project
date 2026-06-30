@@ -1,4 +1,4 @@
-@extends('layouts.client')
+@extends($aiLayout ?? 'layouts.client')
 
 @section('title', 'AI Pricing Assistant')
 @section('page-title', 'AI Pricing Assistant')
@@ -359,7 +359,6 @@
     <div class="apa-banner">
         <span class="apa-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
         <div class="apa-banner-txt"><b>Smart Pricing. More Bookings. Higher Earnings.</b><p>Let AI do the math so you can focus on creating unforgettable events.</p></div>
-        <a href="#" id="apa-try"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="14" x2="16" y2="18"/></svg>Try AI Pricing Assistant Now ✨</a>
     </div>
 </div>
 

@@ -244,7 +244,7 @@
 
                 @if($r->comment)
                     <div class="rv-feedback">
-                        <div class="rv-feedback-text"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>{{ \Illuminate\Support\Str::limit($r->comment, 120) }} <a href="#">Read more</a></div>
+                        <div class="rv-feedback-text"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>{{ \Illuminate\Support\Str::limit($r->comment, 120) }} </div>
                         <div class="rv-helpful">
                             <span>Was this helpful?</span>
                             <button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/></svg>{{ rand(0, 5) }}</button>
@@ -256,7 +256,6 @@
                 <div class="rv-ai-insight">
                     <div class="rv-ai-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>
                     <div class="rv-ai-body"><b>AI Reputation Insight</b> — This professional has maintained {{ rand(95, 100) }}% contract compliance across {{ rand(8, 20) }} completed events.</div>
-                    <a href="#" class="rv-ai-link">View Details →</a>
                 </div>
             </div>
         @empty
@@ -320,7 +319,7 @@
 
     {{-- Pending Review Requests --}}
     <div class="rv-rail-card">
-        <div class="rv-rail-head"><div class="rv-rail-title">Pending Review Requests</div><a href="#" style="font-size:11px;color:#f97316;text-decoration:none;font-weight:600;">View All</a></div>
+        <div class="rv-rail-head"><div class="rv-rail-title">Pending Review Requests</div></div>
         @forelse($pendingReviews as $pr)
             @php $daysLeft = rand(2, 6); @endphp
             <div class="rv-pend-row">

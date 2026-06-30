@@ -197,10 +197,10 @@
         <table class="ms-detail-table">
             <thead><tr><th>Service</th><th>Key Details</th><th>Budget Range</th><th>Needed</th><th></th></tr></thead>
             <tbody>
-                <tr><td><b style="color:var(--text-primary);">Catering</b></td><td>Plated, dietary needs</td><td>$8,000 – $12,000</td><td class="yes">Yes</td><td><a href="#" class="ms-edit-link">Edit</a></td></tr>
-                <tr><td><b style="color:var(--text-primary);">Audio Visual (AV)</b></td><td>Lighting, sound system, screens</td><td>$3,000 – $6,000</td><td class="yes">Yes</td><td><a href="#" class="ms-edit-link">Edit</a></td></tr>
-                <tr><td><b style="color:var(--text-primary);">Decor &amp; Design</b></td><td>Theme: Elegant Black &amp; Gold</td><td>$4,000 – $8,000</td><td class="yes">Yes</td><td><a href="#" class="ms-edit-link">Edit</a></td></tr>
-                <tr><td><b style="color:var(--text-primary);">Photography</b></td><td>Full coverage, group photos</td><td>$2,000 – $3,000</td><td class="yes">Yes</td><td><a href="#" class="ms-edit-link">Edit</a></td></tr>
+                <tr><td><b style="color:var(--text-primary);">Catering</b></td><td>Plated, dietary needs</td><td>$8,000 – $12,000</td><td class="yes">Yes</td><td></td></tr>
+                <tr><td><b style="color:var(--text-primary);">Audio Visual (AV)</b></td><td>Lighting, sound system, screens</td><td>$3,000 – $6,000</td><td class="yes">Yes</td><td></td></tr>
+                <tr><td><b style="color:var(--text-primary);">Decor &amp; Design</b></td><td>Theme: Elegant Black &amp; Gold</td><td>$4,000 – $8,000</td><td class="yes">Yes</td><td></td></tr>
+                <tr><td><b style="color:var(--text-primary);">Photography</b></td><td>Full coverage, group photos</td><td>$2,000 – $3,000</td><td class="yes">Yes</td><td></td></tr>
             </tbody>
         </table>
 
@@ -225,13 +225,12 @@
     </div>
 
     <div class="ms-rail-card">
-        <div class="ms-rail-title">Your Event Summary <a href="#" class="ms-edit-link">Edit</a></div>
+        <div class="ms-rail-title">Your Event Summary </div>
         <div class="ms-sum-row"><span class="lbl">Event Title</span><span class="val">{{ \Illuminate\Support\Str::limit($activeEvent->title ?? 'Untitled', 18) }}</span></div>
         <div class="ms-sum-row"><span class="lbl">Date</span><span class="val">{{ $activeEvent->starts_at?->format('M d, Y') ?? '—' }}</span></div>
         <div class="ms-sum-row"><span class="lbl">Location</span><span class="val">{{ \Illuminate\Support\Str::limit($activeEvent->location ?? '—', 16) }}</span></div>
         <div class="ms-sum-row"><span class="lbl">Guest Count</span><span class="val">300</span></div>
         <div class="ms-sum-row"><span class="lbl">Budget Range</span><span class="val">${{ number_format($activeEvent->budget ?? 20000, 0) }}+</span></div>
-        <a href="#" class="ms-edit-link" style="display:inline-block;margin-top:10px;">View Full Summary →</a>
     </div>
 
     <div class="ms-rail-card">
@@ -246,7 +245,6 @@
         <div class="ms-check-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>All critical services added</div>
         <div class="ms-check-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Timeline looks good</div>
         <div class="ms-check-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Budget within range</div>
-        <a href="#" class="ms-edit-link" style="display:inline-block;margin-top:8px;">View Recommendations →</a>
     </div>
 
     <div class="ms-rail-card">
@@ -263,7 +261,6 @@
         <div class="ms-risk-row"><span class="ms-risk-dot" style="background:#f59e0b;"></span>Weather risk on event day · 40% chance of rain</div>
         <div class="ms-risk-row"><span class="ms-risk-dot" style="background:#10b981;"></span>Backup generator not added · Recommended</div>
         <div class="ms-risk-row"><span class="ms-risk-dot" style="background:#ef4444;"></span>Vendor availability tight · Book soon</div>
-        <a href="#" class="ms-edit-link" style="display:inline-block;margin-top:8px;">View All Risks →</a>
     </div>
 </aside>
 </div>{{-- /.ms-layout --}}

@@ -27,7 +27,21 @@ class MembershipPlanPageController extends Controller
         return view('dashboard.membership-plans.index', [
             'plans' => $plans,
             'activeSubscription' => $activeSubscription,
+            // Render inside the accessing user's own portal — client → client
+            // theme, professional → professional theme, admin → dashboard.
+            'portalLayout' => $this->portalLayout($request),
         ]);
+    }
+
+    /** The layout matching the current user's portal. */
+    private function portalLayout(Request $request): string
+    {
+        $user = $request->user();
+        return match (true) {
+            (bool) $user?->hasRole('supplier') => 'layouts.professional',
+            (bool) $user?->hasRole('client')   => 'layouts.client',
+            default                            => 'layouts.dashboard',
+        };
     }
 
     /**

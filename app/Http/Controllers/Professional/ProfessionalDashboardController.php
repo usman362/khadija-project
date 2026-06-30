@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Professional;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\Review;
 use App\Models\UserSubscription;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -14,12 +15,15 @@ class ProfessionalDashboardController extends Controller
     {
         $user = $request->user();
 
-        // Stats
+        // Real stats from bookings + reviews (no more hardcoded placeholders).
+        $earnedQuery = Booking::where('supplier_id', $user->id)->whereIn('status', ['confirmed', 'completed']);
+
         $stats = [
-            'available_balance' => 0,  // placeholder - no payment model yet
-            'this_month_earnings' => 0,  // placeholder
+            'available_balance'   => (float) (clone $earnedQuery)->where('status', 'completed')->sum('price'),
+            'this_month_earnings' => (float) (clone $earnedQuery)
+                ->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('price'),
             'total_booked' => Booking::where('supplier_id', $user->id)->count(),
-            'avg_rating' => 0,  // placeholder
+            'avg_rating'   => round((float) Review::where('reviewee_id', $user->id)->where('is_hidden', false)->avg('rating'), 1),
         ];
 
         // Recent bookings

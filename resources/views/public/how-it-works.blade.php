@@ -125,7 +125,7 @@
             <div class="hw-window">
                 <div class="hw-window-bar"><i class="l1"></i><i class="l2"></i><i class="l3"></i></div>
                 <div class="hw-profile">
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=140&q=80&auto=format&fit=crop" alt="">
+                    <img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=140&q=80&auto=format&fit=crop" alt="">
                     <div style="flex:1;min-width:0;">
                         <div class="stars">★★★★★</div>
                         <div class="ln"></div>

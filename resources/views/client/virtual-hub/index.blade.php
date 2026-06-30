@@ -234,10 +234,10 @@
 
     {{-- Feature tiles --}}
     <div class="vh-feats">
-        <div class="vh-feat"><div class="vh-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><div class="vh-feat-name">Virtual Venue Builder</div><a href="#" class="vh-feat-link">Launch Builder →</a></div>
-        <div class="vh-feat"><div class="vh-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="vh-feat-name">Engagement Tools</div><a href="#" class="vh-feat-link">Open Tools →</a></div>
-        <div class="vh-feat"><div class="vh-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div><div class="vh-feat-name">AI Stream Assistant</div><a href="#" class="vh-feat-link">View Recommendations →</a></div>
-        <div class="vh-feat"><div class="vh-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></div><div class="vh-feat-name">Analytics Dashboard</div><a href="#" class="vh-feat-link">View Analytics →</a></div>
+        <div class="vh-feat"><div class="vh-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><div class="vh-feat-name">Virtual Venue Builder</div></div>
+        <div class="vh-feat"><div class="vh-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="vh-feat-name">Engagement Tools</div></div>
+        <div class="vh-feat"><div class="vh-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div><div class="vh-feat-name">AI Stream Assistant</div></div>
+        <div class="vh-feat"><div class="vh-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></div><div class="vh-feat-name">Analytics Dashboard</div></div>
     </div>
 </div>{{-- /.vh-main --}}
 

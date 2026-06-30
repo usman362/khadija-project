@@ -233,7 +233,6 @@
                     <div class="th-consent">
                         <input type="checkbox" checked> <span>Include this chat's agreements in the final contract via AI.</span>
                         <span class="meta">(Requires consent from both parties. Currently: You ✓ | Client ✓ | Status: Waiting)</span>
-                        <a href="#">Learn more</a>
                     </div>
                 </div>
 
@@ -250,7 +249,6 @@
                                 </div>
                             @endforeach
                         </div>
-                        <a href="#" class="th-commit-all">View All Extracted Terms ({{ count($thread['commitments']) }})</a>
                     </div>
                 @endif
             @else
@@ -274,7 +272,7 @@
                 </div>
 
                 <div class="th-card" style="margin-bottom:16px;">
-                    <div class="th-side-h"><b>Shared Files</b><a href="#" class="th-link" style="margin:0;">View All</a></div>
+                    <div class="th-side-h"><b>Shared Files</b></div>
                     <div class="th-info">
                         @forelse($thread['files'] as $f)
                             <div class="th-file"><span class="th-file-ic" style="background:{{ $f['ext'] === 'PDF' ? '#dc2626' : '#059669' }};">{{ $f['ext'] }}</span><div class="th-file-mid"><div class="th-file-name">{{ $f['name'] }}</div><div class="th-file-meta">{{ $f['ext'] }} · {{ $f['size'] }}</div></div><span class="th-file-date">{{ $f['date'] }}</span></div>

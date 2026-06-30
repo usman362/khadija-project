@@ -201,7 +201,6 @@
                             <td style="padding-right:18px;">
                                 <div class="pr-actions-cell">
                                     <a href="{{ route('client.chat.index') }}" class="pr-act-btn" title="Message"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></a>
-                                    <a href="#" class="pr-act-btn" title="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></a>
                                     <a href="{{ $p->event ? route('client.events.show', $p->event) : '#' }}" class="pr-act-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></a>
                                 </div>
                             </td>

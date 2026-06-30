@@ -1,0 +1,123 @@
+@extends($aiLayout ?? 'layouts.client')
+
+@section('title', 'AI Checklist Generator')
+@section('page-title', 'AI Checklist Generator')
+@section('page-subtitle', 'Your prioritised plan, budget and vendor status in one place')
+
+{{-- AI Checklist Generator (client). Planning command-center: priorities,
+     budget summary, vendor status, AI recommendations. Representative data. --}}
+
+@push('styles')
+<style>
+    .cg { --cg: #16a34a; }
+    .cg-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 18px; }
+    .cg-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 16px; }
+    .cg-stat b { display: block; font-size: 23px; font-weight: 800; color: var(--text-primary); line-height: 1; } .cg-stat.good b { color: #16a34a; }
+    .cg-stat .l { font-size: 11.5px; color: var(--text-muted); margin-top: 6px; }
+
+    .cg-grid { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 18px; align-items: start; }
+    .cg-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-bottom: 18px; }
+    .cg-card-hd { padding: 14px 16px; border-bottom: 1px solid var(--border-color); font-size: 14.5px; font-weight: 800; color: var(--text-primary); }
+
+    .cg-task { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+    .cg-task:last-child { border-bottom: none; }
+    .cg-check { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--border-color); flex-shrink: 0; }
+    .cg-task.progress .cg-check { background: #f97316; border-color: #f97316; }
+    .cg-tname { flex: 1; min-width: 0; font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
+    .cg-pri { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 999px; }
+    .cg-pri.High { background: rgba(220,38,38,.12); color: #dc2626; } .cg-pri.Medium { background: rgba(217,119,6,.14); color: #d97706; } .cg-pri.Low { background: rgba(100,116,139,.14); color: #64748b; }
+    .cg-due { font-size: 11.5px; color: var(--text-muted); min-width: 60px; text-align: right; }
+
+    .cg-rec { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+    .cg-rec:last-child { border-bottom: none; }
+    .cg-rec-main { flex: 1; min-width: 0; } .cg-rec-main h5 { font-size: 13px; font-weight: 800; color: var(--text-primary); } .cg-rec-main p { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; line-height: 1.45; }
+    .cg-rbtn { font-size: 11.5px; font-weight: 800; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary); border-radius: 8px; padding: 7px 13px; cursor: pointer; white-space: nowrap; }
+
+    /* budget */
+    .cg-bud { padding: 16px; }
+    .cg-bud-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+    .cg-bud-top b { font-size: 22px; font-weight: 800; color: var(--text-primary); } .cg-bud-top span { font-size: 12px; color: var(--text-muted); }
+    .cg-bud-bar { height: 12px; border-radius: 999px; overflow: hidden; display: flex; margin-bottom: 14px; }
+    .cg-bud-bar > i { height: 100%; }
+    .cg-line { display: flex; align-items: center; gap: 9px; padding: 6px 0; font-size: 12.5px; border-bottom: 1px dashed var(--border-color); }
+    .cg-line:last-child { border-bottom: none; }
+    .cg-line i { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .cg-line .nm { flex: 1; color: var(--text-secondary); } .cg-line b { color: var(--text-primary); font-weight: 800; }
+
+    /* vendors */
+    .cg-vd { display: flex; align-items: center; gap: 10px; padding: 9px 16px; border-bottom: 1px solid var(--border-color); }
+    .cg-vd:last-child { border-bottom: none; }
+    .cg-vd-main { flex: 1; min-width: 0; } .cg-vd-main h6 { font-size: 12.5px; font-weight: 800; color: var(--text-primary); } .cg-vd-main span { font-size: 11px; color: var(--text-muted); }
+    .cg-vst { font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 999px; }
+    .cg-vst.Confirmed { background: rgba(22,163,74,.12); color: #15803d; } .cg-vst.Pending { background: rgba(217,119,6,.14); color: #d97706; } .cg-vst { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); }
+
+    @media (max-width: 1000px) { .cg-grid { grid-template-columns: minmax(0,1fr); } .cg-stats { grid-template-columns: repeat(2,1fr); } }
+</style>
+@endpush
+
+@section('content')
+@php $pct = round($budget['spent'] / $budget['total'] * 100); @endphp
+<div class="cg">
+    <div class="cg-stats">
+        @foreach($stats as [$lbl, $val, $tone])
+            <div class="cg-stat {{ $tone }}"><b>{{ $val }}</b><div class="l">{{ $lbl }}</div></div>
+        @endforeach
+    </div>
+
+    <div class="cg-grid">
+        <div>
+            {{-- Priorities --}}
+            <div class="cg-card">
+                <div class="cg-card-hd">🎯 Upcoming Priorities</div>
+                @foreach($priorities as [$task, $pri, $due, $status])
+                    <div class="cg-task {{ $status }}">
+                        <span class="cg-check"></span>
+                        <span class="cg-tname">{{ $task }}</span>
+                        <span class="cg-pri {{ $pri }}">{{ $pri }}</span>
+                        <span class="cg-due">{{ $due }}</span>
+                    </div>
+                @endforeach
+            </div>
+
+            {{-- AI recommendations --}}
+            <div class="cg-card">
+                <div class="cg-card-hd">🤖 AI Recommendations</div>
+                @foreach($recommendations as [$title, $desc, $cta])
+                    <div class="cg-rec">
+                        <div class="cg-rec-main"><h5>{{ $title }}</h5><p>{{ $desc }}</p></div>
+                        <button class="cg-rbtn">{{ $cta }}</button>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- Sidebar: budget + vendors --}}
+        <aside>
+            <div class="cg-card">
+                <div class="cg-card-hd">💰 Budget Summary</div>
+                <div class="cg-bud">
+                    <div class="cg-bud-top"><b>${{ number_format($budget['spent']) }}</b><span>of ${{ number_format($budget['total']) }} ({{ $pct }}%)</span></div>
+                    <div class="cg-bud-bar">
+                        @foreach($budget['lines'] as [$nm, $amt, $color])
+                            <i style="width: {{ round($amt/$budget['total']*100) }}%; background: {{ $color }};"></i>
+                        @endforeach
+                    </div>
+                    @foreach($budget['lines'] as [$nm, $amt, $color])
+                        <div class="cg-line"><i style="background: {{ $color }};"></i><span class="nm">{{ $nm }}</span><b>${{ number_format($amt) }}</b></div>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="cg-card">
+                <div class="cg-card-hd">🤝 Vendor Status</div>
+                @foreach($vendors as [$name, $cat, $status])
+                    <div class="cg-vd">
+                        <div class="cg-vd-main"><h6>{{ $name ?: 'Not booked yet' }}</h6><span>{{ $cat }}</span></div>
+                        <span class="cg-vst {{ $status === 'Confirmed' ? 'Confirmed' : ($status === 'Pending' ? 'Pending' : '') }}">{{ $status }}</span>
+                    </div>
+                @endforeach
+            </div>
+        </aside>
+    </div>
+</div>
+@endsection

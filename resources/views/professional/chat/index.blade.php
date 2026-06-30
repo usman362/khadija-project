@@ -256,7 +256,7 @@
                         </div>
                         <div class="pm-c-foot">
                             <label><input type="checkbox"> Internal only (not sent to client)</label>
-                            <a href="#" style="color:var(--pm);font-weight:700;text-decoration:none;">Manage Email Notifications</a>
+                            <a href="{{ route('professional.notifications.index') }}" style="color:var(--pm);font-weight:700;text-decoration:none;">Manage Email Notifications</a>
                         </div>
                     </form>
                 </div>

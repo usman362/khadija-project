@@ -73,12 +73,17 @@ class ClientEventController extends Controller
             'rescheduled'  => 0, // no schema flag yet
         ];
 
-        // Payment summary (paid / pending / overdue split of total spent).
+        // Payment summary — real split from booking status (paid = completed,
+        // pending = upcoming unpaid, overdue = unpaid past its event date).
+        $paid        = $totalSpent;
+        $unpaidTotal = $priceCol ? (float) (clone $bookingBase)->whereIn('status', ['requested', 'confirmed'])->sum($priceCol) : 0;
+        $overdue     = $priceCol ? (float) (clone $bookingBase)->whereIn('status', ['requested', 'confirmed'])
+            ->whereHas('event', fn ($q) => $q->where('starts_at', '<', now()))->sum($priceCol) : 0;
         $payment = [
-            'total'   => $totalSpent,
-            'paid'    => round($totalSpent * 0.77),
-            'pending' => round($totalSpent * 0.17),
-            'overdue' => round($totalSpent * 0.06),
+            'total'   => $paid + $unpaidTotal,
+            'paid'    => $paid,
+            'pending' => max(0, $unpaidTotal - $overdue),
+            'overdue' => $overdue,
         ];
 
         // Upcoming deadlines — events starting within the next 14 days.
@@ -103,6 +108,16 @@ class ClientEventController extends Controller
             'events', 'stats', 'calendarEvents', 'categories', 'month', 'year',
             'totalSpent', 'proStatus', 'payment', 'deadlines'
         ));
+    }
+
+    /** Flash-card "Create a Gig" wizard — one question per screen. */
+    public function create(Request $request): View
+    {
+        $this->authorize('create', Event::class);
+
+        $categories = Category::active()->orderBy('sort_order')->orderBy('name')->get(['id', 'name', 'icon']);
+
+        return view('client.events.create', compact('categories'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -155,7 +170,11 @@ class ClientEventController extends Controller
             'messages.sender:id,name',
         ]);
 
-        return view('client.events.show', compact('event'));
+        // Categories for the edit form + ids of the ones already attached.
+        $categories = Category::active()->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
+        $selectedCategoryIds = $event->categories->pluck('id')->all();
+
+        return view('client.events.show', compact('event', 'categories', 'selectedCategoryIds'));
     }
 
     public function update(Request $request, Event $event): RedirectResponse

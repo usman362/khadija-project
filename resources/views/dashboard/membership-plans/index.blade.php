@@ -1,6 +1,8 @@
-@extends('layouts.dashboard')
+@extends($portalLayout ?? 'layouts.dashboard')
 
 @section('title', 'Membership Plans')
+@section('page-title', 'Membership Plans')
+@section('page-subtitle', 'Choose the plan that fits your business')
 
 @section('content')
 <style>
@@ -22,7 +24,7 @@
         --mp-current-text: #198754;
     }
 
-    [data-bs-theme="dark"] {
+    [data-bs-theme="dark"], [data-theme="dark"] {
         --mp-bg: #0c1427;
         --mp-card-bg: #111a2e;
         --mp-card-border: #1e2d4a;
@@ -278,20 +280,46 @@
             padding: 1rem;
         }
     }
+
+    /* Suite + opportunity comparison tables */
+    .mp-compare { max-width: 1000px; margin: 0 auto 1.5rem; padding: 0 1.5rem; }
+    .mp-compare h3 { color: var(--mp-text); font-weight: 700; font-size: 1.15rem; margin: 1.5rem 0 0.4rem; display: flex; align-items: center; gap: 8px; }
+    .mp-compare p.sub { color: var(--mp-text-muted); font-size: 0.9rem; margin-bottom: 1rem; }
+    .mp-ctable { width: 100%; border-collapse: collapse; background: var(--mp-card-bg); border: 1px solid var(--mp-card-border); border-radius: 14px; overflow: hidden; }
+    .mp-ctable th, .mp-ctable td { padding: 12px 16px; text-align: center; border-bottom: 1px solid var(--mp-divider); font-size: 0.9rem; color: var(--mp-text); }
+    .mp-ctable thead th { background: rgba(99,102,241,0.06); font-weight: 800; }
+    .mp-ctable th:first-child, .mp-ctable td:first-child { text-align: left; color: var(--mp-text); font-weight: 600; }
+    .mp-ctable tr:last-child td { border-bottom: none; }
+    .mp-ctable .yes { color: var(--mp-feature-icon); font-weight: 800; }
+    .mp-ctable .no { color: var(--mp-text-muted); }
+    .mp-ctable .partial { color: #d97706; font-weight: 700; font-size: 0.8rem; }
+    .mp-ctable .imm { color: var(--mp-feature-icon); font-weight: 800; font-size: 0.8rem; }
+    @media (max-width: 640px) { .mp-ctable th, .mp-ctable td { padding: 9px 8px; font-size: 0.78rem; } }
+
+    /* Self-contained styles so the page renders in any portal (no Bootstrap dep) */
+    .mp-alert { max-width: 1000px; margin: 1rem auto 0; padding: 12px 16px; border-radius: 10px; font-size: 0.9rem; }
+    .mp-alert-ok { background: rgba(22,163,74,.12); color: var(--mp-feature-icon); border: 1px solid rgba(22,163,74,.3); }
+    .mp-alert-err { background: rgba(220,38,38,.1); color: var(--mp-feature-excluded); border: 1px solid rgba(220,38,38,.3); }
+    .mp-subscription-info .card { background: var(--mp-card-bg); border: 1px solid var(--mp-card-border); border-radius: 14px; }
+    .mp-subscription-info .card-body { padding: 16px 18px; }
+    .mp-mini-btn { display: inline-flex; align-items: center; font-size: 0.82rem; font-weight: 700; padding: 7px 14px; border-radius: 9px; text-decoration: none; cursor: pointer; border: 1.5px solid var(--mp-card-border); background: transparent; color: var(--mp-text); }
+    .mp-mini-btn:hover { border-color: #6366f1; color: #6366f1; }
+    .mp-mini-btn.danger { border-color: rgba(220,38,38,.4); color: var(--mp-feature-excluded); }
+    .mp-mini-btn.danger:hover { background: rgba(220,38,38,.08); }
 </style>
 
 @if(session('status'))
-    <div class="alert alert-success mx-3 mt-3">{{ session('status') }}</div>
+    <div class="mp-alert mp-alert-ok">{{ session('status') }}</div>
 @endif
 
 @if(session('error'))
-    <div class="alert alert-danger mx-3 mt-3">{{ session('error') }}</div>
+    <div class="mp-alert mp-alert-err">{{ session('error') }}</div>
 @endif
 
 <div class="mp-page">
     <div class="mp-header">
-        <h2>Choose Your Plan</h2>
-        <p>Select the perfect membership plan that fits your needs. Upgrade or downgrade anytime.</p>
+        <h2>Memberships built around what you actually want</h2>
+        <p>More visibility · more opportunities · more AI · more revenue · more trust. Powered by <strong>GigResource IQ™</strong>. Upgrade or downgrade anytime.</p>
     </div>
 
     <div class="mp-grid">
@@ -301,7 +329,7 @@
             @endphp
             <div class="mp-card {{ $plan->is_featured ? 'featured' : '' }} {{ $isCurrentPlan ? 'current-plan' : '' }}">
                 @if($plan->badge_text)
-                    <span class="mp-badge bg-{{ $plan->badge_color ?? 'primary' }} text-white">
+                    <span class="mp-badge" style="background: {{ $plan->badge_color === 'success' ? '#16a34a' : '#6366f1' }}; color: #fff;">
                         {{ $plan->badge_text }}
                     </span>
                 @endif
@@ -392,6 +420,40 @@
         @endforeach
     </div>
 
+    {{-- ── GigResource IQ™ Suite comparison (by suite, not individual tools) ── --}}
+    <div class="mp-compare">
+        <h3>🤖 GigResource IQ™ — AI by Suite</h3>
+        <p class="sub">You receive whole <strong>suites</strong>, not a list of tools — and any future AI added to a suite is included automatically.</p>
+        <table class="mp-ctable">
+            <thead><tr><th>AI Suite</th><th>Starter</th><th>Professional</th><th>Elite</th></tr></thead>
+            <tbody>
+                <tr><td>🎯 Planning Suite</td><td class="partial">Basic</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+                <tr><td>🤝 Marketplace Suite</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+                <tr><td>💼 Business Suite</td><td class="no">—</td><td class="partial">Limited</td><td class="yes">✓</td></tr>
+                <tr><td>📄 Operations Suite</td><td class="no">—</td><td class="partial">Proposal tools</td><td class="yes">✓</td></tr>
+                <tr><td>🚀 Automation Suite</td><td class="no">—</td><td class="no">—</td><td class="partial">Coming soon</td></tr>
+                <tr><td>Future AI upgrades included</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+                <tr><td>AI assistance level</td><td class="partial">Manual</td><td class="partial">Manual + Semi</td><td class="imm">Manual + Semi + Max</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    {{-- ── Opportunity early-access (the competitive edge) ── --}}
+    <div class="mp-compare">
+        <h3>⚡ Opportunity Access</h3>
+        <p class="sub">Higher tiers see new requests first — a head start competitors like Upwork &amp; Fiverr don’t offer.</p>
+        <table class="mp-ctable">
+            <thead><tr><th>Opportunity</th><th>Starter</th><th>Professional</th><th>Elite</th></tr></thead>
+            <tbody>
+                <tr><td>Standard opportunities</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+                <tr><td>Early access — new SSRs</td><td class="no">—</td><td class="partial">After 60 min</td><td class="imm">Immediate</td></tr>
+                <tr><td>Early access — new MSRs</td><td class="no">—</td><td class="partial">After 60 min</td><td class="imm">Immediate</td></tr>
+                <tr><td>Early access — new ESRs</td><td class="no">—</td><td class="partial">After 60 min</td><td class="imm">Immediate</td></tr>
+                <tr><td>Featured &amp; premium opportunities</td><td class="no">—</td><td class="partial">Limited</td><td class="yes">Full</td></tr>
+            </tbody>
+        </table>
+    </div>
+
     @if($activeSubscription)
         <div class="mp-subscription-info">
             <div class="card">
@@ -407,12 +469,12 @@
                             </span>
                         </div>
                         <div class="d-flex gap-2">
-                            <a href="{{ route('app.membership-plans.history') }}" class="btn btn-sm btn-outline-secondary">
+                            <a href="{{ route('app.membership-plans.history') }}" class="mp-mini-btn">
                                 Subscription History
                             </a>
                             <form method="POST" action="{{ route('app.membership-plans.cancel') }}" class="d-inline" id="cancelSubForm">
                                 @csrf
-                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                <button type="button" class="mp-mini-btn danger"
                                     data-mp-cancel>
                                     Cancel Plan
                                 </button>

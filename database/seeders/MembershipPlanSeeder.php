@@ -9,6 +9,10 @@ class MembershipPlanSeeder extends Seeder
 {
     public function run(): void
     {
+        // Memberships sell the SIX value areas (visibility, opportunities, AI,
+        // revenue, trust, automation) — not just limits — and present AI as
+        // branded GigResource IQ™ suites rather than individual tools
+        // (Peter / ChatGPT membership restructure).
         $plans = [
             [
                 'name' => 'Starter',
@@ -16,7 +20,7 @@ class MembershipPlanSeeder extends Seeder
                 // Priced at $1 (not free) on purpose — a nominal card charge is
                 // enough friction to discourage throwaway / fraudulent accounts
                 // while staying effectively free for real users.
-                'description' => 'Get started for just $1 — full access to core features for 6 months.',
+                'description' => 'Perfect for new professionals building their business.',
                 'price' => 1,
                 'billing_cycle' => '6_month',
                 'duration_days' => 180,
@@ -30,12 +34,19 @@ class MembershipPlanSeeder extends Seeder
                 'badge_text' => null,
                 'badge_color' => null,
                 'features' => [
-                    'Up to 3 events',
-                    'Up to 5 bookings',
-                    'Basic chat support',
-                    'Email notifications',
-                    'Standard templates',
-                    // AI tools (Developer Feedback v1.1 §8.3). Higher tiers unlock more.
+                    'Marketplace access',
+                    'Up to 3 active events',
+                    'Up to 5 active bookings',
+                    'Up to 2 service categories',
+                    'Standard marketplace visibility',
+                    'Standard proposal templates',
+                    'Unlimited event bookmarks',
+                    'Custom cover photo · basic profile',
+                    'Email notifications · basic chat support',
+                    'GigResource IQ™ Planning Suite (manual helpers only)',
+                    'Accept deposits up to $500',
+                    'Follow up to 5 clients',
+                    // AI gating (AiFeatureGate) — Starter = manual assistance only.
                     ['feature' => 'AI Review Writer (10 / month)', 'feature_code' => 'ai.review_writer', 'quota_monthly' => 10],
                     ['feature' => 'AI Budget Allocator', 'feature_code' => 'ai.budget_allocator', 'is_included' => false],
                     ['feature' => 'AI Vendor Matchmaking', 'feature_code' => 'ai.vendor_matchmaking', 'is_included' => false],
@@ -44,10 +55,10 @@ class MembershipPlanSeeder extends Seeder
             [
                 'name' => 'Professional',
                 'slug' => 'professional',
-                'description' => 'Ideal for growing businesses — 12-month partnership.',
-                'price' => 299.99,
-                'billing_cycle' => '12_month',
-                'duration_days' => 365,
+                'description' => 'For growing event businesses.',
+                'price' => 29.99,
+                'billing_cycle' => '6_month',
+                'duration_days' => 180,
                 'max_events' => 25,
                 'max_bookings' => 50,
                 'has_chat' => true,
@@ -58,26 +69,34 @@ class MembershipPlanSeeder extends Seeder
                 'badge_text' => 'Most Popular',
                 'badge_color' => 'primary',
                 'features' => [
-                    'Up to 25 events',
-                    'Up to 50 bookings',
-                    'Full chat with attachments',
+                    'Up to 25 active events',
+                    'Up to 50 active bookings',
+                    'Up to 20 service categories',
+                    'High marketplace visibility · priority search placement',
+                    'Access to client phone numbers',
+                    'Sealed gigs · Verified Professional badge',
+                    'Full chat with file attachments',
                     'Email & SMS notifications',
-                    'Custom templates',
-                    'Analytics dashboard',
-                    'Export reports',
-                    // AI tools (Developer Feedback v1.1 §8.3).
+                    'Analytics dashboard · export reports',
+                    'Booking statistics · bid insights',
+                    'GigResource IQ™ Business Suite (Manual + Semi-Assisted AI)',
+                    'Early access to new SSRs / MSRs / ESRs (after 60 min)',
+                    'Accept deposits up to $1,000',
+                    '20 client followings · video & audio samples',
+                    'Unlock marketplace rewards',
+                    // AI gating — Professional = Manual + Semi-Assisted.
                     ['feature' => 'AI Review Writer (unlimited)', 'feature_code' => 'ai.review_writer', 'quota_monthly' => 0],
                     ['feature' => 'AI Budget Allocator (30 / month)', 'feature_code' => 'ai.budget_allocator', 'quota_monthly' => 30],
                     ['feature' => 'AI Vendor Matchmaking (30 / month)', 'feature_code' => 'ai.vendor_matchmaking', 'quota_monthly' => 30],
                 ],
             ],
             [
-                'name' => 'Enterprise',
+                'name' => 'Elite',
                 'slug' => 'enterprise',
-                'description' => 'For large organizations — 18-month commitment with unlimited access.',
-                'price' => 1499.99,
-                'billing_cycle' => '18_month',
-                'duration_days' => 540,
+                'description' => 'Built for high-performing professionals & agencies.',
+                'price' => 99.99,
+                'billing_cycle' => '6_month',
+                'duration_days' => 180,
                 'max_events' => null,
                 'max_bookings' => null,
                 'has_chat' => true,
@@ -88,17 +107,21 @@ class MembershipPlanSeeder extends Seeder
                 'badge_text' => 'Best Value',
                 'badge_color' => 'success',
                 'features' => [
-                    'Unlimited events',
-                    'Unlimited bookings',
-                    'Full chat with attachments',
-                    'Priority support',
-                    'Email, SMS & push notifications',
-                    'Custom templates & branding',
-                    'Advanced analytics',
-                    'Export reports (PDF, Excel)',
-                    'API access',
-                    'Dedicated account manager',
-                    // AI tools (Developer Feedback v1.1 §8.3) — full unlimited suite.
+                    'Unlimited events, bookings & categories',
+                    'Highest marketplace visibility · premium search placement',
+                    'High-value event access & bidding',
+                    'Sealed gigs · Verified Professional badge',
+                    'Immediate early access to new SSRs / MSRs / ESRs',
+                    'Advanced analytics · booking conversion reports',
+                    'Invoice & payment tracking · client engagement analytics',
+                    'Export PDF & Excel · API access',
+                    'Full chat, email, SMS & push notifications',
+                    'Live support · dedicated account manager',
+                    'GigResource IQ™ Complete Suite (Manual + Semi + Maximum AI)',
+                    'Accept deposits up to $2,000',
+                    'Unlimited client followings · call button on bid cards',
+                    'Custom branding',
+                    // AI gating — Elite = full unlimited suite.
                     ['feature' => 'AI Review Writer (unlimited)', 'feature_code' => 'ai.review_writer', 'quota_monthly' => 0],
                     ['feature' => 'AI Budget Allocator (unlimited)', 'feature_code' => 'ai.budget_allocator', 'quota_monthly' => 0],
                     ['feature' => 'AI Vendor Matchmaking (unlimited)', 'feature_code' => 'ai.vendor_matchmaking', 'quota_monthly' => 0],

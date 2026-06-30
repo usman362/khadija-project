@@ -723,7 +723,6 @@
     <div class="od-card od-a-badges">
         <div class="od-card-head">
             <span class="od-card-title">Client Special Badges</span>
-            <a href="#" class="od-card-link">View All Badges</a>
         </div>
         <div class="od-badges">
             <div class="od-badge b-fast">
@@ -906,7 +905,6 @@
     <div class="od-card">
         <div class="od-card-head">
             <span class="od-card-title">My To-Do List</span>
-            <a href="#" class="od-card-link">+ New Task</a>
         </div>
         @php
             /* Event-planning checklist. Static demo content matching the
@@ -934,7 +932,6 @@
                 </div>
             @endforeach
         </div>
-        <a href="#" class="od-card-link" style="display:inline-flex;align-items:center;gap:4px;margin-top:12px;">View All Tasks <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
     </div>
 
     <div class="od-card">
@@ -976,7 +973,6 @@
                 @endforeach
             </tbody>
         </table>
-        <a href="#" class="od-card-link" style="display:inline-flex;align-items:center;gap:4px;margin-top:12px;">View All Attendees <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
     </div>
 
     {{-- Your Achievements --}}
@@ -987,13 +983,11 @@
         <div class="od-ach-circle">15</div>
         <div class="od-ach-label">Badges Earned</div>
         <div class="od-ach-encouragement">Keep going! You're doing great.</div>
-        <a href="#" class="od-profile-cta" style="margin: 0 auto;">View All Badges</a>
     </div>
 
     <div class="od-card">
         <div class="od-card-head">
             <span class="od-card-title">Recent Activity</span>
-            <a href="#" class="od-card-link">View All</a>
         </div>
         @if($activity->count())
             <div class="od-activity">

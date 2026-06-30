@@ -560,7 +560,7 @@
         {{-- Recent Activity + Quick Actions --}}
         <div class="mg-row2">
             <div class="mg-card">
-                <div class="mg-rail-head"><div class="mg-rail-title">Recent Professional Activity</div><a href="#" style="font-size:11px;color:#f97316;text-decoration:none;font-weight:600;">View All</a></div>
+                <div class="mg-rail-head"><div class="mg-rail-title">Recent Professional Activity</div></div>
                 @forelse($events->take(3) as $ev)
                     <div class="mg-act-row">
                         <div class="mg-act-dot green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
@@ -865,7 +865,6 @@
             <div class="mg-pstat-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Not Scheduled</span><span class="val">{{ $proStatus['not_scheduled'] }}</span></div>
             <div class="mg-pstat-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Cancelled</span><span class="val">{{ $proStatus['cancelled'] }}</span></div>
             <div class="mg-pstat-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Rescheduled</span><span class="val">{{ $proStatus['rescheduled'] }}</span></div>
-            <a href="#" class="mg-rail-link">View All <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         </div>
 
         {{-- Payment Summary --}}
@@ -883,7 +882,7 @@
 
         {{-- Upcoming Deadlines --}}
         <div class="mg-rail-card">
-            <div class="mg-rail-head"><div class="mg-rail-title">Upcoming Deadlines</div><a href="#" style="font-size:11px;color:#f97316;text-decoration:none;font-weight:600;">View All</a></div>
+            <div class="mg-rail-head"><div class="mg-rail-title">Upcoming Deadlines</div></div>
             @forelse($deadlines as $dl)
                 @php $daysLeft = (int) ceil(now()->diffInHours($dl->starts_at, false) / 24); @endphp
                 <div class="mg-dl-row">

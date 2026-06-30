@@ -91,6 +91,8 @@ class AiStaffingPlannerController extends Controller
             'roles'      => $plan['roles'],
             'axis'       => $plan['axis'],
             'stats'      => $plan['stats'],
+            // Professional-facing tool → professional shell for suppliers.
+            'aiLayout'   => $request->user()?->hasRole('supplier') ? 'layouts.professional' : 'layouts.client',
         ]);
     }
 

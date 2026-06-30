@@ -1,1332 +1,544 @@
-@extends('layouts.public')
+@extends('layouts.landing')
 
 @php
-    $seoTitle       = 'Browse Event Professionals';
-    $seoDescription = 'Browse verified event professionals — photographers, caterers, DJs, planners, venues. Filter by category, city, and rating. Read reviews. Book with confidence.';
+    use Illuminate\Support\Str;
+
+    $seoTitle       = 'Browse Event Professionals | GigResource';
+    $seoDescription = 'Find verified event professionals — DJs, photographers, caterers, planners, venues. Filter by category, city, rating and budget. Read real reviews and book with confidence.';
+
+    $f       = $filters ?? [];
+    $kw      = $f['q'] ?? '';
+    $cityF   = $f['city'] ?? '';
+    $ratingF = (float) ($f['rating_min'] ?? 0);
+    $verF    = !empty($f['verified']);
+    $sortF   = $f['sort'] ?? 'top';
+    $total   = method_exists($pros, 'total') ? $pros->total() : $pros->count();
+
+    // Trending "vibe" presets — each pre-populates the keyword search.
+    $vibes = [
+        ['Luxury Weddings',  'Fine dining, string quartets, drone photo',   'photo-1519741497674-611481863552', 'wedding'],
+        ['Corporate Tech',   'Conference A/V, livestreaming, planners',     'photo-1505373877841-8d25f7d46678', 'corporate'],
+        ['Neon Birthdays',   'Party DJs, photo booths, balloon backdrops',  'photo-1530103862676-de8c9debad1d', 'birthday'],
+        ['Boho Baby Showers','Themed decor, pastry chefs, lifestyle photo', 'photo-1515488042361-ee00e0ddd4e4', 'baby shower'],
+        ['Destination Events','Travel planners, local vendors, decor',      'photo-1469371670807-013ccf25f16a', 'destination'],
+        ['Holiday Parties',  'Catering, DJs, lighting & entertainment',     'photo-1511578314322-379afb476865', 'holiday'],
+    ];
+
+    // Representative gallery fallbacks (used when a pro has no portfolio images).
+    $stockGallery = [
+        'photo-1519741497674-611481863552','photo-1465495976277-4387d4b0b4c6',
+        'photo-1511578314322-379afb476865','photo-1511578314322-379afb476865',
+    ];
 @endphp
-
-@push('styles')
-<style>
-    /* ─────────────────────────────────────────────────────────────
-       BROWSE PROFESSIONALS — advanced marketplace UI.
-       Layered hero banner · category chip rail · active-filter pills ·
-       grid/list view toggle · richer cards · collapsible sidebar.
-       ───────────────────────────────────────────────────────────── */
-
-    /* ─── HERO BANNER ─── */
-    .browse-hero {
-        position: relative;
-        padding: 180px 0 70px;
-        overflow: hidden;
-    }
-    /* Photographic cover image behind the hero. Dimmed + gradient
-       overlaid so the search bar and headline remain perfectly legible
-       against any image. */
-    .browse-hero-bg {
-        position: absolute; inset: 0; z-index: 0;
-    }
-    .browse-hero-bg img {
-        width: 100%; height: 100%;
-        object-fit: cover;
-        /* Image shows clearly — only a soft bottom fade keeps the lower
-           edge readable against the rest of the page. */
-        opacity: 1;
-    }
-    .browse-hero-bg::after {
-        content: '';
-        position: absolute; inset: 0;
-        background:
-            radial-gradient(900px 420px at 18% 10%, rgba(59,130,246,0.10), transparent 55%),
-            radial-gradient(800px 400px at 85% 0%, rgba(139,92,246,0.10), transparent 55%),
-            linear-gradient(180deg, rgba(11,15,26,0.55) 0%, rgba(11,15,26,0.75) 65%, var(--bg-dark) 100%);
-    }
-    .browse-hero .container { position: relative; z-index: 1; }
-    .browse-eyebrow {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 6px 16px; border-radius: 999px;
-        background: rgba(139,92,246,0.14);
-        border: 1px solid rgba(139,92,246,0.32);
-        font-size: 11px; font-weight: 800; letter-spacing: 1.2px;
-        text-transform: uppercase; color: #c4b5fd;
-        margin-bottom: 18px;
-    }
-    .browse-eyebrow .dot {
-        width: 6px; height: 6px; border-radius: 50%;
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        box-shadow: 0 0 8px rgba(139,92,246,0.6);
-    }
-    .browse-hero h1 {
-        font-size: 3rem; font-weight: 900;
-        letter-spacing: -0.02em; line-height: 1.1;
-        margin-bottom: 14px;
-    }
-    .browse-hero h1 .gradient-text {
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    .browse-hero p.lede {
-        color: var(--text-muted);
-        font-size: 1.05rem;
-        max-width: 640px;
-        line-height: 1.6;
-        margin-bottom: 30px;
-    }
-    @media (max-width: 700px) {
-        .browse-hero { padding: 140px 0 50px; }
-        .browse-hero h1 { font-size: 2rem; }
-        .browse-hero p.lede { font-size: 0.95rem; }
-    }
-
-    /* ─── BIG SEARCH BAR (in hero) ─── */
-    .browse-mega-search {
-        max-width: 720px;
-        background: rgba(8, 12, 22, 0.7);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        border: 1px solid rgba(255,255,255,0.10);
-        border-radius: 18px;
-        padding: 8px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        box-shadow: 0 30px 70px rgba(0,0,0,0.35);
-    }
-    .browse-mega-search .search-field {
-        flex: 1;
-        position: relative;
-        display: flex; align-items: center;
-        padding: 0 14px;
-    }
-    .browse-mega-search .search-field svg {
-        width: 18px; height: 18px;
-        color: var(--text-muted);
-        flex-shrink: 0;
-        margin-right: 10px;
-    }
-    .browse-mega-search input {
-        flex: 1;
-        padding: 14px 0;
-        background: transparent;
-        border: none;
-        outline: none;
-        color: #fff;
-        font-family: inherit;
-        font-size: 0.98rem;
-    }
-    .browse-mega-search input::placeholder { color: var(--text-muted); }
-    .browse-mega-search .search-divider {
-        width: 1px; height: 32px;
-        background: rgba(255,255,255,0.10);
-        flex-shrink: 0;
-    }
-    .browse-mega-search .city-select {
-        padding: 12px 36px 12px 14px;
-        background: transparent
-            url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c8cdd8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>")
-            right 12px center/14px 14px no-repeat;
-        border: none;
-        color: #fff;
-        font-family: inherit;
-        font-size: 0.92rem;
-        font-weight: 600;
-        appearance: none;
-        -webkit-appearance: none;
-        cursor: pointer;
-        outline: none;
-        max-width: 180px;
-    }
-    .browse-mega-search .city-select option { background: #0f1529; color: #fff; }
-    .browse-mega-search .submit-btn {
-        padding: 13px 22px;
-        border-radius: 12px;
-        border: none;
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        color: #fff;
-        font-family: inherit;
-        font-size: 0.95rem;
-        font-weight: 700;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 8px 22px rgba(139,92,246,0.40);
-        transition: transform 0.2s, opacity 0.2s;
-    }
-    .browse-mega-search .submit-btn:hover { transform: translateY(-1px); opacity: 0.95; }
-    @media (max-width: 700px) {
-        .browse-mega-search { flex-direction: column; align-items: stretch; padding: 8px; gap: 6px; }
-        .browse-mega-search .search-divider { display: none; }
-        .browse-mega-search .city-select { max-width: none; padding: 12px 36px 12px 14px; border-top: 1px solid rgba(255,255,255,0.08); }
-        .browse-mega-search .submit-btn { width: 100%; justify-content: center; padding: 14px; }
-    }
-
-    /* ─── HERO QUICK STATS ─── */
-    .browse-quickstats {
-        display: flex; flex-wrap: wrap; gap: 24px;
-        margin-top: 22px;
-        font-size: 13px; color: var(--text-muted);
-    }
-    .browse-quickstats .qs {
-        display: inline-flex; align-items: center; gap: 8px;
-    }
-    .browse-quickstats .qs strong {
-        color: #fff; font-weight: 800;
-    }
-    .browse-quickstats svg { width: 14px; height: 14px; opacity: 0.7; }
-
-    /* ─── CATEGORY CHIP RAIL ─── */
-    .browse-cat-rail-wrap {
-        position: relative;
-        background: rgba(255,255,255,0.025);
-        border-top: 1px solid rgba(255,255,255,0.06);
-        border-bottom: 1px solid rgba(255,255,255,0.06);
-        margin-bottom: 32px;
-    }
-    .browse-cat-rail {
-        display: flex; align-items: center; gap: 10px;
-        overflow-x: auto;
-        padding: 16px 0;
-        scrollbar-width: none;
-    }
-    .browse-cat-rail::-webkit-scrollbar { display: none; }
-    .browse-cat-chip {
-        flex: 0 0 auto;
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 9px 16px;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.10);
-        border-radius: 999px;
-        color: var(--text-light);
-        font-size: 13px; font-weight: 700;
-        text-decoration: none;
-        white-space: nowrap;
-        transition: all 0.2s;
-    }
-    .browse-cat-chip:hover {
-        background: rgba(139,92,246,0.10);
-        border-color: rgba(139,92,246,0.40);
-        color: #fff;
-        transform: translateY(-1px);
-    }
-    .browse-cat-chip.is-active {
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        border-color: transparent;
-        color: #fff;
-        box-shadow: 0 6px 16px rgba(139,92,246,0.35);
-    }
-
-    /* ─── ACTIVE FILTER PILLS ─── */
-    .browse-active-filters {
-        display: flex; flex-wrap: wrap; align-items: center;
-        gap: 8px; margin-bottom: 22px;
-    }
-    .browse-active-filters .label {
-        font-size: 12px; font-weight: 700;
-        color: var(--text-muted);
-        text-transform: uppercase; letter-spacing: 0.6px;
-        margin-right: 6px;
-    }
-    .browse-filter-pill {
-        display: inline-flex; align-items: center; gap: 6px;
-        padding: 6px 8px 6px 14px;
-        background: rgba(139,92,246,0.10);
-        border: 1px solid rgba(139,92,246,0.30);
-        border-radius: 999px;
-        color: #fff; font-size: 12.5px; font-weight: 700;
-        text-decoration: none;
-    }
-    .browse-filter-pill .x {
-        display: flex; align-items: center; justify-content: center;
-        width: 18px; height: 18px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.10);
-        font-size: 12px; line-height: 1;
-        cursor: pointer;
-    }
-    .browse-filter-pill .x:hover { background: rgba(255,255,255,0.20); }
-    .browse-filter-pill.clear-all {
-        background: transparent;
-        border-color: rgba(239,68,68,0.30);
-        color: #fca5a5;
-    }
-    .browse-filter-pill.clear-all:hover { background: rgba(239,68,68,0.10); }
-
-    /* ─── TOOLBAR (results count + sort + view toggle) ─── */
-    .browse-toolbar {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 14px;
-        margin-bottom: 22px;
-        padding: 14px 18px;
-        background: rgba(255,255,255,0.025);
-        border: 1px solid rgba(255,255,255,0.06);
-        border-radius: 14px;
-    }
-    .browse-count {
-        font-size: 0.92rem;
-        color: var(--text-muted);
-    }
-    .browse-count strong { color: #fff; font-weight: 800; font-size: 1.05rem; }
-
-    .browse-toolbar-right {
-        display: flex; align-items: center;
-        gap: 12px;
-        margin-left: auto;
-        flex-wrap: wrap;
-    }
-    .browse-sort {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.88rem;
-        color: var(--text-muted);
-    }
-    .browse-sort select {
-        padding: 9px 32px 9px 12px;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.04)
-            url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c8cdd8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>")
-            right 10px center/12px 12px no-repeat;
-        border: 1px solid rgba(255, 255, 255, 0.10);
-        color: #fff;
-        font-family: inherit;
-        font-size: 0.88rem;
-        font-weight: 600;
-        appearance: none;
-        -webkit-appearance: none;
-        cursor: pointer;
-    }
-    .browse-sort select:focus { outline: none; border-color: rgba(139,92,246,0.45); }
-    .browse-sort select option { background: #0f1529; }
-
-    .view-toggle {
-        display: inline-flex;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.10);
-        border-radius: 10px;
-        padding: 3px;
-    }
-    .view-toggle button {
-        padding: 7px 10px;
-        background: transparent;
-        border: none;
-        border-radius: 7px;
-        color: var(--text-muted);
-        cursor: pointer;
-        transition: all 0.2s;
-        display: inline-flex; align-items: center; justify-content: center;
-    }
-    .view-toggle button.is-active {
-        background: rgba(139,92,246,0.20);
-        color: #fff;
-    }
-    .view-toggle button:hover { color: #fff; }
-    .view-toggle svg { width: 16px; height: 16px; }
-
-    .filters-mobile-trigger {
-        display: none;
-        padding: 9px 16px;
-        background: rgba(139,92,246,0.10);
-        border: 1px solid rgba(139,92,246,0.30);
-        border-radius: 10px;
-        color: #fff;
-        font-family: inherit;
-        font-size: 0.88rem;
-        font-weight: 700;
-        cursor: pointer;
-        align-items: center;
-        gap: 8px;
-    }
-    .filters-mobile-trigger svg { width: 14px; height: 14px; }
-    @media (max-width: 960px) { .filters-mobile-trigger { display: inline-flex; } }
-
-    /* ─── LAYOUT: SIDEBAR + GRID ─── */
-    .browse-layout {
-        display: grid;
-        grid-template-columns: 280px 1fr;
-        gap: 28px;
-        padding-bottom: 100px;
-    }
-    @media (max-width: 960px) {
-        .browse-layout { grid-template-columns: 1fr; gap: 20px; }
-    }
-
-    /* ─── SIDEBAR FILTERS ─── */
-    .browse-filters {
-        position: sticky;
-        top: 110px;
-        align-self: start;
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 18px;
-        padding: 0;
-        max-height: calc(100vh - 130px);
-        overflow-y: auto;
-        backdrop-filter: blur(8px);
-    }
-    /* Mobile drawer backdrop. Hidden by default at every viewport
-       so it never claims a slot in the desktop grid layout. */
-    .browse-filters-backdrop { display: none; }
-    @media (max-width: 960px) {
-        .browse-filters {
-            position: fixed; top: 0; left: 0;
-            width: 86%; max-width: 360px; height: 100vh;
-            max-height: 100vh;
-            border-radius: 0 18px 18px 0;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
-        }
-        .browse-filters.is-open { transform: translateX(0); }
-        .browse-filters-backdrop.is-visible {
-            display: block;
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.65);
-            backdrop-filter: blur(4px);
-            z-index: 999;
-        }
-    }
-    .browse-filters-head {
-        padding: 18px 22px;
-        border-bottom: 1px solid rgba(255,255,255,0.06);
-        display: flex; align-items: center; justify-content: space-between;
-    }
-    .browse-filters-head h2 {
-        font-size: 0.95rem; font-weight: 800;
-        margin: 0; display: inline-flex; align-items: center; gap: 8px;
-    }
-    .browse-filters-head h2 svg { width: 16px; height: 16px; color: #a78bfa; }
-    .filters-mobile-close {
-        display: none;
-        background: transparent; border: none;
-        color: var(--text-muted); cursor: pointer;
-        padding: 6px;
-    }
-    @media (max-width: 960px) { .filters-mobile-close { display: inline-flex; } }
-
-    .browse-filters-body {
-        padding: 18px 22px 22px;
-    }
-
-    .filter-group + .filter-group {
-        margin-top: 22px;
-        padding-top: 22px;
-        border-top: 1px solid rgba(255,255,255,0.06);
-    }
-    .filter-group h3 {
-        font-size: 0.72rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1.4px;
-        color: var(--text-muted);
-        margin: 0 0 12px;
-        display: flex; align-items: center; justify-content: space-between;
-    }
-
-    .browse-filters label,
-    .browse-filters .filter-option {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 8px 10px;
-        font-size: 0.9rem;
-        color: var(--text-light);
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background 0.15s, color 0.15s;
-    }
-    .browse-filters label:hover,
-    .browse-filters .filter-option:hover {
-        background: rgba(255, 255, 255, 0.04);
-        color: #fff;
-    }
-    .browse-filters input[type="radio"],
-    .browse-filters input[type="checkbox"] {
-        appearance: none;
-        -webkit-appearance: none;
-        width: 16px; height: 16px;
-        border-radius: 50%;
-        border: 1.5px solid rgba(255, 255, 255, 0.25);
-        background: transparent;
-        cursor: pointer;
-        flex-shrink: 0;
-        position: relative;
-        transition: border-color 0.15s, background 0.15s;
-    }
-    .browse-filters input[type="checkbox"] { border-radius: 4px; }
-    .browse-filters input[type="radio"]:checked,
-    .browse-filters input[type="checkbox"]:checked {
-        border-color: var(--primary);
-        background: var(--primary);
-    }
-    .browse-filters input[type="radio"]:checked::after {
-        content: '';
-        position: absolute;
-        inset: 3px;
-        background: #fff;
-        border-radius: 50%;
-    }
-    .browse-filters input[type="checkbox"]:checked::after {
-        content: '✓';
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        font-size: 11px;
-        font-weight: 900;
-    }
-    .browse-filters select,
-    .browse-filters input[type="text"] {
-        width: 100%;
-        padding: 10px 14px;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.10);
-        border-radius: 10px;
-        color: #fff;
-        font-family: inherit;
-        font-size: 0.88rem;
-        outline: none;
-    }
-    .browse-filters select option { background: #0f1529; }
-    .browse-filters select:focus,
-    .browse-filters input[type="text"]:focus {
-        border-color: rgba(139, 92, 246, 0.45);
-    }
-    .filter-actions {
-        display: flex;
-        gap: 8px;
-        margin-top: 22px;
-    }
-    .btn-apply {
-        flex: 1;
-        padding: 11px;
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        color: #fff;
-        border: none;
-        border-radius: 10px;
-        font-weight: 700;
-        font-size: 0.88rem;
-        cursor: pointer;
-        transition: filter 0.2s, transform 0.2s;
-        font-family: inherit;
-    }
-    .btn-apply:hover { filter: brightness(1.08); transform: translateY(-1px); }
-    .btn-clear {
-        padding: 10px 14px;
-        background: transparent;
-        color: var(--text-muted);
-        border: 1px solid rgba(255, 255, 255, 0.10);
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 0.88rem;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        transition: color 0.15s, border-color 0.15s;
-    }
-    .btn-clear:hover { color: #fff; border-color: rgba(255,255,255,0.25); }
-
-    .filter-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-    .filter-chips a {
-        font-size: 0.78rem;
-        color: var(--text-light);
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.10);
-        padding: 6px 12px;
-        border-radius: 999px;
-        text-decoration: none;
-        transition: all 0.15s;
-    }
-    .filter-chips a:hover {
-        background: rgba(59, 130, 246, 0.12);
-        border-color: rgba(59, 130, 246, 0.40);
-        color: #fff;
-    }
-    .filter-chips a.is-active {
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        border-color: transparent;
-        color: #fff;
-    }
-
-    /* ─── PROFESSIONAL GRID ─── */
-    .pro-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 22px;
-    }
-    .pro-grid.is-list {
-        grid-template-columns: 1fr;
-    }
-    .pro-grid.is-list .pro-card {
-        flex-direction: row;
-        align-items: stretch;
-    }
-    .pro-grid.is-list .pro-card-cover {
-        flex: 0 0 220px;
-        height: auto;
-        min-height: 200px;
-    }
-    .pro-grid.is-list .pro-card-body {
-        margin-top: 0;
-        padding: 22px 26px;
-    }
-    .pro-grid.is-list .pro-card-avatar {
-        position: absolute;
-        top: 22px; left: 22px;
-        margin-bottom: 0;
-    }
-    .pro-grid.is-list .pro-card-name,
-    .pro-grid.is-list .pro-card-headline,
-    .pro-grid.is-list .pro-card-meta,
-    .pro-grid.is-list .pro-card-skills,
-    .pro-grid.is-list .pro-card-foot {
-        margin-left: 80px;
-    }
-    @media (max-width: 700px) {
-        .pro-grid.is-list .pro-card { flex-direction: column; }
-        .pro-grid.is-list .pro-card-cover { flex: 0 0 120px; min-height: 120px; }
-        .pro-grid.is-list .pro-card-body { padding: 0 20px 20px; margin-top: -32px; }
-        .pro-grid.is-list .pro-card-avatar { position: relative; top: auto; left: auto; margin-bottom: 12px; }
-        .pro-grid.is-list .pro-card-name,
-        .pro-grid.is-list .pro-card-headline,
-        .pro-grid.is-list .pro-card-meta,
-        .pro-grid.is-list .pro-card-skills,
-        .pro-grid.is-list .pro-card-foot { margin-left: 0; }
-    }
-
-    .pro-card {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        background: var(--bg-card);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 18px;
-        overflow: hidden;
-        transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-        text-decoration: none;
-        color: inherit;
-    }
-    .pro-card:hover {
-        transform: translateY(-6px);
-        border-color: rgba(139, 92, 246, 0.40);
-        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.40);
-    }
-    .pro-card-cover {
-        position: relative;
-        height: 130px;
-        background: linear-gradient(135deg, rgba(59,130,246,0.40), rgba(139,92,246,0.40));
-        background-size: cover;
-        background-position: center;
-        flex-shrink: 0;
-    }
-    .pro-card-cover::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(180deg, transparent 30%, rgba(21, 29, 53, 0.92) 100%);
-    }
-    .pro-card-badges {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        display: flex;
-        gap: 6px;
-        z-index: 2;
-    }
-    .pro-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 4px 9px;
-        background: rgba(8, 12, 22, 0.78);
-        backdrop-filter: blur(6px);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: 999px;
-        font-size: 0.7rem;
-        font-weight: 800;
-        color: #fff;
-    }
-    .pro-badge.top {
-        background: linear-gradient(135deg, rgba(245, 158, 11, 0.95), rgba(239, 68, 68, 0.95));
-        border-color: rgba(255, 255, 255, 0.25);
-    }
-    .pro-badge.verified {
-        background: linear-gradient(135deg, rgba(34, 197, 94, 0.95), rgba(16, 185, 129, 0.95));
-        border-color: rgba(255, 255, 255, 0.20);
-    }
-    .pro-badge.new {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(139, 92, 246, 0.95));
-        border-color: rgba(255, 255, 255, 0.20);
-    }
-    .pro-badge svg { width: 11px; height: 11px; }
-
-    /* Save / favourite button (visual only — non-functional w/o auth integration) */
-    .pro-card-save {
-        position: absolute;
-        top: 10px; right: 10px;
-        z-index: 3;
-        width: 34px; height: 34px;
-        border-radius: 50%;
-        background: rgba(8, 12, 22, 0.65);
-        backdrop-filter: blur(6px);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    .pro-card-save svg {
-        width: 16px; height: 16px;
-        color: #fff;
-        transition: fill 0.2s;
-    }
-    .pro-card-save:hover {
-        background: rgba(239, 68, 68, 0.85);
-        transform: scale(1.08);
-    }
-    .pro-card-save.is-saved svg { fill: #ef4444; color: #ef4444; }
-
-    .pro-card-body {
-        position: relative;
-        padding: 0 20px 20px;
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-        margin-top: -32px;
-    }
-    .pro-card-avatar-wrap {
-        position: relative;
-        width: 64px; height: 64px;
-        margin-bottom: 12px;
-    }
-    .pro-card-avatar {
-        position: relative;
-        z-index: 2;
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid var(--bg-card);
-        background: var(--bg-card);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.30);
-    }
-    .pro-card-online {
-        position: absolute;
-        bottom: 2px; right: 2px;
-        width: 14px; height: 14px;
-        border-radius: 50%;
-        background: #22c55e;
-        border: 2.5px solid var(--bg-card);
-        z-index: 3;
-        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
-        animation: pulse-dot 2.4s ease infinite;
-    }
-    @keyframes pulse-dot {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
-        50%      { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-        .pro-card-online { animation: none; }
-    }
-
-    .pro-card-name {
-        font-size: 1.05rem;
-        font-weight: 800;
-        color: #fff;
-        margin-bottom: 4px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .pro-card-name .check {
-        width: 15px; height: 15px;
-        color: #60a5fa;
-        flex-shrink: 0;
-    }
-    .pro-card-headline {
-        font-size: 0.86rem;
-        color: var(--text-light);
-        line-height: 1.45;
-        margin-bottom: 12px;
-        min-height: 2.4em;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    /* Skills chips on each card */
-    .pro-card-skills {
-        display: flex; flex-wrap: wrap; gap: 4px;
-        margin-bottom: 12px;
-        min-height: 24px;
-    }
-    .pro-card-skills .skill {
-        font-size: 0.7rem;
-        font-weight: 700;
-        padding: 3px 9px;
-        border-radius: 999px;
-        background: rgba(139,92,246,0.12);
-        border: 1px solid rgba(139,92,246,0.25);
-        color: #c4b5fd;
-    }
-    .pro-card-skills .skill.more {
-        background: rgba(255,255,255,0.04);
-        border-color: rgba(255,255,255,0.10);
-        color: var(--text-muted);
-    }
-
-    .pro-card-meta {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 0.8rem;
-        color: var(--text-muted);
-        margin-bottom: 12px;
-        flex-wrap: wrap;
-    }
-    .pro-card-meta .sep { opacity: 0.4; }
-    .pro-card-meta .rating {
-        display: inline-flex; align-items: center; gap: 4px;
-        color: #ffb648;
-        font-weight: 800;
-    }
-    .pro-card-meta .rating svg { width: 13px; height: 13px; fill: currentColor; stroke: none; }
-    .pro-card-meta .rating .count { color: var(--text-muted); font-weight: 500; margin-left: 2px; }
-    .pro-card-meta .loc {
-        display: inline-flex; align-items: center; gap: 4px;
-    }
-    .pro-card-meta .loc svg { width: 12px; height: 12px; }
-
-    .pro-card-foot {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-top: 14px;
-        border-top: 1px dashed rgba(255, 255, 255, 0.10);
-        margin-top: auto;
-    }
-    .pro-card-price {
-        font-size: 0.78rem;
-        color: var(--text-muted);
-    }
-    .pro-card-price strong {
-        color: #fff;
-        font-size: 1rem;
-        font-weight: 900;
-    }
-    .pro-card-cta {
-        font-size: 0.8rem;
-        font-weight: 800;
-        color: #a78bfa;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        transition: gap 0.2s, color 0.2s;
-    }
-    .pro-card:hover .pro-card-cta { gap: 8px; color: #fff; }
-
-    /* ─── EMPTY STATE ─── */
-    .browse-empty {
-        text-align: center;
-        padding: 80px 20px;
-        background: rgba(255,255,255,0.025);
-        border: 1px dashed rgba(255, 255, 255, 0.10);
-        border-radius: 18px;
-    }
-    .browse-empty .icon {
-        width: 72px; height: 72px;
-        margin: 0 auto 18px;
-        border-radius: 20px;
-        background: linear-gradient(135deg, rgba(59,130,246,0.20), rgba(139,92,246,0.20));
-        border: 1px solid rgba(139,92,246,0.30);
-        display: flex; align-items: center; justify-content: center;
-        color: #a78bfa;
-    }
-    .browse-empty .icon svg { width: 32px; height: 32px; }
-    .browse-empty h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; color: #fff; }
-    .browse-empty p { color: var(--text-muted); margin-bottom: 22px; max-width: 460px; margin-left: auto; margin-right: auto; line-height: 1.6; }
-    .browse-empty .empty-actions {
-        display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
-    }
-    .browse-empty .btn {
-        padding: 10px 20px;
-        border-radius: 10px;
-        font-weight: 700;
-        font-size: 0.88rem;
-        text-decoration: none;
-        display: inline-flex; align-items: center; gap: 6px;
-        transition: all 0.2s;
-    }
-    .browse-empty .btn-primary {
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        color: #fff;
-    }
-    .browse-empty .btn-primary:hover { transform: translateY(-1px); opacity: 0.95; }
-    .browse-empty .btn-ghost {
-        background: transparent;
-        border: 1px solid rgba(255,255,255,0.12);
-        color: var(--text-light);
-    }
-    .browse-empty .btn-ghost:hover { border-color: rgba(255,255,255,0.30); color: #fff; }
-
-    /* ─── PAGINATION ─── */
-    .browse-pagination {
-        margin-top: 36px;
-        display: flex;
-        justify-content: center;
-    }
-    .browse-pagination nav > div { display: flex !important; gap: 6px; }
-    .browse-pagination span,
-    .browse-pagination a {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 38px;
-        height: 38px;
-        padding: 0 12px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.10);
-        border-radius: 10px;
-        color: var(--text-light);
-        font-size: 0.88rem;
-        font-weight: 700;
-        text-decoration: none;
-        transition: background 0.15s, border-color 0.15s, color 0.15s;
-    }
-    .browse-pagination a:hover {
-        background: rgba(59, 130, 246, 0.12);
-        border-color: rgba(59, 130, 246, 0.40);
-        color: #fff;
-    }
-    .browse-pagination .page-item.active > span,
-    .browse-pagination span[aria-current] {
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        color: #fff;
-        border-color: transparent;
-        box-shadow: 0 6px 14px rgba(139,92,246,0.35);
-    }
-    .browse-pagination .disabled > span { opacity: 0.4; cursor: not-allowed; }
-</style>
-@endpush
 
 @section('content')
 
-@php
-    // Compose readable labels for the active-filter pill row.
-    $activeFilters = collect();
-    if ($filters['q'])         $activeFilters->push(['key' => 'q',          'label' => '"' . $filters['q'] . '"']);
-    if ($filters['city'])      $activeFilters->push(['key' => 'city',       'label' => 'in ' . $filters['city']]);
-    if ($filters['rating_min'] > 0)
-        $activeFilters->push(['key' => 'rating_min', 'label' => $filters['rating_min'] . '★ & up']);
-    if ($filters['verified'])  $activeFilters->push(['key' => 'verified',   'label' => 'Verified only']);
-@endphp
+@push('styles')
+<style>
+    /* ════════════════════ /browse (light) — page-scoped ════════════════════ */
+    .br-wrap { background: var(--bg-soft); }
 
-<!-- ── HERO BANNER ───────────────────────────────────────────── -->
-<section class="browse-hero">
-    {{-- Cover banner: a wedding reception / celebration scene that
-         previews exactly what a verified professional helps create. --}}
-    <div class="browse-hero-bg">
-        <img src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=1800&q=85&auto=format&fit=crop" alt="Wedding photographer at work capturing moments" loading="eager">
-    </div>
-    <div class="container">
-        <div class="browse-eyebrow">
-            <span class="dot"></span> {{ $pros->total() }} verified professionals
-        </div>
-        <h1>Find the <span class="gradient-text">right professional</span> for your event</h1>
-        <p class="lede">Photographers, caterers, DJs, planners — every verified professional in one place. Filter by city, rating, and trust badges to find your perfect match.</p>
+    /* ── HERO ─────────────────────────────────────────── */
+    .br-hero { position: relative; padding: 46px 0 54px; overflow: hidden;
+        background:
+            linear-gradient(180deg, rgba(255,255,255,.0), rgba(247,249,252,.6)),
+            linear-gradient(110deg, rgba(37,99,235,.10), rgba(249,115,22,.08)); }
+    .br-hero::before { content:''; position:absolute; inset:0;
+        background-image: url('https://images.unsplash.com/photo-1519741497674-611481863552?w=1600&q=70&auto=format&fit=crop');
+        background-size: cover; background-position: center; opacity: .12; z-index: 0; }
+    .br-hero > .lp-container { position: relative; z-index: 1; }
+    .br-h1 { font-size: 40px; font-weight: 800; letter-spacing: -1.1px; text-align: center; }
+    .br-h1 .b { color: var(--blue); }
+    .br-h1 .o { color: var(--orange); }
+    .br-hero-sub { text-align: center; color: var(--text); font-size: 16px; margin: 12px 0 26px; }
 
-        <form method="GET" action="{{ route('public.browse') }}" class="browse-mega-search" id="megaSearchForm">
-            <div class="search-field">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" name="q" value="{{ $filters['q'] }}" placeholder="Try 'wedding photographer' or 'live band'…" autocomplete="off" data-voice-search>
-            </div>
-            <span class="search-divider"></span>
-            <select name="city" class="city-select" aria-label="City">
-                <option value="">Any city</option>
-                @foreach($cities as $c)
-                    <option value="{{ $c }}" {{ $filters['city'] === $c ? 'selected' : '' }}>{{ $c }}</option>
-                @endforeach
-            </select>
-            <button type="submit" class="submit-btn">
-                Search
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
-            {{-- Carry over the rest of the filter state so quick searches don't lose them --}}
-            <input type="hidden" name="rating_min" value="{{ $filters['rating_min'] }}">
-            @if($filters['verified'])<input type="hidden" name="verified" value="1">@endif
-            <input type="hidden" name="sort" value="{{ $filters['sort'] }}">
-        </form>
+    /* search bar */
+    .br-search { display: flex; align-items: stretch; gap: 0; background: #fff;
+        border: 1px solid var(--line); border-radius: 999px; padding: 7px 7px 7px 8px;
+        max-width: 940px; margin: 0 auto; box-shadow: 0 18px 40px -22px rgba(15,27,53,.35); flex-wrap: wrap; }
+    .br-sfield { display: flex; align-items: center; gap: 8px; padding: 8px 14px; flex: 1 1 0; min-width: 150px; position: relative; }
+    .br-sfield + .br-sfield { border-left: 1px solid var(--line-soft); }
+    .br-sfield svg { width: 16px; height: 16px; color: var(--blue); flex-shrink: 0; }
+    .br-sfield select, .br-sfield input { border: none; outline: none; background: transparent; width: 100%;
+        font-size: 14px; font-weight: 600; color: var(--ink-2); font-family: inherit; cursor: pointer; }
+    .br-sfield input::placeholder { color: var(--muted); font-weight: 500; }
+    .br-find { border: none; border-radius: 999px; padding: 0 24px; margin-left: 4px;
+        background: linear-gradient(135deg, var(--orange), var(--orange-dark)); color: #fff;
+        font-weight: 800; font-size: 14.5px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+    .br-find svg { width: 16px; height: 16px; }
 
-        <div class="browse-quickstats">
-            <span class="qs">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                <strong>License-verified</strong> professionals
-            </span>
-            <span class="qs">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                <strong>Escrow-protected</strong> bookings
-            </span>
-            <span class="qs">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                Avg reply in <strong>2 hours</strong>
-            </span>
-        </div>
-    </div>
-</section>
+    /* trust badges row */
+    .br-trustrow { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 22px auto 0; }
+    .br-tb { display: inline-flex; align-items: center; gap: 7px; background: rgba(255,255,255,.7);
+        border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; font-size: 12.5px; font-weight: 700; color: var(--ink-2); }
+    .br-tb svg { width: 14px; height: 14px; color: var(--blue); }
 
-<!-- ── CATEGORY CHIP RAIL ────────────────────────────────────── -->
-@if($categories->isNotEmpty())
-<div class="browse-cat-rail-wrap">
-    <div class="container">
-        <div class="browse-cat-rail" aria-label="Browse by category">
-            <a href="{{ route('public.browse', array_filter(['city' => $filters['city'], 'sort' => $filters['sort']])) }}"
-               class="browse-cat-chip {{ $filters['q'] === '' ? 'is-active' : '' }}">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                All
-            </a>
-            @foreach($categories as $cat)
-                <a href="{{ route('public.browse', array_filter(['q' => $cat->name, 'city' => $filters['city'], 'sort' => $filters['sort']])) }}"
-                   class="browse-cat-chip {{ $filters['q'] === $cat->name ? 'is-active' : '' }}">
-                    @if($cat->icon){{ $cat->icon }}@endif
-                    {{ $cat->name }}
-                </a>
-            @endforeach
-        </div>
-    </div>
-</div>
-@endif
+    /* ── VIBES carousel ───────────────────────────────── */
+    .br-vibes { padding: 30px 0 8px; }
+    .br-vibes-cap { text-align: center; color: var(--text); font-size: 14px; margin-bottom: 16px; }
+    .br-vibes-cap a { color: var(--blue); font-weight: 700; }
+    .br-vibe-scroll { display: grid; grid-auto-flow: column; grid-auto-columns: 200px; gap: 14px;
+        overflow-x: auto; padding: 4px 2px 14px; scroll-snap-type: x mandatory; }
+    .br-vibe-scroll::-webkit-scrollbar { height: 6px; }
+    .br-vibe-scroll::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; }
+    .br-vibe { position: relative; height: 132px; border-radius: 16px; overflow: hidden; scroll-snap-align: start;
+        text-decoration: none; display: block; box-shadow: 0 10px 24px -16px rgba(15,27,53,.4); }
+    .br-vibe img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+    .br-vibe:hover img { transform: scale(1.07); }
+    .br-vibe-ov { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(15,27,53,0) 35%, rgba(15,27,53,.4) 62%, rgba(15,27,53,.86) 100%);
+        display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; }
+    .br-vibe-ov h4 { color: #fff; font-size: 14px; font-weight: 800; }
+    .br-vibe-ov span { color: rgba(255,255,255,.82); font-size: 10.5px; line-height: 1.35; margin-top: 3px; }
 
-<!-- ── SIDEBAR + GRID ────────────────────────────────────────── -->
-<div class="container">
+    /* ── MAIN 3-COLUMN ────────────────────────────────── */
+    .br-main { display: grid; grid-template-columns: 260px minmax(0,1fr) 280px; gap: 22px; padding: 18px 0 60px; align-items: start; }
+    .br-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; }
 
-    {{-- ACTIVE FILTER PILLS --}}
-    @if($activeFilters->isNotEmpty())
-        <div class="browse-active-filters">
-            <span class="label">Active filters:</span>
-            @foreach($activeFilters as $f)
-                @php
-                    // Build a URL with this filter removed so the X is meaningful.
-                    $rest = $filters;
-                    $rest[$f['key']] = '';
-                @endphp
-                <a href="{{ route('public.browse', array_filter($rest)) }}" class="browse-filter-pill">
-                    {{ $f['label'] }}
-                    <span class="x" aria-label="Remove filter">×</span>
-                </a>
-            @endforeach
-            <a href="{{ route('public.browse') }}" class="browse-filter-pill clear-all">
-                Clear all
-            </a>
-        </div>
-    @endif
+    /* filters sidebar */
+    .br-filters { position: sticky; top: 84px; }
+    .br-filters .br-fhead { display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 12px; border-bottom: 1px solid var(--line-soft); }
+    .br-filters .br-fhead h3 { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .br-filters .br-fhead h3 svg { width: 16px; height: 16px; color: var(--blue); }
+    .br-clear { font-size: 12px; font-weight: 700; color: var(--blue); text-decoration: none; }
+    .br-fgroup { padding: 14px 16px; border-bottom: 1px solid var(--line-soft); }
+    .br-fgroup:last-child { border-bottom: none; }
+    .br-fgroup > label.br-flabel { display: block; font-size: 12.5px; font-weight: 800; color: var(--ink); margin-bottom: 10px; letter-spacing: .2px; }
+    .br-opt { display: flex; align-items: center; gap: 9px; padding: 5px 0; font-size: 13px; color: var(--text); cursor: pointer; }
+    .br-opt input { accent-color: var(--blue); width: 15px; height: 15px; }
+    .br-range { width: 100%; accent-color: var(--blue); }
+    .br-range-vals { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+    .br-input { width: 100%; border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; font-size: 13px; color: var(--ink-2); font-family: inherit; }
+    .br-switch { width: 38px; height: 21px; border-radius: 999px; background: var(--line); position: relative; cursor: pointer; transition: background .15s; flex-shrink: 0; }
+    .br-apply { display: block; border: none; border-radius: 11px; padding: 11px; margin: 14px 16px 16px; width: calc(100% - 32px);
+        background: linear-gradient(135deg, var(--blue), var(--blue-dark)); color: #fff; font-weight: 800; font-size: 13.5px; cursor: pointer; }
 
-    {{-- Mobile drawer backdrop sits outside the grid so it can't ever
-         claim a column on desktop. Click-through closes the drawer. --}}
-    <div class="browse-filters-backdrop" id="filtersBackdrop"></div>
+    /* results */
+    .br-results-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+    .br-found { font-size: 14px; color: var(--text); }
+    .br-found b { color: var(--blue); font-weight: 800; }
+    .br-results-tools { display: flex; align-items: center; gap: 8px; }
+    .br-sort { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; font-size: 13px; font-weight: 600; color: var(--ink-2); background: #fff; font-family: inherit; cursor: pointer; }
+    .br-viewtoggle { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    .br-viewtoggle button { border: none; background: #fff; padding: 8px 11px; font-size: 12.5px; font-weight: 700; color: var(--muted); display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+    .br-viewtoggle button.on { background: var(--bg-soft-2); color: var(--blue); }
+    .br-viewtoggle svg { width: 14px; height: 14px; }
 
-    <div class="browse-layout">
+    /* provider card */
+    .br-pro { display: grid; grid-template-columns: 280px minmax(0,1fr); gap: 0; overflow: hidden; margin-bottom: 16px; }
+    .br-pro-media { position: relative; background: var(--bg-soft-2); }
+    .br-pro-hero { width: 100%; height: 100%; min-height: 230px; object-fit: cover; display: block; }
+    .br-pro-thumbs { position: absolute; right: 8px; top: 8px; display: flex; flex-direction: column; gap: 6px; }
+    .br-pro-thumbs img { width: 46px; height: 40px; border-radius: 7px; object-fit: cover; border: 2px solid #fff; }
+    .br-pro-tag { position: absolute; left: 8px; top: 8px; background: rgba(15,27,53,.78); color: #fff; font-size: 10px; font-weight: 800; padding: 4px 9px; border-radius: 6px; }
+    .br-pro-body { padding: 16px 18px; display: flex; flex-direction: column; }
+    .br-pro-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .br-pro-name { font-size: 17px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; }
+    .br-pro-name .vchk { width: 16px; height: 16px; color: var(--blue); }
+    .br-pro-role { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .br-pro-loc { font-size: 12.5px; color: var(--text); margin-top: 6px; display: inline-flex; align-items: center; gap: 5px; }
+    .br-pro-loc svg { width: 13px; height: 13px; color: var(--orange); }
+    .br-fav { border: 1px solid var(--line); background: #fff; width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+    .br-fav svg { width: 16px; height: 16px; color: var(--muted); }
+    .br-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+    .br-chip { font-size: 10.5px; font-weight: 800; padding: 4px 9px; border-radius: 6px; letter-spacing: .2px; }
+    .br-chip.verif { background: #fef3e8; color: #c2590a; }
+    .br-chip.top { background: #e8f0fe; color: var(--blue-dark); }
+    .br-chip.quick { background: #e9f9f1; color: #0f9d58; }
+    .br-pro-meta { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--text); margin: 4px 0 12px; }
+    .br-pro-meta .star { color: #f5a623; font-weight: 800; }
+    .br-pro-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line-soft); flex-wrap: wrap; }
+    .br-price { font-size: 13px; color: var(--muted); }
+    .br-price b { font-size: 18px; color: var(--ink); font-weight: 800; }
+    .br-pro-actions { display: flex; gap: 8px; }
+    .br-btn-ghost { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 9px 14px; font-size: 12.5px; font-weight: 700; color: var(--ink-2); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+    .br-btn-msg { border: none; border-radius: 10px; padding: 9px 16px; font-size: 12.5px; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--orange), var(--orange-dark)); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
 
-        {{-- ── SIDEBAR FILTERS ── --}}
-        <aside id="filtersSidebar" class="browse-filters">
-            <div class="browse-filters-head">
-                <h2>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
-                    Filters
-                </h2>
-                <button type="button" class="filters-mobile-close" aria-label="Close filters">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-            </div>
+    .br-empty { padding: 60px 20px; text-align: center; color: var(--muted); }
+    .br-empty svg { width: 46px; height: 46px; color: var(--line); margin-bottom: 14px; }
+    .br-empty h3 { color: var(--ink); }
 
-            <form method="GET" action="{{ route('public.browse') }}" class="browse-filters-body">
-                {{-- Preserve search keyword and sort across filter submissions --}}
-                <input type="hidden" name="q" value="{{ $filters['q'] }}">
-                <input type="hidden" name="sort" value="{{ $filters['sort'] }}">
+    /* pagination */
+    .br-pager { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+    .br-pager a, .br-pager span { min-width: 36px; height: 36px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; padding: 0 10px;
+        font-size: 13px; font-weight: 700; color: var(--ink-2); border: 1px solid var(--line); background: #fff; text-decoration: none; }
+    .br-pager .cur { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .br-pager .dis { color: var(--line); cursor: default; }
 
-                {{-- Category quick chips --}}
-                @if($categories->isNotEmpty())
-                    <div class="filter-group">
-                        <h3>Popular Categories</h3>
-                        <div class="filter-chips">
-                            @foreach($categories->take(10) as $cat)
-                                <a href="{{ route('public.browse', array_filter(['q' => $cat->name, 'city' => $filters['city'], 'sort' => $filters['sort']])) }}"
-                                   class="{{ $filters['q'] === $cat->name ? 'is-active' : '' }}">
-                                    @if($cat->icon){{ $cat->icon }} @endif{{ $cat->name }}
-                                </a>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
+    /* right rail */
+    .br-rail { position: sticky; top: 84px; display: flex; flex-direction: column; gap: 16px; }
+    .br-rail-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+    .br-rail-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--line-soft); font-size: 13px; font-weight: 800; color: var(--ink); }
+    .br-rail-head svg { width: 15px; height: 15px; color: var(--blue); }
+    .br-rail-head a { font-size: 11.5px; font-weight: 700; color: var(--blue); text-decoration: none; }
+    .br-map { position: relative; height: 170px; background: #eef3fb; }
+    .br-map-fallback { position: absolute; inset: 0; background:
+        repeating-linear-gradient(0deg, var(--line-soft) 0 1px, transparent 1px 28px),
+        repeating-linear-gradient(90deg, var(--line-soft) 0 1px, transparent 1px 28px); }
+    .br-map-pin { position: absolute; width: 22px; height: 22px; border-radius: 50% 50% 50% 0; background: var(--blue); transform: rotate(-45deg); box-shadow: 0 4px 10px rgba(37,99,235,.4); }
+    .br-map-cluster { position: absolute; left: 50%; top: 48%; transform: translate(-50%,-50%); background: var(--orange); color: #fff; font-weight: 800; font-size: 13px; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #fff; box-shadow: 0 6px 16px rgba(249,115,22,.5); z-index: 2; }
+    .br-mini { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--line-soft); }
+    .br-mini:last-of-type { border-bottom: none; }
+    .br-mini-av { width: 34px; height: 34px; border-radius: 9px; object-fit: cover; flex-shrink: 0; }
+    .br-mini-main { min-width: 0; flex: 1; }
+    .br-mini-main h5 { font-size: 12.5px; font-weight: 800; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .br-mini-main span { font-size: 11px; color: var(--muted); }
+    .br-mini-rate { font-size: 11.5px; font-weight: 800; color: var(--blue); flex-shrink: 0; }
+    .br-rail-btn { display: block; margin: 10px 14px 14px; text-align: center; border-radius: 10px; padding: 9px; font-size: 12.5px; font-weight: 800; text-decoration: none; }
+    .br-rail-btn.blue { background: linear-gradient(135deg, var(--blue), var(--blue-dark)); color: #fff; }
+    .br-recent { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 12px 14px; }
+    .br-recent a { display: block; text-decoration: none; }
+    .br-recent img { width: 100%; height: 50px; border-radius: 8px; object-fit: cover; }
+    .br-recent span { display: block; font-size: 10px; color: var(--text); font-weight: 700; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-                {{-- City filter --}}
-                <div class="filter-group">
-                    <h3>Location</h3>
-                    <select name="city">
-                        <option value="">Any city</option>
-                        @foreach($cities as $c)
-                            <option value="{{ $c }}" {{ $filters['city'] === $c ? 'selected' : '' }}>{{ $c }}</option>
+    /* CTA + trust strip */
+    .br-cta { margin: 8px 0 0; border-radius: 20px; padding: 30px 34px; position: relative; overflow: hidden;
+        background: linear-gradient(120deg, #eaf1ff, #f4f7ff); border: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+    .br-cta h3 { font-size: 24px; font-weight: 800; }
+    .br-cta p { color: var(--text); font-size: 14px; margin: 8px 0 16px; max-width: 460px; }
+    .br-cta-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .br-cta-emoji { font-size: 78px; line-height: 1; }
+    .br-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; padding: 28px 0 0; }
+    .br-strip-item { display: flex; align-items: flex-start; gap: 11px; }
+    .br-strip-item svg { width: 26px; height: 26px; color: var(--blue); flex-shrink: 0; }
+    .br-strip-item h4 { font-size: 13.5px; font-weight: 800; }
+    .br-strip-item p { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+    @media (max-width: 1080px) {
+        .br-main { grid-template-columns: minmax(0,1fr); }
+        .br-filters, .br-rail { position: static; }
+        .br-rail { display: grid; grid-template-columns: 1fr 1fr; align-items: start; }
+    }
+    @media (max-width: 720px) {
+        .br-h1 { font-size: 30px; }
+        .br-pro { grid-template-columns: minmax(0,1fr); }
+        .br-pro-hero { min-height: 180px; }
+        .br-rail { grid-template-columns: 1fr; }
+        .br-strip { grid-template-columns: 1fr 1fr; }
+        .br-search { border-radius: 18px; }
+        .br-sfield + .br-sfield { border-left: none; border-top: 1px solid var(--line-soft); }
+    }
+</style>
+@endpush
+
+<div class="br-wrap">
+
+    {{-- ══════════════ HERO ══════════════ --}}
+    <section class="br-hero">
+        <div class="lp-container">
+            <h1 class="br-h1">Find Your <span class="b">Vibe</span>. Book the <span class="o">Pro</span>. ✨</h1>
+            <p class="br-hero-sub">Every verified event professional, right at your fingertips.</p>
+
+            <form action="{{ route('public.browse') }}" method="GET" class="br-search">
+                <div class="br-sfield">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                    <select name="q" aria-label="Category">
+                        <option value="">All Services</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->name }}" @selected($kw === $cat->name)>{{ Str::title($cat->name) }}</option>
                         @endforeach
                     </select>
                 </div>
-
-                {{-- Rating filter --}}
-                <div class="filter-group">
-                    <h3>Minimum Rating</h3>
-                    @foreach([0 => 'Any rating', 4 => '4.0★ & up', 4.5 => '4.5★ & up', 5 => '5.0★ only'] as $val => $label)
-                        <label>
-                            <input type="radio" name="rating_min" value="{{ $val }}" {{ (float) $filters['rating_min'] === (float) $val ? 'checked' : '' }}>
-                            <span>{{ $label }}</span>
-                        </label>
-                    @endforeach
+                <div class="br-sfield">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <input type="text" name="city" value="{{ $cityF }}" placeholder="City or location" list="br-cities" autocomplete="off">
+                    <datalist id="br-cities">@foreach($cities as $c)<option value="{{ $c }}">@endforeach</datalist>
                 </div>
-
-                {{-- Trust filter --}}
-                <div class="filter-group">
-                    <h3>Trust &amp; Safety</h3>
-                    <label>
-                        <input type="checkbox" name="verified" value="1" {{ $filters['verified'] ? 'checked' : '' }}>
-                        <span>Verified professionals only</span>
-                    </label>
+                <div class="br-sfield">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <input type="text" name="date" placeholder="Any date" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'">
                 </div>
-
-                {{-- Actions --}}
-                <div class="filter-actions">
-                    <button type="submit" class="btn-apply">Apply filters</button>
-                    <a href="{{ route('public.browse') }}" class="btn-clear">Reset</a>
+                <div class="br-sfield">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                    <select name="distance" aria-label="Distance">
+                        <option>Within 25 miles</option><option>Within 50 miles</option><option>Within 100 miles</option><option>Anywhere</option>
+                    </select>
                 </div>
-            </form>
-        </aside>
-
-        {{-- ── RESULTS ── --}}
-        <div>
-            {{-- Toolbar: result count + sort + view toggle --}}
-            <div class="browse-toolbar">
-                <button type="button" class="filters-mobile-trigger" id="openFiltersBtn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
-                    Filters
+                <button type="submit" class="br-find">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    Find Talent
                 </button>
+            </form>
 
-                <div class="browse-count">
-                    <strong>{{ $pros->total() }}</strong> {{ Str::plural('professional', $pros->total()) }} found
+            {{-- Trust badges — compliance-safe (no "24/7", no reply-time metric) --}}
+            <div class="br-trustrow">
+                <span class="br-tb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> License-Verified Pros</span>
+                <span class="br-tb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Escrow-Protected Booking</span>
+                <span class="br-tb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Quick Reply Times</span>
+                <span class="br-tb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg> Dedicated Support</span>
+            </div>
+        </div>
+    </section>
+
+    {{-- ══════════════ TRENDING VIBES ══════════════ --}}
+    <section class="br-vibes">
+        <div class="lp-container">
+            <p class="br-vibes-cap">Stuck on planning? Tap a <a href="#">trending vibe</a> to auto-populate your search filters.</p>
+            <div class="br-vibe-scroll">
+                @foreach($vibes as [$vName, $vSub, $vImg, $vQuery])
+                    <a class="br-vibe" href="{{ route('public.browse', ['q' => $vQuery]) }}">
+                        <img src="https://images.unsplash.com/{{ $vImg }}?w=420&q=70&auto=format&fit=crop" alt="{{ $vName }}" loading="lazy">
+                        <span class="br-vibe-ov"><h4>{{ $vName }}</h4><span>{{ $vSub }}</span></span>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    {{-- ══════════════ MAIN ══════════════ --}}
+    <div class="lp-container">
+        <div class="br-main">
+
+            {{-- ── LEFT: POWER FILTERS ── --}}
+            <aside class="br-filters">
+                <form action="{{ route('public.browse') }}" method="GET" class="br-card">
+                    @if($kw)<input type="hidden" name="q" value="{{ $kw }}">@endif
+                    @if($cityF)<input type="hidden" name="city" value="{{ $cityF }}">@endif
+                    <div class="br-fhead">
+                        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg> Power Filters</h3>
+                        <a href="{{ route('public.browse') }}" class="br-clear">Clear All</a>
+                    </div>
+
+                    <div class="br-fgroup">
+                        <label class="br-flabel">Price Range</label>
+                        <input type="range" class="br-range" min="0" max="5000" value="2500" disabled>
+                        <div class="br-range-vals"><span>$0</span><span>$5,000+</span></div>
+                    </div>
+
+                    <div class="br-fgroup">
+                        <label class="br-flabel">Availability</label>
+                        <input type="text" class="br-input" placeholder="Select date" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'">
+                        <label class="br-opt" style="margin-top:8px;"><input type="checkbox"> Only show available pros</label>
+                    </div>
+
+                    <div class="br-fgroup">
+                        <label class="br-flabel">Distance Radius</label>
+                        <select class="br-input"><option>Within 25 miles</option><option>Within 50 miles</option><option>Within 100 miles</option><option>Anywhere</option></select>
+                    </div>
+
+                    <div class="br-fgroup">
+                        <label class="br-flabel">Rating &amp; Reviews</label>
+                        <label class="br-opt"><input type="radio" name="rating_min" value="5" @checked($ratingF == 5)> 5.0 ★ Perfectionists Only</label>
+                        <label class="br-opt"><input type="radio" name="rating_min" value="4.5" @checked($ratingF == 4.5)> 4.5 &amp; Up (Top Rated)</label>
+                        <label class="br-opt"><input type="radio" name="rating_min" value="0" @checked($ratingF == 0)> Any Rating</label>
+                        <label class="br-opt"><input type="checkbox"> Reviews with Photos</label>
+                    </div>
+
+                    <div class="br-fgroup">
+                        <label class="br-flabel">Response Time</label>
+                        <label class="br-opt"><input type="radio" name="resp" disabled> Within 1 Hour</label>
+                        <label class="br-opt"><input type="radio" name="resp" disabled checked> Within a Few Hours</label>
+                        <label class="br-opt"><input type="radio" name="resp" disabled> Anytime</label>
+                    </div>
+
+                    <div class="br-fgroup">
+                        <label class="br-flabel">Other Filters</label>
+                        <label class="br-opt"><input type="checkbox" name="verified" value="1" @checked($verF)> Verified Pro Badge</label>
+                        <label class="br-opt"><input type="checkbox" disabled> Insurance Coverage</label>
+                        <label class="br-opt"><input type="checkbox" disabled> Available for Travel</label>
+                        <label class="br-opt"><input type="checkbox" disabled> Eco-Friendly Vendors</label>
+                    </div>
+
+                    <input type="hidden" name="sort" value="{{ $sortF }}">
+                    <button type="submit" class="br-apply">Apply Filters</button>
+                </form>
+            </aside>
+
+            {{-- ── CENTER: RESULTS ── --}}
+            <main class="br-results">
+                <div class="br-results-head">
+                    <div class="br-found">Found: <b>{{ $total }} {{ Str::plural('Pro', $total) }}</b>{{ $cityF ? ' near '.$cityF : '' }}{{ $kw ? ' for “'.Str::title($kw).'”' : '' }}</div>
+                    <div class="br-results-tools">
+                        <form action="{{ route('public.browse') }}" method="GET" id="brSortForm">
+                            @if($kw)<input type="hidden" name="q" value="{{ $kw }}">@endif
+                            @if($cityF)<input type="hidden" name="city" value="{{ $cityF }}">@endif
+                            @if($ratingF)<input type="hidden" name="rating_min" value="{{ $ratingF }}">@endif
+                            @if($verF)<input type="hidden" name="verified" value="1">@endif
+                            <select name="sort" class="br-sort" onchange="document.getElementById('brSortForm').submit()">
+                                <option value="top" @selected($sortF==='top')>Sort by: Top-Rated</option>
+                                <option value="rating" @selected($sortF==='rating')>Sort by: Highest Rating</option>
+                                <option value="newest" @selected($sortF==='newest')>Sort by: Newest</option>
+                            </select>
+                        </form>
+                        <div class="br-viewtoggle">
+                            <button type="button" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> Grid</button>
+                            <button type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> List</button>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="browse-toolbar-right">
-                    <form method="GET" action="{{ route('public.browse') }}" class="browse-sort" id="sortForm">
-                        <input type="hidden" name="q" value="{{ $filters['q'] }}">
-                        <input type="hidden" name="city" value="{{ $filters['city'] }}">
-                        <input type="hidden" name="rating_min" value="{{ $filters['rating_min'] }}">
-                        @if($filters['verified'])<input type="hidden" name="verified" value="1">@endif
-                        <span>Sort:</span>
-                        <select name="sort" onchange="this.form.submit()">
-                            <option value="top"    {{ $filters['sort'] === 'top'    ? 'selected' : '' }}>Top-rated</option>
-                            <option value="rating" {{ $filters['sort'] === 'rating' ? 'selected' : '' }}>Highest rating</option>
-                            <option value="newest" {{ $filters['sort'] === 'newest' ? 'selected' : '' }}>Newest first</option>
-                        </select>
-                    </form>
+                @forelse($pros as $i => $pro)
+                    @php
+                        $p = $pro->profile;
+                        $avg = round((float) ($pro->reviews_avg ?? 0), 1);
+                        $cnt = (int) ($pro->reviews_count ?? 0);
+                        $isVerified = $p && $p->trade_license_verified_at && $p->liability_insurance_verified_at && $p->workers_comp_verified_at;
+                        $isTop = $avg >= 4.5 && $cnt > 0;
+                        $gallery = collect(is_array($p?->portfolio) ? $p->portfolio : [])->filter()->values();
+                        $rate = $p?->hourly_rate;
+                        $heroImg = $gallery->first() ?: 'https://images.unsplash.com/'.$stockGallery[$i % count($stockGallery)].'?w=560&q=72&auto=format&fit=crop';
+                    @endphp
+                    <article class="br-card br-pro">
+                        <div class="br-pro-media">
+                            <span class="br-pro-tag">Portfolio</span>
+                            <img class="br-pro-hero" src="{{ $heroImg }}" alt="{{ $pro->name }}" loading="lazy">
+                            @if($gallery->count() > 1)
+                                <div class="br-pro-thumbs">
+                                    @foreach($gallery->slice(1, 3) as $g)
+                                        <img src="{{ $g }}" alt="" loading="lazy">
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                        <div class="br-pro-body">
+                            <div class="br-pro-top">
+                                <div>
+                                    <div class="br-pro-name">{{ $pro->name }}@if($isVerified)<svg class="vchk" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>@endif</div>
+                                    <div class="br-pro-role">{{ $p?->headline ?? $p?->company_name ?? 'Event Professional' }}</div>
+                                    <div class="br-pro-loc">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                        {{ $p?->city ?? 'Location on request' }}
+                                    </div>
+                                </div>
+                                <button type="button" class="br-fav" aria-label="Save to favorites"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></button>
+                            </div>
 
-                    <div class="view-toggle" role="tablist" aria-label="View mode">
-                        <button type="button" class="is-active" data-view="grid" aria-label="Grid view" title="Grid view">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                        </button>
-                        <button type="button" data-view="list" aria-label="List view" title="List view">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                        </button>
+                            <div class="br-chips">
+                                @if($isVerified)<span class="br-chip verif">VERIFIED PRO</span>@endif
+                                @if($isTop)<span class="br-chip top">TOP RATED</span>@endif
+                                <span class="br-chip quick">QUICK RESPONDER</span>
+                            </div>
+
+                            <div class="br-pro-meta">
+                                @if($cnt > 0)
+                                    <span><span class="star">★ {{ number_format($avg, 1) }}</span> ({{ $cnt }} {{ Str::plural('review', $cnt) }})</span>
+                                @else
+                                    <span class="star">★ New on GigResource</span>
+                                @endif
+                                <span>Recommended by past clients</span>
+                            </div>
+
+                            <div class="br-pro-foot">
+                                <div class="br-price">
+                                    @if($rate)
+                                        Starting at <b>${{ number_format($rate) }}</b> / hr
+                                    @else
+                                        <b>Request a quote</b>
+                                    @endif
+                                </div>
+                                <div class="br-pro-actions">
+                                    <a href="{{ route('public.professional.show', $pro) }}" class="br-btn-ghost">View Portfolio</a>
+                                    <a href="{{ route('public.professional.show', $pro) }}" class="br-btn-msg">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Message
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                @empty
+                    <div class="br-card br-empty">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <h3>No professionals match your filters yet</h3>
+                        <p>Try widening your search — or post your event and let pros come to you.</p>
+                        <a href="{{ route('public.browse') }}" class="br-btn-ghost" style="margin-top:14px;">Reset filters</a>
                     </div>
+                @endforelse
+
+                @if($pros->hasPages())
+                    <nav class="br-pager">
+                        @if($pros->onFirstPage())
+                            <span class="dis">‹</span>
+                        @else
+                            <a href="{{ $pros->previousPageUrl() }}">‹</a>
+                        @endif
+                        @foreach($pros->getUrlRange(1, $pros->lastPage()) as $page => $url)
+                            @if($page == $pros->currentPage())
+                                <span class="cur">{{ $page }}</span>
+                            @else
+                                <a href="{{ $url }}">{{ $page }}</a>
+                            @endif
+                        @endforeach
+                        @if($pros->hasMorePages())
+                            <a href="{{ $pros->nextPageUrl() }}">Next ›</a>
+                        @else
+                            <span class="dis">Next ›</span>
+                        @endif
+                    </nav>
+                @endif
+            </main>
+
+            {{-- ── RIGHT: RAIL ── --}}
+            <aside class="br-rail">
+                <div class="br-rail-card">
+                    <div class="br-rail-head"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Venue / Location Map</span></div>
+                    <div class="br-map">
+                        <div class="br-map-fallback"></div>
+                        <span class="br-map-pin" style="left:24%;top:30%;"></span>
+                        <span class="br-map-pin" style="left:70%;top:38%;"></span>
+                        <span class="br-map-pin" style="left:38%;top:66%;"></span>
+                        <span class="br-map-pin" style="left:78%;top:70%;"></span>
+                        <span class="br-map-cluster">{{ min($total, 99) }}</span>
+                    </div>
+                </div>
+
+                <div class="br-rail-card">
+                    <div class="br-rail-head"><span>Compare Pros</span><a href="#">Clear All</a></div>
+                    @foreach($pros->take(2) as $cp)
+                        <div class="br-mini">
+                            <img class="br-mini-av" src="{{ $cp->avatar_url }}" alt="">
+                            <div class="br-mini-main"><h5>{{ $cp->name }}</h5><span>{{ $cp->profile?->city ?? '—' }}</span></div>
+                            <span class="br-mini-rate">{{ $cp->profile?->hourly_rate ? '$'.number_format($cp->profile->hourly_rate) : '—' }}</span>
+                        </div>
+                    @endforeach
+                    <a href="#" class="br-rail-btn blue">Compare Now</a>
+                </div>
+
+                <div class="br-rail-card">
+                    <div class="br-rail-head"><span>Recently Viewed</span></div>
+                    <div class="br-recent">
+                        @foreach($pros->take(3) as $rv)
+                            @php $rvImg = collect(is_array($rv->profile?->portfolio) ? $rv->profile->portfolio : [])->first(); @endphp
+                            <a href="{{ route('public.professional.show', $rv) }}">
+                                <img src="{{ $rvImg ?: 'https://images.unsplash.com/'.$stockGallery[$loop->index % count($stockGallery)].'?w=200&q=60&auto=format&fit=crop' }}" alt="">
+                                <span>{{ $rv->name }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        {{-- ══════════════ CTA ══════════════ --}}
+        <section class="br-cta">
+            <div>
+                <h3>Can't find what you're looking for?</h3>
+                <p>Post your event and let verified professionals come to you. Describe your needs and receive proposals from top-rated experts.</p>
+                <div class="br-cta-actions">
+                    <a href="{{ route('register') }}" class="br-btn-msg" style="padding:11px 20px;">Post an Event</a>
+                    <a href="{{ route('register') }}" class="br-btn-ghost" style="padding:11px 20px;">Join as Professional</a>
                 </div>
             </div>
+            <div class="br-cta-emoji">📅</div>
+        </section>
 
-            {{-- Results --}}
-            @if($pros->isEmpty())
-                <div class="browse-empty">
-                    <div class="icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    </div>
-                    <h3>No professionals match your filters</h3>
-                    <p>Try a broader search, lower the minimum rating, or remove the city filter to see more results.</p>
-                    <div class="empty-actions">
-                        <a href="{{ route('public.browse') }}" class="btn btn-primary">Reset filters</a>
-                        <a href="{{ route('events-categories') }}" class="btn btn-ghost">Browse categories</a>
-                    </div>
-                </div>
-            @else
-                <div class="pro-grid" id="proGrid">
-                    @foreach($pros as $pro)
-                        @php
-                            $p = $pro->profile;
-                            // Centralized badge derivation — single source of truth on User model.
-                            // Auto-assigned from reviews + booking + verification doc state.
-                            $isVerified = $pro->isVerified();
-                            $isTop      = $pro->isTopRated();
-                            $isNew      = $pro->isNewVendor();
-                            $loc   = $p ? collect([$p->city, $p->state])->filter()->implode(', ') : null;
-                            // Skills come back as a JSON array on UserProfile — show up to 3 chips.
-                            $skills = is_array($p?->skills) ? array_slice($p->skills, 0, 3) : [];
-                            $extraSkills = is_array($p?->skills) ? max(0, count($p->skills) - 3) : 0;
-                        @endphp
-                        <a href="{{ route('public.professional.show', $pro) }}" class="pro-card">
-                            {{-- Cover with badges + save button --}}
-                            <div class="pro-card-cover" @if($pro->cover_image_url) style="background-image: url('{{ $pro->cover_image_url }}');" @endif>
-                                <div class="pro-card-badges">
-                                    @if($isTop)
-                                        <span class="pro-badge top">
-                                            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                            Top rated
-                                        </span>
-                                    @endif
-                                    @if($isVerified)
-                                        <span class="pro-badge verified">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                                            Verified
-                                        </span>
-                                    @endif
-                                    @if($isNew && !$isTop)
-                                        <span class="pro-badge new">New</span>
-                                    @endif
-                                </div>
-
-                                <button type="button" class="pro-card-save" aria-label="Save professional"
-                                        onclick="event.preventDefault();event.stopPropagation();this.classList.toggle('is-saved');">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                                </button>
-                            </div>
-
-                            {{-- Body --}}
-                            <div class="pro-card-body">
-                                <div class="pro-card-avatar-wrap">
-                                    <img loading="lazy" src="{{ $pro->avatar_url }}" alt="{{ $pro->name }}" class="pro-card-avatar" loading="lazy">
-                                    <span class="pro-card-online" aria-label="Recently active"></span>
-                                </div>
-
-                                <div class="pro-card-name">
-                                    {{ $pro->name }}
-                                    @if($isVerified)
-                                        <svg class="check" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 0l2.39 4.84 5.34.78-3.86 3.77.91 5.31L12 12.18l-4.78 2.52.91-5.31L4.27 5.62l5.34-.78z" transform="scale(0.95) translate(0.7 0)"/><path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-                                    @endif
-                                </div>
-
-                                <p class="pro-card-headline">
-                                    {{ $p->headline ?? $p->bio ?? 'Professional event service provider.' }}
-                                </p>
-
-                                @if(!empty($skills))
-                                    <div class="pro-card-skills">
-                                        @foreach($skills as $sk)
-                                            <span class="skill">{{ $sk }}</span>
-                                        @endforeach
-                                        @if($extraSkills > 0)
-                                            <span class="skill more">+{{ $extraSkills }}</span>
-                                        @endif
-                                    </div>
-                                @endif
-
-                                <div class="pro-card-meta">
-                                    @if($pro->reviews_count > 0)
-                                        <span class="rating">
-                                            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                            {{ number_format($pro->reviews_avg, 1) }}
-                                            <span class="count">({{ $pro->reviews_count }})</span>
-                                        </span>
-                                    @else
-                                        <span class="rating" style="color: var(--text-muted);">
-                                            <svg viewBox="0 0 24 24" style="fill: currentColor;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                                            New
-                                        </span>
-                                    @endif
-
-                                    @if($loc)
-                                        <span class="sep">•</span>
-                                        <span class="loc">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                                            {{ $loc }}
-                                        </span>
-                                    @endif
-                                </div>
-
-                                <div class="pro-card-foot">
-                                    <div class="pro-card-price">
-                                        @if($p && $p->hourly_rate)
-                                            From <strong>${{ number_format((float) $p->hourly_rate, 0) }}</strong>/hr
-                                        @else
-                                            <span style="color: var(--text-muted);">Contact for pricing</span>
-                                        @endif
-                                    </div>
-                                    <span class="pro-card-cta">
-                                        View profile
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                                    </span>
-                                </div>
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
-
-                {{-- Pagination --}}
-                @if($pros->hasPages())
-                    <div class="browse-pagination">
-                        {{ $pros->onEachSide(1)->links() }}
-                    </div>
-                @endif
-            @endif
-        </div>
+        {{-- ══════════════ TRUST STRIP ══════════════ --}}
+        <section class="br-strip">
+            <div class="br-strip-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <div><h4>Secure Bookings</h4><p>Escrow-protected payments for your peace of mind.</p></div>
+            </div>
+            <div class="br-strip-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                <div><h4>Verified Professionals</h4><p>Background &amp; license checks before pros go live.</p></div>
+            </div>
+            <div class="br-strip-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9 12 2"/></svg>
+                <div><h4>Real Reviews</h4><p>Honest reviews from real, verified customers.</p></div>
+            </div>
+            <div class="br-strip-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/></svg>
+                <div><h4>Dedicated Support</h4><p>A real team, here to help when you need it.</p></div>
+            </div>
+        </section>
     </div>
 </div>
-
 @endsection
-
-@push('scripts')
-<script>
-    // ─── View toggle (grid ↔ list) ──────────────────────────────
-    // Persist choice in localStorage so it sticks across visits.
-    (function() {
-        const grid    = document.getElementById('proGrid');
-        const buttons = document.querySelectorAll('.view-toggle [data-view]');
-        if (!grid || !buttons.length) return;
-
-        const STORAGE_KEY = 'browse.viewMode';
-        const saved = localStorage.getItem(STORAGE_KEY);
-
-        function setView(mode) {
-            buttons.forEach(b => b.classList.toggle('is-active', b.dataset.view === mode));
-            grid.classList.toggle('is-list', mode === 'list');
-            try { localStorage.setItem(STORAGE_KEY, mode); } catch (e) { /* ignore quota errors */ }
-        }
-
-        if (saved === 'list') setView('list');
-
-        buttons.forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
-    })();
-
-    // ─── Mobile filters drawer ──────────────────────────────────
-    (function() {
-        const sidebar  = document.getElementById('filtersSidebar');
-        const backdrop = document.getElementById('filtersBackdrop');
-        const opener   = document.getElementById('openFiltersBtn');
-        const closer   = document.querySelector('.filters-mobile-close');
-        if (!sidebar || !backdrop || !opener) return;
-
-        function open() {
-            sidebar.classList.add('is-open');
-            backdrop.classList.add('is-visible');
-            document.body.style.overflow = 'hidden';
-        }
-        function close() {
-            sidebar.classList.remove('is-open');
-            backdrop.classList.remove('is-visible');
-            document.body.style.overflow = '';
-        }
-
-        opener.addEventListener('click', open);
-        backdrop.addEventListener('click', close);
-        if (closer) closer.addEventListener('click', close);
-
-        // Reset drawer state when crossing the breakpoint up to desktop
-        const mq = window.matchMedia('(min-width: 961px)');
-        mq.addEventListener?.('change', (e) => { if (e.matches) close(); });
-    })();
-</script>
-@endpush

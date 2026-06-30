@@ -68,10 +68,24 @@ class ProfessionalChatController extends Controller
             $thread = $this->thread($activeConv, $user);
         }
 
+        // Message Center category cards (counts).
+        $categories = [
+            'inbox'    => count($list),
+            'chats'    => collect($list)->where('category', 'chats')->count(),
+            'bidding'  => collect($list)->where('category', 'bidding')->count(),
+            'packages' => collect($list)->where('category', 'packages')->count(),
+            'offers'   => collect($list)->where('category', 'offers')->count(),
+        ];
+
+        // Conversation Info rail (client + related order) for the active thread.
+        $info = $activeConv ? $this->info($activeConv, $user) : null;
+
         return [
             'currentUser' => $user,
             'conversations' => $list,
             'thread' => $thread,
+            'categories' => $categories,
+            'info' => $info,
             'stats' => $this->stats($conversations, $user),
             'tabCounts' => [
                 'inbox' => count($list),
@@ -121,6 +135,36 @@ class ProfessionalChatController extends Controller
             'tags'    => $tags,
             'initials' => $this->initials($other?->name ?? 'C'),
             'lastFromMe' => $last && $last->sender_id === $user->id,
+            // Message Center category: 1-on-1 chat, gig bid (event-linked), or a direct offer/request.
+            'category' => ($c->type ?? 'direct') === 'direct' ? 'chats' : ($event ? 'bidding' : 'offers'),
+        ];
+    }
+
+    /** Conversation Info rail: the client's contact + the related order/proposal. */
+    private function info(Conversation $c, User $user): array
+    {
+        $client  = $c->participants->firstWhere('id', '!=', $user->id) ?? $c->participants->first();
+        $booking = $c->booking;
+        $event   = $c->event ?? $booking?->event;
+
+        $clientBookings = $client ? Booking::where('client_id', $client->id) : null;
+
+        return [
+            'name'         => $client?->name ?? 'Client',
+            'initials'     => $this->initials($client?->name ?? 'C'),
+            'email'        => $client?->email,
+            'phone'        => $client?->phone ?? optional($client?->profile)->phone,
+            'location'     => optional($client?->profile)->address ?? optional($client?->profile)->city,
+            'member_since' => optional($client?->created_at)->format('M d, Y'),
+            'total_orders' => $clientBookings ? (clone $clientBookings)->count() : 0,
+            'total_spent'  => $clientBookings ? (float) (clone $clientBookings)->whereIn('status', ['confirmed', 'completed'])->sum('price') : 0,
+            'order'        => $booking ? [
+                'title'    => $event?->title ?? 'Booking',
+                'proposal' => 'PR-' . str_pad((string) $booking->id, 4, '0', STR_PAD_LEFT),
+                'price'    => (float) $booking->price,
+                'status'   => $booking->status,
+                'date'     => optional($booking->created_at)->format('M d, Y'),
+            ] : null,
         ];
     }
 

@@ -560,10 +560,6 @@
         {{-- Gateway chips + search --}}
         <div class="bk-gw-row">
             <div class="bk-chips">
-                <a href="#" class="bk-chip is-active">All Gateways</a>
-                <a href="#" class="bk-chip"><svg class="ico-stripe" viewBox="0 0 24 24" fill="currentColor"><path d="M13.479 9.883c-1.626-.604-2.512-1.067-2.512-1.803 0-.622.511-.977 1.423-.977 1.667 0 3.379.642 4.558 1.22l.666-4.111c-.935-.446-2.847-1.177-5.49-1.177-1.87 0-3.425.488-4.536 1.4-1.156.96-1.753 2.346-1.753 4.02 0 3.038 1.857 4.339 4.885 5.434 1.952.711 2.604 1.221 2.604 1.999 0 .755-.629 1.187-1.79 1.187-1.45 0-3.836-.71-5.398-1.62l-.674 4.157C6.86 19.578 8.918 20 11.078 20c1.973 0 3.62-.466 4.737-1.343 1.244-.978 1.889-2.422 1.889-4.299 0-3.111-1.891-4.404-4.225-5.475z"/></svg>Stripe Processing</a>
-                <a href="#" class="bk-chip"><svg class="ico-escrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Escrow.com Locked</a>
-                <a href="#" class="bk-chip"><svg class="ico-dispute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Milestone Disputes</a>
             </div>
             <form method="GET" class="bk-search">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -636,18 +632,9 @@
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                                     Open Chat with {{ \Illuminate\Support\Str::limit($booking->supplier?->name ?? 'Pro', 14, '…') }}
                                 </a>
-                                <a href="#" class="bk-action-item">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                    View Timeline / Milestones
-                                </a>
-                                <a href="#" class="bk-action-item">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                                    Request Change / Modify
-                                </a>
-                                <a href="#" class="bk-action-item warning">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
-                                    Raise Dispute
-                                </a>
+                                
+                                
+                                
                             </div>
                         </div>
 
@@ -681,17 +668,13 @@
                                 <div class="bk-finance-row"><span class="lbl">1099 Rolling Total (YTD)</span><span class="val">${{ number_format($spent) }} / $600</span></div>
                                 <div class="bk-finance-row"><span class="lbl">Tax Form</span><span class="val" style="font-size:11.5px;">W-9 Filed</span></div>
                             </div>
-                            <a href="#" class="bk-rail-link" style="margin-top:6px;">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                                View Compliance Center
-                            </a>
+                            
                         </div>
 
                         {{-- Quick Documents --}}
                         <div>
                             <div class="bk-col-title" style="display:flex;justify-content:space-between;">
                                 <span style="display:flex;align-items:center;gap:6px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Quick Documents</span>
-                                <a href="#" style="color:#6366f1;text-transform:none;font-weight:600;text-decoration:none;font-size:10px;">View All (6)</a>
                             </div>
                             <div class="bk-docs-list">
                                 @php
@@ -709,10 +692,7 @@
                                     </div>
                                 @endforeach
                             </div>
-                            <a href="#" class="bk-doc-add">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                Add Document
-                            </a>
+                            
                         </div>
                     </div>
 
@@ -755,7 +735,7 @@
                         </div>
                         <div class="bk-summarizer-body">
                             @if($booking->event)
-                                Vendor confirmed start time and venue check-in. <a href="#">Review Annex A ›</a>
+                                Vendor confirmed start time and venue check-in. 
                             @else
                                 No new contract adjustments detected in chat.
                             @endif
@@ -840,14 +820,13 @@
             <div class="bk-fin-row"><span class="lbl">Locked in Escrow</span><span class="val amber">${{ number_format($financial['locked_escrow']) }}</span></div>
             <div class="bk-fin-row"><span class="lbl">Paid Out (YTD)</span><span class="val green">${{ number_format($financial['paid_out_ytd']) }}</span></div>
             <div class="bk-fin-row"><span class="lbl">Pending Payouts</span><span class="val amber">${{ number_format($financial['pending_payouts']) }}</span></div>
-            <a href="#" class="bk-rail-link">View Full Financials <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+            <a href="{{ route('client.payments.index') }}" class="bk-rail-link">View Full Financials <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         </div>
 
         {{-- Upcoming Milestones --}}
         <div class="bk-rail-card">
             <div class="bk-rail-head">
                 <div class="bk-rail-title">Upcoming Milestones</div>
-                <a href="#" style="font-size:11px;color:#f97316;text-decoration:none;font-weight:600;">View All</a>
             </div>
             @if($upcomingMilestones->count())
                 @foreach($upcomingMilestones as $m)
@@ -871,8 +850,6 @@
             <div class="bk-rail-head"><div class="bk-rail-title">Quick Actions</div></div>
             <div class="bk-qa-list">
                 <a href="{{ route('client.events.index') }}?create=1" class="bk-qa-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create New Booking</a>
-                <a href="#" class="bk-qa-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>Add Milestone</a>
-                <a href="#" class="bk-qa-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload Document</a>
                 <a href="{{ route('client.bookings.index') }}" class="bk-qa-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>View All Bookings</a>
             </div>
         </div>

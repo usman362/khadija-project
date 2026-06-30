@@ -172,13 +172,13 @@
                 <div class="ab-window-bar"><i class="l1"></i><i class="l2"></i><i class="l3"></i><b>Gig<i>Resource</i></b></div>
                 <div class="ab-pcards">
                     <div class="ab-pcard">
-                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&q=80&auto=format&fit=crop" alt="">
+                        <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=120&q=80&auto=format&fit=crop" alt="">
                         <b>Event Organizer</b>
                         <div class="stars">★★★★★</div>
                     </div>
                     <div class="ab-pcard">
                         <span class="vbadge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span>
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80&auto=format&fit=crop" alt="">
+                        <img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=120&q=80&auto=format&fit=crop" alt="">
                         <b>Event Professional</b>
                         <div class="stars">★★★★★</div>
                     </div>
@@ -197,7 +197,7 @@
 
             {{-- New message float --}}
             <div class="ab-float ab-float-msg">
-                <img src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=90&q=80&auto=format&fit=crop" alt="">
+                <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=90&q=80&auto=format&fit=crop" alt="">
                 <div><b>New Message</b><span>Looking forward to it! 🎉</span></div>
             </div>
 
@@ -229,7 +229,7 @@
                     <circle cx="20" cy="22" r="3" fill="#fff"/><circle cx="29" cy="22" r="3" fill="#fff"/><circle cx="38" cy="22" r="3" fill="#fff"/>
                 </svg>
                 <div class="ab-story-person">
-                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&q=80&auto=format&fit=crop" alt="">
+                    <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=80&q=80&auto=format&fit=crop" alt="">
                     <div><div style="font-size:11px;font-weight:800;color:var(--ink);">Top Rated</div><div class="stars">★★★★★</div></div>
                 </div>
                 <svg class="ab-story-mug" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -387,21 +387,21 @@
         </div>
         <div class="ab-serve">
             <div class="ab-serve-card">
-                <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=600&q=80&auto=format&fit=crop" alt="Event organizer" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80&auto=format&fit=crop" alt="Event organizer" loading="lazy">
                 <div class="ab-serve-body">
                     <span class="ab-serve-ico" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);box-shadow:0 8px 16px rgba(37,99,235,0.3);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
                     <div><h4>Event Organizers</h4><p>Find the right talent for your event.</p></div>
                 </div>
             </div>
             <div class="ab-serve-card">
-                <img src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=600&q=80&auto=format&fit=crop" alt="Event professional" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=80&auto=format&fit=crop" alt="Event professional" loading="lazy">
                 <div class="ab-serve-body">
                     <span class="ab-serve-ico" style="background:linear-gradient(135deg,#fb923c,#ea580c);box-shadow:0 8px 16px rgba(234,88,12,0.3);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
                     <div><h4>Event Professionals</h4><p>Showcase your expertise and grow your business.</p></div>
                 </div>
             </div>
             <div class="ab-serve-card">
-                <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?w=600&q=80&auto=format&fit=crop" alt="Event team" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=600&q=80&auto=format&fit=crop" alt="Event team" loading="lazy">
                 <div class="ab-serve-body">
                     <span class="ab-serve-ico" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);box-shadow:0 8px 16px rgba(37,99,235,0.3);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
                     <div><h4>Event Teams</h4><p>Collaborate efficiently from planning to execution.</p></div>

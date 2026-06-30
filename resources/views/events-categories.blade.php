@@ -622,12 +622,28 @@
     .btn-ghost:hover { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.08); }
 
     /* ─── ANIMATIONS ──────────────────────────── */
+    /* Auto-playing entrance animation with fill-mode:both — content always ends
+       visible (opacity:1) with NO dependency on JS or scroll triggers, so a
+       section can never get stuck hidden and look "empty". */
     .fade-up {
-        opacity: 0;
-        transform: translateY(30px);
-        transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        animation: fadeUpIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
-    .fade-up.visible { opacity: 1; transform: translateY(0); }
+    .fade-up.visible { opacity: 1; transform: none; }
+    @keyframes fadeUpIn {
+        from { opacity: 0; transform: translateY(26px); }
+        to   { opacity: 1; transform: none; }
+    }
+    @media (prefers-reduced-motion: reduce) { .fade-up { animation: none; opacity: 1; transform: none; } }
+
+    /* ─── Reference-clean filter row ──────────────
+       The audience toggle is removed and the chips are simplified to match the
+       reference: no purple toggle pill, no "0" count badge, no chevron. These
+       use the [hidden] attribute, but a class `display` rule was overriding it,
+       so force them off here. Count badges still appear once JS removes [hidden]
+       (i.e. when a filter is actually selected). */
+    .adv-aud-toggle { display: none !important; }
+    .adv-filter-trigger .count-badge[hidden] { display: none !important; }
+    .adv-filter-trigger .chev { display: none !important; }
 
     /* ─── RESPONSIVE ──────────────────────────── */
     @media (max-width: 1100px) {
@@ -1067,21 +1083,28 @@
             <h2>Explore by category</h2>
             <p>Pick a category to see featured pros, reviews, and pricing on a dedicated page.</p>
         </div>
-        <div class="ec-explore-grid">
-            @foreach($allCategories as $cat)
-                <a href="{{ route('public.category', $cat->slug) }}" class="ec-explore-card">
-                    @if($cat->icon)
-                        <span class="ec-explore-icon">{{ $cat->icon }}</span>
-                    @endif
-                    <span class="ec-explore-name">{{ $cat->name }}</span>
-                    @if($cat->children && $cat->children->count())
-                        <span class="ec-explore-sub">{{ $cat->children->count() }} sub-categories</span>
-                    @endif
-                    <svg class="ec-explore-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-                    </svg>
+        <div class="ec-explore-bar" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <a href="{{ route('public.category', $allCategories->first()->slug) }}" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:10px 16px;color:#e2e8f0;font-size:13.5px;font-weight:600;text-decoration:none;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2.2" style="flex-shrink:0;"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                    {{ \Illuminate\Support\Str::title($allCategories->first()->name) }}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" style="opacity:.6;"><polyline points="6 9 12 15 18 9"/></svg>
                 </a>
-            @endforeach
+                <a href="{{ route('public.browse') }}" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:11px;padding:10px 16px;color:#cbd5e1;font-size:13.5px;font-weight:600;text-decoration:none;">
+                    See all categories
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" style="opacity:.6;"><polyline points="6 9 12 15 18 9"/></svg>
+                </a>
+            </div>
+            <div style="display:flex;gap:10px;margin-left:auto;flex-wrap:wrap;">
+                <a href="{{ route('public.browse') }}" style="display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,#3b82f6,#6366f1);border:none;border-radius:11px;padding:10px 18px;color:#fff;font-size:13.5px;font-weight:700;text-decoration:none;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                    Pro Listings
+                </a>
+                <a href="{{ route('public.browse') }}" style="display:inline-flex;align-items:center;gap:7px;background:rgba(99,102,241,0.08);border:1px solid rgba(129,140,248,0.45);border-radius:11px;padding:10px 18px;color:#a5b4fc;font-size:13.5px;font-weight:700;text-decoration:none;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    Pro in Performance
+                </a>
+            </div>
         </div>
     </div>
 </section>
@@ -1315,22 +1338,11 @@
 
 <section class="adv-filter-section">
     <div class="container">
-        {{-- HEAD: section title + audience toggle --}}
-        <div class="adv-filter-head fade-up">
-            <div class="adv-filter-head-left">
-                <h2>Refine Your View</h2>
-                <p>Filters work the way you do — switch between Client and Professional views for tailored options.</p>
-            </div>
-            <div class="adv-aud-toggle" role="tablist" aria-label="Filter audience">
-                <button type="button" class="is-active" data-audience="client" role="tab" aria-selected="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    I'm a Client
-                </button>
-                <button type="button" data-audience="pro" role="tab" aria-selected="false">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    I'm a Professional
-                </button>
-            </div>
+        {{-- Audience toggle removed to match the cleaner reference layout; the
+             hidden 'client' radio keeps the filter JS defaulting to client view. --}}
+        <div class="adv-aud-toggle" hidden aria-hidden="true">
+            <button type="button" class="is-active" data-audience="client" aria-selected="true"></button>
+            <button type="button" data-audience="pro" aria-selected="false"></button>
         </div>
 
         {{-- FILTER BARS — one per audience, only the active one is visible --}}
@@ -1477,9 +1489,9 @@
                         'count' => 120,
                         'cover' => 'https://images.unsplash.com/photo-1519741497674-611481863552?w=900&q=80&auto=format&fit=crop',
                         'subs'  => [
-                            ['name' => 'Floral &amp; Decor',     'count' => 42, 'img' => 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
+                            ['name' => 'Floral &amp; Decor',     'count' => 42, 'img' => 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Wedding Photography',    'count' => 75, 'img' => 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
-                            ['name' => 'Reception Catering',     'count' => 55, 'img' => 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
+                            ['name' => 'Reception Catering',     'count' => 55, 'img' => 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Wedding DJs',            'count' => 90, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Wedding Planners',       'count' => 60, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','newest']],
                         ],
@@ -1490,14 +1502,14 @@
                         'title' => 'Corporate Events &amp; Conferences',
                         'desc'  => 'Meetings, product launches, team off-sites — with AV, staffing, and venues handled end-to-end.',
                         'count' => 80,
-                        'cover' => 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=900&q=80&auto=format&fit=crop',
+                        'cover' => 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=900&q=80&auto=format&fit=crop',
                         'subs'  => [
                             ['name' => 'Conference AV',          'count' => 22, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','trending']],
-                            ['name' => 'Event Planners',         'count' => 60, 'img' => 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
+                            ['name' => 'Event Planners',         'count' => 60, 'img' => 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
                             ['name' => 'Event Staff',            'count' => 30, 'img' => 'https://images.unsplash.com/photo-1525772764200-be829a350797?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Awards &amp; Branding',  'count' => 22, 'img' => 'https://images.unsplash.com/photo-1525772764200-be829a350797?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
-                            ['name' => 'Videography',            'count' => 35, 'img' => 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
-                            ['name' => 'Corporate Catering',     'count' => 40, 'img' => 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
+                            ['name' => 'Videography',            'count' => 35, 'img' => 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
+                            ['name' => 'Corporate Catering',     'count' => 40, 'img' => 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
                         ],
                     ],
                     [
@@ -1510,7 +1522,7 @@
                         'subs'  => [
                             ['name' => 'Themed Decor',           'count' => 18, 'img' => 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','trending']],
                             ['name' => 'Custom Cakes',           'count' => 12, 'img' => 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
-                            ['name' => 'Lifestyle Photography',  'count' => 20, 'img' => 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
+                            ['name' => 'Lifestyle Photography',  'count' => 20, 'img' => 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Shower Planners',        'count' => 15, 'img' => 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
                             ['name' => 'Party Favors',           'count' => 10, 'img' => 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
                         ],
@@ -1540,11 +1552,11 @@
                         'cover' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=900&q=80&auto=format&fit=crop',
                         'subs'  => [
                             ['name' => 'DJ Services',            'count' => 90, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
-                            ['name' => 'Live Bands',             'count' => 38, 'img' => 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
-                            ['name' => 'Solo Artists',           'count' => 24, 'img' => 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
-                            ['name' => 'Emcees / Hosts',         'count' => 20, 'img' => 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','trending']],
+                            ['name' => 'Live Bands',             'count' => 38, 'img' => 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
+                            ['name' => 'Solo Artists',           'count' => 24, 'img' => 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
+                            ['name' => 'Emcees / Hosts',         'count' => 20, 'img' => 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','trending']],
                             ['name' => 'Sound &amp; AV',         'count' => 18, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
-                            ['name' => 'String Quartets',        'count' => 12, 'img' => 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
+                            ['name' => 'String Quartets',        'count' => 12, 'img' => 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
                         ],
                     ],
                     [
@@ -1553,12 +1565,12 @@
                         'title' => 'Photo &amp; Video',
                         'desc'  => 'Editorial, cinematic, same-day edit — the people who turn your event into a keepsake.',
                         'count' => 75,
-                        'cover' => 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=900&q=80&auto=format&fit=crop',
+                        'cover' => 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&q=80&auto=format&fit=crop',
                         'subs'  => [
                             ['name' => 'Wedding Photography',    'count' => 30, 'img' => 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
-                            ['name' => 'Corporate Video',        'count' => 18, 'img' => 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
-                            ['name' => 'Event Photography',      'count' => 22, 'img' => 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','trending']],
-                            ['name' => 'Drone / Aerial',         'count' =>  9, 'img' => 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest','trending']],
+                            ['name' => 'Corporate Video',        'count' => 18, 'img' => 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
+                            ['name' => 'Event Photography',      'count' => 22, 'img' => 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','trending']],
+                            ['name' => 'Drone / Aerial',         'count' =>  9, 'img' => 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest','trending']],
                             ['name' => 'Photo Booths',           'count' => 14, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
                             ['name' => 'Lifestyle Shoots',       'count' => 11, 'img' => 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
                         ],
@@ -1569,14 +1581,14 @@
                         'title' => 'Food &amp; Catering',
                         'desc'  => 'Tasting menus, casual buffets, food trucks, and bartending crews — cuisines for every crowd.',
                         'count' => 55,
-                        'cover' => 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=900&q=80&auto=format&fit=crop',
+                        'cover' => 'https://images.unsplash.com/photo-1519741497674-611481863552?w=900&q=80&auto=format&fit=crop',
                         'subs'  => [
-                            ['name' => 'Full-Service Catering',  'count' => 20, 'img' => 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
-                            ['name' => 'Bartending',             'count' => 12, 'img' => 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','trending']],
+                            ['name' => 'Full-Service Catering',  'count' => 20, 'img' => 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
+                            ['name' => 'Bartending',             'count' => 12, 'img' => 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','trending']],
                             ['name' => 'Food Trucks',            'count' =>  9, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest','trending']],
                             ['name' => 'Cakes &amp; Desserts',   'count' => 14, 'img' => 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
                             ['name' => 'Coffee &amp; Espresso',  'count' =>  7, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
-                            ['name' => 'Private Chefs',          'count' =>  6, 'img' => 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest','top-rated']],
+                            ['name' => 'Private Chefs',          'count' =>  6, 'img' => 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest','top-rated']],
                         ],
                     ],
                     [
@@ -1585,13 +1597,13 @@
                         'title' => 'Decor &amp; Floral',
                         'desc'  => 'Florists, balloon artists, backdrop designers — the people who build the look of the room.',
                         'count' => 42,
-                        'cover' => 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=900&q=80&auto=format&fit=crop',
+                        'cover' => 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=900&q=80&auto=format&fit=crop',
                         'subs'  => [
                             ['name' => 'Florists',               'count' => 18, 'img' => 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Balloon Artists',        'count' => 10, 'img' => 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
-                            ['name' => 'Backdrops',              'count' =>  8, 'img' => 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest','trending']],
+                            ['name' => 'Backdrops',              'count' =>  8, 'img' => 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest','trending']],
                             ['name' => 'Event Lighting',         'count' => 12, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
-                            ['name' => 'Table &amp; Chair Rentals','count' => 9, 'img' => 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
+                            ['name' => 'Table &amp; Chair Rentals','count' => 9, 'img' => 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
                             ['name' => 'Custom Signage',         'count' =>  5, 'img' => 'https://images.unsplash.com/photo-1606800052052-a08af7148866?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
                         ],
                     ],
@@ -1603,11 +1615,11 @@
                         'count' => 90,
                         'cover' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=900&q=80&auto=format&fit=crop',
                         'subs'  => [
-                            ['name' => 'Event Planners',         'count' => 60, 'img' => 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
-                            ['name' => 'Servers &amp; Staff',    'count' => 30, 'img' => 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
+                            ['name' => 'Event Planners',         'count' => 60, 'img' => 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated']],
+                            ['name' => 'Servers &amp; Staff',    'count' => 30, 'img' => 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Event Security',         'count' => 14, 'img' => 'https://images.unsplash.com/photo-1525772764200-be829a350797?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','trending']],
-                            ['name' => 'Registration Desks',     'count' =>  8, 'img' => 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
-                            ['name' => 'Day-Of Coordinators',    'count' => 25, 'img' => 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
+                            ['name' => 'Registration Desks',     'count' =>  8, 'img' => 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
+                            ['name' => 'Day-Of Coordinators',    'count' => 25, 'img' => 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','top-rated','trending']],
                             ['name' => 'Valet Services',         'count' =>  6, 'img' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=400&q=80&auto=format&fit=crop', 'tags' => ['popular','newest']],
                         ],
                     ],
@@ -1695,7 +1707,7 @@
                 </div>
             </a>
             <a class="ts-tile fade-up" href="#" data-tag="featured" data-name="photography wedding">
-                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=600&q=80&auto=format&fit=crop" alt="Photography"></div>
+                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=80&auto=format&fit=crop" alt="Photography"></div>
                 <div class="ts-tile-overlay">
                     <span class="ts-tile-tag tag-featured">Featured</span>
                     <h3>Photography</h3>
@@ -1703,7 +1715,7 @@
                 </div>
             </a>
             <a class="ts-tile fade-up" href="#" data-tag="all" data-name="catering food">
-                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&q=80&auto=format&fit=crop" alt="Catering"></div>
+                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80&auto=format&fit=crop" alt="Catering"></div>
                 <div class="ts-tile-overlay">
                     <span class="ts-tile-tag">Popular</span>
                     <h3>Catering</h3>
@@ -1711,7 +1723,7 @@
                 </div>
             </a>
             <a class="ts-tile fade-up" href="#" data-tag="new" data-name="floral decor flowers">
-                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&q=80&auto=format&fit=crop" alt="Floral"></div>
+                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=600&q=80&auto=format&fit=crop" alt="Floral"></div>
                 <div class="ts-tile-overlay">
                     <span class="ts-tile-tag tag-new">New</span>
                     <h3>Floral Design</h3>
@@ -1719,7 +1731,7 @@
                 </div>
             </a>
             <a class="ts-tile fade-up" href="#" data-tag="all" data-name="event planner coordination">
-                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=600&q=80&auto=format&fit=crop" alt="Planner"></div>
+                <div class="ts-tile-img"><img loading="lazy" src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=80&auto=format&fit=crop" alt="Planner"></div>
                 <div class="ts-tile-overlay">
                     <span class="ts-tile-tag">Reliable</span>
                     <h3>Event Planning</h3>
@@ -1754,61 +1766,33 @@
             <p>Find professionals for every kind of occasion</p>
         </div>
 
+        @php
+            $eventTypes = [
+                ['Weddings', '1,200+', 'photo-1519741497674-611481863552', '#3b82f6'],
+                ['Birthday Parties', '1,780+', 'photo-1530103862676-de8c9debad1d', '#3b82f6'],
+                ['Corporate Events', '1,230+', 'photo-1511578314322-379afb476865', '#f97316'],
+                ['Baby Showers', '950+', 'photo-1515488042361-ee00e0ddd4e4', '#3b82f6'],
+                ['Anniversaries', '870+', 'photo-1519741497674-611481863552', '#3b82f6'],
+                ['Engagement Parties', '690+', 'photo-1583939003579-730e3918a45a', '#3b82f6'],
+            ];
+        @endphp
         <div class="event-grid">
-            <div class="event-tile fade-up">
-                <div class="event-tile-bg">
-                    <img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=800&q=80&auto=format&fit=crop" alt="Birthday party" loading="lazy">
-                </div>
-                <div class="event-tile-overlay">
-                    <h3>Birthday Parties</h3>
-                    <span>60+ professionals available</span>
-                </div>
-            </div>
-            <div class="event-tile fade-up" style="transition-delay:0.05s;">
-                <div class="event-tile-bg">
-                    <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80&auto=format&fit=crop" alt="Music concert" loading="lazy">
-                </div>
-                <div class="event-tile-overlay">
-                    <h3>Music Concerts</h3>
-                    <span>90+ professionals available</span>
-                </div>
-            </div>
-            <div class="event-tile fade-up" style="transition-delay:0.1s;">
-                <div class="event-tile-bg">
-                    <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80&auto=format&fit=crop" alt="Wedding" loading="lazy">
-                </div>
-                <div class="event-tile-overlay">
-                    <h3>Weddings</h3>
-                    <span>120+ professionals available</span>
-                </div>
-            </div>
-            <div class="event-tile fade-up" style="transition-delay:0.15s;">
-                <div class="event-tile-bg">
-                    <img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=800&q=80&auto=format&fit=crop" alt="Corporate event" loading="lazy">
-                </div>
-                <div class="event-tile-overlay">
-                    <h3>Corporate Events</h3>
-                    <span>80+ professionals available</span>
-                </div>
-            </div>
-            <div class="event-tile fade-up" style="transition-delay:0.2s;">
-                <div class="event-tile-bg">
-                    <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800&q=80&auto=format&fit=crop" alt="Graduation" loading="lazy">
-                </div>
-                <div class="event-tile-overlay">
-                    <h3>Graduation Ceremonies</h3>
-                    <span>35+ professionals available</span>
-                </div>
-            </div>
-            <div class="event-tile fade-up" style="transition-delay:0.25s;">
-                <div class="event-tile-bg">
-                    <img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=800&q=80&auto=format&fit=crop" alt="Holiday celebration" loading="lazy">
-                </div>
-                <div class="event-tile-overlay">
-                    <h3>Holiday Celebrations</h3>
-                    <span>50+ professionals available</span>
-                </div>
-            </div>
+            @foreach($eventTypes as $i => [$etName, $etCount, $etPhoto, $etColor])
+                <a href="{{ route('public.browse') }}" class="event-tile fade-up" style="transition-delay:{{ $i * 0.05 }}s; text-decoration:none;">
+                    <div class="event-tile-bg">
+                        <img src="https://images.unsplash.com/{{ $etPhoto }}?w=800&q=80&auto=format&fit=crop" alt="{{ $etName }}" loading="lazy">
+                    </div>
+                    <div class="event-tile-overlay" style="display:flex; align-items:flex-end; justify-content:space-between; gap:10px;">
+                        <div>
+                            <h3>{{ $etName }}</h3>
+                            <span>{{ $etCount }} professionals</span>
+                        </div>
+                        <span style="width:34px; height:34px; border-radius:50%; background:{{ $etColor }}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </span>
+                    </div>
+                </a>
+            @endforeach
         </div>
     </div>
 </section>
@@ -1835,15 +1819,38 @@
 
 @push('scripts')
 <script>
-    // ── Scroll animations ──
-    document.addEventListener('DOMContentLoaded', function () {
-        var observer = new IntersectionObserver(function (entries) {
-            entries.forEach(function (entry) {
-                if (entry.isIntersecting) entry.target.classList.add('visible');
-            });
-        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-        document.querySelectorAll('.fade-up').forEach(function (el) { observer.observe(el); });
-    });
+    // ── Scroll reveal (bulletproof) ──
+    // Plain scroll-position reveal instead of IntersectionObserver: the observer
+    // could miss elements on instant/programmatic scrolls, leaving whole sections
+    // stuck at opacity:0 (the page then looked "empty"). This reveals any .fade-up
+    // once its top enters the viewport, and a load-time pass guarantees nothing
+    // ever stays hidden — while keeping the fade-in animation.
+    (function () {
+        function initReveal() {
+            var items = [].slice.call(document.querySelectorAll('.fade-up'));
+            function reveal() {
+                var vh = window.innerHeight || document.documentElement.clientHeight;
+                for (var i = items.length - 1; i >= 0; i--) {
+                    if (items[i].getBoundingClientRect().top < vh * 0.92) {
+                        items[i].classList.add('visible');
+                        items.splice(i, 1);
+                    }
+                }
+                if (!items.length) {
+                    window.removeEventListener('scroll', reveal);
+                    window.removeEventListener('resize', reveal);
+                }
+            }
+            window.addEventListener('scroll', reveal, { passive: true });
+            window.addEventListener('resize', reveal);
+            reveal();
+            window.addEventListener('load', function () { setTimeout(reveal, 300); });
+        }
+        // Run now if the DOM is already parsed (pushed scripts can execute after
+        // DOMContentLoaded has fired), otherwise wait for it.
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initReveal);
+        else initReveal();
+    })();
 
     // ── Mega-panel switching ──
     // Hover drives it on desktop (like Alibaba); click also works for touch.

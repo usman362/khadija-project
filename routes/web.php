@@ -330,6 +330,38 @@ Route::middleware('auth')->group(function () {
     });
 
     // AI Budget Allocator (plan-gated)
+    // AI Toolkit hub — every tool for this user (catalog-driven, live + planned).
+    Route::get('/ai-tools', [\App\Http\Controllers\AiToolkitController::class, 'index'])->name('ai-tools.index');
+
+    // AI Availability Optimizer (professional).
+    Route::get('/ai-tools/availability-optimizer', [\App\Http\Controllers\AiAvailabilityOptimizerController::class, 'show'])->name('ai-tools.availability-optimizer');
+    // AI Event Planner (client).
+    Route::get('/ai-tools/event-planner', [\App\Http\Controllers\AiEventPlannerController::class, 'show'])->name('ai-tools.event-planner');
+    // AI Theme & Style Advisor (client).
+    Route::get('/ai-tools/theme-advisor', [\App\Http\Controllers\AiThemeAdvisorController::class, 'show'])->name('ai-tools.theme-advisor');
+    // AI Timeline Builder (client).
+    Route::get('/ai-tools/timeline-builder', [\App\Http\Controllers\AiTimelineBuilderController::class, 'show'])->name('ai-tools.timeline-builder');
+    // AI Venue Analyzer (client).
+    Route::get('/ai-tools/venue-analyzer', [\App\Http\Controllers\AiVenueAnalyzerController::class, 'show'])->name('ai-tools.venue-analyzer');
+    // AI Guest Capacity Planner (client).
+    Route::get('/ai-tools/guest-capacity', [\App\Http\Controllers\AiGuestCapacityController::class, 'show'])->name('ai-tools.guest-capacity');
+    // AI Package Builder (professional).
+    Route::get('/ai-tools/package-builder', [\App\Http\Controllers\AiPackageBuilderController::class, 'show'])->name('ai-tools.package-builder');
+    // AI Portfolio Optimizer (professional).
+    Route::get('/ai-tools/portfolio-optimizer', [\App\Http\Controllers\AiPortfolioOptimizerController::class, 'show'])->name('ai-tools.portfolio-optimizer');
+    // AI Checklist Generator (client).
+    Route::get('/ai-tools/checklist-generator', [\App\Http\Controllers\AiChecklistGeneratorController::class, 'show'])->name('ai-tools.checklist-generator');
+    // AI Bid Optimizer (professional).
+    Route::get('/ai-tools/bid-optimizer', [\App\Http\Controllers\AiBidOptimizerController::class, 'show'])->name('ai-tools.bid-optimizer');
+    // AI Upsell Assistant (professional).
+    Route::get('/ai-tools/upsell-assistant', [\App\Http\Controllers\AiUpsellAssistantController::class, 'show'])->name('ai-tools.upsell-assistant');
+    // AI Contract Assistant (both).
+    Route::get('/ai-tools/contract-assistant', [\App\Http\Controllers\AiContractAssistantController::class, 'show'])->name('ai-tools.contract-assistant');
+    // AI Message Assistant (both).
+    Route::get('/ai-tools/message-assistant', [\App\Http\Controllers\AiMessageAssistantController::class, 'show'])->name('ai-tools.message-assistant');
+    // AI Translator (both).
+    Route::get('/ai-tools/translator', [\App\Http\Controllers\AiTranslatorController::class, 'show'])->name('ai-tools.translator');
+
     Route::get('/ai-tools/budget-allocator',  [AiBudgetAllocatorController::class, 'show'])->name('ai-tools.budget-allocator');
     Route::post('/ai-tools/budget-allocator', [AiBudgetAllocatorController::class, 'allocate'])->name('ai-tools.budget-allocator.allocate');
 
@@ -352,6 +384,16 @@ Route::middleware('auth')->group(function () {
     // AI Staffing Planner (deterministic staffing planner — not plan-gated)
     Route::get('/ai-tools/staffing-planner',  [\App\Http\Controllers\AiStaffingPlannerController::class, 'show'])->name('ai-tools.staffing-planner');
     Route::post('/ai-tools/staffing-planner/generate', [\App\Http\Controllers\AiStaffingPlannerController::class, 'generate'])->name('ai-tools.staffing-planner.generate');
+
+    // AI Agreement Builder — guided 3-phase agreement lifecycle (client ↔ professional).
+    // Phase 1: Discovery & AI Evidence Collection.
+    Route::get('/ai-agreement/build/{booking?}', [\App\Http\Controllers\AiAgreementBuilderController::class, 'phase1'])->name('ai-agreement.build');
+    // Draft Generation — AI-filled (green) + required (amber) sections.
+    Route::get('/ai-agreement/draft/{booking?}', [\App\Http\Controllers\AiAgreementBuilderController::class, 'draft'])->name('ai-agreement.draft');
+    // Phase 2: Collaboration & Negotiation.
+    Route::get('/ai-agreement/negotiate/{booking?}', [\App\Http\Controllers\AiAgreementBuilderController::class, 'phase2'])->name('ai-agreement.negotiate');
+    // Phase 3: Execution & Finalization.
+    Route::get('/ai-agreement/finalize/{booking?}', [\App\Http\Controllers\AiAgreementBuilderController::class, 'phase3'])->name('ai-agreement.finalize');
 
     // Integrated Cancellation & Rejection Wizard (agreement reject/renegotiate flow)
     Route::get('/cancellation-wizard/{agreement?}',  [\App\Http\Controllers\CancellationWizardController::class, 'show'])->name('cancellation-wizard.show');
@@ -521,7 +563,10 @@ Route::middleware('auth')->group(function () {
             ->name('client.virtual-hub.brief');
 
         Route::get('/events', [ClientEventController::class, 'index'])->middleware('permission:events.view_any')->name('client.events.index');
+        Route::get('/events/create', [ClientEventController::class, 'create'])->middleware('permission:events.create')->name('client.events.create');
         Route::post('/events', [ClientEventController::class, 'store'])->middleware('permission:events.create')->name('client.events.store');
+        // Direct Offer / Request builder (SSR / MSR / ESR) — client → professional.
+        Route::get('/direct-offers/create', [\App\Http\Controllers\Client\ClientDirectOfferController::class, 'create'])->middleware('permission:events.create')->name('client.direct-offers.create');
         Route::get('/events/{event}', [ClientEventController::class, 'show'])->middleware('permission:events.view')->name('client.events.show');
         Route::patch('/events/{event}', [ClientEventController::class, 'update'])->middleware('permission:events.update')->name('client.events.update');
         Route::post('/events/{event}/publish', [ClientEventController::class, 'publish'])->middleware('permission:events.publish')->name('client.events.publish');
@@ -573,6 +618,9 @@ Route::middleware('auth')->group(function () {
         // Bid Intelligence (bid pipeline performance — invited→submitted→viewed→won/lost)
         Route::get('/bid-intelligence', [\App\Http\Controllers\Professional\ProfessionalBidIntelligenceController::class, 'index'])->name('professional.bid-intelligence.index');
 
+        // Main Bidding Board (browse all open client gigs + place bids)
+        Route::get('/bidding-board', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'index'])->name('professional.bidding-board.index');
+
         // Team & Staffing (crew + shifts subsystem)
         Route::get('/team', [\App\Http\Controllers\Professional\ProfessionalTeamController::class, 'index'])->name('professional.team.index');
         Route::post('/team/staff', [\App\Http\Controllers\Professional\ProfessionalTeamController::class, 'storeStaff'])->name('professional.team.staff.store');
@@ -584,6 +632,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/gigs/{event}', [ProfessionalGigController::class, 'show'])->middleware('permission:events.view')->name('professional.gigs.show');
 
         // Proposals (Bookings from professional's perspective)
+        // Direct Offers (SSR / MSR / ESR) — client sends a direct request to this pro
+        Route::get('/direct-offers/{id?}', [\App\Http\Controllers\Professional\ProfessionalDirectOfferController::class, 'show'])->middleware('permission:bookings.view_any')->name('professional.direct-offers.show');
+
         Route::get('/proposals', [ProfessionalProposalController::class, 'index'])->middleware('permission:bookings.view_any')->name('professional.proposals.index');
         Route::post('/proposals/send/{event}', [ProfessionalProposalController::class, 'sendProposal'])->middleware('permission:bookings.create')->name('professional.proposals.send');
         Route::patch('/proposals/{booking}/status', [ProfessionalProposalController::class, 'updateStatus'])->middleware('permission:bookings.update')->name('professional.proposals.update-status');

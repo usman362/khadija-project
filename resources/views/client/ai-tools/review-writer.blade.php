@@ -395,7 +395,6 @@
                     <div class="rw-plat"><span class="rw-plat-ic">{{ substr($p, 0, 1) }}</span><span>{{ $p }}</span></div>
                 @endforeach
             </div>
-            <a href="#" class="rw-link" style="display:block;text-align:center;">Manage Platforms →</a>
         </div>
     </div>
 </div>

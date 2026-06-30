@@ -284,7 +284,6 @@
             <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Only you can change your rating</div>
             <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Text review stays locked</div>
             <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Keeps your feedback honest</div>
-            <a href="#" class="pr-opt-btn" style="background:#10b981;">Re-Shape Review</a>
         </div>
         <div class="pr-card">
             <div class="pr-opt-h"><span class="pr-opt-ico" style="background:#8b5cf6;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 10h.01M15 10h.01M12 2a8 8 0 0 0-8 8v12l3-3 2 2 3-3 3 3 2-2 3 3V10a8 8 0 0 0-8-8z"/></svg></span><div class="pr-opt-nm">VANISH <span>(Temporary Hold)</span></div></div>
@@ -292,7 +291,6 @@
             <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Moves review to a 48-hour holding tank</div>
             <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Client can restore it anytime</div>
             <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Auto-deletes after time expires</div>
-            <a href="#" class="pr-opt-btn" style="background:#8b5cf6;">Vanish Review</a>
         </div>
         <div class="pr-card">
             <div class="pr-opt-h"><span class="pr-opt-ico" style="background:#14b8a6;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 7h18M6 7l-3 6h6zM18 7l-3 6h6z"/></svg></span><div class="pr-opt-nm">PEER MEDIATE <span>(Get Help)</span></div></div>
@@ -300,7 +298,6 @@
             <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Escalate to our Peer Mediation Panel</div>
             <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>3 verified pros review anonymously</div>
             <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Fair decision based on facts</div>
-            <a href="#" class="pr-opt-btn" style="background:#14b8a6;">Request Mediation</a>
         </div>
         <div class="pr-card">
             <div class="pr-opt-h"><span class="pr-opt-ico" style="background:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg></span><div class="pr-opt-nm">TIPS FOR GIVING GREAT FEEDBACK</div></div>

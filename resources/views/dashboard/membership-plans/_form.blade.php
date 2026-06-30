@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-md-6 mb-3">
         <label class="form-label">Plan Name <span class="text-danger">*</span></label>
-        <input type="text" name="name" class="form-control" value="{{ $plan?->name }}" required placeholder="e.g. Basic, Professional, Enterprise">
+        <input type="text" name="name" class="form-control" value="{{ $plan?->name }}" required placeholder="e.g. Starter, Professional, Elite">
     </div>
     <div class="col-md-3 mb-3">
         <label class="form-label">Price <span class="text-danger">*</span></label>

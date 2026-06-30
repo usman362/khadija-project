@@ -236,14 +236,14 @@
 
             <div class="lp-roles">
                 <div class="lp-role lp-role-blue">
-                    <img class="lp-role-img" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80&auto=format&fit=crop" alt="">
+                    <img class="lp-role-img" src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=200&q=80&auto=format&fit=crop" alt="">
                     <h3>I'm a Professional</h3>
                     <p>Grow your business and get discovered</p>
                     <a href="{{ route('register', ['role' => 'supplier']) }}" class="lp-role-btn">Join as a Pro
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
                 </div>
                 <div class="lp-role lp-role-orange">
-                    <img class="lp-role-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80&auto=format&fit=crop" alt="">
+                    <img class="lp-role-img" src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt="">
                     <h3>I'm a Client</h3>
                     <p>Find the perfect team for your event</p>
                     <a href="{{ route('register', ['role' => 'client']) }}" class="lp-role-btn">Find Talent
@@ -253,9 +253,9 @@
 
             <div class="lp-trustbadge">
                 <div class="lp-avatars">
-                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&q=80&auto=format&fit=crop" alt="">
-                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&q=80&auto=format&fit=crop" alt="">
-                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&q=80&auto=format&fit=crop" alt="">
+                    <img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=80&q=80&auto=format&fit=crop" alt="">
+                    <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=80&q=80&auto=format&fit=crop" alt="">
+                    <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=80&q=80&auto=format&fit=crop" alt="">
                     <img src="https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=80&q=80&auto=format&fit=crop" alt="">
                     <span>+</span>
                 </div>
@@ -400,7 +400,7 @@
                 <div class="lp-acard-top">
                     <span class="lp-acard-ic" style="background:linear-gradient(135deg,#fb923c,#ea580c);box-shadow:0 8px 16px rgba(234,88,12,0.32),inset 0 1.5px 0 rgba(255,255,255,0.4);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20l-2-9-4 3-4-7-4 7-4-3-2 9z"/></svg></span>
                     <div><h3>Maximum Assistance</h3><span class="tagline">AI handles the details.</span></div>
-                    <img class="lp-acard-img" src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=300&q=80&auto=format&fit=crop" alt="">
+                    <img class="lp-acard-img" src="https://images.unsplash.com/photo-1519741497674-611481863552?w=300&q=80&auto=format&fit=crop" alt="">
                 </div>
                 <div class="lp-acard-body">
                     <ul>
@@ -454,14 +454,14 @@
                     @if($featuredReview)
                         <p>{{ \Illuminate\Support\Str::limit($featuredReview->comment, 170) }}</p>
                         <div class="lp-testi-by">
-                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&q=80&auto=format&fit=crop" alt="">
+                            <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=120&q=80&auto=format&fit=crop" alt="">
                             <div><b>{{ optional($featuredReview->reviewer)->name ?? 'Verified Client' }}</b><small>GigResource Member</small></div>
                             <span class="st">★★★★★</span>
                         </div>
                     @else
                         <p>GigResource helped me find amazing vendors and grew my business 3X faster. The tools and support make my job so much easier!</p>
                         <div class="lp-testi-by">
-                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&q=80&auto=format&fit=crop" alt="">
+                            <img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=120&q=80&auto=format&fit=crop" alt="">
                             <div><b>Sarah J.</b><small>Wedding Planner</small></div>
                             <span class="st">★★★★★</span>
                         </div>

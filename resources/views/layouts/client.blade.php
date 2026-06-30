@@ -766,7 +766,7 @@
         }
 
         .cl-content {
-            padding: 2px 26px 20px;
+            padding: 24px 26px 28px;
             max-width: 1560px;
             margin: 0 auto;
         }
@@ -1241,24 +1241,6 @@
                     <a href="{{ route('ai-tools.review-writer') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.review-writer*') ? 'active' : '' }}">
                         <svg class="cl-nav-icon ic-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                         AI Review Writer
-                    </a>
-                </li>
-                <li class="cl-nav-item">
-                    <a href="{{ route('ai-tools.pricing-assistant') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.pricing-assistant*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon ic-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                        AI Pricing Assistant
-                    </a>
-                </li>
-                <li class="cl-nav-item">
-                    <a href="{{ route('ai-tools.proposal-writer') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.proposal-writer*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon ic-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8M16 17H8"/></svg>
-                        AI Proposal Writer
-                    </a>
-                </li>
-                <li class="cl-nav-item">
-                    <a href="{{ route('ai-tools.staffing-planner') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.staffing-planner*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon ic-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                        AI Staffing Planner
                     </a>
                 </li>
 

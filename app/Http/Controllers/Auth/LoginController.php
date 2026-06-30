@@ -65,6 +65,21 @@ class LoginController extends Controller
             return redirect()->route('influencer.status');
         }
 
-        return null;
+        // Land each user in THEIR OWN portal and reset the active-role session,
+        // so a stale "professional mode" from a previous session can't carry
+        // over and bounce a client into the professional portal. A user who
+        // holds the client role logs in as a client (they can still switch to
+        // professional via the toggle); supplier-only users go professional.
+        if ($user->hasRole(RoleName::CLIENT->value)) {
+            session(['active_role' => RoleName::CLIENT->value]);
+            return redirect()->route('client.dashboard');
+        }
+
+        if ($user->hasRole(RoleName::SUPPLIER->value)) {
+            session(['active_role' => RoleName::SUPPLIER->value]);
+            return redirect()->route('professional.dashboard');
+        }
+
+        return null; // admin / others → default dashboard
     }
 }

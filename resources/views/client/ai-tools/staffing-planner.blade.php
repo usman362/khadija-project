@@ -1,4 +1,4 @@
-@extends('layouts.client')
+@extends($aiLayout ?? 'layouts.client')
 
 @section('title', 'AI Staffing Planner')
 @section('page-title', 'AI Staffing Planner')

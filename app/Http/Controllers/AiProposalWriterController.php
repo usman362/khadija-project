@@ -61,6 +61,8 @@ class AiProposalWriterController extends Controller
             'examples'    => self::EXAMPLES,
             'description' => $defaultDescription,
             'proposal'    => $proposal,
+            // Professional-facing tool → professional shell for suppliers.
+            'aiLayout'    => $request->user()?->hasRole('supplier') ? 'layouts.professional' : 'layouts.client',
         ]);
     }
 

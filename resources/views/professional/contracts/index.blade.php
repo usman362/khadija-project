@@ -332,7 +332,6 @@
                     </div>
                     <div class="pc-ai-actions">
                         <button class="pc-ai-gen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5 10.1 7.6 12 3z"/></svg>Generate Proposal</button>
-                        <a href="#" class="pc-ai-view">View Insights →</a>
                     </div>
                 </div>
             </div>

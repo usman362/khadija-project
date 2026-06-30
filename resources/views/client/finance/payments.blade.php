@@ -143,7 +143,6 @@
         <span class="meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>Event: {{ $activeEvent->starts_at?->format('M d, Y') ?? '—' }}</span>
         <span class="meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/></svg>{{ $activeEvent->location ?? 'TBD' }}</span>
         <span class="spacer"></span>
-        <a href="#" class="pay-export"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export Consolidated Ledger</a>
     </div>
     @endif
 
@@ -223,10 +222,7 @@
 <aside class="pay-rail">
     <div class="pay-rail-card">
         <div class="pay-rail-title">Quick Actions</div>
-        <a href="#" class="pay-qa"><div class="pay-qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><div class="pay-qa-body"><div class="pay-qa-name">Add Payment</div><div class="pay-qa-sub">Record manual payment</div></div></a>
         <a href="{{ route('client.search.index') }}" class="pay-qa"><div class="pay-qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div><div class="pay-qa-body"><div class="pay-qa-name">Pay Vendor</div><div class="pay-qa-sub">Send instant payment</div></div></a>
-        <a href="#" class="pay-qa"><div class="pay-qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><div class="pay-qa-body"><div class="pay-qa-name">Upload Receipt</div><div class="pay-qa-sub">Attach payment receipt</div></div></a>
-        <a href="#" class="pay-qa"><div class="pay-qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="pay-qa-body"><div class="pay-qa-name">Schedule Payout</div><div class="pay-qa-sub">Set future payout</div></div></a>
     </div>
 
     <div class="pay-rail-card">

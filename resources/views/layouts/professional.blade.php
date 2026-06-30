@@ -968,6 +968,12 @@
                     </a>
                 </li>
                 <li class="cl-nav-item">
+                    <a href="{{ route('professional.bidding-board.index') }}" class="cl-nav-link {{ request()->routeIs('professional.bidding-board.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                        Bidding Board
+                    </a>
+                </li>
+                <li class="cl-nav-item">
                     <a href="{{ route('professional.multi-service.index') }}" class="cl-nav-link {{ request()->routeIs('professional.multi-service.*') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
                         Multi-Service Requests

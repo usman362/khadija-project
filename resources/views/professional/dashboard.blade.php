@@ -258,7 +258,7 @@
                 <span class="pd-card-ico c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
                 <span class="pd-card-title">Priority Actions</span>
                 <span class="pd-pill-count">7</span>
-                <a href="#" class="pd-card-link">View All <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+                <a href="{{ route('professional.priority.index') }}" class="pd-card-link">View All <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
             </div>
             <div class="pd-pa">
                 <div class="pd-pa-row"><span class="pd-pa-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Contract awaiting signature</div><div class="pd-pa-sub">Corporate Gala Dinner</div></div><span class="pd-pa-pri pri-high">High</span></div>
@@ -268,7 +268,7 @@
                 <div class="pd-pa-row"><span class="pd-pa-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Calendar conflict</div><div class="pd-pa-sub">May 24 – Double Booking</div></div><span class="pd-pa-pri pri-high">High</span></div>
                 <div class="pd-pa-row"><span class="pd-pa-ico c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Late invoice</div><div class="pd-pa-sub">Invoice #INV-2025-1048</div></div><span class="pd-pa-pri pri-medium">Medium</span></div>
             </div>
-            <div class="pd-pa-foot"><a href="#">View All Actions →</a></div>
+            <div class="pd-pa-foot"><a href="{{ route('professional.priority.index') }}">View All Actions →</a></div>
         </div>
 
         {{-- Gig Operations Hub --}}
@@ -276,7 +276,7 @@
             <div class="pd-card-head">
                 <span class="pd-card-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
                 <span class="pd-card-title">Gig Operations Hub</span>
-                <a href="#" class="pd-card-link">View All Gigs <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+                <a href="{{ route('professional.gigs.index') }}" class="pd-card-link">View All Gigs <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
             </div>
             <div class="pd-tabs">
                 <span class="pd-tab active">All Gigs (15)</span>
@@ -368,7 +368,6 @@
             <div class="pd-card-head">
                 <span class="pd-card-ico c-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>
                 <span class="pd-card-title">Finance Hub</span>
-                <a href="#" class="pd-card-link">View Details <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
             </div>
             <div class="pd-fin-grid">
                 <div class="pd-fin-box"><div class="k">Available Balance</div><div class="v">$4,250.00</div></div>
@@ -379,10 +378,7 @@
                 <div class="pd-fin-box"><div class="k">Est. Profit (MTD)</div><div class="v">$6,450.00</div></div>
             </div>
             <div class="pd-fin-actions">
-                <a href="#" class="pd-fin-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><polyline points="19 12 12 19 5 12"/></svg>Withdraw</a>
-                <a href="#" class="pd-fin-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Invoices</a>
-                <a href="#" class="pd-fin-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>Tax Center</a>
-                <a href="#" class="pd-fin-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Disputes</a>
+                <a href="{{ route('professional.transactions.index') }}" class="pd-fin-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Invoices</a>
             </div>
         </div>
 
@@ -391,7 +387,7 @@
             <div class="pd-card-head">
                 <span class="pd-card-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
                 <span class="pd-card-title">Today's Schedule</span>
-                <a href="#" class="pd-card-link">View Calendar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+                <a href="{{ route('professional.calendar.index') }}" class="pd-card-link">View Calendar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
             </div>
             <div class="pd-sch-list">
                 <div class="pd-sch-row"><span class="pd-sch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span class="pd-sch-time">1:00 PM</span><span class="pd-sch-body"><span class="pd-sch-name">Drive to Venue</span></span><span class="pd-sch-dur">30 min</span></div>
@@ -399,7 +395,7 @@
                 <div class="pd-sch-row"><span class="pd-sch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="pd-sch-time">2:30 PM</span><span class="pd-sch-body"><span class="pd-sch-name">Corporate Gala Dinner</span></span><span class="pd-sch-dur">6:00 PM</span></div>
                 <div class="pd-sch-row"><span class="pd-sch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="pd-sch-time">6:00 PM</span><span class="pd-sch-body"><span class="pd-sch-name">Breakdown</span></span><span class="pd-sch-dur">1 hr</span></div>
             </div>
-            <a href="#" class="pd-sch-open">Open Full Calendar →</a>
+            <a href="{{ route('professional.calendar.index') }}" class="pd-sch-open">Open Full Calendar →</a>
             <div class="pd-map">
                 <div class="pd-map-grid"></div>
                 <div class="pd-map-route"></div>

@@ -232,7 +232,6 @@
                 <div class="pg-cc-map"><div class="route"></div><span class="pg-cc-pin" style="top:24%;left:14%;"></span><span class="pg-cc-pin" style="bottom:18%;right:18%;"></span></div>
                 <div style="font-weight:700;color:var(--text-primary);">Driving Directions</div>
                 <div>1 hr 23 min (84.6 mi)</div>
-                <a href="#" class="pg-cc-btn" style="background:#2563eb;">Open in Maps</a>
             </div>
         </div>
         <div class="pg-cc-card">
@@ -243,7 +242,7 @@
                 <div class="pg-cc-line"></div><div class="pg-cc-line" style="width:70%;"></div>
                 <div style="margin-top:5px;">Total: <b style="color:var(--text-primary);">$4,000.00</b></div>
                 <div style="margin-top:4px;">50% Deposit · 50% Final</div>
-                <a href="#" class="pg-cc-btn" style="background:#10b981;">Sign Contract</a>
+                <a href="{{ route('ai-agreement.build') }}" class="pg-cc-btn" style="background:#10b981;">Sign Contract</a>
             </div>
         </div>
         <div class="pg-cc-card">
