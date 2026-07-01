@@ -362,6 +362,22 @@ Route::middleware('auth')->group(function () {
     // AI Translator (both).
     Route::get('/ai-tools/translator', [\App\Http\Controllers\AiTranslatorController::class, 'show'])->name('ai-tools.translator');
 
+    // ── Dynamic compute endpoints for the 14 tools above (real local engines, JSON) ──
+    Route::post('/ai-tools/availability-optimizer/compute', [\App\Http\Controllers\AiAvailabilityOptimizerController::class, 'compute'])->name('ai-tools.availability-optimizer.compute');
+    Route::post('/ai-tools/event-planner/compute',          [\App\Http\Controllers\AiEventPlannerController::class, 'compute'])->name('ai-tools.event-planner.compute');
+    Route::post('/ai-tools/theme-advisor/compute',          [\App\Http\Controllers\AiThemeAdvisorController::class, 'compute'])->name('ai-tools.theme-advisor.compute');
+    Route::post('/ai-tools/timeline-builder/compute',       [\App\Http\Controllers\AiTimelineBuilderController::class, 'compute'])->name('ai-tools.timeline-builder.compute');
+    Route::post('/ai-tools/venue-analyzer/compute',         [\App\Http\Controllers\AiVenueAnalyzerController::class, 'compute'])->name('ai-tools.venue-analyzer.compute');
+    Route::post('/ai-tools/guest-capacity/compute',         [\App\Http\Controllers\AiGuestCapacityController::class, 'compute'])->name('ai-tools.guest-capacity.compute');
+    Route::post('/ai-tools/package-builder/compute',        [\App\Http\Controllers\AiPackageBuilderController::class, 'compute'])->name('ai-tools.package-builder.compute');
+    Route::post('/ai-tools/portfolio-optimizer/compute',    [\App\Http\Controllers\AiPortfolioOptimizerController::class, 'compute'])->name('ai-tools.portfolio-optimizer.compute');
+    Route::post('/ai-tools/checklist-generator/compute',    [\App\Http\Controllers\AiChecklistGeneratorController::class, 'compute'])->name('ai-tools.checklist-generator.compute');
+    Route::post('/ai-tools/bid-optimizer/compute',          [\App\Http\Controllers\AiBidOptimizerController::class, 'compute'])->name('ai-tools.bid-optimizer.compute');
+    Route::post('/ai-tools/upsell-assistant/compute',       [\App\Http\Controllers\AiUpsellAssistantController::class, 'compute'])->name('ai-tools.upsell-assistant.compute');
+    Route::post('/ai-tools/contract-assistant/compute',     [\App\Http\Controllers\AiContractAssistantController::class, 'compute'])->name('ai-tools.contract-assistant.compute');
+    Route::post('/ai-tools/message-assistant/compute',      [\App\Http\Controllers\AiMessageAssistantController::class, 'compute'])->name('ai-tools.message-assistant.compute');
+    Route::post('/ai-tools/translator/compute',             [\App\Http\Controllers\AiTranslatorController::class, 'compute'])->name('ai-tools.translator.compute');
+
     Route::get('/ai-tools/budget-allocator',  [AiBudgetAllocatorController::class, 'show'])->name('ai-tools.budget-allocator');
     Route::post('/ai-tools/budget-allocator', [AiBudgetAllocatorController::class, 'allocate'])->name('ai-tools.budget-allocator.allocate');
 

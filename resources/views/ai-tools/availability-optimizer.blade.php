@@ -56,11 +56,82 @@
     .ao-sugg:last-child { border-bottom: none; } .ao-sugg::before { content: '✨'; position: absolute; left: 2px; top: 7px; }
 
     @media (max-width: 1000px) { .ao-stats { grid-template-columns: repeat(2,1fr); } .ao-3 { grid-template-columns: 1fr; } .ao-cal { overflow-x: auto; } }
+
+    /* Interactive estimator */
+    .ao-tool { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px; margin-bottom: 18px; }
+    .ao-tool h3 { font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+    .ao-tool p.desc { font-size: 12.5px; color: var(--text-muted); margin-bottom: 16px; }
+    .ao-form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    @media (max-width: 800px) { .ao-form-grid { grid-template-columns: 1fr 1fr; } }
+    .ao-field label { display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; }
+    .ao-field input { width: 100%; padding: 10px 12px; background: var(--bg-primary, var(--bg-secondary)); border: 1px solid var(--border-color); border-radius: 9px; color: var(--text-primary); font-size: 13.5px; font-family: inherit; }
+    .ao-field input:focus { outline: none; border-color: var(--ao); box-shadow: 0 0 0 3px rgba(99,102,241,.15); }
+    .ao-run { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 11px 24px; border: none; border-radius: 10px; background: linear-gradient(135deg, var(--ao), var(--ao-strong)); color: #fff; font-size: 13.5px; font-weight: 800; cursor: pointer; font-family: inherit; }
+    .ao-run:disabled { opacity: .6; cursor: not-allowed; }
+    .ao-err { display: none; margin-top: 14px; padding: 11px 14px; background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); color: #f87171; border-radius: 9px; font-size: 12.5px; }
+    .ao-err.on { display: block; }
+    .ao-load { display: none; margin-top: 14px; font-size: 12.5px; color: var(--text-muted); }
+    .ao-load.on { display: block; }
+    .ao-res { display: none; margin-top: 18px; }
+    .ao-res.on { display: block; }
+    .ao-res-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    @media (max-width: 800px) { .ao-res-metrics { grid-template-columns: 1fr 1fr; } }
+    .ao-metric { background: var(--bg-primary, var(--bg-secondary)); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; }
+    .ao-metric b { display: block; font-size: 20px; font-weight: 800; color: var(--text-primary); line-height: 1; }
+    .ao-metric .lbl { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
+    .ao-status-pill { display: inline-block; font-size: 12px; font-weight: 800; padding: 6px 14px; border-radius: 999px; background: rgba(99,102,241,.12); color: var(--ao); margin-bottom: 14px; }
+    .ao-res-summary { font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; background: rgba(99,102,241,.05); border-left: 3px solid var(--ao); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; }
+    .ao-res-sugg { font-size: 12.5px; color: var(--text-secondary); line-height: 1.55; padding: 8px 0 8px 22px; position: relative; border-bottom: 1px dashed var(--border-color); }
+    .ao-res-sugg:last-child { border-bottom: none; } .ao-res-sugg::before { content: '✨'; position: absolute; left: 2px; top: 7px; }
 </style>
 @endpush
 
 @section('content')
 <div class="ao">
+    {{-- Interactive availability estimator --}}
+    <div class="ao-tool">
+        <h3>📊 Availability Estimator</h3>
+        <p class="desc">Enter your working pattern to get an estimated weekly capacity, utilization and open-slot count. Figures are planning estimates.</p>
+
+        <form id="aoForm">
+            <div class="ao-form-grid">
+                <div class="ao-field">
+                    <label>Working days / week</label>
+                    <input type="number" name="working_days" min="1" max="7" step="1" required placeholder="e.g. 5">
+                </div>
+                <div class="ao-field">
+                    <label>Hours / day</label>
+                    <input type="number" name="hours_per_day" min="1" max="16" step="0.5" required placeholder="e.g. 8">
+                </div>
+                <div class="ao-field">
+                    <label>Avg gig length (hrs)</label>
+                    <input type="number" name="avg_gig_hours" min="0.5" max="24" step="0.5" required placeholder="e.g. 4">
+                </div>
+                <div class="ao-field">
+                    <label>Bookings / week</label>
+                    <input type="number" name="current_bookings_per_week" min="0" max="100" step="1" required placeholder="e.g. 6">
+                </div>
+            </div>
+            <button type="submit" class="ao-run" id="aoRun">
+                ⚡ Estimate my availability
+            </button>
+        </form>
+
+        <div class="ao-err" id="aoErr"></div>
+        <div class="ao-load" id="aoLoad">Calculating your availability estimate…</div>
+
+        <div class="ao-res" id="aoRes">
+            <span class="ao-status-pill" id="aoStatus"></span>
+            <div class="ao-res-metrics">
+                <div class="ao-metric"><b id="aoCapacity"></b><div class="lbl">Weekly capacity (hrs)</div></div>
+                <div class="ao-metric"><b id="aoBooked"></b><div class="lbl">Booked hours</div></div>
+                <div class="ao-metric"><b id="aoUtil"></b><div class="lbl">Utilization</div></div>
+                <div class="ao-metric"><b id="aoSlots"></b><div class="lbl">Open slots</div></div>
+            </div>
+            <div class="ao-res-summary" id="aoSummary"></div>
+            <div id="aoSuggList"></div>
+        </div>
+    </div>
     {{-- Stat tiles --}}
     <div class="ao-stats">
         @foreach($stats as [$lbl, $val, $sub, $tone])
@@ -125,4 +196,79 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+(function () {
+    const form = document.getElementById('aoForm');
+    if (!form) return;
+
+    const run   = document.getElementById('aoRun');
+    const load  = document.getElementById('aoLoad');
+    const res   = document.getElementById('aoRes');
+    const errEl = document.getElementById('aoErr');
+    const csrf  = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        errEl.classList.remove('on');
+        res.classList.remove('on');
+        load.classList.add('on');
+        run.disabled = true;
+
+        const payload = Object.fromEntries(new FormData(form).entries());
+
+        try {
+            const r = await fetch('{{ route("ai-tools.availability-optimizer.compute") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrf,
+                    'Accept': 'application/json',
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(payload),
+            });
+
+            const data = await r.json();
+            load.classList.remove('on');
+            run.disabled = false;
+
+            if (!data.success) {
+                errEl.textContent = data.message || 'Could not calculate an estimate.';
+                errEl.classList.add('on');
+                return;
+            }
+
+            render(data.result);
+            res.classList.add('on');
+            res.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } catch (err) {
+            load.classList.remove('on');
+            run.disabled = false;
+            errEl.textContent = 'Network error. Please try again.';
+            errEl.classList.add('on');
+        }
+    });
+
+    function render(x) {
+        document.getElementById('aoStatus').textContent   = x.status;
+        document.getElementById('aoCapacity').textContent = x.weekly_capacity_hours;
+        document.getElementById('aoBooked').textContent   = x.booked_hours;
+        document.getElementById('aoUtil').textContent     = x.utilization_pct + '%';
+        document.getElementById('aoSlots').textContent    = x.open_slots;
+        document.getElementById('aoSummary').textContent  = x.summary || '';
+
+        const list = document.getElementById('aoSuggList');
+        list.innerHTML = '';
+        (x.suggestions || []).forEach(s => {
+            const d = document.createElement('div');
+            d.className = 'ao-res-sugg';
+            d.textContent = s;
+            list.appendChild(d);
+        });
+    }
+})();
+</script>
+@endpush
 @endsection

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Throwable;
 
 /**
  * AI Package Builder (professional). Builds, prices and compares tiered service
@@ -48,6 +50,98 @@ class AiPackageBuilderController extends Controller
                 'Add a Same-Day Teaser to Gold (+$400) — high demand, low effort.',
                 'Bronze margin is thin — trim 1 hour or raise to $1,350.',
             ],
+        ]);
+    }
+
+    /**
+     * Build three priced tiers from a service name, base price and optional
+     * add-ons. Deterministic pricing and add-on distribution — no external API.
+     */
+    public function compute(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'service_name' => ['required', 'string', 'max:120'],
+            'base_price'   => ['required', 'numeric', 'min:1', 'max:9999999'],
+            'addons'       => ['nullable', 'string', 'max:600'],
+        ]);
+
+        try {
+            $service = trim($validated['service_name']);
+            $base    = (float) $validated['base_price'];
+
+            // Parse comma-separated add-ons into a clean list.
+            $addons = collect(explode(',', (string) ($validated['addons'] ?? '')))
+                ->map(fn ($a) => trim($a))
+                ->filter()
+                ->values()
+                ->all();
+
+            // Split add-ons: first half -> Signature, all -> Premium.
+            $half = (int) ceil(count($addons) / 2);
+            $signatureAddons = array_slice($addons, 0, $half);
+
+            // Core deliverables always present in the entry tier.
+            $core = [
+                $service . ' — core service',
+                'Consultation & planning call',
+                'Online delivery',
+            ];
+
+            // Premium extras layered on top of every add-on.
+            $premiumExtras = [
+                'Priority scheduling',
+                'Extended delivery & revisions',
+                'Dedicated point of contact',
+            ];
+
+            $essentialPrice = round($base, 2);
+            $signaturePrice = round($base * 1.6, 2);
+            $premiumPrice   = round($base * 2.3, 2);
+
+            $tiers = [
+                [
+                    'name'     => 'Essential',
+                    'price'    => $essentialPrice,
+                    'includes' => $core,
+                ],
+                [
+                    'name'     => 'Signature',
+                    'price'    => $signaturePrice,
+                    'includes' => array_merge(
+                        $core,
+                        $signatureAddons ?: ['Enhanced ' . strtolower($service) . ' package']
+                    ),
+                ],
+                [
+                    'name'     => 'Premium',
+                    'price'    => $premiumPrice,
+                    'includes' => array_merge($core, $addons, $premiumExtras),
+                ],
+            ];
+
+            $tips = [
+                'Position Signature as your "most popular" option — a strong middle tier makes both the Essential and Premium prices feel more reasonable to clients.',
+                count($addons) > 0
+                    ? 'You spread ' . count($addons) . ' add-on' . (count($addons) === 1 ? '' : 's') . ' across the tiers — consider offering the most-requested one as a standalone upsell too.'
+                    : 'Add a few comma-separated add-ons (e.g. "Extra hour, Second shooter, Prints") to differentiate the higher tiers more clearly.',
+                'These prices are estimates based on a common 1.6× / 2.3× tier spread — adjust them to reflect your real costs and local market.',
+            ];
+
+            $result = [
+                'summary' => 'Three estimated tiers for "' . $service . '": Essential at $' . number_format($essentialPrice, 0) . ', Signature at $' . number_format($signaturePrice, 0) . ', and Premium at $' . number_format($premiumPrice, 0) . '. Prices are suggestions you can fine-tune.',
+                'tiers'   => $tiers,
+                'tips'    => $tips,
+            ];
+        } catch (Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'result'  => $result,
         ]);
     }
 }

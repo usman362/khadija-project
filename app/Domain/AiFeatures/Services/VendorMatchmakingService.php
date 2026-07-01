@@ -28,20 +28,28 @@ class VendorMatchmakingService
     {
         $this->gate->authorize($user, AiFeatureCode::VENDOR_MATCHMAKING);
 
-        $apiKey = $this->settings->getOpenAIKey();
-        if (!$apiKey) {
-            throw new RuntimeException('AI service is not configured. Please contact support.');
-        }
-
-        // ── 1. Pre-filter supplier candidates from DB ──
+        // ── 1. Pre-filter supplier candidates from DB (always real) ──
         $candidates = $this->fetchCandidates($input);
 
         if ($candidates->isEmpty()) {
             throw new RuntimeException('No matching professionals found. Try adjusting your budget or requirements.');
         }
 
-        // ── 2. Ask AI to rank the candidates ──
-        $aiResult = $this->rankWithAI($apiKey, $input, $candidates);
+        // ── 2. Rank: AI when configured, else deterministic local scoring so
+        //        the tool always returns real, ranked matches (no dead-ends). ──
+        $apiKey   = $this->settings->getOpenAIKey();
+        $aiResult = null;
+        if ($apiKey) {
+            try {
+                $aiResult = $this->rankWithAI($apiKey, $input, $candidates);
+            } catch (\Throwable $e) {
+                Log::warning('Matchmaking AI path failed, using local scoring', ['error' => $e->getMessage()]);
+                $aiResult = null;
+            }
+        }
+        if ($aiResult === null) {
+            $aiResult = $this->rankLocally($input, $candidates);
+        }
 
         // ── 3. Enrich AI ranking with full supplier data ──
         $matches = [];
@@ -110,6 +118,105 @@ class VendorMatchmakingService
         $query->with(['profile' => fn($q) => $q->orderByRaw("CASE availability WHEN 'available' THEN 1 WHEN 'busy' THEN 2 ELSE 3 END")]);
 
         return $query->take(self::MAX_CANDIDATES)->get();
+    }
+
+    /**
+     * Deterministic local scoring — no external calls. Ranks the REAL DB
+     * candidates by services match, budget fit, experience, availability,
+     * verified status and rating. Returns the same shape as rankWithAI().
+     */
+    private function rankLocally(array $input, \Illuminate\Support\Collection $candidates): array
+    {
+        $budget = !empty($input['budget']) ? (float) $input['budget'] : null;
+        $needle = strtolower(trim(
+            ($input['event_type'] ?? '') . ' ' . ($input['requirements'] ?? '') . ' ' . ($input['notes'] ?? '')
+        ));
+
+        $scored = $candidates->map(function (User $u) use ($budget, $needle) {
+            $p = $u->profile;
+            $score = 50;
+            $reasons = [];
+
+            // Keyword overlap between the requirement and the pro's profile.
+            $hay = strtolower(
+                ($p?->headline ?? '') . ' '
+                . (is_array($p?->skills) ? implode(' ', $p->skills) : '') . ' '
+                . ($p?->bio ?? '')
+            );
+            $overlap = 0;
+            foreach (array_filter(explode(' ', $needle)) as $w) {
+                if (strlen($w) >= 4 && str_contains($hay, $w)) {
+                    $overlap++;
+                }
+            }
+            if ($overlap) {
+                $score += min(20, $overlap * 5);
+                $reasons[] = 'services match your request';
+            }
+
+            // Budget fit.
+            if ($budget && $p?->hourly_rate) {
+                if ($p->hourly_rate <= $budget) {
+                    $score += 12;
+                    $reasons[] = 'within budget';
+                } else {
+                    $score -= 10;
+                }
+            }
+
+            // Experience.
+            $yrs = (int) ($p?->experience_years ?? 0);
+            if ($yrs >= 8) {
+                $score += 12;
+                $reasons[] = $yrs . ' yrs experience';
+            } elseif ($yrs >= 3) {
+                $score += 6;
+            }
+
+            // Availability.
+            if (($p?->availability ?? '') === 'available') {
+                $score += 8;
+                $reasons[] = 'available now';
+            }
+
+            // Verified badges.
+            $badges = $p?->verifiedBadges() ?? [];
+            if (count($badges)) {
+                $score += min(10, count($badges) * 4);
+                $reasons[] = 'verified pro';
+            }
+
+            // Rating.
+            $rating = round((float) $u->reviewsReceived()->where('is_hidden', false)->avg('rating'), 1);
+            if ($rating >= 4.5) {
+                $score += 10;
+                $reasons[] = $rating . '★ rated';
+            } elseif ($rating >= 4.0) {
+                $score += 5;
+            }
+
+            return ['id' => $u->id, 'score' => max(35, min(99, $score)), 'reasons' => $reasons];
+        })->sortByDesc('score')->values();
+
+        $matches = [];
+        foreach ($scored as $i => $s) {
+            $matches[] = [
+                'supplier_id' => $s['id'],
+                'rank'        => $i + 1,
+                'match_score' => $s['score'],
+                'reasoning'   => $s['reasons']
+                    ? ucfirst(implode(', ', $s['reasons'])) . '.'
+                    : 'Solid all-round fit for your event.',
+            ];
+        }
+
+        return [
+            'matches' => $matches,
+            'summary' => 'Ranked ' . $candidates->count() . ' professionals for your '
+                . ($input['event_type'] ?? 'event')
+                . ' by services match, budget fit, experience, availability and verified status.',
+            'tokens'  => 0,
+        ];
     }
 
     /**

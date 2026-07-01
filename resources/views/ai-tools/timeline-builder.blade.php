@@ -41,11 +41,86 @@
     .tb-btn.primary { border: none; background: linear-gradient(135deg, var(--tb), #6d28d9); color: #fff; }
 
     @media (max-width: 1000px) { .tb-stats { grid-template-columns: repeat(2,1fr); } .tb-card { overflow-x: auto; } }
+
+    /* Interactive builder form */
+    .tb-form-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px; margin-bottom: 18px; }
+    .tb-form-card h3 { font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+    .tb-form-card .sub { font-size: 12.5px; color: var(--text-muted); margin-bottom: 16px; }
+    .tb-fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 640px) { .tb-fgrid { grid-template-columns: 1fr; } }
+    .tb-lbl { display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; }
+    .tb-inp { width: 100%; padding: 10px 12px; background: var(--bg-body, var(--bg-card)); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary); font-size: 13.5px; font-family: inherit; }
+    .tb-inp:focus { outline: none; border-color: var(--tb); box-shadow: 0 0 0 3px rgba(124,58,237,.15); }
+    .tb-go { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 11px 22px; border: none; border-radius: 10px; background: linear-gradient(135deg, var(--tb), #6d28d9); color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; font-family: inherit; }
+    .tb-go:disabled { opacity: .6; cursor: not-allowed; }
+    .tb-err { display: none; margin-top: 14px; padding: 11px 14px; background: rgba(220,38,38,.1); border: 1px solid rgba(220,38,38,.3); color: #dc2626; border-radius: 10px; font-size: 13px; }
+    .tb-err.open { display: block; }
+    .tb-loading { display: none; text-align: center; padding: 26px; color: var(--text-muted); font-size: 13px; }
+    .tb-loading.open { display: block; }
+    .tb-spin { width: 40px; height: 40px; border: 3px solid var(--border-color); border-top-color: var(--tb); border-radius: 50%; margin: 0 auto 12px; animation: tbspin .8s linear infinite; }
+    @keyframes tbspin { to { transform: rotate(360deg); } }
+    .tb-out { display: none; }
+    .tb-out.open { display: block; animation: tbfade .3s ease; }
+    @keyframes tbfade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .tb-out-summary { padding: 13px 16px; background: rgba(124,58,237,.06); border-left: 3px solid var(--tb); border-radius: 10px; font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 16px; }
+    .tb-row { display: flex; align-items: center; gap: 14px; padding: 11px 4px; border-bottom: 1px dashed var(--border-color); }
+    .tb-row:last-child { border-bottom: none; }
+    .tb-row .t { font-size: 13px; font-weight: 800; color: var(--tb); min-width: 78px; }
+    .tb-row .s { flex: 1; font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
+    .tb-row .dm { font-size: 11.5px; font-weight: 700; color: var(--text-muted); background: var(--bg-body, var(--bg-card)); border: 1px solid var(--border-color); border-radius: 999px; padding: 3px 10px; }
 </style>
 @endpush
 
 @section('content')
 <div class="tb">
+    {{-- Interactive builder --}}
+    <div class="tb-form-card">
+        <h3>🛠 Build My Run-of-Show</h3>
+        <div class="sub">Enter your event details and we'll generate a suggested timeline with real clock times.</div>
+        <form id="tbForm">
+            <div class="tb-fgrid">
+                <div>
+                    <label class="tb-lbl">Event Type</label>
+                    <select name="event_type" class="tb-inp" required>
+                        <option value="Wedding">Wedding</option>
+                        <option value="Corporate Event">Corporate Event</option>
+                        <option value="Conference">Conference</option>
+                        <option value="Birthday Party">Birthday Party</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="tb-lbl">Event Date</label>
+                    <input type="date" name="event_date" class="tb-inp" required>
+                </div>
+                <div>
+                    <label class="tb-lbl">Start Time</label>
+                    <input type="time" name="start_time" class="tb-inp" value="16:00" required>
+                </div>
+                <div>
+                    <label class="tb-lbl">Duration (hours)</label>
+                    <input type="number" name="duration_hours" class="tb-inp" min="2" max="12" step="0.5" value="6" required>
+                </div>
+            </div>
+            <button type="submit" class="tb-go" id="tbGo">✨ Generate Timeline</button>
+            <div class="tb-err" id="tbErr"></div>
+        </form>
+    </div>
+
+    <div class="tb-loading" id="tbLoading">
+        <div class="tb-spin"></div>
+        Building your run-of-show...
+    </div>
+
+    {{-- Computed schedule --}}
+    <div class="tb-out" id="tbOut">
+        <div class="tb-out-summary" id="tbSummary"></div>
+        <div class="tb-card">
+            <h3>📋 Suggested Run-of-Show</h3>
+            <div id="tbSchedule"></div>
+        </div>
+    </div>
+
     <div class="tb-stats">
         @foreach($stats as [$lbl, $val, $sub, $tone])
             <div class="tb-stat {{ $tone }}"><b>{{ $val }}</b><div class="lbl">{{ $lbl }}</div><div class="sub">{{ $sub }}</div></div>
@@ -87,3 +162,63 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    const form = document.getElementById('tbForm');
+    if (!form) return;
+    const go = document.getElementById('tbGo');
+    const loading = document.getElementById('tbLoading');
+    const out = document.getElementById('tbOut');
+    const errEl = document.getElementById('tbErr');
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        errEl.classList.remove('open');
+        out.classList.remove('open');
+        loading.classList.add('open');
+        go.disabled = true;
+
+        const payload = Object.fromEntries(new FormData(form).entries());
+        try {
+            const r = await fetch('{{ route("ai-tools.timeline-builder.compute") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify(payload),
+            });
+            const data = await r.json();
+            loading.classList.remove('open');
+            go.disabled = false;
+            if (!data.success) {
+                errEl.textContent = data.message || 'Could not build the timeline. Please check your inputs.';
+                errEl.classList.add('open');
+                return;
+            }
+            render(data.result);
+            out.classList.add('open');
+            out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (err) {
+            loading.classList.remove('open');
+            go.disabled = false;
+            errEl.textContent = 'Network error. Please try again.';
+            errEl.classList.add('open');
+        }
+    });
+
+    function render(res) {
+        document.getElementById('tbSummary').textContent = res.summary || '';
+        document.getElementById('tbSchedule').innerHTML = (res.schedule || []).map(s => `
+            <div class="tb-row">
+                <span class="t">${esc(s.time)}</span>
+                <span class="s">${esc(s.segment)}</span>
+                <span class="dm">${esc(s.duration_min)} min</span>
+            </div>`).join('');
+    }
+})();
+</script>
+@endpush

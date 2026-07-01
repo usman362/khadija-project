@@ -2,7 +2,7 @@
 
 @section('title', 'AI Contract Assistant')
 @section('page-title', 'AI Contract Assistant')
-@section('page-subtitle', 'A plain-English breakdown before you sign')
+@section('page-subtitle', 'Generate a plain-English draft agreement from your event details')
 
 @push('styles')
 <style>
@@ -13,14 +13,19 @@
     .ca-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 18px; align-items: start; }
     .ca-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; }
     .ca-card h3 { font-size: 14.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; }
-    .ca-drop { border: 2px dashed var(--border-color); border-radius: 12px; padding: 22px; text-align: center; color: var(--text-muted); font-size: 12.5px; margin-bottom: 12px; }
-    .ca-doc { display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-color); border-radius: 10px; padding: 11px 13px; font-size: 13px; font-weight: 700; color: var(--text-primary); }
-    .ca-toggle { display: flex; gap: 8px; margin: 14px 0; } .ca-tg { flex: 1; text-align: center; font-size: 12px; font-weight: 700; border: 1px solid var(--border-color); border-radius: 9px; padding: 9px; cursor: pointer; color: var(--text-secondary); } .ca-tg.on { background: var(--ca); border-color: var(--ca); color: #fff; }
+    .ca-lbl { display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin: 0 0 6px; }
+    .ca-in, .ca-sel { width: 100%; border: 1.5px solid var(--border-color); border-radius: 10px; padding: 10px 12px; font-size: 13px; color: var(--text-primary); background: var(--bg-card); font-family: inherit; margin-bottom: 12px; }
+    .ca-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .ca-btn { width: 100%; border: none; border-radius: 11px; padding: 12px; font-size: 13.5px; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--ca), #6d28d9); cursor: pointer; }
-    .ca-pt { display: flex; gap: 10px; padding: 11px 0; border-bottom: 1px dashed var(--border-color); } .ca-pt:last-of-type { border-bottom: none; }
-    .ca-dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; } .ca-dot.good { background: #16a34a; } .ca-dot.warn { background: #d97706; }
-    .ca-pt h6 { font-size: 13px; font-weight: 800; color: var(--text-primary); } .ca-pt p { font-size: 12px; color: var(--text-muted); margin-top: 2px; line-height: 1.5; }
+    .ca-btn:disabled { opacity: .6; cursor: not-allowed; }
+    .ca-clause { padding: 12px 0; border-bottom: 1px dashed var(--border-color); } .ca-clause:last-of-type { border-bottom: none; }
+    .ca-clause h6 { font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+    .ca-clause pre { font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.55; white-space: pre-wrap; font-family: inherit; }
+    .ca-summary { font-size: 12.5px; color: var(--text-secondary); line-height: 1.55; background: rgba(124,58,237,.06); border: 1px solid rgba(124,58,237,.25); border-radius: 10px; padding: 12px; margin-bottom: 12px; }
     .ca-disc { font-size: 11px; color: var(--text-muted); line-height: 1.5; margin-top: 12px; padding: 10px; border: 1px dashed var(--border-color); border-radius: 9px; }
+    .ca-empty { font-size: 12.5px; color: var(--text-muted); }
+    .ca-err { display: none; font-size: 12.5px; color: #dc2626; background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.3); border-radius: 9px; padding: 10px; margin-bottom: 12px; }
+    .ca-err.on { display: block; }
     @media (max-width: 1000px) { .ca-grid { grid-template-columns: minmax(0,1fr); } .ca-stats { grid-template-columns: 1fr 1fr; } }
 </style>
 @endpush
@@ -30,19 +35,111 @@
     <div class="ca-stats">@foreach($stats as [$lbl, $val, $tone])<div class="ca-stat {{ $tone }}"><b>{{ $val }}</b><div class="l">{{ $lbl }}</div></div>@endforeach</div>
     <div class="ca-grid">
         <div class="ca-card">
-            <h3>📄 Your Contract</h3>
-            <div class="ca-drop">⬆ Drag in an agreement, or pick an existing GigResource one</div>
-            <div class="ca-doc">📑 {{ $document }}</div>
-            <div class="ca-toggle"><span class="ca-tg on">I'm reviewing as a Client</span><span class="ca-tg">as a Professional</span></div>
-            <button class="ca-btn">🔍 Explain This Contract</button>
+            <h3>📄 Event & Agreement Details</h3>
+            <div class="ca-err" id="caErr"></div>
+            <form id="caForm">
+                <label class="ca-lbl">Service *</label>
+                <input class="ca-in" name="service" required placeholder="e.g. Wedding floral &amp; décor">
+                <div class="ca-row">
+                    <div>
+                        <label class="ca-lbl">Client name</label>
+                        <input class="ca-in" name="client_name" placeholder="e.g. Sarah Johnson">
+                    </div>
+                    <div>
+                        <label class="ca-lbl">Provider name</label>
+                        <input class="ca-in" name="provider_name" placeholder="e.g. Elite Events Co.">
+                    </div>
+                </div>
+                <div class="ca-row">
+                    <div>
+                        <label class="ca-lbl">Total price *</label>
+                        <input class="ca-in" name="total_price" type="number" min="0" step="0.01" required placeholder="e.g. 7500">
+                    </div>
+                    <div>
+                        <label class="ca-lbl">Event date *</label>
+                        <input class="ca-in" name="event_date" type="date" required>
+                    </div>
+                </div>
+                <div class="ca-row">
+                    <div>
+                        <label class="ca-lbl">Deposit %</label>
+                        <input class="ca-in" name="deposit_pct" type="number" min="0" max="100" step="1" placeholder="30">
+                    </div>
+                    <div>
+                        <label class="ca-lbl">Cancellation terms</label>
+                        <select class="ca-sel" name="cancellation">
+                            <option value="standard">Standard</option>
+                            <option value="flexible">Flexible</option>
+                            <option value="strict">Strict</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="ca-btn" id="caBtn" type="submit">📝 Generate Draft Agreement</button>
+            </form>
         </div>
         <div class="ca-card">
-            <h3>📝 Plain-English Summary</h3>
-            @foreach($summary as [$title, $tone, $text])
-                <div class="ca-pt"><span class="ca-dot {{ $tone }}"></span><div><h6>{{ $title }}</h6><p>{{ $text }}</p></div></div>
-            @endforeach
-            <div class="ca-disc">⚠️ This is a plain-language summary to help you understand the contract — it isn’t legal advice. For important agreements, consider a professional review.</div>
+            <h3 id="caTitle">📝 Draft Agreement</h3>
+            <div id="caOut"><p class="ca-empty">Fill in the details and generate a draft agreement — it will appear here.</p></div>
+            <div class="ca-disc" id="caDisc" style="display:none;"></div>
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    const form = document.getElementById('caForm');
+    if (!form) return;
+    const btn  = document.getElementById('caBtn');
+    const out  = document.getElementById('caOut');
+    const err  = document.getElementById('caErr');
+    const disc = document.getElementById('caDisc');
+    const titleEl = document.getElementById('caTitle');
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+    function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        err.classList.remove('on');
+        btn.disabled = true;
+        out.innerHTML = '<p class="ca-empty">Building your draft agreement…</p>';
+        const payload = Object.fromEntries(new FormData(form).entries());
+        try {
+            const r = await fetch('{{ route("ai-tools.contract-assistant.compute") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify(payload),
+            });
+            const data = await r.json();
+            btn.disabled = false;
+            if (!data.success) {
+                out.innerHTML = '<p class="ca-empty">Nothing to show yet.</p>';
+                err.textContent = data.message || 'Could not generate the agreement.';
+                err.classList.add('on');
+                return;
+            }
+            render(data.result);
+        } catch (ex) {
+            btn.disabled = false;
+            out.innerHTML = '<p class="ca-empty">Nothing to show yet.</p>';
+            err.textContent = 'Network error. Please try again.';
+            err.classList.add('on');
+        }
+    });
+
+    function render(res) {
+        titleEl.textContent = '📝 ' + (res.title || 'Draft Agreement');
+        let html = '';
+        if (res.summary) html += '<div class="ca-summary">' + esc(res.summary) + '</div>';
+        (res.clauses || []).forEach(c => {
+            html += '<div class="ca-clause"><h6>' + esc(c.heading) + '</h6><pre>' + esc(c.body) + '</pre></div>';
+        });
+        out.innerHTML = html || '<p class="ca-empty">No clauses generated.</p>';
+        if (res.disclaimer) { disc.textContent = '⚠️ ' + res.disclaimer; disc.style.display = 'block'; }
+    }
+})();
+</script>
+@endpush

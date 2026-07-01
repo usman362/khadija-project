@@ -52,12 +52,85 @@
     .cg-vst.Confirmed { background: rgba(22,163,74,.12); color: #15803d; } .cg-vst.Pending { background: rgba(217,119,6,.14); color: #d97706; } .cg-vst { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); }
 
     @media (max-width: 1000px) { .cg-grid { grid-template-columns: minmax(0,1fr); } .cg-stats { grid-template-columns: repeat(2,1fr); } }
+
+    /* Generator form */
+    .cg-gen { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px; margin-bottom: 18px; }
+    .cg-gen h3 { font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+    .cg-gen .sub { font-size: 12.5px; color: var(--text-muted); margin-bottom: 16px; }
+    .cg-form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .cg-field label { display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; }
+    .cg-field input, .cg-field select { width: 100%; padding: 10px 12px; background: var(--bg-body, var(--bg-card)); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary); font-size: 13.5px; font-family: inherit; }
+    .cg-field input:focus, .cg-field select:focus { outline: none; border-color: var(--cg); }
+    .cg-gen-btn { margin-top: 16px; display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; border: none; border-radius: 10px; font-size: 13.5px; font-weight: 800; cursor: pointer; font-family: inherit; }
+    .cg-gen-btn:disabled { opacity: .6; cursor: not-allowed; }
+    .cg-err { display: none; margin-top: 12px; padding: 10px 14px; background: rgba(220,38,38,.1); border: 1px solid rgba(220,38,38,.3); color: #dc2626; border-radius: 10px; font-size: 12.5px; }
+    .cg-err.on { display: block; }
+    .cg-loading { display: none; text-align: center; padding: 26px; color: var(--text-muted); font-size: 13px; }
+    .cg-loading.on { display: block; }
+
+    /* Results */
+    .cg-out { display: none; }
+    .cg-out.on { display: block; }
+    .cg-out-sum { padding: 13px 16px; background: rgba(22,163,74,.06); border-left: 3px solid #16a34a; border-radius: 8px; font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 16px; }
+    .cg-tf { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; margin-bottom: 14px; }
+    .cg-tf-hd { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+    .cg-tf-hd h4 { font-size: 13.5px; font-weight: 800; color: var(--text-primary); }
+    .cg-tf-hd .due { font-size: 11.5px; font-weight: 700; color: var(--text-muted); }
+    .cg-tf-item { display: flex; align-items: center; gap: 11px; padding: 10px 16px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--text-primary); }
+    .cg-tf-item:last-child { border-bottom: none; }
+    .cg-tf-item .box { width: 17px; height: 17px; border-radius: 5px; border: 2px solid var(--border-color); flex-shrink: 0; }
+    @media (max-width: 700px) { .cg-form-grid { grid-template-columns: 1fr; } }
 </style>
 @endpush
 
 @section('content')
 @php $pct = round($budget['spent'] / $budget['total'] * 100); @endphp
 <div class="cg">
+    {{-- Generator --}}
+    <div class="cg-gen">
+        <h3>🧩 Generate Your Checklist</h3>
+        <div class="sub">Enter your event details for a suggested, milestone-based planning checklist with estimated due dates.</div>
+        <form id="cgForm">
+            <div class="cg-form-grid">
+                <div class="cg-field">
+                    <label>Event Type</label>
+                    <select name="event_type" required>
+                        <option value="">Select type…</option>
+                        <option value="Wedding">Wedding</option>
+                        <option value="Birthday Party">Birthday Party</option>
+                        <option value="Corporate Event">Corporate Event</option>
+                        <option value="Conference">Conference</option>
+                        <option value="Product Launch">Product Launch</option>
+                        <option value="Baby Shower">Baby Shower</option>
+                        <option value="Anniversary">Anniversary</option>
+                        <option value="Graduation">Graduation</option>
+                        <option value="Private Party">Private Party</option>
+                    </select>
+                </div>
+                <div class="cg-field">
+                    <label>Event Date</label>
+                    <input type="date" name="event_date" required>
+                </div>
+                <div class="cg-field">
+                    <label>Guest Count (optional)</label>
+                    <input type="number" name="guest_count" min="1" max="100000" placeholder="e.g. 120">
+                </div>
+            </div>
+            <button type="submit" class="cg-gen-btn" id="cgSubmit">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                Generate Checklist
+            </button>
+            <div class="cg-err" id="cgErr"></div>
+        </form>
+    </div>
+
+    <div class="cg-loading" id="cgLoading">Building your suggested checklist…</div>
+
+    {{-- Generated results --}}
+    <div class="cg-out" id="cgOut">
+        <div class="cg-out-sum" id="cgSummary"></div>
+        <div id="cgGroups"></div>
+    </div>
     <div class="cg-stats">
         @foreach($stats as [$lbl, $val, $tone])
             <div class="cg-stat {{ $tone }}"><b>{{ $val }}</b><div class="l">{{ $lbl }}</div></div>
@@ -121,3 +194,81 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    const form = document.getElementById('cgForm');
+    if (!form) return;
+
+    const submit  = document.getElementById('cgSubmit');
+    const loading = document.getElementById('cgLoading');
+    const out     = document.getElementById('cgOut');
+    const errEl   = document.getElementById('cgErr');
+    const csrf    = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        errEl.classList.remove('on');
+        out.classList.remove('on');
+        loading.classList.add('on');
+        submit.disabled = true;
+
+        const payload = Object.fromEntries(new FormData(form).entries());
+
+        try {
+            const r = await fetch('{{ route("ai-tools.checklist-generator.compute") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrf,
+                    'Accept': 'application/json',
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(payload),
+            });
+            const data = await r.json();
+            loading.classList.remove('on');
+            submit.disabled = false;
+
+            if (!data.success) {
+                errEl.textContent = data.message || 'Could not generate checklist.';
+                errEl.classList.add('on');
+                return;
+            }
+            render(data.result);
+            out.classList.add('on');
+            out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (err) {
+            loading.classList.remove('on');
+            submit.disabled = false;
+            errEl.textContent = 'Network error. Please try again.';
+            errEl.classList.add('on');
+        }
+    });
+
+    function render(res) {
+        document.getElementById('cgSummary').textContent = res.summary || '';
+        const wrap = document.getElementById('cgGroups');
+        wrap.innerHTML = '';
+        (res.groups || []).forEach(function (g) {
+            const items = (g.items || []).map(function (it) {
+                return '<div class="cg-tf-item"><span class="box"></span>' + esc(it) + '</div>';
+            }).join('');
+            const block = document.createElement('div');
+            block.className = 'cg-tf';
+            block.innerHTML =
+                '<div class="cg-tf-hd"><h4>' + esc(g.timeframe) + '</h4>' +
+                '<span class="due">Target: ' + esc(g.due_date) + '</span></div>' + items;
+            wrap.appendChild(block);
+        });
+    }
+
+    function esc(s) {
+        return String(s || '').replace(/[&<>"']/g, function (c) {
+            return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+        });
+    }
+})();
+</script>
+@endpush

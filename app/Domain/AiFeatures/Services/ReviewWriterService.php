@@ -7,6 +7,7 @@ use App\Domain\Settings\Services\SettingsService;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 class ReviewWriterService
@@ -24,64 +25,134 @@ class ReviewWriterService
     {
         $this->gate->authorize($user, AiFeatureCode::REVIEW_WRITER);
 
+        // Try the AI provider when configured; fall back to the deterministic
+        // template composer so the tool always returns a polished review.
+        $result = null;
+        $tokens = 0;
+
         $apiKey = $this->settings->getOpenAIKey();
-        if (!$apiKey) {
-            throw new RuntimeException('AI service is not configured. Please contact support.');
+        if ($apiKey) {
+            try {
+                [$result, $tokens] = $this->composeViaAi($apiKey, $input);
+            } catch (\Throwable $e) {
+                Log::warning('Review Writer AI path failed, using local composer', ['error' => $e->getMessage()]);
+                $result = null;
+            }
         }
 
-        $prompt = $this->buildPrompt($input);
-
-        try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $apiKey,
-                'Content-Type'  => 'application/json',
-            ])->timeout(45)->post('https://api.openai.com/v1/chat/completions', [
-                'model' => $this->settings->getOpenAIModel(),
-                'response_format' => ['type' => 'json_object'],
-                'messages' => [
-                    ['role' => 'system', 'content' => $this->systemPrompt()],
-                    ['role' => 'user',   'content' => $prompt],
-                ],
-                'temperature' => 0.7,
-                'max_tokens'  => 800,
-            ]);
-
-            if (!$response->successful()) {
-                Log::error('Review Writer OpenAI error', ['status' => $response->status(), 'body' => $response->body()]);
-                throw new RuntimeException('AI service is temporarily unavailable. Please try again.');
-            }
-
-            $data    = $response->json();
-            $content = $data['choices'][0]['message']['content'] ?? null;
-            $tokens  = $data['usage']['total_tokens'] ?? 0;
-
-            if (!$content) {
-                throw new RuntimeException('Empty response from AI. Please try again.');
-            }
-
-            $parsed = json_decode($content, true);
-            if (!is_array($parsed) || empty($parsed['review'])) {
-                Log::warning('Review Writer response not parseable', ['content' => $content]);
-                throw new RuntimeException('AI returned an unexpected format. Please try again.');
-            }
-
-            $this->gate->recordUsage($user, AiFeatureCode::REVIEW_WRITER, $tokens, [
-                'professional' => $input['professional_name'] ?? null,
-                'rating'       => (int) ($input['rating'] ?? 0),
-                'tone'         => $input['tone'] ?? 'balanced',
-            ]);
-
-            return [
-                'review'      => trim($parsed['review']),
-                'short'       => trim($parsed['short'] ?? ''),
-                'tokens_used' => $tokens,
-            ];
-        } catch (RuntimeException $e) {
-            throw $e;
-        } catch (\Throwable $e) {
-            Log::error('Review Writer exception', ['error' => $e->getMessage()]);
-            throw new RuntimeException('Unable to generate review. Please try again.');
+        if ($result === null) {
+            $result = $this->composeLocally($input);
         }
+
+        $this->gate->recordUsage($user, AiFeatureCode::REVIEW_WRITER, $tokens, [
+            'professional' => $input['professional_name'] ?? null,
+            'rating'       => (int) ($input['rating'] ?? 0),
+            'tone'         => $input['tone'] ?? 'balanced',
+        ]);
+
+        return [
+            'review'      => $result['review'],
+            'short'       => $result['short'] ?? '',
+            'tokens_used' => $tokens,
+        ];
+    }
+
+    /** Call the AI provider. Returns [['review','short'], tokens] or throws. */
+    private function composeViaAi(string $apiKey, array $input): array
+    {
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $apiKey,
+            'Content-Type'  => 'application/json',
+        ])->timeout(45)->post('https://api.openai.com/v1/chat/completions', [
+            'model' => $this->settings->getOpenAIModel(),
+            'response_format' => ['type' => 'json_object'],
+            'messages' => [
+                ['role' => 'system', 'content' => $this->systemPrompt()],
+                ['role' => 'user',   'content' => $this->buildPrompt($input)],
+            ],
+            'temperature' => 0.7,
+            'max_tokens'  => 800,
+        ]);
+
+        if (!$response->successful()) {
+            throw new RuntimeException('AI provider returned ' . $response->status());
+        }
+
+        $data   = $response->json();
+        $parsed = json_decode($data['choices'][0]['message']['content'] ?? '', true);
+        if (!is_array($parsed) || empty($parsed['review'])) {
+            throw new RuntimeException('AI returned an unexpected format.');
+        }
+
+        return [
+            ['review' => trim($parsed['review']), 'short' => trim($parsed['short'] ?? '')],
+            (int) ($data['usage']['total_tokens'] ?? 0),
+        ];
+    }
+
+    /**
+     * Deterministic template composer — no external calls. Builds a natural
+     * review from the rating, tone and the customer's own thoughts.
+     */
+    private function composeLocally(array $input): array
+    {
+        $rating   = (int) ($input['rating'] ?? 5);
+        $name     = trim((string) ($input['professional_name'] ?? '')) ?: 'the team';
+        $service  = trim((string) ($input['service_type'] ?? ''));
+        $event    = trim((string) ($input['event_type'] ?? ''));
+        $tone     = strtolower((string) ($input['tone'] ?? 'balanced'));
+        $thoughts = trim((string) ($input['thoughts'] ?? ''));
+
+        $eventPhrase   = $event ? " for our {$event}" : '';
+        $servicePhrase = $service ? " {$service}" : ' service';
+
+        $open = match (true) {
+            $rating >= 5 => "We couldn't be happier with {$name}{$eventPhrase}.",
+            $rating === 4 => "We had a genuinely good experience with {$name}{$eventPhrase}.",
+            $rating === 3 => "Our experience with {$name}{$eventPhrase} was a mixed one.",
+            $rating === 2 => "Unfortunately our experience with {$name}{$eventPhrase} fell short of what we hoped.",
+            default       => "Regrettably, {$name} did not meet our expectations{$eventPhrase}.",
+        };
+
+        if ($thoughts !== '') {
+            $t = rtrim($thoughts, '.');
+            $middle = match (true) {
+                $rating >= 4  => " What stood out most: {$t}. From start to finish the{$servicePhrase} was handled professionally and with real care.",
+                $rating === 3 => " A few things went well — {$t} — though there was room to improve on communication and consistency.",
+                default       => " In particular, {$t}. We had hoped for a smoother experience given the booking.",
+            };
+        } else {
+            $middle = match (true) {
+                $rating >= 4  => " The{$servicePhrase} was professional, well-organised and delivered exactly what we needed.",
+                $rating === 3 => " The{$servicePhrase} was acceptable overall, with a few areas that could be tightened up.",
+                default       => " The{$servicePhrase} did not go as smoothly as we expected.",
+            };
+        }
+
+        $close = match (true) {
+            $rating >= 5  => " We'd recommend them without hesitation and would absolutely book again.",
+            $rating === 4 => " We'd happily recommend them and would consider booking again.",
+            $rating === 3 => " With a few adjustments this could be a strong option for others.",
+            $rating === 2 => " We'd be cautious about recommending them without reservations.",
+            default       => " We're sharing this so future clients can set their expectations accordingly.",
+        };
+
+        if ($tone === 'friendly' && $rating >= 4) {
+            $close .= ' Thanks again' . ($name !== 'the team' ? ", {$name}" : '') . '! 🎉';
+        }
+
+        $short = match (true) {
+            $rating >= 5  => ($service ?: 'Excellent service') . " — highly recommend {$name}!",
+            $rating === 4 => "Great experience with {$name} — would recommend.",
+            $rating === 3 => "Decent experience with {$name}, a few things to improve.",
+            default       => "Mixed experience with {$name} — see the full review.",
+        };
+
+        return [
+            'review'      => trim($open . $middle . $close),
+            'short'       => Str::limit($short, 145),
+            'tokens_used' => 0,
+        ];
     }
 
     private function systemPrompt(): string
