@@ -128,22 +128,52 @@ class ClientEventController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'starts_at' => ['nullable', 'date'],
+            'event_time' => ['nullable', 'date_format:H:i'],
             'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
             'category_ids' => ['nullable', 'array'],
             'category_ids.*' => ['exists:categories,id'],
             'location' => ['nullable', 'string', 'max:255'],
+            'venue' => ['nullable', 'string', 'max:255'],
+            'guest_count' => ['nullable', 'integer', 'min:1', 'max:1000000'],
             'budget' => ['nullable', 'numeric', 'min:0', 'max:9999999.99'],
+            'inspiration_photos' => ['nullable', 'array', 'max:8'],
+            'inspiration_photos.*' => ['image', 'max:5120'],
+            'video' => ['nullable', 'file', 'mimetypes:video/mp4,video/quicktime,video/webm', 'max:51200'],
+            'documents' => ['nullable', 'array', 'max:5'],
+            'documents.*' => ['file', 'mimes:pdf,doc,docx,png,jpg,jpeg', 'max:10240'],
         ]);
+
+        // Merge the optional event time into the start date.
+        $startsAt = $validated['starts_at'] ?? null;
+        if ($startsAt && ! empty($validated['event_time'])) {
+            $startsAt = \Illuminate\Support\Carbon::parse($startsAt)->setTimeFromTimeString($validated['event_time']);
+        }
+
+        // Persist uploaded media on the public disk; store relative paths in JSON.
+        $media = ['photos' => [], 'video' => null, 'documents' => []];
+        foreach ((array) $request->file('inspiration_photos', []) as $photo) {
+            $media['photos'][] = $photo->store('event-media/photos', 'public');
+        }
+        if ($request->hasFile('video')) {
+            $media['video'] = $request->file('video')->store('event-media/videos', 'public');
+        }
+        foreach ((array) $request->file('documents', []) as $doc) {
+            $media['documents'][] = $doc->store('event-media/documents', 'public');
+        }
+        $hasMedia = $media['photos'] || $media['video'] || $media['documents'];
 
         $event = Event::create([
             'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
             'status' => 'pending',
-            'starts_at' => $validated['starts_at'] ?? null,
+            'starts_at' => $startsAt,
             'ends_at' => $validated['ends_at'] ?? null,
             'created_by' => $request->user()->id,
             'client_id' => $request->user()->id,
             'location' => $validated['location'] ?? null,
+            'venue' => $validated['venue'] ?? null,
+            'guest_count' => $validated['guest_count'] ?? null,
+            'media' => $hasMedia ? $media : null,
             'budget' => $validated['budget'] ?? null,
             'is_published' => false,
             'source' => 'user',

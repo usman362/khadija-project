@@ -62,6 +62,7 @@ Route::get('/pro/{user}', [\App\Http\Controllers\Public\ProfessionalProfileShowC
 // mega-panel all converge. Supports ?q= ?city= ?rating_min= ?verified=
 // ?sort= query params.
 Route::get('/browse', [\App\Http\Controllers\Public\BrowseProfessionalsController::class, 'index'])
+    ->middleware('auth')
     ->name('public.browse');
 
 // ── How It Works (standalone explainer page) ──────────────────────────
@@ -169,7 +170,7 @@ Route::get('/sitemap.xml', function () {
         // Static public pages
         foreach ([
             ['url' => route('landing'),             'priority' => '1.0', 'changefreq' => 'weekly'],
-            ['url' => route('public.browse'),       'priority' => '0.9', 'changefreq' => 'daily'],
+            // /browse is now login-gated — excluded from the public sitemap.
             ['url' => route('events-categories'),   'priority' => '0.8', 'changefreq' => 'weekly'],
             ['url' => route('public.how-it-works'), 'priority' => '0.7', 'changefreq' => 'monthly'],
             ['url' => route('public.faq'),          'priority' => '0.6', 'changefreq' => 'monthly'],
@@ -541,6 +542,12 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:influencers.approve')->name('approve');
         Route::post('/{influencer}/reject', [\App\Http\Controllers\Dashboard\AdminInfluencerController::class, 'reject'])
             ->middleware('permission:influencers.reject')->name('reject');
+    });
+
+    // ── Admin AI Tools Control ────────────────────────────────────
+    Route::prefix('app/ai-tools')->name('app.ai-tools-admin.')->middleware('role:admin')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Dashboard\AdminAiToolController::class, 'index'])->name('index');
+        Route::post('/{key}', [\App\Http\Controllers\Dashboard\AdminAiToolController::class, 'update'])->name('update');
     });
 
     // ── Client Panel ──────────────────────────────────────────────

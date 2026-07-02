@@ -240,6 +240,15 @@
                         </li>
 
                         @role('admin')
+                        <li class="nav-item {{ request()->routeIs('app.ai-tools-admin.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.ai-tools-admin.index') }}" class="nav-link">
+                                <i class="link-icon ic-purple" data-lucide="sparkles"></i>
+                                <span class="link-title">AI Tools</span>
+                            </a>
+                        </li>
+                        @endrole
+
+                        @role('admin')
                         <li class="nav-item {{ request()->routeIs('app.admin.verifications.*') ? 'active' : '' }}">
                             <a href="{{ route('app.admin.verifications.index') }}" class="nav-link">
                                 <i class="link-icon ic-green" data-lucide="shield-check"></i>

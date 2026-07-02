@@ -1,447 +1,589 @@
 @extends('layouts.client')
 
 @section('title', 'Create a Gig')
-@section('page-title', 'Create a Gig Request')
-@section('page-subtitle', 'One focused question at a time — move back & forth freely')
+@section('page-title', 'Create a New Gig')
+@section('page-subtitle', 'Fill in the details below and let our AI find the best vendors for you.')
 
-{{-- Flash-card "Create a Gig" wizard (Peter's client-process pattern: one
-     focused card per topic, navigate back/forth, all answers recombine into a
-     single gig). Cards: AI assist → Basics → Describe → Budget → Urgency
-     (Emergency = ESR) → Vendor Prefs → Find method → Review. Core fields submit
-     to the existing client.events.store; richer fields are captured client-side
-     and folded into the description so nothing is lost pending a schema. --}}
+{{-- Rich single-page gig builder (client / orange theme). Everything is visible
+     on one page — the top step bar is anchor-nav that scrolls to each section.
+     Core fields (title, description, starts_at, ends_at, category_ids[], location,
+     budget) submit to client.events.store; the extra guests / time / venue /
+     upload inputs are cosmetic UI-only. A sticky Live Preview updates as you type. --}}
 
 @push('styles')
 <style>
-    .gw { --gw: #f97316; --gw-strong: #ea580c; --ai: #16a34a; max-width: 740px; margin: 0 auto; }
+    .gb { --gb: #f97316; --gb-strong: #ea580c; --gb-soft: rgba(249,115,22,.10); --ai: #16a34a; }
 
-    .gw-count { font-size: 12.5px; font-weight: 800; color: var(--text-muted); white-space: nowrap; }
+    /* ---- Page header ---- */
+    .gb-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+    .gb-head h1 { font-size: 24px; font-weight: 800; color: var(--text-primary); letter-spacing: -.5px; }
+    .gb-head p { font-size: 13.5px; color: var(--text-muted); margin-top: 5px; max-width: 560px; }
 
-    /* Named step indicator (Peter's "gig creation steps" style) — numbered
-       circle + title + description, horizontal, active highlighted. */
-    .gw-stepper { display: flex; gap: 2px; overflow-x: auto; padding: 2px 0 16px; margin-bottom: 20px; }
-    .gw-stepper::-webkit-scrollbar { height: 5px; } .gw-stepper::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 999px; }
-    .gw-st { display: flex; flex-direction: column; align-items: center; text-align: center; flex: 1 0 90px; min-width: 90px; position: relative; }
-    .gw-st::before { content: ''; position: absolute; top: 14px; left: -50%; width: 100%; height: 2px; background: var(--border-color); z-index: 0; }
-    .gw-st:first-child::before { display: none; }
-    .gw-st.done::before { background: #16a34a; }
-    .gw-st.active::before { background: var(--gw); }
-    .gw-st-num { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 800; background: var(--bg-card); border: 2px solid var(--border-color); color: var(--text-muted); position: relative; z-index: 1; transition: all .2s; }
-    .gw-st.done .gw-st-num { background: #16a34a; border-color: #16a34a; color: #fff; }
-    .gw-st.active .gw-st-num { background: var(--gw); border-color: var(--gw); color: #fff; box-shadow: 0 0 0 4px rgba(249,115,22,.18); }
-    .gw-st-title { font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-top: 7px; line-height: 1.2; }
-    .gw-st.active .gw-st-title, .gw-st.done .gw-st-title { color: var(--text-primary); }
-    .gw-st-desc { font-size: 9.5px; color: var(--text-muted); margin-top: 2px; line-height: 1.3; max-width: 96px; }
+    .gb-btn { border: none; border-radius: 11px; padding: 11px 20px; font-size: 13.5px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-family: inherit; text-decoration: none; }
+    .gb-btn svg { width: 16px; height: 16px; }
+    .gb-btn.primary { background: linear-gradient(135deg, var(--gb), var(--gb-strong)); color: #fff; }
+    .gb-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(249,115,22,.28); }
+    .gb-btn.ghost { background: var(--bg-card); color: var(--text-secondary); border: 1.5px solid var(--border-color); }
+    .gb-btn.ghost:hover { border-color: var(--gb); color: var(--gb-strong); }
+    .gb-btn.block { width: 100%; justify-content: center; }
 
-    .gw-stage { position: relative; min-height: 380px; }
-    .gw-card { position: absolute; inset: 0; opacity: 0; transform: translateX(40px); pointer-events: none; transition: opacity .35s ease, transform .35s cubic-bezier(.16,1,.3,1); }
-    .gw-card.active { opacity: 1; transform: none; pointer-events: auto; position: relative; }
-    .gw-card.leaving { transform: translateX(-40px); opacity: 0; }
+    /* ---- Step bar (anchor nav) ---- */
+    .gb-steps { display: flex; gap: 4px; overflow-x: auto; padding: 4px 2px 0; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); }
+    .gb-steps::-webkit-scrollbar { height: 5px; } .gb-steps::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 999px; }
+    .gb-step { flex: 1 0 auto; display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px 13px; font-size: 12.5px; font-weight: 700; color: var(--text-muted); border-bottom: 2.5px solid transparent; margin-bottom: -1px; white-space: nowrap; text-decoration: none; cursor: pointer; transition: all .15s; }
+    .gb-step:hover { color: var(--text-secondary); }
+    .gb-step .n { width: 22px; height: 22px; border-radius: 50%; background: var(--bg-secondary); border: 1.5px solid var(--border-color); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--text-muted); }
+    .gb-step.active { color: var(--gb-strong); border-bottom-color: var(--gb); }
+    .gb-step.active .n { background: var(--gb); border-color: var(--gb); color: #fff; }
 
-    .gw-eyebrow { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; color: var(--gw); background: rgba(249,115,22,.1); padding: 6px 13px; border-radius: 999px; margin-bottom: 15px; }
-    .gw-q { font-size: 25px; font-weight: 800; color: var(--text-primary); letter-spacing: -.5px; line-height: 1.2; }
-    .gw-help { font-size: 14px; color: var(--text-muted); margin: 9px 0 20px; }
+    /* ---- Layout ---- */
+    .gb-grid { display: grid; grid-template-columns: 1fr 360px; gap: 22px; align-items: start; }
+    @media (max-width: 980px) { .gb-grid { grid-template-columns: 1fr; } .gb-aside { position: static !important; } }
+    .gb-main { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+    .gb-aside { position: sticky; top: 18px; display: flex; flex-direction: column; gap: 16px; }
 
-    .gw-flabel { display: block; font-size: 12.5px; font-weight: 700; color: var(--text-secondary); margin: 0 0 7px; }
-    .gw-input { width: 100%; border: 2px solid var(--border-color); border-radius: 12px; padding: 12px 14px; font-size: 15px; color: var(--text-primary); background: var(--bg-card); font-family: inherit; transition: border-color .15s; }
-    .gw-input:focus { outline: none; border-color: var(--gw); }
-    textarea.gw-input { resize: vertical; min-height: 120px; }
-    .gw-row { display: flex; gap: 13px; flex-wrap: wrap; margin-bottom: 13px; }
-    .gw-row > div { flex: 1; min-width: 150px; }
-    .gw-field { margin-bottom: 13px; }
+    /* ---- Cards ---- */
+    .gb-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius, 16px); padding: 22px 24px; scroll-margin-top: 90px; }
+    .gb-card-hd { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .gb-card-hd h3 { font-size: 16px; font-weight: 800; color: var(--text-primary); }
+    .gb-card-hd .ic { width: 34px; height: 34px; border-radius: 10px; background: var(--gb-soft); color: var(--gb-strong); display: inline-flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+    .gb-card-sub { font-size: 12.5px; color: var(--text-muted); margin: 0 0 18px; }
 
-    .gw-chips { display: flex; flex-wrap: wrap; gap: 9px; }
-    .gw-chip { display: inline-flex; align-items: center; gap: 7px; border: 2px solid var(--border-color); border-radius: 11px; padding: 9px 14px; font-size: 13.5px; font-weight: 700; color: var(--text-secondary); background: var(--bg-card); cursor: pointer; user-select: none; }
-    .gw-chip:hover { border-color: var(--gw); }
-    .gw-chip.sel { border-color: var(--gw); background: rgba(249,115,22,.1); color: var(--gw-strong); }
-    .gw-chip .tick { display: none; } .gw-chip.sel .tick { display: inline; }
+    .gb-label { display: block; font-size: 12.5px; font-weight: 700; color: var(--text-secondary); margin: 0 0 7px; }
+    .gb-req { color: var(--gb-strong); }
+    .gb-input, .gb-textarea, .gb-select { width: 100%; border: 1.5px solid var(--border-color); border-radius: 11px; padding: 11px 13px; font-size: 14px; color: var(--text-primary); background: var(--bg-card); font-family: inherit; transition: border-color .15s, box-shadow .15s; }
+    .gb-input:focus, .gb-textarea:focus, .gb-select:focus { outline: none; border-color: var(--gb); box-shadow: 0 0 0 3px rgba(249,115,22,.14); }
+    .gb-textarea { resize: vertical; min-height: 150px; line-height: 1.55; }
+    .gb-field { margin-bottom: 16px; }
+    .gb-field:last-child { margin-bottom: 0; }
+    .gb-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 520px) { .gb-row { grid-template-columns: 1fr; } }
+    .gb-prefix { display: flex; align-items: stretch; }
+    .gb-prefix .sym { flex-shrink: 0; width: 44px; display: flex; align-items: center; justify-content: center; background: var(--gb-soft); color: var(--gb-strong); font-weight: 800; font-size: 15px; border: 1.5px solid var(--border-color); border-right: none; border-radius: 11px 0 0 11px; }
+    .gb-prefix .gb-input { border-radius: 0 11px 11px 0; }
 
-    /* radio-card options (AI level, budget mode, urgency, find method) */
-    .gw-opts { display: flex; flex-direction: column; gap: 10px; }
-    .gw-opt { display: flex; align-items: flex-start; gap: 11px; border: 2px solid var(--border-color); border-radius: 13px; padding: 13px 15px; cursor: pointer; transition: all .15s; }
-    .gw-opt:hover { border-color: var(--gw); }
-    .gw-opt.sel { border-color: var(--gw); background: rgba(249,115,22,.07); }
-    .gw-opt .ic { font-size: 18px; line-height: 1.2; }
-    .gw-opt b { display: block; font-size: 14.5px; font-weight: 800; color: var(--text-primary); }
-    .gw-opt span { font-size: 12.5px; color: var(--text-muted); }
-    .gw-opt .pill { margin-left: auto; font-size: 10px; font-weight: 800; color: var(--gw-strong); background: rgba(249,115,22,.12); padding: 3px 9px; border-radius: 999px; align-self: center; }
+    /* category chips */
+    .gb-chips { display: flex; flex-wrap: wrap; gap: 9px; }
+    .gb-chip { display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--border-color); border-radius: 10px; padding: 8px 13px; font-size: 13px; font-weight: 700; color: var(--text-secondary); background: var(--bg-card); cursor: pointer; user-select: none; transition: all .12s; }
+    .gb-chip:hover { border-color: var(--gb); }
+    .gb-chip.sel { border-color: var(--gb); background: var(--gb-soft); color: var(--gb-strong); }
+    .gb-chip .tick { display: none; font-size: 12px; } .gb-chip.sel .tick { display: inline; }
 
-    .gw-note { font-size: 12px; font-weight: 700; border-radius: 10px; padding: 9px 13px; margin-top: 12px; display: flex; align-items: center; gap: 8px; }
-    .gw-note.warn { color: var(--gw-strong); background: rgba(249,115,22,.1); }
-    .gw-note.ai { color: var(--ai); background: rgba(22,163,74,.09); }
+    /* AI assistant sub-panel */
+    .gb-ai { border: 1px dashed var(--gb); background: linear-gradient(135deg, rgba(249,115,22,.06), rgba(234,88,12,.03)); border-radius: 13px; padding: 15px 16px; margin-bottom: 16px; }
+    .gb-ai-hd { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 800; color: var(--gb-strong); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 10px; }
+    .gb-ai-list { list-style: none; margin: 0 0 13px; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+    .gb-ai-list li { font-size: 12.5px; color: var(--text-secondary); display: flex; gap: 8px; line-height: 1.45; }
+    .gb-ai-list li::before { content: '✦'; color: var(--gb); flex-shrink: 0; }
 
-    .gw-uploads { display: flex; gap: 10px; flex-wrap: wrap; }
-    .gw-upload { width: 78px; height: 64px; border: 2px dashed var(--border-color); border-radius: 11px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 22px; cursor: pointer; }
-    .gw-upload:hover { border-color: var(--gw); color: var(--gw); }
+    /* upload tiles */
+    .gb-uploads { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 11px; }
+    .gb-tile { aspect-ratio: 1; border-radius: 12px; border: 1.5px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--text-muted); overflow: hidden; position: relative; }
+    .gb-tile.ph { background: linear-gradient(135deg, rgba(249,115,22,.10), rgba(249,115,22,.03)); }
+    .gb-tile.add { border-style: dashed; cursor: pointer; flex-direction: column; gap: 4px; font-size: 22px; }
+    .gb-tile.add:hover { border-color: var(--gb); color: var(--gb); }
+    .gb-tile.add span { font-size: 10.5px; font-weight: 700; }
+    .gb-tile.add input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .gb-upload-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+    @media (max-width: 520px) { .gb-upload-row { grid-template-columns: 1fr; } }
+    .gb-drop { border: 1.5px dashed var(--border-color); border-radius: 12px; padding: 14px; text-align: center; font-size: 12px; font-weight: 700; color: var(--text-muted); position: relative; }
+    .gb-drop:hover { border-color: var(--gb); color: var(--gb); }
+    .gb-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .gb-drop b { display: block; color: var(--text-secondary); font-size: 12.5px; margin-bottom: 2px; }
 
-    .gw-ai-help { display: flex; align-items: center; gap: 11px; margin-top: 14px; border: 1px dashed var(--gw); background: rgba(249,115,22,.06); border-radius: 12px; padding: 11px 14px; flex-wrap: wrap; }
-    .gw[data-ai="manual"] .gw-ai-help { display: none; }
-    .gw-ai-help p { font-size: 12.5px; color: var(--text-secondary); flex: 1; min-width: 150px; }
-    .gw-ai-help p b { color: var(--gw-strong); }
-    .gw-ai-use { font-size: 12.5px; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--gw), var(--gw-strong)); border-radius: 9px; padding: 8px 14px; text-decoration: none; white-space: nowrap; }
-    .gw-suggest { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-    .gw-suggest .lbl { width: 100%; font-size: 11.5px; font-weight: 800; color: var(--gw-strong); }
-    .gw-sugg { font-size: 12px; font-weight: 700; color: var(--text-secondary); border: 1px solid var(--border-color); border-radius: 999px; padding: 6px 12px; cursor: pointer; background: var(--bg-card); }
-    .gw-sugg:hover { border-color: var(--gw); color: var(--gw-strong); }
+    /* budget slider */
+    .gb-range { width: 100%; margin-top: 6px; accent-color: var(--gb); }
 
-    .gw-review { border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; }
-    .gw-rev-row { display: flex; justify-content: space-between; gap: 14px; padding: 12px 16px; border-bottom: 1px solid var(--border-color); font-size: 13.5px; }
-    .gw-rev-row:last-child { border-bottom: none; }
-    .gw-rev-row span { color: var(--text-muted); font-weight: 600; }
-    .gw-rev-row b { color: var(--text-primary); font-weight: 700; text-align: right; }
+    /* advanced options */
+    .gb-adv { border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+    .gb-adv summary { list-style: none; cursor: pointer; padding: 14px 18px; font-size: 13.5px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between; }
+    .gb-adv summary::-webkit-details-marker { display: none; }
+    .gb-adv summary .chev { transition: transform .2s; }
+    .gb-adv[open] summary .chev { transform: rotate(180deg); }
+    .gb-adv-body { padding: 4px 18px 18px; border-top: 1px solid var(--border-color); }
+    .gb-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border-color); }
+    .gb-toggle:last-child { border-bottom: none; }
+    .gb-toggle b { display: block; font-size: 13px; font-weight: 800; color: var(--text-primary); }
+    .gb-toggle span { font-size: 11.5px; color: var(--text-muted); }
+    .gb-sw { width: 42px; height: 24px; border-radius: 999px; background: var(--border-color); position: relative; cursor: pointer; flex-shrink: 0; transition: background .15s; }
+    .gb-sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: left .15s; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+    .gb-sw.on { background: var(--gb); } .gb-sw.on::after { left: 20px; }
 
-    .gw-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 26px; }
-    .gw-btn { border: none; border-radius: 12px; padding: 13px 26px; font-size: 14.5px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 9px; font-family: inherit; text-decoration: none; }
-    .gw-btn.next { background: linear-gradient(135deg, var(--gw), var(--gw-strong)); color: #fff; }
-    .gw-btn.back { background: transparent; color: var(--text-muted); }
-    .gw-btn svg { width: 17px; height: 17px; }
-    .gw-err { color: #dc2626; font-size: 12.5px; font-weight: 700; margin-top: 10px; display: none; }
-    .gw-hide { display: none; }
+    .gb-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
 
-    /* toggle rows (bidding rules) */
-    .gw-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 10px; }
-    .gw-toggle div b { display: block; font-size: 13.5px; font-weight: 800; color: var(--text-primary); }
-    .gw-toggle div span { font-size: 12px; color: var(--text-muted); }
-    .gw-sw { width: 42px; height: 24px; border-radius: 999px; background: var(--border-color); position: relative; cursor: pointer; flex-shrink: 0; transition: background .15s; }
-    .gw-sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: left .15s; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
-    .gw-sw.on { background: var(--gw); } .gw-sw.on::after { left: 20px; }
+    .gb-err { color: #dc2626; font-size: 12.5px; font-weight: 700; margin-top: 8px; }
 
-    /* live professional preview (how it appears on the bidding board) */
-    .gw-preview-wrap { border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; margin-top: 16px; }
-    .gw-preview-hd { font-size: 11.5px; font-weight: 800; color: var(--gw-strong); background: rgba(249,115,22,.08); padding: 9px 14px; }
-    .gw-pvcard { display: flex; gap: 12px; padding: 14px; }
-    .gw-pvcard .img { width: 70px; height: 70px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-color); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-    .gw-pvcard h5 { font-size: 14px; font-weight: 800; color: var(--text-primary); }
-    .gw-pvcard .b { font-size: 13px; font-weight: 800; color: #16a34a; margin-top: 4px; }
-    .gw-pvcard .m { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
-    .gw-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 12px 14px; border-top: 1px solid var(--border-color); }
-    .gw-stat { text-align: center; } .gw-stat b { display: block; font-size: 15px; font-weight: 800; color: var(--text-primary); } .gw-stat span { font-size: 10px; color: var(--text-muted); }
+    /* ---- Live preview ---- */
+    .gb-pv-hd h4 { font-size: 15px; font-weight: 800; color: var(--text-primary); }
+    .gb-pv-hd p { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+    .gb-pvcard { border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; background: var(--bg-card); margin-top: 14px; }
+    .gb-pv-cover { height: 84px; background: linear-gradient(135deg, var(--gb), var(--gb-strong)); position: relative; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+    .gb-pv-ring { position: absolute; right: 12px; bottom: -20px; width: 52px; height: 52px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; }
+    .gb-pv-ring svg { width: 46px; height: 46px; transform: rotate(-90deg); }
+    .gb-pv-ring .pct { position: absolute; font-size: 11px; font-weight: 800; color: var(--gb-strong); }
+    .gb-pv-body { padding: 26px 16px 16px; }
+    .gb-pv-title { font-size: 15px; font-weight: 800; color: var(--text-primary); line-height: 1.3; }
+    .gb-pv-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 9px 0; }
+    .gb-pv-tag { font-size: 10.5px; font-weight: 700; color: var(--gb-strong); background: var(--gb-soft); padding: 3px 9px; border-radius: 999px; }
+    .gb-pv-meta { font-size: 11.5px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .gb-pv-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin: 10px 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .gb-pv-budget { font-size: 14px; font-weight: 800; color: var(--ai); }
+    .gb-pv-badges { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color); flex-wrap: wrap; }
+    .gb-pv-badge { font-size: 10.5px; font-weight: 700; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 4px; }
+    .gb-pv-badge svg { width: 13px; height: 13px; color: var(--ai); }
+    .gb-pv-actions { margin-top: 16px; display: flex; flex-direction: column; gap: 9px; align-items: center; }
+    .gb-editlink { font-size: 12.5px; font-weight: 700; color: var(--text-muted); background: none; border: none; cursor: pointer; text-decoration: underline; font-family: inherit; }
+    .gb-editlink:hover { color: var(--gb-strong); }
+
+    /* ---- AI tools row ---- */
+    .gb-tools { margin-top: 26px; }
+    .gb-tools h3 { font-size: 17px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+    .gb-tools p { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+    .gb-tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+    .gb-tool { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 14px; padding: 18px; text-decoration: none; display: flex; flex-direction: column; transition: all .15s; }
+    .gb-tool:hover { border-color: var(--gb); transform: translateY(-2px); box-shadow: 0 10px 26px rgba(249,115,22,.10); }
+    .gb-tool .tic { width: 40px; height: 40px; border-radius: 11px; background: var(--gb-soft); color: var(--gb-strong); display: inline-flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 12px; }
+    .gb-tool b { font-size: 14px; font-weight: 800; color: var(--text-primary); }
+    .gb-tool span { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin: 5px 0 12px; flex: 1; }
+    .gb-tool .use { font-size: 12.5px; font-weight: 800; color: var(--gb-strong); display: inline-flex; align-items: center; gap: 5px; }
 </style>
 @endpush
 
 @section('content')
-<div class="gw" id="gwRoot" data-ai="semi">
+<div class="gb" id="gbRoot">
+
+    {{-- A) Page header --}}
+    <div class="gb-head">
+        <div>
+            <h1>Create a New Gig</h1>
+            <p>Fill in the details below and let our AI find the best vendors for you.</p>
+        </div>
+        <button type="button" class="gb-btn ghost" onclick="document.getElementById('gbForm').submit();">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save Draft
+        </button>
+    </div>
+
+    {{-- B) Step bar (anchor nav) --}}
     @php
-        $gwSteps = [
-            ['AI Assist', 'How much help'],
-            ['Basics', 'Basic details'],
-            ['Describe', 'About the project'],
-            ['Budget', 'Your budget range'],
-            ['Urgency', 'How urgent'],
-            ['Preferences', 'Preferred vendors'],
-            ['Find Vendors', 'How we find them'],
-            ['Bidding Rules', 'Control bidding'],
-            ['Review', 'Preview & publish'],
+        $gbSteps = [
+            ['basics', 'Basics'],
+            ['describe', 'Describe Your Project'],
+            ['budget', 'Budget'],
+            ['timeline', 'Timeline'],
+            ['vendors', 'Vendors'],
+            ['requirements', 'Requirements'],
+            ['review', 'Review'],
+            ['publish', 'Publish'],
         ];
     @endphp
-    <div class="gw-stepper" id="gwStepper">
-        @foreach($gwSteps as $i => [$t, $d])
-            <div class="gw-st {{ $i === 0 ? 'active' : '' }}" data-st="{{ $i }}">
-                <span class="gw-st-num">{{ $i + 1 }}</span>
-                <span class="gw-st-title">{{ $t }}</span>
-                <span class="gw-st-desc">{{ $d }}</span>
-            </div>
+    <div class="gb-steps" id="gbSteps">
+        @foreach($gbSteps as $i => [$anchor, $label])
+            <a href="#gb-{{ $anchor }}" class="gb-step {{ $anchor === 'describe' ? 'active' : '' }}" data-anchor="gb-{{ $anchor }}">
+                <span class="n">{{ $i + 1 }}</span>{{ $label }}
+            </a>
         @endforeach
     </div>
 
-    <form method="POST" action="{{ route('client.events.store') }}" id="gwForm">
+    <form method="POST" action="{{ route('client.events.store') }}" id="gbForm" enctype="multipart/form-data">
         @csrf
-        <input type="hidden" name="location" id="gwLocation">
-        <input type="hidden" name="budget" id="gwBudgetHidden">
 
-        <div class="gw-stage">
+        <div class="gb-grid">
+            {{-- ============ LEFT COLUMN ============ --}}
+            <div class="gb-main">
 
-            {{-- 1 · AI assist --}}
-            <div class="gw-card active" data-step="0">
-                <span class="gw-eyebrow">🤖 AI Assist</span>
-                <h2 class="gw-q">How much help do you want?</h2>
-                <p class="gw-help">Fill it in yourself, or let AI do the heavy lifting — your choice.</p>
-                <div class="gw-opts">
-                    <label class="gw-opt" data-ai="manual"><span class="ic">✍️</span><span><b>I’ll do it myself</b><span>Fill the form manually — no AI.</span></span></label>
-                    <label class="gw-opt sel" data-ai="semi"><span class="ic">✨</span><span><b>Semi-AI — assist me</b><span>Smart suggestions + AI tools as you go.</span></span></label>
-                    <label class="gw-opt" data-ai="max"><span class="ic">⚡</span><span><b>Maximum AI — draft it for me</b><span>AI pre-fills everything; you review &amp; tweak.</span></span></label>
-                </div>
-            </div>
+                {{-- 1 · Basics --}}
+                <section class="gb-card" id="gb-basics">
+                    <div class="gb-card-hd"><span class="ic">📋</span><h3>Basics</h3></div>
+                    <p class="gb-card-sub">The essentials about your event.</p>
 
-            {{-- 2 · Basic Information --}}
-            <div class="gw-card" data-step="1" data-required="basic">
-                <span class="gw-eyebrow">① Basics</span>
-                <h2 class="gw-q">Tell us the basics</h2>
-                <p class="gw-help">The essentials about your event.</p>
-                <div class="gw-field"><label class="gw-flabel">Event Title</label><input type="text" name="title" class="gw-input" placeholder="e.g. Johnson Wedding Celebration" maxlength="255"></div>
-                <div class="gw-field">
-                    <label class="gw-flabel">What do you need?</label>
-                    <div class="gw-chips">
-                        @foreach($categories as $cat)
-                            <label class="gw-chip"><input type="checkbox" name="category_ids[]" value="{{ $cat->id }}" hidden><span>{{ $cat->name }}</span><span class="tick">✓</span></label>
-                        @endforeach
+                    <div class="gb-field">
+                        <label class="gb-label">Gig Title <span class="gb-req">*</span></label>
+                        <input type="text" name="title" id="gbTitle" class="gb-input" required maxlength="255"
+                               placeholder="e.g. Wedding Photographer for June Celebration" value="{{ old('title') }}">
+                        @error('title') <div class="gb-err">{{ $message }}</div> @enderror
                     </div>
-                </div>
-                <div class="gw-row">
-                    <div><label class="gw-flabel">Event Type</label><input class="gw-input" name="event_type" placeholder="Wedding, Corporate…"></div>
-                    <div><label class="gw-flabel">Guests (approx.)</label><input type="number" class="gw-input" name="guests" placeholder="150"></div>
-                </div>
-                <div class="gw-row">
-                    <div><label class="gw-flabel">Date</label><input type="date" name="starts_at" class="gw-input"></div>
-                    <div><label class="gw-flabel">Time</label><input type="time" name="time" class="gw-input"></div>
-                </div>
-                <div class="gw-row">
-                    <div><label class="gw-flabel">City</label><input class="gw-input" id="gwCity" placeholder="Miami, FL"></div>
-                    <div><label class="gw-flabel">Venue</label><input class="gw-input" id="gwVenue" placeholder="Beach Palace Hotel"></div>
-                </div>
-                <div class="gw-err">Please add an event title and pick at least one service.</div>
-            </div>
 
-            {{-- 3 · Describe --}}
-            <div class="gw-card" data-step="2">
-                <span class="gw-eyebrow">② Describe</span>
-                <h2 class="gw-q">Describe the project</h2>
-                <p class="gw-help">Tell pros more about what you’re looking for.</p>
-                <textarea name="description" id="gwDesc" class="gw-input" placeholder="We need a professional photographer to capture our wedding ceremony, reception, family photos and candid moments…"></textarea>
-                <div class="gw-suggest gw-ai-help" style="border:none;background:none;padding:0;">
-                    <span class="lbl">✨ AI suggestions — tap to add:</span>
-                    <span class="gw-sugg">Add venue details</span>
-                    <span class="gw-sugg">Mention guest count</span>
-                    <span class="gw-sugg">Specify preferred style</span>
-                    <span class="gw-sugg">List must-have moments</span>
-                </div>
-                <label class="gw-flabel" style="margin-top:16px;">Upload inspiration photos / documents (optional)</label>
-                <div class="gw-uploads">
-                    <span class="gw-upload">+</span><span class="gw-upload">+</span><span class="gw-upload">+</span>
-                </div>
-            </div>
-
-            {{-- 4 · Budget --}}
-            <div class="gw-card" data-step="3">
-                <span class="gw-eyebrow">③ Budget</span>
-                <h2 class="gw-q">What’s your budget?</h2>
-                <p class="gw-help">Tell us a range, or let us recommend one.</p>
-                <div class="gw-opts">
-                    <label class="gw-opt sel" data-bmode="known"><span class="ic">💰</span><span><b>I know my budget</b><span>Enter a min and max range.</span></span></label>
-                    <label class="gw-opt" data-bmode="recommend"><span class="ic">🤖</span><span><b>I need recommendations</b><span>We’ll suggest a realistic budget from your details.</span></span></label>
-                </div>
-                <div class="gw-row gw-bknown" style="margin-top:14px;">
-                    <div><label class="gw-flabel">Minimum Budget</label><input type="number" id="gwBmin" class="gw-input" placeholder="$2,000"></div>
-                    <div><label class="gw-flabel">Maximum Budget</label><input type="number" id="gwBmax" class="gw-input" placeholder="$3,000"></div>
-                </div>
-                <div class="gw-note ai">📊 Based on similar events, most clients spend between $2,000 – $3,200.</div>
-            </div>
-
-            {{-- 5 · Timeline / Urgency --}}
-            <div class="gw-card" data-step="4">
-                <span class="gw-eyebrow">④ Urgency</span>
-                <h2 class="gw-q">How urgent is this project?</h2>
-                <p class="gw-help">This sets how your request is prioritised.</p>
-                <div class="gw-opts">
-                    <label class="gw-opt" data-urg="ESR"><span class="ic">🔥</span><span><b>Emergency</b><span>Need someone within 24 hours.</span></span><span class="pill">ESR</span></label>
-                    <label class="gw-opt" data-urg="urgent"><span class="ic">⏰</span><span><b>Urgent</b><span>Within 3 days.</span></span></label>
-                    <label class="gw-opt sel" data-urg="standard"><span class="ic">📅</span><span><b>Standard</b><span>Within 1–2 weeks.</span></span></label>
-                    <label class="gw-opt" data-urg="flexible"><span class="ic">🌿</span><span><b>Flexible</b><span>No rush, flexible timing.</span></span></label>
-                </div>
-                <div class="gw-note warn gw-hide" id="gwEsrNote">🔥 This will be listed as an <b>Emergency Request (ESR)</b>.</div>
-                <input type="hidden" name="urgency" id="gwUrg" value="standard">
-            </div>
-
-            {{-- 6 · Vendor Preferences --}}
-            <div class="gw-card" data-step="5">
-                <span class="gw-eyebrow">⑤ Preferences</span>
-                <h2 class="gw-q">Vendor preferences</h2>
-                <p class="gw-help">Choose the type of vendors you prefer.</p>
-                <div class="gw-chips">
-                    @foreach(['Verified Vendors Only','Top Rated Vendors','Local Vendors','Minority-Owned','Woman-Owned','Veteran-Owned','Eco-Friendly'] as $pref)
-                        <label class="gw-chip {{ in_array($pref, ['Verified Vendors Only','Top Rated Vendors','Local Vendors']) ? 'sel' : '' }}">
-                            <input type="checkbox" name="vendor_prefs[]" value="{{ $pref }}" hidden {{ in_array($pref, ['Verified Vendors Only','Top Rated Vendors','Local Vendors']) ? 'checked' : '' }}>
-                            <span>{{ $pref }}</span><span class="tick">✓</span>
-                        </label>
-                    @endforeach
-                </div>
-                <div class="gw-note ai">🛡 Ensures quality and trust in every proposal.</div>
-            </div>
-
-            {{-- 7 · How to find vendors --}}
-            <div class="gw-card" data-step="6">
-                <span class="gw-eyebrow">⑥ Distribution</span>
-                <h2 class="gw-q">How should we find vendors?</h2>
-                <p class="gw-help">Choose how vendors can receive this project.</p>
-                <div class="gw-opts">
-                    <label class="gw-opt" data-find="open"><span class="ic">🌐</span><span><b>Open Bidding</b><span>Anyone qualified can bid.</span></span></label>
-                    <label class="gw-opt" data-find="direct"><span class="ic">✉️</span><span><b>Direct Offers</b><span>We recommend vendors and invite them.</span></span></label>
-                    <label class="gw-opt" data-find="invite"><span class="ic">👤</span><span><b>Invite Only</b><span>You select who receives the project.</span></span></label>
-                    <label class="gw-opt sel" data-find="ai"><span class="ic">✨</span><span><b>AI Match</b><span>AI sends it to the best-fit vendors.</span></span><span class="pill">Recommended</span></label>
-                    <label class="gw-opt" data-find="hybrid"><span class="ic">🔀</span><span><b>Hybrid</b><span>AI recommendations while keeping it open.</span></span></label>
-                </div>
-                <input type="hidden" name="find_method" id="gwFind" value="ai">
-            </div>
-
-            {{-- 8 · Bidding Rules --}}
-            <div class="gw-card" data-step="7">
-                <span class="gw-eyebrow">⑦ Bidding Rules</span>
-                <h2 class="gw-q">Control how bidding works</h2>
-                <p class="gw-help">Decide what professionals can see while they bid.</p>
-                <div class="gw-toggle">
-                    <div><b>🔒 Sealed bidding</b><span>Hide competitor bids — get more honest, quality proposals.</span></div>
-                    <span class="gw-sw" data-toggle="gwSealed"></span>
-                </div>
-                <div class="gw-toggle">
-                    <div><b>Hide my budget from pros</b><span>Pros bid blind to your budget range.</span></div>
-                    <span class="gw-sw" data-toggle="gwHideBudget"></span>
-                </div>
-                <div class="gw-toggle">
-                    <div><b>Allow questions from pros</b><span>Let professionals ask clarifying questions.</span></div>
-                    <span class="gw-sw on" data-toggle="gwAllowQ"></span>
-                </div>
-                <input type="hidden" name="sealed" id="gwSealed" value="0">
-                <input type="hidden" name="hide_budget" id="gwHideBudget" value="0">
-                <input type="hidden" name="allow_questions" id="gwAllowQ" value="1">
-            </div>
-
-            {{-- 9 · Review + Professional Preview --}}
-            <div class="gw-card" data-step="8">
-                <span class="gw-eyebrow">✓ Review</span>
-                <h2 class="gw-q">Review &amp; publish</h2>
-                <p class="gw-help">Check everything’s right — you can go back to any card to edit.</p>
-                <div class="gw-review" id="gwReview"></div>
-
-                <div class="gw-preview-wrap">
-                    <div class="gw-preview-hd">👀 How professionals will see it on the Bidding Board</div>
-                    <div class="gw-pvcard">
-                        <div class="img">🎉</div>
-                        <div>
-                            <h5 id="gwPvTitle">Your gig</h5>
-                            <div class="b" id="gwPvBudget">Budget</div>
-                            <div class="m" id="gwPvMeta">Location · Date</div>
+                    <div class="gb-field">
+                        <label class="gb-label">Event Type</label>
+                        <div class="gb-chips" id="gbCats">
+                            @foreach($categories as $cat)
+                                <label class="gb-chip">
+                                    <input type="checkbox" name="category_ids[]" value="{{ $cat->id }}" hidden>
+                                    @if(!empty($cat->icon))<span>{{ $cat->icon }}</span>@endif
+                                    <span class="lbl">{{ $cat->name }}</span>
+                                    <span class="tick">✓</span>
+                                </label>
+                            @endforeach
                         </div>
                     </div>
-                    <div class="gw-stats">
-                        <div class="gw-stat"><b>~150</b><span>Est. Views</span></div>
-                        <div class="gw-stat"><b>8–14</b><span>Est. Bids</span></div>
-                        <div class="gw-stat"><b>Medium</b><span>Competition</span></div>
-                        <div class="gw-stat"><b>2h 15m</b><span>Avg. Response</span></div>
+
+                    <div class="gb-row">
+                        <div class="gb-field" style="margin-bottom:0;">
+                            <label class="gb-label">Location</label>
+                            <input type="text" name="location" id="gbLocation" class="gb-input" placeholder="e.g. Miami, FL" value="{{ old('location') }}">
+                        </div>
+                        <div class="gb-field" style="margin-bottom:0;">
+                            <label class="gb-label">Venue</label>
+                            <input type="text" name="venue" id="gbVenue" class="gb-input" placeholder="e.g. Beach Palace Hotel" value="{{ old('venue') }}">
+                        </div>
                     </div>
+                </section>
+
+                {{-- 2 · Describe Your Project --}}
+                <section class="gb-card" id="gb-describe">
+                    <div class="gb-card-hd"><span class="ic">📝</span><h3>Describe Your Project</h3></div>
+                    <p class="gb-card-sub">Tell professionals what you're looking for. Not sure where to start? Let the AI assistant draft it.</p>
+
+                    <div class="gb-ai">
+                        <div class="gb-ai-hd"><span>✨</span> AI Suggestions</div>
+                        <ul class="gb-ai-list">
+                            <li>Mention the service, event type and location so vendors know if they're a fit.</li>
+                            <li>Note your guest count and any key moments you want covered.</li>
+                            <li>Ask vendors to share a portfolio and their availability for your date.</li>
+                        </ul>
+                        <button type="button" class="gb-btn primary" id="gbApply">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21.4 8 14 2 9.4h7.6z"/></svg>
+                            Apply Suggestions
+                        </button>
+                    </div>
+
+                    <textarea name="description" id="gbDesc" class="gb-textarea"
+                              placeholder="Describe your event, the service you need, your style preferences and any must-have details…">{{ old('description') }}</textarea>
+                </section>
+
+                {{-- 3 · Inspiration Photos --}}
+                <section class="gb-card" id="gb-inspiration">
+                    <div class="gb-card-hd"><span class="ic">🖼️</span><h3>Inspiration Photos (Optional)</h3></div>
+                    <p class="gb-card-sub">Add visual references so vendors understand the look and feel you're after.</p>
+
+                    <div class="gb-uploads">
+                        <div class="gb-tile ph">🎨</div>
+                        <div class="gb-tile ph">📷</div>
+                        <div class="gb-tile ph">🌸</div>
+                        <label class="gb-tile add">
+                            <span style="font-size:24px;">+</span>
+                            <span>Upload Photo</span>
+                            <input type="file" name="inspiration_photos[]" multiple accept="image/*">
+                        </label>
+                    </div>
+
+                    <div class="gb-upload-row">
+                        <label class="gb-drop">
+                            <b>Upload Video (Optional)</b>
+                            Drop a clip or browse
+                            <input type="file" name="video" accept="video/*">
+                        </label>
+                        <label class="gb-drop">
+                            <b>Upload Documents (Optional)</b>
+                            Briefs, mood boards, PDFs
+                            <input type="file" name="documents[]" multiple>
+                        </label>
+                    </div>
+                </section>
+
+                {{-- 4 · Timeline --}}
+                <section class="gb-card" id="gb-timeline">
+                    <div class="gb-card-hd"><span class="ic">📅</span><h3>Timeline</h3></div>
+                    <p class="gb-card-sub">When is your event happening?</p>
+
+                    <div class="gb-row">
+                        <div class="gb-field" style="margin-bottom:0;">
+                            <label class="gb-label">Event Date</label>
+                            <input type="date" name="starts_at" id="gbStarts" class="gb-input" value="{{ old('starts_at') }}">
+                        </div>
+                        <div class="gb-field" style="margin-bottom:0;">
+                            <label class="gb-label">Event Time</label>
+                            <input type="time" name="event_time" id="gbTime" class="gb-input" value="{{ old('event_time') }}">
+                        </div>
+                    </div>
+                    <div class="gb-row" style="margin-top:14px;">
+                        <div class="gb-field" style="margin-bottom:0;">
+                            <label class="gb-label">End Date (Optional)</label>
+                            <input type="date" name="ends_at" id="gbEnds" class="gb-input" value="{{ old('ends_at') }}">
+                        </div>
+                        <div class="gb-field" style="margin-bottom:0;">
+                            <label class="gb-label">Guests (approx.)</label>
+                            <input type="number" name="guest_count" id="gbGuests" class="gb-input" min="1" placeholder="e.g. 150" value="{{ old('guest_count') }}">
+                        </div>
+                    </div>
+                </section>
+
+                {{-- 5 · Budget --}}
+                <section class="gb-card" id="gb-budget">
+                    <div class="gb-card-hd"><span class="ic">💰</span><h3>Budget</h3></div>
+                    <p class="gb-card-sub">Give vendors a target so you get realistic proposals. This is an estimate — you can adjust later.</p>
+
+                    <div class="gb-field">
+                        <label class="gb-label">Budget</label>
+                        <div class="gb-prefix">
+                            <span class="sym">$</span>
+                            <input type="number" name="budget" id="gbBudget" class="gb-input" min="0" step="1" placeholder="2500" value="{{ old('budget') }}">
+                        </div>
+                        <input type="range" id="gbBudgetRange" class="gb-range" min="0" max="20000" step="100" value="2500">
+                    </div>
+                </section>
+
+                {{-- 6 · Requirements / Advanced Options --}}
+                <section class="gb-card" id="gb-requirements">
+                    <div class="gb-card-hd"><span class="ic">⚙️</span><h3>Requirements</h3></div>
+                    <p class="gb-card-sub">Optional preferences for how vendors bid on your gig.</p>
+
+                    <details class="gb-adv">
+                        <summary>
+                            Advanced Options
+                            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>
+                        </summary>
+                        <div class="gb-adv-body">
+                            <div class="gb-toggle">
+                                <div><b>Verified vendors only</b><span>Only vendors who've completed verification can bid.</span></div>
+                                <span class="gb-sw on"></span>
+                            </div>
+                            <div class="gb-toggle">
+                                <div><b>Sealed bidding</b><span>Hide competing bids so proposals stay independent.</span></div>
+                                <span class="gb-sw"></span>
+                            </div>
+                            <div class="gb-toggle">
+                                <div><b>Allow questions from vendors</b><span>Let vendors ask clarifying questions before bidding.</span></div>
+                                <span class="gb-sw on"></span>
+                            </div>
+                        </div>
+                    </details>
+                </section>
+
+                {{-- 7 · Bottom actions --}}
+                <div class="gb-actions">
+                    <button type="button" class="gb-btn ghost" onclick="document.getElementById('gbForm').submit();">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                        Save Draft
+                    </button>
+                    <button type="submit" class="gb-btn primary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        Publish Gig
+                    </button>
                 </div>
             </div>
-        </div>
 
-        <div class="gw-nav">
-            <button type="button" class="gw-btn back" id="gwBack" style="visibility:hidden;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Back
-            </button>
-            <button type="button" class="gw-btn next" id="gwNext">
-                Next <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
-            <button type="submit" class="gw-btn next" id="gwSubmit" style="display:none;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Publish Gig
-            </button>
+            {{-- ============ RIGHT COLUMN — Live Preview ============ --}}
+            <aside class="gb-aside" id="gb-publish">
+                <div class="gb-card">
+                    <div class="gb-pv-hd">
+                        <h4>Live Preview</h4>
+                        <p>This is how your gig will appear to professionals.</p>
+                    </div>
+
+                    <div class="gb-pvcard">
+                        <div class="gb-pv-cover">
+                            🎉
+                            <div class="gb-pv-ring" title="Gig readiness — how complete your listing is">
+                                <svg viewBox="0 0 44 44">
+                                    <circle cx="22" cy="22" r="19" fill="none" stroke="var(--border-color)" stroke-width="4"/>
+                                    <circle id="pvRingBar" cx="22" cy="22" r="19" fill="none" stroke="var(--gb)" stroke-width="4" stroke-linecap="round" stroke-dasharray="119.4" stroke-dashoffset="119.4"/>
+                                </svg>
+                                <span class="pct" id="pvPct">0%</span>
+                            </div>
+                        </div>
+                        <div class="gb-pv-body">
+                            <div class="gb-pv-title" id="pvTitle">Your Event Title</div>
+                            <div class="gb-pv-tags" id="pvTags"></div>
+                            <div class="gb-pv-meta" id="pvMeta">
+                                <span id="pvLoc">Location</span> · <span id="pvDate">Date</span>
+                            </div>
+                            <div class="gb-pv-desc" id="pvDesc">Your project description will appear here as you type it.</div>
+                            <div class="gb-pv-budget" id="pvBudget">Budget on request</div>
+                            <div class="gb-pv-badges">
+                                <span class="gb-pv-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Verified Client</span>
+                                <span class="gb-pv-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Escrow Protected</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gb-pv-actions">
+                        <button type="submit" form="gbForm" class="gb-btn primary block">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+                            Looks Good? Publish
+                        </button>
+                        <button type="button" class="gb-editlink" onclick="window.scrollTo({top:0,behavior:'smooth'});">Edit Gig</button>
+                    </div>
+                </div>
+            </aside>
         </div>
     </form>
+
+    {{-- D) AI tools row --}}
+    <div class="gb-tools">
+        <h3>AI Tools to Help You Create the Perfect Gig</h3>
+        <p>Use these AI helpers for suggestions and estimates while you plan.</p>
+        <div class="gb-tools-grid">
+            @php
+                $gbTools = [
+                    ['route' => 'ai-tools.budget-allocator',   'icon' => '💵', 'name' => 'AI Budget Allocator',    'desc' => 'Break a total budget into smart category estimates.'],
+                    ['route' => 'ai-tools.vendor-matchmaking', 'icon' => '🤝', 'name' => 'AI Vendor Matchmaking',  'desc' => 'Get suggested vendors that fit your event.'],
+                    ['route' => 'ai-tools.timeline-builder',   'icon' => '🗓️', 'name' => 'AI Timeline Builder',    'desc' => 'Draft a day-of schedule for your event.'],
+                    ['route' => 'ai-tools.checklist-generator','icon' => '✅', 'name' => 'AI Checklist Generator',  'desc' => 'Generate a planning checklist to stay on track.'],
+                    ['route' => 'ai-tools.venue-analyzer',     'icon' => '🏛️', 'name' => 'AI Venue Analyzer',      'desc' => 'Review venue notes for fit and considerations.'],
+                    ['route' => 'ai-tools.theme-advisor',      'icon' => '🎨', 'name' => 'AI Theme & Style Advisor','desc' => 'Explore theme and styling suggestions.'],
+                ];
+            @endphp
+            @foreach($gbTools as $tool)
+                <a href="{{ route($tool['route']) }}" class="gb-tool">
+                    <span class="tic">{{ $tool['icon'] }}</span>
+                    <b>{{ $tool['name'] }}</b>
+                    <span>{{ $tool['desc'] }}</span>
+                    <span class="use">Use tool →</span>
+                </a>
+            @endforeach
+        </div>
+    </div>
 </div>
 @endsection
 
 @push('scripts')
 <script>
 (function () {
-    var form = document.getElementById('gwForm');
-    var root = document.getElementById('gwRoot');
-    var cards = [].slice.call(form.querySelectorAll('.gw-card'));
-    var total = cards.length, cur = 0;
-    var steps = [].slice.call(document.querySelectorAll('.gw-st'));
-    var back = document.getElementById('gwBack'), next = document.getElementById('gwNext'), submit = document.getElementById('gwSubmit');
+    var form = document.getElementById('gbForm');
+    if (!form) return;
 
-    // generic multi-select chips
-    form.querySelectorAll('.gw-chip').forEach(function (chip) {
-        chip.addEventListener('click', function () { var cb = chip.querySelector('input'); cb.checked = !cb.checked; chip.classList.toggle('sel', cb.checked); });
-    });
+    var titleEl  = document.getElementById('gbTitle');
+    var descEl   = document.getElementById('gbDesc');
+    var locEl    = document.getElementById('gbLocation');
+    var venueEl  = document.getElementById('gbVenue');
+    var startsEl = document.getElementById('gbStarts');
+    var guestsEl = document.getElementById('gbGuests');
+    var budgetEl = document.getElementById('gbBudget');
+    var rangeEl  = document.getElementById('gbBudgetRange');
 
-    // radio-card groups: AI level, budget mode, urgency, find method
-    function radioGroup(selector, onPick) {
-        var opts = form.querySelectorAll(selector);
-        opts.forEach(function (opt) {
-            opt.addEventListener('click', function () {
-                opts.forEach(function (o) { o.classList.toggle('sel', o === opt); });
-                onPick(opt);
-            });
-        });
-    }
-    radioGroup('.gw-opt[data-ai]', function (o) { root.setAttribute('data-ai', o.getAttribute('data-ai')); });
-    radioGroup('.gw-opt[data-bmode]', function (o) {
-        form.querySelector('.gw-bknown').style.display = o.getAttribute('data-bmode') === 'known' ? '' : 'none';
-    });
-    radioGroup('.gw-opt[data-urg]', function (o) {
-        var v = o.getAttribute('data-urg'); document.getElementById('gwUrg').value = v;
-        document.getElementById('gwEsrNote').classList.toggle('gw-hide', v !== 'ESR');
-    });
-    radioGroup('.gw-opt[data-find]', function (o) { document.getElementById('gwFind').value = o.getAttribute('data-find'); });
-
-    // bidding-rule toggle switches
-    form.querySelectorAll('.gw-sw').forEach(function (sw) {
-        sw.addEventListener('click', function () {
-            sw.classList.toggle('on');
-            var input = document.getElementById(sw.getAttribute('data-toggle'));
-            if (input) input.value = sw.classList.contains('on') ? '1' : '0';
+    // ---- category chips (multi-select) ----
+    var cats = [].slice.call(document.querySelectorAll('#gbCats .gb-chip'));
+    cats.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+            var cb = chip.querySelector('input');
+            cb.checked = !cb.checked;
+            chip.classList.toggle('sel', cb.checked);
+            updatePreview();
         });
     });
+    function selectedCatNames() {
+        return cats.filter(function (c) { return c.querySelector('input').checked; })
+                   .map(function (c) { return c.querySelector('.lbl').textContent.trim(); });
+    }
 
-    // AI suggestion chips → append to description
-    var desc = document.getElementById('gwDesc');
-    form.querySelectorAll('.gw-sugg').forEach(function (s) {
-        s.addEventListener('click', function () { if (desc) { desc.value = (desc.value ? desc.value.replace(/\s*$/, '') + '\n' : '') + '• ' + s.textContent.trim() + ': '; desc.focus(); } });
+    // ---- advanced toggles (UI only) ----
+    document.querySelectorAll('.gb-sw').forEach(function (sw) {
+        sw.addEventListener('click', function () { sw.classList.toggle('on'); });
     });
 
-    function show(idx) {
-        cards.forEach(function (c, i) { c.classList.toggle('active', i === idx); c.classList.toggle('leaving', i < idx); });
-        cur = idx;
-        steps.forEach(function (s, i) { s.classList.toggle('done', i < idx); s.classList.toggle('active', i === idx); });
-        if (steps[idx]) steps[idx].scrollIntoView({ inline: 'center', block: 'nearest' });
-        back.style.visibility = idx === 0 ? 'hidden' : 'visible';
-        var last = idx === total - 1;
-        next.style.display = last ? 'none' : 'inline-flex';
-        submit.style.display = last ? 'inline-flex' : 'none';
-        if (last) buildReview();
+    // ---- budget <-> slider sync ----
+    if (rangeEl && budgetEl) {
+        rangeEl.addEventListener('input', function () { budgetEl.value = rangeEl.value; updatePreview(); });
+        budgetEl.addEventListener('input', function () {
+            var v = parseInt(budgetEl.value, 10);
+            if (!isNaN(v)) rangeEl.value = Math.min(v, rangeEl.max);
+            updatePreview();
+        });
     }
 
-    function validate(idx) {
-        var card = cards[idx], req = card.getAttribute('data-required'), err = card.querySelector('.gw-err'), ok = true;
-        if (req === 'basic') ok = form.title.value.trim().length > 0 && form.querySelectorAll('input[name="category_ids[]"]:checked').length > 0;
-        if (err) err.style.display = ok ? 'none' : 'block';
-        return ok;
-    }
+    // ---- Apply AI Suggestions -> fill description ----
+    document.getElementById('gbApply').addEventListener('click', function () {
+        var catNames = selectedCatNames();
+        var category = catNames.length ? catNames.join(' and ') : 'vendor';
+        var eventType = (titleEl.value.trim() || 'event');
+        var location = (locEl.value.trim() || 'our area');
+        var guests = guestsEl.value.trim();
+        var guestLine = guests ? (' We are expecting around ' + guests + ' guests.') : '';
 
-    function syncHidden() {
-        var city = document.getElementById('gwCity').value.trim(), venue = document.getElementById('gwVenue').value.trim();
-        document.getElementById('gwLocation').value = [venue, city].filter(Boolean).join(', ');
-        var bmin = document.getElementById('gwBmin').value, bmax = document.getElementById('gwBmax').value;
-        document.getElementById('gwBudgetHidden').value = bmax || bmin || '';
-    }
+        var text = 'We need a professional ' + category + ' to cover our ' + eventType +
+            ' in ' + location + '.' + guestLine +
+            ' Looking for someone with relevant experience and strong attention to detail.' +
+            ' Please share your portfolio and availability so we can find the best fit.';
 
-    function buildReview() {
-        syncHidden();
-        var svcs = [].slice.call(form.querySelectorAll('input[name="category_ids[]"]:checked')).map(function (c) { return c.parentElement.querySelector('span').textContent; });
-        var prefs = [].slice.call(form.querySelectorAll('input[name="vendor_prefs[]"]:checked')).map(function (c) { return c.value; });
-        var rows = [
-            ['Event', form.title.value || '—'],
-            ['Services', svcs.length ? svcs.join(', ') : '—'],
-            ['When', (form.starts_at.value || 'Flexible') + (form.time.value ? ' · ' + form.time.value : '')],
-            ['Location', document.getElementById('gwLocation').value || '—'],
-            ['Budget', (document.getElementById('gwBmin').value || document.getElementById('gwBmax').value) ? ('$' + (document.getElementById('gwBmin').value||'?') + ' – $' + (document.getElementById('gwBmax').value||'?')) : 'Recommend for me'],
-            ['Urgency', document.getElementById('gwUrg').value],
-            ['Vendor prefs', prefs.length ? prefs.join(', ') : 'Any'],
-            ['Distribution', document.getElementById('gwFind').value],
-        ];
-        document.getElementById('gwReview').innerHTML = rows.map(function (r) {
-            return '<div class="gw-rev-row"><span>' + r[0] + '</span><b>' + (r[1] + '').replace(/</g, '&lt;') + '</b></div>';
+        descEl.value = text;
+        descEl.focus();
+        updatePreview();
+    });
+
+    // ---- Live preview ----
+    var pvTitle  = document.getElementById('pvTitle');
+    var pvTags   = document.getElementById('pvTags');
+    var pvLoc    = document.getElementById('pvLoc');
+    var pvDate   = document.getElementById('pvDate');
+    var pvDesc   = document.getElementById('pvDesc');
+    var pvBudget = document.getElementById('pvBudget');
+
+    function fmtMoney(n) { return '$' + Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 }); }
+
+    function updatePreview() {
+        pvTitle.textContent = titleEl.value.trim() || 'Your Event Title';
+
+        var names = selectedCatNames();
+        pvTags.innerHTML = names.slice(0, 4).map(function (n) {
+            return '<span class="gb-pv-tag">' + n.replace(/</g, '&lt;') + '</span>';
         }).join('');
 
-        // Live "how professionals see it" preview card
-        var bmin = document.getElementById('gwBmin').value, bmax = document.getElementById('gwBmax').value;
-        document.getElementById('gwPvTitle').textContent = form.title.value || 'Your gig';
-        document.getElementById('gwPvBudget').textContent = (bmin || bmax) ? ('$' + (bmin || '?') + ' – $' + (bmax || '?')) : 'Budget on request';
-        document.getElementById('gwPvMeta').textContent = [document.getElementById('gwLocation').value, form.starts_at.value].filter(Boolean).join(' · ') || 'Location · Date';
+        pvLoc.textContent  = locEl.value.trim() || 'Location';
+        pvDate.textContent = startsEl.value || 'Date';
+
+        var d = descEl.value.trim();
+        pvDesc.textContent = d || 'Your project description will appear here as you type it.';
+
+        var b = parseInt(budgetEl.value, 10);
+        if (!isNaN(b) && b > 0) {
+            var low = Math.round(b * 0.85), high = Math.round(b * 1.15);
+            pvBudget.textContent = fmtMoney(low) + ' – ' + fmtMoney(high) + ' (est.)';
+        } else {
+            pvBudget.textContent = 'Budget on request';
+        }
+
+        updateReadiness();
     }
 
-    next.addEventListener('click', function () { if (validate(cur) && cur < total - 1) show(cur + 1); });
-    back.addEventListener('click', function () { if (cur > 0) show(cur - 1); });
-    form.addEventListener('submit', syncHidden);
-    show(0);
+    // ---- Gig readiness score (real, computed from filled fields) ----
+    var pvPct     = document.getElementById('pvPct');
+    var pvRingBar = document.getElementById('pvRingBar');
+    var RING_C    = 119.4;
+    function updateReadiness() {
+        var score = 0;
+        if (titleEl.value.trim())              score += 20;
+        if (descEl.value.trim().length > 15)   score += 15;
+        if (selectedCatNames().length)         score += 15;
+        if (locEl.value.trim())                score += 15;
+        if (startsEl.value)                    score += 15;
+        var bv = parseInt(budgetEl.value, 10);
+        if (!isNaN(bv) && bv > 0)              score += 15;
+        if (guestsEl && guestsEl.value.trim()) score += 5;
+        if (score > 100) score = 100;
+        if (pvPct) pvPct.textContent = score + '%';
+        if (pvRingBar) pvRingBar.setAttribute('stroke-dashoffset', (RING_C * (1 - score / 100)).toFixed(1));
+    }
+
+    [titleEl, descEl, locEl, startsEl, budgetEl, guestsEl].forEach(function (el) {
+        if (el) { el.addEventListener('input', updatePreview); el.addEventListener('change', updatePreview); }
+    });
+    updatePreview();
+
+    // ---- Step bar: scroll-spy + smooth anchor scroll ----
+    var stepLinks = [].slice.call(document.querySelectorAll('.gb-step'));
+    stepLinks.forEach(function (link) {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            var target = document.getElementById(link.getAttribute('data-anchor'));
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+    var sections = stepLinks.map(function (l) { return document.getElementById(l.getAttribute('data-anchor')); });
+    if ('IntersectionObserver' in window) {
+        var obs = new IntersectionObserver(function (entries) {
+            entries.forEach(function (en) {
+                if (en.isIntersecting) {
+                    var id = en.target.id;
+                    stepLinks.forEach(function (l) { l.classList.toggle('active', l.getAttribute('data-anchor') === id); });
+                }
+            });
+        }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+        sections.forEach(function (s) { if (s) obs.observe(s); });
+    }
+
+    updatePreview();
 })();
 </script>
 @endpush

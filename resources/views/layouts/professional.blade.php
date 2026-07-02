@@ -1047,25 +1047,24 @@
                 </li>
 
                 {{-- ── AI TOOLS ── --}}
+                {{-- Catalog-driven: every LIVE professional + both AI tool auto-appears here. --}}
                 <li class="cl-nav-label">AI Tools</li>
                 <li class="cl-nav-item">
-                    <a href="{{ route('ai-tools.proposal-writer') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.proposal-writer*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
-                        AI Proposal Writer
+                    <a href="{{ route('ai-tools.index') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.index') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+                        AI Toolkit
                     </a>
                 </li>
-                <li class="cl-nav-item">
-                    <a href="{{ route('ai-tools.pricing-assistant') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.pricing-assistant*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                        AI Pricing Assistant
-                    </a>
-                </li>
-                <li class="cl-nav-item">
-                    <a href="{{ route('ai-tools.staffing-planner') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.staffing-planner*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-                        AI Staffing Planner
-                    </a>
-                </li>
+                @foreach(\App\Domain\AiFeatures\AiToolCatalog::forAudience('professional') as $t)
+                    @if(($t['status'] ?? '') === 'live' && !empty($t['route']) && \Illuminate\Support\Facades\Route::has($t['route']))
+                        <li class="cl-nav-item">
+                            <a href="{{ route($t['route']) }}" class="cl-nav-link {{ request()->routeIs($t['route'].'*') ? 'active' : '' }}">
+                                <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7v1a2 2 0 0 1-2 2h-1v1a1 1 0 0 1-2 0v-1H8v1a1 1 0 0 1-2 0v-1H5a2 2 0 0 1-2-2v-1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/><circle cx="9" cy="13" r="1"/><circle cx="15" cy="13" r="1"/></svg>
+                                {{ $t['name'] }}
+                            </a>
+                        </li>
+                    @endif
+                @endforeach
 
                 {{-- ── BUSINESS ── --}}
                 <li class="cl-nav-label">Business</li>

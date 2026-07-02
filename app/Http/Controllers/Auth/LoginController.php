@@ -70,14 +70,16 @@ class LoginController extends Controller
         // over and bounce a client into the professional portal. A user who
         // holds the client role logs in as a client (they can still switch to
         // professional via the toggle); supplier-only users go professional.
+        // Honor the intended URL (e.g. a guest who clicked /browse and was sent
+        // to log in first) — otherwise land each user in their own portal.
         if ($user->hasRole(RoleName::CLIENT->value)) {
             session(['active_role' => RoleName::CLIENT->value]);
-            return redirect()->route('client.dashboard');
+            return redirect()->intended(route('client.dashboard'));
         }
 
         if ($user->hasRole(RoleName::SUPPLIER->value)) {
             session(['active_role' => RoleName::SUPPLIER->value]);
-            return redirect()->route('professional.dashboard');
+            return redirect()->intended(route('professional.dashboard'));
         }
 
         return null; // admin / others → default dashboard

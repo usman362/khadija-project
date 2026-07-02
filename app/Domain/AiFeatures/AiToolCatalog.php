@@ -51,10 +51,41 @@ final class AiToolCatalog
         ];
     }
 
-    /** Tools a given audience should see: their own + the shared ('both') ones. */
+    /**
+     * Keys of tools an admin has disabled (ai_tool_settings row with enabled=false).
+     * Memoized so this runs a single query per request; guarded so nothing breaks
+     * if the table does not exist yet (pre-migration).
+     */
+    private static ?array $disabledKeys = null;
+
+    public static function disabledKeys(): array
+    {
+        if (self::$disabledKeys !== null) {
+            return self::$disabledKeys;
+        }
+
+        try {
+            self::$disabledKeys = \App\Models\AiToolSetting::query()
+                ->where('enabled', false)
+                ->pluck('tool_key')
+                ->all();
+        } catch (\Throwable $e) {
+            self::$disabledKeys = [];
+        }
+
+        return self::$disabledKeys;
+    }
+
+    /** Tools a given audience should see: their own + the shared ('both') ones, minus admin-disabled. */
     public static function forAudience(string $audience): array
     {
-        return array_values(array_filter(self::all(), fn ($t) => $t['audience'] === $audience || $t['audience'] === 'both'));
+        $disabled = self::disabledKeys();
+
+        return array_values(array_filter(
+            self::all(),
+            fn ($t) => ($t['audience'] === $audience || $t['audience'] === 'both')
+                && ! in_array($t['key'], $disabled, true)
+        ));
     }
 
     public static function client(): array       { return self::forAudience('client'); }

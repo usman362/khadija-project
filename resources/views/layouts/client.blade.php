@@ -1222,27 +1222,32 @@
                         Search Professionals
                     </a>
                 </li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('events-categories') }}" class="cl-nav-link {{ request()->routeIs('events-categories') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                        Browse Categories
+                    </a>
+                </li>
 
                 {{-- ── AI TOOLS ───────────────────────────────────── --}}
+                {{-- Catalog-driven: every LIVE client + both AI tool auto-appears here. --}}
                 <li class="cl-nav-label">AI Tools</li>
                 <li class="cl-nav-item">
-                    <a href="{{ route('ai-tools.budget-allocator') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.budget-allocator*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon ic-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                        AI Budget Allocator
+                    <a href="{{ route('ai-tools.index') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.index') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon ic-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+                        AI Toolkit
                     </a>
                 </li>
-                <li class="cl-nav-item">
-                    <a href="{{ route('ai-tools.vendor-matchmaking') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.vendor-matchmaking*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon ic-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-                        AI Vendor Matchmaking
-                    </a>
-                </li>
-                <li class="cl-nav-item">
-                    <a href="{{ route('ai-tools.review-writer') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.review-writer*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon ic-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                        AI Review Writer
-                    </a>
-                </li>
+                @foreach(\App\Domain\AiFeatures\AiToolCatalog::forAudience('client') as $t)
+                    @if(($t['status'] ?? '') === 'live' && !empty($t['route']) && \Illuminate\Support\Facades\Route::has($t['route']))
+                        <li class="cl-nav-item">
+                            <a href="{{ route($t['route']) }}" class="cl-nav-link {{ request()->routeIs($t['route'].'*') ? 'active' : '' }}">
+                                <svg class="cl-nav-icon ic-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7v1a2 2 0 0 1-2 2h-1v1a1 1 0 0 1-2 0v-1H8v1a1 1 0 0 1-2 0v-1H5a2 2 0 0 1-2-2v-1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/><circle cx="9" cy="13" r="1"/><circle cx="15" cy="13" r="1"/></svg>
+                                {{ $t['name'] }}
+                            </a>
+                        </li>
+                    @endif
+                @endforeach
 
                 {{-- ── INSIGHTS & FINANCE ─────────────────────────── --}}
                 <li class="cl-nav-label">Insights &amp; Finance</li>

@@ -16,7 +16,7 @@ class AiBidOptimizerController extends Controller
 {
     public function show(Request $request): View
     {
-        $aiLayout = $request->user()?->hasRole('supplier') ? 'layouts.professional' : 'layouts.client';
+        $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
 
         return view('ai-tools.bid-optimizer', [
             'aiLayout' => $aiLayout,

@@ -25,7 +25,7 @@ class AiAgreementBuilderController extends Controller
 {
     public function phase1(Request $request, ?string $booking = null): View
     {
-        $aiLayout = $request->user()?->hasRole('supplier') ? 'layouts.professional' : 'layouts.client';
+        $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
 
         return view('ai-agreement.build.phase1', array_merge(
             $this->sampleEvidence($booking),
@@ -35,7 +35,7 @@ class AiAgreementBuilderController extends Controller
 
     public function draft(Request $request, ?string $booking = null): View
     {
-        $aiLayout = $request->user()?->hasRole('supplier') ? 'layouts.professional' : 'layouts.client';
+        $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
 
         return view('ai-agreement.build.draft', array_merge(
             $this->sampleDraft($booking),
@@ -45,7 +45,7 @@ class AiAgreementBuilderController extends Controller
 
     public function phase2(Request $request, ?string $booking = null): View
     {
-        $aiLayout = $request->user()?->hasRole('supplier') ? 'layouts.professional' : 'layouts.client';
+        $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
 
         return view('ai-agreement.build.phase2', array_merge(
             $this->sampleNegotiation($booking),
@@ -55,7 +55,7 @@ class AiAgreementBuilderController extends Controller
 
     public function phase3(Request $request, ?string $booking = null): View
     {
-        $aiLayout = $request->user()?->hasRole('supplier') ? 'layouts.professional' : 'layouts.client';
+        $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
 
         return view('ai-agreement.build.phase3', array_merge(
             $this->sampleExecution($booking),

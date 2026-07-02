@@ -17,6 +17,9 @@ class Event extends Model
         'description',
         'budget',
         'location',
+        'venue',
+        'guest_count',
+        'media',
         'status',
         'is_published',
         'published_at',
@@ -37,6 +40,8 @@ class Event extends Model
             'published_at' => 'datetime',
             'is_published' => 'boolean',
             'budget' => 'decimal:2',
+            'guest_count' => 'integer',
+            'media' => 'array',
         ];
     }
 
