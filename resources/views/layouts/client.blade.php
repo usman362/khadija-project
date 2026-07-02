@@ -1176,6 +1176,12 @@
                 {{-- ── MANAGE EVENTS ─────────────────────────────── --}}
                 <li class="cl-nav-label">Manage Events</li>
                 <li class="cl-nav-item">
+                    <a href="{{ route('client.post-event.event-info') }}" class="cl-nav-link {{ request()->routeIs('client.post-event.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon ic-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                        Post an Event
+                    </a>
+                </li>
+                <li class="cl-nav-item">
                     <a href="{{ route('client.events.index') }}" class="cl-nav-link {{ request()->routeIs('client.events.*') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
                         My Gigs

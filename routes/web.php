@@ -588,6 +588,24 @@ Route::middleware('auth')->group(function () {
         Route::get('/events', [ClientEventController::class, 'index'])->middleware('permission:events.view_any')->name('client.events.index');
         Route::get('/events/create', [ClientEventController::class, 'create'])->middleware('permission:events.create')->name('client.events.create');
         Route::post('/events', [ClientEventController::class, 'store'])->middleware('permission:events.create')->name('client.events.store');
+
+        // ── Post an Event — guided 11-step booking journey ──
+        Route::prefix('post-event')->name('client.post-event.')->group(function () {
+            $pe = \App\Http\Controllers\Client\PostEventController::class;
+            Route::get('/',                [$pe, 'eventInfo'])->name('event-info');
+            Route::post('/',               [$pe, 'storeEventInfo'])->name('store-info');
+            Route::get('/build',           [$pe, 'build'])->name('build');
+            Route::get('/service-details', [$pe, 'serviceDetails'])->name('service-details');
+            Route::get('/review-search',   [$pe, 'reviewSearch'])->name('review-search');
+            Route::get('/results',         [$pe, 'results'])->name('results');
+            Route::get('/compare',         [$pe, 'compare'])->name('compare');
+            Route::get('/customize',       [$pe, 'customize'])->name('customize');
+            Route::get('/combinations',    [$pe, 'combinations'])->name('combinations');
+            Route::get('/checkout',        [$pe, 'checkout'])->name('checkout');
+            Route::get('/confirmed',       [$pe, 'confirmed'])->name('confirmed');
+            Route::get('/final-payment',   [$pe, 'finalPayment'])->name('final-payment');
+        });
+
         // Direct Offer / Request builder (SSR / MSR / ESR) — client → professional.
         Route::get('/direct-offers/create', [\App\Http\Controllers\Client\ClientDirectOfferController::class, 'create'])->middleware('permission:events.create')->name('client.direct-offers.create');
         Route::get('/events/{event}', [ClientEventController::class, 'show'])->middleware('permission:events.view')->name('client.events.show');
