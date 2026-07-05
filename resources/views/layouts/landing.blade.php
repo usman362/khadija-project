@@ -160,7 +160,13 @@
 
         <div class="lpn-links">
             <div class="lpn-item">
-                <a href="{{ route('professional.bidding-board.index') }}" class="lpn-link">Find Gigs</a>
+                @php
+                    $__fgActive = auth()->user()?->activeRole();
+                    $__fgHref = $__fgActive === 'supplier'
+                        ? route('professional.bidding-board.index')
+                        : ($__fgActive === 'client' ? route('client.find-gigs.index') : route('public.browse'));
+                @endphp
+                <a href="{{ $__fgHref }}" class="lpn-link">Find Gigs</a>
             </div>
             <div class="lpn-item">
                 <span class="lpn-link">Find Professionals <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg></span>

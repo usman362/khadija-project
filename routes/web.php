@@ -559,6 +559,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/search', [\App\Http\Controllers\Client\ClientSearchController::class, 'index'])
             ->name('client.search.index');
 
+        // Find Gigs — client-side mirror of the professional bidding board:
+        // browse professional gig listings (service packages) to book / message.
+        Route::get('/find-gigs', [\App\Http\Controllers\Client\FindGigsController::class, 'index'])
+            ->name('client.find-gigs.index');
+
         // Proposals — supplier responses to the client's events.
         Route::get('/proposals', [\App\Http\Controllers\Client\ClientProposalController::class, 'index'])
             ->middleware('permission:bookings.view_any')
