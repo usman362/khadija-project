@@ -11,7 +11,7 @@
 
 @push('styles')
 <style>
-    .bb { --bb: #e11d48; --bb-strong: #be123c; }
+    .bb { --bb: #2563eb; --bb-strong: #1d4ed8; }
     .bb-grid { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 20px; align-items: start; }
 
     /* top bar: tabs + sort */
@@ -85,7 +85,7 @@
     .bb-chk { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 9px; cursor: pointer; }
     .bb-chk input { width: 15px; height: 15px; accent-color: var(--bb); margin: 0; flex-shrink: 0; }
     .bb-save { width: 100%; border: 1px solid var(--border-color); border-radius: 10px; padding: 9px; font-size: 12.5px; font-weight: 800; color: var(--bb); background: var(--bg-card); cursor: pointer; margin-top: 8px; }
-    .bb-sealed { background: linear-gradient(135deg, rgba(225,29,72,.1), rgba(124,58,237,.08)); border: 1px solid var(--border-color); }
+    .bb-sealed { background: linear-gradient(135deg, rgba(37,99,235,.1), rgba(124,58,237,.08)); border: 1px solid var(--border-color); }
     .bb-sealed h4 { display: flex; align-items: center; gap: 7px; }
     .bb-sealed p { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
     .bb-sealed a { font-size: 12px; font-weight: 800; color: var(--bb); text-decoration: none; }
@@ -105,7 +105,7 @@
     {{-- Top bar: filter tabs + sort --}}
     <div class="bb-bar">
         <div class="bb-tabs">
-            <span class="bb-tab on">All Gigs <span class="n">{{ $counts['all'] }}</span></span>
+            <span class="bb-tab on">All Events <span class="n">{{ $counts['all'] }}</span></span>
             <span class="bb-tab">🔥 ESR <span class="sub">(Emergency)</span> <span class="n">{{ $counts['ESR'] }}</span></span>
             <span class="bb-tab">SSR <span class="sub">(Single Service)</span> <span class="n">{{ $counts['SSR'] }}</span></span>
             <span class="bb-tab">MSR <span class="sub">(Multi-Service)</span> <span class="n">{{ $counts['MSR'] }}</span></span>
@@ -178,7 +178,7 @@
                     </div>
                 </article>
             @endforeach
-            <div style="text-align:center; padding:8px;"><button class="bb-tab" style="margin:0 auto;">Load More Gigs ↓</button></div>
+            <div style="text-align:center; padding:8px;"><button class="bb-tab" style="margin:0 auto;">Load More Events ↓</button></div>
         </div>
 
         {{-- Sidebar --}}
