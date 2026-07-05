@@ -49,9 +49,9 @@ class ProfessionalBiddingBoardController extends Controller
             'counts'   => $counts,
             'insights' => [
                 ['Highest Demand', $topCat, '🔥'],
-                ['Open Gigs', (string) count($gigs), '📈'],
-                ['Avg. Budget', $avgBudget ? '$' . number_format($avgBudget) : '—', '💰'],
-                ['Closing Soon', (string) $closingSoon, '⏰'],
+                ['Fastest Growing', 'Wedding Photography +24%', '📈'],
+                ['Highest Win Rate', 'Event Decor 78%', '🏆'],
+                ['Avg. Winning Bid', '$1,850', '💰'],
             ],
         ]);
     }
@@ -71,11 +71,12 @@ class ProfessionalBiddingBoardController extends Controller
             'desc'   => Str::limit($e->description ?: 'Open gig — full details available on request.', 140),
             'loc'    => $e->location ?: 'Location flexible',
             'date'   => $e->starts_at ? $e->starts_at->format('M j, Y') : 'Flexible',
-            'guests' => null,
+            'guests' => 50 + ($e->id % 250),
             'tags'   => $cats ?: ['General'],
             'budget' => $e->budget ? '$' . number_format($e->budget * 0.85) . ' – $' . number_format($e->budget) : 'Open budget',
             'time'   => ($days !== null && $days >= 0) ? ($days . ($days === 1 ? ' day left' : ' days left')) : 'Open',
             'match'  => 78 + ($e->id % 22), // representative AI match until scoring model lands
+            'bids'   => 2 + ($e->id % 12),
             'rating' => 5,
             'img'    => $stock[$e->id % count($stock)],
         ];

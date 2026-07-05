@@ -491,6 +491,11 @@
         .pro-toggle input { display: none; }
         .pro-toggle .track { position: absolute; inset: 0; background: #16a34a; border-radius: 999px; transition: 0.2s; }
         .pro-toggle .track::after { content: ''; position: absolute; top: 2px; left: 18px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: 0.2s; }
+        /* Role switcher recoloured for the professional (blue) portal — the
+           shared partial ships an orange "Switch" button; override it here. */
+        .pro-topbar-right .rs-btn { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+        .pro-topbar-right .rs-btn:hover { box-shadow: 0 4px 12px rgba(37,99,235,0.35); }
+        .pro-topbar-right .rs-btn-enable { background: transparent; }
         .pro-icon-btn { position: relative; width: 38px; height: 38px; border-radius: 10px; border: none; background: transparent; color: var(--text-secondary); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; }
         .pro-icon-btn:hover { background: var(--bg-card-hover); }
         .pro-icon-btn svg { width: 18px; height: 18px; }
@@ -989,7 +994,13 @@
                     </a>
                 </li>
                 <li class="cl-nav-item">
-                    <a href="{{ route('professional.gigs.index') }}" class="cl-nav-link {{ request()->routeIs('professional.gigs.*') ? 'active' : '' }}">
+                    <a href="{{ route('professional.gigs.create') }}" class="cl-nav-link {{ request()->routeIs('professional.gigs.create') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                        Create a Gig
+                    </a>
+                </li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('professional.gigs.index') }}" class="cl-nav-link {{ request()->routeIs('professional.gigs.index') || request()->routeIs('professional.gigs.show') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                         My Gigs
                     </a>
@@ -1131,10 +1142,7 @@
 
             <div class="pro-topbar-right">
                 <div class="pro-topbar-controls">
-                    <label class="pro-avail" title="Availability">
-                        <span class="dot"></span> AVAILABLE
-                        <span class="pro-toggle"><input type="checkbox" checked><span class="track"></span></span>
-                    </label>
+                    @include('partials._role_switcher')
                     <button class="pro-icon-btn" title="Notifications">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                         <span class="pro-icon-badge">3</span>
@@ -1152,10 +1160,6 @@
                         <div class="pro-avatar-meta"><b>{{ auth()->user()?->name ?? 'Professional User' }}</b><span>PRO</span></div>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
                     </div>
-                </div>
-                <div class="pro-topbar-actions">
-                    <button class="pro-btn-ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add New</button>
-                    <a href="{{ route('professional.gigs.index') }}" class="pro-btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Find Gigs</a>
                 </div>
             </div>
         </header>

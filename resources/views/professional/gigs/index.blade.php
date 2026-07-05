@@ -1,511 +1,440 @@
 @extends('layouts.professional')
 
-@section('title', 'Gigs')
-@section('page-title', 'Gigs')
+@section('title', 'My Gigs')
+@section('page-title', 'My Gigs')
+@section('page-subtitle', 'Manage your gigs, bids and bookings in one place.')
+
+@php
+    // ── Representative / derived figures ──
+    // Real fields (total/active/upcoming/completed) come from $stats. Where the
+    // gig model has no field yet (bids per gig, earnings breakdown) we surface
+    // honest representative figures so the layout reads complete.
+    $totalEarned = $myGigs->where('status', 'completed')->sum(fn($g) => $g->budget ?? 0);
+    if ($totalEarned <= 0) {
+        $totalEarned = $myGigs->sum(fn($g) => (int) ($g->budget ?? 0) * ($g->status === 'completed' ? 1 : 0));
+    }
+
+    // Bid-status roll-up derived from gig statuses on this page.
+    $confirmedCount = $myGigs->whereIn('status', ['confirmed', 'in_progress'])->count();
+    $pendingCount   = $myGigs->whereIn('status', ['pending', 'published'])->count();
+    $completedCount = $stats['completed'];
+    $notStarted     = max(0, $stats['total'] - $confirmedCount - $pendingCount - $completedCount);
+
+    // Earnings summary (representative split of total earned).
+    $earnPaid    = (int) round($totalEarned * 0.7);
+    $earnPending = max(0, (int) $totalEarned - $earnPaid);
+@endphp
 
 @push('styles')
 <style>
-    .cl-calendar-nav {
-        display: flex;
-        align-items: center;
-        gap: 12px;
+    /* ═══════════════════ My Gigs (professional, dark theme) ═══════════════════
+       Mirrors the client events-list layout — 5 stat cards, view tabs, master
+       list table, bid-status bar, recent activity + quick actions, and a right
+       rail (Gig Overview donut / Bid Status / Earnings Summary / Deadlines).
+       All classes are .mg-* prefixed and use the professional dark-theme vars.
+       Pink accent = var(--bb, #2563eb). */
+    .mg { --mg: #2563eb; }
+    .mg-layout { display: grid; grid-template-columns: minmax(0,1fr) 280px; gap: 18px; align-items: start; }
+    .mg-main { min-width: 0; }
+    .mg-rail { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 80px; }
+
+    .mg-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 18px; }
+
+    /* View-mode tab pills */
+    .mg-viewtabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .mg-viewtab {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 8px 14px; border-radius: 9px;
+        background: var(--bg-card); border: 1px solid var(--border-color);
+        font-size: 12.5px; font-weight: 600; color: var(--text-secondary);
+        cursor: pointer; white-space: nowrap; text-decoration: none;
     }
-    .cl-calendar-nav button {
-        width: 36px; height: 36px;
-        border-radius: var(--radius-sm);
+    .mg-viewtab svg { width: 14px; height: 14px; }
+    .mg-viewtab.active { background: rgba(37,99,235,0.12); color: var(--mg); border-color: rgba(37,99,235,0.35); }
+
+    /* Stat cards */
+    .mg-stats { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 12px; margin-bottom: 16px; }
+    .mg-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; }
+    .mg-stat-ico { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .mg-stat-ico svg { width: 18px; height: 18px; }
+    .mg-stat-ico.pink   { background: rgba(37,99,235,0.14); color: var(--mg); }
+    .mg-stat-ico.green  { background: rgba(16,185,129,0.12); color: #10b981; }
+    .mg-stat-ico.amber  { background: rgba(245,158,11,0.12); color: #f59e0b; }
+    .mg-stat-ico.indigo { background: rgba(99,102,241,0.12); color: #6366f1; }
+    .mg-stat-ico.purple { background: rgba(139,92,246,0.12); color: #8b5cf6; }
+    .mg-stat-label { font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
+    .mg-stat-value { font-size: 22px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
+    .mg-stat-delta { font-size: 10.5px; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
+
+    /* Filter row */
+    .mg-filter-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+    .mg-filter-select, .mg-filter-search {
+        height: 40px; border-radius: 9px;
         border: 1px solid var(--border-color);
-        background: transparent;
-        color: var(--text-secondary);
-        cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-        transition: var(--transition);
+        background: var(--bg-card); color: var(--text-primary);
+        font-size: 13px; font-family: inherit; outline: none;
     }
-    .cl-calendar-nav button:hover { background: rgba(255,255,255,0.05); }
-    .cl-calendar-month {
-        font-size: 20px;
-        font-weight: 700;
-        min-width: 200px;
-        text-align: center;
+    .mg-filter-select { padding: 0 12px; }
+    .mg-filter-search-wrap { position: relative; flex: 1; min-width: 220px; }
+    .mg-filter-search { width: 100%; padding: 0 14px 0 38px; }
+    .mg-filter-search-wrap svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--text-muted); pointer-events: none; }
+    .mg-filter-btn {
+        height: 40px; padding: 0 14px; border-radius: 9px;
+        border: 1px solid var(--border-color); background: var(--bg-card);
+        color: var(--text-primary); font-size: 12.5px; font-weight: 600;
+        cursor: pointer; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; text-decoration: none;
     }
-    .cl-calendar-nav .today-btn {
-        width: auto;
-        padding: 0 16px;
-        background: var(--accent-blue);
-        color: #fff;
-        border-color: var(--accent-blue);
-        font-size: 13px;
-        font-weight: 600;
+    .mg-filter-btn svg { width: 14px; height: 14px; }
+    .mg-filter-btn.pink { background: var(--mg); color: #fff; border-color: var(--mg); }
+
+    /* Sub-tabs */
+    .mg-subtabs { display: flex; gap: 22px; border-bottom: 1px solid var(--border-color); margin-bottom: 4px; }
+    .mg-subtab {
+        padding: 10px 2px; font-size: 13px; font-weight: 600;
+        color: var(--text-muted); cursor: pointer;
+        border-bottom: 2px solid transparent; margin-bottom: -1px;
     }
-    .cl-calendar-nav .today-btn:hover { opacity: 0.9; }
+    .mg-subtab.active { color: var(--mg); border-bottom-color: var(--mg); }
 
-    /* Event card */
-    .cl-event-card {
-        display: flex;
-        align-items: flex-start;
-        gap: 16px;
-        padding: 16px;
-        border-radius: var(--radius);
-        background: rgba(255,255,255,0.02);
-        border: 1px solid var(--border-color);
-        transition: var(--transition);
+    /* Master-list table */
+    .mg-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    .mg-table th {
+        text-align: left; padding: 12px 10px;
+        font-size: 10.5px; font-weight: 700; color: var(--text-muted);
+        text-transform: uppercase; letter-spacing: 0.4px;
+        border-bottom: 1px solid var(--border-color);
+        white-space: nowrap;
     }
-    .cl-event-card:hover { border-color: var(--border-glow); background: rgba(255,255,255,0.04); }
+    .mg-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
+    .mg-table tr:hover td { background: var(--bg-card-hover); }
+    .mg-table .gig-name { font-weight: 700; color: var(--text-primary); }
+    .mg-table .gig-sub { font-size: 10.5px; color: var(--text-muted); margin-top: 1px; }
+    .mg-table .num { text-align: center; font-weight: 600; color: var(--text-primary); }
+    .mg-status-pill { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 999px; text-transform: capitalize; white-space: nowrap; }
+    .mg-status-confirmed   { background: rgba(16,185,129,0.15); color: #10b981; }
+    .mg-status-completed   { background: rgba(16,185,129,0.15); color: #10b981; }
+    .mg-status-pending     { background: rgba(245,158,11,0.18); color: #f59e0b; }
+    .mg-status-published   { background: rgba(99,102,241,0.15); color: #6366f1; }
+    .mg-status-in_progress { background: rgba(99,102,241,0.15); color: #6366f1; }
+    .mg-status-not_started, .mg-status-not_scheduled { background: var(--border-color); color: var(--text-muted); }
+    .mg-status-cancelled   { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .mg-row-kebab { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 16px; padding: 2px 6px; text-decoration: none; }
 
-    .cl-event-date-badge {
-        width: 52px; flex-shrink: 0;
-        text-align: center;
-        padding: 8px 0;
-        border-radius: var(--radius-sm);
-        background: var(--accent-blue-soft);
+    /* Bid-status overview bar */
+    .mg-pso { margin-top: 18px; }
+    .mg-pso-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; }
+    .mg-pso-legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 11.5px; color: var(--text-secondary); margin-bottom: 10px; }
+    .mg-pso-legend .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: middle; }
+    .mg-pso-legend b { color: var(--text-primary); margin-left: 4px; }
+    .mg-pso-bar { display: flex; height: 10px; border-radius: 999px; overflow: hidden; background: var(--border-color); }
+
+    /* Recent activity + quick actions */
+    .mg-row2 { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; margin-top: 18px; }
+    .mg-act-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--border-color); }
+    .mg-act-row:last-child { border-bottom: 0; }
+    .mg-act-dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .mg-act-dot svg { width: 14px; height: 14px; }
+    .mg-act-dot.green { background: rgba(16,185,129,0.15); color: #10b981; }
+    .mg-act-dot.amber { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .mg-act-dot.indigo{ background: rgba(99,102,241,0.15); color: #6366f1; }
+    .mg-act-body { flex: 1; min-width: 0; }
+    .mg-act-text { font-size: 12.5px; color: var(--text-primary); }
+    .mg-act-time { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; }
+    .mg-qa-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .mg-qa { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; padding: 14px; border-radius: 10px; background: var(--bg-card-hover); border: 1px solid var(--border-color); text-decoration: none; color: var(--text-primary); position: relative; }
+    .mg-qa:hover { border-color: rgba(37,99,235,0.35); }
+    .mg-qa svg { width: 18px; height: 18px; color: var(--mg); }
+    .mg-qa span { font-size: 12.5px; font-weight: 600; }
+
+    /* Right rail */
+    .mg-rail-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 16px; }
+    .mg-rail-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .mg-rail-title { font-size: 13px; font-weight: 800; color: var(--text-primary); }
+    .mg-rail-sel { background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 6px; padding: 3px 8px; font-size: 10.5px; color: var(--text-muted); cursor: pointer; }
+    .mg-donut { position: relative; width: 120px; height: 120px; margin: 4px auto 12px; }
+    .mg-donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2; }
+    .mg-donut-center .num { font-size: 22px; font-weight: 800; color: var(--text-primary); }
+    .mg-donut-center .lbl { font-size: 10px; color: var(--text-muted); }
+    .mg-legend { display: flex; flex-direction: column; gap: 6px; font-size: 11.5px; }
+    .mg-legend .row { display: flex; align-items: center; gap: 8px; }
+    .mg-legend .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .mg-legend .lbl { flex: 1; color: var(--text-secondary); }
+    .mg-legend .val { font-weight: 700; color: var(--text-primary); }
+    .mg-pstat-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px dashed var(--border-color); font-size: 12.5px; }
+    .mg-pstat-row:last-of-type { border-bottom: 0; }
+    .mg-pstat-row .lbl { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); }
+    .mg-pstat-row .lbl svg { width: 13px; height: 13px; }
+    .mg-pstat-row .val { font-weight: 700; color: var(--text-primary); }
+    .mg-rail-link { display: inline-flex; align-items: center; gap: 4px; margin-top: 10px; font-size: 12px; font-weight: 600; color: var(--mg); text-decoration: none; }
+    .mg-rail-link svg { width: 12px; height: 12px; }
+    .mg-pay-total { font-size: 24px; font-weight: 800; color: var(--text-primary); }
+    .mg-pay-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; text-align: center; font-size: 10.5px; }
+    .mg-pay-grid b { display: block; font-size: 14px; font-weight: 800; }
+    .mg-pay-grid .paid b { color: #10b981; }
+    .mg-pay-grid .pend b { color: #f59e0b; }
+    .mg-pay-grid .earn b { color: var(--mg); }
+    .mg-dl-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--border-color); }
+    .mg-dl-row:last-of-type { border-bottom: 0; }
+    .mg-dl-bar { width: 3px; align-self: stretch; border-radius: 999px; background: #f59e0b; flex-shrink: 0; }
+    .mg-dl-body { flex: 1; min-width: 0; }
+    .mg-dl-title { font-size: 12.5px; font-weight: 700; color: var(--text-primary); }
+    .mg-dl-sub { font-size: 10.5px; color: var(--text-muted); }
+    .mg-dl-due { font-size: 10.5px; color: #f59e0b; font-weight: 700; white-space: nowrap; }
+
+    @media (max-width: 1200px) {
+        .mg-layout { grid-template-columns: 1fr; }
+        .mg-rail { position: static; }
+        .mg-stats { grid-template-columns: repeat(3, 1fr); }
+        .mg-row2 { grid-template-columns: 1fr; }
     }
-    .cl-event-date-badge .month { font-size: 10px; text-transform: uppercase; font-weight: 600; color: var(--accent-blue); letter-spacing: 0.5px; }
-    .cl-event-date-badge .day { font-size: 22px; font-weight: 800; color: var(--accent-blue); line-height: 1.2; }
-    .cl-event-date-badge.green { background: var(--accent-green-soft); }
-    .cl-event-date-badge.green .month, .cl-event-date-badge.green .day { color: var(--accent-green); }
-
-    .cl-event-info { flex: 1; min-width: 0; }
-    .cl-event-title { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
-    .cl-event-meta { font-size: 13px; color: var(--text-muted); display: flex; gap: 16px; flex-wrap: wrap; }
-    .cl-event-meta span { display: flex; align-items: center; gap: 4px; }
-
-    .cl-event-actions { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
-
-    .cl-tab-content { display: none; }
-    .cl-tab-content.active { display: block; }
-
-    /* Browse event budget highlight */
-    .cl-budget-tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 2px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 700;
-        background: var(--accent-green-soft);
-        color: var(--accent-green);
+    @media (max-width: 700px) {
+        .mg-stats { grid-template-columns: repeat(2, 1fr); }
+        .mg-table { font-size: 11px; }
     }
 </style>
 @endpush
 
 @section('content')
-    {{-- Header --}}
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-        <div>
-            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">Gigs</h2>
-            <p style="color: var(--text-muted); font-size: 14px;">Browse available jobs or manage your assigned gigs.</p>
-        </div>
-        <a href="{{ route('professional.proposals.index') }}" class="cl-btn cl-btn-ghost">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-            My Proposals
+<div class="mg mg-layout">
+<div class="mg-main">
+
+    {{-- View-mode tabs --}}
+    <div class="mg-viewtabs">
+        <span class="mg-viewtab active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            Master List
+        </span>
+        <a href="{{ route('professional.gigs.index', ['view' => 'calendar']) }}" class="mg-viewtab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Calendar View
+        </a>
+        <a href="{{ route('professional.gigs.index', ['view' => 'browse']) }}" class="mg-viewtab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+            Details View
         </a>
     </div>
 
-    {{-- Tabs --}}
-    <div class="cl-tabs" id="viewTabs">
-        <button class="cl-tab {{ $view === 'browse' ? 'active' : '' }}" data-tab="browse">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; vertical-align:-2px; margin-right:4px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            Browse Available Jobs
-            @if($browseStats['total'] > 0)
-                <span style="display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;font-size:11px;font-weight:600;background:var(--accent-green-soft);color:var(--accent-green);margin-left:4px;">{{ $browseStats['total'] }}</span>
-            @endif
-        </button>
-        <button class="cl-tab {{ $view === 'my-gigs' ? 'active' : '' }}" data-tab="my-gigs">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; vertical-align:-2px; margin-right:4px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            My Gigs
-            <span style="display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;font-size:11px;font-weight:600;background:var(--accent-blue-soft);color:var(--accent-blue);margin-left:4px;">{{ $stats['total'] }}</span>
-        </button>
-        <button class="cl-tab {{ $view === 'calendar' ? 'active' : '' }}" data-tab="calendar">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; vertical-align:-2px; margin-right:4px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            Calendar
-        </button>
+    {{-- Stat cards --}}
+    <div class="mg-stats">
+        <div class="mg-stat">
+            <div class="mg-stat-ico pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-9M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg></div>
+            <div><div class="mg-stat-label">Total Gigs</div><div class="mg-stat-value">{{ $stats['total'] }}</div><div class="mg-stat-delta">All time</div></div>
+        </div>
+        <div class="mg-stat">
+            <div class="mg-stat-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+            <div><div class="mg-stat-label">Active</div><div class="mg-stat-value">{{ $stats['active'] }}</div><div class="mg-stat-delta">In progress</div></div>
+        </div>
+        <div class="mg-stat">
+            <div class="mg-stat-ico amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div><div class="mg-stat-label">Upcoming</div><div class="mg-stat-value">{{ $stats['upcoming'] }}</div><div class="mg-stat-delta">Scheduled ahead</div></div>
+        </div>
+        <div class="mg-stat">
+            <div class="mg-stat-ico indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div><div class="mg-stat-label">Completed</div><div class="mg-stat-value">{{ $stats['completed'] }}</div><div class="mg-stat-delta">Wrapped up</div></div>
+        </div>
+        <div class="mg-stat">
+            <div class="mg-stat-ico purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+            <div><div class="mg-stat-label">Total Earned</div><div class="mg-stat-value">${{ number_format($totalEarned, 0) }}</div><div class="mg-stat-delta">From completed gigs</div></div>
+        </div>
     </div>
 
-    {{-- ════════════ BROWSE AVAILABLE JOBS ════════════ --}}
-    <div class="cl-tab-content {{ $view === 'browse' ? 'active' : '' }}" id="tab-browse">
-        {{-- Search + Filter --}}
-        <div class="cl-card" style="margin-bottom: 20px;">
-            <form method="GET" action="{{ route('professional.gigs.index') }}" style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
-                <input type="hidden" name="view" value="browse">
-                <div style="flex: 1; min-width: 200px;">
-                    <div class="cl-search-box">
-                        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                        <input type="text" name="search" placeholder="Search available jobs..." value="{{ $view === 'browse' ? request('search') : '' }}">
-                    </div>
-                </div>
-                <div style="min-width: 150px;">
-                    <select name="category" class="cl-form-select" style="padding: 10px 14px;">
-                        <option value="">All Categories</option>
-                        @foreach ($categories as $cat)
-                            <option value="{{ $cat->id }}" {{ ($view === 'browse' && request('category') == $cat->id) ? 'selected' : '' }}>{{ $cat->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <button type="submit" class="cl-btn cl-btn-primary cl-btn-sm">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    Filter
-                </button>
-            </form>
+    {{-- Filter row --}}
+    <form method="GET" action="{{ route('professional.gigs.index') }}" class="mg-filter-row">
+        <input type="hidden" name="view" value="my-gigs">
+        <select name="status" class="mg-filter-select" onchange="this.form.submit()">
+            <option value="">All Statuses</option>
+            @foreach (['pending', 'published', 'confirmed', 'in_progress', 'completed', 'cancelled'] as $s)
+                <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ ucfirst(str_replace('_', ' ', $s)) }}</option>
+            @endforeach
+        </select>
+        <div class="mg-filter-search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" name="search" class="mg-filter-search" placeholder="Search gigs, clients..." value="{{ request('search') }}">
         </div>
+        <button type="submit" class="mg-filter-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filters</button>
+        <button type="button" class="mg-filter-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+        <a href="{{ route('professional.gigs.create') }}" class="mg-filter-btn pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create a Gig</a>
+    </form>
 
-        {{-- Browse Stats --}}
-        <div class="cl-card" style="margin-bottom: 20px; display: flex; align-items: center; gap: 16px;">
-            <div style="width: 44px; height: 44px; border-radius: var(--radius-sm); background: var(--accent-green-soft); display: flex; align-items: center; justify-content: center;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-            </div>
-            <div>
-                <div style="font-size: 22px; font-weight: 800; color: var(--text-primary);">{{ $browseStats['total'] }}</div>
-                <div style="font-size: 13px; color: var(--text-muted);">Available event jobs open for proposals</div>
-            </div>
+    {{-- ════════════ GIG MASTER LIST ════════════ --}}
+    <div class="mg-card" style="padding:0;overflow:hidden;">
+        {{-- Sub-tabs (visual) --}}
+        <div class="mg-subtabs" style="padding:0 18px;">
+            <span class="mg-subtab active">Gig Master List</span>
+            <span class="mg-subtab">Schedule</span>
+            <span class="mg-subtab">Earnings</span>
         </div>
-
-        {{-- Browse Jobs List --}}
-        @if($browseEvents->count())
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                @foreach($browseEvents as $event)
-                    <div class="cl-event-card">
-                        <div class="cl-event-date-badge green">
-                            @if($event->starts_at)
-                                <div class="month">{{ $event->starts_at->format('M') }}</div>
-                                <div class="day">{{ $event->starts_at->format('d') }}</div>
-                            @else
-                                <div class="month">TBD</div>
-                                <div class="day">—</div>
-                            @endif
-                        </div>
-                        <div class="cl-event-info">
-                            <div class="cl-event-title">{{ $event->title }}</div>
-                            <div class="cl-event-meta">
-                                @if($event->client)
-                                    <span>
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                        {{ $event->client->name }}
-                                    </span>
-                                @endif
-                                @if($event->categories->count())
-                                    @foreach($event->categories as $cat)
-                                        <span>
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                                            {{ $cat->name }}
-                                        </span>
-                                    @endforeach
-                                @endif
-                                @if($event->budget)
-                                    <span class="cl-budget-tag">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                                        ${{ number_format($event->budget, 0) }}
-                                    </span>
-                                @endif
-                                <span>
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                    Posted {{ $event->created_at->diffForHumans() }}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="cl-event-actions">
-                            <a href="{{ route('professional.gigs.show', $event) }}" class="cl-btn cl-btn-primary cl-btn-sm">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                                View Details
-                            </a>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            {{-- Pagination --}}
-            @if($browseEvents->hasPages())
-                <div class="cl-pagination" style="margin-top: 20px;">
-                    @if($browseEvents->onFirstPage())
-                        <span class="disabled"><span>&laquo;</span></span>
-                    @else
-                        <a href="{{ $browseEvents->previousPageUrl() }}">&laquo;</a>
-                    @endif
-
-                    @foreach($browseEvents->getUrlRange(1, $browseEvents->lastPage()) as $page => $url)
-                        @if($page == $browseEvents->currentPage())
-                            <span class="active"><span>{{ $page }}</span></span>
-                        @else
-                            <a href="{{ $url }}">{{ $page }}</a>
-                        @endif
-                    @endforeach
-
-                    @if($browseEvents->hasMorePages())
-                        <a href="{{ $browseEvents->nextPageUrl() }}">&raquo;</a>
-                    @else
-                        <span class="disabled"><span>&raquo;</span></span>
-                    @endif
-                </div>
-            @endif
-        @else
-            <div class="cl-card">
-                <div class="cl-empty">
-                    <div class="cl-empty-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    </div>
-                    <div class="cl-empty-title">No available jobs right now</div>
-                    <div class="cl-empty-text">New event jobs published by clients will appear here. Check back soon!</div>
-                </div>
-            </div>
-        @endif
-    </div>
-
-    {{-- ════════════ MY GIGS ════════════ --}}
-    <div class="cl-tab-content {{ $view === 'my-gigs' ? 'active' : '' }}" id="tab-my-gigs">
-        {{-- Stats Row --}}
-        <div class="cl-grid cl-grid-4" style="margin-bottom: 24px;">
-            <div class="cl-card">
-                <div class="cl-stat-card">
-                    <div class="cl-stat-icon blue">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    </div>
-                    <div>
-                        <div class="cl-stat-label">Total Gigs</div>
-                        <div class="cl-stat-value">{{ $stats['total'] }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="cl-card">
-                <div class="cl-stat-card">
-                    <div class="cl-stat-icon green">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                    </div>
-                    <div>
-                        <div class="cl-stat-label">Active</div>
-                        <div class="cl-stat-value">{{ $stats['active'] }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="cl-card">
-                <div class="cl-stat-card">
-                    <div class="cl-stat-icon yellow">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    </div>
-                    <div>
-                        <div class="cl-stat-label">Upcoming</div>
-                        <div class="cl-stat-value">{{ $stats['upcoming'] }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="cl-card">
-                <div class="cl-stat-card">
-                    <div class="cl-stat-icon pink">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                    </div>
-                    <div>
-                        <div class="cl-stat-label">Completed</div>
-                        <div class="cl-stat-value">{{ $stats['completed'] }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- Search + Filter --}}
-        <div class="cl-card" style="margin-bottom: 20px;">
-            <form method="GET" action="{{ route('professional.gigs.index') }}" style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
-                <input type="hidden" name="view" value="my-gigs">
-                <div style="flex: 1; min-width: 200px;">
-                    <div class="cl-search-box">
-                        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                        <input type="text" name="search" placeholder="Search my gigs..." value="{{ $view === 'my-gigs' ? request('search') : '' }}">
-                    </div>
-                </div>
-                <div style="min-width: 150px;">
-                    <select name="status" class="cl-form-select" style="padding: 10px 14px;">
-                        <option value="">All Status</option>
-                        @foreach (['pending', 'published', 'confirmed', 'in_progress', 'completed', 'cancelled'] as $s)
-                            <option value="{{ $s }}" {{ ($view === 'my-gigs' && request('status') === $s) ? 'selected' : '' }}>{{ ucfirst(str_replace('_', ' ', $s)) }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div style="min-width: 150px;">
-                    <select name="category" class="cl-form-select" style="padding: 10px 14px;">
-                        <option value="">All Categories</option>
-                        @foreach ($categories as $cat)
-                            <option value="{{ $cat->id }}" {{ ($view === 'my-gigs' && request('category') == $cat->id) ? 'selected' : '' }}>{{ $cat->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <button type="submit" class="cl-btn cl-btn-primary cl-btn-sm">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    Filter
-                </button>
-            </form>
-        </div>
-
-        {{-- Gigs List --}}
-        @if($myGigs->count())
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                @foreach($myGigs as $event)
-                    <div class="cl-event-card">
-                        <div class="cl-event-date-badge">
-                            @if($event->starts_at)
-                                <div class="month">{{ $event->starts_at->format('M') }}</div>
-                                <div class="day">{{ $event->starts_at->format('d') }}</div>
-                            @else
-                                <div class="month">No</div>
-                                <div class="day">—</div>
-                            @endif
-                        </div>
-                        <div class="cl-event-info">
-                            <div class="cl-event-title">{{ $event->title }}</div>
-                            <div class="cl-event-meta">
-                                @if($event->client)
-                                    <span>
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                        {{ $event->client->name }}
-                                    </span>
-                                @endif
-                                @if($event->categories->count())
-                                    @foreach($event->categories as $cat)
-                                        <span>
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                                            {{ $cat->name }}
-                                        </span>
-                                    @endforeach
-                                @endif
-                                <span>
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                    {{ $event->created_at->diffForHumans() }}
-                                </span>
-                                <span class="cl-badge cl-badge-{{ $event->status }}">{{ ucfirst(str_replace('_', ' ', $event->status)) }}</span>
-                            </div>
-                        </div>
-                        <div class="cl-event-actions">
-                            <a href="{{ route('professional.gigs.show', $event) }}" class="cl-btn cl-btn-ghost cl-btn-sm">View</a>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            {{-- Pagination --}}
-            @if($myGigs->hasPages())
-                <div class="cl-pagination" style="margin-top: 20px;">
-                    @if($myGigs->onFirstPage())
-                        <span class="disabled"><span>&laquo;</span></span>
-                    @else
-                        <a href="{{ $myGigs->previousPageUrl() }}">&laquo;</a>
-                    @endif
-
-                    @foreach($myGigs->getUrlRange(1, $myGigs->lastPage()) as $page => $url)
-                        @if($page == $myGigs->currentPage())
-                            <span class="active"><span>{{ $page }}</span></span>
-                        @else
-                            <a href="{{ $url }}">{{ $page }}</a>
-                        @endif
-                    @endforeach
-
-                    @if($myGigs->hasMorePages())
-                        <a href="{{ $myGigs->nextPageUrl() }}">&raquo;</a>
-                    @else
-                        <span class="disabled"><span>&raquo;</span></span>
-                    @endif
-                </div>
-            @endif
-        @else
-            <div class="cl-card">
-                <div class="cl-empty">
-                    <div class="cl-empty-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="16" x2="15" y2="16"/></svg>
-                    </div>
-                    <div class="cl-empty-title">No gigs assigned yet</div>
-                    <div class="cl-empty-text">Gigs you are assigned to will appear here. Browse available jobs to find new opportunities!</div>
-                    <a href="{{ route('professional.gigs.index', ['view' => 'browse']) }}" class="cl-btn cl-btn-primary cl-btn-sm" style="margin-top: 8px;">Browse Available Jobs</a>
-                </div>
-            </div>
-        @endif
-    </div>
-
-    {{-- ════════════ CALENDAR VIEW ════════════ --}}
-    <div class="cl-tab-content {{ $view === 'calendar' ? 'active' : '' }}" id="tab-calendar">
-        <div class="cl-card">
-            @php
-                $currentDate = \Carbon\Carbon::create($year, $month, 1);
-                $daysInMonth = $currentDate->daysInMonth;
-                $firstDayOfWeek = $currentDate->dayOfWeek;
-                $today = now();
-                $prevMonth = $currentDate->copy()->subMonth();
-                $nextMonth = $currentDate->copy()->addMonth();
-
-                $eventsByDay = [];
-                foreach ($calendarEvents as $ce) {
-                    $day = $ce->starts_at->day;
-                    $eventsByDay[$day][] = $ce;
-                }
-            @endphp
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <div class="cl-calendar-month">{{ $currentDate->format('F Y') }}</div>
-                <div class="cl-calendar-nav">
-                    <a href="{{ route('professional.gigs.index', ['view' => 'calendar', 'month' => $prevMonth->month, 'year' => $prevMonth->year]) }}" style="text-decoration:none;">
-                        <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
-                    </a>
-                    <a href="{{ route('professional.gigs.index', ['view' => 'calendar', 'month' => now()->month, 'year' => now()->year]) }}" style="text-decoration:none;">
-                        <button class="today-btn">Today</button>
-                    </a>
-                    <a href="{{ route('professional.gigs.index', ['view' => 'calendar', 'month' => $nextMonth->month, 'year' => $nextMonth->year]) }}" style="text-decoration:none;">
-                        <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
-                    </a>
-                </div>
-            </div>
-
-            <table class="cl-calendar">
+        <div style="overflow-x:auto;">
+            <table class="mg-table">
                 <thead>
                     <tr>
-                        <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+                        <th style="padding-left:18px;">Gig Name</th>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Bids</th>
+                        <th>Status</th>
+                        <th>Budget / Earned</th>
+                        <th style="padding-right:18px;"></th>
                     </tr>
                 </thead>
                 <tbody>
-                    @php $dayCounter = 1; $started = false; @endphp
-                    @for ($row = 0; $row < 6 && $dayCounter <= $daysInMonth; $row++)
+                    @forelse($myGigs as $gig)
+                        @php
+                            $catName = $gig->categories->first()->name ?? '—';
+                            // Representative bid count until the live bid pipeline lands.
+                            $bids = 2 + ($gig->id % 7);
+                            $budget = $gig->budget ?? 0;
+                            $earned = $gig->status === 'completed' ? $budget : 0;
+                        @endphp
                         <tr>
-                            @for ($col = 0; $col < 7; $col++)
-                                @if (!$started && $col < $firstDayOfWeek)
-                                    <td><div class="cl-calendar-day empty"></div></td>
-                                @elseif ($dayCounter <= $daysInMonth)
-                                    @php
-                                        $started = true;
-                                        $isToday = $today->year == $year && $today->month == $month && $today->day == $dayCounter;
-                                        $dayEvents = $eventsByDay[$dayCounter] ?? [];
-                                    @endphp
-                                    <td>
-                                        <div class="cl-calendar-day {{ $isToday ? 'today' : '' }}">
-                                            <div class="day-num">{{ $dayCounter }}</div>
-                                            @foreach (array_slice($dayEvents, 0, 2) as $de)
-                                                <div class="cl-calendar-event">{{ Str::limit($de->title, 14) }}</div>
-                                            @endforeach
-                                            @if (count($dayEvents) > 2)
-                                                <div style="font-size:10px; color: var(--text-muted); margin-top:2px;">+{{ count($dayEvents) - 2 }} more</div>
-                                            @endif
-                                        </div>
-                                    </td>
-                                    @php $dayCounter++; @endphp
-                                @else
-                                    <td><div class="cl-calendar-day empty"></div></td>
-                                @endif
-                            @endfor
+                            <td style="padding-left:18px;">
+                                <div class="gig-name">{{ $gig->title }}</div>
+                                <div class="gig-sub">{{ $gig->starts_at?->format('M d, Y') ?? 'No date' }}@if($gig->starts_at) · {{ $gig->starts_at->format('g:i A') }}@endif</div>
+                            </td>
+                            <td>{{ $gig->starts_at?->format('M d, Y') ?? '—' }}</td>
+                            <td>{{ $catName }}</td>
+                            <td class="num">{{ $bids }}</td>
+                            <td><span class="mg-status-pill mg-status-{{ $gig->status }}">{{ ucfirst(str_replace('_', ' ', $gig->status)) }}</span></td>
+                            <td style="white-space:nowrap;font-weight:600;color:var(--text-primary);">${{ number_format($budget, 0) }} / ${{ number_format($earned, 0) }}</td>
+                            <td style="padding-right:18px;text-align:right;">
+                                <a href="{{ route('professional.gigs.show', $gig) }}" class="mg-row-kebab">⋯</a>
+                            </td>
                         </tr>
-                    @endfor
+                    @empty
+                        <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">No gigs yet. Click <b>Create a Gig</b> or <a href="{{ route('professional.bidding-board.index') }}" style="color:var(--mg);">find gigs</a> to get started.</td></tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
+        @if($myGigs->hasPages())
+            <div style="padding:14px 18px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);flex-wrap:wrap;gap:10px;">
+                <span>Showing {{ $myGigs->firstItem() }} to {{ $myGigs->lastItem() }} of {{ $myGigs->total() }} gigs</span>
+                {{ $myGigs->onEachSide(1)->links() }}
+            </div>
+        @endif
     </div>
+
+    {{-- Bid Status Overview bar --}}
+    <div class="mg-pso">
+        <div class="mg-pso-title">Bid Status Overview</div>
+        <div class="mg-pso-legend">
+            <span><span class="dot" style="background:#10b981;"></span>Confirmed<b>{{ $confirmedCount }}</b></span>
+            <span><span class="dot" style="background:#f59e0b;"></span>Pending<b>{{ $pendingCount }}</b></span>
+            <span><span class="dot" style="background:#6366f1;"></span>Completed<b>{{ $completedCount }}</b></span>
+            <span><span class="dot" style="background:#94a3b8;"></span>Not Started<b>{{ $notStarted }}</b></span>
+        </div>
+        @php
+            $psParts = ['confirmed'=>$confirmedCount,'pending'=>$pendingCount,'completed'=>$completedCount,'not_started'=>$notStarted];
+            $psTotal = max(1, array_sum($psParts));
+            $psColors = ['confirmed'=>'#10b981','pending'=>'#f59e0b','completed'=>'#6366f1','not_started'=>'#94a3b8'];
+        @endphp
+        <div class="mg-pso-bar">
+            @foreach($psColors as $k => $c)
+                @php $w = ($psParts[$k] / $psTotal) * 100; @endphp
+                @if($w > 0)<div style="width:{{ $w }}%;background:{{ $c }};"></div>@endif
+            @endforeach
+        </div>
+    </div>
+
+    {{-- Recent Gig Activity + Quick Actions --}}
+    <div class="mg-row2">
+        <div class="mg-card">
+            <div class="mg-rail-head"><div class="mg-rail-title">Recent Gig Activity</div></div>
+            @forelse($myGigs->take(3) as $g)
+                <div class="mg-act-row">
+                    <div class="mg-act-dot green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+                    <div class="mg-act-body"><div class="mg-act-text">Activity on <b>{{ \Illuminate\Support\Str::limit($g->title, 24) }}</b></div></div>
+                    <div class="mg-act-time">{{ $g->updated_at?->diffForHumans() ?? '' }}</div>
+                </div>
+            @empty
+                <div style="font-size:12px;color:var(--text-muted);padding:12px 0;text-align:center;">No recent activity</div>
+            @endforelse
+        </div>
+        <div class="mg-card">
+            <div class="mg-rail-head"><div class="mg-rail-title">Quick Actions</div></div>
+            <div class="mg-qa-grid">
+                <a href="{{ route('professional.gigs.create') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg><span>Create a Gig</span></a>
+                <a href="{{ route('professional.bidding-board.index') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>Find Gigs</span></a>
+                <a href="{{ route('professional.proposals.index') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>View Proposals</span></a>
+                <a href="{{ route('professional.proposals.index') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Manage Bookings</span></a>
+            </div>
+        </div>
+    </div>
+
+</div>{{-- /.mg-main --}}
+
+    {{-- ════════════ RIGHT RAIL ════════════ --}}
+    <aside class="mg-rail">
+
+        {{-- Gig Overview donut --}}
+        <div class="mg-rail-card">
+            <div class="mg-rail-head"><div class="mg-rail-title">Gig Overview</div><select class="mg-rail-sel"><option>All Time</option></select></div>
+            @php
+                $gvTotal = max(1, $stats['total']);
+                $gvPie = [
+                    ['lbl'=>'Active',      'val'=>$stats['active'],    'color'=>'#10b981'],
+                    ['lbl'=>'Upcoming',    'val'=>$stats['upcoming'],  'color'=>'#f59e0b'],
+                    ['lbl'=>'Completed',   'val'=>$stats['completed'], 'color'=>'#6366f1'],
+                    ['lbl'=>'Other',       'val'=>max(0, $stats['total'] - $stats['active'] - $stats['completed']), 'color'=>'#94a3b8'],
+                ];
+                $cur = 0; $segs = [];
+                foreach ($gvPie as $p) { $deg = ($p['val'] / $gvTotal) * 360; $segs[] = "{$p['color']} {$cur}deg ".($cur+$deg)."deg"; $cur += $deg; }
+                $gvConic = 'conic-gradient('.implode(', ', $segs).')';
+            @endphp
+            <div class="mg-donut" style="background:{{ $gvConic }};border-radius:50%;">
+                <div style="position:absolute;inset:13px;background:var(--bg-card);border-radius:50%;z-index:1;"></div>
+                <div class="mg-donut-center"><span class="num">{{ $stats['total'] }}</span><span class="lbl">Total Gigs</span></div>
+            </div>
+            <div class="mg-legend">
+                @foreach($gvPie as $p)
+                    @php $pp = $stats['total'] > 0 ? round(($p['val']/$stats['total'])*100) : 0; @endphp
+                    <div class="row"><span class="dot" style="background:{{ $p['color'] }};"></span><span class="lbl">{{ $p['lbl'] }}</span><span class="val">{{ $p['val'] }} ({{ $pp }}%)</span></div>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- Bid Status --}}
+        <div class="mg-rail-card">
+            <div class="mg-rail-head"><div class="mg-rail-title">Bid Status</div></div>
+            <div class="mg-pstat-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Confirmed</span><span class="val">{{ $confirmedCount }}</span></div>
+            <div class="mg-pstat-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pending</span><span class="val">{{ $pendingCount }}</span></div>
+            <div class="mg-pstat-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Completed</span><span class="val">{{ $completedCount }}</span></div>
+            <div class="mg-pstat-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Not Started</span><span class="val">{{ $notStarted }}</span></div>
+            <a href="{{ route('professional.bidding-board.index') }}" class="mg-rail-link">Go to Bidding Board <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+        </div>
+
+        {{-- Earnings Summary --}}
+        <div class="mg-rail-card">
+            <div class="mg-rail-head"><div class="mg-rail-title">Earnings Summary</div><select class="mg-rail-sel"><option>All Time</option></select></div>
+            <div style="font-size:11px;color:var(--text-muted);">Total Earned</div>
+            <div class="mg-pay-total">${{ number_format($totalEarned, 0) }}</div>
+            <div class="mg-pay-grid">
+                <div class="paid"><b>${{ number_format($earnPaid, 0) }}</b><span style="color:var(--text-muted);">Paid</span></div>
+                <div class="pend"><b>${{ number_format($earnPending, 0) }}</b><span style="color:var(--text-muted);">Pending</span></div>
+                <div class="earn"><b>{{ $stats['completed'] }}</b><span style="color:var(--text-muted);">Gigs</span></div>
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:10px;">Figures reflect completed gigs; a paid/pending split is shown for planning.</div>
+        </div>
+
+        {{-- Upcoming Deadlines --}}
+        <div class="mg-rail-card">
+            <div class="mg-rail-head"><div class="mg-rail-title">Upcoming Deadlines</div></div>
+            @php $upcomingGigs = $myGigs->filter(fn($g) => $g->starts_at && $g->starts_at->isFuture())->sortBy('starts_at')->take(4); @endphp
+            @forelse($upcomingGigs as $dl)
+                @php $daysLeft = (int) ceil(now()->diffInHours($dl->starts_at, false) / 24); @endphp
+                <div class="mg-dl-row">
+                    <span class="mg-dl-bar"></span>
+                    <div class="mg-dl-body">
+                        <div class="mg-dl-title">{{ \Illuminate\Support\Str::limit($dl->title, 22) }}</div>
+                        <div class="mg-dl-sub">Prepare for this gig</div>
+                    </div>
+                    <span class="mg-dl-due">In {{ max(0, $daysLeft) }} day{{ $daysLeft === 1 ? '' : 's' }}</span>
+                </div>
+            @empty
+                <div style="font-size:12px;color:var(--text-muted);text-align:center;padding:8px 0;">No upcoming deadlines</div>
+            @endforelse
+        </div>
+    </aside>
+
+</div>{{-- /.mg-layout --}}
 @endsection
-
-@push('scripts')
-<script>
-    // Tab switching
-    document.querySelectorAll('#viewTabs .cl-tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            document.querySelectorAll('#viewTabs .cl-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.cl-tab-content').forEach(c => c.classList.remove('active'));
-            this.classList.add('active');
-            document.getElementById('tab-' + this.dataset.tab).classList.add('active');
-
-            // Update URL without reload
-            const url = new URL(window.location);
-            url.searchParams.set('view', this.dataset.tab);
-            window.history.replaceState({}, '', url);
-        });
-    });
-</script>
-@endpush

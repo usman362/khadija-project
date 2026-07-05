@@ -849,7 +849,7 @@
         <div class="bk-rail-card">
             <div class="bk-rail-head"><div class="bk-rail-title">Quick Actions</div></div>
             <div class="bk-qa-list">
-                <a href="{{ route('client.events.index') }}?create=1" class="bk-qa-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create New Booking</a>
+                <a href="{{ route('client.post-event.event-info') }}" class="bk-qa-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Post an Event</a>
                 <a href="{{ route('client.bookings.index') }}" class="bk-qa-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>View All Bookings</a>
             </div>
         </div>

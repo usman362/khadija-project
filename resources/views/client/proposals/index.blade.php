@@ -111,7 +111,7 @@
     {{-- Toolbar header --}}
     <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:16px;">
         <a href="{{ route('client.multi-service.index') }}" class="pr-tool-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Browse Event Jobs</a>
-        <button class="pr-tool-btn" style="background:#f97316;color:#fff;border-color:#f97316;" onclick="window.location='{{ route('client.events.index') }}?create=1'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create New Proposal</button>
+        <button class="pr-tool-btn" style="background:#f97316;color:#fff;border-color:#f97316;" onclick="window.location='{{ route('client.post-event.event-info') }}'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Post an Event</button>
     </div>
 
     {{-- Stat cards --}}

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Professional;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Event;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -87,6 +88,61 @@ class ProfessionalGigController extends Controller
             'myGigs', 'stats', 'browseEvents', 'browseStats',
             'calendarEvents', 'categories', 'month', 'year', 'view'
         ));
+    }
+
+    /** Rich single-page gig builder for the professional portal. */
+    public function create(Request $request): View
+    {
+        $categories = Category::where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return view('professional.gigs.create', ['categories' => $categories]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'title'          => ['required', 'string', 'max:255'],
+            'description'    => ['nullable', 'string'],
+            'starts_at'      => ['nullable', 'date'],
+            'event_time'     => ['nullable', 'date_format:H:i'],
+            'ends_at'        => ['nullable', 'date', 'after_or_equal:starts_at'],
+            'category_ids'   => ['nullable', 'array'],
+            'category_ids.*' => ['exists:categories,id'],
+            'location'       => ['nullable', 'string', 'max:255'],
+            'venue'          => ['nullable', 'string', 'max:255'],
+            'guest_count'    => ['nullable', 'integer', 'min:1', 'max:1000000'],
+            'budget'         => ['nullable', 'numeric', 'min:0', 'max:9999999.99'],
+        ]);
+
+        // Merge the optional event time into the start date.
+        $startsAt = $validated['starts_at'] ?? null;
+        if ($startsAt && ! empty($validated['event_time'])) {
+            $startsAt = \Illuminate\Support\Carbon::parse($startsAt)->setTimeFromTimeString($validated['event_time']);
+        }
+
+        $event = Event::create([
+            'title'        => $validated['title'],
+            'description'  => $validated['description'] ?? null,
+            'status'       => 'pending',
+            'starts_at'    => $startsAt,
+            'ends_at'      => $validated['ends_at'] ?? null,
+            'created_by'   => $request->user()->id,
+            'client_id'    => $request->user()->id,
+            'location'     => $validated['location'] ?? null,
+            'venue'        => $validated['venue'] ?? null,
+            'guest_count'  => $validated['guest_count'] ?? null,
+            'budget'       => $validated['budget'] ?? null,
+            'is_published' => false,
+            'source'       => 'user',
+        ]);
+
+        if (! empty($validated['category_ids'])) {
+            $event->categories()->sync($validated['category_ids']);
+        }
+
+        return redirect()->route('professional.gigs.index')->with('status', 'Gig created!');
     }
 
     public function show(Request $request, Event $event): View

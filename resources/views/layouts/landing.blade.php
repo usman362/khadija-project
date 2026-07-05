@@ -160,11 +160,7 @@
 
         <div class="lpn-links">
             <div class="lpn-item">
-                <span class="lpn-link">Find Gigs <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg></span>
-                <div class="lpn-menu">
-                    <a href="{{ route('public.browse') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Browse Open Gigs</a>
-                    <a href="{{ route('register', ['role' => 'supplier']) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Become a Professional</a>
-                </div>
+                <a href="{{ route('professional.bidding-board.index') }}" class="lpn-link">Find Gigs</a>
             </div>
             <div class="lpn-item">
                 <span class="lpn-link">Find Professionals <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg></span>
@@ -176,10 +172,10 @@
             <div class="lpn-item">
                 <span class="lpn-link">Categories <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg></span>
                 <div class="lpn-menu">
-                    <a href="{{ route('public.browse', ['q' => 'Wedding']) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.35-7-10a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.65-7 10-7 10z"/></svg>Weddings</a>
-                    <a href="{{ route('public.browse', ['q' => 'Corporate']) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Corporate Events</a>
-                    <a href="{{ route('public.browse', ['q' => 'Festival']) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Festivals &amp; Concerts</a>
-                    <a href="{{ route('events-categories') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>View All Categories</a>
+                    <a href="{{ route('events-categories') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span style="display:flex;flex-direction:column;gap:1px;"><span style="font-weight:600;">Shop Packages</span><span style="font-size:11px;color:var(--muted);font-weight:500;">Browse complete event solutions</span></span></a>
+                    <a href="{{ route('events-categories') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3h.01"/><path d="M22 8h.01"/><path d="M15 2c0 2 .5 3.5 2 5"/><path d="M11.5 13.5 21 4"/></svg><span style="display:flex;flex-direction:column;gap:1px;"><span style="font-weight:600;">Event Types</span><span style="font-size:11px;color:var(--muted);font-weight:500;">Browse by occasion</span></span></a>
+                    <a href="{{ route('events-categories') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span style="display:flex;flex-direction:column;gap:1px;"><span style="font-weight:600;">Trending Packages</span><span style="font-size:11px;color:var(--muted);font-weight:500;">See what's popular this week</span></span></a>
+                    <a href="{{ route('events-categories') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><span style="display:flex;flex-direction:column;gap:1px;"><span style="font-weight:600;">View All Categories</span><span style="font-size:11px;color:var(--muted);font-weight:500;">Explore everything</span></span></a>
                 </div>
             </div>
             <div class="lpn-item">

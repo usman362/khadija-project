@@ -586,7 +586,8 @@ Route::middleware('auth')->group(function () {
             ->name('client.virtual-hub.brief');
 
         Route::get('/events', [ClientEventController::class, 'index'])->middleware('permission:events.view_any')->name('client.events.index');
-        Route::get('/events/create', [ClientEventController::class, 'create'])->middleware('permission:events.create')->name('client.events.create');
+        // "Create a Gig" (bidding builder) retired in favour of the "Post an Event" flow — redirect any old links.
+        Route::get('/events/create', fn () => redirect()->route('client.post-event.event-info'))->name('client.events.create');
         Route::post('/events', [ClientEventController::class, 'store'])->middleware('permission:events.create')->name('client.events.store');
 
         // ── Post an Event — guided 11-step booking journey ──
@@ -670,6 +671,8 @@ Route::middleware('auth')->group(function () {
 
         // My Gigs (Events assigned to professional)
         Route::get('/gigs', [ProfessionalGigController::class, 'index'])->middleware('permission:events.view_any')->name('professional.gigs.index');
+        Route::get('/gigs/create', [ProfessionalGigController::class, 'create'])->name('professional.gigs.create');
+        Route::post('/gigs', [ProfessionalGigController::class, 'store'])->name('professional.gigs.store');
         Route::get('/gigs/{event}', [ProfessionalGigController::class, 'show'])->middleware('permission:events.view')->name('professional.gigs.show');
 
         // Proposals (Bookings from professional's perspective)

@@ -1,7 +1,7 @@
 @extends('layouts.client')
 
-@section('title', 'My Gigs')
-@section('page-title', 'My Gigs')
+@section('title', 'My Events')
+@section('page-title', 'My Events')
 @section('page-subtitle', 'Manage your events, master list, and professionals in one place.')
 
 @push('styles')
@@ -407,7 +407,7 @@
 
     {{-- Header button row (greeting lives in the topbar) --}}
     <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
-        <button class="cl-btn cl-btn-primary" style="background:#f97316;border-color:#f97316;" onclick="document.getElementById('postEventModal').classList.add('show')">
+        <button class="cl-btn cl-btn-primary" style="background:#f97316;border-color:#f97316;" onclick="window.location.href='{{ route('client.post-event.event-info') }}'">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Post New Event
         </button>
@@ -468,7 +468,7 @@
         </div>
         <button type="submit" class="mg-filter-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filters</button>
         <button type="button" class="mg-filter-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
-        <button type="button" class="mg-filter-btn coral" onclick="document.getElementById('postEventModal').classList.add('show')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Master List</button>
+        <button type="button" class="mg-filter-btn coral" onclick="window.location.href='{{ route('client.post-event.event-info') }}'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Master List</button>
     </form>
 
     {{-- ════════════ MASTER LIST (default) ════════════ --}}
@@ -574,7 +574,7 @@
             <div class="mg-card">
                 <div class="mg-rail-head"><div class="mg-rail-title">Quick Actions</div></div>
                 <div class="mg-qa-grid">
-                    <a href="{{ route('client.events.index') }}?create=1" class="mg-qa" onclick="event.preventDefault();document.getElementById('postEventModal').classList.add('show');"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg><span>Add Event</span></a>
+                    <a href="{{ route('client.post-event.event-info') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg><span>Post an Event</span></a>
                     <a href="{{ route('client.search.index') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg><span>Invite Professionals</span></a>
                     <a href="{{ route('client.bookings.index') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>View Proposals</span></a>
                     <a href="{{ route('client.bookings.index') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Manage Bookings</span></a>
@@ -819,7 +819,7 @@
                     </div>
                     <div class="cl-empty-title">No events found yet</div>
                     <div class="cl-empty-text">Create your first event to get started with hiring professionals.</div>
-                    <button class="cl-btn cl-btn-primary" onclick="document.getElementById('postEventModal').classList.add('show')">Create Your First Event</button>
+                    <button class="cl-btn cl-btn-primary" onclick="window.location.href='{{ route('client.post-event.event-info') }}'">Create Your First Event</button>
                 </div>
             </div>
         @endif
@@ -901,89 +901,6 @@
 
 </div>{{-- /.mg-layout --}}
 
-    {{-- ════════════ POST EVENT MODAL (Clients only) ════════════ --}}
-    <div class="cl-modal-overlay" id="postEventModal">
-        <div class="cl-modal" style="max-width: 720px;">
-            <form method="POST" action="{{ route('client.events.store') }}">
-                @csrf
-                <div class="cl-modal-header">
-                    <div>
-                        <div class="cl-modal-title">Post an Event</div>
-                        <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Fill out the details to create a new event and invite professionals.</p>
-                    </div>
-                    <button type="button" class="cl-modal-close" onclick="document.getElementById('postEventModal').classList.remove('show')">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                    </button>
-                </div>
-                <div class="cl-modal-body">
-                    <div class="cl-form-group">
-                        <label class="cl-form-label">Event Title *</label>
-                        <input type="text" name="title" class="cl-form-input" placeholder="e.g. Wedding Ceremony, Corporate Gala" required>
-                    </div>
-
-                    <div class="cl-form-group">
-                        <label class="cl-form-label">Description</label>
-                        <textarea name="description" class="cl-form-textarea" rows="4" placeholder="Describe your event, expectations, and requirements..."></textarea>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <div class="cl-form-group">
-                            <label class="cl-form-label">Start Date & Time</label>
-                            <input type="datetime-local" name="starts_at" class="cl-form-input">
-                        </div>
-                        <div class="cl-form-group">
-                            <label class="cl-form-label">End Date & Time</label>
-                            <input type="datetime-local" name="ends_at" class="cl-form-input">
-                        </div>
-                    </div>
-
-                    <div class="cl-form-group">
-                        <label class="cl-form-label">Categories <span style="font-weight:400; color: var(--text-muted);">(select one or more)</span></label>
-                        <div class="cl-multiselect-wrap" id="categoryMultiselect">
-                            <div class="cl-multiselect-toggle" onclick="this.parentElement.classList.toggle('open')">
-                                <span class="cl-multiselect-placeholder">Select categories...</span>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-                            </div>
-                            <div class="cl-multiselect-dropdown">
-                                <div class="cl-multiselect-search">
-                                    <input type="text" placeholder="Search categories..." oninput="filterCategories(this.value)">
-                                </div>
-                                <div class="cl-multiselect-options">
-                                    @foreach ($categories as $cat)
-                                        <label class="cl-multiselect-option" data-name="{{ strtolower($cat->name) }}">
-                                            <input type="checkbox" name="category_ids[]" value="{{ $cat->id }}">
-                                            <span class="cl-multiselect-check">
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                                            </span>
-                                            <span>{{ $cat->name }}</span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <div class="cl-form-group">
-                            <label class="cl-form-label">Location</label>
-                            <input type="text" name="location" class="cl-form-input" placeholder="City, Venue, or Address">
-                        </div>
-                        <div class="cl-form-group">
-                            <label class="cl-form-label">Budget <span style="opacity:.6;font-weight:400">(USD, optional)</span></label>
-                            <input type="number" name="budget" class="cl-form-input" placeholder="e.g. 2500" min="0" step="0.01">
-                        </div>
-                    </div>
-                </div>
-                <div class="cl-modal-footer">
-                    <button type="button" class="cl-btn cl-btn-ghost" onclick="document.getElementById('postEventModal').classList.remove('show')">Cancel</button>
-                    <button type="submit" class="cl-btn cl-btn-primary">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        Create Event
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
 @endsection
 
 @push('scripts')
@@ -1000,7 +917,7 @@
 
     // Open modal if ?create=1
     if (new URLSearchParams(window.location.search).get('create') === '1') {
-        document.getElementById('postEventModal').classList.add('show');
+        window.location.href='{{ route('client.post-event.event-info') }}';
     }
 
     // Open details tab if ?tab=details
@@ -1008,15 +925,9 @@
         document.querySelector('[data-tab="details"]').click();
     }
 
-    // Close modal on overlay click
-    document.getElementById('postEventModal').addEventListener('click', function(e) {
-        if (e.target === this) this.classList.remove('show');
-    });
-
-    // Close modal on Escape
+    // Close any open multi-select dropdowns on Escape.
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            document.getElementById('postEventModal').classList.remove('show');
             document.querySelectorAll('.cl-multiselect-wrap.open').forEach(el => el.classList.remove('open'));
         }
     });
