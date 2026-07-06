@@ -1,6 +1,11 @@
 @php
-    // Active role from ?role= (supplier via "Join as a professional" link, etc.)
-    $active = in_array($role ?? 'client', ['client', 'supplier', 'influencer'], true) ? $role : 'client';
+    // Active role: keep the user's chosen role across a validation-error redirect
+    // (old('role')) so the "I am a..." selector doesn't silently reset to Client;
+    // otherwise from ?role= (e.g. "Join as a professional" link); else Client.
+    $active = old('role', $role ?? 'client');
+    if (! in_array($active, ['client', 'supplier', 'influencer'], true)) {
+        $active = 'client';
+    }
 
     $recaptchaSettings = app(\App\Domain\Settings\Services\SettingsService::class);
     $showRecaptcha     = $recaptchaSettings->isRecaptchaEnabledFor('register');
