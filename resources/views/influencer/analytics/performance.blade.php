@@ -44,7 +44,8 @@
             @for($i=0;$i<=4;$i++)<line x1="30" y1="{{ 30+$i*35 }}" x2="550" y2="{{ 30+$i*35 }}" stroke="var(--line)" stroke-width="1"/>@endfor
             <polyline fill="rgba(22,163,74,0.08)" stroke="none" points="30,170 {{ $pts }} 550,170"/>
             <polyline fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="{{ $pts }}"/>
-            @foreach([0, intdiv($n,3), intdiv(2*$n,3), $n] as $i)<text class="an-axis" x="{{ 30+($i/$n)*520 }}" y="186" text-anchor="middle">{{ $daily[$i]->date->format('M j') }}</text>@endforeach
+            @php $dv = $daily->values(); $axisIdx = collect([0, intdiv($n,3), intdiv(2*$n,3), $n])->unique()->filter(fn($i) => isset($dv[$i]) && $dv[$i]->date)->values(); @endphp
+            @foreach($axisIdx as $i)<text class="an-axis" x="{{ 30+($i/$n)*520 }}" y="186" text-anchor="middle">{{ $dv[$i]->date->format('M j') }}</text>@endforeach
         </svg>
     </div>
     <div class="an-panel">
