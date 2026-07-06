@@ -108,7 +108,7 @@
     .lp-step-ic svg { width: 34px; height: 34px; color: #fff; }
     .lp-step-num { position: absolute; top: -8px; right: -8px; width: 26px; height: 26px; border-radius: 50%; color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 3px solid #fff; }
     .lp-step h4 { font-size: 15px; font-weight: 800; margin-bottom: 7px; }
-    .lp-step p { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin: 0; }
+    .lp-step p { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin: 0 auto; max-width: 190px; text-wrap: balance; }
     .lp-step-line { position: absolute; top: 42px; left: 62%; width: 76%; height: 2px; z-index: 0; }
     .lp-step-line svg { width: 100%; height: 14px; }
 
@@ -168,7 +168,7 @@
     .lp-vb-ic svg { width: 22px; height: 22px; color: #fff; }
     .lp-vb-tile b { font-size: 21px; font-weight: 800; color: #fff; letter-spacing: 0.2px; line-height: 1; }
     .lp-vb-label { font-size: 13px; color: #fff; font-weight: 700; }
-    .lp-vb-sub { font-size: 11.5px; color: rgba(255,255,255,0.82); line-height: 1.35; max-width: 170px; }
+    .lp-vb-sub { font-size: 11.5px; color: rgba(255,255,255,0.82); line-height: 1.35; max-width: 150px; margin: 0 auto; text-align: center; text-wrap: balance; }
 
     /* ── PRICING ────────────────────────────────────── */
     .lp-pricing-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; align-items: stretch; max-width: 1020px; margin: 0 auto; }
@@ -333,9 +333,9 @@
             @php
                 $steps = [
                     ['#3b82f6', '#2563eb', '1', '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>', 'Tell Us What You Need', 'Share your event details, budget, and preferences.'],
-                    ['#3b82f6', '#2563eb', '2', '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>', 'Get Matched', 'We connect you with the best professionals.'],
-                    ['#3b82f6', '#2563eb', '3', '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>', 'Compare &amp; Choose', 'Review profiles, portfolios, reviews, and quotes.'],
-                    ['#fb923c', '#ea580c', '4', '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/>', 'Book with Confidence', 'Secure payments, contracts, and clear communication.'],
+                    ['#6366f1', '#4f46e5', '2', '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>', 'Get Matched', 'We connect you with the best professionals.'],
+                    ['#8b5cf6', '#7c3aed', '3', '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>', 'Compare &amp; Choose', 'Review profiles, portfolios, reviews, and quotes.'],
+                    ['#ec4899', '#db2777', '4', '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/>', 'Book with Confidence', 'Secure payments, contracts, and clear communication.'],
                     ['#fb923c', '#ea580c', '5', '<path d="M8 21h8m-4-4v4M5 3h14l-1 9a6 6 0 0 1-12 0L5 3z"/><path d="M5 7H3a2 2 0 0 0 0 4h2M19 7h2a2 2 0 0 1 0 4h-2"/>', 'Deliver &amp; Celebrate', 'Enjoy a seamless event experience.'],
                 ];
             @endphp
