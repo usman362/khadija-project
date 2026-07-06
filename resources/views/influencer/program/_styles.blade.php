@@ -33,7 +33,7 @@
     .pg-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
     .pg-pill.paid { background: #dcfce7; color: #15803d; }
     .pg-pill.earned { background: var(--blue-soft); color: #1d4ed8; }
-    .pg-pill.pending { background: #fef3c7; color: #b45309; }
+    .pg-pill.pending { background: #dcfce7; color: #b45309; }
     .pg-pill.cancelled { background: #f1f5f9; color: #64748b; }
 
     .pg-bar { height: 8px; border-radius: 6px; background: #eef2f7; overflow: hidden; }
@@ -43,9 +43,9 @@
     .pg-rank-row { display: flex; align-items: center; gap: 14px; padding: 13px 14px; border-radius: 12px; border: 1px solid var(--line); margin-bottom: 10px; }
     .pg-rank-row.me { background: var(--orange-soft); border-color: #f5b890; }
     .pg-rank-no { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: var(--ff); font-weight: 800; font-size: 14px; flex-shrink: 0; background: #f1f5f9; color: var(--muted); }
-    .pg-rank-no.gold { background: #fef3c7; color: #b45309; }
+    .pg-rank-no.gold { background: #dcfce7; color: #b45309; }
     .pg-rank-no.silver { background: #e2e8f0; color: #475569; }
-    .pg-rank-no.bronze { background: #fde4cf; color: #c2410c; }
+    .pg-rank-no.bronze { background: #d1fadf; color: #166534; }
     .pg-rank-av { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--ff); font-weight: 700; color: #fff; font-size: 14px; flex-shrink: 0; }
     .pg-rank-row .nm { flex: 1; min-width: 0; }
     .pg-rank-row .nm b { display: block; font-family: var(--ff); font-size: 13.5px; color: var(--ink); }
@@ -65,7 +65,7 @@
 
     /* commission tiers */
     .pg-tier-row { display: flex; align-items: center; gap: 14px; padding: 14px; border: 1px solid var(--line); border-radius: 13px; margin-bottom: 10px; }
-    .pg-tier-row.current { border-width: 2px; box-shadow: 0 4px 14px rgba(249,115,22,.12); }
+    .pg-tier-row.current { border-width: 2px; box-shadow: 0 4px 14px rgba(22,163,74,.12); }
     .pg-tier-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
     .pg-tier-row .ti { flex: 1; }
     .pg-tier-row .ti b { font-family: var(--ff); font-size: 14px; color: var(--ink); }

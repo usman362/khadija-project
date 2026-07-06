@@ -9,7 +9,7 @@
     <div class="an-panel">
         <div class="an-panel-head"><h3>What you can track</h3></div>
         @foreach([
-            ['Performance','Clicks, conversions, earnings & conversion rate over time.','performance','#f97316','var(--orange-soft)'],
+            ['Performance','Clicks, conversions, earnings & conversion rate over time.','performance','#16a34a','var(--orange-soft)'],
             ['Campaign Performance','See which campaigns convert and earn the most.','campaigns','#2563eb','var(--blue-soft)'],
             ['Audience Insights','Demographics, locations, interests & devices.','audience','#7c3aed','#ede9fe'],
             ['Content Metrics','Top content by views, clicks & engagement.','content','#16a34a','#dcfce7'],
@@ -29,7 +29,7 @@
                 <p>Data refreshes continuously, so the numbers you see reflect your latest activity.</p>
             </div>
         </div>
-        <div class="an-panel" style="background:var(--orange-soft); border-color:#ffe2cd; text-align:center;">
+        <div class="an-panel" style="background:var(--orange-soft); border-color:#c9ecd4; text-align:center;">
             <h3 style="margin-bottom:6px;">Ready to dive in?</h3>
             <p style="font-size:13px; color:var(--text); margin-bottom:14px;">Start with your performance overview.</p>
             <a href="{{ route('influencer.analytics.performance') }}" style="display:inline-block; background:var(--orange); color:#fff; padding:11px 22px; border-radius:11px; font-family:var(--ff); font-weight:700; font-size:13.5px;">View Performance</a>

@@ -8,12 +8,12 @@
     $vals = $daily->pluck('clicks'); $max = max(1, $vals->max()); $n = max(1, $vals->count()-1);
     $pts = $vals->values()->map(fn($v,$i) => round(30+($i/$n)*520,1).','.round(170-($v/$max)*140,1))->implode(' ');
     // channel donut
-    $chanColors = ['#f97316','#2563eb','#16a34a','#fbbf24','#7c3aed'];
+    $chanColors = ['#16a34a','#2563eb','#16a34a','#4ade80','#7c3aed'];
     $acc = 0; $chanStops = []; $ci = 0;
     foreach($channels as $name => $pct){ $chanStops[] = $chanColors[$ci%5].' '.$acc.'% '.($acc+$pct).'%'; $acc += $pct; $ci++; }
     if($acc < 100) $chanStops[] = '#e7ebf2 '.$acc.'% 100%';
     // device donut
-    $devColors = ['mobile'=>'#f97316','desktop'=>'#2563eb','tablet'=>'#16a34a'];
+    $devColors = ['mobile'=>'#16a34a','desktop'=>'#2563eb','tablet'=>'#16a34a'];
     $acc2 = 0; $devStops = [];
     foreach($devices as $k => $v){ $devStops[] = ($devColors[$k] ?? '#999').' '.$acc2.'% '.($acc2+$v).'%'; $acc2 += $v; }
     // clicks vs conversions bars (last 6 points)
@@ -34,7 +34,7 @@
     <div class="an-tile"><div class="top"><span class="ic" style="background:var(--blue-soft);color:var(--blue);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11a3 3 0 1 0 6 0 3 3 0 0 0-6 0z"/><path d="M17.7 17.7 22 22"/><path d="M2 12a10 10 0 1 0 10-10"/></svg></span><span class="lbl">Total Clicks</span></div><div class="v">{{ $fmt($totals['clicks']) }}</div><div class="tr">↑ Last 30 days</div></div>
     <div class="an-tile"><div class="top"><span class="ic" style="background:#dcfce7;color:#16a34a;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span><span class="lbl">Conversions</span></div><div class="v">{{ $fmt($totals['conversions']) }}</div><div class="tr">↑ Last 30 days</div></div>
     <div class="an-tile"><div class="top"><span class="ic" style="background:var(--orange-soft);color:var(--orange);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span class="lbl">Total Earnings</span></div><div class="v">${{ $fmt($totals['earnings']) }}</div><div class="tr">↑ Last 30 days</div></div>
-    <div class="an-tile"><div class="top"><span class="ic" style="background:#fef3c7;color:#d97706;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span class="lbl">Conversion Rate</span></div><div class="v">{{ $totals['conversion_rate'] }}%</div><div class="tr">↑ Last 30 days</div></div>
+    <div class="an-tile"><div class="top"><span class="ic" style="background:#dcfce7;color:#15803d;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span class="lbl">Conversion Rate</span></div><div class="v">{{ $totals['conversion_rate'] }}%</div><div class="tr">↑ Last 30 days</div></div>
 </div>
 
 <div class="an-grid-2">
@@ -42,8 +42,8 @@
         <div class="an-panel-head"><h3>Performance Overview</h3><span class="tag">Clicks · Last 30 days</span></div>
         <svg class="an-chart" viewBox="0 0 560 190" preserveAspectRatio="none">
             @for($i=0;$i<=4;$i++)<line x1="30" y1="{{ 30+$i*35 }}" x2="550" y2="{{ 30+$i*35 }}" stroke="var(--line)" stroke-width="1"/>@endfor
-            <polyline fill="rgba(249,115,22,0.08)" stroke="none" points="30,170 {{ $pts }} 550,170"/>
-            <polyline fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="{{ $pts }}"/>
+            <polyline fill="rgba(22,163,74,0.08)" stroke="none" points="30,170 {{ $pts }} 550,170"/>
+            <polyline fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="{{ $pts }}"/>
             @foreach([0, intdiv($n,3), intdiv(2*$n,3), $n] as $i)<text class="an-axis" x="{{ 30+($i/$n)*520 }}" y="186" text-anchor="middle">{{ $daily[$i]->date->format('M j') }}</text>@endforeach
         </svg>
     </div>
@@ -76,10 +76,10 @@
         <div class="an-panel-head"><h3>Clicks vs Conversions</h3></div>
         <div class="an-bars">
             @foreach($barData as $d)
-                <div class="col"><div class="bar"><i style="height:{{ max(3,(int)($d->conversions/$barMax*120)) }}px; background:#fbbf24;"></i><i style="height:{{ max(3,(int)($d->clicks/$barMax*120)) }}px; background:#f97316;"></i></div><span class="x">{{ $d->date->format('M j') }}</span></div>
+                <div class="col"><div class="bar"><i style="height:{{ max(3,(int)($d->conversions/$barMax*120)) }}px; background:#4ade80;"></i><i style="height:{{ max(3,(int)($d->clicks/$barMax*120)) }}px; background:#16a34a;"></i></div><span class="x">{{ $d->date->format('M j') }}</span></div>
             @endforeach
         </div>
-        <div style="display:flex; gap:16px; margin-top:10px; font-size:11.5px; color:var(--muted);"><span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#f97316;"></span> Clicks</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#fbbf24;"></span> Conversions</span></div>
+        <div style="display:flex; gap:16px; margin-top:10px; font-size:11.5px; color:var(--muted);"><span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#16a34a;"></span> Clicks</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#4ade80;"></span> Conversions</span></div>
     </div>
     <div class="an-panel">
         <div class="an-panel-head"><h3>Device Breakdown</h3></div>

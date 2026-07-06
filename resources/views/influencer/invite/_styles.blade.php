@@ -61,7 +61,8 @@
     .iv-rail-list .it svg { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; }
     .iv-rail-cta { display: inline-flex; align-items: center; justify-content: center; gap: 7px; width: 100%; margin-top: 12px; padding: 10px; border: 1.5px solid var(--orange); border-radius: 10px; color: var(--orange-dark); font-family: var(--ff); font-weight: 700; font-size: 13px; }
     .iv-rail-cta:hover { background: var(--orange); color: #fff; }
-    .iv-rail-soft { background: var(--orange-soft); border-color: #ffe2cd; }
+    .iv-rail-cta svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .iv-rail-soft { background: var(--orange-soft); border-color: #c9ecd4; }
 
     /* how-you-earn list */
     .iv-earn-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
@@ -94,7 +95,7 @@
     .iv-stories { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
     @media (max-width: 900px) { .iv-stories { grid-template-columns: 1fr; } }
     .iv-story { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); }
-    .iv-story .stars { color: #fbbf24; font-size: 14px; letter-spacing: 1px; }
+    .iv-story .stars { color: #4ade80; font-size: 14px; letter-spacing: 1px; }
     .iv-story p { font-size: 13.5px; color: var(--text); line-height: 1.6; margin: 10px 0 16px; }
     .iv-story .who { display: flex; align-items: center; gap: 11px; }
     .iv-story .av { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--ff); font-weight: 700; color: #fff; font-size: 14px; }

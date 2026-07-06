@@ -42,10 +42,11 @@
     .bt-rail-list .it svg { width: 15px; height: 15px; color: var(--orange); flex-shrink: 0; margin-top: 1px; }
     .bt-rail-cta { display: inline-flex; align-items: center; gap: 7px; margin-top: 12px; width: 100%; justify-content: center; padding: 10px; border: 1.5px solid var(--orange); border-radius: 10px; color: var(--orange-dark); font-family: var(--ff); font-weight: 700; font-size: 13px; }
     .bt-rail-cta:hover { background: var(--orange); color: #fff; }
-    .bt-rail-soft { background: var(--orange-soft); border-color: #ffe2cd; }
+    .bt-rail-cta svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .bt-rail-soft { background: var(--orange-soft); border-color: #c9ecd4; }
 
     /* progress + current-tier hero */
-    .bt-hero { background: linear-gradient(135deg, var(--orange-soft), #fff); border: 1px solid #ffe2cd; border-radius: var(--radius); padding: 24px; display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
+    .bt-hero { background: linear-gradient(135deg, var(--orange-soft), #fff); border: 1px solid #c9ecd4; border-radius: var(--radius); padding: 24px; display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
     .bt-hero-main { flex: 1; min-width: 240px; }
     .bt-hero-flag { display: inline-block; background: var(--orange); color: #fff; font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
     .bt-hero-main h2 { font-family: var(--ff); font-size: 26px; font-weight: 800; color: var(--ink); }

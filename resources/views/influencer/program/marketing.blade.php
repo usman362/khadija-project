@@ -5,7 +5,7 @@
 @php
     $banners = [
         ['Leaderboard Banner', '728 × 90', '#2563eb', 'Great for blog headers and website tops.'],
-        ['Square Post', '1080 × 1080', '#f97316', 'Perfect for Instagram & Facebook feeds.'],
+        ['Square Post', '1080 × 1080', '#16a34a', 'Perfect for Instagram & Facebook feeds.'],
         ['Story / Reel', '1080 × 1920', '#7c3aed', 'Vertical format for Stories and Reels.'],
     ];
     $swipes = [
@@ -62,7 +62,7 @@
     <div class="pg-panel">
         <h3>Brand Assets</h3>
         <p class="sub">Logos and brand guidelines for on-brand promotion.</p>
-        @foreach([['GigResource Logo (PNG)', 'Full-colour logo on transparent background', '#0f172a'],['Logo Mark', 'Icon-only mark for avatars & favicons', '#f97316'],['Brand Guidelines', 'Colours, fonts and usage rules (PDF)', '#2563eb']] as [$t,$d,$c])
+        @foreach([['GigResource Logo (PNG)', 'Full-colour logo on transparent background', '#0f172a'],['Logo Mark', 'Icon-only mark for avatars & favicons', '#16a34a'],['Brand Guidelines', 'Colours, fonts and usage rules (PDF)', '#2563eb']] as [$t,$d,$c])
             <div style="display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--line);">
                 <span style="width:40px; height:40px; border-radius:10px; background:{{ $c }}1a; color:{{ $c }}; display:flex; align-items:center; justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
                 <div style="flex:1;"><b style="font-family:var(--ff); font-size:13px; color:var(--ink); display:block;">{{ $t }}</b><span style="font-size:11.5px; color:var(--muted);">{{ $d }}</span></div>

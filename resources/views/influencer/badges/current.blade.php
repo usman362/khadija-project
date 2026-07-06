@@ -29,7 +29,7 @@
             <div class="bt-stat"><div class="l"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Total Referrals</div><div class="v">{{ $influencer->total_referrals }}</div></div>
             <div class="bt-stat"><div class="l"><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg> Commission Rate</div><div class="v orange">{{ $ct['rate'] }}%</div></div>
             <div class="bt-stat"><div class="l"><svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><polygon points="12 2 15 9 22 9.3 16.5 14 18.5 21 12 17 5.5 21 7.5 14 2 9.3 9 9"/></svg> Next Tier</div><div class="v">{{ $nextTier ? $nextTier['label'] : 'Maxed!' }}</div></div>
-            <div class="bt-stat"><div class="l"><svg viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Total Earned</div><div class="v">${{ number_format($influencer->total_earnings, 0) }}</div></div>
+            <div class="bt-stat"><div class="l"><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Total Earned</div><div class="v">${{ number_format($influencer->total_earnings, 0) }}</div></div>
         </div>
 
         {{-- progress --}}
@@ -63,7 +63,7 @@
             <div class="bt-panel" style="margin-top:0;">
                 <h3 style="font-size:15px;">How to Earn More</h3>
                 <div style="margin-top:12px;">
-                    @foreach([['Refer a new member','+'.$ct['rate'].'% commission','#2563eb'],['Promote an event','More reach','#7c3aed'],['Share quality content','Higher engagement','#16a34a'],['Reach the next tier','Higher rates','#f97316']] as [$t,$v,$c])
+                    @foreach([['Refer a new member','+'.$ct['rate'].'% commission','#2563eb'],['Promote an event','More reach','#7c3aed'],['Share quality content','Higher engagement','#16a34a'],['Reach the next tier','Higher rates','#16a34a']] as [$t,$v,$c])
                         <div style="display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--line);">
                             <div style="width:8px;height:8px;border-radius:50%;background:{{ $c }};flex-shrink:0;"></div>
                             <div style="flex:1;font-size:13px;color:var(--ink);">{{ $t }}</div>

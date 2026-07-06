@@ -16,7 +16,7 @@
     <div class="sub">Built for creators, planners, and connectors in the events space.</div>
     <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:10px;">
         @foreach([
-            ['Earn Commissions','#f97316','var(--orange-soft)','Up to 12.5% on every successful referral, paid reliably.'],
+            ['Earn Commissions','#16a34a','var(--orange-soft)','Up to 12.5% on every successful referral, paid reliably.'],
             ['Easy Tracking','#2563eb','var(--blue-soft)','Real-time clicks, signups, and earnings in your portal.'],
             ['Climb Tiers','#7c3aed','#ede9fe','Refer more to unlock higher rates and exclusive perks.'],
         ] as [$t,$c,$bg,$d])

@@ -2,7 +2,7 @@
 @section('title', 'Featured Articles')
 @push('styles') @include('influencer.resources._styles') @endpush
 
-@php $colors = ['#f97316','#2563eb','#7c3aed','#16a34a','#db2777','#0891b2']; @endphp
+@php $colors = ['#16a34a','#2563eb','#7c3aed','#16a34a','#db2777','#0891b2']; @endphp
 @section('content')
 <div class="rs-head" style="margin-bottom:18px;"><h1>Featured Articles</h1><p>Practical reads and expert tips to grow your influence and earnings.</p></div>
 

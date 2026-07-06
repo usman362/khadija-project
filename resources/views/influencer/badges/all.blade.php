@@ -20,7 +20,7 @@
 <div class="ipx-breadcrumb"><a href="{{ route('influencer.badges.current') }}">Badges &amp; Tiers</a> <span class="sep">›</span> All Badges</div>
 <div class="bt-head" style="display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:10px;">
     <div><h1>All Badges</h1><p>Hit milestones to unlock achievement badges and show off your progress.</p></div>
-    <div style="background:var(--orange-soft); border:1px solid #ffe2cd; border-radius:12px; padding:10px 16px; font-family:var(--ff); font-weight:700; color:var(--orange-dark); font-size:14px;">{{ $earned }} / {{ count($badges) }} earned</div>
+    <div style="background:var(--orange-soft); border:1px solid #c9ecd4; border-radius:12px; padding:10px 16px; font-family:var(--ff); font-weight:700; color:var(--orange-dark); font-size:14px;">{{ $earned }} / {{ count($badges) }} earned</div>
 </div>
 
 <div class="bt-badges" style="margin-top:22px;">

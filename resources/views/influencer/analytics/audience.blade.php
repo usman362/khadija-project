@@ -5,7 +5,7 @@
 @php
     $fmt = fn ($n) => $n >= 1000000 ? round($n/1000000,1).'M' : ($n >= 1000 ? round($n/1000,1).'K' : number_format($n));
     $female = $gender['female'] ?? 50;
-    $devColors = ['mobile'=>'#f97316','desktop'=>'#2563eb','tablet'=>'#16a34a'];
+    $devColors = ['mobile'=>'#16a34a','desktop'=>'#2563eb','tablet'=>'#16a34a'];
     $acc=0; $devStops=[]; foreach($devices as $k=>$v){ $devStops[]=($devColors[$k]??'#999').' '.$acc.'% '.($acc+$v).'%'; $acc+=$v; }
     // growth chart (views)
     $vals = $daily->pluck('views'); $max = max(1,$vals->max()); $n = max(1,$vals->count()-1);
@@ -31,17 +31,17 @@
         <div class="an-panel-head"><h3>Audience Growth</h3><span class="tag">Views · 30 days</span></div>
         <svg class="an-chart" viewBox="0 0 560 190" preserveAspectRatio="none" style="height:180px;">
             @for($i=0;$i<=4;$i++)<line x1="30" y1="{{ 30+$i*35 }}" x2="550" y2="{{ 30+$i*35 }}" stroke="var(--line)" stroke-width="1"/>@endfor
-            <polyline fill="rgba(249,115,22,0.08)" stroke="none" points="30,170 {{ $pts }} 550,170"/>
-            <polyline fill="none" stroke="#f97316" stroke-width="2.5" stroke-linejoin="round" points="{{ $pts }}"/>
+            <polyline fill="rgba(22,163,74,0.08)" stroke="none" points="30,170 {{ $pts }} 550,170"/>
+            <polyline fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linejoin="round" points="{{ $pts }}"/>
         </svg>
     </div>
     <div class="an-panel">
         <div class="an-panel-head"><h3>Demographics</h3></div>
         <div style="display:flex; align-items:center; gap:18px; margin-bottom:14px;">
-            <div class="an-donut" style="width:120px;height:120px; background: conic-gradient(#7c3aed 0% {{ $female }}%, #f97316 {{ $female }}% 100%);"><div class="an-donut-c"><b>{{ $female }}%</b><span>Female</span></div></div>
+            <div class="an-donut" style="width:120px;height:120px; background: conic-gradient(#7c3aed 0% {{ $female }}%, #16a34a {{ $female }}% 100%);"><div class="an-donut-c"><b>{{ $female }}%</b><span>Female</span></div></div>
             <div style="font-size:13px;">
                 <div style="display:flex; align-items:center; gap:7px; margin-bottom:8px;"><span style="width:9px;height:9px;border-radius:50%;background:#7c3aed;"></span> Female {{ $female }}%</div>
-                <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#f97316;"></span> Male {{ $gender['male'] ?? (100-$female) }}%</div>
+                <div style="display:flex; align-items:center; gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:#16a34a;"></span> Male {{ $gender['male'] ?? (100-$female) }}%</div>
             </div>
         </div>
         @foreach($age as $band => $pct)

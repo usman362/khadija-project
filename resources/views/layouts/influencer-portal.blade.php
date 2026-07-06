@@ -75,7 +75,10 @@
     <style>
         *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
-            --orange: #f97316; --orange-dark: #ea580c; --orange-soft: #fff3ea;
+            /* Influencer brand accent = GREEN (per Peter). Var names kept as
+               --orange* to avoid churn across the many views; values are green. */
+            --orange: #16a34a; --orange-dark: #15803d; --orange-soft: #ecfdf3;
+            --green: #16a34a; --green-dark: #15803d; --green-soft: #ecfdf3;
             --blue: #2563eb; --blue-soft: #eaf1ff;
             --ink: #0f1b35; --text: #3b4760; --muted: #7a879c; --line: #eef1f6;
             --bg: #f6f8fc; --card: #ffffff;
@@ -118,7 +121,7 @@
         .ipx-sub a.active::before { background: var(--orange); }
 
         .ipx-help {
-            margin: 10px 14px 16px; background: var(--orange-soft); border: 1px solid #ffe2cd;
+            margin: 10px 14px 16px; background: var(--orange-soft); border: 1px solid #c9ecd4;
             border-radius: 14px; padding: 16px; flex-shrink: 0;
         }
         .ipx-help h4 { font-family: var(--ff); font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }

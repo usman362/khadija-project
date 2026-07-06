@@ -49,7 +49,7 @@
             <div class="iv-rail-list">
                 <div class="it"><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg> Lead with value, not the link</div>
                 <div class="it"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg> Be consistent &amp; authentic</div>
-                <div class="it"><svg viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg> Use a clear call-to-action</div>
+                <div class="it"><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg> Use a clear call-to-action</div>
             </div>
         </div>
     </div>

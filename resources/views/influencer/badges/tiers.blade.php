@@ -57,7 +57,7 @@
                     <b>Stay Active</b><span>Consistency keeps you climbing.</span>
                 </div>
                 <div>
-                    <div class="bt-lu-ic" style="background:#fef3c7; color:#d97706;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 9 22 9.3 16.5 14 18.5 21 12 17 5.5 21 7.5 14 2 9.3 9 9"/></svg></div>
+                    <div class="bt-lu-ic" style="background:#dcfce7; color:#15803d;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 9 22 9.3 16.5 14 18.5 21 12 17 5.5 21 7.5 14 2 9.3 9 9"/></svg></div>
                     <b>Earn Badges</b><span>Hit milestones for special badges.</span>
                 </div>
             </div>

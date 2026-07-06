@@ -3,7 +3,7 @@
 @push('styles') @include('influencer.program._styles') @endpush
 
 @php
-    $avatarColors = ['#f97316','#2563eb','#7c3aed','#16a34a','#db2777','#0891b2','#ca8a04'];
+    $avatarColors = ['#16a34a','#2563eb','#7c3aed','#16a34a','#db2777','#0891b2','#ca8a04'];
     $chalIcons = [
         'bolt'   => '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
         'trophy' => '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
@@ -16,7 +16,7 @@
 
 @if($myRank)
 <div class="pg-tiles" style="grid-template-columns:repeat(3,minmax(0,1fr));">
-    <div class="pg-tile"><div class="ic" style="background:#fef3c7;color:#b45309;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/><path d="M4 22h16"/></svg></div><div class="v">#{{ $myRank }}</div><div class="l">Your Rank</div></div>
+    <div class="pg-tile"><div class="ic" style="background:#dcfce7;color:#b45309;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/><path d="M4 22h16"/></svg></div><div class="v">#{{ $myRank }}</div><div class="l">Your Rank</div></div>
     <div class="pg-tile"><div class="ic" style="background:var(--orange-soft);color:var(--orange);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="v">{{ $influencer->total_referrals }}</div><div class="l">Your Referrals</div></div>
     <div class="pg-tile"><div class="ic" style="background:#ede9fe;color:#7c3aed;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div><div class="v" style="text-transform:capitalize;">{{ $influencer->commission_tier->label() }}</div><div class="l">Your Tier{{ $nextTier ? ' · '.$toNextTier.' to '.$nextTier['label'] : '' }}</div></div>
 </div>

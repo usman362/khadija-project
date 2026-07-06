@@ -3,7 +3,7 @@
 @push('styles') @include('influencer.program._styles') @endpush
 
 @php
-    $srcColors = ['social'=>'#2563eb','email'=>'#f97316','website'=>'#7c3aed','direct'=>'#16a34a'];
+    $srcColors = ['social'=>'#2563eb','email'=>'#16a34a','website'=>'#7c3aed','direct'=>'#16a34a'];
     $srcTotal = $bySource->sum();
 @endphp
 
@@ -13,7 +13,7 @@
 <div class="pg-tiles">
     <div class="pg-tile"><div class="ic" style="background:var(--orange-soft);color:var(--orange);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></div><div class="v">{{ $totals['count'] }}</div><div class="l">Total Referrals</div></div>
     <div class="pg-tile"><div class="ic" style="background:#dcfce7;color:#16a34a;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="v">{{ $totals['converted'] }}</div><div class="l">Converted</div></div>
-    <div class="pg-tile"><div class="ic" style="background:#fef3c7;color:#b45309;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="v">{{ $totals['pending_count'] }}</div><div class="l">Pending</div></div>
+    <div class="pg-tile"><div class="ic" style="background:#dcfce7;color:#b45309;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="v">{{ $totals['pending_count'] }}</div><div class="l">Pending</div></div>
     <div class="pg-tile"><div class="ic" style="background:var(--blue-soft);color:var(--blue);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="v">${{ number_format($totals['total'], 0) }}</div><div class="l">Commission Earned</div></div>
 </div>
 

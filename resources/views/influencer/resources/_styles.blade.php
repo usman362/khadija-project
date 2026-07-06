@@ -2,7 +2,7 @@
     .rs-head h1 { font-family: var(--ff); font-size: 26px; font-weight: 800; color: var(--ink); }
     .rs-head p { font-size: 14px; color: var(--muted); margin-top: 4px; }
 
-    .rs-hero { display: flex; align-items: center; justify-content: space-between; gap: 20px; background: linear-gradient(135deg, var(--orange-soft), #fff); border: 1px solid #ffe2cd; border-radius: var(--radius); padding: 26px; margin-bottom: 20px; flex-wrap: wrap; }
+    .rs-hero { display: flex; align-items: center; justify-content: space-between; gap: 20px; background: linear-gradient(135deg, var(--orange-soft), #fff); border: 1px solid #c9ecd4; border-radius: var(--radius); padding: 26px; margin-bottom: 20px; flex-wrap: wrap; }
     .rs-hero h2 { font-family: var(--ff); font-size: 24px; font-weight: 800; color: var(--ink); }
     .rs-hero p { font-size: 13.5px; color: var(--text); margin: 7px 0 14px; max-width: 48ch; line-height: 1.55; }
     .rs-hero a.cta { display: inline-flex; align-items: center; gap: 7px; background: var(--orange); color: #fff; padding: 11px 20px; border-radius: 11px; font-family: var(--ff); font-weight: 700; font-size: 13.5px; }

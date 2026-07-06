@@ -50,7 +50,7 @@
     .dx-list-main b { font-family: var(--ff); font-size: 13.5px; font-weight: 600; color: var(--ink); display: block; }
     .dx-list-main span { font-size: 12px; color: var(--muted); }
     .dx-pill { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
-    .dx-pill-green { background: #dcfce7; color: #16a34a; } .dx-pill-amber { background: #fef3c7; color: #d97706; }
+    .dx-pill-green { background: #dcfce7; color: #16a34a; } .dx-pill-amber { background: #dcfce7; color: #15803d; }
     .dx-pill-gray { background: #eef1f6; color: #7a879c; } .dx-pill-blue { background: var(--blue-soft); color: var(--blue); }
 
     .dx-empty { text-align: center; padding: 26px 10px; color: var(--muted); font-size: 13px; }
@@ -65,7 +65,7 @@
     .dx-quick a:hover { background: #f5f7fb; color: var(--ink); }
     .dx-quick a svg { width: 18px; height: 18px; color: var(--orange); }
 
-    .dx-cta { background: var(--orange-soft); border: 1px solid #ffe2cd; border-radius: var(--radius); padding: 20px; text-align: center; margin-bottom: 18px; }
+    .dx-cta { background: var(--orange-soft); border: 1px solid #c9ecd4; border-radius: var(--radius); padding: 20px; text-align: center; margin-bottom: 18px; }
     .dx-cta h4 { font-family: var(--ff); font-size: 15px; font-weight: 700; color: var(--ink); }
     .dx-cta p { font-size: 12.5px; color: var(--text); margin: 6px 0 12px; }
     .dx-cta a { display: inline-block; background: var(--orange); color: #fff; padding: 9px 18px; border-radius: 10px; font-family: var(--ff); font-weight: 700; font-size: 13px; }
@@ -104,9 +104,9 @@
 </div>
 
 @if(!$influencer->isApproved())
-    <div class="dx-panel" style="border-color:#ffe2cd; background:var(--orange-soft);">
+    <div class="dx-panel" style="border-color:#c9ecd4; background:var(--orange-soft);">
         <div style="display:flex; align-items:center; gap:12px;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             <div><b style="font-family:var(--ff); color:var(--ink);">Application under review</b><div style="font-size:12.5px; color:var(--text);">You'll get your referral link and full earnings access once an admin approves your account.</div></div>
         </div>
     </div>
@@ -149,8 +149,8 @@
                     @for($i=0;$i<=4;$i++)<line x1="30" y1="{{ 30 + $i*35 }}" x2="550" y2="{{ 30 + $i*35 }}"/>@endfor
                 </g>
                 @if($series->sum() > 0)
-                    <polyline fill="rgba(249,115,22,0.08)" stroke="none" points="30,170 {{ $pts }} 550,170"/>
-                    <polyline fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="{{ $pts }}"/>
+                    <polyline fill="rgba(22,163,74,0.08)" stroke="none" points="30,170 {{ $pts }} 550,170"/>
+                    <polyline fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="{{ $pts }}"/>
                 @endif
                 @foreach($series->keys() as $i => $label)
                     <text class="dx-axis" x="{{ 30 + ($i/$n)*520 }}" y="186" text-anchor="middle">{{ $label }}</text>
