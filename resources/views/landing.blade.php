@@ -27,8 +27,8 @@
     .lp-role-blue { background: linear-gradient(150deg, #3b82f6, #1d4ed8); }
     .lp-role-orange { background: linear-gradient(150deg, #fb923c, #ea580c); }
     .lp-role-img { position: absolute; right: -8px; top: -8px; width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,0.35); }
-    .lp-role h3 { color: #fff; font-size: 17px; font-weight: 800; margin-bottom: 6px; max-width: 130px; }
-    .lp-role p { font-size: 12.5px; color: rgba(255,255,255,0.9); line-height: 1.45; margin: 0; max-width: 150px; }
+    .lp-role h3 { color: #fff; font-size: 17px; font-weight: 800; margin-bottom: 6px; padding-right: 84px; }
+    .lp-role p { font-size: 12.5px; color: rgba(255,255,255,0.9); line-height: 1.45; margin: 0; padding-right: 84px; }
     .lp-role .lp-role-btn { margin-top: auto; display: inline-flex; align-items: center; gap: 6px; background: #fff; color: var(--ink); font-weight: 800; font-size: 13px; padding: 9px 15px; border-radius: 9px; align-self: flex-start; }
     .lp-role-orange .lp-role-btn { color: var(--orange-dark); }
     .lp-role-blue .lp-role-btn { color: var(--blue-dark); }
