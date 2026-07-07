@@ -68,16 +68,83 @@
     .gc-gen-btn:disabled { opacity: .6; cursor: not-allowed; }
     .gc-err { display: none; margin-top: 12px; padding: 10px 14px; background: rgba(220,38,38,.1); border: 1px solid rgba(220,38,38,.3); color: #dc2626; border-radius: 10px; font-size: 12.5px; }
     .gc-err.on { display: block; }
+    /* Help Me Plan — editable capacity figure inside a stat card */
+    .gc-edit { width: 100%; max-width: 130px; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-body, var(--bg-card)); color: var(--text-primary); font-size: 22px; font-weight: 800; font-family: inherit; }
+    .gc-edit:focus { outline: none; border-color: var(--gc); box-shadow: 0 0 0 3px rgba(14,165,233,.15); }
+    .gc-mano { margin-top: 4px; }
+    .gc-note { font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin-top: 4px; }
     @media (max-width: 700px) { .gc-form-grid { grid-template-columns: 1fr; } }
 </style>
 @endpush
 
 @section('content')
-<div class="gc">
-    {{-- Compute form --}}
+@php
+    $level = $level ?? 'maximum';
+    $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
+    $lvlMeta = [
+        'manual'  => ['Do It Myself', '#64748b', 'Enter your own room size, guests and space-per-guest — the math runs right here, no AI.'],
+        'semi'    => ['Help Me Plan', '#0ea5e9', 'AI estimates your capacity — adjust the comfort and legal figures and the score updates live.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your space and AI works out comfort, legal capacity and flow for you.'],
+    ];
+    [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
+@endphp
+<div class="gc" data-level="{{ $level }}">
+
+    {{-- Membership-level banner --}}
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
+        <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:#0284c7;text-decoration:none;">Upgrade for more AI →</a>@endunless
+    </div>
+
+    @if($isManual)
+    {{-- Do It Myself — hand-built capacity calculator, no AI, computed client-side --}}
+    <div class="gc-gen">
+        <h3>📐 Build My Capacity Estimate</h3>
+        <div class="sub">Enter your own numbers and adjust space-per-guest — the math runs right here, no AI.</div>
+        <div class="gc-form-grid">
+            <div class="gc-field">
+                <label>Room Size (sq ft)</label>
+                <input type="number" id="gcmSqft" min="20" step="1" value="2400">
+            </div>
+            <div class="gc-field">
+                <label>Layout</label>
+                <select id="gcmLayout">
+                    <option value="12">Banquet (seated dining)</option>
+                    <option value="8">Theater (rows of chairs)</option>
+                    <option value="6">Cocktail (standing / mingling)</option>
+                    <option value="10">Mixed</option>
+                </select>
+            </div>
+            <div class="gc-field">
+                <label>Space per Guest (sq ft)</label>
+                <input type="number" id="gcmPer" min="1" step="0.5" value="12">
+            </div>
+            <div class="gc-field">
+                <label>Expected Guests</label>
+                <input type="number" id="gcmGuests" min="1" max="100000" value="185">
+            </div>
+        </div>
+        <div class="gc-mano">
+            <div class="gc-stats" id="gcmStats"></div>
+            <div class="gc-card">
+                <div class="gc-card-hd"><h3>⚖️ Legal vs Comfort Capacity</h3></div>
+                <div class="gc-bars">
+                    <div class="gc-cap">
+                        <div class="gc-cap-top" id="gcmCapTop"></div>
+                        <div class="gc-track" id="gcmTrack"></div>
+                    </div>
+                    <p class="gc-note" id="gcmNote"></p>
+                </div>
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);">Want AI to estimate flow, insights and tips automatically? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:#0284c7;font-weight:700;text-decoration:none;">Upgrade →</a></div>
+        </div>
+    </div>
+    @else
+    {{-- AI planner (Help Me Plan / Coordinate It For Me) --}}
     <div class="gc-gen">
         <h3>📐 Estimate Your Capacity</h3>
-        <div class="sub">Enter your space and guest details for estimated comfort, legal capacity and flow insights.</div>
+        <div class="sub">{{ $isSemi ? 'AI estimates comfort and legal capacity — you can adjust the figures and the score recalculates.' : 'Enter your space and guest details and AI estimates comfort, legal capacity and flow insights.' }}</div>
         <form id="gcForm">
             <div class="gc-form-grid">
                 <div class="gc-field">
@@ -100,7 +167,7 @@
             </div>
             <button type="submit" class="gc-gen-btn" id="gcSubmit">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h4"/><path d="M22 12a10 10 0 1 0-8.5 9.87"/><path d="M12 6v6l4 2"/></svg>
-                Estimate Capacity
+                {{ $isSemi ? 'Suggest Capacity Plan' : 'Build My Capacity Plan' }}
             </button>
             <div class="gc-err" id="gcErr"></div>
         </form>
@@ -172,6 +239,7 @@
             </div>
         </aside>
     </div>
+    @endif
 </div>
 @endsection
 
@@ -184,6 +252,23 @@
     const submit = document.getElementById('gcSubmit');
     const errEl  = document.getElementById('gcErr');
     const csrf   = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    const LEVEL  = document.querySelector('.gc')?.dataset.level || 'maximum';
+
+    // Comfort score from guests vs comfort capacity — mirrors the server formula
+    // so "Help Me Plan" can recompute live when the user edits the figures.
+    const state = { expected: 0, comfort: 0, legal: 0 };
+    function computeScore(guests, comfort) {
+        comfort = Math.max(comfort, 1);
+        const ratio = guests / comfort;
+        let pct;
+        if (ratio <= 0.75) pct = 100;
+        else if (ratio <= 1.0) pct = Math.round(100 - ((ratio - 0.75) / 0.25) * 20);
+        else if (ratio <= 1.5) pct = Math.round(80 - ((ratio - 1.0) / 0.5) * 40);
+        else pct = Math.max(5, Math.round(40 - ((ratio - 1.5) * 30)));
+        return Math.max(0, Math.min(100, pct));
+    }
+    const scoreTone   = pct => pct >= 80 ? 'good' : (pct >= 50 ? 'warn' : '');
+    const comfortTone = (guests, comfort) => guests <= comfort ? 'good' : 'warn';
 
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -223,35 +308,81 @@
         }
     });
 
-    function render(res) {
-        // Stats
-        const stats = document.getElementById('gcStats');
-        stats.innerHTML = (res.stats || []).map(function (s) {
-            return '<div class="gc-stat ' + esc(s[2]) + '"><b>' + esc(s[1]) + '</b><div class="l">' + esc(s[0]) + '</div></div>';
-        }).join('');
+    function statCard(label, value, tone, id) {
+        return '<div class="gc-stat ' + esc(tone) + '"' + (id ? ' id="' + id + '"' : '') +
+            '><b>' + esc(value) + '</b><div class="l">' + esc(label) + '</div></div>';
+    }
+    function editStatCard(label, value, tone, capKey) {
+        return '<div class="gc-stat ' + esc(tone) + '">' +
+            '<input type="number" class="gc-edit" data-cap="' + capKey + '" min="1" value="' + esc(value) + '">' +
+            '<div class="l">' + esc(label) + '</div></div>';
+    }
 
-        // Insights
+    // Capacity bar + note — reads the current figures (edited or as-returned).
+    function renderCapacity(expected, comfort, legal) {
+        const L = Math.max(legal, 1);
+        const comfortPct  = Math.min(100, Math.round(comfort / L * 100));
+        const expectedPct = Math.min(100, Math.round(expected / L * 100));
+        document.getElementById('gcCapTop').innerHTML =
+            '<b>Your event: ' + esc(expected) + ' guests</b>' +
+            '<span>Comfort ' + esc(comfort) + ' · Legal ' + esc(legal) + '</span>';
+        document.getElementById('gcTrack').innerHTML =
+            '<i style="width:' + comfortPct + '%; background: rgba(22,163,74,.4);"></i>' +
+            '<i style="width:' + expectedPct + '%; background:#16a34a;"></i>' +
+            '<span class="gc-marker" style="left:' + comfortPct + '%;" title="Comfort"></span>';
+        const room = comfort - expected;
+        document.getElementById('gcCapNote').innerHTML = room >= 0
+            ? 'You’re <b style="color:#16a34a;">comfortably under</b> the comfort estimate — room for about ' + room + ' more guests before it feels tight.'
+            : 'You’re about <b style="color:#d97706;">' + Math.abs(room) + ' guests over</b> the comfort estimate — consider a larger space or a different seating style.';
+    }
+
+    // Help Me Plan — recompute the score + bar live when a figure is edited.
+    function onSemiEdit() {
+        const cEl = document.querySelector('.gc-edit[data-cap="comfort"]');
+        const lEl = document.querySelector('.gc-edit[data-cap="legal"]');
+        state.comfort = Math.max(parseInt(cEl?.value, 10) || 0, 0);
+        state.legal   = Math.max(parseInt(lEl?.value, 10) || 0, 0);
+        const score = computeScore(state.expected, state.comfort);
+        const scoreCard = document.getElementById('gcScoreCard');
+        if (scoreCard) {
+            scoreCard.className = 'gc-stat ' + scoreTone(score);
+            scoreCard.querySelector('b').textContent = score + '%';
+        }
+        if (cEl) cEl.closest('.gc-stat').className = 'gc-stat ' + comfortTone(state.expected, state.comfort);
+        renderCapacity(state.expected, state.comfort, state.legal);
+    }
+
+    function render(res) {
+        const cap = res.capacity || {};
+        state.expected = Number(cap.expected) || 0;
+        state.comfort  = Number(cap.comfort)  || 0;
+        state.legal    = Number(cap.legal)    || 0;
+        const score = res.comfort_score_pct != null ? res.comfort_score_pct : computeScore(state.expected, state.comfort);
+
+        // Stats — in "Help Me Plan" the comfort + legal figures are editable.
+        const stats = document.getElementById('gcStats');
+        if (LEVEL === 'semi') {
+            stats.innerHTML =
+                statCard('Expected Guests', state.expected, '') +
+                editStatCard('Recommended Capacity', state.comfort, comfortTone(state.expected, state.comfort), 'comfort') +
+                statCard('Guest Comfort Score', score + '%', scoreTone(score), 'gcScoreCard') +
+                editStatCard('Legal Capacity', state.legal, '', 'legal');
+            stats.querySelectorAll('.gc-edit').forEach(function (inp) { inp.addEventListener('input', onSemiEdit); });
+        } else {
+            stats.innerHTML =
+                statCard('Expected Guests', state.expected, '') +
+                statCard('Recommended Capacity', state.comfort, comfortTone(state.expected, state.comfort)) +
+                statCard('Guest Comfort Score', score + '%', scoreTone(score)) +
+                statCard('Legal Capacity', state.legal, '');
+        }
+
+        // Insights — the AI's qualitative read, shown read-only in both modes.
         const ins = document.getElementById('gcInsights');
         ins.innerHTML = (res.insights || []).map(function (i) {
             return '<div class="gc-in"><h6>' + esc(i[0]) + '</h6><div class="s ' + esc(i[2]) + '">' + esc(i[1]) + '</div></div>';
         }).join('');
 
-        // Capacity bar
-        const cap = res.capacity || {};
-        const legal = Math.max(cap.legal || 1, 1);
-        const comfortPct  = Math.min(100, Math.round((cap.comfort  || 0) / legal * 100));
-        const expectedPct = Math.min(100, Math.round((cap.expected || 0) / legal * 100));
-        document.getElementById('gcCapTop').innerHTML =
-            '<b>Your event: ' + esc(cap.expected) + ' guests</b>' +
-            '<span>Comfort ' + esc(cap.comfort) + ' · Legal ' + esc(cap.legal) + '</span>';
-        document.getElementById('gcTrack').innerHTML =
-            '<i style="width:' + comfortPct + '%; background: rgba(22,163,74,.4);"></i>' +
-            '<i style="width:' + expectedPct + '%; background:#16a34a;"></i>' +
-            '<span class="gc-marker" style="left:' + comfortPct + '%;" title="Comfort"></span>';
-        const room = (cap.comfort || 0) - (cap.expected || 0);
-        document.getElementById('gcCapNote').innerHTML = room >= 0
-            ? 'You’re <b style="color:#16a34a;">comfortably under</b> the comfort estimate — room for about ' + room + ' more guests before it feels tight.'
-            : 'You’re about <b style="color:#d97706;">' + Math.abs(room) + ' guests over</b> the comfort estimate — consider a larger space or a different seating style.';
+        renderCapacity(state.expected, state.comfort, state.legal);
 
         // Tips
         document.getElementById('gcTips').innerHTML = (res.tips || []).map(function (t) {
@@ -264,6 +395,53 @@
             return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
         });
     }
+})();
+
+// Do It Myself — hand-built capacity calculator (no AI, no server call).
+(function () {
+    const sqftEl   = document.getElementById('gcmSqft');
+    const layoutEl = document.getElementById('gcmLayout');
+    const perEl    = document.getElementById('gcmPer');
+    const guestsEl = document.getElementById('gcmGuests');
+    const statsEl  = document.getElementById('gcmStats');
+    const topEl    = document.getElementById('gcmCapTop');
+    const trackEl  = document.getElementById('gcmTrack');
+    const noteEl   = document.getElementById('gcmNote');
+    if (!sqftEl || !statsEl || !trackEl) return;
+
+    const scard = (label, value, tone) =>
+        '<div class="gc-stat ' + tone + '"><b>' + value + '</b><div class="l">' + label + '</div></div>';
+
+    function calc() {
+        const sqft   = Math.max(parseFloat(sqftEl.value) || 0, 0);
+        const per    = Math.max(parseFloat(perEl.value) || 1, 1);
+        const guests = Math.max(parseInt(guestsEl.value, 10) || 0, 0);
+        const comfort = Math.max(Math.floor(sqft / per), 0);
+        const legal   = Math.max(Math.floor(sqft / 7), 0); // ~7 sq ft/person life-safety rule of thumb
+        const room    = comfort - guests;
+
+        statsEl.innerHTML =
+            scard('Expected Guests', guests, '') +
+            scard('Recommended Capacity', comfort, guests <= comfort ? 'good' : 'warn') +
+            scard('Legal Capacity', legal, '');
+
+        const L = Math.max(legal, 1);
+        const comfortPct  = Math.min(100, Math.round(comfort / L * 100));
+        const expectedPct = Math.min(100, Math.round(guests / L * 100));
+        topEl.innerHTML = '<b>Your event: ' + guests + ' guests</b><span>Comfort ' + comfort + ' · Legal ' + legal + '</span>';
+        trackEl.innerHTML =
+            '<i style="width:' + comfortPct + '%; background: rgba(22,163,74,.4);"></i>' +
+            '<i style="width:' + expectedPct + '%; background:#16a34a;"></i>' +
+            '<span class="gc-marker" style="left:' + comfortPct + '%;" title="Comfort"></span>';
+        noteEl.innerHTML = room >= 0
+            ? 'Estimated room for about <b style="color:#16a34a;">' + room + ' more guests</b> before spacing feels tight (comfort estimate ' + comfort + ').'
+            : 'About <b style="color:#d97706;">' + Math.abs(room) + ' over</b> the comfort estimate of ' + comfort + ' — consider more space or a tighter layout.';
+    }
+
+    // Changing the layout seeds a typical space-per-guest the user can override.
+    layoutEl?.addEventListener('change', function () { perEl.value = layoutEl.value; calc(); });
+    [sqftEl, perEl, guestsEl].forEach(function (el) { el?.addEventListener('input', calc); });
+    calc();
 })();
 </script>
 @endpush

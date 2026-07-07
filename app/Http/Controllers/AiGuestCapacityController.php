@@ -17,8 +17,14 @@ class AiGuestCapacityController extends Controller
     {
         $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
 
+        $level = \App\Domain\AiFeatures\AiAccess::level($request->user(), 'guest-capacity');
+        if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
+            $level = $request->query('preview');
+        }
+
         return view('ai-tools.guest-capacity', [
             'aiLayout' => $aiLayout,
+            'level'    => $level,
             'stats' => [
                 ['Expected Guests', '185', ''],
                 ['Recommended Capacity', '220', 'good'],
