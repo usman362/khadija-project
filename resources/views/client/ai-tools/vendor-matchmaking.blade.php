@@ -122,9 +122,26 @@
 @endpush
 
 @section('content')
-<div class="vm" data-match-url="{{ route('ai-tools.vendor-matchmaking.match') }}" data-budget="{{ $event['budget'] }}">
+@php
+    $level = $level ?? 'maximum';
+    $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
+    $lvlMeta = [
+        'manual'  => ['Do It Myself', '#64748b', 'Browse the vendor directory and choose who you want yourself — no AI ranking.'],
+        'semi'    => ['Help Me Plan', '#8b5cf6', 'AI ranks the best-fit vendors — refine the theme, budget and match level to re-rank.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'AI auto-selects your best-fit vendor team from your event details.'],
+    ];
+    [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
+@endphp
+<div class="vm" data-match-url="{{ route('ai-tools.vendor-matchmaking.match') }}" data-budget="{{ $event['budget'] }}" data-level="{{ $level }}">
 
     @include('partials._ai_quota_badge', ['status' => $status, 'tool' => 'AI Vendor Matchmaking'])
+
+    {{-- Membership-level banner --}}
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:18px;">
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
+        <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--vm-strong);text-decoration:none;">Upgrade for more AI →</a>@endunless
+    </div>
 
     {{-- header --}}
     <div class="vm-head">
@@ -160,7 +177,7 @@
                     <div class="vm-ev-item"><div class="k">Theme:</div><div class="v" id="vm-ev-theme">{{ $event['theme'] }}</div></div>
                     <div class="vm-ev-item"><div class="k">Date:</div><div class="v">{{ $event['date'] }}</div></div>
                     <div class="vm-ev-item"><div class="k">Budget:</div><div class="v" id="vm-ev-budget">${{ number_format($event['budget']) }}</div></div>
-                    <button type="button" class="vm-ev-edit" id="vm-edit-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Edit</button>
+                    @if($isSemi)<button type="button" class="vm-ev-edit" id="vm-edit-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Edit</button>@endif
                 </div>
                 <div class="vm-edit-panel" id="vm-edit-panel">
                     <div class="fld"><label>Event Theme</label><input type="text" id="vm-in-theme" value="{{ $event['theme'] }}" maxlength="120"></div>
@@ -168,24 +185,67 @@
                 </div>
             </div>
 
+            @if($isManual)
+            {{-- Do It Myself — browse the vendor directory and pick, no AI ranking --}}
             <div class="vm-card">
-                <div class="vm-tm-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1-6.3-4.6L5.7 21l2.3-7.1-6-4.5h7.6z"/></svg><b>Top Matches For You</b></div>
+                <div class="vm-tm-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><b>Browse Vendors</b> <span style="font-size:12px;font-weight:600;color:var(--text-muted);margin-left:2px;">(<span id="vm-dir-count">{{ count($directory) }}</span>)</span></div>
+                <div id="vm-directory" style="display:flex;flex-direction:column;gap:12px;margin-top:6px;">
+                    @foreach($directory as $v)
+                    <div class="vm-match vm-dir-row" data-cat="{{ $v['category'] }}" data-price="{{ $v['price'] }}" style="margin-top:0;">
+                        <div class="vm-match-top">
+                            <span class="vm-avatar" style="background:linear-gradient(135deg, {{ $v['grad'] }});">{{ $v['initials'] }}</span>
+                            <div class="vm-match-main">
+                                <div class="vm-match-name">{{ $v['name'] }}</div>
+                                <div class="vm-stars" style="font-size:12.5px;color:var(--text-muted);">★ {{ number_format($v['rating'], 1) }} <span class="vm-reviews">({{ $v['reviews'] }} reviews)</span></div>
+                                <div class="vm-tags">@foreach($v['tags'] as $t)<span class="vm-tag">{{ $t }}</span>@endforeach</div>
+                            </div>
+                            <div class="vm-match-right"><span class="vm-match-price" style="margin-top:0;">${{ number_format($v['price']) }}</span></div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                <div class="vm-empty" id="vm-dir-empty" style="display:none;">No vendors match these filters. Try widening your budget or category.</div>
+            </div>
+            @else
+            {{-- AI matches (Help Me Plan / Coordinate It For Me) --}}
+            <div class="vm-card">
+                <div class="vm-tm-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1-6.3-4.6L5.7 21l2.3-7.1-6-4.5h7.6z"/></svg><b>{{ $isMax ? 'Your AI-Matched Team' : 'Top Matches For You' }}</b></div>
+                @if($isMax)<p style="font-size:12.5px;color:var(--text-muted);margin:2px 0 0;">AI selected these vendors automatically from your event details. Review and connect when you're ready.</p>@endif
                 <div id="vm-matches">
                     @include('client.ai-tools._vendor_matches', ['matches' => $matches])
                 </div>
                 <a class="vm-more" id="vm-more">View <span id="vm-more-count">{{ $moreCount }}</span> more matches <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
             </div>
+            @endif
         </div>
 
         {{-- RIGHT --}}
         <div class="vm-col">
+            @unless($isManual)
             <div class="vm-card">
                 <div class="vm-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><b>Match Insights</b></div>
                 <div class="vm-ins"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><div><b>We analyzed <span id="vm-ins-analyzed">{{ $analyzed }}</span>+ vendors</b><p>To find the best matches for your event.</p></div></div>
                 <div class="vm-ins"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><b>Availability Confirmed</b><p>All matched vendors are available on {{ $event['date'] }}.</p></div></div>
                 <div class="vm-ins"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span><div><b>Budget Friendly</b><p>All matches fit within your ${{ number_format($event['budget']) }} budget.</p></div></div>
             </div>
+            @endunless
 
+            @if($isManual)
+            {{-- Do It Myself — plain on-page filters (no AI, no match threshold) --}}
+            <div class="vm-card">
+                <div class="vm-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg><b>Filter Vendors</b></div>
+                <div class="vm-fld">
+                    <label>Category</label>
+                    <div class="vm-select-wrap"><select class="vm-select" id="vm-category">@foreach($categories as $k => $v)<option value="{{ $k }}">{{ $v }}</option>@endforeach</select><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+                </div>
+                <div class="vm-fld">
+                    <label>Max Budget</label>
+                    <div class="vm-select-wrap"><select class="vm-select" id="vm-budget">@foreach($budgetOptions as $k => $v)<option value="{{ $k }}" @selected($k === 0)>{{ $v }}</option>@endforeach</select><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+                </div>
+                <button type="button" class="vm-btn" id="vm-filter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Apply Filters</button>
+            </div>
+            @elseif($isSemi)
+            {{-- Help Me Plan — AI ranks; refine to re-rank --}}
             <div class="vm-card">
                 <div class="vm-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg><b>Refine Your Match</b></div>
                 <div class="vm-fld">
@@ -202,6 +262,16 @@
                 </div>
                 <button type="button" class="vm-btn" id="vm-refine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Refine Matches</button>
             </div>
+            @else
+            {{-- Coordinate It For Me — auto-matched, read-only criteria summary --}}
+            <div class="vm-card">
+                <div class="vm-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><b>Matched Automatically</b></div>
+                <p style="font-size:12.5px;color:var(--text-muted);line-height:1.55;margin:0 0 12px;">AI selected your vendors from these criteria — no tuning needed:</p>
+                <div class="vm-ins" style="padding:6px 0;"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg></span><div><b>Theme fit</b><p>{{ $event['theme'] }}</p></div></div>
+                <div class="vm-ins" style="padding:6px 0;"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span><div><b>Within budget</b><p>Under ${{ number_format($event['budget']) }}</p></div></div>
+                <div class="vm-ins" style="padding:6px 0;"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><b>Available on date</b><p>{{ $event['date'] }}</p></div></div>
+            </div>
+            @endif
 
             <div class="vm-card vm-help">
                 <div class="vm-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><b>Need More Help?</b></div>
@@ -295,12 +365,31 @@
         finally { if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.innerHTML = o; } }
     }
 
-    $('vm-min').addEventListener('input', function () { $('vm-min-lbl').textContent = this.value; });
-    $('vm-refine').addEventListener('click', function () { refine(this); });
-    $('vm-edit-btn').addEventListener('click', () => $('vm-edit-panel').classList.toggle('open'));
-    $('vm-apply-theme').addEventListener('click', function () { refine(this); });
-    $('vm-more').addEventListener('click', function (e) { e.preventDefault(); window.location.href = "{{ route('client.search.index') }}"; });
-    $('vm-save').addEventListener('click', function () { const s = this.querySelector('svg').outerHTML; this.innerHTML = s + 'Search Saved!'; });
+    // Help Me Plan — AI refine controls (only present at that level).
+    $('vm-min')?.addEventListener('input', function () { $('vm-min-lbl').textContent = this.value; });
+    $('vm-refine')?.addEventListener('click', function () { refine(this); });
+    $('vm-edit-btn')?.addEventListener('click', () => $('vm-edit-panel').classList.toggle('open'));
+    $('vm-apply-theme')?.addEventListener('click', function () { refine(this); });
+
+    // Do It Myself — filter the browsable directory on-page (no server call).
+    function applyDirFilter() {
+        const cat = $('vm-category')?.value || 'all';
+        const maxB = parseInt($('vm-budget')?.value || '0', 10);
+        let shown = 0;
+        document.querySelectorAll('.vm-dir-row').forEach((row) => {
+            const okCat = cat === 'all' || row.dataset.cat === cat;
+            const okBudget = maxB === 0 || parseInt(row.dataset.price, 10) <= maxB;
+            const show = okCat && okBudget;
+            row.style.display = show ? '' : 'none';
+            if (show) shown++;
+        });
+        if ($('vm-dir-count')) $('vm-dir-count').textContent = shown;
+        if ($('vm-dir-empty')) $('vm-dir-empty').style.display = shown ? 'none' : '';
+    }
+    $('vm-filter')?.addEventListener('click', applyDirFilter);
+
+    $('vm-more')?.addEventListener('click', function (e) { e.preventDefault(); window.location.href = "{{ route('client.search.index') }}"; });
+    $('vm-save')?.addEventListener('click', function () { const s = this.querySelector('svg').outerHTML; this.innerHTML = s + 'Search Saved!'; });
 })();
 </script>
 @endsection

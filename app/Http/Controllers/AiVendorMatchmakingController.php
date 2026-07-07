@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\AiFeatures\AiAccess;
 use App\Domain\AiFeatures\AiFeatureCode;
 use App\Domain\AiFeatures\Services\AiFeatureGate;
 use Illuminate\Http\JsonResponse;
@@ -62,17 +63,59 @@ class AiVendorMatchmakingController extends Controller
         $event = ['theme' => 'Tropical Beach Party', 'date' => 'May 24, 2025', 'budget' => 1000];
 
         $all     = $this->rank($this->keywords($event['theme']), 'all', $event['budget'], 80);
-        $matches = array_slice($all, 0, 3);
+
+        // Level drives the experience: Do It Myself (browse the directory and
+        // pick), Help Me Plan (AI ranks, you refine), Coordinate It For Me (AI
+        // auto-picks the team, read-only). Admins can preview any level.
+        $level = AiAccess::level($request->user(), 'vendor-matchmaking');
+        if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
+            $level = $request->query('preview');
+        }
+
+        // Maximum curates a fuller done-for-you shortlist; Semi shows the top 3.
+        $topN    = $level === 'maximum' ? 5 : 3;
+        $matches = array_slice($all, 0, $topN);
 
         return view('client.ai-tools.vendor-matchmaking', [
             'event'         => $event,
             'matches'       => $matches,
-            'moreCount'     => max(0, count($all) - 3),
+            'moreCount'     => max(0, count($all) - $topN),
             'analyzed'      => count(self::VENDORS),
             'categories'    => $this->categoryList(),
             'budgetOptions' => self::MAX_BUDGET_OPTIONS,
+            'level'         => $level,
+            'directory'     => $this->directory(),
             'status'        => $this->gate->status($request->user(), AiFeatureCode::VENDOR_MATCHMAKING),
         ]);
+    }
+
+    /**
+     * The full vendor catalogue formatted for manual (Do It Myself) browsing —
+     * no match score, no "why matched": the client filters and picks for
+     * themselves. Carries the fields the directory cards + client-side filter
+     * need (category + price power the on-page filtering).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function directory(): array
+    {
+        $rows = [];
+        foreach (self::VENDORS as [$name, $cat, $tags, $price, $rating, $reviews, $themes, $base, $why, $grad]) {
+            $rows[] = [
+                'name'     => $name,
+                'category' => $cat,
+                'tags'     => $tags,
+                'price'    => $price,
+                'rating'   => $rating,
+                'reviews'  => $reviews,
+                'grad'     => preg_match('/^#[0-9a-fA-F]{6},#[0-9a-fA-F]{6}$/', $grad) ? $grad : '#8b5cf6,#6d28d9',
+                'initials' => $this->initials($name),
+            ];
+        }
+
+        usort($rows, fn ($a, $b) => $b['rating'] <=> $a['rating']);
+
+        return $rows;
     }
 
     public function match(Request $request): JsonResponse
