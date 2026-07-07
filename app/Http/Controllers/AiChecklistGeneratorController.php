@@ -19,8 +19,14 @@ class AiChecklistGeneratorController extends Controller
     {
         $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
 
+        $level = \App\Domain\AiFeatures\AiAccess::level($request->user(), 'checklist-generator');
+        if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
+            $level = $request->query('preview');
+        }
+
         return view('ai-tools.checklist-generator', [
             'aiLayout' => $aiLayout,
+            'level'    => $level,
             'stats' => [
                 ['Event Health', '93%', 'good'], ['Days to Event', '184', ''],
                 ['Budget Remaining', '$12,450', 'good'], ['Pros Booked', '6', ''],

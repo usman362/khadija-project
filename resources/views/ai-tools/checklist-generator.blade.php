@@ -79,17 +79,48 @@
     .cg-tf-item { display: flex; align-items: center; gap: 11px; padding: 10px 16px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--text-primary); }
     .cg-tf-item:last-child { border-bottom: none; }
     .cg-tf-item .box { width: 17px; height: 17px; border-radius: 5px; border: 2px solid var(--border-color); flex-shrink: 0; }
+    /* Help Me Plan — editable task input */
+    .cg-edit { flex: 1; min-width: 0; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-body, var(--bg-card)); color: var(--text-primary); font-size: 13px; font-family: inherit; }
+    .cg-edit:focus { outline: none; border-color: var(--cg); box-shadow: 0 0 0 3px rgba(22,163,74,.14); }
     @media (max-width: 700px) { .cg-form-grid { grid-template-columns: 1fr; } }
 </style>
 @endpush
 
 @section('content')
-@php $pct = round($budget['spent'] / $budget['total'] * 100); @endphp
-<div class="cg">
-    {{-- Generator --}}
+@php
+    $level = $level ?? 'maximum';
+    $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
+    $lvlMeta = [
+        'manual'  => ['Do It Myself', '#64748b', 'Build your checklist by hand — add each task yourself, no AI plan.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'AI drafts a milestone checklist — reword any task before you use it.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and AI builds the full milestone checklist for you.'],
+    ];
+    [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
+@endphp
+<div class="cg" data-level="{{ $level }}">
+
+    {{-- Membership-level banner --}}
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
+        <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:#15803d;text-decoration:none;">Upgrade for more AI →</a>@endunless
+    </div>
+
+    @if($isManual)
+    {{-- Do It Myself — hand-built checklist, no AI --}}
+    <div class="cg-gen">
+        <h3>🧩 Build My Checklist</h3>
+        <div class="sub">Add each task yourself — name it, pick a timeframe and a due date. No AI, fully yours.</div>
+        <div id="cgmRows" style="display:flex;flex-direction:column;gap:10px;"></div>
+        <button type="button" id="cgmAdd" style="margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#15803d;background:rgba(22,163,74,.09);border:1px solid rgba(22,163,74,.28);border-radius:10px;padding:9px 15px;cursor:pointer;font-family:inherit;">+ Add task</button>
+        <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">Want the AI to build this checklist for you automatically? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:#15803d;font-weight:700;text-decoration:none;">Upgrade →</a></div>
+    </div>
+    @else
+    @php $pct = round($budget['spent'] / $budget['total'] * 100); @endphp
+    {{-- Generator (Help Me Plan / Coordinate It For Me) --}}
     <div class="cg-gen">
         <h3>🧩 Generate Your Checklist</h3>
-        <div class="sub">Enter your event details for a suggested, milestone-based planning checklist with estimated due dates.</div>
+        <div class="sub">{{ $isSemi ? 'Enter your event details and AI drafts a milestone checklist you can reword.' : 'Enter your event details and AI builds the full milestone checklist with estimated due dates.' }}</div>
         <form id="cgForm">
             <div class="cg-form-grid">
                 <div class="cg-field">
@@ -118,7 +149,7 @@
             </div>
             <button type="submit" class="cg-gen-btn" id="cgSubmit">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                Generate Checklist
+                {{ $isSemi ? 'Suggest My Checklist' : 'Build My Full Checklist' }}
             </button>
             <div class="cg-err" id="cgErr"></div>
         </form>
@@ -192,6 +223,7 @@
             </div>
         </aside>
     </div>
+    @endif
 </div>
 @endsection
 
@@ -206,6 +238,7 @@
     const out     = document.getElementById('cgOut');
     const errEl   = document.getElementById('cgErr');
     const csrf    = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    const LEVEL   = document.querySelector('.cg')?.dataset.level || 'maximum';
 
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -253,6 +286,12 @@
         wrap.innerHTML = '';
         (res.groups || []).forEach(function (g) {
             const items = (g.items || []).map(function (it) {
+                // Help Me Plan (semi) → each task is an editable input the client
+                // can reword; Coordinate It For Me (maximum) → read-only text.
+                if (LEVEL === 'semi') {
+                    return '<div class="cg-tf-item"><span class="box"></span>' +
+                        '<input type="text" class="cg-edit" value="' + esc(it) + '"></div>';
+                }
                 return '<div class="cg-tf-item"><span class="box"></span>' + esc(it) + '</div>';
             }).join('');
             const block = document.createElement('div');
@@ -269,6 +308,31 @@
             return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
         });
     }
+})();
+
+// Do It Myself — hand-built checklist (no AI, no server call).
+(function () {
+    const rows = document.getElementById('cgmRows');
+    const add  = document.getElementById('cgmAdd');
+    if (!rows || !add) return;
+    const timeframes = ['12+ weeks before', '8 weeks before', '4 weeks before', '2 weeks before', '1 week before', 'Day of'];
+    function addRow(name = '', tf = '4 weeks before', due = '') {
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;';
+        div.innerHTML =
+            '<input type="text" placeholder="Task name" class="cg-edit" style="flex:2;min-width:150px;">' +
+            '<select class="cg-edit" style="flex:0 0 auto;width:auto;">' + timeframes.map(t => '<option ' + (t === tf ? 'selected' : '') + '>' + t + '</option>').join('') + '</select>' +
+            '<input type="date" class="cg-edit" style="flex:0 0 auto;width:auto;">' +
+            '<button type="button" title="Remove" style="border:none;background:rgba(220,38,38,.1);color:#dc2626;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px;flex:0 0 auto;">&times;</button>';
+        div.querySelector('input[type="text"]').value = name;
+        div.querySelector('input[type="date"]').value = due;
+        div.querySelector('button').addEventListener('click', () => div.remove());
+        rows.appendChild(div);
+    }
+    // Seed a few common starter tasks the client can rename, retime or remove.
+    [['Set overall budget and guest list', '12+ weeks before'], ['Book venue', '12+ weeks before'], ['Book key vendors (catering, photo)', '8 weeks before'], ['Send invitations', '4 weeks before']]
+        .forEach(([n, t]) => addRow(n, t, ''));
+    add.addEventListener('click', () => addRow());
 })();
 </script>
 @endpush
