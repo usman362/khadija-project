@@ -145,9 +145,25 @@
 @endpush
 
 @section('content')
-<div class="apa"
+@php
+    $level = $level ?? 'maximum';
+    $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
+    $lvlMeta = [
+        'manual'  => ['Do It Myself', '#64748b', 'Work out your own price — a manual rate worksheet, no AI.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'AI suggests a competitive price and market context — you set the final number.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'AI analyses the market and sets your optimal price automatically.'],
+    ];
+    [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
+@endphp
+<div class="apa" data-level="{{ $level }}"
      data-calc-url="{{ route('ai-tools.pricing-assistant.calculate') }}"
      data-init='@json($result)'>
+
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card,var(--bg-secondary));border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:18px;">
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
+        <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--apa,#d97706);text-decoration:none;">Upgrade for more AI →</a>@endunless
+    </div>
 
     {{-- header --}}
     <div class="apa-head">
@@ -185,6 +201,20 @@
         <a href="{{ route('ai-tools.budget-allocator') }}" class="apa-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to AI Toolkit</a>
     </div>
 
+    @if($isManual)
+    {{-- Do It Myself — manual rate worksheet, no AI --}}
+    <div class="apa-card" style="margin-bottom:20px; max-width:520px;">
+        <div class="apa-sec-num">Your Price Worksheet</div>
+        <p class="apa-sec-sub">Work out your own quote — enter your rate, hours and any extras.</p>
+        <div class="apa-field"><label>Your Rate ($ / hour)</label><input type="number" class="apa-input" id="pm-rate" min="0" step="1" placeholder="e.g. 150"></div>
+        <div class="apa-field"><label>Hours</label><input type="number" class="apa-input" id="pm-hours" min="0" step="0.5" placeholder="e.g. 4"></div>
+        <div class="apa-field"><label>Add-ons / extras ($)</label><input type="number" class="apa-input" id="pm-addons" min="0" step="1" placeholder="e.g. 200"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:16px;border-top:1px solid var(--border-color);">
+            <span style="font-size:14px;font-weight:700;color:var(--text-secondary);">Your Price</span>
+            <span style="font-size:28px;font-weight:800;color:var(--apa-strong,#d97706);" id="pm-total">$0</span>
+        </div>
+    </div>
+    @else
     {{-- ════════ main: form + recommended ════════ --}}
     <div class="apa-main">
         {{-- form --}}
@@ -221,7 +251,7 @@
 
         {{-- recommended --}}
         <div class="apa-rec">
-            <h3>Recommended Price</h3>
+            <h3>{{ $isMax ? 'AI-Set Price' : 'Suggested Price' }}</h3>
             <div class="apa-rec-top">
                 <span class="apa-rec-price" id="apa-price">{{ $money($result['price']) }}</span>
                 <span class="apa-badge" id="apa-badge" style="background:{{ $result['badgeColor'] }}1f;color:{{ $result['badgeColor'] }};">{{ $result['badge'] }}</span>
@@ -360,12 +390,14 @@
         <span class="apa-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
         <div class="apa-banner-txt"><b>Smart Pricing. More Bookings. Higher Earnings.</b><p>Let AI do the math so you can focus on creating unforgettable events.</p></div>
     </div>
+    @endif
 </div>
 
 <script>
 (function () {
     const root = document.querySelector('.apa');
     if (!root) return;
+    if (!document.getElementById('apa-calc')) return; // Do It Myself (manual) — no AI form
     const url = root.dataset.calcUrl;
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
     const $ = (id) => document.getElementById(id);
@@ -439,6 +471,21 @@
     $('apa-recalc').addEventListener('click', function () { calculate(this); });
     $('apa-try')?.addEventListener('click', function (e) { e.preventDefault(); $('apa-calc').click(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
     syncLabels();
+})();
+
+// Do It Myself — manual price worksheet (no AI)
+(function () {
+    const rate = document.getElementById('pm-rate');
+    if (!rate) return;
+    const hours = document.getElementById('pm-hours');
+    const addons = document.getElementById('pm-addons');
+    const out = document.getElementById('pm-total');
+    function calc() {
+        const t = (parseFloat(rate.value) || 0) * (parseFloat(hours.value) || 0) + (parseFloat(addons.value) || 0);
+        out.textContent = '$' + Number(t).toLocaleString(undefined, { maximumFractionDigits: 0 });
+    }
+    [rate, hours, addons].forEach(el => el.addEventListener('input', calc));
+    calc();
 })();
 </script>
 @endsection
