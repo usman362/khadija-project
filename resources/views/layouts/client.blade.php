@@ -332,9 +332,9 @@
         }
 
         .cl-sidebar-brand .brand-logo-img {
-            height: 26px;
+            height: 34px;
             width: auto;
-            max-width: 150px;
+            max-width: 180px;
             object-fit: contain;
         }
         .cl-sidebar-brand .brand-logo-light { display: block; }
@@ -1159,7 +1159,6 @@
             <div>
                 <img src="{{ asset('gigresource-logos/gigresource-logo-dark.png') }}" alt="GigResource" class="brand-logo-img brand-logo-light">
                 <img src="{{ asset('gigresource-logos/gigresource-logo-light.png') }}" alt="GigResource" class="brand-logo-img brand-logo-dark">
-                <div class="brand-sub">Event Planner Account</div>
             </div>
         </a>
 

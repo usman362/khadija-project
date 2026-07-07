@@ -320,7 +320,10 @@
         }
 
         .cl-sidebar-brand .brand-logo-img {
-            height: 30px;
+            height: 34px;
+            width: auto;
+            max-width: 180px;
+            object-fit: contain;
         }
         .cl-sidebar-brand .brand-logo-light { display: block; }
         .cl-sidebar-brand .brand-logo-dark { display: none; }
@@ -946,7 +949,6 @@
             <div>
                 <img src="{{ asset('gigresource-logos/gigresource-logo-dark.png') }}" alt="GigResource" class="brand-logo-img brand-logo-light">
                 <img src="{{ asset('gigresource-logos/gigresource-logo-light.png') }}" alt="GigResource" class="brand-logo-img brand-logo-dark">
-                <div class="brand-sub">Professional Portal</div>
             </div>
         </a>
 
