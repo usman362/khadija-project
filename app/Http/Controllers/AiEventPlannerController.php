@@ -19,8 +19,14 @@ class AiEventPlannerController extends Controller
     {
         $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
 
+        $level = \App\Domain\AiFeatures\AiAccess::level($request->user(), 'event-planner');
+        if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
+            $level = $request->query('preview');
+        }
+
         return view('ai-tools.event-planner', [
             'aiLayout' => $aiLayout,
+            'level'    => $level,
             'event' => ['name' => 'Sarah & Alex Wedding', 'date' => 'June 14, 2027', 'location' => 'Los Angeles, CA', 'guests' => 120, 'progress' => 84, 'days_left' => 540],
             'phases' => [
                 ['12 Months', 'done'], ['9 Months', 'done'], ['6 Months', 'active'],

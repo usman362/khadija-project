@@ -98,11 +98,39 @@
 @endpush
 
 @section('content')
-<div class="ep">
-    {{-- Interactive planner --}}
+@php
+    $level = $level ?? 'maximum';
+    $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
+    $lvlMeta = [
+        'manual'  => ['Do It Myself', '#64748b', 'Build your own checklist by hand — add each task yourself, no AI plan.'],
+        'semi'    => ['Help Me Plan', '#f97316', 'AI drafts a milestone plan and budget split — tweak the amounts before you use it.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and AI builds the full plan, milestones and budget for you.'],
+    ];
+    [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
+@endphp
+<div class="ep" data-level="{{ $level }}">
+
+    {{-- Membership-level banner --}}
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
+        <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--ep-strong);text-decoration:none;">Upgrade for more AI →</a>@endunless
+    </div>
+
+    @if($isManual)
+    {{-- Do It Myself — hand-built checklist, no AI --}}
+    <div class="ep-form-card">
+        <h3>🗓 Build My Checklist</h3>
+        <div class="sub">Add each task yourself — set a name, priority and due date. No AI, fully yours.</div>
+        <div id="epmRows" style="display:flex;flex-direction:column;gap:10px;"></div>
+        <button type="button" id="epmAdd" style="margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--ep-strong);background:rgba(249,115,22,.09);border:1px solid rgba(249,115,22,.28);border-radius:10px;padding:9px 15px;cursor:pointer;font-family:inherit;">+ Add task</button>
+        <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">Want the AI to build this plan for you automatically? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--ep-strong);font-weight:700;text-decoration:none;">Upgrade →</a></div>
+    </div>
+    @else
+    {{-- Interactive planner (Help Me Plan / Coordinate It For Me) --}}
     <div class="ep-form-card">
         <h3>🗓 Plan My Event</h3>
-        <div class="sub">Enter your details and we'll build a suggested milestone plan, vendor list and budget split.</div>
+        <div class="sub">{{ $isSemi ? "Enter your details and AI drafts a plan you can adjust." : "Enter your details and AI builds the full milestone plan, vendor list and budget split." }}</div>
         <form id="epForm">
             <div class="ep-fgrid">
                 <div>
@@ -135,7 +163,7 @@
                     <input type="text" name="location" class="ep-inp" maxlength="200" placeholder="e.g. Los Angeles, CA">
                 </div>
             </div>
-            <button type="submit" class="ep-go" id="epGo">✨ Build My Plan</button>
+            <button type="submit" class="ep-go" id="epGo">{{ $isSemi ? '✨ Suggest My Plan' : '🤖 Build My Full Plan' }}</button>
             <div class="ep-err" id="epErr"></div>
         </form>
     </div>
@@ -233,6 +261,7 @@
             </div>
         </aside>
     </div>
+    @endif
 </div>
 @endsection
 
@@ -246,6 +275,7 @@
     const out = document.getElementById('epOut');
     const errEl = document.getElementById('epErr');
     const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    const LEVEL = document.querySelector('.ep')?.dataset.level || 'maximum';
 
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const money = n => '$' + Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
@@ -298,12 +328,54 @@
         document.getElementById('epVendors').innerHTML = (res.vendor_categories || [])
             .map(v => `<span class="ep-chip">${esc(v)}</span>`).join('');
 
-        document.getElementById('epBudget').innerHTML = (res.budget_split || []).map(b => `
-            <div class="ep-bs"><span>${esc(b.category)}</span><span class="amt">${money(b.amount)}</span></div>`).join('');
+        const budgetEl = document.getElementById('epBudget');
+        if (LEVEL === 'semi') {
+            // Help Me Plan — amounts are editable, with a live running total.
+            budgetEl.innerHTML = (res.budget_split || []).map((b, i) => `
+                <div class="ep-bs"><span>${esc(b.category)}</span>
+                    <span class="amt">$<input type="number" class="ep-bamt" data-i="${i}" value="${Math.round(b.amount)}" style="width:86px;text-align:right;padding:5px 8px;border:1px solid var(--border-color);border-radius:8px;background:var(--bg-body,var(--bg-card));color:var(--text-primary);font-weight:800;font-family:inherit;font-size:12.5px;"></span>
+                </div>`).join('')
+                + `<div class="ep-bs" style="border-top:2px solid var(--border-color);margin-top:4px;padding-top:9px;"><span style="font-weight:800;">Total</span><span class="amt" id="epBudgetTotal"></span></div>`;
+            const recalc = () => {
+                let t = 0; budgetEl.querySelectorAll('.ep-bamt').forEach(inp => t += (parseFloat(inp.value) || 0));
+                document.getElementById('epBudgetTotal').textContent = money(t);
+            };
+            budgetEl.querySelectorAll('.ep-bamt').forEach(inp => inp.addEventListener('input', recalc));
+            recalc();
+        } else {
+            // Coordinate It For Me — read-only.
+            budgetEl.innerHTML = (res.budget_split || []).map(b => `
+                <div class="ep-bs"><span>${esc(b.category)}</span><span class="amt">${money(b.amount)}</span></div>`).join('');
+        }
 
         document.getElementById('epTips').innerHTML = (res.tips || [])
             .map(t => `<div class="ep-rec" style="padding-left:22px;">${esc(t)}</div>`).join('');
     }
+})();
+
+// Do It Myself — hand-built checklist (no AI, no server call).
+(function () {
+    const rows = document.getElementById('epmRows');
+    const add = document.getElementById('epmAdd');
+    if (!rows || !add) return;
+    const priorities = ['High', 'Medium', 'Low'];
+    function addRow(name = '', pri = 'Medium', due = '') {
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;';
+        div.innerHTML =
+            '<input type="text" placeholder="Task name" class="ep-inp" style="flex:2;min-width:150px;">' +
+            '<select class="ep-inp" style="flex:0 0 auto;width:auto;">' + priorities.map(p => '<option ' + (p === pri ? 'selected' : '') + '>' + p + '</option>').join('') + '</select>' +
+            '<input type="date" class="ep-inp" style="flex:0 0 auto;width:auto;">' +
+            '<button type="button" title="Remove" style="border:none;background:rgba(220,38,38,.1);color:#dc2626;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px;flex:0 0 auto;">&times;</button>';
+        div.querySelector('input[type="text"]').value = name;
+        div.querySelector('input[type="date"]').value = due;
+        div.querySelector('button').addEventListener('click', () => div.remove());
+        rows.appendChild(div);
+    }
+    // Seed a few common starter tasks the client can rename or remove.
+    [['Set overall budget', 'High'], ['Book venue', 'High'], ['Book key vendors (catering, photo)', 'Medium'], ['Send invites', 'Medium']]
+        .forEach(([n, p]) => addRow(n, p, ''));
+    add.addEventListener('click', () => addRow());
 })();
 </script>
 @endpush
