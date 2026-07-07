@@ -117,9 +117,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Manual', '#64748b', 'Write your proposal yourself — templates & structure, no AI.'],
-        'semi'    => ['Semi-Assisted', '#2563eb', 'Write a draft, then let AI improve, rewrite or expand it — you approve.'],
-        'maximum' => ['Maximum AI', '#16a34a', 'Describe the event and AI writes the whole proposal for you.'],
+        'manual'  => ['Do It Myself', '#64748b', 'Write your proposal yourself — templates & structure, no AI.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'Write a draft, then let AI improve, rewrite or expand it — you approve.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Describe the event and AI writes the whole proposal for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp

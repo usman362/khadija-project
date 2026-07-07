@@ -63,15 +63,17 @@ return [
     ],
 
     // Human labels + short descriptions per level (for badges / tooltips / pricing UI).
+    // Client-facing level names (Peter's "DIY" wording). Internal keys stay
+    // manual/semi/maximum; only the display labels change.
     'labels' => [
         'none'    => 'Locked',
-        'manual'  => 'Manual',
-        'semi'    => 'Semi-Assisted',
-        'maximum' => 'Maximum AI',
+        'manual'  => 'Do It Myself',
+        'semi'    => 'Help Me Plan',
+        'maximum' => 'Coordinate It For Me',
     ],
     'descriptions' => [
         'manual'  => 'Do it yourself — templates & frameworks, no AI.',
-        'semi'    => 'AI assists — suggestions & rewrites you approve.',
-        'maximum' => 'AI auto-generates the whole thing for you.',
+        'semi'    => 'AI helps you plan — suggestions & rewrites you approve.',
+        'maximum' => 'AI coordinates it for you — auto-generates the whole thing.',
     ],
 ];
