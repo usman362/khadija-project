@@ -118,10 +118,10 @@ class AiStaffingPlannerController extends Controller
             'success' => true,
             'event'   => [
                 'type'     => $type,
-                'name'     => $data['event_name'] ?: self::EVENT_TYPES[$type],
-                'date'     => $data['date'] ?: 'May 24, 2025',
+                'name'     => ($data['event_name'] ?? '') ?: self::EVENT_TYPES[$type],
+                'date'     => ($data['date'] ?? '') ?: 'May 24, 2025',
                 'guests'   => $guests,
-                'location' => $data['location'] ?: 'Los Angeles, CA',
+                'location' => ($data['location'] ?? '') ?: 'Los Angeles, CA',
             ],
             'roles' => $plan['roles'],
             'axis'  => $plan['axis'],

@@ -437,7 +437,7 @@
 
     $('apa-calc').addEventListener('click', function () { calculate(this); });
     $('apa-recalc').addEventListener('click', function () { calculate(this); });
-    $('apa-try').addEventListener('click', function (e) { e.preventDefault(); $('apa-calc').click(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    $('apa-try')?.addEventListener('click', function (e) { e.preventDefault(); $('apa-calc').click(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
     syncLabels();
 })();
 </script>
