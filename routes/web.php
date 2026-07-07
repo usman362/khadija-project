@@ -364,43 +364,43 @@ Route::middleware('auth')->group(function () {
     Route::get('/ai-tools/translator', [\App\Http\Controllers\AiTranslatorController::class, 'show'])->name('ai-tools.translator');
 
     // ── Dynamic compute endpoints for the 14 tools above (real local engines, JSON) ──
-    Route::post('/ai-tools/availability-optimizer/compute', [\App\Http\Controllers\AiAvailabilityOptimizerController::class, 'compute'])->name('ai-tools.availability-optimizer.compute');
-    Route::post('/ai-tools/event-planner/compute',          [\App\Http\Controllers\AiEventPlannerController::class, 'compute'])->name('ai-tools.event-planner.compute');
-    Route::post('/ai-tools/theme-advisor/compute',          [\App\Http\Controllers\AiThemeAdvisorController::class, 'compute'])->name('ai-tools.theme-advisor.compute');
-    Route::post('/ai-tools/timeline-builder/compute',       [\App\Http\Controllers\AiTimelineBuilderController::class, 'compute'])->name('ai-tools.timeline-builder.compute');
-    Route::post('/ai-tools/venue-analyzer/compute',         [\App\Http\Controllers\AiVenueAnalyzerController::class, 'compute'])->name('ai-tools.venue-analyzer.compute');
-    Route::post('/ai-tools/guest-capacity/compute',         [\App\Http\Controllers\AiGuestCapacityController::class, 'compute'])->name('ai-tools.guest-capacity.compute');
-    Route::post('/ai-tools/package-builder/compute',        [\App\Http\Controllers\AiPackageBuilderController::class, 'compute'])->name('ai-tools.package-builder.compute');
-    Route::post('/ai-tools/portfolio-optimizer/compute',    [\App\Http\Controllers\AiPortfolioOptimizerController::class, 'compute'])->name('ai-tools.portfolio-optimizer.compute');
-    Route::post('/ai-tools/checklist-generator/compute',    [\App\Http\Controllers\AiChecklistGeneratorController::class, 'compute'])->name('ai-tools.checklist-generator.compute');
-    Route::post('/ai-tools/bid-optimizer/compute',          [\App\Http\Controllers\AiBidOptimizerController::class, 'compute'])->name('ai-tools.bid-optimizer.compute');
-    Route::post('/ai-tools/upsell-assistant/compute',       [\App\Http\Controllers\AiUpsellAssistantController::class, 'compute'])->name('ai-tools.upsell-assistant.compute');
-    Route::post('/ai-tools/contract-assistant/compute',     [\App\Http\Controllers\AiContractAssistantController::class, 'compute'])->name('ai-tools.contract-assistant.compute');
-    Route::post('/ai-tools/message-assistant/compute',      [\App\Http\Controllers\AiMessageAssistantController::class, 'compute'])->name('ai-tools.message-assistant.compute');
-    Route::post('/ai-tools/translator/compute',             [\App\Http\Controllers\AiTranslatorController::class, 'compute'])->name('ai-tools.translator.compute');
+    Route::post('/ai-tools/availability-optimizer/compute', [\App\Http\Controllers\AiAvailabilityOptimizerController::class, 'compute'])->middleware('ai.level')->name('ai-tools.availability-optimizer.compute');
+    Route::post('/ai-tools/event-planner/compute',          [\App\Http\Controllers\AiEventPlannerController::class, 'compute'])->middleware('ai.level')->name('ai-tools.event-planner.compute');
+    Route::post('/ai-tools/theme-advisor/compute',          [\App\Http\Controllers\AiThemeAdvisorController::class, 'compute'])->middleware('ai.level')->name('ai-tools.theme-advisor.compute');
+    Route::post('/ai-tools/timeline-builder/compute',       [\App\Http\Controllers\AiTimelineBuilderController::class, 'compute'])->middleware('ai.level')->name('ai-tools.timeline-builder.compute');
+    Route::post('/ai-tools/venue-analyzer/compute',         [\App\Http\Controllers\AiVenueAnalyzerController::class, 'compute'])->middleware('ai.level')->name('ai-tools.venue-analyzer.compute');
+    Route::post('/ai-tools/guest-capacity/compute',         [\App\Http\Controllers\AiGuestCapacityController::class, 'compute'])->middleware('ai.level')->name('ai-tools.guest-capacity.compute');
+    Route::post('/ai-tools/package-builder/compute',        [\App\Http\Controllers\AiPackageBuilderController::class, 'compute'])->middleware('ai.level')->name('ai-tools.package-builder.compute');
+    Route::post('/ai-tools/portfolio-optimizer/compute',    [\App\Http\Controllers\AiPortfolioOptimizerController::class, 'compute'])->middleware('ai.level')->name('ai-tools.portfolio-optimizer.compute');
+    Route::post('/ai-tools/checklist-generator/compute',    [\App\Http\Controllers\AiChecklistGeneratorController::class, 'compute'])->middleware('ai.level')->name('ai-tools.checklist-generator.compute');
+    Route::post('/ai-tools/bid-optimizer/compute',          [\App\Http\Controllers\AiBidOptimizerController::class, 'compute'])->middleware('ai.level')->name('ai-tools.bid-optimizer.compute');
+    Route::post('/ai-tools/upsell-assistant/compute',       [\App\Http\Controllers\AiUpsellAssistantController::class, 'compute'])->middleware('ai.level')->name('ai-tools.upsell-assistant.compute');
+    Route::post('/ai-tools/contract-assistant/compute',     [\App\Http\Controllers\AiContractAssistantController::class, 'compute'])->middleware('ai.level')->name('ai-tools.contract-assistant.compute');
+    Route::post('/ai-tools/message-assistant/compute',      [\App\Http\Controllers\AiMessageAssistantController::class, 'compute'])->middleware('ai.level')->name('ai-tools.message-assistant.compute');
+    Route::post('/ai-tools/translator/compute',             [\App\Http\Controllers\AiTranslatorController::class, 'compute'])->middleware('ai.level')->name('ai-tools.translator.compute');
 
     Route::get('/ai-tools/budget-allocator',  [AiBudgetAllocatorController::class, 'show'])->name('ai-tools.budget-allocator');
-    Route::post('/ai-tools/budget-allocator', [AiBudgetAllocatorController::class, 'allocate'])->name('ai-tools.budget-allocator.allocate');
+    Route::post('/ai-tools/budget-allocator', [AiBudgetAllocatorController::class, 'allocate'])->middleware('ai.level')->name('ai-tools.budget-allocator.allocate');
 
     // AI Vendor Matchmaking (plan-gated)
     Route::get('/ai-tools/vendor-matchmaking',  [AiVendorMatchmakingController::class, 'show'])->name('ai-tools.vendor-matchmaking');
-    Route::post('/ai-tools/vendor-matchmaking', [AiVendorMatchmakingController::class, 'match'])->name('ai-tools.vendor-matchmaking.match');
+    Route::post('/ai-tools/vendor-matchmaking', [AiVendorMatchmakingController::class, 'match'])->middleware('ai.level')->name('ai-tools.vendor-matchmaking.match');
 
     // AI Review Writer (plan-gated)
     Route::get('/ai-tools/review-writer',  [AiReviewWriterController::class, 'show'])->name('ai-tools.review-writer');
-    Route::post('/ai-tools/review-writer', [AiReviewWriterController::class, 'compose'])->name('ai-tools.review-writer.compose');
+    Route::post('/ai-tools/review-writer', [AiReviewWriterController::class, 'compose'])->middleware('ai.level')->name('ai-tools.review-writer.compose');
 
     // AI Pricing Assistant (deterministic calculator — not plan-gated)
     Route::get('/ai-tools/pricing-assistant',  [\App\Http\Controllers\AiPricingAssistantController::class, 'show'])->name('ai-tools.pricing-assistant');
-    Route::post('/ai-tools/pricing-assistant/calculate', [\App\Http\Controllers\AiPricingAssistantController::class, 'calculate'])->name('ai-tools.pricing-assistant.calculate');
+    Route::post('/ai-tools/pricing-assistant/calculate', [\App\Http\Controllers\AiPricingAssistantController::class, 'calculate'])->middleware('ai.level')->name('ai-tools.pricing-assistant.calculate');
 
     // AI Proposal Writer (deterministic template generator — not plan-gated)
     Route::get('/ai-tools/proposal-writer',  [\App\Http\Controllers\AiProposalWriterController::class, 'show'])->name('ai-tools.proposal-writer');
-    Route::post('/ai-tools/proposal-writer/generate', [\App\Http\Controllers\AiProposalWriterController::class, 'generate'])->name('ai-tools.proposal-writer.generate');
+    Route::post('/ai-tools/proposal-writer/generate', [\App\Http\Controllers\AiProposalWriterController::class, 'generate'])->middleware('ai.level')->name('ai-tools.proposal-writer.generate');
 
     // AI Staffing Planner (deterministic staffing planner — not plan-gated)
     Route::get('/ai-tools/staffing-planner',  [\App\Http\Controllers\AiStaffingPlannerController::class, 'show'])->name('ai-tools.staffing-planner');
-    Route::post('/ai-tools/staffing-planner/generate', [\App\Http\Controllers\AiStaffingPlannerController::class, 'generate'])->name('ai-tools.staffing-planner.generate');
+    Route::post('/ai-tools/staffing-planner/generate', [\App\Http\Controllers\AiStaffingPlannerController::class, 'generate'])->middleware('ai.level')->name('ai-tools.staffing-planner.generate');
 
     // AI Agreement Builder — guided 3-phase agreement lifecycle (client ↔ professional).
     // Phase 1: Discovery & AI Evidence Collection.

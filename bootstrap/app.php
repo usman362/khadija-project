@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission'              => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission'      => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'check.deletion.status'   => \App\Http\Middleware\CheckAccountDeletionStatus::class,
+            'ai.level'                => \App\Http\Middleware\EnsureAiLevel::class,
         ]);
 
         // Run canonical-host redirect FIRST (before anything else) so a
