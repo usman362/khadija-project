@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\AiFeatures\AiAccess;
 use App\Domain\AiFeatures\AiFeatureCode;
 use App\Domain\AiFeatures\Services\AiFeatureGate;
 use App\Domain\AiFeatures\Services\BudgetAllocatorService;
@@ -22,10 +23,17 @@ class AiBudgetAllocatorController extends Controller
      */
     public function show(Request $request): View
     {
-        $status = $this->gate->status($request->user(), AiFeatureCode::BUDGET_ALLOCATOR);
+        $user   = $request->user();
+        $status = $this->gate->status($user, AiFeatureCode::BUDGET_ALLOCATOR);
+
+        $level = AiAccess::level($user, 'budget-allocator');
+        if ($user?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
+            $level = $request->query('preview');
+        }
 
         return view('client.ai-tools.budget-allocator', [
             'status' => $status,
+            'level'  => $level,
         ]);
     }
 

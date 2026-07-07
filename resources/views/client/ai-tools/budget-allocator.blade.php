@@ -291,10 +291,38 @@
         margin-bottom: 16px;
     }
     .bat-error.open { display: block; }
+
+    /* Level banner + manual planner */
+    .bat-levelbar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; background:var(--bg-secondary); border:1px solid var(--border-color); border-left:4px solid var(--lvl,#64748b); border-radius:12px; padding:12px 16px; margin-bottom:18px; }
+    .bat-lvltag { font-size:10.5px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; color:#fff; background:var(--lvl,#64748b); padding:4px 11px; border-radius:999px; }
+    .bat-levelbar .d { font-size:12.5px; color:var(--text-secondary); }
+    .bat-levelbar a.up { margin-left:auto; font-size:12px; font-weight:700; color:#f97316; text-decoration:none; }
+    .bat-mrow { display:grid; grid-template-columns:1fr 160px 40px; gap:10px; margin-bottom:10px; align-items:center; }
+    .bat-mtotals { display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-color); font-size:14px; font-weight:700; color:var(--text-primary); }
+    .bat-mtotals .rem.over { color:#ef4444; } .bat-mtotals .rem.ok { color:#10b981; }
+    .bat-addcat { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:#6366f1; background:rgba(99,102,241,.08); border:1px solid rgba(99,102,241,.25); border-radius:9px; padding:8px 14px; cursor:pointer; font-family:inherit; }
+    .bat-xrow { background:none; border:1px solid var(--border-color); color:var(--text-muted); border-radius:8px; cursor:pointer; font-size:15px; height:38px; }
+    .bat-amt-edit { width:120px; }
 </style>
 @endpush
 
 @section('content')
+@php
+    $level = $level ?? 'maximum';
+    $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
+    $lvlMeta = [
+        'manual'  => ['Do It Myself', '#64748b', 'Build your budget by hand — add categories & amounts yourself, no AI.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'AI recommends a budget split — you adjust the amounts before saving.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and AI allocates the entire budget across categories.'],
+    ];
+    [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
+@endphp
+
+<div class="bat-levelbar" style="--lvl: {{ $lvlColor }};">
+    <span class="bat-lvltag">{{ $lvlLabel }}</span>
+    <span class="d">{{ $lvlDesc }}</span>
+    @unless($isMax)<a class="up" href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}">Upgrade for more AI →</a>@endunless
+</div>
 
 {{-- Hero --}}
 <div class="bat-hero">
@@ -336,11 +364,33 @@
             Upgrade Plan
         </a>
     </div>
+@elseif($isManual)
+    {{-- Manual (Do It Myself) — hand-build the budget, no AI --}}
+    <div class="bat-card">
+        <div class="bat-card-title">Your Budget Planner</div>
+        <div class="bat-card-desc">Set your total, then add categories and amounts yourself. We'll track what's left.</div>
+        <div class="bat-form-grid" style="margin-bottom:18px;">
+            <div>
+                <label class="bat-label">Total Budget</label>
+                <div class="bat-input-group">
+                    <select id="mCurrency" class="bat-currency"><option>USD</option><option>CAD</option><option>EUR</option><option>GBP</option><option>AUD</option></select>
+                    <input type="number" id="mTotal" class="bat-input" min="0" step="0.01" placeholder="e.g. 5000">
+                </div>
+            </div>
+        </div>
+        <label class="bat-label">Categories</label>
+        <div id="mRows"></div>
+        <button type="button" class="bat-addcat" id="mAdd"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add category</button>
+        <div class="bat-mtotals">
+            <span>Allocated: <span id="mAllocated">0</span></span>
+            <span class="rem ok" id="mRemainWrap">Remaining: <span id="mRemain">0</span></span>
+        </div>
+    </div>
 @else
     {{-- Form --}}
     <div class="bat-card">
         <div class="bat-card-title">Event Details</div>
-        <div class="bat-card-desc">Fill in what you know — the more detail, the better the AI allocation.</div>
+        <div class="bat-card-desc">{{ $isSemi ? 'Fill in what you know — AI will recommend a split you can adjust.' : 'Fill in what you know — the more detail, the better the AI allocation.' }}</div>
 
         <div class="bat-error" id="batError"></div>
 
@@ -405,7 +455,7 @@
             <div style="margin-top: 22px;">
                 <button type="submit" class="bat-btn" id="batSubmit">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    Generate Budget with AI
+                    {{ $isSemi ? '✨ Suggest a Budget Split' : '🤖 Auto-Allocate My Budget' }}
                 </button>
             </div>
         </form>
@@ -496,9 +546,11 @@
         }
     });
 
+    const LEVEL = @json($level ?? 'maximum');
+
     function renderResult(res) {
         document.getElementById('batResultTotal').textContent = res.currency + ' ' + formatNum(res.total);
-        document.getElementById('batSummary').textContent = res.summary || '';
+        document.getElementById('batSummary').textContent = (LEVEL === 'semi' ? 'Recommended split — adjust any amount to fit your needs. ' : '') + (res.summary || '');
 
         const list = document.getElementById('batAllocList');
         list.innerHTML = '';
@@ -507,16 +559,16 @@
             const color = COLORS[i % COLORS.length];
             const div = document.createElement('div');
             div.className = 'bat-alloc';
+            const amtCell = LEVEL === 'semi'
+                ? `<div class="bat-alloc-amt">${escapeHtml(res.currency)} <input type="number" class="bat-input bat-amt-edit" min="0" step="1" value="${Math.round(a.amount)}"></div>`
+                : `<div class="bat-alloc-amt">${escapeHtml(res.currency)} ${formatNum(a.amount)} <span class="bat-alloc-pct">(${a.percent}%)</span></div>`;
             div.innerHTML = `
                 <div class="bat-alloc-row">
                     <div class="bat-alloc-cat">
                         <span class="bat-alloc-dot" style="background:${color};"></span>
                         ${escapeHtml(a.category)}
                     </div>
-                    <div class="bat-alloc-amt">
-                        ${escapeHtml(res.currency)} ${formatNum(a.amount)}
-                        <span class="bat-alloc-pct">(${a.percent}%)</span>
-                    </div>
+                    ${amtCell}
                 </div>
                 <div class="bat-alloc-bar">
                     <div class="bat-alloc-fill" style="width:0%;background:${color};"></div>
@@ -524,9 +576,21 @@
                 ${a.notes ? `<div class="bat-alloc-notes">${escapeHtml(a.notes)}</div>` : ''}
             `;
             list.appendChild(div);
-            // Animate bar
             setTimeout(() => { div.querySelector('.bat-alloc-fill').style.width = a.percent + '%'; }, 100);
         });
+
+        // Semi — live "adjusted total" as the user edits amounts.
+        if (LEVEL === 'semi') {
+            let foot = document.getElementById('batAdjFoot');
+            if (!foot) { foot = document.createElement('div'); foot.id = 'batAdjFoot'; foot.className = 'bat-mtotals'; list.after(foot); }
+            const recompute = () => {
+                let sum = 0; list.querySelectorAll('.bat-amt-edit').forEach(i => sum += (parseFloat(i.value) || 0));
+                const diff = res.total - sum;
+                foot.innerHTML = `<span>Adjusted total: ${escapeHtml(res.currency)} ${formatNum(sum)}</span><span class="rem ${diff < 0 ? 'over' : 'ok'}">${diff < 0 ? 'Over by' : 'Left'}: ${escapeHtml(res.currency)} ${formatNum(Math.abs(diff))}</span>`;
+            };
+            list.querySelectorAll('.bat-amt-edit').forEach(i => i.addEventListener('input', recompute));
+            recompute();
+        }
 
         // Tips
         const tipsBox  = document.getElementById('batTipsBox');
@@ -550,6 +614,35 @@
     function escapeHtml(s) {
         return String(s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
     }
+})();
+
+// ── Manual planner (Do It Myself) — no AI, hand-built budget ──
+(function () {
+    const rows = document.getElementById('mRows');
+    if (!rows) return;
+    const totalIn = document.getElementById('mTotal');
+    const cur = document.getElementById('mCurrency');
+    const fmt = (n) => Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
+
+    function recompute() {
+        let sum = 0; rows.querySelectorAll('.mAmt').forEach(i => sum += (parseFloat(i.value) || 0));
+        const total = parseFloat(totalIn.value) || 0; const rem = total - sum;
+        document.getElementById('mAllocated').textContent = cur.value + ' ' + fmt(sum);
+        document.getElementById('mRemain').textContent = cur.value + ' ' + fmt(Math.abs(rem)) + (rem < 0 ? ' over' : '');
+        const w = document.getElementById('mRemainWrap');
+        w.classList.toggle('over', rem < 0); w.classList.toggle('ok', rem >= 0);
+    }
+    function addRow(name = '', amt = '') {
+        const div = document.createElement('div'); div.className = 'bat-mrow';
+        div.innerHTML = `<input class="bat-input" placeholder="Category (e.g. Catering)" value="${name}"><input class="bat-input mAmt" type="number" min="0" step="1" placeholder="0" value="${amt}"><button type="button" class="bat-xrow" title="Remove">×</button>`;
+        div.querySelector('.bat-xrow').addEventListener('click', () => { div.remove(); recompute(); });
+        div.querySelector('.mAmt').addEventListener('input', recompute);
+        rows.appendChild(div);
+    }
+    document.getElementById('mAdd').addEventListener('click', () => addRow());
+    totalIn.addEventListener('input', recompute);
+    ['Venue', 'Catering', 'Décor', 'Entertainment'].forEach(c => addRow(c));
+    recompute();
 })();
 </script>
 
