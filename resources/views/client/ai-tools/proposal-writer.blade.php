@@ -36,6 +36,12 @@
     .pw-chips { display: flex; flex-wrap: wrap; gap: 9px; }
     .pw-chip { padding: 8px 16px; border: 1px solid rgba(236,72,153,0.3); border-radius: 999px; background: var(--bg-card); color: var(--pw-strong); font-size: 12.5px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .15s; }
     .pw-chip:hover { background: var(--pw-soft); border-color: var(--pw); }
+    /* Semi assist bar */
+    .pw-assist { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 800; color: var(--pw-strong); background: var(--pw-soft); border: 1px solid rgba(236,72,153,0.3); border-radius: 999px; padding: 6px 13px; cursor: pointer; font-family: inherit; }
+    .pw-assist:hover { background: rgba(236,72,153,0.14); }
+    .pw-assist[disabled] { opacity: .5; cursor: default; }
+    textarea.pw-proposal { border: 1.5px solid rgba(236,72,153,0.35); border-radius: 12px; padding: 14px 16px; background: var(--bg-card); outline: none; }
+    textarea.pw-proposal:focus { border-color: var(--pw); }
 
     /* generated proposal */
     .pw-gen { background: linear-gradient(135deg, rgba(236,72,153,0.06), rgba(219,39,119,0.03)); border: 1px solid rgba(236,72,153,0.2); border-radius: var(--radius-lg); padding: 22px 24px; }
@@ -107,7 +113,23 @@
 @endpush
 
 @section('content')
-<div class="pw" data-gen-url="{{ route('ai-tools.proposal-writer.generate') }}" data-examples='@json($examples)'>
+@php
+    $level = $level ?? 'maximum';
+    $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
+    $lvlMeta = [
+        'manual'  => ['Manual', '#64748b', 'Write your proposal yourself — templates & structure, no AI.'],
+        'semi'    => ['Semi-Assisted', '#2563eb', 'Write a draft, then let AI improve, rewrite or expand it — you approve.'],
+        'maximum' => ['Maximum AI', '#16a34a', 'Describe the event and AI writes the whole proposal for you.'],
+    ];
+    [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
+@endphp
+<div class="pw" data-level="{{ $level }}" data-gen-url="{{ route('ai-tools.proposal-writer.generate') }}" data-examples='@json($examples)'>
+
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:18px;">
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
+        <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--pw);text-decoration:none;">Upgrade for more AI →</a>@endunless
+    </div>
 
     {{-- header --}}
     <div class="pw-head">
@@ -145,6 +167,7 @@
     <div class="pw-main pw-mb">
         {{-- LEFT --}}
         <div class="pw-col">
+            @if($isMax)
             <div class="pw-card">
                 <div class="pw-sec-num">1. Client Event Description</div>
                 <p class="pw-sec-sub">Paste or write the client's event details.</p>
@@ -156,10 +179,21 @@
                     @endforeach
                 </div>
             </div>
+            @endif
 
             <div class="pw-gen">
-                <div class="pw-sec-num">2. Your AI Generated Proposal</div>
-                <div class="pw-proposal" id="pw-proposal">{{ $proposal }}</div>
+                <div class="pw-sec-num">{{ $isManual ? 'Write Your Proposal' : ($isSemi ? 'Your Draft — refine with AI' : '2. Your AI Generated Proposal') }}</div>
+                @if($isSemi || $isMax)
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px;">
+                    <button type="button" class="pw-assist" data-assist="improve">✨ Improve</button>
+                    <button type="button" class="pw-assist" data-assist="rewrite">✨ Rewrite</button>
+                    <button type="button" class="pw-assist" data-assist="expand">✨ Expand</button>
+                    @if($isSemi)
+                        <select class="pw-select" id="pw-tone" style="max-width:190px;margin-left:auto;">@foreach($tones as $k => $v)<option value="{{ $k }}">{{ $v }}</option>@endforeach</select>
+                    @endif
+                </div>
+                @endif
+                <textarea class="pw-proposal" id="pw-proposal" rows="9" placeholder="{{ $isManual ? 'Write your proposal here…' : 'Your proposal will appear here — edit freely.' }}">{{ $proposal }}</textarea>
                 <div class="pw-gen-actions">
                     <button type="button" class="pw-btn pw-btn-pink" id="pw-copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy Proposal</button>
                     <button type="button" class="pw-btn" id="pw-download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download</button>
@@ -182,6 +216,7 @@
                 <div class="pw-why-row"><span class="pw-why-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><div><b>Error-Free</b><p>Polished, professional, and ready to send.</p></div></div>
             </div>
 
+            @if($isMax)
             <div class="pw-card">
                 <div class="pw-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><b>Customize Your Proposal</b></div>
                 <div class="pw-field">
@@ -207,6 +242,7 @@
                 </div>
                 <button type="button" class="pw-btn pw-btn-pink pw-regen" id="pw-regen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.6 3.3 3.6.5-2.6 2.5.6 3.6L12 10.7 8.8 12.4l.6-3.6L6.8 6.3l3.6-.5L12 2z"/></svg>Regenerate Proposal</button>
             </div>
+            @endif
 
             <div class="pw-card">
                 <div class="pw-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><b>Tips for Winning Proposals</b></div>
@@ -262,53 +298,59 @@
     const examples = JSON.parse(root.dataset.examples || '{}');
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
     const $ = (id) => document.getElementById(id);
+    const box = $('pw-proposal');
 
-    async function generate(btn) {
+    async function call(payload) {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        return res.ok ? res.json() : { success: false, message: 'Request failed.' };
+    }
+
+    // Maximum — full auto-generate from the event description.
+    async function generateFull(btn) {
         const original = btn ? btn.innerHTML : null;
         if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
         try {
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
-                body: JSON.stringify({
-                    description: $('pw-desc').value,
-                    tone: $('pw-tone').value,
-                    focus: $('pw-focus').value,
-                    length: $('pw-length').value,
-                }),
-            });
-            if (res.ok) {
-                const data = await res.json();
-                if (data.proposal) $('pw-proposal').textContent = data.proposal;
-            }
-        } catch (e) { /* keep last proposal on failure */ }
+            const data = await call({ action: 'full', description: $('pw-desc')?.value || '', tone: $('pw-tone')?.value, focus: $('pw-focus')?.value, length: $('pw-length')?.value });
+            if (data.success && data.proposal) box.value = data.proposal;
+        } catch (e) {}
         finally { if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.innerHTML = original; } }
     }
 
-    // Quick-fill chips → set description + regenerate.
-    document.querySelectorAll('.pw-chip').forEach((chip) => {
-        chip.addEventListener('click', () => {
-            const key = chip.dataset.key;
-            if (examples[key]) $('pw-desc').value = examples[key];
-            generate($('pw-regen'));
-        });
-    });
+    // Semi — improve / rewrite / expand the current draft.
+    async function assist(action, btn) {
+        if (!box.value.trim()) { box.focus(); return; }
+        const label = btn.innerHTML; btn.disabled = true; btn.innerHTML = '…';
+        try {
+            const data = await call({ action, draft: box.value, tone: $('pw-tone')?.value });
+            if (data.success && data.proposal) box.value = data.proposal;
+            else if (data.message) alert(data.message);
+        } catch (e) {}
+        finally { btn.disabled = false; btn.innerHTML = label; }
+    }
 
-    $('pw-regen').addEventListener('click', function () { generate(this); });
-    ['pw-tone', 'pw-focus', 'pw-length'].forEach((id) => $(id).addEventListener('change', () => generate($('pw-regen'))));
+    // Wire — elements only exist for the relevant level, so guard everything.
+    document.querySelectorAll('.pw-chip').forEach((chip) => chip.addEventListener('click', () => {
+        if (examples[chip.dataset.key]) $('pw-desc').value = examples[chip.dataset.key];
+        generateFull($('pw-regen'));
+    }));
+    $('pw-regen')?.addEventListener('click', function () { generateFull(this); });
+    ['pw-focus', 'pw-length'].forEach((id) => $(id)?.addEventListener('change', () => generateFull($('pw-regen'))));
+    if ($('pw-regen')) $('pw-tone')?.addEventListener('change', () => generateFull($('pw-regen')));
+    document.querySelectorAll('.pw-assist').forEach((b) => b.addEventListener('click', () => assist(b.dataset.assist, b)));
 
-    // Copy.
-    $('pw-copy').addEventListener('click', function () {
-        const text = $('pw-proposal').textContent;
-        navigator.clipboard?.writeText(text);
+    $('pw-copy')?.addEventListener('click', function () {
+        navigator.clipboard?.writeText(box.value);
         const o = this.innerHTML;
         this.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Copied!';
         setTimeout(() => { this.innerHTML = o; }, 1600);
     });
 
-    // Download as .txt.
-    $('pw-download').addEventListener('click', function () {
-        const blob = new Blob([$('pw-proposal').textContent], { type: 'text/plain' });
+    $('pw-download')?.addEventListener('click', function () {
+        const blob = new Blob([box.value], { type: 'text/plain' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = 'proposal.txt';
@@ -316,11 +358,8 @@
         URL.revokeObjectURL(a.href);
     });
 
-    // Send → copy text, then open Messages (no auto-send).
-    $('pw-send').addEventListener('click', function () { navigator.clipboard?.writeText($('pw-proposal').textContent); });
-
-    // Bottom CTA → focus the description box.
-    $('pw-create').addEventListener('click', function (e) { e.preventDefault(); $('pw-desc').focus(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    $('pw-send')?.addEventListener('click', function () { navigator.clipboard?.writeText(box.value); });
+    $('pw-create')?.addEventListener('click', function (e) { e.preventDefault(); (($('pw-desc') || box)).focus(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
 })();
 </script>
 @endsection

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\AiFeatures\AiAccess;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -51,22 +52,67 @@ class AiProposalWriterController extends Controller
 
     public function show(Request $request): View
     {
+        $user  = $request->user();
+        $level = AiAccess::level($user, 'proposal-writer');
+        if ($user?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
+            $level = $request->query('preview');
+        }
+
         $defaultDescription = self::EXAMPLES['Wedding'];
-        $proposal = $this->compose($defaultDescription, 'professional_friendly', 'experience', 'medium');
+        // Manual tier gets a blank canvas (no AI pre-fill); Semi/Maximum get an example.
+        $proposal = $level === 'manual'
+            ? ''
+            : $this->compose($defaultDescription, 'professional_friendly', 'experience', 'medium');
 
         return view('client.ai-tools.proposal-writer', [
             'tones'       => self::TONES,
             'focuses'     => self::FOCUSES,
             'lengths'     => self::LENGTHS,
             'examples'    => self::EXAMPLES,
-            'description' => $defaultDescription,
+            'description' => $level === 'manual' ? '' : $defaultDescription,
             'proposal'    => $proposal,
+            'level'       => $level,
             // Professional-facing tool → professional shell for suppliers.
-            'aiLayout'    => $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client',
+            'aiLayout'    => $user?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client',
         ]);
     }
 
+    /**
+     * Level-aware generate. `action`:
+     *   full    → Maximum: write the whole proposal from the event description.
+     *   improve → Semi: tighten/polish the user's current draft.
+     *   rewrite → Semi: re-voice the draft in the chosen tone.
+     *   expand  → Semi: add a closing paragraph to the draft.
+     */
     public function generate(Request $request): JsonResponse
+    {
+        $action = (string) $request->input('action', 'full');
+        $user   = $request->user();
+
+        $needed = $action === 'full' ? 'maximum' : 'semi';
+        if (! AiAccess::can($user, 'proposal-writer', $needed)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This AI action is not included in your current membership. Please upgrade to unlock it.',
+            ], 403);
+        }
+
+        try {
+            $proposal = match ($action) {
+                'improve' => $this->improveDraft($request),
+                'rewrite' => $this->rewriteDraft($request),
+                'expand'  => $this->expandDraft($request),
+                default   => $this->fullProposal($request),
+            };
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        }
+
+        return response()->json(['success' => true, 'action' => $action, 'proposal' => $proposal]);
+    }
+
+    /** Maximum — full proposal from the event description. */
+    private function fullProposal(Request $request): string
     {
         $data = $request->validate([
             'description' => ['required', 'string', 'min:10', 'max:1500'],
@@ -79,10 +125,58 @@ class AiProposalWriterController extends Controller
         $focus  = array_key_exists($data['focus'] ?? '', self::FOCUSES) ? $data['focus'] : 'experience';
         $length = array_key_exists($data['length'] ?? '', self::LENGTHS) ? $data['length'] : 'medium';
 
-        return response()->json([
-            'success'  => true,
-            'proposal' => $this->compose($data['description'], $tone, $focus, $length),
+        return $this->compose($data['description'], $tone, $focus, $length);
+    }
+
+    /** Semi — tighten/polish the user's existing draft. */
+    private function improveDraft(Request $request): string
+    {
+        $draft = trim((string) $request->validate(['draft' => ['required', 'string', 'min:5', 'max:6000']])['draft']);
+        // Normalise spacing, ensure a professional open/close around the draft body.
+        $body = preg_replace('/[ \t]+/', ' ', $draft);
+        $body = trim(preg_replace('/\n{3,}/', "\n\n", $body));
+
+        return "Dear Client,\n\n"
+            . rtrim($body, ". \n") . ". "
+            . "I've kept the details clear and to the point so you know exactly what to expect.\n\n"
+            . "I'd be glad to answer any questions and adjust anything to suit your event.\n\n"
+            . "Warm regards,";
+    }
+
+    /** Semi — re-voice the draft in the selected tone. */
+    private function rewriteDraft(Request $request): string
+    {
+        $data  = $request->validate([
+            'draft' => ['required', 'string', 'min:5', 'max:6000'],
+            'tone'  => ['nullable', 'string'],
         ]);
+        $tone  = array_key_exists($data['tone'] ?? '', self::TONES) ? $data['tone'] : 'professional_friendly';
+        $body  = trim((string) $data['draft']);
+
+        $open = match ($tone) {
+            'friendly_casual'    => "Hi there!\n\nThanks so much for thinking of us — ",
+            'confident_bold'     => "Hello,\n\nYou're in expert hands. ",
+            'warm_personal'      => "Hello,\n\nIt would be a genuine pleasure to be part of your event. ",
+            default              => "Dear Client,\n\nThank you for the opportunity. ",
+        };
+        $close = match ($tone) {
+            'friendly_casual' => "\n\nCan't wait to hear from you!\n\nCheers,",
+            'confident_bold'  => "\n\nLet's make it unforgettable.\n\nBest,",
+            default           => "\n\nWarm regards,",
+        };
+
+        return $open . lcfirst(rtrim($body, ". \n")) . '.' . $close;
+    }
+
+    /** Semi — add a strong closing paragraph to the draft. */
+    private function expandDraft(Request $request): string
+    {
+        $draft = trim((string) $request->validate(['draft' => ['required', 'string', 'min:5', 'max:6000']])['draft']);
+
+        return rtrim($draft, "\n")
+            . "\n\nEvery booking includes a planning consultation, a clear timeline and dependable, on-time delivery, "
+            . "so there are no surprises on the day. I take real pride in tailoring each detail to your vision and making the "
+            . "experience effortless for you from start to finish. I'd love the opportunity to bring your event to life.";
     }
 
     /**
