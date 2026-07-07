@@ -19,8 +19,14 @@ class AiTimelineBuilderController extends Controller
     {
         $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
 
+        $level = \App\Domain\AiFeatures\AiAccess::level($request->user(), 'timeline-builder');
+        if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
+            $level = $request->query('preview');
+        }
+
         return view('ai-tools.timeline-builder', [
             'aiLayout' => $aiLayout,
+            'level'    => $level,
             'stats' => [
                 ['Timeline Health', '96%', 'Excellent', 'good'],
                 ['Event Duration', '8h 00m', '5 PM – 1 AM', ''],

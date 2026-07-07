@@ -72,11 +72,36 @@
 @endpush
 
 @section('content')
-<div class="tb">
+@php
+    $level = $level ?? 'maximum';
+    $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
+    $lvlMeta = [
+        'manual'  => ['Do It Myself', '#64748b', 'Build your run-of-show by hand — add each time slot yourself, no AI.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'AI suggests a timeline — edit the times and segments before you save.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and AI builds the entire run-of-show for you.'],
+    ];
+    [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
+@endphp
+<div class="tb" data-level="{{ $level }}">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:18px;">
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
+        <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:#2563eb;text-decoration:none;">Upgrade for more AI →</a>@endunless
+    </div>
+
+    @if($isManual)
+    {{-- Do It Myself — hand-built run-of-show, no AI --}}
+    <div class="tb-form-card">
+        <h3>🛠 Build My Run-of-Show</h3>
+        <div class="sub">Add each slot yourself — set the time and what's happening.</div>
+        <div id="tbmRows" style="display:flex;flex-direction:column;gap:8px;"></div>
+        <button type="button" id="tbmAdd" style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#2563eb;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.25);border-radius:9px;padding:8px 14px;cursor:pointer;font-family:inherit;">+ Add time slot</button>
+    </div>
+    @else
     {{-- Interactive builder --}}
     <div class="tb-form-card">
         <h3>🛠 Build My Run-of-Show</h3>
-        <div class="sub">Enter your event details and we'll generate a suggested timeline with real clock times.</div>
+        <div class="sub">{{ $isSemi ? "Enter your event — AI suggests a timeline you can edit." : "Enter your event details and AI builds the run-of-show with real clock times." }}</div>
         <form id="tbForm">
             <div class="tb-fgrid">
                 <div>
@@ -102,10 +127,11 @@
                     <input type="number" name="duration_hours" class="tb-inp" min="2" max="12" step="0.5" value="6" required>
                 </div>
             </div>
-            <button type="submit" class="tb-go" id="tbGo">✨ Generate Timeline</button>
+            <button type="submit" class="tb-go" id="tbGo">{{ $isSemi ? '✨ Suggest a Timeline' : '🤖 Build My Timeline' }}</button>
             <div class="tb-err" id="tbErr"></div>
         </form>
     </div>
+    @endif
 
     <div class="tb-loading" id="tbLoading">
         <div class="tb-spin"></div>
@@ -175,6 +201,7 @@
     const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const LEVEL = document.querySelector('.tb')?.dataset.level || 'maximum';
 
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -211,14 +238,46 @@
     });
 
     function render(res) {
-        document.getElementById('tbSummary').textContent = res.summary || '';
-        document.getElementById('tbSchedule').innerHTML = (res.schedule || []).map(s => `
-            <div class="tb-row">
-                <span class="t">${esc(s.time)}</span>
-                <span class="s">${esc(s.segment)}</span>
-                <span class="dm">${esc(s.duration_min)} min</span>
-            </div>`).join('');
+        document.getElementById('tbSummary').textContent = (LEVEL === 'semi' ? 'Suggested timeline — edit any time or segment below. ' : '') + (res.summary || '');
+        const sched = document.getElementById('tbSchedule');
+        if (LEVEL === 'semi') {
+            sched.innerHTML = (res.schedule || []).map(s => `
+                <div class="tb-row" style="gap:8px;">
+                    <input type="time" class="tb-inp" style="max-width:120px;" value="${to24(s.time)}">
+                    <input class="tb-inp" value="${esc(s.segment)}">
+                    <span class="dm">${esc(s.duration_min)} min</span>
+                </div>`).join('');
+        } else {
+            sched.innerHTML = (res.schedule || []).map(s => `
+                <div class="tb-row">
+                    <span class="t">${esc(s.time)}</span>
+                    <span class="s">${esc(s.segment)}</span>
+                    <span class="dm">${esc(s.duration_min)} min</span>
+                </div>`).join('');
+        }
     }
+    // "5:30 PM" -> "17:30" for the editable time input
+    function to24(t) {
+        const m = String(t).match(/(\d+):(\d+)\s*(AM|PM)/i);
+        if (!m) return '';
+        let h = parseInt(m[1], 10) % 12; if (/pm/i.test(m[3])) h += 12;
+        return String(h).padStart(2, '0') + ':' + m[2];
+    }
+})();
+
+// Do It Myself — manual run-of-show builder (no AI)
+(function () {
+    const rows = document.getElementById('tbmRows');
+    if (!rows) return;
+    function addRow(time = '', act = '') {
+        const div = document.createElement('div');
+        div.style.cssText = 'display:grid;grid-template-columns:120px 1fr 36px;gap:8px;align-items:center;';
+        div.innerHTML = `<input type="time" class="tb-inp" value="${time}"><input class="tb-inp" placeholder="What's happening (e.g. Ceremony)" value="${act}"><button type="button" title="Remove" style="background:none;border:1px solid var(--border-color);color:var(--text-muted);border-radius:8px;height:36px;cursor:pointer;">×</button>`;
+        div.querySelector('button').addEventListener('click', () => div.remove());
+        rows.appendChild(div);
+    }
+    document.getElementById('tbmAdd').addEventListener('click', () => addRow());
+    [['16:00', 'Guest Arrival'], ['16:30', 'Ceremony'], ['17:30', 'Cocktail Hour'], ['18:30', 'Dinner Service'], ['20:00', 'Dancing']].forEach(([t, a]) => addRow(t, a));
 })();
 </script>
 @endpush
