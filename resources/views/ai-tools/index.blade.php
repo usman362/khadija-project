@@ -39,6 +39,12 @@
     .akt-badge.professional { background: rgba(37,99,235,.12); color: #1d4ed8; }
     .akt-badge.both { background: rgba(22,163,74,.12); color: #15803d; }
     .akt-purpose { font-size: 12px; color: var(--text-muted); line-height: 1.5; flex: 1; }
+    /* AI level badge (Manual / Semi / Maximum) — from AiAccess resolver */
+    .akt-lvl { display: inline-block; margin-left: 6px; font-size: 9.5px; font-weight: 800; letter-spacing: .3px; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; vertical-align: middle; }
+    .lvl-manual  { background: rgba(100,116,139,.16); color: #64748b; }
+    .lvl-semi    { background: rgba(37,99,235,.15);  color: #2563eb; }
+    .lvl-maximum { background: rgba(22,163,74,.16);  color: #16a34a; }
+    .lvl-none    { background: rgba(239,68,68,.14);  color: #ef4444; }
     .akt-foot { margin-top: 13px; }
     .akt-use { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--akt), var(--akt-strong)); border-radius: 9px; padding: 9px 16px; text-decoration: none; }
     .akt-use svg { width: 14px; height: 14px; }
@@ -87,6 +93,8 @@
                             <div>
                                 <div class="akt-name">{{ $t['name'] }}</div>
                                 <span class="akt-badge {{ $t['audience'] }}">{{ $audLabel[$t['audience']] }}</span>
+                                @php($lvl = \App\Domain\AiFeatures\AiAccess::level(auth()->user(), $t['key']))
+                                <span class="akt-lvl lvl-{{ $lvl }}" title="Your AI level for this tool">{{ \App\Domain\AiFeatures\AiAccess::label($lvl) }}</span>
                             </div>
                         </div>
                         <p class="akt-purpose">{{ $t['purpose'] }}</p>
