@@ -1186,6 +1186,7 @@
             @endif
 
             @include('partials._breadcrumb')
+            @include('partials._ai_tool_identity')
 
             @yield('content')
         </div>
