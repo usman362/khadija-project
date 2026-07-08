@@ -17,8 +17,14 @@ class AiThemeAdvisorController extends Controller
     {
         $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
 
+        $level = \App\Domain\AiFeatures\AiAccess::level($request->user(), 'theme-advisor');
+        if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
+            $level = $request->query('preview');
+        }
+
         return view('ai-tools.theme-advisor', [
             'aiLayout' => $aiLayout,
+            'level'    => $level,
             'themes' => [
                 ['Elegant Garden Romance', 98, 'Lush greenery, soft blush florals and timeless elegance for a classic garden affair.', 'photo-1519225421980-715cb0215aed', ['#5a7d57', '#a8c3a0', '#f4d9d0', '#e8b4b8', '#c9a227'], true],
                 ['Modern Luxury', 95, 'Sleek black, warm gold accents and dramatic lighting for a sophisticated celebration.', 'photo-1511795409834-ef04bbd61622', ['#1a1a1a', '#2d2d2d', '#c9a227', '#e8d8a0', '#8a8a8a'], false],
