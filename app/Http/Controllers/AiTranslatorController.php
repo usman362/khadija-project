@@ -21,8 +21,16 @@ class AiTranslatorController extends Controller
     {
         $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
 
+        $level = \App\Domain\AiFeatures\AiAccess::level($request->user(), 'translator');
+        if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
+            $level = $request->query('preview');
+        }
+
         return view('ai-tools.translator', [
-            'aiLayout'  => $aiLayout,
+            'aiLayout'   => $aiLayout,
+            'level'      => $level,
+            'languages'  => self::LANGUAGES,
+            'phrasebook' => self::phrasebook(),
             'stats' => [
                 ['Phrasebook', (string) count(self::phrasebook()), 'good'], ['Languages', '5', ''],
                 ['Match', 'Fuzzy', 'good'], ['Built-in', 'No API', 'good'],

@@ -30,8 +30,48 @@
 @endpush
 
 @section('content')
-<div class="tr">
+@php
+    $level = $level ?? 'maximum';
+    $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
+    $lvlMeta = [
+        'manual'  => ['Do It Myself', '#64748b', 'Browse the event phrasebook yourself — look up phrases by hand, no auto-translate.'],
+        'semi'    => ['Help Me Plan', '#7c3aed', 'AI suggests a translation — edit the wording before you use it.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Type a phrase and AI translates it for you automatically.'],
+    ];
+    [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
+@endphp
+<div class="tr" data-level="{{ $level }}">
+
+    {{-- Membership-level banner --}}
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
+        <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--tr,#7c3aed);text-decoration:none;">Upgrade for more AI →</a>@endunless
+    </div>
+
     <div class="tr-stats">@foreach($stats as [$lbl, $val, $tone])<div class="tr-stat {{ $tone }}"><b>{{ $val }}</b><div class="l">{{ $lbl }}</div></div>@endforeach</div>
+
+    @if($isManual)
+    {{-- Do It Myself — browse the phrasebook by hand, no auto-translate --}}
+    <div class="tr-card">
+        <h3>📖 Event Phrasebook</h3>
+        <div class="det">Pick a language and browse the common booking phrases yourself.</div>
+        <div class="tr-langs" id="trmLangs">
+            @foreach($languages as $i => $lang)
+                <span class="tr-lang {{ $i === 0 ? 'on' : '' }}" data-lang="{{ $lang }}">{{ ucfirst($lang) }}</span>
+            @endforeach
+        </div>
+        <div id="trmList" style="max-height:520px;overflow-y:auto;">
+            @foreach($phrasebook as $p)
+                <div class="tr-sug-item" data-spanish="{{ $p['spanish'] }}" data-french="{{ $p['french'] }}" data-german="{{ $p['german'] }}" data-italian="{{ $p['italian'] }}" data-portuguese="{{ $p['portuguese'] }}">
+                    <div class="en">{{ $p['en'] }}</div>
+                    <div class="tt">{{ $p['spanish'] }}</div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+    @else
+    {{-- Help Me Plan / Coordinate It For Me — the translator --}}
     <div class="tr-grid">
         <div class="tr-card">
             <h3>🌐 Phrase to translate</h3>
@@ -47,16 +87,17 @@
                     <span class="tr-lang" data-lang="portuguese">Portuguese</span>
                 </div>
                 <input type="hidden" name="target_language" id="trLang" value="spanish">
-                <button class="tr-btn" id="trBtn" type="submit">🔄 Translate</button>
+                <button class="tr-btn" id="trBtn" type="submit">{{ $isSemi ? '✨ Suggest a Translation' : '🔄 Translate' }}</button>
             </form>
         </div>
         <div class="tr-card">
-            <h3>✨ Translation</h3>
-            <div class="det" id="trTargetDet">Pick a language and translate</div>
+            <h3>{{ $isSemi ? '✨ Suggested Translation' : '✨ Translation' }}</h3>
+            <div class="det" id="trTargetDet">{{ $isSemi ? 'Edit the suggestion before you use it' : 'Pick a language and translate' }}</div>
             <div id="trOut"><p class="tr-empty">The translation and closest phrasebook matches will appear here.</p></div>
             <p class="tr-note">Live translation of any free text activates once an AI key is configured. Until then, this built-in phrasebook covers the most common event phrases across five languages.</p>
         </div>
     </div>
+    @endif
 </div>
 @endsection
 
@@ -65,6 +106,7 @@
 (function () {
     const form = document.getElementById('trForm');
     if (!form) return;
+    const LEVEL = document.querySelector('.tr')?.dataset.level || 'maximum';
     const btn  = document.getElementById('trBtn');
     const out  = document.getElementById('trOut');
     const err  = document.getElementById('trErr');
@@ -114,8 +156,13 @@
 
     function render(res) {
         det.textContent = res.target_language + (res.matched ? ' · phrasebook match' : ' · no exact match');
-        let html = '<div class="tr-tag">' + (res.matched ? 'TRANSLATED' : 'NOTE') + '</div>';
-        html += '<div class="tr-out">' + esc(res.translation) + '</div>';
+        let html = '<div class="tr-tag">' + (LEVEL === 'semi' ? 'SUGGESTED — EDIT AS NEEDED' : (res.matched ? 'TRANSLATED' : 'NOTE')) + '</div>';
+        // Help Me Plan: the translation is editable; Coordinate It For Me: read-only.
+        if (LEVEL === 'semi') {
+            html += '<textarea class="tr-text tr-out" id="trEdit" style="min-height:80px;">' + esc(res.translation) + '</textarea>';
+        } else {
+            html += '<div class="tr-out">' + esc(res.translation) + '</div>';
+        }
         if (res.summary) html += '<p class="tr-note">' + esc(res.summary) + '</p>';
         if (res.phrasebook_suggestions && res.phrasebook_suggestions.length) {
             html += '<div class="tr-sug"><h4>Available event phrases in ' + esc(res.target_language) + '</h4>';
@@ -126,6 +173,24 @@
         }
         out.innerHTML = html;
     }
+})();
+
+// Do It Myself — browse the phrasebook by hand (no compute call).
+(function () {
+    const langs = document.getElementById('trmLangs');
+    const list = document.getElementById('trmList');
+    if (!langs || !list) return;
+    langs.addEventListener('click', function (e) {
+        const l = e.target.closest('.tr-lang');
+        if (!l) return;
+        this.querySelectorAll('.tr-lang').forEach(x => x.classList.remove('on'));
+        l.classList.add('on');
+        const lang = l.getAttribute('data-lang');
+        list.querySelectorAll('.tr-sug-item').forEach(row => {
+            const tt = row.querySelector('.tt');
+            if (tt) tt.textContent = row.getAttribute('data-' + lang) || '';
+        });
+    });
 })();
 </script>
 @endpush
