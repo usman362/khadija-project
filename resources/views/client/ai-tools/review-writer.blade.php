@@ -29,6 +29,15 @@
             default => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 20 5v6.2c0 5-3.5 8.6-8 10.3-4.5-1.7-8-5.3-8-10.3V5z"/><path d="M8.5 12l2.3 2.3L15.7 9.5" stroke="#e2670d" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
         };
     };
+
+    $level = $level ?? 'maximum';
+    $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
+    $lvlMeta = [
+        'manual'  => ['Do It Myself', '#64748b', 'Write your own review by hand — no AI, just your words.'],
+        'semi'    => ['Help Me Plan', '#ea580c', 'AI drafts a review — edit the wording before you post it.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter a few thoughts and AI writes the full review for you.'],
+    ];
+    [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
 
 @push('styles')
@@ -179,10 +188,25 @@
 </style>
 @endpush
 
+@push('styles')
+<style>
+    .rw-review-text[contenteditable="true"] { outline: none; cursor: text; }
+    .rw-review-text[contenteditable="true"]:focus { box-shadow: inset 0 0 0 2px rgba(234,88,12,.35); border-radius: 8px; }
+    .rw-review-text[data-placeholder]:empty:before { content: attr(data-placeholder); color: var(--text-muted); }
+</style>
+@endpush
+
 @section('content')
-<div class="rw" data-compose-url="{{ route('ai-tools.review-writer.compose') }}">
+<div class="rw" data-compose-url="{{ route('ai-tools.review-writer.compose') }}" data-level="{{ $level }}">
 
     @include('partials._ai_quota_badge', ['status' => $status, 'tool' => 'AI Review Writer'])
+
+    {{-- Membership-level banner --}}
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
+        <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--rw,#ea580c);text-decoration:none;">Upgrade for more AI →</a>@endunless
+    </div>
 
     {{-- hero --}}
     <div class="rw-hero">
@@ -235,7 +259,7 @@
             {{-- share experience --}}
             <div class="rw-card">
                 <div class="rw-sec-h"><span class="n">1</span><b>Share Your Experience</b></div>
-                <p class="rw-sec-sub">A few keywords are enough — AI will turn them into a natural, helpful review.</p>
+                <p class="rw-sec-sub">{{ $isManual ? 'Add a few details for context, then write your review below.' : ($isSemi ? 'A few keywords are enough — AI drafts a review you can edit.' : 'A few keywords are enough — AI writes a natural, helpful review.') }}</p>
                 <div class="rw-form-grid">
                     <div>
                         <div class="rw-2col">
@@ -255,7 +279,7 @@
                             </div>
                         </div>
                         <div class="rw-fld"><label>Your Quick Thoughts <span style="color:var(--rw);">*</span> <span class="opt">(bullet points, keywords, or full sentences — anything works)</span></label><textarea class="rw-textarea" id="rw-thoughts" placeholder="e.g. On time, great energy, captured amazing candid shots, professional team, delivered edits in 2 weeks...">{{ $defaults['thoughts'] }}</textarea></div>
-                        <button type="button" class="rw-gen-btn" id="rw-generate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>Generate Review</button>
+                        @unless($isManual)<button type="button" class="rw-gen-btn" id="rw-generate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>{{ $isSemi ? '✨ Suggest a Review' : '🤖 Write My Review' }}</button>@endunless
                     </div>
                     <div class="rw-tips">
                         <div class="rw-tips-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg>Smart Review Tips</div>
@@ -273,12 +297,15 @@
             {{-- generated review --}}
             <div class="rw-card">
                 <div class="rw-gr-h">
-                    <div class="rw-gr-h-l"><span class="rw-sec-h" style="margin:0;"><span class="n">2</span><b>AI Generated Review</b></span><span class="rw-tone-badge" id="rw-tone-badge">{{ $review['toneLabel'] }}</span></div>
+                    <div class="rw-gr-h-l"><span class="rw-sec-h" style="margin:0;"><span class="n">2</span><b>{{ $isManual ? 'Your Review' : ($isMax ? 'AI-Written Review' : 'AI-Drafted Review') }}</b></span>@unless($isManual)<span class="rw-tone-badge" id="rw-tone-badge">{{ $review['toneLabel'] }}</span>@endunless</div>
+                    @unless($isManual)
                     <div class="rw-gr-actions">
                         <button type="button" class="rw-mini-btn" id="rw-rewrite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Rewrite</button>
                         <button type="button" class="rw-mini-btn" id="rw-regen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Regenerate</button>
                     </div>
+                    @endunless
                 </div>
+                @unless($isManual)
                 <div class="rw-tabs" id="rw-tabs">
                     <span class="rw-tab" data-fmt="short">Short Review</span>
                     <span class="rw-tab on" data-fmt="detailed">Detailed Review</span>
@@ -287,7 +314,8 @@
                     <span class="rw-tab" data-fmt="linkedin">LinkedIn</span>
                     <span class="rw-tab" data-fmt="custom">Custom</span>
                 </div>
-                <div class="rw-review-text" id="rw-review-text">{{ $review['formats']['detailed'] }}</div>
+                @endunless
+                <div class="rw-review-text" id="rw-review-text" @unless($isMax)contenteditable="true" spellcheck="true"@endunless @if($isManual)data-placeholder="Write your review here…" style="min-height:150px;"@endif>{{ $isManual ? '' : $review['formats']['detailed'] }}</div>
                 <div class="rw-gr-foot">
                     <span class="rw-wc">Word Count: <b id="rw-wc">{{ $review['words']['detailed'] }}</b></span>
                     <div style="display:flex;gap:8px;">
@@ -403,6 +431,7 @@
 (function () {
     const root = document.querySelector('.rw');
     if (!root) return;
+    const LEVEL = root.dataset.level || 'maximum';
     const url = root.dataset.composeUrl;
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
     const $ = (id) => document.getElementById(id);
@@ -447,22 +476,24 @@
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
                 body: JSON.stringify({ provider: $('rw-provider').value, service: $('rw-service').value, event: $('rw-event').value, rating: rating, tone: tone, thoughts: $('rw-thoughts').value }),
             });
-            if (res.ok) { const d = await res.json(); review = d.review; $('rw-tone-badge').textContent = review.toneLabel; showFmt(fmt); }
+            if (res.ok) { const d = await res.json(); review = d.review; const tb = $('rw-tone-badge'); if (tb) tb.textContent = review.toneLabel; showFmt(fmt); }
         } catch (e) { /* keep last review */ }
         finally { if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.innerHTML = o; } }
     }
 
-    $('rw-generate').addEventListener('click', function () { generate(this); });
-    $('rw-regen').addEventListener('click', function () { generate(this); });
-    $('rw-rewrite').addEventListener('click', function () { generate(this); });
-    $('rw-copy').addEventListener('click', function () {
-        navigator.clipboard?.writeText(review.formats[fmt]);
+    $('rw-generate')?.addEventListener('click', function () { generate(this); });
+    $('rw-regen')?.addEventListener('click', function () { generate(this); });
+    $('rw-rewrite')?.addEventListener('click', function () { generate(this); });
+    $('rw-copy')?.addEventListener('click', function () {
+        // Copy what's actually in the box (reflects manual writing + semi edits).
+        navigator.clipboard?.writeText($('rw-review-text')?.innerText || review.formats[fmt]);
         const o = this.innerHTML; this.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Copied!';
         setTimeout(() => { this.innerHTML = o; }, 1500);
     });
-    $('rw-save-notes').addEventListener('click', function () { const o = this.textContent; this.textContent = 'Saved!'; setTimeout(() => { this.textContent = o; }, 1400); });
+    $('rw-save-notes')?.addEventListener('click', function () { const o = this.textContent; this.textContent = 'Saved!'; setTimeout(() => { this.textContent = o; }, 1400); });
 
-    showFmt('detailed');
+    // Do It Myself starts with a blank box the user fills — don't seed AI text.
+    if (LEVEL !== 'manual') showFmt('detailed');
 })();
 </script>
 @endsection

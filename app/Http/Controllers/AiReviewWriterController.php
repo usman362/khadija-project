@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\AiFeatures\AiAccess;
 use App\Domain\AiFeatures\AiFeatureCode;
 use App\Domain\AiFeatures\Services\AiFeatureGate;
 use Illuminate\Http\JsonResponse;
@@ -51,12 +52,18 @@ class AiReviewWriterController extends Controller
     {
         $review = $this->composeAll(self::DEFAULTS);
 
+        $level = AiAccess::level($request->user(), 'review-writer');
+        if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
+            $level = $request->query('preview');
+        }
+
         return view('client.ai-tools.review-writer', [
             'tones'    => self::TONES,
             'defaults' => self::DEFAULTS,
             'keywords' => self::SUGGESTED_KEYWORDS,
             'review'   => $review,
             'metrics'  => $this->metrics(),
+            'level'    => $level,
             'status'   => $this->gate->status($request->user(), AiFeatureCode::REVIEW_WRITER),
         ]);
     }
