@@ -33,7 +33,25 @@
 @endpush
 
 @section('content')
-<div class="ma">
+@php
+    $level = $level ?? 'maximum';
+    $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
+    $lvlMeta = [
+        'manual'  => ['Do It Myself', '#64748b', 'Write your own message by hand — no AI, just your words.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'AI drafts message options — edit the wording before you send.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Pick a purpose and tone and AI writes the whole message for you.'],
+    ];
+    [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
+@endphp
+<div class="ma" data-level="{{ $level }}">
+
+    {{-- Membership-level banner --}}
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
+        <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--ma,#2563eb);text-decoration:none;">Upgrade for more AI →</a>@endunless
+    </div>
+
     <div class="ma-stats">@foreach($stats as [$lbl, $val, $tone])<div class="ma-stat {{ $tone }}"><b>{{ $val }}</b><div class="l">{{ $lbl }}</div></div>@endforeach</div>
     <div class="ma-grid">
         <div class="ma-card">
@@ -59,14 +77,27 @@
                     <span class="ma-tone" data-tone="warm">Warm</span>
                 </div>
                 <input type="hidden" name="tone" id="maTone" value="friendly">
-                <button class="ma-btn" id="maBtn" type="submit">✍️ Draft My Message</button>
+                @unless($isManual)<button class="ma-btn" id="maBtn" type="submit">{{ $isSemi ? '✨ Suggest Messages' : '✍️ Draft My Message' }}</button>@endunless
+                @if($isManual)<div style="font-size:12px;color:var(--text-muted);margin-top:6px;">Use these as notes, then write your message on the right. <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--ma,#2563eb);font-weight:700;text-decoration:none;">Want AI to draft it? Upgrade →</a></div>@endif
             </form>
         </div>
+        @if($isManual)
+        {{-- Do It Myself — write your own message by hand --}}
         <div class="ma-card">
-            <h3>📨 Suggested Messages</h3>
+            <h3>✉️ Your Message</h3>
+            <label class="ma-lbl">Subject</label>
+            <input class="ma-in" id="mamSubject" placeholder="Subject line">
+            <label class="ma-lbl">Message</label>
+            <textarea class="ma-in" id="mamBody" style="min-height:200px;" placeholder="Write your message here…"></textarea>
+            <button type="button" class="ma-btn" id="mamCopy" style="margin-top:12px;">📋 Copy message</button>
+        </div>
+        @else
+        <div class="ma-card">
+            <h3>{{ $isMax ? '📨 AI-Written Messages' : '📨 Suggested Messages' }}</h3>
             <div class="ma-summary" id="maSummary" style="display:none;"></div>
             <div id="maOut"><p class="ma-empty">Choose a purpose and tone, then draft your message — a few options will appear here.</p></div>
         </div>
+        @endif
     </div>
 </div>
 @endsection
@@ -76,6 +107,7 @@
 (function () {
     const form = document.getElementById('maForm');
     if (!form) return;
+    const LEVEL = document.querySelector('.ma')?.dataset.level || 'maximum';
     const btn  = document.getElementById('maBtn');
     const out  = document.getElementById('maOut');
     const err  = document.getElementById('maErr');
@@ -95,6 +127,7 @@
 
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
+        if (LEVEL === 'manual' || !btn) return;   // Do It Myself has no AI draft
         err.classList.remove('on');
         btn.disabled = true;
         out.innerHTML = '<p class="ma-empty">Drafting your message…</p>';
@@ -125,25 +158,45 @@
 
     function render(res) {
         if (res.summary) { summaryEl.textContent = res.summary; summaryEl.style.display = 'block'; }
+        const editable = LEVEL === 'semi';
         let html = '';
         (res.variations || []).forEach(v => {
+            const bodyHtml = editable
+                ? '<textarea class="ma-in ma-edit" style="min-height:150px;">' + esc(v.body) + '</textarea>'
+                : '<div class="ma-out">' + esc(v.body) + '</div>';
             html += '<div class="ma-var">'
                 + '<div class="ma-ready">' + esc(v.label) + '</div>'
                 + '<div class="ma-subj">Subject: ' + esc(v.subject) + '</div>'
-                + '<div class="ma-out">' + esc(v.body) + '</div>'
+                + bodyHtml
                 + '<button type="button" class="ma-copy" data-body="' + esc(v.body) + '">📋 Copy</button>'
                 + '</div>';
         });
         out.innerHTML = html || '<p class="ma-empty">No drafts generated.</p>';
         out.querySelectorAll('.ma-copy').forEach(b => {
             b.addEventListener('click', () => {
-                const txt = b.getAttribute('data-body') || '';
+                // Copy the edited text when present (semi), else the original body (max).
+                const ta = b.closest('.ma-var').querySelector('.ma-edit');
+                const txt = ta ? ta.value : (b.getAttribute('data-body') || '');
                 navigator.clipboard?.writeText(txt);
                 b.textContent = '✓ Copied';
                 setTimeout(() => { b.textContent = '📋 Copy'; }, 1500);
             });
         });
     }
+})();
+
+// Do It Myself — copy the hand-written message (no AI, no server call).
+(function () {
+    const copyBtn = document.getElementById('mamCopy');
+    if (!copyBtn) return;
+    copyBtn.addEventListener('click', () => {
+        const subj = document.getElementById('mamSubject')?.value || '';
+        const body = document.getElementById('mamBody')?.value || '';
+        const txt = (subj ? 'Subject: ' + subj + '\n\n' : '') + body;
+        navigator.clipboard?.writeText(txt);
+        copyBtn.textContent = '✓ Copied';
+        setTimeout(() => { copyBtn.textContent = '📋 Copy message'; }, 1500);
+    });
 })();
 </script>
 @endpush

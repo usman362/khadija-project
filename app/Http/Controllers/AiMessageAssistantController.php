@@ -18,8 +18,14 @@ class AiMessageAssistantController extends Controller
     {
         $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
 
+        $level = \App\Domain\AiFeatures\AiAccess::level($request->user(), 'message-assistant');
+        if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
+            $level = $request->query('preview');
+        }
+
         return view('ai-tools.message-assistant', [
             'aiLayout' => $aiLayout,
+            'level'    => $level,
             'stats' => [
                 ['Message Purposes', '5', ''], ['Tone Options', '3', 'good'],
                 ['Drafts per Run', '2–3', 'good'], ['Built-in', 'No API', 'good'],
