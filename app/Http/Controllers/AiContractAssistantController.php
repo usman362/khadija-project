@@ -18,8 +18,14 @@ class AiContractAssistantController extends Controller
     {
         $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
 
+        $level = \App\Domain\AiFeatures\AiAccess::level($request->user(), 'contract-assistant');
+        if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
+            $level = $request->query('preview');
+        }
+
         return view('ai-tools.contract-assistant', [
             'aiLayout' => $aiLayout,
+            'level'    => $level,
             'stats' => [
                 ['Clause Sections', '6', ''], ['Deposit Default', '30%', ''],
                 ['Cancellation Modes', '3', 'good'], ['Built-in', 'No API', 'good'],

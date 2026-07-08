@@ -26,16 +26,60 @@
     .ca-empty { font-size: 12.5px; color: var(--text-muted); }
     .ca-err { display: none; font-size: 12.5px; color: #dc2626; background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.3); border-radius: 9px; padding: 10px; margin-bottom: 12px; }
     .ca-err.on { display: block; }
+
+    /* Help Me Plan — editable draft fields */
+    .ca-edit { width: 100%; border: 1px solid var(--border-color); border-radius: 9px; padding: 9px 11px; font-size: 12.5px; color: var(--text-primary); background: var(--bg-body, var(--bg-card)); font-family: inherit; margin-bottom: 10px; }
+    .ca-edit:focus { outline: none; border-color: var(--ca); box-shadow: 0 0 0 3px rgba(124,58,237,.15); }
+    .ca-edit-h { font-weight: 800; }
+    textarea.ca-edit { line-height: 1.55; resize: vertical; }
+
+    /* Do It Myself — hand-built agreement builder */
+    .ca-crow { border: 1px solid var(--border-color); border-radius: 11px; padding: 12px; margin-bottom: 12px; position: relative; }
+    .ca-crow .ca-del { position: absolute; top: 10px; right: 10px; border: none; background: rgba(220,38,38,.1); color: #dc2626; border-radius: 8px; width: 30px; height: 30px; cursor: pointer; font-size: 16px; }
+    .ca-crow-h { padding-right: 44px; }
+    .ca-add { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #6d28d9; background: rgba(124,58,237,.09); border: 1px solid rgba(124,58,237,.28); border-radius: 10px; padding: 9px 15px; cursor: pointer; font-family: inherit; }
+
     @media (max-width: 1000px) { .ca-grid { grid-template-columns: minmax(0,1fr); } .ca-stats { grid-template-columns: 1fr 1fr; } }
 </style>
 @endpush
 
 @section('content')
-<div class="ca">
+@php
+    $level = $level ?? 'maximum';
+    $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
+    $lvlMeta = [
+        'manual'  => ['Do It Myself', '#64748b', 'Assemble your own draft by hand — add, edit and remove your own clauses. No AI.'],
+        'semi'    => ['Help Me Plan', '#7c3aed', 'AI drafts the agreement — reword any clause before you use it.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your details and AI drafts the full agreement for you.'],
+    ];
+    [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
+@endphp
+<div class="ca" data-level="{{ $level }}">
+
+    {{-- Membership-level banner --}}
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
+        <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:#6d28d9;text-decoration:none;">Upgrade for more AI →</a>@endunless
+    </div>
+
+    @if($isManual)
+    {{-- Do It Myself — hand-built agreement, no AI --}}
+    <div class="ca-card ca-mano">
+        <h3>📝 Build My Agreement</h3>
+        <div style="font-size:12.5px;color:var(--text-muted);margin:-6px 0 14px;">Assemble your own draft by hand — add, edit and remove clauses. No AI.</div>
+        <label class="ca-lbl">Agreement Title</label>
+        <input class="ca-in" id="camTitle" placeholder="e.g. Service Agreement — Wedding Floral &amp; Décor">
+        <div id="camClauses"></div>
+        <button type="button" id="camAdd" class="ca-add">+ Add clause</button>
+        <div class="ca-disc" style="display:block;margin-top:14px;">⚠️ This is a draft template for your convenience and is not legal advice — have a professional review it before signing.</div>
+    </div>
+    @else
     <div class="ca-stats">@foreach($stats as [$lbl, $val, $tone])<div class="ca-stat {{ $tone }}"><b>{{ $val }}</b><div class="l">{{ $lbl }}</div></div>@endforeach</div>
     <div class="ca-grid">
         <div class="ca-card">
             <h3>📄 Event & Agreement Details</h3>
+            <div style="font-size:12.5px;color:var(--text-muted);margin:-6px 0 12px;">{{ $isSemi ? 'AI drafts an agreement you can reword clause by clause before using.' : 'AI drafts a full plain-English agreement from your details.' }}</div>
             <div class="ca-err" id="caErr"></div>
             <form id="caForm">
                 <label class="ca-lbl">Service *</label>
@@ -74,7 +118,7 @@
                         </select>
                     </div>
                 </div>
-                <button class="ca-btn" id="caBtn" type="submit">📝 Generate Draft Agreement</button>
+                <button class="ca-btn" id="caBtn" type="submit">{{ $isSemi ? '✨ Suggest Draft Agreement' : '🤖 Draft My Agreement' }}</button>
             </form>
         </div>
         <div class="ca-card">
@@ -83,6 +127,7 @@
             <div class="ca-disc" id="caDisc" style="display:none;"></div>
         </div>
     </div>
+    @endif
 </div>
 @endsection
 
@@ -97,6 +142,7 @@
     const disc = document.getElementById('caDisc');
     const titleEl = document.getElementById('caTitle');
     const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    const LEVEL = document.querySelector('.ca')?.dataset.level || 'maximum';
 
     function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
@@ -131,15 +177,61 @@
     });
 
     function render(res) {
+        // "Help Me Plan" renders the title, summary and every clause as editable
+        // fields the user can reword; "Coordinate It For Me" is read-only.
+        const editable = LEVEL === 'semi';
         titleEl.textContent = '📝 ' + (res.title || 'Draft Agreement');
         let html = '';
-        if (res.summary) html += '<div class="ca-summary">' + esc(res.summary) + '</div>';
-        (res.clauses || []).forEach(c => {
-            html += '<div class="ca-clause"><h6>' + esc(c.heading) + '</h6><pre>' + esc(c.body) + '</pre></div>';
-        });
+        if (editable) {
+            html += '<label class="ca-lbl">Title</label>' +
+                '<input class="ca-edit ca-edit-h" value="' + esc(res.title || '') + '">';
+            if (res.summary) {
+                html += '<label class="ca-lbl">Summary</label>' +
+                    '<textarea class="ca-edit" rows="3">' + esc(res.summary) + '</textarea>';
+            }
+            (res.clauses || []).forEach(c => {
+                html += '<div class="ca-clause">' +
+                    '<input class="ca-edit ca-edit-h" value="' + esc(c.heading) + '">' +
+                    '<textarea class="ca-edit" rows="5">' + esc(c.body) + '</textarea></div>';
+            });
+        } else {
+            if (res.summary) html += '<div class="ca-summary">' + esc(res.summary) + '</div>';
+            (res.clauses || []).forEach(c => {
+                html += '<div class="ca-clause"><h6>' + esc(c.heading) + '</h6><pre>' + esc(c.body) + '</pre></div>';
+            });
+        }
         out.innerHTML = html || '<p class="ca-empty">No clauses generated.</p>';
         if (res.disclaimer) { disc.textContent = '⚠️ ' + res.disclaimer; disc.style.display = 'block'; }
     }
+})();
+
+// Do It Myself — hand-built agreement builder (no AI, no server call).
+(function () {
+    const wrap = document.getElementById('camClauses');
+    const add  = document.getElementById('camAdd');
+    if (!wrap || !add) return;
+
+    function addClause(heading, body) {
+        const row = document.createElement('div');
+        row.className = 'ca-crow';
+        row.innerHTML =
+            '<button type="button" class="ca-del" title="Remove">&times;</button>' +
+            '<input class="ca-edit ca-edit-h ca-crow-h" placeholder="Clause heading (e.g. 1. Scope of Services)">' +
+            '<textarea class="ca-edit" rows="4" placeholder="Write this clause in your own words…"></textarea>';
+        row.querySelector('input').value = heading || '';
+        row.querySelector('textarea').value = body || '';
+        row.querySelector('.ca-del').addEventListener('click', function () { row.remove(); });
+        wrap.appendChild(row);
+    }
+
+    // Seed a few common clause prompts the user can rewrite, add to or remove.
+    [
+        ['1. Scope of Services', 'Describe exactly what will be provided, where and when.'],
+        ['2. Fees & Payment Schedule', 'State the total fee, the deposit amount and when the balance is due.'],
+        ['3. Cancellation & Refunds', 'Explain what happens if either party cancels, and any refund terms.'],
+    ].forEach(function (c) { addClause(c[0], c[1]); });
+
+    add.addEventListener('click', function () { addClause(); });
 })();
 </script>
 @endpush
