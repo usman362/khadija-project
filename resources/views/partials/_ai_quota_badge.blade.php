@@ -23,10 +23,10 @@
         </a>
     </div>
 @elseif($unlimited)
-    <div style="display:inline-flex; align-items:center; gap:7px; padding:6px 14px; margin-bottom:18px; border-radius:999px; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); color:#10b981; font-size:12.5px; font-weight:700;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18.178 8c5.096 0 5.096 8 0 8-5.095 0-7.133-8-12.739-8-4.585 0-4.585 8 0 8 5.606 0 7.644-8 12.739-8z"/></svg>
-        Unlimited on your plan
-    </div>
+    {{-- Intentionally no badge. Peter: stop marketing the tool as simply
+         "Unlimited" — the AI level banner (Do It Myself / Help Me Plan /
+         Coordinate It For Me) already states the user's entitlement, so a
+         second "Unlimited on your plan" pill was redundant. --}}
 @elseif($remaining <= 0)
     <div style="display:inline-flex; align-items:center; gap:7px; padding:6px 14px; margin-bottom:18px; border-radius:999px; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#ef4444; font-size:12.5px; font-weight:700;">
         Monthly limit reached — resets on the 1st
