@@ -65,13 +65,25 @@ class LoginController extends Controller
             return redirect()->route('influencer.status');
         }
 
-        // Land each user in THEIR OWN portal and reset the active-role session,
-        // so a stale "professional mode" from a previous session can't carry
-        // over and bounce a client into the professional portal. A user who
-        // holds the client role logs in as a client (they can still switch to
-        // professional via the toggle); supplier-only users go professional.
-        // Honor the intended URL (e.g. a guest who clicked /browse and was sent
-        // to log in first) — otherwise land each user in their own portal.
+        // Honor the login page the user came through. A dual-role user who signs
+        // in via /professional/login must land in the PROFESSIONAL portal (blue)
+        // without having to switch out of client mode — and vice-versa. The
+        // login form posts a hidden `login_role` for this.
+        $intended = (string) $request->input('login_role', '');
+
+        if ($intended === RoleName::SUPPLIER->value && $user->hasRole(RoleName::SUPPLIER->value)) {
+            session(['active_role' => RoleName::SUPPLIER->value]);
+            return redirect()->intended(route('professional.dashboard'));
+        }
+
+        if ($intended === RoleName::CLIENT->value && $user->hasRole(RoleName::CLIENT->value)) {
+            session(['active_role' => RoleName::CLIENT->value]);
+            return redirect()->intended(route('client.dashboard'));
+        }
+
+        // No explicit intent (generic /login): land each user in their own
+        // portal, resetting any stale active-role. Client role wins for
+        // dual-role users; supplier-only users go professional.
         if ($user->hasRole(RoleName::CLIENT->value)) {
             session(['active_role' => RoleName::CLIENT->value]);
             return redirect()->intended(route('client.dashboard'));

@@ -196,6 +196,9 @@
 
             <form method="POST" action="{{ route('login') }}" id="rgLoginForm">
                 @csrf
+                {{-- Which portal the user is signing in through, so a dual-role
+                     user lands in the right mode (professional login → pro portal). --}}
+                <input type="hidden" name="login_role" value="{{ $loginRole }}">
 
                 <div class="rg-field">
                     <label class="rg-label">Email Address</label>
