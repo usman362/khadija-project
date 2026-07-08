@@ -85,12 +85,18 @@ class AiStaffingPlannerController extends Controller
 
         $plan = $this->plan('wedding', 150, 10);
 
+        $level = \App\Domain\AiFeatures\AiAccess::level($request->user(), 'staffing-planner');
+        if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
+            $level = $request->query('preview');
+        }
+
         return view('client.ai-tools.staffing-planner', [
             'eventTypes' => self::EVENT_TYPES,
             'event'      => $event,
             'roles'      => $plan['roles'],
             'axis'       => $plan['axis'],
             'stats'      => $plan['stats'],
+            'level'      => $level,
             // Professional-facing tool → professional shell for suppliers.
             'aiLayout'   => $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client',
         ]);

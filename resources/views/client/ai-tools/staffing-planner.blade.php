@@ -127,7 +127,24 @@
 @endpush
 
 @section('content')
-<div class="sp" data-gen-url="{{ route('ai-tools.staffing-planner.generate') }}">
+@php
+    $level = $level ?? 'maximum';
+    $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
+    $lvlMeta = [
+        'manual'  => ['Do It Myself', '#64748b', 'Build your own staff roster by hand — add each role yourself, no AI plan.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'AI suggests a roster — adjust the event and staff counts, then regenerate.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and AI builds the whole staffing plan for you.'],
+    ];
+    [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
+@endphp
+<div class="sp" data-gen-url="{{ route('ai-tools.staffing-planner.generate') }}" data-level="{{ $level }}">
+
+    {{-- Membership-level banner --}}
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
+        <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--sp,#2563eb);text-decoration:none;">Upgrade for more AI →</a>@endunless
+    </div>
 
     {{-- header --}}
     <div class="sp-head">
@@ -162,6 +179,15 @@
         </div>
     </div>
 
+    @if($isManual)
+    {{-- Do It Myself — build your own roster by hand, no AI --}}
+    <div class="sp-card sp-mb">
+        <div class="sp-tl-h"><b>🛠 Build My Staff Roster</b><span style="font-size:12.5px;color:var(--text-muted);">Total staff: <b id="spm-total" style="color:var(--sp);">0</b></span></div>
+        <div id="spmRows" style="display:flex;flex-direction:column;gap:10px;"></div>
+        <button type="button" id="spmAdd" style="margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--sp);background:var(--sp-soft);border:1px solid rgba(37,99,235,.28);border-radius:10px;padding:9px 15px;cursor:pointer;font-family:inherit;">+ Add role</button>
+        <div style="margin-top:14px;font-size:12px;color:var(--text-muted);">Want AI to build this roster + timeline for you automatically? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--sp);font-weight:700;text-decoration:none;">Upgrade →</a></div>
+    </div>
+    @else
     {{-- timeline --}}
     <div class="sp-card sp-mb">
         <div class="sp-tl-h">
@@ -201,13 +227,15 @@
 
         <div class="sp-allset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg><span id="sp-allset-txt">All set! Your team, perfectly timed.</span></div>
 
-        {{-- adjust panel (revealed by Quick Actions) --}}
-        <div class="sp-adjust" id="sp-adjust">
+        {{-- adjust panel (Help Me Plan only — the assistive tune-and-regenerate) --}}
+        @if($isSemi)
+        <div class="sp-adjust open" id="sp-adjust">
             <div class="fld"><label>Event Type</label><select id="sp-in-type">@foreach($eventTypes as $k => $v)<option value="{{ $k }}" @selected($k === $event['type'])>{{ $v }}</option>@endforeach</select></div>
             <div class="fld"><label>Guest Count</label><input type="number" id="sp-in-guests" min="10" max="2000" value="{{ $event['guests'] }}"></div>
             <div class="fld"><label>Start Time</label><select id="sp-in-start">@for($h = 6; $h <= 20; $h++)<option value="{{ $h }}" @selected($h === 10)>{{ $h <= 12 ? $h : $h - 12 }}:00 {{ $h < 12 ? 'AM' : 'PM' }}</option>@endfor</select></div>
             <div class="fld" style="flex:0 0 auto;"><button type="button" class="sp-banner" style="all:unset;display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;font-size:13px;font-weight:800;padding:10px 18px;border-radius:9px;cursor:pointer;" id="sp-regen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Regenerate Plan</button></div>
         </div>
+        @endif
     </div>
 
     {{-- stats --}}
@@ -259,6 +287,8 @@
         </div>
     </div>
 
+    @endif
+
     {{-- bottom banner --}}
     <div class="sp-banner">
         <span class="sp-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
@@ -271,6 +301,7 @@
 (function () {
     const root = document.querySelector('.sp');
     if (!root) return;
+    const LEVEL = root.dataset.level || 'maximum';
     const url = root.dataset.genUrl;
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
     const $ = (id) => document.getElementById(id);
@@ -329,14 +360,14 @@
     }
 
     // View toggle.
-    $('sp-view-timeline').addEventListener('click', function () { $('sp-timeline-view').style.display = ''; $('sp-list-view').style.display = 'none'; this.classList.add('on'); $('sp-view-list').classList.remove('on'); });
-    $('sp-view-list').addEventListener('click', function () { $('sp-timeline-view').style.display = 'none'; $('sp-list-view').style.display = ''; this.classList.add('on'); $('sp-view-timeline').classList.remove('on'); });
+    $('sp-view-timeline')?.addEventListener('click', function () { $('sp-timeline-view').style.display = ''; $('sp-list-view').style.display = 'none'; this.classList.add('on'); $('sp-view-list').classList.remove('on'); });
+    $('sp-view-list')?.addEventListener('click', function () { $('sp-timeline-view').style.display = 'none'; $('sp-list-view').style.display = ''; this.classList.add('on'); $('sp-view-timeline').classList.remove('on'); });
 
-    // Regenerate.
-    $('sp-regen').addEventListener('click', function () { regenerate(this); });
+    // Regenerate (Help Me Plan only).
+    $('sp-regen')?.addEventListener('click', function () { regenerate(this); });
 
-    // Quick Actions.
-    function openAdjust() { $('sp-adjust').classList.add('open'); $('sp-adjust').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    // Quick Actions. Adjust panel only exists at the Help Me Plan level.
+    function openAdjust() { const el = $('sp-adjust'); if (!el) return; el.classList.add('open'); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
     function csv() {
         const rows = [['Role', 'Staff', 'Start', 'End']].concat(current.roles.map((r) => [r.name, r.count, r.start_label, r.end_label]));
         const blob = new Blob([rows.map((r) => r.join(',')).join('\n')], { type: 'text/csv' });
@@ -352,7 +383,45 @@
     }));
     function flash(el, msg) { const s = el.querySelector('b').textContent; el.querySelector('b').textContent = msg; setTimeout(() => { el.querySelector('b').textContent = s; }, 1500); }
 
-    $('sp-create').addEventListener('click', openAdjust);
+    $('sp-create')?.addEventListener('click', openAdjust);
+})();
+
+// Do It Myself — hand-built roster (no AI, no server call).
+(function () {
+    const rows = document.getElementById('spmRows');
+    const add = document.getElementById('spmAdd');
+    const totalEl = document.getElementById('spm-total');
+    if (!rows || !add) return;
+    function recompute() {
+        let t = 0;
+        rows.querySelectorAll('.spm-count').forEach(i => t += (parseInt(i.value, 10) || 0));
+        if (totalEl) totalEl.textContent = t;
+    }
+    function hourOpts(sel) {
+        let h = '';
+        for (let x = 6; x <= 26; x++) { const d = x % 24; const p = d < 12 ? 'AM' : 'PM'; const dd = d % 12 === 0 ? 12 : d % 12; h += '<option value="' + x + '"' + (x === sel ? ' selected' : '') + '>' + dd + ':00 ' + p + '</option>'; }
+        return h;
+    }
+    function addRow(name = '', count = 1, start = 10, end = 18) {
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;';
+        div.innerHTML =
+            '<input type="text" placeholder="Role (e.g. Server Team)" class="spm-inp" style="flex:2;min-width:150px;padding:9px 12px;border:1px solid var(--border-color);border-radius:9px;background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:13px;">' +
+            '<input type="number" min="1" max="99" value="' + count + '" title="How many" class="spm-inp spm-count" style="width:70px;padding:9px 10px;border:1px solid var(--border-color);border-radius:9px;background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:13px;">' +
+            '<select class="spm-inp" style="width:auto;padding:9px 10px;border:1px solid var(--border-color);border-radius:9px;background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:13px;">' + hourOpts(start) + '</select>' +
+            '<span style="color:var(--text-muted);font-size:12px;">to</span>' +
+            '<select class="spm-inp" style="width:auto;padding:9px 10px;border:1px solid var(--border-color);border-radius:9px;background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:13px;">' + hourOpts(end) + '</select>' +
+            '<button type="button" title="Remove" style="border:none;background:rgba(220,38,38,.1);color:#dc2626;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px;flex:0 0 auto;">&times;</button>';
+        div.querySelector('input[type="text"]').value = name;
+        div.querySelector('.spm-count').addEventListener('input', recompute);
+        div.querySelector('button').addEventListener('click', () => { div.remove(); recompute(); });
+        rows.appendChild(div);
+    }
+    // Seed common event-day roles the user can rename or remove.
+    [['Event Manager', 1, 10, 25], ['Server Team', 4, 16, 25], ['Setup Crew', 2, 8, 14], ['DJ', 1, 18, 24], ['Cleanup Crew', 2, 24, 28]]
+        .forEach(([n, c, s, e]) => addRow(n, c, s, e));
+    add.addEventListener('click', () => { addRow(); recompute(); });
+    recompute();
 })();
 </script>
 @endsection
