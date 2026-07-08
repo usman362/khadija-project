@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Professional;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -50,11 +51,15 @@ class ProfessionalTransactionController extends Controller
         $transactions = $this->loadTransactions($request, $filters);
         $activity     = $this->loadActivity($request, $filters);
 
+        // Real earnings summary from this professional's bookings.
+        $base  = Booking::where('supplier_id', $request->user()->id);
         $stats = [
-            'total'     => 0,
-            'earned'    => 0,
-            'withdrawn' => 0,
-            'pending'   => 0,
+            'total'     => (clone $base)->count(),
+            'earned'    => (float) (clone $base)->where('status', 'completed')->sum('price'),
+            'pending'   => (float) (clone $base)->whereIn('status', ['pending', 'confirmed'])->sum('price'),
+            // No dedicated professional-payout table yet — withdrawals stay 0
+            // until the payout/escrow subsystem is built.
+            'withdrawn' => 0.0,
         ];
 
         return view('professional.transactions.index', [
@@ -122,37 +127,77 @@ class ProfessionalTransactionController extends Controller
     }
 
     /**
-     * Placeholder data loader. Returns an empty paginator with metadata wired
-     * up so the pagination strip renders. Replace the empty collection with
-     * a real query once a Transaction model exists.
+     * Real transactions = this professional's bookings. Each booking becomes a
+     * transaction row (its price is the professional's earning). Supports the
+     * search / status / date-range filters and paginates 10 per page. A
+     * dedicated Transaction/payout table can slot in later without touching the
+     * view contract.
      */
     private function loadTransactions(Request $request, array $filters): LengthAwarePaginator
     {
-        return new LengthAwarePaginator(
-            items: new Collection([]),
-            total: 0,
-            perPage: 10,
-            currentPage: (int) $request->query('page', 1),
-            options: [
-                'path'     => $request->url(),
-                'pageName' => 'page',
-                'query'    => $request->query(),
-            ],
-        );
+        $query = Booking::query()
+            ->where('supplier_id', $request->user()->id)
+            ->with(['event:id,title', 'client:id,name']);
+
+        if (($filters['status'] ?? '') !== '') {
+            $query->where('status', $filters['status']);
+        }
+        if (($filters['date_from'] ?? '') !== '') {
+            $query->whereDate('created_at', '>=', $filters['date_from']);
+        }
+        if (($filters['date_to'] ?? '') !== '') {
+            $query->whereDate('created_at', '<=', $filters['date_to']);
+        }
+        if (($filters['search'] ?? '') !== '') {
+            $term = $filters['search'];
+            $query->where(function ($q) use ($term) {
+                $q->whereHas('event', fn ($e) => $e->where('title', 'like', "%{$term}%"))
+                  ->orWhereHas('client', fn ($c) => $c->where('name', 'like', "%{$term}%"))
+                  ->orWhere('status', 'like', "%{$term}%");
+            });
+        }
+
+        return $query->latest('created_at')
+            ->paginate(10, ['*'], 'page', (int) $request->query('page', 1))
+            ->through(fn (Booking $b) => [
+                'id'          => $b->id,
+                'date'        => ($b->booked_at ?? $b->created_at)?->format('M d, Y') ?? '—',
+                'type'        => 'Booking',
+                'description' => trim(($b->event?->title ?? 'Booking')
+                    . ($b->client?->name ? ' · ' . $b->client->name : '')),
+                'amount'      => (float) $b->price,
+                'status'      => ucfirst((string) $b->status),
+            ]);
     }
 
     /**
-     * Placeholder activity feed (separate from transactions). Activity is a
-     * higher-level log: "Booking confirmed", "Proposal sent", etc. Paginated
-     * via a separate page param so it doesn't collide with transactions.
+     * Activity feed — a higher-level log built from the professional's recent
+     * bookings ("Booking confirmed", etc.). Paginated via a separate page param
+     * so it doesn't collide with the transactions table.
      */
     private function loadActivity(Request $request, array $filters): LengthAwarePaginator
     {
+        $page    = (int) $request->query('activity_page', 1);
+        $perPage = 10;
+
+        $items = Booking::query()
+            ->where('supplier_id', $request->user()->id)
+            ->with(['event:id,title', 'client:id,name'])
+            ->latest('created_at')
+            ->get()
+            ->map(fn (Booking $b) => [
+                'title' => 'Booking ' . strtolower((string) $b->status)
+                    . ($b->event?->title ? ' — ' . $b->event->title : ''),
+                'meta'  => trim(($b->client?->name ? $b->client->name . ' · ' : '')
+                    . (($b->booked_at ?? $b->created_at)?->diffForHumans() ?? '')),
+            ])
+            ->values();
+
         return new LengthAwarePaginator(
-            items: new Collection([]),
-            total: 0,
-            perPage: 10,
-            currentPage: (int) $request->query('activity_page', 1),
+            items: $items->forPage($page, $perPage)->values(),
+            total: $items->count(),
+            perPage: $perPage,
+            currentPage: $page,
             options: [
                 'path'     => $request->url(),
                 'pageName' => 'activity_page',
