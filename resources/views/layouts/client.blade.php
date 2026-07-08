@@ -1396,6 +1396,8 @@
                 </div>
             @endif
 
+            @include('partials._breadcrumb')
+
             @yield('content')
         </div>
     </main>

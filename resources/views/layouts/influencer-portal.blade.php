@@ -260,6 +260,8 @@
 {{-- ── Main ── --}}
 <main class="ipx-main">
     <div class="ipx-content">
+        @include('partials._breadcrumb')
+
         @yield('content')
     </div>
 </main>
