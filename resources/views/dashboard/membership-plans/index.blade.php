@@ -342,6 +342,24 @@
                     <div class="mp-plan-desc">&nbsp;</div>
                 @endif
 
+                @php
+                    // The AI IQ level this plan unlocks (Peter's DIY wording).
+                    $planLevels = config('ai-levels.plan_levels.' . $plan->slug, []);
+                    $aiLevel = null;
+                    foreach (['maximum', 'semi', 'manual'] as $lv) {
+                        if (in_array($lv, (array) $planLevels, true)) { $aiLevel = $lv; break; }
+                    }
+                    $aiColor = ['manual' => '#64748b', 'semi' => '#2563eb', 'maximum' => '#16a34a'][$aiLevel] ?? '#64748b';
+                @endphp
+                @if($aiLevel)
+                    <div style="margin:2px 0 12px;">
+                        <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#fff;background:{{ $aiColor }};padding:4px 11px;border-radius:999px;">
+                            ✨ AI: {{ config('ai-levels.labels.' . $aiLevel) }}
+                        </span>
+                        <div style="font-size:11.5px;color:var(--text-muted,#6b7280);margin-top:7px;line-height:1.45;">{{ config('ai-levels.descriptions.' . $aiLevel) }}</div>
+                    </div>
+                @endif
+
                 <div class="mp-price-block">
                     <span class="mp-price">{{ $plan->formattedPrice() }}</span>
                     @if(!$plan->isFree())

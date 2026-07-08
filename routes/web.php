@@ -350,6 +350,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/ai-tools/package-builder', [\App\Http\Controllers\AiPackageBuilderController::class, 'show'])->name('ai-tools.package-builder');
     // AI Portfolio Optimizer (professional).
     Route::get('/ai-tools/portfolio-optimizer', [\App\Http\Controllers\AiPortfolioOptimizerController::class, 'show'])->name('ai-tools.portfolio-optimizer');
+    // AI membership / pricing page — the target for every AI tool's "Upgrade for
+    // more AI" banner. Reuses the plans page controller (auth-only, no extra
+    // permission gate) so any signed-in pro can view and pick a plan.
+    Route::get('/membership', [MembershipPlanPageController::class, 'index'])->name('membership.plans');
+
     // AI Checklist Generator (client).
     Route::get('/ai-tools/checklist-generator', [\App\Http\Controllers\AiChecklistGeneratorController::class, 'show'])->name('ai-tools.checklist-generator');
     // AI Bid Optimizer (professional).
