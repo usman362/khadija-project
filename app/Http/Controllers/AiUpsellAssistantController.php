@@ -17,8 +17,14 @@ class AiUpsellAssistantController extends Controller
     {
         $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
 
+        $level = \App\Domain\AiFeatures\AiAccess::level($request->user(), 'upsell-assistant');
+        if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
+            $level = $request->query('preview');
+        }
+
         return view('ai-tools.upsell-assistant', [
             'aiLayout' => $aiLayout,
+            'level'    => $level,
             'stats' => [
                 ['Upsell Opportunities', '6', ''], ['Potential Extra', '+$2,150', 'good'],
                 ['Acceptance Rate', '64%', 'good'], ['Avg Order Uplift', '+18%', 'good'],
