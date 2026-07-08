@@ -91,15 +91,70 @@
     .va-bd .st.good { background: rgba(22,163,74,.12); color: #15803d; }
     .va-bd .st.tight { background: rgba(217,119,6,.12); color: #d97706; }
     .va-bd .st.over { background: rgba(220,38,38,.12); color: #dc2626; }
+
+    /* Help Me Plan — editable output fields */
+    .va-edit { width: 100%; padding: 7px 10px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-body, var(--bg-card)); color: var(--text-primary); font-size: 13px; font-family: inherit; }
+    .va-edit:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
+    .va-metric .va-edit { max-width: 150px; padding: 4px 8px; font-size: 22px; font-weight: 800; }
+    .va-verdict .va-edit { max-width: 340px; font-size: 15px; font-weight: 800; }
+
+    /* Do It Myself — hand-built venue scorecard */
+    .va-mano h4 { font-size: 13px; font-weight: 800; color: var(--text-primary); margin: 4px 0 12px; }
+    .va-frow { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+    .va-frow .fname { flex: 1; min-width: 140px; }
+    .va-frow input[type="range"] { flex: 1.4; min-width: 140px; accent-color: var(--va); }
+    .va-frow .fscore { width: 40px; text-align: right; font-weight: 800; color: var(--text-primary); }
+    .va-mdel { border: none; background: rgba(220,38,38,.1); color: #dc2626; border-radius: 8px; width: 34px; height: 34px; cursor: pointer; font-size: 16px; flex: 0 0 auto; }
+    .va-madd { margin-top: 4px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #15803d; background: rgba(22,163,74,.09); border: 1px solid rgba(22,163,74,.28); border-radius: 10px; padding: 9px 15px; cursor: pointer; font-family: inherit; }
+    .va-mscore { display: flex; align-items: center; gap: 18px; margin-top: 16px; padding: 16px; border: 1px solid var(--border-color); border-radius: 14px; }
+    .va-mscore .big { font-size: 34px; font-weight: 800; color: var(--va); line-height: 1; }
+    .va-mverdict { font-size: 15px; font-weight: 800; }
 </style>
 @endpush
 
 @section('content')
-<div class="va">
-    {{-- Interactive analyzer --}}
+@php
+    $level = $level ?? 'maximum';
+    $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
+    $lvlMeta = [
+        'manual'  => ['Do It Myself', '#64748b', 'Score the venue factors yourself — we average them into an overall verdict, no AI.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'AI analyses the space — adjust the figures, verdict and notes and utilization recalculates live.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your space and AI analyses capacity, fit and gaps for you.'],
+    ];
+    [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
+@endphp
+<div class="va" data-level="{{ $level }}">
+
+    {{-- Membership-level banner --}}
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
+        <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:#15803d;text-decoration:none;">Upgrade for more AI →</a>@endunless
+    </div>
+
+    @if($isManual)
+    {{-- Do It Myself — hand-built venue scorecard, no AI, computed client-side --}}
+    <div class="va-form-card va-mano">
+        <h3>🏛 Score My Venue</h3>
+        <div class="sub">Rate each factor yourself — we average them into an overall venue score. No AI.</div>
+        <div style="margin-bottom:14px;">
+            <label class="va-lbl">Venue Name (optional)</label>
+            <input type="text" id="vamName" class="va-inp" placeholder="e.g. The Garden Estate">
+        </div>
+        <h4>📋 Venue Factors</h4>
+        <div id="vamRows"></div>
+        <button type="button" id="vamAdd" class="va-madd">+ Add factor</button>
+        <div class="va-mscore">
+            <div><div class="big" id="vamScore">0</div><div style="font-size:11px;color:var(--text-muted);">Overall Score / 100</div></div>
+            <div class="va-mverdict" id="vamVerdict"></div>
+        </div>
+        <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">Want AI to analyse the space, gaps and hidden costs for you? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:#15803d;font-weight:700;text-decoration:none;">Upgrade →</a></div>
+    </div>
+    @else
+    {{-- Interactive analyzer (Help Me Plan / Coordinate It For Me) --}}
     <div class="va-form-card">
         <h3>📐 Analyze My Venue Space</h3>
-        <div class="sub">Enter the venue size and your guest count to get a suggested capacity and space fit.</div>
+        <div class="sub">{{ $isSemi ? 'AI suggests a capacity and space fit you can adjust before using.' : 'Enter the venue size and your guest count and AI works out capacity and space fit.' }}</div>
         <form id="vaForm">
             <div class="va-fgrid">
                 <div>
@@ -123,7 +178,7 @@
                     <label class="va-chk"><input type="checkbox" name="has_dancefloor" value="1"> Include a dance floor</label>
                 </div>
             </div>
-            <button type="submit" class="va-go" id="vaGo">✨ Analyze Space</button>
+            <button type="submit" class="va-go" id="vaGo">{{ $isSemi ? '✨ Suggest Venue Analysis' : '🤖 Analyze My Venue' }}</button>
             <div class="va-err" id="vaErr"></div>
         </form>
     </div>
@@ -220,6 +275,7 @@
             </div>
         </aside>
     </div>
+    @endif
 </div>
 @endsection
 
@@ -233,6 +289,8 @@
     const out = document.getElementById('vaOut');
     const errEl = document.getElementById('vaErr');
     const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    const LEVEL = document.querySelector('.va')?.dataset.level || 'maximum';
+    let lastGuests = 0; // captured from the form so "Help Me Plan" can recompute utilization live
 
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const num = n => Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
@@ -247,6 +305,7 @@
         const fd = new FormData(form);
         const payload = Object.fromEntries(fd.entries());
         payload.has_dancefloor = fd.get('has_dancefloor') ? true : false;
+        lastGuests = parseInt(payload.guest_count, 10) || 0;
 
         try {
             const r = await fetch('{{ route("ai-tools.venue-analyzer.compute") }}', {
@@ -275,22 +334,91 @@
     });
 
     function render(res) {
+        // "Help Me Plan" renders the key figures/verdict/notes as editable fields
+        // and recomputes utilization live; "Coordinate It For Me" is read-only.
+        const editable = LEVEL === 'semi';
+
         const v = res.verdict || '';
         const cls = v.startsWith('Over') ? 'over' : (v.startsWith('Tight') ? 'tight' : 'good');
+        const icon = cls === 'over' ? '🚫' : (cls === 'tight' ? '⚠️' : '✅');
         const verdictEl = document.getElementById('vaVerdict');
         verdictEl.className = 'va-verdict ' + cls;
-        verdictEl.innerHTML = '<span>' + (cls === 'over' ? '🚫' : (cls === 'tight' ? '⚠️' : '✅')) + '</span><span>' + esc(v) + '</span>';
+        verdictEl.innerHTML = editable
+            ? '<span>' + icon + '</span><input class="va-edit" value="' + esc(v) + '">'
+            : '<span>' + icon + '</span><span>' + esc(v) + '</span>';
 
-        document.getElementById('vaReq').textContent = num(res.required_sqft);
-        document.getElementById('vaCap').textContent = num(res.max_capacity);
-        document.getElementById('vaUtil').textContent = res.utilization_pct + '%';
+        const reqEl = document.getElementById('vaReq');
+        const capEl = document.getElementById('vaCap');
+        const utilEl = document.getElementById('vaUtil');
+        if (editable) {
+            reqEl.innerHTML = '<input class="va-edit" type="number" min="0" value="' + (Number(res.required_sqft) || 0) + '">';
+            capEl.innerHTML = '<input class="va-edit" id="vaCapEdit" type="number" min="0" value="' + (Number(res.max_capacity) || 0) + '">';
+            utilEl.textContent = res.utilization_pct + '%';
+            // Editing the estimated capacity recomputes utilization from the guests submitted.
+            const capInput = document.getElementById('vaCapEdit');
+            capInput?.addEventListener('input', function () {
+                const cap = parseInt(capInput.value, 10) || 0;
+                const util = cap > 0 ? Math.round((lastGuests / cap) * 1000) / 10 : 0;
+                utilEl.textContent = util + '%';
+            });
+        } else {
+            reqEl.textContent = num(res.required_sqft);
+            capEl.textContent = num(res.max_capacity);
+            utilEl.textContent = res.utilization_pct + '%';
+        }
 
+        // Area breakdown — read-only qualitative statuses in both modes.
         document.getElementById('vaBreakdown').innerHTML = (res.breakdown || []).map(b => `
             <div class="va-bd"><span>${esc(b.area)}</span><span class="st ${esc(b.status)}">${esc(b.status)}</span></div>`).join('');
 
-        document.getElementById('vaTips').innerHTML = (res.tips || [])
-            .map(t => `<div class="va-alert" style="padding-left:22px;">${esc(t)}</div>`).join('');
+        const tipsEl = document.getElementById('vaTips');
+        tipsEl.innerHTML = editable
+            ? (res.tips || []).map(t => '<div style="margin-bottom:8px;"><input class="va-edit" value="' + esc(t) + '"></div>').join('')
+            : (res.tips || []).map(t => `<div class="va-alert" style="padding-left:22px;">${esc(t)}</div>`).join('');
     }
+})();
+
+// Do It Myself — hand-built venue scorecard (no AI, no server call).
+(function () {
+    const rows = document.getElementById('vamRows');
+    const add  = document.getElementById('vamAdd');
+    const scoreEl   = document.getElementById('vamScore');
+    const verdictEl = document.getElementById('vamVerdict');
+    if (!rows || !add) return;
+
+    function verdictFor(score) {
+        if (score >= 85) return ['Excellent venue', '#15803d'];
+        if (score >= 70) return ['Good venue', '#16a34a'];
+        if (score >= 50) return ['Fair — some trade-offs', '#d97706'];
+        return ['Weak fit — keep looking', '#dc2626'];
+    }
+    function recalc() {
+        const scores = Array.from(rows.querySelectorAll('input[type="range"]')).map(function (i) { return parseInt(i.value, 10) || 0; });
+        const avg = scores.length ? Math.round(scores.reduce(function (a, b) { return a + b; }, 0) / scores.length) : 0;
+        if (scoreEl) scoreEl.textContent = avg;
+        if (verdictEl) { const vf = verdictFor(avg); verdictEl.textContent = vf[0]; verdictEl.style.color = vf[1]; }
+    }
+    function addRow(name, score) {
+        if (score == null) score = 75;
+        const row = document.createElement('div');
+        row.className = 'va-frow';
+        row.innerHTML =
+            '<input type="text" class="va-inp fname" placeholder="Factor (e.g. Parking)">' +
+            '<input type="range" min="0" max="100" value="' + score + '">' +
+            '<span class="fscore">' + score + '</span>' +
+            '<button type="button" class="va-mdel" title="Remove">&times;</button>';
+        row.querySelector('input[type="text"]').value = name || '';
+        const range = row.querySelector('input[type="range"]');
+        const out   = row.querySelector('.fscore');
+        range.addEventListener('input', function () { out.textContent = range.value; recalc(); });
+        row.querySelector('.va-mdel').addEventListener('click', function () { row.remove(); recalc(); });
+        rows.appendChild(row);
+    }
+    // Seed the common venue factors the user can rescore, rename or remove.
+    [['Capacity', 85], ['Location', 80], ['Price', 70], ['Amenities', 75], ['Accessibility', 65]]
+        .forEach(function (f) { addRow(f[0], f[1]); });
+    add.addEventListener('click', function () { addRow(); });
+    recalc();
 })();
 </script>
 @endpush

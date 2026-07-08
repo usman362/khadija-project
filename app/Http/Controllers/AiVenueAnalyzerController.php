@@ -19,8 +19,14 @@ class AiVenueAnalyzerController extends Controller
     {
         $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
 
+        $level = \App\Domain\AiFeatures\AiAccess::level($request->user(), 'venue-analyzer');
+        if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
+            $level = $request->query('preview');
+        }
+
         return view('ai-tools.venue-analyzer', [
             'aiLayout' => $aiLayout,
+            'level'    => $level,
             'venue' => ['name' => 'The Garden Estate', 'address' => '1234 Garden Way, Pasadena, CA 91101', 'score' => 94, 'capacity' => 250, 'compatibility' => 96],
             'summary' => [
                 ['Capacity Match', '92%', 'good'], ['Accessibility', '88%', 'good'],
