@@ -18,8 +18,14 @@ class AiPortfolioOptimizerController extends Controller
     {
         $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
 
+        $level = \App\Domain\AiFeatures\AiAccess::level($request->user(), 'portfolio-optimizer');
+        if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
+            $level = $request->query('preview');
+        }
+
         return view('ai-tools.portfolio-optimizer', [
             'aiLayout' => $aiLayout,
+            'level'    => $level,
             'stats' => [
                 ['Portfolio Success Score', '94%', 'good'], ['Search Visibility', '87%', 'good'],
                 ['Profile Views', '88%', 'good'], ['Profile Completeness', '98%', 'good'],

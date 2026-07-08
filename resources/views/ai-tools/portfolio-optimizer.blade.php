@@ -87,11 +87,29 @@
 @endpush
 
 @section('content')
-<div class="po">
+@php
+    $level = $level ?? 'maximum';
+    $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
+    $lvlMeta = [
+        'manual'  => ['Do It Myself', '#64748b', 'Score your own profile — enter your details and see your rating, no AI suggestions.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'AI scores your profile and suggests prioritised improvements you can act on.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'AI audits your whole profile, benchmarks it and hands you a full improvement plan.'],
+    ];
+    [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
+@endphp
+<div class="po" data-level="{{ $level }}">
+
+    {{-- Membership-level banner --}}
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
+        <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--po,#2563eb);text-decoration:none;">Upgrade for more AI →</a>@endunless
+    </div>
+
     {{-- Interactive portfolio optimizer --}}
     <div class="po-tool">
         <h3>🔎 Score Your Profile</h3>
-        <div class="sub">Enter your current profile details for an estimated score and prioritised improvement suggestions.</div>
+        <div class="sub">{{ $isManual ? 'Enter your profile details to score your profile yourself — no AI suggestions.' : ($isSemi ? 'Enter your profile details for an estimated score plus prioritised AI suggestions.' : 'Enter your current profile details for an estimated score and prioritised improvement suggestions.') }}</div>
         <form id="poForm" class="po-form">
             <div>
                 <label class="po-lbl">Portfolio Photos</label>
@@ -117,7 +135,7 @@
                 <label class="po-check"><input type="checkbox" name="has_video" value="1"> Has a highlight video</label>
             </div>
             <div class="full">
-                <button type="submit" class="po-go" id="poSubmit">🔎 Analyze Profile</button>
+                <button type="submit" class="po-go" id="poSubmit">{{ $isManual ? '🧮 Score My Profile' : ($isSemi ? '✨ Score + suggest' : '🔎 Analyze My Profile') }}</button>
             </div>
         </form>
 
@@ -139,6 +157,8 @@
         </div>
     </div>
 
+    @if($isMax)
+    {{-- Coordinate It For Me — full auto audit dashboard --}}
     <div class="po-stats">
         @foreach($stats as [$lbl, $val, $tone])
             <div class="po-stat"><b>{{ $val }}</b><div class="l">{{ $lbl }}</div></div>
@@ -204,6 +224,7 @@
             <div class="po-m"><b>{{ $val }}</b><div class="l">{{ $lbl }}</div><div class="s">{{ $sub }}</div></div>
         @endforeach
     </div>
+    @endif
 </div>
 
 @push('scripts')
@@ -211,6 +232,7 @@
 (function () {
     const form = document.getElementById('poForm');
     if (!form) return;
+    const LEVEL = document.querySelector('.po')?.dataset.level || 'maximum';
     const submit = document.getElementById('poSubmit');
     const loading = document.getElementById('poLoading');
     const out = document.getElementById('poOut');
@@ -226,6 +248,24 @@
 
         const payload = Object.fromEntries(new FormData(form).entries());
         payload.has_video = form.querySelector('[name="has_video"]').checked ? 1 : 0;
+
+        // Do It Myself — score locally with a mirrored rubric, no AI actions.
+        if (LEVEL === 'manual') {
+            loading.classList.remove('open');
+            submit.disabled = false;
+            const local = computeLocal(payload);
+            if (!local) {
+                errEl.textContent = 'Please fill in all fields with valid numbers.';
+                errEl.classList.add('open');
+                return;
+            }
+            render(local);
+            const acts = document.getElementById('poActs');
+            acts.innerHTML = ''; acts.style.display = 'none';   // no AI suggestions at this level
+            out.classList.add('open');
+            out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            return;
+        }
 
         try {
             const r = await fetch('{{ route("ai-tools.portfolio-optimizer.compute") }}', {
@@ -254,7 +294,38 @@
         }
     });
 
+    // Client-side scoring mirroring the server rubric (Do It Myself — no AI actions).
+    function computeLocal(p) {
+        const photos = parseInt(p.num_photos, 10), reviews = parseInt(p.num_reviews, 10);
+        const rating = parseFloat(p.avg_rating), resp = parseFloat(p.response_hours), cats = parseInt(p.categories_listed, 10);
+        const hasVideo = String(p.has_video) === '1';
+        if ([photos, reviews, cats].some(n => isNaN(n)) || isNaN(rating) || isNaN(resp)) return null;
+        const r = Math.round;
+        const photoPts = r(Math.min(1, photos / 15) * 25);
+        const videoPts = hasVideo ? 15 : 0;
+        const reviewPts = r(Math.min(1, reviews / 20) * 20);
+        const ratingPts = r(Math.min(1, rating / 5) * 20);
+        const respPts = resp <= 2 ? 10 : (resp >= 48 ? 0 : r((1 - ((resp - 2) / 46)) * 10));
+        const catPts = r(Math.min(1, cats / 3) * 10);
+        const score = Math.max(0, Math.min(100, photoPts + videoPts + reviewPts + ratingPts + respPts + catPts));
+        const grade = score >= 85 ? 'A' : (score >= 70 ? 'B' : (score >= 55 ? 'C' : 'D'));
+        const f = (label, points, max, detail) => ({ label, points, max, status: points >= max ? 'good' : 'warn', detail });
+        return {
+            score, grade, actions: [],
+            factors: [
+                f('Portfolio photos', photoPts, 25, photos + ' photo' + (photos === 1 ? '' : 's') + ' (15+ recommended)'),
+                f('Highlight video', videoPts, 15, hasVideo ? 'Video added' : 'No video'),
+                f('Client reviews', reviewPts, 20, reviews + ' review' + (reviews === 1 ? '' : 's') + ' (20+ recommended)'),
+                f('Average rating', ratingPts, 20, rating.toFixed(1) + ' / 5.0'),
+                f('Responsiveness', respPts, 10, 'Replies in ~' + resp + 'h (2h or less is ideal)'),
+                f('Categories listed', catPts, 10, cats + ' categor' + (cats === 1 ? 'y' : 'ies') + ' (3+ recommended)'),
+            ],
+            summary: 'Your profile scores ' + score + '/100 (grade ' + grade + ') on your own worksheet. Areas below full points are where you have the most room to improve.',
+        };
+    }
+
     function render(res) {
+        const acts0 = document.getElementById('poActs'); if (acts0) acts0.style.display = '';
         document.getElementById('poScore').textContent = res.score + '/100';
         document.getElementById('poGrade').textContent = res.grade;
         document.getElementById('poSum').textContent = res.summary || '';
