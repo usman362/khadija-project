@@ -211,6 +211,18 @@
         text-decoration: line-through;
     }
 
+    /* Cap the visible features so every card is a similar height; the rest
+       expand on click. */
+    .mp-features li.mp-extra { display: none; }
+    .mp-features.mp-expanded li.mp-extra { display: flex; }
+    .mp-more-row { padding: 0.55rem 0 0 !important; }
+    .mp-more-btn {
+        background: none; border: none; padding: 0; cursor: pointer;
+        font-family: inherit; font-size: 0.85rem; font-weight: 700;
+        color: #2563eb; display: inline-flex; align-items: center; gap: 5px;
+    }
+    .mp-more-btn:hover { text-decoration: underline; }
+
     .mp-action {
         margin-top: auto;
     }
@@ -395,9 +407,10 @@
                     </div>
                 </div>
 
+                @php $mpLimit = 8; $mpTotal = $plan->features->count(); @endphp
                 <ul class="mp-features">
-                    @foreach($plan->features as $feature)
-                        <li class="{{ !$feature->is_included ? 'excluded' : '' }}">
+                    @foreach($plan->features as $mpIdx => $feature)
+                        <li class="{{ !$feature->is_included ? 'excluded' : '' }} {{ $mpIdx >= $mpLimit ? 'mp-extra' : '' }}">
                             @if($feature->is_included)
                                 <svg class="icon-included" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                             @else
@@ -406,6 +419,14 @@
                             {{ $feature->feature }}
                         </li>
                     @endforeach
+                    @if($mpTotal > $mpLimit)
+                        <li class="mp-more-row">
+                            <button type="button" class="mp-more-btn" data-more="{{ $mpTotal - $mpLimit }}" onclick="mpToggleFeatures(this)">
+                                + {{ $mpTotal - $mpLimit }} more to know
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                        </li>
+                    @endif
                 </ul>
 
                 <div class="mp-action">
@@ -615,6 +636,17 @@
 @endsection
 
 @push('scripts')
+<script>
+// Expand / collapse the extra plan features so cards stay a similar height.
+function mpToggleFeatures(btn) {
+    const ul = btn.closest('.mp-features');
+    if (!ul) return;
+    const expanded = ul.classList.toggle('mp-expanded');
+    const more = btn.getAttribute('data-more');
+    btn.querySelector('svg')?.setAttribute('style', expanded ? 'transform:rotate(180deg);' : '');
+    btn.childNodes[0].nodeValue = expanded ? ' Show less ' : ' + ' + more + ' more to know ';
+}
+</script>
 <script>
 (function () {
     const modal      = document.getElementById('mpModal');
