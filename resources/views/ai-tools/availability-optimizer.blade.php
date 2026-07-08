@@ -87,11 +87,29 @@
 @endpush
 
 @section('content')
-<div class="ao">
+@php
+    $level = $level ?? 'maximum';
+    $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
+    $lvlMeta = [
+        'manual'  => ['Do It Myself', '#64748b', 'Work out your own weekly capacity and open slots — just the math, no AI advice.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'Enter your pattern — AI estimates utilization and suggests how to optimize it.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'AI reads your pattern, optimizes availability and fills your calendar plan for you.'],
+    ];
+    [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
+@endphp
+<div class="ao" data-level="{{ $level }}">
+
+    {{-- Membership-level banner --}}
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
+        <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--ao,#2563eb);text-decoration:none;">Upgrade for more AI →</a>@endunless
+    </div>
+
     {{-- Interactive availability estimator --}}
     <div class="ao-tool">
         <h3>📊 Availability Estimator</h3>
-        <p class="desc">Enter your working pattern to get an estimated weekly capacity, utilization and open-slot count. Figures are planning estimates.</p>
+        <p class="desc">{{ $isManual ? 'Enter your working pattern to work out your weekly capacity, utilization and open slots yourself.' : 'Enter your working pattern to get an estimated weekly capacity, utilization and open-slot count' . ($isSemi ? ' plus AI suggestions to optimize it.' : '. Figures are planning estimates.') }}</p>
 
         <form id="aoForm">
             <div class="ao-form-grid">
@@ -113,7 +131,7 @@
                 </div>
             </div>
             <button type="submit" class="ao-run" id="aoRun">
-                ⚡ Estimate my availability
+                {{ $isManual ? '🧮 Calculate my availability' : ($isSemi ? '✨ Estimate + suggest' : '⚡ Optimize my availability') }}
             </button>
         </form>
 
@@ -132,6 +150,9 @@
             <div id="aoSuggList"></div>
         </div>
     </div>
+
+    @if($isMax)
+    {{-- Coordinate It For Me — full auto dashboard (calendar + opportunities + forecast) --}}
     {{-- Stat tiles --}}
     <div class="ao-stats">
         @foreach($stats as [$lbl, $val, $sub, $tone])
@@ -195,6 +216,7 @@
             @endforeach
         </div>
     </div>
+    @endif
 </div>
 
 @push('scripts')
@@ -202,6 +224,7 @@
 (function () {
     const form = document.getElementById('aoForm');
     if (!form) return;
+    const LEVEL = document.querySelector('.ao')?.dataset.level || 'maximum';
 
     const run   = document.getElementById('aoRun');
     const load  = document.getElementById('aoLoad');
@@ -217,6 +240,22 @@
         run.disabled = true;
 
         const payload = Object.fromEntries(new FormData(form).entries());
+
+        // Do It Myself — pure client-side math, no AI suggestions, no server call.
+        if (LEVEL === 'manual') {
+            load.classList.remove('on');
+            run.disabled = false;
+            const local = computeLocal(payload);
+            if (!local) {
+                errEl.textContent = 'Please fill in all four fields with valid numbers.';
+                errEl.classList.add('on');
+                return;
+            }
+            render(local);
+            res.classList.add('on');
+            res.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            return;
+        }
 
         try {
             const r = await fetch('{{ route("ai-tools.availability-optimizer.compute") }}', {
@@ -250,6 +289,24 @@
             errEl.classList.add('on');
         }
     });
+
+    // Client-side capacity math mirroring the server (Do It Myself — no AI advice).
+    function computeLocal(p) {
+        const wd = parseFloat(p.working_days), hpd = parseFloat(p.hours_per_day);
+        const gig = parseFloat(p.avg_gig_hours), bk = parseFloat(p.current_bookings_per_week);
+        if (![wd, hpd, gig, bk].every(n => !isNaN(n)) || wd < 1 || hpd < 1 || gig < 0.5 || bk < 0) return null;
+        const cap = Math.round(wd * hpd * 10) / 10;
+        const booked = Math.round(bk * gig * 10) / 10;
+        const util = cap > 0 ? Math.round(Math.min(100, Math.max(0, booked / cap * 100)) * 10) / 10 : 0;
+        const remaining = Math.max(0, cap - booked);
+        const slots = gig > 0 ? Math.floor(remaining / gig) : 0;
+        const status = util < 60 ? 'Under-booked — room to grow' : (util < 85 ? 'Healthy' : 'Near capacity');
+        return {
+            weekly_capacity_hours: cap, booked_hours: booked, utilization_pct: util, open_slots: slots,
+            status: status, suggestions: [],
+            summary: 'Your weekly capacity is about ' + cap + 'h; you are using roughly ' + booked + 'h (' + util + '% utilization), leaving about ' + remaining + 'h / ' + slots + ' open slot(s). These figures are your own worksheet math.',
+        };
+    }
 
     function render(x) {
         document.getElementById('aoStatus').textContent   = x.status;
