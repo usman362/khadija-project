@@ -183,6 +183,13 @@
     .lp-plan ul { list-style: none; margin: 0 0 24px; padding: 0; display: flex; flex-direction: column; gap: 12px; }
     .lp-plan li { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--ink-2); font-weight: 500; }
     .lp-plan li svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+    /* Cap the visible features so all three pricing cards read as a similar
+       height; the rest expand on click. */
+    .lp-plan li.lp-feat-extra { display: none; }
+    .lp-plan ul.lp-expanded li.lp-feat-extra { display: flex; }
+    .lp-more-btn { background: none; border: none; padding: 0; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 700; color: #2563eb; display: inline-flex; align-items: center; gap: 5px; }
+    .lp-more-btn:hover { text-decoration: underline; }
+    .lp-more-btn svg { width: 13px; height: 13px; }
     .lp-plan .lp-btn { width: 100%; margin-top: auto; }
 
     /* ── CTA BANNER ─────────────────────────────────── */
@@ -528,12 +535,19 @@
                     <div class="lp-plan-price">
                         <b>{{ $priceDisplay }}</b>@if($priceSuffix)<span>{{ $priceSuffix }}</span>@endif
                     </div>
+                    @php
+                        $lpIncluded = $plan->features->where('is_included', true)->values();
+                        $lpLimit = 8;
+                    @endphp
                     <ul>
-                        @forelse($plan->features->where('is_included', true) as $f)
-                            <li><svg viewBox="0 0 24 24" fill="none" stroke="{{ $accent }}" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>{{ $f->feature }}</li>
+                        @forelse($lpIncluded as $fi => $f)
+                            <li class="{{ $fi >= $lpLimit ? 'lp-feat-extra' : '' }}"><svg viewBox="0 0 24 24" fill="none" stroke="{{ $accent }}" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>{{ $f->feature }}</li>
                         @empty
                             <li><svg viewBox="0 0 24 24" fill="none" stroke="{{ $accent }}" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>{{ $plan->contractTermLabel() }}</li>
                         @endforelse
+                        @if($lpIncluded->count() > $lpLimit)
+                            <li><button type="button" class="lp-more-btn" data-more="{{ $lpIncluded->count() - $lpLimit }}" onclick="lpToggleFeatures(this)">+ {{ $lpIncluded->count() - $lpLimit }} more to know<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button></li>
+                        @endif
                     </ul>
                     <a href="{{ $ctaHref }}" class="lp-btn {{ $ctaClass }}">{{ $ctaLabel }}</a>
                 </div>
@@ -565,6 +579,19 @@
 </div>
 
 @push('scripts')
+<script>
+    // Expand / collapse the extra pricing-card features (Peter: keep card
+    // heights consistent).
+    function lpToggleFeatures(btn) {
+        var ul = btn.closest('ul');
+        if (!ul) return;
+        var expanded = ul.classList.toggle('lp-expanded');
+        var more = btn.getAttribute('data-more');
+        btn.firstChild.nodeValue = expanded ? 'Show less' : ('+ ' + more + ' more to know');
+        var svg = btn.querySelector('svg');
+        if (svg) svg.style.transform = expanded ? 'rotate(180deg)' : '';
+    }
+</script>
 <script>
     (function () {
         var track = document.getElementById('lpCatTrack');
