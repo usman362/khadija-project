@@ -18,8 +18,14 @@ class AiBidOptimizerController extends Controller
     {
         $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
 
+        $level = \App\Domain\AiFeatures\AiAccess::level($request->user(), 'bid-optimizer');
+        if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
+            $level = $request->query('preview');
+        }
+
         return view('ai-tools.bid-optimizer', [
             'aiLayout' => $aiLayout,
+            'level'    => $level,
             'stats' => [
                 ['Recommended Bid', '$1,720', 'good'], ['Win Probability', '82%', 'good'],
                 ['Competing Bids', '7', ''], ['Market Range', '$1.2k–2k', ''],

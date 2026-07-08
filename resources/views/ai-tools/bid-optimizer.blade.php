@@ -54,11 +54,45 @@
 @endpush
 
 @section('content')
-<div class="bo">
-    {{-- Interactive bid optimizer --}}
+@php
+    $level = $level ?? 'maximum';
+    $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
+    $lvlMeta = [
+        'manual'  => ['Do It Myself', '#64748b', 'Work out your own bid by hand — enter your bid and cost, see your margin. No AI.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'AI suggests a bid — adjust the amount and your margin updates before you send it.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter the job details and AI computes your best bid, range and win odds.'],
+    ];
+    [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
+@endphp
+<div class="bo" data-level="{{ $level }}">
+
+    {{-- Membership-level banner --}}
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
+        <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
+        <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--bo,#2563eb);text-decoration:none;">Upgrade for more AI →</a>@endunless
+    </div>
+
+    @if($isManual)
+    {{-- Do It Myself — plain margin worksheet, no AI --}}
+    <div class="bo-tool">
+        <h3>🧮 Work Out My Bid</h3>
+        <div class="sub">Enter the bid you're considering and your own cost — we'll show the margin. No AI, just the math.</div>
+        <div class="bo-form">
+            <div><label class="bo-lbl">Your Bid ($)</label><input type="number" id="bomBid" class="bo-in" min="0" step="0.01" placeholder="e.g. 1720"></div>
+            <div><label class="bo-lbl">Your Cost / Base Price ($)</label><input type="number" id="bomCost" class="bo-in" min="0" step="0.01" placeholder="e.g. 1200"></div>
+        </div>
+        <div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--border-color);">
+            <div><div style="font-size:11.5px;color:var(--text-muted);">Profit</div><div style="font-size:24px;font-weight:800;color:var(--text-primary);" id="bomProfit">—</div></div>
+            <div><div style="font-size:11.5px;color:var(--text-muted);">Margin</div><div style="font-size:24px;font-weight:800;color:#16a34a;" id="bomMargin">—</div></div>
+        </div>
+        <div style="margin-top:14px;font-size:12px;color:var(--text-muted);">Want AI to suggest the winning bid + win probability? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--bo,#2563eb);font-weight:700;text-decoration:none;">Upgrade →</a></div>
+    </div>
+    @else
+    {{-- Interactive bid optimizer (Help Me Plan / Coordinate It For Me) --}}
     <div class="bo-tool">
         <h3>⚡ Optimize a Bid</h3>
-        <div class="sub">Enter the job details and get an estimated bid, range and win probability. Results are estimates to guide your decision.</div>
+        <div class="sub">{{ $isSemi ? 'Enter the job details — AI suggests a bid you can adjust before sending.' : 'Enter the job details and get an estimated bid, range and win probability. Results are estimates to guide your decision.' }}</div>
         <form id="boForm" class="bo-form">
             <div>
                 <label class="bo-lbl">Client Budget ($)</label>
@@ -80,7 +114,7 @@
                 </select>
             </div>
             <div class="full">
-                <button type="submit" class="bo-btn" id="boSubmit">⚡ Optimize My Bid</button>
+                <button type="submit" class="bo-btn" id="boSubmit">{{ $isSemi ? '✨ Suggest My Bid' : '⚡ Optimize My Bid' }}</button>
             </div>
         </form>
 
@@ -123,6 +157,7 @@
             <div class="bo-strat">💡 {{ $strategy }}</div>
         </div>
     </div>
+    @endif
 </div>
 
 @push('scripts')
@@ -130,6 +165,7 @@
 (function () {
     const form = document.getElementById('boForm');
     if (!form) return;
+    const LEVEL = document.querySelector('.bo')?.dataset.level || 'maximum';
     const submit = document.getElementById('boSubmit');
     const loading = document.getElementById('boLoading');
     const out = document.getElementById('boOut');
@@ -173,10 +209,26 @@
     });
 
     function render(res) {
-        document.getElementById('boBid').textContent = '$' + fmt(res.suggested_bid);
-        document.getElementById('boMeta').textContent =
-            'Range $' + fmt(res.bid_range.low) + '–$' + fmt(res.bid_range.high) +
-            ' · ' + res.win_probability_pct + '% est. win · ~' + res.margin_pct + '% margin';
+        const boBid = document.getElementById('boBid');
+        const boMeta = document.getElementById('boMeta');
+        if (LEVEL === 'semi') {
+            // Help Me Plan — the suggested bid is editable; margin recomputes live.
+            const base = parseFloat(form.your_base_price.value) || 0;
+            boBid.innerHTML = '$<input id="boEditBid" type="number" min="0" step="1" value="' + Math.round(res.suggested_bid) + '" style="width:160px;font-size:28px;font-weight:800;border:1px solid var(--border-color);border-radius:8px;padding:2px 10px;background:var(--bg-card);color:var(--text-primary);font-family:inherit;">';
+            const recompute = () => {
+                const bid = parseFloat(document.getElementById('boEditBid').value) || 0;
+                const margin = bid > 0 ? Math.round((bid - base) / bid * 100) : 0;
+                boMeta.textContent = 'Your bid $' + fmt(bid) + ' · ~' + margin + '% margin · adjust as needed';
+            };
+            document.getElementById('boEditBid').addEventListener('input', recompute);
+            recompute();
+        } else {
+            // Coordinate It For Me — read-only.
+            boBid.textContent = '$' + fmt(res.suggested_bid);
+            boMeta.textContent =
+                'Range $' + fmt(res.bid_range.low) + '–$' + fmt(res.bid_range.high) +
+                ' · ' + res.win_probability_pct + '% est. win · ~' + res.margin_pct + '% margin';
+        }
         document.getElementById('boSum').textContent = res.summary || '';
         const tips = document.getElementById('boTips');
         tips.innerHTML = '';
@@ -187,6 +239,24 @@
         });
     }
     function fmt(n) { return Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 }); }
+})();
+
+// Do It Myself — plain margin worksheet (no AI, no server call).
+(function () {
+    const bidEl = document.getElementById('bomBid');
+    const costEl = document.getElementById('bomCost');
+    if (!bidEl || !costEl) return;
+    const fmt = (n) => Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
+    function recompute() {
+        const bid = parseFloat(bidEl.value) || 0;
+        const cost = parseFloat(costEl.value) || 0;
+        const profit = bid - cost;
+        const margin = bid > 0 ? Math.round(profit / bid * 100) : 0;
+        document.getElementById('bomProfit').textContent = (bid || cost) ? '$' + fmt(profit) : '—';
+        document.getElementById('bomMargin').textContent = bid > 0 ? margin + '%' : '—';
+    }
+    bidEl.addEventListener('input', recompute);
+    costEl.addEventListener('input', recompute);
 })();
 </script>
 @endpush
