@@ -156,7 +156,7 @@
             <div class="ms-field"><label>Event Type <span class="req">*</span></label><select class="ms-select"><option>Select event type</option><option>Wedding</option><option>Corporate</option><option>Birthday</option><option>Conference</option><option>Concert</option></select></div>
         </div>
         <div class="ms-grid3">
-            <div class="ms-field"><label>Event Date <span class="req">*</span></label><input type="date" class="ms-input" value="{{ $activeEvent->starts_at?->format('Y-m-d') ?? '' }}"></div>
+            <div class="ms-field"><label>Event Date <span class="req">*</span></label><input type="date" class="ms-input" value="{{ $activeEvent?->starts_at?->format('Y-m-d') ?? '' }}"></div>
             <div class="ms-field"><label>Start Time</label><input type="time" class="ms-input"></div>
             <div class="ms-field"><label>End Time</label><input type="time" class="ms-input"></div>
         </div>
@@ -227,7 +227,7 @@
     <div class="ms-rail-card">
         <div class="ms-rail-title">Your Event Summary </div>
         <div class="ms-sum-row"><span class="lbl">Event Title</span><span class="val">{{ \Illuminate\Support\Str::limit($activeEvent->title ?? 'Untitled', 18) }}</span></div>
-        <div class="ms-sum-row"><span class="lbl">Date</span><span class="val">{{ $activeEvent->starts_at?->format('M d, Y') ?? '—' }}</span></div>
+        <div class="ms-sum-row"><span class="lbl">Date</span><span class="val">{{ $activeEvent?->starts_at?->format('M d, Y') ?? '—' }}</span></div>
         <div class="ms-sum-row"><span class="lbl">Location</span><span class="val">{{ \Illuminate\Support\Str::limit($activeEvent->location ?? '—', 16) }}</span></div>
         <div class="ms-sum-row"><span class="lbl">Guest Count</span><span class="val">300</span></div>
         <div class="ms-sum-row"><span class="lbl">Budget Range</span><span class="val">${{ number_format($activeEvent->budget ?? 20000, 0) }}+</span></div>
