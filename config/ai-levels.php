@@ -76,4 +76,16 @@ return [
         'semi'    => 'AI helps you plan — suggestions & rewrites you approve.',
         'maximum' => 'AI coordinates it for you — auto-generates the whole thing.',
     ],
+
+    // ── Phase 4: free-beta usage cap ───────────────────────────────────────
+    // Clients & influencers get every AI level free during the launch/beta
+    // (see AiAccess::unlockedLevels). To keep beta usage — and cost — bounded,
+    // each of them gets a soft monthly action cap across all AI tools. It is
+    // enforced centrally in the EnsureAiLevel middleware; professionals are
+    // unaffected (they have their own per-plan quotas), and admins are exempt.
+    // Set the monthly limit to 0 to disable the cap entirely.
+    'free_beta' => [
+        'monthly_actions' => (int) env('AI_FREE_BETA_MONTHLY', 60),
+        'roles'           => ['client', 'influencer'],
+    ],
 ];

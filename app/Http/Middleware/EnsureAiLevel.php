@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Domain\AiFeatures\AiAccess;
+use App\Models\AiFeatureUsage;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +23,8 @@ class EnsureAiLevel
     public function handle(Request $request, Closure $next): Response
     {
         $slug  = (string) $request->segment(2);
-        $level = AiAccess::level($request->user(), $slug);
+        $user  = $request->user();
+        $level = AiAccess::level($user, $slug);
 
         if ((AiAccess::ORDER[$level] ?? 0) < AiAccess::ORDER['semi']) {
             return response()->json([
@@ -31,6 +33,30 @@ class EnsureAiLevel
             ], 403);
         }
 
-        return $next($request);
+        // Phase 4 — free-beta monthly cap for clients & influencers. Block once
+        // the allowance is spent; professionals and admins are unaffected.
+        $capped = $user && AiAccess::isFreeBetaUser($user) && ($cap = AiAccess::freeBetaCap()) > 0;
+        if ($capped && $user->aiFreeBetaUsedThisMonth() >= $cap) {
+            return response()->json([
+                'success'   => false,
+                'message'   => "You've used all {$cap} of your free AI actions for this month. They reset on the 1st.",
+                'remaining' => 0,
+            ], 429);
+        }
+
+        $response = $next($request);
+
+        // Count the action only when it actually succeeded.
+        if ($capped && $response->getStatusCode() < 400) {
+            AiFeatureUsage::create([
+                'user_id'      => $user->id,
+                'feature_code' => AiAccess::BETA_ACTION_PREFIX . $slug,
+                'tokens_used'  => 0,
+                'metadata'     => null,
+                'created_at'   => now(),
+            ]);
+        }
+
+        return $response;
     }
 }

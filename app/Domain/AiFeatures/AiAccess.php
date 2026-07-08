@@ -24,6 +24,9 @@ final class AiAccess
     /** Level ranking — higher wins. */
     public const ORDER = ['none' => 0, 'manual' => 1, 'semi' => 2, 'maximum' => 3];
 
+    /** feature_code prefix used to record + count free-beta AI actions. */
+    public const BETA_ACTION_PREFIX = 'ai_action:';
+
     private const ALL = ['manual', 'semi', 'maximum'];
 
     /**
@@ -87,5 +90,28 @@ final class AiAccess
     public static function label(string $level): string
     {
         return config("ai-levels.labels.{$level}", ucfirst($level));
+    }
+
+    // ── Phase 4: free-beta usage cap ───────────────────────────────────────
+
+    /** The monthly free-beta action cap (0 = disabled). */
+    public static function freeBetaCap(): int
+    {
+        return (int) config('ai-levels.free_beta.monthly_actions', 0);
+    }
+
+    /**
+     * Whether the free-beta monthly cap applies to this user.
+     * It covers exactly the users who get every level free at launch —
+     * clients & influencers acting outside the professional portal — while
+     * professionals (their own per-plan quotas) and admins are exempt.
+     */
+    public static function isFreeBetaUser(?User $user): bool
+    {
+        if (! $user || $user->isAdmin()) {
+            return false;
+        }
+
+        return $user->activeRole() !== 'supplier';
     }
 }

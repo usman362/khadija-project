@@ -427,4 +427,25 @@ class User extends Authenticatable
         if ($access['quota'] === 0) return PHP_INT_MAX;
         return max(0, $access['quota'] - $this->aiFeatureUsageThisMonth($featureCode));
     }
+
+    /**
+     * Phase 4 — count this user's free-beta AI actions used this calendar month
+     * (all tools combined). Only rows recorded by the AI action gate with the
+     * free-beta prefix are counted, so it never collides with per-plan quotas.
+     */
+    public function aiFreeBetaUsedThisMonth(): int
+    {
+        return \App\Models\AiFeatureUsage::where('user_id', $this->id)
+            ->where('feature_code', 'like', \App\Domain\AiFeatures\AiAccess::BETA_ACTION_PREFIX . '%')
+            ->where('created_at', '>=', now()->startOfMonth())
+            ->count();
+    }
+
+    /** Free-beta actions this user has left this month (PHP_INT_MAX if uncapped). */
+    public function aiFreeBetaRemaining(): int
+    {
+        $cap = \App\Domain\AiFeatures\AiAccess::freeBetaCap();
+        if ($cap <= 0) return PHP_INT_MAX;
+        return max(0, $cap - $this->aiFreeBetaUsedThisMonth());
+    }
 }
