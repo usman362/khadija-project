@@ -8,7 +8,6 @@
     use App\Domain\AiFeatures\AiToolCatalog;
     use App\Domain\AiFeatures\AiAccess;
 
-    $audLabel = ['client' => 'Client', 'professional' => 'Pro', 'both' => 'Both'];
     // Role brand accent — orange for clients, blue for professionals (matches the site).
     $accent  = $isPro ? '#2563eb' : '#f97316';
     $accentD = $isPro ? '#1d4ed8' : '#ea580c';
@@ -139,8 +138,10 @@
                             <span class="akt-num">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
                         </div>
                         <div class="akt-name">{{ $t['name'] }}</div>
+                        {{-- Audience tag (Client/Professional/Both) intentionally not shown here —
+                             the hub is already filtered to each user's own tools, so it's redundant
+                             for them. It's admin-facing info only. --}}
                         <div class="akt-badges">
-                            <span class="akt-badge {{ $t['audience'] }}">{{ $audLabel[$t['audience']] }}</span>
                             <span class="akt-lvl lvl-{{ $lvl }}" title="Your AI level">{{ AiAccess::label($lvl) }}</span>
                         </div>
                         <p class="akt-purpose">{{ $t['purpose'] }}</p>
