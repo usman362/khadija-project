@@ -102,6 +102,10 @@ class RegisterController extends Controller
             );
         }
 
+        // Record the account type they signed up as — their permanent "home"
+        // role for login landing, independent of any later client/pro switch.
+        $user->update(['primary_role' => $role]);
+
         // Phone captured at signup (optional) — stored on the user.
         if (! empty($data['phone'])) {
             $user->update(['phone' => $data['phone']]);

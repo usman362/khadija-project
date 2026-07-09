@@ -65,35 +65,37 @@ class LoginController extends Controller
             return redirect()->route('influencer.status');
         }
 
-        // Honor the login page the user came through. A dual-role user who signs
-        // in via /professional/login must land in the PROFESSIONAL portal (blue)
-        // without having to switch out of client mode — and vice-versa. The
-        // login form posts a hidden `login_role` for this.
-        $intended = (string) $request->input('login_role', '');
+        // Always land the user in their PRIMARY role — the account type they
+        // registered as, unaffected by any client/professional switch. So a
+        // professional who switched to client and logged out still logs back in
+        // as a professional, and a client stays a client, no matter which login
+        // page they use. The active-role session is reset to the primary here.
+        $landRole = $this->primaryRoleFor($user);
 
-        if ($intended === RoleName::SUPPLIER->value && $user->hasRole(RoleName::SUPPLIER->value)) {
+        if ($landRole === RoleName::SUPPLIER->value && $user->hasRole(RoleName::SUPPLIER->value)) {
             session(['active_role' => RoleName::SUPPLIER->value]);
             return redirect()->intended(route('professional.dashboard'));
         }
 
-        if ($intended === RoleName::CLIENT->value && $user->hasRole(RoleName::CLIENT->value)) {
+        if ($landRole === RoleName::CLIENT->value && $user->hasRole(RoleName::CLIENT->value)) {
             session(['active_role' => RoleName::CLIENT->value]);
             return redirect()->intended(route('client.dashboard'));
-        }
-
-        // No explicit intent (generic /login): land each user in their own
-        // portal, resetting any stale active-role. Client role wins for
-        // dual-role users; supplier-only users go professional.
-        if ($user->hasRole(RoleName::CLIENT->value)) {
-            session(['active_role' => RoleName::CLIENT->value]);
-            return redirect()->intended(route('client.dashboard'));
-        }
-
-        if ($user->hasRole(RoleName::SUPPLIER->value)) {
-            session(['active_role' => RoleName::SUPPLIER->value]);
-            return redirect()->intended(route('professional.dashboard'));
         }
 
         return null; // admin / others → default dashboard
+    }
+
+    /**
+     * The user's home role: the stored primary_role when present, otherwise a
+     * sensible fallback from their assigned roles (supplier-first for dual).
+     */
+    private function primaryRoleFor($user): string
+    {
+        $primary = $user->primary_role;
+        if (in_array($primary, [RoleName::SUPPLIER->value, RoleName::CLIENT->value], true) && $user->hasRole($primary)) {
+            return $primary;
+        }
+
+        return $user->hasRole(RoleName::SUPPLIER->value) ? RoleName::SUPPLIER->value : RoleName::CLIENT->value;
     }
 }

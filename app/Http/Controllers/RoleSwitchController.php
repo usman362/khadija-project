@@ -62,6 +62,13 @@ class RoleSwitchController extends Controller
             return redirect()->route($target === RoleName::SUPPLIER->value ? 'professional.dashboard' : 'client.dashboard');
         }
 
+        // Lock in their existing role as the primary before they gain a second
+        // one, so "Become a X" never changes where they land at login.
+        if (! $user->primary_role) {
+            $existing = $user->hasRole(RoleName::SUPPLIER->value) ? RoleName::SUPPLIER->value : RoleName::CLIENT->value;
+            $user->update(['primary_role' => $existing]);
+        }
+
         $user->assignRole($target);
         session(['active_role' => $target]);
 
