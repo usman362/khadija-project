@@ -351,6 +351,20 @@
         font-size: 12.5px; color: var(--text-muted);
     }
     .sp-pagination nav { display: flex; gap: 4px; }
+    /* Neat page buttons (custom pagination.gr-nav view) */
+    .gr-pag { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .gr-pag-btn {
+        display: inline-flex; align-items: center; justify-content: center;
+        min-width: 34px; height: 34px; padding: 0 9px;
+        border: 1px solid var(--border-color); border-radius: 9px;
+        background: var(--bg-card); color: var(--text-secondary);
+        font-size: 13px; font-weight: 600; text-decoration: none; line-height: 1;
+    }
+    .gr-pag-btn svg { width: 15px; height: 15px; }
+    .gr-pag-btn:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+    .gr-pag-btn.is-active { background: #ea580c; border-color: #ea580c; color: #fff; }
+    .gr-pag-btn.is-disabled { opacity: .4; pointer-events: none; }
+    .gr-pag-btn.is-dots { border: none; background: none; min-width: 18px; padding: 0; }
 
     /* ── Right rail cards ───────────────────────────────────── */
     .sp-rail .sp-card-title { font-size: 13.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; }
@@ -696,7 +710,7 @@
 
             <div class="sp-pagination">
                 <div>Showing {{ $pros->firstItem() }} to {{ $pros->lastItem() }} of {{ $pros->total() }} professionals</div>
-                {{ $pros->onEachSide(1)->links() }}
+                {{ $pros->onEachSide(1)->links('pagination.gr-nav') }}
                 <div>12 per page</div>
             </div>
         @else
