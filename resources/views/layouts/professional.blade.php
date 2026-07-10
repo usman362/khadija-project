@@ -476,7 +476,7 @@
 
         /* ══════ Professional topbar — blue welcome banner ══════ */
         .pro-topbar { display: flex; align-items: flex-start; gap: 16px; padding: 14px 26px 4px; position: sticky; top: 0; z-index: 100; background: var(--bg-primary); }
-        .pro-banner { flex: 1; min-width: 0; display: flex; align-items: center; gap: 16px; background: linear-gradient(120deg, #1e3a8a 0%, #2563eb 55%, #1d4ed8 100%); border-radius: 14px; padding: 13px 18px; box-shadow: 0 6px 20px rgba(37,99,235,0.22); }
+        .pro-banner { flex: 1; min-width: 0; display: flex; align-items: center; gap: 16px; background: linear-gradient(120deg, #3b82f6 0%, #2563eb 100%); border-radius: 14px; padding: 13px 18px; box-shadow: 0 6px 18px rgba(37,99,235,0.20); }
         .pro-banner-avatar { width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 16px; }
         .pro-banner-text { flex-shrink: 0; }
         .pro-banner-text h1 { font-size: 17px; font-weight: 800; color: #fff; margin: 0; }
