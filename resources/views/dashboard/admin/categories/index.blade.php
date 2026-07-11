@@ -27,6 +27,11 @@
             <div class="card">
                 <div class="card-body">
                     <h6 class="card-title mb-3">Categories</h6>
+                    <style>
+                        .gr-tree-link { border-radius: 6px; padding-left: 6px; padding-right: 6px; transition: background .12s ease; cursor: pointer; }
+                        .gr-tree-link:hover { background: rgba(99,102,241,0.12); }
+                        .gr-tree-link:hover span { text-decoration: underline; }
+                    </style>
                     @if($treeCategories->count())
                         <div class="category-tree" style="max-height: 500px; overflow-y: auto;">
                             @include('dashboard.admin.categories._tree_item', ['categories' => $treeCategories, 'depth' => 0])
@@ -74,8 +79,9 @@
                         <div class="card h-100">
                             {{-- Cover Image --}}
                             <div style="height: 160px; overflow: hidden; position: relative; background: linear-gradient(135deg, #1e3a5f, #2d1b69); border-radius: 0.5rem 0.5rem 0 0;">
-                                @if($category->cover_image)
-                                    <img src="{{ asset('storage/' . $category->cover_image) }}" alt="{{ $category->name }}"
+                                @php($cardImg = $category->cover_image ?: $category->thumbnail)
+                                @if($cardImg)
+                                    <img src="{{ asset('storage/' . $cardImg) }}" alt="{{ $category->name }}"
                                          style="width:100%; height:100%; object-fit:cover;">
                                 @else
                                     <div class="d-flex align-items-center justify-content-center h-100">
@@ -148,7 +154,7 @@
                     @endforeach
                 </div>
 
-                <div class="mt-2">{{ $categories->links() }}</div>
+                <div class="mt-3 d-flex justify-content-center">{{ $categories->onEachSide(1)->links('pagination::bootstrap-5') }}</div>
             @else
                 <div class="alert alert-warning">
                     <i data-lucide="info" class="icon-sm me-1"></i>

@@ -819,6 +819,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/categories', [AdminCategoryController::class, 'index'])->middleware('permission:events.view_any')->name('app.admin.categories.index');
         Route::get('/categories/create', [AdminCategoryController::class, 'create'])->middleware('permission:events.create')->name('app.admin.categories.create');
         Route::post('/categories', [AdminCategoryController::class, 'store'])->middleware('permission:events.create')->name('app.admin.categories.store');
+        Route::get('/categories/{category}', [AdminCategoryController::class, 'show'])->middleware('permission:events.view_any')->name('app.admin.categories.show');
         Route::get('/categories/{category}/edit', [AdminCategoryController::class, 'edit'])->middleware('permission:events.update')->name('app.admin.categories.edit');
         Route::patch('/categories/{category}', [AdminCategoryController::class, 'update'])->middleware('permission:events.update')->name('app.admin.categories.update');
         Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->middleware('permission:events.delete')->name('app.admin.categories.destroy');

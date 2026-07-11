@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             DemoUsersSeeder::class,
             PolicyPageSeeder::class,
             PlatformDisclaimerSeeder::class,
+            CategorySeeder::class,
         ]);
 
         Artisan::call('permission:cache-reset');

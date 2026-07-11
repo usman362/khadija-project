@@ -36,13 +36,13 @@ class AdminCategoryController extends Controller
             }
         }
 
-        // Card grid categories (paginated)
-        $categories = $query->with('parent:id,name')->orderBy('sort_order')->orderBy('name')->paginate(12)->withQueryString();
+        // Card grid categories (paginated) — newest first, matching the legacy admin.
+        $categories = $query->with('parent:id,name')->orderByDesc('sort_order')->orderByDesc('id')->paginate(12)->withQueryString();
 
-        // Tree structure for sidebar (unlimited depth)
+        // Tree structure for sidebar (unlimited depth) — alphabetical, matching the legacy admin.
         $treeCategories = Category::whereNull('parent_id')
             ->with('allChildren')
-            ->orderBy('sort_order')->orderBy('name')
+            ->orderBy('name')
             ->get();
 
         $stats = [
@@ -58,6 +58,22 @@ class AdminCategoryController extends Controller
             'treeCategories' => $treeCategories,
             'stats' => $stats,
             'filters' => $request->only(['search', 'status', 'type']),
+        ]);
+    }
+
+    public function show(Category $category): View
+    {
+        $category->load('parent:id,name', 'children:id,parent_id,name,is_active');
+
+        $eventsCount = $category->events()->count();
+
+        return view('dashboard.admin.categories.show', [
+            'category' => $category,
+            'stats' => [
+                'gigs'          => 0, // no gig subsystem yet
+                'events'        => $eventsCount,
+                'subcategories' => $category->children->count(),
+            ],
         ]);
     }
 

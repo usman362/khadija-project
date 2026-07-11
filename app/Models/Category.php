@@ -57,10 +57,10 @@ class Category extends Model
         return $query->whereNull('parent_id');
     }
 
-    // Recursive children (unlimited depth)
+    // Recursive children (unlimited depth) — alphabetical, matching the legacy admin tree.
     public function allChildren(): HasMany
     {
-        return $this->hasMany(Category::class, 'parent_id')->with('allChildren')->orderBy('sort_order')->orderBy('name');
+        return $this->hasMany(Category::class, 'parent_id')->with('allChildren')->orderBy('name');
     }
 
     // Get full path name (e.g. "Weddings > Photography")
