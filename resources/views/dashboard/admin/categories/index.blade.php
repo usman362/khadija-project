@@ -31,30 +31,6 @@
                         .gr-tree-link { border-radius: 6px; padding-left: 6px; padding-right: 6px; transition: background .12s ease; cursor: pointer; }
                         .gr-tree-link:hover { background: rgba(99,102,241,0.12); }
                         .gr-tree-link:hover span { text-decoration: underline; }
-
-                        /* --- Category cards pagination --- */
-                        /* Center everything so the » next button never sits under the floating chat widget */
-                        .gr-pagination nav > div { justify-content: center !important; align-items: center; gap: 1.25rem; flex-wrap: wrap; }
-                        .gr-pagination nav { gap: 1rem; padding-bottom: 4px; }
-                        .gr-pagination .pagination { gap: 6px; margin: 0; }
-                        .gr-pagination .page-item .page-link {
-                            min-width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-                            border-radius: 10px; border: 1px solid rgba(148,163,184,.18);
-                            background: transparent; color: #cbd5e1; font-weight: 600; font-size: .85rem;
-                            transition: all .15s ease; box-shadow: none; padding: 0 10px;
-                        }
-                        .gr-pagination .page-item .page-link:hover {
-                            background: rgba(99,102,241,.15); border-color: rgba(99,102,241,.5); color: #fff;
-                        }
-                        .gr-pagination .page-item.active .page-link {
-                            background: linear-gradient(135deg,#6366f1,#8b5cf6); border-color: transparent; color: #fff;
-                            box-shadow: 0 4px 14px rgba(99,102,241,.45);
-                        }
-                        .gr-pagination .page-item.disabled .page-link {
-                            opacity: .35; background: transparent; border-color: rgba(148,163,184,.12); color: #64748b;
-                        }
-                        .gr-pagination p, .gr-pagination .small { color: #94a3b8 !important; margin: 0; font-size: .82rem; }
-                        .gr-pagination svg { width: 16px; height: 16px; }
                     </style>
                     @if($treeCategories->count())
                         <div class="category-tree" style="max-height: 500px; overflow-y: auto;">
@@ -178,7 +154,7 @@
                     @endforeach
                 </div>
 
-                <div class="gr-pagination mt-4">{{ $categories->onEachSide(1)->links('pagination::bootstrap-5') }}</div>
+                <div class="mt-4">{{ $categories->onEachSide(1)->links() }}</div>
             @else
                 <div class="alert alert-warning">
                     <i data-lucide="info" class="icon-sm me-1"></i>

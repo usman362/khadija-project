@@ -41,6 +41,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Global pagination: use the self-contained GigResource pager for every
+        // bare ->links() call (framework-agnostic, replaces the oversized default).
+        \Illuminate\Pagination\Paginator::defaultView('pagination.gr');
+
         Gate::before(function (User $user): ?bool {
             return $user->hasRole(RoleName::ADMIN->value) ? true : null;
         });
