@@ -703,9 +703,11 @@ Route::middleware('auth')->group(function () {
         Route::patch('/packages/{package}', [ProfessionalPackageController::class, 'update'])->name('professional.packages.update');
         Route::delete('/packages/{package}', [ProfessionalPackageController::class, 'destroy'])->name('professional.packages.destroy');
 
+        // NOTE: professionals do NOT create gigs — clients post gigs (events), pros
+        // create Package Services + bid on gigs. "My Gigs" here = work ASSIGNED to
+        // the pro. The create/store gig routes were removed; pros use
+        // professional.packages.create instead.
         Route::get('/gigs', [ProfessionalGigController::class, 'index'])->middleware('permission:events.view_any')->name('professional.gigs.index');
-        Route::get('/gigs/create', [ProfessionalGigController::class, 'create'])->name('professional.gigs.create');
-        Route::post('/gigs', [ProfessionalGigController::class, 'store'])->name('professional.gigs.store');
         Route::get('/gigs/{event}', [ProfessionalGigController::class, 'show'])->middleware('permission:events.view')->name('professional.gigs.show');
 
         // Proposals (Bookings from professional's perspective)
