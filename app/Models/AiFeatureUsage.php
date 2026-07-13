@@ -13,6 +13,7 @@ class AiFeatureUsage extends Model
         'user_id',
         'feature_code',
         'tokens_used',
+        'credits',
         'metadata',
         'created_at',
     ];

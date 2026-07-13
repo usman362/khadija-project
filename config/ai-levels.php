@@ -88,4 +88,51 @@ return [
         'monthly_actions' => (int) env('AI_FREE_BETA_MONTHLY', 60),
         'roles'           => ['client', 'influencer'],
     ],
+
+    // ── GigResource IQ™ credit economy (Peter's pilot metering) ────────────
+    // Tools run on our own engines (no real AI cost), but each AI action spends
+    // "AI Assist Credits" from the user's monthly allowance. This lets us charge
+    // for AI tiers and capture real usage/demand data before switching on a real
+    // model. Users only ever see credits — never tokens. Master switch is
+    // AI_CREDITS_ENABLED; when off, the older per-action beta cap applies.
+    'credits' => [
+        'enabled' => filter_var(env('AI_CREDITS_ENABLED', true), FILTER_VALIDATE_BOOLEAN),
+
+        // Credit cost per weight class (Peter: Light 1 / Standard 2 / Advanced 4 / Visual 6).
+        'weights' => ['light' => 1, 'standard' => 2, 'advanced' => 4, 'visual' => 6],
+
+        // Per-tool weight class (anything unlisted = 'standard').
+        'tool_weight' => [
+            'message-assistant'      => 'light',
+            'review-writer'          => 'light',
+            'translator'             => 'light',
+            'upsell-assistant'       => 'light',
+            'proposal-writer'        => 'standard',
+            'checklist-generator'    => 'standard',
+            'package-builder'        => 'standard',
+            'budget-allocator'       => 'standard',
+            'vendor-matchmaking'     => 'standard',
+            'guest-capacity'         => 'standard',
+            'theme-advisor'          => 'standard',
+            'pricing-assistant'      => 'standard',
+            'staffing-planner'       => 'standard',
+            'bid-optimizer'          => 'standard',
+            'availability-optimizer' => 'standard',
+            'timeline-builder'       => 'standard',
+            'event-planner'          => 'advanced',
+            'contract-assistant'     => 'advanced',
+            'venue-analyzer'         => 'advanced',
+            'portfolio-optimizer'    => 'visual',
+        ],
+
+        // Monthly credit grant. Professionals by plan slug; clients/influencers
+        // get the free-role grant during beta. Manual/Core = 0 (templates only).
+        'plan_grants' => [
+            'starter'      => 0,    // Core
+            'professional' => 100,  // Pro-Grow
+            'enterprise'   => 400,  // Elite
+        ],
+        'professional_default_grant' => 0,
+        'free_role_grant'            => (int) env('AI_FREE_ROLE_CREDITS', 100),
+    ],
 ];

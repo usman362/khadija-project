@@ -89,6 +89,10 @@
 @section('content')
 <div class="akt">
 
+    <div style="display:flex; justify-content:flex-end; margin-bottom:14px;">
+        @include('partials._ai_credits_badge')
+    </div>
+
     {{-- ── Suite selector ── --}}
     <div class="akt-nav">
         @foreach($suites as $sk => $s)

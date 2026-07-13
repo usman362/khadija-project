@@ -114,4 +114,45 @@ final class AiAccess
 
         return $user->activeRole() !== 'supplier';
     }
+
+    // ── GigResource IQ™ credit economy ─────────────────────────────────────
+
+    /** Master switch for the visible AI-credit metering. */
+    public static function creditsEnabled(): bool
+    {
+        return (bool) config('ai-levels.credits.enabled', false);
+    }
+
+    /** Credit cost of one action on a tool (weighted; unlisted = standard). */
+    public static function creditCost(string $toolKey): int
+    {
+        $weights = (array) config('ai-levels.credits.weights', []);
+        $class   = (string) config("ai-levels.credits.tool_weight.{$toolKey}", 'standard');
+
+        return (int) ($weights[$class] ?? $weights['standard'] ?? 2);
+    }
+
+    /**
+     * The user's monthly AI-credit grant. Admins are effectively unlimited;
+     * professionals get their plan's grant; clients & influencers get the
+     * free-role grant during beta.
+     */
+    public static function monthlyCreditGrant(?User $user): int
+    {
+        if (! $user) {
+            return 0;
+        }
+        if ($user->isAdmin()) {
+            return PHP_INT_MAX;
+        }
+
+        if ($user->activeRole() === 'supplier') {
+            $slug   = $user->activeSubscription()?->plan?->slug;
+            $grants = (array) config('ai-levels.credits.plan_grants', []);
+
+            return (int) ($grants[$slug] ?? config('ai-levels.credits.professional_default_grant', 0));
+        }
+
+        return (int) config('ai-levels.credits.free_role_grant', 0);
+    }
 }

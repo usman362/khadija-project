@@ -449,4 +449,29 @@ class User extends Authenticatable
         if ($cap <= 0) return PHP_INT_MAX;
         return max(0, $cap - $this->aiFreeBetaUsedThisMonth());
     }
+
+    // ── GigResource IQ™ AI credits ─────────────────────────────────────────
+
+    /** This user's monthly AI-credit allowance. */
+    public function aiCreditsGrant(): int
+    {
+        return \App\Domain\AiFeatures\AiAccess::monthlyCreditGrant($this);
+    }
+
+    /** AI credits spent this month (sum of weighted action costs). */
+    public function aiCreditsUsedThisMonth(): int
+    {
+        return (int) \App\Models\AiFeatureUsage::where('user_id', $this->id)
+            ->where('feature_code', 'like', \App\Domain\AiFeatures\AiAccess::BETA_ACTION_PREFIX . '%')
+            ->where('created_at', '>=', now()->startOfMonth())
+            ->sum('credits');
+    }
+
+    /** AI credits remaining this month (PHP_INT_MAX when effectively unlimited). */
+    public function aiCreditsRemaining(): int
+    {
+        $grant = $this->aiCreditsGrant();
+        if ($grant >= PHP_INT_MAX) return PHP_INT_MAX;
+        return max(0, $grant - $this->aiCreditsUsedThisMonth());
+    }
 }
