@@ -677,6 +677,9 @@ Route::middleware('auth')->group(function () {
 
         // Main Bidding Board (browse all open client gigs + place bids)
         Route::get('/bidding-board', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'index'])->name('professional.bidding-board.index');
+        Route::post('/bidding-board/bid', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'placeBid'])->name('professional.bidding-board.bid');
+        Route::get('/bidding-board/my-bids', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'myBids'])->name('professional.bidding-board.my-bids');
+        Route::post('/bidding-board/bid/{bid}/toggle', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'toggleBidVisibility'])->name('professional.bidding-board.toggle');
 
         // Team & Staffing (crew + shifts subsystem)
         Route::get('/team', [\App\Http\Controllers\Professional\ProfessionalTeamController::class, 'index'])->name('professional.team.index');

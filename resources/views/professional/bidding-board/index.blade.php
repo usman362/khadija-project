@@ -58,6 +58,32 @@
     .bb-stars { font-size: 11px; letter-spacing: .5px; color: #f59e0b; line-height: 1; }
     .bb-stars i { color: var(--border-color); font-style: normal; }
 
+    /* sealed-bid: flash, chip, modal */
+    .bb-flash { display: flex; align-items: center; gap: 8px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; font-size: 13px; font-weight: 600; padding: 11px 16px; border-radius: 12px; margin-bottom: 16px; }
+    .bb-mybid { margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; letter-spacing: .2px; padding: 4px 9px; border-radius: 7px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; align-self: flex-start; }
+    .bb-mybid.sealed { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+    .bb-bid.done { background: var(--bg-card); color: var(--bb); border: 1.5px solid var(--bb); }
+    .bb-mylink { margin-left: 8px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 999px; padding: 7px 15px; font-size: 13px; font-weight: 700; color: var(--text-secondary); text-decoration: none; }
+
+    .bb-modal { position: fixed; inset: 0; background: rgba(15,23,42,.55); display: none; align-items: center; justify-content: center; z-index: 1200; padding: 20px; }
+    .bb-modal.open { display: flex; }
+    .bb-dialog { width: 100%; max-width: 440px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 18px; padding: 22px; box-shadow: 0 24px 60px rgba(0,0,0,.28); }
+    .bb-dialog h3 { font-size: 17px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px; }
+    .bb-dialog .sub { font-size: 12.5px; color: var(--text-muted); margin: 0 0 16px; }
+    .bb-field { margin-bottom: 14px; }
+    .bb-field label { display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; }
+    .bb-field input[type=number], .bb-field textarea { width: 100%; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; font-size: 14px; font-family: inherit; color: var(--text-primary); background: var(--bg-body, var(--bg-card)); }
+    .bb-field textarea { min-height: 78px; resize: vertical; }
+    .bb-amtwrap { position: relative; }
+    .bb-amtwrap span { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-weight: 800; color: var(--text-muted); }
+    .bb-amtwrap input { padding-left: 26px !important; }
+    .bb-seal { display: flex; gap: 9px; align-items: flex-start; background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 11px; padding: 11px 13px; font-size: 12px; color: #5b21b6; line-height: 1.45; }
+    .bb-seal input { margin-top: 2px; }
+    .bb-seal b { color: #4c1d95; }
+    .bb-dialog-actions { display: flex; gap: 10px; margin-top: 18px; }
+    .bb-dialog-actions .bb-bid { flex: 1; }
+    .bb-cancel { border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 11px; padding: 11px 18px; font-size: 14px; font-weight: 700; color: var(--text-secondary); cursor: pointer; }
+
     /* actions column */
     .bb-actions { padding: 14px 12px; border-left: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px; justify-content: center; }
     .bb-bid { border: none; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--bb), var(--bb-strong)); cursor: pointer; }
@@ -102,6 +128,10 @@
 
 @section('content')
 <div class="bb">
+    @if(session('status'))
+        <div class="bb-flash">✅ {{ session('status') }}</div>
+    @endif
+
     {{-- Top bar: filter tabs + sort --}}
     <div class="bb-bar">
         <div class="bb-tabs">
@@ -111,6 +141,7 @@
             <span class="bb-tab">MSR <span class="sub">(Multi-Service)</span> <span class="n">{{ $counts['MSR'] }}</span></span>
             <span class="bb-tab">Invite Only</span>
             <span class="bb-tab">★ Bookmarked</span>
+            <a class="bb-mylink" href="{{ route('professional.bidding-board.my-bids') }}">🔒 My Bids</a>
         </div>
         <div class="bb-sort">
             <label for="bb-sort-sel">Sort by:</label>
@@ -154,6 +185,11 @@
                         <div class="bb-tags">
                             @foreach($g['tags'] as $t)<span class="bb-tagx">{{ $t }}</span>@endforeach
                         </div>
+                        @if($g['my_bid'])
+                            <span class="bb-mybid {{ $g['my_bid']['is_public'] ? '' : 'sealed' }}">
+                                {{ $g['my_bid']['is_public'] ? '📣 Public bid' : '🔒 Sealed bid' }} · ${{ number_format($g['my_bid']['amount']) }}
+                            </span>
+                        @endif
                     </div>
 
                     <div class="bb-stats">
@@ -172,7 +208,14 @@
                     </div>
 
                     <div class="bb-actions">
-                        <button class="bb-bid">Place Bid</button>
+                        <button class="bb-bid {{ $g['my_bid'] ? 'done' : '' }}" type="button"
+                                data-bid-open
+                                data-event-id="{{ $g['event_id'] }}"
+                                data-title="{{ $g['title'] }}"
+                                data-amount="{{ $g['my_bid']['amount'] ?? '' }}"
+                                data-public="{{ $g['my_bid'] && $g['my_bid']['is_public'] ? '1' : '0' }}">
+                            {{ $g['my_bid'] ? 'Edit Bid' : 'Place Bid' }}
+                        </button>
                         <button class="bb-ob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg>Save</button>
                         <button class="bb-ob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>Share</button>
                     </div>
@@ -214,10 +257,41 @@
             </div>
 
             <div class="bb-rail-card bb-sealed">
-                <h4>🔒 Try Sealed Bidding</h4>
-                <p>Hide competitor bids and get more quality proposals — your bid stays private until the client reviews.</p>
+                <h4>🔒 Sealed Bidding is On</h4>
+                <p>Every bid you place is hidden from other pros by default — only you and the client see the amount. You can opt to make a bid public anytime from <a href="{{ route('professional.bidding-board.my-bids') }}" style="font-weight:800; text-decoration:underline;">My Bids</a>.</p>
             </div>
         </aside>
+    </div>
+</div>
+
+{{-- Place / edit bid modal --}}
+<div class="bb-modal" id="bbModal">
+    <div class="bb-dialog">
+        <h3>Place your bid</h3>
+        <p class="sub" id="bbModalGig">—</p>
+        <form method="POST" action="{{ route('professional.bidding-board.bid') }}">
+            @csrf
+            <input type="hidden" name="event_id" id="bbEventId" value="">
+            <div class="bb-field">
+                <label for="bbAmount">Your bid amount</label>
+                <div class="bb-amtwrap">
+                    <span>$</span>
+                    <input type="number" name="amount" id="bbAmount" min="1" step="1" placeholder="0" required>
+                </div>
+            </div>
+            <div class="bb-field">
+                <label for="bbNote">Note to client <span style="font-weight:500;color:var(--text-muted)">(optional)</span></label>
+                <textarea name="note" id="bbNote" placeholder="What's included, why you're a great fit…"></textarea>
+            </div>
+            <label class="bb-seal">
+                <input type="checkbox" name="is_public" value="1" id="bbPublic">
+                <span><b>Keep my bid sealed (recommended).</b> Leave this unchecked and other professionals can't see your amount — only you and the client can. Check it to make your bid public.</span>
+            </label>
+            <div class="bb-dialog-actions">
+                <button type="button" class="bb-cancel" data-bid-close>Cancel</button>
+                <button type="submit" class="bb-bid">Submit Bid</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -245,6 +319,34 @@
         }
         tick();
         setInterval(tick, 1000);
+    })();
+
+    // Sealed-bid modal
+    (function () {
+        var modal = document.getElementById('bbModal');
+        if (!modal) return;
+        var gig = document.getElementById('bbModalGig');
+        var eventId = document.getElementById('bbEventId');
+        var amount = document.getElementById('bbAmount');
+        var pub = document.getElementById('bbPublic');
+        function open(btn) {
+            eventId.value = btn.getAttribute('data-event-id');
+            gig.textContent = btn.getAttribute('data-title');
+            amount.value = btn.getAttribute('data-amount') || '';
+            pub.checked = btn.getAttribute('data-public') === '1';
+            modal.querySelector('h3').textContent = btn.getAttribute('data-amount') ? 'Edit your bid' : 'Place your bid';
+            modal.classList.add('open');
+            setTimeout(function () { amount.focus(); }, 50);
+        }
+        function close() { modal.classList.remove('open'); }
+        document.querySelectorAll('[data-bid-open]').forEach(function (b) {
+            b.addEventListener('click', function () { open(b); });
+        });
+        modal.querySelectorAll('[data-bid-close]').forEach(function (b) {
+            b.addEventListener('click', close);
+        });
+        modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
     })();
 </script>
 @endpush

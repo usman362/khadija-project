@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Professional;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bid;
 use App\Models\Event;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -29,7 +31,14 @@ class ProfessionalBiddingBoardController extends Controller
             ->limit(15)
             ->get();
 
-        $gigs = $events->map(fn ($e) => $this->mapEvent($e))->all();
+        // Real sealed-bid data: per-gig bid count + this pro's own bid (if any).
+        $ids = $events->pluck('id');
+        $bidCounts = Bid::whereIn('event_id', $ids)
+            ->selectRaw('event_id, COUNT(*) as c')->groupBy('event_id')->pluck('c', 'event_id');
+        $myBids = Bid::where('supplier_id', $request->user()?->id)
+            ->whereIn('event_id', $ids)->get()->keyBy('event_id');
+
+        $gigs = $events->map(fn ($e) => $this->mapEvent($e, (int) ($bidCounts[$e->id] ?? 0), $myBids->get($e->id)))->all();
 
         $counts = [
             'all' => count($gigs),
@@ -56,8 +65,58 @@ class ProfessionalBiddingBoardController extends Controller
         ]);
     }
 
+    /** Place (or update) a sealed bid on an open gig. */
+    public function placeBid(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'event_id'  => ['required', 'exists:events,id'],
+            'amount'    => ['required', 'integer', 'min:1', 'max:10000000'],
+            'note'      => ['nullable', 'string', 'max:1000'],
+            'is_public' => ['nullable', 'boolean'],
+        ]);
+
+        $event = Event::where('id', $data['event_id'])
+            ->where('is_published', true)
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->firstOrFail();
+
+        Bid::updateOrCreate(
+            ['event_id' => $event->id, 'supplier_id' => $request->user()->id],
+            [
+                'amount'    => $data['amount'],
+                'note'      => $data['note'] ?? null,
+                'is_public' => $request->boolean('is_public'),   // sealed unless the pro opts in
+                'status'    => 'submitted',
+            ],
+        );
+
+        return back()->with('status', 'Your sealed bid was submitted. Only you and the client can see the amount.');
+    }
+
+    /** Toggle a bid between sealed and public (the bidder's opt-in). */
+    public function toggleBidVisibility(Request $request, Bid $bid): RedirectResponse
+    {
+        abort_unless($bid->supplier_id === $request->user()->id, 403);
+        $bid->update(['is_public' => ! $bid->is_public]);
+
+        return back()->with('status', $bid->is_public
+            ? 'Your bid amount is now public.'
+            : 'Your bid amount is sealed again.');
+    }
+
+    /** The pro's own bids across all gigs, with seal/reveal control. */
+    public function myBids(Request $request): View
+    {
+        $bids = Bid::where('supplier_id', $request->user()->id)
+            ->with('event:id,title,starts_at,status')
+            ->latest()
+            ->paginate(15);
+
+        return view('professional.bidding-board.my-bids', compact('bids'));
+    }
+
     /** Map a real Event to the bidding-board gig card shape. */
-    private function mapEvent(Event $e): array
+    private function mapEvent(Event $e, int $bidCount = 0, ?Bid $myBid = null): array
     {
         $cats  = $e->categories->pluck('name')->all();
         $type  = count($cats) >= 4 ? 'ESR' : (count($cats) >= 2 ? 'MSR' : 'SSR');
@@ -76,9 +135,11 @@ class ProfessionalBiddingBoardController extends Controller
             'budget' => $e->budget ? '$' . number_format($e->budget * 0.85) . ' – $' . number_format($e->budget) : 'Open budget',
             'time'   => ($days !== null && $days >= 0) ? ($days . ($days === 1 ? ' day left' : ' days left')) : 'Open',
             'match'  => 78 + ($e->id % 22), // representative AI match until scoring model lands
-            'bids'   => 2 + ($e->id % 12),
+            'bids'   => $bidCount,                    // real sealed-bid count
             'rating' => 5,
             'img'    => $stock[$e->id % count($stock)],
+            'event_id' => $e->id,
+            'my_bid' => $myBid ? ['amount' => $myBid->amount, 'is_public' => $myBid->is_public] : null,
         ];
     }
 }

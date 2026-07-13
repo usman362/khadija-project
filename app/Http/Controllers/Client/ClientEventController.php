@@ -204,7 +204,14 @@ class ClientEventController extends Controller
         $categories = Category::active()->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
         $selectedCategoryIds = $event->categories->pluck('id')->all();
 
-        return view('client.events.show', compact('event', 'categories', 'selectedCategoryIds'));
+        // Sealed bids received on this event. The client is the event owner, so
+        // they see every amount (bids are only sealed from OTHER professionals).
+        $bids = \App\Models\Bid::where('event_id', $event->id)
+            ->with('supplier:id,name')
+            ->orderBy('amount')
+            ->get();
+
+        return view('client.events.show', compact('event', 'categories', 'selectedCategoryIds', 'bids'));
     }
 
     public function update(Request $request, Event $event): RedirectResponse

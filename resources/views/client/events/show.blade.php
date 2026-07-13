@@ -99,6 +99,44 @@
                     </div>
                 @endif
             </div>
+
+            {{-- Sealed bids received — the client (event owner) sees every amount;
+                 other professionals can't. Sorted lowest-first. --}}
+            <div class="cl-card" style="margin-top:20px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                    <h3 style="font-size:16px;font-weight:600;">🔒 Sealed Bids Received ({{ $bids->count() }})</h3>
+                </div>
+                <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:16px;">
+                    Bid amounts are hidden from other professionals — only you can see them here.
+                </p>
+                @if($bids->count())
+                    <table class="cl-table">
+                        <thead><tr><th>Professional</th><th>Bid Amount</th><th>Submitted</th><th></th></tr></thead>
+                        <tbody>
+                            @foreach($bids as $bid)
+                            <tr>
+                                <td style="color:var(--text-primary);font-weight:500;">
+                                    {{ $bid->supplier?->name ?? '—' }}
+                                    @if($loop->first)<span class="cl-badge" style="background:#ecfdf5;color:#065f46;margin-left:6px;">Lowest</span>@endif
+                                </td>
+                                <td style="color:var(--text-primary);font-weight:700;">${{ number_format($bid->amount) }}</td>
+                                <td style="color:var(--text-muted);">{{ $bid->created_at->format('M d, Y') }}</td>
+                                <td style="text-align:right;">
+                                    <a href="{{ route('client.chat.index') }}" style="color:var(--accent-orange,#f97316);font-size:12.5px;font-weight:600;text-decoration:none;">Message →</a>
+                                </td>
+                            </tr>
+                            @if($bid->note)
+                            <tr><td colspan="4" style="color:var(--text-muted);font-size:12.5px;padding-top:0;">↳ {{ $bid->note }}</td></tr>
+                            @endif
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    <div style="text-align:center;padding:24px 16px;color:var(--text-muted);font-size:13.5px;">
+                        No sealed bids yet. {{ $event->is_published ? 'Professionals can bid on this event from their bidding board.' : 'Publish your event so professionals can place sealed bids.' }}
+                    </div>
+                @endif
+            </div>
         </div>
 
         {{-- ── Right rail ────────────────────────────────────── --}}
