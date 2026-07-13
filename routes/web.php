@@ -709,8 +709,10 @@ Route::middleware('auth')->group(function () {
 
         // NOTE: professionals do NOT create gigs — clients post gigs (events), pros
         // create Package Services + bid on gigs. "My Gigs" here = work ASSIGNED to
-        // the pro. The create/store gig routes were removed; pros use
-        // professional.packages.create instead.
+        // the pro. Per Peter, the old gig-create URL is REPURPOSED (not deleted)
+        // into the pro's Create-a-Package form so pros keep their ability to list.
+        Route::get('/gigs/create', fn () => redirect()->route('professional.packages.create'))
+            ->name('professional.gigs.create');
         Route::get('/gigs', [ProfessionalGigController::class, 'index'])->middleware('permission:events.view_any')->name('professional.gigs.index');
         Route::get('/gigs/{event}', [ProfessionalGigController::class, 'show'])->middleware('permission:events.view')->name('professional.gigs.show');
 
