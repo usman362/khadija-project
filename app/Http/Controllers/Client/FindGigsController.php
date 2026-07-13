@@ -84,8 +84,47 @@ class FindGigsController extends Controller
                 'rating'  => $avg,
                 'reviews' => $count,
                 'img'     => self::STOCK[$i % count(self::STOCK)],
+                'img_url' => 'https://images.unsplash.com/' . self::STOCK[$i % count(self::STOCK)] . '?w=320&q=70&auto=format&fit=crop',
+                'real'    => false,
             ];
         });
+
+        // Real published packages from pros — surfaced ahead of the representative set.
+        $realGigs = \App\Models\Package::active()
+            ->with(['category:id,name', 'user' => function ($q) {
+                $q->select('id', 'name')
+                  ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')
+                  ->withCount(['reviewsReceived as reviews_count' => fn ($r) => $r->where('is_hidden', false)])
+                  ->with('profile:user_id,city');
+            }])
+            ->latest()
+            ->get()
+            ->values()
+            ->map(function ($pkg, $i) {
+                $hero = $pkg->heroUrls(1)[0] ?? null;
+                return [
+                    'id'       => 'pkg-' . $pkg->id,
+                    'title'    => $pkg->title,
+                    'type'     => $pkg->type === 'co-op' ? 'MSR' : 'SSR',
+                    'featured' => false,
+                    'pro'      => $pkg->user?->name ?: 'Verified Professional',
+                    'pro_id'   => $pkg->user_id,
+                    'cat'      => $pkg->category?->name ?: 'Services',
+                    'loc'      => $pkg->user?->profile?->city ?: 'Location on request',
+                    'desc'     => $pkg->description ?: '',
+                    'price'    => $pkg->priceLabel(),
+                    'price_lo' => $pkg->price,
+                    'from'     => $pkg->priceLabel(),
+                    'rating'   => $pkg->user?->reviews_avg ? round((float) $pkg->user->reviews_avg, 1) : null,
+                    'reviews'  => (int) ($pkg->user?->reviews_count ?? 0),
+                    'img'      => self::STOCK[$i % count(self::STOCK)],
+                    'img_url'  => $hero ?: 'https://images.unsplash.com/' . self::STOCK[$i % count(self::STOCK)] . '?w=320&q=70&auto=format&fit=crop',
+                    'real'     => true,
+                ];
+            });
+
+        $gigs = $realGigs->concat($gigs)->values();
+        $allGigs = $gigs;
 
         // ── Filters (all query-string, all optional) ──
         $type     = strtoupper((string) $request->query('type', ''));
@@ -120,13 +159,12 @@ class FindGigsController extends Controller
 
         $gigs = $gigs->values();
 
-        // Type counts from the FULL (unfiltered) set for the tab pills.
-        $all = collect(self::CATALOG);
+        // Type counts from the FULL (unfiltered) merged set for the tab pills.
         $counts = [
-            'all' => $all->count(),
-            'SSR' => $all->filter(fn ($t) => $t[2] === 'SSR')->count(),
-            'MSR' => $all->filter(fn ($t) => $t[2] === 'MSR')->count(),
-            'ESR' => $all->filter(fn ($t) => $t[2] === 'ESR')->count(),
+            'all' => $allGigs->count(),
+            'SSR' => $allGigs->where('type', 'SSR')->count(),
+            'MSR' => $allGigs->where('type', 'MSR')->count(),
+            'ESR' => $allGigs->where('type', 'ESR')->count(),
         ];
 
         // Real categories for the filter dropdown (skip seed "Test" junk).
@@ -137,8 +175,9 @@ class FindGigsController extends Controller
             ->unique()->values();
 
         // Right-rail insights, computed from the catalogue.
-        $topCat = $all->countBy(fn ($t) => $t[1])->sortDesc()->keys()->first() ?: 'Photography';
-        $avgFrom = (int) round($all->avg(fn ($t) => $t[3]));
+        $catalog = collect(self::CATALOG);
+        $topCat = $catalog->countBy(fn ($t) => $t[1])->sortDesc()->keys()->first() ?: 'Photography';
+        $avgFrom = (int) round($catalog->avg(fn ($t) => $t[3]));
 
         return view('client.find-gigs.index', [
             'gigs'       => $gigs,

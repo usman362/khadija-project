@@ -130,7 +130,7 @@
                 <article class="fg-card">
                     <div class="fg-media">
                         <span class="fg-type {{ $g['type'] }}">{{ $g['type'] }}</span>
-                        <img src="https://images.unsplash.com/{{ $g['img'] }}?w=320&q=70&auto=format&fit=crop" alt="" loading="lazy">
+                        <img src="{{ $g['img_url'] ?? ('https://images.unsplash.com/' . $g['img'] . '?w=320&q=70&auto=format&fit=crop') }}" alt="{{ $g['title'] }}" loading="lazy">
                     </div>
 
                     <div class="fg-main">
@@ -158,9 +158,9 @@
                         <div class="fg-stat"><span>Starting At</span><b class="from">{{ $g['from'] }}</b></div>
                         <div class="fg-stat"><span>Price Range</span><b>{{ $g['price'] }}</b></div>
                         <div class="fg-ring">
-                            <span class="fg-score"><b>{{ number_format($g['rating'], 1) }}</b><em>RATING</em></span>
+                            <span class="fg-score"><b>{{ $g['rating'] ? number_format($g['rating'], 1) : '—' }}</b><em>RATING</em></span>
                             <div class="fg-ring-txt">
-                                <span class="fg-score-lbl">{{ $g['rating'] >= 4.8 ? 'Top Rated' : 'Great' }}</span>
+                                <span class="fg-score-lbl">{{ !$g['rating'] ? 'New' : ($g['rating'] >= 4.8 ? 'Top Rated' : 'Great') }}</span>
                                 <span class="fg-stars">@for($i = 1; $i <= 5; $i++){!! $i <= $rf ? '★' : '<i>★</i>' !!}@endfor</span>
                             </div>
                         </div>

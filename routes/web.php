@@ -10,6 +10,7 @@ use App\Http\Controllers\Professional\ProfessionalChatController;
 use App\Http\Controllers\Professional\ProfessionalDashboardController;
 use App\Http\Controllers\Professional\ProfessionalEarningsController;
 use App\Http\Controllers\Professional\ProfessionalGigController;
+use App\Http\Controllers\Professional\ProfessionalPackageController;
 use App\Http\Controllers\Professional\ProfessionalProposalController;
 use App\Http\Controllers\Professional\ProfessionalProfileController;
 use App\Http\Controllers\Professional\ProfessionalReviewController;
@@ -680,6 +681,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/team/shifts/{shift}/fill', [\App\Http\Controllers\Professional\ProfessionalTeamController::class, 'fillShift'])->name('professional.team.shifts.fill');
 
         // My Gigs (Events assigned to professional)
+        // Professional Packages — bundle services into a fixed, browsable offering.
+        Route::get('/packages', [ProfessionalPackageController::class, 'index'])->name('professional.packages.index');
+        Route::get('/packages/create', [ProfessionalPackageController::class, 'create'])->name('professional.packages.create');
+        Route::post('/packages', [ProfessionalPackageController::class, 'store'])->name('professional.packages.store');
+        Route::get('/packages/{package}/edit', [ProfessionalPackageController::class, 'edit'])->name('professional.packages.edit');
+        Route::patch('/packages/{package}', [ProfessionalPackageController::class, 'update'])->name('professional.packages.update');
+        Route::delete('/packages/{package}', [ProfessionalPackageController::class, 'destroy'])->name('professional.packages.destroy');
+
         Route::get('/gigs', [ProfessionalGigController::class, 'index'])->middleware('permission:events.view_any')->name('professional.gigs.index');
         Route::get('/gigs/create', [ProfessionalGigController::class, 'create'])->name('professional.gigs.create');
         Route::post('/gigs', [ProfessionalGigController::class, 'store'])->name('professional.gigs.store');
