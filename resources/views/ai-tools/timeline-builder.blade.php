@@ -9,7 +9,7 @@
 
 @push('styles')
 <style>
-    .tb { --tb: #7c3aed; }
+    .tb { --tb: var(--brand, #7c3aed); }
     .tb-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 18px; }
     .tb-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 16px; }
     .tb-stat b { display: block; font-size: 23px; font-weight: 800; color: var(--text-primary); line-height: 1; }

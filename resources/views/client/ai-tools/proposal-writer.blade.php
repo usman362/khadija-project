@@ -11,7 +11,7 @@
 
 @push('styles')
 <style>
-    .pw { --pw: #db2777; --pw-strong: #be185d; --pw-soft: rgba(236,72,153,0.08); padding-top: 22px; }
+    .pw { --pw: var(--brand, #db2777); --pw-strong: var(--brand-strong, #be185d); --pw-soft: var(--brand-soft, rgba(236,72,153,0.08)); padding-top: 22px; }
     .pw-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 22px 24px; }
 
     /* header */

@@ -10,7 +10,7 @@
 
 @push('styles')
 <style>
-    .vm { --vm: #8b5cf6; --vm-strong: #7c3aed; --vm-soft: rgba(139,92,246,0.09); padding-top: 22px; }
+    .vm { --vm: var(--brand, #8b5cf6); --vm-strong: var(--brand-strong, #7c3aed); --vm-soft: var(--brand-soft, rgba(139,92,246,0.09)); padding-top: 22px; }
     .vm-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 22px 24px; }
     .vm-mb { margin-bottom: 20px; }
 

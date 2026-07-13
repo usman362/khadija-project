@@ -9,7 +9,7 @@
 
 @push('styles')
 <style>
-    .cg { --cg: #16a34a; }
+    .cg { --cg: var(--brand, #16a34a); }
     .cg-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 18px; }
     .cg-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 16px; }
     .cg-stat b { display: block; font-size: 23px; font-weight: 800; color: var(--text-primary); line-height: 1; } .cg-stat.good b { color: #16a34a; }

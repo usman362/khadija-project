@@ -6,7 +6,7 @@
 
 @push('styles')
 <style>
-    .ma { --ma: #0d9488; }
+    .ma { --ma: var(--brand, #0d9488); }
     .ma-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
     .ma-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 16px; }
     .ma-stat b { display: block; font-size: 21px; font-weight: 800; color: var(--text-primary); line-height: 1; } .ma-stat.good b { color: #0d9488; } .ma-stat .l { font-size: 11.5px; color: var(--text-muted); margin-top: 6px; }

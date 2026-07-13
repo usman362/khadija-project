@@ -16,7 +16,7 @@
 
 @push('styles')
 <style>
-    .apa { --apa: #d97706; --apa-strong: #b45309; padding-top: 22px; }
+    .apa { --apa: var(--brand, #d97706); --apa-strong: var(--brand-strong, #b45309); padding-top: 22px; }
     .apa-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 22px 24px; }
 
     /* header */

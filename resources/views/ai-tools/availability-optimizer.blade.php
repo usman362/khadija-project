@@ -9,7 +9,7 @@
 
 @push('styles')
 <style>
-    .ao { --ao: #6366f1; --ao-strong: #4f46e5;
+    .ao { --ao: var(--brand, #6366f1); --ao-strong: var(--brand-strong, #4f46e5);
           --c-confirmed:#16a34a; --c-tight:#d97706; --c-open:#6366f1; --c-personal:#64748b; }
     .ao-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 18px; }
     .ao-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 16px; }

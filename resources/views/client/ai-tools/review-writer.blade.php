@@ -42,7 +42,7 @@
 
 @push('styles')
 <style>
-    .rw { --rw: #ea580c; --rw-strong: #c2410c; --rw-soft: rgba(234,88,12,0.08); padding-top: 22px; }
+    .rw { --rw: var(--brand, #ea580c); --rw-strong: var(--brand-strong, #c2410c); --rw-soft: var(--brand-soft, rgba(234,88,12,0.08)); padding-top: 22px; }
     .rw-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px 22px; }
     .rw-mb { margin-bottom: 18px; }
 

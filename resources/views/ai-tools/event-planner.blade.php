@@ -9,7 +9,7 @@
 
 @push('styles')
 <style>
-    .ep { --ep: #f97316; --ep-strong: #ea580c; }
+    .ep { --ep: var(--brand, #f97316); --ep-strong: var(--brand-strong, #ea580c); }
     .ep-grid { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 18px; align-items: start; }
 
     .ep-hero { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px 18px; margin-bottom: 16px; }

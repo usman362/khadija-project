@@ -11,7 +11,7 @@
 
 @push('styles')
 <style>
-    .sp { --sp: #2563eb; --sp-strong: #1d4ed8; --sp-soft: rgba(37,99,235,0.08); padding-top: 22px; }
+    .sp { --sp: var(--brand, #2563eb); --sp-strong: var(--brand-strong, #1d4ed8); --sp-soft: var(--brand-soft, rgba(37,99,235,0.08)); padding-top: 22px; }
     .sp-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 22px 24px; }
     .sp-mb { margin-bottom: 20px; }
 

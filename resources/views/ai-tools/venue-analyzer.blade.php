@@ -9,7 +9,7 @@
 
 @push('styles')
 <style>
-    .va { --va: #16a34a; }
+    .va { --va: var(--brand, #16a34a); }
     .va-hero { display: flex; align-items: center; gap: 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px 18px; margin-bottom: 16px; flex-wrap: wrap; }
     .va-hero h2 { font-size: 18px; font-weight: 800; color: var(--text-primary); }
     .va-hero .a { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }

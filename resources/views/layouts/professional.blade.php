@@ -19,6 +19,9 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root, [data-theme="dark"] {
+            /* Role brand accent — PROFESSIONAL = blue. Tools use var(--brand*) so
+               their accent follows the portal they're rendered in. */
+            --brand: #2563eb; --brand-strong: #1d4ed8; --brand-soft: rgba(37,99,235,0.10);
             --bg-primary: #0a0e1a;
             --bg-secondary: #111827;
             --bg-card: rgba(17, 24, 39, 0.7);

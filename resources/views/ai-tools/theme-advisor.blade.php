@@ -9,7 +9,7 @@
 
 @push('styles')
 <style>
-    .ta { --ta: #7c3aed; --ta-strong: #6d28d9; }
+    .ta { --ta: var(--brand, #7c3aed); --ta-strong: var(--brand-strong, #6d28d9); }
     .ta-sec { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px; margin-bottom: 18px; }
     .ta-sec > h3 { font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 14px; }
 

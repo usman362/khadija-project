@@ -9,7 +9,7 @@
 
 @push('styles')
 <style>
-    .po { --po: #6366f1; --po-strong: #4f46e5; }
+    .po { --po: var(--brand, #6366f1); --po-strong: var(--brand-strong, #4f46e5); }
     .po-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
     .po-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 16px; }
     .po-stat b { display: block; font-size: 24px; font-weight: 800; color: #16a34a; line-height: 1; } .po-stat .l { font-size: 11.5px; color: var(--text-muted); margin-top: 6px; }

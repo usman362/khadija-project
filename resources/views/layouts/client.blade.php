@@ -19,6 +19,9 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root, [data-theme="dark"] {
+            /* Role brand accent — CLIENT = orange. Tools use var(--brand*) so their
+               accent follows the portal they're rendered in. */
+            --brand: #f97316; --brand-strong: #ea580c; --brand-soft: rgba(249,115,22,0.10);
             --bg-primary: #0a0e1a;
             --bg-secondary: #111827;
             --bg-card: rgba(17, 24, 39, 0.7);

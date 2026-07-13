@@ -9,7 +9,7 @@
 
 @push('styles')
 <style>
-    .gc { --gc: #0ea5e9; }
+    .gc { --gc: var(--brand, #0ea5e9); }
     .gc-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
     .gc-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 16px; }
     .gc-stat b { display: block; font-size: 25px; font-weight: 800; color: var(--text-primary); line-height: 1; }

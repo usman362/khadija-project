@@ -6,7 +6,7 @@
 
 @push('styles')
 <style>
-    .tr { --tr: #7c3aed; }
+    .tr { --tr: var(--brand, #7c3aed); }
     .tr-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
     .tr-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 16px; }
     .tr-stat b { display: block; font-size: 22px; font-weight: 800; color: var(--text-primary); line-height: 1; } .tr-stat.good b { color: #16a34a; } .tr-stat .l { font-size: 11.5px; color: var(--text-muted); margin-top: 6px; }

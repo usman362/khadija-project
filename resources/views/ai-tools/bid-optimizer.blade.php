@@ -6,7 +6,7 @@
 
 @push('styles')
 <style>
-    .bo { --bo: #2563eb; }
+    .bo { --bo: var(--brand, #2563eb); }
     .bo-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
     .bo-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 16px; }
     .bo-stat b { display: block; font-size: 23px; font-weight: 800; color: var(--text-primary); line-height: 1; } .bo-stat.good b { color: #16a34a; } .bo-stat .l { font-size: 11.5px; color: var(--text-muted); margin-top: 6px; }

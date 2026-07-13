@@ -24,7 +24,7 @@
 
 @push('styles')
 <style>
-    .pb { --pb: #6366f1; --pb-strong: #4f46e5; }
+    .pb { --pb: var(--brand, #6366f1); --pb-strong: var(--brand-strong, #4f46e5); }
 
     /* Level banner */
     .pb-levelbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: var(--bg-card); border: 1px solid var(--border-color); border-left: 4px solid var(--lvl,#64748b); border-radius: 12px; padding: 12px 16px; margin-bottom: 18px; }
