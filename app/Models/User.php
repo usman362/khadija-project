@@ -303,12 +303,15 @@ class User extends Authenticatable
             return $session;
         }
 
-        if ($this->hasRole(RoleName::SUPPLIER->value)) {
-            return RoleName::SUPPLIER->value;
-        }
-
+        // Fallback for a user with no explicit active_role in session: prefer
+        // CLIENT so a dual-role account never lands in the professional portal by
+        // accident. A pure professional (no client role) still resolves to supplier.
         if ($this->hasRole(RoleName::CLIENT->value)) {
             return RoleName::CLIENT->value;
+        }
+
+        if ($this->hasRole(RoleName::SUPPLIER->value)) {
+            return RoleName::SUPPLIER->value;
         }
 
         return null;

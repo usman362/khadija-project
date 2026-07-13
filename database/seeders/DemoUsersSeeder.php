@@ -29,9 +29,14 @@ class DemoUsersSeeder extends Seeder
                 [
                     'name' => $userData['name'],
                     'password' => 'password',
+                    // Authoritative landing role — the client demo must log into the
+                    // CLIENT portal, the supplier demo into the professional portal.
+                    'primary_role' => $userData['role'],
                 ]
             );
 
+            // syncRoles is authoritative: strips any stray role (e.g. a client demo
+            // that wrongly picked up the supplier role) so login routing is correct.
             $user->syncRoles([$userData['role']]);
         }
     }

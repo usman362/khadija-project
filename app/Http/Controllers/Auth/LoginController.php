@@ -96,6 +96,9 @@ class LoginController extends Controller
             return $primary;
         }
 
-        return $user->hasRole(RoleName::SUPPLIER->value) ? RoleName::SUPPLIER->value : RoleName::CLIENT->value;
+        // No stored primary_role: prefer CLIENT for a dual-role account so a client
+        // never lands in the professional portal. A pure professional (no client
+        // role) still resolves to supplier.
+        return $user->hasRole(RoleName::CLIENT->value) ? RoleName::CLIENT->value : RoleName::SUPPLIER->value;
     }
 }
