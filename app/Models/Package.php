@@ -9,16 +9,20 @@ use Illuminate\Support\Facades\Storage;
 class Package extends Model
 {
     protected $fillable = [
-        'user_id', 'category_id', 'title', 'slug', 'type', 'description',
-        'price', 'price_unit', 'duration', 'includes', 'images',
-        'is_active', 'sort_order',
+        'user_id', 'coop_partner_id', 'category_id', 'services', 'title', 'slug',
+        'type', 'description', 'price', 'price_unit', 'duration', 'coverage',
+        'team', 'guests', 'serves_regions', 'availability', 'savings_pct',
+        'includes', 'images', 'is_active', 'sort_order',
     ];
 
     protected $casts = [
-        'includes'  => 'array',
-        'images'    => 'array',
-        'is_active' => 'boolean',
-        'price'     => 'integer',
+        'services'   => 'array',
+        'team'       => 'array',
+        'includes'   => 'array',
+        'images'     => 'array',
+        'is_active'  => 'boolean',
+        'price'      => 'integer',
+        'savings_pct' => 'integer',
         'sort_order' => 'integer',
     ];
 
@@ -27,9 +31,33 @@ class Package extends Model
         return $this->belongsTo(User::class);
     }
 
+    /** The second professional on a co-op package (null for solo). */
+    public function coopPartner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'coop_partner_id');
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /** True when the package bundles two or more services. */
+    public function isMultiService(): bool
+    {
+        return count($this->services ?? []) >= 2;
+    }
+
+    /** Whether this is a co-op partnership (two+ pros) vs solo multi-pro. */
+    public function isCoop(): bool
+    {
+        return $this->type === 'co-op';
+    }
+
+    /** Number of gallery photos (for the "N Photos" badge). */
+    public function photosCount(): int
+    {
+        return count($this->images ?? []);
     }
 
     public function scopeActive($query)
