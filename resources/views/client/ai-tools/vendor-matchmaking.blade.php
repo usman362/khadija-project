@@ -126,9 +126,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Browse the vendor directory and choose who you want yourself — no AI ranking.'],
-        'semi'    => ['Help Me Plan', '#8b5cf6', 'AI ranks the best-fit vendors — refine the theme, budget and match level to re-rank.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'AI auto-selects your best-fit vendor team from your event details.'],
+        'manual'  => ['Do It Myself', '#64748b', 'Browse the vendor directory and choose who you want yourself — you choose yourself.'],
+        'semi'    => ['Help Me Plan', '#8b5cf6', 'Ranks the best-fit vendors — refine the theme, budget and match level to re-rank.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Auto-selects your best-fit vendor team from your event details.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -140,7 +140,7 @@
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:18px;">
         <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
         <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
-        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--vm-strong);text-decoration:none;">Upgrade for more AI →</a>@endunless
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--vm-strong);text-decoration:none;">Upgrade for more →</a>@endunless
     </div>
 
     {{-- header --}}
@@ -165,7 +165,7 @@
             </span>
             <div class="vm-head-txt"><h1>Smart Match</h1><p>We find the perfect vendors for your event based on your theme, date, and budget.</p></div>
         </div>
-        <a href="{{ route('ai-tools.budget-allocator') }}" class="vm-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to AI Toolkit</a>
+        <a href="{{ route('ai-tools.budget-allocator') }}" class="vm-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to Toolkit</a>
     </div>
 
     <div class="vm-main">
@@ -174,6 +174,16 @@
             <div class="vm-card">
                 <div class="vm-sec-h"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><b>Event Details</b></div>
                 <div class="vm-ev">
+                    @if(!empty($events) && count($events) > 1)
+                        <div class="vm-ev-item"><div class="k">Event:</div><div class="v">
+                            <select onchange="location.href='{{ route('ai-tools.vendor-matchmaking') }}?event='+this.value"
+                                    style="width:100%;border:1px solid var(--border-color);border-radius:8px;padding:6px 9px;font-size:12.5px;font-weight:700;color:var(--text-primary);background:var(--bg-card);font-family:inherit;cursor:pointer;">
+                                @foreach($events as $ev)
+                                    <option value="{{ $ev['id'] }}" @selected(($selectedEvent ?? null) == $ev['id'])>{{ \Illuminate\Support\Str::limit($ev['title'], 42) }}</option>
+                                @endforeach
+                            </select>
+                        </div></div>
+                    @endif
                     <div class="vm-ev-item"><div class="k">Theme:</div><div class="v" id="vm-ev-theme">{{ $event['theme'] }}</div></div>
                     <div class="vm-ev-item"><div class="k">Date:</div><div class="v">{{ $event['date'] }}</div></div>
                     <div class="vm-ev-item"><div class="k">Budget:</div><div class="v" id="vm-ev-budget">${{ number_format($event['budget']) }}</div></div>
@@ -209,8 +219,8 @@
             @else
             {{-- AI matches (Help Me Plan / Coordinate It For Me) --}}
             <div class="vm-card">
-                <div class="vm-tm-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1-6.3-4.6L5.7 21l2.3-7.1-6-4.5h7.6z"/></svg><b>{{ $isMax ? 'Your AI-Matched Team' : 'Top Matches For You' }}</b></div>
-                @if($isMax)<p style="font-size:12.5px;color:var(--text-muted);margin:2px 0 0;">AI selected these vendors automatically from your event details. Review and connect when you're ready.</p>@endif
+                <div class="vm-tm-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1-6.3-4.6L5.7 21l2.3-7.1-6-4.5h7.6z"/></svg><b>{{ $isMax ? 'Your Matched Team' : 'Top Matches For You' }}</b></div>
+                @if($isMax)<p style="font-size:12.5px;color:var(--text-muted);margin:2px 0 0;">Selected automatically from your event details. Review and connect when you're ready.</p>@endif
                 <div id="vm-matches">
                     @include('client.ai-tools._vendor_matches', ['matches' => $matches])
                 </div>
@@ -266,7 +276,7 @@
             {{-- Coordinate It For Me — auto-matched, read-only criteria summary --}}
             <div class="vm-card">
                 <div class="vm-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><b>Matched Automatically</b></div>
-                <p style="font-size:12.5px;color:var(--text-muted);line-height:1.55;margin:0 0 12px;">AI selected your vendors from these criteria — no tuning needed:</p>
+                <p style="font-size:12.5px;color:var(--text-muted);line-height:1.55;margin:0 0 12px;">Selected from these criteria — no tuning needed:</p>
                 <div class="vm-ins" style="padding:6px 0;"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg></span><div><b>Theme fit</b><p>{{ $event['theme'] }}</p></div></div>
                 <div class="vm-ins" style="padding:6px 0;"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span><div><b>Within budget</b><p>Under ${{ number_format($event['budget']) }}</p></div></div>
                 <div class="vm-ins" style="padding:6px 0;"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><b>Available on date</b><p>{{ $event['date'] }}</p></div></div>
@@ -293,7 +303,7 @@
         <div class="vm-steps">
             <div class="vm-step"><span class="vm-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><b>1. Add Event Details</b><p>Tell us your theme, date, location, and budget.</p></div>
             <span class="vm-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-            <div class="vm-step"><span class="vm-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="M11 8v6M8 11h6"/></svg></span><b>2. AI Finds Matches</b><p>We scan hundreds of vendors to find the best fit.</p></div>
+            <div class="vm-step"><span class="vm-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="M11 8v6M8 11h6"/></svg></span><b>2. Finds Best Matches</b><p>We scan hundreds of vendors to find the best fit.</p></div>
             <span class="vm-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
             <div class="vm-step"><span class="vm-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span><b>3. Review Top Matches</b><p>See top vendors with match scores, reviews &amp; pricing.</p></div>
             <span class="vm-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
