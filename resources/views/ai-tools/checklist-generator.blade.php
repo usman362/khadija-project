@@ -92,7 +92,7 @@
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
         'manual'  => ['Do It Myself', '#64748b', 'Build your checklist by hand — add each task yourself, no AI plan.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'AI drafts a milestone checklist — reword any task before you use it.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'instantly drafts a milestone checklist — reword any task before you use it.'],
         'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and AI builds the full milestone checklist for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -120,7 +120,7 @@
     {{-- Generator (Help Me Plan / Coordinate It For Me) --}}
     <div class="cg-gen">
         <h3>🧩 Generate Your Checklist</h3>
-        <div class="sub">{{ $isSemi ? 'Enter your event details and AI drafts a milestone checklist you can reword.' : 'Enter your event details and AI builds the full milestone checklist with estimated due dates.' }}</div>
+        <div class="sub">{{ $isSemi ? 'Enter your event details and instantly drafts a milestone checklist you can reword.' : 'Enter your event details and AI builds the full milestone checklist with estimated due dates.' }}</div>
         <form id="cgForm">
             <div class="cg-form-grid">
                 <div class="cg-field">

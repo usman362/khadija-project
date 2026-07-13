@@ -38,8 +38,8 @@
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
         'manual'  => ['Do It Myself', '#64748b', 'Write your own message by hand — no AI, just your words.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'AI drafts message options — edit the wording before you send.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Pick a purpose and tone and AI writes the whole message for you.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'instantly drafts message options — edit the wording before you send.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Pick a purpose and tone and instantly writes the whole message for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp

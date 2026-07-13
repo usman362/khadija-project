@@ -4,7 +4,7 @@
 @section('page-title', 'Theme & Style Advisor')
 @section('page-subtitle', 'Cohesive themes, palettes & mood boards for your event')
 
-{{-- Theme & Style Advisor (client). AI-generated themes + colour palette +
+{{-- Theme & Style Advisor (client). auto-generated themes + colour palette +
      mood board + category filters. Representative data. --}}
 
 @push('styles')

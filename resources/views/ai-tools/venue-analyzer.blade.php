@@ -118,8 +118,8 @@
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
         'manual'  => ['Do It Myself', '#64748b', 'Score the venue factors yourself — we average them into an overall verdict, no AI.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'AI analyses the space — adjust the figures, verdict and notes and utilization recalculates live.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your space and AI analyses capacity, fit and gaps for you.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'the tool analyses the space — adjust the figures, verdict and notes and utilization recalculates live.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your space and the tool analyses capacity, fit and gaps for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp

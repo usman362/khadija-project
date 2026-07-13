@@ -390,7 +390,7 @@
     {{-- Form --}}
     <div class="bat-card">
         <div class="bat-card-title">Event Details</div>
-        <div class="bat-card-desc">{{ $isSemi ? 'Fill in what you know — AI will recommend a split you can adjust.' : 'Fill in what you know — the more detail, the better the AI allocation.' }}</div>
+        <div class="bat-card-desc">{{ $isSemi ? 'Fill in what you know — we'll recommend a split you can adjust.' : 'Fill in what you know — the more detail, the better the AI allocation.' }}</div>
 
         <div class="bat-error" id="batError"></div>
 

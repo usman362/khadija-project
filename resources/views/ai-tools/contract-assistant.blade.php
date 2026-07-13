@@ -49,8 +49,8 @@
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
         'manual'  => ['Do It Myself', '#64748b', 'Assemble your own draft by hand — add, edit and remove your own clauses. No AI.'],
-        'semi'    => ['Help Me Plan', '#7c3aed', 'AI drafts the agreement — reword any clause before you use it.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your details and AI drafts the full agreement for you.'],
+        'semi'    => ['Help Me Plan', '#7c3aed', 'instantly drafts the agreement — reword any clause before you use it.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your details and instantly drafts the full agreement for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -79,7 +79,7 @@
     <div class="ca-grid">
         <div class="ca-card">
             <h3>📄 Event & Agreement Details</h3>
-            <div style="font-size:12.5px;color:var(--text-muted);margin:-6px 0 12px;">{{ $isSemi ? 'AI drafts an agreement you can reword clause by clause before using.' : 'AI drafts a full plain-English agreement from your details.' }}</div>
+            <div style="font-size:12.5px;color:var(--text-muted);margin:-6px 0 12px;">{{ $isSemi ? 'instantly drafts an agreement you can reword clause by clause before using.' : 'instantly drafts a full plain-English agreement from your details.' }}</div>
             <div class="ca-err" id="caErr"></div>
             <form id="caForm">
                 <label class="ca-lbl">Service *</label>

@@ -119,7 +119,7 @@
     $lvlMeta = [
         'manual'  => ['Do It Myself', '#64748b', 'Write your proposal yourself — templates & structure, no AI.'],
         'semi'    => ['Help Me Plan', '#2563eb', 'Write a draft, then let AI improve, rewrite or expand it — you approve.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Describe the event and AI writes the whole proposal for you.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Describe the event and instantly writes the whole proposal for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -182,7 +182,7 @@
             @endif
 
             <div class="pw-gen">
-                <div class="pw-sec-num">{{ $isManual ? 'Write Your Proposal' : ($isSemi ? 'Your Draft — refine with AI' : '2. Your AI Generated Proposal') }}</div>
+                <div class="pw-sec-num">{{ $isManual ? 'Write Your Proposal' : ($isSemi ? 'Your Draft — refine with AI' : '2. Your Auto-generated Proposal') }}</div>
                 @if($isSemi || $isMax)
                 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px;">
                     <button type="button" class="pw-assist" data-assist="improve">✨ Improve</button>
@@ -260,7 +260,7 @@
         <div class="pw-steps">
             <div class="pw-step"><span class="pw-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M10.5 13.5l1.5 1.5 3-3"/></svg></span><b>1. Add Event Details</b><p>Share the client's event description or requirements.</p></div>
             <span class="pw-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-            <div class="pw-step"><span class="pw-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 4.1L18 9l-4.1 1.9L12 15l-1.9-4.1L6 9l4.1-1.9L12 3z"/><path d="M5 16l.9 2L8 19l-2.1.9L5 22l-.9-2.1L2 19l2.1-1L5 16z"/></svg></span><b>2. AI Generates Proposal</b><p>Our AI writes a personalized, professional proposal for you.</p></div>
+            <div class="pw-step"><span class="pw-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 4.1L18 9l-4.1 1.9L12 15l-1.9-4.1L6 9l4.1-1.9L12 3z"/><path d="M5 16l.9 2L8 19l-2.1.9L5 22l-.9-2.1L2 19l2.1-1L5 16z"/></svg></span><b>2. Auto-generates Proposal</b><p>The tool writes a personalized, professional proposal for you.</p></div>
             <span class="pw-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
             <div class="pw-step"><span class="pw-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span><b>3. Customize (Optional)</b><p>Adjust tone, focus, and length to match your style.</p></div>
             <span class="pw-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>

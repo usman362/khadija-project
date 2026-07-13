@@ -103,7 +103,7 @@
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
         'manual'  => ['Do It Myself', '#64748b', 'Build your own checklist by hand — add each task yourself, no AI plan.'],
-        'semi'    => ['Help Me Plan', '#f97316', 'AI drafts a milestone plan and budget split — tweak the amounts before you use it.'],
+        'semi'    => ['Help Me Plan', '#f97316', 'instantly drafts a milestone plan and budget split — tweak the amounts before you use it.'],
         'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and AI builds the full plan, milestones and budget for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -130,7 +130,7 @@
     {{-- Interactive planner (Help Me Plan / Coordinate It For Me) --}}
     <div class="ep-form-card">
         <h3>🗓 Plan My Event</h3>
-        <div class="sub">{{ $isSemi ? "Enter your details and AI drafts a plan you can adjust." : "Enter your details and AI builds the full milestone plan, vendor list and budget split." }}</div>
+        <div class="sub">{{ $isSemi ? "Enter your details and instantly drafts a plan you can adjust." : "Enter your details and AI builds the full milestone plan, vendor list and budget split." }}</div>
         <form id="epForm">
             <div class="ep-fgrid">
                 <div>

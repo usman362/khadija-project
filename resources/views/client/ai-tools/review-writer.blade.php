@@ -2,7 +2,7 @@
 
 @section('title', 'Review Builder')
 @section('page-title', 'Review Builder')
-@section('page-subtitle', 'Rate your experience and share a few thoughts — AI will craft a polished, helpful review you can post anywhere.')
+@section('page-subtitle', 'Rate your experience and share a few thoughts — we'll instantly craft a polished, helpful review you can post anywhere.')
 
 {{-- Review Builder — deterministic, dynamic review generator (no LLM).
      Builds 6 formats in one pass; tabs switch instantly. Page-scoped. --}}
@@ -34,8 +34,8 @@
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
         'manual'  => ['Do It Myself', '#64748b', 'Write your own review by hand — no AI, just your words.'],
-        'semi'    => ['Help Me Plan', '#ea580c', 'AI drafts a review — edit the wording before you post it.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter a few thoughts and AI writes the full review for you.'],
+        'semi'    => ['Help Me Plan', '#ea580c', 'instantly drafts a review — edit the wording before you post it.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter a few thoughts and instantly writes the full review for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -230,7 +230,7 @@
                 </g>
             </svg>
         </span>
-        <div class="rw-hero-txt"><b>Review Builder</b><p>Our AI analyses your experience and helps you write clear, honest, and impactful reviews.</p></div>
+        <div class="rw-hero-txt"><b>Review Builder</b><p>The tool analyses your experience and helps you write clear, honest, and impactful reviews.</p></div>
     </div>
 
     {{-- rating cards --}}
@@ -258,7 +258,7 @@
             {{-- share experience --}}
             <div class="rw-card">
                 <div class="rw-sec-h"><span class="n">1</span><b>Share Your Experience</b></div>
-                <p class="rw-sec-sub">{{ $isManual ? 'Add a few details for context, then write your review below.' : ($isSemi ? 'A few keywords are enough — AI drafts a review you can edit.' : 'A few keywords are enough — AI writes a natural, helpful review.') }}</p>
+                <p class="rw-sec-sub">{{ $isManual ? 'Add a few details for context, then write your review below.' : ($isSemi ? 'A few keywords are enough — instantly drafts a review you can edit.' : 'A few keywords are enough — instantly writes a natural, helpful review.') }}</p>
                 <div class="rw-form-grid">
                     <div>
                         <div class="rw-2col">
