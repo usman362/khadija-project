@@ -162,6 +162,10 @@ Route::get('/events-categories', function () {
 Route::get('/category/{slug}', [\App\Http\Controllers\Public\CategoryLandingController::class, 'show'])
     ->name('public.category');
 
+// Public package detail — the browsable, shareable page for a pro's package.
+Route::get('/package/{package:slug}', [\App\Http\Controllers\Public\PackageController::class, 'show'])
+    ->name('public.package');
+
 // XML sitemap — generated on the fly so newly-added pros / blog posts show
 // up the next time a crawler hits /sitemap.xml. Cached for an hour to keep
 // the DB query out of every robot ping.

@@ -167,7 +167,7 @@
                     </div>
 
                     <div class="fg-actions">
-                        <a class="fg-book" href="{{ route('client.search.index', ['q' => $g['cat']]) }}">View Gig</a>
+                        <a class="fg-book" href="{{ $g['detail_url'] ?? route('client.search.index', ['q' => $g['cat']]) }}">{{ ($g['real'] ?? false) ? 'View Package' : 'View Gig' }}</a>
                         <a class="fg-ob" href="{{ route('client.chat.index') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Message</a>
                         <button class="fg-ob" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg>Save</button>
                     </div>

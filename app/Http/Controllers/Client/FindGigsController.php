@@ -86,6 +86,7 @@ class FindGigsController extends Controller
                 'img'     => self::STOCK[$i % count(self::STOCK)],
                 'img_url' => 'https://images.unsplash.com/' . self::STOCK[$i % count(self::STOCK)] . '?w=320&q=70&auto=format&fit=crop',
                 'real'    => false,
+                'detail_url' => route('client.search.index', ['q' => $cat]),
             ];
         });
 
@@ -120,6 +121,7 @@ class FindGigsController extends Controller
                     'img'      => self::STOCK[$i % count(self::STOCK)],
                     'img_url'  => $hero ?: 'https://images.unsplash.com/' . self::STOCK[$i % count(self::STOCK)] . '?w=320&q=70&auto=format&fit=crop',
                     'real'     => true,
+                    'detail_url' => route('public.package', $pkg->slug),
                 ];
             });
 
