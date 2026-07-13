@@ -60,7 +60,7 @@
     <div class="pk-container">
         <nav class="pk-crumb">
             <a href="{{ route('landing') }}">Home</a> ›
-            <a href="{{ route('events-categories') }}">Packages</a> ›
+            <a href="{{ route('public.packages') }}">Packages</a> ›
             <span>{{ $package->title }}</span>
         </nav>
 
