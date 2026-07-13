@@ -36,6 +36,17 @@ class SecurityHeaders
         $response->headers->set('X-XSS-Protection',        '0');
         $response->headers->set('Referrer-Policy',         'strict-origin-when-cross-origin');
 
+        // Never let the browser (or its back/forward cache) store an AUTHENTICATED
+        // page. Without this, hitting Back after logout re-shows the previous
+        // user's page from cache (the "public library" problem). With no-store the
+        // browser must re-request it, the auth middleware fires, and the visitor is
+        // bounced to login. Public/guest pages stay cacheable.
+        if ($request->user()) {
+            $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+            $response->headers->set('Pragma', 'no-cache');
+            $response->headers->set('Expires', '0');
+        }
+
         $response->headers->set(
             'Permissions-Policy',
             'camera=(), microphone=(self), geolocation=(self), payment=(self), usb=(), interest-cohort=()'
