@@ -105,7 +105,7 @@
     {{-- Top bar: type tabs (links) + sort --}}
     <div class="fg-bar">
         <div class="fg-tabs">
-            <a href="{{ route('client.find-gigs.index', array_merge(request()->except(['type','page']), [])) }}" class="fg-tab {{ $f['type'] === '' ? 'on' : '' }}">All Gigs <span class="n">{{ $counts['all'] }}</span></a>
+            <a href="{{ route('client.find-gigs.index', array_merge(request()->except(['type','page']), [])) }}" class="fg-tab {{ $f['type'] === '' ? 'on' : '' }}">All Packages <span class="n">{{ $counts['all'] }}</span></a>
             <a href="{{ route('client.find-gigs.index', array_merge(request()->except('page'), ['type' => 'ESR'])) }}" class="fg-tab {{ $f['type'] === 'ESR' ? 'on' : '' }}">🔥 ESR <span class="sub">(Premium)</span> <span class="n">{{ $counts['ESR'] }}</span></a>
             <a href="{{ route('client.find-gigs.index', array_merge(request()->except('page'), ['type' => 'SSR'])) }}" class="fg-tab {{ $f['type'] === 'SSR' ? 'on' : '' }}">SSR <span class="sub">(Single Service)</span> <span class="n">{{ $counts['SSR'] }}</span></a>
             <a href="{{ route('client.find-gigs.index', array_merge(request()->except('page'), ['type' => 'MSR'])) }}" class="fg-tab {{ $f['type'] === 'MSR' ? 'on' : '' }}">MSR <span class="sub">(Multi-Service)</span> <span class="n">{{ $counts['MSR'] }}</span></a>
@@ -167,13 +167,13 @@
                     </div>
 
                     <div class="fg-actions">
-                        <a class="fg-book" href="{{ $g['detail_url'] ?? route('client.search.index', ['q' => $g['cat']]) }}">{{ ($g['real'] ?? false) ? 'View Package' : 'View Gig' }}</a>
+                        <a class="fg-book" href="{{ $g['detail_url'] ?? route('client.search.index', ['q' => $g['cat']]) }}">View Package</a>
                         <a class="fg-ob" href="{{ route('client.chat.index') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Message</a>
                         <button class="fg-ob" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg>Save</button>
                     </div>
                 </article>
             @empty
-                <div class="fg-empty">No gigs match your filters. <a href="{{ route('client.find-gigs.index') }}" style="color:var(--fg-strong);font-weight:700;">Clear filters</a> to see all packages.</div>
+                <div class="fg-empty">No packages match your filters. <a href="{{ route('client.find-gigs.index') }}" style="color:var(--fg-strong);font-weight:700;">Clear filters</a> to see all packages.</div>
             @endforelse
         </div>
 
@@ -221,7 +221,7 @@
             </form>
 
             <div class="fg-rail-card fg-cta">
-                <h4>📣 Can't find the right gig?</h4>
+                <h4>📣 Can't find the right package?</h4>
                 <p>Post your event and let verified professionals send you tailored proposals.</p>
                 <a href="{{ route('client.post-event.event-info') }}">Post an Event</a>
             </div>
