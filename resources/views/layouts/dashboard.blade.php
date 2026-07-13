@@ -243,7 +243,7 @@
                         <li class="nav-item {{ request()->routeIs('app.ai-tools-admin.*') ? 'active' : '' }}">
                             <a href="{{ route('app.ai-tools-admin.index') }}" class="nav-link">
                                 <i class="link-icon ic-purple" data-lucide="sparkles"></i>
-                                <span class="link-title">AI Tools</span>
+                                <span class="link-title">Productivity Tools</span>
                             </a>
                         </li>
                         @endrole

@@ -24,30 +24,30 @@ final class AiToolCatalog
     {
         return [
             // ── CLIENT ────────────────────────────────────────────────
-            ['key' => 'budget-allocator',   'name' => 'AI Budget Allocator',     'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.budget-allocator',   'purpose' => 'Allocates the event budget across services.'],
-            ['key' => 'vendor-matchmaking', 'name' => 'AI Vendor Matchmaking',   'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.vendor-matchmaking', 'purpose' => 'Finds the best professionals by budget, location, rating & availability.'],
-            ['key' => 'event-planner',      'name' => 'AI Event Planner',        'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.event-planner', 'purpose' => 'Organises the event from planning through completion.'],
-            ['key' => 'timeline-builder',   'name' => 'AI Timeline Builder',     'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.timeline-builder', 'purpose' => 'Creates an event timeline incl. setup, schedule and teardown.'],
-            ['key' => 'venue-analyzer',     'name' => 'AI Venue Analyzer',       'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.venue-analyzer', 'purpose' => 'Reviews venue details and recommends vendors, equipment & logistics.'],
-            ['key' => 'checklist-generator','name' => 'AI Checklist Generator',  'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.checklist-generator', 'purpose' => 'Builds a personalised event-planning checklist with budget & vendor status.'],
-            ['key' => 'guest-capacity',     'name' => 'AI Guest Capacity Planner','audience' => 'client',      'status' => 'live',    'route' => 'ai-tools.guest-capacity', 'purpose' => 'Estimates staffing, seating, food, beverage and venue capacity.'],
-            ['key' => 'theme-advisor',      'name' => 'AI Theme & Style Advisor','audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.theme-advisor', 'purpose' => 'Recommends colours, décor, themes and styling.'],
+            ['key' => 'budget-allocator',   'name' => 'Budget Planner',     'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.budget-allocator',   'purpose' => 'Allocates the event budget across services.'],
+            ['key' => 'vendor-matchmaking', 'name' => 'Smart Match',   'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.vendor-matchmaking', 'purpose' => 'Finds the best professionals by budget, location, rating & availability.'],
+            ['key' => 'event-planner',      'name' => 'Guided Event Planner',        'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.event-planner', 'purpose' => 'Organises the event from planning through completion.'],
+            ['key' => 'timeline-builder',   'name' => 'Timeline Builder',     'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.timeline-builder', 'purpose' => 'Creates an event timeline incl. setup, schedule and teardown.'],
+            ['key' => 'venue-analyzer',     'name' => 'Venue Compatibility Check',       'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.venue-analyzer', 'purpose' => 'Reviews venue details and recommends vendors, equipment & logistics.'],
+            ['key' => 'checklist-generator','name' => 'Smart Checklist',  'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.checklist-generator', 'purpose' => 'Builds a personalised event-planning checklist with budget & vendor status.'],
+            ['key' => 'guest-capacity',     'name' => 'Guest Capacity Calculator','audience' => 'client',      'status' => 'live',    'route' => 'ai-tools.guest-capacity', 'purpose' => 'Estimates staffing, seating, food, beverage and venue capacity.'],
+            ['key' => 'theme-advisor',      'name' => 'Theme & Style Advisor','audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.theme-advisor', 'purpose' => 'Recommends colours, décor, themes and styling.'],
 
             // ── PROFESSIONAL ──────────────────────────────────────────
-            ['key' => 'pricing-assistant',  'name' => 'AI Pricing Assistant',    'audience' => 'professional', 'status' => 'live',    'route' => 'ai-tools.pricing-assistant',  'purpose' => 'Calculates competitive pricing from labour, equipment, demand & market rates.'],
-            ['key' => 'proposal-writer',    'name' => 'AI Proposal Builder',     'audience' => 'professional', 'status' => 'live',    'route' => 'ai-tools.proposal-writer',    'purpose' => 'Generates professional proposals, cover letters and bid descriptions.'],
-            ['key' => 'staffing-planner',   'name' => 'AI Staffing Planner',     'audience' => 'professional', 'status' => 'live',    'route' => 'ai-tools.staffing-planner',   'purpose' => 'Determines how many people are needed and the staffing strategy.'],
-            ['key' => 'bid-optimizer',      'name' => 'AI Bid Optimizer',        'audience' => 'professional', 'status' => 'live',    'route' => 'ai-tools.bid-optimizer', 'purpose' => 'Recommends the best bid amount balanced against your margin.'],
-            ['key' => 'package-builder',    'name' => 'AI Package Builder',      'audience' => 'professional', 'status' => 'live',    'route' => 'ai-tools.package-builder', 'purpose' => 'Builds, prices and compares tiered service packages.'],
-            ['key' => 'portfolio-optimizer','name' => 'AI Portfolio Optimizer',  'audience' => 'professional', 'status' => 'live',    'route' => 'ai-tools.portfolio-optimizer', 'purpose' => 'Audits your profile & portfolio and recommends high-impact fixes.'],
-            ['key' => 'availability-optimizer','name' => 'AI Availability Optimizer','audience' => 'professional','status' => 'live','route' => 'ai-tools.availability-optimizer', 'purpose' => 'Suggests scheduling improvements via calendar optimisation.'],
-            ['key' => 'upsell-assistant',   'name' => 'AI Upsell Assistant',     'audience' => 'professional', 'status' => 'live',    'route' => 'ai-tools.upsell-assistant', 'purpose' => 'Suggests add-on services and package upgrades to grow revenue.'],
+            ['key' => 'pricing-assistant',  'name' => 'Pricing Calculator',    'audience' => 'professional', 'status' => 'live',    'route' => 'ai-tools.pricing-assistant',  'purpose' => 'Calculates competitive pricing from labour, equipment, demand & market rates.'],
+            ['key' => 'proposal-writer',    'name' => 'Proposal Builder',     'audience' => 'professional', 'status' => 'live',    'route' => 'ai-tools.proposal-writer',    'purpose' => 'Generates professional proposals, cover letters and bid descriptions.'],
+            ['key' => 'staffing-planner',   'name' => 'Staffing Planner',     'audience' => 'professional', 'status' => 'live',    'route' => 'ai-tools.staffing-planner',   'purpose' => 'Determines how many people are needed and the staffing strategy.'],
+            ['key' => 'bid-optimizer',      'name' => 'Bid Calculator',        'audience' => 'professional', 'status' => 'live',    'route' => 'ai-tools.bid-optimizer', 'purpose' => 'Recommends the best bid amount balanced against your margin.'],
+            ['key' => 'package-builder',    'name' => 'Package Builder',      'audience' => 'professional', 'status' => 'live',    'route' => 'ai-tools.package-builder', 'purpose' => 'Builds, prices and compares tiered service packages.'],
+            ['key' => 'portfolio-optimizer','name' => 'Portfolio Optimizer',  'audience' => 'professional', 'status' => 'live',    'route' => 'ai-tools.portfolio-optimizer', 'purpose' => 'Audits your profile & portfolio and recommends high-impact fixes.'],
+            ['key' => 'availability-optimizer','name' => 'Availability Scheduler','audience' => 'professional','status' => 'live','route' => 'ai-tools.availability-optimizer', 'purpose' => 'Suggests scheduling improvements via calendar optimisation.'],
+            ['key' => 'upsell-assistant',   'name' => 'Upsell Assistant',     'audience' => 'professional', 'status' => 'live',    'route' => 'ai-tools.upsell-assistant', 'purpose' => 'Suggests add-on services and package upgrades to grow revenue.'],
 
             // ── BOTH ──────────────────────────────────────────────────
-            ['key' => 'review-writer',      'name' => 'AI Review Writer',        'audience' => 'both',         'status' => 'live',    'route' => 'ai-tools.review-writer',      'purpose' => 'Helps clients and pros write fair, detailed reviews.'],
-            ['key' => 'contract-assistant', 'name' => 'AI Contract Assistant',   'audience' => 'both',         'status' => 'live',    'route' => 'ai-tools.contract-assistant', 'purpose' => 'Summarises contract clauses and highlights important terms.'],
-            ['key' => 'message-assistant',  'name' => 'AI Message Assistant',    'audience' => 'both',         'status' => 'live',    'route' => 'ai-tools.message-assistant', 'purpose' => 'Writes professional messages, replies and follow-ups.'],
-            ['key' => 'translator',         'name' => 'AI Translator',           'audience' => 'both',         'status' => 'live',    'route' => 'ai-tools.translator', 'purpose' => 'Translates conversations, proposals and documents between languages.'],
+            ['key' => 'review-writer',      'name' => 'Review Builder',        'audience' => 'both',         'status' => 'live',    'route' => 'ai-tools.review-writer',      'purpose' => 'Helps clients and pros write fair, detailed reviews.'],
+            ['key' => 'contract-assistant', 'name' => 'Contract Assistant',   'audience' => 'both',         'status' => 'live',    'route' => 'ai-tools.contract-assistant', 'purpose' => 'Summarises contract clauses and highlights important terms.'],
+            ['key' => 'message-assistant',  'name' => 'Message Builder',    'audience' => 'both',         'status' => 'live',    'route' => 'ai-tools.message-assistant', 'purpose' => 'Writes professional messages, replies and follow-ups.'],
+            ['key' => 'translator',         'name' => 'Translator',           'audience' => 'both',         'status' => 'live',    'route' => 'ai-tools.translator', 'purpose' => 'Translates conversations, proposals and documents between languages.'],
         ];
     }
 
@@ -125,9 +125,9 @@ final class AiToolCatalog
     public static function suites(): array
     {
         return [
-            'planning'    => ['name' => 'Planning Suite',    'emoji' => '🎯', 'tagline' => 'Plan your entire event with AI before spending a dollar.'],
+            'planning'    => ['name' => 'Planning Suite',    'emoji' => '🎯', 'tagline' => 'Plan your entire event before spending a dollar.'],
             'marketplace' => ['name' => 'Marketplace Suite', 'emoji' => '🤝', 'tagline' => 'Connect buyers and professionals, intelligently.'],
-            'business'    => ['name' => 'Business Suite',     'emoji' => '💼', 'tagline' => 'Grow your event business with AI.'],
+            'business'    => ['name' => 'Business Suite',     'emoji' => '💼', 'tagline' => 'Grow your event business.'],
             'operations'  => ['name' => 'Operations Suite',  'emoji' => '📄', 'tagline' => 'Communicate faster. Close more business.'],
             'automation'  => ['name' => 'Automation Suite',  'emoji' => '🚀', 'tagline' => 'Automation, analytics & insights — coming soon.'],
         ];
@@ -214,7 +214,7 @@ final class AiToolCatalog
     /** Three short feature bullets for a tool. */
     public static function features(string $key): array
     {
-        return self::FEATURES[$key] ?? ['AI-powered', 'Fast & simple', 'Built for events'];
+        return self::FEATURES[$key] ?? ['Smart & guided', 'Fast & simple', 'Built for events'];
     }
 
     /** Suite icon path — for the redesigned hub's suite selector/header. */

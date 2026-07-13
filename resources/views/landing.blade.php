@@ -289,7 +289,7 @@
             $trust = [
                 ['#2563eb', '<path d="M9 12l2 2 4-4"/><path d="M21 12c0 1.66-.45 3.2-1.24 4.5C18.5 18.7 15.6 21 12 21s-6.5-2.3-7.76-4.5A8.94 8.94 0 0 1 3 12V5l9-3 9 3z"/>', 'Verified Professionals', 'Profile &amp; business verification'],
                 ['#0ea5e9', '<rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>', 'Secure Payments', 'Escrow protected transactions'],
-                ['#8b5cf6', '<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>', 'AI-Powered Support', 'Smart help at every step'],
+                ['#8b5cf6', '<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>', 'Guided Support', 'Smart help at every step'],
                 ['#10b981', '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>', 'Privacy Controls', 'You choose what you share'],
                 ['#f97316', '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>', 'Built for Events', 'Smart tools to plan with confidence'],
             ];
@@ -368,7 +368,7 @@
     <div class="lp-container">
         <div class="lp-head">
             <h2 class="lp-h2">Choose Your Level of Assistance</h2>
-            <p class="lp-lead">You're in control. Each level brings more AI into your planning — from fully manual to AI-powered.</p>
+            <p class="lp-lead">You're in control. Each level unlocks more capability — from fully manual to fully automated.</p>
         </div>
         <div class="lp-assist-grid">
             <div class="lp-acard">
@@ -413,7 +413,7 @@
                     <ul>
                         <li><svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI matches &amp; outreach</li>
                         <li><svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI negotiation assistant</li>
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI-powered booking workflows</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Smart booking workflows</li>
                     </ul>
                     <a href="{{ route('register', ['role' => 'client']) }}" class="lp-acard-foot" style="color:var(--orange-dark);">Best for busy professionals &amp; clients
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>

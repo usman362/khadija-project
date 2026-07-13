@@ -1,10 +1,10 @@
 @extends('layouts.client')
 
-@section('title', 'AI Vendor Matchmaking')
-@section('page-title', 'AI Vendor Matchmaking')
+@section('title', 'Smart Match')
+@section('page-title', 'Smart Match')
 @section('page-subtitle', 'We find the perfect vendors for your event based on your theme, date, and budget.')
 
-{{-- AI Vendor Matchmaking — deterministic, dynamic matcher (no LLM). Ranks a
+{{-- Smart Match — deterministic, dynamic matcher (no LLM). Ranks a
      vendor catalogue against the event theme/budget and the refine controls
      re-filter/re-rank live. Page-scoped — the shared layout is untouched. --}}
 
@@ -134,7 +134,7 @@
 @endphp
 <div class="vm" data-match-url="{{ route('ai-tools.vendor-matchmaking.match') }}" data-budget="{{ $event['budget'] }}" data-level="{{ $level }}">
 
-    @include('partials._ai_quota_badge', ['status' => $status, 'tool' => 'AI Vendor Matchmaking'])
+    @include('partials._ai_quota_badge', ['status' => $status, 'tool' => 'Smart Match'])
 
     {{-- Membership-level banner --}}
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:18px;">
@@ -163,7 +163,7 @@
                     <circle cx="12.5" cy="20.5" r="2" fill="#fff" opacity="0.35"/>
                 </svg>
             </span>
-            <div class="vm-head-txt"><h1>AI Vendor Matchmaking</h1><p>We find the perfect vendors for your event based on your theme, date, and budget.</p></div>
+            <div class="vm-head-txt"><h1>Smart Match</h1><p>We find the perfect vendors for your event based on your theme, date, and budget.</p></div>
         </div>
         <a href="{{ route('ai-tools.budget-allocator') }}" class="vm-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to AI Toolkit</a>
     </div>

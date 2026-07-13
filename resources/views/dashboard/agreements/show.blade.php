@@ -158,7 +158,7 @@
     .agreement-wrapper .btn-primary { background: #f97316; border-color: #f97316; }
     .agreement-wrapper .btn-primary:hover { background: #ea580c; border-color: #ea580c; }
 
-    /* AI Contract Assistant — placeholder rail (feature pending backend) */
+    /* Contract Assistant — placeholder rail (feature pending backend) */
     .agr-ai-rail {
         max-width: 900px; margin: 0 auto 20px;
         background: var(--agr-bg);
@@ -195,13 +195,13 @@
     @endunless
 </div>
 
-{{-- AI Contract Assistant — source-data summary. The full assistant
+{{-- Contract Assistant — source-data summary. The full assistant
      (prompt console + per-section regeneration) is a planned feature
      that needs its own backend; this rail shows the evaluated sources. --}}
 <div class="agr-ai-rail">
     <div class="agr-ai-head">
         <div class="agr-ai-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 0-4 4v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2h-2V6a4 4 0 0 0-4-4z"/><circle cx="9" cy="13" r="1"/><circle cx="15" cy="13" r="1"/></svg></div>
-        <span class="agr-ai-title">AI Contract Assistant</span>
+        <span class="agr-ai-title">Contract Assistant</span>
         <span class="agr-ai-badge">{{ ucfirst($agreement->source) }} Generated</span>
     </div>
     <div class="agr-ai-src">

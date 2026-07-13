@@ -1,7 +1,7 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'AI Message Assistant')
-@section('page-title', 'AI Message Assistant')
+@section('title', 'Message Builder')
+@section('page-title', 'Message Builder')
 @section('page-subtitle', 'Clear, professional messages in the right tone')
 
 @push('styles')

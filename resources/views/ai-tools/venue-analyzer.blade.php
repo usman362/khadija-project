@@ -1,10 +1,10 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'AI Venue Analyzer')
-@section('page-title', 'AI Venue Analyzer')
+@section('title', 'Venue Compatibility Check')
+@section('page-title', 'Venue Compatibility Check')
 @section('page-subtitle', 'Score a venue, map the layout, spot the gaps')
 
-{{-- AI Venue Analyzer (client). Venue score + intelligence summary + gap
+{{-- Venue Compatibility Check (client). Venue score + intelligence summary + gap
      analysis + interactive layout map + required vendors. Representative. --}}
 
 @push('styles')

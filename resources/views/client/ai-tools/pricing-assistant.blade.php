@@ -1,10 +1,10 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'AI Pricing Assistant')
-@section('page-title', 'AI Pricing Assistant')
+@section('title', 'Pricing Calculator')
+@section('page-title', 'Pricing Calculator')
 @section('page-subtitle', 'Get the right price. Win more gigs. Maximize your value.')
 
-{{-- AI Pricing Assistant — a deterministic pricing calculator (no LLM / no
+{{-- Pricing Calculator — a deterministic pricing calculator (no LLM / no
      quota). Recommended price + market band are computed from a transparent
      rate model server-side (and live via POST on Calculate/Recalculate);
      "Recent Price Calculations" are REAL (the client's own events). Market
@@ -196,7 +196,7 @@
                     <rect x="26.4" y="32.2" width="4.6" height="4" rx="1.2" fill="#ea580c"/>
                 </svg>
             </span>
-            <div class="apa-head-txt"><h1>AI Pricing Assistant</h1><p>Get the right price. Win more gigs. Maximize your value.</p></div>
+            <div class="apa-head-txt"><h1>Pricing Calculator</h1><p>Get the right price. Win more gigs. Maximize your value.</p></div>
         </div>
         <a href="{{ route('ai-tools.budget-allocator') }}" class="apa-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to AI Toolkit</a>
     </div>
@@ -270,7 +270,7 @@
 
     {{-- ════════ why use ════════ --}}
     <div class="apa-card" style="margin-bottom:20px;">
-        <div class="apa-why-h">Why Use AI Pricing Assistant?</div>
+        <div class="apa-why-h">Why Use Pricing Calculator?</div>
         <div class="apa-why">
             <div class="apa-why-card"><span class="apa-why-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><div><b>Price with Confidence</b><p>Get data-backed pricing based on real market trends.</p></div></div>
             <div class="apa-why-card"><span class="apa-why-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><div><b>Win More Bookings</b><p>Competitive pricing helps you stand out and get hired.</p></div></div>
@@ -312,7 +312,7 @@
             <div class="apa-steps">
                 <div class="apa-step"><span class="apa-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span><b>1. Enter Details</b><p>Add your service type, date, and location.</p></div>
                 <span class="apa-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-                <div class="apa-step"><span class="apa-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></span><b>2. AI Analyzes</b><p>Our AI scans local market data.</p></div>
+                <div class="apa-step"><span class="apa-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></span><b>2. Smart Analysis</b><p>We scan local market data.</p></div>
                 <span class="apa-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
                 <div class="apa-step"><span class="apa-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><b>3. Get Recommendation</b><p>Receive the best price and market insights.</p></div>
                 <span class="apa-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
@@ -369,7 +369,7 @@
                 'Offer package options (Basic, Standard, Premium).',
                 'Adjust prices for peak seasons and weekends.',
                 'Highlight what makes your service unique.',
-                'Use AI Pricing Assistant before every new gig!',
+                'Use Pricing Calculator before every new gig!',
             ] as $tip)
                 <div class="apa-tip-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>{{ $tip }}</span></div>
             @endforeach

@@ -1,10 +1,10 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'AI Checklist Generator')
-@section('page-title', 'AI Checklist Generator')
+@section('title', 'Smart Checklist')
+@section('page-title', 'Smart Checklist')
 @section('page-subtitle', 'Your prioritised plan, budget and vendor status in one place')
 
-{{-- AI Checklist Generator (client). Planning command-center: priorities,
+{{-- Smart Checklist (client). Planning command-center: priorities,
      budget summary, vendor status, AI recommendations. Representative data. --}}
 
 @push('styles')

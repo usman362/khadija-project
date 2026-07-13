@@ -248,7 +248,7 @@
     </div>
 
     <div class="ms-rail-card">
-        <div class="ms-rail-title">AI Event Assistant</div>
+        <div class="ms-rail-title">Event Assistant</div>
         <input class="ms-input" placeholder="Ask me anything..." style="height:38px;margin-bottom:10px;">
         <div class="ms-ai-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>Suggest services for my event</div>
         <div class="ms-ai-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Estimate my total budget</div>

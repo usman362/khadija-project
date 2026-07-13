@@ -1,10 +1,10 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'AI Guest Capacity Planner')
-@section('page-title', 'AI Guest Capacity Planner')
+@section('title', 'Guest Capacity Calculator')
+@section('page-title', 'Guest Capacity Calculator')
 @section('page-subtitle', 'Comfort, flow and legal capacity for your guest count')
 
-{{-- AI Guest Capacity Planner (client). Capacity stats + heatmap simulation +
+{{-- Guest Capacity Calculator (client). Capacity stats + heatmap simulation +
      capacity insights + what-if sliders. Representative data. --}}
 
 @push('styles')

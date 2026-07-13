@@ -17,11 +17,11 @@
         $out   = $rem <= 0;
         $accent = $out ? '#ef4444' : ($low ? '#f59e0b' : '#f97316');
     @endphp
-    <div class="gr-credits" title="AI Assist Credits — reset on the 1st of each month">
+    <div class="gr-credits" title="GigResource IQ Credits — reset on the 1st of each month">
         <svg viewBox="0 0 24 24" fill="{{ $accent }}" stroke="{{ $accent }}" stroke-width="1.2" style="width:15px;height:15px;flex-shrink:0;">
             <path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/>
         </svg>
-        <span class="gr-credits-txt"><b>{{ number_format($rem) }}</b> / {{ number_format($grant) }} AI Credits</span>
+        <span class="gr-credits-txt"><b>{{ number_format($rem) }}</b> / {{ number_format($grant) }} IQ Credits</span>
         <span class="gr-credits-bar"><i style="width:{{ $pct }}%; background:{{ $accent }};"></i></span>
         @if($out)
             <a href="{{ route('app.membership-plans.index') }}" class="gr-credits-up">Upgrade</a>

@@ -1,10 +1,10 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'AI Theme & Style Advisor')
-@section('page-title', 'AI Theme & Style Advisor')
+@section('title', 'Theme & Style Advisor')
+@section('page-title', 'Theme & Style Advisor')
 @section('page-subtitle', 'Cohesive themes, palettes & mood boards for your event')
 
-{{-- AI Theme & Style Advisor (client). AI-generated themes + colour palette +
+{{-- Theme & Style Advisor (client). AI-generated themes + colour palette +
      mood board + category filters. Representative data. --}}
 
 @push('styles')
@@ -202,7 +202,7 @@
 
     {{-- Themes --}}
     <div class="ta-sec">
-        <h3>✨ Your AI-Generated Themes</h3>
+        <h3>✨ Your Theme Concepts</h3>
         <div class="ta-themes">
             @foreach($themes as [$name, $match, $desc, $img, $sw, $best])
                 <div class="ta-theme {{ $best ? 'best' : '' }}">

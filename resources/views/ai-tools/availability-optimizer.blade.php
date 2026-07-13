@@ -1,10 +1,10 @@
 @extends($aiLayout ?? 'layouts.professional')
 
-@section('title', 'AI Availability Optimizer')
-@section('page-title', 'AI Availability Optimizer')
+@section('title', 'Availability Scheduler')
+@section('page-title', 'Availability Scheduler')
 @section('page-subtitle', 'Fill the gaps, tighten turnarounds, lift revenue')
 
-{{-- AI Availability Optimizer (professional). Reads the calendar to surface
+{{-- Availability Scheduler (professional). Reads the calendar to surface
      open slots, tight turnarounds and revenue lift. Representative data. --}}
 
 @push('styles')

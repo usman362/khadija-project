@@ -1,7 +1,7 @@
 @extends('layouts.client')
 
-@section('title', 'AI Budget Allocator')
-@section('page-title', 'AI Budget Allocator')
+@section('title', 'Budget Planner')
+@section('page-title', 'Budget Planner')
 @section('page-subtitle', 'Let AI break down your event budget into smart category allocations and a complete spending plan.')
 
 @push('styles')
@@ -330,7 +330,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
     </div>
     <div class="bat-hero-content" style="flex:1;">
-        <h2>AI Budget Allocator</h2>
+        <h2>Budget Planner</h2>
         <p>Let AI break down your event budget into smart category allocations. Enter your event details and get a complete spending plan with expert tips.</p>
     </div>
     <div>
@@ -358,7 +358,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
         <h3>This is a Premium Feature</h3>
-        <p>The AI Budget Allocator is not included in your current plan.<br>Upgrade to unlock AI-powered event planning tools.</p>
+        <p>The Budget Planner is not included in your current plan.<br>Upgrade to unlock premium planning tools.</p>
         <a href="{{ route('app.membership-plans.index') }}" class="bat-btn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
             Upgrade Plan

@@ -1,7 +1,7 @@
 @extends($aiLayout ?? 'layouts.professional')
 
-@section('title', 'AI Bid Optimizer')
-@section('page-title', 'AI Bid Optimizer')
+@section('title', 'Bid Calculator')
+@section('page-title', 'Bid Calculator')
 @section('page-subtitle', 'The best bid for you — balanced against your margin')
 
 @push('styles')

@@ -1,10 +1,10 @@
 @extends('layouts.client')
 
-@section('title', 'AI Review Writer')
-@section('page-title', 'AI Review Writer')
+@section('title', 'Review Builder')
+@section('page-title', 'Review Builder')
 @section('page-subtitle', 'Rate your experience and share a few thoughts — AI will craft a polished, helpful review you can post anywhere.')
 
-{{-- AI Review Writer — deterministic, dynamic review generator (no LLM).
+{{-- Review Builder — deterministic, dynamic review generator (no LLM).
      Builds 6 formats in one pass; tabs switch instantly. Page-scoped. --}}
 
 @php
@@ -199,7 +199,7 @@
 @section('content')
 <div class="rw" data-compose-url="{{ route('ai-tools.review-writer.compose') }}" data-level="{{ $level }}">
 
-    @include('partials._ai_quota_badge', ['status' => $status, 'tool' => 'AI Review Writer'])
+    @include('partials._ai_quota_badge', ['status' => $status, 'tool' => 'Review Builder'])
 
     {{-- Membership-level banner --}}
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
@@ -230,7 +230,7 @@
                 </g>
             </svg>
         </span>
-        <div class="rw-hero-txt"><b>AI Review Writer</b><p>Our AI analyses your experience and helps you write clear, honest, and impactful reviews.</p></div>
+        <div class="rw-hero-txt"><b>Review Builder</b><p>Our AI analyses your experience and helps you write clear, honest, and impactful reviews.</p></div>
     </div>
 
     {{-- rating cards --}}

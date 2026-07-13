@@ -1,10 +1,10 @@
 @extends($aiLayout ?? 'layouts.professional')
 
-@section('title', 'AI Portfolio Optimizer')
-@section('page-title', 'AI Portfolio Optimizer')
+@section('title', 'Portfolio Optimizer')
+@section('page-title', 'Portfolio Optimizer')
 @section('page-subtitle', 'Lift your visibility, views and win-rate')
 
-{{-- AI Portfolio Optimizer (professional). Profile audit + high-impact
+{{-- Portfolio Optimizer (professional). Profile audit + high-impact
      recommendations + gallery scoring + benchmark. Representative data. --}}
 
 @push('styles')
@@ -168,7 +168,7 @@
     <div class="po-grid">
         {{-- Audit --}}
         <div class="po-card">
-            <div class="po-card-hd">✅ AI Portfolio Audit</div>
+            <div class="po-card-hd">✅ Portfolio Audit</div>
             <div class="po-audit">
                 @foreach($audit as [$item, $done])
                     <div class="po-au {{ $done ? 'yes' : 'no' }}"><span class="ck">{{ $done ? '✓' : '○' }}</span> {{ $item }}</div>

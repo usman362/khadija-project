@@ -279,7 +279,7 @@
                 @endif
             </div>
 
-            {{-- Live Gig Opportunities + AI Bid Assistant --}}
+            {{-- Live Gig Opportunities + Bid Calculator --}}
             <div class="pc-sub2">
                 <div class="pc-card">
                     <div class="pc-card-head">

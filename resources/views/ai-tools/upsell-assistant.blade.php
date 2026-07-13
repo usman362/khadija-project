@@ -1,7 +1,7 @@
 @extends($aiLayout ?? 'layouts.professional')
 
-@section('title', 'AI Upsell Assistant')
-@section('page-title', 'AI Upsell Assistant')
+@section('title', 'Upsell Assistant')
+@section('page-title', 'Upsell Assistant')
 @section('page-subtitle', 'Spot the right add-ons to grow each booking')
 
 @push('styles')

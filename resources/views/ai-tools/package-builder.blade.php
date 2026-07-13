@@ -1,10 +1,10 @@
 @extends($aiLayout ?? 'layouts.professional')
 
-@section('title', 'AI Package Builder')
-@section('page-title', 'AI Package Builder')
+@section('title', 'Package Builder')
+@section('page-title', 'Package Builder')
 @section('page-subtitle', 'Build, price & compare your service packages')
 
-{{-- AI Package Builder — Layer-3 aware. The SAME tool renders a different
+{{-- Package Builder — Layer-3 aware. The SAME tool renders a different
      experience per the user's AI level ($level): manual / semi / maximum.
      Representative deterministic engine. --}}
 
@@ -222,7 +222,7 @@
     {{-- AI suggestions only appear when the user actually has AI (semi/maximum) --}}
     @if($isSemi || $isMax)
     <div class="pb-card">
-        <div class="pb-card-hd">✨ AI Package Suggestions</div>
+        <div class="pb-card-hd">✨ Package Suggestions</div>
         @foreach($suggestions as $s)<div class="pb-sugg">{{ $s }}</div>@endforeach
     </div>
     @endif

@@ -1,10 +1,10 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'AI Proposal Writer')
-@section('page-title', 'AI Proposal Writer')
+@section('title', 'Proposal Builder')
+@section('page-title', 'Proposal Builder')
 @section('page-subtitle', 'Create winning proposals in seconds with the power of AI.')
 
-{{-- AI Proposal Writer — deterministic, dynamic proposal generator (no LLM /
+{{-- Proposal Builder — deterministic, dynamic proposal generator (no LLM /
      no quota). Parses the event description + tone/focus/length and assembles
      a tailored proposal. Copy / Download work client-side; Send opens the
      client's Messages. All page-scoped — the shared layout is untouched. --}}
@@ -158,7 +158,7 @@
                     </g>
                 </svg>
             </span>
-            <div class="pw-head-txt"><h1>AI Proposal Writer</h1><p>Create winning proposals in seconds with the power of AI.</p></div>
+            <div class="pw-head-txt"><h1>Proposal Builder</h1><p>Create winning proposals in seconds with the power of AI.</p></div>
         </div>
         <a href="{{ route('ai-tools.budget-allocator') }}" class="pw-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to AI Toolkit</a>
     </div>
@@ -209,7 +209,7 @@
         {{-- RIGHT --}}
         <div class="pw-col">
             <div class="pw-card">
-                <div class="pw-side-h"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><b>Why Use AI Proposal Writer?</b></div>
+                <div class="pw-side-h"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><b>Why Use Proposal Builder?</b></div>
                 <div class="pw-why-row"><span class="pw-why-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><b>Save Time</b><p>Generate professional proposals in seconds.</p></div></div>
                 <div class="pw-why-row"><span class="pw-why-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><div><b>Personalized</b><p>AI customizes your message to match the client's event theme.</p></div></div>
                 <div class="pw-why-row"><span class="pw-why-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span><div><b>Win More Gigs</b><p>Stand out with well-written, tailored proposals every time.</p></div></div>
@@ -285,7 +285,7 @@
     {{-- bottom banner --}}
     <div class="pw-banner">
         <span class="pw-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
-        <div class="pw-banner-txt"><b>Write Better. Win More. Grow Your Business.</b><p>AI Proposal Writer helps you create personalized, high-converting proposals that impress clients and win more bookings.</p></div>
+        <div class="pw-banner-txt"><b>Write Better. Win More. Grow Your Business.</b><p>Proposal Builder helps you create personalized, high-converting proposals that impress clients and win more bookings.</p></div>
         <a id="pw-create"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Create Your Proposal Now ✨</a>
     </div>
 </div>

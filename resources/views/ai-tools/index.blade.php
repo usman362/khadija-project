@@ -1,6 +1,6 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'GigResource IQ™ — AI Tools')
+@section('title', 'GigResource IQ™ — Smart Productivity Tools')
 @section('page-title', 'GigResource IQ™')
 @section('page-subtitle', 'The intelligence behind every event')
 
@@ -103,7 +103,7 @@
                     <span class="akt-sname">{{ $s['name'] }}</span>
                     <span class="akt-stag">{{ $s['tagline'] }}</span>
                 </span>
-                <span class="akt-scount">{{ count($s['tools']) }}<small>AI Tools</small></span>
+                <span class="akt-scount">{{ count($s['tools']) }}<small>Tools</small></span>
             </button>
         @endforeach
 
@@ -146,7 +146,7 @@
                              the hub is already filtered to each user's own tools, so it's redundant
                              for them. It's admin-facing info only. --}}
                         <div class="akt-badges">
-                            <span class="akt-lvl lvl-{{ $lvl }}" title="Your AI level">{{ AiAccess::label($lvl) }}</span>
+                            <span class="akt-lvl lvl-{{ $lvl }}" title="Your plan level">{{ AiAccess::label($lvl) }}</span>
                         </div>
                         <p class="akt-purpose">{{ $t['purpose'] }}</p>
                         <ul class="akt-feats">

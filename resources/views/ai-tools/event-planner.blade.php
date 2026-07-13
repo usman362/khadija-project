@@ -1,10 +1,10 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'AI Event Planner')
-@section('page-title', 'AI Event Planner')
+@section('title', 'Guided Event Planner')
+@section('page-title', 'Guided Event Planner')
 @section('page-subtitle', 'Your event, organised end-to-end')
 
-{{-- AI Event Planner (client). Milestone checklist + progress + AI
+{{-- Guided Event Planner (client). Milestone checklist + progress + AI
      recommendations + marketplace suggestions + deadlines. Representative. --}}
 
 @push('styles')

@@ -1,10 +1,10 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'AI Timeline Builder')
-@section('page-title', 'AI Timeline Builder')
+@section('title', 'Timeline Builder')
+@section('page-title', 'Timeline Builder')
 @section('page-subtitle', 'A conflict-free run-of-show for your event day')
 
-{{-- AI Timeline Builder (client). Event-day run-of-show across vendor tracks
+{{-- Timeline Builder (client). Event-day run-of-show across vendor tracks
      with buffers + conflict detection. Representative data. --}}
 
 @push('styles')

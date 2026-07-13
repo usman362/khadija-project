@@ -1,10 +1,10 @@
 @extends('layouts.dashboard')
-@section('title', 'AI Tools')
+@section('title', 'Productivity Tools')
 @section('content')
 <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
     <div>
-        <h4 class="mb-1"><i data-lucide="sparkles" class="me-2" style="width:24px;height:24px;"></i> AI Tools</h4>
-        <p class="text-secondary mb-0">Enable or disable AI tools across client &amp; professional sidebars and the /ai-tools hub.</p>
+        <h4 class="mb-1"><i data-lucide="sparkles" class="me-2" style="width:24px;height:24px;"></i> Productivity Tools</h4>
+        <p class="text-secondary mb-0">Enable or disable productivity tools across client &amp; professional sidebars and the /ai-tools hub.</p>
     </div>
     <div class="text-end">
         <span class="badge bg-success">{{ $counts['enabled'] }} enabled</span>

@@ -1,4 +1,4 @@
-{{-- Market insight rows for the AI Pricing Assistant (initial server render;
+{{-- Market insight rows for the Pricing Calculator (initial server render;
      the JS render() mirrors this markup on recalculation). --}}
 @foreach($insights as $i)
     <div class="apa-mi">

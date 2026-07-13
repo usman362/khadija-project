@@ -1,7 +1,7 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'AI Contract Assistant')
-@section('page-title', 'AI Contract Assistant')
+@section('title', 'Contract Assistant')
+@section('page-title', 'Contract Assistant')
 @section('page-subtitle', 'Generate a plain-English draft agreement from your event details')
 
 @push('styles')

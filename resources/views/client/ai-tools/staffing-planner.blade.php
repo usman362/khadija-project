@@ -1,10 +1,10 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'AI Staffing Planner')
-@section('page-title', 'AI Staffing Planner')
+@section('title', 'Staffing Planner')
+@section('page-title', 'Staffing Planner')
 @section('page-subtitle', 'Plan the perfect team. At the right time. Every time.')
 
-{{-- AI Staffing Planner — deterministic, dynamic staffing planner (no LLM).
+{{-- Staffing Planner — deterministic, dynamic staffing planner (no LLM).
      Builds a positioned role timeline + coverage stats from event type +
      guests + start time, and regenerates live. Export/Share are client-side.
      Fully page-scoped — the shared layout is untouched. --}}
@@ -166,7 +166,7 @@
                 <path d="M11 41a13 12 0 0 1 26 0z" fill="#1e40af" opacity="0.12"/>
             </svg>
         </span>
-        <div class="sp-head-txt"><h1>AI Staffing Planner</h1><p>Plan the perfect team. At the right time. Every time.</p></div>
+        <div class="sp-head-txt"><h1>Staffing Planner</h1><p>Plan the perfect team. At the right time. Every time.</p></div>
     </div>
 
     {{-- event bar --}}
@@ -292,7 +292,7 @@
     {{-- bottom banner --}}
     <div class="sp-banner">
         <span class="sp-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
-        <div class="sp-banner-txt"><b>Right People. Right Time. Flawless Events.</b><p>AI Staffing Planner takes the guesswork out of scheduling so you can focus on creating unforgettable moments.</p></div>
+        <div class="sp-banner-txt"><b>Right People. Right Time. Flawless Events.</b><p>Staffing Planner takes the guesswork out of scheduling so you can focus on creating unforgettable moments.</p></div>
         <button type="button" id="sp-create"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>Create My Staffing Plan</button>
     </div>
 </div>

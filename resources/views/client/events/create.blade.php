@@ -412,17 +412,17 @@
 
     {{-- D) AI tools row --}}
     <div class="gb-tools">
-        <h3>AI Tools to Help You Create the Perfect Gig</h3>
+        <h3>Smart Tools to Help You Create the Perfect Gig</h3>
         <p>Use these AI helpers for suggestions and estimates while you plan.</p>
         <div class="gb-tools-grid">
             @php
                 $gbTools = [
-                    ['route' => 'ai-tools.budget-allocator',   'icon' => '💵', 'name' => 'AI Budget Allocator',    'desc' => 'Break a total budget into smart category estimates.'],
-                    ['route' => 'ai-tools.vendor-matchmaking', 'icon' => '🤝', 'name' => 'AI Vendor Matchmaking',  'desc' => 'Get suggested vendors that fit your event.'],
-                    ['route' => 'ai-tools.timeline-builder',   'icon' => '🗓️', 'name' => 'AI Timeline Builder',    'desc' => 'Draft a day-of schedule for your event.'],
-                    ['route' => 'ai-tools.checklist-generator','icon' => '✅', 'name' => 'AI Checklist Generator',  'desc' => 'Generate a planning checklist to stay on track.'],
-                    ['route' => 'ai-tools.venue-analyzer',     'icon' => '🏛️', 'name' => 'AI Venue Analyzer',      'desc' => 'Review venue notes for fit and considerations.'],
-                    ['route' => 'ai-tools.theme-advisor',      'icon' => '🎨', 'name' => 'AI Theme & Style Advisor','desc' => 'Explore theme and styling suggestions.'],
+                    ['route' => 'ai-tools.budget-allocator',   'icon' => '💵', 'name' => 'Budget Planner',    'desc' => 'Break a total budget into smart category estimates.'],
+                    ['route' => 'ai-tools.vendor-matchmaking', 'icon' => '🤝', 'name' => 'Smart Match',  'desc' => 'Get suggested vendors that fit your event.'],
+                    ['route' => 'ai-tools.timeline-builder',   'icon' => '🗓️', 'name' => 'Timeline Builder',    'desc' => 'Draft a day-of schedule for your event.'],
+                    ['route' => 'ai-tools.checklist-generator','icon' => '✅', 'name' => 'Smart Checklist',  'desc' => 'Generate a planning checklist to stay on track.'],
+                    ['route' => 'ai-tools.venue-analyzer',     'icon' => '🏛️', 'name' => 'Venue Compatibility Check',      'desc' => 'Review venue notes for fit and considerations.'],
+                    ['route' => 'ai-tools.theme-advisor',      'icon' => '🎨', 'name' => 'Theme & Style Advisor','desc' => 'Explore theme and styling suggestions.'],
                 ];
             @endphp
             @foreach($gbTools as $tool)

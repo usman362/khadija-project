@@ -294,7 +294,7 @@
                     'elements' => 'Top navbar (logo · search · notifications · theme toggle · role switcher · avatar), left sidebar with role-coloured icons, welcome banner, 4 stat cards, upcoming events list, recent bookings, recommended pros carousel, AI tools quick-access cards.'],
                 ['id' => 'D-17', 'title' => 'Professional Dashboard Home', 'url' => '/professional/dashboard',
                     'purpose' => 'Earnings overview, active proposals, recent gigs, messages, reviews.',
-                    'elements' => 'Same navbar / sidebar shell as client (coral-themed icons), revenue stat cards, upcoming gigs strip, lead status counts (won/lost/pending), recent messages, ratings widget, AI Review Writer quick link.'],
+                    'elements' => 'Same navbar / sidebar shell as client (coral-themed icons), revenue stat cards, upcoming gigs strip, lead status counts (won/lost/pending), recent messages, ratings widget, Review Builder quick link.'],
                 ['id' => 'D-18', 'title' => 'Influencer Dashboard Home', 'url' => '/influencer/dashboard',
                     'purpose' => 'Performance overview for referral-program members.',
                     'elements' => 'Top stats (total earned · this month · pending payout · click count), unique referral link with copy button, recent referrals strip, tier-progress widget, marketing assets download.'],
