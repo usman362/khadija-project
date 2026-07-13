@@ -135,6 +135,16 @@
         }
         .ipx-help-cta:hover { background: var(--orange); color: #fff; }
 
+        .ipx-logout-form { margin: 12px 14px 0; }
+        .ipx-logout-btn {
+            width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10px; border: 1px solid rgba(239,68,68,0.22); border-radius: 10px;
+            background: rgba(239,68,68,0.08); color: #ef4444; font-family: var(--ff);
+            font-weight: 700; font-size: 13px; cursor: pointer; transition: background .15s;
+        }
+        .ipx-logout-btn:hover { background: rgba(239,68,68,0.16); }
+        .ipx-logout-btn svg { width: 16px; height: 16px; }
+
         /* ── Top bar ── */
         .ipx-top {
             position: fixed; top: 0; left: var(--sb); right: 0; height: var(--top); background: var(--card);
@@ -232,6 +242,13 @@
         <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 1 1-4.5-7.8L21 3v9z"/></svg> Live Chat</a>
         <a href="#" class="ipx-help-cta">Go to Support Center <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
     </div>
+
+    <form action="{{ route('logout') }}" method="POST" class="ipx-logout-form">@csrf
+        <button type="submit" class="ipx-logout-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Log Out
+        </button>
+    </form>
 </aside>
 
 {{-- ── Top bar ── --}}
