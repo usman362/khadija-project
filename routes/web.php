@@ -573,9 +573,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/search', [\App\Http\Controllers\Client\ClientSearchController::class, 'index'])
             ->name('client.search.index');
 
-        // Find Gigs — client-side mirror of the professional bidding board:
-        // browse professional gig listings (service packages) to book / message.
-        Route::get('/find-gigs', [\App\Http\Controllers\Client\FindGigsController::class, 'index'])
+        // Browse Packages — the client's package browsing IS the public Package
+        // Service Search (pro-authored multi-service bundles, solo/co-op). Kept as
+        // ONE canonical page and deliberately separate from MSRs (client gig-posts
+        // that pros bid on). The old find-gigs view mixed packages into SSR/MSR
+        // shapes, so it now redirects to the rich catalogue.
+        Route::get('/find-gigs', fn () => redirect()->route('public.packages'))
             ->name('client.find-gigs.index');
 
         // Proposals — supplier responses to the client's events.

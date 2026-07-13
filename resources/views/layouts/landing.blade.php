@@ -165,7 +165,7 @@
                     // Clients browse professional PACKAGES; only professionals "find gigs" (work).
                     $__fgHref = $__fgActive === 'supplier'
                         ? route('professional.bidding-board.index')
-                        : ($__fgActive === 'client' ? route('client.find-gigs.index') : route('public.browse'));
+                        : ($__fgActive === 'client' ? route('public.packages') : route('public.browse'));
                     $__fgLabel = $__fgActive === 'client' ? 'Browse Packages' : 'Find Gigs';
                 @endphp
                 <a href="{{ $__fgHref }}" class="lpn-link">{{ $__fgLabel }}</a>
