@@ -17,7 +17,7 @@
     /* header */
     .pw-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
     .pw-head-l { display: flex; align-items: center; gap: 16px; }
-    .pw-head-ico { width: 62px; height: 62px; border-radius: 18px; background: linear-gradient(135deg, #f472b6, #db2777); display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; box-shadow: 0 8px 18px rgba(219,39,119,0.35), inset 0 1.5px 0 rgba(255,255,255,0.4); }
+    .pw-head-ico { width: 62px; height: 62px; border-radius: 18px; background: linear-gradient(135deg, var(--brand, #f472b6), var(--brand-strong, #db2777)); display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; box-shadow: 0 8px 18px rgba(219,39,119,0.35), inset 0 1.5px 0 rgba(255,255,255,0.4); }
     .pw-head-ico svg { width: 42px; height: 42px; }
     .pw-head-txt h1 { font-size: 28px; font-weight: 800; color: var(--pw-strong); margin: 0; }
     .pw-head-txt p { font-size: 13.5px; color: var(--text-muted); margin: 3px 0 0; }
@@ -49,7 +49,7 @@
     .pw-gen-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
     .pw-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 18px; border-radius: 10px; font-size: 13px; font-weight: 800; cursor: pointer; font-family: inherit; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary); text-decoration: none; }
     .pw-btn svg { width: 15px; height: 15px; }
-    .pw-btn-pink { background: linear-gradient(135deg, #ec4899, #db2777); color: #fff; border: none; }
+    .pw-btn-pink { background: linear-gradient(135deg, var(--brand, #ec4899), var(--brand-strong, #db2777)); color: #fff; border: none; }
     .pw-btn-pink:hover { filter: brightness(1.05); }
     .pw-gen-sep { border: none; border-top: 1px solid rgba(236,72,153,0.18); margin: 18px 0; }
     .pw-gen-send { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
@@ -103,7 +103,7 @@
     .pw-banner-txt { flex: 1; min-width: 230px; }
     .pw-banner-txt b { font-size: 16px; color: var(--pw-strong); }
     .pw-banner-txt p { font-size: 12.5px; color: var(--text-muted); margin: 3px 0 0; line-height: 1.45; }
-    .pw-banner a { display: inline-flex; align-items: center; gap: 9px; background: linear-gradient(135deg, #ec4899, #db2777); color: #fff; font-size: 14px; font-weight: 800; padding: 13px 22px; border-radius: 11px; text-decoration: none; white-space: nowrap; cursor: pointer; }
+    .pw-banner a { display: inline-flex; align-items: center; gap: 9px; background: linear-gradient(135deg, var(--brand, #ec4899), var(--brand-strong, #db2777)); color: #fff; font-size: 14px; font-weight: 800; padding: 13px 22px; border-radius: 11px; text-decoration: none; white-space: nowrap; cursor: pointer; }
     .pw-banner a svg { width: 16px; height: 16px; }
 
     .pw-mb { margin-bottom: 20px; }
@@ -143,13 +143,13 @@
                     <rect x="11" y="5.5" width="21" height="33" rx="4.5" fill="url(#pwDoc)"/>
                     <rect x="11" y="5.5" width="21" height="9" rx="4.5" fill="#ffffff" opacity="0.5"/>
                     {{-- text lines --}}
-                    <rect x="15" y="15" width="13" height="2" rx="1" fill="#f472b6"/>
+                    <rect x="15" y="15" width="13" height="2" rx="1" fill="var(--brand, #f472b6)"/>
                     <rect x="15" y="20" width="13" height="2" rx="1" fill="#f9a8d4"/>
                     <rect x="15" y="25" width="9" height="2" rx="1" fill="#fbcfe8"/>
                     <rect x="15" y="30" width="11" height="2" rx="1" fill="#fbcfe8"/>
                     {{-- 3D pencil writing across the paper --}}
                     <g transform="rotate(50 31 22)">
-                        <rect x="28.5" y="6.5" width="5" height="20" rx="0.8" fill="#ec4899"/>
+                        <rect x="28.5" y="6.5" width="5" height="20" rx="0.8" fill="var(--brand, #ec4899)"/>
                         <rect x="28.5" y="6.5" width="2" height="20" fill="#f9a8d4"/>
                         <polygon points="28.5,26.5 33.5,26.5 31,32.5" fill="#fcd34d"/>
                         <polygon points="29.6,30 32.4,30 31,32.5" fill="#1f2937"/>

@@ -15,7 +15,7 @@
     $isLocked = $level === 'none';
     $lvlMeta  = [
         'manual'  => ['Do It Myself', '#64748b', 'You build packages by hand — templates & structure, no AI.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'AI suggests prices, descriptions and add-ons — you review and approve.'],
+        'semi'    => ['Help Me Plan', 'var(--brand-strong, #2563eb)', 'AI suggests prices, descriptions and add-ons — you review and approve.'],
         'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter a service and let AI auto-generate the whole tiered package.'],
         'none'    => ['Locked', '#ef4444', 'This tool is currently unavailable.'],
     ];

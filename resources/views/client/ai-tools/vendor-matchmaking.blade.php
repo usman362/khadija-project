@@ -88,9 +88,9 @@
     .vm-slider-top .k { font-size: 12.5px; font-weight: 700; color: var(--text-primary); }
     .vm-slider-top .v { font-size: 12px; font-weight: 800; color: var(--vm-strong); }
     .vm-range { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 4px; background: var(--border-color); outline: none; }
-    .vm-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 17px; height: 17px; border-radius: 50%; background: #8b5cf6; cursor: pointer; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
-    .vm-range::-moz-range-thumb { width: 17px; height: 17px; border-radius: 50%; background: #8b5cf6; cursor: pointer; border: 2px solid #fff; }
-    .vm-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: none; border-radius: 10px; background: linear-gradient(135deg, #a78bfa, #7c3aed); color: #fff; font-size: 13.5px; font-weight: 800; cursor: pointer; font-family: inherit; margin-top: 6px; }
+    .vm-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 17px; height: 17px; border-radius: 50%; background: var(--brand, #8b5cf6); cursor: pointer; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
+    .vm-range::-moz-range-thumb { width: 17px; height: 17px; border-radius: 50%; background: var(--brand, #8b5cf6); cursor: pointer; border: 2px solid #fff; }
+    .vm-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: none; border-radius: 10px; background: linear-gradient(135deg, var(--brand, #a78bfa), var(--brand-strong, #7c3aed)); color: #fff; font-size: 13.5px; font-weight: 800; cursor: pointer; font-family: inherit; margin-top: 6px; }
     .vm-btn svg { width: 15px; height: 15px; }
     .vm-help p { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin: 0 0 12px; }
     .vm-help-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 11px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); color: var(--vm-strong); font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; text-decoration: none; }
@@ -114,7 +114,7 @@
     .vm-banner-txt { flex: 1; min-width: 230px; }
     .vm-banner-txt b { font-size: 16px; color: var(--vm-strong); }
     .vm-banner-txt p { font-size: 12.5px; color: var(--text-muted); margin: 3px 0 0; line-height: 1.45; }
-    .vm-banner a { display: inline-flex; align-items: center; gap: 9px; background: linear-gradient(135deg, #a78bfa, #7c3aed); color: #fff; font-size: 14px; font-weight: 800; padding: 13px 22px; border-radius: 11px; text-decoration: none; white-space: nowrap; }
+    .vm-banner a { display: inline-flex; align-items: center; gap: 9px; background: linear-gradient(135deg, var(--brand, #a78bfa), var(--brand-strong, #7c3aed)); color: #fff; font-size: 14px; font-weight: 800; padding: 13px 22px; border-radius: 11px; text-decoration: none; white-space: nowrap; }
 
     @media (max-width: 1100px) { .vm-main { grid-template-columns: 1fr; } }
     @media (max-width: 640px) { .vm-steps { flex-wrap: wrap; } .vm-step { flex-basis: 45%; } .vm-step-arr { display: none; } .vm-match-top { flex-wrap: wrap; } }
@@ -127,7 +127,7 @@
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
         'manual'  => ['Do It Myself', '#64748b', 'Browse the vendor directory and choose who you want yourself — you choose yourself.'],
-        'semi'    => ['Help Me Plan', '#8b5cf6', 'Ranks the best-fit vendors — refine the theme, budget and match level to re-rank.'],
+        'semi'    => ['Help Me Plan', 'var(--brand, #8b5cf6)', 'Ranks the best-fit vendors — refine the theme, budget and match level to re-rank.'],
         'maximum' => ['Coordinate It For Me', '#16a34a', 'Auto-selects your best-fit vendor team from your event details.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -148,16 +148,16 @@
         <div class="vm-head-l">
             <span class="vm-head-ico">
                 <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs><linearGradient id="vmClover" x1="10" y1="8" x2="38" y2="40"><stop stop-color="#a78bfa"/><stop offset="1" stop-color="#6d28d9"/></linearGradient></defs>
+                    <defs><linearGradient id="vmClover" x1="10" y1="8" x2="38" y2="40"><stop stop-color="var(--brand, #a78bfa)"/><stop offset="1" stop-color="var(--brand-strong, #6d28d9)"/></linearGradient></defs>
                     {{-- depth (offset darker clover) --}}
-                    <g fill="#5b21b6" opacity="0.55">
+                    <g fill="var(--brand-strong, #5b21b6)" opacity="0.55">
                         <circle cx="25.5" cy="15.5" r="9"/><circle cx="25.5" cy="33.5" r="9"/><circle cx="16.5" cy="24.5" r="9"/><circle cx="34.5" cy="24.5" r="9"/>
                     </g>
                     {{-- main clover --}}
                     <g fill="url(#vmClover)">
                         <circle cx="24" cy="14" r="9"/><circle cx="24" cy="32" r="9"/><circle cx="15" cy="23" r="9"/><circle cx="33" cy="23" r="9"/>
                     </g>
-                    <circle cx="24" cy="23" r="6" fill="#7c3aed"/>
+                    <circle cx="24" cy="23" r="6" fill="var(--brand-strong, #7c3aed)"/>
                     {{-- shine highlights --}}
                     <circle cx="21" cy="11" r="2.4" fill="#fff" opacity="0.45"/>
                     <circle cx="12.5" cy="20.5" r="2" fill="#fff" opacity="0.35"/>
