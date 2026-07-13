@@ -767,7 +767,7 @@
 
         .cl-content {
             padding: 24px 26px 28px;
-            max-width: 1560px;
+            max-width: 1760px;
             margin: 0 auto;
         }
 

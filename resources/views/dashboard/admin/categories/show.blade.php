@@ -18,10 +18,11 @@
 
     <div class="card">
         <div class="card-body">
-            {{-- Cover banner --}}
+            {{-- Cover banner (dedicated cover, else the thumbnail) --}}
+            @php($cover = $category->cover_image ?: $category->thumbnail)
             <div class="mb-4" style="height:220px; border-radius:12px; overflow:hidden; background:linear-gradient(135deg,#1e3a5f,#2d1b69); display:flex; align-items:center; justify-content:center;">
-                @if($category->cover_image)
-                    <img src="{{ asset('storage/' . $category->cover_image) }}" alt="{{ $category->name }}" style="width:100%; height:100%; object-fit:cover;">
+                @if($cover)
+                    <img src="{{ asset('storage/' . $cover) }}" alt="{{ $category->name }}" style="width:100%; height:100%; object-fit:cover;">
                 @else
                     <i data-lucide="image" style="width:56px; height:56px; opacity:.35;"></i>
                 @endif

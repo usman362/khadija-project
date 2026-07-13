@@ -258,7 +258,24 @@
         transition: border-color 0.15s, box-shadow 0.15s;
         position: relative;
     }
-    .sp-procard:hover { border-color: rgba(249, 115, 22, 0.40); box-shadow: 0 6px 24px rgba(0,0,0,0.10); }
+    .sp-procard:hover { border-color: rgba(249, 115, 22, 0.40); box-shadow: 0 14px 34px -14px rgba(15,27,53,0.22); transform: translateY(-3px); }
+    .sp-procard { padding: 0; overflow: hidden; transition: border-color .15s, box-shadow .15s, transform .15s; }
+
+    /* ── Image-forward hero + hover carousel ── */
+    .sp-procard-media { position: relative; height: 188px; background: linear-gradient(135deg,#e2e8f0,#eef2ff); overflow: hidden; }
+    .sp-procard-media > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .55s ease; }
+    .sp-procard-media > img.on { opacity: 1; }
+    .sp-procard-catbadge { position: absolute; top: 10px; left: 10px; z-index: 3; background: rgba(255,255,255,.94); color: #0f1b35;
+        font-size: 11px; font-weight: 800; padding: 5px 11px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px;
+        box-shadow: 0 2px 10px rgba(15,27,53,.18); text-transform: capitalize; }
+    .sp-procard-catbadge svg { width: 13px; height: 13px; color: #f97316; }
+    .sp-procard-media .sp-fav-btn { position: absolute; top: 10px; right: 10px; z-index: 3; background: rgba(255,255,255,.94);
+        border: none; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+        color: #64748b; box-shadow: 0 2px 10px rgba(15,27,53,.18); cursor: pointer; }
+    .sp-procard-dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 3; display: flex; gap: 5px; }
+    .sp-procard-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.55); transition: all .2s; }
+    .sp-procard-dots i.on { background: #fff; width: 16px; border-radius: 3px; }
+    .sp-procard-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
     .sp-procard-top { display: flex; gap: 12px; align-items: flex-start; }
     .sp-procard-avatar {
         width: 56px; height: 56px;
@@ -635,6 +652,7 @@
 
         {{-- Pro cards grid --}}
         @if($pros->count())
+            @php $stockGallery = ['photo-1519741497674-611481863552','photo-1465495976277-4387d4b0b4c6','photo-1511578314322-379afb476865','photo-1530103862676-de8c9debad1d']; @endphp
             <div class="sp-grid {{ $filters['view'] === 'list' ? 'list' : '' }}">
                 @foreach($pros as $pro)
                     @php
@@ -645,8 +663,31 @@
                         $verified = method_exists($pro, 'isVerified') ? $pro->isVerified() : false;
                         $headline = $profile?->headline ?? '';
                         $city     = $profile?->city ?? '—';
+                        $skills   = is_array($profile?->skills) ? array_values(array_filter($profile->skills)) : [];
+                        $catBadge = $skills[0] ?? ($profile?->industry ?: 'Event Pro');
+                        $realImgs = $profile ? $profile->portfolioHeroUrls(4) : [];
+                        $gallery = ! empty($realImgs)
+                            ? collect($realImgs)
+                            : collect($stockGallery)->map(fn ($id) => 'https://images.unsplash.com/'.$id.'?w=560&q=72&auto=format&fit=crop');
+                        $gallery = $gallery->take(4)->values();
                     @endphp
                     <div class="sp-procard">
+                        <div class="sp-procard-media">
+                            @foreach($gallery as $gi => $img)
+                                <img src="{{ $img }}" alt="{{ $pro->name }}" class="{{ $gi === 0 ? 'on' : '' }}" loading="lazy">
+                            @endforeach
+                            <span class="sp-procard-catbadge">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41 13.42 20.6a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                                {{ \Illuminate\Support\Str::limit($catBadge, 18) }}
+                            </span>
+                            <button type="button" class="sp-fav-btn" onclick="this.classList.toggle('is-saved')" aria-label="Save">
+                                <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            </button>
+                            @if($gallery->count() > 1)
+                                <div class="sp-procard-dots">@foreach($gallery as $gi => $x)<i class="{{ $gi === 0 ? 'on' : '' }}"></i>@endforeach</div>
+                            @endif
+                        </div>
+                        <div class="sp-procard-body">
                         <div class="sp-procard-top">
                             <img src="{{ $pro->avatar_url }}" alt="{{ $pro->name }}" class="sp-procard-avatar" loading="lazy">
                             <div class="sp-procard-info">
@@ -664,9 +705,6 @@
                                     <div class="sp-procard-tag">{{ \Illuminate\Support\Str::limit($headline, 32) }}</div>
                                 @endif
                             </div>
-                            <button type="button" class="sp-fav-btn" onclick="this.classList.toggle('is-saved')" aria-label="Save">
-                                <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                            </button>
                         </div>
                         <div class="sp-procard-meta">
                             <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>{{ $city }}, {{ rand(2, 9) }}.{{ rand(1, 9) }} mi</span>
@@ -704,6 +742,7 @@
                             <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Escrow Active</span>
                             <a href="{{ route('public.professional.show', $pro) }}" class="sp-view-profile" style="margin-left:auto;">View Profile</a>
                         </div>
+                        </div>{{-- /.sp-procard-body --}}
                     </div>
                 @endforeach
             </div>
@@ -806,4 +845,28 @@
         </div>
     </aside>
 </div>
+
+<script>
+    // Hover carousel: cycle a card's portfolio images on mouse-enter.
+    (function () {
+        document.querySelectorAll('.sp-procard-media').forEach(function (media) {
+            var imgs = media.querySelectorAll(':scope > img');
+            var dots = media.querySelectorAll('.sp-procard-dots i');
+            if (imgs.length < 2) return;
+            var idx = 0, timer = null;
+            function show(n) {
+                imgs[idx].classList.remove('on'); if (dots[idx]) dots[idx].classList.remove('on');
+                idx = (n + imgs.length) % imgs.length;
+                imgs[idx].classList.add('on'); if (dots[idx]) dots[idx].classList.add('on');
+            }
+            var card = media.closest('.sp-procard');
+            card.addEventListener('mouseenter', function () {
+                timer = setInterval(function () { show(idx + 1); }, 1400);
+            });
+            card.addEventListener('mouseleave', function () {
+                clearInterval(timer); timer = null; show(0);
+            });
+        });
+    })();
+</script>
 @endsection

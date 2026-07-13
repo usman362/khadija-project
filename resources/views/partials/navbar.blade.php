@@ -178,181 +178,33 @@
                 </button>
 
                 <div class="nav-mega-panel" role="menu">
-                    {{-- LEFT: category rail (hover-driven swap). --}}
+                    {{-- LEFT: category rail (hover-driven swap) — real top-level categories. --}}
                     <div class="nmp-rail" id="nmpRail">
-                        <a class="nmp-rail-item active" data-target="weddings" href="{{ route('events-categories') }}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.35-7-10a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.65-7 10-7 10z"/></svg>
-                            <span>Weddings &amp; Ceremonies</span>
-                            <svg class="rail-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                        </a>
-                        <a class="nmp-rail-item" data-target="corporate" href="{{ route('events-categories') }}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                            <span>Corporate &amp; Conferences</span>
-                            <svg class="rail-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                        </a>
-                        <a class="nmp-rail-item" data-target="birthday" href="{{ route('events-categories') }}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21V10a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11"/><path d="M4 15h16"/><path d="M12 4v4"/></svg>
-                            <span>Birthday Parties</span>
-                            <svg class="rail-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                        </a>
-                        <a class="nmp-rail-item" data-target="baby-shower" href="{{ route('events-categories') }}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 10h.01M15 10h.01M9.5 15a3 3 0 0 0 5 0"/></svg>
-                            <span>Baby Showers</span>
-                            <svg class="rail-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                        </a>
-                        <a class="nmp-rail-item" data-target="music" href="{{ route('events-categories') }}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                            <span>Music &amp; Entertainment</span>
-                            <svg class="rail-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                        </a>
-                        <a class="nmp-rail-item" data-target="visual" href="{{ route('events-categories') }}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19V6a2 2 0 0 0-2-2h-4l-2-2h-6l-2 2H3a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2z"/><circle cx="12" cy="13" r="4"/></svg>
-                            <span>Photo &amp; Video</span>
-                            <svg class="rail-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                        </a>
-                        <a class="nmp-rail-item" data-target="food" href="{{ route('events-categories') }}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>
-                            <span>Food &amp; Catering</span>
-                            <svg class="rail-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                        </a>
-                        <a class="nmp-rail-item" data-target="decor" href="{{ route('events-categories') }}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                            <span>Decor &amp; Floral</span>
-                            <svg class="rail-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                        </a>
-                        <a class="nmp-rail-item" data-target="staff" href="{{ route('events-categories') }}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                            <span>Planners &amp; Staff</span>
-                            <svg class="rail-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                        </a>
+                        @foreach(($megaCategories ?? collect()) as $i => $mc)
+                            <a class="nmp-rail-item {{ $i === 0 ? 'active' : '' }}" data-target="{{ $mc->slug }}" href="{{ route('public.category', $mc->slug) }}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                                <span>{{ $mc->name }}</span>
+                                <svg class="rail-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                            </a>
+                        @endforeach
                     </div>
 
                     {{-- RIGHT: showcase. One .nmp-panel per rail item. --}}
                     <div class="nmp-showcase" id="nmpShowcase">
-
-                        <div class="nmp-panel active" data-panel="weddings">
-                            <h4 class="nmp-title">Popular in <span>Weddings &amp; Ceremonies</span></h4>
-                            <div class="nmp-grid">
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Photography</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Wedding DJs</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Floral Design</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Catering</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Venues</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Planners</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Live Bands</span></a>
+                        @foreach(($megaCategories ?? collect()) as $i => $mc)
+                            <div class="nmp-panel {{ $i === 0 ? 'active' : '' }}" data-panel="{{ $mc->slug }}">
+                                <h4 class="nmp-title">Popular in <span>{{ $mc->name }}</span></h4>
+                                <div class="nmp-grid">
+                                    @foreach($mc->children->take(8) as $child)
+                                        @php($cimg = $child->thumbnail ?: $child->cover_image)
+                                        <a class="nmp-tile" href="{{ route('public.category', $child->slug) }}">
+                                            <span class="nmp-bubble">@if($cimg)<img src="{{ asset('storage/'.$cimg) }}" alt="{{ $child->name }}">@endif</span>
+                                            <span class="nmp-label">{{ $child->name }}</span>
+                                        </a>
+                                    @endforeach
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="nmp-panel" data-panel="corporate">
-                            <h4 class="nmp-title">Popular in <span>Corporate &amp; Conferences</span></h4>
-                            <div class="nmp-grid">
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Conference AV</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Videography</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Event Planners</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1525772764200-be829a350797?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Event Staff</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1525772764200-be829a350797?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Awards</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Catering</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Headshots</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Venues</span></a>
-                            </div>
-                        </div>
-
-                        <div class="nmp-panel" data-panel="birthday">
-                            <h4 class="nmp-title">Popular in <span>Birthday Parties</span></h4>
-                            <div class="nmp-grid">
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Party DJs</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Cakes</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Photo Booths</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Balloon Decor</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Entertainers</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Planners</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Party Favors</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Venues</span></a>
-                            </div>
-                        </div>
-
-                        <div class="nmp-panel" data-panel="baby-shower">
-                            <h4 class="nmp-title">Popular in <span>Baby Showers</span></h4>
-                            <div class="nmp-grid">
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Themed Decor</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Custom Cakes</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Photographers</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Shower Planners</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Party Favors</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Balloons</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Gift Boxes</span></a>
-                            </div>
-                        </div>
-
-                        <div class="nmp-panel" data-panel="music">
-                            <h4 class="nmp-title">Popular in <span>Music &amp; Entertainment</span></h4>
-                            <div class="nmp-grid">
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">DJ Services</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Live Bands</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Solo Artists</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Emcees</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Sound &amp; AV</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">String Quartets</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Karaoke</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Dancers</span></a>
-                            </div>
-                        </div>
-
-                        <div class="nmp-panel" data-panel="visual">
-                            <h4 class="nmp-title">Popular in <span>Photo &amp; Video</span></h4>
-                            <div class="nmp-grid">
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Wedding Photo</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Corporate Video</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Event Photo</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Drone Shoots</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Photo Booths</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Lifestyle</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Livestreaming</span></a>
-                            </div>
-                        </div>
-
-                        <div class="nmp-panel" data-panel="food">
-                            <h4 class="nmp-title">Popular in <span>Food &amp; Catering</span></h4>
-                            <div class="nmp-grid">
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Full Catering</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Bartending</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Food Trucks</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Cakes</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Coffee Carts</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Private Chefs</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Servers</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Desserts</span></a>
-                            </div>
-                        </div>
-
-                        <div class="nmp-panel" data-panel="decor">
-                            <h4 class="nmp-title">Popular in <span>Decor &amp; Floral</span></h4>
-                            <div class="nmp-grid">
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Florists</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Balloons</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Backdrops</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Event Lighting</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Rentals</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Signage</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Draping</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Linens</span></a>
-                            </div>
-                        </div>
-
-                        <div class="nmp-panel" data-panel="staff">
-                            <h4 class="nmp-title">Popular in <span>Planners &amp; Staff</span></h4>
-                            <div class="nmp-grid">
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Event Planners</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Servers</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1525772764200-be829a350797?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Security</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Registration</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Day-Of Coord.</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Valet</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Concierge</span></a>
-                                <a class="nmp-tile" href="{{ route('events-categories') }}"><span class="nmp-bubble"><img src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt=""></span><span class="nmp-label">Greeters</span></a>
-                            </div>
-                        </div>
-
+                        @endforeach
                     </div>
                 </div>
             </li>

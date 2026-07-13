@@ -45,6 +45,21 @@ class AppServiceProvider extends ServiceProvider
         // bare ->links() call (framework-agnostic, replaces the oversized default).
         \Illuminate\Pagination\Paginator::defaultView('pagination.gr');
 
+        // Public header mega-menu → real top-level categories (with children) that
+        // have imagery, so the "All Categories" menu reflects the live taxonomy.
+        \Illuminate\Support\Facades\View::composer('partials.navbar', function ($view) {
+            $view->with('megaCategories',
+                \App\Models\Category::query()
+                    ->where('is_active', true)
+                    ->whereNull('parent_id')
+                    ->whereHas('children')
+                    ->with(['children' => fn ($q) => $q->where('is_active', true)->orderBy('name')])
+                    ->orderBy('sort_order')->orderBy('name')
+                    ->limit(9)
+                    ->get()
+            );
+        });
+
         Gate::before(function (User $user): ?bool {
             return $user->hasRole(RoleName::ADMIN->value) ? true : null;
         });

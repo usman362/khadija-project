@@ -6,47 +6,48 @@
     $seoTitle       = 'Explore Event Categories | GigResource';
     $seoDescription = 'Explore every event category we cover — weddings, corporate events, birthdays, festivals, conferences and more. Browse real categories and find the right professionals for your occasion.';
 
-    // Real, active parent categories passed from the route (with active children).
+    // Real, active parent categories passed from the route (with full subtree).
     $cats = $allCategories ?? collect();
 
-    // A rotating set of event-only Unsplash images (weddings, catering, florals,
-    // venues, tables) used to give the real DB category cards visual richness.
-    // NO faces / portraits, NO concert/stage photos.
-    $catImages = [
-        'photo-1519741497674-611481863552', // wedding table
-        'photo-1464366400600-7168b8af9bc3', // florals
-        'photo-1511578314322-379afb476865', // corporate venue
-        'photo-1530103862676-de8c9debad1d', // birthday balloons
-        'photo-1478146059778-26028b07395a', // catering plates
-        'photo-1583939003579-730e3918a45a', // engagement decor
-        'photo-1511578314322-379afb476865', // event hall
-        'photo-1515169067868-5387ec356754', // reception decor
-    ];
+    // Total descendant count across ALL sub-levels (the event roots are thin
+    // chains: root → group → sub-group → services), so direct-child count is
+    // always 1 — we count every descendant to show a meaningful number.
+    $descCount = function ($cat) use (&$descCount) {
+        $kids = $cat->allChildren ?? collect();
+        return $kids->reduce(fn ($carry, $k) => $carry + 1 + $descCount($k), 0);
+    };
 
-    // Representative "Top Services" tiles. Prices are REPRESENTATIVE starting
-    // points ("from $X"), not guarantees. Event-only imagery.
-    // [name, unsplash-id, badge, badge-class, subtitle, from-price, group]
-    $topServices = [
-        ['Catering',        'photo-1478146059778-26028b07395a', 'POPULAR',  'o', 'Food &amp; drink for any headcount',   450, 'featured'],
-        ['Floral Design',   'photo-1464366400600-7168b8af9bc3', 'FEATURED', 'b', 'Bouquets, arches &amp; centerpieces',  180, 'featured'],
-        ['Event Planning',  'photo-1511578314322-379afb476865', 'POPULAR',  'o', 'Full-service planners &amp; staff',    600, 'hot'],
-        ['Venue &amp; Decor',   'photo-1511578314322-379afb476865', 'HOT',      'h', 'Spaces styled for your occasion',      800, 'hot'],
-        ['Wedding Styling', 'photo-1519741497674-611481863552', 'FEATURED', 'b', 'Tablescapes &amp; reception decor',    350, 'featured'],
-        ['Cake &amp; Desserts', 'photo-1535254973040-607b474cb50d', 'NEW',      'n', 'Custom cakes &amp; dessert tables',    120, 'new'],
-        ['Balloon Styling', 'photo-1530103862676-de8c9debad1d', 'NEW',      'n', 'Arches, garlands &amp; installs',      140, 'new'],
-        ['Table &amp; Rentals', 'photo-1515169067868-5387ec356754', 'HOT',      'h', 'Chairs, linens, glassware &amp; more', 200, 'hot'],
-    ];
+    // Real category image (cover/thumbnail) → full URL, or a neutral fallback.
+    $fallbackImg = 'https://images.unsplash.com/photo-1519741497674-611481863552?w=900&q=80&auto=format&fit=crop';
+    $imgUrl = function ($c) use ($fallbackImg) {
+        $f = ($c->cover_image ?? null) ?: ($c->thumbnail ?? null);
+        return $f ? asset('storage/' . $f) : $fallbackImg;
+    };
 
-    // Representative "popular event type" tiles — framed honestly as popular
-    // occasions, not tied to invented precise counts.
-    $eventTypes = [
-        ['Weddings',           'photo-1519741497674-611481863552', 'wedding'],
-        ['Birthday Parties',   'photo-1530103862676-de8c9debad1d', 'birthday'],
-        ['Corporate Events',   'photo-1511578314322-379afb476865', 'corporate'],
-        ['Baby Showers',       'photo-1515488042361-ee00e0ddd4e4', 'baby shower'],
-        ['Anniversaries',      'photo-1464366400600-7168b8af9bc3', 'anniversary'],
-        ['Engagement Parties', 'photo-1583939003579-730e3918a45a', 'engagement'],
-    ];
+    // "Top Services" = real sub-categories that have imagery. Prices are
+    // REPRESENTATIVE starting points ("from $X"), not guarantees.
+    $svcBadges = [['POPULAR', 'o', 'featured'], ['FEATURED', 'b', 'featured'], ['HOT', 'h', 'hot'], ['NEW', 'n', 'new']];
+    $svcPrices = [450, 180, 600, 800, 350, 120, 140, 200];
+    $topServices = $cats->flatMap(fn ($c) => $c->allChildren ?? collect())
+        ->filter(fn ($c) => ($c->thumbnail || $c->cover_image))
+        ->unique('name')
+        ->take(8)->values()
+        ->map(function ($c, $i) use ($imgUrl, $svcBadges, $svcPrices) {
+            [$badge, $badgeClass, $group] = $svcBadges[$i % count($svcBadges)];
+            return [
+                'name'  => $c->name,
+                'image' => $imgUrl($c),
+                'badge' => $badge, 'badgeClass' => $badgeClass, 'group' => $group,
+                'sub'   => Str::limit(strip_tags((string) $c->short_description), 42) ?: 'Browse specialists',
+                'from'  => $svcPrices[$i % count($svcPrices)],
+                'slug'  => $c->slug,
+            ];
+        });
+
+    // "Popular Event Types" = real top-level categories with imagery.
+    $eventTypes = $cats->filter(fn ($c) => ($c->thumbnail || $c->cover_image))
+        ->take(6)->values()
+        ->map(fn ($c) => ['name' => $c->name, 'image' => $imgUrl($c), 'slug' => $c->slug]);
 @endphp
 
 @push('styles')
@@ -151,8 +152,10 @@
     .ec-fcard > * { position: relative; z-index: 2; }
     .ec-fcard-badge { align-self: flex-start; font-size: 10.5px; font-weight: 800; text-transform: uppercase;
         letter-spacing: .5px; padding: 5px 11px; border-radius: 999px; background: var(--orange); margin-bottom: 10px; }
-    .ec-fcard h3 { font-size: 24px; font-weight: 800; margin: 0 0 6px; letter-spacing: -.4px; }
-    .ec-fcard p { font-size: 13.5px; color: rgba(255,255,255,.88); margin: 0 0 16px; max-width: 360px; }
+    .ec-fcard h3 { font-size: 24px; font-weight: 800; margin: 0 0 6px; letter-spacing: -.4px;
+        color: #fff !important; text-shadow: 0 1px 12px rgba(15,27,53,.55); }
+    .ec-fcard p { font-size: 13.5px; color: rgba(255,255,255,.92); margin: 0 0 16px; max-width: 360px;
+        text-shadow: 0 1px 10px rgba(15,27,53,.5); }
     .ec-fcard-btn { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px;
         background: #fff; color: var(--blue-dark, var(--blue)); border-radius: 999px; padding: 10px 18px;
         font-size: 13px; font-weight: 800; }
@@ -286,7 +289,7 @@
                 <select class="ec-select" id="ecSubSelect" aria-label="Subcategory" onchange="ecCategoryJump(this)">
                     <option value="">All subcategories</option>
                     @foreach($cats as $cat)
-                        @foreach(($cat->children ?? collect()) as $child)
+                        @foreach(($cat->allChildren ?? collect()) as $child)
                             <option value="{{ $child->name }}">{{ Str::title($child->name) }}</option>
                         @endforeach
                     @endforeach
@@ -294,23 +297,15 @@
             </div>
 
             <div class="ec-fb-chips" id="ecChips">
-                <button type="button" class="ec-chip active" data-filter="popular">
+                <button type="button" class="ec-chip active" data-sort="top">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8.5 22 9.3 17 14 18.3 21 12 17.5 5.7 21 7 14 2 9.3 9 8.5 12 2"/></svg>
                     Popular
                 </button>
-                <button type="button" class="ec-chip" data-filter="budget">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                    Budget-Friendly
-                </button>
-                <button type="button" class="ec-chip" data-filter="rated">
+                <button type="button" class="ec-chip" data-sort="rating">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.9 6.3L22 9.2l-5 5 1.2 7L12 17.8 5.8 21.2 7 14.2l-5-5 7.1-.9L12 2z"/></svg>
                     Top Rated
                 </button>
-                <button type="button" class="ec-chip" data-filter="near">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    Near Me
-                </button>
-                <button type="button" class="ec-chip" data-filter="new">
+                <button type="button" class="ec-chip" data-sort="newest">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     New Arrivals
                 </button>
@@ -334,29 +329,22 @@
                     <aside class="ec-shop-left">
                         <div class="ec-catlist">
                             @foreach($cats as $i => $cat)
-                                @php $children = $cat->children ?? collect(); @endphp
-                                <a class="ec-catrow {{ $i === 0 ? 'active' : '' }}" href="{{ route('public.browse', ['q' => $cat->name]) }}">
+                                @php $count = $descCount($cat); @endphp
+                                <a class="ec-catrow {{ $i === 0 ? 'active' : '' }}" href="{{ route('public.category', $cat->slug) }}">
                                     <span class="ec-catrow-ic">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
                                     </span>
                                     <span class="ec-catrow-name">{{ Str::title($cat->name) }}</span>
-                                    @if($children->isNotEmpty())
-                                        <span class="ec-catrow-badge">{{ $children->count() }}</span>
+                                    @if($count > 0)
+                                        <span class="ec-catrow-badge">{{ $count }}</span>
                                     @endif
                                 </a>
                             @endforeach
                         </div>
                     </aside>
 
-                    {{-- RIGHT: tabs + featured card + smaller category cards --}}
+                    {{-- RIGHT: featured card + smaller category cards --}}
                     <div class="ec-shop-right">
-                        <div class="ec-tabs">
-                            <button type="button" class="ec-tab active">All</button>
-                            <button type="button" class="ec-tab">Weddings</button>
-                            <button type="button" class="ec-tab">Corporate</button>
-                            <button type="button" class="ec-tab">Birthday</button>
-                            <button type="button" class="ec-tab">Trending</button>
-                        </div>
 
                         <div class="ec-shop-cards">
                             @php
@@ -366,11 +354,12 @@
                             @endphp
 
                             {{-- BIG feature card = first real category --}}
-                            <a class="ec-fcard" href="{{ route('public.browse', ['q' => $first->name]) }}"
-                               style="--x:0" data-bg="https://images.unsplash.com/{{ $catImages[0] }}?w=900&q=80&auto=format&fit=crop">
+                            <a class="ec-fcard" href="{{ route('public.category', $first->slug) }}"
+                               style="--x:0" data-bg="{{ $imgUrl($first) }}">
                                 <span class="ec-fcard-badge">Featured</span>
                                 <h3>{{ Str::title($first->name) }}</h3>
-                                <p>Explore vetted professionals for {{ Str::lower($first->name) }}{{ $firstChildren->isNotEmpty() ? ' — ' . $firstChildren->count() . ' ' . Str::plural('subcategory', $firstChildren->count()) . ' to browse' : '' }}.</p>
+                                @php $firstCount = $descCount($first); @endphp
+                                <p>Explore vetted professionals for {{ Str::lower($first->name) }}{{ $firstCount > 0 ? ' — ' . $firstCount . ' ' . Str::plural('subcategory', $firstCount) . ' to browse' : '' }}.</p>
                                 <span class="ec-fcard-btn">
                                     Explore top professionals
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -379,17 +368,14 @@
 
                             {{-- smaller cards = next real categories --}}
                             @foreach($rest as $j => $cat)
-                                @php
-                                    $children = $cat->children ?? collect();
-                                    $img = $catImages[($j + 1) % count($catImages)];
-                                @endphp
-                                <a class="ec-scard" href="{{ route('public.browse', ['q' => $cat->name]) }}">
-                                    <div class="ec-scard-img" style="background-image:url('https://images.unsplash.com/{{ $img }}?w=400&q=80&auto=format&fit=crop')"></div>
+                                @php $scount = $descCount($cat); @endphp
+                                <a class="ec-scard" href="{{ route('public.category', $cat->slug) }}">
+                                    <div class="ec-scard-img" style="background-image:url('{{ $imgUrl($cat) }}')"></div>
                                     <div class="ec-scard-body">
                                         <div class="ec-scard-name">{{ Str::title($cat->name) }}</div>
                                         <div class="ec-scard-meta">
-                                            @if($children->isNotEmpty())
-                                                <span class="b">{{ $children->count() }}</span> {{ Str::plural('subcategory', $children->count()) }}
+                                            @if($scount > 0)
+                                                <span class="b">{{ $scount }}</span> {{ Str::plural('subcategory', $scount) }}
                                             @else
                                                 Browse professionals
                                             @endif
@@ -426,16 +412,16 @@
             </div>
 
             <div class="ec-ts-grid" id="ecTsGrid">
-                @foreach($topServices as [$svcName, $svcPhoto, $badge, $badgeClass, $svcSub, $svcFrom, $svcGroup])
-                    <a class="ec-ts" data-group="{{ $svcGroup }}" href="{{ route('public.browse', ['q' => strip_tags(html_entity_decode($svcName))]) }}">
+                @foreach($topServices as $svc)
+                    <a class="ec-ts" data-group="{{ $svc['group'] }}" href="{{ route('public.category', $svc['slug']) }}">
                         <div class="ec-ts-img">
-                            <img loading="lazy" src="https://images.unsplash.com/{{ $svcPhoto }}?w=600&q=80&auto=format&fit=crop" alt="{{ strip_tags(html_entity_decode($svcName)) }}">
-                            <span class="ec-ts-tag {{ $badgeClass }}">{{ $badge }}</span>
+                            <img loading="lazy" src="{{ $svc['image'] }}" alt="{{ $svc['name'] }}">
+                            <span class="ec-ts-tag {{ $svc['badgeClass'] }}">{{ $svc['badge'] }}</span>
                         </div>
                         <div class="ec-ts-body">
-                            <h3>{!! $svcName !!}</h3>
-                            <div class="ec-ts-sub">{!! $svcSub !!}</div>
-                            <div class="ec-ts-price"><span>from</span> <b>${{ number_format($svcFrom) }}</b></div>
+                            <h3>{{ $svc['name'] }}</h3>
+                            <div class="ec-ts-sub">{{ $svc['sub'] }}</div>
+                            <div class="ec-ts-price"><span>from</span> <b>${{ number_format($svc['from']) }}</b></div>
                         </div>
                     </a>
                 @endforeach
@@ -454,12 +440,12 @@
             </div>
 
             <div class="ec-et-grid">
-                @foreach($eventTypes as [$etName, $etPhoto, $etQuery])
-                    <a class="ec-et" href="{{ route('public.browse', ['q' => $etQuery]) }}">
-                        <img loading="lazy" src="https://images.unsplash.com/{{ $etPhoto }}?w=800&q=80&auto=format&fit=crop" alt="{{ $etName }}">
+                @foreach($eventTypes as $et)
+                    <a class="ec-et" href="{{ route('public.category', $et['slug']) }}">
+                        <img loading="lazy" src="{{ $et['image'] }}" alt="{{ $et['name'] }}">
                         <div class="ec-et-ov">
                             <div>
-                                <h3>{{ $etName }}</h3>
+                                <h3>{{ $et['name'] }}</h3>
                                 <span>Browse specialists</span>
                             </div>
                             <span class="ec-et-arrow">
@@ -512,12 +498,16 @@
     styleEl.textContent = css;
     document.head.appendChild(styleEl);
 
-    // Filter chips: toggle active state (visual filter).
+    // Filter chips → jump to Browse Professionals sorted accordingly.
     var chips = document.querySelectorAll('#ecChips .ec-chip');
     chips.forEach(function (chip) {
         chip.addEventListener('click', function () {
             chips.forEach(function (c) { c.classList.remove('active'); });
             chip.classList.add('active');
+            var sort = chip.getAttribute('data-sort') || 'top';
+            var q = document.getElementById('ecCatSelect');
+            var qv = q && q.value ? '&q=' + encodeURIComponent(q.value) : '';
+            window.location.href = browseBase + '?sort=' + encodeURIComponent(sort) + qv;
         });
     });
 

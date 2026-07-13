@@ -564,7 +564,9 @@
 
         .cl-content {
             padding: 28px 32px;
-            max-width: 1440px;
+            max-width: 1760px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         /* ═══════════════════════ CARDS ═══════════════════════ */

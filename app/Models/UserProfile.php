@@ -134,4 +134,27 @@ class UserProfile extends Model
         }
         return false;
     }
+
+    /** Uploaded portfolio image items (with generated sizes), featured first. */
+    public function portfolioImageItems(): \Illuminate\Support\Collection
+    {
+        $imgs = collect(is_array($this->portfolio) ? $this->portfolio : [])
+            ->filter(fn ($i) => is_array($i) && ($i['type'] ?? null) === 'image')
+            ->values();
+
+        return $imgs->filter(fn ($i) => $i['featured'] ?? false)
+            ->merge($imgs->reject(fn ($i) => $i['featured'] ?? false))
+            ->values();
+    }
+
+    /** Hero-size portfolio image URLs for search cards (featured cover first). */
+    public function portfolioHeroUrls(int $limit = 4): array
+    {
+        return $this->portfolioImageItems()
+            ->map(fn ($i) => \Illuminate\Support\Facades\Storage::url($i['hero'] ?? $i['square'] ?? ''))
+            ->filter()
+            ->take($limit)
+            ->values()
+            ->all();
+    }
 }

@@ -279,6 +279,23 @@
     .pf-switch input:checked + .pf-switch-slider { background: var(--accent-blue); }
     .pf-switch input:checked + .pf-switch-slider::before { transform: translateX(20px); }
 
+    /* ── Portfolio photo uploader ── */
+    .pf-photos { margin: 6px 0 10px; }
+    .pf-photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .pf-photo { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 10; border: 2px solid transparent; background: #eef2f7; }
+    .pf-photo.is-featured { border-color: #f59e0b; }
+    .pf-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .pf-photo-badge { position: absolute; top: 8px; left: 8px; background: #f59e0b; color: #fff; font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 999px; }
+    .pf-photo-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; opacity: 0; transition: opacity .15s; }
+    .pf-photo:hover .pf-photo-actions { opacity: 1; }
+    .pf-photo-actions form { margin: 0; }
+    .pf-photo-btn { width: 28px; height: 28px; border-radius: 50%; border: none; background: rgba(255,255,255,.95); color: #0f1b35; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+    .pf-photo-btn.del { color: #ef4444; }
+    .pf-photo-addform { margin: 0; }
+    .pf-photo-add { display: flex; flex-direction: column; align-items: center; justify-content: center; aspect-ratio: 16 / 10; border: 2px dashed var(--border-color); border-radius: 12px; cursor: pointer; color: var(--text-muted); font-size: 13px; font-weight: 700; text-align: center; line-height: 1.3; transition: border-color .15s, color .15s; }
+    .pf-photo-add:hover { border-color: #f97316; color: #f97316; }
+    .pf-photo-add input { display: none; }
+
     /* ── Portfolio & Certifications Repeatable ── */
     .pf-repeatable-item {
         padding: 16px;
@@ -590,10 +607,120 @@
             <div class="pf-card-title">Portfolio</div>
             <div class="pf-card-desc">Showcase your past work and projects to attract clients.</div>
 
+            {{-- Portfolio PHOTOS — upload once, the system auto-generates every size.
+                 The featured photo becomes your search-card cover image. --}}
+            <div class="pf-photos">
+                <label class="pf-label" style="margin-bottom:10px;display:block;">Portfolio Photos
+                    <span style="color:var(--text-muted);font-weight:500;font-size:12px;">— upload your best work. Star one to use it as your search-card cover.</span>
+                </label>
+                <div class="pf-photo-grid">
+                    @foreach(($profile->portfolio ?? []) as $k => $img)
+                        @if(is_array($img) && ($img['type'] ?? null) === 'image')
+                            <div class="pf-photo {{ ($img['featured'] ?? false) ? 'is-featured' : '' }}">
+                                <img src="{{ \Illuminate\Support\Facades\Storage::url($img['hero'] ?? $img['square'] ?? '') }}" alt="Portfolio" loading="lazy">
+                                @if($img['featured'] ?? false)<span class="pf-photo-badge">★ Cover</span>@endif
+                                <div class="pf-photo-actions">
+                                    <button type="button" class="pf-photo-btn pf-crop-open" title="Adjust crop"
+                                        data-index="{{ $k }}"
+                                        data-original="{{ \Illuminate\Support\Facades\Storage::url($img['original'] ?? $img['hero'] ?? '') }}"
+                                        data-fx="{{ $img['focal_x'] ?? 0.5 }}" data-fy="{{ $img['focal_y'] ?? 0.5 }}">◎</button>
+                                    @unless($img['featured'] ?? false)
+                                        <form action="{{ route('professional.profile.portfolio.featured') }}" method="POST">@csrf
+                                            <input type="hidden" name="index" value="{{ $k }}">
+                                            <button type="submit" class="pf-photo-btn" title="Make cover">★</button>
+                                        </form>
+                                    @endunless
+                                    <form action="{{ route('professional.profile.portfolio.image.delete') }}" method="POST" onsubmit="return confirm('Remove this photo?')">@csrf @method('DELETE')
+                                        <input type="hidden" name="index" value="{{ $k }}">
+                                        <button type="submit" class="pf-photo-btn del" title="Delete">✕</button>
+                                    </form>
+                                </div>
+                            </div>
+                        @endif
+                    @endforeach
+                    <form action="{{ route('professional.profile.portfolio.image') }}" method="POST" enctype="multipart/form-data" class="pf-photo-addform">
+                        @csrf
+                        <label class="pf-photo-add">
+                            <input type="file" name="portfolio_image" accept="image/jpeg,image/png,image/webp" onchange="this.form.submit()">
+                            <span>＋<br>Add Photo</span>
+                        </label>
+                    </form>
+                </div>
+                @error('portfolio_image')<div style="color:#ef4444;font-size:13px;margin-top:8px;">{{ $message }}</div>@enderror
+            </div>
+
+            {{-- Focal-point picker: the pro drags to choose what stays in frame. --}}
+            <div id="pfCropModal" class="pf-crop-modal" hidden>
+                <div class="pf-crop-box">
+                    <div class="pf-crop-head"><b>Adjust cover crop</b><button type="button" class="pf-crop-x" onclick="pfCloseCrop()">✕</button></div>
+                    <p class="pf-crop-hint">Drag the dot to the part of the photo that should always stay in frame — your camera, the cake, the couple.</p>
+                    <div class="pf-crop-stage" id="pfCropStage"><img id="pfCropImg" src="" alt=""><span class="pf-crop-dot" id="pfCropDot"></span></div>
+                    <form action="{{ route('professional.profile.portfolio.crop') }}" method="POST" class="pf-crop-actions">
+                        @csrf
+                        <input type="hidden" name="index" id="pfCropIndex">
+                        <input type="hidden" name="focal_x" id="pfCropFx">
+                        <input type="hidden" name="focal_y" id="pfCropFy">
+                        <button type="button" class="pf-btn-ghost" onclick="pfCloseCrop()">Cancel</button>
+                        <button type="submit" class="pf-btn-primary">Save crop</button>
+                    </form>
+                </div>
+            </div>
+            <style>
+                .pf-crop-modal { position: fixed; inset: 0; z-index: 9999; background: rgba(6,10,20,.72); display: flex; align-items: center; justify-content: center; padding: 20px; }
+                .pf-crop-box { background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e5e9f0); border-radius: 16px; padding: 20px; width: min(560px, 100%); box-shadow: 0 30px 60px -20px rgba(0,0,0,.5); }
+                .pf-crop-head { display: flex; justify-content: space-between; align-items: center; font-size: 16px; }
+                .pf-crop-x { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-muted, #64748b); }
+                .pf-crop-hint { font-size: 13px; color: var(--text-muted, #64748b); margin: 8px 0 14px; }
+                .pf-crop-stage { position: relative; border-radius: 12px; overflow: hidden; cursor: crosshair; user-select: none; touch-action: none; background: #000; }
+                .pf-crop-stage img { width: 100%; max-height: 60vh; object-fit: contain; display: block; pointer-events: none; }
+                .pf-crop-dot { position: absolute; width: 26px; height: 26px; border-radius: 50%; border: 3px solid #fff; background: rgba(249,115,22,.85); transform: translate(-50%, -50%); box-shadow: 0 0 0 2px rgba(0,0,0,.35); pointer-events: none; }
+                .pf-crop-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+                .pf-btn-ghost { background: transparent; border: 1px solid var(--border-color, #e5e9f0); color: var(--text-light, #334155); border-radius: 10px; padding: 9px 18px; font-weight: 700; cursor: pointer; }
+                .pf-btn-primary { background: linear-gradient(135deg,#f97316,#ea580c); border: none; color: #fff; border-radius: 10px; padding: 9px 20px; font-weight: 800; cursor: pointer; }
+            </style>
+            <script>
+                (function () {
+                    var modal = document.getElementById('pfCropModal'),
+                        stage = document.getElementById('pfCropStage'),
+                        img = document.getElementById('pfCropImg'),
+                        dot = document.getElementById('pfCropDot'),
+                        fx = document.getElementById('pfCropFx'),
+                        fy = document.getElementById('pfCropFy'),
+                        idx = document.getElementById('pfCropIndex'),
+                        cur = { x: 0.5, y: 0.5 }, dragging = false;
+
+                    function place() { dot.style.left = (cur.x * 100) + '%'; dot.style.top = (cur.y * 100) + '%'; fx.value = cur.x.toFixed(4); fy.value = cur.y.toFixed(4); }
+                    function fromEvent(e) {
+                        var r = img.getBoundingClientRect(), cx = (e.touches ? e.touches[0].clientX : e.clientX), cy = (e.touches ? e.touches[0].clientY : e.clientY);
+                        cur.x = Math.min(1, Math.max(0, (cx - r.left) / r.width));
+                        cur.y = Math.min(1, Math.max(0, (cy - r.top) / r.height));
+                        place();
+                    }
+                    stage.addEventListener('pointerdown', function (e) { dragging = true; fromEvent(e); });
+                    stage.addEventListener('pointermove', function (e) { if (dragging) fromEvent(e); });
+                    window.addEventListener('pointerup', function () { dragging = false; });
+
+                    document.querySelectorAll('.pf-crop-open').forEach(function (btn) {
+                        btn.addEventListener('click', function () {
+                            img.src = btn.getAttribute('data-original');
+                            idx.value = btn.getAttribute('data-index');
+                            cur.x = parseFloat(btn.getAttribute('data-fx')) || 0.5;
+                            cur.y = parseFloat(btn.getAttribute('data-fy')) || 0.5;
+                            modal.hidden = false;
+                            img.complete ? place() : (img.onload = place);
+                        });
+                    });
+                    window.pfCloseCrop = function () { modal.hidden = true; };
+                    modal.addEventListener('click', function (e) { if (e.target === modal) modal.hidden = true; });
+                })();
+            </script>
+
+            @php $linkItems = collect($profile->portfolio ?? [])->filter(fn ($i) => is_array($i) && ($i['type'] ?? null) !== 'image')->values(); @endphp
             <form action="{{ route('professional.profile.update.portfolio') }}" method="POST">
                 @csrf @method('PATCH')
+                <div class="pf-card-title" style="font-size:15px;margin:22px 0 4px;">Portfolio Links</div>
                 <div id="portfolioItems">
-                    @forelse(($profile->portfolio ?? []) as $i => $item)
+                    @forelse($linkItems as $i => $item)
                         <div class="pf-repeatable-item" data-index="{{ $i }}">
                             <div class="pf-form-grid">
                                 <div>

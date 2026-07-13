@@ -65,7 +65,8 @@ class CategorySeeder extends Seeder
         $usedSlugs = [];
 
         foreach ($rows as $r) {
-            $slug = $r['slug'] ?: Str::slug($r['name']);
+            // Always URL-safe: some legacy slugs contain slashes/invalid chars.
+            $slug = Str::slug($r['slug'] ?: $r['name']) ?: Str::slug($r['name']);
             // guarantee uniqueness
             $base = $slug; $i = 2;
             while (isset($usedSlugs[$slug])) { $slug = $base . '-' . $i++; }
@@ -80,7 +81,9 @@ class CategorySeeder extends Seeder
                 'cover_image'       => $copyImage($r['cover_image'] ?? null, 'covers', $coverDir),
                 'icon'              => $r['icon'] ?? null,
                 'parent_id'         => null,
-                'is_active'         => (bool)($r['is_active'] ?? true),
+                // Import every category as active — the client wants the full
+                // taxonomy live/visible; individual ones can be toggled off in admin.
+                'is_active'         => true,
                 'sort_order'        => (int)($r['old_id'] ?? 0),
             ]);
 

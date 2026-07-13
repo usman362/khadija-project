@@ -125,11 +125,14 @@
 
     /* provider card */
     .br-pro { display: grid; grid-template-columns: 280px minmax(0,1fr); gap: 0; overflow: hidden; margin-bottom: 16px; }
-    .br-pro-media { position: relative; background: var(--bg-soft-2); }
-    .br-pro-hero { width: 100%; height: 100%; min-height: 230px; object-fit: cover; display: block; }
-    .br-pro-thumbs { position: absolute; right: 8px; top: 8px; display: flex; flex-direction: column; gap: 6px; }
-    .br-pro-thumbs img { width: 46px; height: 40px; border-radius: 7px; object-fit: cover; border: 2px solid #fff; }
-    .br-pro-tag { position: absolute; left: 8px; top: 8px; background: rgba(15,27,53,.78); color: #fff; font-size: 10px; font-weight: 800; padding: 4px 9px; border-radius: 6px; }
+    .br-pro-media { position: relative; height: 230px; background: linear-gradient(135deg,#e2e8f0,#eef2ff); overflow: hidden; }
+    .br-pro-hero { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: opacity .55s ease; }
+    .br-pro-hero.on { opacity: 1; }
+    .br-pro-tag { position: absolute; left: 10px; top: 10px; z-index: 2; background: rgba(255,255,255,.94); color: #0f1b35; font-size: 11px; font-weight: 800; padding: 5px 11px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(15,27,53,.18); text-transform: capitalize; }
+    .br-pro-tag svg { width: 13px; height: 13px; color: #f97316; }
+    .br-pro-dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 2; display: flex; gap: 5px; }
+    .br-pro-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.55); transition: all .2s; }
+    .br-pro-dots i.on { background: #fff; width: 16px; border-radius: 3px; }
     .br-pro-body { padding: 16px 18px; display: flex; flex-direction: column; }
     .br-pro-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
     .br-pro-name { font-size: 17px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; }
@@ -373,20 +376,29 @@
                         $cnt = (int) ($pro->reviews_count ?? 0);
                         $isVerified = $p && $p->trade_license_verified_at && $p->liability_insurance_verified_at && $p->workers_comp_verified_at;
                         $isTop = $avg >= 4.5 && $cnt > 0;
-                        $gallery = collect(is_array($p?->portfolio) ? $p->portfolio : [])->filter()->values();
+                        $gallery = collect($p ? $p->portfolioHeroUrls(4) : []);
                         $rate = $p?->hourly_rate;
                         $heroImg = $gallery->first() ?: 'https://images.unsplash.com/'.$stockGallery[$i % count($stockGallery)].'?w=560&q=72&auto=format&fit=crop';
                     @endphp
+                    @php
+                        $bg = $gallery->isNotEmpty()
+                            ? $gallery
+                            : collect($stockGallery)->map(fn ($id) => 'https://images.unsplash.com/'.$id.'?w=560&q=72&auto=format&fit=crop');
+                        $bg = $bg->take(4)->values();
+                        $skillsB = is_array($p?->skills) ? array_values(array_filter($p->skills)) : [];
+                        $catB = $skillsB[0] ?? ($p?->industry ?: 'Event Pro');
+                    @endphp
                     <article class="br-card br-pro">
                         <div class="br-pro-media">
-                            <span class="br-pro-tag">Portfolio</span>
-                            <img class="br-pro-hero" src="{{ $heroImg }}" alt="{{ $pro->name }}" loading="lazy">
-                            @if($gallery->count() > 1)
-                                <div class="br-pro-thumbs">
-                                    @foreach($gallery->slice(1, 3) as $g)
-                                        <img src="{{ $g }}" alt="" loading="lazy">
-                                    @endforeach
-                                </div>
+                            @foreach($bg as $gi => $img)
+                                <img class="br-pro-hero {{ $gi === 0 ? 'on' : '' }}" src="{{ $img }}" alt="{{ $pro->name }}" loading="lazy">
+                            @endforeach
+                            <span class="br-pro-tag">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41 13.42 20.6a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                                {{ \Illuminate\Support\Str::limit($catB, 18) }}
+                            </span>
+                            @if($bg->count() > 1)
+                                <div class="br-pro-dots">@foreach($bg as $gi => $x)<i class="{{ $gi === 0 ? 'on' : '' }}"></i>@endforeach</div>
                             @endif
                         </div>
                         <div class="br-pro-body">
@@ -541,4 +553,24 @@
         </section>
     </div>
 </div>
+
+<script>
+    // Hover carousel for pro cards — cycle portfolio images on hover.
+    (function () {
+        document.querySelectorAll('.br-pro-media').forEach(function (media) {
+            var imgs = media.querySelectorAll('.br-pro-hero');
+            var dots = media.querySelectorAll('.br-pro-dots i');
+            if (imgs.length < 2) return;
+            var i = 0, t = null;
+            function show(n) {
+                imgs[i].classList.remove('on'); if (dots[i]) dots[i].classList.remove('on');
+                i = (n + imgs.length) % imgs.length;
+                imgs[i].classList.add('on'); if (dots[i]) dots[i].classList.add('on');
+            }
+            var card = media.closest('.br-pro');
+            card.addEventListener('mouseenter', function () { t = setInterval(function () { show(i + 1); }, 1400); });
+            card.addEventListener('mouseleave', function () { clearInterval(t); t = null; show(0); });
+        });
+    })();
+</script>
 @endsection

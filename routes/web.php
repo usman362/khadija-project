@@ -149,7 +149,7 @@ Route::view('/design-spec-custom', 'design-spec-custom')->name('design-spec-cust
 Route::get('/events-categories', function () {
     $allCategories = \App\Models\Category::active()
         ->whereNull('parent_id')
-        ->with(['children' => fn ($q) => $q->where('is_active', true)->orderBy('sort_order')])
+        ->with('allChildren')
         ->orderBy('sort_order')
         ->orderBy('name')
         ->get();
@@ -724,6 +724,10 @@ Route::middleware('auth')->group(function () {
         Route::patch('/profile/general', [ProfessionalProfileController::class, 'updateGeneral'])->name('professional.profile.update.general');
         Route::patch('/profile/professional', [ProfessionalProfileController::class, 'updateProfessional'])->name('professional.profile.update.professional');
         Route::patch('/profile/portfolio', [ProfessionalProfileController::class, 'updatePortfolio'])->name('professional.profile.update.portfolio');
+        Route::post('/profile/portfolio/image', [ProfessionalProfileController::class, 'uploadPortfolioImage'])->name('professional.profile.portfolio.image');
+        Route::delete('/profile/portfolio/image', [ProfessionalProfileController::class, 'deletePortfolioImage'])->name('professional.profile.portfolio.image.delete');
+        Route::post('/profile/portfolio/featured', [ProfessionalProfileController::class, 'setFeaturedPortfolio'])->name('professional.profile.portfolio.featured');
+        Route::post('/profile/portfolio/crop', [ProfessionalProfileController::class, 'adjustPortfolioCrop'])->name('professional.profile.portfolio.crop');
         Route::patch('/profile/social', [ProfessionalProfileController::class, 'updateSocial'])->name('professional.profile.update.social');
         Route::patch('/profile/password', [ProfessionalProfileController::class, 'updatePassword'])->name('professional.profile.update.password');
         Route::patch('/profile/notifications', [ProfessionalProfileController::class, 'updateNotifications'])->name('professional.profile.update.notifications');

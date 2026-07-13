@@ -123,12 +123,126 @@ class ProfessionalProfileController extends Controller
         $portfolio = collect($validated['portfolio'] ?? [])->filter(fn($item) => !empty($item['title']))->values()->toArray();
         $certifications = collect($validated['certifications'] ?? [])->filter(fn($item) => !empty($item['name']))->values()->toArray();
 
+        // Merge with any uploaded portfolio IMAGES already stored (those live in
+        // the same portfolio array with type=image and must not be wiped by the
+        // link-based repeater).
+        $existingImages = collect(is_array($profile->portfolio) ? $profile->portfolio : [])
+            ->filter(fn ($i) => ($i['type'] ?? null) === 'image')->values()->toArray();
+
         $profile->update([
-            'portfolio' => $portfolio ?: null,
+            'portfolio' => array_merge($existingImages, $portfolio) ?: null,
             'certifications' => $certifications ?: null,
         ]);
 
         return back()->with('status', 'Portfolio & certifications updated.');
+    }
+
+    /**
+     * Upload one portfolio photo → auto-generate every size (Peter's image
+     * pipeline). The first image becomes the featured cover used on search cards.
+     */
+    public function uploadPortfolioImage(Request $request, \App\Services\ImagePipelineService $pipeline): RedirectResponse
+    {
+        $request->validate([
+            'portfolio_image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:6144'],
+            'focal_x' => ['nullable', 'numeric', 'between:0,1'],
+            'focal_y' => ['nullable', 'numeric', 'between:0,1'],
+        ]);
+
+        $user = $request->user();
+        $profile = $user->getOrCreateProfile();
+        $items = collect(is_array($profile->portfolio) ? $profile->portfolio : []);
+
+        if ($items->filter(fn ($i) => ($i['type'] ?? null) === 'image')->count() >= 12) {
+            return back()->withErrors(['portfolio_image' => 'You can upload up to 12 portfolio images.']);
+        }
+
+        $sizes = $pipeline->process(
+            $request->file('portfolio_image'),
+            'portfolio/' . $user->id,
+            (float) $request->input('focal_x', 0.5),
+            (float) $request->input('focal_y', 0.5),
+        );
+        if (empty($sizes)) {
+            return back()->withErrors(['portfolio_image' => 'That image could not be processed. Try a JPG or PNG.']);
+        }
+
+        $isFirstImage = $items->filter(fn ($i) => ($i['type'] ?? null) === 'image')->isEmpty();
+        $items->push(array_merge($sizes, [
+            'type' => 'image',
+            'featured' => $isFirstImage,
+            'uploaded_at' => now()->toIso8601String(),
+        ]));
+
+        $profile->update(['portfolio' => $items->values()->toArray()]);
+        Log::info('Image upload (rights confirmed)', ['type' => 'portfolio', 'user_id' => $user->id, 'at' => now()->toIso8601String()]);
+
+        return back()->with('status', 'Portfolio image added.');
+    }
+
+    public function deletePortfolioImage(Request $request, \App\Services\ImagePipelineService $pipeline): RedirectResponse
+    {
+        $idx = (int) $request->input('index', -1);
+        $profile = $request->user()->getOrCreateProfile();
+        $items = collect(is_array($profile->portfolio) ? $profile->portfolio : [])->values();
+
+        if ($item = $items->get($idx)) {
+            if (($item['type'] ?? null) === 'image') {
+                $pipeline->delete($item);
+            }
+            $items->forget($idx);
+            $items = $items->values();
+            // If the featured cover was removed, promote the first remaining image.
+            if (! $items->firstWhere('featured', true)) {
+                $arr = $items->toArray();
+                foreach ($arr as $k => $i) {
+                    if (($i['type'] ?? null) === 'image') { $arr[$k]['featured'] = true; break; }
+                }
+                $items = collect($arr);
+            }
+            $profile->update(['portfolio' => $items->isEmpty() ? null : $items->values()->toArray()]);
+        }
+
+        return back()->with('status', 'Portfolio image removed.');
+    }
+
+    public function setFeaturedPortfolio(Request $request): RedirectResponse
+    {
+        $idx = (int) $request->input('index', -1);
+        $profile = $request->user()->getOrCreateProfile();
+        $items = collect(is_array($profile->portfolio) ? $profile->portfolio : [])
+            ->values()
+            ->map(function ($i, $k) use ($idx) {
+                $i['featured'] = ($k === $idx);
+                return $i;
+            });
+        $profile->update(['portfolio' => $items->toArray()]);
+
+        return back()->with('status', 'Featured cover updated.');
+    }
+
+    /** Re-crop a portfolio image around a focal point the pro picked. */
+    public function adjustPortfolioCrop(Request $request, \App\Services\ImagePipelineService $pipeline): RedirectResponse
+    {
+        $data = $request->validate([
+            'index'   => ['required', 'integer', 'min:0'],
+            'focal_x' => ['required', 'numeric', 'between:0,1'],
+            'focal_y' => ['required', 'numeric', 'between:0,1'],
+        ]);
+
+        $user = $request->user();
+        $profile = $user->getOrCreateProfile();
+        $items = collect(is_array($profile->portfolio) ? $profile->portfolio : [])->values();
+        $item = $items->get((int) $data['index']);
+
+        if ($item && ($item['type'] ?? null) === 'image') {
+            $updated = $pipeline->reprocess($item, 'portfolio/' . $user->id, (float) $data['focal_x'], (float) $data['focal_y']);
+            $arr = $items->toArray();
+            $arr[(int) $data['index']] = $updated;
+            $profile->update(['portfolio' => $arr]);
+        }
+
+        return back()->with('status', 'Cover crop updated.');
     }
 
     public function updateSocial(Request $request): RedirectResponse
