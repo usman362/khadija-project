@@ -162,6 +162,10 @@ Route::get('/events-categories', function () {
 Route::get('/category/{slug}', [\App\Http\Controllers\Public\CategoryLandingController::class, 'show'])
     ->name('public.category');
 
+// Public "Explore by Event Type" — occasion-first discovery (Weddings, Corporate…).
+Route::get('/event-types', [\App\Http\Controllers\Public\EventTypeController::class, 'index'])
+    ->name('public.event-types');
+
 // Public "Shop Packages" catalogue — every active package, filterable + sortable.
 Route::get('/packages', [\App\Http\Controllers\Public\PackageController::class, 'index'])
     ->name('public.packages');
