@@ -9,14 +9,15 @@ use Illuminate\Support\Facades\Storage;
 class Package extends Model
 {
     protected $fillable = [
-        'user_id', 'coop_partner_id', 'category_id', 'services', 'title', 'slug',
-        'type', 'description', 'price', 'price_unit', 'duration', 'coverage',
-        'team', 'guests', 'serves_regions', 'availability', 'savings_pct',
+        'user_id', 'coop_partner_id', 'category_id', 'services', 'event_types',
+        'title', 'slug', 'type', 'description', 'price', 'price_unit', 'duration',
+        'coverage', 'team', 'guests', 'serves_regions', 'availability', 'savings_pct',
         'includes', 'images', 'is_active', 'sort_order',
     ];
 
     protected $casts = [
         'services'   => 'array',
+        'event_types' => 'array',
         'team'       => 'array',
         'includes'   => 'array',
         'images'     => 'array',
