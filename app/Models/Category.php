@@ -39,6 +39,12 @@ class Category extends Model
         return $this->hasMany(Category::class, 'parent_id')->orderBy('sort_order');
     }
 
+    // Professional packages filed under this category
+    public function packages(): HasMany
+    {
+        return $this->hasMany(Package::class);
+    }
+
     // Events in this category (pivot)
     public function events(): BelongsToMany
     {

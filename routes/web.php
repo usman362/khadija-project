@@ -162,6 +162,10 @@ Route::get('/events-categories', function () {
 Route::get('/category/{slug}', [\App\Http\Controllers\Public\CategoryLandingController::class, 'show'])
     ->name('public.category');
 
+// Public "Shop Packages" catalogue — every active package, filterable + sortable.
+Route::get('/packages', [\App\Http\Controllers\Public\PackageController::class, 'index'])
+    ->name('public.packages');
+
 // Public package detail — the browsable, shareable page for a pro's package.
 Route::get('/package/{package:slug}', [\App\Http\Controllers\Public\PackageController::class, 'show'])
     ->name('public.package');
