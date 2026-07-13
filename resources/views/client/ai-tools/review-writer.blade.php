@@ -2,7 +2,7 @@
 
 @section('title', 'Review Builder')
 @section('page-title', 'Review Builder')
-@section('page-subtitle', 'Rate your experience and share a few thoughts — we'll instantly craft a polished, helpful review you can post anywhere.')
+@section('page-subtitle', 'Rate your experience and share a few thoughts — we instantly craft a polished, helpful review you can post anywhere.')
 
 {{-- Review Builder — deterministic, dynamic review generator (no LLM).
      Builds 6 formats in one pass; tabs switch instantly. Page-scoped. --}}

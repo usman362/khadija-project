@@ -77,7 +77,7 @@
     {{-- Do It Myself — plain margin worksheet, no AI --}}
     <div class="bo-tool">
         <h3>🧮 Work Out My Bid</h3>
-        <div class="sub">Enter the bid you're considering and your own cost — we'll show the margin. No AI, just the math.</div>
+        <div class="sub">Enter the bid you're considering and your own cost — we will show the margin. No AI, just the math.</div>
         <div class="bo-form">
             <div><label class="bo-lbl">Your Bid ($)</label><input type="number" id="bomBid" class="bo-in" min="0" step="0.01" placeholder="e.g. 1720"></div>
             <div><label class="bo-lbl">Your Cost / Base Price ($)</label><input type="number" id="bomCost" class="bo-in" min="0" step="0.01" placeholder="e.g. 1200"></div>
