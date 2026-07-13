@@ -57,7 +57,12 @@ class AiReviewWriterController extends Controller
             $level = $request->query('preview');
         }
 
+        // Review Builder is a shared ('both') tool — render it inside the shell
+        // for the user's ACTIVE role so a professional doesn't get the client one.
+        $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
+
         return view('client.ai-tools.review-writer', [
+            'aiLayout' => $aiLayout,
             'tones'    => self::TONES,
             'defaults' => self::DEFAULTS,
             'keywords' => self::SUGGESTED_KEYWORDS,
