@@ -296,7 +296,7 @@
             {{-- generated review --}}
             <div class="rw-card">
                 <div class="rw-gr-h">
-                    <div class="rw-gr-h-l"><span class="rw-sec-h" style="margin:0;"><span class="n">2</span><b>{{ $isManual ? 'Your Review' : ($isMax ? 'AI-Written Review' : 'AI-Drafted Review') }}</b></span>@unless($isManual)<span class="rw-tone-badge" id="rw-tone-badge">{{ $review['toneLabel'] }}</span>@endunless</div>
+                    <div class="rw-gr-h-l"><span class="rw-sec-h" style="margin:0;"><span class="n">2</span><b>{{ $isManual ? 'Your Review' : ($isMax ? 'Generated Review' : 'Drafted Review') }}</b></span>@unless($isManual)<span class="rw-tone-badge" id="rw-tone-badge">{{ $review['toneLabel'] }}</span>@endunless</div>
                     @unless($isManual)
                     <div class="rw-gr-actions">
                         <button type="button" class="rw-mini-btn" id="rw-rewrite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Rewrite</button>

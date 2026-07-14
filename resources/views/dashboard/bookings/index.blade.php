@@ -105,7 +105,7 @@
                                                 <strong>Include professional chat in my agreement</strong>
                                             </label>
                                             <div class="form-text">
-                                                The AI will use your conversation with the pro when building your final document — pulling in dates, prices, and specifics you discussed. Uncheck to generate a clean, standard agreement from booking details only.
+                                                We.ll use your conversation with the pro when building your final document — pulling in dates, prices, and specifics you discussed. Uncheck to generate a clean, standard agreement from booking details only.
                                             </div>
                                         </div>
                                     </div>

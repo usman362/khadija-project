@@ -14,7 +14,7 @@
 <div class="card">
     <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h6 class="card-title mb-0">AI-Generated Agreements</h6>
+            <h6 class="card-title mb-0">Service Agreements</h6>
         </div>
 
         <form method="GET" action="{{ route('app.agreements.index') }}" class="row g-2 mb-3">
