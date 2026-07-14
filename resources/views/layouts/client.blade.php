@@ -1210,6 +1210,12 @@
                     </a>
                 </li>
                 <li class="cl-nav-item">
+                    <a href="{{ route('client.direct-offers.create') }}" class="cl-nav-link {{ request()->routeIs('client.direct-offers.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>
+                        Direct Offer
+                    </a>
+                </li>
+                <li class="cl-nav-item">
                     <a href="{{ route('client.bookings.index') }}" class="cl-nav-link {{ request()->routeIs('client.bookings.*') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
                         Bookings
