@@ -111,7 +111,7 @@
                     <a href="{{ auth()->check() ? route('client.chat.index') : route('login') }}" class="pk-cta pk-cta-primary">Request this Package</a>
                     <a href="{{ route('public.professional.show', $pro) }}" class="pk-cta pk-cta-ghost">View {{ \Illuminate\Support\Str::limit($pro?->name, 18) }}'s profile</a>
                     <div class="pk-trust">
-                        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Escrow-protected payment</span>
+                        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Secure, protected payment</span>
                         <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified professional</span>
                         <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Message before you book</span>
                     </div>

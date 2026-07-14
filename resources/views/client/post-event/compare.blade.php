@@ -71,7 +71,7 @@
                                             {{ $svc }}
                                         </div>
                                     @endforeach
-                                    @foreach(['6 Hours Coverage', 'Insurance Included', 'Contract & Escrow'] as $rep)
+                                    @foreach(['6 Hours Coverage', 'Insurance Included', 'Contract & Secure Payment'] as $rep)
                                         <div class="pe-cmp-feat">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                                             {{ $rep }}

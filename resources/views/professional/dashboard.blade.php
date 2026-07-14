@@ -220,7 +220,7 @@
             <div class="pd-stat-foot"><span class="pd-stat-delta">Excellent</span><svg class="pd-stat-spark" width="40" height="18" viewBox="0 0 40 18" fill="none"><polyline points="0,11 8,8 16,9 24,5 32,6 40,3" stroke="#10b981" stroke-width="1.6"/></svg></div>
         </div>
         <div class="pd-stat">
-            <div class="pd-stat-top"><span class="pd-stat-ico c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span class="pd-stat-label">Escrow Pending</span></div>
+            <div class="pd-stat-top"><span class="pd-stat-ico c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span class="pd-stat-label">Payment Pending</span></div>
             <div class="pd-stat-val">$4,250</div>
             <div class="pd-stat-foot"><span class="pd-stat-delta muted">2 payments</span><svg class="pd-stat-spark" width="40" height="18" viewBox="0 0 40 18" fill="none"><polyline points="0,9 8,10 16,8 24,11 32,7 40,8" stroke="#f97316" stroke-width="1.6"/></svg></div>
         </div>
@@ -264,7 +264,7 @@
                 <div class="pd-pa-row"><span class="pd-pa-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Contract awaiting signature</div><div class="pd-pa-sub">Corporate Gala Dinner</div></div><span class="pd-pa-pri pri-high">High</span></div>
                 <div class="pd-pa-row"><span class="pd-pa-ico c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Staffing shortage detected</div><div class="pd-pa-sub">Outdoor Wedding</div></div><span class="pd-pa-pri pri-medium">Medium</span></div>
                 <div class="pd-pa-row"><span class="pd-pa-ico c-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">2 bids expire in 2 hours</div><div class="pd-pa-sub">Tech Conference 2025</div></div><span class="pd-pa-pri pri-medium">Medium</span></div>
-                <div class="pd-pa-row"><span class="pd-pa-ico c-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Escrow payment released</div><div class="pd-pa-sub">Private Birthday Party</div></div><span class="pd-pa-pri pri-low">Low</span></div>
+                <div class="pd-pa-row"><span class="pd-pa-ico c-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Payment released</div><div class="pd-pa-sub">Private Birthday Party</div></div><span class="pd-pa-pri pri-low">Low</span></div>
                 <div class="pd-pa-row"><span class="pd-pa-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Calendar conflict</div><div class="pd-pa-sub">May 24 – Double Booking</div></div><span class="pd-pa-pri pri-high">High</span></div>
                 <div class="pd-pa-row"><span class="pd-pa-ico c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Late invoice</div><div class="pd-pa-sub">Invoice #INV-2025-1048</div></div><span class="pd-pa-pri pri-medium">Medium</span></div>
             </div>
@@ -371,7 +371,7 @@
             </div>
             <div class="pd-fin-grid">
                 <div class="pd-fin-box"><div class="k">Available Balance</div><div class="v">$4,250.00</div></div>
-                <div class="pd-fin-box"><div class="k">Escrow Held</div><div class="v">$7,850.00</div></div>
+                <div class="pd-fin-box"><div class="k">Secure Payment Held</div><div class="v">$7,850.00</div></div>
                 <div class="pd-fin-box"><div class="k">Pending Payout</div><div class="v">$3,200.00</div></div>
                 <div class="pd-fin-box"><div class="k">Released This Month</div><div class="v green">$9,640.00</div></div>
                 <div class="pd-fin-box"><div class="k">Taxes Owed</div><div class="v amber">$1,250.00</div></div>

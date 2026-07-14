@@ -129,7 +129,7 @@
     }
     .bk-chip svg { width: 13px; height: 13px; }
     .bk-chip .ico-stripe   { color: #635bff; }
-    .bk-chip .ico-escrow   { color: #16a34a; }
+    .bk-chip .ico-secure payment   { color: #16a34a; }
     .bk-chip .ico-dispute  { color: #ef4444; }
     .bk-search {
         position: relative; min-width: 280px;
@@ -605,7 +605,7 @@
                             <span>{{ $booking->event?->location ?? 'Location TBD' }}</span>
                         </div>
                         <div class="item item-providers">
-                            <span class="bk-provider-tag"><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Escrow.com</span>
+                            <span class="bk-provider-tag"><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Secure Payment.com</span>
                             <span class="bk-provider-tag"><svg viewBox="0 0 24 24" fill="#635bff"><path d="M13.479 9.883c-1.626-.604-2.512-1.067-2.512-1.803 0-.622.511-.977 1.423-.977 1.667 0 3.379.642 4.558 1.22l.666-4.111c-.935-.446-2.847-1.177-5.49-1.177-1.87 0-3.425.488-4.536 1.4-1.156.96-1.753 2.346-1.753 4.02 0 3.038 1.857 4.339 4.885 5.434 1.952.711 2.604 1.221 2.604 1.999 0 .755-.629 1.187-1.79 1.187-1.45 0-3.836-.71-5.398-1.62l-.674 4.157C6.86 19.578 8.918 20 11.078 20c1.973 0 3.62-.466 4.737-1.343 1.244-.978 1.889-2.422 1.889-4.299 0-3.111-1.891-4.404-4.225-5.475z"/></svg>Stripe</span>
                             <span class="bk-provider-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Contract Signed</span>
                         </div>
@@ -647,7 +647,7 @@
                             <div class="bk-finance-list">
                                 <div class="bk-finance-row"><span class="lbl">Contract Value</span><span class="val">${{ number_format($contractValue) }}</span></div>
                                 <div class="bk-finance-row"><span class="lbl">Stripe Deposit</span><span class="val">${{ number_format(round($contractValue * 0.2)) }}<span class="pill bk-pill-settled">Settled</span></span></div>
-                                <div class="bk-finance-row"><span class="lbl">Escrow.com Balance</span><span class="val">${{ number_format(round($contractValue * 0.8)) }}<span class="pill bk-pill-locked">Locked</span></span></div>
+                                <div class="bk-finance-row"><span class="lbl">Secure Payment.com Balance</span><span class="val">${{ number_format(round($contractValue * 0.8)) }}<span class="pill bk-pill-locked">Locked</span></span></div>
                                 <div class="bk-finance-row"><span class="lbl">Next Payout Trigger</span><span class="val" style="font-size:11.5px;">Setup Day ({{ $booking->event?->starts_at?->format('M d, Y') ?? 'TBD' }})</span></div>
                             </div>
                             <div class="bk-finance-cta">
@@ -704,7 +704,7 @@
                                 ['label' => 'Contract Signed',         'date' => $booking->created_at?->format('M d'), 'state' => 'done'],
                                 ['label' => 'Deposit Paid (Stripe)',   'date' => $booking->created_at?->copy()?->addDays(3)?->format('M d'), 'state' => 'done'],
                                 ['label' => 'Checked-in at Venue',     'date' => $booking->event?->starts_at?->format('M d') ?? 'TBD', 'state' => $cardStatus === 'completed' ? 'done' : ($cardStatus === 'in_progress' ? 'current' : 'pending')],
-                                ['label' => 'In Inspection (Escrow)',  'date' => 'Pending', 'state' => $cardStatus === 'completed' ? 'current' : 'pending'],
+                                ['label' => 'In Inspection (Secure Payment)',  'date' => 'Pending', 'state' => $cardStatus === 'completed' ? 'current' : 'pending'],
                                 ['label' => 'Funds Released',          'date' => 'Pending', 'state' => 'pending'],
                             ];
                         @endphp
@@ -817,7 +817,7 @@
                 <select class="bk-rail-select"><option>This Month</option><option>YTD</option></select>
             </div>
             <div class="bk-fin-row"><span class="lbl">Total Bookings Value</span><span class="val">${{ number_format($financial['total_value']) }}</span></div>
-            <div class="bk-fin-row"><span class="lbl">Locked in Escrow</span><span class="val amber">${{ number_format($financial['locked_escrow']) }}</span></div>
+            <div class="bk-fin-row"><span class="lbl">Locked in Secure Payment</span><span class="val amber">${{ number_format($financial['locked_secure payment']) }}</span></div>
             <div class="bk-fin-row"><span class="lbl">Paid Out (YTD)</span><span class="val green">${{ number_format($financial['paid_out_ytd']) }}</span></div>
             <div class="bk-fin-row"><span class="lbl">Pending Payouts</span><span class="val amber">${{ number_format($financial['pending_payouts']) }}</span></div>
             <a href="{{ route('client.payments.index') }}" class="bk-rail-link">View Full Financials <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>

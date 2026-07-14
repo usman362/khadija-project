@@ -178,7 +178,7 @@
                 $fullStars = str_repeat('★', $rating) . str_repeat('☆', 5 - $rating);
                 $pro = $r->reviewee;
                 $eventTitle = $r->booking?->event?->title ?? 'Hired Service';
-                $gateway = $r->id % 2 === 0 ? ['Stripe', '#635bff'] : ['Escrow.com', '#16a34a'];
+                $gateway = $r->id % 2 === 0 ? ['Stripe', '#635bff'] : ['Secure Payment.com', '#16a34a'];
                 $metricVal = fn() => rand(4, 5);
             @endphp
             <div class="rv-rc">
@@ -188,7 +188,7 @@
                         <div class="rv-rc-stars">
                             <span class="stars">{{ $fullStars }}</span>
                             <span class="score">{{ number_format($rating, 1) }}</span>
-                            <span class="rv-rc-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified {{ $gateway[0] === 'Stripe' ? 'Stripe' : 'Escrow' }} Review</span>
+                            <span class="rv-rc-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified {{ $gateway[0] === 'Stripe' ? 'Stripe' : 'Secure Payment' }} Review</span>
                         </div>
                         <div class="rv-rc-title">{{ $eventTitle }}</div>
                         <div class="rv-rc-meta">
@@ -216,7 +216,7 @@
                         <div class="rv-metric"><span class="lbl">Milestone Release</span><span class="val rv-ok">Smooth ✓</span></div>
                         <div class="rv-metric"><span class="lbl">Dispute Level</span><span class="val">0% (None)</span></div>
                         <div class="rv-metric"><span class="lbl">Budget Adjustments</span><span class="val">None</span></div>
-                        <div class="rv-metric"><span class="lbl">Escrow Inspection</span><span class="val rv-ok">Approved ✓</span></div>
+                        <div class="rv-metric"><span class="lbl">Payment Check</span><span class="val rv-ok">Approved ✓</span></div>
                         <div class="rv-metric"><span class="lbl">Chargebacks</span><span class="val">0</span></div>
                     </div>
                     {{-- Contract & compliance --}}
@@ -302,7 +302,7 @@
     <div class="rv-rail-card">
         <div class="rv-rail-title" style="margin-bottom:12px;">Trust &amp; Verification</div>
         <div class="rv-tv-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified Reviews</span><span class="val">{{ $stats['positive'] }} ({{ $stats['positive_pct'] }}%)</span></div>
-        <div class="rv-tv-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Escrow Verified</span><span class="val">{{ (int)round($stats['total'] * 0.67) }} (67%)</span></div>
+        <div class="rv-tv-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Secure Payment</span><span class="val">{{ (int)round($stats['total'] * 0.67) }} (67%)</span></div>
         <div class="rv-tv-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Stripe Verified</span><span class="val">{{ (int)round($stats['total'] * 0.33) }} (33%)</span></div>
         <div class="rv-tv-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>AI Verified (Annex A)</span><span class="val">{{ (int)round($stats['total'] * 0.83) }} (83%)</span></div>
         <div class="rv-tv-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Identity Verified</span><span class="val">{{ $stats['total'] }} (100%)</span></div>

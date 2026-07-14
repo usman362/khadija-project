@@ -9,7 +9,7 @@
     /* ═══════════════════ Earnings — project financial dashboard ═══════
        For an event-planner client "Earnings" = the project funds they
        manage and disburse to vendors. Real booking amounts drive figures;
-       escrow/Stripe split + 1099 status are derived pending Stripe sandbox. */
+       secure payment/Stripe split + 1099 status are derived pending Stripe sandbox. */
     .ea-layout { display: grid; grid-template-columns: minmax(0,1fr) 280px; gap: 18px; align-items: start; }
     .ea-main { min-width: 0; }
     .ea-rail { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 80px; }
@@ -146,7 +146,7 @@
             <div class="ea-gw-foot red">${{ number_format($stats['withdrawn'] * 0.029, 0) }} processing fees incurred</div>
         </div>
         <div class="ea-gw">
-            <div class="ea-gw-head"><span class="ea-gw-name">Escrow.com Matrix</span><span class="ea-gw-tag">ESCROW</span></div>
+            <div class="ea-gw-head"><span class="ea-gw-name">Secure Payment Vault</span><span class="ea-gw-tag">SECURED</span></div>
             <div class="ea-gw-split">
                 <div><b style="color:#10b981;">${{ number_format($stats['pending_release'], 0) }}</b><span style="color:var(--text-muted);">Funded</span></div>
                 <div><b>${{ number_format($stats['available'], 0) }}</b><span style="color:var(--text-muted);">Released</span></div>
@@ -170,7 +170,7 @@
                 <tbody>
                     @forelse($vendors as $i => $v)
                         @php
-                            $gw = $i % 2 === 0 ? ['Escrow.com', '#16a34a'] : ['Stripe.com', '#635bff'];
+                            $gw = $i % 2 === 0 ? ['Secure Payment.com', '#16a34a'] : ['Stripe.com', '#635bff'];
                             $statuses = [['In Inspection','blue'],['Deposit Paid','green'],['Milestone Funded','green'],['Charge Settled','green'],['Pending Milestone','amber']];
                             $st = $statuses[$i % count($statuses)];
                             $hasW9 = $i !== 1; // one vendor missing W-9

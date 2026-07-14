@@ -639,9 +639,9 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
                     Available on date ({{ $countAvailable }})
                 </a>
-                <a href="?escrow=1" class="sp-chip purple">
+                <a href="?secure payment=1" class="sp-chip purple">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    Escrow Verified ({{ $countEscrow }})
+                    Secure Payment ({{ $countSecure Payment }})
                 </a>
             </div>
             <div class="sp-best-match">
@@ -739,7 +739,7 @@
                         </div>
                         <div class="sp-procard-trust">
                             <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>W-9 Verified</span>
-                            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Escrow Active</span>
+                            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Secure Payment Active</span>
                             <a href="{{ route('public.professional.show', $pro) }}" class="sp-view-profile" style="margin-left:auto;">View Profile</a>
                         </div>
                         </div>{{-- /.sp-procard-body --}}

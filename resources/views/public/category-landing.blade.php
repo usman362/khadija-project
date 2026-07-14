@@ -3,7 +3,7 @@
 @php
     $seoTitle       = 'Hire ' . $category->name . ' — Verified Pros on GigResource';
     $seoDescription = $category->short_description
-        ?: ('Browse top-rated ' . strtolower($category->name) . ' on GigResource. Compare quotes, read reviews, and book the right pro with escrow-protected payments.');
+        ?: ('Browse top-rated ' . strtolower($category->name) . ' on GigResource. Compare quotes, read reviews, and book the right pro with secure, protected payments.');
     $seoImage       = $category->cover_image ? asset('storage/' . $category->cover_image) : null;
     $browseUrl      = route('public.browse', ['q' => $category->name]);
 @endphp
@@ -242,7 +242,7 @@
         <span class="cl-eyebrow"><span class="dot"></span>{{ $category->parent->name ?? 'Featured Category' }}</span>
         <h1>Hire <span class="grad">{{ $category->name }}</span></h1>
         <p class="lede">
-            {{ $category->long_description ?: $category->short_description ?: ('Browse ' . strtolower($category->name) . ' for your next event. Compare profiles, reviews, and quotes — with escrow-protected payments on every booking.') }}
+            {{ $category->long_description ?: $category->short_description ?: ('Browse ' . strtolower($category->name) . ' for your next event. Compare profiles, reviews, and quotes — with secure, protected payments on every booking.') }}
         </p>
         <div class="cl-stats">
             <div><b>{{ number_format($totalCount) }}+</b>Pros available</div>

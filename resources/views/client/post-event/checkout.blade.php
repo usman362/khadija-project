@@ -80,7 +80,7 @@
                         <h3 style="margin-bottom:12px;">Secure Your Date</h3>
                         @foreach([
                             ['⚡','Instant Confirmation','Your date is locked the moment your deposit clears.'],
-                            ['🛡️','Protected Payments','Funds are held in secure escrow until services are delivered.'],
+                            ['🛡️','Protected Payments','Funds are held in secure securely until services are delivered.'],
                             ['🔄','Free Date Changes (1x)','Reschedule your event once at no extra cost.'],
                         ] as $point)
                             <div style="display:flex; gap:10px; padding:9px 0; border-bottom:1px dashed var(--pe-line-2);">
@@ -98,7 +98,7 @@
                 <div class="pe-card" style="margin-top:18px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
                     <span style="font-size:16px;">🛡️</span>
                     <div style="font-weight:800; font-size:13px;">Buyer Protection</div>
-                    <div class="pe-muted" style="font-size:12.5px;">Secure Escrow Payments · Verified Professionals · Dedicated Customer Support</div>
+                    <div class="pe-muted" style="font-size:12.5px;">Secure Secure Payments · Verified Professionals · Dedicated Customer Support</div>
                 </div>
 
                 {{-- Actions --}}

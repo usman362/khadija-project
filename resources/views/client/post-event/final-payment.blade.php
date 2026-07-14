@@ -33,21 +33,21 @@
 
                     <div style="display:flex; gap:10px; align-items:flex-start; background:var(--pe-green-l); border:1px solid #bbf7d0; border-radius:10px; padding:12px 14px; margin-top:16px;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.2" style="width:18px; height:18px; flex-shrink:0; margin-top:1px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        <div style="font-size:12.5px; color:#15803d; line-height:1.5;">Funds are held securely in escrow until the event is completed to your satisfaction.</div>
+                        <div style="font-size:12.5px; color:#15803d; line-height:1.5;">Funds are held securely securely until the event is completed to your satisfaction.</div>
                     </div>
 
-                    {{-- Escrow mini timeline --}}
+                    {{-- Payment mini timeline --}}
                     <div style="margin-top:18px;">
-                        <div style="font-size:12.5px; font-weight:800; color:var(--pe-ink); margin-bottom:12px;">Escrow Status: <span style="color:var(--pe-green);">Protected</span></div>
+                        <div style="font-size:12.5px; font-weight:800; color:var(--pe-ink); margin-bottom:12px;">Payment Status: <span style="color:var(--pe-green);">Protected</span></div>
                         @php
-                            $escrow = [
+                            $secure payment = [
                                 ['Deposit Paid', 'done'],
                                 ['Event Completed', 'done'],
                                 ['Final Payment', 'pending'],
                             ];
                         @endphp
                         <div style="display:flex; align-items:flex-start;">
-                            @foreach($escrow as $e)
+                            @foreach($secure payment as $e)
                                 @php
                                     $done = $e[1] === 'done';
                                     $dotBg = $done ? 'var(--pe-green)' : '#eef1f5';
@@ -55,7 +55,7 @@
                                 @endphp
                                 <div style="flex:1; text-align:center; position:relative;">
                                     @unless($loop->first)
-                                        <span style="position:absolute; top:12px; right:50%; width:100%; height:3px; background:{{ $escrow[$loop->index - 1][1] === 'done' ? 'var(--pe-green)' : 'var(--pe-line)' }};"></span>
+                                        <span style="position:absolute; top:12px; right:50%; width:100%; height:3px; background:{{ $secure payment[$loop->index - 1][1] === 'done' ? 'var(--pe-green)' : 'var(--pe-line)' }};"></span>
                                     @endunless
                                     <span style="position:relative; z-index:1; width:26px; height:26px; border-radius:50%; background:{{ $dotBg }}; color:{{ $dotColor }}; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;">
                                         @if($done)

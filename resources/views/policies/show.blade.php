@@ -365,7 +365,7 @@
         'ai_usage_agreement'  => ['eyebrow' => 'AI Usage Agreement', 'subtitle' => 'How GigResource uses AI features responsibly — and the rules every user agrees to before using them.'],
         'terms_of_service'    => ['eyebrow' => 'Terms of Service',   'subtitle' => 'The rules of engagement for clients, GigProfessionals, and Influencers using the platform.'],
         'payment_policy'      => ['eyebrow' => 'Payment Policy',     'subtitle' => 'How payments, refunds, and disputes are handled across bookings and memberships.'],
-        'cancellation_policy' => ['eyebrow' => 'Cancellation & Refund', 'subtitle' => 'When and how clients and professionals can cancel — and what happens to the funds in escrow.'],
+        'cancellation_policy' => ['eyebrow' => 'Cancellation & Refund', 'subtitle' => 'When and how clients and professionals can cancel — and what happens to the funds securely.'],
     ];
     $meta = $policyMeta[$policyType ?? ''] ?? [
         'eyebrow'  => 'Legal Document',

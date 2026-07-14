@@ -2,13 +2,13 @@
 
 @section('title', 'Payments')
 @section('page-title', 'Payments')
-@section('page-subtitle', 'Track settled deposits, escrow, and vendor disbursements across your events.')
+@section('page-subtitle', 'Track settled deposits, secure payment, and vendor disbursements across your events.')
 
 @push('styles')
 <style>
     /* ═══════════════════ Payments ledger ═══════════════════
        Matches "Clients dashboard Payments" mockup. Real booking amounts
-       drive the figures; the escrow/Stripe split + 1099 thresholds are
+       drive the figures; the secure payment/Stripe split + 1099 thresholds are
        derived placeholders pending the Stripe Connect sandbox. */
     .pay-layout { display: grid; grid-template-columns: minmax(0,1fr) 280px; gap: 18px; align-items: start; }
     .pay-main { min-width: 0; }
@@ -119,7 +119,7 @@
             <div class="pay-stat-foot"><span>Processing Fees</span><span class="red">-${{ number_format($stats['processing_fees'], 2) }}</span></div>
         </div>
         <div class="pay-stat">
-            <div class="pay-stat-head"><div class="pay-stat-ico amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><div class="pay-stat-label">Locked in Escrow</div><div class="pay-stat-value">${{ number_format($stats['escrow_locked'], 0) }}</div></div></div>
+            <div class="pay-stat-head"><div class="pay-stat-ico amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><div class="pay-stat-label">Locked in Secure Payment</div><div class="pay-stat-value">${{ number_format($stats['secure payment_locked'], 0) }}</div></div></div>
             <div class="pay-stat-foot"><span>Total Locked</span><span>{{ \App\Models\Booking::where('client_id', auth()->id())->where('status','confirmed')->count() }} active</span></div>
         </div>
         <div class="pay-stat">
@@ -151,7 +151,7 @@
         <div class="pay-ledger-head"><span class="pay-ledger-title">Ledger Stream</span></div>
         <form method="GET" class="pay-filters">
             <button type="button" class="pay-gw-btn active">All Gateways</button>
-            <button type="button" class="pay-gw-btn">Escrow.com</button>
+            <button type="button" class="pay-gw-btn">Secure Payment.com</button>
             <button type="button" class="pay-gw-btn">Stripe</button>
             <div class="pay-search">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -165,7 +165,7 @@
                     @forelse($transactions as $t)
                         @php
                             $amount = $t->total_amount ?? $t->agreed_price ?? 0;
-                            $gw = $t->id % 2 === 0 ? ['Stripe', '#635bff'] : ['Escrow.com', '#16a34a'];
+                            $gw = $t->id % 2 === 0 ? ['Stripe', '#635bff'] : ['Secure Payment.com', '#16a34a'];
                             $txid = ($gw[0] === 'Stripe' ? 'STR-' : 'ESC-') . str_pad($t->id * 7919 % 999999, 6, '0', STR_PAD_LEFT);
                         @endphp
                         <tr>
@@ -199,9 +199,9 @@
     <div class="pay-bottom">
         <div class="pay-card">
             <div class="pay-sum-title">Payment Methods Summary</div>
-            <div class="pay-sum-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="#16a34a" style="width:14px;height:14px;"><circle cx="12" cy="12" r="10"/></svg>Escrow.com</span><span class="val">${{ number_format($methods['escrow'], 0) }}<span class="pct">62%</span></span></div>
+            <div class="pay-sum-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="#16a34a" style="width:14px;height:14px;"><circle cx="12" cy="12" r="10"/></svg>Secure Payment.com</span><span class="val">${{ number_format($methods['secure payment'], 0) }}<span class="pct">62%</span></span></div>
             <div class="pay-sum-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="#635bff" style="width:14px;height:14px;"><circle cx="12" cy="12" r="10"/></svg>Stripe</span><span class="val">${{ number_format($methods['stripe'], 0) }}<span class="pct">38%</span></span></div>
-            <div class="pay-sum-row pay-sum-total"><span class="lbl">Total</span><span class="val">${{ number_format($methods['escrow'] + $methods['stripe'], 0) }}</span></div>
+            <div class="pay-sum-row pay-sum-total"><span class="lbl">Total</span><span class="val">${{ number_format($methods['secure payment'] + $methods['stripe'], 0) }}</span></div>
         </div>
         <div class="pay-card">
             <div class="pay-sum-title">Fee Breakdown (This Month)</div>
@@ -212,8 +212,8 @@
         <div class="pay-card">
             <div class="pay-sum-title">Cash Flow (This Month)</div>
             <div class="pay-sum-row"><span class="lbl">Total Outflow</span><span class="val pay-neg">${{ number_format($stats['stripe_outflow'], 0) }}</span></div>
-            <div class="pay-sum-row"><span class="lbl">Milestone Releases</span><span class="val pay-pos">${{ number_format($stats['escrow_locked'], 0) }}</span></div>
-            <div class="pay-sum-row pay-sum-total"><span class="lbl">Net Cash Flow</span><span class="val pay-neg">-${{ number_format($stats['stripe_outflow'] - $stats['escrow_locked'], 0) }}</span></div>
+            <div class="pay-sum-row"><span class="lbl">Milestone Releases</span><span class="val pay-pos">${{ number_format($stats['secure payment_locked'], 0) }}</span></div>
+            <div class="pay-sum-row pay-sum-total"><span class="lbl">Net Cash Flow</span><span class="val pay-neg">-${{ number_format($stats['stripe_outflow'] - $stats['secure payment_locked'], 0) }}</span></div>
         </div>
     </div>
 </div>{{-- /.pay-main --}}
@@ -227,7 +227,7 @@
 
     <div class="pay-rail-card">
         <div class="pay-rail-title">AI Payment Insights <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:rgba(99,102,241,0.12);color:#6366f1;">BETA</span></div>
-        <div class="pay-insight"><svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><div class="body"><b>All escrow inspections on track.</b> No delays detected.</div></div>
+        <div class="pay-insight"><svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><div class="body"><b>All payment checks on track.</b> No delays detected.</div></div>
         <div class="pay-insight"><svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg><div class="body"><b>1 vendor missing a W-9.</b> Upload to avoid tax hold.</div></div>
         <div class="pay-insight"><svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><div class="body">Projected 1099-NEC total: <b>${{ number_format($stats['tax_liability'], 0) }}</b></div></div>
     </div>

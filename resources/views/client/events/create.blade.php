@@ -393,7 +393,7 @@
                             <div class="gb-pv-budget" id="pvBudget">Budget on request</div>
                             <div class="gb-pv-badges">
                                 <span class="gb-pv-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Verified Client</span>
-                                <span class="gb-pv-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Escrow Protected</span>
+                                <span class="gb-pv-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Secure Payment</span>
                             </div>
                         </div>
                     </div>
