@@ -11,10 +11,11 @@
      green = AI-generated. Representative submit (no backend yet). --}}
 
 @php
+    // ESR is its own standalone "Post a Rush Request" workflow — NOT a Direct
+    // Offer type (per Peter). Direct Offer supports single / multi service only.
     $types = [
         ['SSR', 'Single Service Request', 'One specific service from this pro — simplest request.'],
-        ['MSR', 'Multiple Service Request', 'Several services + let the pro bring a vetted team.'],
-        ['ESR', 'Event-wide Service Request', 'Hand off the full event scope to one lead professional.'],
+        ['MSR', 'Multi-Service Request', 'Several services + let the pro bring a vetted team.'],
     ];
 @endphp
 
@@ -23,7 +24,7 @@
     .do { --do: #f97316; --do-strong: #ea580c; --ai: #16a34a; max-width: 920px; margin: 0 auto; }
 
     /* request type selector */
-    .do-types { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 22px; }
+    .do-types { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 22px; }
     .do-type { border: 2px solid var(--border-color); border-radius: 14px; padding: 15px; cursor: pointer; transition: all .15s; background: var(--bg-card); }
     .do-type:hover { border-color: var(--do); }
     .do-type.sel { border-color: var(--do); background: rgba(249,115,22,.07); }
@@ -183,9 +184,9 @@
             </div>
         </div>
 
-        {{-- Team Collaboration (MSR / ESR only) --}}
-        <div class="do-sec req" data-types="MSR ESR">
-            <div class="do-sec-hd"><h4>Team Collaboration</h4><span class="do-tag">MSR / ESR</span></div>
+        {{-- Team Collaboration (MSR only) --}}
+        <div class="do-sec req" data-types="MSR">
+            <div class="do-sec-hd"><h4>Team Collaboration</h4><span class="do-tag">MSR</span></div>
             <div class="do-sec-bd">
                 <div class="do-field"><label>Allow the pro to bring a vetted team?</label>
                     <select class="do-input" name="allow_team"><option>Yes — they may subcontract trusted pros</option><option>No — only this professional</option></select>
@@ -202,7 +203,7 @@
             <div class="do-sec-bd">
                 <div class="do-ai-row"><span class="ck">✓</span> AI drafts a clear, structured request from your inputs so the pro understands scope instantly.</div>
                 <div class="do-ai-row"><span class="ck">✓</span> Suggests a fair budget band based on your services, location and guest count.</div>
-                <div class="do-ai-row" data-types="MSR ESR"><span class="ck">✓</span> Recommends which roles the lead pro should staff for this <b id="doTypeLbl">{{ $type }}</b>.</div>
+                <div class="do-ai-row" data-types="MSR"><span class="ck">✓</span> Recommends which roles the lead pro should staff for this <b id="doTypeLbl">{{ $type }}</b>.</div>
             </div>
         </div>
 
