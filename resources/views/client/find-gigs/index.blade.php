@@ -106,9 +106,9 @@
     <div class="fg-bar">
         <div class="fg-tabs">
             <a href="{{ route('client.find-gigs.index', array_merge(request()->except(['type','page']), [])) }}" class="fg-tab {{ $f['type'] === '' ? 'on' : '' }}">All Packages <span class="n">{{ $counts['all'] }}</span></a>
-            <a href="{{ route('client.find-gigs.index', array_merge(request()->except('page'), ['type' => 'ESR'])) }}" class="fg-tab {{ $f['type'] === 'ESR' ? 'on' : '' }}">🔥 ESR <span class="sub">(Premium)</span> <span class="n">{{ $counts['ESR'] }}</span></a>
-            <a href="{{ route('client.find-gigs.index', array_merge(request()->except('page'), ['type' => 'SSR'])) }}" class="fg-tab {{ $f['type'] === 'SSR' ? 'on' : '' }}">SSR <span class="sub">(Single Service)</span> <span class="n">{{ $counts['SSR'] }}</span></a>
-            <a href="{{ route('client.find-gigs.index', array_merge(request()->except('page'), ['type' => 'MSR'])) }}" class="fg-tab {{ $f['type'] === 'MSR' ? 'on' : '' }}">MSR <span class="sub">(Multi-Service)</span> <span class="n">{{ $counts['MSR'] }}</span></a>
+            <a href="{{ route('client.find-gigs.index', array_merge(request()->except('page'), ['type' => 'ESR'])) }}" class="fg-tab {{ $f['type'] === 'ESR' ? 'on' : '' }}">🔥 ESR <span class="sub">(Emergency Service Request)</span> <span class="n">{{ $counts['ESR'] }}</span></a>
+            <a href="{{ route('client.find-gigs.index', array_merge(request()->except('page'), ['type' => 'SSR'])) }}" class="fg-tab {{ $f['type'] === 'SSR' ? 'on' : '' }}">SSR <span class="sub">(Single Service Request)</span> <span class="n">{{ $counts['SSR'] }}</span></a>
+            <a href="{{ route('client.find-gigs.index', array_merge(request()->except('page'), ['type' => 'MSR'])) }}" class="fg-tab {{ $f['type'] === 'MSR' ? 'on' : '' }}">MSR <span class="sub">(Multi-Service Request)</span> <span class="n">{{ $counts['MSR'] }}</span></a>
         </div>
         <form class="fg-sort" method="GET" action="{{ route('client.find-gigs.index') }}">
             @foreach(request()->except(['sort','page']) as $k => $v)<input type="hidden" name="{{ $k }}" value="{{ $v }}">@endforeach
@@ -150,7 +150,7 @@
                         </div>
                         <div class="fg-tags">
                             <span class="fg-tagx">{{ $g['cat'] }}</span>
-                            <span class="fg-tagx">{{ $g['type'] === 'MSR' ? 'Multi-Service' : ($g['type'] === 'ESR' ? 'Premium' : 'Single Service') }}</span>
+                            <span class="fg-tagx">{{ $g['type'] === 'MSR' ? 'Multi-Service' : ($g['type'] === 'ESR' ? 'Emergency' : 'Single Service') }}</span>
                         </div>
                     </div>
 
@@ -201,9 +201,9 @@
                     <label>Service Type</label>
                     <select name="type">
                         <option value="">All Types</option>
-                        <option value="SSR" @selected($f['type']==='SSR')>SSR — Single Service</option>
-                        <option value="MSR" @selected($f['type']==='MSR')>MSR — Multi-Service</option>
-                        <option value="ESR" @selected($f['type']==='ESR')>ESR — Premium</option>
+                        <option value="SSR" @selected($f['type']==='SSR')>SSR — Single Service Request</option>
+                        <option value="MSR" @selected($f['type']==='MSR')>MSR — Multi-Service Request</option>
+                        <option value="ESR" @selected($f['type']==='ESR')>ESR — Emergency Service Request</option>
                     </select>
                 </div>
                 <div class="fg-frow">

@@ -136,9 +136,9 @@
     <div class="bb-bar">
         <div class="bb-tabs">
             <span class="bb-tab on">All Events <span class="n">{{ $counts['all'] }}</span></span>
-            <span class="bb-tab">🔥 ESR <span class="sub">(Emergency)</span> <span class="n">{{ $counts['ESR'] }}</span></span>
-            <span class="bb-tab">SSR <span class="sub">(Single Service)</span> <span class="n">{{ $counts['SSR'] }}</span></span>
-            <span class="bb-tab">MSR <span class="sub">(Multi-Service)</span> <span class="n">{{ $counts['MSR'] }}</span></span>
+            <span class="bb-tab">🔥 ESR <span class="sub">(Emergency Service Request)</span> <span class="n">{{ $counts['ESR'] }}</span></span>
+            <span class="bb-tab">SSR <span class="sub">(Single Service Request)</span> <span class="n">{{ $counts['SSR'] }}</span></span>
+            <span class="bb-tab">MSR <span class="sub">(Multi-Service Request)</span> <span class="n">{{ $counts['MSR'] }}</span></span>
             <span class="bb-tab">Invite Only</span>
             <span class="bb-tab">★ Bookmarked</span>
             <a class="bb-mylink" href="{{ route('professional.bidding-board.my-bids') }}">🔒 My Bids</a>
@@ -245,7 +245,7 @@
                     <h4>Filters</h4>
                     <button class="bb-clear" type="button">Clear All</button>
                 </div>
-                <div class="bb-frow"><label>Request Type</label><select><option>All Types</option><option>ESR — Emergency</option><option>SSR — Single</option><option>MSR — Multiple</option></select></div>
+                <div class="bb-frow"><label>Request Type</label><select><option>All Types</option><option>ESR — Emergency Service Request</option><option>SSR — Single Service Request</option><option>MSR — Multi-Service Request</option></select></div>
                 <div class="bb-frow"><label>Category</label><select><option>All Categories</option><option>Photography</option><option>DJ &amp; Music</option><option>Catering</option><option>Décor</option></select></div>
                 <div class="bb-frow"><label>Location</label><input placeholder="City or state"></div>
                 <div class="bb-frow"><label>Budget Range</label><input type="number" placeholder="Min $"></div>
