@@ -49,7 +49,7 @@
                     <th>Status</th>
                     <th>Published</th>
                     <th>Source</th>
-                    <th>Supplier</th>
+                    <th>Professional</th>
                     <th class="text-end">Actions</th>
                 </tr>
                 </thead>
@@ -120,7 +120,7 @@
                                                 <input type="datetime-local" name="ends_at" class="form-control" value="{{ optional($event->ends_at)->format('Y-m-d\\TH:i') }}">
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label">Supplier</label>
+                                                <label class="form-label">Professional</label>
                                                 <select name="supplier_id" class="form-select">
                                                     <option value="">None</option>
                                                     @foreach($suppliers as $supplier)
@@ -169,7 +169,7 @@
                             <input type="text" name="title" class="form-control" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Supplier</label>
+                            <label class="form-label">Professional</label>
                             <select name="supplier_id" class="form-select">
                                 <option value="">None</option>
                                 @foreach($suppliers as $supplier)

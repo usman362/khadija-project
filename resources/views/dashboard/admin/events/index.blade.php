@@ -159,7 +159,7 @@
                                         <th>#</th>
                                         <th>Title</th>
                                         <th>Client</th>
-                                        <th>Supplier</th>
+                                        <th>Professional</th>
                                         <th>Status</th>
                                         <th>Published</th>
                                         <th>Event Date</th>
@@ -248,9 +248,9 @@
                                                                 </select>
                                                             </div>
                                                             <div class="col-md-6 mb-3">
-                                                                <label class="form-label">Supplier</label>
+                                                                <label class="form-label">Professional</label>
                                                                 <select name="supplier_id" class="form-select">
-                                                                    <option value="">No Supplier</option>
+                                                                    <option value="">No Professional</option>
                                                                     @foreach($suppliers as $supplier)
                                                                         <option value="{{ $supplier->id }}" {{ $event->supplier_id == $supplier->id ? 'selected' : '' }}>{{ $supplier->name }}</option>
                                                                     @endforeach
@@ -350,9 +350,9 @@
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Supplier</label>
+                                <label class="form-label">Professional</label>
                                 <select name="supplier_id" class="form-select">
-                                    <option value="">No Supplier</option>
+                                    <option value="">No Professional</option>
                                     @foreach($suppliers as $supplier)
                                         <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
                                     @endforeach

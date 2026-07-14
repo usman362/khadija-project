@@ -39,7 +39,7 @@
                     <th>ID</th>
                     <th>Event / Booking</th>
                     <th>Client</th>
-                    <th>Supplier</th>
+                    <th>Professional</th>
                     <th>Version</th>
                     <th>Status</th>
                     <th>Source</th>

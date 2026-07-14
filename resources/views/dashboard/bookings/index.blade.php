@@ -48,7 +48,7 @@
                     <th>ID</th>
                     <th>Event</th>
                     <th>Client</th>
-                    <th>Supplier</th>
+                    <th>Professional</th>
                     <th>Status</th>
                     <th>Source</th>
                     <th class="text-end">Actions</th>

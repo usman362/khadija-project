@@ -17,7 +17,7 @@
                 <p><strong>Published:</strong> {{ $event->is_published ? 'Yes' : 'No' }}</p>
                 <p><strong>Source:</strong> @php $src = $event->source ?? 'user'; @endphp<span class="badge bg-{{ $src === 'user' ? 'primary' : ($src === 'ai' ? 'info' : 'secondary') }}">{{ ucfirst($src) }}</span></p>
                 <p><strong>Client:</strong> {{ $event->client?->name }}</p>
-                <p><strong>Supplier:</strong> {{ $event->supplier?->name ?? 'N/A' }}</p>
+                <p><strong>Professional:</strong> {{ $event->supplier?->name ?? 'N/A' }}</p>
                 <p class="mb-0"><strong>Description:</strong> {{ $event->description ?? 'N/A' }}</p>
             </div>
         </div>
