@@ -1,10 +1,10 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'AI Agreement — Negotiation')
-@section('page-title', 'AI Agreement Builder')
+@section('title', 'Agreement — Negotiation')
+@section('page-title', 'Agreement Builder')
 @section('page-subtitle', 'Phase 2 — Collaboration & Negotiation')
 
-{{-- AI Agreement Builder · Phase 2. Both parties collaborate on the AI draft —
+{{-- Agreement Builder · Phase 2. Both parties collaborate on the tool draft —
      editing clauses, tracking versions and redlines, and threading comments —
      until every clause is agreed. Data is representative pending the model. --}}
 
@@ -12,7 +12,7 @@
     $statusMeta = [
         'agreed'       => ['Agreed', '#16a34a', 'rgba(22,163,74,.12)'],
         'edited'       => ['Edited', '#2563eb', 'rgba(37,99,235,.12)'],
-        'ai-suggested' => ['AI Suggested', '#6366f1', 'rgba(99,102,241,.14)'],
+        'ai-suggested' => ['Suggested', '#6366f1', 'rgba(99,102,241,.14)'],
         'disputed'     => ['Needs Response', '#d97706', 'rgba(217,119,6,.14)'],
     ];
 @endphp
@@ -133,7 +133,7 @@
         <div class="aab-card">
             <div class="aab-sec-head">
                 <h3>Agreement Draft · {{ $event }}</h3>
-                <p>The AI built the agreement. Both parties refine each clause until everything is fair, accurate and agreed.</p>
+                <p>The tool built the agreement. Both parties refine each clause until everything is fair, accurate and agreed.</p>
             </div>
             <div class="aab-clauses">
                 @foreach($clauses as $cl)
@@ -194,7 +194,7 @@
             </div>
 
             <div class="aab-side-card">
-                <h4><svg viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg> AI Negotiation Assistant</h4>
+                <h4><svg viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg> Negotiation Assistant</h4>
                 @foreach($ai_suggestions as $s)
                     <div class="aab-sugg">{{ $s }}</div>
                 @endforeach

@@ -1,12 +1,12 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'AI Agreement — Draft & AI Fill')
-@section('page-title', 'AI Agreement Builder')
-@section('page-subtitle', 'Draft Generation — AI-filled & required sections')
+@section('title', 'Agreement — Draft & Auto-Fill')
+@section('page-title', 'Agreement Builder')
+@section('page-subtitle', 'Draft Generation — auto-filled & required sections')
 
-{{-- AI Agreement Builder · Draft. Every section is tagged AI-GENERATED (green —
-     the AI filled it from Phase-1 evidence) or REQUIRED (amber — the user must
-     complete it). Confidence score reflects how complete the AI draft is. --}}
+{{-- Agreement Builder · Draft. Every section is tagged AI-GENERATED (green —
+     the auto-filled it from Phase-1 evidence) or REQUIRED (amber — the user must
+     complete it). Confidence score reflects how complete the tool draft is. --}}
 
 @push('styles')
 <style>
@@ -40,7 +40,7 @@
     .aab-sec.req .aab-sec-dot { background: var(--req); }
     .aab-sec-bd { padding: 13px 15px; }
 
-    /* AI filled fields */
+    /* auto-filled fields */
     .aab-kv { display: flex; justify-content: space-between; gap: 12px; font-size: 12.5px; padding: 5px 0; border-bottom: 1px dashed var(--border-color); }
     .aab-kv:last-child { border-bottom: none; }
     .aab-kv span { color: var(--text-muted); }
@@ -71,22 +71,22 @@
 
 @section('content')
 <div class="aab">
-    <span class="aab-phase">📄 Draft Generation · Review &amp; AI Fill</span>
+    <span class="aab-phase">📄 Draft Generation · Review &amp; Auto-Fill</span>
 
     {{-- Header with AI confidence score --}}
     <div class="aab-dhead">
         <div>
             <h3>Draft Agreement · {{ $event }}</h3>
-            <p>The AI filled the green sections from your evidence. Complete the amber sections, then continue.</p>
+            <p>The auto-filled the green sections from your evidence. Complete the amber sections, then continue.</p>
         </div>
         <div class="aab-score">
             <b>{{ $confidence }}%</b>
-            <span>AI CONFIDENCE</span>
+            <span>CONFIDENCE</span>
         </div>
     </div>
 
     <div class="aab-legend">
-        <span class="aab-leg ai"><i></i> AI Generated — auto-filled, editable</span>
+        <span class="aab-leg ai"><i></i> Auto-filled — auto-filled, editable</span>
         <span class="aab-leg req"><i></i> Requires Your Input</span>
     </div>
 
@@ -97,7 +97,7 @@
                     <div class="aab-sec-hd">
                         <span class="aab-sec-dot"></span>
                         <h5>{{ $sec['title'] }}</h5>
-                        <span class="aab-tag">{{ $sec['type']==='ai' ? 'AI GENERATED' : 'REQUIRED' }}</span>
+                        <span class="aab-tag">{{ $sec['type']==='ai' ? 'AUTO-FILLED' : 'REQUIRED' }}</span>
                     </div>
                     <div class="aab-sec-bd">
                         @if($sec['type']==='ai')

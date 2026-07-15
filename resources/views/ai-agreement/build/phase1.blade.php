@@ -1,10 +1,10 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'AI Agreement — Evidence Collection')
-@section('page-title', 'AI Agreement Builder')
-@section('page-subtitle', 'Phase 1 — Discovery & AI Evidence Collection')
+@section('title', 'Agreement — Evidence Collection')
+@section('page-title', 'Agreement Builder')
+@section('page-subtitle', 'Phase 1 — Discovery & Evidence Collection')
 
-{{-- AI Agreement Builder · Phase 1. The AI scans the existing booking
+{{-- Agreement Builder · Phase 1. The tool scans the existing booking
      conversation, accepted proposal and attachments to assemble the evidence
      for a first draft, with per-source confidence and a missing-info detector.
      Evidence shown is representative pending the extraction service. --}}
@@ -99,7 +99,7 @@
 
 @section('content')
 <div class="aab">
-    <span class="aab-phase">⚡ PHASE 1 <b>· Discovery & AI Evidence Collection</b></span>
+    <span class="aab-phase">⚡ PHASE 1 <b>· Discovery & Evidence Collection</b></span>
 
     {{-- Stepper --}}
     <div class="aab-steps">
@@ -130,8 +130,8 @@
         {{-- Evidence collection --}}
         <div class="aab-card">
             <div class="aab-sec-head">
-                <h3>AI Evidence Collection &amp; Analysis</h3>
-                <p>The AI gathered everything from your conversation, accepted proposal and files to build the most accurate agreement possible.</p>
+                <h3>Evidence Collection &amp; Analysis</h3>
+                <p>The tool gathered everything from your conversation, accepted proposal and files to build the most accurate agreement possible.</p>
             </div>
             <div class="aab-ev-grid">
                 @foreach($evidence as $ev)
@@ -154,7 +154,7 @@
                 <p>Review the gaps on the right, then generate the first draft to move into negotiation.</p>
                 <a href="{{ route('ai-agreement.draft') }}" class="aab-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg>
-                    Generate Draft AI Agreement
+                    Generate Draft Agreement
                 </a>
             </div>
         </div>
@@ -162,7 +162,7 @@
         {{-- Sidebar: sources + missing + confidence --}}
         <aside class="aab-side">
             <div class="aab-side-card">
-                <h4><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> AI Evidence Sources</h4>
+                <h4><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Evidence Sources</h4>
                 @foreach($sources as [$name, $pct])
                     <div class="aab-src">
                         <div class="aab-src-top"><span>{{ $name }}</span><b>{{ $pct }}%</b></div>
@@ -172,14 +172,14 @@
             </div>
 
             <div class="aab-side-card">
-                <h4><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> AI Missing-Info Detector</h4>
+                <h4><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Missing-Info Detector</h4>
                 @foreach($missing as $m)
                     <div class="aab-miss">{{ $m }}</div>
                 @endforeach
             </div>
 
             <div class="aab-side-card aab-conf-ring">
-                <h4 style="justify-content:center;"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> AI Confidence Overview</h4>
+                <h4 style="justify-content:center;"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Confidence Overview</h4>
                 <div class="aab-conf-num">{{ $overall_confidence }}%</div>
                 <div class="aab-conf-lbl">Overall draft confidence</div>
                 <div class="aab-bar aab-conf-bar"><i style="width: {{ $overall_confidence }}%"></i></div>

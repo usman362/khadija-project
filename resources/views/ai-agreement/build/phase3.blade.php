@@ -1,10 +1,10 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'AI Agreement — Execution')
-@section('page-title', 'AI Agreement Builder')
+@section('title', 'Agreement — Execution')
+@section('page-title', 'Agreement Builder')
 @section('page-subtitle', 'Phase 3 — Execution & Finalization')
 
-{{-- AI Agreement Builder · Phase 3. Finalize, sign and activate. Both parties
+{{-- Agreement Builder · Phase 3. Finalize, sign and activate. Both parties
      receive a final, legally structured, signed document held in a secure,
      auditable archive. Representative data pending the signing/archive service. --}}
 
