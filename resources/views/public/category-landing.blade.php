@@ -1,4 +1,4 @@
-@extends('layouts.public')
+@extends('layouts.landing')
 
 @php
     $seoTitle       = 'Hire ' . $category->name . ' — Verified Pros on GigResource';
@@ -13,9 +13,10 @@
     /* ─── Hero ─────────────────────────────────────────────── */
     .cl-hero {
         position: relative;
-        padding: 140px 24px 80px;
+        padding: 56px 24px 64px;
         overflow: hidden;
-        background: linear-gradient(135deg, var(--bg-section) 0%, var(--bg-dark) 100%);
+        background: linear-gradient(135deg, var(--bg-soft) 0%, var(--bg-soft-2) 100%);
+        border-bottom: 1px solid var(--line);
     }
     @if($category->cover_image)
     .cl-hero::before {
@@ -24,13 +25,13 @@
         background-image: url('{{ asset('storage/' . $category->cover_image) }}');
         background-size: cover;
         background-position: center;
-        opacity: 0.35;
+        opacity: 0.14;
         z-index: 0;
     }
     .cl-hero::after {
         content: '';
         position: absolute; inset: 0;
-        background: linear-gradient(180deg, rgba(11,15,26,0.55) 0%, rgba(11,15,26,0.80) 100%);
+        background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(247,249,252,0.90) 100%);
         z-index: 0;
     }
     @endif
@@ -41,60 +42,60 @@
     .cl-eyebrow {
         display: inline-flex; align-items: center; gap: 8px;
         padding: 6px 14px;
-        background: rgba(139, 92, 246, 0.15);
-        border: 1px solid rgba(139, 92, 246, 0.30);
+        background: rgba(37, 99, 235, 0.08);
+        border: 1px solid rgba(37, 99, 235, 0.20);
         border-radius: 999px;
         font-size: 12px; font-weight: 700;
         letter-spacing: 1px; text-transform: uppercase;
-        color: #c4b5fd;
+        color: var(--blue-dark);
     }
     .cl-eyebrow .dot {
         width: 6px; height: 6px; border-radius: 50%;
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        background: linear-gradient(135deg, var(--blue), var(--orange));
     }
     .cl-hero h1 {
         font-size: 3rem; font-weight: 900;
         margin: 18px 0 14px;
-        color: var(--text-white);
+        color: var(--ink);
         line-height: 1.05; letter-spacing: -0.02em;
     }
     .cl-hero h1 .grad {
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        background: linear-gradient(135deg, var(--blue), var(--orange));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
     .cl-hero p.lede {
         font-size: 1.05rem;
-        color: var(--text-light);
+        color: var(--muted);
         max-width: 680px;
         line-height: 1.65;
     }
     .cl-stats {
         display: flex; flex-wrap: wrap; gap: 28px;
         margin-top: 26px; padding-top: 22px;
-        border-top: 1px solid rgba(255,255,255,0.08);
-        font-size: 14px; color: var(--text-muted);
+        border-top: 1px solid var(--line);
+        font-size: 14px; color: var(--muted);
     }
     .cl-stats b {
         display: block;
         font-size: 1.6rem; font-weight: 900;
-        color: var(--text-white);
+        color: var(--ink);
         margin-bottom: 2px;
     }
     .cl-cta {
         display: inline-flex; align-items: center; gap: 8px;
         margin-top: 28px;
         padding: 13px 26px;
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        background: linear-gradient(135deg, var(--blue), var(--blue-dark));
         color: #fff; font-weight: 700;
         border-radius: 12px;
         text-decoration: none;
-        box-shadow: 0 10px 30px rgba(99,102,241,0.30);
+        box-shadow: 0 10px 30px rgba(37,99,235,0.22);
         transition: transform 0.15s, box-shadow 0.15s;
     }
     .cl-cta:hover {
         transform: translateY(-2px);
-        box-shadow: 0 14px 36px rgba(99,102,241,0.40);
+        box-shadow: 0 14px 36px rgba(37,99,235,0.30);
         color: #fff;
     }
 
@@ -103,10 +104,10 @@
     .cl-section-head { margin-bottom: 28px; }
     .cl-section-head h2 {
         font-size: 1.75rem; font-weight: 800;
-        color: var(--text-white);
+        color: var(--ink);
         margin: 0 0 6px;
     }
-    .cl-section-head p { color: var(--text-muted); margin: 0; font-size: 0.98rem; }
+    .cl-section-head p { color: var(--muted); margin: 0; font-size: 0.98rem; }
 
     /* ─── Featured cards ──────────────────────────────────── */
     .cl-grid {
@@ -115,38 +116,38 @@
         gap: 18px;
     }
     .cl-card {
-        background: var(--bg-card);
-        border: 1px solid var(--border-color);
+        background: var(--bg);
+        border: 1px solid var(--line);
         border-radius: 16px;
         padding: 20px;
         display: flex; flex-direction: column; gap: 12px;
         text-decoration: none; color: inherit;
+        box-shadow: var(--shadow-sm);
         transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
     }
     .cl-card:hover {
-        border-color: rgba(139,92,246,0.50);
+        border-color: rgba(37,99,235,0.40);
         transform: translateY(-3px);
-        box-shadow: 0 12px 30px rgba(0,0,0,0.30);
-        background: var(--bg-card-hover);
+        box-shadow: var(--shadow);
     }
     .cl-card-head { display: flex; gap: 12px; align-items: center; }
     .cl-card-avatar {
         width: 54px; height: 54px; border-radius: 50%;
         object-fit: cover;
-        background: var(--bg-section);
-        border: 2px solid var(--border-color);
+        background: var(--bg-soft);
+        border: 2px solid var(--line);
     }
-    .cl-card-name { font-weight: 700; color: var(--text-white); font-size: 15px; }
-    .cl-card-headline { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
-    .cl-card-meta { display: flex; gap: 12px; font-size: 13px; color: var(--text-light); flex-wrap: wrap; }
-    .cl-card-rating { color: #fbbf24; font-weight: 700; }
+    .cl-card-name { font-weight: 700; color: var(--ink); font-size: 15px; }
+    .cl-card-headline { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .cl-card-meta { display: flex; gap: 12px; font-size: 13px; color: var(--text); flex-wrap: wrap; }
+    .cl-card-rating { color: #f59e0b; font-weight: 700; }
     .cl-card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto; padding-top: 6px; }
     .cl-card-tag {
         font-size: 11px; font-weight: 600;
         padding: 3px 9px; border-radius: 999px;
-        background: rgba(139,92,246,0.15);
-        color: #c4b5fd;
-        border: 1px solid rgba(139,92,246,0.25);
+        background: rgba(37,99,235,0.08);
+        color: var(--blue-dark);
+        border: 1px solid rgba(37,99,235,0.18);
         text-transform: capitalize;
     }
 
@@ -154,39 +155,40 @@
     .cl-siblings { display: flex; flex-wrap: wrap; gap: 10px; }
     .cl-sibling {
         display: inline-flex; align-items: center; gap: 8px;
-        background: var(--bg-card);
-        border: 1px solid var(--border-color);
+        background: var(--bg);
+        border: 1px solid var(--line);
         border-radius: 999px;
         padding: 9px 18px;
         font-size: 14px; font-weight: 600;
-        color: var(--text-light);
+        color: var(--text);
         text-decoration: none;
+        box-shadow: var(--shadow-sm);
         transition: all 0.15s;
     }
     .cl-sibling:hover {
-        border-color: rgba(139,92,246,0.50);
-        color: #fff;
-        background: var(--bg-card-hover);
+        border-color: rgba(37,99,235,0.40);
+        color: var(--blue-dark);
+        background: var(--bg-soft);
     }
 
     /* ─── Empty state ─────────────────────────────────────── */
     .cl-empty {
-        background: var(--bg-card);
-        border: 1px dashed var(--border-color);
+        background: var(--bg-soft);
+        border: 1px dashed var(--line);
         border-radius: 16px;
         padding: 56px 24px;
         text-align: center;
-        color: var(--text-muted);
+        color: var(--muted);
     }
     .cl-empty h3 {
-        color: var(--text-white);
+        color: var(--ink);
         margin: 0 0 8px;
         font-size: 1.2rem; font-weight: 700;
     }
     .cl-empty p { margin: 0 0 18px; font-size: 0.95rem; }
     .cl-empty a {
         display: inline-block;
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        background: linear-gradient(135deg, var(--blue), var(--blue-dark));
         color: #fff !important;
         padding: 11px 24px;
         border-radius: 10px;
@@ -196,19 +198,19 @@
 
     /* ─── Breadcrumb ──────────────────────────────────────── */
     .cl-breadcrumb {
-        max-width: 1180px; margin: 14px auto 0; padding: 0 24px;
-        font-size: 13px; color: var(--text-muted);
+        max-width: 1180px; margin: 0 auto 14px; padding: 0;
+        font-size: 13px; color: var(--muted);
         position: relative; z-index: 2;
     }
     .cl-breadcrumb a {
-        color: var(--text-muted);
+        color: var(--muted);
         text-decoration: none;
     }
-    .cl-breadcrumb a:hover { color: #c4b5fd; }
-    .cl-breadcrumb .current { color: var(--text-white); font-weight: 600; }
+    .cl-breadcrumb a:hover { color: var(--blue-dark); }
+    .cl-breadcrumb .current { color: var(--ink); font-weight: 600; }
 
     @media (max-width: 640px) {
-        .cl-hero { padding: 120px 18px 56px; }
+        .cl-hero { padding: 40px 18px 48px; }
         .cl-hero h1 { font-size: 2.1rem; }
         .cl-section { padding: 40px 18px; }
     }
@@ -230,15 +232,15 @@
 </script>
 
 <section class="cl-hero">
-    <nav class="cl-breadcrumb" aria-label="Breadcrumb">
-        <a href="{{ route('landing') }}">Home</a>
-        <span> › </span>
-        <a href="{{ route('events-categories') }}">Categories</a>
-        <span> › </span>
-        <span class="current">{{ $category->name }}</span>
-    </nav>
-
     <div class="cl-hero-inner">
+        <nav class="cl-breadcrumb" aria-label="Breadcrumb">
+            <a href="{{ route('landing') }}">Home</a>
+            <span> › </span>
+            <a href="{{ route('events-categories') }}">Categories</a>
+            <span> › </span>
+            <span class="current">{{ $category->name }}</span>
+        </nav>
+
         <span class="cl-eyebrow"><span class="dot"></span>{{ $category->parent->name ?? 'Featured Category' }}</span>
         <h1>Hire <span class="grad">{{ $category->name }}</span></h1>
         <p class="lede">
@@ -308,7 +310,7 @@
 </section>
 
 @if($siblings->isNotEmpty())
-<section class="cl-section">
+<section class="cl-section" style="padding-top:0;">
     <div class="cl-section-head">
         <h2>Related categories</h2>
         <p>Other event services you might need.</p>
