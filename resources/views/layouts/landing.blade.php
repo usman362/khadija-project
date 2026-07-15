@@ -306,7 +306,7 @@
             </div>
         </div>
         <div class="lpf-bottom">
-            <span>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</span>
+            <span>&copy; {{ date('Y') }} GigResource.com LLC. All rights reserved.</span>
             <span>
                 <a href="{{ route('privacy-policy') }}">Privacy Policy</a> &middot;
                 <a href="{{ route('payment-policy') }}">Payment Policy</a> &middot;

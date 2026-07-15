@@ -56,7 +56,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <span>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</span>
+            <span>&copy; {{ date('Y') }} GigResource.com LLC. All rights reserved.</span>
             <span>
                 <a href="{{ route('privacy-policy') }}" style="color: var(--text-muted);">Privacy</a> &middot;
                 <a href="{{ route('payment-policy') }}" style="color: var(--text-muted);">Payment</a> &middot;

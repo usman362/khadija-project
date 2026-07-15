@@ -33,7 +33,7 @@
 
                     <div style="display:flex; gap:10px; align-items:flex-start; background:var(--pe-green-l); border:1px solid #bbf7d0; border-radius:10px; padding:12px 14px; margin-top:16px;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.2" style="width:18px; height:18px; flex-shrink:0; margin-top:1px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        <div style="font-size:12.5px; color:#15803d; line-height:1.5;">Funds are held securely securely until the event is completed to your satisfaction.</div>
+                        <div style="font-size:12.5px; color:#15803d; line-height:1.5;">Funds are held securely until the event is completed and the services materially meet the agreed contract.</div>
                     </div>
 
                     {{-- Payment mini timeline --}}

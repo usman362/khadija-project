@@ -34,6 +34,7 @@ class MembershipPlanSeeder extends Seeder
                 'badge_text' => null,
                 'badge_color' => null,
                 'features' => [
+                    '5% booking commission per finalized contract',
                     'Marketplace access',
                     'Up to 3 active events',
                     'Up to 5 active bookings',
@@ -53,7 +54,7 @@ class MembershipPlanSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Professional',
+                'name' => 'Pro',
                 'slug' => 'professional',
                 'description' => 'For growing event businesses.',
                 'price' => 29,
@@ -69,6 +70,7 @@ class MembershipPlanSeeder extends Seeder
                 'badge_text' => 'Most Popular',
                 'badge_color' => 'primary',
                 'features' => [
+                    '3% booking commission per finalized contract',
                     'Up to 25 active events',
                     'Up to 50 active bookings',
                     'Up to 20 service categories',
@@ -107,6 +109,7 @@ class MembershipPlanSeeder extends Seeder
                 'badge_text' => 'Best Value',
                 'badge_color' => 'success',
                 'features' => [
+                    '1.5% booking commission per finalized contract',
                     'Unlimited events, bookings & categories',
                     'Highest marketplace visibility · premium search placement',
                     'High-value event access & bidding',
