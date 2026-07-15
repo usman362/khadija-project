@@ -67,7 +67,7 @@
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </button>
                         <div class="join-dropdown-menu">
-                            <a href="{{ route('register', ['role' => 'supplier']) }}" class="join-dropdown-item">Join As Professional</a>
+                            <a href="{{ route('register', ['role' => 'professional']) }}" class="join-dropdown-item">Join As Professional</a>
                             <a href="{{ route('register', ['role' => 'client']) }}" class="join-dropdown-item">Join As Client</a>
                             <a href="{{ route('influencer.join') }}" class="join-dropdown-item">Join As Influencer</a>
                         </div>
@@ -147,7 +147,7 @@
                         @else
                             <a href="{{ route('login') }}" class="mobile-nav-btn ghost">Log in</a>
                             <a href="{{ route('register', ['role' => 'client']) }}" class="mobile-nav-btn primary">Start Planning</a>
-                            <a href="{{ route('register', ['role' => 'supplier']) }}" class="mobile-nav-btn coral">List Your Services</a>
+                            <a href="{{ route('register', ['role' => 'professional']) }}" class="mobile-nav-btn coral">List Your Services</a>
                         @endauth
                     </div>
                 </div>

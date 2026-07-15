@@ -468,7 +468,7 @@
                     <div class="ec-cta-actions">
                         @if(auth()->guest())
                             <a href="{{ route('register', ['role' => 'client']) }}" class="ec-btn-blue">Post an Event</a>
-                            <a href="{{ route('register', ['role' => 'supplier']) }}" class="ec-btn-ghost">Join as Professional</a>
+                            <a href="{{ route('register', ['role' => 'professional']) }}" class="ec-btn-ghost">Join as Professional</a>
                         @else
                             <a href="{{ url('/dashboard') }}" class="ec-btn-blue">Go to Dashboard</a>
                             <a href="{{ route('public.browse') }}" class="ec-btn-ghost">Browse Professionals</a>

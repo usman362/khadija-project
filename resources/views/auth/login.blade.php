@@ -9,7 +9,7 @@
     // it only to point the "create an account" link at the matching signup.
     $loginRole = $loginRole ?? 'client';
     $registerHref = match ($loginRole) {
-        'supplier'   => route('register', ['role' => 'supplier']),
+        'supplier'   => route('register', ['role' => 'professional']),
         'influencer' => route('influencer.join'),
         default      => route('register', ['role' => 'client']),
     };

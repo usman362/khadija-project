@@ -35,7 +35,7 @@
                 <h4>Get Started</h4>
                 <ul>
                     @guest
-                        <li><a href="{{ route('register', ['role' => 'supplier']) }}">Join as Professional</a></li>
+                        <li><a href="{{ route('register', ['role' => 'professional']) }}">Join as Professional</a></li>
                         <li><a href="{{ route('register', ['role' => 'client']) }}">Hire Talent</a></li>
                         <li><a href="{{ route('influencer.join') }}">Join as Influencer</a></li>
                         <li><a href="{{ route('login') }}">Log In</a></li>

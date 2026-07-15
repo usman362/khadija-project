@@ -246,7 +246,7 @@
                     <img class="lp-role-img" src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=200&q=80&auto=format&fit=crop" alt="">
                     <h3>I'm a Professional</h3>
                     <p>Grow your business and get discovered</p>
-                    <a href="{{ route('register', ['role' => 'supplier']) }}" class="lp-role-btn">Join as a Pro
+                    <a href="{{ route('register', ['role' => 'professional']) }}" class="lp-role-btn">Join as a Pro
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
                 </div>
                 <div class="lp-role lp-role-orange">
@@ -567,7 +567,7 @@
                 <p>Join thousands of professionals and clients who trust GigResource to bring their events to life.</p>
             </div>
             <div class="lp-cta-btns">
-                <a href="{{ route('register', ['role' => 'supplier']) }}" class="lp-btn lp-btn-white">
+                <a href="{{ route('register', ['role' => 'professional']) }}" class="lp-btn lp-btn-white">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
                     Join as a Professional</a>
                 <a href="{{ route('register', ['role' => 'client']) }}" class="lp-btn lp-btn-orange">

@@ -32,7 +32,11 @@ class RegisterController extends Controller
      */
     public function showRegistrationForm(Request $request)
     {
+        // "professional" is the public-facing name for the internal "supplier" role.
         $role = $request->query('role', 'client');
+        if ($role === 'professional') {
+            $role = 'supplier';
+        }
 
         return view('auth.register', compact('role'));
     }
@@ -56,7 +60,7 @@ class RegisterController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'phone' => ['nullable', 'string', 'max:30'],
             'agree' => ['accepted'],
-            'role' => ['sometimes', 'string', 'in:client,supplier,influencer'],
+            'role' => ['sometimes', 'string', 'in:client,supplier,professional,influencer'],
             'state' => $stateRule,
             'g-recaptcha-response' => [new Recaptcha('register')],
         ], [
@@ -69,6 +73,9 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
         $role  = $data['role'] ?? 'client';
+        if ($role === 'professional') {   // public alias → internal supplier role
+            $role = 'supplier';
+        }
         $state = $data['state'] ?? null;
 
         if ($role === 'influencer') {
