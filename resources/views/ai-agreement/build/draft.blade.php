@@ -111,7 +111,7 @@
                                     @foreach($sec['list'] as $li)<li>{{ $li }}</li>@endforeach
                                 </ul>
                             @endif
-                            <span class="aab-conf-note">✓ Auto-filled by AI · {{ $sec['conf'] }}% confidence</span>
+                            <span class="aab-conf-note">✓ Auto-filled · {{ $sec['conf'] }}% confidence</span>
                         @else
                             @foreach($sec['inputs'] as $field)
                                 @php [$flabel, $ftype, $fval] = [$field[0], $field[1], $field[2] ?? '']; @endphp
@@ -136,7 +136,7 @@
         </div>
 
         <div class="aab-foot">
-            <p><b>6 sections</b> need your input · 4 auto-filled by AI</p>
+            <p><b>6 sections</b> need your input · 4 auto-filled</p>
             <a href="{{ route('ai-agreement.negotiate') }}" class="aab-btn">
                 Continue to Negotiation
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
