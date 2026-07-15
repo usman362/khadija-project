@@ -112,7 +112,9 @@
                     <a href="{{ route('public.professional.show', $pro) }}" class="pk-cta pk-cta-ghost">View {{ \Illuminate\Support\Str::limit($pro?->name, 18) }}'s profile</a>
                     <div class="pk-trust">
                         <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Secure, protected payment</span>
-                        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified professional</span>
+                        @if($pro?->isVerified())
+                            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified professional</span>
+                        @endif
                         <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Message before you book</span>
                     </div>
                 </div>

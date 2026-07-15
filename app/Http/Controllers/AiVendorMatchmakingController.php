@@ -183,7 +183,7 @@ class AiVendorMatchmakingController extends Controller
             $name = $s->profile?->company_name ?: $s->name;
             $why  = $overlap > 0
                 ? ($skills[0] ?? 'Event') . ' specialist' . ($s->profile?->city ? ' in ' . $s->profile->city : '') . ' — fits your theme and budget.'
-                : 'Verified pro' . ($s->profile?->city ? ' in ' . $s->profile->city : '') . ' available within your budget.';
+                : 'Professional' . ($s->profile?->city ? ' in ' . $s->profile->city : '') . ' available within your budget.';
 
             $ranked[] = [
                 'name'      => $name,

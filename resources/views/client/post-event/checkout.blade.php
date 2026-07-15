@@ -98,7 +98,7 @@
                 <div class="pe-card" style="margin-top:18px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
                     <span style="font-size:16px;">🛡️</span>
                     <div style="font-weight:800; font-size:13px;">Buyer Protection</div>
-                    <div class="pe-muted" style="font-size:12.5px;">Secure Secure Payments · Verified Professionals · Dedicated Customer Support</div>
+                    <div class="pe-muted" style="font-size:12.5px;">Secure Payments · Verified Professionals · Dedicated Customer Support</div>
                 </div>
 
                 {{-- Actions --}}

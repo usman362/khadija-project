@@ -316,7 +316,7 @@
     {{-- banner --}}
     <div class="vm-banner">
         <span class="vm-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>
-        <div class="vm-banner-txt"><b>Trusted. Verified. Reviewed.</b><p>All vendors are verified and reviewed by real customers like you for a safe booking experience.</p></div>
+        <div class="vm-banner-txt"><b>Trusted &amp; Reviewed.</b><p>Professionals are reviewed by real customers, and verified pros carry a Verified badge — for a safer booking experience.</p></div>
         <a href="{{ route('client.search.index') }}">Learn More About Safety</a>
     </div>
 </div>

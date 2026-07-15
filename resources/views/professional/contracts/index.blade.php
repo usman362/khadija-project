@@ -13,8 +13,8 @@
     $money = fn ($n) => '$' . number_format((float) $n, ($n == (int) $n) ? 0 : 2);
     $tot = max($totalRevenue, 0.01);
     $pctPaid    = (int) round($sumPaid    / $tot * 100);
-    $pctSecure Payment  = (int) round($sumSecure Payment  / $tot * 100);
-    $pctPending = max(0, 100 - $pctPaid - $pctSecure Payment);
+    $pctEscrow  = (int) round($sumEscrow  / $tot * 100);
+    $pctPending = max(0, 100 - $pctPaid - $pctEscrow);
 @endphp
 
 @push('styles')
@@ -90,7 +90,7 @@
     .pc-earn-up { font-size: 11px; color: #10b981; font-weight: 700; margin: 2px 0 12px; }
     .pc-earn-body { display: flex; align-items: center; gap: 16px; }
     .pc-donut { width: 120px; height: 120px; border-radius: 50%; flex-shrink: 0; position: relative;
-        background: conic-gradient(#2563eb 0 {{ $pctPaid }}%, #06b6d4 {{ $pctPaid }}% {{ $pctPaid + $pctSecure Payment }}%, #f97316 {{ $pctPaid + $pctSecure Payment }}% 100%); }
+        background: conic-gradient(#2563eb 0 {{ $pctPaid }}%, #06b6d4 {{ $pctPaid }}% {{ $pctPaid + $pctEscrow }}%, #f97316 {{ $pctPaid + $pctEscrow }}% 100%); }
     .pc-donut.empty { background: var(--bg-card-hover); }
     .pc-donut::after { content: ''; position: absolute; inset: 20px; background: var(--bg-card); border-radius: 50%; }
     .pc-earn-legend { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 9px; }
@@ -350,7 +350,7 @@
                     <div class="pc-donut {{ $totalRevenue <= 0 ? 'empty' : '' }}"></div>
                     <div class="pc-earn-legend">
                         <div class="pc-earn-leg"><span class="dot" style="background:#2563eb;"></span><span class="nm">Paid</span><span class="vl">{{ $money($sumPaid) }}</span> <span class="pc">({{ $pctPaid }}%)</span></div>
-                        <div class="pc-earn-leg"><span class="dot" style="background:#06b6d4;"></span><span class="nm">In Secure Payment</span><span class="vl">{{ $money($sumSecure Payment) }}</span> <span class="pc">({{ $pctSecure Payment }}%)</span></div>
+                        <div class="pc-earn-leg"><span class="dot" style="background:#06b6d4;"></span><span class="nm">In Secure Payment</span><span class="vl">{{ $money($sumEscrow) }}</span> <span class="pc">({{ $pctEscrow }}%)</span></div>
                         <div class="pc-earn-leg"><span class="dot" style="background:#f97316;"></span><span class="nm">Pending</span><span class="vl">{{ $money($sumPending) }}</span> <span class="pc">({{ $pctPending }}%)</span></div>
                     </div>
                 </div>
