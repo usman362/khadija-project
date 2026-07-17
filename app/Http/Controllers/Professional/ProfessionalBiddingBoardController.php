@@ -80,10 +80,11 @@ class ProfessionalBiddingBoardController extends Controller
     public function placeBid(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'event_id'  => ['required', 'exists:events,id'],
-            'amount'    => ['required', 'integer', 'min:1', 'max:10000000'],
-            'note'      => ['nullable', 'string', 'max:1000'],
-            'is_public' => ['nullable', 'boolean'],
+            'event_id'    => ['required', 'exists:events,id'],
+            'category_id' => ['nullable', 'exists:categories,id'],
+            'amount'      => ['required', 'integer', 'min:1', 'max:10000000'],
+            'note'        => ['nullable', 'string', 'max:1000'],
+            'is_public'   => ['nullable', 'boolean'],
         ]);
 
         $event = Event::where('id', $data['event_id'])
@@ -91,8 +92,15 @@ class ProfessionalBiddingBoardController extends Controller
             ->whereNotIn('status', ['completed', 'cancelled'])
             ->firstOrFail();
 
+        // Per-service (MSR) bid: the chosen service must be one of the event's
+        // gigs. null category = a whole-event / single-service bid.
+        $categoryId = $data['category_id'] ?? null;
+        if ($categoryId && ! $event->categories()->whereKey($categoryId)->exists()) {
+            return back()->withErrors(['category_id' => 'That service is not part of this event.']);
+        }
+
         Bid::updateOrCreate(
-            ['event_id' => $event->id, 'supplier_id' => $request->user()->id],
+            ['event_id' => $event->id, 'supplier_id' => $request->user()->id, 'category_id' => $categoryId],
             [
                 'amount'    => $data['amount'],
                 'note'      => $data['note'] ?? null,
@@ -138,7 +146,7 @@ class ProfessionalBiddingBoardController extends Controller
     public function myBids(Request $request): View
     {
         $bids = Bid::where('supplier_id', $request->user()->id)
-            ->with(['event:id,title,starts_at,status', 'replies.user:id,name'])
+            ->with(['event:id,title,starts_at,status', 'category:id,name', 'replies.user:id,name'])
             ->latest()
             ->paginate(15);
 
@@ -170,6 +178,9 @@ class ProfessionalBiddingBoardController extends Controller
             'img'    => $stock[$e->id % count($stock)],
             'event_id' => $e->id,
             'my_bid' => $myBid ? ['amount' => $myBid->amount, 'is_public' => $myBid->is_public] : null,
+            // Per-service bidding: the event's services the pro can bid on
+            // individually (MSR = each service is its own gig).
+            'services' => $e->categories->unique('name')->map(fn ($c) => ['id' => $c->id, 'name' => $c->name])->values()->all(),
         ];
     }
 }

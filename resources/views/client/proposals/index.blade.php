@@ -182,7 +182,7 @@
                                     <div class="pr-prop-ico" style="background:{{ $icoColor }};">{{ $ico }}</div>
                                     <div>
                                         <div class="pr-prop-name">{{ \Illuminate\Support\Str::limit($p->event?->title ?? 'Proposal', 20) }}</div>
-                                        <div class="pr-prop-sub">{{ $p->supplier?->name ?? '—' }}</div>
+                                        <div class="pr-prop-sub">{{ $p->supplier?->name ?? '—' }}@if($p->category) · <span style="color:#2563eb;font-weight:600;">{{ $p->category->name }}</span>@endif</div>
                                     </div>
                                 </div>
                             </td>

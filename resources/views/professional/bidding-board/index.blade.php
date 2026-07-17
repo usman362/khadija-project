@@ -213,7 +213,8 @@
                                 data-event-id="{{ $g['event_id'] }}"
                                 data-title="{{ $g['title'] }}"
                                 data-amount="{{ $g['my_bid']['amount'] ?? '' }}"
-                                data-public="{{ $g['my_bid'] && $g['my_bid']['is_public'] ? '1' : '0' }}">
+                                data-public="{{ $g['my_bid'] && $g['my_bid']['is_public'] ? '1' : '0' }}"
+                                data-services="{{ json_encode($g['services'] ?? []) }}">
                             {{ $g['my_bid'] ? 'Edit Bid' : 'Place Bid' }}
                         </button>
                         <button class="bb-ob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg>Save</button>
@@ -272,6 +273,12 @@
         <form method="POST" action="{{ route('professional.bidding-board.bid') }}">
             @csrf
             <input type="hidden" name="event_id" id="bbEventId" value="">
+            <div class="bb-field" id="bbServiceWrap" style="display:none;">
+                <label for="bbCategory">Which service are you bidding on?</label>
+                <select name="category_id" id="bbCategory" style="width:100%;padding:10px 12px;border:1px solid var(--border-color);border-radius:10px;background:var(--bg-card);color:var(--text-primary);font-size:14px;">
+                </select>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:5px;">Each service is its own gig — bid on one at a time.</div>
+            </div>
             <div class="bb-field">
                 <label for="bbAmount">Your bid amount</label>
                 <div class="bb-amtwrap">
@@ -349,12 +356,26 @@
             net.style.display = '';
         }
         if (amount) { amount.addEventListener('input', updateNet); }
+        var svcWrap = document.getElementById('bbServiceWrap');
+        var svcSel = document.getElementById('bbCategory');
         function open(btn) {
             eventId.value = btn.getAttribute('data-event-id');
             gig.textContent = btn.getAttribute('data-title');
             amount.value = btn.getAttribute('data-amount') || '';
             pub.checked = btn.getAttribute('data-public') === '1';
             modal.querySelector('h3').textContent = btn.getAttribute('data-amount') ? 'Edit your bid' : 'Place your bid';
+            // Per-service picker: populate from the gig's services.
+            var services = [];
+            try { services = JSON.parse(btn.getAttribute('data-services') || '[]'); } catch (e) {}
+            if (svcSel) {
+                svcSel.innerHTML = '';
+                services.forEach(function (s) {
+                    var o = document.createElement('option');
+                    o.value = s.id; o.textContent = s.name; svcSel.appendChild(o);
+                });
+                // Show the picker only when there's more than one service (MSR/ESR).
+                svcWrap.style.display = services.length > 1 ? 'block' : 'none';
+            }
             updateNet();
             modal.classList.add('open');
             setTimeout(function () { amount.focus(); }, 50);

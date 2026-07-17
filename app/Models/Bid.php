@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Bid extends Model
 {
     protected $fillable = [
-        'event_id', 'supplier_id', 'amount', 'note', 'is_public', 'status',
+        'event_id', 'category_id', 'supplier_id', 'amount', 'note', 'is_public', 'status',
     ];
 
     protected $casts = [
@@ -20,6 +20,12 @@ class Bid extends Model
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
+    }
+
+    /** The specific service this bid targets (null = whole-event / SSR bid). */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function supplier(): BelongsTo

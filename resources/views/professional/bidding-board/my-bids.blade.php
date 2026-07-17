@@ -60,7 +60,9 @@
     @forelse($bids as $bid)
         <div class="mb-card">
             <div>
-                <div class="mb-title">{{ $bid->event?->title ?? 'Gig #' . $bid->event_id }}</div>
+                <div class="mb-title">{{ $bid->event?->title ?? 'Gig #' . $bid->event_id }}
+                    @if($bid->category)<span style="font-size:11px;font-weight:700;background:rgba(37,99,235,.1);color:#2563eb;border-radius:6px;padding:2px 8px;margin-left:6px;">{{ $bid->category->name }}</span>@endif
+                </div>
                 <div class="mb-meta">
                     <span>📅 {{ $bid->event?->starts_at?->format('M j, Y') ?? 'Flexible' }}</span>
                     <span>Submitted {{ $bid->created_at->diffForHumans() }}</span>
