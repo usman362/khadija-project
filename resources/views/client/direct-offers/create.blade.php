@@ -4,18 +4,18 @@
 @section('page-title', 'Send a Direct Offer / Request')
 @section('page-subtitle', 'Request services directly from a professional')
 
-{{-- Client → Professional Direct Offer builder. The request type (SSR / MSR /
-     ESR) reshapes the form: SSR = one service, no team; MSR = multiple services
-     + team collaboration; ESR = full event scope + team. Type switching is
-     pure-JS via data attributes. Sections are colour-coded: amber = your input,
-     green = AI-generated. Representative submit (no backend yet). --}}
+{{-- Client → Professional Direct Offer builder. The request type (SSR / MSR)
+     reshapes the form: SSR = one service; MSR = multiple services, each handled
+     as its own separate agreement (Team/Co-Op combined-force removed platform-
+     wide). Type switching is pure-JS via data attributes. Representative submit
+     (no backend yet). --}}
 
 @php
     // ESR is its own standalone "Post a Rush Request" workflow — NOT a Direct
     // Offer type (per Peter). Direct Offer supports single / multi service only.
     $types = [
         ['SSR', 'Single Service Request', 'One specific service from this pro — simplest request.'],
-        ['MSR', 'Multi-Service Request', 'Several services + let the pro bring a vetted team.'],
+        ['MSR', 'Multi-Service Request', 'Several services — each handled as its own separate agreement.'],
     ];
 @endphp
 
@@ -153,7 +153,7 @@
                             @foreach($categories as $cat)<option>{{ $cat->name }}</option>@endforeach
                         </select>
                     </div>
-                    <div class="do-hint">SSR — a single, specific service. No team collaboration needed.</div>
+                    <div class="do-hint">SSR — a single, specific service from this professional.</div>
                 </div>
                 {{-- MSR / ESR: multiple services --}}
                 <div class="do-svc-multi">
@@ -184,26 +184,13 @@
             </div>
         </div>
 
-        {{-- Team Collaboration (MSR only) --}}
-        <div class="do-sec req" data-types="MSR">
-            <div class="do-sec-hd"><h4>Team Collaboration</h4><span class="do-tag">MSR</span></div>
-            <div class="do-sec-bd">
-                <div class="do-field"><label>Allow the pro to bring a vetted team?</label>
-                    <select class="do-input" name="allow_team"><option>Yes — they may subcontract trusted pros</option><option>No — only this professional</option></select>
-                </div>
-                <div class="do-field"><label>Max additional professionals</label>
-                    <select class="do-input" name="max_pros"><option>Up to 3</option><option>Up to 5</option><option>No limit</option></select>
-                </div>
-            </div>
-        </div>
-
         {{-- AI Summary (green) --}}
         <div class="do-sec ai">
             <div class="do-sec-hd"><h4>AI Request Summary</h4><span class="do-tag">AI GENERATED</span></div>
             <div class="do-sec-bd">
                 <div class="do-ai-row"><span class="ck">✓</span> AI drafts a clear, structured request from your inputs so the pro understands scope instantly.</div>
                 <div class="do-ai-row"><span class="ck">✓</span> Suggests a fair budget band based on your services, location and guest count.</div>
-                <div class="do-ai-row" data-types="MSR"><span class="ck">✓</span> Recommends which roles the lead pro should staff for this <b id="doTypeLbl">{{ $type }}</b>.</div>
+                <div class="do-ai-row" data-types="MSR"><span class="ck">✓</span> For an <b id="doTypeLbl">{{ $type }}</b>, each requested service is sent as its own separate agreement.</div>
             </div>
         </div>
 

@@ -207,7 +207,7 @@
 
     <div class="pm-banner">
         <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></span>
-        <p><b>Every service is a separate gig</b> — different professionals can win different services in the same event. No overlapping. No confusion. Just a smarter, more organized way to do more business.</p>
+        <p><b>Every service is a separate gig</b> — bid on one, some, or all of the services you provide. Different professionals can win different services in the same event, and each is awarded, contracted, and paid separately.</p>
     </div>
 
     {{-- ════════ Example + sidebar ════════ --}}
@@ -279,7 +279,7 @@
                 ['star','More Opportunities','One event can mean multiple gigs for you.'],
                 ['zap','Bid Your Strengths','Choose only the services you specialize in.'],
                 ['grid','Better Organization','Each gig is tracked, managed, and paid separately.'],
-                ['scale','Fair & Transparent','No overlapping bids. No system confusion.'],
+                ['scale','Fair & Transparent','Every service awarded on its own merits — sealed bids by default.'],
                 ['trend','Grow Your Business','Win more gigs across more events.'],
             ];
         @endphp
