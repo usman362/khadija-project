@@ -223,7 +223,7 @@
             <div class="fg-rail-card fg-cta">
                 <h4>📣 Can't find the right package?</h4>
                 <p>Post your event and let verified professionals send you tailored proposals.</p>
-                <a href="{{ route('client.post-event.event-info') }}">Post an Event</a>
+                <a href="{{ route('client.post-event.choose') }}">Post an Event</a>
             </div>
         </aside>
     </div>

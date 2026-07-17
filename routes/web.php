@@ -613,12 +613,13 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/events', [ClientEventController::class, 'index'])->middleware('permission:events.view_any')->name('client.events.index');
         // "Create a Gig" (bidding builder) retired in favour of the "Post an Event" flow — redirect any old links.
-        Route::get('/events/create', fn () => redirect()->route('client.post-event.event-info'))->name('client.events.create');
+        Route::get('/events/create', fn () => redirect()->route('client.post-event.choose'))->name('client.events.create');
         Route::post('/events', [ClientEventController::class, 'store'])->middleware('permission:events.create')->name('client.events.store');
 
         // ── Post an Event — guided 11-step booking journey ──
         Route::prefix('post-event')->name('client.post-event.')->group(function () {
             $pe = \App\Http\Controllers\Client\PostEventController::class;
+            Route::get('/choose',          [$pe, 'chooseRoute'])->name('choose');
             Route::get('/',                [$pe, 'eventInfo'])->name('event-info');
             Route::post('/',               [$pe, 'storeEventInfo'])->name('store-info');
             Route::get('/build',           [$pe, 'build'])->name('build');

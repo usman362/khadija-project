@@ -1180,7 +1180,7 @@
                 {{-- ── MANAGE EVENTS ─────────────────────────────── --}}
                 <li class="cl-nav-label">Manage Events</li>
                 <li class="cl-nav-item">
-                    <a href="{{ route('client.post-event.event-info') }}" class="cl-nav-link {{ request()->routeIs('client.post-event.*') ? 'active' : '' }}">
+                    <a href="{{ route('client.post-event.choose') }}" class="cl-nav-link {{ request()->routeIs('client.post-event.*') ? 'active' : '' }}">
                         <svg class="cl-nav-icon ic-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
                         Post an Event
                     </a>

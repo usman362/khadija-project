@@ -63,6 +63,22 @@ class PostEventController extends Controller
         ], (array) session('post_event', []));
     }
 
+    // ── Step 0: Choose Route ────────────────────────────────────────────────
+    /**
+     * The posting entry point. Packages are ONE route of five, not the whole
+     * product (Fix Spec 07.14). SSR/MSR/ESR end at Publish then bids arrive
+     * async on Proposals; Direct Offer is a targeted non-bidding invite;
+     * Package Search is the synchronous "buy a bundle" wizard below.
+     */
+    public function chooseRoute(): View
+    {
+        return view('client.post-event.choose', [
+            'steps'   => self::STEPS,
+            'current' => 0,
+            'summary' => $this->summary(),
+        ]);
+    }
+
     // ── Step 1 ──────────────────────────────────────────────────────────────
     public function eventInfo(Request $request): View
     {
