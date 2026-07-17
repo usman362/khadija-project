@@ -25,6 +25,10 @@
     .mb-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 7px; }
     .mb-badge.sealed { background: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe; }
     .mb-badge.public { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .mb-badge.mb-award-won { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .mb-badge.mb-award-declined { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
+    .mb-badge.mb-award-short { background: #fef9c3; color: #a16207; border: 1px solid #fde68a; }
+    .mb-badge.mb-award-review { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
     .mb-toggle { border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 10px; padding: 8px 14px; font-size: 12.5px; font-weight: 700; color: var(--text-secondary); cursor: pointer; white-space: nowrap; }
     .mb-toggle:hover { border-color: var(--text-secondary); }
     .mb-status { display: flex; flex-direction: column; align-items: flex-end; gap: 7px; }
@@ -67,13 +71,25 @@
                 <span>Your bid</span>
             </div>
             <div class="mb-status">
+                @php
+                    $award = match ($bid->status) {
+                        'won'       => ['🏆 You won', 'won'],
+                        'declined'  => ['Not selected', 'declined'],
+                        'withdrawn' => ['Withdrawn', 'declined'],
+                        'shortlisted' => ['⭐ Shortlisted', 'short'],
+                        default     => ['⏳ Under review', 'review'],
+                    };
+                @endphp
+                <span class="mb-badge mb-award-{{ $award[1] }}">{{ $award[0] }}</span>
                 <span class="mb-badge {{ $bid->is_public ? 'public' : 'sealed' }}">
                     {{ $bid->is_public ? '📣 Public' : '🔒 Sealed' }}
                 </span>
-                <form method="POST" action="{{ route('professional.bidding-board.toggle', $bid) }}">
-                    @csrf
-                    <button type="submit" class="mb-toggle">{{ $bid->is_public ? 'Seal again' : 'Make public' }}</button>
-                </form>
+                @if(! in_array($bid->status, ['won', 'declined', 'withdrawn']))
+                    <form method="POST" action="{{ route('professional.bidding-board.toggle', $bid) }}">
+                        @csrf
+                        <button type="submit" class="mb-toggle">{{ $bid->is_public ? 'Seal again' : 'Make public' }}</button>
+                    </form>
+                @endif
             </div>
         </div>
     @empty
