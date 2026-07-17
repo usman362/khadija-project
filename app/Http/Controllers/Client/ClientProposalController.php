@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bid;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Client-side Proposals view. A "proposal" here is a professional's bid on
@@ -79,5 +81,34 @@ class ClientProposalController extends Controller
         ];
 
         return view('client.proposals.index', compact('stats', 'proposals', 'tab', 'pipeline'));
+    }
+
+    /** Award a bid (mark it won). Only the event's owner may act. */
+    public function accept(Request $request, Bid $bid): RedirectResponse
+    {
+        $this->authorizeOwner($request, $bid);
+        $bid->update(['status' => 'won']);
+
+        return back()->with('status', 'Bid accepted. '
+            . ($bid->supplier?->name ?? 'The professional')
+            . ' has been awarded — we\'ll take it to a contract next.');
+    }
+
+    /** Decline a bid. Only the event's owner may act. */
+    public function decline(Request $request, Bid $bid): RedirectResponse
+    {
+        $this->authorizeOwner($request, $bid);
+        $bid->update(['status' => 'declined']);
+
+        return back()->with('status', 'Bid declined.');
+    }
+
+    /** Guard: the bid must sit on an event this client owns. */
+    private function authorizeOwner(Request $request, Bid $bid): void
+    {
+        abort_unless(
+            $bid->event && $bid->event->client_id === $request->user()->id,
+            Response::HTTP_FORBIDDEN
+        );
     }
 }

@@ -589,6 +589,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/proposals', [\App\Http\Controllers\Client\ClientProposalController::class, 'index'])
             ->middleware('permission:bookings.view_any')
             ->name('client.proposals.index');
+        Route::post('/proposals/{bid}/accept', [\App\Http\Controllers\Client\ClientProposalController::class, 'accept'])
+            ->middleware('permission:bookings.update')->name('client.proposals.accept');
+        Route::post('/proposals/{bid}/decline', [\App\Http\Controllers\Client\ClientProposalController::class, 'decline'])
+            ->middleware('permission:bookings.update')->name('client.proposals.decline');
 
         // Multi-Service Request (MSR).
         Route::get('/multi-service', [\App\Http\Controllers\Client\ClientMultiServiceController::class, 'index'])

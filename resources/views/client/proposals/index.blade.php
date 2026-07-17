@@ -64,6 +64,10 @@
     .pr-actions-cell { display: flex; gap: 6px; }
     .pr-act-btn { width: 28px; height: 28px; border-radius: 7px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
     .pr-act-btn:hover { color: #f97316; border-color: rgba(249,115,22,0.30); }
+    .pr-act-accept { color: #16a34a; border-color: rgba(22,163,74,0.30); }
+    .pr-act-accept:hover { color: #fff; background: #16a34a; border-color: #16a34a; }
+    .pr-act-decline { color: #ef4444; border-color: rgba(239,68,68,0.30); }
+    .pr-act-decline:hover { color: #fff; background: #ef4444; border-color: #ef4444; }
     .pr-act-btn svg { width: 13px; height: 13px; }
 
     /* Right rail */
@@ -203,6 +207,16 @@
                             </td>
                             <td style="padding-right:18px;">
                                 <div class="pr-actions-cell">
+                                    @if($pipe === 'pending')
+                                        <form method="POST" action="{{ route('client.proposals.accept', $p->id) }}" style="display:inline;">
+                                            @csrf
+                                            <button type="submit" class="pr-act-btn pr-act-accept" title="Accept &amp; award"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></button>
+                                        </form>
+                                        <form method="POST" action="{{ route('client.proposals.decline', $p->id) }}" style="display:inline;">
+                                            @csrf
+                                            <button type="submit" class="pr-act-btn pr-act-decline" title="Decline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                                        </form>
+                                    @endif
                                     <a href="{{ route('client.chat.index') }}" class="pr-act-btn" title="Message"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></a>
                                     <a href="{{ $p->event ? route('client.events.show', $p->event) : '#' }}" class="pr-act-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></a>
                                 </div>
