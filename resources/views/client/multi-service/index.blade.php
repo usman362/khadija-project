@@ -1,7 +1,7 @@
 @extends('layouts.client')
 
 @section('title', 'Multi-Service Request')
-@section('page-title', 'Multi-Service Request for Proposal')
+@section('page-title', 'Multi-Service Request (MSR)')
 @section('page-subtitle', 'One event. Multiple services. Better matches — get competitive bids in one brief.')
 
 @push('styles')
@@ -129,7 +129,7 @@
     </div>
 
     {{-- 4-step process --}}
-    <div class="ms-process-title">The 4-Step RFP Process</div>
+    <div class="ms-process-title">The 4-Step MSR Process</div>
     <div class="ms-steps">
         <div class="ms-step s1"><div class="ms-step-num">1</div><div class="ms-step-name">Master Form</div><div class="ms-step-desc">Fill out one event brief to start your event.</div></div>
         <div class="ms-step s2"><div class="ms-step-num">2</div><div class="ms-step-name">Select Services</div><div class="ms-step-desc">Choose the services you need from categories.</div></div>
