@@ -517,7 +517,7 @@
                     <label>Location</label>
                     <div class="sp-field-wrap">
                         <svg class="sp-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        <input class="sp-input" type="text" name="city" value="{{ $filters['city'] }}" placeholder="New York, NY" list="sp-cities">
+                        <input class="sp-input" type="text" name="city" value="{{ $filters['city'] }}" placeholder="Baltimore, MD" list="sp-cities">
                         <datalist id="sp-cities">@foreach($cities as $c)<option value="{{ $c }}">@endforeach</datalist>
                     </div>
                 </div>

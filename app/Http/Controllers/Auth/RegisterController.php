@@ -66,7 +66,7 @@ class RegisterController extends Controller
         ], [
             'agree.accepted' => 'Please accept the Terms of Service and Privacy Policy to continue.',
             'state.required' => 'Please select your state.',
-            'state.in' => 'GigResource is currently available in Maryland, Virginia, Washington D.C., Delaware, Pennsylvania, New Jersey, and New York.',
+            'state.in' => 'GigResource is currently available in Maryland, Pennsylvania, West Virginia, Virginia, New Jersey, Delaware, and Washington D.C.',
         ]);
     }
 

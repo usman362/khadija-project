@@ -17,9 +17,6 @@
 $zipPrefixes = array_replace(
     // New Jersey — 070–089 (leading zero ⇒ string keys)
     array_fill_keys(array_map(fn ($n) => str_pad((string) $n, 3, '0', STR_PAD_LEFT), range(70, 89)), 'NJ'),
-    // New York — 004/005 + 100–149
-    ['004' => 'NY', '005' => 'NY'],
-    array_fill_keys(range(100, 149), 'NY'),
     // Pennsylvania — 150–196
     array_fill_keys(range(150, 196), 'PA'),
     // Delaware — 197–199
@@ -29,6 +26,8 @@ $zipPrefixes = array_replace(
     // Virginia — 201 + 220–246
     [201 => 'VA'],
     array_fill_keys(range(220, 246), 'VA'),
+    // West Virginia — 247–268
+    array_fill_keys(range(247, 268), 'WV'),
     // Maryland — 206–219
     array_fill_keys(range(206, 219), 'MD'),
 );
@@ -41,7 +40,7 @@ return [
         'DE' => 'Delaware',
         'PA' => 'Pennsylvania',
         'NJ' => 'New Jersey',
-        'NY' => 'New York',
+        'WV' => 'West Virginia',
     ],
 
     // 3-digit ZIP prefix → state (deterministic USPS allocations).
