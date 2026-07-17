@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Client;
 use App\Domain\Auth\Enums\RoleName;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Event;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -36,5 +38,58 @@ class ClientDirectOfferController extends Controller
         $type        = in_array($request->query('type'), ['SSR', 'MSR', 'ESR'], true) ? $request->query('type') : 'MSR';
 
         return view('client.direct-offers.create', compact('pros', 'categories', 'selectedPro', 'type'));
+    }
+
+    /**
+     * Send a Direct Offer: a targeted, NON-bidding request to one specific
+     * professional. Modelled as an Event assigned to that pro and NOT
+     * published to the open Bidding Board — the pro accepts / declines / replies.
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'professional_id' => ['required', 'exists:users,id'],
+            'event_name'      => ['nullable', 'string', 'max:200'],
+            'event_date'      => ['nullable', 'date'],
+            'guests'          => ['nullable', 'integer', 'min:1', 'max:1000000'],
+            'venue'           => ['nullable', 'string', 'max:200'],
+            'services'        => ['nullable', 'array'],
+            'services.*'      => ['integer', 'exists:categories,id'],
+            'service_single'  => ['nullable', 'string', 'max:120'],
+            'budget_min'      => ['nullable', 'integer', 'min:0'],
+            'request_type'    => ['nullable', 'in:SSR,MSR,ESR'],
+        ]);
+
+        $user = $request->user();
+        $pro  = User::findOrFail($data['professional_id']);
+
+        $event = Event::create([
+            'title'        => $data['event_name'] ?: ('Direct Offer to ' . $pro->name),
+            'status'       => 'pending',
+            'is_published' => false,               // targeted — never hits the open board
+            'starts_at'    => $data['event_date'] ?? null,
+            'budget'       => $data['budget_min'] ?? null,
+            'location'     => $data['venue'] ?? null,
+            'guest_count'  => $data['guests'] ?? null,
+            'created_by'   => $user->id,
+            'client_id'    => $user->id,
+            'supplier_id'  => $pro->id,            // the invited professional
+            'source'       => 'direct_offer',
+        ]);
+
+        // Attach requested services as categories.
+        $categoryIds = collect($data['services'] ?? []);
+        if ($categoryIds->isEmpty() && ! empty($data['service_single'])) {
+            $categoryIds = Category::active()->where('name', $data['service_single'])
+                ->limit(1)->pluck('id');
+        }
+        if ($categoryIds->isNotEmpty()) {
+            $event->categories()->sync($categoryIds->all());
+        }
+
+        return redirect()
+            ->route('client.proposals.index')
+            ->with('status', 'Direct offer sent to ' . $pro->name
+                . '. They can accept, decline, or reply — you\'ll see their response here.');
     }
 }

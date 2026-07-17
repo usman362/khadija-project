@@ -97,7 +97,11 @@
         @endforeach
     </div>
 
-    <form method="POST" action="#" onsubmit="alert('Demo: direct offer sent to professional');return false;">
+    <form method="POST" action="{{ route('client.direct-offers.store') }}">
+        @csrf
+        @if($errors->any())
+            <div style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;">{{ $errors->first() }}</div>
+        @endif
         @csrf
         <input type="hidden" name="request_type" id="doType" value="{{ $type }}">
 

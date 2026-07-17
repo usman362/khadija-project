@@ -644,6 +644,7 @@ Route::middleware('auth')->group(function () {
 
         // Direct Offer / Request builder (SSR / MSR / ESR) — client → professional.
         Route::get('/direct-offers/create', [\App\Http\Controllers\Client\ClientDirectOfferController::class, 'create'])->middleware('permission:events.create')->name('client.direct-offers.create');
+        Route::post('/direct-offers', [\App\Http\Controllers\Client\ClientDirectOfferController::class, 'store'])->middleware('permission:events.create')->name('client.direct-offers.store');
         Route::get('/events/{event}', [ClientEventController::class, 'show'])->middleware('permission:events.view')->name('client.events.show');
         Route::patch('/events/{event}', [ClientEventController::class, 'update'])->middleware('permission:events.update')->name('client.events.update');
         Route::post('/events/{event}/publish', [ClientEventController::class, 'publish'])->middleware('permission:events.publish')->name('client.events.publish');
