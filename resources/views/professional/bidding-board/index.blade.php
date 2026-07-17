@@ -278,6 +278,13 @@
                     <span>$</span>
                     <input type="number" name="amount" id="bbAmount" min="1" step="1" placeholder="0" required>
                 </div>
+                <div class="bb-net" id="bbNet" data-commission="{{ $commissionPct ?? 5 }}"
+                     style="margin-top:8px;font-size:12.5px;color:var(--text-muted);display:none;">
+                    Platform commission ({{ rtrim(rtrim(number_format($commissionPct ?? 5, 2), '0'), '.') }}%):
+                    <b id="bbFee" style="color:var(--text-primary);">$0</b>
+                    · You net <b id="bbNetAmt" style="color:#16a34a;">$0</b>
+                    <span style="display:block;margin-top:2px;">Deducted only on a finalized contract — never on bids that don't win.</span>
+                </div>
             </div>
             <div class="bb-field">
                 <label for="bbNote">Note to client <span style="font-weight:500;color:var(--text-muted)">(optional)</span></label>
@@ -329,12 +336,26 @@
         var eventId = document.getElementById('bbEventId');
         var amount = document.getElementById('bbAmount');
         var pub = document.getElementById('bbPublic');
+        var net = document.getElementById('bbNet');
+        var commission = net ? parseFloat(net.getAttribute('data-commission')) || 0 : 0;
+        function money(n) { return '$' + Math.round(n).toLocaleString(); }
+        function updateNet() {
+            if (!net) return;
+            var amt = parseFloat(amount.value) || 0;
+            if (amt <= 0) { net.style.display = 'none'; return; }
+            var fee = amt * commission / 100;
+            document.getElementById('bbFee').textContent = money(fee);
+            document.getElementById('bbNetAmt').textContent = money(amt - fee);
+            net.style.display = '';
+        }
+        if (amount) { amount.addEventListener('input', updateNet); }
         function open(btn) {
             eventId.value = btn.getAttribute('data-event-id');
             gig.textContent = btn.getAttribute('data-title');
             amount.value = btn.getAttribute('data-amount') || '';
             pub.checked = btn.getAttribute('data-public') === '1';
             modal.querySelector('h3').textContent = btn.getAttribute('data-amount') ? 'Edit your bid' : 'Place your bid';
+            updateNet();
             modal.classList.add('open');
             setTimeout(function () { amount.focus(); }, 50);
         }

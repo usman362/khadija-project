@@ -53,9 +53,20 @@ class ProfessionalBiddingBoardController extends Controller
         $avgBudget = $events->filter(fn ($e) => $e->budget)->avg('budget');
         $closingSoon = $events->filter(fn ($e) => $e->starts_at && $e->starts_at->isBetween(now(), now()->addDays(7)))->count();
 
+        // Commission the pro absorbs at payout, by membership tier
+        // (Starter 5% / Pro 3% / Elite 1.5%) — shown on the bid form so they
+        // bid knowing their net (MSR review #17).
+        $planSlug = $request->user()?->activeSubscription()?->plan?->slug;
+        $commissionPct = match ($planSlug) {
+            'professional' => 3.0,
+            'enterprise'   => 1.5,
+            default        => 5.0,
+        };
+
         return view('professional.bidding-board.index', [
             'gigs'     => $gigs,
             'counts'   => $counts,
+            'commissionPct' => $commissionPct,
             'insights' => [
                 ['Highest Demand', $topCat, '🔥'],
                 ['Fastest Growing', 'Wedding Photography +24%', '📈'],
