@@ -729,6 +729,8 @@ Route::middleware('auth')->group(function () {
 
         // Proposals (Bookings from professional's perspective)
         // Direct Offers (SSR / MSR / ESR) — client sends a direct request to this pro
+        Route::post('/direct-offers/{event}/accept', [\App\Http\Controllers\Professional\ProfessionalDirectOfferController::class, 'accept'])->middleware('permission:bookings.update')->name('professional.direct-offers.accept');
+        Route::post('/direct-offers/{event}/decline', [\App\Http\Controllers\Professional\ProfessionalDirectOfferController::class, 'decline'])->middleware('permission:bookings.update')->name('professional.direct-offers.decline');
         Route::get('/direct-offers/{id?}', [\App\Http\Controllers\Professional\ProfessionalDirectOfferController::class, 'show'])->middleware('permission:bookings.view_any')->name('professional.direct-offers.show');
 
         Route::get('/proposals', [ProfessionalProposalController::class, 'index'])->middleware('permission:bookings.view_any')->name('professional.proposals.index');

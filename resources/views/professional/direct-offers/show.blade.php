@@ -83,6 +83,10 @@
 @section('content')
 <div class="do">
 
+    @if(session('status'))
+        <div style="background:#dcfce7;border:1px solid #bbf7d0;color:#15803d;border-radius:10px;padding:11px 15px;margin-bottom:16px;font-size:13.5px;font-weight:600;">✅ {{ session('status') }}</div>
+    @endif
+
     {{-- header card --}}
     <div class="do-card" style="margin-bottom:18px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
@@ -95,8 +99,18 @@
                 <div class="do-sub">Direct Request ID: {{ $offer['id'] }} · Received on {{ $offer['received_at'] }}</div>
             </div>
             <div style="display:flex;gap:10px;">
-                <button type="button" class="do-btn ghost">Decline Request</button>
-                <a href="{{ route('professional.proposals.index') }}" class="do-btn primary">Create Proposal</a>
+                @if(($offer['is_open'] ?? false) && ($offer['event_id'] ?? null))
+                    <form method="POST" action="{{ route('professional.direct-offers.decline', $offer['event_id']) }}">
+                        @csrf
+                        <button type="submit" class="do-btn ghost">Decline Request</button>
+                    </form>
+                    <form method="POST" action="{{ route('professional.direct-offers.accept', $offer['event_id']) }}">
+                        @csrf
+                        <button type="submit" class="do-btn primary">Accept Offer</button>
+                    </form>
+                @else
+                    <span class="do-btn ghost" style="cursor:default;">{{ $offer['status'] }}</span>
+                @endif
             </div>
         </div>
         <div class="do-summary">
