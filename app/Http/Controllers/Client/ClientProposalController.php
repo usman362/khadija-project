@@ -3,53 +3,57 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
-use App\Models\Booking;
+use App\Models\Bid;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Client-side Proposals view. A "proposal" here is a supplier's response
- * to a client's event (modelled today on the Booking record). This page
- * gives the client one place to review, compare, and act on every
- * proposal received across their events.
- *
- * NOTE: this reuses the Booking model as the proposal source. When a
- * dedicated Proposal model ships, swap the query source here — the view
- * contract (status, amount, health score) stays the same.
+ * Client-side Proposals view. A "proposal" here is a professional's bid on
+ * one of the client's published events (Fix Spec: after a posting is
+ * published, bids arrive asynchronously here). Sourced from the Bid model
+ * so the loop is real: MSR/SSR/ESR publish → pro bids on the Bidding Board
+ * → the bid appears on this page for the client to review and act on.
  *
  * Route: GET /client/proposals
  */
 class ClientProposalController extends Controller
 {
+    /** Bid statuses grouped into the proposal-pipeline buckets. */
+    private const PENDING  = ['submitted', 'shortlisted'];
+    private const DECLINED = ['declined', 'withdrawn'];
+
     public function index(Request $request): View
     {
         $user = $request->user();
 
-        $base = Booking::where('client_id', $user->id);
+        // Every bid placed on an event this client owns.
+        $base = Bid::whereHas('event', fn ($q) => $q->where('client_id', $user->id));
 
-        // Map booking statuses → proposal-pipeline buckets used by the tabs.
         $stats = [
             'submitted'   => (clone $base)->count(),
-            'pending'     => (clone $base)->where('status', 'requested')->count(),
-            'accepted'    => (clone $base)->where('status', 'confirmed')->count(),
-            'in_progress' => (clone $base)->where('status', 'confirmed')
-                ->whereHas('event', fn ($q) => $q->where('starts_at', '<=', now())->where('ends_at', '>=', now()))->count(),
-            'completed'   => (clone $base)->where('status', 'completed')->count(),
-            'declined'    => (clone $base)->where('status', 'cancelled')->count(),
+            'pending'     => (clone $base)->whereIn('status', self::PENDING)->count(),
+            'accepted'    => (clone $base)->where('status', 'won')->count(),
+            'in_progress' => (clone $base)->where('status', 'won')
+                ->whereHas('event', fn ($q) => $q->where('starts_at', '<=', now())
+                    ->where('ends_at', '>=', now()))->count(),
+            'completed'   => (clone $base)->where('status', 'won')
+                ->whereHas('event', fn ($q) => $q->where('status', 'completed'))->count(),
+            'declined'    => (clone $base)->whereIn('status', self::DECLINED)->count(),
             'drafts'      => 0,
         ];
 
         $tab = $request->string('tab')->toString() ?: 'all';
         $query = (clone $base)
-            ->with(['event:id,title,starts_at,location', 'event.categories:id,name', 'supplier:id,name'])
+            ->with(['event:id,title,starts_at,location,status', 'event.categories:id,name', 'supplier:id,name'])
             ->latest();
 
         match ($tab) {
-            'pending'     => $query->where('status', 'requested'),
-            'accepted'    => $query->where('status', 'confirmed'),
-            'completed'   => $query->where('status', 'completed'),
-            'declined'    => $query->where('status', 'cancelled'),
-            'in_progress' => $query->where('status', 'confirmed'),
+            'pending'     => $query->whereIn('status', self::PENDING),
+            'accepted'    => $query->where('status', 'won'),
+            'completed'   => $query->where('status', 'won')
+                ->whereHas('event', fn ($q) => $q->where('status', 'completed')),
+            'declined'    => $query->whereIn('status', self::DECLINED),
+            'in_progress' => $query->where('status', 'won'),
             default       => null,
         };
 
@@ -62,12 +66,9 @@ class ClientProposalController extends Controller
 
         $proposals = $query->paginate(10)->withQueryString();
 
-        // Revenue pipeline — pending vs accepted value.
-        $priceCol = \Illuminate\Support\Facades\Schema::hasColumn('bookings', 'total_amount')
-            ? 'total_amount'
-            : (\Illuminate\Support\Facades\Schema::hasColumn('bookings', 'agreed_price') ? 'agreed_price' : null);
-        $pendingValue  = $priceCol ? (float) (clone $base)->where('status', 'requested')->sum($priceCol) : 0;
-        $acceptedValue = $priceCol ? (float) (clone $base)->where('status', 'confirmed')->sum($priceCol) : 0;
+        // Revenue pipeline — pending vs accepted bid value.
+        $pendingValue  = (float) (clone $base)->whereIn('status', self::PENDING)->sum('amount');
+        $acceptedValue = (float) (clone $base)->where('status', 'won')->sum('amount');
 
         $pipeline = [
             'pending_value'  => $pendingValue,

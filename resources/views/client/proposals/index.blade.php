@@ -99,8 +99,11 @@
         'declined'    => ['Declined', $stats['declined']],
     ];
     $statusToPipe = fn ($s) => match ($s) {
-        'requested' => 'pending', 'confirmed' => 'accepted',
-        'completed' => 'completed', 'cancelled' => 'declined', default => $s,
+        'submitted', 'shortlisted', 'requested' => 'pending',
+        'won', 'confirmed' => 'accepted',
+        'completed' => 'completed',
+        'declined', 'withdrawn', 'cancelled' => 'declined',
+        default => $s,
     };
     $ringColor = fn ($score) => $score >= 80 ? '#10b981' : ($score >= 50 ? '#f59e0b' : '#ef4444');
 @endphp
@@ -161,7 +164,7 @@
                     @forelse($proposals as $p)
                         @php
                             $pipe = $statusToPipe($p->status);
-                            $amount = $p->total_amount ?? $p->agreed_price ?? 0;
+                            $amount = $p->amount ?? $p->total_amount ?? $p->agreed_price ?? 0;
                             // Health score heuristic: accepted=high, pending=mid, declined=low.
                             $score = match ($pipe) { 'accepted','completed' => rand(82, 96), 'pending','in_progress' => rand(55, 78), default => rand(20, 45) };
                             $col = $ringColor($score);
