@@ -605,6 +605,8 @@ Route::middleware('auth')->group(function () {
         // Reviews the client has written about hired professionals.
         Route::get('/reviews', [\App\Http\Controllers\Client\ClientReviewController::class, 'index'])
             ->name('client.reviews.index');
+        Route::post('/reviews/{booking}', [\App\Http\Controllers\Client\ClientReviewController::class, 'store'])
+            ->middleware('permission:bookings.view_any')->name('client.reviews.store');
 
         // Finance — Payments ledger + Earnings (project financial dashboard).
         Route::get('/payments', [\App\Http\Controllers\Client\ClientFinanceController::class, 'payments'])

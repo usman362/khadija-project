@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Review;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Client-side Reviews. Surfaces the feedback the client has written about
@@ -75,5 +77,38 @@ class ClientReviewController extends Controller
             ->get();
 
         return view('client.reviews.index', compact('stats', 'reviews', 'star', 'pendingReviews'));
+    }
+
+    /**
+     * Leave a review for the professional on a completed booking. One review
+     * per client per booking (enforced by the unique triple + firstOrCreate).
+     */
+    public function store(Request $request, Booking $booking): RedirectResponse
+    {
+        abort_unless(
+            $booking->client_id === $request->user()->id && $booking->status === 'completed',
+            Response::HTTP_FORBIDDEN
+        );
+
+        $data = $request->validate([
+            'rating'  => ['required', 'integer', 'min:1', 'max:5'],
+            'comment' => ['required', 'string', 'max:2000'],
+            'title'   => ['nullable', 'string', 'max:120'],
+        ]);
+
+        Review::firstOrCreate(
+            [
+                'reviewer_id' => $request->user()->id,
+                'reviewee_id' => $booking->supplier_id,
+                'booking_id'  => $booking->id,
+            ],
+            [
+                'rating'  => $data['rating'],
+                'title'   => $data['title'] ?? null,
+                'comment' => $data['comment'],
+            ]
+        );
+
+        return back()->with('status', 'Thanks — your review has been posted.');
     }
 }

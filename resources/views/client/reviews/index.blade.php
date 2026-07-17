@@ -321,22 +321,43 @@
     <div class="rv-rail-card">
         <div class="rv-rail-head"><div class="rv-rail-title">Pending Review Requests</div></div>
         @forelse($pendingReviews as $pr)
-            @php $daysLeft = rand(2, 6); @endphp
             <div class="rv-pend-row">
                 <img src="{{ $pr->supplier?->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($pr->supplier?->name ?? 'Pro') }}" class="rv-pend-avatar" loading="lazy">
                 <div class="rv-pend-body">
                     <div class="rv-pend-name">{{ \Illuminate\Support\Str::limit($pr->event?->title ?? 'Booking', 18) }}</div>
-                    <div class="rv-pend-date">{{ $pr->event?->starts_at?->format('M d, Y') ?? '' }}</div>
+                    <div class="rv-pend-date">{{ $pr->supplier?->name ?? '' }} · {{ $pr->event?->starts_at?->format('M d, Y') ?? '' }}</div>
                 </div>
                 <div style="text-align:right;">
-                    <div class="rv-pend-left">{{ $daysLeft }} days left</div>
-                    <button class="rv-pend-btn">Send Reminder</button>
+                    <button type="button" class="rv-pend-btn" onclick="var f=document.getElementById('rvform-{{ $pr->id }}');f.style.display=f.style.display==='block'?'none':'block';">Leave Review</button>
                 </div>
             </div>
+            <form id="rvform-{{ $pr->id }}" method="POST" action="{{ route('client.reviews.store', $pr) }}" style="display:none;margin:0 0 12px;padding:10px 12px;background:var(--bg-soft,#f8fafc);border-radius:10px;">
+                @csrf
+                <div style="display:flex;gap:4px;margin-bottom:8px;" class="rv-star-pick" data-target="rvrate-{{ $pr->id }}">
+                    @for($s = 1; $s <= 5; $s++)
+                        <span data-val="{{ $s }}" style="cursor:pointer;font-size:20px;color:#d1d5db;">★</span>
+                    @endfor
+                </div>
+                <input type="hidden" name="rating" id="rvrate-{{ $pr->id }}" value="5">
+                <textarea name="comment" required maxlength="2000" placeholder="How was your experience?" style="width:100%;border:1px solid var(--border-color,#e5e7eb);border-radius:8px;padding:8px;font-size:13px;min-height:56px;background:transparent;color:inherit;"></textarea>
+                <button type="submit" style="margin-top:8px;background:#f97316;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;">Post Review</button>
+            </form>
         @empty
             <div style="font-size:12px;color:var(--text-muted);text-align:center;padding:8px 0;">No pending requests</div>
         @endforelse
     </div>
 </aside>
 </div>{{-- /.rv-layout --}}
+
+<script>
+    document.querySelectorAll('.rv-star-pick').forEach(function (pick) {
+        var input = document.getElementById(pick.dataset.target);
+        var stars = pick.querySelectorAll('span');
+        function paint(n) { stars.forEach(function (s, i) { s.style.color = i < n ? '#f59e0b' : '#d1d5db'; }); }
+        stars.forEach(function (s) {
+            s.addEventListener('click', function () { input.value = s.dataset.val; paint(+s.dataset.val); });
+        });
+        paint(+input.value);
+    });
+</script>
 @endsection
