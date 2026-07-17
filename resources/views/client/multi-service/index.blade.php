@@ -139,6 +139,13 @@
 
     {{-- Wizard form --}}
     <div class="ms-card" id="ms-brief">
+        <form method="POST" action="{{ route('client.multi-service.store') }}">
+        @csrf
+        @if($errors->any())
+            <div style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;">
+                {{ $errors->first() }}
+            </div>
+        @endif
         <div class="ms-section-label">Create New Master Event Brief</div>
         <div class="ms-wizbar">
             <div class="ms-wizstep active"><span class="n">1</span>Event Overview</div>
@@ -152,22 +159,22 @@
 
         {{-- Step 1: Event Overview --}}
         <div class="ms-grid2">
-            <div class="ms-field"><label>Event Name <span class="req">*</span></label><input class="ms-input" placeholder="e.g. Annual Gala Dinner" value="{{ $activeEvent->title ?? '' }}"></div>
-            <div class="ms-field"><label>Event Type <span class="req">*</span></label><select class="ms-select"><option>Select event type</option><option>Wedding</option><option>Corporate</option><option>Birthday</option><option>Conference</option><option>Concert</option></select></div>
+            <div class="ms-field"><label>Event Name <span class="req">*</span></label><input name="event_name" class="ms-input" placeholder="e.g. Annual Gala Dinner" value="{{ old('event_name', $activeEvent->title ?? '') }}" required></div>
+            <div class="ms-field"><label>Event Type <span class="req">*</span></label><select name="event_type" class="ms-select"><option value="">Select event type</option><option>Wedding</option><option>Corporate</option><option>Birthday</option><option>Conference</option><option>Concert</option></select></div>
         </div>
         <div class="ms-grid3">
-            <div class="ms-field"><label>Event Date <span class="req">*</span></label><input type="date" class="ms-input" value="{{ $activeEvent?->starts_at?->format('Y-m-d') ?? '' }}"></div>
-            <div class="ms-field"><label>Start Time</label><input type="time" class="ms-input"></div>
-            <div class="ms-field"><label>End Time</label><input type="time" class="ms-input"></div>
+            <div class="ms-field"><label>Event Date <span class="req">*</span></label><input name="event_date" type="date" class="ms-input" value="{{ old('event_date', $activeEvent?->starts_at?->format('Y-m-d') ?? '') }}"></div>
+            <div class="ms-field"><label>Start Time</label><input name="start_time" type="time" class="ms-input" value="{{ old('start_time') }}"></div>
+            <div class="ms-field"><label>End Time</label><input name="end_time" type="time" class="ms-input" value="{{ old('end_time') }}"></div>
         </div>
         <div class="ms-grid2">
-            <div class="ms-field"><label>Event Location <span class="req">*</span></label><input class="ms-input" placeholder="Venue or address" value="{{ $activeEvent->location ?? '' }}"></div>
-            <div class="ms-field"><label>Estimated Guest Count <span class="req">*</span></label><input type="number" class="ms-input" placeholder="e.g. 300"></div>
+            <div class="ms-field"><label>Event Location <span class="req">*</span></label><input name="location" class="ms-input" placeholder="Venue or address" value="{{ old('location', $activeEvent->location ?? '') }}"></div>
+            <div class="ms-field"><label>Estimated Guest Count <span class="req">*</span></label><input name="guest_count" type="number" class="ms-input" placeholder="e.g. 300" value="{{ old('guest_count') }}"></div>
         </div>
-        <div class="ms-field" style="margin-bottom:14px;"><label>Event Description / Goals</label><textarea class="ms-textarea" placeholder="Tell us about your event, goals, theme, and any important details."></textarea></div>
+        <div class="ms-field" style="margin-bottom:14px;"><label>Event Description / Goals</label><textarea name="description" class="ms-textarea" placeholder="Tell us about your event, goals, theme, and any important details.">{{ old('description') }}</textarea></div>
         <div class="ms-grid2">
-            <div class="ms-field"><label>Budget Range (Total)</label><select class="ms-select"><option>Select budget range</option><option>$5,000 – $10,000</option><option>$10,000 – $25,000</option><option>$25,000 – $50,000</option><option>$50,000+</option></select></div>
-            <div class="ms-field"><label>Planning Stage</label><select class="ms-select"><option>Select planning stage</option><option>Just exploring</option><option>Actively planning</option><option>Ready to book</option></select></div>
+            <div class="ms-field"><label>Budget Range (Total)</label><select name="budget_range" class="ms-select"><option value="">Select budget range</option><option>$5,000 – $10,000</option><option>$10,000 – $25,000</option><option>$25,000 – $50,000</option><option>$50,000+</option></select></div>
+            <div class="ms-field"><label>Planning Stage</label><select name="planning_stage" class="ms-select"><option value="">Select planning stage</option><option>Just exploring</option><option>Actively planning</option><option>Ready to book</option></select></div>
         </div>
 
         {{-- Step 2: Services --}}
@@ -183,7 +190,7 @@
             @endphp
             @foreach($svcList as $i => [$svc, $sub])
                 <label class="ms-service">
-                    <input type="checkbox" name="services[]" value="{{ $svc }}" {{ $i < 4 ? 'checked' : '' }}>
+                    <input type="checkbox" name="services[]" value="{{ $svc }}" {{ (is_array(old('services')) ? in_array($svc, old('services')) : $i < 4) ? 'checked' : '' }}>
                     <div class="ms-service-body">
                         <div class="ms-service-name">{{ $svc }}</div>
                         @if($sub)<div class="ms-service-sub">{{ $sub }}</div>@endif
@@ -205,12 +212,12 @@
         </table>
 
         <div class="ms-form-actions">
-            <button class="ms-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+            <a href="{{ route('client.post-event.choose') }}" class="ms-btn" style="text-decoration:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Back</a>
             <div style="display:flex;gap:8px;">
-                <button class="ms-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>Save Draft</button>
-                <button class="ms-btn coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>Next: Review &amp; Submit</button>
+                <button type="submit" class="ms-btn coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>Publish Request</button>
             </div>
         </div>
+        </form>
     </div>
 </div>{{-- /.ms-main --}}
 

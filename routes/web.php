@@ -590,9 +590,11 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:bookings.view_any')
             ->name('client.proposals.index');
 
-        // Multi-Service Request for Proposal (RFP wizard).
+        // Multi-Service Request (MSR).
         Route::get('/multi-service', [\App\Http\Controllers\Client\ClientMultiServiceController::class, 'index'])
             ->name('client.multi-service.index');
+        Route::post('/multi-service', [\App\Http\Controllers\Client\ClientMultiServiceController::class, 'store'])
+            ->middleware('permission:events.create')->name('client.multi-service.store');
 
         // Reviews the client has written about hired professionals.
         Route::get('/reviews', [\App\Http\Controllers\Client\ClientReviewController::class, 'index'])
