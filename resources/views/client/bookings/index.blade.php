@@ -817,7 +817,7 @@
                 <select class="bk-rail-select"><option>This Month</option><option>YTD</option></select>
             </div>
             <div class="bk-fin-row"><span class="lbl">Total Bookings Value</span><span class="val">${{ number_format($financial['total_value']) }}</span></div>
-            <div class="bk-fin-row"><span class="lbl">Locked in Secure Payment</span><span class="val amber">${{ number_format($financial['locked_secure payment']) }}</span></div>
+            <div class="bk-fin-row"><span class="lbl">Locked in Secure Payment</span><span class="val amber">${{ number_format($financial['locked_escrow']) }}</span></div>
             <div class="bk-fin-row"><span class="lbl">Paid Out (YTD)</span><span class="val green">${{ number_format($financial['paid_out_ytd']) }}</span></div>
             <div class="bk-fin-row"><span class="lbl">Pending Payouts</span><span class="val amber">${{ number_format($financial['pending_payouts']) }}</span></div>
             <a href="{{ route('client.payments.index') }}" class="bk-rail-link">View Full Financials <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>

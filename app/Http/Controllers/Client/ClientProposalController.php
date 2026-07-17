@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bid;
+use App\Models\Booking;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -84,15 +85,33 @@ class ClientProposalController extends Controller
         return view('client.proposals.index', compact('stats', 'proposals', 'tab', 'pipeline'));
     }
 
-    /** Award a bid (mark it won). Only the event's owner may act. */
+    /**
+     * Award a bid: mark it won and open a confirmed Booking (the contract).
+     * Only the event's owner may act.
+     */
     public function accept(Request $request, Bid $bid): RedirectResponse
     {
         $this->authorizeOwner($request, $bid);
         $bid->update(['status' => 'won']);
 
+        // Turn the award into a real booking/contract (idempotent per pro+event).
+        Booking::firstOrCreate(
+            ['event_id' => $bid->event_id, 'supplier_id' => $bid->supplier_id],
+            [
+                'client_id'  => $bid->event->client_id,
+                'created_by' => $request->user()->id,
+                'status'     => 'confirmed',
+                'price'      => $bid->amount,
+                'currency'   => 'USD',
+                'booked_at'  => now(),
+                'source'     => 'bid',
+                'notes'      => 'Awarded from bid #' . $bid->id,
+            ]
+        );
+
         return back()->with('status', 'Bid accepted. '
             . ($bid->supplier?->name ?? 'The professional')
-            . ' has been awarded — we\'ll take it to a contract next.');
+            . ' is awarded — a confirmed booking has been created under Bookings.');
     }
 
     /** Decline a bid. Only the event's owner may act. */
