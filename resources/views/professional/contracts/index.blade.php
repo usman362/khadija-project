@@ -171,6 +171,10 @@
 @section('content')
 <div class="pc">
 
+    @if($errors->any())
+        <div style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:10px;padding:11px 15px;margin-bottom:16px;font-size:13.5px;font-weight:600;">{{ $errors->first() }}</div>
+    @endif
+
     {{-- Page header --}}
     <div class="pc-head">
         <span class="pc-head-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg></span>
@@ -263,6 +267,13 @@
                                 <td><span class="pc-badge {{ $stClass }}">{{ $stLabel }}</span></td>
                                 <td>
                                     <span class="pc-actions">
+                                        @if($c->status === 'confirmed')
+                                            <form method="POST" action="{{ route('professional.proposals.update-status', $c) }}" style="margin:0;" onsubmit="return confirm('Mark this work as delivered? The client will be asked to review and release payment.');">
+                                                @csrf @method('PATCH')
+                                                <input type="hidden" name="status" value="completed">
+                                                <button type="submit" class="pc-act" title="Mark as delivered" style="border:none;cursor:pointer;background:#dcfce7;color:#15803d;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></button>
+                                            </form>
+                                        @endif
                                         <a href="{{ route('professional.chat.index') }}" class="pc-act" title="Message"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></a>
                                         <a href="{{ route('professional.gigs.show', $ev?->id ?? 0) }}" class="pc-act" title="View gig"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></a>
                                     </span>
