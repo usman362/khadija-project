@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Bid extends Model
 {
@@ -24,6 +25,12 @@ class Bid extends Model
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(User::class, 'supplier_id');
+    }
+
+    /** Negotiation thread (client ↔ pro replies / counter-offers). */
+    public function replies(): HasMany
+    {
+        return $this->hasMany(BidReply::class)->oldest();
     }
 
     /**

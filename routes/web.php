@@ -593,6 +593,8 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:bookings.update')->name('client.proposals.accept');
         Route::post('/proposals/{bid}/decline', [\App\Http\Controllers\Client\ClientProposalController::class, 'decline'])
             ->middleware('permission:bookings.update')->name('client.proposals.decline');
+        Route::post('/proposals/{bid}/reply', [\App\Http\Controllers\Client\ClientProposalController::class, 'reply'])
+            ->middleware('permission:bookings.update')->name('client.proposals.reply');
 
         // Multi-Service Request (MSR).
         Route::get('/multi-service', [\App\Http\Controllers\Client\ClientMultiServiceController::class, 'index'])
@@ -698,6 +700,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/bidding-board/bid', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'placeBid'])->name('professional.bidding-board.bid');
         Route::get('/bidding-board/my-bids', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'myBids'])->name('professional.bidding-board.my-bids');
         Route::post('/bidding-board/bid/{bid}/toggle', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'toggleBidVisibility'])->name('professional.bidding-board.toggle');
+        Route::post('/bidding-board/bid/{bid}/reply', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'reply'])->name('professional.bidding-board.reply');
 
         // Team & Staffing (crew + shifts subsystem)
         Route::get('/team', [\App\Http\Controllers\Professional\ProfessionalTeamController::class, 'index'])->name('professional.team.index');

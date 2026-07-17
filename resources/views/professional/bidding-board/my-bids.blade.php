@@ -65,6 +65,7 @@
                     <span>📅 {{ $bid->event?->starts_at?->format('M j, Y') ?? 'Flexible' }}</span>
                     <span>Submitted {{ $bid->created_at->diffForHumans() }}</span>
                 </div>
+                @include('professional.bidding-board._bid-thread', ['bid' => $bid])
             </div>
             <div class="mb-amt">
                 <b>${{ number_format($bid->amount) }}</b>

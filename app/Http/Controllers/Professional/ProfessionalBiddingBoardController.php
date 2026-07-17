@@ -115,11 +115,30 @@ class ProfessionalBiddingBoardController extends Controller
             : 'Your bid amount is sealed again.');
     }
 
+    /** Post a reply / counter-offer back to the client (negotiation loop). */
+    public function reply(Request $request, Bid $bid): RedirectResponse
+    {
+        abort_unless($bid->supplier_id === $request->user()->id, 403);
+
+        $data = $request->validate([
+            'note'           => ['nullable', 'required_without:counter_amount', 'string', 'max:1000'],
+            'counter_amount' => ['nullable', 'integer', 'min:1', 'max:100000000'],
+        ]);
+
+        $bid->replies()->create([
+            'user_id'        => $request->user()->id,
+            'counter_amount' => $data['counter_amount'] ?? null,
+            'note'           => $data['note'] ?? null,
+        ]);
+
+        return back()->with('status', 'Reply sent to the client.');
+    }
+
     /** The pro's own bids across all gigs, with seal/reveal control. */
     public function myBids(Request $request): View
     {
         $bids = Bid::where('supplier_id', $request->user()->id)
-            ->with('event:id,title,starts_at,status')
+            ->with(['event:id,title,starts_at,status', 'replies.user:id,name'])
             ->latest()
             ->paginate(15);
 

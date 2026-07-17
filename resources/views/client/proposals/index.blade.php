@@ -217,9 +217,14 @@
                                             <button type="submit" class="pr-act-btn pr-act-decline" title="Decline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                                         </form>
                                     @endif
-                                    <a href="{{ route('client.chat.index') }}" class="pr-act-btn" title="Message"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></a>
+                                    <button type="button" class="pr-act-btn" title="Reply / Counter" onclick="var t=document.getElementById('prthread-{{ $p->id }}');t.style.display=t.style.display==='table-row'?'none':'table-row';"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
                                     <a href="{{ $p->event ? route('client.events.show', $p->event) : '#' }}" class="pr-act-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></a>
                                 </div>
+                            </td>
+                        </tr>
+                        <tr id="prthread-{{ $p->id }}" style="display:none;">
+                            <td colspan="7" style="padding:0 18px 16px;background:var(--bg-soft, #f8fafc);">
+                                @include('professional.bidding-board._bid-thread', ['bid' => $p, 'replyRoute' => 'client.proposals.reply', 'meId' => auth()->id()])
                             </td>
                         </tr>
                     @empty

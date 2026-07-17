@@ -46,7 +46,8 @@ class ClientProposalController extends Controller
 
         $tab = $request->string('tab')->toString() ?: 'all';
         $query = (clone $base)
-            ->with(['event:id,title,starts_at,location,status', 'event.categories:id,name', 'supplier:id,name'])
+            ->with(['event:id,title,starts_at,location,status', 'event.categories:id,name',
+                'supplier:id,name', 'replies.user:id,name'])
             ->latest();
 
         match ($tab) {
@@ -101,6 +102,26 @@ class ClientProposalController extends Controller
         $bid->update(['status' => 'declined']);
 
         return back()->with('status', 'Bid declined.');
+    }
+
+    /** Post a reply / counter-offer to the professional (negotiation loop). */
+    public function reply(Request $request, Bid $bid): RedirectResponse
+    {
+        $this->authorizeOwner($request, $bid);
+
+        $data = $request->validate([
+            'note'           => ['nullable', 'required_without:counter_amount', 'string', 'max:1000'],
+            'counter_amount' => ['nullable', 'integer', 'min:1', 'max:100000000'],
+        ]);
+
+        $bid->replies()->create([
+            'user_id'        => $request->user()->id,
+            'counter_amount' => $data['counter_amount'] ?? null,
+            'note'           => $data['note'] ?? null,
+        ]);
+
+        return back()->with('status', 'Reply sent to '
+            . ($bid->supplier?->name ?? 'the professional') . '.');
     }
 
     /** Guard: the bid must sit on an event this client owns. */
