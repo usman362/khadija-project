@@ -228,13 +228,6 @@
                 </div>
                 <button type="button" class="pk-showmore" id="pkShowMore" onclick="pkToggleMore()">Show More ▾</button>
 
-                <div class="pk-divider"></div>
-
-                <div class="pk-rail-sec">2. Provider Type</div>
-                <label class="pk-radio"><input type="radio" name="provider" value="all" @checked($f['provider']==='all')><span><b>All Packages ({{ $providerCounts['all'] }})</b></span></label>
-                <label class="pk-radio"><input type="radio" name="provider" value="solo" @checked($f['provider']==='solo')><span><b>Solo Multi-Pros Only ({{ $providerCounts['solo'] }})</b><span>One professional does multiple services</span></span></label>
-                <label class="pk-radio"><input type="radio" name="provider" value="coop" @checked($f['provider']==='coop')><span><b>Co-Op Partnerships Only ({{ $providerCounts['coop'] }})</b><span>Two or more professionals collaborate</span></span></label>
-
                 <button type="submit" class="pk-apply">Apply Filters</button>
             </form>
 
@@ -248,13 +241,11 @@
                                 $hero = $pkg->heroUrls(1)[0] ?? 'https://images.unsplash.com/' . $stock[$pkg->id % count($stock)] . '?w=520&q=70&auto=format&fit=crop';
                                 $rating = $pro?->reviews_avg ? number_format($pro->reviews_avg, 1) : null;
                                 $svcTags = $pkg->services ?: ($pkg->category ? [$pkg->category->name] : []);
-                                $isCoop = $pkg->type === 'co-op';
                                 $total_ = '$' . number_format($pkg->price);
                             @endphp
                             <article class="pk-card">
                                 <div class="pk-media">
                                     <img src="{{ $hero }}" alt="{{ $pkg->title }}" loading="lazy">
-                                    <span class="pk-typebadge {{ $isCoop ? 'coop' : 'solo' }}">{{ $isCoop ? 'CO-OP PARTNERSHIP' : 'SOLO PACKAGE' }}</span>
                                     <button type="button" class="pk-heart" aria-label="Save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg></button>
                                     @if($pkg->photosCount())<span class="pk-photos">📷 {{ $pkg->photosCount() }} Photos</span>@endif
                                 </div>
@@ -262,9 +253,6 @@
                                     <h3 class="pk-title">{{ $pkg->title }}</h3>
                                     <div class="pk-pro">
                                         {{ $pro?->name ?? 'Verified Professional' }} <span class="pk-verif">✔</span>
-                                        @if($isCoop && $pkg->coopPartner)
-                                            <span class="pk-x">×</span> {{ $pkg->coopPartner->name }} <span class="pk-verif">✔</span>
-                                        @endif
                                     </div>
                                     @if($pkg->isMultiService())<span class="pk-msp">MULTI-SERVICE PRO</span>@endif
                                     <div class="pk-tags">
@@ -273,9 +261,6 @@
                                     <p class="pk-desc">{{ \Illuminate\Support\Str::limit($pkg->description, 120) }}</p>
                                     <div class="pk-facts">
                                         <div class="pk-fact"><span>Event Coverage</span><b>{{ $pkg->coverage ?: $pkg->duration ?: '—' }}</b></div>
-                                        <div class="pk-fact"><span>Team on Event Day</span>
-                                            @forelse(array_slice($pkg->team ?? [], 0, 4) as $member)<div class="row">{{ $member }}</div>@empty<b>{{ $isCoop ? 'Partner team' : 'Solo pro' }}</b>@endforelse
-                                        </div>
                                         <div class="pk-fact"><span>Guests Served</span><b>{{ $pkg->guests ?: '—' }}</b></div>
                                     </div>
                                     <div class="pk-cardfoot">
@@ -301,7 +286,7 @@
                     <div class="pk-empty">
                         <div style="font-size:40px;">🎁</div>
                         <h3>No packages match your mix</h3>
-                        <p>Try removing a service or switching provider type — packages need every selected service to appear.</p>
+                        <p>Try removing a service — packages need every selected service to appear.</p>
                         <a href="{{ route('public.packages') }}">Clear filters</a>
                     </div>
                 @endif
@@ -317,10 +302,6 @@
                     @foreach($availability as $city => $count)
                         <div class="pk-avail"><span>{{ $city }}</span><b>{{ $count }}</b></div>
                     @endforeach
-                    <div class="pk-legend">
-                        <span class="solo">Solo Multi-Pros Packages</span>
-                        <span class="coop">Co-Op Partnership Packages</span>
-                    </div>
                 </div>
 
                 <div class="pk-scard">

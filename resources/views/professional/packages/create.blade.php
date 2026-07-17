@@ -7,15 +7,13 @@
 @section('page-subtitle', 'Build a ready-made service bundle clients can discover and book')
 
 {{-- Professional — Create a Package for Package Search. A pro bundles 2+ of
-     their own services (solo or co-op) into a fixed offering that appears in
-     the client Package Service Search. NOT an MSR. --}}
+     their own services (solo — one professional) into a fixed offering that
+     appears in the client Package Service Search. NOT an MSR. --}}
 
 @php
     $pServices   = old('services', $p?->services ?? []);
     $pEventTypes = old('event_types', $p?->event_types ?? []);
-    $pTeam       = old('team', $p?->team ?? []);
     $pIncludes   = old('includes', $p?->includes ?? []);
-    $pType       = old('type', $p?->type ?? 'solo');
     $gMin = old('guest_min'); $gMax = old('guest_max');
 @endphp
 
@@ -152,32 +150,9 @@
                         <div class="hint">Choose a clear, attractive name for your package.</div>
                     </div>
 
-                    <div class="pc-field">
-                        <label>Package Type <span class="req">*</span></label>
-                        <div class="pc-typegrid">
-                            <label class="pc-typeopt {{ $pType==='solo' ? 'on' : '' }}" data-type="solo">
-                                <input type="radio" name="type" value="solo" @checked($pType==='solo')>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                <div><b>Solo Package</b><span>You provide all included services</span></div>
-                            </label>
-                            <label class="pc-typeopt {{ $pType==='co-op' ? 'on' : '' }}" data-type="co-op">
-                                <input type="radio" name="type" value="co-op" @checked($pType==='co-op')>
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                                <div><b>Co-Op Package</b><span>You &amp; one or more pros collaborate</span></div>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="pc-field" id="pcPartnerWrap" style="{{ $pType==='co-op' ? '' : 'display:none;' }}">
-                        <label>Partner Professional <span class="req">*</span></label>
-                        <select name="coop_partner_id" class="pc-select">
-                            <option value="">Select a partner pro…</option>
-                            @foreach($partners as $partner)
-                                <option value="{{ $partner->id }}" @selected(old('coop_partner_id', $p?->coop_partner_id) == $partner->id)>{{ $partner->name }}</option>
-                            @endforeach
-                        </select>
-                        <div class="hint">The other professional collaborating with you on this package.</div>
-                    </div>
+                    {{-- Packages are solo-only: one professional provides all included
+                         services (Team/Co-Op "combined force" removed platform-wide). --}}
+                    <input type="hidden" name="type" value="solo">
 
                     <div class="pc-field">
                         <label>Short Description <span class="req">*</span></label>
@@ -307,17 +282,6 @@
                         <div class="hint">Comma-separated states/regions you'll travel to.</div>
                     </div>
                     <div class="pc-field">
-                        <label>Team on Event Day</label>
-                        <div id="pcTeam">
-                            @forelse($pTeam as $member)
-                                <div class="pc-rep-item"><input type="text" name="team[]" class="pc-input" value="{{ $member }}" placeholder="e.g. 1 Lead Photographer"><button type="button" class="pc-rep-del" onclick="pcDel(this)">✕</button></div>
-                            @empty
-                                <div class="pc-rep-item"><input type="text" name="team[]" class="pc-input" placeholder="e.g. 1 Lead Photographer"><button type="button" class="pc-rep-del" onclick="pcDel(this)">✕</button></div>
-                            @endforelse
-                        </div>
-                        <button type="button" class="pc-addbtn" onclick="pcAdd('pcTeam','team[]','e.g. 1 Videographer')">+ Add Team Member</button>
-                    </div>
-                    <div class="pc-field">
                         <label>Cover Photo</label>
                         <input type="file" name="cover_image" class="pc-input" accept="image/*">
                         <div class="hint">A high-quality hero image makes your package stand out. JPG/PNG/WebP, up to 6 MB.</div>
@@ -336,7 +300,7 @@
                 <h4>👁 Package Preview</h4>
                 <div class="pc-prev-media" id="pcPrevMedia">Cover photo preview</div>
                 <div class="pc-prev-title" id="pcPrevTitle">{{ old('title', $p?->title) ?: 'Your package name' }}</div>
-                <span class="pc-prev-type" id="pcPrevType">{{ $pType==='co-op' ? 'Co-Op Package' : 'Solo Package' }}</span>
+                <span class="pc-prev-type" id="pcPrevType">Service Package</span>
                 <div class="pc-prev-svc"><span id="pcPrevSvcCount">0</span> Services Included</div>
                 <div class="pc-prev-price">$<span id="pcPrevPrice">{{ old('price', $p?->price) ?: '0' }}</span><small>Total Package Price</small></div>
             </div>
@@ -384,16 +348,6 @@
     document.querySelectorAll('[data-prev]').forEach(function (b) { b.addEventListener('click', function () { goStep(b.dataset.prev); }); });
     document.querySelectorAll('.pc-step').forEach(function (s) { s.addEventListener('click', function () { goStep(s.dataset.step); }); });
 
-    document.querySelectorAll('.pc-typeopt').forEach(function (opt) {
-        opt.addEventListener('click', function () {
-            document.querySelectorAll('.pc-typeopt').forEach(function (o) { o.classList.remove('on'); });
-            opt.classList.add('on');
-            opt.querySelector('input').checked = true;
-            var coop = opt.dataset.type === 'co-op';
-            document.getElementById('pcPartnerWrap').style.display = coop ? '' : 'none';
-            document.getElementById('pcPrevType').textContent = coop ? 'Co-Op Package' : 'Solo Package';
-        });
-    });
 
     window.pcCount = function () {
         var d = document.getElementById('pcDesc');

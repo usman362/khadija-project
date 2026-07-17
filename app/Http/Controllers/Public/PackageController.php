@@ -36,10 +36,10 @@ class PackageController extends Controller
             ->filter(fn ($s) => in_array($s, self::SERVICES, true))
             ->values();
 
-        $provider = (string) $request->query('provider', 'all');   // all | solo | coop
         $q        = trim((string) $request->query('q', ''));
         $sort     = (string) $request->query('sort', 'relevant');
 
+        // Packages are solo-only (Team/Co-Op combined-force removed platform-wide).
         $base = Package::active()
             ->with([
                 'category:id,name,slug',
@@ -47,10 +47,7 @@ class PackageController extends Controller
                     ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')
                     ->withCount(['reviewsReceived as reviews_count' => fn ($r) => $r->where('is_hidden', false)])
                     ->with('profile:user_id,city,state'),
-                'coopPartner:id,name',
             ])
-            ->when($provider === 'solo', fn ($qr) => $qr->where('type', 'solo'))
-            ->when($provider === 'coop', fn ($qr) => $qr->where('type', 'co-op'))
             ->when($q !== '', fn ($qr) => $qr->where(fn ($w) => $w
                 ->where('title', 'like', "%{$q}%")
                 ->orWhere('description', 'like', "%{$q}%")));
@@ -70,12 +67,10 @@ class PackageController extends Controller
 
         $packages = $base->paginate(12)->withQueryString();
 
-        // Left-rail service counts (respecting provider filter, ignoring service selection).
+        // Left-rail service counts (ignoring the current service selection).
         $serviceCounts = [];
         foreach (self::SERVICES as $svc) {
             $serviceCounts[$svc] = Package::active()
-                ->when($provider === 'solo', fn ($qr) => $qr->where('type', 'solo'))
-                ->when($provider === 'coop', fn ($qr) => $qr->where('type', 'co-op'))
                 ->whereJsonContains('services', $svc)
                 ->count();
         }
@@ -88,13 +83,6 @@ class PackageController extends Controller
             ->map->count()
             ->sortDesc()
             ->take(6);
-
-        // Provider-type totals for the radio labels.
-        $providerCounts = [
-            'all'  => Package::active()->count(),
-            'solo' => Package::active()->where('type', 'solo')->count(),
-            'coop' => Package::active()->where('type', 'co-op')->count(),
-        ];
 
         // Recently viewed (session ids, newest first), excluding what's on-page already.
         $recentIds = collect(session('recent_packages', []))->take(4);
@@ -109,11 +97,10 @@ class PackageController extends Controller
             'services'       => self::SERVICES,
             'serviceCounts'  => $serviceCounts,
             'availability'   => $availability,
-            'providerCounts' => $providerCounts,
             'recent'         => $recent,
             'filters'        => [
                 'selected' => $selected->all(),
-                'provider' => in_array($provider, ['all', 'solo', 'coop'], true) ? $provider : 'all',
+                'provider' => 'all',
                 'q'        => $q,
                 'sort'     => $sort,
                 'view'     => $request->query('view') === 'grid' ? 'grid' : 'list',

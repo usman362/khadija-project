@@ -75,7 +75,7 @@
 
         <div class="pk-grid">
             <div>
-                <span class="pk-eyebrow">{{ $package->type === 'co-op' ? 'Co-op Package' : 'Service Package' }}</span>
+                <span class="pk-eyebrow">Service Package</span>
                 <h1 class="pk-title">{{ $package->title }}</h1>
 
                 <div class="pk-pro">

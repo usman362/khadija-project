@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers\Professional;
 
-use App\Domain\Auth\Enums\RoleName;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Public\PackageController;
 use App\Models\Category;
 use App\Models\Package;
-use App\Models\User;
 use App\Services\ImagePipelineService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,8 +15,8 @@ use Illuminate\View\View;
 /**
  * Professional "Packages" — a pro bundles TWO OR MORE of their own services
  * into a fixed offering clients browse and book in the Package Service Search.
- * Delivered solo (one multi-service pro) or co-op (with a partner pro). This is
- * NOT an MSR (client gig-post pros bid on) — the two are kept separate.
+ * Delivered solo (one multi-service pro). This is NOT an MSR (client gig-post
+ * pros bid on) — the two are kept separate.
  */
 class ProfessionalPackageController extends Controller
 {
@@ -50,9 +48,6 @@ class ProfessionalPackageController extends Controller
             'categories'  => Category::getNestedDropdownList(),
             'serviceList' => PackageController::SERVICES,
             'eventTypes'  => self::EVENT_TYPES,
-            'partners'    => User::whereHas('roles', fn ($r) => $r->where('name', RoleName::SUPPLIER->value))
-                ->where('id', '!=', auth()->id())
-                ->orderBy('name')->get(['id', 'name']),
         ];
     }
 
@@ -122,8 +117,6 @@ class ProfessionalPackageController extends Controller
         return $request->validate([
             'title'           => ['required', 'string', 'max:160'],
             'category_id'     => ['nullable', 'exists:categories,id'],
-            'type'            => ['required', 'in:solo,co-op'],
-            'coop_partner_id' => ['nullable', 'required_if:type,co-op', 'exists:users,id'],
             'description'     => ['nullable', 'string', 'max:2000'],
             'services'        => ['required', 'array', 'min:2'],
             'services.*'      => ['string', 'max:60'],
@@ -133,8 +126,6 @@ class ProfessionalPackageController extends Controller
             'price_unit'      => ['required', 'in:flat,from,hourly'],
             'duration'        => ['nullable', 'string', 'max:60'],
             'coverage'        => ['nullable', 'string', 'max:80'],
-            'team'            => ['nullable', 'array'],
-            'team.*'          => ['string', 'max:80'],
             'guest_min'       => ['nullable', 'integer', 'min:0', 'max:1000000'],
             'guest_max'       => ['nullable', 'integer', 'min:0', 'max:1000000'],
             'serves_regions'  => ['nullable', 'string', 'max:120'],
@@ -160,8 +151,10 @@ class ProfessionalPackageController extends Controller
         return [
             'services'        => $services,
             'event_types'     => $eventTypes,
-            'coop_partner_id' => $request->input('type') === 'co-op' ? $request->input('coop_partner_id') : null,
-            'team'            => $this->cleanList($request->input('team')),
+            // Packages are solo-only (Team/Co-Op combined-force removed platform-wide).
+            'type'            => 'solo',
+            'coop_partner_id' => null,
+            'team'            => [],
             'includes'        => $this->cleanList($request->input('includes')),
             'guests'          => $this->guestLabel($request->integer('guest_min'), $request->integer('guest_max')),
         ];

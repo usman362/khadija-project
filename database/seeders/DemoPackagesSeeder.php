@@ -37,16 +37,12 @@ class DemoPackagesSeeder extends Seeder
         foreach ($this->packages() as $i => $data) {
             $supplier = $suppliers[$i % $suppliers->count()];
             $category = $this->resolveCategory($data['category']);
-            // Co-op packages get a second, different professional as the partner.
-            $partner = $data['type'] === 'co-op'
-                ? $suppliers->where('id', '!=', $supplier->id)->values()[$i % max($suppliers->count() - 1, 1)] ?? null
-                : null;
 
             Package::firstOrCreate(
                 ['slug' => Str::slug($data['title'])],
                 [
                     'user_id'        => $supplier->id,
-                    'coop_partner_id'=> $partner?->id,
+                    'coop_partner_id'=> null,
                     'category_id'    => $category?->id,
                     'services'       => $data['services'],
                     'title'          => $data['title'],
@@ -96,7 +92,7 @@ class DemoPackagesSeeder extends Seeder
                 'sort' => 96,
             ],
             [
-                'title' => 'Ultimate Visual Bundle', 'category' => 'Photograph', 'type' => 'co-op',
+                'title' => 'Ultimate Visual Bundle', 'category' => 'Photograph', 'type' => 'solo',
                 'services' => ['Photography', 'Videography'],
                 'price' => 4850, 'price_unit' => 'from', 'duration' => 'Up to 12 Hours', 'coverage' => 'Up to 12 Hours',
                 'team' => ['1 Lead Photographer', '1 Assistant', '1 Videographer', '1 Drone Pilot'], 'guests' => 'Up to 200',
@@ -116,7 +112,7 @@ class DemoPackagesSeeder extends Seeder
                 'sort' => 92,
             ],
             [
-                'title' => 'Complete Celebration — Photo, DJ & Décor', 'category' => 'DJ', 'type' => 'co-op',
+                'title' => 'Complete Celebration — Photo, DJ & Décor', 'category' => 'DJ', 'type' => 'solo',
                 'services' => ['Photography', 'DJ / Entertainment', 'Decor & Design', 'Lighting & Tech'],
                 'price' => 5600, 'price_unit' => 'from', 'duration' => 'Up to 8 Hours', 'coverage' => 'Up to 8 Hours',
                 'team' => ['1 Photographer', '1 DJ + MC', '1 Décor Lead', '1 Lighting Tech'], 'guests' => 'Up to 250',
@@ -126,7 +122,7 @@ class DemoPackagesSeeder extends Seeder
                 'sort' => 90,
             ],
             [
-                'title' => 'Corporate Conference — Catering & AV', 'category' => 'Cater', 'type' => 'co-op',
+                'title' => 'Corporate Conference — Catering & AV', 'category' => 'Cater', 'type' => 'solo',
                 'services' => ['Catering / Food', 'Lighting & Tech', 'Planning / Coordination'],
                 'price' => 8400, 'price_unit' => 'from', 'duration' => 'Multi-day', 'coverage' => 'Up to 3 Days',
                 'team' => ['Catering crew (6)', '2 AV Technicians', '1 Event Coordinator'], 'guests' => 'Up to 400',
@@ -176,7 +172,7 @@ class DemoPackagesSeeder extends Seeder
                 'sort' => 44,
             ],
             [
-                'title' => 'Grand Gala Production Package', 'category' => 'Planning', 'type' => 'co-op',
+                'title' => 'Grand Gala Production Package', 'category' => 'Planning', 'type' => 'solo',
                 'services' => ['Planning / Coordination', 'Catering / Food', 'Lighting & Tech', 'DJ / Entertainment'],
                 'price' => 15000, 'price_unit' => 'from', 'duration' => 'Per event', 'coverage' => 'Full Production',
                 'team' => ['1 Production Lead', 'Catering crew (8)', '2 AV Techs', '1 DJ', 'Event staff (6)'], 'guests' => 'Up to 500',

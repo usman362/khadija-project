@@ -106,7 +106,7 @@ class FindGigsController extends Controller
                 return [
                     'id'       => 'pkg-' . $pkg->id,
                     'title'    => $pkg->title,
-                    'type'     => $pkg->type === 'co-op' ? 'MSR' : 'SSR',
+                    'type'     => 'SSR',
                     'featured' => false,
                     'pro'      => $pkg->user?->name ?: 'Verified Professional',
                     'pro_id'   => $pkg->user_id,
