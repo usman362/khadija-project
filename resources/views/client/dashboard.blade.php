@@ -682,7 +682,7 @@
         <div class="od-emerg-title">EMERGENCY REQUEST</div>
         <div class="od-emerg-urgent">URGENT</div>
         <p class="od-emerg-desc">Need help now? Post your request and verified pros can apply right away.</p>
-        <a href="{{ route('client.multi-service.index') }}" class="od-emerg-btn">
+        <a href="{{ route('client.esr.create') }}" class="od-emerg-btn">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h6l-1 8 10-12h-6l1-8z"/></svg>
             Post a Rush Request
         </a>

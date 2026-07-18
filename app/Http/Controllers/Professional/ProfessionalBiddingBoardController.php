@@ -157,7 +157,8 @@ class ProfessionalBiddingBoardController extends Controller
     private function mapEvent(Event $e, int $bidCount = 0, ?Bid $myBid = null): array
     {
         $cats  = $e->categories->pluck('name')->all();
-        $type  = count($cats) >= 4 ? 'ESR' : (count($cats) >= 2 ? 'MSR' : 'SSR');
+        // ESR is explicit (source), not guessed from service count.
+        $type  = $e->source === 'esr' ? 'ESR' : (count($cats) >= 2 ? 'MSR' : 'SSR');
         $days  = $e->starts_at ? (int) round(now()->diffInDays($e->starts_at, false)) : null;
         $stock = ['photo-1519741497674-611481863552', 'photo-1511795409834-ef04bbd61622', 'photo-1530103862676-de8c9debad1d', 'photo-1492684223066-81342ee5ff30'];
 

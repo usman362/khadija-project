@@ -602,6 +602,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/multi-service', [\App\Http\Controllers\Client\ClientMultiServiceController::class, 'store'])
             ->middleware('permission:events.create')->name('client.multi-service.store');
 
+        // Emergency Service Request (ESR) — standalone rush flow (within 72h).
+        Route::get('/esr/create', [\App\Http\Controllers\Client\ClientEsrController::class, 'create'])
+            ->name('client.esr.create');
+        Route::post('/esr', [\App\Http\Controllers\Client\ClientEsrController::class, 'store'])
+            ->middleware('permission:events.create')->name('client.esr.store');
+
         // Reviews the client has written about hired professionals.
         Route::get('/reviews', [\App\Http\Controllers\Client\ClientReviewController::class, 'index'])
             ->name('client.reviews.index');
