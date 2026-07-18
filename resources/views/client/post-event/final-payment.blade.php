@@ -118,7 +118,7 @@
                         </div>
                     </label>
 
-                    <button type="button" class="pe-btn" style="width:100%;" onclick="peReleaseFunds()">🔒 Pay Remaining Balance of ${{ number_format($order['remaining']) }}</button>
+                    <a href="{{ route('client.post-event.confirmed') }}" class="pe-btn" style="width:100%;text-decoration:none;text-align:center;">🔒 Pay Remaining Balance of ${{ number_format($order['remaining']) }}</a>
 
                     <div style="display:flex; gap:10px; align-items:flex-start; background:var(--pe-green-l); border:1px solid #bbf7d0; border-radius:10px; padding:12px 14px; margin-top:14px;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.2" style="width:18px; height:18px; flex-shrink:0; margin-top:1px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
