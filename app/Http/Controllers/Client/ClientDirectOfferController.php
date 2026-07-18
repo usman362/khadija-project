@@ -88,8 +88,8 @@ class ClientDirectOfferController extends Controller
         }
 
         return redirect()
-            ->route('client.proposals.index')
+            ->route('client.events.index')
             ->with('status', 'Direct offer sent to ' . $pro->name
-                . '. They can accept, decline, or reply — you\'ll see their response here.');
+                . ' — it\'s now under My Events. Once they accept, the confirmed booking appears under Bookings.');
     }
 }
