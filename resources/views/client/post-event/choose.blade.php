@@ -63,11 +63,11 @@
                     'icon'  => '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
                 ],
                 [
-                    'href'  => null,
-                    'tag'   => ['Single service', 'soon'],
+                    'href'  => route('client.multi-service.index'),
+                    'tag'   => ['Single service', ''],
                     'title' => 'Single-Service Request (SSR)',
-                    'desc'  => 'Post one specific service for professionals to bid on. Coming soon — for now use an MSR or a Direct Offer.',
-                    'cta'   => 'Coming soon',
+                    'desc'  => 'Post one specific service for professionals to bid on — same quick brief, just pick a single service.',
+                    'cta'   => 'Start a request',
                     'icon'  => '<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
                 ],
                 [
