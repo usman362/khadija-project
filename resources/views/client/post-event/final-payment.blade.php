@@ -10,6 +10,22 @@
         <h1 class="pe-h1">🔒 Final Payment</h1>
         <p class="pe-sub">Your event is complete! Review your final invoice and make the remaining payment to release funds to your professional.</p>
 
+        @if(request()->boolean('paid'))
+            {{-- Payment complete success state (final step done) --}}
+            <div class="pe-card" style="text-align:center; padding:44px 24px;">
+                <div style="width:64px; height:64px; border-radius:50%; background:var(--pe-green-l); display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.6" style="width:32px; height:32px;"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <h2 style="margin-bottom:8px;">Payment Complete 🎉</h2>
+                <p class="pe-sub" style="max-width:520px; margin:0 auto 22px;">Your event is fully paid and funds have been released to your professional. Thank you for using GigResource!</p>
+                <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                    <a href="{{ route('client.bookings.index') }}" class="pe-btn" style="text-decoration:none;">View My Bookings</a>
+                    <a href="{{ route('client.reviews.index') }}" class="pe-btn pe-btn-ghost" style="text-decoration:none;">Leave a Review</a>
+                    <a href="{{ route('client.dashboard') }}" class="pe-btn pe-btn-ghost" style="text-decoration:none;">Back to Dashboard</a>
+                </div>
+            </div>
+        @else
+
         {{-- Completion banner --}}
         <div style="display:flex; gap:12px; align-items:flex-start; background:var(--pe-green-l); border:1px solid #bbf7d0; border-radius:12px; padding:14px 16px; margin-bottom:22px;">
             <svg viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.4" style="width:20px; height:20px; flex-shrink:0; margin-top:1px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -118,7 +134,7 @@
                         </div>
                     </label>
 
-                    <a href="{{ route('client.post-event.confirmed') }}" class="pe-btn" style="width:100%;text-decoration:none;text-align:center;">🔒 Pay Remaining Balance of ${{ number_format($order['remaining']) }}</a>
+                    <a href="{{ route('client.post-event.final-payment', ['paid' => 1]) }}" class="pe-btn" style="width:100%;text-decoration:none;text-align:center;">🔒 Pay Remaining Balance of ${{ number_format($order['remaining']) }}</a>
 
                     <div style="display:flex; gap:10px; align-items:flex-start; background:var(--pe-green-l); border:1px solid #bbf7d0; border-radius:10px; padding:12px 14px; margin-top:14px;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.2" style="width:18px; height:18px; flex-shrink:0; margin-top:1px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -219,12 +235,7 @@
                 Download Invoice
             </a>
         </div>
+        @endif
     </div>
 </div>
-
-<script>
-    function peReleaseFunds() {
-        window.location.href = "{{ route('client.post-event.confirmed') }}";
-    }
-</script>
 @endsection
