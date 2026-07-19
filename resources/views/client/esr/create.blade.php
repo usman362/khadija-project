@@ -98,8 +98,8 @@
         {{-- Publish --}}
         <div class="esr-card esr-foot">
             <div class="esr-fees">
-                <div><b>$2.99</b> posting fee at publish · <b>$8.99</b> ESR service fee only if you finalize with a pro.</div>
-                <div style="margin-top:2px;">Nothing is charged on requests that go unfilled.</div>
+                <div><b>$0</b> to post — you only pay a single <b>$2.99</b> when you finalize with a professional.</div>
+                <div style="margin-top:2px;">Nothing is charged to post, and nothing if the request goes unfilled.</div>
             </div>
             <button type="submit" class="esr-btn">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>

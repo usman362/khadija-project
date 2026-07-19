@@ -17,11 +17,10 @@ class MembershipPlanSeeder extends Seeder
             [
                 'name' => 'Starter',
                 'slug' => 'starter',
-                // Priced at $1 (not free) on purpose — a nominal card charge is
-                // enough friction to discourage throwaway / fraudulent accounts
-                // while staying effectively free for real users.
+                // Canonical pricing (reconciled workflows 2026-07-19):
+                // Starter $4.99 / Professional $39.99 / Elite $59.99 per month.
                 'description' => 'Perfect for new professionals building their business.',
-                'price' => 0,
+                'price' => 4.99,
                 'billing_cycle' => 'monthly',
                 'duration_days' => 30,
                 'max_events' => 3,
@@ -57,7 +56,7 @@ class MembershipPlanSeeder extends Seeder
                 'name' => 'Pro',
                 'slug' => 'professional',
                 'description' => 'For growing event businesses.',
-                'price' => 29,
+                'price' => 39.99,
                 'billing_cycle' => 'monthly',
                 'duration_days' => 30,
                 'max_events' => 25,
@@ -96,7 +95,7 @@ class MembershipPlanSeeder extends Seeder
                 'name' => 'Elite',
                 'slug' => 'enterprise',
                 'description' => 'Built for high-performing professionals & agencies.',
-                'price' => 59,
+                'price' => 59.99,
                 'billing_cycle' => 'monthly',
                 'duration_days' => 30,
                 'max_events' => null,
