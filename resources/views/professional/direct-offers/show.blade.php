@@ -202,31 +202,28 @@
                 <div class="do-sec-h" style="margin-bottom:6px;">Your Response Center</div>
                 <p style="font-size:12px;color:var(--text-muted);margin:0 0 16px;">Review details and choose how you'd like to respond.</p>
 
-                <div class="do-action">
-                    <div class="do-action-h"><span class="do-num">1</span>Create Proposal</div>
-                    <p>Build a custom proposal with pricing, terms, and availability.</p>
-                    <a href="{{ route('professional.proposals.index') }}" class="do-action-btn solid">Create &amp; Send Proposal</a>
-                </div>
-                <div class="do-action">
-                    <div class="do-action-h"><span class="do-num">2</span>Offer Pricing Options</div>
-                    <p>Provide multiple pricing packages — Basic, Standard, Premium, or Custom.</p>
-                    <button type="button" class="do-action-btn">Create Pricing Options</button>
-                </div>
-                <div class="do-action">
-                    <div class="do-action-h"><span class="do-num">3</span>Request More Details</div>
-                    <p>Ask questions or request missing information.</p>
-                    <button type="button" class="do-action-btn">Request More Information</button>
-                </div>
-                <div class="do-action">
-                    <div class="do-action-h"><span class="do-num">4</span>Invite Team / Collaborators</div>
-                    <p>Bring in other professionals to work together.</p>
-                    <button type="button" class="do-action-btn">Invite Team Members</button>
-                </div>
-                <div class="do-action">
-                    <div class="do-action-h"><span class="do-num red">5</span>Decline Request</div>
-                    <p>Not the right fit? Choose a reason and send a polite message.</p>
-                    <button type="button" class="do-action-btn danger">Decline This Request</button>
-                </div>
+                @if(($offer['is_open'] ?? false) && ($offer['event_id'] ?? null))
+                    <div class="do-action">
+                        <div class="do-action-h"><span class="do-num">1</span>Accept the Offer</div>
+                        <p>Take the job at the client's terms — a confirmed booking is created.</p>
+                        <form method="POST" action="{{ route('professional.direct-offers.accept', $offer['event_id']) }}">@csrf<button type="submit" class="do-action-btn solid">Accept Offer</button></form>
+                    </div>
+                    <div class="do-action">
+                        <div class="do-action-h"><span class="do-num">2</span>Message the Client</div>
+                        <p>Ask questions or discuss the details before you respond.</p>
+                        <a href="{{ route('professional.chat.index') }}" class="do-action-btn">Open Messages</a>
+                    </div>
+                    <div class="do-action">
+                        <div class="do-action-h"><span class="do-num red">3</span>Decline Request</div>
+                        <p>Not the right fit? Politely pass on this request.</p>
+                        <form method="POST" action="{{ route('professional.direct-offers.decline', $offer['event_id']) }}">@csrf<button type="submit" class="do-action-btn danger">Decline This Request</button></form>
+                    </div>
+                @else
+                    <div class="do-action">
+                        <p style="margin:0;">This offer is <b>{{ $offer['status'] }}</b>. You can still message the client below.</p>
+                        <a href="{{ route('professional.chat.index') }}" class="do-action-btn" style="margin-top:10px;">Open Messages</a>
+                    </div>
+                @endif
             </div>
 
             <div class="do-card">
@@ -241,10 +238,6 @@
                     <div class="do-fld"><label>Staff Availability</label><select><option>{{ $offer['planning']['staff'] }}</option></select></div>
                     <div class="do-fld"><label>Potential Conflicts</label><select><option>{{ $offer['planning']['conflicts'] }}</option></select></div>
                 </div>
-                <div class="do-mini-h" style="margin-top:8px;">Suggested Subcontractors</div>
-                @foreach($offer['planning']['subcontractors'] as [$name, $role])
-                    <div class="do-sub-row"><span class="do-sub-av">{{ strtoupper(substr($name,0,1)) }}</span><div><b>{{ $name }}</b></div><span class="tag">{{ $role }}</span></div>
-                @endforeach
             </div>
         </div>
     </div>
