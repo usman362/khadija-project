@@ -119,7 +119,7 @@
             <div class="pay-stat-foot"><span>Processing Fees</span><span class="red">-${{ number_format($stats['processing_fees'], 2) }}</span></div>
         </div>
         <div class="pay-stat">
-            <div class="pay-stat-head"><div class="pay-stat-ico amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><div class="pay-stat-label">Locked in Secure Payment</div><div class="pay-stat-value">${{ number_format($stats['secure payment_locked'], 0) }}</div></div></div>
+            <div class="pay-stat-head"><div class="pay-stat-ico amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><div class="pay-stat-label">Locked in Secure Payment</div><div class="pay-stat-value">${{ number_format($stats['escrow_locked'], 0) }}</div></div></div>
             <div class="pay-stat-foot"><span>Total Locked</span><span>{{ \App\Models\Booking::where('client_id', auth()->id())->where('status','confirmed')->count() }} active</span></div>
         </div>
         <div class="pay-stat">
@@ -199,9 +199,9 @@
     <div class="pay-bottom">
         <div class="pay-card">
             <div class="pay-sum-title">Payment Methods Summary</div>
-            <div class="pay-sum-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="#16a34a" style="width:14px;height:14px;"><circle cx="12" cy="12" r="10"/></svg>Secure Payment.com</span><span class="val">${{ number_format($methods['secure payment'], 0) }}<span class="pct">62%</span></span></div>
+            <div class="pay-sum-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="#16a34a" style="width:14px;height:14px;"><circle cx="12" cy="12" r="10"/></svg>Secure Payment.com</span><span class="val">${{ number_format($methods['escrow'], 0) }}<span class="pct">62%</span></span></div>
             <div class="pay-sum-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="#635bff" style="width:14px;height:14px;"><circle cx="12" cy="12" r="10"/></svg>Stripe</span><span class="val">${{ number_format($methods['stripe'], 0) }}<span class="pct">38%</span></span></div>
-            <div class="pay-sum-row pay-sum-total"><span class="lbl">Total</span><span class="val">${{ number_format($methods['secure payment'] + $methods['stripe'], 0) }}</span></div>
+            <div class="pay-sum-row pay-sum-total"><span class="lbl">Total</span><span class="val">${{ number_format($methods['escrow'] + $methods['stripe'], 0) }}</span></div>
         </div>
         <div class="pay-card">
             <div class="pay-sum-title">Fee Breakdown (This Month)</div>
@@ -212,8 +212,8 @@
         <div class="pay-card">
             <div class="pay-sum-title">Cash Flow (This Month)</div>
             <div class="pay-sum-row"><span class="lbl">Total Outflow</span><span class="val pay-neg">${{ number_format($stats['stripe_outflow'], 0) }}</span></div>
-            <div class="pay-sum-row"><span class="lbl">Milestone Releases</span><span class="val pay-pos">${{ number_format($stats['secure payment_locked'], 0) }}</span></div>
-            <div class="pay-sum-row pay-sum-total"><span class="lbl">Net Cash Flow</span><span class="val pay-neg">-${{ number_format($stats['stripe_outflow'] - $stats['secure payment_locked'], 0) }}</span></div>
+            <div class="pay-sum-row"><span class="lbl">Milestone Releases</span><span class="val pay-pos">${{ number_format($stats['escrow_locked'], 0) }}</span></div>
+            <div class="pay-sum-row pay-sum-total"><span class="lbl">Net Cash Flow</span><span class="val pay-neg">-${{ number_format($stats['stripe_outflow'] - $stats['escrow_locked'], 0) }}</span></div>
         </div>
     </div>
 </div>{{-- /.pay-main --}}

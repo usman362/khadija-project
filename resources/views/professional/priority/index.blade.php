@@ -302,7 +302,7 @@
                     <div class="pa-wh c4">
                         <div class="pa-wh-h"><span class="pa-wh-ico" style="background:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span class="pa-wh-nm">Payment released</span></div>
                         <p>Your financial vault shows the payment has been released safely.</p>
-                        <div class="pa-wh-meta">Amount: {{ $money($cards['secure payment']) }}</div>
+                        <div class="pa-wh-meta">Amount: {{ $money($cards['escrow']) }}</div>
                         <a href="{{ route('professional.earnings.index') }}" class="pa-wh-btn" style="background:#10b981;">View Payment</a>
                     </div>
                 </div>
