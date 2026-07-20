@@ -1309,28 +1309,6 @@
             </ul>
         </nav>
 
-        {{-- Upcoming Event card — shows the client's next scheduled event
-             (matches the design's sidebar promo block). Hidden for users
-             with no upcoming event. --}}
-        @php($cl_upcomingEvent = auth()->check() ? \App\Models\Event::where('client_id', auth()->id())->where('starts_at', '>=', now())->orderBy('starts_at')->first(['id', 'title', 'starts_at', 'budget']) : null)
-        @if($cl_upcomingEvent)
-            <div class="cl-upcoming">
-                <div class="cl-upcoming-label">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    Upcoming Event
-                </div>
-                <div class="cl-upcoming-name">{{ \Illuminate\Support\Str::limit($cl_upcomingEvent->title, 22) }}</div>
-                <div class="cl-upcoming-date">{{ $cl_upcomingEvent->starts_at?->format('M d, Y') }}</div>
-                @if($cl_upcomingEvent->budget)
-                    <div class="cl-upcoming-budget-label">Budget</div>
-                    <div class="cl-upcoming-budget">${{ number_format($cl_upcomingEvent->budget, 2) }}</div>
-                @endif
-                <a href="{{ route('client.events.show', $cl_upcomingEvent) }}" class="cl-upcoming-btn">
-                    View Event Details
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                </a>
-            </div>
-        @endif
 
         <div class="cl-sidebar-footer">
             <a href="{{ route('client.profile.index') }}" class="cl-user-card" title="View profile">
