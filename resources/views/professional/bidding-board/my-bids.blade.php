@@ -10,7 +10,7 @@
 
 @push('styles')
 <style>
-    .mb-wrap { max-width: 880px; }
+    .mb-wrap { max-width: 880px; margin: 0 auto; }
     .mb-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
     .mb-back { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 700; color: var(--text-secondary); text-decoration: none; }
     .mb-note { display: flex; gap: 9px; align-items: flex-start; background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px; padding: 12px 15px; font-size: 12.5px; color: #5b21b6; line-height: 1.5; margin-bottom: 18px; }

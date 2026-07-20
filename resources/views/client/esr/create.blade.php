@@ -5,7 +5,7 @@
 
 @push('styles')
 <style>
-    .esr { max-width: 900px; }
+    .esr { max-width: 900px; margin: 0 auto; }
     .esr-alert { display:flex; gap:12px; align-items:flex-start; background:#fef2f2; border:1px solid #fecaca; border-radius:14px; padding:14px 16px; margin-bottom:18px; }
     .esr-alert svg { width:22px; height:22px; color:#dc2626; flex-shrink:0; margin-top:1px; }
     .esr-alert b { color:#b91c1c; }

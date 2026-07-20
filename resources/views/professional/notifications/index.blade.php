@@ -7,7 +7,7 @@
 @push('styles')
 <style>
     /* ── Notification Preferences (dedicated page) ── */
-    .np-wrap { max-width: 760px; }
+    .np-wrap { max-width: 760px; margin: 0 auto; }
     .np-back {
         display: inline-flex; align-items: center; gap: 6px;
         font-size: 13px; font-weight: 600;
