@@ -106,6 +106,20 @@
 
     @media (max-width: 1080px) { .pc-grid { grid-template-columns: 1fr; } .pc-side { position: static; } .pc-step .lbl span { display: none; } }
     @media (max-width: 640px) { .pc-two, .pc-typegrid { grid-template-columns: 1fr; } }
+
+    /* Multi-image gallery uploader */
+    .pc-imgs { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 12px; margin: 12px 0; }
+    .pc-img { position: relative; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; background: var(--bg-subtle, rgba(0,0,0,.02)); }
+    .pc-img.is-cover { border-color: var(--accent-orange, #f97316); box-shadow: 0 0 0 2px rgba(249,115,22,.25); }
+    .pc-img.removing { opacity: .4; }
+    .pc-img img { display: block; width: 100%; aspect-ratio: 16/10; object-fit: cover; }
+    .pc-img-bar { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 6px 8px; font-size: 11px; font-weight: 700; }
+    .pc-img-bar label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text-secondary); }
+    .pc-img-bar input { accent-color: var(--accent-orange, #f97316); }
+    .pc-cover-tag { position: absolute; top: 7px; left: 7px; font-size: 9.5px; font-weight: 800; letter-spacing: .3px; color: #fff; background: var(--accent-orange, #f97316); border-radius: 6px; padding: 3px 7px; display: none; }
+    .pc-img.is-cover .pc-cover-tag { display: inline-block; }
+    .pc-drop { border: 1.5px dashed var(--border-color); border-radius: 12px; padding: 20px; text-align: center; font-size: 12.5px; color: var(--text-muted); cursor: pointer; }
+    .pc-drop:hover { border-color: var(--accent-orange, #f97316); color: var(--accent-orange, #f97316); }
 </style>
 @endpush
 
@@ -281,10 +295,29 @@
                         <input type="text" name="serves_regions" class="pc-input" maxlength="120" value="{{ old('serves_regions', $p?->serves_regions) }}" placeholder="NY, NJ, CT">
                         <div class="hint">Comma-separated states/regions you'll travel to.</div>
                     </div>
-                    <div class="pc-field">
-                        <label>Cover Photo</label>
-                        <input type="file" name="cover_image" class="pc-input" accept="image/*">
-                        <div class="hint">A high-quality hero image makes your package stand out. JPG/PNG/WebP, up to 6 MB.</div>
+                    <div class="pc-field" style="grid-column:1/-1;">
+                        <label>Package Photos</label>
+                        <div class="hint">Upload up to 8 photos. Pick one as the <b>cover</b> — it becomes the hero image and drives the card's hover carousel. JPG/PNG/WebP, up to 6 MB each.</div>
+
+                        @if($editing && !empty($p->images))
+                            <div class="pc-imgs" id="pcExisting">
+                                @foreach($p->images as $i => $img)
+                                    @php($u = \Illuminate\Support\Facades\Storage::url($img['hero'] ?? $img['square'] ?? ''))
+                                    <div class="pc-img {{ ($img['featured'] ?? false) ? 'is-cover' : '' }}" data-img>
+                                        <span class="pc-cover-tag">★ Cover</span>
+                                        <img src="{{ $u }}" alt="">
+                                        <div class="pc-img-bar">
+                                            <label><input type="radio" name="cover" value="e{{ $i }}" {{ ($img['featured'] ?? false) ? 'checked' : '' }} onchange="pcMarkCover(this)"> Cover</label>
+                                            <label><input type="checkbox" name="remove_images[]" value="e{{ $i }}" onchange="this.closest('[data-img]').classList.toggle('removing', this.checked)"> Remove</label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        <label for="pcGallery" class="pc-drop" id="pcDrop">＋ Click to add photos (up to 8)</label>
+                        <input type="file" name="gallery_images[]" id="pcGallery" accept="image/*" multiple hidden>
+                        <div class="pc-imgs" id="pcNewPreviews"></div>
                     </div>
                 </div>
                 <div class="pc-actions">
@@ -361,10 +394,40 @@
     document.getElementById('pcName').addEventListener('input', function () {
         document.getElementById('pcPrevTitle').textContent = this.value || 'Your package name';
     });
-    document.querySelector('input[name=cover_image]').addEventListener('change', function (e) {
-        var f = e.target.files[0]; if (!f) return;
-        document.getElementById('pcPrevMedia').innerHTML = '<img src="' + URL.createObjectURL(f) + '" alt="">';
-    });
+    // ── Multi-image gallery uploader ──
+    window.pcMarkCover = function (radio) {
+        document.querySelectorAll('#pcExisting .pc-img, #pcNewPreviews .pc-img').forEach(function (c) {
+            var r = c.querySelector('input[name=cover]');
+            c.classList.toggle('is-cover', !!r && r.checked);
+        });
+        pcSyncPreview();
+    };
+    function pcSyncPreview() {
+        var cover = document.querySelector('input[name=cover]:checked');
+        var img = cover ? cover.closest('.pc-img').querySelector('img') : document.querySelector('.pc-img img');
+        var media = document.getElementById('pcPrevMedia');
+        if (img && media) media.innerHTML = '<img src="' + img.src + '" alt="">';
+    }
+    var pcGallery = document.getElementById('pcGallery');
+    if (pcGallery) {
+        pcGallery.addEventListener('change', function (e) {
+            var box = document.getElementById('pcNewPreviews');
+            box.innerHTML = '';
+            var files = Array.prototype.slice.call(e.target.files, 0, 8);
+            var noExistingCover = !document.querySelector('#pcExisting input[name=cover]:checked');
+            files.forEach(function (f, i) {
+                var url = URL.createObjectURL(f);
+                var checked = (i === 0 && noExistingCover) ? 'checked' : '';
+                var div = document.createElement('div');
+                div.className = 'pc-img' + (checked ? ' is-cover' : '');
+                div.setAttribute('data-img', '');
+                div.innerHTML = '<span class="pc-cover-tag">★ Cover</span><img src="' + url + '" alt="">' +
+                    '<div class="pc-img-bar"><label><input type="radio" name="cover" value="n' + i + '" ' + checked + ' onchange="pcMarkCover(this)"> Cover</label><span style="color:var(--text-muted);font-weight:600;">New</span></div>';
+                box.appendChild(div);
+            });
+            pcSyncPreview();
+        });
+    }
 
     window.pcSvcToggle = function (el) {
         var cb = el.parentElement.querySelector('input[type=checkbox]');

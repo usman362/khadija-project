@@ -59,11 +59,9 @@ class ProfessionalPackageController extends Controller
         $data['slug'] = Str::slug($data['title']) . '-' . Str::lower(Str::random(5));
         $data = array_merge($data, $this->richFields($request));
 
-        if ($request->hasFile('cover_image')) {
-            $set = $pipeline->process($request->file('cover_image'), 'packages/' . $request->user()->id);
-            if ($set) {
-                $data['images'] = [array_merge($set, ['featured' => true])];
-            }
+        $images = $this->syncImages($request, $pipeline, $request->user()->id, []);
+        if ($images !== null) {
+            $data['images'] = $images;
         }
 
         Package::create($data);
@@ -85,14 +83,9 @@ class ProfessionalPackageController extends Controller
         $data = $this->validated($request);
         $data = array_merge($data, $this->richFields($request));
 
-        if ($request->hasFile('cover_image')) {
-            foreach ((array) $package->images as $old) {
-                $pipeline->delete($old);
-            }
-            $set = $pipeline->process($request->file('cover_image'), 'packages/' . $request->user()->id);
-            if ($set) {
-                $data['images'] = [array_merge($set, ['featured' => true])];
-            }
+        $images = $this->syncImages($request, $pipeline, $request->user()->id, (array) $package->images);
+        if ($images !== null) {
+            $data['images'] = $images;
         }
 
         $package->update($data);
@@ -110,6 +103,70 @@ class ProfessionalPackageController extends Controller
         $package->delete();
 
         return back()->with('status', 'Package removed.');
+    }
+
+    /**
+     * Build images[] from kept existing sets + newly uploaded files, honouring
+     * removals and the chosen cover. The cover is stored FIRST (heroUrls() reads
+     * array order) and flagged featured. Returns null to leave images untouched.
+     *
+     * Cover / remove ids: existing images are "e{originalIndex}", new uploads
+     * are "n{fileIndex}".
+     *
+     * @return array<int,array>|null
+     */
+    private function syncImages(Request $request, ImagePipelineService $pipeline, int $userId, array $existing): ?array
+    {
+        $remove = array_map('strval', (array) $request->input('remove_images', []));
+        $cover  = (string) $request->input('cover', '');
+        $touched = $request->hasFile('gallery_images') || $request->hasFile('cover_image') || ! empty($remove);
+
+        if (! $touched) {
+            return null;
+        }
+
+        $final = [];
+        $coverKey = null;
+
+        foreach ($existing as $i => $img) {
+            if (in_array('e' . $i, $remove, true)) {
+                $pipeline->delete($img);
+                continue;
+            }
+            $img['featured'] = false;
+            $final[] = $img;
+            if ($cover === 'e' . $i) {
+                $coverKey = count($final) - 1;
+            }
+        }
+
+        $files = array_values(array_filter((array) $request->file('gallery_images', [])));
+        if ($request->hasFile('cover_image')) {
+            $files[] = $request->file('cover_image');
+        }
+        foreach ($files as $j => $file) {
+            $set = $pipeline->process($file, 'packages/' . $userId);
+            if ($set) {
+                $set['featured'] = false;
+                $final[] = $set;
+                if ($cover === 'n' . $j) {
+                    $coverKey = count($final) - 1;
+                }
+            }
+        }
+
+        if (empty($final)) {
+            return [];
+        }
+
+        if ($coverKey === null) {
+            $coverKey = 0;
+        }
+        $coverImg = array_splice($final, $coverKey, 1)[0];
+        $coverImg['featured'] = true;
+        array_unshift($final, $coverImg);
+
+        return array_values($final);
     }
 
     private function validated(Request $request): array
@@ -132,6 +189,12 @@ class ProfessionalPackageController extends Controller
             'availability'    => ['nullable', 'string', 'max:80'],
             'savings_pct'     => ['nullable', 'integer', 'min:0', 'max:90'],
             'is_active'       => ['nullable', 'boolean'],
+            'gallery_images'   => ['nullable', 'array', 'max:8'],
+            'gallery_images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:6144'],
+            'cover'            => ['nullable', 'string', 'max:20'],
+            'remove_images'    => ['nullable', 'array'],
+            'remove_images.*'  => ['string', 'max:20'],
+            // legacy single-file field (kept for back-compat)
             'cover_image'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:6144'],
         ]) + ['is_active' => $request->boolean('is_active', true)];
     }
