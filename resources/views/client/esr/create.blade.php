@@ -5,7 +5,21 @@
 
 @push('styles')
 <style>
-    .esr { max-width: 900px; margin: 0 auto; }
+    .esr { max-width: 1180px; margin: 0 auto; }
+    /* Fill large screens: form + contextual rail side-by-side, stacks on narrow. */
+    .esr-layout { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 18px; align-items: start; }
+    .esr-rail { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 88px; }
+    .esr-rcard { background: var(--bg-card,#fff); border: 1px solid var(--border-color,#e5e7eb); border-radius: 16px; padding: 18px; }
+    .esr-rcard h4 { font-size: 13px; font-weight: 800; color: var(--text-primary,#111827); margin-bottom: 13px; display:flex; align-items:center; gap:8px; }
+    .esr-rcard h4 svg { width:16px; height:16px; color:#dc2626; }
+    .esr-step { display: flex; gap: 11px; margin-bottom: 12px; }
+    .esr-step:last-child { margin-bottom: 0; }
+    .esr-step-n { flex-shrink:0; width:24px; height:24px; border-radius:50%; background:#fef2f2; color:#dc2626; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+    .esr-step-b { font-size:12.5px; color:var(--text-secondary,#4b5563); line-height:1.45; }
+    .esr-step-b b { color:var(--text-primary,#111827); display:block; font-size:12.5px; margin-bottom:1px; }
+    .esr-rlist { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
+    .esr-rlist li { display:flex; gap:8px; font-size:12.5px; color:var(--text-secondary,#4b5563); line-height:1.4; }
+    .esr-rlist svg { width:14px; height:14px; color:#16a34a; flex-shrink:0; margin-top:2px; }
     .esr-alert { display:flex; gap:12px; align-items:flex-start; background:#fef2f2; border:1px solid #fecaca; border-radius:14px; padding:14px 16px; margin-bottom:18px; }
     .esr-alert svg { width:22px; height:22px; color:#dc2626; flex-shrink:0; margin-top:1px; }
     .esr-alert b { color:#b91c1c; }
@@ -33,7 +47,8 @@
     .esr-fees b { color:var(--text-primary,#111827); }
     .esr-btn { display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,#f43f5e,#dc2626); color:#fff; border:none; border-radius:12px; padding:13px 26px; font-size:14.5px; font-weight:800; cursor:pointer; }
     .esr-btn:hover { filter:brightness(1.05); }
-    @media (max-width:640px){ .esr-grid3,.esr-grid2,.esr-reasons{ grid-template-columns:1fr; } }
+    @media (max-width:1024px){ .esr-layout { grid-template-columns: 1fr; } .esr-rail { position: static; flex-direction: row; flex-wrap: wrap; } .esr-rcard { flex:1; min-width: 240px; } }
+    @media (max-width:640px){ .esr-grid3,.esr-grid2,.esr-reasons{ grid-template-columns:1fr; } .esr-rail{ flex-direction:column; } }
 </style>
 @endpush
 
@@ -51,6 +66,7 @@
         </div>
     </div>
 
+    <div class="esr-layout">
     <form method="POST" action="{{ route('client.esr.store') }}">
         @csrf
 
@@ -79,11 +95,7 @@
         {{-- 2. Services --}}
         <div class="esr-card">
             <div class="esr-sec-h"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Services You Need <span class="esr-req">*</span></div>
-            <div class="esr-services">
-                @foreach($categories as $cat)
-                    <label class="esr-svc"><input type="checkbox" name="services[]" value="{{ $cat->id }}" @checked(is_array(old('services')) && in_array($cat->id, old('services')))><span>{{ $cat->name }}</span></label>
-                @endforeach
-            </div>
+            <x-service-picker :categories="$categories" name="services" :selected="old('services', [])" />
         </div>
 
         {{-- 3. Budget & details --}}
@@ -107,5 +119,31 @@
             </button>
         </div>
     </form>
+
+    {{-- Contextual rail — fills large screens, stacks under the form on tablet/mobile --}}
+    <aside class="esr-rail">
+        <div class="esr-rcard">
+            <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>How rush requests work</h4>
+            <div class="esr-step"><span class="esr-step-n">1</span><span class="esr-step-b"><b>Publish your request</b>Tell us what you need and by when — it's free to post.</span></div>
+            <div class="esr-step"><span class="esr-step-n">2</span><span class="esr-step-b"><b>Verified pros are notified</b>Available professionals nearby get a priority alert instantly.</span></div>
+            <div class="esr-step"><span class="esr-step-n">3</span><span class="esr-step-b"><b>Respond &amp; finalize</b>Replies appear on your Proposals page — pick one and confirm.</span></div>
+        </div>
+        <div class="esr-rcard">
+            <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>What you'll pay</h4>
+            <ul class="esr-rlist">
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span><b>$0</b> to post — nothing charged upfront.</span></li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span>A single <b>$2.99</b> only when you finalize with a pro.</span></li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span>Nothing if the request goes unfilled.</span></li>
+            </ul>
+        </div>
+        <div class="esr-rcard">
+            <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>Faster responses</h4>
+            <ul class="esr-rlist">
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span>Add a clear "needed by" time and location.</span></li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span>Share a budget range so pros can commit quickly.</span></li>
+            </ul>
+        </div>
+    </aside>
+    </div>
 </div>
 @endsection
