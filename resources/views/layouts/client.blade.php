@@ -572,10 +572,15 @@
         .cl-tn-item.open .cl-tn-link { color: var(--accent-orange); background: var(--accent-orange-soft); }
         .cl-tn-item.open .cl-tn-link .chev { transform: rotate(180deg); }
 
-        .cl-tn-menu { position: absolute; top: calc(100% + 8px); left: 0; min-width: 240px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; box-shadow: 0 16px 40px rgba(0,0,0,.18); padding: 8px; opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity .16s, transform .16s, visibility .16s; z-index: 210; }
-        .cl-tn-item.open .cl-tn-menu { opacity: 1; visibility: visible; transform: translateY(0); }
-        .cl-tn-menu.mega { display: grid; grid-template-columns: repeat(2, minmax(210px, 1fr)); gap: 2px 10px; min-width: 460px; }
+        /* Closed = display:none so the absolute menu never extends page height
+           (a sticky-header + hidden-but-laid-out dropdown otherwise adds a huge
+           empty scroll void below the content). */
+        .cl-tn-menu { position: absolute; top: calc(100% + 8px); left: 0; min-width: 240px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; box-shadow: 0 16px 40px rgba(0,0,0,.18); padding: 8px; display: none; z-index: 210; }
+        .cl-tn-item.open .cl-tn-menu { display: block; animation: clTnMenuIn .16s ease; }
+        .cl-tn-menu.mega { grid-template-columns: repeat(2, minmax(210px, 1fr)); gap: 2px 10px; min-width: 460px; }
+        .cl-tn-item.open .cl-tn-menu.mega { display: grid; }
         .cl-tn-menu.mega.wide { grid-template-columns: repeat(3, minmax(190px, 1fr)); min-width: 620px; }
+        @keyframes clTnMenuIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
         .cl-tn-mlink { display: flex; align-items: flex-start; gap: 10px; padding: 9px 11px; border-radius: 10px; text-decoration: none; color: var(--text-primary); }
         .cl-tn-mlink:hover { background: var(--accent-orange-soft); }
         .cl-tn-mlink.active { background: var(--accent-orange-soft); }

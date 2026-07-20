@@ -39,7 +39,10 @@
     .svc-tag button { border: none; background: none; color: var(--svc-strong); cursor: pointer; font-size: 15px; line-height: 1; padding: 0; opacity: .7; }
     .svc-tag button:hover { opacity: 1; }
 
-    .svc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; max-height: 300px; overflow-y: auto; padding: 4px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-subtle, rgba(0,0,0,.015)); }
+    /* contain:paint stops the inner scroll area's tall content from leaking
+       into the page's scroll height (Chrome grid quirk → phantom empty space
+       below the page). */
+    .svc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; max-height: 300px; overflow-y: auto; contain: paint; padding: 4px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-subtle, rgba(0,0,0,.015)); }
     .svc-item { display: flex; align-items: center; gap: 9px; border: 1.5px solid var(--border-color); border-radius: 10px; padding: 10px 12px; font-size: 12.5px; font-weight: 600; color: var(--text-secondary); background: var(--bg-card); cursor: pointer; user-select: none; }
     .svc-item:hover { border-color: var(--svc); }
     .svc-item input { position: absolute; opacity: 0; pointer-events: none; }
