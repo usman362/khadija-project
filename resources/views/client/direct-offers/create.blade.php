@@ -21,7 +21,22 @@
 
 @push('styles')
 <style>
-    .do { --do: #f97316; --do-strong: #ea580c; --ai: #16a34a; max-width: 920px; margin: 0 auto; }
+    .do { --do: #f97316; --do-strong: #ea580c; --ai: #16a34a; max-width: 100%; margin: 0 auto; }
+    /* Fill large screens: form + contextual rail side-by-side, stacks on narrow. */
+    .do-layout { display: grid; grid-template-columns: minmax(0,1fr) 340px; gap: 20px; align-items: start; }
+    .do-rail { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 88px; }
+    .do-rcard { background: var(--bg-card,#fff); border: 1px solid var(--border-color,#e5e7eb); border-radius: 16px; padding: 18px; }
+    .do-rcard h4 { font-size: 13px; font-weight: 800; color: var(--text-primary,#111827); margin-bottom: 13px; display:flex; align-items:center; gap:8px; }
+    .do-rcard h4 svg { width:16px; height:16px; color: var(--do); }
+    .do-step { display: flex; gap: 11px; margin-bottom: 12px; }
+    .do-step:last-child { margin-bottom: 0; }
+    .do-step-n { flex-shrink:0; width:24px; height:24px; border-radius:50%; background: rgba(249,115,22,.12); color: var(--do-strong); font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+    .do-step-b { font-size:12.5px; color:var(--text-secondary,#4b5563); line-height:1.45; }
+    .do-step-b b { color:var(--text-primary,#111827); display:block; font-size:12.5px; margin-bottom:1px; }
+    .do-rlist { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
+    .do-rlist li { display:flex; gap:8px; font-size:12.5px; color:var(--text-secondary,#4b5563); line-height:1.4; }
+    .do-rlist svg { width:14px; height:14px; color: var(--do); flex-shrink:0; margin-top:2px; }
+    .do-rlist b { color: var(--text-primary,#111827); }
 
     /* request type selector */
     .do-types { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 22px; }
@@ -79,7 +94,9 @@
     .do[data-type="SSR"] .do-svc-multi { display: none; }
     .do:not([data-type="SSR"]) .do-svc-single { display: none; }
 
+    @media (max-width: 1024px) { .do-layout { grid-template-columns: 1fr; } .do-rail { position: static; flex-direction: row; flex-wrap: wrap; } .do-rcard { flex:1; min-width: 240px; } }
     @media (max-width: 760px) { .do-types { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) { .do-rail { flex-direction: column; } }
 </style>
 @endpush
 
@@ -97,12 +114,12 @@
         @endforeach
     </div>
 
+    <div class="do-layout">
     <form method="POST" action="{{ route('client.direct-offers.store') }}">
         @csrf
         @if($errors->any())
             <div style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;">{{ $errors->first() }}</div>
         @endif
-        @csrf
         <input type="hidden" name="request_type" id="doType" value="{{ $type }}">
 
         {{-- Choose Professional --}}
@@ -202,6 +219,31 @@
             </button>
         </div>
     </form>
+
+    {{-- Contextual rail — fills large screens, stacks under the form on tablet/mobile --}}
+    <aside class="do-rail">
+        <div class="do-rcard">
+            <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>How direct offers work</h4>
+            <div class="do-step"><span class="do-step-n">1</span><span class="do-step-b"><b>Pick your pro &amp; services</b>Choose who you're offering to and exactly what you need.</span></div>
+            <div class="do-step"><span class="do-step-n">2</span><span class="do-step-b"><b>Send the request</b>AI drafts a clear brief from your inputs and delivers it to the pro.</span></div>
+            <div class="do-step"><span class="do-step-n">3</span><span class="do-step-b"><b>They respond</b>The pro can accept, counter, or ask questions — replies land on your Proposals page.</span></div>
+        </div>
+        <div class="do-rcard">
+            <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>SSR vs MSR</h4>
+            <ul class="do-rlist">
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span><b>SSR</b> — one service, handled as a single agreement.</span></li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span><b>MSR</b> — multiple services; each is sent as its own separate agreement.</span></li>
+            </ul>
+        </div>
+        <div class="do-rcard">
+            <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>Good to know</h4>
+            <ul class="do-rlist">
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span>Your budget range is only visible to the pro you send to.</span></li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span>You can counter or negotiate before anything is confirmed.</span></li>
+            </ul>
+        </div>
+    </aside>
+    </div>
 </div>
 @endsection
 
