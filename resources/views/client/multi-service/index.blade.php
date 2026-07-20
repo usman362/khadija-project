@@ -28,14 +28,20 @@
     /* 4-step process */
     .ms-process-title { font-size: 14px; font-weight: 800; color: var(--text-primary); text-align: center; margin-bottom: 14px; }
     .ms-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
-    .ms-step { border-radius: 12px; padding: 16px 14px; color: #fff; position: relative; }
-    .ms-step.s1 { background: linear-gradient(135deg, #10b981, #059669); }
-    .ms-step.s2 { background: linear-gradient(135deg, #f97316, #ea580c); }
-    .ms-step.s3 { background: linear-gradient(135deg, #ef4444, #dc2626); }
-    .ms-step.s4 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-    .ms-step-num { width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; margin-bottom: 10px; }
+    /* Softer step palette (Peter: "softer colors in the steps") — tinted
+       backgrounds with matching text instead of saturated full-color blocks. */
+    .ms-step { border-radius: 12px; padding: 16px 14px; position: relative; border: 1px solid transparent; }
+    .ms-step.s1 { background: #ecfdf5; border-color: #d1fae5; color: #047857; }
+    .ms-step.s2 { background: #fff7ed; border-color: #fed7aa; color: #c2410c; }
+    .ms-step.s3 { background: #fef2f2; border-color: #fecaca; color: #dc2626; }
+    .ms-step.s4 { background: #f5f3ff; border-color: #e9d5ff; color: #7c3aed; }
+    .ms-step-num { width: 26px; height: 26px; border-radius: 50%; background: currentColor; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; margin-bottom: 10px; }
+    .ms-step.s1 .ms-step-num { background: #10b981; }
+    .ms-step.s2 .ms-step-num { background: #f97316; }
+    .ms-step.s3 .ms-step-num { background: #ef4444; }
+    .ms-step.s4 .ms-step-num { background: #8b5cf6; }
     .ms-step-name { font-size: 13px; font-weight: 800; margin-bottom: 4px; }
-    .ms-step-desc { font-size: 11px; opacity: 0.92; line-height: 1.4; }
+    .ms-step-desc { font-size: 11px; opacity: 0.85; line-height: 1.4; }
 
     /* Wizard step indicator */
     .ms-wizbar { display: flex; align-items: center; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
@@ -179,25 +185,7 @@
 
         {{-- Step 2: Services --}}
         <div class="ms-section-label" style="margin-top:18px;">Select the Services You Need</div>
-        <div class="ms-services">
-            @php
-                $defaultServices = [
-                    ['Catering', 'Food & beverage'], ['Audio Visual (AV)', 'Sound & lighting'], ['Decor & Design', 'Theme & styling'],
-                    ['Photography', 'Event photography'], ['Videography', 'Event videography'], ['Venue', 'Spaces & logistics'],
-                    ['Entertainment', 'Live band, DJ'], ['Staffing', 'Bartenders, security'], ['Transportation', 'Shuttles & cars'],
-                ];
-                $svcList = $categories->count() ? $categories->map(fn($c) => [$c->name, ''])->toArray() : $defaultServices;
-            @endphp
-            @foreach($svcList as $i => [$svc, $sub])
-                <label class="ms-service">
-                    <input type="checkbox" name="services[]" value="{{ $svc }}" {{ (is_array(old('services')) ? in_array($svc, old('services')) : $i < 4) ? 'checked' : '' }}>
-                    <div class="ms-service-body">
-                        <div class="ms-service-name">{{ $svc }}</div>
-                        @if($sub)<div class="ms-service-sub">{{ $sub }}</div>@endif
-                    </div>
-                </label>
-            @endforeach
-        </div>
+        <x-service-picker :categories="$categories" name="services" valueField="name" :selected="old('services', [])" />
 
         {{-- Step 3: Service Details Preview --}}
         <div class="ms-section-label" style="margin-top:18px;">Service Details <span style="font-weight:500;color:var(--text-muted);font-size:11px;">(Preview)</span></div>

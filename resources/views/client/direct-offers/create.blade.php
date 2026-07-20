@@ -163,11 +163,7 @@
                 <div class="do-svc-multi">
                     <div class="do-field">
                         <label>Services requested (pick all that apply)</label>
-                        <div class="do-chips">
-                            @foreach($categories as $cat)
-                                <label class="do-chip"><input type="checkbox" name="services[]" value="{{ $cat->id }}" hidden><span>{{ $cat->name }}</span><span class="tick">✓</span></label>
-                            @endforeach
-                        </div>
+                        <x-service-picker :categories="$categories" name="services" :selected="old('services', [])" />
                     </div>
                     <div class="do-hint" data-types="ESR">ESR — the lead professional coordinates the entire event scope across all selected services.</div>
                 </div>
@@ -221,12 +217,6 @@
             root.setAttribute('data-type', t);
             hidden.value = t;
             document.querySelectorAll('#doTypeLbl, #doTypeLbl2').forEach(function (el) { el.textContent = t; });
-        });
-    });
-    // chip toggles
-    document.querySelectorAll('.do-chip').forEach(function (chip) {
-        chip.addEventListener('click', function () {
-            var cb = chip.querySelector('input'); cb.checked = !cb.checked; chip.classList.toggle('sel', cb.checked);
         });
     });
 })();
