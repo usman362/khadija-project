@@ -76,11 +76,23 @@
     .pk-card { display: grid; grid-template-columns: 240px minmax(0,1fr) 190px; background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
     .pk-media { position: relative; min-height: 210px; background: linear-gradient(135deg,#e2e8f0,#eef2ff); }
     .pk-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    /* Airbnb-style hover carousel */
+    .pk-slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .4s ease; }
+    .pk-slide.active { opacity: 1; }
+    .pk-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; width: 30px; height: 30px; border-radius: 50%; border: none; background: rgba(255,255,255,.94); color: #111827; font-size: 17px; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: opacity .15s; box-shadow: 0 2px 8px rgba(0,0,0,.22); }
+    .pk-media:hover .pk-nav { opacity: 1; }
+    .pk-nav.prev { left: 9px; } .pk-nav.next { right: 9px; }
+    .pk-dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 2; display: flex; gap: 5px; }
+    .pk-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.6); transition: all .15s; }
+    .pk-dot.active { background: #fff; width: 15px; border-radius: 3px; }
+    .pk-card { transition: transform .18s, box-shadow .18s; }
+    .pk-cards.grid .pk-card:hover { transform: translateY(-3px); box-shadow: 0 16px 36px rgba(0,0,0,.12); }
     .pk-typebadge { position: absolute; top: 10px; left: 10px; font-size: 10.5px; font-weight: 800; letter-spacing: .3px; color: #fff; padding: 5px 11px; border-radius: 7px; }
     .pk-typebadge.solo { background: var(--pk); } .pk-typebadge.coop { background: #7c3aed; }
     .pk-photos { position: absolute; bottom: 10px; left: 10px; font-size: 11px; font-weight: 700; color: #fff; background: rgba(0,0,0,.55); padding: 4px 9px; border-radius: 7px; display: inline-flex; align-items: center; gap: 5px; }
     .pk-heart { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.92); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     .pk-heart svg { width: 17px; height: 17px; color: #64748b; }
+    .pk-heart.on svg { color: #ef4444; fill: #ef4444; }
     .pk-main { padding: 16px 18px; min-width: 0; }
     .pk-title { font-size: 17px; font-weight: 800; color: var(--ink); margin: 0 0 5px; }
     .pk-pro { font-size: 13px; color: var(--ink-2); font-weight: 600; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
@@ -238,16 +250,26 @@
                         @foreach($packages as $pkg)
                             @php
                                 $pro = $pkg->user;
-                                $hero = $pkg->heroUrls(1)[0] ?? 'https://images.unsplash.com/' . $stock[$pkg->id % count($stock)] . '?w=520&q=70&auto=format&fit=crop';
+                                $gallery = $pkg->heroUrls(4);
+                                if (empty($gallery)) {
+                                    $gallery = collect(range(0, 3))->map(fn ($k) => 'https://images.unsplash.com/' . $stock[($pkg->id + $k) % count($stock)] . '?w=520&q=70&auto=format&fit=crop')->all();
+                                }
                                 $rating = $pro?->reviews_avg ? number_format($pro->reviews_avg, 1) : null;
                                 $svcTags = $pkg->services ?: ($pkg->category ? [$pkg->category->name] : []);
                                 $total_ = '$' . number_format($pkg->price);
                             @endphp
                             <article class="pk-card">
                                 <div class="pk-media">
-                                    <img src="{{ $hero }}" alt="{{ $pkg->title }}" loading="lazy">
-                                    <button type="button" class="pk-heart" aria-label="Save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg></button>
+                                    @foreach($gallery as $gi => $src)
+                                        <img class="pk-slide {{ $gi === 0 ? 'active' : '' }}" src="{{ $src }}" alt="{{ $pkg->title }}" loading="lazy">
+                                    @endforeach
+                                    <button type="button" class="pk-heart" onclick="this.classList.toggle('on')" aria-label="Save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg></button>
                                     @if($pkg->photosCount())<span class="pk-photos">📷 {{ $pkg->photosCount() }} Photos</span>@endif
+                                    @if(count($gallery) > 1)
+                                        <button class="pk-nav prev" type="button" onclick="pkSlide(this,-1)" aria-label="Previous photo">‹</button>
+                                        <button class="pk-nav next" type="button" onclick="pkSlide(this,1)" aria-label="Next photo">›</button>
+                                        <div class="pk-dots">@foreach($gallery as $gi => $s)<span class="pk-dot {{ $gi === 0 ? 'active' : '' }}"></span>@endforeach</div>
+                                    @endif
                                 </div>
                                 <div class="pk-main">
                                     <h3 class="pk-title">{{ $pkg->title }}</h3>
@@ -348,5 +370,31 @@
         hidden.forEach(function (el) { el.classList.toggle('hidden', !expand); });
         btn.textContent = expand ? 'Show Less ▴' : 'Show More ▾';
     }
+
+    // Package card image carousel — arrows, dots, hover auto-advance.
+    function pkSlide(btn, dir) {
+        var media = btn.closest('.pk-media');
+        var slides = media.querySelectorAll('.pk-slide');
+        var dots = media.querySelectorAll('.pk-dot');
+        if (slides.length < 2) return;
+        var cur = 0;
+        slides.forEach(function (s, i) { if (s.classList.contains('active')) cur = i; });
+        var next = (cur + dir + slides.length) % slides.length;
+        slides[cur].classList.remove('active'); slides[next].classList.add('active');
+        if (dots[cur]) dots[cur].classList.remove('active');
+        if (dots[next]) dots[next].classList.add('active');
+    }
+    document.querySelectorAll('.pk-media').forEach(function (m) {
+        if (m.querySelectorAll('.pk-slide').length < 2) return;
+        var timer = null, nextBtn = m.querySelector('.pk-nav.next');
+        m.addEventListener('mouseenter', function () {
+            timer = setInterval(function () { if (nextBtn) pkSlide(nextBtn, 1); }, 1400);
+        });
+        m.addEventListener('mouseleave', function () {
+            if (timer) { clearInterval(timer); timer = null; }
+            m.querySelectorAll('.pk-slide').forEach(function (s, i) { s.classList.toggle('active', i === 0); });
+            m.querySelectorAll('.pk-dot').forEach(function (d, i) { d.classList.toggle('active', i === 0); });
+        });
+    });
 </script>
 @endsection
