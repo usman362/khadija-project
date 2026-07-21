@@ -4,8 +4,9 @@
 @section('meta_description', 'Search by occasion — find the perfect professionals, services and packages for weddings, corporate events, birthdays and every kind of event.')
 
 @php
-    // Deep-link helper: occasion → find-professionals browse, scoped by keyword.
-    $link = fn ($name) => route('public.browse', ['q' => $name]);
+    // Deep-link helper: occasion → real packages filtered by that event type.
+    $link = fn ($name) => route('public.packages', ['event_type' => $name]);
+    $countOf = fn ($name) => (int) (($counts ?? [])[$name] ?? 0);
     $badgeColor = ['POPULAR' => '#ea580c', 'FEATURED' => '#2563eb', 'HOT' => '#dc2626', 'NEW' => '#16a34a'];
 @endphp
 
@@ -77,6 +78,9 @@
     .et-pbody b { display: block; font-size: 14px; font-weight: 800; color: var(--ink); }
     .et-pbody span { display: block; font-size: 12px; color: var(--muted); margin: 3px 0 8px; line-height: 1.4; }
     .et-pfrom { font-size: 13px; font-weight: 800; color: var(--et); }
+    .et-rc { margin-left: auto; font-size: 11px; font-weight: 800; color: var(--et-dark); background: var(--et-soft); border-radius: 999px; padding: 1px 8px; }
+    .et-rail a.on .et-rc { background: rgba(255,255,255,.25); color: #fff; }
+    .et-pcount { font-size: 11.5px; font-weight: 700; color: var(--muted); margin-left: 8px; }
 
     /* More occasions */
     .et-more { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 34px; }
@@ -132,7 +136,7 @@
             <nav class="et-rail">
                 <a href="{{ route('public.event-types') }}" class="on"><span class="e">🗂️</span> All Occasions</a>
                 @foreach($occasions as $o)
-                    <a href="{{ $link($o['name']) }}"><span class="e">{{ $o['icon'] }}</span> {{ $o['name'] }}</a>
+                    <a href="{{ $link($o['name']) }}"><span class="e">{{ $o['icon'] }}</span> {{ $o['name'] }}{!! $countOf($o['name']) ? '<span class="et-rc">' . $countOf($o['name']) . '</span>' : '' !!}</a>
                 @endforeach
             </nav>
 
@@ -151,7 +155,7 @@
                             <span class="et-badge-feat">FEATURED</span>
                             <h3>{{ $featured['hero']['name'] }}</h3>
                             <p>{{ $featured['hero']['blurb'] }}</p>
-                            <span class="go">Explore Wedding Services →</span>
+                            <span class="go">Explore {{ $featured['hero']['name'] }}{!! $countOf($featured['hero']['name']) ? ' · ' . $countOf($featured['hero']['name']) . ' packages' : '' !!} →</span>
                         </div>
                     </a>
                     @foreach(array_slice($featured['tiles'], 0, 2) as $t)
@@ -190,7 +194,7 @@
                     <div class="et-pbody">
                         <b>{{ $pop['name'] }}</b>
                         <span>{{ $pop['blurb'] }}</span>
-                        <span class="et-pfrom">from ${{ number_format($pop['from']) }}</span>
+                        <span class="et-pfrom">from ${{ number_format($pop['from']) }}{!! $countOf($pop['name']) ? '<span class="et-pcount">' . $countOf($pop['name']) . ' packages</span>' : '' !!}</span>
                     </div>
                 </a>
             @endforeach

@@ -66,6 +66,12 @@ class Package extends Model
         return $query->where('is_active', true);
     }
 
+    /** Packages matching a browse-by-occasion label (title/category/services). */
+    public function scopeForOccasion($query, string $label)
+    {
+        return \App\Support\Occasions::apply($query, $label);
+    }
+
     /** Hero-size image URLs (for cards + carousel), or empty. */
     public function heroUrls(int $limit = 4): array
     {

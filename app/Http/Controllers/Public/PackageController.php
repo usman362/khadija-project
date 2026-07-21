@@ -38,6 +38,7 @@ class PackageController extends Controller
 
         $q        = trim((string) $request->query('q', ''));
         $sort     = (string) $request->query('sort', 'relevant');
+        $occasion = trim((string) $request->query('event_type', ''));
 
         // Packages are solo-only (Team/Co-Op combined-force removed platform-wide).
         $base = Package::active()
@@ -50,7 +51,9 @@ class PackageController extends Controller
             ])
             ->when($q !== '', fn ($qr) => $qr->where(fn ($w) => $w
                 ->where('title', 'like', "%{$q}%")
-                ->orWhere('description', 'like', "%{$q}%")));
+                ->orWhere('description', 'like', "%{$q}%")))
+            ->when($occasion !== '' && \App\Support\Occasions::known($occasion),
+                fn ($qr) => \App\Support\Occasions::apply($qr, $occasion));
 
         // AND-match every selected service against the JSON services column.
         foreach ($selected as $svc) {
@@ -103,6 +106,7 @@ class PackageController extends Controller
                 'provider' => 'all',
                 'q'        => $q,
                 'sort'     => $sort,
+                'event_type' => $occasion,
                 'view'     => $request->query('view') === 'grid' ? 'grid' : 'list',
             ],
         ]);

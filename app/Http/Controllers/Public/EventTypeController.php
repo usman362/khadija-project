@@ -19,11 +19,32 @@ class EventTypeController extends Controller
 
     public function index(): View
     {
+        $occasions = $this->occasions();
+        $featured  = $this->featured();
+        $popular   = $this->popular();
+        $more      = $this->more();
+
+        // Real package counts per occasion label (matched by title/category/services).
+        $names = collect($occasions)->pluck('name')
+            ->merge([$featured['hero']['name']])
+            ->merge(collect($featured['tiles'])->pluck('name'))
+            ->merge(collect($popular)->pluck('name'))
+            ->merge(collect($more)->pluck('name'))
+            ->unique();
+
+        $counts = [];
+        foreach ($names as $name) {
+            $counts[$name] = \App\Support\Occasions::known($name)
+                ? \App\Models\Package::active()->forOccasion($name)->count()
+                : 0;
+        }
+
         return view('public.event-types', [
-            'occasions'  => $this->occasions(),
-            'featured'   => $this->featured(),
-            'popular'    => $this->popular(),
-            'more'       => $this->more(),
+            'occasions'  => $occasions,
+            'featured'   => $featured,
+            'popular'    => $popular,
+            'more'       => $more,
+            'counts'     => $counts,
             'groups'     => ['All', 'Celebrations', 'Corporate', 'Personal', 'Seasonal', 'Cultural'],
         ]);
     }
