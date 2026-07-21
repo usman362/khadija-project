@@ -84,7 +84,7 @@ class EventTypeController extends Controller
         return [
             ['name' => 'Holiday Parties',   'blurb' => 'Festive fun & celebrations',   'img' => self::IMG . 'photo-1543934638-bd2e138430c4?w=400&q=70&auto=format&fit=crop'],
             ['name' => 'Fundraisers',       'blurb' => 'Events for a great cause',      'img' => self::IMG . 'photo-1497206365907-f5e630693df0?w=400&q=70&auto=format&fit=crop'],
-            ['name' => 'School Events',     'blurb' => 'From prom to field days',       'img' => self::IMG . 'photo-1523050854058-8df90110c9f1?w=400&q=70&auto=format&fit=crop'],
+            ['name' => 'School Events',     'blurb' => 'From prom to field days',       'img' => self::IMG . 'photo-1427504494785-3a9ca7044f45?w=400&q=70&auto=format&fit=crop'],
             ['name' => 'Retirement Parties','blurb' => 'Celebrate new beginnings',      'img' => self::IMG . 'photo-1556761175-5973dc0f32e7?w=400&q=70&auto=format&fit=crop'],
             ['name' => 'Religious Events',  'blurb' => 'Ceremonies & celebrations',     'img' => self::IMG . 'photo-1438232992991-995b7058bbb3?w=400&q=70&auto=format&fit=crop'],
         ];
