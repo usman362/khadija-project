@@ -657,6 +657,10 @@ Route::middleware('auth')->group(function () {
         Route::patch('/events/{event}', [ClientEventController::class, 'update'])->middleware('permission:events.update')->name('client.events.update');
         Route::post('/events/{event}/publish', [ClientEventController::class, 'publish'])->middleware('permission:events.publish')->name('client.events.publish');
 
+        // "Add to my event" — save an AI-tool result onto an event.
+        Route::post('/ai-artifacts', [\App\Http\Controllers\Client\EventAiArtifactController::class, 'store'])->name('client.ai-artifacts.store');
+        Route::delete('/ai-artifacts/{artifact}', [\App\Http\Controllers\Client\EventAiArtifactController::class, 'destroy'])->name('client.ai-artifacts.destroy');
+
         // Client Bookings
         Route::get('/bookings', [ClientBookingController::class, 'index'])->middleware('permission:bookings.view_any')->name('client.bookings.index');
         Route::patch('/bookings/{booking}/status', [ClientBookingController::class, 'updateStatus'])->middleware('permission:bookings.update')->name('client.bookings.update-status');

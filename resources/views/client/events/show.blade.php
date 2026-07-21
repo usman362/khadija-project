@@ -60,6 +60,31 @@
                 </p>
             </div>
 
+            {{-- AI Toolkit results saved onto this event ("Add to my event") --}}
+            @php
+                $aiArtifacts = $event->aiArtifacts;
+            @endphp
+            @if($aiArtifacts->isNotEmpty())
+            <div class="cl-card" style="margin-top:20px;">
+                <h3 style="font-size:16px;font-weight:600;margin-bottom:14px;">✨ AI Toolkit Results ({{ $aiArtifacts->count() }})</h3>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    @foreach($aiArtifacts as $art)
+                        <div style="display:flex;align-items:center;gap:12px;border:1px solid var(--border-color);border-radius:12px;padding:11px 13px;">
+                            <span style="font-size:20px;">{{ $art->icon() }}</span>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:13.5px;font-weight:700;color:var(--text-primary);">{{ $art->title }}</div>
+                                <div style="font-size:11.5px;color:var(--text-muted);">{{ $art->tool_name }} · {{ $art->created_at->diffForHumans() }}{{ $art->mode === 'auto' ? ' · auto-attached' : '' }}</div>
+                            </div>
+                            <form method="POST" action="{{ route('client.ai-artifacts.destroy', $art) }}" onsubmit="return confirm('Remove this result from your event?');">
+                                @csrf @method('DELETE')
+                                <button type="submit" style="border:none;background:none;color:#dc2626;font-size:12px;font-weight:700;cursor:pointer;">Remove</button>
+                            </form>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
             {{-- Proposals & Bookings --}}
             @php
                 $proposals = $event->bookings->where('status', 'requested');

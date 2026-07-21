@@ -76,6 +76,12 @@ class Event extends Model
         return $this->hasMany(Booking::class);
     }
 
+    /** AI-tool results the client saved onto this event ("Add to my event"). */
+    public function aiArtifacts(): HasMany
+    {
+        return $this->hasMany(EventAiArtifact::class)->latest();
+    }
+
     public function messages(): HasMany
     {
         return $this->hasMany(Message::class);

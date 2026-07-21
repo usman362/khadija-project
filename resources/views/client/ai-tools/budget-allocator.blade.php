@@ -488,6 +488,8 @@
             </div>
             <ul id="batTipsList"></ul>
         </div>
+
+        <x-add-to-event tool-key="budget-allocator" tool-name="AI Budget Allocator" :event-id="request('event_id')" />
     </div>
 @endif
 
@@ -605,6 +607,11 @@
             tipsBox.style.display = 'block';
         } else {
             tipsBox.style.display = 'none';
+        }
+
+        // Enable "Add to my event" with this result.
+        if (window.aiAttachSet) {
+            window.aiAttachSet('Budget plan · ' + res.currency + ' ' + formatNum(res.total), res);
         }
     }
 
