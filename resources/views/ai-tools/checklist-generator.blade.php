@@ -161,6 +161,7 @@
     <div class="cg-out" id="cgOut">
         <div class="cg-out-sum" id="cgSummary"></div>
         <div id="cgGroups"></div>
+        <x-add-to-event tool-key="checklist-generator" tool-name="AI Smart Checklist" :event-id="request('event_id')" />
     </div>
     <div class="cg-stats">
         @foreach($stats as [$lbl, $val, $tone])
@@ -301,6 +302,8 @@
                 '<span class="due">Target: ' + esc(g.due_date) + '</span></div>' + items;
             wrap.appendChild(block);
         });
+        var __n = (res.groups || []).reduce(function (s, g) { return s + (g.items || []).length; }, 0);
+        if (window.aiAttachSet) window.aiAttachSet('Checklist · ' + __n + ' tasks', res);
     }
 
     function esc(s) {

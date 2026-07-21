@@ -179,6 +179,8 @@
         @endforeach
     </div>
 
+    <x-add-to-event tool-key="guest-capacity" tool-name="AI Guest Capacity Calculator" :event-id="request('event_id')" />
+
     <div class="gc-grid">
         <div>
             {{-- Heatmap --}}
@@ -300,6 +302,7 @@
                 return;
             }
             render(data.result);
+            if (window.aiAttachSet) window.aiAttachSet('Guest capacity · ' + ((data.result.capacity && data.result.capacity.comfort) || '') + ' comfortable', data.result);
         } catch (err) {
             submit.disabled = false;
             submit.innerHTML = prev;

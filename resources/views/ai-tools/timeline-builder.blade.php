@@ -140,6 +140,7 @@
 
     {{-- Computed schedule --}}
     <div class="tb-out" id="tbOut">
+        <x-add-to-event tool-key="timeline-builder" tool-name="AI Timeline Builder" :event-id="request('event_id')" />
         <div class="tb-out-summary" id="tbSummary"></div>
         <div class="tb-card">
             <h3>📋 Suggested Run-of-Show</h3>
@@ -227,6 +228,7 @@
                 return;
             }
             render(data.result);
+            if (window.aiAttachSet) window.aiAttachSet('Event timeline', data.result);
             out.classList.add('open');
             out.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } catch (err) {

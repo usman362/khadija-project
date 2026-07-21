@@ -175,6 +175,7 @@
 
     {{-- Computed results --}}
     <div class="ep-out" id="epOut">
+        <x-add-to-event tool-key="event-planner" tool-name="AI Guided Event Planner" :event-id="request('event_id')" />
         <div class="ep-out-summary" id="epSummary"></div>
         <div class="ep-grid">
             <div class="ep-card">
@@ -304,6 +305,7 @@
                 return;
             }
             render(data.result);
+            if (window.aiAttachSet) window.aiAttachSet('Event plan', data.result);
             out.classList.add('open');
             out.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } catch (err) {

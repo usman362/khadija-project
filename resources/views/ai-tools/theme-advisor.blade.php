@@ -181,6 +181,7 @@
 
     {{-- Generated palette + guidance --}}
     <div class="ta-out" id="taOut">
+        <x-add-to-event tool-key="theme-advisor" tool-name="AI Theme & Style Advisor" :event-id="request('event_id')" />
         <div class="ta-sec">
             <h3>🎨 Your Suggested Palette</h3>
             <div class="ta-out-sum" id="taSummary"></div>
@@ -295,6 +296,7 @@
                 return;
             }
             render(data.result);
+            if (window.aiAttachSet) window.aiAttachSet('Theme & style plan', data.result);
             out.classList.add('on');
             out.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } catch (err) {

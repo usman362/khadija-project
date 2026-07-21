@@ -39,6 +39,7 @@ class EventAiArtifact extends Model
             'guest-capacity'      => '👥',
             'vendor-matchmaking'  => '🤝',
             'event-planner'       => '🧭',
+            'venue-analyzer'      => '🏛️',
         ][$this->tool_key] ?? '✨';
     }
 }

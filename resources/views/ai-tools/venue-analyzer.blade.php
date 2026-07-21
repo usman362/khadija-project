@@ -190,6 +190,7 @@
 
     {{-- Computed analysis --}}
     <div class="va-out" id="vaOut">
+        <x-add-to-event tool-key="venue-analyzer" tool-name="AI Venue Compatibility Check" :event-id="request('event_id')" />
         <div class="va-verdict" id="vaVerdict"></div>
         <div class="va-metrics">
             <div class="va-metric"><b id="vaReq"></b><div class="l">Space Needed (sq ft)</div></div>
@@ -323,6 +324,7 @@
                 return;
             }
             render(data.result);
+            if (window.aiAttachSet) window.aiAttachSet('Venue analysis', data.result);
             out.classList.add('open');
             out.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } catch (err) {
