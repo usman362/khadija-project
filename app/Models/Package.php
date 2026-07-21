@@ -77,6 +77,26 @@ class Package extends Model
             ->all();
     }
 
+    /** A category-appropriate stock hero for packages with no uploaded photos. */
+    public function fallbackHeroUrl(int $w = 640): string
+    {
+        $name = strtolower((string) ($this->category?->name ?? ''));
+        $map = [
+            'photo' => 'photo-1519741497674-611481863552', 'video' => 'photo-1485846234645-a62644f84728',
+            'cater' => 'photo-1555244162-803834f70033',    'food'  => 'photo-1555244162-803834f70033',
+            'dj'    => 'photo-1470229722913-7c0e2dbbafd3',  'music' => 'photo-1470229722913-7c0e2dbbafd3',
+            'floral'=> 'photo-1519225421980-715cb0215aed',  'decor' => 'photo-1478146896981-b80fe463b330',
+            'plan'  => 'photo-1511578314322-379afb476865',  'light' => 'photo-1492684223066-81342ee5ff30',
+            'venue' => 'photo-1464366400600-7168b8af9bc3',
+        ];
+        $id = 'photo-1519741497674-611481863552';
+        foreach ($map as $kw => $pid) {
+            if (str_contains($name, $kw)) { $id = $pid; break; }
+        }
+
+        return 'https://images.unsplash.com/' . $id . '?w=' . $w . '&q=70&auto=format&fit=crop';
+    }
+
     /** Human price label, e.g. "from $1,400" / "$2,125" / "$150/hr". */
     public function priceLabel(): string
     {

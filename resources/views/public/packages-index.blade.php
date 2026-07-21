@@ -252,7 +252,11 @@
                                 $pro = $pkg->user;
                                 $gallery = $pkg->heroUrls(4);
                                 if (empty($gallery)) {
-                                    $gallery = collect(range(0, 3))->map(fn ($k) => 'https://images.unsplash.com/' . $stock[($pkg->id + $k) % count($stock)] . '?w=520&q=70&auto=format&fit=crop')->all();
+                                    // No uploads yet — lead with a category-appropriate hero, then vary.
+                                    $gallery = array_merge(
+                                        [$pkg->fallbackHeroUrl(520)],
+                                        collect(range(1, 3))->map(fn ($k) => 'https://images.unsplash.com/' . $stock[($pkg->id + $k) % count($stock)] . '?w=520&q=70&auto=format&fit=crop')->all()
+                                    );
                                 }
                                 $rating = $pro?->reviews_avg ? number_format($pro->reviews_avg, 1) : null;
                                 $svcTags = $pkg->services ?: ($pkg->category ? [$pkg->category->name] : []);
