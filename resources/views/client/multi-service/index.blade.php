@@ -164,9 +164,9 @@
         </div>
 
         {{-- Step 1: Event Overview --}}
-        <div class="ms-grid2">
-            <div class="ms-field"><label>Event Name <span class="req">*</span></label><input name="event_name" class="ms-input" placeholder="e.g. Annual Gala Dinner" value="{{ old('event_name', $activeEvent->title ?? '') }}" required></div>
-            <div class="ms-field"><label>Event Type <span class="req">*</span></label><select name="event_type" class="ms-select"><option value="">Select event type</option><option>Wedding</option><option>Corporate</option><option>Birthday</option><option>Conference</option><option>Concert</option></select></div>
+        <div class="ms-field"><label>Event Name <span class="req">*</span></label><input name="event_name" class="ms-input" placeholder="e.g. Annual Gala Dinner" value="{{ old('event_name', $activeEvent->title ?? '') }}" required></div>
+        <div class="ms-field"><label>Event Type <span class="req">*</span></label>
+            <x-event-type-picker name="event_type" :selected="old('event_type')" />
         </div>
         <div class="ms-grid3">
             <div class="ms-field"><label>Event Date <span class="req">*</span></label><input name="event_date" type="date" class="ms-input" value="{{ old('event_date', $activeEvent?->starts_at?->format('Y-m-d') ?? '') }}"></div>
