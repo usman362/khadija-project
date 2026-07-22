@@ -768,6 +768,7 @@ Route::middleware('auth')->group(function () {
 
         // Transactions
         Route::get('/transactions', [ProfessionalTransactionController::class, 'index'])->name('professional.transactions.index');
+        Route::post('/transactions/payout', [ProfessionalTransactionController::class, 'requestPayout'])->name('professional.transactions.payout');
         Route::get('/transactions/export/csv', [ProfessionalTransactionController::class, 'exportCsv'])->name('professional.transactions.export.csv');
         Route::get('/transactions/export/pdf', [ProfessionalTransactionController::class, 'exportPdf'])->name('professional.transactions.export.pdf');
 

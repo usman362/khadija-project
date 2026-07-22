@@ -205,6 +205,42 @@
         </div>
     </div>
 
+    {{-- Payouts & Withdrawals --}}
+    <div class="cl-card" style="margin-bottom:18px;">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
+            <div>
+                <div class="cl-stat-label">Available to withdraw</div>
+                <div style="font-size:24px;font-weight:800;color:var(--text-primary);">${{ number_format($stats['available'] ?? 0, 2) }}</div>
+                <div style="font-size:12px;color:var(--text-muted);">Earned ${{ number_format($stats['earned'] ?? 0, 2) }} · Withdrawn ${{ number_format($stats['withdrawn'] ?? 0, 2) }}</div>
+            </div>
+            <form method="POST" action="{{ route('professional.transactions.payout') }}" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                @csrf
+                <div style="position:relative;"><span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);">$</span><input type="number" name="amount" min="1" step="1" placeholder="Amount" required style="padding:9px 12px 9px 22px;border:1px solid var(--border-color);border-radius:9px;width:140px;font-family:inherit;background:var(--bg-card);color:var(--text-primary);"></div>
+                <select name="method" style="padding:9px 12px;border:1px solid var(--border-color);border-radius:9px;font-family:inherit;background:var(--bg-card);color:var(--text-primary);"><option value="bank">Bank transfer</option><option value="paypal">PayPal</option><option value="stripe">Stripe</option></select>
+                <button type="submit" style="padding:9px 18px;border:none;border-radius:9px;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;">Request Payout</button>
+            </form>
+        </div>
+        @error('amount')<div style="color:#dc2626;font-size:12.5px;margin-bottom:10px;">{{ $message }}</div>@enderror
+
+        @if($payouts->isNotEmpty())
+            <table class="cl-table">
+                <thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Status</th></tr></thead>
+                <tbody>
+                    @foreach($payouts as $p)
+                        <tr>
+                            <td>{{ ($p->requested_at ?? $p->created_at)->format('M d, Y') }}</td>
+                            <td><b>${{ number_format($p->amount) }}</b></td>
+                            <td>{{ $p->method ? ucfirst($p->method) : '—' }}</td>
+                            <td><span style="font-weight:700;font-size:12px;color:{{ $p->status === 'paid' ? '#15803d' : ($p->status === 'rejected' ? '#b91c1c' : '#b45309') }};">{{ ucfirst($p->status) }}</span></td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <div style="font-size:12.5px;color:var(--text-muted);">No payouts yet. Request one above once you have available earnings.</div>
+        @endif
+    </div>
+
     {{-- Filter + Export bar --}}
     <div class="cl-card" style="margin-bottom: 0;">
         <form method="GET" action="{{ route('professional.transactions.index') }}" class="tx-filter-bar">

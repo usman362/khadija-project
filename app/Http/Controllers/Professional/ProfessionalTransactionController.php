@@ -53,14 +53,23 @@ class ProfessionalTransactionController extends Controller
 
         // Real earnings summary from this professional's bookings.
         $base  = Booking::where('supplier_id', $request->user()->id);
+        $earned = (float) (clone $base)->where('status', 'completed')->sum('price');
+
+        // Payout ledger — withdrawn = paid out, held = still-requested.
+        $payoutBase = \App\Models\Payout::where('user_id', $request->user()->id);
+        $withdrawn  = (float) (clone $payoutBase)->where('status', 'paid')->sum('amount');
+        $requested  = (float) (clone $payoutBase)->where('status', 'requested')->sum('amount');
+
         $stats = [
             'total'     => (clone $base)->count(),
-            'earned'    => (float) (clone $base)->where('status', 'completed')->sum('price'),
+            'earned'    => $earned,
             'pending'   => (float) (clone $base)->whereIn('status', ['pending', 'confirmed'])->sum('price'),
-            // No dedicated professional-payout table yet — withdrawals stay 0
-            // until the payout/escrow subsystem is built.
-            'withdrawn' => 0.0,
+            'withdrawn' => $withdrawn,
+            // What the pro can still withdraw: earned minus paid-out minus in-flight requests.
+            'available' => max(0.0, $earned - $withdrawn - $requested),
         ];
+
+        $payouts = (clone $payoutBase)->latest()->take(20)->get();
 
         return view('professional.transactions.index', [
             'stats'          => $stats,
@@ -68,7 +77,44 @@ class ProfessionalTransactionController extends Controller
             'activity'       => $activity,
             'filters'        => $filters,
             'contentFilters' => self::CONTENT_FILTERS,
+            'payouts'        => $payouts,
         ]);
+    }
+
+    /**
+     * Request a payout (withdrawal) against the available balance.
+     * Recorded as 'requested'; an admin/gateway marks it 'paid' later.
+     */
+    public function requestPayout(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $data = $request->validate([
+            'amount' => ['required', 'integer', 'min:1'],
+            'method' => ['nullable', 'string', 'max:40'],
+        ]);
+
+        $base       = Booking::where('supplier_id', $request->user()->id);
+        $earned     = (float) (clone $base)->where('status', 'completed')->sum('price');
+        $payoutBase = \App\Models\Payout::where('user_id', $request->user()->id);
+        $withdrawn  = (float) (clone $payoutBase)->where('status', 'paid')->sum('amount');
+        $requested  = (float) (clone $payoutBase)->where('status', 'requested')->sum('amount');
+        $available  = max(0.0, $earned - $withdrawn - $requested);
+
+        if ($data['amount'] > $available) {
+            return back()->withErrors([
+                'amount' => 'That exceeds your available balance of $' . number_format($available, 2) . '.',
+            ]);
+        }
+
+        \App\Models\Payout::create([
+            'user_id'      => $request->user()->id,
+            'amount'       => $data['amount'],
+            'currency'     => 'USD',
+            'method'       => $data['method'] ?? null,
+            'status'       => 'requested',
+            'requested_at' => now(),
+        ]);
+
+        return back()->with('status', 'Payout of $' . number_format($data['amount']) . ' requested — you\'ll be notified once it\'s processed.');
     }
 
     /**
