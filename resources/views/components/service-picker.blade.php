@@ -13,6 +13,17 @@
     $svcList = collect($categories)->unique('name')->sortBy('name')->values();
     $selectedVals = collect($selected)->map(fn ($v) => (string) $v)->all();
     $valOf = fn ($cat) => (string) ($valueField === 'name' ? $cat->name : $cat->id);
+
+    // Event → services cascade: flatten each event type's themes to keywords.
+    $etThemes = config('event-service-map.themes', []);
+    $svcCascade = [];
+    foreach (config('event-service-map.map', []) as $type => $themes) {
+        $kw = [];
+        foreach ($themes as $t) {
+            $kw = array_merge($kw, $etThemes[$t] ?? []);
+        }
+        $svcCascade[$type] = array_values(array_unique($kw));
+    }
 @endphp
 
 @once
@@ -53,6 +64,12 @@
     .svc-item.sel .svc-box svg { opacity: 1; }
     .svc-item.hide { display: none; }
     .svc-none { grid-column: 1 / -1; font-size: 12.5px; color: var(--text-muted); padding: 16px 4px; text-align: center; display: none; }
+    .svc-cascade { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; color: var(--svc-strong, #ea580c); background: rgba(249,115,22,.08); border: 1px solid var(--svc, #f97316); border-radius: 9px; padding: 7px 11px; margin-bottom: 9px; }
+    .svc-cascade[hidden] { display: none; }
+    .svc-cascade svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .svc-cascade b { font-weight: 800; }
+    .svc-cascade button { margin-left: auto; border: none; background: none; color: var(--svc-strong, #ea580c); font-weight: 800; font-size: 12px; cursor: pointer; text-decoration: underline; padding: 0; font-family: inherit; }
+    .svc-item.cascade-hide { display: none; }
 
     @media (max-width: 900px) { .svc-grid { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 680px) { .svc-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -63,6 +80,7 @@
 @push('scripts')
 <script>
 (function () {
+    var CASCADE = @json($svcCascade);
     function initPicker(root) {
         var grid     = root.querySelector('.svc-grid');
         var selBox   = root.querySelector('.svc-selected');
@@ -129,6 +147,29 @@
             refresh();
         });
 
+        // Event → services cascade: narrow the grid to what fits the chosen type.
+        var cascadeBox  = root.querySelector('[data-svc-cascade]');
+        var cascadeType = root.querySelector('[data-svc-cascade-type]');
+        var cascadeAll  = root.querySelector('[data-svc-cascade-all]');
+        function applyCascade(type) {
+            var kws = type ? CASCADE[type] : null;
+            var items = grid.querySelectorAll('.svc-item');
+            if (!kws || !kws.length) {
+                items.forEach(function (i) { i.classList.remove('cascade-hide'); });
+                if (cascadeBox) cascadeBox.hidden = true;
+                return;
+            }
+            items.forEach(function (i) {
+                var n = i.getAttribute('data-name') || '';
+                var keep = kws.some(function (k) { return n.indexOf(k) !== -1; }) || i.querySelector('input').checked;
+                i.classList.toggle('cascade-hide', !keep);
+            });
+            if (cascadeType) cascadeType.textContent = type;
+            if (cascadeBox) cascadeBox.hidden = false;
+        }
+        if (cascadeAll) cascadeAll.addEventListener('click', function () { applyCascade(null); });
+        document.addEventListener('etp:change', function (e) { applyCascade(e.detail && e.detail.value); });
+
         refresh();
     }
     document.querySelectorAll('[data-svc-picker]').forEach(initPicker);
@@ -156,6 +197,11 @@
     <div class="svc-head">
         <span class="lbl">Or browse all services</span>
         <span class="cnt"><span data-svc-count data-svc-suffix>0 selected</span></span>
+    </div>
+    <div class="svc-cascade" data-svc-cascade hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Showing services that fit <b data-svc-cascade-type></b>.
+        <button type="button" data-svc-cascade-all>Show all</button>
     </div>
     <div class="svc-grid">
         @foreach($svcList as $cat)

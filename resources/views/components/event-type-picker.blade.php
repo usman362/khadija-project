@@ -61,6 +61,8 @@
             root.querySelectorAll('[data-etp-pick]').forEach(function (b) {
                 b.classList.toggle('sel', b.getAttribute('data-etp-pick') === val);
             });
+            // Drive the event → services cascade (service-picker listens).
+            document.dispatchEvent(new CustomEvent('etp:change', { detail: { value: val } }));
         }
         root.querySelectorAll('[data-etp-pick]').forEach(function (b) {
             b.addEventListener('click', function () { pick(b.getAttribute('data-etp-pick')); });
