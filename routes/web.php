@@ -626,6 +626,8 @@ Route::middleware('auth')->group(function () {
         // Virtual & Hybrid Event Brief — dedicated posting form.
         Route::get('/virtual-hub/brief', [\App\Http\Controllers\Client\ClientVirtualHubController::class, 'brief'])
             ->name('client.virtual-hub.brief');
+        Route::post('/virtual-hub/brief', [\App\Http\Controllers\Client\ClientVirtualHubController::class, 'store'])
+            ->name('client.virtual-hub.store');
 
         Route::get('/events', [ClientEventController::class, 'index'])->middleware('permission:events.view_any')->name('client.events.index');
         // "Create a Gig" (bidding builder) retired in favour of the "Post an Event" flow — redirect any old links.

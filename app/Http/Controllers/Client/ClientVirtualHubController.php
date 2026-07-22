@@ -83,4 +83,55 @@ class ClientVirtualHubController extends Controller
 
         return view('client.virtual-hub.brief', compact('activeEvent'));
     }
+
+    /**
+     * Persist a Virtual & Hybrid Event Brief as a real published Event (RFP)
+     * so it flows into the same proposals/bidding pipeline as other gigs.
+     *
+     * Route: POST /client/virtual-hub/brief
+     */
+    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $data = $request->validate([
+            'title'      => ['required', 'string', 'max:200'],
+            'event_type' => ['nullable', 'string', 'max:120'],
+            'event_date' => ['nullable', 'string', 'max:60'],
+            'location'   => ['nullable', 'string', 'max:200'],
+            'budget_min' => ['nullable', 'string', 'max:40'],
+            'budget_max' => ['nullable', 'string', 'max:40'],
+        ]);
+
+        // "$5,000" → 5000 ; free-text date → Carbon or null.
+        $budget = null;
+        if (! empty($data['budget_min']) && preg_match('/[\d,]+/', $data['budget_min'], $m)) {
+            $budget = (int) str_replace(',', '', $m[0]);
+        }
+        $startsAt = null;
+        if (! empty($data['event_date'])) {
+            try { $startsAt = \Illuminate\Support\Carbon::parse($data['event_date']); } catch (\Throwable $e) { $startsAt = null; }
+        }
+
+        $descParts = array_filter([
+            $data['event_type'] ?? null,
+            ! empty($data['budget_min']) ? ('Budget: ' . $data['budget_min'] . (! empty($data['budget_max']) ? ' – ' . $data['budget_max'] : '')) : null,
+        ]);
+
+        $event = Event::create([
+            'title'        => $data['title'],
+            'description'  => 'Virtual / Hybrid event brief. ' . implode(' · ', $descParts),
+            'status'       => 'published',
+            'is_published' => true,
+            'published_at' => now(),
+            'starts_at'    => $startsAt,
+            'budget'       => $budget,
+            'location'     => $data['location'] ?? null,
+            'source'       => 'virtual_hub',
+            'created_by'   => $request->user()->id,
+            'client_id'    => $request->user()->id,
+        ]);
+
+        return redirect()
+            ->route('client.events.show', $event)
+            ->with('status', 'Your virtual/hybrid gig is posted — professionals can now submit bids.');
+    }
 }

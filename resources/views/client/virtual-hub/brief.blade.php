@@ -140,7 +140,11 @@
 @endpush
 
 @section('content')
-<form method="GET" action="{{ route('client.virtual-hub.brief') }}">
+<form method="POST" action="{{ route('client.virtual-hub.store') }}">
+    @csrf
+    @if($errors->any())
+        <div style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:10px;padding:11px 15px;margin-bottom:16px;font-size:13.5px;font-weight:600;">{{ $errors->first() }}</div>
+    @endif
 
     {{-- ════════ Step header ════════ --}}
     <div class="vhb-stepper">
@@ -173,12 +177,12 @@
 
             <div class="vhb-field">
                 <label class="vhb-label">Project Title <span class="req">*</span></label>
-                <input type="text" class="vhb-input" value="Technical Director for 3-Day Hybrid Crypto Summit">
+                <input type="text" name="title" class="vhb-input" value="{{ old('title', 'Technical Director for 3-Day Hybrid Crypto Summit') }}" required>
             </div>
             <div class="vhb-field">
                 <label class="vhb-label">Event Type <span class="req">*</span></label>
-                <select class="vhb-select">
-                    <option selected>Hybrid Event (Physical + Virtual)</option>
+                <select name="event_type" class="vhb-select">
+                    <option>Hybrid Event (Physical + Virtual)</option>
                     <option>Fully Virtual Event</option>
                     <option>Livestream / Broadcast</option>
                     <option>Webinar / Conference</option>
@@ -188,7 +192,7 @@
                 <label class="vhb-label">Event Date <span class="req">*</span></label>
                 <div class="vhb-iwrap has-l has-r">
                     <svg class="ico-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    <input type="text" class="vhb-input" value="Oct 25, 2024">
+                    <input type="text" name="event_date" class="vhb-input" value="{{ old('event_date', 'Oct 25, 2024') }}">
                     <svg class="ico-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 </div>
             </div>
@@ -282,7 +286,7 @@
             <div class="vhb-subhead">Physical Venue Details <span class="hint">(Only for Hybrid Events)</span></div>
             <div class="vhb-field">
                 <label class="vhb-label">Venue Name &amp; Location</label>
-                <input type="text" class="vhb-input" placeholder="e.g., TechCenter, San Francisco, CA">
+                <input type="text" name="location" class="vhb-input" value="{{ old('location') }}" placeholder="e.g., TechCenter, San Francisco, CA">
             </div>
             <div class="vhb-field">
                 <label class="vhb-label">On-Site Internet Speed <span class="hint">(if known)</span></label>
@@ -307,9 +311,9 @@
                 <label class="vhb-label">Estimated Production Budget <span class="req">*</span></label>
                 <div class="vhb-budget-row">
                     <select class="vhb-select"><option selected>USD $</option><option>EUR €</option><option>GBP £</option></select>
-                    <input type="text" class="vhb-input" value="$5,000">
+                    <input type="text" name="budget_min" class="vhb-input" value="{{ old('budget_min', '$5,000') }}">
                     <span class="to">to</span>
-                    <input type="text" class="vhb-input" value="$15,000">
+                    <input type="text" name="budget_max" class="vhb-input" value="{{ old('budget_max', '$15,000') }}">
                 </div>
                 <div class="vhb-range">
                     <div class="vhb-range-track"></div>
