@@ -18,13 +18,7 @@
                     <div class="pe-card">
                         <div class="pe-field">
                             <label class="pe-label">Event Type <span class="pe-req">*</span></label>
-                            <select name="event_type" class="pe-select">
-                                <option value="">Select Event Type</option>
-                                @foreach(($categories ?? collect()) as $cat)
-                                    <option value="{{ $cat->name }}" @selected(($summary['event_type'] ?? '') === $cat->name)>{{ $cat->name }}</option>
-                                @endforeach
-                                <option value="Wedding" @selected(($summary['event_type'] ?? '') === 'Wedding')>Wedding</option>
-                            </select>
+                            <x-event-type-picker name="event_type" :selected="old('event_type', $summary['event_type'] ?? null)" />
                         </div>
 
                         <div class="pe-row">
