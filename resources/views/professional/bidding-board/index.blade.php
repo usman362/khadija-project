@@ -132,6 +132,21 @@
         <div class="bb-flash">✅ {{ session('status') }}</div>
     @endif
 
+    {{-- Tiered early access. Counts above are what's unlocked to THIS pro, so
+         say so — a withheld gig must never read as "none exist". --}}
+    @unless($isElite ?? false)
+        <div style="display:flex;gap:10px;align-items:center;background:rgba(37,99,235,.10);border:1px solid rgba(37,99,235,.28);border-radius:12px;padding:11px 15px;margin-bottom:14px;font-size:12.5px;color:var(--text-secondary);">
+            <span style="font-size:15px;">⏱️</span>
+            <div style="flex:1;">
+                <b style="color:var(--text-primary);">Emergency &amp; Multi-Service requests: Elite pros see them immediately. Pro and Starter unlock at 60 minutes.</b>
+                @if(($lockedCount ?? 0) > 0)
+                    <div style="margin-top:2px;">{{ $lockedCount }} {{ $lockedCount === 1 ? 'request opens' : 'requests open' }} to you shortly. Counts below show what's unlocked to you.</div>
+                @endif
+            </div>
+            <a href="{{ route('membership.plans') }}" style="color:#2563eb;font-weight:700;text-decoration:none;white-space:nowrap;">Upgrade to Elite →</a>
+        </div>
+    @endunless
+
     {{-- Top bar: filter tabs + sort --}}
     <div class="bb-bar">
         <div class="bb-tabs">
@@ -208,15 +223,23 @@
                     </div>
 
                     <div class="bb-actions">
-                        <button class="bb-bid {{ $g['my_bid'] ? 'done' : '' }}" type="button"
-                                data-bid-open
-                                data-event-id="{{ $g['event_id'] }}"
-                                data-title="{{ $g['title'] }}"
-                                data-amount="{{ $g['my_bid']['amount'] ?? '' }}"
-                                data-public="{{ $g['my_bid'] && $g['my_bid']['is_public'] ? '1' : '0' }}"
-                                data-services="{{ json_encode($g['services'] ?? []) }}">
-                            {{ $g['my_bid'] ? 'Edit Bid' : 'Place Bid' }}
-                        </button>
+                        {{-- A past-dated request can't be bid on. --}}
+                        @if($g['expired'] ?? false)
+                            <button class="bb-bid" type="button" disabled
+                                    style="opacity:.55;cursor:not-allowed;background:var(--border-color);color:var(--text-muted);">
+                                Bidding Closed
+                            </button>
+                        @else
+                            <button class="bb-bid {{ $g['my_bid'] ? 'done' : '' }}" type="button"
+                                    data-bid-open
+                                    data-event-id="{{ $g['event_id'] }}"
+                                    data-title="{{ $g['title'] }}"
+                                    data-amount="{{ $g['my_bid']['amount'] ?? '' }}"
+                                    data-public="{{ $g['my_bid'] && $g['my_bid']['is_public'] ? '1' : '0' }}"
+                                    data-services="{{ json_encode($g['services'] ?? []) }}">
+                                {{ $g['my_bid'] ? 'Edit Bid' : 'Place Bid' }}
+                            </button>
+                        @endif
                         <button class="bb-ob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg>Save</button>
                         <button class="bb-ob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>Share</button>
                     </div>
