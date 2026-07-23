@@ -1,4 +1,4 @@
-@extends('layouts.public')
+@extends('layouts.landing')
 
 @php
     $seoTitle       = $pro->name . ' — ' . ($profile->headline ?? 'Event Professional');
@@ -27,13 +27,11 @@
 .pp-page {
     max-width: 1180px;
     margin: 0 auto;
-    /* Top padding bumped from 100px → 160px so the breadcrumb clears
-       the two-row sticky navbar (~140px tall on desktop) without
-       requiring the user to scroll. */
-    padding: 160px 24px 120px;
-    color: var(--text-primary, #1f2937);
+    /* The light landing header sits in flow, so no clearance padding needed. */
+    padding: 28px 24px 90px;
+    color: var(--ink, #0f1b35);
 }
-@media (max-width: 720px) { .pp-page { padding: 130px 16px 90px; } }
+@media (max-width: 720px) { .pp-page { padding: 18px 16px 80px; } }
 
 /* ── Breadcrumb ───────────────────────────────────────────── */
 .pp-breadcrumb {
@@ -42,10 +40,10 @@
     gap: 8px;
     margin-bottom: 16px;
     font-size: 13px;
-    color: var(--text-muted, #94a3b8);
+    color: var(--muted, #64748b);
 }
 .pp-breadcrumb a {
-    color: var(--text-light, #c8cdd8);
+    color: var(--text, #475569);
     text-decoration: none;
     transition: color 0.15s;
 }
@@ -68,7 +66,7 @@
     border-radius: 18px;
     overflow: hidden;
     box-shadow: 0 10px 32px rgba(0, 0, 0, 0.28);
-    border: 1px solid rgba(255,255,255,0.06);
+    border: 1px solid var(--line, #e6eaf1);
     margin-bottom: 24px;
 }
 .pp-hero-cover {
@@ -260,7 +258,7 @@
     padding: 24px;
     margin-bottom: 20px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
-    border: 1px solid rgba(255,255,255,0.04);
+    border: 1px solid var(--line, #e6eaf1);
 }
 .pp-card-title {
     font-size: 16px; font-weight: 700;
@@ -556,7 +554,7 @@
     gap: 12px;
     padding: 14px;
     background: var(--bg-card, #151d35);
-    border: 1px solid rgba(255,255,255,0.06);
+    border: 1px solid var(--line, #e6eaf1);
     border-radius: 14px;
     text-decoration: none;
     transition: transform 0.2s, border-color 0.2s;
@@ -573,30 +571,30 @@
 }
 .pp-mini .info { min-width: 0; flex: 1; }
 .pp-mini .name { font-size: 14px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pp-mini .headline { font-size: 12px; color: var(--text-muted, #94a3b8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 2px 0 4px; }
+.pp-mini .headline { font-size: 12px; color: var(--muted, #64748b); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 2px 0 4px; }
 .pp-mini .rating { font-size: 12px; color: #ffb648; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; }
-.pp-mini .rating .count { color: var(--text-muted, #94a3b8); font-weight: 500; }
+.pp-mini .rating .count { color: var(--muted, #64748b); font-weight: 500; }
 
 /* ── Mobile sticky CTA bar ─────────────────────────────────── */
 .pp-sticky-cta {
     position: fixed;
     left: 0; right: 0; bottom: 0;
     padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-    background: rgba(11, 15, 26, 0.94);
+    background: rgba(255, 255, 255, 0.96);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid var(--line, #e6eaf1);
     display: none;
     gap: 10px;
     z-index: 500;
-    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 -8px 24px rgba(15, 27, 53, 0.10);
 }
 .pp-sticky-cta .pp-btn { flex: 1; justify-content: center; padding: 13px; font-size: 14px; }
 .pp-sticky-cta .pp-btn.secondary-sm {
     flex: 0 0 auto;
-    background: rgba(255,255,255,0.08);
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.15);
+    background: #fff;
+    color: var(--ink, #0f1b35);
+    border: 1px solid var(--line, #e6eaf1);
     padding: 13px;
 }
 @media (max-width: 720px) { .pp-sticky-cta { display: flex; } }
