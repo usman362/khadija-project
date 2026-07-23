@@ -174,8 +174,15 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                 </div>
                 <div>
-                    <div class="cl-stat-label">Total Earned</div>
+                    <div class="cl-stat-label">Total Earned <span style="font-weight:500;">(net)</span></div>
                     <div class="cl-stat-value">${{ number_format($stats['earned'] ?? 0, 2) }}</div>
+                    {{-- Show the deduction rather than a bare net, so the number
+                         reconciles against what the client was invoiced. --}}
+                    @if(($stats['commission'] ?? 0) > 0)
+                        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">
+                            ${{ number_format($stats['gross'] ?? 0, 2) }} gross − ${{ number_format($stats['commission'], 2) }} commission ({{ rtrim(rtrim(number_format($stats['commissionPct'] ?? 5, 2), '0'), '.') }}%)
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

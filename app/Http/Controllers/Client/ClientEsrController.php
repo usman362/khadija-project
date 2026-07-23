@@ -17,8 +17,11 @@ use Illuminate\View\View;
  * Bidding Board with priority, then flows through bids → proposals → award →
  * booking → review exactly like SSR/MSR.
  *
- * Fees (per counsel): $2.99 posting at post; $8.99 ESR service fee only on a
- * finalized agreement — never on deals that fall through.
+ * Fees: success-only. $0 to post; the client pays a single $2.99 when an
+ * agreement finalizes, and nothing at all if the request goes unfilled. (This
+ * used to claim "$2.99 at post + $8.99 ESR service fee" — an earlier model.
+ * $8.99 appears in no current workflow doc, and the Integration Diagnosis is
+ * explicit: "a single $2.99 only when something finalizes.")
  */
 class ClientEsrController extends Controller
 {
