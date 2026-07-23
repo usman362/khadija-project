@@ -87,9 +87,10 @@ class ClientDirectOfferController extends Controller
             $event->categories()->sync($categoryIds->all());
         }
 
+        // Land on the offer itself, same as the other post flows.
         return redirect()
-            ->route('client.events.index')
+            ->route('client.events.show', $event)
             ->with('status', 'Direct offer sent to ' . $pro->name
-                . ' — it\'s now under My Events. Once they accept, the confirmed booking appears under Bookings.');
+                . '. Once they accept, the confirmed booking appears under Bookings.');
     }
 }

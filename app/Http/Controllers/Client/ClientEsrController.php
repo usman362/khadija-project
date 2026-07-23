@@ -77,8 +77,9 @@ class ClientEsrController extends Controller
 
         $event->categories()->sync(collect($data['services'])->unique()->all());
 
+        // Land on the request itself; responses show up under Proposals.
         return redirect()
-            ->route('client.proposals.index')
-            ->with('status', 'Rush request published. Verified professionals are being notified now — responses will appear here.');
+            ->route('client.events.show', $event)
+            ->with('status', 'Rush request published. Verified professionals are being notified now — responses will appear under Proposals.');
     }
 }

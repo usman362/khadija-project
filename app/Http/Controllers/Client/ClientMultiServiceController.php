@@ -108,8 +108,10 @@ class ClientMultiServiceController extends Controller
             $event->categories()->sync($categoryIds);
         }
 
+        // Land on the request itself so the client sees what was published;
+        // incoming bids show up under Proposals.
         return redirect()
-            ->route('client.proposals.index')
-            ->with('status', 'Your Multi-Service Request is live. Professionals can now bid on each service — offers will appear here as they come in.');
+            ->route('client.events.show', $event)
+            ->with('status', 'Your Multi-Service Request is live. Professionals can now bid on each service — offers will appear under Proposals as they come in.');
     }
 }
