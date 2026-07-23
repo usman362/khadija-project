@@ -309,6 +309,4 @@
 </div>{{-- /.pr-layout --}}
 @endsection
 
-@push('scripts')
 @include('partials._row-menu-script')
-@endpush

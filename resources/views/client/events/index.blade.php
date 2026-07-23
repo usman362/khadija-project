@@ -925,8 +925,8 @@
 
 @endsection
 
-@push('scripts')
 @include('partials._row-menu-script')
+@push('scripts')
 <script>
 
     // Tab switching

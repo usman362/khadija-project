@@ -11,6 +11,8 @@
      absolutely positioned popup gets clipped at the card edge. Fixed
      positioning escapes every clipping ancestor; the trade-off is we place it
      by hand and re-place it on scroll/resize. --}}
+@once
+@push('scripts')
 <script>
 (function () {
     var openMenu = null;
@@ -77,3 +79,5 @@
     window.addEventListener('scroll', function () { if (openMenu) place(openMenu); }, true);
 })();
 </script>
+@endpush
+@endonce

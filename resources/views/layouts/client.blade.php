@@ -1241,8 +1241,18 @@
                     <a href="{{ route('client.chat.index') }}" class="cl-nav-link {{ request()->routeIs('client.chat.*') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                         Messages (Inbox)
-                        @php($unread = auth()->check() ? auth()->user()->unreadNotifications->count() : 0)
-                        <span class="cl-nav-badge cl-nav-badge-count">{{ $unread > 9 ? '9+' : ($unread > 0 ? $unread : 2) }}</span>
+                        {{-- Real unread MESSAGES (this counted notifications before,
+                             and showed a hardcoded 2 when there were none). --}}
+                        @php
+                            $unread = auth()->check()
+                                ? \App\Models\Message::where('recipient_id', auth()->id())
+                                    ->whereDoesntHave('reads', fn ($q) => $q->where('user_id', auth()->id()))
+                                    ->count()
+                                : 0;
+                        @endphp
+                        @if($unread > 0)
+                            <span class="cl-nav-badge cl-nav-badge-count">{{ $unread > 9 ? '9+' : $unread }}</span>
+                        @endif
                     </a>
                 </li>
                 <li class="cl-nav-item">
@@ -1360,15 +1370,8 @@
                     <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 </button>
 
-                {{-- Notifications bell with unread count (demo "2" fallback) --}}
-                <button class="cl-nav-btn" title="Notifications">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                    @php($notifCount = auth()->check() ? auth()->user()->unreadNotifications->count() : 0)
-                    <span class="cl-nav-btn-count">{{ $notifCount > 9 ? '9+' : ($notifCount > 0 ? $notifCount : 2) }}</span>
-                </button>
-
-                {{-- Profile avatar --}}
-                <a href="{{ route('client.profile.index') }}" class="cl-navbar-avatar" title="{{ auth()->user()?->name }}">{{ strtoupper(substr(auth()->user()?->name ?? 'C', 0, 1)) }}</a>
+                {{-- Notifications bell + account, both real dropdowns --}}
+                @include('partials._topbar-menus', ['portal' => 'client', 'trigger' => 'avatar'])
             </div>
         </header>
 
