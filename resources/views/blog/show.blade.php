@@ -1,4 +1,4 @@
-@extends('layouts.public')
+@extends('layouts.landing')
 
 @section('title', ($post->meta_title ?: $post->title) . ' - ' . config('app.name', 'Khadija'))
 
@@ -11,7 +11,7 @@
        featured image. */
     .post-hero {
         position: relative;
-        padding: 180px 0 70px;
+        padding: 72px 0 52px;
         text-align: center;
         overflow: hidden;
         margin-bottom: 40px;
@@ -34,7 +34,7 @@
         background:
             radial-gradient(900px 400px at 18% 0%, rgba(59,130,246,0.10), transparent 55%),
             radial-gradient(800px 380px at 85% 0%, rgba(139,92,246,0.10), transparent 55%),
-            linear-gradient(180deg, rgba(11,15,26,0.55) 0%, rgba(11,15,26,0.75) 65%, var(--bg-dark) 100%);
+            linear-gradient(180deg, rgba(11,15,26,0.60) 0%, rgba(11,15,26,0.74) 60%, rgba(11,15,26,0.86) 100%);
         pointer-events: none;
     }
     .post-hero .container {
@@ -91,22 +91,22 @@
         padding: 60px 24px 80px;
         font-size: 1.05rem;
         line-height: 1.85;
-        color: var(--text-light);
+        color: var(--text, #475569);
     }
-    .post-body h2 { color: var(--text-white); font-size: 1.6rem; font-weight: 700; margin: 40px 0 16px; }
-    .post-body h3 { color: var(--text-white); font-size: 1.25rem; font-weight: 700; margin: 30px 0 12px; }
-    .post-body h4 { color: var(--text-white); font-size: 1.1rem; font-weight: 600; margin: 24px 0 10px; }
+    .post-body h2 { color: var(--ink, #0f1b35); font-size: 1.6rem; font-weight: 700; margin: 40px 0 16px; }
+    .post-body h3 { color: var(--ink, #0f1b35); font-size: 1.25rem; font-weight: 700; margin: 30px 0 12px; }
+    .post-body h4 { color: var(--ink, #0f1b35); font-size: 1.1rem; font-weight: 600; margin: 24px 0 10px; }
     .post-body p { margin-bottom: 18px; }
     .post-body ul, .post-body ol { margin: 16px 0 16px 28px; }
     .post-body li { margin-bottom: 8px; }
     .post-body a { color: var(--primary); text-decoration: underline; }
     .post-body a:hover { color: var(--accent); }
-    .post-body strong { color: var(--text-white); font-weight: 600; }
+    .post-body strong { color: var(--ink, #0f1b35); font-weight: 600; }
     .post-body img {
         max-width: 100%;
         border-radius: 12px;
         margin: 24px 0;
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--line, #e6eaf1);
     }
     .post-body blockquote {
         border-left: 4px solid var(--primary);
@@ -114,11 +114,11 @@
         margin: 28px 0;
         background: rgba(59,130,246,0.05);
         border-radius: 8px;
-        color: var(--text-white);
+        color: var(--ink, #0f1b35);
         font-style: italic;
     }
     .post-body code {
-        background: rgba(255,255,255,0.06);
+        background: var(--bg-soft, #f7f9fc);
         padding: 2px 8px;
         border-radius: 4px;
         font-size: 0.9em;
@@ -126,7 +126,7 @@
     }
     .post-body pre {
         background: #0f1629;
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--line, #e6eaf1);
         border-radius: 10px;
         padding: 18px 22px;
         overflow-x: auto;
@@ -142,13 +142,13 @@
         justify-content: space-between;
         align-items: center;
         gap: 16px;
-        border-top: 1px solid var(--border-color);
-        border-bottom: 1px solid var(--border-color);
+        border-top: 1px solid var(--line, #e6eaf1);
+        border-bottom: 1px solid var(--line, #e6eaf1);
         flex-wrap: wrap;
     }
     .share-bar-label {
         font-size: 0.88rem;
-        color: var(--text-muted);
+        color: var(--muted, #64748b);
         font-weight: 600;
     }
     .share-buttons { display: flex; gap: 10px; }
@@ -156,11 +156,11 @@
         width: 38px; height: 38px;
         border-radius: 50%;
         background: var(--bg-card);
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--line, #e6eaf1);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--text-light);
+        color: var(--text, #475569);
         transition: all 0.2s;
     }
     .share-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-2px); }
@@ -176,10 +176,10 @@
         font-size: 1.75rem;
         font-weight: 800;
         margin-bottom: 28px;
-        color: var(--text-white);
+        color: var(--ink, #0f1b35);
     }
     .related-section h2 .gradient-text {
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        background: linear-gradient(135deg, var(--blue, #2563eb), var(--orange, #f97316));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -191,7 +191,7 @@
     }
     .related-card {
         background: var(--bg-card);
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--line, #e6eaf1);
         border-radius: 14px;
         overflow: hidden;
         transition: all 0.3s;
@@ -205,17 +205,17 @@
     .related-card h4 {
         font-size: 1rem;
         font-weight: 700;
-        color: var(--text-white);
+        color: var(--ink, #0f1b35);
         line-height: 1.4;
         margin-bottom: 8px;
     }
     .related-card .meta {
         font-size: 0.75rem;
-        color: var(--text-muted);
+        color: var(--muted, #64748b);
     }
 
     @media (max-width: 768px) {
-        .post-hero     { padding: 140px 20px 50px; margin-bottom: 24px; }
+        .post-hero     { padding: 48px 20px 40px; margin-bottom: 24px; }
         .post-hero h1  { font-size: 1.85rem; }
         .post-meta     { gap: 10px; font-size: 0.82rem; }
         .post-body     { padding: 40px 20px 60px; font-size: 0.95rem; }

@@ -675,7 +675,7 @@
                 .pf-crop-stage img { width: 100%; max-height: 60vh; object-fit: contain; display: block; pointer-events: none; }
                 .pf-crop-dot { position: absolute; width: 26px; height: 26px; border-radius: 50%; border: 3px solid #fff; background: rgba(249,115,22,.85); transform: translate(-50%, -50%); box-shadow: 0 0 0 2px rgba(0,0,0,.35); pointer-events: none; }
                 .pf-crop-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
-                .pf-btn-ghost { background: transparent; border: 1px solid var(--border-color, #e5e9f0); color: var(--text-light, #334155); border-radius: 10px; padding: 9px 18px; font-weight: 700; cursor: pointer; }
+                .pf-btn-ghost { background: transparent; border: 1px solid var(--border-color, #e5e9f0); color: var(--text-secondary); border-radius: 10px; padding: 9px 18px; font-weight: 700; cursor: pointer; }
                 .pf-btn-primary { background: linear-gradient(135deg,#f97316,#ea580c); border: none; color: #fff; border-radius: 10px; padding: 9px 20px; font-weight: 800; cursor: pointer; }
             </style>
             <script>

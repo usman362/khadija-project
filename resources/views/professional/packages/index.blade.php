@@ -17,14 +17,14 @@
     .pkl-badge.off { background: rgba(15,27,53,.7); color: #fff; }
     .pkl-body { padding: 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
     .pkl-cat { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .3px; font-weight: 700; }
-    .pkl-title { font-size: 15px; font-weight: 800; color: var(--text-white); line-height: 1.25; }
+    .pkl-title { font-size: 15px; font-weight: 800; color: var(--text-primary); line-height: 1.25; }
     .pkl-price { font-size: 18px; font-weight: 900; color: var(--accent-blue, #3b82f6); margin-top: 2px; }
     .pkl-price small { font-size: 12px; font-weight: 600; color: var(--text-muted); }
     .pkl-actions { display: flex; gap: 8px; margin-top: 10px; }
-    .pkl-btn { flex: 1; text-align: center; padding: 8px; border-radius: 9px; font-size: 13px; font-weight: 700; text-decoration: none; border: 1px solid var(--border-color); color: var(--text-light); background: transparent; cursor: pointer; }
+    .pkl-btn { flex: 1; text-align: center; padding: 8px; border-radius: 9px; font-size: 13px; font-weight: 700; text-decoration: none; border: 1px solid var(--border-color); color: var(--text-secondary); background: transparent; cursor: pointer; }
     .pkl-btn.del { color: #ef4444; border-color: rgba(239,68,68,.3); }
     .pkl-empty { background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: 16px; padding: 56px 24px; text-align: center; color: var(--text-muted); }
-    .pkl-empty h3 { color: var(--text-white); margin: 0 0 8px; }
+    .pkl-empty h3 { color: var(--text-primary); margin: 0 0 8px; }
 </style>
 @endpush
 
