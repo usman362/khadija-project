@@ -14,9 +14,10 @@ use Illuminate\View\View;
  * Professional — Main Bidding Board.
  *
  * Every OPEN client gig in one place to bid on. Gigs are REAL published Events
- * (not completed/cancelled). Request type (SSR/MSR/ESR) is derived from how many
- * services the gig spans; match-score, time-left and images are AI/representative
- * fields until the live bid pipeline + scoring model land.
+ * (not completed/cancelled). ESR is read from the event's source — a rush
+ * request can be single-service, so counting services would mislabel it;
+ * SSR vs MSR is then the service count. Match-score and images are
+ * representative fields until the scoring model lands.
  */
 class ProfessionalBiddingBoardController extends Controller
 {
@@ -164,7 +165,9 @@ class ProfessionalBiddingBoardController extends Controller
 
         return [
             'type'   => $type,
-            'urgent' => $days !== null && $days >= 0 && $days <= 3,
+            // A rush request is urgent by definition — don't let a needed-by
+            // date further out quietly drop the flag that's the whole point.
+            'urgent' => $type === 'ESR' || ($days !== null && $days >= 0 && $days <= 3),
             'title'  => $e->title,
             'desc'   => Str::limit($e->description ?: 'Open gig — full details available on request.', 140),
             'loc'    => $e->location ?: 'Location flexible',
