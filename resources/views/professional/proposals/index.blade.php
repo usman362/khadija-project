@@ -259,6 +259,18 @@
                             </form>
                         @endif
 
+                        {{-- The third action. Accept / Decline alone made a client's
+                             offer take-it-or-leave-it; the rule is Accept / Decline /
+                             Reply, back and forth until deal or no deal. Stays
+                             available after acceptance — that's when the details get
+                             sorted — and drops once the job is done or cancelled. --}}
+                        @unless(in_array($booking->status, ['completed', 'cancelled']))
+                            <form method="POST" action="{{ route('professional.proposals.reply', $booking) }}" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="cl-btn cl-btn-ghost cl-btn-sm">Reply</button>
+                            </form>
+                        @endunless
+
                         @if($booking->event)
                             <a href="{{ route('professional.gigs.show', $booking->event) }}" class="cl-btn cl-btn-ghost cl-btn-sm">View Gig</a>
                         @endif

@@ -750,6 +750,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/proposals', [ProfessionalProposalController::class, 'index'])->middleware('permission:bookings.view_any')->name('professional.proposals.index');
         Route::post('/proposals/send/{event}', [ProfessionalProposalController::class, 'sendProposal'])->middleware('permission:bookings.create')->name('professional.proposals.send');
         Route::patch('/proposals/{booking}/status', [ProfessionalProposalController::class, 'updateStatus'])->middleware('permission:bookings.update')->name('professional.proposals.update-status');
+        Route::post('/proposals/{booking}/reply', [ProfessionalProposalController::class, 'reply'])->middleware('permission:bookings.view_any')->name('professional.proposals.reply');
 
         // Earnings
         Route::get('/earnings', [ProfessionalEarningsController::class, 'index'])->name('professional.earnings.index');

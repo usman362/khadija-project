@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Professional;
 use App\Http\Controllers\Controller;
 use App\Models\AgreementLog;
 use App\Models\Booking;
+use App\Models\Conversation;
 use App\Models\Event;
 use App\Models\User;
 use App\Notifications\BookingCompleted;
@@ -171,5 +172,45 @@ class ProfessionalProposalController extends Controller
         }
 
         return back()->with('status', 'Booking status updated.');
+    }
+
+    /**
+     * Open the conversation for a proposal so the professional can negotiate
+     * instead of only accepting or declining it.
+     *
+     * The universal rule across the request routes is Accept / Decline /
+     * Reply — "back and forth, unlimited, until deal or no deal". This page
+     * had the first two only, so a client's direct offer was take-it-or-
+     * leave-it. Reuses the existing booking conversation rather than a second
+     * messaging surface; finds or creates it exactly like ConversationController.
+     */
+    public function reply(Request $request, Booking $booking): RedirectResponse
+    {
+        $this->authorize('view', $booking);
+
+        $user = $request->user();
+
+        $conversation = Conversation::ofType('booking')
+            ->where('booking_id', $booking->id)
+            ->first();
+
+        if (! $conversation) {
+            $conversation = Conversation::create([
+                'type'       => 'booking',
+                'booking_id' => $booking->id,
+                'event_id'   => $booking->event_id,
+                'created_by' => $user->id,
+            ]);
+        }
+
+        // Both sides must be in the thread, however it was created.
+        $conversation->addParticipant($user);
+        if ($booking->client) {
+            $conversation->addParticipant($booking->client);
+        }
+
+        return redirect()
+            ->route('professional.chat.show', $conversation)
+            ->with('status', 'You can negotiate this proposal here — the client is in the thread.');
     }
 }
