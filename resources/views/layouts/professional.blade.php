@@ -426,6 +426,7 @@
         }
 
         .cl-user-card {
+            text-decoration: none;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -1129,7 +1130,6 @@
                 <div class="cl-user-avatar">{{ strtoupper(substr(auth()->user()?->name ?? 'U', 0, 1)) }}</div>
                 <div class="cl-user-info">
                     <div class="cl-user-name">{{ auth()->user()?->name }}</div>
-                    <div class="cl-user-role">Professional</div>
                 </div>
             </a>
             <form action="{{ route('logout') }}" method="POST" class="cl-logout-form">@csrf

@@ -11,23 +11,51 @@
     @endif
 
     {{-- ── Header ───────────────────────────────────────────── --}}
-    <div style="margin-bottom: 24px;">
-        <a href="{{ route('client.events.index') }}" style="display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); text-decoration: none; font-size: 13px; margin-bottom: 12px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    @php
+        $evProposals = $event->bookings->where('status', 'requested')->count();
+        $evBids      = isset($bids) ? $bids->count() : 0;
+        $evDaysToGo  = $event->starts_at ? (int) round(now()->startOfDay()->diffInDays($event->starts_at->startOfDay(), false)) : null;
+    @endphp
+
+    <style>
+        .ev-hero { position: relative; overflow: hidden; border-radius: 18px; border: 1px solid var(--border-color); background: var(--bg-card); padding: 22px 24px; margin-bottom: 18px; }
+        .ev-hero::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 100%; background: radial-gradient(620px 220px at 4% 0%, rgba(249,115,22,.10), transparent 60%); pointer-events: none; }
+        .ev-hero > * { position: relative; }
+        .ev-back { display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); text-decoration: none; font-size: 12.5px; font-weight: 600; margin-bottom: 12px; }
+        .ev-back:hover { color: var(--accent-orange, #f97316); }
+        .ev-title { font-size: 26px; font-weight: 800; letter-spacing: -0.01em; color: var(--text-primary); margin: 0 0 9px; }
+        .ev-chips { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; }
+        .ev-cat { font-size: 11.5px; font-weight: 700; color: var(--text-secondary); background: var(--bg-subtle, rgba(0,0,0,.04)); border: 1px solid var(--border-color); border-radius: 999px; padding: 3px 10px; }
+        .ev-meta { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-color); }
+        .ev-meta div { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-secondary); font-weight: 600; }
+        .ev-meta svg { width: 15px; height: 15px; color: var(--accent-orange, #f97316); flex-shrink: 0; }
+        .ev-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .ev-stat { border: 1px solid var(--border-color); border-radius: 14px; background: var(--bg-card); padding: 14px 16px; }
+        .ev-stat b { display: block; font-size: 22px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
+        .ev-stat span { display: block; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--text-muted); margin-top: 4px; }
+    </style>
+
+    <div class="ev-hero">
+        <a href="{{ route('client.events.index') }}" class="ev-back">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
             Back to My Events
         </a>
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
-            <div>
-                <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">{{ $event->title }}</h2>
-                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                    <span class="cl-badge cl-badge-{{ $event->status }}">{{ ucfirst(str_replace('_', ' ', $event->status)) }}</span>
+            <div style="min-width:0;">
+                <h2 class="ev-title">{{ $event->title }}</h2>
+                <div class="ev-chips">
+                    {{-- Publish state once; the workflow status only when it adds
+                         something beyond "published" (confirmed / completed / …). --}}
                     @if($event->is_published)
                         <span class="cl-badge cl-badge-published">Published</span>
                     @else
                         <span class="cl-badge" style="background:#fef3c7;color:#b45309;">Draft</span>
                     @endif
+                    @if(! in_array($event->status, ['published', 'pending'], true))
+                        <span class="cl-badge cl-badge-{{ $event->status }}">{{ ucfirst(str_replace('_', ' ', $event->status)) }}</span>
+                    @endif
                     @foreach($event->categories as $cat)
-                        <span style="font-size: 13px; color: var(--text-muted);">{{ $cat->name }}</span>
+                        <span class="ev-cat">{{ $cat->name }}</span>
                     @endforeach
                 </div>
             </div>
@@ -46,6 +74,31 @@
                     </form>
                 @endif
             </div>
+        </div>
+
+        <div class="ev-meta">
+            @if($event->starts_at)
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>{{ $event->starts_at->format('M d, Y · g:i A') }}</div>
+            @endif
+            @if($event->location)
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>{{ $event->location }}</div>
+            @endif
+            @if($event->budget)
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>${{ number_format($event->budget, 2) }}</div>
+            @endif
+            @if($event->guest_count)
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>{{ number_format($event->guest_count) }} guests</div>
+            @endif
+        </div>
+    </div>
+
+    <div class="ev-stats">
+        <div class="ev-stat"><b>{{ $evProposals }}</b><span>Proposals</span></div>
+        <div class="ev-stat"><b>{{ $evBids }}</b><span>Sealed Bids</span></div>
+        <div class="ev-stat"><b>{{ $event->categories->count() }}</b><span>Services</span></div>
+        <div class="ev-stat">
+            <b>{{ $evDaysToGo === null ? '—' : ($evDaysToGo > 0 ? $evDaysToGo : ($evDaysToGo === 0 ? 'Today' : 'Past')) }}</b>
+            <span>{{ $evDaysToGo !== null && $evDaysToGo > 0 ? 'Days to go' : 'Event date' }}</span>
         </div>
     </div>
 
