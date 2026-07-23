@@ -38,7 +38,14 @@ class ClientEsrController extends Controller
         return view('client.esr.create', [
             'categories' => $categories,
             'reasons'    => self::REASONS,
+            'scope'      => $this->scopeOf($request->query('scope')),
         ]);
+    }
+
+    /** Normalise the single/multi choice; multi is the default. */
+    private function scopeOf(?string $raw): string
+    {
+        return $raw === 'single' ? 'single' : 'multi';
     }
 
     public function store(Request $request): RedirectResponse
@@ -51,6 +58,7 @@ class ClientEsrController extends Controller
             'guest_count'  => ['nullable', 'integer', 'min:1', 'max:1000000'],
             'description'  => ['nullable', 'string', 'max:2000'],
             'budget_min'   => ['nullable', 'integer', 'min:0'],
+            'scope'        => ['nullable', 'in:single,multi'],
             'services'     => ['required', 'array', 'min:1'],
             'services.*'   => ['integer', 'exists:categories,id'],
         ], [
@@ -59,7 +67,17 @@ class ClientEsrController extends Controller
             'needed_by.required' => 'When do you need this by?',
         ]);
 
-        $user = $request->user();
+        $user     = $request->user();
+        $scope    = $this->scopeOf($data['scope'] ?? null);
+        $services = collect($data['services'])->unique()->values();
+
+        // A single-service rush request means exactly that — one service. The
+        // picker enforces it client-side; this is the server-side guard.
+        if ($scope === 'single' && $services->count() > 1) {
+            return back()->withInput()->withErrors([
+                'services' => 'A single-service rush request takes one service. Pick just one, or switch to a multi-service request.',
+            ]);
+        }
 
         $event = Event::create([
             'title'        => $data['event_name'],
@@ -75,11 +93,13 @@ class ClientEsrController extends Controller
             'source'       => 'esr',   // marks it urgent on the Bidding Board
         ]);
 
-        $event->categories()->sync(collect($data['services'])->unique()->all());
+        $event->categories()->sync($services->all());
 
         // Land on the request itself; responses show up under Proposals.
         return redirect()
             ->route('client.events.show', $event)
-            ->with('status', 'Rush request published. Verified professionals are being notified now — responses will appear under Proposals.');
+            ->with('status', $scope === 'single'
+                ? 'Rush request published. Verified professionals for that service are being notified now — responses will appear under Proposals.'
+                : 'Rush request published. Verified professionals are being notified now — each service is bid on separately, and responses appear under Proposals.');
     }
 }

@@ -5,6 +5,10 @@
     'accent' => '#f97316',
     'accentStrong' => '#ea580c',
     'valueField' => 'id', // 'id' (Direct Offer) or 'name' (MSR store matches on name)
+    // Single-service mode: picking one service clears the previous pick, so a
+    // single-service request (SSR, or an ESR scoped to one service) can't be
+    // submitted with two. Flip it live by setting data-svc-single on the root.
+    'single' => false,
 ])
 
 @php
@@ -117,9 +121,33 @@
         grid.querySelectorAll('.svc-item').forEach(function (item) {
             var cb = item.querySelector('input');
             cb.addEventListener('change', function () {
+                // Read the attribute per-event, not at init — the ESR page flips
+                // single mode when the client switches scope.
+                if (cb.checked && root.getAttribute('data-svc-single') === '1') {
+                    grid.querySelectorAll('.svc-item').forEach(function (other) {
+                        if (other === item) return;
+                        var ocb = other.querySelector('input');
+                        if (ocb.checked) { ocb.checked = false; other.classList.remove('sel'); }
+                    });
+                }
                 item.classList.toggle('sel', cb.checked);
                 refresh();
             });
+        });
+
+        // Switching into single mode with several already picked: keep the first.
+        root.addEventListener('svc:single', function (e) {
+            var on = !!(e.detail && e.detail.on);
+            root.setAttribute('data-svc-single', on ? '1' : '0');
+            if (!on) return;
+            var kept = false;
+            grid.querySelectorAll('.svc-item').forEach(function (item) {
+                var cb = item.querySelector('input');
+                if (!cb.checked) return;
+                if (kept) { cb.checked = false; item.classList.remove('sel'); }
+                kept = true;
+            });
+            refresh();
         });
 
         if (searchEl) {
@@ -178,7 +206,7 @@
 @endpush
 @endonce
 
-<div class="svc-picker" data-svc-picker>
+<div class="svc-picker" data-svc-picker @if($single) data-svc-single="1" @endif>
     <div class="svc-search">
         <svg class="svc-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" placeholder="Search services, or type multiple keywords…" autocomplete="off">

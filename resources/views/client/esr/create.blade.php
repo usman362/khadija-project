@@ -42,6 +42,18 @@
     .esr-svc { display:flex; gap:8px; align-items:center; border:1.5px solid var(--border-color,#e5e7eb); border-radius:10px; padding:9px 11px; cursor:pointer; font-size:13px; }
     .esr-svc:has(input:checked) { border-color:#f97316; background:#fff7ed; }
     .esr-svc input { accent-color:#f97316; }
+    /* Single vs multi scope chooser — an ESR can be either, same as SSR/MSR. */
+    .esr-scope { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+    .esr-scope-o { border:2px solid var(--border-color,#e5e7eb); border-radius:14px; padding:15px; cursor:pointer; background:var(--bg-card,#fff); transition:border-color .15s, background .15s; }
+    .esr-scope-o:hover { border-color:#f97316; }
+    .esr-scope-o.sel { border-color:#dc2626; background:#fef2f2; }
+    .esr-scope-code { display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:800; letter-spacing:.3px; color:#b91c1c; background:rgba(220,38,38,.12); padding:3px 10px; border-radius:999px; }
+    .esr-scope-o h5 { font-size:14px; font-weight:800; color:var(--text-primary,#111827); margin:9px 0 5px; }
+    .esr-scope-o p { font-size:12px; color:var(--text-muted,#6b7280); line-height:1.45; margin:0; }
+    /* Copy that belongs to only one scope. */
+    .esr[data-scope="single"] [data-scope-only="multi"],
+    .esr[data-scope="multi"]  [data-scope-only="single"] { display:none; }
+    @media (max-width:760px){ .esr-scope { grid-template-columns:1fr; } }
     .esr-foot { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
     .esr-fees { font-size:12.5px; color:var(--text-muted,#6b7280); }
     .esr-fees b { color:var(--text-primary,#111827); }
@@ -53,7 +65,7 @@
 @endpush
 
 @section('content')
-<div class="esr">
+<div class="esr" data-scope="{{ $scope }}">
     @if($errors->any())
         <div style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:10px;padding:11px 15px;margin-bottom:16px;font-size:13.5px;font-weight:600;">{{ $errors->first() }}</div>
     @endif
@@ -69,6 +81,23 @@
     <div class="esr-layout">
     <form method="POST" action="{{ route('client.esr.store') }}">
         @csrf
+
+        {{-- 0. Single or multi. A rush request can be either — one urgent gap to
+             fill, or several at once. Unlike a Direct Offer it still publishes to
+             the board and every professional bids; it is not aimed at one pro. --}}
+        <div class="esr-scope">
+            <div class="esr-scope-o {{ $scope === 'single' ? 'sel' : '' }}" data-scope-pick="single">
+                <span class="esr-scope-code">SINGLE SERVICE</span>
+                <h5>One urgent service</h5>
+                <p>One gap to fill right now — a replacement DJ, a caterer, a van. Handled as a single agreement.</p>
+            </div>
+            <div class="esr-scope-o {{ $scope === 'multi' ? 'sel' : '' }}" data-scope-pick="multi">
+                <span class="esr-scope-code">MULTI-SERVICE</span>
+                <h5>Several urgent services</h5>
+                <p>More than one thing fell through. Each service is bid on and agreed separately.</p>
+            </div>
+        </div>
+        <input type="hidden" name="scope" id="esrScope" value="{{ $scope }}">
 
         {{-- 1. Emergency & timing --}}
         <div class="esr-card">
@@ -94,8 +123,12 @@
 
         {{-- 2. Services --}}
         <div class="esr-card">
-            <div class="esr-sec-h"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Services You Need <span class="esr-req">*</span></div>
-            <x-service-picker :categories="$categories" name="services" :selected="old('services', [])" />
+            <div class="esr-sec-h"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span data-scope-only="single">The Service You Need</span><span data-scope-only="multi">Services You Need</span> <span class="esr-req">*</span></div>
+            <p style="font-size:12.5px;color:var(--text-muted,#6b7280);margin:-6px 0 12px;">
+                <span data-scope-only="single">Pick the one service you need covered — choosing another replaces it.</span>
+                <span data-scope-only="multi">Pick every service you need covered. Each one is bid on separately.</span>
+            </p>
+            <x-service-picker :categories="$categories" name="services" :selected="old('services', [])" :single="$scope === 'single'" />
         </div>
 
         {{-- 3. Budget & details --}}
@@ -129,6 +162,14 @@
             <div class="esr-step"><span class="esr-step-n">3</span><span class="esr-step-b"><b>Respond &amp; finalize</b>Replies appear on your Proposals page — pick one and confirm.</span></div>
         </div>
         <div class="esr-rcard">
+            <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Single or multi?</h4>
+            <ul class="esr-rlist">
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span><b>Single service</b> — one urgent gap, one agreement.</span></li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span><b>Multi-service</b> — several gaps; each is bid on and agreed separately.</span></li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span>Either way this goes out to <b>every available professional</b> — it isn't sent to one pro like a Direct Offer.</span></li>
+            </ul>
+        </div>
+        <div class="esr-rcard">
             <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>What you'll pay</h4>
             <ul class="esr-rlist">
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span><b>$0</b> to post — nothing charged upfront.</span></li>
@@ -147,3 +188,32 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    var root   = document.querySelector('.esr');
+    var field  = document.getElementById('esrScope');
+    var picker = root && root.querySelector('[data-svc-picker]');
+    if (!root || !field) return;
+
+    root.querySelectorAll('[data-scope-pick]').forEach(function (card) {
+        card.addEventListener('click', function () {
+            var val = card.getAttribute('data-scope-pick');
+            if (val === field.value) return;
+
+            field.value = val;
+            root.setAttribute('data-scope', val);
+            root.querySelectorAll('[data-scope-pick]').forEach(function (c) {
+                c.classList.toggle('sel', c === card);
+            });
+            // Let the picker collapse a multi-selection down to one itself, so
+            // its tags and counters stay in step.
+            if (picker) {
+                picker.dispatchEvent(new CustomEvent('svc:single', { detail: { on: val === 'single' } }));
+            }
+        });
+    });
+})();
+</script>
+@endpush
