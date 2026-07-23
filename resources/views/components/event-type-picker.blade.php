@@ -84,7 +84,8 @@
         root.querySelectorAll('[data-etp-letter]:not(.off)').forEach(function (b) {
             b.addEventListener('click', function () {
                 var g = list.querySelector('[data-etp-grp="' + b.getAttribute('data-etp-letter') + '"]');
-                if (g) list.scrollTop = g.offsetTop - list.offsetTop;
+                // Rect delta — correct whatever the group's offsetParent is.
+                if (g) list.scrollTop += g.getBoundingClientRect().top - list.getBoundingClientRect().top;
             });
         });
     });
