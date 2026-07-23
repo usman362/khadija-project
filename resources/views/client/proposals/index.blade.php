@@ -69,6 +69,16 @@
     .pr-act-decline { color: #ef4444; border-color: rgba(239,68,68,0.30); }
     .pr-act-decline:hover { color: #fff; background: #ef4444; border-color: #ef4444; }
     .pr-act-btn svg { width: 13px; height: 13px; }
+    /* Row "more actions" menu. The kebab used to be a bare link straight to the
+       event, which read as a menu and behaved as a redirect. */
+    .pr-menu { position: relative; }
+    .pr-menu-pop { display: none; position: absolute; right: 0; top: calc(100% + 5px); z-index: 40; min-width: 178px; background: var(--bg-card,#fff); border: 1px solid var(--border-color,#e5e7eb); border-radius: 10px; box-shadow: 0 10px 28px rgba(15,23,42,.13); padding: 5px; }
+    .pr-menu.open .pr-menu-pop { display: block; }
+    .pr-menu-pop a, .pr-menu-pop button { display: block; width: 100%; text-align: left; background: none; border: 0; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--text-primary,#111827); text-decoration: none; padding: 8px 10px; border-radius: 7px; cursor: pointer; }
+    .pr-menu-pop a:hover, .pr-menu-pop button:hover { background: rgba(249,115,22,.10); color: #ea580c; }
+    .pr-menu-pop form { margin: 0; }
+    .pr-menu-pop .danger { color: #dc2626; }
+    .pr-menu-pop .danger:hover { background: rgba(220,38,38,.10); color: #b91c1c; }
 
     /* Right rail */
     .pr-rail-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 16px; }
@@ -218,13 +228,33 @@
                                         </form>
                                     @endif
                                     <button type="button" class="pr-act-btn" title="Reply / Counter" onclick="var t=document.getElementById('prthread-{{ $p->id }}');t.style.display=t.style.display==='table-row'?'none':'table-row';"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
-                                    <a href="{{ $p->event ? route('client.events.show', $p->event) : '#' }}" class="pr-act-btn" title="View"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></a>
+                                    <div class="pr-menu" data-row-menu>
+                                        <button type="button" class="pr-act-btn" title="More actions" aria-haspopup="true" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+                                        <div class="pr-menu-pop" data-row-menu-pop>
+                                            @if($p->event)
+                                                <a href="{{ route('client.events.show', $p->event) }}">View event</a>
+                                            @endif
+                                            <button type="button" onclick="var t=document.getElementById('prthread-{{ $p->id }}');t.style.display='table-row';t.scrollIntoView({block:'nearest'});">Message professional</button>
+                                            @if($p->supplier)
+                                                <a href="{{ route('public.professional.show', $p->supplier) }}">View profile</a>
+                                            @endif
+                                            <a href="{{ route('client.chat.index') }}">Open inbox</a>
+                                            @if($pipe === 'pending')
+                                                <form method="POST" action="{{ route('client.proposals.decline', $p->id) }}">
+                                                    @csrf
+                                                    <button type="submit" class="danger">Decline proposal</button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
                         <tr id="prthread-{{ $p->id }}" style="display:none;">
                             <td colspan="7" style="padding:0 18px 16px;background:var(--bg-soft, #f8fafc);">
-                                @include('professional.bidding-board._bid-thread', ['bid' => $p, 'replyRoute' => 'client.proposals.reply', 'meId' => auth()->id()])
+                                {{-- The row toggle already revealed this; expanded skips the
+                                     partial's own second toggle so one click is enough. --}}
+                                @include('professional.bidding-board._bid-thread', ['bid' => $p, 'replyRoute' => 'client.proposals.reply', 'meId' => auth()->id(), 'expanded' => true])
                             </td>
                         </tr>
                     @empty
@@ -278,3 +308,7 @@
 </aside>
 </div>{{-- /.pr-layout --}}
 @endsection
+
+@push('scripts')
+@include('partials._row-menu-script')
+@endpush

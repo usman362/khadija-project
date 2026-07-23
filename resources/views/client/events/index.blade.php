@@ -96,6 +96,15 @@
     .mg-status-not_started, .mg-status-not_scheduled { background: var(--border-color); color: var(--text-muted); }
     .mg-status-cancelled   { background: rgba(239,68,68,0.15); color: #ef4444; }
     .mg-row-kebab { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 16px; padding: 2px 6px; }
+    .mg-row-kebab:hover { color: #f97316; }
+    /* Row "more actions" menu — the kebab used to be a bare link to the event,
+       which looked like a menu and behaved as a redirect. */
+    .mg-menu { position: relative; display: inline-block; }
+    .mg-menu-pop { display: none; position: absolute; right: 0; top: calc(100% + 5px); z-index: 40; min-width: 180px; background: var(--bg-card,#fff); border: 1px solid var(--border-color,#e5e7eb); border-radius: 10px; box-shadow: 0 10px 28px rgba(15,23,42,.13); padding: 5px; text-align: left; }
+    .mg-menu.open .mg-menu-pop { display: block; }
+    .mg-menu-pop a, .mg-menu-pop button { display: block; width: 100%; text-align: left; background: none; border: 0; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--text-primary,#111827); text-decoration: none; padding: 8px 10px; border-radius: 7px; cursor: pointer; }
+    .mg-menu-pop a:hover, .mg-menu-pop button:hover { background: rgba(249,115,22,.10); color: #ea580c; }
+    .mg-menu-pop form { margin: 0; }
 
     /* Professional Status Overview bar */
     .mg-pso { margin-top: 18px; }
@@ -518,7 +527,20 @@
                                 <td><span class="mg-status-pill mg-status-{{ $event->status }}">{{ ucfirst(str_replace('_', ' ', $event->status)) }}</span></td>
                                 <td style="white-space:nowrap;font-weight:600;color:var(--text-primary);">${{ number_format($budget, 0) }} / ${{ number_format($spent, 0) }}</td>
                                 <td style="padding-right:18px;text-align:right;">
-                                    <a href="{{ route('client.events.show', $event) }}" class="mg-row-kebab" style="text-decoration:none;">⋯</a>
+                                    <div class="mg-menu" data-row-menu>
+                                        <button type="button" class="mg-row-kebab" aria-haspopup="true" aria-expanded="false" title="More actions">⋯</button>
+                                        <div class="mg-menu-pop" data-row-menu-pop>
+                                            <a href="{{ route('client.events.show', $event) }}">View event</a>
+                                            <a href="{{ route('client.proposals.index') }}">View proposals</a>
+                                            @unless($event->is_published)
+                                                <form method="POST" action="{{ route('client.events.publish', $event) }}">
+                                                    @csrf
+                                                    <button type="submit">Publish event</button>
+                                                </form>
+                                            @endunless
+                                            <a href="{{ route('client.chat.index') }}">Message professionals</a>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -904,7 +926,9 @@
 @endsection
 
 @push('scripts')
+@include('partials._row-menu-script')
 <script>
+
     // Tab switching
     document.querySelectorAll('#viewTabs .cl-tab').forEach(tab => {
         tab.addEventListener('click', function() {
