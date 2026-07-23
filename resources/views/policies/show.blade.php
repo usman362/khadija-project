@@ -1,4 +1,4 @@
-@extends('layouts.public')
+@extends('layouts.landing')
 
 @section('title', ($policy->title ?? $fallbackTitle) . ' - ' . config('app.name', 'Khadija'))
 
@@ -11,7 +11,7 @@
        reinforces the legal/document context. */
     .policy-hero {
         position: relative;
-        padding: 180px 0 90px;
+        padding: 72px 0 60px;
         text-align: center;
         overflow: hidden;
         margin-bottom: 20px;
@@ -31,7 +31,7 @@
         background:
             radial-gradient(900px 400px at 18% 10%, rgba(59,130,246,0.10), transparent 55%),
             radial-gradient(800px 380px at 85% 0%, rgba(139,92,246,0.10), transparent 55%),
-            linear-gradient(180deg, rgba(11,15,26,0.55) 0%, rgba(11,15,26,0.75) 65%, var(--bg-dark) 100%);
+            linear-gradient(180deg, rgba(11,15,26,0.60) 0%, rgba(11,15,26,0.74) 60%, rgba(11,15,26,0.86) 100%);
     }
     .policy-hero .container { position: relative; z-index: 1; }
     .policy-hero::before {
@@ -55,7 +55,7 @@
     }
     .policy-eyebrow .dot {
         width: 6px; height: 6px; border-radius: 50%;
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        background: linear-gradient(135deg, var(--blue, #2563eb), var(--orange, #f97316));
         box-shadow: 0 0 8px rgba(139,92,246,0.6);
     }
     .policy-hero-icon {
@@ -81,12 +81,8 @@
         line-height: 1.1;
     }
 
-    .policy-hero h1 .gradient-text {
-        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
+    .policy-hero h1 { color: #fff; text-shadow: 0 2px 18px rgba(0,0,0,.35); }
+    .policy-hero h1 .gradient-text { color: #fff; }
 
     .policy-hero p.subtitle {
         max-width: 580px;
@@ -102,7 +98,7 @@
         background: rgba(255,255,255,0.05);
         border: 1px solid rgba(255,255,255,0.12);
         border-radius: 999px;
-        color: var(--text-light);
+        color: rgba(255,255,255,0.85);
         font-size: 0.82rem;
         font-weight: 600;
     }
@@ -119,7 +115,7 @@
         font-weight: 700;
         margin-top: 36px;
         margin-bottom: 14px;
-        color: var(--text-white);
+        color: var(--ink, #0f1b35);
     }
 
     .policy-body h3 {
@@ -127,18 +123,18 @@
         font-weight: 600;
         margin-top: 20px;
         margin-bottom: 10px;
-        color: var(--text-light);
+        color: var(--text, #475569);
     }
 
     .policy-body p {
-        color: var(--text-light);
+        color: var(--text, #475569);
         margin-bottom: 14px;
         line-height: 1.75;
     }
 
     .policy-body ul, .policy-body ol {
         margin: 14px 0 14px 24px;
-        color: var(--text-light);
+        color: var(--text, #475569);
     }
 
     .policy-body li {
@@ -146,7 +142,7 @@
         line-height: 1.7;
     }
 
-    .policy-body strong { color: var(--text-white); }
+    .policy-body strong { color: var(--ink, #0f1b35); }
     .policy-body a { color: var(--primary); }
     .policy-body a:hover { text-decoration: underline; }
 
@@ -168,7 +164,7 @@
     }
     .esign-box {
         background: var(--bg-card);
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--line, #e6eaf1);
         border-radius: 16px;
         padding: 36px 40px;
     }
@@ -179,7 +175,7 @@
     .esign-title {
         font-size: 1.25rem;
         font-weight: 700;
-        color: var(--text-white);
+        color: var(--ink, #0f1b35);
         margin-bottom: 8px;
         display: flex;
         align-items: center;
@@ -188,14 +184,14 @@
     .esign-title svg { width: 22px; height: 22px; flex-shrink: 0; }
     .esign-desc {
         font-size: 0.875rem;
-        color: var(--text-muted);
+        color: var(--muted, #64748b);
         margin-bottom: 28px;
         line-height: 1.6;
     }
     .esign-tabs {
         display: flex;
         gap: 0;
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--line, #e6eaf1);
         border-radius: 10px;
         overflow: hidden;
         margin-bottom: 24px;
@@ -206,7 +202,7 @@
         font-size: 0.875rem;
         font-weight: 600;
         background: transparent;
-        color: var(--text-muted);
+        color: var(--muted, #64748b);
         cursor: pointer;
         border: none;
         transition: all 0.2s;
@@ -215,16 +211,16 @@
         background: var(--primary);
         color: #fff;
     }
-    .esign-tab:not(.active):hover { color: var(--text-white); }
+    .esign-tab:not(.active):hover { color: var(--ink, #0f1b35); }
     .esign-panel { display: none; }
     .esign-panel.active { display: block; }
     .esign-input {
         width: 100%;
         padding: 14px 18px;
-        background: rgba(255,255,255,0.04);
-        border: 1.5px solid var(--border-color);
+        background: var(--bg-soft, #f7f9fc);
+        border: 1.5px solid var(--line, #e6eaf1);
         border-radius: 10px;
-        color: var(--text-white);
+        color: var(--ink, #0f1b35);
         font-size: 1.1rem;
         font-family: 'Caveat', 'Inter', cursive;
         letter-spacing: 0.5px;
@@ -232,13 +228,13 @@
         outline: none;
     }
     .esign-input:focus { border-color: var(--primary); }
-    .esign-input::placeholder { color: var(--text-muted); font-size: 0.95rem; font-family: 'Inter', sans-serif; }
+    .esign-input::placeholder { color: var(--muted, #64748b); font-size: 0.95rem; font-family: 'Inter', sans-serif; }
     .esign-canvas-wrap {
         position: relative;
-        border: 1.5px solid var(--border-color);
+        border: 1.5px solid var(--line, #e6eaf1);
         border-radius: 10px;
         overflow: hidden;
-        background: rgba(255,255,255,0.03);
+        background: var(--bg-soft, #f7f9fc);
     }
     .esign-canvas {
         display: block;
@@ -253,7 +249,7 @@
         left: 50%;
         transform: translate(-50%,-50%);
         font-size: 0.82rem;
-        color: var(--text-muted);
+        color: var(--muted, #64748b);
         pointer-events: none;
         user-select: none;
     }
@@ -274,11 +270,11 @@
     .esign-meta {
         margin-top: 16px;
         padding: 12px 16px;
-        background: rgba(255,255,255,0.03);
+        background: var(--bg-soft, #f7f9fc);
         border-radius: 8px;
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--line, #e6eaf1);
         font-size: 0.8rem;
-        color: var(--text-muted);
+        color: var(--muted, #64748b);
         display: flex;
         flex-wrap: wrap;
         gap: 16px;
@@ -324,10 +320,10 @@
     .esign-signed-badge svg { width: 18px; height: 18px; }
     .esign-signed-details {
         font-size: 0.85rem;
-        color: var(--text-muted);
+        color: var(--muted, #64748b);
         line-height: 1.7;
     }
-    .esign-signed-details strong { color: var(--text-light); }
+    .esign-signed-details strong { color: var(--text, #475569); }
     /* Login prompt */
     .esign-login-prompt {
         display: flex;
@@ -339,13 +335,13 @@
         border-radius: 12px;
     }
     .esign-login-prompt svg { width: 28px; height: 28px; color: var(--primary); flex-shrink: 0; }
-    .esign-login-prompt p { font-size: 0.9rem; color: var(--text-light); margin: 0; }
+    .esign-login-prompt p { font-size: 0.9rem; color: var(--text, #475569); margin: 0; }
     .esign-login-prompt a { color: var(--primary); font-weight: 600; }
 
     /* ─── RESPONSIVE ──────────────────────────── */
     @media (max-width: 768px) {
         .policy-hero h1 { font-size: 1.85rem; }
-        .policy-hero { padding: 140px 16px 60px; }
+        .policy-hero { padding: 48px 16px 44px; }
         .policy-hero-icon { width: 60px; height: 60px; border-radius: 16px; }
         .policy-hero-icon svg { width: 28px; height: 28px; }
         .policy-hero p.subtitle { font-size: 0.9rem; }
@@ -398,7 +394,7 @@
     @if($policy && $policy->content)
         {!! $policy->content !!}
     @else
-        <p style="text-align:center; color: var(--text-muted);">This policy page has not been set up yet. Please check back later.</p>
+        <p style="text-align:center; color: var(--muted, #64748b);">This policy page has not been set up yet. Please check back later.</p>
     @endif
 </div>
 
@@ -431,7 +427,7 @@
             <input type="url" name="content_url" value="{{ old('content_url') }}" required placeholder="URL of the infringing content on GigResource" class="esign-input" style="font-family:'Inter',sans-serif;font-size:0.95rem;margin-top:14px;">
             <textarea name="original_work" required placeholder="Identify the original copyrighted work (description or URL)" class="esign-input" rows="3" style="font-family:'Inter',sans-serif;font-size:0.95rem;margin-top:14px;resize:vertical;">{{ old('original_work') }}</textarea>
             <textarea name="statement" placeholder="Additional details (optional)" class="esign-input" rows="2" style="font-family:'Inter',sans-serif;font-size:0.95rem;margin-top:14px;resize:vertical;">{{ old('statement') }}</textarea>
-            <label style="display:flex;gap:10px;align-items:flex-start;margin-top:16px;font-size:0.85rem;color:var(--text-light);line-height:1.6;cursor:pointer;">
+            <label style="display:flex;gap:10px;align-items:flex-start;margin-top:16px;font-size:0.85rem;color:var(--text, #475569);line-height:1.6;cursor:pointer;">
                 <input type="checkbox" name="good_faith" required style="margin-top:3px;flex-shrink:0;">
                 I have a good-faith belief that the use of this material is not authorized by the copyright owner, its agent, or the law — and I declare, under penalty of perjury, that this notice is accurate and that I am (or am authorized to act for) the copyright owner.
             </label>
@@ -486,7 +482,7 @@
                 </div>
                 <p class="esign-desc">
                     By signing below, you confirm that you have read, understood, and agree to the terms of this
-                    <strong style="color:var(--text-white);">{{ $policyLabel }}</strong>. Your electronic signature is legally binding.
+                    <strong style="color:var(--ink, #0f1b35);">{{ $policyLabel }}</strong>. Your electronic signature is legally binding.
                 </p>
 
                 {{-- Error display --}}
