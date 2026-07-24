@@ -50,11 +50,6 @@ class ProfessionalContractController extends Controller
         $earningsMtd  = (float) $base()->where('status', 'completed')
             ->where('updated_at', '>=', $monthStart)->sum('price');
 
-        // Win rate = won (confirmed+completed) / decided (won + cancelled).
-        $won     = $cConfirmed + $cCompleted;
-        $decided = $won + $cCancelled;
-        $winRate = $decided > 0 ? (int) round($won / $decided * 100) : 0;
-
         $reviewStats = $user->reviewStats();
 
         $stats = [
@@ -63,7 +58,9 @@ class ProfessionalContractController extends Controller
             'leads'            => Event::where('is_published', true)->whereNull('supplier_id')
                                     ->where('created_at', '>=', $monthStart)->count(),
             'contracts_active' => $cConfirmed,
-            'win_rate'         => $winRate,
+            // Was "Win Rate" — a win aggregate the sealed-bid rule (R8) forbids
+            // surfacing. Completed count is a plain volume metric, allowed.
+            'completed'        => $cCompleted,
             'avg_rating'       => round((float) ($reviewStats['average'] ?? 0), 1),
         ];
 

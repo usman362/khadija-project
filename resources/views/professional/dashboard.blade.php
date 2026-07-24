@@ -205,9 +205,12 @@
             <div class="pd-stat-foot"><span class="pd-stat-delta">▲ 3 this month</span><svg class="pd-stat-spark" width="40" height="18" viewBox="0 0 40 18" fill="none"><polyline points="0,10 8,11 16,9 24,10 32,6 40,5" stroke="#8b5cf6" stroke-width="1.6"/></svg></div>
         </div>
         <div class="pd-stat">
-            <div class="pd-stat-top"><span class="pd-stat-ico c-indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span class="pd-stat-label">Win Rate</span></div>
-            <div class="pd-stat-val">68%</div>
-            <div class="pd-stat-foot"><span class="pd-stat-delta">▲ 6% vs last month</span><svg class="pd-stat-spark" width="40" height="18" viewBox="0 0 40 18" fill="none"><polyline points="0,12 8,10 16,11 24,7 32,8 40,4" stroke="#6366f1" stroke-width="1.6"/></svg></div>
+            {{-- "Win Rate" is derived from sealed bid outcomes — a leak the rules
+                 name explicitly (R8). Replaced with a request-count metric, which
+                 is allowed. --}}
+            <div class="pd-stat-top"><span class="pd-stat-ico c-indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span class="pd-stat-label">Active Bids</span></div>
+            <div class="pd-stat-val">{{ \App\Models\Bid::where('supplier_id', auth()->id())->where('status', 'submitted')->count() }}</div>
+            <div class="pd-stat-foot"><span class="pd-stat-delta">Open on the board now</span></div>
         </div>
         <div class="pd-stat">
             <div class="pd-stat-top"><span class="pd-stat-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span class="pd-stat-label">Response Time (Avg)</span><svg class="pd-stat-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>

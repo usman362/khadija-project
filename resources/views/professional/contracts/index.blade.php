@@ -207,9 +207,9 @@
             <div class="pc-stat-sub">Confirmed bookings</div>
         </div>
         <div class="pc-stat">
-            <div class="pc-stat-top"><span class="pc-stat-ico ci-indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><span class="pc-stat-label">Proposal Win Rate</span></div>
-            <div class="pc-stat-val">{{ $stats['win_rate'] }}%</div>
-            <div class="pc-stat-sub">Won vs decided</div>
+            <div class="pc-stat-top"><span class="pc-stat-ico ci-indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span class="pc-stat-label">Completed</span></div>
+            <div class="pc-stat-val">{{ $stats['completed'] }}</div>
+            <div class="pc-stat-sub">Finished contracts</div>
         </div>
         <div class="pc-stat">
             <div class="pc-stat-top"><span class="pc-stat-ico ci-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span class="pc-stat-label">Avg Rating</span></div>
@@ -323,26 +323,32 @@
                     @endif
                 </div>
 
-                {{-- AI Smart Bid Assistant (illustrative) --}}
+                {{-- Bid Helper — rules-based, No-AI. Was an "AI Smart Bid Assistant"
+                     with a Suggested Bid + Win Probability (both an amount/outcome
+                     leak per R8 and an AI feature the No-AI rule forbids). Now it
+                     just shows the client's stated budget — which IS visible to
+                     responders — and the pro's net after commission, so they bid
+                     knowing their take-home. No suggestion, no win odds, no AI. --}}
                 <div class="pc-card pc-ai">
                     <div class="pc-card-head">
-                        <span class="pc-card-title" style="font-size:13.5px;">AI Smart Bid Assistant</span>
-                        <span class="pc-ai-beta">BETA</span>
+                        <span class="pc-card-title" style="font-size:13.5px;">Bid Helper</span>
                     </div>
-                    @php $pick = $opportunities->first(); @endphp
+                    @php
+                        $pick = $opportunities->first();
+                        $net  = $pick?->budget ? \App\Support\Commission::netOf((float) $pick->budget, auth()->user()) : null;
+                    @endphp
                     <div class="pc-ai-top">
                         <div class="pc-ai-info">
                             <div class="pc-ai-name">{{ $pick?->title ?? 'No gig selected' }}</div>
-                            <div class="pc-ai-meta">{{ $pick ? ($pick->categories->first()?->name ?? 'Event Service') . ' · ' . ($pick->location ?? 'TBD') : 'Pick a gig to analyse' }}</div>
+                            <div class="pc-ai-meta">{{ $pick ? ($pick->categories->first()?->name ?? 'Event Service') . ' · ' . ($pick->location ?? 'TBD') : 'Open a gig from the board to bid' }}</div>
                         </div>
-                        <div class="pc-ai-fit"><span>92<small>%</small></span></div>
                     </div>
                     <div class="pc-ai-rows">
-                        <div class="pc-ai-box"><div class="k">Suggested Bid</div><div class="v">{{ $pick?->budget ? $money($pick->budget) : '$2,000 - $3,000' }}</div></div>
-                        <div class="pc-ai-box"><div class="k">Win Probability</div><div class="v good">High (78%)</div></div>
+                        <div class="pc-ai-box"><div class="k">Client budget</div><div class="v">{{ $pick?->budget ? $money($pick->budget) : 'Open' }}</div></div>
+                        <div class="pc-ai-box"><div class="k">Your net at that price</div><div class="v good">{{ $net !== null ? $money($net) : '—' }}</div></div>
                     </div>
                     <div class="pc-ai-actions">
-                        <button class="pc-ai-gen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5 10.1 7.6 12 3z"/></svg>Generate Proposal</button>
+                        <a href="{{ route('professional.bidding-board.index') }}" class="pc-ai-gen" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Place a bid</a>
                     </div>
                 </div>
             </div>
