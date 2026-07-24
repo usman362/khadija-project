@@ -123,6 +123,7 @@
         </div>
         <div class="ca-card">
             <h3 id="caTitle">📝 Draft Agreement</h3>
+            <x-add-to-event tool-key="contract-assistant" tool-name="Contract Assistant" :event-id="request('event_id')" />
             <div id="caOut"><p class="ca-empty">Fill in the details and generate a draft agreement — it will appear here.</p></div>
             <div class="ca-disc" id="caDisc" style="display:none;"></div>
         </div>
@@ -168,6 +169,7 @@
                 return;
             }
             render(data.result);
+            if (window.aiAttachSet) window.aiAttachSet('Draft agreement', data.result);
         } catch (ex) {
             btn.disabled = false;
             out.innerHTML = '<p class="ca-empty">Nothing to show yet.</p>';

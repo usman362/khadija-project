@@ -94,6 +94,7 @@
         @else
         <div class="ma-card">
             <h3>{{ $isMax ? '📨 AI-Written Messages' : '📨 Suggested Messages' }}</h3>
+            <x-add-to-event tool-key="message-assistant" tool-name="Message Builder" :event-id="request('event_id')" />
             <div class="ma-summary" id="maSummary" style="display:none;"></div>
             <div id="maOut"><p class="ma-empty">Choose a purpose and tone, then draft your message — a few options will appear here.</p></div>
         </div>
@@ -148,6 +149,7 @@
                 return;
             }
             render(data.result);
+            if (window.aiAttachSet) window.aiAttachSet('Message draft', data.result);
         } catch (ex) {
             btn.disabled = false;
             out.innerHTML = '<p class="ma-empty">Nothing to show yet.</p>';

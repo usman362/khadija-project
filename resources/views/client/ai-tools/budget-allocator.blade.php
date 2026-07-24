@@ -469,6 +469,7 @@
 
     {{-- Result --}}
     <div class="bat-result" id="batResult">
+        <x-add-to-event tool-key="budget-allocator" tool-name="Budget Planner" :event-id="request('event_id')" />
         <div class="bat-result-header">
             <div class="bat-result-title">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -538,6 +539,7 @@
             }
 
             renderResult(data.result);
+            if (window.aiAttachSet) window.aiAttachSet('Budget plan', data.result);
             result.classList.add('open');
             result.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } catch (err) {
