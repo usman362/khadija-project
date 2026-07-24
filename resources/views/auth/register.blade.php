@@ -315,7 +315,7 @@
 
                 <label class="rg-agree">
                     <input type="checkbox" name="agree" value="1" {{ old('agree') ? 'checked' : '' }} required>
-                    <span>I agree to the <a href="{{ route('platform-disclaimer') }}" target="_blank">Terms of Service</a> and <a href="{{ route('privacy-policy') }}" target="_blank">Privacy Policy</a></span>
+                    <span>I confirm I am 18 or older and agree to the <a href="{{ route('platform-disclaimer') }}" target="_blank">Terms of Service</a> and <a href="{{ route('privacy-policy') }}" target="_blank">Privacy Policy</a></span>
                 </label>
 
                 @if($showRecaptcha && $recaptchaSiteKey)
