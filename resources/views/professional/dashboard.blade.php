@@ -243,7 +243,7 @@
             <div class="pd-emerg-sub">Previous DJ Canceled</div>
             <div class="pd-emerg-sub">Private Birthday — 50 Guests</div>
             <div class="pd-emerg-meta">
-                <div><div class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;vertical-align:-1px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Location</div><div class="v">Miami, FL</div></div>
+                <div><div class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;vertical-align:-1px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Location</div><div class="v">Baltimore, MD</div></div>
                 <div><div class="k">Date</div><div class="v">Tonight</div></div>
                 <div><div class="k">Payout</div><div class="v pay">$1,200 - $1,800</div></div>
                 <div><div class="k">Start</div><div class="v">8:00 PM</div></div>
@@ -266,10 +266,10 @@
             <div class="pd-pa">
                 <div class="pd-pa-row"><span class="pd-pa-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Contract awaiting signature</div><div class="pd-pa-sub">Corporate Gala Dinner</div></div><span class="pd-pa-pri pri-high">High</span></div>
                 <div class="pd-pa-row"><span class="pd-pa-ico c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Staffing shortage detected</div><div class="pd-pa-sub">Outdoor Wedding</div></div><span class="pd-pa-pri pri-medium">Medium</span></div>
-                <div class="pd-pa-row"><span class="pd-pa-ico c-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">2 bids expire in 2 hours</div><div class="pd-pa-sub">Tech Conference 2025</div></div><span class="pd-pa-pri pri-medium">Medium</span></div>
+                <div class="pd-pa-row"><span class="pd-pa-ico c-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">2 bids expire in 2 hours</div><div class="pd-pa-sub">Tech Conference 2026</div></div><span class="pd-pa-pri pri-medium">Medium</span></div>
                 <div class="pd-pa-row"><span class="pd-pa-ico c-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Payment released</div><div class="pd-pa-sub">Private Birthday Party</div></div><span class="pd-pa-pri pri-low">Low</span></div>
                 <div class="pd-pa-row"><span class="pd-pa-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Calendar conflict</div><div class="pd-pa-sub">May 24 – Double Booking</div></div><span class="pd-pa-pri pri-high">High</span></div>
-                <div class="pd-pa-row"><span class="pd-pa-ico c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Late invoice</div><div class="pd-pa-sub">Invoice #INV-2025-1048</div></div><span class="pd-pa-pri pri-medium">Medium</span></div>
+                <div class="pd-pa-row"><span class="pd-pa-ico c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Late invoice</div><div class="pd-pa-sub">Invoice #INV-2026-1048</div></div><span class="pd-pa-pri pri-medium">Medium</span></div>
             </div>
             <div class="pd-pa-foot"><a href="{{ route('professional.priority.index') }}">View All Actions →</a></div>
         </div>
@@ -293,7 +293,7 @@
                 <tbody>
                     <tr>
                         <td><div class="pd-g-event"><span class="pd-g-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div><div class="pd-g-name">Corporate Gala Dinner</div><div class="pd-g-client">ABC Corporation</div></div></div></td>
-                        <td class="pd-g-date">May 30, 2025</td>
+                        <td class="pd-g-date">May 30, 2026</td>
                         <td class="pd-g-budget">$3,000 - $5,000</td>
                         <td><span class="pd-g-status st-confirmed">Confirmed</span></td>
                         <td><span class="pd-g-staff">6/6 <span class="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>2</span></span></td>
@@ -301,15 +301,15 @@
                     </tr>
                     <tr>
                         <td><div class="pd-g-event"><span class="pd-g-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span><div><div class="pd-g-name">Outdoor Wedding Reception</div><div class="pd-g-client">Emily & Michael</div></div></div></td>
-                        <td class="pd-g-date">Jun 14, 2025</td>
+                        <td class="pd-g-date">Jun 14, 2026</td>
                         <td class="pd-g-budget">$2,000 - $4,000</td>
                         <td><span class="pd-g-status st-confirmed">Confirmed</span></td>
                         <td><span class="pd-g-staff">3/5 <span class="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>4</span></span></td>
                         <td><span class="pd-ring" style="background:conic-gradient(#f59e0b 75%, var(--border-color) 0);"><span style="width:22px;height:22px;border-radius:50%;background:var(--bg-card);display:flex;align-items:center;justify-content:center;">75%</span></span></td>
                     </tr>
                     <tr>
-                        <td><div class="pd-g-event"><span class="pd-g-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span><div><div class="pd-g-name">Tech Conference 2025</div><div class="pd-g-client">Tech Innovators</div></div></div></td>
-                        <td class="pd-g-date">Jun 17, 2025</td>
+                        <td><div class="pd-g-event"><span class="pd-g-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span><div><div class="pd-g-name">Tech Conference 2026</div><div class="pd-g-client">Tech Innovators</div></div></div></td>
+                        <td class="pd-g-date">Jun 17, 2026</td>
                         <td class="pd-g-budget">$1,500 - $3,000</td>
                         <td><span class="pd-g-status st-inprogress">In Progress</span></td>
                         <td><span class="pd-g-staff">3/5 <span class="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>4</span></span></td>
@@ -317,7 +317,7 @@
                     </tr>
                     <tr>
                         <td><div class="pd-g-event"><span class="pd-g-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span><div><div class="pd-g-name">Private Birthday Party</div><div class="pd-g-client">Jason Carter</div></div></div></td>
-                        <td class="pd-g-date">May 22, 2025</td>
+                        <td class="pd-g-date">May 22, 2026</td>
                         <td class="pd-g-budget">$900 - $1,400</td>
                         <td><span class="pd-g-status st-today">Today</span></td>
                         <td><span class="pd-g-staff">7/7 <span class="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>1</span></span></td>
@@ -325,7 +325,7 @@
                     </tr>
                     <tr>
                         <td><div class="pd-g-event"><span class="pd-g-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20"/><path d="M5 12a7 7 0 0 1 14 0"/><path d="M2 12a10 10 0 0 0 20 0"/></svg></span><div><div class="pd-g-name">Beach Wedding Ceremony</div><div class="pd-g-client">Sarah Johnson</div></div></div></td>
-                        <td class="pd-g-date">Jun 6, 2025</td>
+                        <td class="pd-g-date">Jun 6, 2026</td>
                         <td class="pd-g-budget">$1,800 - $2,400</td>
                         <td><span class="pd-g-status st-confirmed">Confirmed</span></td>
                         <td><span class="pd-g-staff">4/6 <span class="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>0</span></span></td>
@@ -404,7 +404,7 @@
                 <div class="pd-map-route"></div>
                 <span class="pd-map-pin" style="top:26%; left:16%;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/></svg></span>
                 <span class="pd-map-pin" style="bottom:24%; right:22%;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/></svg></span>
-                <span class="pd-map-label">Miami, FL</span>
+                <span class="pd-map-label">Baltimore, MD</span>
             </div>
             <div class="pd-meta-row">
                 <div class="pd-meta-box"><svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.2" y1="4.2" x2="5.6" y2="5.6"/><line x1="18.4" y1="18.4" x2="19.8" y2="19.8"/></svg><div><div class="t">84°F</div><div class="s">Partly Cloudy</div></div></div>
