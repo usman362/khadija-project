@@ -271,7 +271,16 @@
                 </div>
                 <div class="bb-frow"><label>Request Type</label><select><option>All Types</option><option>ESR — Emergency Service Request</option><option>SSR — Single Service Request</option><option>MSR — Multi-Service Request</option></select></div>
                 <div class="bb-frow"><label>Category</label><select><option>All Categories</option><option>Photography</option><option>DJ &amp; Music</option><option>Catering</option><option>Décor</option></select></div>
-                <div class="bb-frow"><label>Location</label><input placeholder="City or state"></div>
+                {{-- 7-jurisdiction dropdown, not free text — a free-text location
+                     out-scopes the create forms, which only accept the 7 (F6). --}}
+                <div class="bb-frow"><label>Location</label>
+                    <select>
+                        <option value="">All areas</option>
+                        @foreach(config('geo.allowed_states', []) as $abbr => $name)
+                            <option value="{{ $abbr }}">{{ $name }}</option>
+                        @endforeach
+                    </select>
+                </div>
                 <div class="bb-frow"><label>Budget Range</label><input type="number" placeholder="Min $"></div>
                 <label class="bb-chk"><input type="checkbox" checked> Open Now</label>
                 <label class="bb-chk"><input type="checkbox"> Ending Soon</label>
