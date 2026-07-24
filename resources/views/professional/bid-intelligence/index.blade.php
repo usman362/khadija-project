@@ -165,7 +165,7 @@
             </div>
             <div>
                 <h1>Bid Intelligence</h1>
-                <div class="sub">Track performance and improve your win rate.</div>
+                <div class="sub">Track your bid activity and follow up smarter.</div>
                 <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><div><b>Stops Guesswork</b><p>See exactly which clients are engaging with your bids.</p></div></div>
                 <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></span><div><b>Boosts Wins</b><p>Learn what works so you can win more high-paying jobs.</p></div></div>
                 <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(16,185,129,0.12);color:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></span><div><b>Organizes Follow-Ups</b><p>Know who to call or email and when.</p></div></div>
@@ -232,11 +232,13 @@
     <div class="bi-cc">
         {{-- Win/Loss Reports --}}
         <div class="bi-cc-card">
-            <div class="bi-cc-h"><span class="ic" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><div><b>Win/Loss Reports</b><p>Smart AI insights that explain why you won or lost a job.</p></div></div>
+            <div class="bi-cc-h"><span class="ic" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><div><b>Bid Activity</b><p>Rules-based insights on how your bids are moving.</p></div></div>
             <div class="bi-cc-prev">
+                {{-- No "win rate" (a sealed-outcome aggregate, R8) and no AI label
+                     (No-AI). Framed as bid activity a pro can act on. --}}
                 <div class="bi-ai-box" style="background:rgba(37,99,235,0.07);">
-                    <div class="k" style="color:#2563eb;">AI Insight</div>
-                    <p>Your win rate is <b>{{ $stats['win_rate'] }}%</b>. Bids viewed by clients convert far more often than un-opened ones.</p>
+                    <div class="k" style="color:#2563eb;">Insight</div>
+                    <p>You have <b>{{ \App\Models\Bid::where('supplier_id', auth()->id())->where('status','submitted')->count() }}</b> active bids. Bids viewed by clients convert far more often than un-opened ones — follow up on the ones going quiet.</p>
                 </div>
                 <div class="bi-ai-box" style="background:rgba(16,185,129,0.07);">
                     <div class="k" style="color:#10b981;">Recommendation</div>
