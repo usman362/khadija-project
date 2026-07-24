@@ -196,7 +196,37 @@ class ProfessionalPackageController extends Controller
             'remove_images.*'  => ['string', 'max:20'],
             // legacy single-file field (kept for back-compat)
             'cover_image'     => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:6144'],
-        ]) + ['is_active' => $request->boolean('is_active', true)];
+        ]);
+
+        // The create form still submits is_active (1 = Publish, 0 = Save as
+        // Draft). Map it to the canonical status; is_active stays === active.
+        $active = $request->boolean('is_active', true);
+
+        return $data + [
+            'is_active' => $active,
+            'status'    => $active ? 'active' : 'draft',
+        ];
+    }
+
+    /**
+     * Move a package through its lifecycle: active → paused → active, or
+     * archive. Publish/unpublish keep is_active in step so the public scope and
+     * the 404 guard stay coherent.
+     */
+    public function setStatus(Request $request, Package $package): \Illuminate\Http\RedirectResponse
+    {
+        abort_unless($package->user_id === $request->user()->id, 403);
+
+        $data = $request->validate([
+            'status' => ['required', 'in:' . implode(',', Package::STATUSES)],
+        ]);
+
+        $package->update([
+            'status'    => $data['status'],
+            'is_active' => $data['status'] === 'active',
+        ]);
+
+        return back()->with('status', 'Package ' . $data['status'] . '.');
     }
 
     /** Normalise the array/derived fields the base validator leaves as raw input. */

@@ -114,7 +114,8 @@ class PackageController extends Controller
 
     public function show(Package $package): View
     {
-        abort_unless($package->is_active, 404);
+        // Only an active package is publicly visible — draft/paused/archived 404.
+        abort_unless(($package->status ?? ($package->is_active ? 'active' : 'draft')) === 'active', 404);
 
         $package->load([
             'category:id,name,slug',

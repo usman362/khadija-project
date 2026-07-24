@@ -15,6 +15,10 @@
     .pkl-badge { position: absolute; top: 10px; left: 10px; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; }
     .pkl-badge.on { background: #16a34a; color: #fff; }
     .pkl-badge.off { background: rgba(15,27,53,.7); color: #fff; }
+    .pkl-st-active   { background: #16a34a; color: #fff; }
+    .pkl-st-draft    { background: rgba(15,27,53,.7); color: #fff; }
+    .pkl-st-paused   { background: #d97706; color: #fff; }
+    .pkl-st-archived { background: #64748b; color: #fff; }
     .pkl-body { padding: 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
     .pkl-cat { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .3px; font-weight: 700; }
     .pkl-title { font-size: 15px; font-weight: 800; color: var(--text-primary); line-height: 1.25; }
@@ -45,7 +49,8 @@
                 <div class="pkl-card">
                     <div class="pkl-media">
                         @if($hero)<img src="{{ $hero }}" alt="{{ $pkg->title }}" loading="lazy">@endif
-                        <span class="pkl-badge {{ $pkg->is_active ? 'on' : 'off' }}">{{ $pkg->is_active ? 'Published' : 'Draft' }}</span>
+                        @php $st = $pkg->status ?? ($pkg->is_active ? 'active' : 'draft'); @endphp
+                        <span class="pkl-badge pkl-st-{{ $st }}">{{ ucfirst($st) }}</span>
                     </div>
                     <div class="pkl-body">
                         <div class="pkl-cat">{{ $pkg->category?->name ?? ucfirst($pkg->type) }}</div>
@@ -53,6 +58,30 @@
                         <div class="pkl-price">{{ $pkg->priceLabel() }} @if($pkg->duration)<small>· {{ $pkg->duration }}</small>@endif</div>
                         <div class="pkl-actions">
                             <a href="{{ route('professional.packages.edit', $pkg) }}" class="pkl-btn">Edit</a>
+                            @php $st = $pkg->status ?? ($pkg->is_active ? 'active' : 'draft'); @endphp
+                            {{-- Lifecycle: draft/paused → Publish (active); active → Pause. --}}
+                            @if($st === 'active')
+                                <form action="{{ route('professional.packages.status', $pkg) }}" method="POST" style="flex:1;">
+                                    @csrf @method('PATCH')
+                                    <input type="hidden" name="status" value="paused">
+                                    <button type="submit" class="pkl-btn" style="width:100%;">Pause</button>
+                                </form>
+                            @elseif($st !== 'archived')
+                                <form action="{{ route('professional.packages.status', $pkg) }}" method="POST" style="flex:1;">
+                                    @csrf @method('PATCH')
+                                    <input type="hidden" name="status" value="active">
+                                    <button type="submit" class="pkl-btn" style="width:100%;">Publish</button>
+                                </form>
+                            @endif
+                        </div>
+                        <div class="pkl-actions" style="margin-top:6px;">
+                            @if($st !== 'archived')
+                                <form action="{{ route('professional.packages.status', $pkg) }}" method="POST" style="flex:1;" onsubmit="return confirm('Archive this package? It will stop appearing in search.')">
+                                    @csrf @method('PATCH')
+                                    <input type="hidden" name="status" value="archived">
+                                    <button type="submit" class="pkl-btn" style="width:100%;">Archive</button>
+                                </form>
+                            @endif
                             <form action="{{ route('professional.packages.destroy', $pkg) }}" method="POST" style="flex:1;" onsubmit="return confirm('Delete this package?')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="pkl-btn del" style="width:100%;">Delete</button>

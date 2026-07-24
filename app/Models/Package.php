@@ -12,8 +12,11 @@ class Package extends Model
         'user_id', 'coop_partner_id', 'category_id', 'services', 'event_types',
         'title', 'slug', 'type', 'description', 'price', 'price_unit', 'duration',
         'coverage', 'team', 'guests', 'serves_regions', 'availability', 'savings_pct',
-        'includes', 'images', 'is_active', 'sort_order',
+        'includes', 'images', 'is_active', 'status', 'sort_order',
     ];
+
+    /** Canonical package lifecycle (Q11). Only ACTIVE is publicly browsable. */
+    public const STATUSES = ['draft', 'active', 'paused', 'archived'];
 
     protected $casts = [
         'services'   => 'array',
@@ -61,9 +64,16 @@ class Package extends Model
         return count($this->images ?? []);
     }
 
+    /** Publicly browsable = the 'active' state (kept in step with is_active). */
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('status', 'active');
+    }
+
+    /** Human label for the status badge. */
+    public function statusLabel(): string
+    {
+        return ucfirst($this->status ?? ($this->is_active ? 'active' : 'draft'));
     }
 
     /** Packages matching a browse-by-occasion label (title/category/services). */
