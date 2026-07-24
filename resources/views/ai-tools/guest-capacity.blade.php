@@ -94,7 +94,7 @@
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
         <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
         <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
-        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:#0284c7;text-decoration:none;">Upgrade for more AI →</a>@endunless
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:#0284c7;text-decoration:none;">Upgrade for more →</a>@endunless
     </div>
 
     @if($isManual)
@@ -137,7 +137,7 @@
                     <p class="gc-note" id="gcmNote"></p>
                 </div>
             </div>
-            <div style="font-size:12px;color:var(--text-muted);">Want AI to estimate flow, insights and tips automatically? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:#0284c7;font-weight:700;text-decoration:none;">Upgrade →</a></div>
+            <div style="font-size:12px;color:var(--text-muted);">Want us to estimate flow, insights and tips automatically? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:#0284c7;font-weight:700;text-decoration:none;">Upgrade →</a></div>
         </div>
     </div>
     @else
@@ -179,7 +179,7 @@
         @endforeach
     </div>
 
-    <x-add-to-event tool-key="guest-capacity" tool-name="AI Guest Capacity Calculator" :event-id="request('event_id')" />
+    <x-add-to-event tool-key="guest-capacity" tool-name="Guest Capacity Calculator" :event-id="request('event_id')" />
 
     <div class="gc-grid">
         <div>
@@ -236,7 +236,7 @@
                 <div class="gc-slider"><label>Service Level <b>Seated</b></label><input type="range" min="0" max="2" value="2"></div>
             </div>
             <div class="gc-pan">
-                <h4>✨ AI Tips</h4>
+                <h4>✨ Tips</h4>
                 <div id="gcTips">@foreach($tips as $t)<div class="gc-tip">{{ $t }}</div>@endforeach</div>
             </div>
         </aside>

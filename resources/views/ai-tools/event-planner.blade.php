@@ -114,7 +114,7 @@
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
         <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
         <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
-        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--ep-strong);text-decoration:none;">Upgrade for more AI →</a>@endunless
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--ep-strong);text-decoration:none;">Upgrade for more →</a>@endunless
     </div>
 
     @if($isManual)
@@ -175,7 +175,7 @@
 
     {{-- Computed results --}}
     <div class="ep-out" id="epOut">
-        <x-add-to-event tool-key="event-planner" tool-name="AI Guided Event Planner" :event-id="request('event_id')" />
+        <x-add-to-event tool-key="event-planner" tool-name="Guided Event Planner" :event-id="request('event_id')" />
         <div class="ep-out-summary" id="epSummary"></div>
         <div class="ep-grid">
             <div class="ep-card">
@@ -237,7 +237,7 @@
         {{-- Sidebar --}}
         <aside class="ep-rail">
             <div class="ep-pan">
-                <h4>🤖 AI Recommendations</h4>
+                <h4>📋 Recommendations</h4>
                 @foreach($recommendations as $r)<div class="ep-rec">{{ $r }}</div>@endforeach
             </div>
             <div class="ep-pan">
@@ -257,7 +257,7 @@
                 @endforeach
             </div>
             <div class="ep-pan">
-                <h4>💡 AI Planning Tips</h4>
+                <h4>💡 Planning Tips</h4>
                 @foreach($tips as $t)<div class="ep-rec" style="padding-left:22px;">{{ $t }}</div>@endforeach
             </div>
         </aside>

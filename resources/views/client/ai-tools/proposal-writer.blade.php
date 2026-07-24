@@ -128,7 +128,7 @@
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:18px;">
         <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
         <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
-        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--pw);text-decoration:none;">Upgrade for more AI →</a>@endunless
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--pw);text-decoration:none;">Upgrade for more →</a>@endunless
     </div>
 
     {{-- header --}}
@@ -160,7 +160,7 @@
             </span>
             <div class="pw-head-txt"><h1>Proposal Builder</h1><p>Create winning proposals in seconds with the power of AI.</p></div>
         </div>
-        <a href="{{ route('ai-tools.budget-allocator') }}" class="pw-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to AI Toolkit</a>
+        <a href="{{ route('ai-tools.budget-allocator') }}" class="pw-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to Toolkit</a>
     </div>
 
     {{-- main --}}

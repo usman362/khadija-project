@@ -37,7 +37,7 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Write your own message by hand — no AI, just your words.'],
+        'manual'  => ['Do It Myself', '#64748b', 'Write your own message by hand — by hand, just your words.'],
         'semi'    => ['Help Me Plan', '#2563eb', 'instantly drafts message options — edit the wording before you send.'],
         'maximum' => ['Coordinate It For Me', '#16a34a', 'Pick a purpose and tone and instantly writes the whole message for you.'],
     ];
@@ -49,7 +49,7 @@
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
         <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
         <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
-        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--ma,#2563eb);text-decoration:none;">Upgrade for more AI →</a>@endunless
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--ma,#2563eb);text-decoration:none;">Upgrade for more →</a>@endunless
     </div>
 
     <div class="ma-stats">@foreach($stats as [$lbl, $val, $tone])<div class="ma-stat {{ $tone }}"><b>{{ $val }}</b><div class="l">{{ $lbl }}</div></div>@endforeach</div>
@@ -78,7 +78,7 @@
                 </div>
                 <input type="hidden" name="tone" id="maTone" value="friendly">
                 @unless($isManual)<button class="ma-btn" id="maBtn" type="submit">{{ $isSemi ? '✨ Suggest Messages' : '✍️ Draft My Message' }}</button>@endunless
-                @if($isManual)<div style="font-size:12px;color:var(--text-muted);margin-top:6px;">Use these as notes, then write your message on the right. <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--ma,#2563eb);font-weight:700;text-decoration:none;">Want AI to draft it? Upgrade →</a></div>@endif
+                @if($isManual)<div style="font-size:12px;color:var(--text-muted);margin-top:6px;">Use these as notes, then write your message on the right. <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--ma,#2563eb);font-weight:700;text-decoration:none;">Want it drafted for you? Upgrade →</a></div>@endif
             </form>
         </div>
         @if($isManual)
@@ -93,7 +93,7 @@
         </div>
         @else
         <div class="ma-card">
-            <h3>{{ $isMax ? '📨 AI-Written Messages' : '📨 Suggested Messages' }}</h3>
+            <h3>{{ $isMax ? '📨 Drafted Messages' : '📨 Suggested Messages' }}</h3>
             <x-add-to-event tool-key="message-assistant" tool-name="Message Builder" :event-id="request('event_id')" />
             <div class="ma-summary" id="maSummary" style="display:none;"></div>
             <div id="maOut"><p class="ma-empty">Choose a purpose and tone, then draft your message — a few options will appear here.</p></div>

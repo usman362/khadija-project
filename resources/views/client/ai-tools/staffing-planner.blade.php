@@ -143,12 +143,12 @@
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
         <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
         <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
-        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--sp,#2563eb);text-decoration:none;">Upgrade for more AI →</a>@endunless
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--sp,#2563eb);text-decoration:none;">Upgrade for more →</a>@endunless
     </div>
 
     {{-- header --}}
     <div class="sp-head">
-        <a href="{{ route('ai-tools.budget-allocator') }}" class="sp-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to AI Toolkit</a>
+        <a href="{{ route('ai-tools.budget-allocator') }}" class="sp-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to Toolkit</a>
         <span class="sp-head-ico">
             <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs><linearGradient id="spPerson" x1="16" y1="9" x2="32" y2="40"><stop stop-color="#93c5fd"/><stop offset="1" stop-color="#2563eb"/></linearGradient></defs>
@@ -185,7 +185,7 @@
         <div class="sp-tl-h"><b>🛠 Build My Staff Roster</b><span style="font-size:12.5px;color:var(--text-muted);">Total staff: <b id="spm-total" style="color:var(--sp);">0</b></span></div>
         <div id="spmRows" style="display:flex;flex-direction:column;gap:10px;"></div>
         <button type="button" id="spmAdd" style="margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--sp);background:var(--sp-soft);border:1px solid rgba(37,99,235,.28);border-radius:10px;padding:9px 15px;cursor:pointer;font-family:inherit;">+ Add role</button>
-        <div style="margin-top:14px;font-size:12px;color:var(--text-muted);">Want AI to build this roster + timeline for you automatically? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--sp);font-weight:700;text-decoration:none;">Upgrade →</a></div>
+        <div style="margin-top:14px;font-size:12px;color:var(--text-muted);">Want us to build this roster + timeline for you automatically? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--sp);font-weight:700;text-decoration:none;">Upgrade →</a></div>
     </div>
     @else
     {{-- timeline --}}
@@ -256,7 +256,7 @@
             <div class="sp-steps">
                 <div class="sp-step"><span class="sp-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><b>1. Add Event Details</b><p>Enter event info like date, time, location, and guest count.</p></div>
                 <span class="sp-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-                <div class="sp-step"><span class="sp-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span><b>2. AI Suggests Staff</b><p>We recommend the right roles and team size.</p></div>
+                <div class="sp-step"><span class="sp-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span><b>2. Suggests Staff</b><p>We recommend the right roles and team size.</p></div>
                 <span class="sp-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
                 <div class="sp-step"><span class="sp-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><b>3. Build Schedule</b><p>AI creates the perfect timeline for every team member.</p></div>
                 <span class="sp-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
@@ -279,7 +279,7 @@
     <div class="sp-card sp-mb">
         <div class="sp-sec-h">Powerful Features Built for Stress-Free Events</div>
         <div class="sp-feats">
-            <div><span class="sp-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><b>AI Team Recommendations</b><p>Get smart role suggestions based on event type, guests, and needs.</p></div>
+            <div><span class="sp-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><b>Team Recommendations</b><p>Get smart role suggestions based on event type, guests, and needs.</p></div>
             <div><span class="sp-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><b>Perfect Timing</b><p>AI ensures no overlaps or gaps in your event schedule.</p></div>
             <div><span class="sp-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span><b>Role-Based Planning</b><p>Assign tasks and responsibilities to every team member.</p></div>
             <div><span class="sp-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><b>Real-Time Updates</b><p>Make changes and notify your team instantly in one click.</p></div>

@@ -70,7 +70,7 @@
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
         <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
         <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
-        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--bo,#2563eb);text-decoration:none;">Upgrade for more AI →</a>@endunless
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--bo,#2563eb);text-decoration:none;">Upgrade for more →</a>@endunless
     </div>
 
     @if($isManual)
@@ -86,7 +86,7 @@
             <div><div style="font-size:11.5px;color:var(--text-muted);">Profit</div><div style="font-size:24px;font-weight:800;color:var(--text-primary);" id="bomProfit">—</div></div>
             <div><div style="font-size:11.5px;color:var(--text-muted);">Margin</div><div style="font-size:24px;font-weight:800;color:#16a34a;" id="bomMargin">—</div></div>
         </div>
-        <div style="margin-top:14px;font-size:12px;color:var(--text-muted);">Want AI to suggest the winning bid + win probability? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--bo,#2563eb);font-weight:700;text-decoration:none;">Upgrade →</a></div>
+        <div style="margin-top:14px;font-size:12px;color:var(--text-muted);">Want us to suggest the winning bid + win probability? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--bo,#2563eb);font-weight:700;text-decoration:none;">Upgrade →</a></div>
     </div>
     @else
     {{-- Interactive bid optimizer (Help Me Plan / Coordinate It For Me) --}}

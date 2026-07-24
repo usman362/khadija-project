@@ -33,7 +33,7 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Write your own review by hand — no AI, just your words.'],
+        'manual'  => ['Do It Myself', '#64748b', 'Write your own review by hand — by hand, just your words.'],
         'semi'    => ['Help Me Plan', '#ea580c', 'instantly drafts a review — edit the wording before you post it.'],
         'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter a few thoughts and instantly writes the full review for you.'],
     ];
@@ -205,7 +205,7 @@
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
         <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
         <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
-        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--rw,#ea580c);text-decoration:none;">Upgrade for more AI →</a>@endunless
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--rw,#ea580c);text-decoration:none;">Upgrade for more →</a>@endunless
     </div>
 
     {{-- hero --}}
@@ -286,7 +286,7 @@
                         <div class="rw-tip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Mention key strengths.</div>
                         <div class="rw-tip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Share how the vendor impacted your event.</div>
                         <div class="rw-tip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Add details about timeliness or communication.</div>
-                        <div class="rw-kw-h">AI Suggested Keywords</div>
+                        <div class="rw-kw-h">Suggested Keywords</div>
                         <div class="rw-kws">@foreach($keywords as $kw)<span class="rw-kw" data-kw="{{ $kw }}">{{ $kw }}</span>@endforeach</div>
                     </div>
                 </div>

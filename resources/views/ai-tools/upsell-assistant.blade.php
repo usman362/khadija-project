@@ -75,7 +75,7 @@
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
         <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
         <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
-        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--us,#2563eb);text-decoration:none;">Upgrade for more AI →</a>@endunless
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--us,#2563eb);text-decoration:none;">Upgrade for more →</a>@endunless
     </div>
 
     @if($isManual)
@@ -86,7 +86,7 @@
         <div id="usmRows" style="display:flex;flex-direction:column;gap:10px;"></div>
         <button type="button" id="usmAdd" style="margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--us);background:rgba(37,99,235,.09);border:1px solid rgba(37,99,235,.28);border-radius:10px;padding:9px 15px;cursor:pointer;font-family:inherit;">+ Add upsell</button>
         <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-color);font-size:14px;">Total extra revenue: <b id="usmTotal" style="color:#16a34a;font-size:20px;">$0</b></div>
-        <div style="margin-top:12px;font-size:12px;color:var(--text-muted);">Want AI to find the best add-ons + write the pitch for you? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--us);font-weight:700;text-decoration:none;">Upgrade →</a></div>
+        <div style="margin-top:12px;font-size:12px;color:var(--text-muted);">Want us to find the best add-ons + write the pitch for you? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--us);font-weight:700;text-decoration:none;">Upgrade →</a></div>
     </div>
     @else
     {{-- Interactive upsell finder (Help Me Plan / Coordinate It For Me) --}}

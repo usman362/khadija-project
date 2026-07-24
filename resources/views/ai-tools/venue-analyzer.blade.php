@@ -129,7 +129,7 @@
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
         <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
         <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
-        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:#15803d;text-decoration:none;">Upgrade for more AI →</a>@endunless
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:#15803d;text-decoration:none;">Upgrade for more →</a>@endunless
     </div>
 
     @if($isManual)
@@ -148,7 +148,7 @@
             <div><div class="big" id="vamScore">0</div><div style="font-size:11px;color:var(--text-muted);">Overall Score / 100</div></div>
             <div class="va-mverdict" id="vamVerdict"></div>
         </div>
-        <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">Want AI to analyse the space, gaps and hidden costs for you? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:#15803d;font-weight:700;text-decoration:none;">Upgrade →</a></div>
+        <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">Want us to analyse the space, gaps and hidden costs for you? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:#15803d;font-weight:700;text-decoration:none;">Upgrade →</a></div>
     </div>
     @else
     {{-- Interactive analyzer (Help Me Plan / Coordinate It For Me) --}}
@@ -190,7 +190,7 @@
 
     {{-- Computed analysis --}}
     <div class="va-out" id="vaOut">
-        <x-add-to-event tool-key="venue-analyzer" tool-name="AI Venue Compatibility Check" :event-id="request('event_id')" />
+        <x-add-to-event tool-key="venue-analyzer" tool-name="Venue Compatibility Check" :event-id="request('event_id')" />
         <div class="va-verdict" id="vaVerdict"></div>
         <div class="va-metrics">
             <div class="va-metric"><b id="vaReq"></b><div class="l">Space Needed (sq ft)</div></div>
@@ -239,7 +239,7 @@
 
             {{-- Gap analysis --}}
             <div class="va-card">
-                <div class="va-card-hd">🔍 AI Gap Analysis</div>
+                <div class="va-card-hd">🔍 Gap Analysis</div>
                 @foreach($gaps as [$cat, $tone, $detail, $rec])
                     <div class="va-gap">
                         <span class="cat"><span class="va-dot {{ $tone }}"></span> {{ $cat }}</span>
@@ -267,7 +267,7 @@
                 <b>{{ $venue['score'] }}</b><span>/ 100 — Excellent</span>
             </div>
             <div class="va-pan">
-                <h4>🚨 AI Alerts</h4>
+                <h4>🚨 Alerts</h4>
                 @foreach($alerts as $a)<div class="va-alert">{{ $a }}</div>@endforeach
             </div>
             <div class="va-pan">

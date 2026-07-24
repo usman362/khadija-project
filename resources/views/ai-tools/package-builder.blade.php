@@ -115,7 +115,7 @@
         <span class="pb-lvltag">{{ $lvlLabel }}</span>
         <span class="d">{{ $lvlDesc }}</span>
         @unless($isMax || $isLocked)
-            <a class="pb-upsell" href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}">Upgrade for more AI →</a>
+            <a class="pb-upsell" href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}">Upgrade for more →</a>
         @endunless
     </div>
 

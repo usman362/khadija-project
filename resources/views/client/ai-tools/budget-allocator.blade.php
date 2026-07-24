@@ -2,7 +2,7 @@
 
 @section('title', 'Budget Planner')
 @section('page-title', 'Budget Planner')
-@section('page-subtitle', 'Let AI break down your event budget into smart category allocations and a complete spending plan.')
+@section('page-subtitle', 'Break your event budget into smart category allocations and a complete spending plan.')
 
 @push('styles')
 <style>
@@ -321,7 +321,7 @@
 <div class="bat-levelbar" style="--lvl: {{ $lvlColor }};">
     <span class="bat-lvltag">{{ $lvlLabel }}</span>
     <span class="d">{{ $lvlDesc }}</span>
-    @unless($isMax)<a class="up" href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}">Upgrade for more AI →</a>@endunless
+    @unless($isMax)<a class="up" href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}">Upgrade for more →</a>@endunless
 </div>
 
 {{-- Hero --}}
@@ -331,7 +331,7 @@
     </div>
     <div class="bat-hero-content" style="flex:1;">
         <h2>Budget Planner</h2>
-        <p>Let AI break down your event budget into smart category allocations. Enter your event details and get a complete spending plan with expert tips.</p>
+        <p>Break down your event budget into smart category allocations. Enter your event details and get a complete spending plan with expert tips.</p>
     </div>
     <div>
         @if($status['enabled'])
@@ -490,7 +490,7 @@
             <ul id="batTipsList"></ul>
         </div>
 
-        <x-add-to-event tool-key="budget-allocator" tool-name="AI Budget Allocator" :event-id="request('event_id')" />
+        <x-add-to-event tool-key="budget-allocator" tool-name="Budget Allocator" :event-id="request('event_id')" />
     </div>
 @endif
 

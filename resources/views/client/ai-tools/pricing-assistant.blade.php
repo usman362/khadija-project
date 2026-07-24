@@ -162,7 +162,7 @@
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card,var(--bg-secondary));border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:18px;">
         <span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:{{ $lvlColor }};padding:4px 11px;border-radius:999px;">{{ $lvlLabel }}</span>
         <span style="font-size:12.5px;color:var(--text-secondary);">{{ $lvlDesc }}</span>
-        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--apa,#d97706);text-decoration:none;">Upgrade for more AI →</a>@endunless
+        @unless($isMax)<a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--apa,#d97706);text-decoration:none;">Upgrade for more →</a>@endunless
     </div>
 
     {{-- header --}}
@@ -198,7 +198,7 @@
             </span>
             <div class="apa-head-txt"><h1>Pricing Calculator</h1><p>Get the right price. Win more gigs. Maximize your value.</p></div>
         </div>
-        <a href="{{ route('ai-tools.budget-allocator') }}" class="apa-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to AI Toolkit</a>
+        <a href="{{ route('ai-tools.budget-allocator') }}" class="apa-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to Toolkit</a>
     </div>
 
     @if($isManual)
@@ -251,7 +251,7 @@
 
         {{-- recommended --}}
         <div class="apa-rec">
-            <h3>{{ $isMax ? 'AI-Set Price' : 'Suggested Price' }}</h3>
+            <h3>{{ $isMax ? 'Set Price' : 'Suggested Price' }}</h3>
             <div class="apa-rec-top">
                 <span class="apa-rec-price" id="apa-price">{{ $money($result['price']) }}</span>
                 <span class="apa-badge" id="apa-badge" style="background:{{ $result['badgeColor'] }}1f;color:{{ $result['badgeColor'] }};">{{ $result['badge'] }}</span>
@@ -388,7 +388,7 @@
     {{-- ════════ bottom banner ════════ --}}
     <div class="apa-banner">
         <span class="apa-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
-        <div class="apa-banner-txt"><b>Smart Pricing. More Bookings. Higher Earnings.</b><p>Let AI do the math so you can focus on creating unforgettable events.</p></div>
+        <div class="apa-banner-txt"><b>Smart Pricing. More Bookings. Higher Earnings.</b><p>Do the math so you can focus on creating unforgettable events.</p></div>
     </div>
     @endif
 </div>
