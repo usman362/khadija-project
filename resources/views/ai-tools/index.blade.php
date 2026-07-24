@@ -28,9 +28,11 @@
     .akt-scard.on { border-color: var(--akt); box-shadow: 0 0 0 1px var(--akt), 0 10px 24px -12px var(--akt); }
     .akt-scard.soon { cursor: default; opacity: .72; }
     .akt-scard.soon:hover { border-color: var(--border-color); transform: none; }
-    .akt-sic { width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--akt-soft); color: var(--akt); }
+    /* White icon on a solid accent tile — dark symbols on the heavy colour read
+       poorly (client feedback). Matches the tool-card icon treatment. */
+    .akt-sic { width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--akt), var(--akt-d)); color: #fff; box-shadow: 0 8px 18px -8px var(--akt); }
     .akt-sic svg { width: 22px; height: 22px; }
-    .akt-scard.soon .akt-sic { background: var(--border-color); color: var(--text-muted); }
+    .akt-scard.soon .akt-sic { background: var(--border-color); color: var(--text-muted); box-shadow: none; }
     .akt-sbody { min-width: 0; flex: 1; display: flex; flex-direction: column; }
     .akt-sname { display: block; font-size: 14px; font-weight: 800; color: var(--text-primary); }
     .akt-stag { display: block; font-size: 11.5px; color: var(--text-muted); line-height: 1.4; margin-top: 3px; }
@@ -42,7 +44,7 @@
 
     /* ── Suite banner ── */
     .akt-banner { display: flex; align-items: center; gap: 18px; background: linear-gradient(120deg, var(--akt-soft), transparent 70%); border: 1px solid var(--border-color); border-radius: 18px; padding: 20px 24px; margin-bottom: 20px; position: relative; overflow: hidden; }
-    .akt-bic { width: 60px; height: 60px; border-radius: 15px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--akt); }
+    .akt-bic { width: 60px; height: 60px; border-radius: 15px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--akt), var(--akt-d)); border: none; color: #fff; box-shadow: 0 10px 22px -10px var(--akt); }
     .akt-bic svg { width: 30px; height: 30px; }
     .akt-banner h2 { font-size: 26px; font-weight: 800; color: var(--akt); line-height: 1.1; }
     .akt-banner p { font-size: 13.5px; color: var(--text-secondary); margin-top: 4px; }
@@ -88,10 +90,6 @@
 
 @section('content')
 <div class="akt">
-
-    <div style="display:flex; justify-content:flex-end; margin-bottom:14px;">
-        @include('partials._ai_credits_badge')
-    </div>
 
     {{-- ── Suite selector ── --}}
     <div class="akt-nav">
