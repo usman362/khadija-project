@@ -238,6 +238,13 @@ class User extends Authenticatable
         return $this->hasMany(Booking::class, 'created_by');
     }
 
+    /** Professionals this client has explicitly saved (My Professionals). */
+    public function savedProfessionals(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'saved_professionals', 'client_id', 'professional_id')
+            ->withPivot('note')->withTimestamps();
+    }
+
     public function sentMessages(): HasMany
     {
         return $this->hasMany(Message::class, 'sender_id');

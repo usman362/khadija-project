@@ -614,6 +614,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/reviews/{booking}', [\App\Http\Controllers\Client\ClientReviewController::class, 'store'])
             ->middleware('permission:bookings.view_any')->name('client.reviews.store');
 
+        // My Professionals (Saved Vendors) — the client retention surface.
+        Route::get('/my-professionals', [\App\Http\Controllers\Client\ClientSavedProfessionalController::class, 'index'])
+            ->name('client.saved-professionals.index');
+        Route::post('/my-professionals', [\App\Http\Controllers\Client\ClientSavedProfessionalController::class, 'store'])
+            ->name('client.saved-professionals.store');
+        Route::delete('/my-professionals/{professional}', [\App\Http\Controllers\Client\ClientSavedProfessionalController::class, 'destroy'])
+            ->name('client.saved-professionals.destroy');
+
         // Finance — Payments ledger + Earnings (project financial dashboard).
         Route::get('/payments', [\App\Http\Controllers\Client\ClientFinanceController::class, 'payments'])
             ->name('client.payments.index');

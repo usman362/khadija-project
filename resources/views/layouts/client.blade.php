@@ -1259,6 +1259,12 @@
                     </a>
                 </li>
                 <li class="cl-nav-item">
+                    <a href="{{ route('client.saved-professionals.index') }}" class="cl-nav-link {{ request()->routeIs('client.saved-professionals.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m22 11-3 3-2-2"/></svg>
+                        My Professionals
+                    </a>
+                </li>
+                <li class="cl-nav-item">
                     <a href="{{ route('events-categories') }}" class="cl-nav-link {{ request()->routeIs('events-categories') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                         Browse Categories
