@@ -39,7 +39,7 @@
         @php
             $routes = [
                 [
-                    'href'  => route('client.post-event.event-info'),
+                    'href'  => route('public.packages'),
                     'tag'   => ['Ready-made', 'hot'],
                     'title' => 'Shop Packages',
                     'desc'  => 'Browse fixed service bundles from professionals and book instantly — one contract, one payment.',
@@ -63,7 +63,7 @@
                     'icon'  => '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
                 ],
                 [
-                    'href'  => route('client.multi-service.index'),
+                    'href'  => route('client.multi-service.index', ['scope' => 'single']),
                     'tag'   => ['Single service', ''],
                     'title' => 'Single-Service Request (SSR)',
                     'desc'  => 'Post one specific service for professionals to bid on — same quick brief, just pick a single service.',

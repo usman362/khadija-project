@@ -40,7 +40,17 @@ class ClientMultiServiceController extends Controller
             ->latest('starts_at')
             ->first();
 
-        return view('client.multi-service.index', compact('categories', 'activeEvent'));
+        // SSR and MSR are the same brief with a different service count, so one
+        // form serves both: ?scope=single is the SSR create flow.
+        $scope = $this->scopeOf($request->query('scope'));
+
+        return view('client.multi-service.index', compact('categories', 'activeEvent', 'scope'));
+    }
+
+    /** Normalise the single (SSR) / multi (MSR) choice; multi is the default. */
+    private function scopeOf(?string $raw): string
+    {
+        return $raw === 'single' ? 'single' : 'multi';
     }
 
     /**
@@ -61,6 +71,7 @@ class ClientMultiServiceController extends Controller
             'guest_count'  => ['nullable', 'integer', 'min:1', 'max:1000000'],
             'description'  => ['nullable', 'string', 'max:2000'],
             'budget_range' => ['nullable', 'string', 'max:60'],
+            'scope'        => ['nullable', 'in:single,multi'],
             'services'     => ['required', 'array', 'min:1'],
             'services.*'   => ['string', 'max:120'],
         ], [
@@ -68,7 +79,16 @@ class ClientMultiServiceController extends Controller
             'event_name.required' => 'Give your event a name.',
         ]);
 
-        $user = $request->user();
+        $user  = $request->user();
+        $scope = $this->scopeOf($data['scope'] ?? null);
+
+        // A single-service request (SSR) means exactly one service. The picker
+        // enforces it client-side; this is the server-side guard.
+        if ($scope === 'single' && count(array_unique($data['services'])) > 1) {
+            return back()->withInput()->withErrors([
+                'services' => 'A single-service request takes one service. Pick just one, or switch to a multi-service request.',
+            ]);
+        }
 
         // Compose a start timestamp from the date + optional start time.
         $startsAt = null;
@@ -112,6 +132,8 @@ class ClientMultiServiceController extends Controller
         // incoming bids show up under Proposals.
         return redirect()
             ->route('client.events.show', $event)
-            ->with('status', 'Your Multi-Service Request is live. Professionals can now bid on each service — offers will appear under Proposals as they come in.');
+            ->with('status', $scope === 'single'
+                ? 'Your Single-Service Request is live — free to post. Professionals can now bid, and offers will appear under Proposals as they come in.'
+                : 'Your Multi-Service Request is live — free to post. Professionals can now bid on each service, and offers will appear under Proposals as they come in.');
     }
 }

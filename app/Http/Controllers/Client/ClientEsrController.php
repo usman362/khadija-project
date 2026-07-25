@@ -45,10 +45,11 @@ class ClientEsrController extends Controller
         ]);
     }
 
-    /** Normalise the single/multi choice; multi is the default. */
+    /** Normalise the single/multi choice; single is the default — a rush
+     *  request is usually one urgent gap to fill. */
     private function scopeOf(?string $raw): string
     {
-        return $raw === 'single' ? 'single' : 'multi';
+        return $raw === 'multi' ? 'multi' : 'single';
     }
 
     public function store(Request $request): RedirectResponse

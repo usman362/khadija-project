@@ -1,8 +1,10 @@
 @extends('layouts.client')
 
-@section('title', 'Multi-Service Request')
-@section('page-title', 'Multi-Service Request (MSR)')
-@section('page-subtitle', 'One event. Multiple services. Better matches — get competitive bids in one brief.')
+@section('title', ($scope ?? 'multi') === 'single' ? 'Single-Service Request' : 'Multi-Service Request')
+@section('page-title', ($scope ?? 'multi') === 'single' ? 'Single-Service Request (SSR)' : 'Multi-Service Request (MSR)')
+@section('page-subtitle', ($scope ?? 'multi') === 'single'
+    ? 'One service, one brief — free to post, and professionals bid on it.'
+    : 'One event. Multiple services. Better matches — get competitive bids in one brief.')
 
 @push('styles')
 <style>
@@ -53,6 +55,16 @@
     .ms-wizline { flex: 1; height: 1px; background: var(--border-color); min-width: 14px; }
 
     /* Form */
+    .ms-scope { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:18px; }
+    .ms-scope-o { border:2px solid var(--border-color); border-radius:14px; padding:15px; cursor:pointer; background:var(--bg-card); transition:border-color .15s, background .15s; }
+    .ms-scope-o:hover { border-color:#f97316; }
+    .ms-scope-o.sel { border-color:#ea580c; background:rgba(249,115,22,.07); }
+    .ms-scope-code { display:inline-flex; align-items:center; font-size:11.5px; font-weight:800; letter-spacing:.3px; color:#c2410c; background:rgba(249,115,22,.14); padding:3px 10px; border-radius:999px; }
+    .ms-scope-o h5 { font-size:14px; font-weight:800; color:var(--text-primary); margin:9px 0 5px; }
+    .ms-scope-o p { font-size:12px; color:var(--text-muted); line-height:1.45; margin:0; }
+    .ms[data-scope="single"] [data-scope-only="multi"],
+    .ms[data-scope="multi"]  [data-scope-only="single"] { display:none; }
+    @media (max-width:760px){ .ms-scope { grid-template-columns:1fr; } }
     .ms-section-label { font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; }
     .ms-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
     .ms-grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
@@ -121,21 +133,22 @@
 @endpush
 
 @section('content')
-<div class="ms-layout">
+<div class="ms ms-layout" data-scope="{{ $scope ?? 'multi' }}">
 <div class="ms-main">
 
     {{-- Hero --}}
     <div class="ms-hero">
         <div class="ms-hero-body">
-            <h2>Multi-Service <span>Request</span> for Proposal</h2>
-            <p>One event. Multiple services. Better matches. Get competitive bids from the right professionals for each part of your event.</p>
+            <h2><span data-scope-only="single">Single-Service <span>Request</span></span><span data-scope-only="multi">Multi-Service <span>Request</span> for Proposal</span></h2>
+            <p data-scope-only="single">One service, one brief. Free to post — professionals bid, and you only pay when you finalise with one.</p>
+            <p data-scope-only="multi">One event. Multiple services. Better matches. Get competitive bids from the right professionals for each part of your event.</p>
             <a href="#ms-brief" class="ms-hero-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create New Event Brief</a>
         </div>
         <div class="ms-hero-art"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 2h6a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h1V4a2 2 0 0 1 2-2z"/><path d="M9 12l2 2 4-4"/></svg></div>
     </div>
 
     {{-- 4-step process --}}
-    <div class="ms-process-title">The 4-Step MSR Process</div>
+    <div class="ms-process-title">The 4-Step <span data-scope-only="single">SSR</span><span data-scope-only="multi">MSR</span> Process</div>
     <div class="ms-steps">
         <div class="ms-step s1"><div class="ms-step-num">1</div><div class="ms-step-name">Master Form</div><div class="ms-step-desc">Fill out one event brief to start your event.</div></div>
         <div class="ms-step s2"><div class="ms-step-num">2</div><div class="ms-step-name">Select Services</div><div class="ms-step-desc">Choose the services you need from categories.</div></div>
@@ -146,6 +159,21 @@
     {{-- Wizard form --}}
     <div class="ms-card" id="ms-brief">
         <form method="POST" action="{{ route('client.multi-service.store') }}">
+        {{-- SSR vs MSR — the same brief, one service or several. Posting is free
+             either way; the single $2.99 applies only on finalisation (R10). --}}
+        <div class="ms-scope">
+            <div class="ms-scope-o {{ ($scope ?? 'multi') === 'single' ? 'sel' : '' }}" data-scope-pick="single">
+                <span class="ms-scope-code">SSR</span>
+                <h5>One service</h5>
+                <p>Post a single service for professionals to bid on.</p>
+            </div>
+            <div class="ms-scope-o {{ ($scope ?? 'multi') === 'multi' ? 'sel' : '' }}" data-scope-pick="multi">
+                <span class="ms-scope-code">MSR</span>
+                <h5>Several services</h5>
+                <p>Each service is its own gig with its own bids and agreement.</p>
+            </div>
+        </div>
+        <input type="hidden" name="scope" id="msScope" value="{{ $scope ?? 'multi' }}">
         @csrf
         @if($errors->any())
             <div style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;">
@@ -184,8 +212,10 @@
         </div>
 
         {{-- Step 2: Services --}}
-        <div class="ms-section-label" style="margin-top:18px;">Select the Services You Need</div>
-        <x-service-picker :categories="$categories" name="services" valueField="name" :selected="old('services', [])" />
+        <div class="ms-section-label" style="margin-top:18px;">
+            <span data-scope-only="single">Select the Service You Need</span><span data-scope-only="multi">Select the Services You Need</span>
+        </div>
+        <x-service-picker :categories="$categories" name="services" valueField="name" :selected="old('services', [])" :single="($scope ?? 'multi') === 'single'" />
 
         {{-- Step 3: Service Details Preview --}}
         <div class="ms-section-label" style="margin-top:18px;">Service Details <span style="font-weight:500;color:var(--text-muted);font-size:11px;">(Preview)</span></div>
@@ -260,3 +290,29 @@
 </aside>
 </div>{{-- /.ms-layout --}}
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    var root  = document.querySelector('.ms');
+    var field = document.getElementById('msScope');
+    var picker= root && root.querySelector('[data-svc-picker]');
+    if (!root || !field) return;
+
+    root.querySelectorAll('[data-scope-pick]').forEach(function (card) {
+        card.addEventListener('click', function () {
+            var val = card.getAttribute('data-scope-pick');
+            if (val === field.value) return;
+            field.value = val;
+            root.setAttribute('data-scope', val);
+            root.querySelectorAll('[data-scope-pick]').forEach(function (c) {
+                c.classList.toggle('sel', c === card);
+            });
+            // Let the picker collapse a multi-selection itself so its chips and
+            // counters stay in step.
+            if (picker) picker.dispatchEvent(new CustomEvent('svc:single', { detail: { on: val === 'single' } }));
+        });
+    });
+})();
+</script>
+@endpush

@@ -35,7 +35,8 @@ class ClientDirectOfferController extends Controller
 
         $categories  = Category::active()->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
         $selectedPro = $request->query('pro') ? $pros->firstWhere('id', (int) $request->query('pro')) : $pros->first();
-        $type        = in_array($request->query('type'), ['SSR', 'MSR', 'ESR'], true) ? $request->query('type') : 'MSR';
+        // Default to SSR — a direct offer is normally one service to one pro.
+        $type        = in_array($request->query('type'), ['SSR', 'MSR', 'ESR'], true) ? $request->query('type') : 'SSR';
 
         return view('client.direct-offers.create', compact('pros', 'categories', 'selectedPro', 'type'));
     }
