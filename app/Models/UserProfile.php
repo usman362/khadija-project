@@ -135,11 +135,28 @@ class UserProfile extends Model
         return false;
     }
 
-    /** Uploaded portfolio image items (with generated sizes), featured first. */
+    /**
+     * Uploaded portfolio image items (with generated sizes), featured first.
+     *
+     * The column holds two shapes. Uploads write a structured entry
+     * (`type`/`featured`/`hero`/`square`/`uploaded_at`); older and seeded rows
+     * hold a bare URL string. Only the structured shape used to be recognised,
+     * so every profile carrying the flat form read as having NO portfolio at
+     * all — which is why search cards fell through to a placeholder even for
+     * pros whose work was right there in the column. Flat entries are lifted
+     * into the same shape here so both render everywhere.
+     */
     public function portfolioImageItems(): \Illuminate\Support\Collection
     {
         $imgs = collect(is_array($this->portfolio) ? $this->portfolio : [])
-            ->filter(fn ($i) => is_array($i) && ($i['type'] ?? null) === 'image')
+            ->map(function ($i) {
+                if (is_string($i) && $i !== '') {
+                    return ['type' => 'image', 'featured' => false, 'hero' => $i, 'square' => $i];
+                }
+
+                return is_array($i) && ($i['type'] ?? null) === 'image' ? $i : null;
+            })
+            ->filter()
             ->values();
 
         return $imgs->filter(fn ($i) => $i['featured'] ?? false)
@@ -151,7 +168,18 @@ class UserProfile extends Model
     public function portfolioHeroUrls(int $limit = 4): array
     {
         return $this->portfolioImageItems()
-            ->map(fn ($i) => \Illuminate\Support\Facades\Storage::url($i['hero'] ?? $i['square'] ?? ''))
+            ->map(function ($i) {
+                $path = $i['hero'] ?? $i['square'] ?? '';
+                if ($path === '') {
+                    return null;
+                }
+
+                // Already absolute (legacy rows store full URLs) — Storage::url
+                // would prefix it and produce a broken /storage/https://… path.
+                return str_starts_with($path, 'http://') || str_starts_with($path, 'https://')
+                    ? $path
+                    : \Illuminate\Support\Facades\Storage::url($path);
+            })
             ->filter()
             ->take($limit)
             ->values()
