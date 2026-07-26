@@ -69,10 +69,11 @@ class CategoryLandingController extends Controller
             ->get(['id', 'name', 'slug', 'icon']);
 
         return view('public.category-landing', [
-            'category'   => $category,
-            'featured'   => $featured,
-            'totalCount' => $totalCount,
-            'siblings'   => $siblings,
+            'category'         => $category,
+            'featured'         => $featured,
+            'totalCount'       => $totalCount,
+            'subcategoryCount' => $category->children()->where('is_active', true)->count(),
+            'siblings'         => $siblings,
         ]);
     }
 }

@@ -1,6 +1,8 @@
 @extends('layouts.landing')
 
 @php
+    use Illuminate\Support\Str;
+
     $seoTitle       = 'Hire ' . $category->name . ' — Verified Pros on GigResource';
     $seoDescription = $category->short_description
         ?: ('Browse top-rated ' . strtolower($category->name) . ' on GigResource. Compare quotes, read reviews, and book the right pro with secure, protected payments.');
@@ -246,11 +248,23 @@
         <p class="lede">
             {{ $category->long_description ?: $category->short_description ?: ('Browse ' . strtolower($category->name) . ' for your next event. Compare profiles, reviews, and quotes — with secure, protected payments on every booking.') }}
         </p>
-        <div class="cl-stats">
-            <div><b>{{ number_format($totalCount) }}+</b>Pros available</div>
-            <div><b>4.8★</b>Avg rating</div>
-            <div><b>24h</b>Avg quote time</div>
-        </div>
+        {{-- "4.8 Avg rating" and "24h Avg quote time" used to sit here as hard-coded
+             literals — invented numbers presented as platform data, and exactly the
+             unverified-metric claim the copy rules ban. The pro count is real, so it
+             stays, but only once there is something to count: "0+ Pros available"
+             reads as a broken page. --}}
+        @if($totalCount > 0)
+            <div class="cl-stats">
+                <div><b>{{ number_format($totalCount) }}</b>{{ Str::plural('Pro', $totalCount) }} available</div>
+                @if($subcategoryCount > 0)
+                    <div><b>{{ number_format($subcategoryCount) }}</b>{{ Str::plural('Service', $subcategoryCount) }} covered</div>
+                @endif
+            </div>
+        @elseif($subcategoryCount > 0)
+            <div class="cl-stats">
+                <div><b>{{ number_format($subcategoryCount) }}</b>{{ Str::plural('Service', $subcategoryCount) }} covered</div>
+            </div>
+        @endif
         <a href="{{ $browseUrl }}" class="cl-cta">
             Browse all {{ $category->name }}
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
