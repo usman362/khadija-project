@@ -177,6 +177,21 @@
 
     .br-vibe.is-active { outline: 3px solid var(--blue); outline-offset: -3px; }
 
+    /* Identity anchor: the pro's own avatar or logo, sitting beside the name the
+       way Freelancer leads with it. The hero to its left shows the WORK; this
+       shows WHO. Kept inline rather than overlapping the media — the card is a
+       side-by-side grid, so an overlapping badge just gets clipped. */
+    .br-pro-av { position: relative; flex-shrink: 0; width: 48px; height: 48px;
+        border-radius: 13px; overflow: visible; display: block; }
+    .br-pro-av img { width: 100%; height: 100%; object-fit: cover; display: block;
+        border-radius: 13px; background: var(--bg-soft-2, #eef2f8);
+        box-shadow: 0 4px 12px -6px rgba(15,27,53,.45); }
+    .br-pro-av-chk { position: absolute; right: -4px; bottom: -4px; width: 18px; height: 18px;
+        border-radius: 50%; background: var(--blue); border: 2px solid #fff;
+        display: flex; align-items: center; justify-content: center; }
+    .br-pro-av-chk svg { width: 10px; height: 10px; color: #fff; }
+    .br-pro-idm { min-width: 0; flex: 1; }
+
     .br-pro-blank { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
         background: linear-gradient(140deg, #eef3fb, #dde6f4); color: var(--blue);
         font-size: 44px; font-weight: 800; letter-spacing: -1px; }
@@ -420,7 +435,19 @@
                         </div>
                         <div class="br-pro-body">
                             <div class="br-pro-top">
-                                <div>
+                                {{-- The hero shows the WORK; this shows WHO. Without it a card
+                                     was a photo with a name beside it and no face or logo
+                                     anywhere — the thing Freelancer leads with. --}}
+                                <a class="br-pro-av" href="{{ route('public.professional.show', $pro) }}"
+                                   aria-label="{{ $pro->name }}">
+                                    <img src="{{ $pro->avatar_url }}" alt="{{ $pro->name }}" loading="lazy">
+                                    @if($isVerified)
+                                        <span class="br-pro-av-chk" title="Verified professional">
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
+                                        </span>
+                                    @endif
+                                </a>
+                                <div class="br-pro-idm">
                                     <div class="br-pro-name">{{ $pro->name }}@if($isVerified)<svg class="vchk" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>@endif</div>
                                     <div class="br-pro-role">{{ $p?->headline ?? $p?->company_name ?? 'Event Professional' }}</div>
                                     <div class="br-pro-loc">
