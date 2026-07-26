@@ -37,6 +37,9 @@ class BrowseProfessionalsController extends Controller
         $catSlug   = trim((string) $request->query('category', ''));
         $ratingMin = (float) $request->query('rating_min', 0);
         $verified  = (bool) $request->query('verified', false);
+        $insured   = (bool) $request->query('insured', false);
+        $available = (bool) $request->query('available', false);
+        $rateMax   = (int) $request->query('rate_max', 0);
         $sort      = (string) $request->query('sort', 'top');
 
         // Base query: only suppliers, with their profile for card details.
@@ -73,6 +76,26 @@ class BrowseProfessionalsController extends Controller
         if ($category) {
             $branchIds = $this->branchIds($category);
             $query->whereHas('serviceCategories', fn (Builder $c) => $c->whereIn('categories.id', $branchIds));
+        }
+
+        // ── Rate ceiling ────────────────────────────────────────────
+        // The sidebar slider used to be `disabled` decoration. Pros who haven't
+        // published a rate are kept: filtering them out would hide real
+        // professionals for not filling in an optional field.
+        if ($rateMax > 0) {
+            $query->whereHas('profile', fn (Builder $p) => $p
+                ->where('hourly_rate', '<=', $rateMax)
+                ->orWhereNull('hourly_rate'));
+        }
+
+        // ── Insurance ───────────────────────────────────────────────
+        if ($insured) {
+            $query->whereHas('profile', fn (Builder $p) => $p->whereNotNull('liability_insurance_verified_at'));
+        }
+
+        // ── Currently taking work ───────────────────────────────────
+        if ($available) {
+            $query->whereHas('profile', fn (Builder $p) => $p->where('availability', 'available'));
         }
 
         // ── City filter ─────────────────────────────────────────────
@@ -129,6 +152,10 @@ class BrowseProfessionalsController extends Controller
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get(['id', 'name', 'slug', 'icon']);
+
+        // Slider bounds come from the data — a hardcoded $5,000 ceiling meant the
+        // handle sat in dead space when nobody charges near it.
+        $rateCeiling = (int) ceil(((float) UserProfile::max('hourly_rate') ?: 500) / 50) * 50;
 
         $cities = UserProfile::query()
             ->whereNotNull('city')
@@ -213,11 +240,15 @@ class BrowseProfessionalsController extends Controller
                 'city'       => $city,
                 'rating_min' => $ratingMin,
                 'verified'   => $verified,
+                'insured'    => $insured,
+                'available'  => $available,
+                'rate_max'   => $rateMax,
                 'sort'       => $sort,
                 'category'   => $category?->slug,
             ],
             'activeCategory'  => $category,
             'trending'        => $trending,
+            'rateCeiling'     => $rateCeiling,
             'locationCounts'  => $locationCounts,
             'recentPros'      => $recentPros,
             'badges'     => UserProfile::BADGES,

@@ -48,6 +48,11 @@ class DemoProfessionalsSeeder extends Seeder
                     'country'          => 'United States',
                     'hourly_rate'      => $data['rate'],
                     'experience_years' => $data['years'],
+                    // The "Currently taking work" filter reads this. Left null by the
+                    // seeder it matched nobody, so the filter looked broken when it was
+                    // only unpopulated. Most demo pros are open; two are not, so the
+                    // filter visibly does something.
+                    'availability'     => $data['availability'] ?? 'available',
                     'skills'           => $data['skills'],
                     'languages'        => $data['languages'],
                     // No portfolio: these accounts never uploaded anything, and
@@ -202,6 +207,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'name' => 'Mix Masters', 'email' => 'mixmasters.demo@example.test',
                 'company' => 'Mix Masters', 'headline' => 'Wedding & Party DJ Specialists',
                 'city' => 'San Diego', 'state' => 'CA', 'rate' => 90, 'years' => 6, 'verified' => true,
+                'availability' => 'busy',
                 'skills' => ['Open-Format DJ', 'MC / Emcee', 'Uplighting', 'Photo Booth'],
                 'services' => ['DJs & Sound Services', 'Music & Entertainment', 'Photo Booths'],
                 'languages' => ['English'],
@@ -272,6 +278,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'name' => 'Glow Studio', 'email' => 'glowstudio.demo@example.test',
                 'company' => 'Glow Studio', 'headline' => 'Bridal Hair & Makeup Artists',
                 'city' => 'Portland', 'state' => 'OR', 'rate' => 110, 'years' => 6, 'verified' => false,
+                'availability' => 'not_available',
                 'skills' => ['Bridal Makeup', 'Hair Styling', 'Airbrush', 'On-Location Glam'],
                 'services' => ['Guest & Attendee Experience', 'Event Staffing'],
                 'languages' => ['English'],

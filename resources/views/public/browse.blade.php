@@ -11,6 +11,9 @@
     $cityF   = $f['city'] ?? '';
     $ratingF = (float) ($f['rating_min'] ?? 0);
     $verF    = !empty($f['verified']);
+    $insF    = !empty($f['insured']);
+    $availF  = !empty($f['available']);
+    $rateMaxF = (int) ($f['rate_max'] ?? 0);
     $sortF   = $f['sort'] ?? 'top';
     $total   = method_exists($pros, 'total') ? $pros->total() : $pros->count();
 
@@ -192,6 +195,11 @@
     .br-pro-av-chk svg { width: 10px; height: 10px; color: #fff; }
     .br-pro-idm { min-width: 0; flex: 1; }
 
+    .br-frate { float: right; font-weight: 800; color: var(--blue); font-size: 12px; }
+    .br-fscale { display: flex; justify-content: space-between; margin-top: 4px;
+        font-size: 11px; font-weight: 600; color: var(--muted); }
+    .br-range { width: 100%; accent-color: var(--blue); cursor: pointer; }
+
     .br-pro-blank { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
         background: linear-gradient(140deg, #eef3fb, #dde6f4); color: var(--blue);
         font-size: 44px; font-weight: 800; letter-spacing: -1px; }
@@ -243,10 +251,14 @@
             <form action="{{ route('public.browse') }}" method="GET" class="br-search">
                 <div class="br-sfield">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-                    <select name="q" aria-label="Category">
+                    {{-- Scopes by the real relation, same as the trending row and the
+                         category landing pages — it used to post the category NAME as a
+                         keyword, which only matched pros whose free text happened to
+                         contain it. --}}
+                    <select name="category" aria-label="Category">
                         <option value="">All Services</option>
                         @foreach($categories as $cat)
-                            <option value="{{ $cat->name }}" @selected($kw === $cat->name)>{{ Str::title($cat->name) }}</option>
+                            <option value="{{ $cat->slug }}" @selected(($f['category'] ?? null) === $cat->slug)>{{ Str::title($cat->name) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -255,15 +267,13 @@
                     <input type="text" name="city" value="{{ $cityF }}" placeholder="City or location" list="br-cities" autocomplete="off">
                     <datalist id="br-cities">@foreach($cities as $c)<option value="{{ $c }}">@endforeach</datalist>
                 </div>
+                {{-- "Any date" and "Within 25 miles" used to sit here. Neither was
+                     read by the backend — there is no availability calendar and no
+                     coordinates are stored — so they collected input and threw it
+                     away. Replaced by a keyword box, which the search does use. --}}
                 <div class="br-sfield">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    <input type="text" name="date" placeholder="Any date" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'">
-                </div>
-                <div class="br-sfield">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
-                    <select name="distance" aria-label="Distance">
-                        <option>Within 25 miles</option><option>Within 50 miles</option><option>Within 100 miles</option><option>Anywhere</option>
-                    </select>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" name="q" value="{{ $kw }}" placeholder="Name, skill or keyword" autocomplete="off">
                 </div>
                 <button type="submit" class="br-find">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -316,28 +326,30 @@
             {{-- ── LEFT: POWER FILTERS ── --}}
             <aside class="br-filters">
                 <form action="{{ route('public.browse') }}" method="GET" class="br-card">
+                    {{-- Carry the hero's scope so applying a sidebar filter doesn't
+                         silently widen the search back out. --}}
                     @if($kw)<input type="hidden" name="q" value="{{ $kw }}">@endif
                     @if($cityF)<input type="hidden" name="city" value="{{ $cityF }}">@endif
+                    @if(!empty($f['category']))<input type="hidden" name="category" value="{{ $f['category'] }}">@endif
                     <div class="br-fhead">
                         <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg> Power Filters</h3>
                         <a href="{{ route('public.browse') }}" class="br-clear">Clear All</a>
                     </div>
 
-                    <div class="br-fgroup">
-                        <label class="br-flabel">Price Range</label>
-                        <input type="range" class="br-range" min="0" max="5000" value="2500" disabled>
-                        <div class="br-range-vals"><span>$0</span><span>$5,000+</span></div>
-                    </div>
+                    {{-- Only filters with data behind them survive here. Distance Radius
+                         (no coordinates are stored anywhere), Response Time (no reply
+                         times are tracked), Available for Travel and Eco-Friendly
+                         Vendors (no such fields), Reviews with Photos (reviews carry no
+                         images) and the availability date picker (no availability
+                         calendar exists) were all inert controls — three of them
+                         literally `disabled` — so they were removed rather than left
+                         looking operable. --}}
 
                     <div class="br-fgroup">
-                        <label class="br-flabel">Availability</label>
-                        <input type="text" class="br-input" placeholder="Select date" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'">
-                        <label class="br-opt" style="margin-top:8px;"><input type="checkbox"> Only show available pros</label>
-                    </div>
-
-                    <div class="br-fgroup">
-                        <label class="br-flabel">Distance Radius</label>
-                        <select class="br-input"><option>Within 25 miles</option><option>Within 50 miles</option><option>Within 100 miles</option><option>Anywhere</option></select>
+                        <label class="br-flabel">Hourly Rate <span class="br-frate" id="brRateOut">{{ $rateMaxF ? 'up to $' . number_format($rateMaxF) : 'Any' }}</span></label>
+                        <input type="range" class="br-range" name="rate_max" id="brRate"
+                               min="0" max="{{ $rateCeiling }}" step="25" value="{{ $rateMaxF ?: 0 }}">
+                        <div class="br-fscale"><span>Any</span><span>${{ number_format($rateCeiling) }}</span></div>
                     </div>
 
                     <div class="br-fgroup">
@@ -345,22 +357,13 @@
                         <label class="br-opt"><input type="radio" name="rating_min" value="5" @checked($ratingF == 5)> 5.0 ★ Perfectionists Only</label>
                         <label class="br-opt"><input type="radio" name="rating_min" value="4.5" @checked($ratingF == 4.5)> 4.5 &amp; Up (Top Rated)</label>
                         <label class="br-opt"><input type="radio" name="rating_min" value="0" @checked($ratingF == 0)> Any Rating</label>
-                        <label class="br-opt"><input type="checkbox"> Reviews with Photos</label>
                     </div>
 
                     <div class="br-fgroup">
-                        <label class="br-flabel">Response Time</label>
-                        <label class="br-opt"><input type="radio" name="resp" disabled> Within 1 Hour</label>
-                        <label class="br-opt"><input type="radio" name="resp" disabled checked> Within a Few Hours</label>
-                        <label class="br-opt"><input type="radio" name="resp" disabled> Anytime</label>
-                    </div>
-
-                    <div class="br-fgroup">
-                        <label class="br-flabel">Other Filters</label>
-                        <label class="br-opt"><input type="checkbox" name="verified" value="1" @checked($verF)> Verified Pro Badge</label>
-                        <label class="br-opt"><input type="checkbox" disabled> Insurance Coverage</label>
-                        <label class="br-opt"><input type="checkbox" disabled> Available for Travel</label>
-                        <label class="br-opt"><input type="checkbox" disabled> Eco-Friendly Vendors</label>
+                        <label class="br-flabel">Verification &amp; Availability</label>
+                        <label class="br-opt"><input type="checkbox" name="verified" value="1" @checked($verF)> Fully verified pro</label>
+                        <label class="br-opt"><input type="checkbox" name="insured" value="1" @checked($insF)> Liability insurance on file</label>
+                        <label class="br-opt"><input type="checkbox" name="available" value="1" @checked($availF)> Currently taking work</label>
                     </div>
 
                     <input type="hidden" name="sort" value="{{ $sortF }}">
@@ -369,7 +372,7 @@
             </aside>
 
             {{-- ── CENTER: RESULTS ── --}}
-            <main class="br-results">
+            <main class="br-results" id="brResults" aria-busy="false">
                 <div class="br-results-head">
                     <div class="br-found">Found: <b>{{ $total }} {{ Str::plural('Pro', $total) }}</b>{{ $cityF ? ' near '.$cityF : '' }}{{ $kw ? ' for “'.Str::title($kw).'”' : '' }}</div>
                     <div class="br-results-tools">
@@ -378,7 +381,7 @@
                             @if($cityF)<input type="hidden" name="city" value="{{ $cityF }}">@endif
                             @if($ratingF)<input type="hidden" name="rating_min" value="{{ $ratingF }}">@endif
                             @if($verF)<input type="hidden" name="verified" value="1">@endif
-                            <select name="sort" class="br-sort" onchange="document.getElementById('brSortForm').submit()">
+                            <select name="sort" class="br-sort" {{-- submit handled by the live filter script --}}>
                                 <option value="top" @selected($sortF==='top')>Sort by: Top-Rated</option>
                                 <option value="rating" @selected($sortF==='rating')>Sort by: Highest Rating</option>
                                 <option value="newest" @selected($sortF==='newest')>Sort by: Newest</option>
@@ -530,7 +533,7 @@
                      showed the same picture for every search. Counts cover the
                      whole filtered set, not just this page. --}}
                 @if($locationCounts->isNotEmpty())
-                <div class="br-rail-card">
+                <div class="br-rail-card" id="brWhere">
                     <div class="br-rail-head"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Where they are</span></div>
                     <div class="br-loc">
                         @foreach($locationCounts as $locCity => $locCount)
@@ -560,7 +563,7 @@
                      itself until the visitor has opened one. It used to show
                      the first three search results regardless. --}}
                 @if($recentPros->isNotEmpty())
-                <div class="br-rail-card">
+                <div class="br-rail-card" id="brRecent">
                     <div class="br-rail-head"><span>Recently Viewed</span></div>
                     <div class="br-recent">
                         @foreach($recentPros->take(3) as $rv)
@@ -613,8 +616,10 @@
 
 <script>
     // Hover carousel for pro cards — cycle portfolio images on hover.
-    (function () {
-        document.querySelectorAll('.br-pro-media').forEach(function (media) {
+    // Exposed so the live filter can re-bind after swapping the results in.
+    window.brBindCards = function () {
+        document.querySelectorAll('.br-pro-media:not([data-bound])').forEach(function (media) {
+            media.setAttribute('data-bound', '1');
             var imgs = media.querySelectorAll('.br-pro-hero');
             var dots = media.querySelectorAll('.br-pro-dots i');
             if (imgs.length < 2) return;
@@ -628,6 +633,157 @@
             card.addEventListener('mouseenter', function () { t = setInterval(function () { show(i + 1); }, 1400); });
             card.addEventListener('mouseleave', function () { clearInterval(t); t = null; show(0); });
         });
-    })();
+    };
+    window.brBindCards();
+</script>
+
+{{-- ═══════════ Live filtering ═══════════
+     Every control on this page — the hero search, the sidebar filters, the sort
+     select, the city rail and the pager — points at the same URL, so one
+     handler covers them all: fetch, swap the results column, keep the URL real.
+     With JS off the identical URLs still work as full page loads. --}}
+<script>
+(function () {
+    var results = document.getElementById('brResults');
+    if (!results || !window.fetch) return;
+
+    var token = 0;
+
+    function collect(form) {
+        var params = new URLSearchParams(new FormData(form));
+        // Drop empties and the "no filter" sentinels so the URL stays readable
+        // and a cleared control doesn't leave ?rate_max=0 behind.
+        [...params.keys()].forEach(function (k) {
+            var v = params.get(k);
+            if (!v || ((k === 'rate_max' || k === 'rating_min') && Number(v) === 0)) params.delete(k);
+        });
+        return params;
+    }
+
+    function load(url, push) {
+        var mine = ++token;
+        results.setAttribute('aria-busy', 'true');
+
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+            .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+            .then(function (html) {
+                if (mine !== token) return;   // a newer change already won
+                var doc = new DOMParser().parseFromString(html, 'text/html');
+                var fresh = doc.getElementById('brResults');
+                if (!fresh) throw new Error('unexpected response');
+                results.innerHTML = fresh.innerHTML;
+
+                // The rails live outside the swapped region, so refresh them by hand.
+                ['brWhere', 'brRecent'].forEach(function (id) {
+                    var a = document.getElementById(id), b = doc.getElementById(id);
+                    if (a && b) a.innerHTML = b.innerHTML;
+                });
+
+                syncOutsideControls(url);
+                if (push !== false) history.pushState({ brUrl: url }, '', url);
+                if (typeof window.brBindCards === 'function') window.brBindCards();
+            })
+            .catch(function () { window.location.href = url; })
+            .then(function () { if (mine === token) results.setAttribute('aria-busy', 'false'); });
+    }
+
+    // The hero form and the sidebar sit OUTSIDE the swapped region, so nothing
+    // re-renders them. Left alone they keep whatever the page first loaded with,
+    // and the next currentUrl() quietly drops any filter they don't mirror —
+    // picking a trending category then typing a keyword lost the category.
+    function syncOutsideControls(url) {
+        var p = new URL(url, location.origin).searchParams;
+        var setVal = function (sel, v) {
+            document.querySelectorAll(sel).forEach(function (el) {
+                if (el !== document.activeElement) el.value = v;
+            });
+        };
+        setVal('form.br-search select[name="category"]', p.get('category') || '');
+        setVal('form.br-search input[name="q"]', p.get('q') || '');
+        setVal('form.br-search input[name="city"]', p.get('city') || '');
+
+        // Sidebar hidden passthroughs.
+        var card = document.querySelector('form.br-card');
+        if (card) {
+            [['q', p.get('q')], ['city', p.get('city')], ['category', p.get('category')]].forEach(function (pair) {
+                var el = card.querySelector('input[type="hidden"][name="' + pair[0] + '"]');
+                if (el) { el.value = pair[1] || ''; el.disabled = !pair[1]; }
+                else if (pair[1]) {
+                    el = document.createElement('input');
+                    el.type = 'hidden'; el.name = pair[0]; el.value = pair[1];
+                    card.appendChild(el);
+                }
+            });
+            var sortHidden = card.querySelector('input[type="hidden"][name="sort"]');
+            if (sortHidden) sortHidden.disabled = true;   // the sort form owns this
+        }
+
+        // Highlight the active trending card.
+        document.querySelectorAll('.br-vibe').forEach(function (a) {
+            var slug = new URL(a.href, location.origin).searchParams.get('category');
+            a.classList.toggle('is-active', !!slug && slug === p.get('category'));
+        });
+    }
+
+    // Merge every filter form into one query string — the hero and the sidebar
+    // each hold half of the state, and submitting one must not drop the other.
+    function currentUrl(changed) {
+        var params = new URLSearchParams();
+        document.querySelectorAll('form.br-search, form.br-card, #brSortForm').forEach(function (f) {
+            collect(f).forEach(function (v, k) { params.set(k, v); });
+        });
+        if (changed) changed.forEach(function (v, k) { v === null ? params.delete(k) : params.set(k, v); });
+        params.delete('page');   // any filter change returns to page one
+        var qs = params.toString();
+        return '{{ route('public.browse') }}' + (qs ? '?' + qs : '');
+    }
+
+    // Delegated, not bound per form: #brSortForm lives INSIDE the swapped
+    // region, so binding it directly meant its listener died on the first
+    // filter change and the next sort submitted natively — rebuilding the query
+    // from that form's own hidden fields and dropping every filter it doesn't
+    // mirror.
+    var FORMS = 'form.br-search, form.br-card, #brSortForm';
+
+    document.addEventListener('submit', function (e) {
+        if (!e.target.closest(FORMS)) return;
+        e.preventDefault();
+        load(currentUrl());
+    }, true);
+
+    document.addEventListener('change', function (e) {
+        if (!e.target.closest(FORMS)) return;
+        if (e.target.type === 'range') return;   // handled below, debounced
+        load(currentUrl());
+    });
+
+    // Rate slider: live label, debounced request so dragging doesn't spam.
+    var rate = document.getElementById('brRate'), rateOut = document.getElementById('brRateOut'), rateTimer;
+    if (rate) {
+        rate.addEventListener('input', function () {
+            var v = Number(rate.value);
+            if (rateOut) rateOut.textContent = v ? 'up to $' + v.toLocaleString() : 'Any';
+            clearTimeout(rateTimer);
+            rateTimer = setTimeout(function () { load(currentUrl()); }, 320);
+        });
+    }
+
+
+    // Pager, city rail, trending row and the "clear" links are plain anchors.
+    document.addEventListener('click', function (e) {
+        var a = e.target.closest('#brResults a[href*="/browse"], .br-loc-row, .br-loc-clear, .br-vibe, .br-fclear');
+        if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
+        var href = a.getAttribute('href') || '';
+        if (href.indexOf('/browse') === -1) return;
+        e.preventDefault();
+        load(a.href);
+    });
+
+    window.addEventListener('popstate', function (e) {
+        if (e.state && e.state.brUrl) load(e.state.brUrl, false);
+    });
+
+    syncOutsideControls(location.href);
+})();
 </script>
 @endsection
