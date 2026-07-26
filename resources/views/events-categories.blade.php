@@ -197,6 +197,10 @@
        category name that the legacy art bakes into the image. */
     .ec-card-img { position: relative; aspect-ratio: 6 / 5; overflow: hidden; background: var(--bg-soft-2, #eef2f8); }
     .ec-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s; }
+    /* Wide promo banner: shown whole on its own soft field rather than cropped
+       through the lettering the artwork is built around. */
+    .ec-card-img.is-banner { background: linear-gradient(160deg, #eef3fb, #e6ecf6); }
+    .ec-card-img.is-banner img { object-fit: contain; }
     .ec-card:hover .ec-card-img img { transform: scale(1.06); }
     .ec-card-count { position: absolute; bottom: 9px; right: 9px; font-size: 10.5px; font-weight: 800;
         color: #fff; background: rgba(15,27,53,.72); backdrop-filter: blur(4px);
@@ -427,9 +431,17 @@
                     @if($categories->count())
                         <div class="ec-grid">
                             @foreach($categories as $cat)
+                                @php
+                                    // 87 categories carry only the wide 1280x800 promo banner (the
+                                    // reclassify pass moved those out of `thumbnail`). Cropping one
+                                    // into the 6:5 card slices its lettering, so those are shown
+                                    // whole — letterboxed — while square/6:5 art fills the box.
+                                    $isBanner = empty($cat->thumbnail) && ! empty($cat->cover_image);
+                                    $cardImg  = $isBanner ? asset('storage/' . $cat->cover_image) : $thumbUrl($cat);
+                                @endphp
                                 <a class="ec-card" href="{{ route('public.category', $cat->slug) }}">
-                                    <div class="ec-card-img">
-                                        <img loading="lazy" src="{{ $thumbUrl($cat) }}" alt="{{ $cat->name }}">
+                                    <div class="ec-card-img {{ $isBanner ? 'is-banner' : '' }}">
+                                        <img loading="lazy" src="{{ $cardImg }}" alt="{{ $cat->name }}">
                                         @php $kidCount = $descCounts[$cat->id] ?? 0; @endphp
                                         @if($kidCount > 0)
                                             <span class="ec-card-count">{{ $kidCount }} {{ Str::plural('subcategory', $kidCount) }}</span>

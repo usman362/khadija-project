@@ -24,11 +24,11 @@ class EventsCategoriesController extends Controller
     public function __invoke(Request $request): View
     {
         // Parent categories with their full subtree — feeds the sidebar tree
-        // and the marketing rows further down the page.
+        // and the marketing rows further down the page. Alphabetical, matching
+        // the admin Categories tree (allChildren sorts by name too).
         $allCategories = Category::active()
             ->whereNull('parent_id')
             ->with('allChildren')
-            ->orderBy('sort_order')
             ->orderBy('name')
             ->get();
 
@@ -54,9 +54,9 @@ class EventsCategoriesController extends Controller
 
         /** @var LengthAwarePaginator $categories */
         $categories = $query
-            ->orderByRaw('parent_id IS NOT NULL')   // main categories first
-            ->orderBy('sort_order')
-            ->orderBy('name')
+            // Same order as the admin card grid: newest first.
+            ->orderByDesc('sort_order')
+            ->orderByDesc('id')
             ->paginate(self::PER_PAGE)
             ->withQueryString()
             // Land back on the grid rather than the top of the page — the
