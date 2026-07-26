@@ -243,7 +243,7 @@
         <div class="post-meta">
             @if($post->author)
                 <div class="post-meta-item">
-                    <img src="{{ $post->author->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode($post->author->name) }}" class="post-author-img" alt="">
+                    <img src="{{ $post->author->avatar_url ?? \App\Models\User::placeholderAvatarUri() }}" class="post-author-img" alt="">
                     <span>{{ $post->author->name }}</span>
                 </div>
                 <span>·</span>

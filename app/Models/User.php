@@ -91,9 +91,57 @@ class User extends Authenticatable
             return asset('storage/' . $this->avatar);
         }
 
-        // Generate initials avatar
-        $name = urlencode($this->name);
-        return "https://ui-avatars.com/api/?name={$name}&size=200&background=6366f1&color=fff&bold=true";
+        return $this->initialsAvatarUri();
+    }
+
+    /**
+     * Neutral avatar for the "no user at all" case — a deleted reviewer, a
+     * vendor row with no supplier. Views used to fall back to ui-avatars.com
+     * here; there is no name to render, so a plain glyph does the job locally.
+     */
+    public static function placeholderAvatarUri(): string
+    {
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">'
+             . '<rect width="200" height="200" fill="#e2e8f0"/>'
+             . '<circle cx="100" cy="78" r="32" fill="#94a3b8"/>'
+             . '<path d="M40 176c0-33 27-52 60-52s60 19 60 52z" fill="#94a3b8"/></svg>';
+
+        return 'data:image/svg+xml;base64,' . base64_encode($svg);
+    }
+
+    /**
+     * Initials avatar as an inline SVG data URI.
+     *
+     * This used to call out to ui-avatars.com — a third-party request on every
+     * avatar of every user who hasn't uploaded one, which is most of them. The
+     * same picture is trivially drawn locally, so no request leaves the server
+     * and avatars keep working with no network at all.
+     */
+    public function initialsAvatarUri(): string
+    {
+        // Skip words that don't start with a letter or digit, or "Bloom & Vine
+        // Co." would initial as "B&" — and a bare & is invalid XML inside the
+        // SVG below.
+        $initials = collect(preg_split('/\s+/', trim((string) $this->name)))
+            ->filter(fn ($w) => $w !== '' && preg_match('/^\p{L}|^\p{N}/u', $w))
+            ->take(2)
+            ->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))
+            ->implode('');
+
+        $initials = htmlspecialchars($initials !== '' ? $initials : '?', ENT_XML1 | ENT_QUOTES, 'UTF-8');
+
+        // Stable per-user hue so two people never read as the same avatar.
+        $hue = crc32((string) ($this->id ?: $this->name)) % 360;
+
+        $svg = <<<SVG
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+              <rect width="200" height="200" fill="hsl({$hue} 62% 46%)"/>
+              <text x="100" y="100" fill="#fff" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif"
+                    font-size="88" font-weight="700" text-anchor="middle" dominant-baseline="central">{$initials}</text>
+            </svg>
+            SVG;
+
+        return 'data:image/svg+xml;base64,' . base64_encode($svg);
     }
 
     /**

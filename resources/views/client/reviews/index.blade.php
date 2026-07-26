@@ -183,7 +183,7 @@
             @endphp
             <div class="rv-rc">
                 <div class="rv-rc-head">
-                    <img src="{{ $pro?->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($pro?->name ?? 'Pro') }}" alt="{{ $pro?->name }}" class="rv-rc-avatar" loading="lazy">
+                    <img src="{{ $pro?->avatar_url ?? \App\Models\User::placeholderAvatarUri() }}" alt="{{ $pro?->name }}" class="rv-rc-avatar" loading="lazy">
                     <div style="flex:1;min-width:0;">
                         <div class="rv-rc-stars">
                             <span class="stars">{{ $fullStars }}</span>
@@ -322,7 +322,7 @@
         <div class="rv-rail-head"><div class="rv-rail-title">Pending Review Requests</div></div>
         @forelse($pendingReviews as $pr)
             <div class="rv-pend-row">
-                <img src="{{ $pr->supplier?->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($pr->supplier?->name ?? 'Pro') }}" class="rv-pend-avatar" loading="lazy">
+                <img src="{{ $pr->supplier?->avatar_url ?? \App\Models\User::placeholderAvatarUri() }}" class="rv-pend-avatar" loading="lazy">
                 <div class="rv-pend-body">
                     <div class="rv-pend-name">{{ \Illuminate\Support\Str::limit($pr->event?->title ?? 'Booking', 18) }}</div>
                     <div class="rv-pend-date">{{ $pr->supplier?->name ?? '' }} · {{ $pr->event?->starts_at?->format('M d, Y') ?? '' }}</div>

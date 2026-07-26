@@ -176,7 +176,7 @@
                             $hasW9 = $i !== 1; // one vendor missing W-9
                         @endphp
                         <tr>
-                            <td style="padding-left:18px;"><div class="ea-vendor"><img src="{{ $v->supplier?->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($v->supplier?->name ?? 'V') }}" loading="lazy"><span class="nm">{{ $v->supplier?->name ?? 'Vendor' }}</span></div></td>
+                            <td style="padding-left:18px;"><div class="ea-vendor"><img src="{{ $v->supplier?->avatar_url ?? \App\Models\User::placeholderAvatarUri() }}" loading="lazy"><span class="nm">{{ $v->supplier?->name ?? 'Vendor' }}</span></div></td>
                             <td>{{ \Illuminate\Support\Str::limit($v->supplier?->profile?->headline ?? $v->event?->title ?? 'Service', 16) }}</td>
                             <td><span style="display:inline-flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" fill="{{ $gw[1] }}" style="width:12px;height:12px;"><circle cx="12" cy="12" r="10"/></svg>{{ $gw[0] }}</span></td>
                             <td><span class="ea-pill {{ $st[1] }}">{{ $st[0] }} ↗</span></td>

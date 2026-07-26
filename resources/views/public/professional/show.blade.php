@@ -820,7 +820,7 @@
                 </h3>
                 @forelse($reviews as $r)
                     <div class="pp-review">
-                        <img src="{{ $r->reviewer?->avatar_url ?? 'https://ui-avatars.com/api/?name=?&size=88&background=cbd5e1&color=64748b' }}"
+                        <img src="{{ $r->reviewer?->avatar_url ?? \App\Models\User::placeholderAvatarUri() }}"
                              alt="{{ $r->reviewer?->name ?? 'Former client' }}"
                              class="pp-review-avatar">
                         <div class="pp-review-body">

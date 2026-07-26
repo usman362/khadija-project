@@ -171,7 +171,7 @@
                         <tr>
                             <td style="padding-left:18px;">
                                 <div class="pay-vendor">
-                                    <img src="{{ $t->supplier?->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($t->supplier?->name ?? 'V') }}" loading="lazy">
+                                    <img src="{{ $t->supplier?->avatar_url ?? \App\Models\User::placeholderAvatarUri() }}" loading="lazy">
                                     <div><div class="nm">{{ $t->supplier?->name ?? 'Vendor' }}</div><div class="sub">{{ \Illuminate\Support\Str::limit($t->supplier?->profile?->headline ?? $t->event?->title ?? '', 18) }}</div></div>
                                 </div>
                             </td>
