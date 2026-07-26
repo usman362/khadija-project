@@ -9,9 +9,11 @@
     $__fgHref = match ($__fgActive) {
         'supplier' => route('professional.bidding-board.index'),  // the real gig board
         'client'   => route('public.packages'),                   // clients shop packages, not gigs
-        // A guest has nowhere to browse gigs — the board is pro-only and there is
-        // no public listing — so send them to the professional signup that unlocks it.
-        default    => route('register', ['role' => 'professional']),
+        // A guest can't reach the board — it's pro-only and there is no public gig
+        // listing — so fall back to the professional directory rather than a dead
+        // end. Ali's call 07.26.2026: for anyone without gig access, Browse
+        // Professionals is the right landing.
+        default    => route('public.browse'),
     };
     $__fgLabel = $__fgActive === 'client' ? 'Browse Packages' : 'Find Gigs';
 @endphp
