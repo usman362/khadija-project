@@ -160,7 +160,7 @@
         border-radius: 18px; overflow: hidden; text-decoration: none; display: flex; flex-direction: column;
         justify-content: flex-end; padding: 24px; color: #fff; box-shadow: 0 18px 40px -24px rgba(15,27,53,.6); }
     .ec-fcard::before { content: ''; position: absolute; inset: 0; z-index: 0;
-        background-size: cover; background-position: center; transition: transform .5s; }
+        background-size: cover; background-position: center 72%; transition: transform .5s; }
     .ec-fcard:hover::before { transform: scale(1.06); }
     .ec-fcard::after { content: ''; position: absolute; inset: 0; z-index: 1;
         background: linear-gradient(180deg, rgba(15,27,53,.05) 20%, rgba(15,27,53,.86) 100%); }
@@ -181,7 +181,7 @@
         background: #fff; border: 1px solid var(--line); display: flex; flex-direction: column;
         min-height: 143px; box-shadow: 0 10px 22px -20px rgba(15,27,53,.5); transition: transform .15s, box-shadow .15s; }
     .ec-scard:hover { transform: translateY(-3px); box-shadow: 0 18px 34px -22px rgba(15,27,53,.55); }
-    .ec-scard-img { height: 132px; background-size: cover; background-position: center; }
+    .ec-scard-img { height: 132px; background-size: cover; background-position: center 68%; }
     .ec-scard-body { padding: 10px 12px 12px; }
     .ec-scard-name { font-size: 13.5px; font-weight: 800; color: var(--ink); line-height: 1.2; }
     .ec-scard-meta { font-size: 11.5px; font-weight: 600; color: var(--muted); margin-top: 3px; }
@@ -198,8 +198,12 @@
         border: 1px solid var(--line); text-decoration: none; display: flex; flex-direction: column;
         box-shadow: 0 10px 24px -20px rgba(15,27,53,.5); transition: transform .15s, box-shadow .15s; }
     .ec-ts:hover { transform: translateY(-3px); box-shadow: 0 20px 38px -22px rgba(15,27,53,.55); }
-    .ec-ts-img { position: relative; height: 150px; overflow: hidden; }
-    .ec-ts-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s; }
+    /* Every SERVICE asset in the legacy import is a 293x244 promo graphic with the
+       service name set across it — there is no photo-only variant. Cropping one
+       into a wide strip slices that name in half and reads as a broken image, so
+       the box takes the artwork's own 6:5 ratio and shows it whole instead. */
+    .ec-ts-img { position: relative; aspect-ratio: 293 / 244; overflow: hidden; }
+    .ec-ts-img img { width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform .45s; }
     .ec-ts:hover .ec-ts-img img { transform: scale(1.07); }
     .ec-ts-tag { position: absolute; top: 10px; left: 10px; font-size: 10px; font-weight: 800;
         text-transform: uppercase; letter-spacing: .5px; padding: 4px 9px; border-radius: 6px;
@@ -220,7 +224,7 @@
     .ec-et-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
     .ec-et { position: relative; height: 200px; border-radius: 18px; overflow: hidden;
         text-decoration: none; display: block; box-shadow: 0 12px 28px -20px rgba(15,27,53,.5); }
-    .ec-et img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s; }
+    .ec-et img { width: 100%; height: 100%; object-fit: cover; object-position: center 68%; transition: transform .45s; }
     .ec-et:hover img { transform: scale(1.06); }
     .ec-et-ov { position: absolute; inset: 0; padding: 22px; display: flex; align-items: flex-end;
         justify-content: space-between; gap: 12px;
