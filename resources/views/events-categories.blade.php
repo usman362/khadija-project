@@ -210,8 +210,28 @@
     .ec-card-go svg { width: 13px; height: 13px; transition: transform .15s; }
     .ec-card:hover .ec-card-go svg { transform: translateX(3px); }
 
+    /* ── AJAX paging: cross-fade the grid instead of reloading the page ── */
+    .ec-grid { transition: opacity .18s ease; }
+    #ecResults[aria-busy="true"] .ec-grid,
+    #ecResults[aria-busy="true"] .ec-empty { opacity: .35; pointer-events: none; }
+    #ecResults[aria-busy="true"] { position: relative; }
+    #ecResults[aria-busy="true"]::after { content: ''; position: absolute; top: 40px; left: 50%;
+        width: 30px; height: 30px; margin-left: -15px; border-radius: 50%;
+        border: 3px solid rgba(37,99,235,.2); border-top-color: var(--blue);
+        animation: ec-spin .6s linear infinite; }
+    @keyframes ec-spin { to { transform: rotate(360deg); } }
+    /* Freshly swapped cards rise into place, staggered by JS. */
+    .ec-card.ec-in { animation: ec-rise .34s cubic-bezier(.22,.8,.3,1) both; }
+    @keyframes ec-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) {
+        .ec-card.ec-in { animation: none; }
+        #ecResults[aria-busy="true"]::after { animation: none; }
+    }
+
     /* The shared paginator is styled for the dark dashboard — repaint it for
        the light public theme without touching the partial itself. */
+    .ec-pag { margin-top: 4px; }
+    .ec-pag .grpag { margin: 0; }
     .ec-pag .grpag-info { color: var(--muted); }
     .ec-pag .grpag-info strong { color: var(--ink); }
     .ec-pag .grpag-item > a, .ec-pag .grpag-item > span {
@@ -362,7 +382,10 @@
                 {{-- LEFT: search · full category tree · quick stats --}}
                 <aside class="ec-shop-left">
                     <form class="ec-side-search" method="GET" action="{{ route('events-categories') }}#ec-browse">
-                        @if($branch)<input type="hidden" name="in" value="{{ $branch->slug }}">@endif
+                        {{-- Always present, blank when unscoped: the AJAX pager keeps this in
+                             sync with the URL so a search after a drill-in stays in that branch.
+                             The submit handler drops empty params. --}}
+                        <input type="hidden" name="in" value="{{ $branch?->slug }}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                         <input type="search" name="q" value="{{ $search }}" placeholder="Search categories…" aria-label="Search categories">
                     </form>
@@ -381,12 +404,12 @@
                         <div class="ec-stat"><span>Total Categories</span><b class="v-b">{{ number_format($stats['total']) }}</b></div>
                         <div class="ec-stat"><span>Main Categories</span><b class="v-o">{{ number_format($stats['parents']) }}</b></div>
                         <div class="ec-stat"><span>Subcategories</span><b class="v-g">{{ number_format($stats['subcategories']) }}</b></div>
-                        <div class="ec-stat"><span>Showing</span><b class="v-n">{{ number_format($stats['showing']) }}</b></div>
+                        <div class="ec-stat"><span>Showing</span><b class="v-n" id="ecShowing">{{ number_format($stats['showing']) }}</b></div>
                     </div>
                 </aside>
 
-                {{-- RIGHT: paginated card grid --}}
-                <div class="ec-shop-right">
+                {{-- RIGHT: card grid (swapped in place by the AJAX pager) --}}
+                <div class="ec-shop-right" id="ecResults" aria-busy="false">
                     @if($branch || $search !== '')
                         <div class="ec-fchips">
                             @if($branch)
@@ -439,7 +462,6 @@
                             @endforeach
                         </div>
 
-                        <div class="ec-pag">{{ $categories->onEachSide(1)->links() }}</div>
                     @else
                         <div class="ec-empty">
                             <h3>No categories match that</h3>
@@ -448,6 +470,10 @@
                     @endif
                 </div>
             </div>
+
+            {{-- Pager sits below BOTH columns so it centres on the page, not on
+                 the grid — the sidebar is shorter than the results. --}}
+            <div class="ec-pag" id="ecPag">{{ $categories->onEachSide(1)->links() }}</div>
         </div>
     </section>
 
@@ -545,6 +571,131 @@
             tree.scrollTop = Math.max(0, active.offsetTop - tree.clientHeight / 2);
         }
     }
+
+    // ── AJAX browsing: paging, tree drill-in, search and chips swap the ──
+    // results in place instead of reloading the page. Every entry point is a
+    // real link or a GET form, so this is pure enhancement — with JS off the
+    // same URLs still work as full page loads.
+    var results = document.getElementById('ecResults');
+    var pager   = document.getElementById('ecPag');
+    var shead   = document.getElementById('ec-browse');
+    var token   = 0;   // guards against a slow earlier request landing last
+
+    function animateCards() {
+        var cards = results.querySelectorAll('.ec-card');
+        cards.forEach(function (card, i) {
+            card.style.animationDelay = Math.min(i * 28, 280) + 'ms';
+            card.classList.add('ec-in');
+        });
+    }
+
+    // The sidebar lives outside the swapped region, so its form has to be
+    // re-pointed at the new URL by hand — otherwise searching after a drill-in
+    // would post a stale (or missing) branch and silently widen the results.
+    function syncSidebarForm(url) {
+        var form = document.querySelector('.ec-side-search');
+        if (!form) return;
+        var params = new URL(url, location.origin).searchParams;
+        var hidden = form.querySelector('input[name="in"]');
+        var q      = form.querySelector('input[name="q"]');
+        if (hidden) hidden.value = params.get('in') || '';
+        if (q) q.value = params.get('q') || '';
+    }
+
+    function markActiveTree(url) {
+        if (!tree) return;
+        var inSlug = new URL(url, location.origin).searchParams.get('in');
+        tree.querySelectorAll('.ec-tree-row.active').forEach(function (r) { r.classList.remove('active'); });
+        if (!inSlug) return;
+        var link = tree.querySelector('.ec-tree-link[href*="in=' + inSlug + '"]');
+        if (!link) return;
+        var row = link.closest('.ec-tree-row');
+        row.classList.add('active');
+        // Open every branch above the newly active row.
+        var node = row.closest('.ec-tree-node');
+        while (node) {
+            var kids = node.parentElement && node.parentElement.closest('.ec-tree-kids');
+            if (!kids) break;
+            kids.removeAttribute('hidden');
+            var owner = kids.parentElement.querySelector(':scope > .ec-tree-row > .ec-tree-toggle');
+            if (owner) owner.setAttribute('aria-expanded', 'true');
+            node = kids.closest('.ec-tree-node');
+        }
+    }
+
+    function load(url, push) {
+        if (!results || !pager) return;
+        var mine = ++token;
+        results.setAttribute('aria-busy', 'true');
+
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+            .then(function (r) {
+                if (!r.ok) throw new Error(r.status);
+                return r.text();
+            })
+            .then(function (html) {
+                if (mine !== token) return;   // a newer click already won
+                var doc = new DOMParser().parseFromString(html, 'text/html');
+                var freshResults = doc.getElementById('ecResults');
+                var freshPager   = doc.getElementById('ecPag');
+                if (!freshResults) throw new Error('unexpected response');
+
+                results.innerHTML = freshResults.innerHTML;
+                pager.innerHTML   = freshPager ? freshPager.innerHTML : '';
+
+                var showing = doc.getElementById('ecShowing');
+                var target  = document.getElementById('ecShowing');
+                if (showing && target) target.textContent = showing.textContent;
+
+                markActiveTree(url);
+                syncSidebarForm(url);
+                animateCards();
+
+                if (push) history.pushState({ ecUrl: url }, '', url);
+                if (shead) {
+                    var top = shead.getBoundingClientRect().top + window.scrollY - 16;
+                    if (window.scrollY > top) window.scrollTo({ top: top, behavior: 'smooth' });
+                }
+            })
+            .catch(function () {
+                // Network or server trouble: fall back to a normal navigation
+                // rather than leaving the visitor on a dimmed grid.
+                window.location.href = url;
+            })
+            .then(function () {
+                if (mine === token) results.setAttribute('aria-busy', 'false');
+            });
+    }
+
+    // One delegated handler covers the pager, the tree, and the filter chips —
+    // they all point at /events-categories with different query strings.
+    document.addEventListener('click', function (e) {
+        if (!results) return;
+        var a = e.target.closest('#ecPag a, #ecTree .ec-tree-link, #ecResults .ec-fchip a, #ecResults .ec-fchip-clear, #ecResults .ec-empty a');
+        if (!a || e.metaKey || e.ctrlKey || e.shiftKey || a.target === '_blank') return;
+        var href = a.getAttribute('href') || '';
+        if (href.indexOf('/events-categories') === -1) return;
+        e.preventDefault();
+        load(a.href, true);
+    });
+
+    // The sidebar search submits through the same path.
+    var searchForm = document.querySelector('.ec-side-search');
+    if (searchForm && results) {
+        searchForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var params = new URLSearchParams(new FormData(searchForm));
+            // Drop empties so a cleared box doesn't leave ?q= behind.
+            [...params.keys()].forEach(function (k) { if (!params.get(k)) params.delete(k); });
+            var qs = params.toString();
+            load(searchForm.action.split('#')[0] + (qs ? '?' + qs : '') + '#ec-browse', true);
+        });
+    }
+
+    // Back/forward through the AJAX history.
+    window.addEventListener('popstate', function (e) {
+        if (e.state && e.state.ecUrl) load(e.state.ecUrl, false);
+    });
 
     // Filter chips → jump to Browse Professionals sorted accordingly.
     var chips = document.querySelectorAll('#ecChips .ec-chip');
