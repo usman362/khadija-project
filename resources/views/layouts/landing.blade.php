@@ -1,3 +1,20 @@
+@php
+    // "Find Gigs" means different things per audience, and three separate nav
+    // surfaces render it: the desktop bar, the mobile drawer and the footer.
+    // Only the desktop one was role-aware; the other two hardcoded /browse, so a
+    // logged-in professional clicking "Find Gigs" in the footer landed on a
+    // directory of other professionals instead of the gigs they can bid on.
+    // Computed once here, used by all three.
+    $__fgActive = auth()->user()?->activeRole();
+    $__fgHref = match ($__fgActive) {
+        'supplier' => route('professional.bidding-board.index'),  // the real gig board
+        'client'   => route('public.packages'),                   // clients shop packages, not gigs
+        // A guest has nowhere to browse gigs — the board is pro-only and there is
+        // no public listing — so send them to the professional signup that unlocks it.
+        default    => route('register', ['role' => 'professional']),
+    };
+    $__fgLabel = $__fgActive === 'client' ? 'Browse Packages' : 'Find Gigs';
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -160,14 +177,6 @@
 
         <div class="lpn-links">
             <div class="lpn-item">
-                @php
-                    $__fgActive = auth()->user()?->activeRole();
-                    // Clients browse professional PACKAGES; only professionals "find gigs" (work).
-                    $__fgHref = $__fgActive === 'supplier'
-                        ? route('professional.bidding-board.index')
-                        : ($__fgActive === 'client' ? route('public.packages') : route('public.browse'));
-                    $__fgLabel = $__fgActive === 'client' ? 'Browse Packages' : 'Find Gigs';
-                @endphp
                 <a href="{{ $__fgHref }}" class="lpn-link">{{ $__fgLabel }}</a>
             </div>
             <div class="lpn-item">
@@ -238,7 +247,7 @@
     </div>
     {{-- Mobile dropdown --}}
     <div id="lpnMobile" style="display:none;background:#fff;border-top:1px solid var(--line);padding:12px 24px 18px;">
-        <a href="{{ route('public.browse') }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">Find Gigs</a>
+        <a href="{{ $__fgHref }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">{{ $__fgLabel }}</a>
         <a href="{{ route('public.browse') }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">Find Professionals</a>
         <a href="{{ route('events-categories') }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">Categories</a>
         <a href="{{ route('blog.index') }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">Resources</a>
@@ -268,7 +277,7 @@
             <div class="lpf-col">
                 <h4>Platform</h4>
                 <ul>
-                    <li><a href="{{ route('public.browse') }}">Find Gigs</a></li>
+                    <li><a href="{{ $__fgHref }}">{{ $__fgLabel }}</a></li>
                     <li><a href="{{ route('public.browse') }}">Find Professionals</a></li>
                     <li><a href="{{ route('events-categories') }}">Categories</a></li>
                     <li><a href="{{ url('/dashboard') }}">AI Toolkit <span class="lpf-new-badge">NEW</span></a></li>
