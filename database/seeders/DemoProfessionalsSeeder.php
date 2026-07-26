@@ -26,8 +26,6 @@ use Illuminate\Support\Carbon;
  */
 class DemoProfessionalsSeeder extends Seeder
 {
-    private const IMG = 'https://images.unsplash.com/';
-
     public function run(): void
     {
         $reviewers = $this->reviewerPool();
@@ -52,7 +50,12 @@ class DemoProfessionalsSeeder extends Seeder
                     'experience_years' => $data['years'],
                     'skills'           => $data['skills'],
                     'languages'        => $data['languages'],
-                    'portfolio'        => array_map(fn ($id) => self::IMG . $id . '?w=700&q=75&auto=format&fit=crop', $data['portfolio']),
+                    // No portfolio: these accounts never uploaded anything, and
+                    // seeding stock photos as their "work" put one wedding bouquet on
+                    // eight of the ten pros — including the DJ and the lighting company.
+                    // Left empty, the search card falls back to the artwork of the
+                    // services they actually offer, which is local and matches the trade.
+                    'portfolio'        => [],
                 ] + ($data['verified'] ? [
                     'trade_license_number'            => 'TL-' . rand(10000, 99999),
                     'trade_license_verified_at'       => now()->subDays(rand(30, 200)),
@@ -182,7 +185,6 @@ class DemoProfessionalsSeeder extends Seeder
                 'skills' => ['Cinematography', 'Drone / Aerial', 'Same-Day Edits', 'Color Grading'],
                 'services' => ['Event Videography', 'Videography Services', 'Photography & Videography', 'Event Photography'],
                 'languages' => ['English', 'Vietnamese'],
-                'portfolio' => ['photo-1519741497674-611481863552', 'photo-1606800052052-a08af7148866', 'photo-1606800052052-a08af7148866', 'photo-1511578314322-379afb476865'],
                 'bio' => 'Award-winning cinematographer capturing weddings and brand films with a cinematic, story-first approach.',
                 'eventTitle' => 'Wedding Film',
             ],
@@ -193,7 +195,6 @@ class DemoProfessionalsSeeder extends Seeder
                 'skills' => ['DJ / MC', 'Sound Engineering', 'Lighting', 'Live Streaming'],
                 'services' => ['DJs & Sound Services', 'Lighting & Stage Setup', 'Music & Entertainment'],
                 'languages' => ['English', 'Spanish'],
-                'portfolio' => ['photo-1519741497674-611481863552', 'photo-1511578314322-379afb476865', 'photo-1511578314322-379afb476865'],
                 'bio' => 'Full-service DJ and A/V production for weddings, corporate galas, and festivals.',
                 'eventTitle' => 'Corporate Gala',
             ],
@@ -204,7 +205,6 @@ class DemoProfessionalsSeeder extends Seeder
                 'skills' => ['Open-Format DJ', 'MC / Emcee', 'Uplighting', 'Photo Booth'],
                 'services' => ['DJs & Sound Services', 'Music & Entertainment', 'Photo Booths'],
                 'languages' => ['English'],
-                'portfolio' => ['photo-1511578314322-379afb476865', 'photo-1519741497674-611481863552', 'photo-1492684223066-81342ee5ff30'],
                 'bio' => 'High-energy DJs who read the room and keep the dance floor packed all night.',
                 'eventTitle' => 'Birthday Party',
             ],
@@ -215,7 +215,6 @@ class DemoProfessionalsSeeder extends Seeder
                 'skills' => ['Photography', 'Editorial', 'Album Design', 'Engagement Shoots'],
                 'services' => ['Event Photography', 'Photography Services', 'Photography & Videography'],
                 'languages' => ['English', 'Italian'],
-                'portfolio' => ['photo-1606800052052-a08af7148866', 'photo-1606800052052-a08af7148866', 'photo-1519741497674-611481863552'],
                 'bio' => 'Timeless, editorial-style photography for couples who love art and authenticity.',
                 'eventTitle' => 'Wedding Photography',
             ],
@@ -226,7 +225,6 @@ class DemoProfessionalsSeeder extends Seeder
                 'skills' => ['Floral Design', 'Tablescapes', 'Arch & Backdrop', 'Installations'],
                 'services' => ['Floral Design & Arrangements', 'Floral Arrangements', 'Decor & Floral Services', 'Event Decor & Styling'],
                 'languages' => ['English'],
-                'portfolio' => ['photo-1465495976277-4387d4b0b4c6', 'photo-1469371670807-013ccf25f16a', 'photo-1519741497674-611481863552'],
                 'bio' => 'Lush, seasonal florals and full-room décor that transform any venue.',
                 'eventTitle' => 'Wedding Florals',
             ],
@@ -237,7 +235,6 @@ class DemoProfessionalsSeeder extends Seeder
                 'skills' => ['Full Planning', 'Day-of Coordination', 'Vendor Sourcing', 'Budgeting'],
                 'services' => ['Event Planning & Production', 'Planning, Coordination & Management', 'Event Coordination'],
                 'languages' => ['English', 'Spanish', 'Portuguese'],
-                'portfolio' => ['photo-1505373877841-8d25f7d46678', 'photo-1511578314322-379afb476865', 'photo-1465495976277-4387d4b0b4c6'],
                 'bio' => 'From concept to last dance — we plan luxury weddings and corporate events end to end.',
                 'eventTitle' => 'Luxury Wedding',
             ],
@@ -248,7 +245,6 @@ class DemoProfessionalsSeeder extends Seeder
                 'skills' => ['Live Band', 'Jazz / Soul', 'Ceremony Music', 'Custom Requests'],
                 'services' => ['Live Bands & Musical Acts', 'Solo Musicians & Vocalists', 'Music & Entertainment'],
                 'languages' => ['English'],
-                'portfolio' => ['photo-1511578314322-379afb476865', 'photo-1519741497674-611481863552', 'photo-1511578314322-379afb476865'],
                 'bio' => 'A seven-piece live band bringing timeless jazz and soul to weddings and galas.',
                 'eventTitle' => 'Reception Music',
             ],
@@ -259,7 +255,6 @@ class DemoProfessionalsSeeder extends Seeder
                 'skills' => ['Uplighting', 'Stage Design', 'Gobo / Monogram', 'Pin Spotting'],
                 'services' => ['Lighting Services', 'Lighting & Stage Setup', 'Spotlight & Stage Lighting'],
                 'languages' => ['English'],
-                'portfolio' => ['photo-1492684223066-81342ee5ff30', 'photo-1511578314322-379afb476865', 'photo-1519741497674-611481863552'],
                 'bio' => 'We sculpt rooms with light — from intimate receptions to large-scale productions.',
                 'eventTitle' => 'Event Lighting',
             ],
@@ -270,7 +265,6 @@ class DemoProfessionalsSeeder extends Seeder
                 'skills' => ['Plated Dinners', 'Stations', 'Dietary Menus', 'Bar Service'],
                 'services' => ['Catering Services', 'Catering Coordination', 'Food Services', 'Beverage Services'],
                 'languages' => ['English'],
-                'portfolio' => ['photo-1414235077428-338989a2e8c0', 'photo-1555244162-803834f70033', 'photo-1465495976277-4387d4b0b4c6'],
                 'bio' => 'Seasonal, locally-sourced menus crafted for weddings and corporate events.',
                 'eventTitle' => 'Catered Dinner',
             ],
@@ -281,7 +275,6 @@ class DemoProfessionalsSeeder extends Seeder
                 'skills' => ['Bridal Makeup', 'Hair Styling', 'Airbrush', 'On-Location Glam'],
                 'services' => ['Guest & Attendee Experience', 'Event Staffing'],
                 'languages' => ['English'],
-                'portfolio' => ['photo-1465495976277-4387d4b0b4c6', 'photo-1606800052052-a08af7148866', 'photo-1519741497674-611481863552'],
                 'bio' => 'On-location glam for brides and bridal parties — flawless, photo-ready looks.',
                 'eventTitle' => 'Bridal Glam',
             ],

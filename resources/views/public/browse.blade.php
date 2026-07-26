@@ -176,6 +176,10 @@
     .br-loc-clear:hover { text-decoration: underline; }
 
     .br-vibe.is-active { outline: 3px solid var(--blue); outline-offset: -3px; }
+
+    .br-pro-blank { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(140deg, #eef3fb, #dde6f4); color: var(--blue);
+        font-size: 44px; font-weight: 800; letter-spacing: -1px; }
     .br-rail-btn { display: block; margin: 10px 14px 14px; text-align: center; border-radius: 10px; padding: 9px; font-size: 12.5px; font-weight: 800; text-decoration: none; }
     .br-rail-btn.blue { background: linear-gradient(135deg, var(--blue), var(--blue-dark)); color: #fff; }
     .br-recent { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 12px 14px; }
@@ -399,9 +403,13 @@
                     @endphp
                     <article class="br-card br-pro">
                         <div class="br-pro-media">
-                            @foreach($bg as $gi => $img)
+                            @forelse($bg as $gi => $img)
                                 <img class="br-pro-hero {{ $gi === 0 ? 'on' : '' }}" src="{{ $img }}" alt="{{ $pro->name }}" loading="lazy">
-                            @endforeach
+                            @empty
+                                {{-- Neither uploads nor listed services: a plain monogram beats
+                                     borrowing a stock photo that says nothing true about them. --}}
+                                <span class="br-pro-blank">{{ Str::upper(Str::substr($pro->name, 0, 1)) }}</span>
+                            @endforelse
                             <span class="br-pro-tag">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41 13.42 20.6a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
                                 {{ \Illuminate\Support\Str::limit($catB, 18) }}
