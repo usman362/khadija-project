@@ -599,6 +599,31 @@
                 </div>
             </form>
         </div>
+
+        {{-- Services offered — this is what actually places the pro on a
+             category landing page and in a category-filtered Browse. The free
+             text "Skills" field above stays as prose for the profile; it is not
+             what discovery matches on. --}}
+        <div class="pf-card" id="services">
+            <div class="pf-card-title">Services You Offer</div>
+            <div class="pf-card-desc">
+                Pick every service you take bookings for. Clients browsing those categories will see your profile —
+                without at least one, you will not appear on any category page.
+            </div>
+
+            <form action="{{ route('professional.profile.update.services') }}" method="POST">
+                @csrf @method('PATCH')
+                <x-service-picker
+                    :categories="$categories"
+                    name="services"
+                    accent="#2563eb"
+                    accentStrong="#1d4ed8"
+                    :selected="old('services', $selectedServices)" />
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="pf-btn">Save Services</button>
+                </div>
+            </form>
+        </div>
         @endif
 
         {{-- Portfolio & Certifications --}}

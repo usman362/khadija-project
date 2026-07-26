@@ -238,6 +238,16 @@ class User extends Authenticatable
         return $this->hasMany(Booking::class, 'created_by');
     }
 
+    /**
+     * Service categories this professional offers — the real answer to "which
+     * pros work in this category", replacing a name LIKE against free-text
+     * skills that never matched.
+     */
+    public function serviceCategories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class)->withTimestamps();
+    }
+
     /** Professionals this client has explicitly saved (My Professionals). */
     public function savedProfessionals(): BelongsToMany
     {

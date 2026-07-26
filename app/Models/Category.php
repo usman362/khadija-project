@@ -51,6 +51,12 @@ class Category extends Model
         return $this->belongsToMany(Event::class)->withTimestamps();
     }
 
+    // Professionals who list this category as a service they offer.
+    public function professionals(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)->withTimestamps();
+    }
+
     // Scope: only active
     public function scopeActive($query)
     {

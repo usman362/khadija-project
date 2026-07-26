@@ -33,6 +33,7 @@ class BrowseProfessionalsController extends Controller
     {
         $q         = trim((string) $request->query('q', ''));
         $city      = trim((string) $request->query('city', ''));
+        $catSlug   = trim((string) $request->query('category', ''));
         $ratingMin = (float) $request->query('rating_min', 0);
         $verified  = (bool) $request->query('verified', false);
         $sort      = (string) $request->query('sort', 'top');
@@ -58,6 +59,19 @@ class BrowseProfessionalsController extends Controller
                           ->orWhere('company_name', 'like', $like);
                     });
             });
+        }
+
+        // ── Category filter ─────────────────────────────────────────
+        // A real relation, not a keyword guess: ?category=<slug> narrows to the
+        // pros who listed that category (or anything under it) as a service
+        // they offer. The category landing pages link here with it.
+        $category = $catSlug !== ''
+            ? Category::active()->where('slug', $catSlug)->first()
+            : null;
+
+        if ($category) {
+            $branchIds = $this->branchIds($category);
+            $query->whereHas('serviceCategories', fn (Builder $c) => $c->whereIn('categories.id', $branchIds));
         }
 
         // ── City filter ─────────────────────────────────────────────
@@ -133,8 +147,29 @@ class BrowseProfessionalsController extends Controller
                 'rating_min' => $ratingMin,
                 'verified'   => $verified,
                 'sort'       => $sort,
+                'category'   => $category?->slug,
             ],
+            'activeCategory' => $category,
             'badges'     => UserProfile::BADGES,
         ]);
+    }
+
+    /**
+     * The category's own id plus every descendant's, so filtering by a group
+     * ("Photography Services") also returns the pros listed under its leaves.
+     *
+     * @return array<int, int>
+     */
+    private function branchIds(Category $category): array
+    {
+        $ids   = [$category->id];
+        $level = [$category->id];
+
+        for ($depth = 0; $depth < 8 && $level !== []; $depth++) {
+            $level = Category::whereIn('parent_id', $level)->pluck('id')->all();
+            $ids   = array_merge($ids, $level);
+        }
+
+        return $ids;
     }
 }

@@ -7,7 +7,9 @@
     $seoDescription = $category->short_description
         ?: ('Browse top-rated ' . strtolower($category->name) . ' on GigResource. Compare quotes, read reviews, and book the right pro with secure, protected payments.');
     $seoImage       = $category->cover_image ? asset('storage/' . $category->cover_image) : null;
-    $browseUrl      = route('public.browse', ['q' => $category->name]);
+    // Filter Browse by the real relation, not by a keyword guess — ?q= searched
+    // the pro's free text for the whole category name and always came back empty.
+    $browseUrl      = route('public.browse', ['category' => $category->slug]);
 @endphp
 
 @push('styles')

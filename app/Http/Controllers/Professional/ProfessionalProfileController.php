@@ -20,7 +20,52 @@ class ProfessionalProfileController extends Controller
         $profile = $user->getOrCreateProfile();
         $tab = $request->string('tab')->toString() ?: 'general';
 
-        return view('professional.profile.index', compact('user', 'profile', 'tab'));
+        // The service picker only renders on the Professional tab, so only pay
+        // for the category list there.
+        $categories = $tab === 'professional'
+            ? \App\Models\Category::active()->whereNotNull('parent_id')
+                ->orderBy('name')->get(['id', 'name'])
+            : collect();
+
+        $selectedServices = $tab === 'professional'
+            ? $user->serviceCategories()->pluck('categories.id')->all()
+            : [];
+
+        return view('professional.profile.index', compact(
+            'user', 'profile', 'tab', 'categories', 'selectedServices'
+        ));
+    }
+
+    /**
+     * The categories this pro offers. This is what puts them on a category
+     * landing page and into a filtered /browse — free-text skills never could,
+     * since "Fine-Art Wedding Photographer" does not contain the category name
+     * "Photography Services".
+     */
+    public function updateServices(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'services'   => ['nullable', 'array'],
+            'services.*' => ['integer', 'exists:categories,id'],
+        ]);
+
+        $picked = collect($data['services'] ?? [])->unique();
+
+        // The picker dedupes by NAME — the legacy tree repeats "Event
+        // Photography" under a dozen event types — so it can only ever submit
+        // one id per name. Saving those ids verbatim would quietly drop the pro
+        // from every other branch carrying the same service. Expand back out:
+        // offering a service means offering it wherever a client browses to it.
+        $names = \App\Models\Category::whereIn('id', $picked)->pluck('name');
+        $ids   = \App\Models\Category::whereIn('name', $names)->pluck('id')->all();
+
+        $request->user()->serviceCategories()->sync($ids);
+
+        $shown = $names->count();
+
+        return back()->with('status', $shown === 0
+            ? 'Services cleared — your profile will not appear on any category page until you pick at least one.'
+            : $shown . ' ' . \Illuminate\Support\Str::plural('service', $shown) . ' saved. Clients browsing those categories can now find you.');
     }
 
     public function updateGeneral(Request $request): RedirectResponse

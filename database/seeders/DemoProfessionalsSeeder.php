@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\Event;
 use App\Models\Review;
 use App\Models\User;
+use App\Models\Category;
 use App\Models\UserProfile;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
@@ -62,8 +63,37 @@ class DemoProfessionalsSeeder extends Seeder
                 ] : []),
             );
 
+            $this->attachServices($user, $data['services'] ?? []);
             $this->seedReviews($user, $reviewers, $data);
         }
+    }
+
+    /**
+     * Put the pro into the real category relation. Without this they exist but
+     * are undiscoverable — category landing pages and a category-filtered
+     * /browse both read `category_user`, not the free-text skills list.
+     *
+     * Names are matched, not ids: the legacy import repeats a name across
+     * branches, so every category carrying that name gets attached and the pro
+     * shows up wherever a client browses to it.
+     *
+     * @param array<int, string> $serviceNames
+     */
+    private function attachServices(User $user, array $serviceNames): void
+    {
+        if ($serviceNames === []) {
+            return;
+        }
+
+        $ids = Category::whereIn('name', $serviceNames)->pluck('id')->all();
+
+        if ($ids === []) {
+            $this->command?->warn("  No categories matched for {$user->name} — skipped.");
+
+            return;
+        }
+
+        $user->serviceCategories()->sync($ids);
     }
 
     /** A small pool of client accounts used as review authors. */
@@ -150,6 +180,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'Skyline Films', 'headline' => 'Lead Cinematographer & Drone Pilot',
                 'city' => 'Los Angeles', 'state' => 'CA', 'rate' => 150, 'years' => 7, 'verified' => true,
                 'skills' => ['Cinematography', 'Drone / Aerial', 'Same-Day Edits', 'Color Grading'],
+                'services' => ['Event Videography', 'Videography Services', 'Photography & Videography', 'Event Photography'],
                 'languages' => ['English', 'Vietnamese'],
                 'portfolio' => ['photo-1519741497674-611481863552', 'photo-1606800052052-a08af7148866', 'photo-1606800052052-a08af7148866', 'photo-1511578314322-379afb476865'],
                 'bio' => 'Award-winning cinematographer capturing weddings and brand films with a cinematic, story-first approach.',
@@ -160,6 +191,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'Horizon Audio', 'headline' => 'Premium Event DJ & A/V Visual Systems',
                 'city' => 'Austin', 'state' => 'TX', 'rate' => 130, 'years' => 10, 'verified' => true,
                 'skills' => ['DJ / MC', 'Sound Engineering', 'Lighting', 'Live Streaming'],
+                'services' => ['DJs & Sound Services', 'Lighting & Stage Setup', 'Music & Entertainment'],
                 'languages' => ['English', 'Spanish'],
                 'portfolio' => ['photo-1519741497674-611481863552', 'photo-1511578314322-379afb476865', 'photo-1511578314322-379afb476865'],
                 'bio' => 'Full-service DJ and A/V production for weddings, corporate galas, and festivals.',
@@ -170,6 +202,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'Mix Masters', 'headline' => 'Wedding & Party DJ Specialists',
                 'city' => 'San Diego', 'state' => 'CA', 'rate' => 90, 'years' => 6, 'verified' => true,
                 'skills' => ['Open-Format DJ', 'MC / Emcee', 'Uplighting', 'Photo Booth'],
+                'services' => ['DJs & Sound Services', 'Music & Entertainment', 'Photo Booths'],
                 'languages' => ['English'],
                 'portfolio' => ['photo-1511578314322-379afb476865', 'photo-1519741497674-611481863552', 'photo-1492684223066-81342ee5ff30'],
                 'bio' => 'High-energy DJs who read the room and keep the dance floor packed all night.',
@@ -180,6 +213,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'Rossi Studio', 'headline' => 'Fine-Art Wedding Photographer',
                 'city' => 'New York', 'state' => 'NY', 'rate' => 175, 'years' => 9, 'verified' => true,
                 'skills' => ['Photography', 'Editorial', 'Album Design', 'Engagement Shoots'],
+                'services' => ['Event Photography', 'Photography Services', 'Photography & Videography'],
                 'languages' => ['English', 'Italian'],
                 'portfolio' => ['photo-1606800052052-a08af7148866', 'photo-1606800052052-a08af7148866', 'photo-1519741497674-611481863552'],
                 'bio' => 'Timeless, editorial-style photography for couples who love art and authenticity.',
@@ -190,6 +224,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'Bloom & Vine Co.', 'headline' => 'Floral & Décor Designers',
                 'city' => 'Chicago', 'state' => 'IL', 'rate' => 120, 'years' => 8, 'verified' => true,
                 'skills' => ['Floral Design', 'Tablescapes', 'Arch & Backdrop', 'Installations'],
+                'services' => ['Floral Design & Arrangements', 'Floral Arrangements', 'Decor & Floral Services', 'Event Decor & Styling'],
                 'languages' => ['English'],
                 'portfolio' => ['photo-1465495976277-4387d4b0b4c6', 'photo-1469371670807-013ccf25f16a', 'photo-1519741497674-611481863552'],
                 'bio' => 'Lush, seasonal florals and full-room décor that transform any venue.',
@@ -200,6 +235,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'Grand Affair', 'headline' => 'Full-Service Event Planners',
                 'city' => 'Miami', 'state' => 'FL', 'rate' => 200, 'years' => 12, 'verified' => true,
                 'skills' => ['Full Planning', 'Day-of Coordination', 'Vendor Sourcing', 'Budgeting'],
+                'services' => ['Event Planning & Production', 'Planning, Coordination & Management', 'Event Coordination'],
                 'languages' => ['English', 'Spanish', 'Portuguese'],
                 'portfolio' => ['photo-1505373877841-8d25f7d46678', 'photo-1511578314322-379afb476865', 'photo-1465495976277-4387d4b0b4c6'],
                 'bio' => 'From concept to last dance — we plan luxury weddings and corporate events end to end.',
@@ -210,6 +246,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'The Velvet Notes', 'headline' => 'Live Jazz & Soul Band',
                 'city' => 'Nashville', 'state' => 'TN', 'rate' => 250, 'years' => 11, 'verified' => false,
                 'skills' => ['Live Band', 'Jazz / Soul', 'Ceremony Music', 'Custom Requests'],
+                'services' => ['Live Bands & Musical Acts', 'Solo Musicians & Vocalists', 'Music & Entertainment'],
                 'languages' => ['English'],
                 'portfolio' => ['photo-1511578314322-379afb476865', 'photo-1519741497674-611481863552', 'photo-1511578314322-379afb476865'],
                 'bio' => 'A seven-piece live band bringing timeless jazz and soul to weddings and galas.',
@@ -220,6 +257,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'Lumière Lighting', 'headline' => 'Event Lighting & Staging',
                 'city' => 'Las Vegas', 'state' => 'NV', 'rate' => 95, 'years' => 5, 'verified' => true,
                 'skills' => ['Uplighting', 'Stage Design', 'Gobo / Monogram', 'Pin Spotting'],
+                'services' => ['Lighting Services', 'Lighting & Stage Setup', 'Spotlight & Stage Lighting'],
                 'languages' => ['English'],
                 'portfolio' => ['photo-1492684223066-81342ee5ff30', 'photo-1511578314322-379afb476865', 'photo-1519741497674-611481863552'],
                 'bio' => 'We sculpt rooms with light — from intimate receptions to large-scale productions.',
@@ -230,6 +268,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'Saffron Table', 'headline' => 'Gourmet Event Catering',
                 'city' => 'Seattle', 'state' => 'WA', 'rate' => 45, 'years' => 9, 'verified' => true,
                 'skills' => ['Plated Dinners', 'Stations', 'Dietary Menus', 'Bar Service'],
+                'services' => ['Catering Services', 'Catering Coordination', 'Food Services', 'Beverage Services'],
                 'languages' => ['English'],
                 'portfolio' => ['photo-1414235077428-338989a2e8c0', 'photo-1555244162-803834f70033', 'photo-1465495976277-4387d4b0b4c6'],
                 'bio' => 'Seasonal, locally-sourced menus crafted for weddings and corporate events.',
@@ -240,6 +279,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'Glow Studio', 'headline' => 'Bridal Hair & Makeup Artists',
                 'city' => 'Portland', 'state' => 'OR', 'rate' => 110, 'years' => 6, 'verified' => false,
                 'skills' => ['Bridal Makeup', 'Hair Styling', 'Airbrush', 'On-Location Glam'],
+                'services' => ['Guest & Attendee Experience', 'Event Staffing'],
                 'languages' => ['English'],
                 'portfolio' => ['photo-1465495976277-4387d4b0b4c6', 'photo-1606800052052-a08af7148866', 'photo-1519741497674-611481863552'],
                 'bio' => 'On-location glam for brides and bridal parties — flawless, photo-ready looks.',
