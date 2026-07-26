@@ -183,10 +183,14 @@
        category name that the legacy art bakes into the image. */
     .ec-card-img { position: relative; aspect-ratio: 6 / 5; overflow: hidden; background: var(--bg-soft-2, #eef2f8); }
     .ec-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s; }
-    /* Wide promo banner: shown whole on its own soft field rather than cropped
-       through the lettering the artwork is built around. */
-    .ec-card-img.is-banner { background: linear-gradient(160deg, #eef3fb, #e6ecf6); }
-    .ec-card-img.is-banner img { object-fit: contain; }
+    /* Wide promo banner in a 6:5 box. Cropping to fill would slice 25% off each
+       side, straight through the lettering the artwork is built around, so the
+       banner stays whole and a blurred, scaled copy of itself fills the space
+       around it — the card reads as full-bleed with nothing cut off. */
+    .ec-card-img.is-banner::before { content: ''; position: absolute; inset: 0;
+        background-image: var(--ec-bg); background-size: cover; background-position: center;
+        filter: blur(20px) saturate(1.25); transform: scale(1.25); }
+    .ec-card-img.is-banner img { position: relative; object-fit: contain; }
     .ec-card:hover .ec-card-img img { transform: scale(1.06); }
     .ec-card-count { position: absolute; bottom: 9px; right: 9px; font-size: 10.5px; font-weight: 800;
         color: #fff; background: rgba(15,27,53,.72); backdrop-filter: blur(4px);
@@ -438,7 +442,8 @@
                                     $cardImg  = $isBanner ? asset('storage/' . $cat->cover_image) : $thumbUrl($cat);
                                 @endphp
                                 <a class="ec-card" href="{{ route('public.category', $cat->slug) }}">
-                                    <div class="ec-card-img {{ $isBanner ? 'is-banner' : '' }}">
+                                    <div class="ec-card-img {{ $isBanner ? 'is-banner' : '' }}"
+                                         @if($isBanner) style="--ec-bg: url('{{ $cardImg }}')" @endif>
                                         <img loading="lazy" src="{{ $cardImg }}" alt="{{ $cat->name }}">
                                         @php $kidCount = $descCounts[$cat->id] ?? 0; @endphp
                                         @if($kidCount > 0)
