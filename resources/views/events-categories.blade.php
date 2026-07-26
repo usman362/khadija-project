@@ -181,7 +181,7 @@
         background: #fff; border: 1px solid var(--line); display: flex; flex-direction: column;
         min-height: 143px; box-shadow: 0 10px 22px -20px rgba(15,27,53,.5); transition: transform .15s, box-shadow .15s; }
     .ec-scard:hover { transform: translateY(-3px); box-shadow: 0 18px 34px -22px rgba(15,27,53,.55); }
-    .ec-scard-img { height: 80px; background-size: cover; background-position: center; }
+    .ec-scard-img { height: 132px; background-size: cover; background-position: center; }
     .ec-scard-body { padding: 10px 12px 12px; }
     .ec-scard-name { font-size: 13.5px; font-weight: 800; color: var(--ink); line-height: 1.2; }
     .ec-scard-meta { font-size: 11.5px; font-weight: 600; color: var(--muted); margin-top: 3px; }
@@ -370,7 +370,7 @@
 
                             {{-- BIG feature card = first real category --}}
                             <a class="ec-fcard" href="{{ route('public.category', $first->slug) }}"
-                               style="--x:0" data-bg="{{ $coverUrl($first) }}">
+                               style="--x:0" data-bg="{{ $thumbUrl($first) }}">
                                 <span class="ec-fcard-badge">Featured</span>
                                 <h3>{{ Str::title($first->name) }}</h3>
                                 @php $firstCount = $descCount($first); @endphp
