@@ -89,15 +89,6 @@
         padding: 9px 34px 9px 15px; font-size: 13px; font-weight: 700; color: var(--ink-2);
         background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a8699' stroke-width='2.5'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 12px center;
         background-size: 14px; font-family: inherit; cursor: pointer; }
-    .ec-fb-chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-left: auto; }
-    .ec-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line);
-        background: #fff; border-radius: 999px; padding: 8px 14px; font-size: 12.5px; font-weight: 700;
-        color: var(--ink-2); cursor: pointer; transition: all .15s; }
-    .ec-chip svg { width: 14px; height: 14px; color: var(--blue); }
-    .ec-chip:hover { border-color: var(--blue); color: var(--blue); }
-    .ec-chip.active { background: linear-gradient(135deg, var(--blue-light, var(--blue)), var(--blue-dark, var(--blue)));
-        border-color: transparent; color: #fff; box-shadow: 0 10px 22px -14px rgba(37,99,235,.8); }
-    .ec-chip.active svg { color: #fff; }
 
     /* ── SECTION HEADS ─────────────────────────────────── */
     .ec-section { padding: 34px 0; }
@@ -302,7 +293,6 @@
         .ec-shop { grid-template-columns: 1fr; }
         .ec-shop-left { position: static; }
         .ec-tree { max-height: 300px; }
-        .ec-fb-chips { margin-left: 0; }
     }
     @media (max-width: 720px) {
         .ec-h1 { font-size: 30px; }
@@ -371,21 +361,6 @@
                         @endforeach
                     @endforeach
                 </select>
-            </div>
-
-            <div class="ec-fb-chips" id="ecChips">
-                <button type="button" class="ec-chip active" data-sort="top">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8.5 22 9.3 17 14 18.3 21 12 17.5 5.7 21 7 14 2 9.3 9 8.5 12 2"/></svg>
-                    Popular
-                </button>
-                <button type="button" class="ec-chip" data-sort="rating">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.9 6.3L22 9.2l-5 5 1.2 7L12 17.8 5.8 21.2 7 14.2l-5-5 7.1-.9L12 2z"/></svg>
-                    Top Rated
-                </button>
-                <button type="button" class="ec-chip" data-sort="newest">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    New Arrivals
-                </button>
             </div>
         </div>
     </section>
@@ -559,8 +534,6 @@
 @push('scripts')
 <script>
 (function () {
-    var browseBase = @json(route('public.browse'));
-
     // ── Category tree: disclosure toggles ─────────────────────────────
     // Branches ship collapsed (`hidden` in the markup) so the panel opens at a
     // readable size; clicking the chevron reveals that level only.
@@ -775,19 +748,6 @@
     // Back/forward through the AJAX history.
     window.addEventListener('popstate', function (e) {
         if (e.state && e.state.ecUrl) load(e.state.ecUrl, false);
-    });
-
-    // Filter chips → jump to Browse Professionals sorted accordingly.
-    var chips = document.querySelectorAll('#ecChips .ec-chip');
-    chips.forEach(function (chip) {
-        chip.addEventListener('click', function () {
-            chips.forEach(function (c) { c.classList.remove('active'); });
-            chip.classList.add('active');
-            var sort = chip.getAttribute('data-sort') || 'top';
-            var q = document.getElementById('ecCatSelect');
-            var qv = q && q.value ? '&q=' + encodeURIComponent(q.value) : '';
-            window.location.href = browseBase + '?sort=' + encodeURIComponent(sort) + qv;
-        });
     });
 
     // Shop-by-category tabs: visual toggle only.
