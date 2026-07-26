@@ -326,10 +326,13 @@
             <h1 class="ec-h1">Explore by <span class="b">Category</span> <span class="o">✨</span></h1>
             <p class="ec-hero-sub">Every kind of event, every kind of professional — browse the categories we cover and find the right people for your occasion.</p>
 
-            <form action="{{ route('public.browse') }}" method="GET" class="ec-search">
+            {{-- Searches the category browser below. It used to post to /browse,
+                 which sits behind auth — a guest typing here just landed on the
+                 login screen. --}}
+            <form action="{{ route('events-categories') }}" method="GET" class="ec-search" data-ec-filter>
                 <div class="ec-sfield">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="text" name="q" placeholder="Search categories or services...">
+                    <input type="text" name="q" value="{{ $search }}" placeholder="Search categories or services...">
                 </div>
                 <button type="submit" class="ec-find">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -342,18 +345,29 @@
     {{-- ══════════════ EXPLORE BY CATEGORY — FILTER BAR ══════════════ --}}
     <section class="ec-filterbar">
         <div class="lp-container">
+            {{-- Both selects scope the browser below by slug. The subcategory list
+                 holds every descendant of every root, tagged with its root so the
+                 script can narrow it to the chosen category instead of offering
+                 311 options at once. --}}
             <div class="ec-fb-selects">
-                <select class="ec-select" id="ecCatSelect" aria-label="Category" onchange="ecCategoryJump(this)">
+                <select class="ec-select" id="ecCatSelect" aria-label="Category">
                     <option value="">All categories</option>
                     @foreach($cats as $cat)
-                        <option value="{{ $cat->name }}">{{ Str::title($cat->name) }}</option>
+                        <option value="{{ $cat->slug }}" @selected($branch && $branch->id === $cat->id)>{{ Str::title($cat->name) }}</option>
                     @endforeach
                 </select>
-                <select class="ec-select" id="ecSubSelect" aria-label="Subcategory" onchange="ecCategoryJump(this)">
+                <select class="ec-select" id="ecSubSelect" aria-label="Subcategory">
                     <option value="">All subcategories</option>
                     @foreach($cats as $cat)
-                        @foreach(($cat->allChildren ?? collect()) as $child)
-                            <option value="{{ $child->name }}">{{ Str::title($child->name) }}</option>
+                        @php
+                            $flatten = function ($node) use (&$flatten) {
+                                return ($node->allChildren ?? collect())
+                                    ->flatMap(fn ($k) => collect([$k])->merge($flatten($k)));
+                            };
+                        @endphp
+                        @foreach($flatten($cat) as $desc)
+                            <option value="{{ $desc->slug }}" data-root="{{ $cat->slug }}"
+                                    @selected($branch && $branch->id === $desc->id)>{{ Str::title($desc->name) }}</option>
                         @endforeach
                     @endforeach
                 </select>
@@ -389,7 +403,7 @@
             <div class="ec-shop">
                 {{-- LEFT: search · full category tree · quick stats --}}
                 <aside class="ec-shop-left">
-                    <form class="ec-side-search" method="GET" action="{{ route('events-categories') }}#ec-browse">
+                    <form class="ec-side-search" method="GET" action="{{ route('events-categories') }}#ec-browse" data-ec-filter>
                         {{-- Always present, blank when unscoped: the AJAX pager keeps this in
                              sync with the URL so a search after a drill-in stays in that branch.
                              The submit handler drops empty params. --}}
@@ -597,17 +611,48 @@
         });
     }
 
-    // The sidebar lives outside the swapped region, so its form has to be
-    // re-pointed at the new URL by hand — otherwise searching after a drill-in
-    // would post a stale (or missing) branch and silently widen the results.
-    function syncSidebarForm(url) {
-        var form = document.querySelector('.ec-side-search');
-        if (!form) return;
+    // The hero search, the filter-bar selects and the sidebar form all live
+    // OUTSIDE the swapped region, so each has to be re-pointed at the new URL
+    // by hand — otherwise searching after a drill-in would post a stale (or
+    // missing) branch and silently widen the results.
+    function syncControls(url) {
         var params = new URL(url, location.origin).searchParams;
-        var hidden = form.querySelector('input[name="in"]');
-        var q      = form.querySelector('input[name="q"]');
-        if (hidden) hidden.value = params.get('in') || '';
-        if (q) q.value = params.get('q') || '';
+        var inSlug = params.get('in') || '';
+        var q      = params.get('q') || '';
+
+        document.querySelectorAll('[data-ec-filter]').forEach(function (form) {
+            var hidden = form.querySelector('input[name="in"]');
+            var box    = form.querySelector('input[name="q"]');
+            if (hidden) hidden.value = inSlug;
+            if (box) box.value = q;
+        });
+
+        // A slug can be a root or any descendant, so try both selects and let
+        // the other fall back to "All".
+        var catSel = document.getElementById('ecCatSelect');
+        var subSel = document.getElementById('ecSubSelect');
+        if (catSel && subSel) {
+            var asSub  = subSel.querySelector('option[value="' + inSlug + '"]');
+            var asRoot = catSel.querySelector('option[value="' + inSlug + '"]');
+            catSel.value = asSub ? (asSub.getAttribute('data-root') || '') : (asRoot ? inSlug : '');
+            subSel.value = asSub ? inSlug : '';
+            narrowSubSelect();
+        }
+    }
+
+    // "All subcategories" holds every descendant of every root. Show only the
+    // ones under the chosen category so the list stays usable.
+    function narrowSubSelect() {
+        var catSel = document.getElementById('ecCatSelect');
+        var subSel = document.getElementById('ecSubSelect');
+        if (!catSel || !subSel) return;
+        var root = catSel.value;
+        subSel.querySelectorAll('option[data-root]').forEach(function (opt) {
+            opt.hidden = root !== '' && opt.getAttribute('data-root') !== root;
+        });
+        // Drop a selection that the new category doesn't contain.
+        var current = subSel.selectedOptions[0];
+        if (current && current.hidden) subSel.value = '';
     }
 
     function markActiveTree(url) {
@@ -656,7 +701,7 @@
                 if (showing && target) target.textContent = showing.textContent;
 
                 markActiveTree(url);
-                syncSidebarForm(url);
+                syncControls(url);
                 animateCards();
 
                 if (push) history.pushState({ ecUrl: url }, '', url);
@@ -687,18 +732,45 @@
         load(a.href, true);
     });
 
-    // The sidebar search submits through the same path.
-    var searchForm = document.querySelector('.ec-side-search');
-    if (searchForm && results) {
-        searchForm.addEventListener('submit', function (e) {
+    // Both search forms — the hero one and the sidebar one — submit through the
+    // same path. They post ?q= (+ ?in= when scoped) to this very page.
+    document.querySelectorAll('[data-ec-filter]').forEach(function (form) {
+        if (!results) return;
+        form.addEventListener('submit', function (e) {
             e.preventDefault();
-            var params = new URLSearchParams(new FormData(searchForm));
+            var params = new URLSearchParams(new FormData(form));
             // Drop empties so a cleared box doesn't leave ?q= behind.
             [...params.keys()].forEach(function (k) { if (!params.get(k)) params.delete(k); });
             var qs = params.toString();
-            load(searchForm.action.split('#')[0] + (qs ? '?' + qs : '') + '#ec-browse', true);
+            load(form.action.split('#')[0] + (qs ? '?' + qs : '') + '#ec-browse', true);
+        });
+    });
+
+    // Filter-bar selects scope the grid. Choosing a category narrows the
+    // subcategory list first, then loads; clearing one widens back out.
+    var catSel = document.getElementById('ecCatSelect');
+    var subSel = document.getElementById('ecSubSelect');
+    function scopeTo(slug) {
+        var params = new URLSearchParams();
+        if (slug) params.set('in', slug);
+        var box = document.querySelector('[data-ec-filter] input[name="q"]');
+        if (box && box.value) params.set('q', box.value);
+        var qs = params.toString();
+        load('{{ route('events-categories') }}' + (qs ? '?' + qs : '') + '#ec-browse', true);
+    }
+    if (catSel && results) {
+        catSel.addEventListener('change', function () {
+            narrowSubSelect();
+            scopeTo(catSel.value);
         });
     }
+    if (subSel && results) {
+        subSel.addEventListener('change', function () {
+            // Falling back to "All subcategories" returns to the parent category.
+            scopeTo(subSel.value || (catSel ? catSel.value : ''));
+        });
+    }
+    narrowSubSelect();
 
     // Back/forward through the AJAX history.
     window.addEventListener('popstate', function (e) {
@@ -739,14 +811,6 @@
             card.classList.toggle('ec-hide', !show);
         });
     }
-
-    // Expose category-jump used by the filter-bar selects.
-    window.ecCategoryJump = function (sel) {
-        var val = sel.value;
-        if (!val) { return; }
-        var url = browseBase + '?q=' + encodeURIComponent(val);
-        window.location.href = url;
-    };
 })();
 </script>
 @endpush
