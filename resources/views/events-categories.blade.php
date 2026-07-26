@@ -45,11 +45,6 @@
                 'slug'  => $c->slug,
             ];
         });
-
-    // "Popular Event Types" = real top-level categories with imagery.
-    $eventTypes = $cats->filter(fn ($c) => (bool) $c->thumbnail)
-        ->take(6)->values()
-        ->map(fn ($c) => ['name' => $c->name, 'image' => $thumbUrl($c), 'slug' => $c->slug]);
 @endphp
 
 @push('styles')
@@ -258,22 +253,6 @@
     .ec-ts-price b { color: var(--blue); }
     .ec-ts.ec-hide { display: none; }
 
-    /* ── POPULAR EVENT TYPES ───────────────────────────── */
-    .ec-et-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-    .ec-et { position: relative; height: 200px; border-radius: 18px; overflow: hidden;
-        text-decoration: none; display: block; box-shadow: 0 12px 28px -20px rgba(15,27,53,.5); }
-    .ec-et img { width: 100%; height: 100%; object-fit: cover; object-position: center 68%; transition: transform .45s; }
-    .ec-et:hover img { transform: scale(1.06); }
-    .ec-et-ov { position: absolute; inset: 0; padding: 22px; display: flex; align-items: flex-end;
-        justify-content: space-between; gap: 12px;
-        background: linear-gradient(180deg, rgba(15,27,53,0) 32%, rgba(15,27,53,.85) 100%); }
-    .ec-et-ov h3 { color: #fff; font-size: 18px; font-weight: 800; }
-    .ec-et-ov span { color: rgba(255,255,255,.85); font-size: 12.5px; }
-    .ec-et-arrow { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
-        background: linear-gradient(135deg, var(--blue-light, var(--blue)), var(--blue-dark, var(--blue)));
-        display: flex; align-items: center; justify-content: center; }
-    .ec-et-arrow svg { width: 16px; height: 16px; color: #fff; }
-
     /* ── CTA ───────────────────────────────────────────── */
     .ec-cta { margin: 8px 0 0; border-radius: 20px; padding: 34px; position: relative; overflow: hidden;
         background: linear-gradient(120deg, #eaf1ff, #f4f7ff); border: 1px solid var(--line);
@@ -299,14 +278,12 @@
         .ec-shop { grid-template-columns: 1fr; }
         .ec-shop-left { position: static; }
         .ec-tree { max-height: 300px; }
-        .ec-et-grid { grid-template-columns: repeat(2, 1fr); }
         .ec-fb-chips { margin-left: 0; }
     }
     @media (max-width: 720px) {
         .ec-h1 { font-size: 30px; }
         .ec-grid { grid-template-columns: 1fr; }
         .ec-ts-grid { grid-template-columns: repeat(2, 1fr); }
-        .ec-et-grid { grid-template-columns: 1fr; }
         .ec-search { border-radius: 18px; }
     }
 </style>
@@ -501,35 +478,6 @@
                             <h3>{{ $svc['name'] }}</h3>
                             <div class="ec-ts-sub">{{ $svc['sub'] }}</div>
                             <div class="ec-ts-price"><span>from</span> <b>${{ number_format($svc['from']) }}</b></div>
-                        </div>
-                    </a>
-                @endforeach
-            </div>
-        </div>
-    </section>
-
-    {{-- ══════════════ POPULAR EVENT TYPES ══════════════ --}}
-    <section class="ec-section">
-        <div class="lp-container">
-            <div class="ec-shead">
-                <div>
-                    <h2>Popular <span class="b">Event Types</span></h2>
-                    <p>Find professionals for every kind of occasion.</p>
-                </div>
-            </div>
-
-            <div class="ec-et-grid">
-                @foreach($eventTypes as $et)
-                    <a class="ec-et" href="{{ route('public.category', $et['slug']) }}">
-                        <img loading="lazy" src="{{ $et['image'] }}" alt="{{ $et['name'] }}">
-                        <div class="ec-et-ov">
-                            <div>
-                                <h3>{{ $et['name'] }}</h3>
-                                <span>Browse specialists</span>
-                            </div>
-                            <span class="ec-et-arrow">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                            </span>
                         </div>
                     </a>
                 @endforeach
