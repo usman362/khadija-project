@@ -384,7 +384,8 @@
                              The submit handler drops empty params. --}}
                         <input type="hidden" name="in" value="{{ $branch?->slug }}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                        <input type="search" name="q" value="{{ $search }}" placeholder="Search categories…" aria-label="Search categories">
+                        <input type="search" name="q" value="{{ $search }}" placeholder="Type 3+ letters to search…"
+                               aria-label="Search categories" autocomplete="off">
                     </form>
 
                     <div class="ec-side-title">Categories</div>
@@ -597,7 +598,10 @@
             var hidden = form.querySelector('input[name="in"]');
             var box    = form.querySelector('input[name="q"]');
             if (hidden) hidden.value = inSlug;
-            if (box) box.value = q;
+            // Never rewrite the box the visitor is typing in — live search fires
+            // mid-word, and a landing response would otherwise yank the caret
+            // back to whatever the request was issued for.
+            if (box && box !== document.activeElement) box.value = q;
         });
 
         // A slug can be a root or any descendant, so try both selects and let
@@ -649,8 +653,17 @@
         }
     }
 
-    function load(url, push) {
+    /**
+     * opts.history — 'push' (default) writes a history entry, 'replace' updates
+     *   the current one, false leaves history alone. Live search replaces, so
+     *   typing "photography" doesn't bury the previous view under 9 entries.
+     * opts.scroll  — false keeps the viewport still; live search must not yank
+     *   the page while the visitor is typing in the sidebar.
+     */
+    function load(url, opts) {
         if (!results || !pager) return;
+        opts = opts || {};
+        var mode = 'history' in opts ? opts.history : 'push';
         var mine = ++token;
         results.setAttribute('aria-busy', 'true');
 
@@ -677,8 +690,10 @@
                 syncControls(url);
                 animateCards();
 
-                if (push) history.pushState({ ecUrl: url }, '', url);
-                if (shead) {
+                if (mode === 'replace') history.replaceState({ ecUrl: url }, '', url);
+                else if (mode) history.pushState({ ecUrl: url }, '', url);
+
+                if (shead && opts.scroll !== false) {
                     var top = shead.getBoundingClientRect().top + window.scrollY - 16;
                     if (window.scrollY > top) window.scrollTo({ top: top, behavior: 'smooth' });
                 }
@@ -702,7 +717,7 @@
         var href = a.getAttribute('href') || '';
         if (href.indexOf('/events-categories') === -1) return;
         e.preventDefault();
-        load(a.href, true);
+        load(a.href);
     });
 
     // Both search forms — the hero one and the sidebar one — submit through the
@@ -715,9 +730,53 @@
             // Drop empties so a cleared box doesn't leave ?q= behind.
             [...params.keys()].forEach(function (k) { if (!params.get(k)) params.delete(k); });
             var qs = params.toString();
-            load(form.action.split('#')[0] + (qs ? '?' + qs : '') + '#ec-browse', true);
+            load(form.action.split('#')[0] + (qs ? '?' + qs : '') + '#ec-browse');
         });
     });
+
+    // ── Sidebar search runs live ──────────────────────────────────────
+    // Enter still works; it just isn't required. One or two characters match
+    // most of the 360 names, so the query only fires from three — clearing the
+    // box counts as a reset and fires immediately.
+    var LIVE_MIN = 3;
+    var sideForm = document.querySelector('.ec-side-search');
+    var sideBox  = sideForm && sideForm.querySelector('input[name="q"]');
+    if (sideBox && results) {
+        var liveTimer = null;
+        // Seed with the URL we rendered from, so the first keystroke on an
+        // unfiltered page doesn't fire a request for the state we're already in.
+        var lastLive = location.href;
+
+        var runLive = function (term) {
+            var params = new URLSearchParams(new FormData(sideForm));
+            params.set('q', term);
+            [...params.keys()].forEach(function (k) { if (!params.get(k)) params.delete(k); });
+            var qs  = params.toString();
+            var url = sideForm.action.split('#')[0] + (qs ? '?' + qs : '') + '#ec-browse';
+            if (url.split('#')[0] === lastLive.split('#')[0]) return;   // nothing actually changed
+            lastLive = url;
+            // Replace rather than push: typing "photography" would otherwise
+            // bury the previous view under nine history entries. Don't scroll —
+            // the visitor is mid-word in the sidebar.
+            load(url, { history: 'replace', scroll: false });
+        };
+
+        sideBox.addEventListener('input', function () {
+            clearTimeout(liveTimer);
+            var v = sideBox.value.trim();
+            // Under three characters there is no query — show everything rather
+            // than leave stale results contradicting what the box says.
+            var term = v.length >= LIVE_MIN ? v : '';
+            liveTimer = setTimeout(function () { runLive(term); }, 300);
+        });
+
+        // Enter submits through the shared handler — drop the pending timer so
+        // the same query doesn't run twice.
+        sideForm.addEventListener('submit', function () {
+            clearTimeout(liveTimer);
+            lastLive = '';
+        });
+    }
 
     // Filter-bar selects scope the grid. Choosing a category narrows the
     // subcategory list first, then loads; clearing one widens back out.
@@ -729,7 +788,7 @@
         var box = document.querySelector('[data-ec-filter] input[name="q"]');
         if (box && box.value) params.set('q', box.value);
         var qs = params.toString();
-        load('{{ route('events-categories') }}' + (qs ? '?' + qs : '') + '#ec-browse', true);
+        load('{{ route('events-categories') }}' + (qs ? '?' + qs : '') + '#ec-browse');
     }
     if (catSel && results) {
         catSel.addEventListener('change', function () {
@@ -747,7 +806,7 @@
 
     // Back/forward through the AJAX history.
     window.addEventListener('popstate', function (e) {
-        if (e.state && e.state.ecUrl) load(e.state.ecUrl, false);
+        if (e.state && e.state.ecUrl) load(e.state.ecUrl, { history: false });
     });
 
     // Shop-by-category tabs: visual toggle only.
