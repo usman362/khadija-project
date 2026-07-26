@@ -228,10 +228,14 @@
         #ecResults[aria-busy="true"]::after { animation: none; }
     }
 
-    /* The shared paginator is styled for the dark dashboard — repaint it for
-       the light public theme without touching the partial itself. */
-    .ec-pag { margin-top: 4px; }
-    .ec-pag .grpag { margin: 0; }
+    /* The shared paginator is a centred column built for the dark dashboard.
+       Here it reads as a toolbar under the grid — count on the left, pages on
+       the right — repainted for the light theme. The partial itself is left
+       alone; every rule below is scoped to .ec-pag. */
+    .ec-pag { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+    .ec-pag .grpag { margin: 0; flex-direction: row; align-items: center;
+        justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+    .ec-pag .grpag-list { justify-content: flex-end; margin-left: auto; }
     .ec-pag .grpag-info { color: var(--muted); }
     .ec-pag .grpag-info strong { color: var(--ink); }
     .ec-pag .grpag-item > a, .ec-pag .grpag-item > span {
@@ -305,6 +309,10 @@
         .ec-grid { grid-template-columns: 1fr; }
         .ec-ts-grid { grid-template-columns: repeat(2, 1fr); }
         .ec-search { border-radius: 18px; }
+        /* Too narrow for a toolbar — stack the count over the pages rather
+           than pinning them to opposite edges. */
+        .ec-pag .grpag { flex-direction: column; align-items: center; gap: 10px; }
+        .ec-pag .grpag-list { justify-content: center; margin-left: 0; }
     }
 </style>
 @endpush
