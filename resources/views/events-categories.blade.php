@@ -19,7 +19,15 @@
 
     // Real category image (cover/thumbnail) → full URL, or a neutral fallback.
     $fallbackImg = 'https://images.unsplash.com/photo-1519741497674-611481863552?w=900&q=80&auto=format&fit=crop';
-    $imgUrl = function ($c) use ($fallbackImg) {
+    // Two shapes of asset live on a category: a square photo thumbnail and a
+    // wide promo banner with the name baked in. Small cards must use the
+    // thumbnail — a banner shrunk to 150px reads as a shouty graphic — and only
+    // the big feature card should reach for the banner.
+    $thumbUrl = function ($c) use ($fallbackImg) {
+        $f = $c->thumbnail ?? null;
+        return $f ? asset('storage/' . $f) : $fallbackImg;
+    };
+    $coverUrl = function ($c) use ($fallbackImg) {
         $f = ($c->cover_image ?? null) ?: ($c->thumbnail ?? null);
         return $f ? asset('storage/' . $f) : $fallbackImg;
     };
@@ -28,15 +36,22 @@
     // REPRESENTATIVE starting points ("from $X"), not guarantees.
     $svcBadges = [['POPULAR', 'o', 'featured'], ['FEATURED', 'b', 'featured'], ['HOT', 'h', 'hot'], ['NEW', 'n', 'new']];
     $svcPrices = [450, 180, 600, 800, 350, 120, 140, 200];
-    $topServices = $cats->flatMap(fn ($c) => $c->allChildren ?? collect())
-        ->filter(fn ($c) => ($c->thumbnail || $c->cover_image))
+    // The level-2 service groups only ever had wide banner art, so pull the
+    // leaf services instead — they carry real square thumbnails and read more
+    // specifically ("DJs Services" beats "Entertainment & Activities" here).
+    $topServices = \App\Models\Category::query()
+        ->whereNotNull('parent_id')
+        ->whereNotNull('thumbnail')
+        ->where('is_active', true)
+        ->orderBy('sort_order')->orderBy('name')
+        ->limit(24)->get()
         ->unique('name')
         ->take(8)->values()
-        ->map(function ($c, $i) use ($imgUrl, $svcBadges, $svcPrices) {
+        ->map(function ($c, $i) use ($thumbUrl, $svcBadges, $svcPrices) {
             [$badge, $badgeClass, $group] = $svcBadges[$i % count($svcBadges)];
             return [
                 'name'  => $c->name,
-                'image' => $imgUrl($c),
+                'image' => $thumbUrl($c),
                 'badge' => $badge, 'badgeClass' => $badgeClass, 'group' => $group,
                 'sub'   => Str::limit(strip_tags((string) $c->short_description), 42) ?: 'Browse specialists',
                 'from'  => $svcPrices[$i % count($svcPrices)],
@@ -45,9 +60,9 @@
         });
 
     // "Popular Event Types" = real top-level categories with imagery.
-    $eventTypes = $cats->filter(fn ($c) => ($c->thumbnail || $c->cover_image))
+    $eventTypes = $cats->filter(fn ($c) => (bool) $c->thumbnail)
         ->take(6)->values()
-        ->map(fn ($c) => ['name' => $c->name, 'image' => $imgUrl($c), 'slug' => $c->slug]);
+        ->map(fn ($c) => ['name' => $c->name, 'image' => $thumbUrl($c), 'slug' => $c->slug]);
 @endphp
 
 @push('styles')
@@ -355,7 +370,7 @@
 
                             {{-- BIG feature card = first real category --}}
                             <a class="ec-fcard" href="{{ route('public.category', $first->slug) }}"
-                               style="--x:0" data-bg="{{ $imgUrl($first) }}">
+                               style="--x:0" data-bg="{{ $coverUrl($first) }}">
                                 <span class="ec-fcard-badge">Featured</span>
                                 <h3>{{ Str::title($first->name) }}</h3>
                                 @php $firstCount = $descCount($first); @endphp
@@ -370,7 +385,7 @@
                             @foreach($rest as $j => $cat)
                                 @php $scount = $descCount($cat); @endphp
                                 <a class="ec-scard" href="{{ route('public.category', $cat->slug) }}">
-                                    <div class="ec-scard-img" style="background-image:url('{{ $imgUrl($cat) }}')"></div>
+                                    <div class="ec-scard-img" style="background-image:url('{{ $thumbUrl($cat) }}')"></div>
                                     <div class="ec-scard-body">
                                         <div class="ec-scard-name">{{ Str::title($cat->name) }}</div>
                                         <div class="ec-scard-meta">
