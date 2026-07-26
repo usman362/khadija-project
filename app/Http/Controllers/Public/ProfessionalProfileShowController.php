@@ -30,6 +30,8 @@ class ProfessionalProfileShowController extends Controller
         // Keeps random non-pro account IDs from being crawled as "pros".
         abort_unless($user->hasRole(RoleName::SUPPLIER->value), 404);
 
+        $this->rememberView($request, $user);
+
         $profile = $user->getOrCreateProfile();
         $stats   = $user->reviewStats();
 
@@ -76,5 +78,28 @@ class ProfessionalProfileShowController extends Controller
             'isFullyVerified'  => $isFullyVerified,
             'badges'           => UserProfile::BADGES,
         ]);
+    }
+
+    /** How many profiles the "Recently Viewed" rail on /browse remembers. */
+    public const RECENT_LIMIT = 6;
+
+    /** Session key holding the visitor's recently-viewed professional ids. */
+    public const RECENT_KEY = 'recently_viewed_pros';
+
+    /**
+     * Push this pro to the front of the visitor's recently-viewed list. The
+     * /browse rail used to fill that card with whatever the first three search
+     * results happened to be, which was not "recently viewed" by any reading.
+     */
+    private function rememberView(Request $request, User $user): void
+    {
+        $seen = collect($request->session()->get(self::RECENT_KEY, []))
+            ->reject(fn ($id) => (int) $id === $user->id)
+            ->prepend($user->id)
+            ->take(self::RECENT_LIMIT)
+            ->values()
+            ->all();
+
+        $request->session()->put(self::RECENT_KEY, $seen);
     }
 }

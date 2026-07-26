@@ -14,21 +14,6 @@
     $sortF   = $f['sort'] ?? 'top';
     $total   = method_exists($pros, 'total') ? $pros->total() : $pros->count();
 
-    // Trending "vibe" presets — each pre-populates the keyword search.
-    $vibes = [
-        ['Luxury Weddings',  'Fine dining, string quartets, drone photo',   'photo-1519741497674-611481863552', 'wedding'],
-        ['Corporate Tech',   'Conference A/V, livestreaming, planners',     'photo-1505373877841-8d25f7d46678', 'corporate'],
-        ['Neon Birthdays',   'Party DJs, photo booths, balloon backdrops',  'photo-1530103862676-de8c9debad1d', 'birthday'],
-        ['Boho Baby Showers','Themed decor, pastry chefs, lifestyle photo', 'photo-1515488042361-ee00e0ddd4e4', 'baby shower'],
-        ['Destination Events','Travel planners, local vendors, decor',      'photo-1469371670807-013ccf25f16a', 'destination'],
-        ['Holiday Parties',  'Catering, DJs, lighting & entertainment',     'photo-1511578314322-379afb476865', 'holiday'],
-    ];
-
-    // Representative gallery fallbacks (used when a pro has no portfolio images).
-    $stockGallery = [
-        'photo-1519741497674-611481863552','photo-1465495976277-4387d4b0b4c6',
-        'photo-1511578314322-379afb476865','photo-1511578314322-379afb476865',
-    ];
 @endphp
 
 @section('content')
@@ -173,19 +158,24 @@
     .br-rail-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--line-soft); font-size: 13px; font-weight: 800; color: var(--ink); }
     .br-rail-head svg { width: 15px; height: 15px; color: var(--blue); }
     .br-rail-head a { font-size: 11.5px; font-weight: 700; color: var(--blue); text-decoration: none; }
-    .br-map { position: relative; height: 170px; background: #eef3fb; }
-    .br-map-fallback { position: absolute; inset: 0; background:
-        repeating-linear-gradient(0deg, var(--line-soft) 0 1px, transparent 1px 28px),
-        repeating-linear-gradient(90deg, var(--line-soft) 0 1px, transparent 1px 28px); }
-    .br-map-pin { position: absolute; width: 22px; height: 22px; border-radius: 50% 50% 50% 0; background: var(--blue); transform: rotate(-45deg); box-shadow: 0 4px 10px rgba(37,99,235,.4); }
-    .br-map-cluster { position: absolute; left: 50%; top: 48%; transform: translate(-50%,-50%); background: var(--orange); color: #fff; font-weight: 800; font-size: 13px; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #fff; box-shadow: 0 6px 16px rgba(249,115,22,.5); z-index: 2; }
-    .br-mini { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--line-soft); }
-    .br-mini:last-of-type { border-bottom: none; }
-    .br-mini-av { width: 34px; height: 34px; border-radius: 9px; object-fit: cover; flex-shrink: 0; }
-    .br-mini-main { min-width: 0; flex: 1; }
-    .br-mini-main h5 { font-size: 12.5px; font-weight: 800; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .br-mini-main span { font-size: 11px; color: var(--muted); }
-    .br-mini-rate { font-size: 11.5px; font-weight: 800; color: var(--blue); flex-shrink: 0; }
+    /* "Where they are" — a real city breakdown over the filtered result set,
+       in place of a decorative map with four fixed pins. */
+    .br-loc { padding: 6px 0; }
+    .br-loc-row { display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        padding: 9px 14px; text-decoration: none; transition: background .12s; }
+    .br-loc-row:hover { background: var(--bg-soft-2, #eef2f8); }
+    .br-loc-row.is-active { background: rgba(37,99,235,.09); box-shadow: inset 2px 0 0 var(--blue); }
+    .br-loc-name { font-size: 13px; font-weight: 600; color: var(--ink-2); overflow: hidden;
+        text-overflow: ellipsis; white-space: nowrap; }
+    .br-loc-row.is-active .br-loc-name { color: var(--blue); font-weight: 800; }
+    .br-loc-count { flex-shrink: 0; font-size: 11.5px; font-weight: 800; color: var(--ink-2);
+        background: var(--bg-soft-2, #eef2f8); border-radius: 999px; padding: 3px 9px; min-width: 26px; text-align: center; }
+    .br-loc-row.is-active .br-loc-count { background: var(--blue); color: #fff; }
+    .br-loc-clear { display: block; padding: 9px 14px 4px; font-size: 12px; font-weight: 700;
+        color: var(--blue); text-decoration: none; }
+    .br-loc-clear:hover { text-decoration: underline; }
+
+    .br-vibe.is-active { outline: 3px solid var(--blue); outline-offset: -3px; }
     .br-rail-btn { display: block; margin: 10px 14px 14px; text-align: center; border-radius: 10px; padding: 9px; font-size: 12.5px; font-weight: 800; text-decoration: none; }
     .br-rail-btn.blue { background: linear-gradient(135deg, var(--blue), var(--blue-dark)); color: #fff; }
     .br-recent { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 12px 14px; }
@@ -272,20 +262,33 @@
         </div>
     </section>
 
-    {{-- ══════════════ TRENDING VIBES ══════════════ --}}
+    {{-- ══════════════ BUSIEST CATEGORIES ══════════════ --}}
+    {{-- Real categories that have professionals behind them, with their own
+         artwork and live counts. Each filters this page by the pro↔category
+         relation. This row used to be six hard-coded "vibes" pointing Unsplash
+         photos at keyword guesses. --}}
+    @if($trending->isNotEmpty())
     <section class="br-vibes">
         <div class="lp-container">
-            <p class="br-vibes-cap">Stuck on planning? Tap a <a href="#">trending vibe</a> to auto-populate your search filters.</p>
+            <p class="br-vibes-cap">Not sure where to start? Tap a category — these are the ones with the most professionals right now.</p>
             <div class="br-vibe-scroll">
-                @foreach($vibes as [$vName, $vSub, $vImg, $vQuery])
-                    <a class="br-vibe" href="{{ route('public.browse', ['q' => $vQuery]) }}">
-                        <img src="https://images.unsplash.com/{{ $vImg }}?w=420&q=70&auto=format&fit=crop" alt="{{ $vName }}" loading="lazy">
-                        <span class="br-vibe-ov"><h4>{{ $vName }}</h4><span>{{ $vSub }}</span></span>
+                @foreach($trending as $tc)
+                    <a class="br-vibe {{ ($f['category'] ?? null) === $tc->slug ? 'is-active' : '' }}"
+                       href="{{ route('public.browse', ['category' => $tc->slug]) }}">
+                        <img src="{{ asset('storage/' . $tc->thumbnail) }}" alt="{{ $tc->name }}" loading="lazy">
+                        {{-- Count only. The artwork already carries the service name,
+                             so a description here just stacked three lines of text
+                             over the image. --}}
+                        <span class="br-vibe-ov">
+                            <h4>{{ Str::title($tc->name) }}</h4>
+                            <span>{{ $tc->pros_count }} {{ Str::plural('professional', $tc->pros_count) }}</span>
+                        </span>
                     </a>
                 @endforeach
             </div>
         </div>
     </section>
+    @endif
 
     {{-- ══════════════ MAIN ══════════════ --}}
     <div class="lp-container">
@@ -378,15 +381,21 @@
                         $isTop = $avg >= 4.5 && $cnt > 0;
                         $gallery = collect($p ? $p->portfolioHeroUrls(4) : []);
                         $rate = $p?->hourly_rate;
-                        $heroImg = $gallery->first() ?: 'https://images.unsplash.com/'.$stockGallery[$i % count($stockGallery)].'?w=560&q=72&auto=format&fit=crop';
-                    @endphp
-                    @php
-                        $bg = $gallery->isNotEmpty()
-                            ? $gallery
-                            : collect($stockGallery)->map(fn ($id) => 'https://images.unsplash.com/'.$id.'?w=560&q=72&auto=format&fit=crop');
+
+                        // No portfolio yet? Fall back to the artwork of the services this
+                        // pro actually offers, so an empty card still shows something true
+                        // about them instead of a rotating stock photo.
+                        $bg = $gallery->isNotEmpty() ? $gallery : $pro->serviceCategories
+                            ->filter(fn ($c) => $c->thumbnail)
+                            ->unique('name')
+                            ->take(4)
+                            ->map(fn ($c) => asset('storage/' . $c->thumbnail))
+                            ->values();
                         $bg = $bg->take(4)->values();
+                        $heroImg = $bg->first();
                         $skillsB = is_array($p?->skills) ? array_values(array_filter($p->skills)) : [];
-                        $catB = $skillsB[0] ?? ($p?->industry ?: 'Event Pro');
+                        // Prefer a real service the pro signed up for over free-text skills.
+                        $catB = $pro->serviceCategories->first()?->name ?: ($skillsB[0] ?? ($p?->industry ?: 'Event Pro'));
                     @endphp
                     <article class="br-card br-pro">
                         <div class="br-pro-media">
@@ -480,42 +489,55 @@
 
             {{-- ── RIGHT: RAIL ── --}}
             <aside class="br-rail">
+                {{-- Where the matching pros actually are. This replaced a
+                     decorative map whose four pins sat at fixed CSS percentages
+                     and whose cluster badge just echoed the result count — it
+                     showed the same picture for every search. Counts cover the
+                     whole filtered set, not just this page. --}}
+                @if($locationCounts->isNotEmpty())
                 <div class="br-rail-card">
-                    <div class="br-rail-head"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Venue / Location Map</span></div>
-                    <div class="br-map">
-                        <div class="br-map-fallback"></div>
-                        <span class="br-map-pin" style="left:24%;top:30%;"></span>
-                        <span class="br-map-pin" style="left:70%;top:38%;"></span>
-                        <span class="br-map-pin" style="left:38%;top:66%;"></span>
-                        <span class="br-map-pin" style="left:78%;top:70%;"></span>
-                        <span class="br-map-cluster">{{ min($total, 99) }}</span>
+                    <div class="br-rail-head"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:5px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Where they are</span></div>
+                    <div class="br-loc">
+                        @foreach($locationCounts as $locCity => $locCount)
+                            {{-- array_merge, not `+`: the union operator keeps the LEFT
+                                 value on a duplicate key, so $f's empty 'city' would win
+                                 and the link would drop the filter it exists to apply. --}}
+                            <a class="br-loc-row {{ $cityF === $locCity ? 'is-active' : '' }}"
+                               href="{{ route('public.browse', array_filter(array_merge($f, ['city' => $locCity]))) }}">
+                                <span class="br-loc-name">{{ $locCity }}</span>
+                                <span class="br-loc-count">{{ $locCount }}</span>
+                            </a>
+                        @endforeach
+                        @if($cityF)
+                            <a class="br-loc-clear" href="{{ route('public.browse', array_filter(array_diff_key($f, ['city' => 1]))) }}">Clear city filter</a>
+                        @endif
                     </div>
                 </div>
+                @endif
 
-                <div class="br-rail-card">
-                    <div class="br-rail-head"><span>Compare Pros</span><a href="#">Clear All</a></div>
-                    @foreach($pros->take(2) as $cp)
-                        <div class="br-mini">
-                            <img class="br-mini-av" src="{{ $cp->avatar_url }}" alt="">
-                            <div class="br-mini-main"><h5>{{ $cp->name }}</h5><span>{{ $cp->profile?->city ?? '—' }}</span></div>
-                            <span class="br-mini-rate">{{ $cp->profile?->hourly_rate ? '$'.number_format($cp->profile->hourly_rate) : '—' }}</span>
-                        </div>
-                    @endforeach
-                    <a href="#" class="br-rail-btn blue">Compare Now</a>
-                </div>
+                {{-- A "Compare Pros" card used to sit here listing the first two
+                     search results, with "Clear All" and "Compare Now" both
+                     pointing at href="#". There is no compare feature, so the
+                     card was removed rather than left as decoration.
 
+                     Recently Viewed is now genuinely recent: profile views are
+                     recorded in the session, newest first, and the card hides
+                     itself until the visitor has opened one. It used to show
+                     the first three search results regardless. --}}
+                @if($recentPros->isNotEmpty())
                 <div class="br-rail-card">
                     <div class="br-rail-head"><span>Recently Viewed</span></div>
                     <div class="br-recent">
-                        @foreach($pros->take(3) as $rv)
+                        @foreach($recentPros->take(3) as $rv)
                             @php $rvImg = collect(is_array($rv->profile?->portfolio) ? $rv->profile->portfolio : [])->first(); @endphp
                             <a href="{{ route('public.professional.show', $rv) }}">
-                                <img src="{{ $rvImg ?: 'https://images.unsplash.com/'.$stockGallery[$loop->index % count($stockGallery)].'?w=200&q=60&auto=format&fit=crop' }}" alt="">
+                                <img src="{{ $rvImg ?: $rv->avatar_url }}" alt="{{ $rv->name }}">
                                 <span>{{ $rv->name }}</span>
                             </a>
                         @endforeach
                     </div>
                 </div>
+                @endif
             </aside>
         </div>
 

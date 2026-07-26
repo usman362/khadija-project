@@ -11,6 +11,7 @@ use App\Models\UserProfile;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 /**
@@ -43,7 +44,7 @@ class BrowseProfessionalsController extends Controller
         // hourly rate / verification badges without N+1 queries.
         $query = User::query()
             ->whereHas('roles', fn ($r) => $r->where('name', RoleName::SUPPLIER->value))
-            ->with(['profile']);
+            ->with(['profile', 'serviceCategories:id,name,thumbnail']);
 
         // ── Keyword search across name + profile text fields ──────────
         // skills/portfolio are JSON arrays on UserProfile, so a LIKE on
@@ -137,6 +138,72 @@ class BrowseProfessionalsController extends Controller
             ->limit(40)
             ->pluck('city');
 
+        // ── Trending categories ─────────────────────────────────────
+        // The row above the results used to be six hard-coded "vibes" with
+        // Unsplash photos and keyword guesses. These are real top-level
+        // categories that actually have professionals behind them, carrying
+        // their own artwork, and each one filters this page by the relation.
+        $trending = Category::active()
+            ->whereNull('parent_id')
+            ->whereNotNull('thumbnail')
+            ->withCount(['professionals as pros_count'])
+            ->having('pros_count', '>', 0)
+            ->orderByDesc('pros_count')
+            ->orderBy('name')
+            ->limit(30)
+            ->get(['id', 'name', 'slug', 'thumbnail', 'short_description'])
+            ->unique('name')
+            ->take(6)
+            ->values();
+
+        // Fall back to the busiest categories at any depth when no top-level
+        // one has pros yet — better an honest short row than an empty strip.
+        // Over-fetch and dedupe by name: the legacy tree repeats the same
+        // service under many event types, so the raw top-6 was three copies of
+        // "DJs & Sound Services".
+        if ($trending->isEmpty()) {
+            $trending = Category::active()
+                ->whereNotNull('thumbnail')
+                ->withCount(['professionals as pros_count'])
+                ->having('pros_count', '>', 0)
+                ->orderByDesc('pros_count')
+                ->limit(60)
+                ->get(['id', 'name', 'slug', 'thumbnail', 'short_description'])
+                ->unique('name')
+                ->take(6)
+                ->values();
+        }
+
+        // ── Where these pros are ────────────────────────────────────
+        // Replaces a decorative map whose pins sat at fixed CSS percentages.
+        // Real counts over the current filter, minus paging, so the numbers
+        // describe the whole result set rather than page one.
+        // Counted in two steps rather than one GROUP BY over $query: that query
+        // carries withAvg/withCount subselects and a HAVING on the rating alias,
+        // and grouping on top of them trips only_full_group_by. Materialising
+        // the filtered ids first keeps the counts correct under every filter.
+        $filteredIds = (clone $query)->reorder()->get()->pluck('id');
+
+        $locationCounts = $filteredIds->isEmpty()
+            ? collect()
+            : UserProfile::whereIn('user_id', $filteredIds)
+                ->whereNotNull('city')->where('city', '!=', '')
+                ->select('city', DB::raw('COUNT(*) as total'))
+                ->groupBy('city')
+                ->orderByDesc('total')
+                ->limit(6)
+                ->pluck('total', 'city');
+
+        // ── Recently viewed ─────────────────────────────────────────
+        // Real session history written when a profile is opened, in the order
+        // the visitor actually saw them.
+        $recentIds  = collect($request->session()->get(ProfessionalProfileShowController::RECENT_KEY, []));
+        $recentPros = $recentIds->isEmpty()
+            ? collect()
+            : User::whereIn('id', $recentIds)->with('profile')->get()
+                ->sortBy(fn ($u) => $recentIds->search($u->id))
+                ->values();
+
         return view('public.browse', [
             'pros'       => $pros,
             'categories' => $categories,
@@ -149,7 +216,10 @@ class BrowseProfessionalsController extends Controller
                 'sort'       => $sort,
                 'category'   => $category?->slug,
             ],
-            'activeCategory' => $category,
+            'activeCategory'  => $category,
+            'trending'        => $trending,
+            'locationCounts'  => $locationCounts,
+            'recentPros'      => $recentPros,
             'badges'     => UserProfile::BADGES,
         ]);
     }
