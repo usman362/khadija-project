@@ -145,17 +145,11 @@ Route::view('/design-breakdown', 'design-breakdown')->name('design-breakdown');
 // Internal — custom-design-only spec (28 pages the designer mocks up).
 Route::view('/design-spec-custom', 'design-spec-custom')->name('design-spec-custom');
 
-// Events & Categories — passes live DB categories so the "Explore by category"
-// grid can link directly to /category/{slug} landing pages.
-Route::get('/events-categories', function () {
-    $allCategories = \App\Models\Category::active()
-        ->whereNull('parent_id')
-        ->with('allChildren')
-        ->orderBy('sort_order')
-        ->orderBy('name')
-        ->get();
-    return view('events-categories', compact('allCategories'));
-})->name('events-categories');
+// Events & Categories — the public category browser: full tree down the left,
+// a real paginated card grid on the right, every card linking to its
+// /category/{slug} landing page.
+Route::get('/events-categories', \App\Http\Controllers\Public\EventsCategoriesController::class)
+    ->name('events-categories');
 
 // Per-category landing page — SEO-friendly URL that highlights featured
 // pros and links into /browse for full results.

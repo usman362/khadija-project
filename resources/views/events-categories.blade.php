@@ -9,26 +9,13 @@
     // Real, active parent categories passed from the route (with full subtree).
     $cats = $allCategories ?? collect();
 
-    // Total descendant count across ALL sub-levels (the event roots are thin
-    // chains: root → group → sub-group → services), so direct-child count is
-    // always 1 — we count every descendant to show a meaningful number.
-    $descCount = function ($cat) use (&$descCount) {
-        $kids = $cat->allChildren ?? collect();
-        return $kids->reduce(fn ($carry, $k) => $carry + 1 + $descCount($k), 0);
-    };
-
-    // Real category image (cover/thumbnail) → full URL, or a neutral fallback.
+    // Real category image → full URL, or a neutral fallback. Two shapes of
+    // asset live on a category: a square photo thumbnail and a wide promo
+    // banner with the name baked in. Cards always take the thumbnail — a
+    // banner shrunk into a card reads as a shouty graphic.
     $fallbackImg = 'https://images.unsplash.com/photo-1519741497674-611481863552?w=900&q=80&auto=format&fit=crop';
-    // Two shapes of asset live on a category: a square photo thumbnail and a
-    // wide promo banner with the name baked in. Small cards must use the
-    // thumbnail — a banner shrunk to 150px reads as a shouty graphic — and only
-    // the big feature card should reach for the banner.
     $thumbUrl = function ($c) use ($fallbackImg) {
         $f = $c->thumbnail ?? null;
-        return $f ? asset('storage/' . $f) : $fallbackImg;
-    };
-    $coverUrl = function ($c) use ($fallbackImg) {
-        $f = ($c->cover_image ?? null) ?: ($c->thumbnail ?? null);
         return $f ? asset('storage/' . $f) : $fallbackImg;
     };
 
@@ -132,60 +119,107 @@
         font-size: 12.5px; font-weight: 700; color: var(--ink-2); cursor: pointer; font-family: inherit; transition: all .15s; }
     .ec-tab.active { background: #fff; color: var(--blue); box-shadow: 0 4px 12px -6px rgba(15,27,53,.4); }
 
-    /* ── SHOP BY CATEGORY: two-panel ───────────────────── */
-    .ec-shop { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: start; }
-    .ec-shop-left { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 10px;
-        box-shadow: 0 12px 30px -24px rgba(15,27,53,.5); }
-    .ec-catlist { display: flex; flex-direction: column; gap: 2px; max-height: 560px; overflow-y: auto; }
-    .ec-catrow { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 12px;
-        text-decoration: none; transition: background .15s; }
-    .ec-catrow:hover { background: var(--bg-soft-2, #eef2f8); }
-    .ec-catrow.active { background: linear-gradient(135deg, rgba(37,99,235,.10), rgba(37,99,235,.04));
-        box-shadow: inset 0 0 0 1px rgba(37,99,235,.25); }
-    .ec-catrow-ic { width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
-        background: linear-gradient(135deg, rgba(37,99,235,.10), rgba(249,115,22,.10));
-        display: flex; align-items: center; justify-content: center; }
-    .ec-catrow-ic svg { width: 19px; height: 19px; color: var(--blue); }
-    .ec-catrow.active .ec-catrow-ic { background: linear-gradient(135deg, var(--blue), var(--blue-dark, var(--blue))); }
-    .ec-catrow.active .ec-catrow-ic svg { color: #fff; }
-    .ec-catrow-name { font-size: 14px; font-weight: 700; color: var(--ink); flex: 1; line-height: 1.2; }
-    .ec-catrow.active .ec-catrow-name { color: var(--blue); }
-    .ec-catrow-badge { font-size: 11.5px; font-weight: 800; color: var(--ink-2);
-        background: var(--bg-soft-2, #eef2f8); border-radius: 999px; padding: 3px 9px; min-width: 26px; text-align: center; }
-    .ec-catrow.active .ec-catrow-badge { background: var(--blue); color: #fff; }
+    /* ── BROWSE ALL CATEGORIES: tree panel + paginated grid ─────────── */
+    .ec-shop { display: grid; grid-template-columns: 320px 1fr; gap: 20px; align-items: start; }
+    .ec-shop-left { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 14px;
+        box-shadow: 0 12px 30px -24px rgba(15,27,53,.5); position: sticky; top: 82px; }
 
-    .ec-shop-right { display: flex; flex-direction: column; gap: 16px; }
-    .ec-shop-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    .ec-fcard { grid-column: span 2; grid-row: span 2; position: relative; min-height: 300px;
-        border-radius: 18px; overflow: hidden; text-decoration: none; display: flex; flex-direction: column;
-        justify-content: flex-end; padding: 24px; color: #fff; box-shadow: 0 18px 40px -24px rgba(15,27,53,.6); }
-    .ec-fcard::before { content: ''; position: absolute; inset: 0; z-index: 0;
-        background-size: cover; background-position: center 72%; transition: transform .5s; }
-    .ec-fcard:hover::before { transform: scale(1.06); }
-    .ec-fcard::after { content: ''; position: absolute; inset: 0; z-index: 1;
-        background: linear-gradient(180deg, rgba(15,27,53,.05) 20%, rgba(15,27,53,.86) 100%); }
-    .ec-fcard > * { position: relative; z-index: 2; }
-    .ec-fcard-badge { align-self: flex-start; font-size: 10.5px; font-weight: 800; text-transform: uppercase;
-        letter-spacing: .5px; padding: 5px 11px; border-radius: 999px; background: var(--orange); margin-bottom: 10px; }
-    .ec-fcard h3 { font-size: 24px; font-weight: 800; margin: 0 0 6px; letter-spacing: -.4px;
-        color: #fff !important; text-shadow: 0 1px 12px rgba(15,27,53,.55); }
-    .ec-fcard p { font-size: 13.5px; color: rgba(255,255,255,.92); margin: 0 0 16px; max-width: 360px;
-        text-shadow: 0 1px 10px rgba(15,27,53,.5); }
-    .ec-fcard-btn { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px;
-        background: #fff; color: var(--blue-dark, var(--blue)); border-radius: 999px; padding: 10px 18px;
-        font-size: 13px; font-weight: 800; }
-    .ec-fcard-btn svg { width: 15px; height: 15px; transition: transform .15s; }
-    .ec-fcard:hover .ec-fcard-btn svg { transform: translateX(3px); }
+    .ec-side-search { position: relative; margin-bottom: 14px; }
+    .ec-side-search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+        width: 16px; height: 16px; color: var(--muted); pointer-events: none; }
+    .ec-side-search input { width: 100%; border: 1px solid var(--line); border-radius: 11px;
+        padding: 10px 12px 10px 36px; font-size: 13.5px; color: var(--ink); background: var(--bg-soft, #f7f9fc);
+        outline: none; transition: border-color .15s, box-shadow .15s; }
+    .ec-side-search input:focus { border-color: var(--blue); background: #fff;
+        box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
 
-    .ec-scard { position: relative; border-radius: 16px; overflow: hidden; text-decoration: none;
-        background: #fff; border: 1px solid var(--line); display: flex; flex-direction: column;
-        min-height: 143px; box-shadow: 0 10px 22px -20px rgba(15,27,53,.5); transition: transform .15s, box-shadow .15s; }
-    .ec-scard:hover { transform: translateY(-3px); box-shadow: 0 18px 34px -22px rgba(15,27,53,.55); }
-    .ec-scard-img { height: 132px; background-size: cover; background-position: center 68%; }
-    .ec-scard-body { padding: 10px 12px 12px; }
-    .ec-scard-name { font-size: 13.5px; font-weight: 800; color: var(--ink); line-height: 1.2; }
-    .ec-scard-meta { font-size: 11.5px; font-weight: 600; color: var(--muted); margin-top: 3px; }
-    .ec-scard-meta .b { color: var(--blue); }
+    .ec-side-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .7px;
+        color: var(--muted); padding: 0 4px 8px; }
+    .ec-side-title-mt { margin-top: 16px; border-top: 1px solid var(--line-soft, var(--line)); padding-top: 14px; }
+    .ec-side-none { font-size: 13px; color: var(--muted); padding: 0 4px; }
+
+    /* The tree carries all 360 categories, so it scrolls inside the panel
+       and every branch stays collapsed until the visitor opens it. */
+    .ec-tree { max-height: 460px; overflow-y: auto; padding-right: 4px; }
+    .ec-tree::-webkit-scrollbar { width: 7px; }
+    .ec-tree::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; }
+    .ec-tree-nested { margin-left: 13px; padding-left: 9px; border-left: 1px solid var(--line-soft, var(--line)); }
+    .ec-tree-row { display: flex; align-items: center; gap: 2px; border-radius: 9px; transition: background .12s; }
+    .ec-tree-row:hover { background: var(--bg-soft-2, #eef2f8); }
+    .ec-tree-row.active { background: rgba(37,99,235,.10); box-shadow: inset 0 0 0 1px rgba(37,99,235,.25); }
+    .ec-tree-toggle { width: 20px; height: 26px; flex-shrink: 0; display: flex; align-items: center;
+        justify-content: center; background: none; border: 0; padding: 0; cursor: pointer; color: var(--muted); }
+    .ec-tree-toggle svg { width: 13px; height: 13px; transition: transform .15s; }
+    .ec-tree-toggle[aria-expanded="true"] svg { transform: rotate(90deg); }
+    .ec-tree-leaf { cursor: default; }
+    .ec-tree-link { flex: 1; min-width: 0; display: flex; align-items: center; gap: 7px;
+        padding: 5px 8px 5px 2px; text-decoration: none; }
+    .ec-tree-ico { width: 14px; height: 14px; flex-shrink: 0; color: var(--orange); }
+    .ec-tree-nested .ec-tree-ico { color: var(--blue-light, var(--blue)); }
+    .ec-tree-nested .ec-tree-nested .ec-tree-ico { color: var(--muted); }
+    .ec-tree-link span { font-size: 13px; font-weight: 600; color: var(--ink-2); line-height: 1.25;
+        overflow: hidden; text-overflow: ellipsis; }
+    .ec-tree-node > .ec-tree-row > .ec-tree-link span { font-weight: 700; }
+    .ec-tree-nested .ec-tree-link span { font-size: 12.5px; font-weight: 600; }
+    .ec-tree-row:hover .ec-tree-link span { color: var(--blue); }
+    .ec-tree-row.active .ec-tree-link span { color: var(--blue); }
+
+    .ec-stats { display: flex; flex-direction: column; gap: 8px; padding: 0 4px; }
+    .ec-stat { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .ec-stat span { font-size: 12.5px; font-weight: 600; color: var(--muted); }
+    .ec-stat b { font-size: 11.5px; font-weight: 800; color: #fff; border-radius: 999px;
+        padding: 3px 10px; min-width: 34px; text-align: center; }
+    .ec-stat b.v-b { background: var(--blue); }
+    .ec-stat b.v-o { background: var(--orange); }
+    .ec-stat b.v-g { background: #0f9d58; }
+    .ec-stat b.v-n { background: var(--ink-2); }
+
+    .ec-shop-right { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+    .ec-fchips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .ec-fchip { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--line);
+        border-radius: 999px; padding: 6px 8px 6px 13px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
+    .ec-fchip b { color: var(--ink); font-weight: 800; }
+    .ec-fchip a { width: 19px; height: 19px; border-radius: 50%; display: flex; align-items: center;
+        justify-content: center; background: var(--bg-soft-2, #eef2f8); color: var(--ink-2);
+        text-decoration: none; font-size: 14px; line-height: 1; }
+    .ec-fchip a:hover { background: var(--orange); color: #fff; }
+    .ec-fchip-clear { font-size: 12.5px; font-weight: 700; color: var(--blue); text-decoration: none; }
+    .ec-fchip-clear:hover { text-decoration: underline; }
+
+    .ec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .ec-card { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line);
+        border-radius: 16px; overflow: hidden; text-decoration: none;
+        box-shadow: 0 10px 24px -20px rgba(15,27,53,.5); transition: transform .15s, box-shadow .15s; }
+    .ec-card:hover { transform: translateY(-3px); box-shadow: 0 20px 38px -22px rgba(15,27,53,.55); }
+    /* 6:5 matches the service artwork exactly and trims only 8% off a square
+       occasion photo — enough to fill the box, never enough to slice the
+       category name that the legacy art bakes into the image. */
+    .ec-card-img { position: relative; aspect-ratio: 6 / 5; overflow: hidden; background: var(--bg-soft-2, #eef2f8); }
+    .ec-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s; }
+    .ec-card:hover .ec-card-img img { transform: scale(1.06); }
+    .ec-card-count { position: absolute; bottom: 9px; right: 9px; font-size: 10.5px; font-weight: 800;
+        color: #fff; background: rgba(15,27,53,.72); backdrop-filter: blur(4px);
+        border-radius: 7px; padding: 4px 9px; }
+    .ec-card-body { padding: 12px 14px 14px; display: flex; flex-direction: column; flex: 1; }
+    .ec-card-parent { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase;
+        letter-spacing: .4px; }
+    .ec-card-body h3 { font-size: 15px; font-weight: 800; color: var(--ink); margin: 3px 0 0; line-height: 1.25; }
+    .ec-card-body p { font-size: 12.5px; color: var(--muted); margin: 6px 0 0; line-height: 1.5; }
+    .ec-card-go { margin-top: auto; padding-top: 12px; display: inline-flex; align-items: center; gap: 6px;
+        font-size: 12.5px; font-weight: 800; color: var(--blue); }
+    .ec-card-go svg { width: 13px; height: 13px; transition: transform .15s; }
+    .ec-card:hover .ec-card-go svg { transform: translateX(3px); }
+
+    /* The shared paginator is styled for the dark dashboard — repaint it for
+       the light public theme without touching the partial itself. */
+    .ec-pag .grpag-info { color: var(--muted); }
+    .ec-pag .grpag-info strong { color: var(--ink); }
+    .ec-pag .grpag-item > a, .ec-pag .grpag-item > span {
+        border-color: var(--line); color: var(--ink-2); background: #fff; }
+    .ec-pag .grpag-item > a:hover { background: var(--bg-soft-2, #eef2f8); border-color: var(--blue); color: var(--blue); }
+    .ec-pag .grpag-item.active > span { background: linear-gradient(135deg, var(--blue-light, var(--blue)), var(--blue-dark, var(--blue)));
+        border-color: transparent; color: #fff; box-shadow: 0 6px 16px -6px rgba(37,99,235,.7); }
 
     .ec-empty { background: #fff; border: 1px solid var(--line); border-radius: 16px;
         padding: 46px 20px; text-align: center; color: var(--muted); }
@@ -250,25 +284,26 @@
     .ec-cta-emoji { font-size: 76px; line-height: 1; }
 
     @media (max-width: 1080px) {
-        .ec-shop { grid-template-columns: 260px 1fr; }
+        .ec-shop { grid-template-columns: 268px 1fr; }
+        .ec-grid { grid-template-columns: repeat(2, 1fr); }
         .ec-ts-grid { grid-template-columns: repeat(3, 1fr); }
     }
     @media (max-width: 900px) {
+        /* Below the two-panel breakpoint the tree stops being a rail: it sits
+           above the grid and collapses to its own height so it can't push the
+           results off-screen. */
         .ec-shop { grid-template-columns: 1fr; }
-        .ec-catlist { flex-direction: row; overflow-x: auto; max-height: none; }
-        .ec-catrow { flex: 0 0 auto; }
-        .ec-shop-cards { grid-template-columns: repeat(2, 1fr); }
-        .ec-fcard { grid-column: span 2; grid-row: auto; min-height: 220px; }
+        .ec-shop-left { position: static; }
+        .ec-tree { max-height: 300px; }
         .ec-et-grid { grid-template-columns: repeat(2, 1fr); }
         .ec-fb-chips { margin-left: 0; }
     }
     @media (max-width: 720px) {
         .ec-h1 { font-size: 30px; }
+        .ec-grid { grid-template-columns: 1fr; }
         .ec-ts-grid { grid-template-columns: repeat(2, 1fr); }
         .ec-et-grid { grid-template-columns: 1fr; }
         .ec-search { border-radius: 18px; }
-        .ec-shop-cards { grid-template-columns: 1fr; }
-        .ec-fcard { grid-column: auto; }
     }
 </style>
 @endpush
@@ -332,85 +367,98 @@
         </div>
     </section>
 
-    {{-- ══════════════ SHOP BY CATEGORY — TWO PANEL ══════════════ --}}
-    <section class="ec-section">
+    {{-- ══════════════ BROWSE ALL CATEGORIES — TREE + PAGINATED GRID ══════════════ --}}
+    <section class="ec-section" id="ec-browse">
         <div class="lp-container">
             <div class="ec-shead">
                 <div>
-                    <h2>Shop by <span class="b">Category</span></h2>
-                    <p>Pick a category on the left, then jump straight into matching professionals.</p>
+                    <h2>Browse all <span class="b">Categories</span></h2>
+                    <p>Drill into the tree on the left, or search — every card opens that category's professionals.</p>
                 </div>
             </div>
 
-            @if($cats->isNotEmpty())
-                <div class="ec-shop">
-                    {{-- LEFT: real category list with subcategory-count badges --}}
-                    <aside class="ec-shop-left">
-                        <div class="ec-catlist">
-                            @foreach($cats as $i => $cat)
-                                @php $count = $descCount($cat); @endphp
-                                <a class="ec-catrow {{ $i === 0 ? 'active' : '' }}" href="{{ route('public.category', $cat->slug) }}">
-                                    <span class="ec-catrow-ic">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-                                    </span>
-                                    <span class="ec-catrow-name">{{ Str::title($cat->name) }}</span>
-                                    @if($count > 0)
-                                        <span class="ec-catrow-badge">{{ $count }}</span>
-                                    @endif
-                                </a>
-                            @endforeach
+            <div class="ec-shop">
+                {{-- LEFT: search · full category tree · quick stats --}}
+                <aside class="ec-shop-left">
+                    <form class="ec-side-search" method="GET" action="{{ route('events-categories') }}#ec-browse">
+                        @if($branch)<input type="hidden" name="in" value="{{ $branch->slug }}">@endif
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="search" name="q" value="{{ $search }}" placeholder="Search categories…" aria-label="Search categories">
+                    </form>
+
+                    <div class="ec-side-title">Categories</div>
+                    @if($cats->isNotEmpty())
+                        <div class="ec-tree" id="ecTree">
+                            @include('partials._ec-tree-item', ['categories' => $cats, 'depth' => 0, 'branch' => $branch])
                         </div>
-                    </aside>
+                    @else
+                        <p class="ec-side-none">No categories yet.</p>
+                    @endif
 
-                    {{-- RIGHT: featured card + smaller category cards --}}
-                    <div class="ec-shop-right">
+                    <div class="ec-side-title ec-side-title-mt">Quick Stats</div>
+                    <div class="ec-stats">
+                        <div class="ec-stat"><span>Total Categories</span><b class="v-b">{{ number_format($stats['total']) }}</b></div>
+                        <div class="ec-stat"><span>Main Categories</span><b class="v-o">{{ number_format($stats['parents']) }}</b></div>
+                        <div class="ec-stat"><span>Subcategories</span><b class="v-g">{{ number_format($stats['subcategories']) }}</b></div>
+                        <div class="ec-stat"><span>Showing</span><b class="v-n">{{ number_format($stats['showing']) }}</b></div>
+                    </div>
+                </aside>
 
-                        <div class="ec-shop-cards">
-                            @php
-                                $first = $cats->first();
-                                $firstChildren = $first->children ?? collect();
-                                $rest = $cats->slice(1)->take(5);
-                            @endphp
-
-                            {{-- BIG feature card = first real category --}}
-                            <a class="ec-fcard" href="{{ route('public.category', $first->slug) }}"
-                               style="--x:0" data-bg="{{ $thumbUrl($first) }}">
-                                <span class="ec-fcard-badge">Featured</span>
-                                <h3>{{ Str::title($first->name) }}</h3>
-                                @php $firstCount = $descCount($first); @endphp
-                                <p>Explore vetted professionals for {{ Str::lower($first->name) }}{{ $firstCount > 0 ? ' — ' . $firstCount . ' ' . Str::plural('subcategory', $firstCount) . ' to browse' : '' }}.</p>
-                                <span class="ec-fcard-btn">
-                                    Explore top professionals
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                {{-- RIGHT: paginated card grid --}}
+                <div class="ec-shop-right">
+                    @if($branch || $search !== '')
+                        <div class="ec-fchips">
+                            @if($branch)
+                                <span class="ec-fchip">
+                                    In <b>{{ Str::title($branch->name) }}</b>
+                                    <a href="{{ route('events-categories', array_filter(['q' => $search])) }}#ec-browse" aria-label="Clear category filter">&times;</a>
                                 </span>
-                            </a>
+                            @endif
+                            @if($search !== '')
+                                <span class="ec-fchip">
+                                    Search <b>“{{ $search }}”</b>
+                                    <a href="{{ route('events-categories', array_filter(['in' => $branch?->slug])) }}#ec-browse" aria-label="Clear search">&times;</a>
+                                </span>
+                            @endif
+                            <a class="ec-fchip-clear" href="{{ route('events-categories') }}#ec-browse">Clear all</a>
+                        </div>
+                    @endif
 
-                            {{-- smaller cards = next real categories --}}
-                            @foreach($rest as $j => $cat)
-                                @php $scount = $descCount($cat); @endphp
-                                <a class="ec-scard" href="{{ route('public.category', $cat->slug) }}">
-                                    <div class="ec-scard-img" style="background-image:url('{{ $thumbUrl($cat) }}')"></div>
-                                    <div class="ec-scard-body">
-                                        <div class="ec-scard-name">{{ Str::title($cat->name) }}</div>
-                                        <div class="ec-scard-meta">
-                                            @if($scount > 0)
-                                                <span class="b">{{ $scount }}</span> {{ Str::plural('subcategory', $scount) }}
-                                            @else
-                                                Browse professionals
-                                            @endif
-                                        </div>
+                    @if($categories->count())
+                        <div class="ec-grid">
+                            @foreach($categories as $cat)
+                                <a class="ec-card" href="{{ route('public.category', $cat->slug) }}">
+                                    <div class="ec-card-img">
+                                        <img loading="lazy" src="{{ $thumbUrl($cat) }}" alt="{{ $cat->name }}">
+                                        @php $kidCount = $descCounts[$cat->id] ?? 0; @endphp
+                                        @if($kidCount > 0)
+                                            <span class="ec-card-count">{{ $kidCount }} {{ Str::plural('subcategory', $kidCount) }}</span>
+                                        @endif
+                                    </div>
+                                    <div class="ec-card-body">
+                                        <span class="ec-card-parent">{{ $cat->parent?->name ?? 'Main Category' }}</span>
+                                        <h3>{{ Str::title($cat->name) }}</h3>
+                                        @if($cat->short_description)
+                                            <p>{{ Str::limit(strip_tags((string) $cat->short_description), 80) }}</p>
+                                        @endif
+                                        <span class="ec-card-go">
+                                            View professionals
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                                        </span>
                                     </div>
                                 </a>
                             @endforeach
                         </div>
-                    </div>
+
+                        <div class="ec-pag">{{ $categories->onEachSide(1)->links() }}</div>
+                    @else
+                        <div class="ec-empty">
+                            <h3>No categories match that</h3>
+                            <p>Try a different search, or <a href="{{ route('events-categories') }}#ec-browse">show everything</a>.</p>
+                        </div>
+                    @endif
                 </div>
-            @else
-                <div class="ec-empty">
-                    <h3>Categories are on their way</h3>
-                    <p>Browse all professionals in the meantime — <a href="{{ route('public.browse') }}">open Browse</a>.</p>
-                </div>
-            @endif
+            </div>
         </div>
     </section>
 
@@ -505,17 +553,38 @@
 (function () {
     var browseBase = @json(route('public.browse'));
 
-    // Paint featured-card backgrounds from data-bg (::before needs a stylesheet rule,
-    // and this avoids inline url() quoting issues).
-    var styleEl = document.createElement('style');
-    var css = '';
-    document.querySelectorAll('.ec-fcard[data-bg]').forEach(function (el, idx) {
-        el.classList.add('ec-fcard-' + idx);
-        el.style.backgroundColor = '#1b2a4a';
-        css += '.ec-fcard-' + idx + '::before{background-image:url(' + el.getAttribute('data-bg') + ');}';
-    });
-    styleEl.textContent = css;
-    document.head.appendChild(styleEl);
+    // ── Category tree: disclosure toggles ─────────────────────────────
+    // Branches ship collapsed (`hidden` in the markup) so the panel opens at a
+    // readable size; clicking the chevron reveals that level only.
+    var tree = document.getElementById('ecTree');
+    if (tree) {
+        tree.addEventListener('click', function (e) {
+            var btn = e.target.closest('.ec-tree-toggle');
+            if (!btn || btn.classList.contains('ec-tree-leaf')) return;
+            e.preventDefault();
+            var kids = btn.closest('.ec-tree-node').querySelector(':scope > .ec-tree-kids');
+            if (!kids) return;
+            var open = kids.hasAttribute('hidden');
+            if (open) { kids.removeAttribute('hidden'); } else { kids.setAttribute('hidden', ''); }
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+
+        // Reveal the drilled-into category by opening every branch above it,
+        // then scroll it into view inside the panel.
+        var active = tree.querySelector('.ec-tree-row.active');
+        if (active) {
+            var node = active.closest('.ec-tree-node');
+            while (node) {
+                var kids = node.parentElement && node.parentElement.closest('.ec-tree-kids');
+                if (!kids) break;
+                kids.removeAttribute('hidden');
+                var owner = kids.parentElement.querySelector(':scope > .ec-tree-row > .ec-tree-toggle');
+                if (owner) owner.setAttribute('aria-expanded', 'true');
+                node = kids.closest('.ec-tree-node');
+            }
+            tree.scrollTop = Math.max(0, active.offsetTop - tree.clientHeight / 2);
+        }
+    }
 
     // Filter chips → jump to Browse Professionals sorted accordingly.
     var chips = document.querySelectorAll('#ecChips .ec-chip');
