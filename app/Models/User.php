@@ -303,6 +303,12 @@ class User extends Authenticatable
             ->withPivot('note')->withTimestamps();
     }
 
+    /** Opportunities this professional bookmarked on the Bidding Board. */
+    public function savedEvents(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\Event::class, 'saved_events')->withTimestamps();
+    }
+
     public function sentMessages(): HasMany
     {
         return $this->hasMany(Message::class, 'sender_id');

@@ -25,18 +25,75 @@ class ProfessionalBiddingBoardController extends Controller
     /** Non-Elite tiers unlock ESR/MSR this many minutes after posting. */
     private const TIER_DELAY_MINUTES = 60;
 
+    /** Tabs the board can filter by. Packages and Invite Only are in the
+     *  mockups but have no model behind them yet — see the note in index(). */
+    public const TABS = ['all', 'SSR', 'MSR', 'ESR', 'DO', 'saved'];
+
     public function index(Request $request): View
     {
         $user = $request->user();
 
-        // Real open gigs: published & still biddable.
-        $events = Event::query()
-            ->where('is_published', true)
+        $tab    = in_array($request->query('tab'), self::TABS, true) ? $request->query('tab') : 'all';
+        $q      = trim((string) $request->query('q', ''));
+        $catId  = (int) $request->query('category', 0);
+        $city   = trim((string) $request->query('city', ''));
+        $window = (string) $request->query('closing', '');      // 48h | week | ''
+        $sort   = (string) $request->query('sort', 'deadline');
+        $view   = $request->query('view') === 'card' ? 'card' : 'list';
+
+        $savedIds = $user ? $user->savedEvents()->pluck('events.id') : collect();
+
+        // Direct Offers used to be excluded outright — the query only took
+        // published events, and an offer is unpublished by design. But an offer
+        // IS this pro's opportunity: it names them in supplier_id. They now
+        // appear alongside broadcast gigs, scoped to the recipient.
+        $base = Event::query()
             ->whereNotIn('status', ['completed', 'cancelled'])
-            ->with('categories:id,name')
-            ->orderByRaw('starts_at IS NULL, starts_at ASC')
-            ->limit(15)
-            ->get();
+            ->where(function ($outer) use ($user) {
+                $outer->where('is_published', true)
+                      ->orWhere(fn ($q2) => $q2->where('source', 'direct_offer')
+                                                ->where('supplier_id', $user?->id));
+            })
+            ->with('categories:id,name');
+
+        if ($q !== '') {
+            $like = '%' . str_replace(['%', '_'], ['\\%', '\\_'], $q) . '%';
+            $base->where(fn ($w) => $w->where('title', 'like', $like)
+                                      ->orWhere('location', 'like', $like)
+                                      ->orWhereHas('categories', fn ($c) => $c->where('name', 'like', $like)));
+        }
+        if ($catId > 0) {
+            $base->whereHas('categories', fn ($c) => $c->where('categories.id', $catId));
+        }
+        if ($city !== '') {
+            $base->where('location', 'like', $city . '%');
+        }
+        if ($window === '48h') {
+            $base->whereBetween('starts_at', [now(), now()->addHours(48)]);
+        } elseif ($window === 'week') {
+            $base->whereBetween('starts_at', [now(), now()->addWeek()]);
+        }
+        if ($tab === 'saved') {
+            $base->whereIn('id', $savedIds->all() ?: [0]);
+        } elseif ($tab === 'DO') {
+            $base->where('source', 'direct_offer');
+        } elseif ($tab === 'ESR') {
+            $base->where('source', 'esr');
+        }
+
+        match ($sort) {
+            'newest' => $base->latest('id'),
+            'budget' => $base->orderByRaw('budget IS NULL, budget DESC'),
+            default  => $base->orderByRaw('starts_at IS NULL, starts_at ASC'),
+        };
+
+        $events = $base->get();
+
+        // SSR/MSR is a service COUNT, which SQL can't filter on before the
+        // categories are loaded — so those two tabs are applied here.
+        if ($tab === 'SSR' || $tab === 'MSR') {
+            $events = $events->filter(fn ($e) => $this->typeOf($e) === $tab)->values();
+        }
 
         // Tiered early access — ESR + MSR only. Elite sees them on post; Pro and
         // Starter unlock 60 minutes later. SSR is open to every tier. Locked
@@ -52,6 +109,11 @@ class ProfessionalBiddingBoardController extends Controller
             return true;
         })->values();
 
+        $page    = max(1, (int) $request->query('page', 1));
+        $perPage = 10;
+        $total   = $events->count();
+        $events  = $events->forPage($page, $perPage)->values();
+
         // Real sealed-bid data: per-gig bid count + this pro's own bid (if any).
         $ids = $events->pluck('id');
         $bidCounts = Bid::whereIn('event_id', $ids)
@@ -59,43 +121,123 @@ class ProfessionalBiddingBoardController extends Controller
         $myBids = Bid::where('supplier_id', $user?->id)
             ->whereIn('event_id', $ids)->get()->keyBy('event_id');
 
-        $gigs = $events->map(fn ($e) => $this->mapEvent($e, (int) ($bidCounts[$e->id] ?? 0), $myBids->get($e->id), $user))->all();
+        $gigs = $events->map(function ($e) use ($bidCounts, $myBids, $user, $savedIds) {
+            $g = $this->mapEvent($e, (int) ($bidCounts[$e->id] ?? 0), $myBids->get($e->id), $user);
+            $g['saved'] = $savedIds->contains($e->id);
 
-        $counts = [
-            'all' => count($gigs),
-            'ESR' => count(array_filter($gigs, fn ($g) => $g['type'] === 'ESR')),
-            'SSR' => count(array_filter($gigs, fn ($g) => $g['type'] === 'SSR')),
-            'MSR' => count(array_filter($gigs, fn ($g) => $g['type'] === 'MSR')),
-        ];
-
-        // Insights computed from the real open gigs.
-        $topCat = $events->flatMap(fn ($e) => $e->categories->pluck('name'))
-            ->countBy()->sortDesc()->keys()->first() ?: 'Photography';
-        $avgBudget = $events->filter(fn ($e) => $e->budget)->avg('budget');
-        $closingSoon = $events->filter(fn ($e) => $e->starts_at && $e->starts_at->isBetween(now(), now()->addDays(7)))->count();
-
-        // Commission the pro absorbs at payout, by membership tier — shown on
-        // the bid form so they bid knowing their net (MSR review #17). Shared
-        // so this preview and the payout screens can't drift apart.
-        $commissionPct = Commission::rateFor($request->user());
+            return $g;
+        })->all();
 
         return view('professional.bidding-board.index', [
-            'gigs'     => $gigs,
-            'counts'   => $counts,
-            'commissionPct' => $commissionPct,
+            'gigs'          => $gigs,
+            'counts'        => $this->tabCounts($user, $savedIds),
+            'filters'       => compact('tab', 'q', 'catId', 'city', 'window', 'sort', 'view'),
+            'categories'    => \App\Models\Category::active()->whereNotNull('parent_id')
+                                ->orderBy('name')->get(['id', 'name'])->unique('name')->take(60),
+            'page'          => $page,
+            'perPage'       => $perPage,
+            'total'         => $total,
+            'commissionPct' => Commission::rateFor($user),
             'lockedCount'   => $lockedCount,
             'isElite'       => $this->isElite($user),
-            // Demand/volume only. "Avg. Winning Bid" and "Win Rate" were here and
-            // are gone on purpose: bids are sealed, and aggregating sealed amounts
-            // into a stat shown to competitors is still a disclosure. Metrics that
-            // count REQUESTS are fine; metrics derived from AMOUNTS are not.
-            'insights' => [
-                ['Highest Demand', $topCat, '🔥'],
-                ['Open Requests', (string) count($gigs), '📋'],
-                ['Closing This Week', (string) $closingSoon, '⏳'],
-                ['Typical Client Budget', $avgBudget ? '$' . number_format((float) $avgBudget) : 'Varies', '💰'],
-            ],
+            'myActivity'    => $this->myActivity($user),
+            'insights'      => $this->insights(),
+            // Packages and Invite Only appear as tabs in Peter's mockups but have
+            // no model yet — no package_requests, no event_invites table. Left off
+            // rather than rendered as tabs that can only ever show nothing.
         ]);
+    }
+
+    /** Counts for the tab strip — over the whole board, not the current page. */
+    private function tabCounts(?\App\Models\User $user, \Illuminate\Support\Collection $savedIds): array
+    {
+        $open = Event::query()
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->where(function ($outer) use ($user) {
+                $outer->where('is_published', true)
+                      ->orWhere(fn ($q2) => $q2->where('source', 'direct_offer')
+                                                ->where('supplier_id', $user?->id));
+            })
+            ->with('categories:id')
+            ->get()
+            ->reject(fn ($e) => $this->isLockedFor($e, $user));
+
+        return [
+            'all'   => $open->count(),
+            'SSR'   => $open->filter(fn ($e) => $this->typeOf($e) === 'SSR')->count(),
+            'MSR'   => $open->filter(fn ($e) => $this->typeOf($e) === 'MSR')->count(),
+            'ESR'   => $open->where('source', 'esr')->count(),
+            'DO'    => $open->where('source', 'direct_offer')->count(),
+            'saved' => $savedIds->count(),
+        ];
+    }
+
+    /** This pro's own bid pipeline, for the right rail. */
+    private function myActivity(?\App\Models\User $user): array
+    {
+        if (! $user) {
+            return ['drafts' => 0, 'submitted' => 0, 'negotiating' => 0, 'won' => 0];
+        }
+
+        $byStatus = Bid::where('supplier_id', $user->id)
+            ->selectRaw('status, COUNT(*) as c')->groupBy('status')->pluck('c', 'status');
+
+        return [
+            'drafts'      => (int) ($byStatus['draft'] ?? 0),
+            'submitted'   => (int) ($byStatus['submitted'] ?? 0),
+            'negotiating' => (int) ($byStatus['negotiating'] ?? 0),
+            'won'         => (int) ($byStatus['accepted'] ?? 0),
+        ];
+    }
+
+    /** Demand/volume insights. Never anything derived from bid AMOUNTS —
+     *  bids are sealed, and aggregating them for competitors is a disclosure. */
+    private function insights(): array
+    {
+        $open = Event::where('is_published', true)
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->with('categories:id,name')->get();
+
+        $topCat = $open->flatMap(fn ($e) => $e->categories->pluck('name'))
+            ->countBy()->sortDesc()->keys()->first();
+        $avgBudget = $open->filter(fn ($e) => $e->budget)->avg('budget');
+        $closingSoon = $open->filter(fn ($e) => $e->starts_at && $e->starts_at->isBetween(now(), now()->addWeek()))->count();
+
+        return [
+            ['Highest Demand', $topCat ?: 'No open requests', '🔥'],
+            ['Open Requests', (string) $open->count(), '📋'],
+            ['Closing This Week', (string) $closingSoon, '⏳'],
+            ['Typical Client Budget', $avgBudget ? '$' . number_format((float) $avgBudget) : 'Varies', '💰'],
+        ];
+    }
+
+    /** SSR vs MSR is the service count; ESR and Direct Offer come from source. */
+    private function typeOf(Event $e): string
+    {
+        return match (true) {
+            $e->source === 'esr'          => 'ESR',
+            $e->source === 'direct_offer' => 'DO',
+            $e->categories->count() >= 2  => 'MSR',
+            default                       => 'SSR',
+        };
+    }
+
+    /** Bookmark / un-bookmark an opportunity. */
+    public function toggleSaved(Request $request): RedirectResponse
+    {
+        $data = $request->validate(['event_id' => ['required', 'exists:events,id']]);
+        $user = $request->user();
+
+        $saved = $user->savedEvents();
+        if ($saved->where('events.id', $data['event_id'])->exists()) {
+            $saved->detach($data['event_id']);
+            $msg = 'Removed from saved opportunities.';
+        } else {
+            $saved->syncWithoutDetaching([$data['event_id']]);
+            $msg = 'Saved. Find it under the Saved tab.';
+        }
+
+        return back()->with('status', $msg);
     }
 
     /** Elite is the tier with immediate ESR/MSR access. */
