@@ -30,6 +30,15 @@ class Event extends Model
         'supplier_id',
         'source',
         'category_id',
+        // BSR wizard fields
+        'event_type',
+        'organization_type',
+        'characteristic',
+        'budget_min',
+        'budget_max',
+        'proposal_deadline',
+        'sealed_proposals',
+        'questions_enabled',
     ];
 
     protected function casts(): array
@@ -42,6 +51,11 @@ class Event extends Model
             'budget' => 'decimal:2',
             'guest_count' => 'integer',
             'media' => 'array',
+            'proposal_deadline' => 'datetime',
+            'budget_min' => 'decimal:2',
+            'budget_max' => 'decimal:2',
+            'sealed_proposals' => 'boolean',
+            'questions_enabled' => 'boolean',
         ];
     }
 

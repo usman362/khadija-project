@@ -587,6 +587,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/proposals', [\App\Http\Controllers\Client\ClientProposalController::class, 'index'])
             ->middleware('permission:bookings.view_any')
             ->name('client.proposals.index');
+
+        // ── BSR (Bidding Service Request) create wizard ──────────────
+        Route::get('/bsr/{step?}', [\App\Http\Controllers\Client\ClientBsrController::class, 'show'])
+            ->middleware('permission:events.create')->name('client.bsr.step');
+        Route::post('/bsr/{step}', [\App\Http\Controllers\Client\ClientBsrController::class, 'save'])
+            ->middleware('permission:events.create')->name('client.bsr.save');
+        Route::get('/bsr-resume/{event}', [\App\Http\Controllers\Client\ClientBsrController::class, 'resume'])
+            ->middleware('permission:events.create')->name('client.bsr.resume');
+        Route::post('/bsr-discard', [\App\Http\Controllers\Client\ClientBsrController::class, 'discard'])
+            ->middleware('permission:events.create')->name('client.bsr.discard');
         Route::get('/events/{event}/compare-proposals', [\App\Http\Controllers\Client\ClientProposalController::class, 'compare'])
             ->name('client.proposals.compare');
         Route::post('/proposals/{bid}/accept', [\App\Http\Controllers\Client\ClientProposalController::class, 'accept'])
