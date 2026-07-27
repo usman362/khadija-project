@@ -389,7 +389,7 @@
                 <h3 style="font-size:16px;font-weight:600;">Proposals received ({{ $bids->count() }})</h3>
                 @if($bids->count() > 1)
                     <a class="cl-btn cl-btn-primary cl-btn-sm" style="background:#f97316;border-color:#f97316;"
-                       href="{{ route('client.proposals.index', ['event' => $event->id]) }}">Compare proposals</a>
+                       href="{{ route('client.proposals.compare', $event) }}">Compare proposals</a>
                 @endif
             </div>
 
@@ -443,7 +443,7 @@
                         <span>{{ $q['reply']->created_at->diffForHumans() }}</span>
                     </div>
                     <p>{{ $q['reply']->note }}</p>
-                    <a class="cl-btn cl-btn-ghost cl-btn-sm" href="{{ route('client.proposals.index', ['event' => $event->id]) }}">Reply on the proposal</a>
+                    <a class="cl-btn cl-btn-ghost cl-btn-sm" href="{{ route('client.proposals.compare', $event) }}">Reply on the proposal</a>
                 </div>
             @empty
                 <div class="ev-empty"><b>No questions yet</b><p>If a professional needs something clarified before bidding, it will show up here.</p></div>

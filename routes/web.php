@@ -587,6 +587,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/proposals', [\App\Http\Controllers\Client\ClientProposalController::class, 'index'])
             ->middleware('permission:bookings.view_any')
             ->name('client.proposals.index');
+        Route::get('/events/{event}/compare-proposals', [\App\Http\Controllers\Client\ClientProposalController::class, 'compare'])
+            ->name('client.proposals.compare');
         Route::post('/proposals/{bid}/accept', [\App\Http\Controllers\Client\ClientProposalController::class, 'accept'])
             ->middleware('permission:bookings.update')->name('client.proposals.accept');
         Route::post('/proposals/{bid}/decline', [\App\Http\Controllers\Client\ClientProposalController::class, 'decline'])

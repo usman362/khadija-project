@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bid;
+use App\Models\Event;
 use App\Models\Booking;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -89,6 +90,91 @@ class ClientProposalController extends Controller
      * Award a bid: mark it won and open a confirmed Booking (the contract).
      * Only the event's owner may act.
      */
+    /**
+     * Compare the proposals on ONE request side by side.
+     *
+     * The cross-request list at index() answers "what's happening across all my
+     * events". This answers the different question the client actually has when
+     * a deadline is near: of the people who bid on THIS request, who do I pick.
+     */
+    public function compare(Request $request, Event $event): View
+    {
+        abort_unless((int) $event->client_id === (int) $request->user()->id, 403);
+
+        $sort   = (string) $request->query('sort', 'amount');
+        $q      = trim((string) $request->query('q', ''));
+        $only   = (string) $request->query('only', '');     // verified | insured | ''
+
+        $bids = Bid::where('event_id', $event->id)
+            ->with(['supplier.profile', 'category:id,name', 'replies.user:id,name'])
+            ->get();
+
+        // Rating and review count per professional, in one query rather than per row.
+        $stats = \App\Models\Review::selectRaw('reviewee_id, AVG(rating) as avg_rating, COUNT(*) as total')
+            ->whereIn('reviewee_id', $bids->pluck('supplier_id')->filter())
+            ->where('is_hidden', false)
+            ->groupBy('reviewee_id')
+            ->get()
+            ->keyBy('reviewee_id');
+
+        $awardedTo = Booking::where('event_id', $event->id)
+            ->whereNotIn('status', ['cancelled'])
+            ->value('supplier_id');
+
+        $rows = $bids->map(function (Bid $b) use ($stats, $event, $awardedTo) {
+            $p  = $b->supplier?->profile;
+            $st = $stats->get($b->supplier_id);
+
+            return [
+                'bid'        => $b,
+                'pro'        => $b->supplier,
+                'profile'    => $p,
+                'rating'     => $st ? round((float) $st->avg_rating, 1) : null,
+                'reviews'    => $st ? (int) $st->total : 0,
+                'years'      => $p?->experience_years,
+                'insured'    => (bool) $p?->liability_insurance_verified_at,
+                'verified'   => (bool) ($p?->trade_license_verified_at && $p?->liability_insurance_verified_at && $p?->workers_comp_verified_at),
+                'city'       => $p?->city,
+                'overBudget' => $event->budget && $b->amount > $event->budget,
+                'state'      => match (true) {
+                    $awardedTo && (int) $awardedTo === (int) $b->supplier_id => 'accepted',
+                    (bool) $awardedTo                                        => 'not_selected',
+                    in_array($b->status, self::DECLINED, true)               => 'declined',
+                    $b->replies->isNotEmpty()                                => 'negotiating',
+                    default                                                  => 'responded',
+                },
+            ];
+        });
+
+        if ($only === 'verified') {
+            $rows = $rows->where('verified', true);
+        } elseif ($only === 'insured') {
+            $rows = $rows->where('insured', true);
+        }
+        if ($q !== '') {
+            $needle = mb_strtolower($q);
+            $rows = $rows->filter(fn ($r) => str_contains(mb_strtolower(($r['pro']->name ?? '') . ' ' . ($r['city'] ?? '')), $needle));
+        }
+
+        $rows = match ($sort) {
+            'rating'  => $rows->sortByDesc(fn ($r) => $r['rating'] ?? -1),
+            'newest'  => $rows->sortByDesc(fn ($r) => $r['bid']->created_at),
+            'years'   => $rows->sortByDesc(fn ($r) => $r['years'] ?? -1),
+            default   => $rows->sortBy(fn ($r) => $r['bid']->amount),
+        };
+
+        return view('client.proposals.compare', [
+            'event'     => $event,
+            'rows'      => $rows->values(),
+            'total'     => $bids->count(),
+            'awardedTo' => $awardedTo,
+            'filters'   => compact('sort', 'q', 'only'),
+            // Deliberately NOT offered as columns: distance (no coordinates are
+            // stored on a profile) and response time (nothing records it). The
+            // mockup lists both; inventing them would be worse than omitting.
+        ]);
+    }
+
     public function accept(Request $request, Bid $bid): RedirectResponse
     {
         $this->authorizeOwner($request, $bid);
