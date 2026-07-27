@@ -91,6 +91,29 @@
     .bb-ob svg { width: 14px; height: 14px; }
 
     /* sidebar */
+    .bb-filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+    .bb-filters input, .bb-filters select { background: var(--bg-card); border: 1px solid var(--border-color);
+        border-radius: 10px; padding: 8px 11px; font-size: 12.5px; color: var(--text-primary); font-family: inherit; }
+    .bb-f-search { flex: 1 1 240px; min-width: 180px; }
+    .bb-f-go { background: #2563eb; border: 0; border-radius: 10px; padding: 9px 16px;
+        font-size: 12.5px; font-weight: 800; color: #fff; cursor: pointer; font-family: inherit; }
+    .bb-f-clear { font-size: 12.5px; font-weight: 700; color: var(--text-secondary); text-decoration: none; }
+    a.bb-tab { text-decoration: none; }
+
+    .bb-empty { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px;
+        padding: 40px 20px; text-align: center; }
+    .bb-empty h4 { font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
+    .bb-empty p { font-size: 13px; color: var(--text-secondary); }
+
+    .bb-pag { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        flex-wrap: wrap; padding: 14px 2px 4px; }
+    .bb-pag-info { font-size: 12.5px; color: var(--text-secondary); }
+    .bb-pag-links { display: flex; gap: 6px; }
+    .bb-pag-links a { min-width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+        border: 1px solid var(--border-color); border-radius: 9px; font-size: 12.5px; font-weight: 700;
+        color: var(--text-secondary); text-decoration: none; }
+    .bb-pag-links a.on { background: #2563eb; border-color: transparent; color: #fff; }
+
     .bb-rail { position: sticky; top: 84px; display: flex; flex-direction: column; gap: 16px; }
     .bb-rail-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; }
     .bb-rail-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
@@ -147,27 +170,58 @@
         </div>
     @endunless
 
-    {{-- Top bar: filter tabs + sort --}}
+    {{-- Tabs, search and filters. These were <span>s and a dead <select>: the
+         strip looked interactive but nothing was wired, and "Invite Only" /
+         "Bookmarked" had no data at all. Every control below is a real query
+         parameter the controller reads. --}}
+    @php $ff = $filters; @endphp
     <div class="bb-bar">
         <div class="bb-tabs">
-            <span class="bb-tab on">All Events <span class="n">{{ $counts['all'] }}</span></span>
-            <span class="bb-tab">🔥 ESR <span class="sub">(Emergency Service Request)</span> <span class="n">{{ $counts['ESR'] }}</span></span>
-            <span class="bb-tab">SSR <span class="sub">(Single Service Request)</span> <span class="n">{{ $counts['SSR'] }}</span></span>
-            <span class="bb-tab">MSR <span class="sub">(Multi-Service Request)</span> <span class="n">{{ $counts['MSR'] }}</span></span>
-            <span class="bb-tab">Invite Only</span>
-            <span class="bb-tab">★ Bookmarked</span>
+            @foreach([
+                ['all', 'All Requests', ''],
+                ['ESR', '🔥 ESR', 'Emergency Service Request'],
+                ['SSR', 'SSR', 'Single Service Request'],
+                ['MSR', 'MSR', 'Multi-Service Request'],
+                ['DO',  'Direct Offers', 'Sent to you'],
+                ['saved', '★ Saved', ''],
+            ] as [$key, $label, $sub])
+                <a class="bb-tab {{ $ff['tab'] === $key ? 'on' : '' }}"
+                   href="{{ route('professional.bidding-board.index', array_filter(array_merge($ff, ['tab' => $key, 'view' => null, 'page' => null]))) }}">
+                    {{ $label }}
+                    @if($sub)<span class="sub">({{ $sub }})</span>@endif
+                    <span class="n">{{ $counts[$key] ?? 0 }}</span>
+                </a>
+            @endforeach
             <a class="bb-mylink" href="{{ route('professional.bidding-board.my-bids') }}">🔒 My Bids</a>
         </div>
-        <div class="bb-sort">
-            <label for="bb-sort-sel">Sort by:</label>
-            <select id="bb-sort-sel">
-                <option>Recommended</option>
-                <option>Newest</option>
-                <option>Budget: High to Low</option>
-                <option>Closing Soon</option>
-            </select>
-        </div>
     </div>
+
+    <form method="GET" action="{{ route('professional.bidding-board.index') }}" class="bb-filters">
+        <input type="hidden" name="tab" value="{{ $ff['tab'] }}">
+        <input class="bb-f-search" type="search" name="q" value="{{ $ff['q'] }}"
+               placeholder="Search by event, service or location…">
+        <select name="category">
+            <option value="">All services</option>
+            @foreach($categories as $c)
+                <option value="{{ $c->id }}" @selected($ff['catId'] === $c->id)>{{ $c->name }}</option>
+            @endforeach
+        </select>
+        <input type="text" name="city" value="{{ $ff['city'] }}" placeholder="City">
+        <select name="closing">
+            <option value="">Any deadline</option>
+            <option value="48h" @selected($ff['window'] === '48h')>Next 48 hours</option>
+            <option value="week" @selected($ff['window'] === 'week')>This week</option>
+        </select>
+        <select name="sort">
+            <option value="deadline" @selected($ff['sort'] === 'deadline')>Closing soonest</option>
+            <option value="newest" @selected($ff['sort'] === 'newest')>Newest</option>
+            <option value="budget" @selected($ff['sort'] === 'budget')>Budget: high to low</option>
+        </select>
+        <button type="submit" class="bb-f-go">Apply</button>
+        @if($ff['q'] || $ff['catId'] || $ff['city'] || $ff['window'])
+            <a class="bb-f-clear" href="{{ route('professional.bidding-board.index', ['tab' => $ff['tab']]) }}">Clear</a>
+        @endif
+    </form>
 
     <div class="bb-grid">
         {{-- Gigs --}}
@@ -245,7 +299,29 @@
                     </div>
                 </article>
             @endforeach
-            <div style="text-align:center; padding:8px;"><button class="bb-tab" style="margin:0 auto;">Load More Events ↓</button></div>
+            @if(empty($gigs))
+                <div class="bb-empty">
+                    <h4>Nothing open here right now</h4>
+                    <p>{{ $ff['tab'] === 'saved' ? 'You haven’t saved any opportunities yet — use the ☆ on a request to park it.' : 'Try a different tab, or clear your filters.' }}</p>
+                </div>
+            @endif
+
+            {{-- Real paging. A "Load More Events" button used to sit here that
+                 loaded nothing. --}}
+            @php $pages = (int) ceil($total / $perPage); @endphp
+            @if($pages > 1)
+                <nav class="bb-pag">
+                    <span class="bb-pag-info">
+                        {{ ($page - 1) * $perPage + 1 }}–{{ min($page * $perPage, $total) }} of {{ $total }}
+                    </span>
+                    <span class="bb-pag-links">
+                        @for($i = 1; $i <= $pages; $i++)
+                            <a class="{{ $i === $page ? 'on' : '' }}"
+                               href="{{ route('professional.bidding-board.index', array_filter(array_merge($ff, ['page' => $i, 'view' => null]))) }}">{{ $i }}</a>
+                        @endfor
+                    </span>
+                </nav>
+            @endif
         </div>
 
         {{-- Sidebar --}}
