@@ -10,11 +10,17 @@ class Bid extends Model
 {
     protected $fillable = [
         'event_id', 'category_id', 'supplier_id', 'amount', 'note', 'is_public', 'status',
+        // Proposal fields collected by the Submit Your Bid wizard
+        'breakdown', 'above_budget_reason', 'available_confirmed',
+        'availability_note', 'plan', 'terms', 'submitted_at',
     ];
 
     protected $casts = [
         'is_public' => 'boolean',
         'amount'    => 'integer',
+        'breakdown' => 'array',
+        'available_confirmed' => 'boolean',
+        'submitted_at' => 'datetime',
     ];
 
     public function event(): BelongsTo

@@ -114,6 +114,9 @@
         color: var(--text-secondary); text-decoration: none; }
     .bb-pag-links a.on { background: #2563eb; border-color: transparent; color: #fff; }
 
+    .bb-full { display: block; text-align: center; margin-top: 10px; font-size: 12.5px; font-weight: 700; color: #60a5fa; text-decoration: none; }
+    .bb-full:hover { text-decoration: underline; }
+
     .bb-rail { position: sticky; top: 84px; display: flex; flex-direction: column; gap: 16px; }
     .bb-rail-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; }
     .bb-rail-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
@@ -420,6 +423,10 @@
             <div class="bb-dialog-actions">
                 <button type="button" class="bb-cancel" data-bid-close>Cancel</button>
                 <button type="submit" class="bb-bid">Submit Bid</button>
+                {{-- The quick form is a price and a note. The full proposal —
+                     itemised price, availability, plan, terms — is where the
+                     client actually compares people, so offer the way through. --}}
+                <a class="bb-full" id="bbFullLink" href="#">Build a full proposal instead →</a>
             </div>
         </form>
     </div>
@@ -480,6 +487,8 @@
             amount.value = btn.getAttribute('data-amount') || '';
             pub.checked = btn.getAttribute('data-public') === '1';
             modal.querySelector('h3').textContent = btn.getAttribute('data-amount') ? 'Edit your bid' : 'Place your bid';
+        var full = document.getElementById('bbFullLink');
+        if (full) full.href = '{{ url('professional/bid') }}/' + btn.getAttribute('data-event-id') + '/price';
             // Per-service picker: populate from the gig's services.
             var services = [];
             try { services = JSON.parse(btn.getAttribute('data-services') || '[]'); } catch (e) {}

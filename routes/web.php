@@ -734,6 +734,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/bidding-board/my-bids', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'myBids'])->name('professional.bidding-board.my-bids');
         Route::post('/bidding-board/bid/{bid}/toggle', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'toggleBidVisibility'])->name('professional.bidding-board.toggle');
         Route::post('/bidding-board/save', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'toggleSaved'])->name('professional.bidding-board.save');
+
+        // ── Submit Your Bid — the multi-step proposal builder ────────
+        Route::get('/bid/{event}/{step?}', [\App\Http\Controllers\Professional\ProfessionalBidWizardController::class, 'show'])
+            ->name('professional.bid.step');
+        Route::post('/bid/{event}/{step}', [\App\Http\Controllers\Professional\ProfessionalBidWizardController::class, 'save'])
+            ->name('professional.bid.save');
         Route::post('/bidding-board/bid/{bid}/withdraw', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'withdrawBid'])->name('professional.bidding-board.withdraw');
         Route::post('/bidding-board/bid/{bid}/reply', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'reply'])->name('professional.bidding-board.reply');
 
