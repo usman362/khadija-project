@@ -207,11 +207,65 @@ class ClientEventController extends Controller
         // Sealed bids received on this event. The client is the event owner, so
         // they see every amount (bids are only sealed from OTHER professionals).
         $bids = \App\Models\Bid::where('event_id', $event->id)
-            ->with('supplier:id,name')
+            ->with(['supplier.profile', 'supplier.reviewsReceived', 'category:id,name', 'replies.user:id,name'])
             ->orderBy('amount')
             ->get();
 
-        return view('client.events.show', compact('event', 'categories', 'selectedCategoryIds', 'bids'));
+        // Request type and scope, the same model the professional board uses:
+        // BSR is broadcast bidding, ESR is that with urgency, DSR is targeted at
+        // one professional. SSR/MSR is the SCOPE — the service count.
+        $type  = match ($event->source) {
+            'esr'          => 'ESR',
+            'direct_offer' => 'DSR',
+            default        => 'BSR',
+        };
+        $scope = $event->categories->count() >= 2 ? 'MSR' : 'SSR';
+
+        // Which tab is open. Everything is rendered server-side and switched by
+        // query string, so a tab is linkable and survives a reload.
+        $tab = in_array($request->query('tab'), ['overview', 'requirements', 'proposals', 'questions', 'files', 'activity'], true)
+            ? $request->query('tab')
+            : 'overview';
+
+        // The award, if the client already picked someone. Once this exists the
+        // request is no longer open for proposals.
+        $award = $event->bookings->first(fn ($b) => ! in_array($b->status, ['cancelled', 'declined'], true));
+
+        // Clarifying questions live on the bid threads — a reply with no counter
+        // amount is a question rather than a negotiation move.
+        $questions = $bids->flatMap(fn ($b) => $b->replies->map(fn ($r) => [
+            'bid'   => $b,
+            'reply' => $r,
+        ]))->filter(fn ($q) => ! $q['reply']->counter_amount)->values();
+
+        // A single ordered stream for the Activity tab, newest first.
+        $activity = collect()
+            ->concat($bids->map(fn ($b) => [
+                'at'    => $b->created_at,
+                'icon'  => '📩',
+                'text'  => ($b->supplier->name ?? 'A professional') . ' submitted a proposal',
+            ]))
+            ->concat($bids->flatMap(fn ($b) => $b->replies)->map(fn ($r) => [
+                'at'    => $r->created_at,
+                'icon'  => $r->counter_amount ? '↔️' : '💬',
+                'text'  => ($r->user->name ?? 'Someone') . ($r->counter_amount
+                            ? ' countered at $' . number_format($r->counter_amount)
+                            : ' left a message'),
+            ]))
+            ->concat($event->bookings->map(fn ($b) => [
+                'at'    => $b->created_at,
+                'icon'  => '🏆',
+                'text'  => ($b->supplier->name ?? 'A professional') . ' was selected',
+            ]))
+            ->push(['at' => $event->created_at, 'icon' => '✳️', 'text' => 'Request created'])
+            ->filter(fn ($a) => $a['at'])
+            ->sortByDesc('at')
+            ->values();
+
+        return view('client.events.show', compact(
+            'event', 'categories', 'selectedCategoryIds', 'bids',
+            'type', 'scope', 'tab', 'award', 'questions', 'activity'
+        ));
     }
 
     public function update(Request $request, Event $event): RedirectResponse
