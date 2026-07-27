@@ -25,15 +25,25 @@ class ProfessionalBiddingBoardController extends Controller
     /** Non-Elite tiers unlock ESR/MSR this many minutes after posting. */
     private const TIER_DELAY_MINUTES = 60;
 
-    /** Tabs the board can filter by. Packages and Invite Only are in the
-     *  mockups but have no model behind them yet — see the note in index(). */
-    public const TABS = ['all', 'SSR', 'MSR', 'ESR', 'DO', 'saved'];
+    /**
+     * Board tabs = the request TYPE. Peter's model (2026-07-27): BSR is
+     * broadcast bidding, ESR is the same mechanism with urgency on top, DSR is
+     * targeted at one professional and never bid on. SSR and MSR are NOT types
+     * here — they are the scope (single vs multi service) inside each, and are
+     * filtered separately. Packages and Invite Only are in the mockups but have
+     * no model yet — see the note in index().
+     */
+    public const TABS = ['all', 'BSR', 'ESR', 'DSR', 'saved'];
+
+    /** Scope filter — the service count, which is what single vs multi means. */
+    public const SCOPES = ['', 'single', 'multi'];
 
     public function index(Request $request): View
     {
         $user = $request->user();
 
         $tab    = in_array($request->query('tab'), self::TABS, true) ? $request->query('tab') : 'all';
+        $scope  = in_array($request->query('scope'), self::SCOPES, true) ? (string) $request->query('scope') : '';
         $q      = trim((string) $request->query('q', ''));
         $catId  = (int) $request->query('category', 0);
         $city   = trim((string) $request->query('city', ''));
@@ -75,10 +85,14 @@ class ProfessionalBiddingBoardController extends Controller
         }
         if ($tab === 'saved') {
             $base->whereIn('id', $savedIds->all() ?: [0]);
-        } elseif ($tab === 'DO') {
+        } elseif ($tab === 'DSR') {
             $base->where('source', 'direct_offer');
         } elseif ($tab === 'ESR') {
             $base->where('source', 'esr');
+        } elseif ($tab === 'BSR') {
+            // Bidding, but not the emergency flavour — ESR has its own tab so a
+            // pro can spot the time-critical ones without scanning everything.
+            $base->where('source', '!=', 'direct_offer')->where(fn ($w) => $w->whereNull('source')->orWhere('source', '!=', 'esr'));
         }
 
         match ($sort) {
@@ -89,10 +103,10 @@ class ProfessionalBiddingBoardController extends Controller
 
         $events = $base->get();
 
-        // SSR/MSR is a service COUNT, which SQL can't filter on before the
-        // categories are loaded — so those two tabs are applied here.
-        if ($tab === 'SSR' || $tab === 'MSR') {
-            $events = $events->filter(fn ($e) => $this->typeOf($e) === $tab)->values();
+        // Scope is a service COUNT, which SQL can't filter on before the
+        // categories are loaded — so it is applied here.
+        if ($scope !== '') {
+            $events = $events->filter(fn ($e) => $this->scopeOf($e) === $scope)->values();
         }
 
         // Tiered early access — ESR + MSR only. Elite sees them on post; Pro and
@@ -131,7 +145,7 @@ class ProfessionalBiddingBoardController extends Controller
         return view('professional.bidding-board.index', [
             'gigs'          => $gigs,
             'counts'        => $this->tabCounts($user, $savedIds),
-            'filters'       => compact('tab', 'q', 'catId', 'city', 'window', 'sort', 'view'),
+            'filters'       => compact('tab', 'scope', 'q', 'catId', 'city', 'window', 'sort', 'view'),
             'categories'    => \App\Models\Category::active()->whereNotNull('parent_id')
                                 ->orderBy('name')->get(['id', 'name'])->unique('name')->take(60),
             'page'          => $page,
@@ -164,10 +178,9 @@ class ProfessionalBiddingBoardController extends Controller
 
         return [
             'all'   => $open->count(),
-            'SSR'   => $open->filter(fn ($e) => $this->typeOf($e) === 'SSR')->count(),
-            'MSR'   => $open->filter(fn ($e) => $this->typeOf($e) === 'MSR')->count(),
+            'BSR'   => $open->filter(fn ($e) => $this->typeOf($e) === 'BSR')->count(),
             'ESR'   => $open->where('source', 'esr')->count(),
-            'DO'    => $open->where('source', 'direct_offer')->count(),
+            'DSR'   => $open->where('source', 'direct_offer')->count(),
             'saved' => $savedIds->count(),
         ];
     }
@@ -211,15 +224,20 @@ class ProfessionalBiddingBoardController extends Controller
         ];
     }
 
-    /** SSR vs MSR is the service count; ESR and Direct Offer come from source. */
+    /** The request TYPE — how it reaches professionals. */
     private function typeOf(Event $e): string
     {
-        return match (true) {
-            $e->source === 'esr'          => 'ESR',
-            $e->source === 'direct_offer' => 'DO',
-            $e->categories->count() >= 2  => 'MSR',
-            default                       => 'SSR',
+        return match ($e->source) {
+            'esr'          => 'ESR',
+            'direct_offer' => 'DSR',
+            default        => 'BSR',
         };
+    }
+
+    /** The request SCOPE — single or multi service, which is the service count. */
+    private function scopeOf(Event $e): string
+    {
+        return $e->categories->count() >= 2 ? 'multi' : 'single';
     }
 
     /** Bookmark / un-bookmark an opportunity. */

@@ -177,12 +177,15 @@
     @php $ff = $filters; @endphp
     <div class="bb-bar">
         <div class="bb-tabs">
+            {{-- Type, not scope. Peter's model: BSR is broadcast bidding, ESR is
+                 that same mechanism with urgency, DSR goes to one professional
+                 and is never bid on. Single vs multi service is the SCOPE
+                 filter below, because both BSR and DSR carry either. --}}
             @foreach([
                 ['all', 'All Requests', ''],
-                ['ESR', '🔥 ESR', 'Emergency Service Request'],
-                ['SSR', 'SSR', 'Single Service Request'],
-                ['MSR', 'MSR', 'Multi-Service Request'],
-                ['DO',  'Direct Offers', 'Sent to you'],
+                ['BSR', 'BSR', 'Bidding Service Request'],
+                ['ESR', '🔥 ESR', 'Emergency — open to everyone'],
+                ['DSR', 'DSR', 'Direct — sent to you'],
                 ['saved', '★ Saved', ''],
             ] as [$key, $label, $sub])
                 <a class="bb-tab {{ $ff['tab'] === $key ? 'on' : '' }}"
@@ -207,6 +210,11 @@
             @endforeach
         </select>
         <input type="text" name="city" value="{{ $ff['city'] }}" placeholder="City">
+        <select name="scope" aria-label="Service scope">
+            <option value="">Single &amp; multi-service</option>
+            <option value="single" @selected($ff['scope'] === 'single')>SSR — single service</option>
+            <option value="multi" @selected($ff['scope'] === 'multi')>MSR — multi-service</option>
+        </select>
         <select name="closing">
             <option value="">Any deadline</option>
             <option value="48h" @selected($ff['window'] === '48h')>Next 48 hours</option>
@@ -218,7 +226,7 @@
             <option value="budget" @selected($ff['sort'] === 'budget')>Budget: high to low</option>
         </select>
         <button type="submit" class="bb-f-go">Apply</button>
-        @if($ff['q'] || $ff['catId'] || $ff['city'] || $ff['window'])
+        @if($ff['q'] || $ff['catId'] || $ff['city'] || $ff['window'] || $ff['scope'])
             <a class="bb-f-clear" href="{{ route('professional.bidding-board.index', ['tab' => $ff['tab']]) }}">Clear</a>
         @endif
     </form>
