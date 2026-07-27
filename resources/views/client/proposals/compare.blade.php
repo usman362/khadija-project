@@ -174,13 +174,13 @@
                         @csrf
                         <button type="submit" class="cp-btn no">Decline</button>
                     </form>
-                    {{-- Accepting awards the request and creates the booking, so it
-                         asks first — Peter's rule is the client can back out right
-                         up until this point, and not after. --}}
-                    <form method="POST" action="{{ route('client.proposals.accept', $b) }}" style="display:inline;"
-                          onsubmit="return confirm('Select {{ addslashes($pro->name ?? 'this professional') }} for ${{ number_format($b->amount) }}? Other proposals will close.');">
+                    {{-- Selecting opens the finalization rather than booking on the
+                         spot: scope, price, schedule, terms, contract and deposit
+                         all get agreed first, and either side can still back out
+                         until it is signed and funded. --}}
+                    <form method="POST" action="{{ route('client.finalize.start', $b) }}" style="display:inline;">
                         @csrf
-                        <button type="submit" class="cp-btn go">Select</button>
+                        <button type="submit" class="cp-btn go">Select &amp; finalize</button>
                     </form>
                 @endif
             </div>

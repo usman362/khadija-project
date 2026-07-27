@@ -599,6 +599,16 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:events.create')->name('client.bsr.discard');
         Route::get('/events/{event}/compare-proposals', [\App\Http\Controllers\Client\ClientProposalController::class, 'compare'])
             ->name('client.proposals.compare');
+
+        // ── Finalize With Professional — the 7-step agreement ────────
+        Route::post('/finalize/start/{bid}', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'start'])
+            ->name('client.finalize.start');
+        Route::get('/finalize/{finalization}/{step?}', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'show'])
+            ->name('client.finalize.step');
+        Route::post('/finalize/{finalization}/{step}', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'save'])
+            ->name('client.finalize.save');
+        Route::post('/finalize/{finalization}-cancel', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'cancel'])
+            ->name('client.finalize.cancel');
         Route::post('/proposals/{bid}/accept', [\App\Http\Controllers\Client\ClientProposalController::class, 'accept'])
             ->middleware('permission:bookings.update')->name('client.proposals.accept');
         Route::post('/proposals/{bid}/decline', [\App\Http\Controllers\Client\ClientProposalController::class, 'decline'])
