@@ -2,110 +2,245 @@
 
 @section('title', 'My Bids')
 @section('page-title', 'My Bids')
-@section('page-subtitle', 'Every bid you\'ve placed — sealed by default, reveal any time')
+@section('page-subtitle', 'Every request, bid, reply and outcome in one place')
 
-{{-- Professional — My Bids. The pro's own sealed bids across all gigs, with a
-     per-bid seal/reveal opt-in. Amounts are private (only the pro + the client
-     see them) unless the pro chooses to make a bid public. --}}
+{{-- Professional — My Bids.
+
+     States are DERIVED, not stored (see BID_STATES in the controller): an award
+     on the event decides won vs not-selected, a reply means a live negotiation,
+     a past event date means expired. Only submitted and withdrawn are written.
+     Peter's mockup also shows Drafts and Declined tabs — there is no draft-save
+     flow and no client-decline record, so they aren't rendered as tabs that
+     could only ever read zero. --}}
 
 @push('styles')
 <style>
-    .mb-wrap { max-width: 880px; margin: 0 auto; }
-    .mb-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+    .mb { max-width: 1180px; }
+    .mb-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
     .mb-back { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 700; color: var(--text-secondary); text-decoration: none; }
-    .mb-note { display: flex; gap: 9px; align-items: flex-start; background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: 12px; padding: 12px 15px; font-size: 12.5px; color: #5b21b6; line-height: 1.5; margin-bottom: 18px; }
     .mb-flash { display: flex; align-items: center; gap: 8px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; font-size: 13px; font-weight: 600; padding: 11px 16px; border-radius: 12px; margin-bottom: 16px; }
+    .mb-err { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
 
-    .mb-card { display: grid; grid-template-columns: minmax(0,1fr) auto auto; gap: 16px; align-items: center; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 15px 18px; margin-bottom: 12px; }
-    .mb-title { font-size: 15px; font-weight: 800; color: var(--text-primary); }
-    .mb-meta { font-size: 12px; color: var(--text-muted); margin-top: 3px; display: flex; flex-wrap: wrap; gap: 10px; }
-    .mb-amt { text-align: right; }
-    .mb-amt b { font-size: 18px; font-weight: 800; color: var(--text-primary); }
-    .mb-amt span { display: block; font-size: 10px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase; color: var(--text-muted); }
-    .mb-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 7px; }
-    .mb-badge.sealed { background: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe; }
-    .mb-badge.public { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
-    .mb-badge.mb-award-won { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-    .mb-badge.mb-award-declined { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
-    .mb-badge.mb-award-short { background: #fef9c3; color: #a16207; border: 1px solid #fde68a; }
-    .mb-badge.mb-award-review { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
-    .mb-toggle { border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 10px; padding: 8px 14px; font-size: 12.5px; font-weight: 700; color: var(--text-secondary); cursor: pointer; white-space: nowrap; }
-    .mb-toggle:hover { border-color: var(--text-secondary); }
-    .mb-status { display: flex; flex-direction: column; align-items: flex-end; gap: 7px; }
+    .mb-grid { display: grid; grid-template-columns: minmax(0,1fr) 290px; gap: 20px; align-items: start; }
+    @media (max-width: 1080px) { .mb-grid { grid-template-columns: minmax(0,1fr); } .mb-rail { position: static !important; } }
 
-    .mb-empty { text-align: center; padding: 60px 20px; background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: 16px; }
-    .mb-empty h3 { font-size: 17px; font-weight: 800; color: var(--text-primary); margin: 12px 0 6px; }
-    .mb-empty p { font-size: 13.5px; color: var(--text-muted); margin: 0 0 18px; }
-    .mb-empty a { display: inline-flex; align-items: center; gap: 7px; background: #2563eb; color: #fff; border-radius: 10px; padding: 10px 20px; font-size: 13.5px; font-weight: 700; text-decoration: none; }
-    @media (max-width: 620px) { .mb-card { grid-template-columns: 1fr; text-align: left; } .mb-amt { text-align: left; } .mb-status { align-items: flex-start; } }
+    /* Stat strip doubles as the state filter — the mockup had a stat row and a
+       status tab row saying the same numbers twice. */
+    .mb-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 16px; }
+    @media (max-width: 900px) { .mb-stats { grid-template-columns: repeat(2, 1fr); } }
+    .mb-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 13px 15px; text-decoration: none; display: block; }
+    .mb-stat.on { border-color: #2563eb; box-shadow: 0 0 0 1px #2563eb inset; }
+    .mb-stat b { display: block; font-size: 22px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
+    .mb-stat span { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+
+    .mb-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .mb-tab { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 999px; padding: 7px 14px; font-size: 12.5px; font-weight: 700; color: var(--text-secondary); text-decoration: none; }
+    .mb-tab.on { background: #2563eb; border-color: transparent; color: #fff; }
+    .mb-tab .n { font-size: 11px; font-weight: 800; opacity: .8; }
+    .mb-filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+    .mb-filters input, .mb-filters select { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 11px; font-size: 12.5px; color: var(--text-primary); font-family: inherit; }
+    .mb-filters .go { background: #2563eb; border: 0; border-radius: 10px; padding: 9px 16px; font-size: 12.5px; font-weight: 800; color: #fff; cursor: pointer; font-family: inherit; }
+    .mb-filters .clear { font-size: 12.5px; font-weight: 700; color: var(--text-secondary); text-decoration: none; }
+    .mb-search { flex: 1 1 220px; min-width: 170px; }
+
+    .mb-row { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 15px 18px; margin-bottom: 11px; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 14px; align-items: start; }
+    @media (max-width: 620px) { .mb-row { grid-template-columns: 1fr; } .mb-right { text-align: left !important; } .mb-acts { justify-content: flex-start !important; } }
+    .mb-title { font-size: 15px; font-weight: 800; color: var(--text-primary); text-decoration: none; }
+    .mb-title:hover { color: #2563eb; }
+    .mb-meta { font-size: 12px; color: var(--text-secondary); margin-top: 5px; display: flex; gap: 9px; flex-wrap: wrap; align-items: center; }
+    .mb-chip { display: inline-flex; align-items: center; border-radius: 6px; padding: 2px 8px; font-size: 10.5px; font-weight: 800; }
+    .mb-chip.BSR { background: rgba(37,99,235,.12); color: #2563eb; }
+    .mb-chip.ESR { background: rgba(220,38,38,.12); color: #dc2626; }
+    .mb-chip.DSR { background: rgba(124,58,237,.12); color: #7c3aed; }
+    .mb-chip.scope { background: rgba(100,116,139,.14); color: var(--text-secondary); }
+    .mb-right { text-align: right; min-width: 200px; }
+    .mb-amt { font-size: 18px; font-weight: 800; color: var(--text-primary); }
+    .mb-net { font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
+    .mb-state { display: inline-block; border-radius: 999px; padding: 3px 11px; font-size: 11px; font-weight: 800; margin-bottom: 6px; }
+    .mb-state.submitted { background: rgba(37,99,235,.12); color: #2563eb; }
+    .mb-state.negotiating { background: rgba(124,58,237,.14); color: #7c3aed; }
+    .mb-state.won { background: rgba(22,163,74,.14); color: #16a34a; }
+    .mb-state.not_selected, .mb-state.withdrawn { background: rgba(100,116,139,.16); color: var(--text-secondary); }
+    .mb-state.expired { background: rgba(217,119,6,.14); color: #d97706; }
+    .mb-acts { display: flex; gap: 7px; justify-content: flex-end; margin-top: 9px; flex-wrap: wrap; }
+    .mb-btn { border: 1px solid var(--border-color); background: transparent; border-radius: 9px; padding: 6px 12px; font-size: 12px; font-weight: 700; color: var(--text-secondary); text-decoration: none; cursor: pointer; font-family: inherit; }
+    .mb-btn.danger { border-color: rgba(220,38,38,.4); color: #dc2626; }
+
+    .mb-empty { background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: 14px; padding: 48px 20px; text-align: center; }
+    .mb-empty h4 { font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
+    .mb-empty p { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }
+    .mb-empty a { display: inline-flex; background: #2563eb; color: #fff; border-radius: 10px; padding: 10px 20px; font-size: 13px; font-weight: 700; text-decoration: none; }
+
+    .mb-rail { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 84px; }
+    .mb-rc { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 15px; }
+    .mb-rc h4 { font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 11px; }
+    .mb-rl { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; padding: 5px 0; }
+    .mb-rl span { color: var(--text-secondary); }
+    .mb-rl b { color: var(--text-primary); font-weight: 800; }
+    .mb-seal { background: #f5f3ff; border-color: #ddd6fe; }
+    .mb-seal h4 { color: #5b21b6; }
+    .mb-seal ul { margin: 0; padding-left: 17px; font-size: 12px; line-height: 1.7; color: #5b21b6; }
 </style>
 @endpush
 
 @section('content')
-<div class="mb-wrap">
-    @if(session('status'))
-        <div class="mb-flash">✅ {{ session('status') }}</div>
-    @endif
+<div class="mb">
+    @if(session('status'))<div class="mb-flash">✅ {{ session('status') }}</div>@endif
+    @error('bid')<div class="mb-flash mb-err">⚠️ {{ $message }}</div>@enderror
+
+    @php $f = $filters; @endphp
 
     <div class="mb-top">
-        <a class="mb-back" href="{{ route('professional.bidding-board.index') }}">← Back to Bidding Board</a>
-        <span style="font-size:12.5px;font-weight:700;color:var(--text-muted);">{{ $bids->total() }} bid{{ $bids->total() === 1 ? '' : 's' }} placed</span>
+        <a class="mb-back" href="{{ route('professional.bidding-board.index') }}">← Return to Bidding Board</a>
+        <span style="font-size:12.5px;font-weight:700;color:var(--text-secondary);">
+            {{ $rows->count() }} shown of {{ $counts['all'] }} total
+        </span>
     </div>
 
-    <div class="mb-note">
-        <span>🔒</span>
-        <span><b>Your bids are sealed.</b> Other professionals can't see your amounts — only you and the client can. Choose <b>Make public</b> on any bid if you'd rather show your amount openly.</span>
+    <div class="mb-stats">
+        @foreach([
+            ['all', 'All bids'],
+            ['submitted', 'Awaiting client'],
+            ['negotiating', 'Negotiating'],
+            ['won', 'Won'],
+            ['expired', 'Expired'],
+        ] as [$key, $label])
+            <a class="mb-stat {{ $f['state'] === $key ? 'on' : '' }}"
+               href="{{ route('professional.bidding-board.my-bids', array_filter(array_merge($f, ['state' => $key]))) }}">
+                <b>{{ $counts[$key] ?? 0 }}</b><span>{{ $label }}</span>
+            </a>
+        @endforeach
     </div>
 
-    @forelse($bids as $bid)
-        <div class="mb-card">
-            <div>
-                <div class="mb-title">{{ $bid->event?->title ?? 'Gig #' . $bid->event_id }}
-                    @if($bid->category)<span style="font-size:11px;font-weight:700;background:rgba(37,99,235,.1);color:#2563eb;border-radius:6px;padding:2px 8px;margin-left:6px;">{{ $bid->category->name }}</span>@endif
-                </div>
-                <div class="mb-meta">
-                    <span>📅 {{ $bid->event?->starts_at?->format('M j, Y') ?? 'Flexible' }}</span>
-                    <span>Submitted {{ $bid->created_at->diffForHumans() }}</span>
-                </div>
-                @include('professional.bidding-board._bid-thread', ['bid' => $bid])
-            </div>
-            <div class="mb-amt">
-                <b>${{ number_format($bid->amount) }}</b>
-                <span>Your bid</span>
-            </div>
-            <div class="mb-status">
-                @php
-                    $award = match ($bid->status) {
-                        'won'       => ['🏆 You won', 'won'],
-                        'declined'  => ['Not selected', 'declined'],
-                        'withdrawn' => ['Withdrawn', 'declined'],
-                        'shortlisted' => ['⭐ Shortlisted', 'short'],
-                        default     => ['⏳ Under review', 'review'],
-                    };
-                @endphp
-                <span class="mb-badge mb-award-{{ $award[1] }}">{{ $award[0] }}</span>
-                <span class="mb-badge {{ $bid->is_public ? 'public' : 'sealed' }}">
-                    {{ $bid->is_public ? '📣 Public' : '🔒 Sealed' }}
-                </span>
-                @if(! in_array($bid->status, ['won', 'declined', 'withdrawn']))
-                    <form method="POST" action="{{ route('professional.bidding-board.toggle', $bid) }}">
-                        @csrf
-                        <button type="submit" class="mb-toggle">{{ $bid->is_public ? 'Seal again' : 'Make public' }}</button>
-                    </form>
-                @endif
-            </div>
-        </div>
-    @empty
-        <div class="mb-empty">
-            <div style="font-size:38px;">🔒</div>
-            <h3>No bids yet</h3>
-            <p>Head to the bidding board and place your first sealed bid on an open gig.</p>
-            <a href="{{ route('professional.bidding-board.index') }}">Browse open gigs →</a>
-        </div>
-    @endforelse
+    {{-- Request type. Same model as the board: BSR / ESR / DSR are the types,
+         single vs multi service is the scope filter below. --}}
+    <div class="mb-tabs">
+        <a class="mb-tab {{ $f['type'] === '' ? 'on' : '' }}"
+           href="{{ route('professional.bidding-board.my-bids', array_filter(array_merge($f, ['type' => null]))) }}">
+            All types <span class="n">{{ $counts['all'] }}</span>
+        </a>
+        @foreach(['BSR', 'ESR', 'DSR'] as $key)
+            <a class="mb-tab {{ $f['type'] === $key ? 'on' : '' }}"
+               href="{{ route('professional.bidding-board.my-bids', array_filter(array_merge($f, ['type' => $key]))) }}">
+                {{ $key }} <span class="n">{{ $typeCounts[$key] }}</span>
+            </a>
+        @endforeach
+        {{-- Closed states only appear once they can actually happen. --}}
+        @foreach(['not_selected' => 'Not selected', 'withdrawn' => 'Withdrawn'] as $key => $label)
+            @if(($counts[$key] ?? 0) > 0)
+                <a class="mb-tab {{ $f['state'] === $key ? 'on' : '' }}"
+                   href="{{ route('professional.bidding-board.my-bids', array_filter(array_merge($f, ['state' => $key]))) }}">
+                    {{ $label }} <span class="n">{{ $counts[$key] }}</span>
+                </a>
+            @endif
+        @endforeach
+    </div>
 
-    @if($bids->hasPages())
-        <div style="margin-top:18px;">{{ $bids->links() }}</div>
-    @endif
+    <form method="GET" action="{{ route('professional.bidding-board.my-bids') }}" class="mb-filters">
+        <input type="hidden" name="state" value="{{ $f['state'] }}">
+        <input type="hidden" name="type" value="{{ $f['type'] }}">
+        <input class="mb-search" type="search" name="q" value="{{ $f['q'] }}" placeholder="Search event, client or service…">
+        <select name="scope">
+            <option value="">Single &amp; multi-service</option>
+            <option value="single" @selected($f['scope'] === 'single')>SSR — single service</option>
+            <option value="multi" @selected($f['scope'] === 'multi')>MSR — multi-service</option>
+        </select>
+        <button type="submit" class="go">Apply</button>
+        @if($f['q'] || $f['scope'])
+            <a class="clear" href="{{ route('professional.bidding-board.my-bids', array_filter(['state' => $f['state'], 'type' => $f['type']])) }}">Clear</a>
+        @endif
+    </form>
+
+    <div class="mb-grid">
+        <div>
+            @forelse($rows as $r)
+                @php $bid = $r['bid']; $e = $r['event']; @endphp
+                <article class="mb-row">
+                    <div>
+                        @if($e)
+                            <a class="mb-title" href="{{ route('professional.gigs.show', $e) }}">{{ $e->title }}</a>
+                        @else
+                            <span class="mb-title">Request no longer available</span>
+                        @endif
+                        <div class="mb-meta">
+                            <span class="mb-chip {{ $r['type'] }}">{{ $r['type'] }}</span>
+                            <span class="mb-chip scope">{{ $r['scope'] === 'multi' ? 'MSR · multi-service' : 'SSR · single service' }}</span>
+                            @if($bid->category)<span>{{ $bid->category->name }}</span>@endif
+                            @if($e?->client)<span>{{ $e->client->name }}</span>@endif
+                            @if($e?->starts_at)<span>📅 {{ $e->starts_at->format('M j, Y') }}</span>@endif
+                            <span>Bid {{ $bid->created_at->diffForHumans() }}</span>
+                        </div>
+
+                        {{-- The negotiation thread, unchanged — this is where
+                             counters and replies already live. --}}
+                        @include('professional.bidding-board._bid-thread', ['bid' => $bid])
+                    </div>
+
+                    <div class="mb-right">
+                        <span class="mb-state {{ $r['state'] }}">{{ Str::title(str_replace('_', ' ', $r['state'])) }}</span>
+                        <div class="mb-amt">${{ number_format($bid->amount) }}</div>
+                        <div class="mb-net">${{ number_format($r['net']) }} after {{ rtrim(rtrim(number_format($payout['pct'], 2), '0'), '.') }}% commission</div>
+                        <div class="mb-acts">
+                            <span class="mb-btn" style="cursor:default;">{{ $bid->is_public ? '📣 Public' : '🔒 Sealed' }}</span>
+                            @if(in_array($r['state'], ['submitted', 'negotiating'], true))
+                                <form method="POST" action="{{ route('professional.bidding-board.toggle', $bid) }}">
+                                    @csrf
+                                    <button type="submit" class="mb-btn">{{ $bid->is_public ? 'Seal again' : 'Make public' }}</button>
+                                </form>
+                                <form method="POST" action="{{ route('professional.bidding-board.withdraw', $bid) }}"
+                                      onsubmit="return confirm('Withdraw this bid? The client will no longer see it.');">
+                                    @csrf
+                                    <button type="submit" class="mb-btn danger">Withdraw</button>
+                                </form>
+                            @endif
+                            @if($e)
+                                <a class="mb-btn" href="{{ route('professional.gigs.show', $e) }}">View request</a>
+                            @endif
+                        </div>
+                    </div>
+                </article>
+            @empty
+                <div class="mb-empty">
+                    <div style="font-size:36px;">🔒</div>
+                    <h4>No bids here yet</h4>
+                    <p>{{ $f['state'] === 'all' && $f['type'] === '' && ! $f['q'] && ! $f['scope']
+                        ? 'Head to the Bidding Board and place your first bid — submitting is free.'
+                        : 'Nothing matches this filter. Try another tab, or clear your search.' }}</p>
+                    <a href="{{ route('professional.bidding-board.index') }}">Browse open requests →</a>
+                </div>
+            @endforelse
+        </div>
+
+        <aside class="mb-rail">
+            <div class="mb-rc">
+                <h4>Bid activity</h4>
+                @foreach(['all' => 'Total bids', 'submitted' => 'Awaiting client', 'negotiating' => 'Negotiating', 'won' => 'Won', 'not_selected' => 'Not selected', 'withdrawn' => 'Withdrawn', 'expired' => 'Expired'] as $k => $label)
+                    <div class="mb-rl"><span>{{ $label }}</span><b>{{ $counts[$k] ?? 0 }}</b></div>
+                @endforeach
+            </div>
+
+            {{-- Net, not gross: commission comes off at payout, so a gross total
+                 would overstate what actually arrives. --}}
+            <div class="mb-rc">
+                <h4>Estimated payout</h4>
+                <div class="mb-rl"><span>Won</span><b>${{ number_format($payout['won']) }}</b></div>
+                <div class="mb-rl"><span>In negotiation</span><b>${{ number_format($payout['negotiating']) }}</b></div>
+                <div class="mb-rl"><span>Awaiting client</span><b>${{ number_format($payout['submitted']) }}</b></div>
+                <div class="mb-rl" style="border-top:1px solid var(--border-color);margin-top:6px;padding-top:9px;">
+                    <span>Shown after commission</span><b>{{ rtrim(rtrim(number_format($payout['pct'], 2), '0'), '.') }}%</b>
+                </div>
+            </div>
+
+            <div class="mb-rc mb-seal">
+                <h4>🔒 Sealed bidding</h4>
+                <ul>
+                    <li>Your amount and terms are visible only to you and the client.</li>
+                    <li>Submitting, revising and negotiating are free.</li>
+                    <li>Withdraw any time before the request is awarded.</li>
+                    <li>Commission is deducted at payout, not at bid.</li>
+                </ul>
+            </div>
+        </aside>
+    </div>
 </div>
 @endsection

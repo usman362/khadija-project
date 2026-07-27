@@ -722,6 +722,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/bidding-board/my-bids', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'myBids'])->name('professional.bidding-board.my-bids');
         Route::post('/bidding-board/bid/{bid}/toggle', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'toggleBidVisibility'])->name('professional.bidding-board.toggle');
         Route::post('/bidding-board/save', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'toggleSaved'])->name('professional.bidding-board.save');
+        Route::post('/bidding-board/bid/{bid}/withdraw', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'withdrawBid'])->name('professional.bidding-board.withdraw');
         Route::post('/bidding-board/bid/{bid}/reply', [\App\Http\Controllers\Professional\ProfessionalBiddingBoardController::class, 'reply'])->name('professional.bidding-board.reply');
 
         // Team & Staffing (crew + shifts subsystem)

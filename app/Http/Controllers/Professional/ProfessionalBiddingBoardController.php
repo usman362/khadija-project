@@ -347,14 +347,134 @@ class ProfessionalBiddingBoardController extends Controller
     }
 
     /** The pro's own bids across all gigs, with seal/reveal control. */
+    /**
+     * Bid states shown on My Bids.
+     *
+     * Only 'submitted' and 'withdrawn' are stored — everything else is DERIVED
+     * from facts that already exist, so the page can't drift from reality:
+     * an award on the event decides won vs not-selected, a reply on the thread
+     * means a negotiation is live, and a past event date means the chance is
+     * gone. Peter's mockup also lists Drafts and Declined; there is no
+     * draft-save flow and no client-decline record, so those aren't offered as
+     * tabs that could only ever read zero.
+     */
+    public const BID_STATES = ['all', 'submitted', 'negotiating', 'won', 'not_selected', 'withdrawn', 'expired'];
+
     public function myBids(Request $request): View
     {
-        $bids = Bid::where('supplier_id', $request->user()->id)
-            ->with(['event:id,title,starts_at,status', 'category:id,name', 'replies.user:id,name'])
-            ->latest()
-            ->paginate(15);
+        $user = $request->user();
 
-        return view('professional.bidding-board.my-bids', compact('bids'));
+        $state = in_array($request->query('state'), self::BID_STATES, true) ? $request->query('state') : 'all';
+        $type  = in_array($request->query('type'), ['BSR', 'ESR', 'DSR'], true) ? $request->query('type') : '';
+        $scope = in_array($request->query('scope'), self::SCOPES, true) ? (string) $request->query('scope') : '';
+        $q     = trim((string) $request->query('q', ''));
+
+        $all = Bid::where('supplier_id', $user->id)
+            ->with(['event.categories:id,name', 'event.client:id,name', 'category:id,name', 'replies.user:id,name'])
+            ->latest()
+            ->get();
+
+        // One query for every award on the events this pro bid on, instead of
+        // asking per row.
+        $awards = \App\Models\Booking::whereIn('event_id', $all->pluck('event_id')->filter())
+            ->whereNotIn('status', ['cancelled'])
+            ->get()
+            ->keyBy('event_id');
+
+        $rows = $all->map(function (Bid $b) use ($awards, $user) {
+            $e     = $b->event;
+            $award = $e ? $awards->get($e->id) : null;
+
+            return [
+                'bid'       => $b,
+                'event'     => $e,
+                'state'     => $this->bidState($b, $award, $user),
+                'type'      => $e ? $this->typeOf($e) : 'BSR',
+                'scope'     => $e ? $this->scopeOf($e) : 'single',
+                'lastReply' => $b->replies->last(),
+                'net'       => Commission::netOf($b->amount, $user),
+            ];
+        });
+
+        if ($state !== 'all') {
+            $rows = $rows->where('state', $state);
+        }
+        if ($type !== '') {
+            $rows = $rows->where('type', $type);
+        }
+        if ($scope !== '') {
+            $rows = $rows->where('scope', $scope);
+        }
+        if ($q !== '') {
+            $needle = mb_strtolower($q);
+            $rows = $rows->filter(fn ($r) => str_contains(mb_strtolower(($r['event']->title ?? '') . ' ' . ($r['event']->client->name ?? '') . ' ' . ($r['bid']->category->name ?? '')), $needle));
+        }
+        $rows = $rows->values();
+
+        // Counts are over ALL of this pro's bids, not the filtered view — a tab
+        // that changed its own count when you clicked it would be useless.
+        $everyRow = $all->map(fn (Bid $b) => [
+            'state' => $this->bidState($b, $b->event ? $awards->get($b->event->id) : null, $user),
+            'type'  => $b->event ? $this->typeOf($b->event) : 'BSR',
+        ]);
+
+        return view('professional.bidding-board.my-bids', [
+            'rows'    => $rows,
+            'filters' => compact('state', 'type', 'scope', 'q'),
+            'counts'  => [
+                'all'          => $everyRow->count(),
+                'submitted'    => $everyRow->where('state', 'submitted')->count(),
+                'negotiating'  => $everyRow->where('state', 'negotiating')->count(),
+                'won'          => $everyRow->where('state', 'won')->count(),
+                'not_selected' => $everyRow->where('state', 'not_selected')->count(),
+                'withdrawn'    => $everyRow->where('state', 'withdrawn')->count(),
+                'expired'      => $everyRow->where('state', 'expired')->count(),
+            ],
+            'typeCounts' => [
+                'BSR' => $everyRow->where('type', 'BSR')->count(),
+                'ESR' => $everyRow->where('type', 'ESR')->count(),
+                'DSR' => $everyRow->where('type', 'DSR')->count(),
+            ],
+            // Net of commission, because that is what the pro actually receives.
+            'payout' => [
+                'pct'         => Commission::rateFor($user),
+                'won'         => $rows->where('state', 'won')->sum('net'),
+                'negotiating' => $rows->where('state', 'negotiating')->sum('net'),
+                'submitted'   => $rows->where('state', 'submitted')->sum('net'),
+            ],
+        ]);
+    }
+
+    /** Derive a bid's state — see BID_STATES for why almost none of it is stored. */
+    private function bidState(Bid $bid, ?\App\Models\Booking $award, \App\Models\User $user): string
+    {
+        if ($bid->status === 'withdrawn') {
+            return 'withdrawn';
+        }
+        if ($award) {
+            return (int) $award->supplier_id === (int) $user->id ? 'won' : 'not_selected';
+        }
+        if ($bid->event?->starts_at && $bid->event->starts_at->isPast()) {
+            return 'expired';
+        }
+
+        return $bid->replies->isNotEmpty() ? 'negotiating' : 'submitted';
+    }
+
+    /** Withdraw an open bid. Only the bidder, and only while nothing is awarded. */
+    public function withdrawBid(Request $request, Bid $bid): RedirectResponse
+    {
+        abort_unless((int) $bid->supplier_id === (int) $request->user()->id, 403);
+
+        $awarded = \App\Models\Booking::where('event_id', $bid->event_id)
+            ->whereNotIn('status', ['cancelled'])->exists();
+        if ($awarded) {
+            return back()->withErrors(['bid' => 'This request has already been awarded — the bid can no longer be withdrawn.']);
+        }
+
+        $bid->update(['status' => 'withdrawn']);
+
+        return back()->with('status', 'Bid withdrawn.');
     }
 
     /** Map a real Event to the bidding-board gig card shape. */
