@@ -11,24 +11,24 @@
     .esr-rail { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 88px; }
     .esr-rcard { background: var(--bg-card,#fff); border: 1px solid var(--border-color,#e5e7eb); border-radius: 16px; padding: 18px; }
     .esr-rcard h4 { font-size: 13px; font-weight: 800; color: var(--text-primary,#111827); margin-bottom: 13px; display:flex; align-items:center; gap:8px; }
-    .esr-rcard h4 svg { width:16px; height:16px; color:#dc2626; }
+    .esr-rcard h4 svg { width:16px; height:16px; color:#ea580c; }
     .esr-step { display: flex; gap: 11px; margin-bottom: 12px; }
     .esr-step:last-child { margin-bottom: 0; }
-    .esr-step-n { flex-shrink:0; width:24px; height:24px; border-radius:50%; background:#fef2f2; color:#dc2626; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+    .esr-step-n { flex-shrink:0; width:24px; height:24px; border-radius:50%; background:#fff7ed; color:#ea580c; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; }
     .esr-step-b { font-size:12.5px; color:var(--text-secondary,#4b5563); line-height:1.45; }
     .esr-step-b b { color:var(--text-primary,#111827); display:block; font-size:12.5px; margin-bottom:1px; }
     .esr-rlist { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
     .esr-rlist li { display:flex; gap:8px; font-size:12.5px; color:var(--text-secondary,#4b5563); line-height:1.4; }
     .esr-rlist svg { width:14px; height:14px; color:#16a34a; flex-shrink:0; margin-top:2px; }
-    .esr-alert { display:flex; gap:12px; align-items:flex-start; background:#fef2f2; border:1px solid #fecaca; border-radius:14px; padding:14px 16px; margin-bottom:18px; }
-    .esr-alert svg { width:22px; height:22px; color:#dc2626; flex-shrink:0; margin-top:1px; }
-    .esr-alert b { color:#b91c1c; }
-    .esr-alert p { margin:2px 0 0; font-size:13px; color:#7f1d1d; }
+    .esr-alert { display:flex; gap:12px; align-items:flex-start; background:#fff7ed; border:1px solid #fed7aa; border-radius:14px; padding:14px 16px; margin-bottom:18px; }
+    .esr-alert svg { width:22px; height:22px; color:#ea580c; flex-shrink:0; margin-top:1px; }
+    .esr-alert b { color:#c2410c; }
+    .esr-alert p { margin:2px 0 0; font-size:13px; color:#9a3412; }
     .esr-card { background:var(--bg-card,#fff); border:1px solid var(--border-color,#e5e7eb); border-radius:16px; padding:22px; margin-bottom:16px; }
-    .esr-sec-h { font-size:12px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; color:#dc2626; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+    .esr-sec-h { font-size:12px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; color:#ea580c; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
     .esr-field { margin-bottom:14px; }
     .esr-field label { display:block; font-size:12.5px; font-weight:700; color:var(--text-primary,#111827); margin-bottom:6px; }
-    .esr-req { color:#dc2626; }
+    .esr-req { color:#ea580c; }
     .esr-input, .esr-select, .esr-textarea { width:100%; border:1px solid var(--border-color,#e5e7eb); border-radius:10px; padding:11px 12px; font-size:14px; font-family:inherit; color:var(--text-primary,#111827); background:var(--bg-card,#fff); outline:none; }
     .esr-input:focus, .esr-select:focus, .esr-textarea:focus { border-color:#f97316; box-shadow:0 0 0 3px rgba(249,115,22,.12); }
     .esr-textarea { min-height:80px; resize:vertical; }
@@ -36,8 +36,8 @@
     .esr-grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
     .esr-reasons { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
     .esr-reason { display:flex; gap:10px; align-items:flex-start; border:1.5px solid var(--border-color,#e5e7eb); border-radius:12px; padding:12px; cursor:pointer; font-size:13px; }
-    .esr-reason:has(input:checked) { border-color:#dc2626; background:#fef2f2; }
-    .esr-reason input { margin-top:2px; accent-color:#dc2626; }
+    .esr-reason:has(input:checked) { border-color:#ea580c; background:#fff7ed; }
+    .esr-reason input { margin-top:2px; accent-color:#ea580c; }
     .esr-services { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:8px; max-height:230px; overflow-y:auto; padding:2px; }
     .esr-svc { display:flex; gap:8px; align-items:center; border:1.5px solid var(--border-color,#e5e7eb); border-radius:10px; padding:9px 11px; cursor:pointer; font-size:13px; }
     .esr-svc:has(input:checked) { border-color:#f97316; background:#fff7ed; }
@@ -46,8 +46,8 @@
     .esr-scope { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
     .esr-scope-o { border:2px solid var(--border-color,#e5e7eb); border-radius:14px; padding:15px; cursor:pointer; background:var(--bg-card,#fff); transition:border-color .15s, background .15s; }
     .esr-scope-o:hover { border-color:#f97316; }
-    .esr-scope-o.sel { border-color:#dc2626; background:#fef2f2; }
-    .esr-scope-code { display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:800; letter-spacing:.3px; color:#b91c1c; background:rgba(220,38,38,.12); padding:3px 10px; border-radius:999px; }
+    .esr-scope-o.sel { border-color:#ea580c; background:#fff7ed; }
+    .esr-scope-code { display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:800; letter-spacing:.3px; color:#c2410c; background:rgba(234,88,12,.12); padding:3px 10px; border-radius:999px; }
     .esr-scope-o h5 { font-size:14px; font-weight:800; color:var(--text-primary,#111827); margin:9px 0 5px; }
     .esr-scope-o p { font-size:12px; color:var(--text-muted,#6b7280); line-height:1.45; margin:0; }
     /* Copy that belongs to only one scope. */
@@ -57,7 +57,7 @@
     .esr-foot { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
     .esr-fees { font-size:12.5px; color:var(--text-muted,#6b7280); }
     .esr-fees b { color:var(--text-primary,#111827); }
-    .esr-btn { display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,#f43f5e,#dc2626); color:#fff; border:none; border-radius:12px; padding:13px 26px; font-size:14.5px; font-weight:800; cursor:pointer; }
+    .esr-btn { display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,#f97316,#ea580c); color:#fff; border:none; border-radius:12px; padding:13px 26px; font-size:14.5px; font-weight:800; cursor:pointer; }
     .esr-btn:hover { filter:brightness(1.05); }
     @media (max-width:1024px){ .esr-layout { grid-template-columns: 1fr; } .esr-rail { position: static; flex-direction: row; flex-wrap: wrap; } .esr-rcard { flex:1; min-width: 240px; } }
     @media (max-width:640px){ .esr-grid3,.esr-grid2,.esr-reasons{ grid-template-columns:1fr; } .esr-rail{ flex-direction:column; } }
@@ -67,6 +67,9 @@
 @section('content')
 <div class="esr" data-scope="{{ $scope }}">
     @if($errors->any())
+        {{-- The page is orange like the rest of the client area; this one box stays
+             red because it is a validation failure, not decoration — in orange it
+             would read as part of the theme and be missed. --}}
         <div style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:10px;padding:11px 15px;margin-bottom:16px;font-size:13.5px;font-weight:600;">{{ $errors->first() }}</div>
     @endif
 
