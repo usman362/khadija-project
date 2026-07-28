@@ -25,7 +25,7 @@ final class AiToolCatalog
         return [
             // ── CLIENT ────────────────────────────────────────────────
             ['key' => 'budget-allocator',   'name' => 'Budget Planner',     'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.budget-allocator',   'purpose' => 'Allocates the event budget across services.'],
-            ['key' => 'vendor-matchmaking', 'name' => 'Smart Match',   'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.vendor-matchmaking', 'purpose' => 'Finds the best professionals by budget, location, rating & availability.'],
+            ['key' => 'vendor-matchmaking', 'name' => 'Best Match',    'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.vendor-matchmaking', 'purpose' => 'Finds the best professionals by budget, location, rating & availability.'],
             ['key' => 'event-planner',      'name' => 'Guided Event Planner',        'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.event-planner', 'purpose' => 'Organises the event from planning through completion.'],
             ['key' => 'timeline-builder',   'name' => 'Timeline Builder',     'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.timeline-builder', 'purpose' => 'Creates an event timeline incl. setup, schedule and teardown.'],
             ['key' => 'venue-analyzer',     'name' => 'Venue Compatibility Check',       'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.venue-analyzer', 'purpose' => 'Reviews venue details and recommends vendors, equipment & logistics.'],
@@ -47,7 +47,7 @@ final class AiToolCatalog
             ['key' => 'review-writer',      'name' => 'Review Builder',        'audience' => 'both',         'status' => 'live',    'route' => 'ai-tools.review-writer',      'purpose' => 'Helps clients and pros write fair, detailed reviews.'],
             ['key' => 'contract-assistant', 'name' => 'Contract Assistant',   'audience' => 'both',         'status' => 'live',    'route' => 'ai-tools.contract-assistant', 'purpose' => 'Summarises contract clauses and highlights important terms.'],
             ['key' => 'message-assistant',  'name' => 'Message Builder',    'audience' => 'both',         'status' => 'live',    'route' => 'ai-tools.message-assistant', 'purpose' => 'Writes professional messages, replies and follow-ups.'],
-            ['key' => 'translator',         'name' => 'Translator',           'audience' => 'both',         'status' => 'live',    'route' => 'ai-tools.translator', 'purpose' => 'Translates conversations, proposals and documents between languages.'],
+            ['key' => 'translator',         'name' => 'Language',             'audience' => 'both',         'status' => 'live',    'route' => 'ai-tools.translator', 'purpose' => 'A fixed phrasebook of common event terms across supported languages.'],
         ];
     }
 

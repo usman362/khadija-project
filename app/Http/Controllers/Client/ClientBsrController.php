@@ -80,7 +80,7 @@ class ClientBsrController extends Controller
             'characteristics' => self::CHARACTERISTICS,
             'orgTypes'        => self::ORG_TYPES,
             'draftId'         => $data['draft_id'] ?? null,
-            'defaultWindowDays' => (int) config('bsr.default_proposal_window_days', 7),
+            'defaultWindowDays' => config('bsr.default_proposal_window_days'),
         ]);
     }
 
@@ -195,9 +195,15 @@ class ClientBsrController extends Controller
                 'budget_max' => ['nullable', 'numeric', 'min:0', 'max:9999999', 'gte:budget_min'],
             ],
             'proposals' => [
-                // The hard ceiling from R37: a proposal deadline can never fall
-                // after the event itself. Enforced here as well as in persist().
-                'proposal_deadline' => ['nullable', 'date', 'after:now'],
+                // R37 forbids inventing a window. Until GigResource approves a
+                // default, the client has to choose the deadline themselves —
+                // the platform must not quietly pick one for them.
+                // The hard ceiling also applies: a deadline can never fall
+                // after the event itself. Enforced here and in persist().
+                'proposal_deadline' => [
+                    config('bsr.default_proposal_window_days') ? 'nullable' : 'required',
+                    'date', 'after:now',
+                ],
                 'sealed_proposals'  => ['nullable', 'boolean'],
                 'questions_enabled' => ['nullable', 'boolean'],
             ],
@@ -218,6 +224,7 @@ class ClientBsrController extends Controller
             'description.min'            => 'A little more detail helps professionals bid accurately.',
             'budget_max.gte'             => 'The top of the range must be at least the bottom.',
             'proposal_deadline.after'    => 'The proposal deadline has to be in the future.',
+            'proposal_deadline.required' => 'Choose when proposals close. No standard window has been approved yet, so this can’t be set for you.',
             'confirm.accepted'           => 'Confirm the details before publishing.',
         ];
     }
@@ -260,15 +267,22 @@ class ClientBsrController extends Controller
             ? \Illuminate\Support\Carbon::parse($d['starts_at'])
             : null;
 
-        // No deadline chosen: fall back to the configured default window. This
-        // is the value the R37 Admin page will own once it exists — until then
-        // it is one config entry rather than a number buried in this method.
-        if (! $deadline) {
-            $deadline = now()->addDays((int) config('bsr.default_proposal_window_days', 7));
+        // R37: no invented fallbacks. A window is used only if one has actually
+        // been approved; otherwise the deadline came from the client, and if
+        // neither exists the request cannot be published safely.
+        $approvedWindow = config('bsr.default_proposal_window_days');
+        if (! $deadline && $approvedWindow) {
+            $deadline = now()->addDays((int) $approvedWindow);
+        }
+
+        if (! $deadline && $publish) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'proposal_deadline' => 'This request has no proposal deadline and no approved default window, so it can’t be published yet.',
+            ]);
         }
 
         // R37's hard ceiling: proposals must close before the event happens.
-        if ($startsAt && $deadline->gt($startsAt)) {
+        if ($deadline && $startsAt && $deadline->gt($startsAt)) {
             $deadline = $startsAt->copy()->subHour();
         }
 

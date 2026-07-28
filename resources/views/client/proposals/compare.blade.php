@@ -164,11 +164,10 @@
             <div class="cp-acts">
                 @if($pro)<a class="cp-btn" href="{{ route('public.professional.show', $pro) }}">Profile</a>@endif
                 @if(! $awardedTo && $r['state'] !== 'declined')
-                    <form method="POST" action="{{ route('client.proposals.reply', $b) }}" style="display:inline;">
-                        @csrf
-                        <input type="hidden" name="note" value="Could you share a little more detail on your proposal?">
-                        <button type="submit" class="cp-btn">Ask a question</button>
-                    </form>
+                    {{-- R12: Reply is a counter-offer, not a message — the two are
+                         deliberately different things. General questions belong in
+                         the message thread, so that's where this points. --}}
+                    <a class="cp-btn" href="{{ route('client.chat.index') }}">Message</a>
                     <form method="POST" action="{{ route('client.proposals.decline', $b) }}" style="display:inline;"
                           onsubmit="return confirm('Decline this proposal?');">
                         @csrf

@@ -256,7 +256,11 @@ class ProfessionalBidWizardController extends Controller
             'plan'                => $d['plan'] ?? null,
             'terms'               => $d['terms'] ?? null,
             'note'                => $d['note'] ?? null,
-            'is_public'           => (bool) ($d['is_public'] ?? false),
+            // R8: making a bid public is one-way. Once true it stays true, no
+            // matter what a later submission says.
+            'is_public'           => (bool) ($d['is_public'] ?? false)
+                                      || (bool) Bid::where('event_id', $event->id)
+                                            ->where('supplier_id', $user->id)->value('is_public'),
             'status'              => $submit ? 'submitted' : 'draft',
             'submitted_at'        => $submit ? now() : null,
         ];

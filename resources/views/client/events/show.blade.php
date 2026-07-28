@@ -190,7 +190,9 @@
             @endphp
             @if($aiArtifacts->isNotEmpty())
             <div class="cl-card" style="margin-top:20px;">
-                <h3 style="font-size:16px;font-weight:600;margin-bottom:14px;">✨ AI Toolkit Results ({{ $aiArtifacts->count() }})</h3>
+                {{-- R29 is platform-wide: no feature may claim or imply AI. The tools are
+                     rules-based calculators and templates, so the heading says that. --}}
+                <h3 style="font-size:16px;font-weight:600;margin-bottom:14px;">Toolkit Results ({{ $aiArtifacts->count() }})</h3>
                 <div style="display:flex;flex-direction:column;gap:10px;">
                     @foreach($aiArtifacts as $art)
                         <div style="display:flex;align-items:center;gap:12px;border:1px solid var(--border-color);border-radius:12px;padding:11px 13px;">

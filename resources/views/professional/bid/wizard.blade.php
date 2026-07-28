@@ -279,10 +279,19 @@
             <textarea name="note" style="min-height:80px;" placeholder="A short note to go with your proposal…">{{ $data['note'] ?? '' }}</textarea>
         </div>
 
-        <label class="bd-check">
-            <input type="checkbox" name="is_public" value="1" @checked(! empty($data['is_public']))>
-            <span><b>Make my bid amount public.</b> Off by default. Once made public it cannot be undone.</span>
-        </label>
+        {{-- R8: this is a real one-way door. The copy says it cannot be undone,
+             so once it is set the control is locked rather than left tickable —
+             the server ignores an attempt to turn it back off either way. --}}
+        @if(! empty($existing?->is_public))
+            <div class="bd-check" style="border-color:rgba(37,99,235,.35);">
+                <span>🔓 <b>Your bid amount is public.</b> This was a one-way choice and can't be reversed.</span>
+            </div>
+        @else
+            <label class="bd-check">
+                <input type="checkbox" name="is_public" value="1">
+                <span><b>Make my bid amount public.</b> Off by default, and sealed is recommended. <b>Once made public it cannot be undone.</b></span>
+            </label>
+        @endif
 
         <label class="bd-check" style="border-color:rgba(37,99,235,.35);background:rgba(37,99,235,.07);">
             <input type="checkbox" name="confirm" value="1">
