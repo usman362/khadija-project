@@ -68,6 +68,12 @@
     .ms-section-label { font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; }
     .ms-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
     .ms-grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    /* Standalone fields had no bottom margin — only .ms-grid2/.ms-grid3 carried
+       one — so anything sitting on its own (Event Name, the Event Type picker)
+       butted straight into the row below it. Inside a grid the gap already does
+       the spacing, so those are reset to avoid doubling up. */
+    .ms-field { margin-bottom: 14px; }
+    .ms-grid2 .ms-field, .ms-grid3 .ms-field { margin-bottom: 0; }
     .ms-field label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; }
     .ms-field label .req { color: #ef4444; }
     .ms-input, .ms-select, .ms-textarea {
@@ -205,7 +211,7 @@
             <div class="ms-field"><label>Event Location <span class="req">*</span></label><input name="location" class="ms-input" placeholder="Venue or address" value="{{ old('location', $activeEvent->location ?? '') }}"></div>
             <div class="ms-field"><label>Estimated Guest Count <span class="req">*</span></label><input name="guest_count" type="number" class="ms-input" placeholder="e.g. 300" value="{{ old('guest_count') }}"></div>
         </div>
-        <div class="ms-field" style="margin-bottom:14px;"><label>Event Description / Goals</label><textarea name="description" class="ms-textarea" placeholder="Tell us about your event, goals, theme, and any important details.">{{ old('description') }}</textarea></div>
+        <div class="ms-field"><label>Event Description / Goals</label><textarea name="description" class="ms-textarea" placeholder="Tell us about your event, goals, theme, and any important details.">{{ old('description') }}</textarea></div>
         <div class="ms-grid2">
             <div class="ms-field"><label>Budget Range (Total)</label><select name="budget_range" class="ms-select"><option value="">Select budget range</option><option>$5,000 – $10,000</option><option>$10,000 – $25,000</option><option>$25,000 – $50,000</option><option>$50,000+</option></select></div>
             <div class="ms-field"><label>Planning Stage</label><select name="planning_stage" class="ms-select"><option value="">Select planning stage</option><option>Just exploring</option><option>Actively planning</option><option>Ready to book</option></select></div>
