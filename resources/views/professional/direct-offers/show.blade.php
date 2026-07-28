@@ -23,7 +23,11 @@
     .do-req-av { width:54px; height:54px; border-radius:50%; background:#2563eb; color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; flex-shrink:0; }
     .do-req b { font-size:15px; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:6px; }
     .do-req .verif { color:#2563eb; }
-    .do-req span { font-size:12px; color:var(--text-muted); display:block; margin-top:2px; }
+    /* Scoped to the text block on purpose. As a bare `.do-req span` this also
+       matched the avatar — which is a span — and beat `.do-req-av` on
+       specificity, turning it back into a block so the initial sat in the
+       corner in muted grey instead of centred and white. */
+    .do-req > div span { font-size:12px; color:var(--text-muted); display:block; margin-top:2px; }
     .do-k { font-size:11.5px; color:var(--text-muted); }
     .do-v { font-size:20px; font-weight:800; color:var(--text-primary); margin-top:3px; }
     .do-v.warn { color:#dc2626; }
