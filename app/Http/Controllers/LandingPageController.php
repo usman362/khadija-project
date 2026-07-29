@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Faq;
 use App\Models\MembershipPlan;
 use App\Models\Review;
+use App\Models\Setting;
 use Illuminate\View\View;
 
 class LandingPageController extends Controller
@@ -40,12 +41,24 @@ class LandingPageController extends Controller
             ->latest()
             ->first();
 
+        // Promo video — URL and poster come from settings so they can be
+        // swapped without a deploy. `homepage.video_url` empty means no video
+        // is configured, and the section renders as a still with no play
+        // control rather than a button that opens an empty player.
+        $video = [
+            'url'    => trim((string) Setting::get('homepage.video_url', '')),
+            'poster' => trim((string) Setting::get('homepage.video_poster', ''))
+                ?: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80&auto=format&fit=crop',
+            'title'  => trim((string) Setting::get('homepage.video_title', '')) ?: 'GigResource',
+        ];
+
         return view('landing', compact(
             'plans',
             'faqs',
             'categories',
             'showcaseCategories',
-            'featuredReview'
+            'featuredReview',
+            'video'
         ));
     }
 

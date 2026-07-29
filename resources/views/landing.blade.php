@@ -141,11 +141,22 @@
     .lp-video .play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
     .lp-video .play span { width: 66px; height: 66px; border-radius: 50%; background: rgba(255,255,255,0.92); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); }
     .lp-video .play svg { width: 24px; height: 24px; color: var(--blue); margin-left: 3px; }
-    .lp-video-badge { position: absolute; left: 18px; bottom: 18px; right: 18px; background: rgba(255,255,255,0.96); border-radius: 13px; padding: 11px 14px; display: flex; align-items: center; gap: 11px; }
-    .lp-video-badge .vic { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg,#fb923c,#ea580c); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .lp-video-badge .vic svg { width: 18px; height: 18px; color: #fff; }
-    .lp-video-badge b { font-size: 14px; color: var(--ink); display: block; }
-    .lp-video-badge small { font-size: 11px; color: var(--muted); }
+    /* The poster is a real <button> when a video is configured, so it is
+       keyboard-reachable; these reset the button chrome. */
+    button.lp-video { display: block; width: 100%; padding: 0; border: none; background: none; cursor: pointer; font: inherit; }
+    button.lp-video:focus-visible { outline: 3px solid var(--orange-dark); outline-offset: 3px; }
+    .lp-video .play span { transition: transform .18s ease; }
+    button.lp-video:hover .play span { transform: scale(1.08); }
+
+    /* ── Video modal ── */
+    .lp-vm { position: fixed; inset: 0; z-index: 1000; display: none; align-items: center; justify-content: center; padding: 24px; background: rgba(8, 15, 31, 0.82); }
+    .lp-vm.is-open { display: flex; }
+    .lp-vm-box { position: relative; width: min(960px, 100%); }
+    .lp-vm-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 16px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.45); }
+    .lp-vm-frame iframe, .lp-vm-frame video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .lp-vm-close { position: absolute; top: -44px; right: 0; width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; background: rgba(255,255,255,0.92); display: flex; align-items: center; justify-content: center; }
+    .lp-vm-close svg { width: 18px; height: 18px; color: #0f172a; }
+    @media (max-width: 640px) { .lp-vm-close { top: auto; bottom: -46px; right: 50%; transform: translateX(50%); } }
     .lp-testi h3 { font-size: 19px; font-weight: 800; margin-bottom: 16px; }
     .lp-testi-card { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 24px; box-shadow: var(--shadow); }
     .lp-testi-q { font-size: 34px; line-height: 1; color: var(--blue); font-family: Georgia, serif; }
@@ -445,14 +456,20 @@
                 @endforeach
             </div>
 
-            <div class="lp-video">
-                <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80&auto=format&fit=crop" alt="Event highlights">
-                <div class="play"><span><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></span></div>
-                <div class="lp-video-badge">
-                    <span class="vic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
-                    <div><b>Powering Unforgettable Celebrations</b><small>Weddings, conferences, concerts &amp; more</small></div>
+            {{-- A button only when there is something to play; otherwise the
+                 poster stands on its own rather than offering a dead control. --}}
+            @if($video['url'])
+                <button type="button" class="lp-video" id="lpVideoOpen"
+                        data-video="{{ $video['url'] }}"
+                        aria-label="Play video: {{ $video['title'] }}">
+                    <img src="{{ $video['poster'] }}" alt="{{ $video['title'] }}">
+                    <span class="play"><span><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></span></span>
+                </button>
+            @else
+                <div class="lp-video">
+                    <img src="{{ $video['poster'] }}" alt="{{ $video['title'] }}">
                 </div>
-            </div>
+            @endif
 
             <div class="lp-testi">
                 <h3>Loved by Our Community</h3>
@@ -578,6 +595,19 @@
     </div>
 </div>
 
+@if($video['url'])
+    <div class="lp-vm" id="lpVideoModal" role="dialog" aria-modal="true" aria-label="{{ $video['title'] }}">
+        <div class="lp-vm-box">
+            <button type="button" class="lp-vm-close" aria-label="Close video">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            {{-- Filled in on open, emptied on close, so nothing keeps playing
+                 behind the overlay. --}}
+            <div class="lp-vm-frame"></div>
+        </div>
+    </div>
+@endif
+
 @push('scripts')
 <script>
     // Expand / collapse the extra pricing-card features (Peter: keep card
@@ -602,6 +632,58 @@
             prev.addEventListener('click', function () { track.scrollBy({ left: -step(), behavior: 'smooth' }); });
             next.addEventListener('click', function () { track.scrollBy({ left: step(), behavior: 'smooth' }); });
         }
+    })();
+</script>
+<script>
+    // Promo video modal. The player is only built on open and torn out on
+    // close — leaving an iframe in the DOM keeps YouTube loading (and, with
+    // autoplay in the src, playing) behind the closed overlay.
+    (function () {
+        var opener = document.getElementById('lpVideoOpen');
+        var modal  = document.getElementById('lpVideoModal');
+        if (!opener || !modal) return;
+
+        var frame  = modal.querySelector('.lp-vm-frame');
+        var closer = modal.querySelector('.lp-vm-close');
+        var lastFocus = null;
+
+        // YouTube and Vimeo need their embed form; anything else is treated as
+        // a direct file and handed to a <video> element.
+        function player(url) {
+            var yt = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/);
+            if (yt) {
+                return '<iframe src="https://www.youtube-nocookie.com/embed/' + yt[1] +
+                    '?autoplay=1&rel=0" title="Video" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>';
+            }
+            var vm = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+            if (vm) {
+                return '<iframe src="https://player.vimeo.com/video/' + vm[1] +
+                    '?autoplay=1" title="Video" allow="autoplay; fullscreen" allowfullscreen></iframe>';
+            }
+            return '<video src="' + url.replace(/"/g, '&quot;') + '" controls autoplay playsinline></video>';
+        }
+
+        function open() {
+            lastFocus = document.activeElement;
+            frame.innerHTML = player(opener.getAttribute('data-video'));
+            modal.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+            closer.focus();
+        }
+
+        function close() {
+            modal.classList.remove('is-open');
+            frame.innerHTML = '';
+            document.body.style.overflow = '';
+            if (lastFocus) lastFocus.focus();
+        }
+
+        opener.addEventListener('click', open);
+        closer.addEventListener('click', close);
+        modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal.classList.contains('is-open')) close();
+        });
     })();
 </script>
 @endpush
