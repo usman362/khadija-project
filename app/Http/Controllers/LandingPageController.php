@@ -80,8 +80,11 @@ class LandingPageController extends Controller
         return Category::active()
             ->whereNull('parent_id')
             ->whereNotNull('thumbnail')
-            ->orderBy('sort_order')
-            ->orderBy('name')
+            // Same order as /events-categories and the admin card grid —
+            // newest first — so a category added today shows up at the front
+            // of the carousel instead of alphabetically buried.
+            ->orderByDesc('sort_order')
+            ->orderByDesc('id')
             ->limit(8)
             ->get(['name', 'slug', 'thumbnail', 'cover_image'])
             ->map(fn (Category $c) => [
