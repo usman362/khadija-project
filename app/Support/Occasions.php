@@ -56,4 +56,10 @@ class Occasions
     {
         return isset(self::MAP[$label]);
     }
+
+    /** Every matchable label, for building a filter control. */
+    public static function labels(): array
+    {
+        return array_keys(self::MAP);
+    }
 }

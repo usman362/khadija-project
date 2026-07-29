@@ -8,10 +8,11 @@
     // Build a query array with one service removed (for the removable top chips).
     $withoutService = function ($svc) use ($f) {
         $rest = array_values(array_diff($f['selected'], [$svc]));
-        return array_filter(['services' => $rest ?: null, 'provider' => $f['provider'] !== 'all' ? $f['provider'] : null, 'q' => $f['q'] ?: null, 'sort' => $f['sort'] !== 'relevant' ? $f['sort'] : null, 'view' => $f['view'] !== 'list' ? $f['view'] : null]);
+        return array_filter(['services' => $rest ?: null, 'provider' => $f['provider'] !== 'all' ? $f['provider'] : null, 'q' => $f['q'] ?: null, 'event_type' => $f['event_type'] ?: null, 'sort' => $f['sort'] !== 'relevant' ? $f['sort'] : null, 'view' => $f['view'] !== 'list' ? $f['view'] : null]);
     };
-    $baseQuery = array_filter(['services' => $f['selected'] ?: null, 'provider' => $f['provider'] !== 'all' ? $f['provider'] : null, 'q' => $f['q'] ?: null]);
-    $stock = ['photo-1519741497674-611481863552','photo-1511795409834-ef04bbd61622','photo-1530103862676-de8c9debad1d','photo-1492684223066-81342ee5ff30','photo-1464366400600-7168b8af9bc3','photo-1519225421980-715cb0215aed'];
+    // event_type rides along here too, otherwise switching sort or view
+    // silently dropped the chosen occasion.
+    $baseQuery = array_filter(['services' => $f['selected'] ?: null, 'provider' => $f['provider'] !== 'all' ? $f['provider'] : null, 'q' => $f['q'] ?: null, 'event_type' => $f['event_type'] ?: null]);
 @endphp
 
 @push('styles')
@@ -129,9 +130,9 @@
     .pk-side { display: flex; flex-direction: column; gap: 18px; position: sticky; top: 84px; }
     .pk-scard { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
     .pk-scard h4 { font-size: 14px; font-weight: 800; color: var(--ink); margin: 0 0 12px; display: flex; align-items: center; justify-content: space-between; }
-    .pk-map { position: relative; border-radius: 12px; overflow: hidden; background: linear-gradient(135deg,#dbeafe,#eff6ff); height: 150px; margin-bottom: 12px; }
-    .pk-map svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .pk-avail-note { font-size: 11.5px; color: var(--muted); margin: -4px 0 10px; }
     .pk-avail { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; color: var(--ink-2); padding: 4px 0; }
+    .pk-avail + .pk-avail { border-top: 1px solid rgba(0,0,0,0.05); }
     .pk-avail b { color: var(--ink); }
     .pk-legend { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; font-size: 11.5px; color: var(--muted); }
     .pk-legend span::before { content: "●"; margin-right: 6px; }
@@ -198,6 +199,7 @@
                     @foreach($f['selected'] as $s)<input type="hidden" name="services[]" value="{{ $s }}">@endforeach
                     @if($f['provider'] !== 'all')<input type="hidden" name="provider" value="{{ $f['provider'] }}">@endif
                     @if($f['q'])<input type="hidden" name="q" value="{{ $f['q'] }}">@endif
+                    @if($f['event_type'])<input type="hidden" name="event_type" value="{{ $f['event_type'] }}">@endif
                     @if($f['view'] !== 'list')<input type="hidden" name="view" value="{{ $f['view'] }}">@endif
                     <label for="pk-sort">Sort by:</label>
                     <select id="pk-sort" name="sort" onchange="this.form.submit()">
@@ -240,6 +242,19 @@
                 </div>
                 <button type="button" class="pk-showmore" id="pkShowMore" onclick="pkToggleMore()">Show More ▾</button>
 
+                <div class="pk-divider"></div>
+
+                {{-- The controller has always accepted `event_type`; until now the
+                     only way to reach it was to type it into the address bar. --}}
+                <div class="pk-rail-sec">2. Occasion</div>
+                <p class="pk-rail-hint">Show packages suited to one kind of event</p>
+                <select name="event_type" class="pk-svcsearch" style="cursor:pointer;">
+                    <option value="">Any occasion</option>
+                    @foreach($occasions as $o)
+                        <option value="{{ $o }}" @selected($f['event_type'] === $o)>{{ $o }}</option>
+                    @endforeach
+                </select>
+
                 <button type="submit" class="pk-apply">Apply Filters</button>
             </form>
 
@@ -251,12 +266,13 @@
                             @php
                                 $pro = $pkg->user;
                                 $gallery = $pkg->heroUrls(4);
-                                if (empty($gallery)) {
-                                    // No uploads yet — lead with a category-appropriate hero, then vary.
-                                    $gallery = array_merge(
-                                        [$pkg->fallbackHeroUrl(520)],
-                                        collect(range(1, 3))->map(fn ($k) => 'https://images.unsplash.com/' . $stock[($pkg->id + $k) % count($stock)] . '?w=520&q=70&auto=format&fit=crop')->all()
-                                    );
+                                // A package with no uploads gets one stand-in picture, not four.
+                                // Padding it out to four stock shots gave every card arrows and
+                                // dots — a gallery the professional never uploaded, and clicking
+                                // through it showed unrelated stock. One image, no controls.
+                                $hasOwnPhotos = ! empty($gallery);
+                                if (! $hasOwnPhotos) {
+                                    $gallery = [$pkg->fallbackHeroUrl(520)];
                                 }
                                 $rating = $pro?->reviews_avg ? number_format($pro->reviews_avg, 1) : null;
                                 $svcTags = $pkg->services ?: ($pkg->category ? [$pkg->category->name] : []);
@@ -267,7 +283,10 @@
                                     @foreach($gallery as $gi => $src)
                                         <img class="pk-slide {{ $gi === 0 ? 'active' : '' }}" src="{{ $src }}" alt="{{ $pkg->title }}" loading="lazy">
                                     @endforeach
-                                    <button type="button" class="pk-heart" onclick="this.classList.toggle('on')" aria-label="Save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg></button>
+                                    {{-- The heart used to be here. It only toggled a CSS class —
+                                         nothing was saved, and there is no saved-packages table for
+                                         it to save to, so it promised a shortlist that did not
+                                         exist. Removed until that is real. --}}
                                     @if($pkg->photosCount())<span class="pk-photos">📷 {{ $pkg->photosCount() }} Photos</span>@endif
                                     @if(count($gallery) > 1)
                                         <button class="pk-nav prev" type="button" onclick="pkSlide(this,-1)" aria-label="Previous photo">‹</button>
@@ -300,8 +319,9 @@
                                     <span class="lbl">Starting at</span>
                                     <span class="amt">{{ $total_ }}</span>
                                     <span class="tp">Total Package</span>
+                                    {{-- One button. "Customize Package" pointed at the very same
+                                         URL, so it read as a second, different action and wasn't. --}}
                                     <a class="pk-btn pk-btn-primary" href="{{ route('public.package', $pkg->slug) }}">View Package</a>
-                                    <a class="pk-btn pk-btn-ghost" href="{{ route('public.package', $pkg->slug) }}">Customize Package</a>
                                     @if($pkg->savings_pct)<div class="pk-save">Save up to {{ $pkg->savings_pct }}%<br>vs. booking separately</div>@endif
                                 </div>
                             </article>
@@ -321,12 +341,19 @@
             {{-- Right rail --}}
             <aside class="pk-side">
                 <div class="pk-scard">
-                    <h4>Where Packages Are Available <span style="color:var(--muted);font-weight:600;">ⓘ</span></h4>
-                    <div class="pk-map">
-                        <svg viewBox="0 0 200 150" preserveAspectRatio="none"><rect width="200" height="150" fill="#dbeafe"/><path d="M0 90 Q50 70 100 85 T200 80 V150 H0 Z" fill="#bfdbfe"/><path d="M120 0 L140 40 L110 60 L130 90 L160 70 L200 90 V0 Z" fill="#e0f2fe"/></svg>
-                    </div>
+                    <h4>Where Packages Are Available</h4>
+                    {{-- There was a decorative blue blob above this list posing as a
+                         map. It plotted nothing — no coordinates, no map library — so
+                         it read as coverage data while carrying none. The counts below
+                         are the real answer to the same question. --}}
+                    <p class="pk-avail-note">Cities these packages are offered from.</p>
                     @foreach($availability as $city => $count)
-                        <div class="pk-avail"><span>{{ $city }}</span><b>{{ $count }}</b></div>
+                        {{-- A package whose professional has not set a city. Named
+                             rather than dropped, so the numbers still add up. --}}
+                        <div class="pk-avail">
+                            <span>{{ $city === 'Other' ? 'City not listed' : $city }}</span>
+                            <b>{{ $count }}</b>
+                        </div>
                     @endforeach
                 </div>
 
@@ -336,7 +363,8 @@
                     <div class="pk-why"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg><div><b>Seamless Experience</b><span>Professionals coordinate for you</span></div></div>
                     <div class="pk-why"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div><b>One Contract</b><span>One payment, one point of contact</span></div></div>
                     <div class="pk-why"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg><div><b>Customizable</b><span>Adjust services to fit your needs</span></div></div>
-                    <a class="pk-howbtn" href="#">How Packages Work</a>
+                    {{-- Was href="#". There is a real page for this. --}}
+                    <a class="pk-howbtn" href="{{ route('public.how-it-works') }}">How Packages Work</a>
                 </div>
 
                 @if($recent->count())
@@ -344,7 +372,9 @@
                         <h4>Recently Viewed Packages</h4>
                         <div class="pk-recent">
                             @foreach($recent->take(3) as $r)
-                                @php $rhero = $r->heroUrls(1)[0] ?? 'https://images.unsplash.com/' . $stock[$r->id % count($stock)] . '?w=160&q=60&auto=format&fit=crop'; @endphp
+                                {{-- Same stand-in the cards use, so a package looks the
+                                     same here as it did in the list. --}}
+                                @php $rhero = $r->heroUrls(1)[0] ?? $r->fallbackHeroUrl(160); @endphp
                                 <a href="{{ route('public.package', $r->slug) }}">
                                     <img src="{{ $rhero }}" alt="{{ $r->title }}" loading="lazy">
                                     <div class="cap">{{ \Illuminate\Support\Str::limit($r->title, 32) }}</div>

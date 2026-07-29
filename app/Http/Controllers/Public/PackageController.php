@@ -78,14 +78,16 @@ class PackageController extends Controller
                 ->count();
         }
 
-        // Right-rail "Where Packages Are Available" — real counts by pro city.
+        // Right-rail "Where Packages Are Available" — real counts by the
+        // professional's city. Not capped: it used to take(6), which silently
+        // dropped four cities, so the list added up to less than the package
+        // count printed at the top of the page.
         $availability = Package::active()
             ->with('user.profile:user_id,city')
             ->get()
             ->groupBy(fn ($p) => $p->user?->profile?->city ?: 'Other')
             ->map->count()
-            ->sortDesc()
-            ->take(6);
+            ->sortDesc();
 
         // Recently viewed (session ids, newest first), excluding what's on-page already.
         $recentIds = collect(session('recent_packages', []))->take(4);
@@ -99,6 +101,9 @@ class PackageController extends Controller
             'total'          => $packages->total(),
             'services'       => self::SERVICES,
             'serviceCounts'  => $serviceCounts,
+            // The occasion filter already worked, but only from a hand-typed
+            // URL — there was no control for it anywhere on the page.
+            'occasions'      => \App\Support\Occasions::labels(),
             'availability'   => $availability,
             'recent'         => $recent,
             'filters'        => [
