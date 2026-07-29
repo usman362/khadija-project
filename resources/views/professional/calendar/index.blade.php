@@ -56,7 +56,7 @@
     /* ── Section heading ── */
     .mc-sec-h { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
     .mc-sec-h .ic { width: 30px; height: 30px; border-radius: 9px; background: rgba(37,99,235,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .mc-sec-h .ic svg { width: 17px; height: 17px; color: #2563eb; }
+    .mc-sec-h .ic svg { width: 17px; height: 17px; color: var(--info-text); }
     .mc-sec-h b { font-size: 19px; font-weight: 800; color: var(--text-primary); }
     .mc-sec-sub { font-size: 12.5px; color: var(--text-muted); margin: 0 0 16px; padding-left: 40px; }
 
@@ -67,7 +67,7 @@
     .mc-bd-art { display: flex; justify-content: center; padding: 6px 0 14px; }
     .mc-bd-art svg { width: 130px; height: auto; }
     .mc-bd-note { font-size: 12.5px; color: var(--text-secondary); line-height: 1.55; margin: 0 0 8px; }
-    .mc-bd-note b { color: #2563eb; }
+    .mc-bd-note b { color: var(--info-text); }
     .mc-bd-row { display: flex; gap: 12px; padding: 11px 0; align-items: flex-start; }
     .mc-bd-row .ic { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .mc-bd-row .ic svg { width: 17px; height: 17px; }
@@ -76,7 +76,7 @@
     .mc-bd-row p { font-size: 11px; color: var(--text-muted); margin: 1px 0 0; line-height: 1.4; }
     .mc-navmock { background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
     .mc-navmock .cal { width: 60px; height: 60px; border-radius: 12px; background: rgba(16,185,129,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .mc-navmock .cal svg { width: 30px; height: 30px; color: #10b981; }
+    .mc-navmock .cal svg { width: 30px; height: 30px; color: var(--ok-text); }
     .mc-navmock .lines { flex: 1; }
     .mc-navmock .lrow { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
     .mc-navmock .lrow:last-child { margin-bottom: 0; }
@@ -123,8 +123,8 @@
     .mc-sync-app .box { width: 46px; height: 46px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; margin: 0 auto 4px; background: var(--bg-card-hover); }
     .mc-sync-app .box svg { width: 24px; height: 24px; }
     .mc-sync-app span { font-size: 9.5px; color: var(--text-muted); }
-    .mc-sync-arr svg { width: 22px; height: 22px; color: #10b981; }
-    .mc-sync-done { display: flex; align-items: center; justify-content: center; gap: 7px; background: rgba(16,185,129,0.1); border-radius: 9px; padding: 9px; font-size: 11px; font-weight: 700; color: #10b981; }
+    .mc-sync-arr svg { width: 22px; height: 22px; color: var(--ok-text); }
+    .mc-sync-done { display: flex; align-items: center; justify-content: center; gap: 7px; background: rgba(16,185,129,0.1); border-radius: 9px; padding: 9px; font-size: 11px; font-weight: 700; color: var(--ok-text); }
     .mc-sync-done svg { width: 14px; height: 14px; }
 
     /* travel time */
@@ -167,19 +167,19 @@
             </div>
             <div class="mc-feats">
                 <div class="mc-feat">
-                    <span class="mc-feat-ico" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>
+                    <span class="mc-feat-ico" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>
                     <div><b>Prevents Double-Booking</b><p>Stops you from scheduling two clients at the same time.</p></div>
                 </div>
                 <div class="mc-feat">
-                    <span class="mc-feat-ico" style="background:rgba(16,185,129,0.12);color:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6M22 6l-3-3M9 1h6"/></svg></span>
+                    <span class="mc-feat-ico" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6M22 6l-3-3M9 1h6"/></svg></span>
                     <div><b>Improves Punctuality</b><p>Keeps event start times front and center so you're never late.</p></div>
                 </div>
                 <div class="mc-feat">
-                    <span class="mc-feat-ico" style="background:rgba(139,92,246,0.12);color:#8b5cf6;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></span>
+                    <span class="mc-feat-ico" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></span>
                     <div><b>Reduces Daily Stress</b><p>No more guessing what you have to do today.</p></div>
                 </div>
                 <div class="mc-feat">
-                    <span class="mc-feat-ico" style="background:rgba(249,115,22,0.12);color:#f97316;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+                    <span class="mc-feat-ico" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
                     <div><b>Protects Free Time</b><p>See when you're busy and when you're free to relax.</p></div>
                 </div>
             </div>
@@ -216,15 +216,15 @@
         <div class="mc-bd">
             {{-- 1. Header --}}
             <div class="mc-bd-col">
-                <div class="mc-bd-h" style="color:#2563eb;border-color:#2563eb;">1. The Clock &amp; Calendar Header</div>
+                <div class="mc-bd-h" style="color:var(--info-text);border-color:#2563eb;">1. The Clock &amp; Calendar Header</div>
                 <div class="mc-bd-art">@include('professional.calendar._cal_clock', ['w' => 130])</div>
                 <p class="mc-bd-note"><b>The Visual:</b> The calendar and clock symbolize organized time.</p>
-                <p class="mc-bd-note"><b style="color:#8b5cf6;">The Mission:</b> This is your home base for tracking your daily routine, open hours, and deadlines.</p>
+                <p class="mc-bd-note"><b style="color:var(--accent-text);">The Mission:</b> This is your home base for tracking your daily routine, open hours, and deadlines.</p>
             </div>
             {{-- 2. Daily Agenda --}}
             <div class="mc-bd-col">
-                <div class="mc-bd-h" style="color:#8b5cf6;border-color:#8b5cf6;">2. The Daily Agenda</div>
-                <div class="mc-bd-row"><span class="ic" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div><b>Date Indicator</b><div class="tm" style="color:#2563eb;">Today • {{ $now->format('M d, Y') }}</div><p>Clear header showing the day you are viewing.</p></div></div>
+                <div class="mc-bd-h" style="color:var(--accent-text);border-color:#8b5cf6;">2. The Daily Agenda</div>
+                <div class="mc-bd-row"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div><b>Date Indicator</b><div class="tm" style="color:var(--info-text);">Today • {{ $now->format('M d, Y') }}</div><p>Clear header showing the day you are viewing.</p></div></div>
                 @foreach($agenda as $idx => $it)
                     <div class="mc-bd-row"><span class="ic" style="background:{{ $it['color'] }}1f;color:{{ $it['color'] }};"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div><b>{{ \Illuminate\Support\Str::limit($it['title'], 24) }}</b><div class="tm" style="color:{{ $it['color'] }};">{{ $it['all_day'] ? $it['start']->format('M d') . ' • All Day' : $it['start']->format('g:i A') }}</div><p>{{ $it['all_day'] ? 'All-day event or date reminder.' : ($idx === 0 ? 'Your first scheduled event.' : 'Your next scheduled event.') }}</p></div></div>
                 @endforeach
@@ -234,7 +234,7 @@
             </div>
             {{-- 3. Navigation Gate --}}
             <div class="mc-bd-col">
-                <div class="mc-bd-h" style="color:#10b981;border-color:#10b981;">3. The Navigation Gate</div>
+                <div class="mc-bd-h" style="color:var(--ok-text);border-color:#10b981;">3. The Navigation Gate</div>
                 <div class="mc-navmock">
                     <span class="cal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
                     <div class="lines">
@@ -255,7 +255,7 @@
     <div class="mc-cc">
         {{-- Monthly Grid View --}}
         <div class="mc-cc-card">
-            <div class="mc-cc-h"><span class="ic" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><b>Monthly Grid View</b></div>
+            <div class="mc-cc-h"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><b>Monthly Grid View</b></div>
             <p>See your entire month. Drag and drop events to change dates.</p>
             <div class="mc-mini">
                 <div class="mc-mini-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg><b>{{ $monthLabel }}</b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
@@ -274,7 +274,7 @@
         </div>
         {{-- Availability Toggles --}}
         <div class="mc-cc-card">
-            <div class="mc-cc-h"><span class="ic" style="background:rgba(139,92,246,0.12);color:#8b5cf6;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="5" width="22" height="14" rx="7"/><circle cx="16" cy="12" r="3"/></svg></span><b>Availability Toggles</b></div>
+            <div class="mc-cc-h"><span class="ic" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="5" width="22" height="14" rx="7"/><circle cx="16" cy="12" r="3"/></svg></span><b>Availability Toggles</b></div>
             <p>Block off days so new clients can't book you.</p>
             <div style="border:1px solid var(--border-color);border-radius:10px;padding:4px 12px;">
                 @foreach($availability as $av)
@@ -292,7 +292,7 @@
         </div>
         {{-- Phone Synchronization --}}
         <div class="mc-cc-card">
-            <div class="mc-cc-h"><span class="ic" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></span><b>Phone Synchronization</b></div>
+            <div class="mc-cc-h"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></span><b>Phone Synchronization</b></div>
             <p>Sync with your phone so your schedule is always updated.</p>
             <div class="mc-sync">
                 <div class="mc-sync-app"><span class="box"><svg viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-primary);"><path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.572-2.27 1.206-2.98.804-.94 2.142-1.64 3.248-1.68.03.13.05.28.05.43zm4.565 15.71c-.03.07-.463 1.58-1.518 3.12-.945 1.34-1.94 2.71-3.43 2.71-1.517 0-1.9-.88-3.63-.88-1.698 0-2.302.91-3.67.91-1.377 0-2.332-1.26-3.428-2.8-1.287-1.82-2.323-4.63-2.323-7.28 0-4.28 2.797-6.55 5.552-6.55 1.448 0 2.675.95 3.6.95.865 0 2.222-1.01 3.902-1.01.613 0 2.886.06 4.374 2.19-.13.09-2.383 1.37-2.383 4.19 0 3.26 2.854 4.42 2.955 4.46z"/></svg></span><span>Apple<br>Calendar</span></div>
@@ -303,17 +303,17 @@
         </div>
         {{-- Travel Time Calculator --}}
         <div class="mc-cc-card">
-            <div class="mc-cc-h"><span class="ic" style="background:rgba(249,115,22,0.12);color:#f97316;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3v-5l2-5h11l3 5h2v5h-2"/><circle cx="7.5" cy="17.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/></svg></span><b>Travel Time Calculator</b></div>
+            <div class="mc-cc-h"><span class="ic" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3v-5l2-5h11l3 5h2v5h-2"/><circle cx="7.5" cy="17.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/></svg></span><b>Travel Time Calculator</b></div>
             <p>See travel time and when you should leave.</p>
             @php $dest = $agenda->first()['title'] ?? 'your event'; $leaveBy = isset($agenda[0]) && !$agenda[0]['all_day'] ? $agenda[0]['start']->copy()->subMinutes(35)->format('g:i A') : '5:25 PM'; @endphp
             <div class="mc-tt-row"><span class="k">From</span><span class="v">Your Location</span><span class="pin"><svg viewBox="0 0 24 24" fill="#2563eb" stroke="none"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/><circle cx="12" cy="9" r="2.5" fill="#fff"/></svg></span></div>
             <div class="mc-tt-row" style="border-top:1px solid var(--border-color);"><span class="k">To</span><span class="v">{{ \Illuminate\Support\Str::limit($dest, 18) }}</span><span class="pin"><svg viewBox="0 0 24 24" fill="#ef4444" stroke="none"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/><circle cx="12" cy="9" r="2.5" fill="#fff"/></svg></span></div>
             <div class="mc-tt-big">
-                <div style="flex:1;"><div class="k">Travel Time</div><div class="v" style="color:#f97316;">35 mins</div></div>
+                <div style="flex:1;"><div class="k">Travel Time</div><div class="v" style="color:var(--brand-text);">35 mins</div></div>
                 <svg viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M5 17H3v-5l2-5h11l3 5h2v5h-2"/><circle cx="7.5" cy="17.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/></svg>
             </div>
             <div class="mc-tt-big" style="border-top:none;padding-top:4px;">
-                <div style="flex:1;"><div class="k">Leave By</div><div class="v" style="color:#2563eb;">{{ $leaveBy }}</div></div>
+                <div style="flex:1;"><div class="k">Leave By</div><div class="v" style="color:var(--info-text);">{{ $leaveBy }}</div></div>
             </div>
         </div>
     </div>

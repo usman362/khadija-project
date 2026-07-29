@@ -57,6 +57,17 @@
             --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.2);
             --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.08);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            /* Status text colours — named for meaning, not hue, and redefined per
+               theme. The mid-tone palette (#10b981, #f59e0b, #f97316 …) reads fine
+               on the dark shell but falls to ~2.5:1 on white, so the light theme
+               swaps in the darker step of the same ramp. These are for TEXT; the
+               raw --accent-* values stay as they are for fills, dots and borders. */
+            --ok-text: #34d399;
+            --warn-text: #fbbf24;
+            --bad-text: #f87171;
+            --brand-text: #fb923c;
+            --info-text: #60a5fa;
+            --accent-text: #a5b4fc;
         }
 
         [data-theme="light"] {
@@ -87,6 +98,13 @@
             --accent-red-soft: rgba(239, 68, 68, 0.1);
             --accent-purple: #a855f7;
             --accent-purple-soft: rgba(168, 85, 247, 0.1);
+            /* Darker step of each ramp — clears 4.5:1 on white and on the tints. */
+            --ok-text: #047857;
+            --warn-text: #b45309;
+            --bad-text: #b91c1c;
+            --brand-text: #c2410c;
+            --info-text: #1d4ed8;
+            --accent-text: #4338ca;
         }
 
         [data-theme="light"] .cl-navbar {
@@ -237,7 +255,7 @@
             color: #1e293b;
         }
         [data-theme="light"] .cl-nav-link.active {
-            color: #f97316;
+            color: var(--brand-text);
             background: rgba(249, 115, 22, 0.10);
         }
         [data-theme="light"] .cl-user-card {
@@ -262,10 +280,16 @@
         [data-theme="light"] .cl-calendar-day:hover {
             background: rgba(0, 0, 0, 0.04);
         }
-        [data-theme="light"] p,
-        [data-theme="light"] span,
-        [data-theme="light"] td,
-        [data-theme="light"] li {
+        /* Unstyled inline elements follow the light theme's text colour.
+           Scoped to :not([class]) deliberately: as a bare `[data-theme="light"] span`
+           this outweighed every component class (0,2,1 vs 0,1,0) and stripped the
+           colour off anything built from a span — avatar initials, status pills,
+           badge counts — leaving them the same colour as whatever they sat on.
+           Elements that carry a class own their colour; only bare ones inherit. */
+        [data-theme="light"] p:not([class]),
+        [data-theme="light"] span:not([class]),
+        [data-theme="light"] td:not([class]),
+        [data-theme="light"] li:not([class]) {
             color: inherit;
         }
         [data-theme="light"] .cl-content p {
@@ -402,9 +426,9 @@
         /* Active item — orange (matches reference, was purple). */
         .cl-nav-link.active {
             background: var(--accent-orange-soft, rgba(249,115,22,0.10));
-            color: #f97316;
+            color: var(--brand-text);
         }
-        .cl-nav-link.active .cl-nav-icon { color: #f97316; opacity: 1; }
+        .cl-nav-link.active .cl-nav-icon { color: var(--brand-text); opacity: 1; }
 
         .cl-nav-link.active::before {
             content: '';
@@ -438,7 +462,7 @@
             border-radius: 999px;
             /* Soft peach pill with orange text (matches reference, was solid). */
             background: rgba(249, 115, 22, 0.14);
-            color: #ea580c;
+            color: var(--brand-text);
             letter-spacing: 0.2px;
             line-height: 1;
             flex-shrink: 0;
@@ -479,8 +503,8 @@
         .cl-nav-item:hover .cl-nav-icon,
         .cl-nav-item:has(.cl-nav-link.active) .cl-nav-icon { color: var(--accent-orange, #f97316); }
         /* AI-tools icons keep their brand colour even when not hovered. */
-        .cl-nav-icon.ic-orange { color: #f97316 !important; }
-        .cl-nav-icon.ic-purple { color: #8b5cf6 !important; }
+        .cl-nav-icon.ic-orange { color: var(--brand-text) !important; }
+        .cl-nav-icon.ic-purple { color: var(--accent-text) !important; }
 
         /* Sidebar "Upcoming Event" promo card */
         .cl-upcoming {
@@ -496,7 +520,7 @@
             text-transform: uppercase; letter-spacing: 0.4px;
             margin-bottom: 8px;
         }
-        .cl-upcoming-label svg { color: #f97316; }
+        .cl-upcoming-label svg { color: var(--brand-text); }
         .cl-upcoming-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
         .cl-upcoming-date { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
         .cl-upcoming-budget-label { font-size: 10px; color: var(--text-muted); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.4px; }
@@ -505,7 +529,7 @@
             display: flex; align-items: center; justify-content: center; gap: 6px;
             margin-top: 12px; padding: 8px;
             background: rgba(249,115,22,0.12);
-            color: #f97316;
+            color: var(--brand-text);
             border-radius: 8px;
             font-size: 11.5px; font-weight: 700;
             text-decoration: none;

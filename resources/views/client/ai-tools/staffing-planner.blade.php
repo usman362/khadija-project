@@ -411,7 +411,7 @@
             '<select class="spm-inp" style="width:auto;padding:9px 10px;border:1px solid var(--border-color);border-radius:9px;background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:13px;">' + hourOpts(start) + '</select>' +
             '<span style="color:var(--text-muted);font-size:12px;">to</span>' +
             '<select class="spm-inp" style="width:auto;padding:9px 10px;border:1px solid var(--border-color);border-radius:9px;background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:13px;">' + hourOpts(end) + '</select>' +
-            '<button type="button" title="Remove" style="border:none;background:rgba(220,38,38,.1);color:#dc2626;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px;flex:0 0 auto;">&times;</button>';
+            '<button type="button" title="Remove" style="border:none;background:rgba(220,38,38,.1);color:var(--bad-text);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px;flex:0 0 auto;">&times;</button>';
         div.querySelector('input[type="text"]').value = name;
         div.querySelector('.spm-count').addEventListener('input', recompute);
         div.querySelector('button').addEventListener('click', () => { div.remove(); recompute(); });

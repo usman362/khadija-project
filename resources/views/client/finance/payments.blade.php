@@ -21,15 +21,15 @@
     .pay-stat-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .pay-stat-ico { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .pay-stat-ico svg { width: 16px; height: 16px; }
-    .pay-stat-ico.indigo { background: rgba(99,102,241,0.12); color: #6366f1; }
-    .pay-stat-ico.green  { background: rgba(16,185,129,0.12); color: #10b981; }
-    .pay-stat-ico.amber  { background: rgba(245,158,11,0.12); color: #f59e0b; }
-    .pay-stat-ico.coral  { background: rgba(249,115,22,0.12); color: #f97316; }
+    .pay-stat-ico.indigo { background: rgba(99,102,241,0.12); color: var(--accent-text); }
+    .pay-stat-ico.green  { background: rgba(16,185,129,0.12); color: var(--ok-text); }
+    .pay-stat-ico.amber  { background: rgba(245,158,11,0.12); color: var(--warn-text); }
+    .pay-stat-ico.coral  { background: rgba(249,115,22,0.12); color: var(--brand-text); }
     .pay-stat-ico.slate  { background: rgba(100,116,139,0.12); color: #64748b; }
     .pay-stat-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
     .pay-stat-value { font-size: 19px; font-weight: 800; color: var(--text-primary); }
     .pay-stat-foot { font-size: 10.5px; color: var(--text-muted); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; }
-    .pay-stat-foot .red { color: #ef4444; font-weight: 700; }
+    .pay-stat-foot .red { color: var(--bad-text); font-weight: 700; }
 
     /* Context bar */
     .pay-context { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 12px 18px; margin-bottom: 14px; font-size: 12.5px; }
@@ -37,7 +37,7 @@
     .pay-context .meta { color: var(--text-muted); display: inline-flex; align-items: center; gap: 5px; }
     .pay-context .meta svg { width: 12px; height: 12px; }
     .pay-context .spacer { flex: 1; }
-    .pay-export { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #f97316; border: 1px solid rgba(249,115,22,0.3); border-radius: 8px; padding: 6px 12px; text-decoration: none; }
+    .pay-export { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--brand-text); border: 1px solid rgba(249,115,22,0.3); border-radius: 8px; padding: 6px 12px; text-decoration: none; }
     .pay-export svg { width: 13px; height: 13px; }
 
     /* Ledger table */
@@ -60,10 +60,10 @@
     .pay-gw { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); }
     .pay-gw svg { width: 12px; height: 12px; }
     .pay-pill { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
-    .pay-pill.settled  { background: rgba(16,185,129,0.15); color: #10b981; }
-    .pay-pill.locked, .pay-pill.confirmed { background: rgba(245,158,11,0.16); color: #d97706; }
-    .pay-pill.funded   { background: rgba(99,102,241,0.15); color: #6366f1; }
-    .pay-pill.released { background: rgba(16,185,129,0.15); color: #10b981; }
+    .pay-pill.settled  { background: rgba(16,185,129,0.15); color: var(--ok-text); }
+    .pay-pill.locked, .pay-pill.confirmed { background: rgba(245,158,11,0.16); color: var(--warn-text); }
+    .pay-pill.funded   { background: rgba(99,102,241,0.15); color: var(--accent-text); }
+    .pay-pill.released { background: rgba(16,185,129,0.15); color: var(--ok-text); }
     .pay-pill.pending, .pay-pill.requested { background: rgba(100,116,139,0.15); color: #64748b; }
     .pay-amt { font-weight: 700; color: var(--text-primary); }
     .pay-txid { font-family: monospace; font-size: 10.5px; color: var(--text-muted); }
@@ -77,15 +77,15 @@
     .pay-sum-row .val { font-weight: 700; color: var(--text-primary); }
     .pay-sum-row .pct { font-size: 10.5px; color: var(--text-muted); margin-left: 6px; }
     .pay-sum-total { padding-top: 9px; margin-top: 5px; border-top: 2px solid var(--border-color); font-weight: 800; }
-    .pay-neg { color: #ef4444; }
-    .pay-pos { color: #10b981; }
+    .pay-neg { color: var(--bad-text); }
+    .pay-pos { color: var(--ok-text); }
 
     /* Right rail */
     .pay-rail-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 16px; }
     .pay-rail-title { font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; }
     .pay-qa { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px dashed var(--border-color); text-decoration: none; }
     .pay-qa:last-child { border-bottom: 0; }
-    .pay-qa-ico { width: 30px; height: 30px; border-radius: 8px; background: rgba(249,115,22,0.10); color: #f97316; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .pay-qa-ico { width: 30px; height: 30px; border-radius: 8px; background: rgba(249,115,22,0.10); color: var(--brand-text); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .pay-qa-ico svg { width: 15px; height: 15px; }
     .pay-qa-body { flex: 1; min-width: 0; }
     .pay-qa-name { font-size: 12.5px; font-weight: 700; color: var(--text-primary); }
@@ -98,7 +98,7 @@
     .pay-act-row { display: flex; gap: 10px; padding: 8px 0; font-size: 11.5px; border-bottom: 1px dashed var(--border-color); }
     .pay-act-row:last-child { border-bottom: 0; }
     .pay-act-ico { width: 26px; height: 26px; border-radius: 7px; background: var(--bg-card-hover); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .pay-act-ico svg { width: 13px; height: 13px; color: #10b981; }
+    .pay-act-ico svg { width: 13px; height: 13px; color: var(--ok-text); }
     .pay-act-body { flex: 1; min-width: 0; }
     .pay-act-name { font-size: 12px; color: var(--text-primary); font-weight: 600; }
     .pay-act-time { font-size: 10px; color: var(--text-muted); }
@@ -226,7 +226,7 @@
     </div>
 
     <div class="pay-rail-card">
-        <div class="pay-rail-title">AI Payment Insights <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:rgba(99,102,241,0.12);color:#6366f1;">BETA</span></div>
+        <div class="pay-rail-title">AI Payment Insights <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:rgba(99,102,241,0.12);color:var(--accent-text);">BETA</span></div>
         <div class="pay-insight"><svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><div class="body"><b>All payment checks on track.</b> No delays detected.</div></div>
         <div class="pay-insight"><svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg><div class="body"><b>1 vendor missing a W-9.</b> Upload to avoid tax hold.</div></div>
         <div class="pay-insight"><svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><div class="body">Projected 1099-NEC total: <b>${{ number_format($stats['tax_liability'], 0) }}</b></div></div>

@@ -52,11 +52,11 @@
     .fg-stat b { font-size: 13.5px; font-weight: 800; color: var(--text-primary); white-space: nowrap; }
     .fg-stat .from { color: var(--fg-strong); }
     .fg-ring { display: flex; align-items: center; gap: 9px; }
-    .fg-score { width: 44px; height: 44px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff !important; font-weight: 800; flex-shrink: 0; background: #f59e0b; }
+    .fg-score { width: 44px; height: 44px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff !important; font-weight: 800; flex-shrink: 0; background: #b45309; }
     .fg-score b { font-size: 12.5px; line-height: 1; color: #fff !important; } .fg-score em { font-size: 6.5px; font-style: normal; letter-spacing: .3px; opacity: .95; color: #fff !important; }
     .fg-ring-txt { display: flex; flex-direction: column; gap: 2px; }
-    .fg-score-lbl { font-size: 9.5px; font-weight: 800; letter-spacing: .3px; text-transform: uppercase; color: #d97706; }
-    .fg-stars { font-size: 11px; letter-spacing: .5px; color: #f59e0b; line-height: 1; }
+    .fg-score-lbl { font-size: 9.5px; font-weight: 800; letter-spacing: .3px; text-transform: uppercase; color: var(--warn-text); }
+    .fg-stars { font-size: 11px; letter-spacing: .5px; color: var(--warn-text); line-height: 1; }
     .fg-stars i { color: var(--border-color); font-style: normal; }
 
     /* actions column */
@@ -70,7 +70,7 @@
     .fg-rail-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; }
     .fg-rail-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
     .fg-rail-head h4 { font-size: 13.5px; font-weight: 800; color: var(--text-primary); }
-    .fg-live { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; color: #16a34a; background: rgba(22,163,74,.12); padding: 2px 8px; border-radius: 999px; }
+    .fg-live { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; color: var(--ok-text); background: rgba(22,163,74,.12); padding: 2px 8px; border-radius: 999px; }
     .fg-live b { font-size: 8px; line-height: 1; }
     .fg-clear { margin-left: auto; font-size: 11.5px; font-weight: 700; color: var(--fg-strong); background: none; border: none; cursor: pointer; text-decoration: none; }
     .fg-ins { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--border-color); }

@@ -42,7 +42,7 @@
                             </div>
                             <div class="pe-muted" style="margin:4px 0 6px;">By {{ $package['vendor'] }}</div>
                             <div style="font-size:13px; font-weight:700; color:var(--pe-ink-2); margin-bottom:10px;">
-                                <span style="color:#f59e0b;">★</span> {{ $package['rating'] }}
+                                <span style="color:var(--warn-text);">★</span> {{ $package['rating'] }}
                                 <span class="pe-muted" style="font-weight:600;">({{ $package['reviews'] }} reviews)</span>
                             </div>
                             <div>

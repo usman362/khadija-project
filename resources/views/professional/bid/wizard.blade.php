@@ -20,20 +20,20 @@
     .bd-opp-h { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin-bottom: 8px; }
     .bd-opp-h b { font-size: 16px; font-weight: 800; color: var(--text-primary); }
     .bd-tag { font-size: 10.5px; font-weight: 800; border-radius: 6px; padding: 3px 9px; }
-    .bd-tag.BSR { background: rgba(37,99,235,.14); color: #60a5fa; }
-    .bd-tag.ESR { background: rgba(220,38,38,.16); color: #f87171; }
-    .bd-tag.DSR { background: rgba(124,58,237,.16); color: #a78bfa; }
+    .bd-tag.BSR { background: rgba(37,99,235,.14); color: var(--info-text); }
+    .bd-tag.ESR { background: rgba(220,38,38,.16); color: var(--bad-text); }
+    .bd-tag.DSR { background: rgba(124,58,237,.16); color: var(--accent-text); }
     .bd-tag.sc  { background: rgba(148,163,184,.16); color: var(--text-secondary); }
     .bd-opp-meta { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12.5px; color: var(--text-secondary); font-weight: 600; }
-    .bd-dl { color: #f59e0b; font-weight: 800; }
+    .bd-dl { color: var(--warn-text); font-weight: 800; }
 
     .bd-steps { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 18px; }
     .bd-step { flex: 1 1 0; min-width: 104px; text-align: center; text-decoration: none; }
     .bd-dot { width: 29px; height: 29px; margin: 0 auto 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; background: rgba(148,163,184,.14); color: var(--text-muted); border: 1px solid var(--border-color); }
-    .bd-step.done .bd-dot { background: #16a34a; border-color: #16a34a; color: #fff; }
+    .bd-step.done .bd-dot { background: #15803d; border-color: #16a34a; color: #fff; }
     .bd-step.on .bd-dot { background: #2563eb; border-color: #2563eb; color: #fff; }
     .bd-step small { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); }
-    .bd-step.on small { color: #60a5fa; }
+    .bd-step.on small { color: var(--info-text); }
 
     .bd-grid { display: grid; grid-template-columns: minmax(0,1fr) 290px; gap: 18px; align-items: start; }
     @media (max-width: 1000px) { .bd-grid { grid-template-columns: minmax(0,1fr); } }
@@ -43,7 +43,7 @@
     .bd-card .lede { font-size: 13px; color: var(--text-secondary); line-height: 1.65; margin-bottom: 18px; }
     .bd-f { margin-bottom: 16px; }
     .bd-f label { display: block; font-size: 12.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
-    .bd-f .req { color: #f87171; }
+    .bd-f .req { color: var(--bad-text); }
     .bd-f input[type=text], .bd-f input[type=number], .bd-f textarea {
         width: 100%; background: transparent; border: 1px solid var(--border-color); border-radius: 10px;
         padding: 10px 12px; font-size: 13.5px; color: var(--text-primary); font-family: inherit;
@@ -66,7 +66,7 @@
     @media (max-width: 620px) { .bd-money { grid-template-columns: 1fr; } }
     .bd-money div span { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .3px; }
     .bd-money div b { font-size: 17px; font-weight: 800; color: var(--text-primary); }
-    .bd-money .neg b { color: #f87171; }
+    .bd-money .neg b { color: var(--bad-text); }
     .bd-money .net b { color: #4ade80; }
 
     .bd-check { display: flex; gap: 9px; align-items: flex-start; border: 1px solid var(--border-color); border-radius: 11px; padding: 12px 14px; font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; }
@@ -82,7 +82,7 @@
     .bd-el span { color: var(--text-muted); }
     .bd-el b { font-weight: 700; }
     .bd-el.ok b { color: #4ade80; }
-    .bd-el.no b { color: #f59e0b; }
+    .bd-el.no b { color: var(--warn-text); }
     .bd-rem { display: flex; gap: 8px; font-size: 11.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px; }
 
     .bd-rev { display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid var(--border-color); font-size: 13px; }
@@ -95,7 +95,7 @@
     <div style="background:rgba(22,163,74,.12);border:1px solid rgba(22,163,74,.3);color:#4ade80;padding:12px 16px;border-radius:12px;margin-bottom:16px;font-size:13.5px;">✅ {{ session('status') }}</div>
 @endif
 @if($errors->any())
-    <div style="background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.3);color:#f87171;padding:12px 16px;border-radius:12px;margin-bottom:16px;font-size:13.5px;">
+    <div style="background:rgba(220,38,38,.12);border:1px solid rgba(220,38,38,.3);color:var(--bad-text);padding:12px 16px;border-radius:12px;margin-bottom:16px;font-size:13.5px;">
         @foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach
     </div>
 @endif

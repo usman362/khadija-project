@@ -18,7 +18,7 @@
     .ea-context { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; font-size: 12.5px; color: var(--text-muted); }
     .ea-context b { color: var(--text-primary); }
     .ea-context .spacer { flex: 1; }
-    .ea-export { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #f97316; border: 1px solid rgba(249,115,22,0.3); border-radius: 8px; padding: 6px 12px; text-decoration: none; }
+    .ea-export { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--brand-text); border: 1px solid rgba(249,115,22,0.3); border-radius: 8px; padding: 6px 12px; text-decoration: none; }
     .ea-export svg { width: 13px; height: 13px; }
 
     /* Stat cards (4) */
@@ -26,15 +26,15 @@
     .ea-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px; display: flex; gap: 12px; align-items: flex-start; }
     .ea-stat-ico { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .ea-stat-ico svg { width: 19px; height: 19px; }
-    .ea-stat-ico.indigo { background: rgba(99,102,241,0.12); color: #6366f1; }
-    .ea-stat-ico.green  { background: rgba(16,185,129,0.12); color: #10b981; }
-    .ea-stat-ico.amber  { background: rgba(245,158,11,0.12); color: #f59e0b; }
-    .ea-stat-ico.coral  { background: rgba(249,115,22,0.12); color: #f97316; }
+    .ea-stat-ico.indigo { background: rgba(99,102,241,0.12); color: var(--accent-text); }
+    .ea-stat-ico.green  { background: rgba(16,185,129,0.12); color: var(--ok-text); }
+    .ea-stat-ico.amber  { background: rgba(245,158,11,0.12); color: var(--warn-text); }
+    .ea-stat-ico.coral  { background: rgba(249,115,22,0.12); color: var(--brand-text); }
     .ea-stat-label { font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
     .ea-stat-value { font-size: 23px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
     .ea-stat-sub { font-size: 10.5px; color: var(--text-muted); margin-top: 3px; }
-    .ea-stat-sub.up { color: #10b981; font-weight: 700; }
-    .ea-stat-sub.amber { color: #f59e0b; font-weight: 700; }
+    .ea-stat-sub.up { color: var(--ok-text); font-weight: 700; }
+    .ea-stat-sub.amber { color: var(--warn-text); font-weight: 700; }
 
     /* Toolbar */
     .ea-toolbar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
@@ -54,7 +54,7 @@
     .ea-gw-split { display: flex; gap: 16px; margin-top: 6px; font-size: 11px; }
     .ea-gw-split b { display: block; font-size: 15px; font-weight: 800; }
     .ea-gw-foot { font-size: 10.5px; color: var(--text-muted); margin-top: 8px; }
-    .ea-gw-foot.red { color: #ef4444; }
+    .ea-gw-foot.red { color: var(--bad-text); }
 
     /* Vendor expense matrix */
     .ea-matrix-title { font-size: 12px; font-weight: 800; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.4px; padding: 14px 18px; border-bottom: 1px solid var(--border-color); }
@@ -66,18 +66,18 @@
     .ea-vendor img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
     .ea-vendor .nm { font-weight: 700; color: var(--text-primary); font-size: 12px; }
     .ea-pill { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 999px; display: inline-flex; align-items: center; gap: 3px; }
-    .ea-pill.green { background: rgba(16,185,129,0.15); color: #10b981; }
-    .ea-pill.blue  { background: rgba(99,102,241,0.15); color: #6366f1; }
-    .ea-pill.amber { background: rgba(245,158,11,0.16); color: #d97706; }
-    .ea-tax-ok { color: #10b981; font-weight: 700; }
-    .ea-tax-miss { color: #ef4444; font-weight: 700; }
+    .ea-pill.green { background: rgba(16,185,129,0.15); color: var(--ok-text); }
+    .ea-pill.blue  { background: rgba(99,102,241,0.15); color: var(--accent-text); }
+    .ea-pill.amber { background: rgba(245,158,11,0.16); color: var(--warn-text); }
+    .ea-tax-ok { color: var(--ok-text); font-weight: 700; }
+    .ea-tax-miss { color: var(--bad-text); font-weight: 700; }
     .ea-action-btn { font-size: 10.5px; font-weight: 700; padding: 5px 11px; border-radius: 7px; border: none; cursor: pointer; color: #fff; }
     .ea-action-btn.coral { background: #f97316; }
     .ea-action-btn.ghost { background: var(--bg-card-hover); color: var(--text-secondary); border: 1px solid var(--border-color); }
 
     /* Critical alert */
     .ea-alert { display: flex; align-items: center; gap: 14px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-radius: var(--radius); padding: 14px 18px; margin-top: 16px; }
-    .ea-alert svg { width: 18px; height: 18px; color: #f59e0b; flex-shrink: 0; }
+    .ea-alert svg { width: 18px; height: 18px; color: var(--warn-text); flex-shrink: 0; }
     .ea-alert .body { flex: 1; font-size: 12.5px; color: var(--text-secondary); }
     .ea-alert .body b { color: var(--text-primary); }
     .ea-alert button { background: #f97316; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
@@ -97,11 +97,11 @@
     .ea-legend .lbl { flex: 1; color: var(--text-secondary); }
     .ea-legend .val { font-weight: 700; color: var(--text-primary); }
     .ea-trend-big { font-size: 24px; font-weight: 800; color: var(--text-primary); }
-    .ea-trend-up { font-size: 11px; color: #10b981; font-weight: 700; }
+    .ea-trend-up { font-size: 11px; color: var(--ok-text); font-weight: 700; }
     .ea-qa-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .ea-qa { display: flex; align-items: center; gap: 7px; padding: 9px 10px; background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 8px; font-size: 11px; font-weight: 600; color: var(--text-primary); text-decoration: none; }
     .ea-qa:hover { border-color: rgba(249,115,22,0.3); }
-    .ea-qa svg { width: 14px; height: 14px; color: #f97316; flex-shrink: 0; }
+    .ea-qa svg { width: 14px; height: 14px; color: var(--brand-text); flex-shrink: 0; }
 
     @media (max-width: 1200px) { .ea-layout { grid-template-columns: 1fr; } .ea-rail { position: static; } .ea-stats { grid-template-columns: repeat(2, 1fr); } .ea-gw-row { grid-template-columns: 1fr; } }
     @media (max-width: 700px) { .ea-stats { grid-template-columns: 1fr; } .ea-table { font-size: 11px; } }
@@ -148,7 +148,7 @@
         <div class="ea-gw">
             <div class="ea-gw-head"><span class="ea-gw-name">Secure Payment Vault</span><span class="ea-gw-tag">SECURED</span></div>
             <div class="ea-gw-split">
-                <div><b style="color:#10b981;">${{ number_format($stats['pending_release'], 0) }}</b><span style="color:var(--text-muted);">Funded</span></div>
+                <div><b style="color:var(--ok-text);">${{ number_format($stats['pending_release'], 0) }}</b><span style="color:var(--text-muted);">Funded</span></div>
                 <div><b>${{ number_format($stats['available'], 0) }}</b><span style="color:var(--text-muted);">Released</span></div>
             </div>
             <div class="ea-gw-foot">$0.00 currently in dispute</div>

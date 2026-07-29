@@ -64,8 +64,8 @@
     .rw-rcard .val { font-size: 26px; font-weight: 800; color: var(--text-primary); margin: 6px 0 4px; }
     .rw-cookies { display: flex; gap: 2px; }
     .rw-cookies svg { width: 14px; height: 14px; }
-    .rw-rcard .tag { font-size: 11px; font-weight: 700; color: #059669; margin-top: 5px; }
-    .rw-rcard .tag.vg { color: #d97706; }
+    .rw-rcard .tag { font-size: 11px; font-weight: 700; color: var(--ok-text); margin-top: 5px; }
+    .rw-rcard .tag.vg { color: var(--warn-text); }
 
     /* main grid */
     .rw-main { display: grid; grid-template-columns: minmax(0,2.2fr) minmax(0,1fr); gap: 18px; align-items: start; }
@@ -86,7 +86,7 @@
     .rw-2col { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
     .rw-cookie-input { display: flex; gap: 4px; cursor: pointer; }
     .rw-cookie-input svg { width: 28px; height: 28px; }
-    .rw-cookie-lbl { font-size: 12px; font-weight: 700; color: #059669; margin-top: 4px; }
+    .rw-cookie-lbl { font-size: 12px; font-weight: 700; color: var(--ok-text); margin-top: 4px; }
     .rw-tones { display: flex; gap: 8px; flex-wrap: wrap; }
     .rw-tone { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-secondary); font-size: 12.5px; font-weight: 700; cursor: pointer; font-family: inherit; }
     .rw-tone.on { background: var(--rw); border-color: var(--rw); color: #fff; }
@@ -140,7 +140,7 @@
     .rw-check input:focus-visible + .box { outline: 2px solid var(--rw); outline-offset: 2px; }
     .rw-ring::before { content: ''; position: absolute; inset: 7px; border-radius: 50%; background: var(--bg-card); }
     .rw-ring b { position: relative; font-size: 22px; font-weight: 800; color: var(--text-primary); }
-    .rw-rep-info b { font-size: 16px; font-weight: 800; color: #059669; }
+    .rw-rep-info b { font-size: 16px; font-weight: 800; color: var(--ok-text); }
     .rw-rep-info p { font-size: 11.5px; color: var(--text-muted); margin: 2px 0 0; }
     .rw-bar-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
     .rw-bar-row .k { font-size: 12px; color: var(--text-secondary); flex: 0 0 96px; display: flex; align-items: center; gap: 6px; }
@@ -175,8 +175,8 @@
     .rw-cl-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border-color); }
     .rw-cl-row:first-of-type { border-top: none; }
     .rw-cl-row .l { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-secondary); }
-    .rw-cl-row .l svg { width: 15px; height: 15px; color: #10b981; }
-    .rw-cl-row .y { font-size: 12px; font-weight: 800; color: #059669; }
+    .rw-cl-row .l svg { width: 15px; height: 15px; color: var(--ok-text); }
+    .rw-cl-row .y { font-size: 12px; font-weight: 800; color: var(--ok-text); }
     .rw-platforms { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
     .rw-plat { text-align: center; border: 1px solid var(--border-color); border-radius: 10px; padding: 11px 6px; cursor: pointer; }
     .rw-plat-ic { width: 30px; height: 30px; border-radius: 8px; background: var(--rw-soft); display: flex; align-items: center; justify-content: center; color: var(--rw); margin: 0 auto 5px; font-size: 13px; font-weight: 800; }
@@ -245,7 +245,7 @@
         @endforeach
         <div class="rw-rcard">
             <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Would Hire Again</div>
-            <div class="val" style="color:#059669;">Yes</div>
+            <div class="val" style="color:var(--ok-text);">Yes</div>
             <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">93% probability</div>
             <div class="tag">High likelihood</div>
         </div>

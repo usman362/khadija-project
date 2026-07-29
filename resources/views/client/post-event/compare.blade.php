@@ -12,7 +12,7 @@
     .pe-cmp-name { font-size:15.5px; font-weight:800; margin:0 0 3px; line-height:1.3; }
     .pe-cmp-vendor { font-size:12.5px; color:var(--pe-muted); margin:0 0 8px; }
     .pe-cmp-stars { font-size:12.5px; font-weight:700; color:var(--pe-ink-2); }
-    .pe-cmp-stars .st { color:#f59e0b; }
+    .pe-cmp-stars .st { color:var(--warn-text); }
     .pe-cmp-mid { display:flex; align-items:center; gap:12px; margin:12px 0; padding:12px 0; border-top:1px solid var(--pe-line-2); border-bottom:1px solid var(--pe-line-2); }
     .pe-cmp-mid .lbl { font-size:11px; font-weight:700; color:var(--pe-muted); text-transform:uppercase; letter-spacing:.4px; }
     .pe-cmp-mid .pe-price { font-size:20px; }

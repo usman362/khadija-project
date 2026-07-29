@@ -227,7 +227,7 @@
                 <button type="submit" style="padding:9px 18px;border:none;border-radius:9px;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;">Request Payout</button>
             </form>
         </div>
-        @error('amount')<div style="color:#dc2626;font-size:12.5px;margin-bottom:10px;">{{ $message }}</div>@enderror
+        @error('amount')<div style="color:var(--bad-text);font-size:12.5px;margin-bottom:10px;">{{ $message }}</div>@enderror
 
         @if($payouts->isNotEmpty())
             <table class="cl-table">

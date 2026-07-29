@@ -58,10 +58,10 @@
     .mg-stat-ico { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .mg-stat-ico svg { width: 18px; height: 18px; }
     .mg-stat-ico.pink   { background: rgba(37,99,235,0.14); color: var(--mg); }
-    .mg-stat-ico.green  { background: rgba(16,185,129,0.12); color: #10b981; }
-    .mg-stat-ico.amber  { background: rgba(245,158,11,0.12); color: #f59e0b; }
-    .mg-stat-ico.indigo { background: rgba(99,102,241,0.12); color: #6366f1; }
-    .mg-stat-ico.purple { background: rgba(139,92,246,0.12); color: #8b5cf6; }
+    .mg-stat-ico.green  { background: rgba(16,185,129,0.12); color: var(--ok-text); }
+    .mg-stat-ico.amber  { background: rgba(245,158,11,0.12); color: var(--warn-text); }
+    .mg-stat-ico.indigo { background: rgba(99,102,241,0.12); color: var(--accent-text); }
+    .mg-stat-ico.purple { background: rgba(139,92,246,0.12); color: var(--accent-text); }
     .mg-stat-label { font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
     .mg-stat-value { font-size: 22px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
     .mg-stat-delta { font-size: 10.5px; color: var(--text-muted); font-weight: 700; margin-top: 2px; }
@@ -111,13 +111,13 @@
     .mg-table .gig-sub { font-size: 10.5px; color: var(--text-muted); margin-top: 1px; }
     .mg-table .num { text-align: center; font-weight: 600; color: var(--text-primary); }
     .mg-status-pill { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 999px; text-transform: capitalize; white-space: nowrap; }
-    .mg-status-confirmed   { background: rgba(16,185,129,0.15); color: #10b981; }
-    .mg-status-completed   { background: rgba(16,185,129,0.15); color: #10b981; }
-    .mg-status-pending     { background: rgba(245,158,11,0.18); color: #f59e0b; }
-    .mg-status-published   { background: rgba(99,102,241,0.15); color: #6366f1; }
-    .mg-status-in_progress { background: rgba(99,102,241,0.15); color: #6366f1; }
+    .mg-status-confirmed   { background: rgba(16,185,129,0.15); color: var(--ok-text); }
+    .mg-status-completed   { background: rgba(16,185,129,0.15); color: var(--ok-text); }
+    .mg-status-pending     { background: rgba(245,158,11,0.18); color: var(--warn-text); }
+    .mg-status-published   { background: rgba(99,102,241,0.15); color: var(--accent-text); }
+    .mg-status-in_progress { background: rgba(99,102,241,0.15); color: var(--accent-text); }
     .mg-status-not_started, .mg-status-not_scheduled { background: var(--border-color); color: var(--text-muted); }
-    .mg-status-cancelled   { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .mg-status-cancelled   { background: rgba(239,68,68,0.15); color: var(--bad-text); }
     .mg-row-kebab { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 16px; padding: 2px 6px; text-decoration: none; }
 
     /* Bid-status overview bar */
@@ -134,9 +134,9 @@
     .mg-act-row:last-child { border-bottom: 0; }
     .mg-act-dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .mg-act-dot svg { width: 14px; height: 14px; }
-    .mg-act-dot.green { background: rgba(16,185,129,0.15); color: #10b981; }
-    .mg-act-dot.amber { background: rgba(245,158,11,0.15); color: #f59e0b; }
-    .mg-act-dot.indigo{ background: rgba(99,102,241,0.15); color: #6366f1; }
+    .mg-act-dot.green { background: rgba(16,185,129,0.15); color: var(--ok-text); }
+    .mg-act-dot.amber { background: rgba(245,158,11,0.15); color: var(--warn-text); }
+    .mg-act-dot.indigo{ background: rgba(99,102,241,0.15); color: var(--accent-text); }
     .mg-act-body { flex: 1; min-width: 0; }
     .mg-act-text { font-size: 12.5px; color: var(--text-primary); }
     .mg-act-time { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; }
@@ -170,8 +170,8 @@
     .mg-pay-total { font-size: 24px; font-weight: 800; color: var(--text-primary); }
     .mg-pay-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; text-align: center; font-size: 10.5px; }
     .mg-pay-grid b { display: block; font-size: 14px; font-weight: 800; }
-    .mg-pay-grid .paid b { color: #10b981; }
-    .mg-pay-grid .pend b { color: #f59e0b; }
+    .mg-pay-grid .paid b { color: var(--ok-text); }
+    .mg-pay-grid .pend b { color: var(--warn-text); }
     .mg-pay-grid .earn b { color: var(--mg); }
     .mg-dl-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--border-color); }
     .mg-dl-row:last-of-type { border-bottom: 0; }
@@ -179,7 +179,7 @@
     .mg-dl-body { flex: 1; min-width: 0; }
     .mg-dl-title { font-size: 12.5px; font-weight: 700; color: var(--text-primary); }
     .mg-dl-sub { font-size: 10.5px; color: var(--text-muted); }
-    .mg-dl-due { font-size: 10.5px; color: #f59e0b; font-weight: 700; white-space: nowrap; }
+    .mg-dl-due { font-size: 10.5px; color: var(--warn-text); font-weight: 700; white-space: nowrap; }
 
     @media (max-width: 1200px) {
         .mg-layout { grid-template-columns: 1fr; }

@@ -9,7 +9,7 @@
     .pe-cz-name { font-size:17px; font-weight:800; margin:0 0 3px; }
     .pe-cz-vendor { font-size:12.5px; color:var(--pe-muted); margin:0 0 8px; }
     .pe-cz-stars { font-size:12.5px; font-weight:700; color:var(--pe-ink-2); }
-    .pe-cz-stars .st { color:#f59e0b; }
+    .pe-cz-stars .st { color:var(--warn-text); }
 
     .pe-cz-table { width:100%; }
     .pe-cz-line { display:grid; grid-template-columns:minmax(0,1.6fr) 110px minmax(0,1.3fr) 120px; gap:12px; align-items:center;
@@ -18,10 +18,10 @@
     @media (max-width:720px){ .pe-cz-line { grid-template-columns:1fr 1fr; } }
     .pe-cz-svc { font-size:13.5px; font-weight:800; color:var(--pe-ink); }
     .pe-cz-cov { font-size:12px; color:var(--pe-muted); margin-top:2px; }
-    .pe-cz-inc { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:#15803d; }
+    .pe-cz-inc { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--ok-text); }
     .pe-cz-inc svg { width:15px; height:15px; }
     .pe-cz-sel { font-size:12.5px; color:var(--pe-ink-2); }
-    .pe-cz-sel b { color:#15803d; }
+    .pe-cz-sel b { color:var(--ok-text); }
     .pe-cz-pricec { text-align:right; }
     .pe-cz-pricec .p { font-size:15px; font-weight:800; }
     .pe-cz-pricec a { display:block; font-size:11.5px; font-weight:700; color:var(--pe-orange-d); text-decoration:none; margin-top:2px; }

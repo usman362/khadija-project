@@ -15,7 +15,7 @@
 <div style="margin-top:10px;">
     @unless($expanded)
         <button type="button" onclick="var t=document.getElementById('{{ $threadId }}');t.style.display=t.style.display==='none'?'block':'none';"
-                style="background:none;border:none;padding:0;cursor:pointer;font-size:12px;font-weight:700;color:#2563eb;">
+                style="background:none;border:none;padding:0;cursor:pointer;font-size:12px;font-weight:700;color:var(--info-text);">
             💬 Reply / Counter @if($bid->replies->count())<span style="opacity:.7;">({{ $bid->replies->count() }})</span>@endif
         </button>
     @endunless
@@ -28,7 +28,7 @@
                     <div style="font-size:11px;font-weight:700;opacity:.75;">{{ $mine ? 'You' : ($r->user?->name ?? 'Them') }}
                         <span style="font-weight:500;opacity:.7;">· {{ $r->created_at->diffForHumans() }}</span></div>
                     @if($r->counter_amount)
-                        <div style="font-weight:800;color:#16a34a;font-size:13px;">Counter-offer: ${{ number_format($r->counter_amount) }}</div>
+                        <div style="font-weight:800;color:var(--ok-text);font-size:13px;">Counter-offer: ${{ number_format($r->counter_amount) }}</div>
                     @endif
                     @if($r->note)<div style="font-size:13px;">{{ $r->note }}</div>@endif
                 </div>
@@ -39,7 +39,7 @@
 
         @unless($closed)
             @if($awarded)
-                <div style="font-size:12px;color:#16a34a;font-weight:700;margin-bottom:6px;">✓ Awarded — use this thread to sort out the details.</div>
+                <div style="font-size:12px;color:var(--ok-text);font-weight:700;margin-bottom:6px;">✓ Awarded — use this thread to sort out the details.</div>
             @endif
             <form method="POST" action="{{ route($replyRoute, $bid->id) }}" style="display:flex;flex-direction:column;gap:6px;">
                 @csrf

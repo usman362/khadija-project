@@ -55,17 +55,17 @@
     .pg-gig-status { font-size: 11px; font-weight: 700; }
     .pg-gig-stats { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
     .pg-gig-stat { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--text-secondary); }
-    .pg-gig-stat svg { width: 14px; height: 14px; color: #2563eb; }
+    .pg-gig-stat svg { width: 14px; height: 14px; color: var(--info-text); }
     .pg-viewall { display: block; text-align: center; padding: 13px; margin-top: 6px; font-size: 13px; font-weight: 800; color: var(--pg-blue); text-decoration: none; }
     .pg-empty { padding: 26px 10px; text-align: center; color: var(--text-muted); font-size: 13px; }
 
     /* Breakdown */
     .pg-sec-h { display: flex; align-items: center; gap: 9px; margin-bottom: 4px; }
-    .pg-sec-h svg { width: 20px; height: 20px; color: #2563eb; }
+    .pg-sec-h svg { width: 20px; height: 20px; color: var(--info-text); }
     .pg-sec-h b { font-size: 18px; font-weight: 800; color: var(--text-primary); }
     .pg-sec-sub { font-size: 12.5px; color: var(--text-muted); margin: 0 0 14px; }
     .pg-bd { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .pg-bd-h { font-size: 13px; font-weight: 800; color: #2563eb; margin-bottom: 8px; }
+    .pg-bd-h { font-size: 13px; font-weight: 800; color: var(--info-text); margin-bottom: 8px; }
     .pg-bd-sub { font-size: 11.5px; color: var(--text-muted); margin: 0 0 12px; line-height: 1.4; }
     .pg-bd-row { display: flex; gap: 9px; padding: 7px 0; }
     .pg-bd-row svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
@@ -83,7 +83,7 @@
     .pg-cc-card { border: 1px solid var(--border-color); border-radius: 12px; padding: 13px; background: var(--bg-card); display: flex; flex-direction: column; }
     .pg-cc-card > :last-child { margin-top: auto; }
     .pg-cc-h { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
-    .pg-cc-h svg { width: 15px; height: 15px; color: #2563eb; flex-shrink: 0; }
+    .pg-cc-h svg { width: 15px; height: 15px; color: var(--info-text); flex-shrink: 0; }
     .pg-cc-h b { font-size: 11.5px; font-weight: 800; color: var(--text-primary); }
     .pg-cc-card > p { font-size: 10px; color: var(--text-muted); line-height: 1.4; margin: 0 0 9px; }
     .pg-cc-prev { background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; font-size: 9.5px; color: var(--text-secondary); }
@@ -93,10 +93,10 @@
     .pg-cc-line { height: 5px; border-radius: 3px; background: var(--border-color); margin: 4px 0; }
     .pg-cc-btn { display: block; text-align: center; padding: 6px; border-radius: 7px; color: #fff; font-size: 10px; font-weight: 800; text-decoration: none; margin-top: 8px; }
     .pg-cc-chk { display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: var(--text-secondary); padding: 2px 0; }
-    .pg-cc-chk svg { width: 11px; height: 11px; color: #10b981; }
+    .pg-cc-chk svg { width: 11px; height: 11px; color: var(--ok-text); }
     .pg-cc-tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border-color); margin-bottom: 7px; }
     .pg-cc-tab { font-size: 9.5px; font-weight: 700; padding-bottom: 5px; color: var(--text-muted); }
-    .pg-cc-tab.on { color: #2563eb; border-bottom: 2px solid #2563eb; }
+    .pg-cc-tab.on { color: var(--info-text); border-bottom: 2px solid #2563eb; }
     .pg-cc-msg { display: flex; gap: 5px; margin-bottom: 5px; }
     .pg-cc-bub { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 7px; padding: 4px 7px; font-size: 9px; color: var(--text-secondary); }
     .pg-cc-bub.me { background: rgba(37,99,235,0.1); margin-left: auto; }
@@ -104,7 +104,7 @@
     .pg-prog > i { display: block; height: 100%; background: #10b981; }
 
     .pg-banner { display: flex; align-items: center; gap: 14px; background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.18); border-radius: 14px; padding: 16px 20px; margin-top: 18px; }
-    .pg-banner svg.star { width: 26px; height: 26px; color: #2563eb; flex-shrink: 0; }
+    .pg-banner svg.star { width: 26px; height: 26px; color: var(--info-text); flex-shrink: 0; }
     .pg-banner-txt { flex: 1; }
     .pg-banner-txt b { font-size: 13.5px; color: var(--text-primary); }
     .pg-banner-txt p { font-size: 12px; color: var(--text-muted); margin: 1px 0 0; }
@@ -139,10 +139,10 @@
             <h1>Gig Operations Hub</h1>
             <div class="tag">Manage all your gigs in one place.</div>
             <p>Your centralized control center to track jobs, monitor earnings, manage staffing, and organize communications — all in one powerful dashboard.</p>
-            <div class="pg-feat x1"><span class="pg-feat-ico" style="background:rgba(139,92,246,0.14);color:#8b5cf6;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19.5 12.5l-7 7a2 2 0 0 1-2.8 0l-7-7a2 2 0 0 1 0-2.8l7-7a2 2 0 0 1 2.8 0l7 7a2 2 0 0 1 0 2.8z"/></svg></span><div><b>Stops Confusion</b><p>Gathers scattered details into one view.</p></div></div>
-            <div class="pg-feat x2"><span class="pg-feat-ico" style="background:rgba(16,185,129,0.14);color:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9.5a2.5 2.5 0 0 1 5 0M9 14.5a2.5 2.5 0 0 0 5 0"/></svg></span><div><b>Tracks Money</b><p>Shows exactly how much each job pays.</p></div></div>
-            <div class="pg-feat x3"><span class="pg-feat-ico" style="background:rgba(249,115,22,0.14);color:#f97316;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span><div><b>Manages Teams</b><p>Helps verify that enough workers are assigned to every event.</p></div></div>
-            <div class="pg-feat x4"><span class="pg-feat-ico" style="background:rgba(37,99,235,0.14);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><b>Saves Time</b><p>Eliminates the need to switch between emails, calendars, and text messages.</p></div></div>
+            <div class="pg-feat x1"><span class="pg-feat-ico" style="background:rgba(139,92,246,0.14);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19.5 12.5l-7 7a2 2 0 0 1-2.8 0l-7-7a2 2 0 0 1 0-2.8l7-7a2 2 0 0 1 2.8 0l7 7a2 2 0 0 1 0 2.8z"/></svg></span><div><b>Stops Confusion</b><p>Gathers scattered details into one view.</p></div></div>
+            <div class="pg-feat x2"><span class="pg-feat-ico" style="background:rgba(16,185,129,0.14);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9.5a2.5 2.5 0 0 1 5 0M9 14.5a2.5 2.5 0 0 0 5 0"/></svg></span><div><b>Tracks Money</b><p>Shows exactly how much each job pays.</p></div></div>
+            <div class="pg-feat x3"><span class="pg-feat-ico" style="background:rgba(249,115,22,0.14);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span><div><b>Manages Teams</b><p>Helps verify that enough workers are assigned to every event.</p></div></div>
+            <div class="pg-feat x4"><span class="pg-feat-ico" style="background:rgba(37,99,235,0.14);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><b>Saves Time</b><p>Eliminates the need to switch between emails, calendars, and text messages.</p></div></div>
         </div>
 
         <div class="pg-card">
@@ -206,11 +206,11 @@
             <div>
                 <div class="pg-bd-h">2. The Live Event List <span style="color:var(--text-muted);font-weight:600;">(Middle)</span></div>
                 <p class="pg-bd-sub">This section highlights the most urgent events on your schedule.</p>
-                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p><b style="color:#8b5cf6;">The Job Details:</b> event name, date, location, and service.</p></div>
-                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><p><b style="color:#10b981;">The Paycheck:</b> estimated price range of the contract.</p></div>
-                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg><p><b style="color:#f97316;">Booking Status:</b> color codes — <b style="color:#059669;">Confirmed</b> (green) / In Progress (orange).</p></div>
-                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p><b style="color:#2563eb;">The Crew Counter:</b> staffing levels (6/6 fully staffed; 3/5 = hire 2 more).</p></div>
-                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p><b style="color:#2563eb;">The Message Bubble:</b> unread questions or updates from the client or crew.</p></div>
+                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p><b style="color:var(--accent-text);">The Job Details:</b> event name, date, location, and service.</p></div>
+                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><p><b style="color:var(--ok-text);">The Paycheck:</b> estimated price range of the contract.</p></div>
+                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg><p><b style="color:var(--brand-text);">Booking Status:</b> color codes — <b style="color:var(--ok-text);">Confirmed</b> (green) / In Progress (orange).</p></div>
+                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p><b style="color:var(--info-text);">The Crew Counter:</b> staffing levels (6/6 fully staffed; 3/5 = hire 2 more).</p></div>
+                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p><b style="color:var(--info-text);">The Message Bubble:</b> unread questions or updates from the client or crew.</p></div>
             </div>
             <div>
                 <div class="pg-bd-h">3. The Navigation Gate <span style="color:var(--text-muted);font-weight:600;">(Bottom)</span></div>
@@ -242,7 +242,7 @@
                 <div class="pg-cc-line"></div><div class="pg-cc-line" style="width:70%;"></div>
                 <div style="margin-top:5px;">Total: <b style="color:var(--text-primary);">$4,000.00</b></div>
                 <div style="margin-top:4px;">50% Deposit · 50% Final</div>
-                <a href="{{ route('ai-agreement.build') }}" class="pg-cc-btn" style="background:#10b981;">Sign Contract</a>
+                <a href="{{ route('ai-agreement.build') }}" class="pg-cc-btn" style="background:#047857;">Sign Contract</a>
             </div>
         </div>
         <div class="pg-cc-card">

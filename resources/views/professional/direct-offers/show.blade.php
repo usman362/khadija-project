@@ -7,22 +7,22 @@
     .do { --do: #2563eb; }
     .do-back { display:inline-flex; align-items:center; gap:7px; font-size:13px; color:var(--text-muted); text-decoration:none; }
     .do-back svg { width:15px; height:15px; }
-    .do-pill { font-size:11.5px; font-weight:800; color:#d97706; background:rgba(217,119,6,0.12); padding:4px 12px; border-radius:999px; }
+    .do-pill { font-size:11.5px; font-weight:800; color:var(--warn-text); background:rgba(217,119,6,0.12); padding:4px 12px; border-radius:999px; }
     .do-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; padding:22px; }
     .do-h-top { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:14px; }
     .do-title { font-size:22px; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-    .do-badge { font-size:11px; font-weight:800; color:#7c3aed; background:rgba(124,58,237,0.12); padding:3px 9px; border-radius:6px; }
+    .do-badge { font-size:11px; font-weight:800; color:var(--accent-text); background:rgba(124,58,237,0.12); padding:3px 9px; border-radius:6px; }
     .do-sub { font-size:12.5px; color:var(--text-muted); margin-top:5px; }
     .do-btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:11px 18px; border-radius:10px; font-size:13.5px; font-weight:800; cursor:pointer; font-family:inherit; text-decoration:none; border:1px solid transparent; }
     .do-btn.primary { background:var(--do); color:#fff; border:none; }
-    .do-btn.ghost { background:var(--bg-card); color:#dc2626; border:1px solid #fca5a5; }
+    .do-btn.ghost { background:var(--bg-card); color:var(--bad-text); border:1px solid #fca5a5; }
     .do-btn svg { width:15px; height:15px; }
 
     .do-summary { display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:22px; padding-top:18px; border-top:1px solid var(--border-color); margin-top:6px; }
     .do-req { display:flex; align-items:center; gap:13px; }
     .do-req-av { width:54px; height:54px; border-radius:50%; background:#2563eb; color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; flex-shrink:0; }
     .do-req b { font-size:15px; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:6px; }
-    .do-req .verif { color:#2563eb; }
+    .do-req .verif { color:var(--info-text); }
     /* Scoped to the text block on purpose. As a bare `.do-req span` this also
        matched the avatar — which is a span — and beat `.do-req-av` on
        specificity, turning it back into a block so the initial sat in the
@@ -30,7 +30,7 @@
     .do-req > div span { font-size:12px; color:var(--text-muted); display:block; margin-top:2px; }
     .do-k { font-size:11.5px; color:var(--text-muted); }
     .do-v { font-size:20px; font-weight:800; color:var(--text-primary); margin-top:3px; }
-    .do-v.warn { color:#dc2626; }
+    .do-v.warn { color:var(--bad-text); }
     .do-v small { font-size:12px; color:var(--text-muted); font-weight:600; }
 
     .do-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,340px); gap:18px; align-items:start; margin-top:18px; }
@@ -41,20 +41,20 @@
     .do-row:last-child { border-bottom:none; }
     .do-row .rk { color:var(--text-muted); }
     .do-row .rv { color:var(--text-primary); font-weight:600; }
-    .do-chip { font-size:11.5px; font-weight:700; padding:2px 9px; border-radius:6px; background:rgba(37,99,235,0.1); color:#2563eb; display:inline-block; }
+    .do-chip { font-size:11.5px; font-weight:700; padding:2px 9px; border-radius:6px; background:rgba(37,99,235,0.1); color:var(--info-text); display:inline-block; }
 
     .do-services { display:grid; grid-template-columns:1fr 1fr; gap:9px 18px; }
     .do-srv { display:flex; align-items:center; gap:9px; font-size:13px; color:var(--text-primary); }
-    .do-srv svg { width:16px; height:16px; color:#16a34a; flex-shrink:0; }
+    .do-srv svg { width:16px; height:16px; color:var(--ok-text); flex-shrink:0; }
     .do-note-box { background:var(--bg-card-hover); border:1px solid var(--border-color); border-radius:10px; padding:13px; font-size:13px; color:var(--text-secondary); line-height:1.6; }
     .do-twocol { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     .do-mini-h { font-size:13px; font-weight:800; color:var(--text-primary); margin-bottom:7px; }
     .do-venue-warn { background:rgba(217,119,6,0.08); border:1px solid rgba(217,119,6,0.25); border-radius:10px; padding:12px 14px; }
-    .do-venue-warn div { display:flex; align-items:center; gap:8px; font-size:12.5px; color:#b45309; padding:3px 0; }
+    .do-venue-warn div { display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--warn-text); padding:3px 0; }
     .do-venue-warn svg { width:15px; height:15px; flex-shrink:0; }
     .do-files { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
     .do-file { border:1px solid var(--border-color); border-radius:11px; padding:12px; text-align:center; }
-    .do-file .ic { width:40px; height:40px; border-radius:9px; background:rgba(220,38,38,0.1); color:#dc2626; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; }
+    .do-file .ic { width:40px; height:40px; border-radius:9px; background:rgba(220,38,38,0.1); color:var(--bad-text); display:flex; align-items:center; justify-content:center; margin:0 auto 8px; }
     .do-file .ic svg { width:18px; height:18px; }
     .do-file b { font-size:11.5px; color:var(--text-primary); word-break:break-word; display:block; }
 
@@ -67,7 +67,7 @@
     .do-action p { font-size:12px; color:var(--text-muted); margin:0 0 11px 31px; line-height:1.45; }
     .do-action-btn { display:block; width:100%; box-sizing:border-box; text-align:center; padding:11px; border-radius:9px; font-size:13px; font-weight:800; cursor:pointer; font-family:inherit; text-decoration:none; border:1px solid var(--do); color:var(--do); background:var(--bg-card); }
     .do-action-btn.solid { background:var(--do); color:#fff; border:none; }
-    .do-action-btn.danger { border-color:#fca5a5; color:#dc2626; }
+    .do-action-btn.danger { border-color:#fca5a5; color:var(--bad-text); }
     .do-action small { display:block; font-size:11px; color:var(--text-muted); margin:8px 0 0 31px; }
 
     .do-ta { width:100%; box-sizing:border-box; min-height:80px; border:1px solid var(--border-color); border-radius:9px; background:var(--bg-card); color:var(--text-primary); font-size:12.5px; padding:10px; font-family:inherit; resize:vertical; }
@@ -130,13 +130,13 @@
             </div>
             <div>
                 <div class="do-k">Offer Amount <span style="opacity:.7;">(Target)</span></div>
-                <div class="do-v" style="color:#16a34a;">${{ number_format($offer['offer_min']) }} – ${{ number_format($offer['offer_max']) }} <small>USD</small></div>
+                <div class="do-v" style="color:var(--ok-text);">${{ number_format($offer['offer_min']) }} – ${{ number_format($offer['offer_max']) }} <small>USD</small></div>
                 <div class="do-k" style="margin-top:3px;">{{ $offer['budget_note'] }}</div>
             </div>
             <div>
                 <div class="do-k">Response Deadline</div>
                 <div class="do-v">{{ $offer['response_deadline'] }}</div>
-                <div class="do-k" style="color:#dc2626;margin-top:3px;font-weight:700;">{{ $offer['days_remaining'] }} Days Remaining</div>
+                <div class="do-k" style="color:var(--bad-text);margin-top:3px;font-weight:700;">{{ $offer['days_remaining'] }} Days Remaining</div>
             </div>
         </div>
     </div>

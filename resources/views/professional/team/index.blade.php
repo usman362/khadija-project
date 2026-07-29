@@ -14,7 +14,7 @@
     /* Header */
     .pt-head { display: flex; align-items: center; gap: 20px; margin-bottom: 18px; }
     .pt-head-art { width: 92px; height: 92px; border-radius: 22px; background: linear-gradient(135deg,#dbeafe,#bfdbfe); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .pt-head-art svg { width: 50px; height: 50px; color: #2563eb; }
+    .pt-head-art svg { width: 50px; height: 50px; color: var(--info-text); }
     .pt-head h1 { font-size: 30px; font-weight: 800; color: var(--text-primary); margin: 0; }
     .pt-head p { font-size: 14px; color: var(--text-muted); margin: 4px 0 0; }
     .pt-head-spacer { flex: 1; }
@@ -31,9 +31,9 @@
     .pt-stat.s-red { background: rgba(239,68,68,0.05); }
     .pt-stat-ico { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .pt-stat-ico svg { width: 28px; height: 28px; }
-    .s-blue .pt-stat-ico { background: rgba(37,99,235,0.12); color: #2563eb; }
-    .s-green .pt-stat-ico { background: rgba(16,185,129,0.12); color: #10b981; }
-    .s-red .pt-stat-ico { background: rgba(239,68,68,0.12); color: #ef4444; }
+    .s-blue .pt-stat-ico { background: rgba(37,99,235,0.12); color: var(--info-text); }
+    .s-green .pt-stat-ico { background: rgba(16,185,129,0.12); color: var(--ok-text); }
+    .s-red .pt-stat-ico { background: rgba(239,68,68,0.12); color: var(--bad-text); }
     .pt-stat-label { font-size: 13px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 7px; }
     .pt-stat-label .dot { width: 8px; height: 8px; border-radius: 50%; }
     .pt-stat-val { font-size: 34px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
@@ -45,8 +45,8 @@
     .pt-sec-h .dot { width: 11px; height: 11px; border-radius: 50%; }
     .pt-sec-h b { font-size: 16px; font-weight: 800; color: var(--text-primary); }
     .pt-sec-h .tag { margin-left: auto; font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 6px; }
-    .tag-live { background: rgba(16,185,129,0.12); color: #059669; }
-    .tag-urgent { background: rgba(239,68,68,0.12); color: #dc2626; }
+    .tag-live { background: rgba(16,185,129,0.12); color: var(--ok-text); }
+    .tag-urgent { background: rgba(239,68,68,0.12); color: var(--bad-text); }
 
     .pt-avatars { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; padding: 6px 4px 14px; }
     .pt-av { text-align: center; }
@@ -54,20 +54,20 @@
     .pt-av-img .on { position: absolute; bottom: 1px; right: 1px; width: 12px; height: 12px; border-radius: 50%; background: #10b981; border: 2px solid var(--bg-card); }
     .pt-av-name { font-size: 10.5px; font-weight: 700; color: var(--text-secondary); }
     .pt-onshift-foot { display: flex; align-items: center; gap: 10px; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.18); border-radius: 11px; padding: 11px 13px; }
-    .pt-onshift-foot .ic { width: 30px; height: 30px; border-radius: 8px; background: rgba(16,185,129,0.14); color: #059669; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .pt-onshift-foot .ic { width: 30px; height: 30px; border-radius: 8px; background: rgba(16,185,129,0.14); color: var(--ok-text); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .pt-onshift-foot .ic svg { width: 15px; height: 15px; }
     .pt-onshift-foot .t b { font-size: 12px; color: var(--text-primary); display: block; }
     .pt-onshift-foot .t span { font-size: 10.5px; color: var(--text-muted); }
-    .pt-onshift-foot a { margin-left: auto; font-size: 11.5px; font-weight: 800; color: #059669; text-decoration: none; white-space: nowrap; }
+    .pt-onshift-foot a { margin-left: auto; font-size: 11.5px; font-weight: 800; color: var(--ok-text); text-decoration: none; white-space: nowrap; }
 
     .pt-shift { display: flex; align-items: center; gap: 11px; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
     .pt-shift:last-child { border-bottom: none; }
-    .pt-shift-pin { width: 26px; height: 26px; border-radius: 50%; background: rgba(239,68,68,0.1); color: #ef4444; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .pt-shift-pin { width: 26px; height: 26px; border-radius: 50%; background: rgba(239,68,68,0.1); color: var(--bad-text); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .pt-shift-pin svg { width: 14px; height: 14px; }
     .pt-shift-body { flex: 1; min-width: 0; }
     .pt-shift-role { font-size: 12.5px; font-weight: 800; color: var(--text-primary); }
     .pt-shift-time { font-size: 11px; color: var(--text-muted); }
-    .pt-fill { font-size: 11px; font-weight: 800; color: #dc2626; background: rgba(239,68,68,0.09); border: none; border-radius: 8px; padding: 7px 14px; cursor: pointer; white-space: nowrap; }
+    .pt-fill { font-size: 11px; font-weight: 800; color: var(--bad-text); background: rgba(239,68,68,0.09); border: none; border-radius: 8px; padding: 7px 14px; cursor: pointer; white-space: nowrap; }
     .pt-fill:hover { background: rgba(239,68,68,0.16); }
     .pt-empty { padding: 22px 10px; text-align: center; color: var(--text-muted); font-size: 12.5px; }
 
@@ -94,14 +94,14 @@
     .pt-feat-h { display: flex; align-items: center; gap: 9px; margin-bottom: 6px; }
     .pt-feat-ico { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .pt-feat-ico svg { width: 17px; height: 17px; }
-    .f1 .pt-feat-ico { background: rgba(37,99,235,0.14); color: #2563eb; }
-    .f2 .pt-feat-ico { background: rgba(16,185,129,0.14); color: #10b981; }
-    .f3 .pt-feat-ico { background: rgba(139,92,246,0.14); color: #8b5cf6; }
-    .f4 .pt-feat-ico { background: rgba(249,115,22,0.14); color: #f97316; }
+    .f1 .pt-feat-ico { background: rgba(37,99,235,0.14); color: var(--info-text); }
+    .f2 .pt-feat-ico { background: rgba(16,185,129,0.14); color: var(--ok-text); }
+    .f3 .pt-feat-ico { background: rgba(139,92,246,0.14); color: var(--accent-text); }
+    .f4 .pt-feat-ico { background: rgba(249,115,22,0.14); color: var(--brand-text); }
     .pt-feat-nm { font-size: 13px; font-weight: 800; color: var(--text-primary); }
     .pt-feat p { font-size: 11px; color: var(--text-muted); line-height: 1.4; margin: 0 0 10px; }
     .pt-labor-total-k { font-size: 10px; color: var(--text-muted); text-align: center; }
-    .pt-labor-total { font-size: 26px; font-weight: 800; color: #10b981; text-align: center; }
+    .pt-labor-total { font-size: 26px; font-weight: 800; color: var(--ok-text); text-align: center; }
     .pt-labor-meta { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 4px; }
     .pt-feat-btn { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; padding: 9px; border-radius: 9px; border: none; font-size: 12px; font-weight: 800; cursor: pointer; color: #fff; text-decoration: none; }
 
@@ -114,7 +114,7 @@
 <div class="pt">
 
     @if(session('status'))
-        <div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:#059669;border-radius:10px;padding:11px 16px;margin-bottom:16px;font-size:13px;font-weight:600;">{{ session('status') }}</div>
+        <div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:var(--ok-text);border-radius:10px;padding:11px 16px;margin-bottom:16px;font-size:13px;font-weight:600;">{{ session('status') }}</div>
     @endif
 
     {{-- Header --}}
@@ -154,7 +154,8 @@
         <div class="pt-card">
             <div class="pt-sec-h"><span class="dot" style="background:#10b981;"></span><b>Current On-Shift ({{ $onShift->count() }})</b><span class="tag tag-live">Live</span></div>
             @if($onShift->count())
-                @php $avColors = ['#f472b6','#60a5fa','#34d399','#a78bfa','#fbbf24','#fb923c','#94a3b8','#22d3ee']; @endphp
+                {{-- Deep enough for the white initials that sit on them to stay legible. --}}
+                @php $avColors = ['#be185d','#1d4ed8','#047857','#6d28d9','#b45309','#c2410c','#475569','#0e7490']; @endphp
                 <div class="pt-avatars">
                     @foreach($onShift as $i => $sh)
                         <div class="pt-av">
@@ -235,7 +236,7 @@
         <div class="pt-feat f2">
             <div class="pt-feat-h"><span class="pt-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span class="pt-feat-nm">Team Chat</span></div>
             <p>Message on-shift workers instantly.</p>
-            <a href="{{ route('professional.chat.index') }}" class="pt-feat-btn" style="background:#10b981;">Open Chat</a>
+            <a href="{{ route('professional.chat.index') }}" class="pt-feat-btn" style="background:#047857;">Open Chat</a>
         </div>
         <div class="pt-feat f3">
             <div class="pt-feat-h"><span class="pt-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span class="pt-feat-nm">Labor Cost Estimator</span></div>

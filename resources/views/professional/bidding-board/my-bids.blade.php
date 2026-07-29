@@ -18,7 +18,7 @@
     .mb { max-width: 1180px; }
     .mb-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
     .mb-back { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 700; color: var(--text-secondary); text-decoration: none; }
-    .mb-flash { display: flex; align-items: center; gap: 8px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; font-size: 13px; font-weight: 600; padding: 11px 16px; border-radius: 12px; margin-bottom: 16px; }
+    .mb-flash { display: flex; align-items: center; gap: 8px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; font-size: 13px; font-weight: 600; padding: 11px 16px; border-radius: 12px; margin-bottom: 16px; }
     .mb-err { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
 
     .mb-grid { display: grid; grid-template-columns: minmax(0,1fr) 290px; gap: 20px; align-items: start; }
@@ -46,25 +46,25 @@
     .mb-row { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 15px 18px; margin-bottom: 11px; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 14px; align-items: start; }
     @media (max-width: 620px) { .mb-row { grid-template-columns: 1fr; } .mb-right { text-align: left !important; } .mb-acts { justify-content: flex-start !important; } }
     .mb-title { font-size: 15px; font-weight: 800; color: var(--text-primary); text-decoration: none; }
-    .mb-title:hover { color: #2563eb; }
+    .mb-title:hover { color: var(--info-text); }
     .mb-meta { font-size: 12px; color: var(--text-secondary); margin-top: 5px; display: flex; gap: 9px; flex-wrap: wrap; align-items: center; }
     .mb-chip { display: inline-flex; align-items: center; border-radius: 6px; padding: 2px 8px; font-size: 10.5px; font-weight: 800; }
-    .mb-chip.BSR { background: rgba(37,99,235,.12); color: #2563eb; }
-    .mb-chip.ESR { background: rgba(220,38,38,.12); color: #dc2626; }
-    .mb-chip.DSR { background: rgba(124,58,237,.12); color: #7c3aed; }
+    .mb-chip.BSR { background: rgba(37,99,235,.12); color: var(--info-text); }
+    .mb-chip.ESR { background: rgba(220,38,38,.12); color: var(--bad-text); }
+    .mb-chip.DSR { background: rgba(124,58,237,.12); color: var(--accent-text); }
     .mb-chip.scope { background: rgba(100,116,139,.14); color: var(--text-secondary); }
     .mb-right { text-align: right; min-width: 200px; }
     .mb-amt { font-size: 18px; font-weight: 800; color: var(--text-primary); }
     .mb-net { font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
     .mb-state { display: inline-block; border-radius: 999px; padding: 3px 11px; font-size: 11px; font-weight: 800; margin-bottom: 6px; }
-    .mb-state.submitted { background: rgba(37,99,235,.12); color: #2563eb; }
-    .mb-state.negotiating { background: rgba(124,58,237,.14); color: #7c3aed; }
-    .mb-state.won { background: rgba(22,163,74,.14); color: #16a34a; }
+    .mb-state.submitted { background: rgba(37,99,235,.12); color: var(--info-text); }
+    .mb-state.negotiating { background: rgba(124,58,237,.14); color: var(--accent-text); }
+    .mb-state.won { background: rgba(22,163,74,.14); color: var(--ok-text); }
     .mb-state.not_selected, .mb-state.withdrawn { background: rgba(100,116,139,.16); color: var(--text-secondary); }
-    .mb-state.expired { background: rgba(217,119,6,.14); color: #d97706; }
+    .mb-state.expired { background: rgba(217,119,6,.14); color: var(--warn-text); }
     .mb-acts { display: flex; gap: 7px; justify-content: flex-end; margin-top: 9px; flex-wrap: wrap; }
     .mb-btn { border: 1px solid var(--border-color); background: transparent; border-radius: 9px; padding: 6px 12px; font-size: 12px; font-weight: 700; color: var(--text-secondary); text-decoration: none; cursor: pointer; font-family: inherit; }
-    .mb-btn.danger { border-color: rgba(220,38,38,.4); color: #dc2626; }
+    .mb-btn.danger { border-color: rgba(220,38,38,.4); color: var(--bad-text); }
 
     .mb-empty { background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: 14px; padding: 48px 20px; text-align: center; }
     .mb-empty h4 { font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }

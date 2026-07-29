@@ -15,7 +15,7 @@
         margin-bottom: 16px;
         transition: var(--transition);
     }
-    .np-back:hover { color: #f97316; }
+    .np-back:hover { color: var(--brand-text); }
     .np-back svg { width: 16px; height: 16px; }
 
     .np-success {
@@ -23,7 +23,7 @@
         background: rgba(16,185,129,0.1);
         border: 1px solid rgba(16,185,129,0.3);
         border-radius: var(--radius-sm);
-        color: #10b981;
+        color: var(--ok-text);
         font-size: 14px;
         margin-bottom: 16px;
     }

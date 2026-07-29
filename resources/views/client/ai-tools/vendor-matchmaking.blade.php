@@ -59,7 +59,7 @@
     .vm-reviews { font-size: 12.5px; color: var(--text-muted); margin-left: 5px; }
     .vm-tags { display: flex; flex-wrap: wrap; gap: 7px; }
     .vm-tag { font-size: 11.5px; font-weight: 700; padding: 4px 11px; border-radius: 999px; background: var(--bg-card-hover); color: var(--text-secondary); }
-    .vm-tag-avail { background: rgba(16,185,129,0.12); color: #059669; }
+    .vm-tag-avail { background: rgba(16,185,129,0.12); color: var(--ok-text); }
     .vm-match-right { text-align: right; flex-shrink: 0; }
     .vm-match-pct { display: inline-block; font-size: 12.5px; font-weight: 800; color: var(--vm); border: 1px solid rgba(139,92,246,0.4); border-radius: 999px; padding: 4px 12px; }
     .vm-match-price { display: block; font-size: 20px; font-weight: 800; color: var(--text-primary); margin-top: 10px; }

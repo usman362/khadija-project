@@ -37,7 +37,7 @@
     .pc-card h3 { font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0 0 18px; }
     .pc-field { margin-bottom: 18px; }
     .pc-field label { display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 7px; }
-    .pc-field label .req { color: #dc2626; }
+    .pc-field label .req { color: var(--bad-text); }
     .pc-field .hint { font-size: 11.5px; color: var(--text-muted); margin-top: 5px; }
     .pc-input, .pc-textarea, .pc-select { width: 100%; border: 1px solid var(--border-color); border-radius: 10px; padding: 11px 13px; font-size: 14px; font-family: inherit; color: var(--text-primary); background: var(--bg-body, var(--bg-card)); }
     .pc-textarea { min-height: 84px; resize: vertical; }
@@ -72,7 +72,7 @@
     .pc-toggle.on::after { transform: translateX(18px); }
     .pc-svccount { font-size: 12.5px; color: var(--text-muted); margin-top: 14px; }
     .pc-svccount b { color: var(--text-primary); }
-    .pc-svccount.bad b { color: #dc2626; }
+    .pc-svccount.bad b { color: var(--bad-text); }
 
     .pc-rep-item { display: flex; gap: 8px; margin-bottom: 8px; }
     .pc-rep-item input { flex: 1; }
@@ -98,7 +98,7 @@
     .pc-prev-price small { display: block; font-size: 11px; color: var(--text-muted); font-weight: 600; }
     .pc-list { list-style: none; padding: 0; margin: 0; }
     .pc-list li { display: flex; gap: 8px; font-size: 12.5px; color: var(--text-secondary); padding: 5px 0; }
-    .pc-list svg { width: 15px; height: 15px; color: #16a34a; flex-shrink: 0; margin-top: 1px; }
+    .pc-list svg { width: 15px; height: 15px; color: var(--ok-text); flex-shrink: 0; margin-top: 1px; }
     .pc-tips li { position: relative; padding-left: 15px; margin-bottom: 7px; font-size: 12px; color: var(--text-secondary); }
     .pc-tips li::before { content: "•"; position: absolute; left: 2px; color: var(--pc); }
     .pc-help p { font-size: 12px; color: var(--text-muted); margin: 0 0 8px; }

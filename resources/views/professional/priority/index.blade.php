@@ -49,7 +49,7 @@
     .pa-sec-t span { font-size: 12px; font-weight: 600; color: var(--text-muted); }
     .pa-sec-d { font-size: 12.5px; color: var(--text-muted); margin: 0 0 10px; }
     .pa-chk { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); padding: 3px 0; }
-    .pa-chk svg { width: 14px; height: 14px; color: #10b981; flex-shrink: 0; }
+    .pa-chk svg { width: 14px; height: 14px; color: var(--ok-text); flex-shrink: 0; }
     .pa-bullet { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); padding: 3px 0; }
     .pa-bullet .d { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
@@ -61,16 +61,16 @@
     .pa-ex-row b { color: var(--text-primary); }
     .pa-ex-quote { font-size: 12.5px; font-style: italic; color: var(--text-secondary); line-height: 1.5; }
     .pa-ex-client { font-size: 11.5px; font-weight: 700; color: var(--text-primary); margin-top: 8px; }
-    .pa-ex-timer { font-size: 11px; color: #dc2626; font-weight: 700; margin-top: 8px; }
+    .pa-ex-timer { font-size: 11px; color: var(--bad-text); font-weight: 700; margin-top: 8px; }
     .pa-ex-timer .big { font-size: 22px; font-weight: 800; display: block; }
     .pa-ex-action { font-size: 12.5px; color: var(--text-secondary); }
-    .pa-ex-action b { color: #059669; }
+    .pa-ex-action b { color: var(--ok-text); }
 
     /* How it works */
     .pa-hiw-title { font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 18px 0 14px; }
     .pa-steps { display: flex; align-items: stretch; gap: 6px; }
     .pa-step { flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px 10px; text-align: center; }
-    .pa-step-ico { width: 42px; height: 42px; border-radius: 11px; background: rgba(37,99,235,0.1); color: #2563eb; display: flex; align-items: center; justify-content: center; margin: 0 auto 9px; }
+    .pa-step-ico { width: 42px; height: 42px; border-radius: 11px; background: rgba(37,99,235,0.1); color: var(--info-text); display: flex; align-items: center; justify-content: center; margin: 0 auto 9px; }
     .pa-step-ico svg { width: 21px; height: 21px; }
     .pa-step h4 { font-size: 12px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px; }
     .pa-step p { font-size: 10px; color: var(--text-muted); line-height: 1.35; margin: 0; }
@@ -92,7 +92,7 @@
     .pa-wh-btn { display: block; text-align: center; padding: 8px; border-radius: 8px; color: #fff; border: none; font-size: 11px; font-weight: 800; cursor: pointer; text-decoration: none; }
 
     .pa-short { display: flex; align-items: center; gap: 14px; background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.18); border-radius: 12px; padding: 15px 18px; margin-top: 16px; }
-    .pa-short .ic { width: 36px; height: 36px; border-radius: 10px; background: rgba(37,99,235,0.12); color: #2563eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .pa-short .ic { width: 36px; height: 36px; border-radius: 10px; background: rgba(37,99,235,0.12); color: var(--info-text); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .pa-short .ic svg { width: 18px; height: 18px; }
     .pa-short-txt { flex: 1; }
     .pa-short-txt b { font-size: 12.5px; color: var(--text-primary); }
@@ -116,9 +116,9 @@
     .pa-li-d { font-size: 10.5px; color: var(--text-muted); line-height: 1.4; }
     .pa-li-d b { color: var(--text-secondary); }
     .pa-li-btn { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 6px; align-self: flex-start; white-space: nowrap; border: 1px solid; }
-    .b-accept { color: #059669; border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.08); }
-    .b-counter { color: #d97706; border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.08); }
-    .b-decline { color: #dc2626; border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.08); }
+    .b-accept { color: var(--ok-text); border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.08); }
+    .b-counter { color: var(--warn-text); border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.08); }
+    .b-decline { color: var(--bad-text); border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.08); }
     .pa-live-foot { padding: 11px 14px; text-align: center; }
     .pa-live-foot a { font-size: 12px; font-weight: 800; color: var(--pa-blue); text-decoration: none; }
     .pa-create { display: flex; align-items: center; justify-content: center; gap: 7px; margin: 4px 14px 0; padding: 9px; border-radius: 8px; background: #2563eb; color: #fff; font-size: 11.5px; font-weight: 800; text-decoration: none; }
@@ -191,7 +191,7 @@
                 {{-- WHAT --}}
                 <div class="pa-sec">
                     <div class="pa-sec-l">
-                        <div class="pa-sec-h"><span class="pa-sec-ico" style="background:rgba(239,68,68,0.12);color:#ef4444;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="pa-sec-t">WHAT <span>(Event Details)</span></span></div>
+                        <div class="pa-sec-h"><span class="pa-sec-ico" style="background:rgba(239,68,68,0.12);color:var(--bad-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="pa-sec-t">WHAT <span>(Event Details)</span></span></div>
                         <p class="pa-sec-d">Shows the important facts about the event.</p>
                         <div class="pa-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>When the event happens</div>
                         <div class="pa-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Where it happens</div>
@@ -209,7 +209,7 @@
                 {{-- WHY --}}
                 <div class="pa-sec">
                     <div class="pa-sec-l">
-                        <div class="pa-sec-h"><span class="pa-sec-ico" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span class="pa-sec-t">WHY <span>(Client Message)</span></span></div>
+                        <div class="pa-sec-h"><span class="pa-sec-ico" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span class="pa-sec-t">WHY <span>(Client Message)</span></span></div>
                         <p class="pa-sec-d">Shows why the client needs your help.</p>
                         <div class="pa-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>The client tells you what they want</div>
                         <div class="pa-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Helps you understand the event better</div>
@@ -225,7 +225,7 @@
                 {{-- EXTRAS --}}
                 <div class="pa-sec">
                     <div class="pa-sec-l">
-                        <div class="pa-sec-h"><span class="pa-sec-ico" style="background:rgba(249,115,22,0.12);color:#f97316;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span class="pa-sec-t">EXTRAS <span>(Offer &amp; Urgency)</span></span></div>
+                        <div class="pa-sec-h"><span class="pa-sec-ico" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span class="pa-sec-t">EXTRAS <span>(Offer &amp; Urgency)</span></span></div>
                         <p class="pa-sec-d">Shows the offer details and how soon you need to act.</p>
                         <div class="pa-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>How much the client is offering</div>
                         <div class="pa-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>How much time you have to respond</div>
@@ -242,7 +242,7 @@
                 {{-- SYSTEM ACTIONS --}}
                 <div class="pa-sec">
                     <div class="pa-sec-l">
-                        <div class="pa-sec-h"><span class="pa-sec-ico" style="background:rgba(16,185,129,0.12);color:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></span><span class="pa-sec-t">SYSTEM ACTIONS <span>(What You Can Do)</span></span></div>
+                        <div class="pa-sec-h"><span class="pa-sec-ico" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></span><span class="pa-sec-t">SYSTEM ACTIONS <span>(What You Can Do)</span></span></div>
                         <p class="pa-sec-d">Quick buttons to help you take action fast.</p>
                         <div class="pa-bullet"><span class="d" style="background:#10b981;"></span><b style="color:var(--text-primary);">Accept</b> – Take the offer</div>
                         <div class="pa-bullet"><span class="d" style="background:#f59e0b;"></span><b style="color:var(--text-primary);">Counter</b> – Make your own offer</div>
@@ -285,7 +285,7 @@
                         <div class="pa-wh-h"><span class="pa-wh-ico" style="background:#ef4444;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span class="pa-wh-nm">Contract awaiting signature</span></div>
                         <p>A secure legal page shows the full digital contract between you and the client.</p>
                         <div class="pa-wh-meta">{{ $cards['contracts'] }} pending</div>
-                        <a href="{{ route('professional.contracts.index') }}" class="pa-wh-btn" style="background:#ef4444;">Review &amp; Sign</a>
+                        <a href="{{ route('professional.contracts.index') }}" class="pa-wh-btn" style="background:#b91c1c;">Review &amp; Sign</a>
                     </div>
                     <div class="pa-wh c2">
                         <div class="pa-wh-h"><span class="pa-wh-ico" style="background:#f97316;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></span><span class="pa-wh-nm">Staffing shortage detected</span></div>
@@ -303,7 +303,7 @@
                         <div class="pa-wh-h"><span class="pa-wh-ico" style="background:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span class="pa-wh-nm">Payment released</span></div>
                         <p>Your financial vault shows the payment has been released safely.</p>
                         <div class="pa-wh-meta">Amount: {{ $money($cards['escrow']) }}</div>
-                        <a href="{{ route('professional.earnings.index') }}" class="pa-wh-btn" style="background:#10b981;">View Payment</a>
+                        <a href="{{ route('professional.earnings.index') }}" class="pa-wh-btn" style="background:#047857;">View Payment</a>
                     </div>
                 </div>
 
@@ -324,17 +324,17 @@
                 <div class="pa-live">
                     <div class="pa-live-h"><b>PRIORITY ACTIONS</b><span class="pa-live-count">{{ $priorityCount ?: 3 }}</span></div>
                     <div class="pa-li">
-                        <span class="pa-li-ico" style="background:rgba(239,68,68,0.1);color:#ef4444;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                        <span class="pa-li-ico" style="background:rgba(239,68,68,0.1);color:var(--bad-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
                         <div class="pa-li-body"><div class="pa-li-t">The WHAT (Event Details)</div><div class="pa-li-d">{{ $exDate }} – {{ $exEnd }}<br>{{ \Illuminate\Support\Str::limit($exLoc, 24) }}</div></div>
                         <span class="pa-li-btn b-accept">Accept</span>
                     </div>
                     <div class="pa-li">
-                        <span class="pa-li-ico" style="background:rgba(37,99,235,0.1);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                        <span class="pa-li-ico" style="background:rgba(37,99,235,0.1);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
                         <div class="pa-li-body"><div class="pa-li-t">The WHY (Client Message)</div><div class="pa-li-d">Special performance request. <b>Client: {{ $exClient }}</b></div></div>
                         <span class="pa-li-btn b-counter">Counter</span>
                     </div>
                     <div class="pa-li">
-                        <span class="pa-li-ico" style="background:rgba(249,115,22,0.1);color:#f97316;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+                        <span class="pa-li-ico" style="background:rgba(249,115,22,0.1);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
                         <div class="pa-li-body"><div class="pa-li-t">The EXTRAS (Offer &amp; Urgency)</div><div class="pa-li-d">Offer: {{ $spotlight?->price ? $money($spotlight->price) : '$300.00' }} · Expires in 4h 32m</div></div>
                         <span class="pa-li-btn b-decline">Decline</span>
                     </div>

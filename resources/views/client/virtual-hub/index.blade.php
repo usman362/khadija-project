@@ -19,8 +19,8 @@
     /* Command center header */
     .vh-cc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
     .vh-cc-title { font-size: 14px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
-    .vh-cc-title svg { width: 16px; height: 16px; color: #f97316; }
-    .vh-live { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: #ef4444; }
+    .vh-cc-title svg { width: 16px; height: 16px; color: var(--brand-text); }
+    .vh-live { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: var(--bad-text); }
     .vh-live .dot { width: 7px; height: 7px; border-radius: 50%; background: #ef4444; animation: vhPulse 1.4s infinite; }
     @keyframes vhPulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
 
@@ -30,7 +30,7 @@
     .vh-cc-stat-head { display: flex; align-items: center; gap: 7px; font-size: 10.5px; color: var(--text-muted); font-weight: 600; margin-bottom: 6px; }
     .vh-cc-stat-head svg { width: 13px; height: 13px; }
     .vh-cc-stat-val { font-size: 19px; font-weight: 800; color: var(--text-primary); }
-    .vh-cc-stat-sub { font-size: 10px; color: #10b981; font-weight: 700; }
+    .vh-cc-stat-sub { font-size: 10px; color: var(--ok-text); font-weight: 700; }
     .vh-cc-stats-2 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
 
     /* Two paths */
@@ -47,11 +47,11 @@
     /* Service categories */
     .vh-sec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .vh-sec-title { font-size: 14px; font-weight: 800; color: var(--text-primary); }
-    .vh-sec-link { font-size: 11.5px; color: #f97316; text-decoration: none; font-weight: 600; }
+    .vh-sec-link { font-size: 11.5px; color: var(--brand-text); text-decoration: none; font-weight: 600; }
     .vh-svc-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
     .vh-svc { text-align: center; padding: 14px 8px; border-radius: 10px; background: var(--bg-card-hover); border: 1px solid var(--border-color); text-decoration: none; }
     .vh-svc:hover { border-color: rgba(249,115,22,0.3); }
-    .vh-svc-ico { width: 34px; height: 34px; border-radius: 9px; background: rgba(249,115,22,0.12); color: #f97316; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; }
+    .vh-svc-ico { width: 34px; height: 34px; border-radius: 9px; background: rgba(249,115,22,0.12); color: var(--brand-text); display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; }
     .vh-svc-ico svg { width: 16px; height: 16px; }
     .vh-svc-name { font-size: 10.5px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
     .vh-svc-cnt { font-size: 9px; color: var(--text-muted); }
@@ -61,8 +61,8 @@
     .vh-pro { border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; background: var(--bg-card); }
     .vh-pro-top { display: flex; gap: 9px; align-items: center; margin-bottom: 8px; }
     .vh-pro-avatar { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; }
-    .vh-pro-match { font-size: 10px; font-weight: 800; color: #f97316; }
-    .vh-pro-avail { font-size: 9px; font-weight: 700; color: #10b981; display: inline-flex; align-items: center; gap: 3px; }
+    .vh-pro-match { font-size: 10px; font-weight: 800; color: var(--brand-text); }
+    .vh-pro-avail { font-size: 9px; font-weight: 700; color: var(--ok-text); display: inline-flex; align-items: center; gap: 3px; }
     .vh-pro-avail .dot { width: 5px; height: 5px; border-radius: 50%; background: #10b981; }
     .vh-pro-name { font-size: 12.5px; font-weight: 700; color: var(--text-primary); }
     .vh-pro-role { font-size: 10px; color: var(--text-muted); }
@@ -80,19 +80,19 @@
     .vh-rfp-table tr:hover td { background: var(--bg-card-hover); }
     .vh-rfp-name { font-weight: 700; color: var(--text-primary); }
     .vh-rfp-type { font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 999px; }
-    .vh-rfp-type.hybrid { background: rgba(249,115,22,0.12); color: #f97316; }
-    .vh-rfp-type.virtual { background: rgba(99,102,241,0.12); color: #6366f1; }
-    .vh-rfp-status { font-size: 9.5px; font-weight: 700; color: #10b981; }
+    .vh-rfp-type.hybrid { background: rgba(249,115,22,0.12); color: var(--brand-text); }
+    .vh-rfp-type.virtual { background: rgba(99,102,241,0.12); color: var(--accent-text); }
+    .vh-rfp-status { font-size: 9.5px; font-weight: 700; color: var(--ok-text); }
 
     .vh-post-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; width: 100%; padding: 11px; margin-top: 12px; background: #f97316; color: #fff; border: 1px dashed rgba(249,115,22,0.5); border-radius: 9px; font-size: 12.5px; font-weight: 700; text-decoration: none; }
 
     /* Bottom feature tiles */
     .vh-feats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
     .vh-feat { padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-card); }
-    .vh-feat-ico { width: 34px; height: 34px; border-radius: 9px; background: rgba(249,115,22,0.12); color: #f97316; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+    .vh-feat-ico { width: 34px; height: 34px; border-radius: 9px; background: rgba(249,115,22,0.12); color: var(--brand-text); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
     .vh-feat-ico svg { width: 16px; height: 16px; }
     .vh-feat-name { font-size: 12.5px; font-weight: 700; color: var(--text-primary); }
-    .vh-feat-link { font-size: 10.5px; color: #f97316; text-decoration: none; font-weight: 600; }
+    .vh-feat-link { font-size: 10.5px; color: var(--brand-text); text-decoration: none; font-weight: 600; }
 
     /* Right rail */
     .vh-rail-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 16px; }
@@ -103,14 +103,14 @@
     .vh-monitor svg { width: 36px; height: 36px; color: rgba(255,255,255,0.5); }
     .vh-mon-row { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 0; color: var(--text-muted); }
     .vh-mon-row .v { color: var(--text-primary); font-weight: 600; }
-    .vh-mon-row .ok { color: #10b981; font-weight: 700; }
+    .vh-mon-row .ok { color: var(--ok-text); font-weight: 700; }
     .vh-alert-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; font-size: 11px; border-bottom: 1px dashed var(--border-color); }
     .vh-alert-row:last-child { border-bottom: 0; }
-    .vh-alert-row .ok { color: #10b981; font-weight: 700; }
+    .vh-alert-row .ok { color: var(--ok-text); font-weight: 700; }
     .vh-int-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; font-size: 11.5px; border-bottom: 1px dashed var(--border-color); }
     .vh-int-row:last-of-type { border-bottom: 0; }
     .vh-int-row .name { display: flex; align-items: center; gap: 7px; color: var(--text-secondary); }
-    .vh-int-row .conn { font-size: 10px; font-weight: 700; color: #10b981; }
+    .vh-int-row .conn { font-size: 10px; font-weight: 700; color: var(--ok-text); }
     .vh-aud-big { font-size: 24px; font-weight: 800; color: var(--text-primary); }
 
     @media (max-width: 1200px) { .vh-layout { grid-template-columns: 1fr; } .vh-rail { position: static; } .vh-svc-grid { grid-template-columns: repeat(3, 1fr); } .vh-pro-grid { grid-template-columns: repeat(2, 1fr); } .vh-feats { grid-template-columns: repeat(2, 1fr); } }
@@ -256,7 +256,7 @@
 
     {{-- AI Alerts --}}
     <div class="vh-rail-card">
-        <div class="vh-rail-head"><div class="vh-rail-title">AI Alerts</div><span style="font-size:10px;color:#10b981;font-weight:700;">All Clear</span></div>
+        <div class="vh-rail-head"><div class="vh-rail-title">AI Alerts</div><span style="font-size:10px;color:var(--ok-text);font-weight:700;">All Clear</span></div>
         @foreach(['Stream Health', 'Audio Sync', 'Internet Stability', 'Chat Moderation', 'Translation Feeds'] as $a)
             <div class="vh-alert-row"><span>{{ $a }}</span><span class="ok">Excellent</span></div>
         @endforeach
@@ -266,7 +266,7 @@
     <div class="vh-rail-card">
         <div class="vh-rail-head"><div class="vh-rail-title">Audience Overview</div><span class="vh-live"><span class="dot"></span>Live Now</span></div>
         <div class="vh-aud-big">1,248</div>
-        <div style="font-size:10.5px;color:#10b981;font-weight:700;margin-bottom:8px;">↑ 12% last hour</div>
+        <div style="font-size:10.5px;color:var(--ok-text);font-weight:700;margin-bottom:8px;">↑ 12% last hour</div>
         <div class="vh-mon-row"><span>Live Viewers</span><span class="v">892</span></div>
         <div class="vh-mon-row"><span>On-Demand</span><span class="v">166</span></div>
         <div class="vh-mon-row"><span>Chat Participants</span><span class="v">642</span></div>
@@ -277,7 +277,7 @@
     <div class="vh-rail-card">
         <div class="vh-rail-title" style="margin-bottom:10px;">Active Integrations</div>
         @foreach(['Zoom Events', 'YouTube Live', 'RTMP Server', 'Slack Alerts'] as $int)
-            <div class="vh-int-row"><span class="name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;color:#10b981;"><polyline points="20 6 9 17 4 12"/></svg>{{ $int }}</span><span class="conn">Connected</span></div>
+            <div class="vh-int-row"><span class="name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;color:var(--ok-text);"><polyline points="20 6 9 17 4 12"/></svg>{{ $int }}</span><span class="conn">Connected</span></div>
         @endforeach
     </div>
 </aside>

@@ -57,6 +57,17 @@
             --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.2);
             --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.08);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            /* Status text colours — named for meaning, not hue, and redefined per
+               theme. The mid-tone palette (#10b981, #f59e0b, #f97316 …) reads fine
+               on the dark shell but falls to ~2.5:1 on white, so the light theme
+               swaps in the darker step of the same ramp. These are for TEXT; the
+               raw --accent-* values stay as they are for fills, dots and borders. */
+            --ok-text: #34d399;
+            --warn-text: #fbbf24;
+            --bad-text: #f87171;
+            --brand-text: #fb923c;
+            --info-text: #60a5fa;
+            --accent-text: #a5b4fc;
         }
 
         [data-theme="light"] {
@@ -88,6 +99,13 @@
             --accent-purple-soft: rgba(168, 85, 247, 0.1);
             --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.06);
             --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.1);
+            /* Darker step of each ramp — clears 4.5:1 on white and on the tints. */
+            --ok-text: #047857;
+            --warn-text: #b45309;
+            --bad-text: #b91c1c;
+            --brand-text: #c2410c;
+            --info-text: #1d4ed8;
+            --accent-text: #4338ca;
         }
 
         [data-theme="light"] .cl-navbar {
@@ -226,7 +244,7 @@
             color: #1e293b;
         }
         [data-theme="light"] .cl-nav-link.active {
-            color: var(--accent-blue);
+            color: var(--accent-text);
             background: rgba(99, 102, 241, 0.08);
         }
         [data-theme="light"] .cl-user-card {
@@ -251,10 +269,16 @@
         [data-theme="light"] .cl-calendar-day:hover {
             background: rgba(0, 0, 0, 0.04);
         }
-        [data-theme="light"] p,
-        [data-theme="light"] span,
-        [data-theme="light"] td,
-        [data-theme="light"] li {
+        /* Unstyled inline elements follow the light theme's text colour.
+           Scoped to :not([class]) deliberately: as a bare `[data-theme="light"] span`
+           this outweighed every component class (0,2,1 vs 0,1,0) and stripped the
+           colour off anything built from a span — avatar initials, status pills,
+           badge counts — leaving them the same colour as whatever they sat on.
+           Elements that carry a class own their colour; only bare ones inherit. */
+        [data-theme="light"] p:not([class]),
+        [data-theme="light"] span:not([class]),
+        [data-theme="light"] td:not([class]),
+        [data-theme="light"] li:not([class]) {
             color: inherit;
         }
         [data-theme="light"] .cl-content p {
@@ -418,7 +442,7 @@
         .cl-nav-link.active .cl-nav-icon { color: var(--accent-blue); }
         /* nav count badge + urgent pill */
         .pro-nav-badge { margin-left: auto; background: var(--accent-blue); color: #fff; font-size: 9.5px; font-weight: 800; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .pro-nav-urgent { margin-left: auto; background: rgba(239,68,68,0.14); color: #ef4444; font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 5px; letter-spacing: 0.5px; flex-shrink: 0; }
+        .pro-nav-urgent { margin-left: auto; background: rgba(239,68,68,0.14); color: var(--bad-text); font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 5px; letter-spacing: 0.5px; flex-shrink: 0; }
 
         .cl-sidebar-footer {
             padding: 16px;
@@ -494,7 +518,7 @@
 
         .pro-topbar-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
         .pro-topbar-controls { display: flex; align-items: center; gap: 12px; }
-        .pro-avail { display: inline-flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 800; color: #16a34a; letter-spacing: 0.5px; cursor: pointer; }
+        .pro-avail { display: inline-flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 800; color: var(--ok-text); letter-spacing: 0.5px; cursor: pointer; }
         .pro-avail .dot { width: 7px; height: 7px; border-radius: 50%; background: #16a34a; }
         .pro-toggle { position: relative; width: 34px; height: 18px; display: inline-block; }
         .pro-toggle input { display: none; }
@@ -514,7 +538,7 @@
         .pro-avatar-img { width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg,#2563eb,#1d4ed8); color: #fff; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; }
         .pro-avatar-meta { display: flex; flex-direction: column; line-height: 1.2; }
         .pro-avatar-meta b { font-size: 12px; color: var(--text-primary); font-weight: 700; white-space: nowrap; }
-        .pro-avatar-meta span { font-size: 9px; font-weight: 800; color: #2563eb; letter-spacing: 0.5px; }
+        .pro-avatar-meta span { font-size: 9px; font-weight: 800; color: var(--info-text); letter-spacing: 0.5px; }
         .pro-avatar-chip > svg { width: 13px; height: 13px; color: var(--text-muted); }
 
         .pro-topbar-actions { display: flex; gap: 10px; }

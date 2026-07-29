@@ -25,7 +25,7 @@
     .pm-head { display: grid; grid-template-columns: minmax(0,1.3fr) minmax(0,1fr); gap: 24px; align-items: center; margin-bottom: 22px; }
     .pm-title { display: flex; align-items: center; gap: 10px; }
     .pm-title h1 { font-size: 30px; font-weight: 800; color: var(--text-primary); margin: 0; }
-    .pm-new { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 6px; background: rgba(37,99,235,0.14); color: #2563eb; letter-spacing: 0.5px; }
+    .pm-new { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 6px; background: rgba(37,99,235,0.14); color: var(--info-text); letter-spacing: 0.5px; }
     .pm-lead { font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 10px 0 14px; }
     .pm-head p { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin: 0 0 10px; }
     /* diagram */
@@ -38,8 +38,8 @@
     .pm-brief { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); width: 150px; }
     .pm-brief-h { font-size: 11px; font-weight: 800; color: var(--text-primary); text-align: center; margin-bottom: 9px; letter-spacing: 0.5px; }
     .pm-brief-row { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: var(--text-secondary); margin: 5px 0; }
-    .pm-brief-row svg { width: 12px; height: 12px; color: #10b981; }
-    .pm-brief-add { font-size: 10.5px; font-weight: 700; color: #2563eb; margin-top: 5px; }
+    .pm-brief-row svg { width: 12px; height: 12px; color: var(--ok-text); }
+    .pm-brief-add { font-size: 10.5px; font-weight: 700; color: var(--info-text); margin-top: 5px; }
     .pm-diag-tag { grid-column: 1/-1; text-align: center; margin-top: 12px; }
     .pm-diag-tag span { font-size: 11px; font-weight: 800; color: #fff; background: linear-gradient(135deg,#8b5cf6,#6d28d9); padding: 6px 16px; border-radius: 8px; letter-spacing: 0.5px; }
 
@@ -47,7 +47,7 @@
     .pm-sec-title { font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0 0 14px; }
     .pm-steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; align-items: stretch; margin-bottom: 18px; }
     .pm-step { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px 12px; text-align: center; flex: 1; }
-    .pm-step-ico { width: 48px; height: 48px; border-radius: 12px; background: rgba(37,99,235,0.1); color: #2563eb; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
+    .pm-step-ico { width: 48px; height: 48px; border-radius: 12px; background: rgba(37,99,235,0.1); color: var(--info-text); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
     .pm-step-ico svg { width: 24px; height: 24px; }
     .pm-step h4 { font-size: 12.5px; font-weight: 800; color: var(--text-primary); margin: 0 0 5px; }
     .pm-step p { font-size: 10.5px; color: var(--text-muted); line-height: 1.4; margin: 0; }
@@ -56,11 +56,11 @@
     .pm-step-arrow svg { width: 18px; height: 18px; }
 
     .pm-banner { display: flex; align-items: center; gap: 12px; background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.18); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; }
-    .pm-banner .ic { width: 34px; height: 34px; border-radius: 9px; background: rgba(37,99,235,0.12); color: #2563eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .pm-banner .ic { width: 34px; height: 34px; border-radius: 9px; background: rgba(37,99,235,0.12); color: var(--info-text); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .pm-banner .ic svg { width: 18px; height: 18px; }
     .pm-banner p { font-size: 12.5px; color: var(--text-secondary); margin: 0; line-height: 1.5; }
     .pm-banner.green { background: rgba(16,185,129,0.07); border-color: rgba(16,185,129,0.22); }
-    .pm-banner.green .ic { background: rgba(16,185,129,0.14); color: #10b981; }
+    .pm-banner.green .ic { background: rgba(16,185,129,0.14); color: var(--ok-text); }
 
     /* Example + sidebar grid */
     .pm-grid { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 16px; align-items: start; margin-bottom: 20px; }
@@ -71,7 +71,7 @@
     .pm-event-h { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
     .pm-event-h b { font-size: 17px; font-weight: 800; color: var(--text-primary); }
     .pm-event-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    .pm-live { font-size: 9.5px; font-weight: 800; color: #10b981; display: inline-flex; align-items: center; gap: 5px; }
+    .pm-live { font-size: 9.5px; font-weight: 800; color: var(--ok-text); display: inline-flex; align-items: center; gap: 5px; }
     .pm-live .dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
     .pm-svcs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .pm-svc { border: 1px solid var(--border-color); border-radius: 11px; padding: 13px; text-align: center; }
@@ -82,9 +82,9 @@
     .pm-svc-budget-k { font-size: 9px; color: var(--text-muted); }
     .pm-svc-budget { font-size: 12px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
     .pm-svc-bids { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; }
-    .pm-svc-bid { display: block; font-size: 11px; font-weight: 800; color: #2563eb; text-decoration: none; padding: 6px; border-radius: 8px; background: rgba(37,99,235,0.08); }
+    .pm-svc-bid { display: block; font-size: 11px; font-weight: 800; color: var(--info-text); text-decoration: none; padding: 6px; border-radius: 8px; background: rgba(37,99,235,0.08); }
     .pm-ex-note { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 10px 12px; background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.2); border-radius: 9px; font-size: 11.5px; color: var(--text-secondary); }
-    .pm-ex-note svg { width: 15px; height: 15px; color: #10b981; flex-shrink: 0; }
+    .pm-ex-note svg { width: 15px; height: 15px; color: var(--ok-text); flex-shrink: 0; }
 
     /* sidebar cards */
     .pm-side { display: flex; flex-direction: column; gap: 16px; }
@@ -92,14 +92,14 @@
     .pm-side-card h4 { font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px; display: flex; align-items: center; gap: 7px; }
     .pm-side-card .sub { font-size: 11px; color: var(--text-muted); line-height: 1.5; margin: 0 0 12px; }
     .pm-check { display: flex; align-items: center; gap: 9px; font-size: 12px; color: var(--text-secondary); padding: 5px 0; }
-    .pm-check svg { width: 16px; height: 16px; color: #2563eb; flex-shrink: 0; }
+    .pm-check svg { width: 16px; height: 16px; color: var(--info-text); flex-shrink: 0; }
     .pm-help-link { display: flex; align-items: center; gap: 9px; padding: 9px 11px; border-radius: 9px; border: 1px solid var(--border-color); background: var(--bg-card-hover); color: var(--text-primary); font-size: 12px; font-weight: 700; text-decoration: none; margin-bottom: 8px; }
-    .pm-help-link svg { width: 15px; height: 15px; color: #2563eb; }
+    .pm-help-link svg { width: 15px; height: 15px; color: var(--info-text); }
 
     /* Why pros love */
     .pm-why { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
     .pm-why-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; text-align: center; }
-    .pm-why-ico { width: 38px; height: 38px; border-radius: 10px; background: rgba(37,99,235,0.1); color: #2563eb; display: flex; align-items: center; justify-content: center; margin: 0 auto 9px; }
+    .pm-why-ico { width: 38px; height: 38px; border-radius: 10px; background: rgba(37,99,235,0.1); color: var(--info-text); display: flex; align-items: center; justify-content: center; margin: 0 auto 9px; }
     .pm-why-ico svg { width: 18px; height: 18px; }
     .pm-why-card h5 { font-size: 12px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px; }
     .pm-why-card p { font-size: 10px; color: var(--text-muted); line-height: 1.4; margin: 0; }
@@ -107,7 +107,7 @@
     /* Recent table */
     .pm-rt-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .pm-rt-head h3 { font-size: 16px; font-weight: 800; margin: 0; }
-    .pm-rt-head a { font-size: 12px; font-weight: 700; color: #2563eb; text-decoration: none; }
+    .pm-rt-head a { font-size: 12px; font-weight: 700; color: var(--info-text); text-decoration: none; }
     .pm-tbl-wrap { width: 100%; overflow-x: auto; }
     .pm-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
     .pm-tbl th { text-align: left; padding: 9px 8px; font-size: 9px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
@@ -118,10 +118,10 @@
     .pm-rt-name { font-weight: 700; color: var(--text-primary); white-space: nowrap; }
     .pm-rt-client { font-size: 10px; color: var(--text-muted); white-space: nowrap; }
     .pm-svc-pills { display: inline-flex; align-items: center; gap: 4px; }
-    .pm-svc-pill { width: 24px; height: 24px; border-radius: 6px; background: rgba(37,99,235,0.1); color: #2563eb; display: inline-flex; align-items: center; justify-content: center; }
+    .pm-svc-pill { width: 24px; height: 24px; border-radius: 6px; background: rgba(37,99,235,0.1); color: var(--info-text); display: inline-flex; align-items: center; justify-content: center; }
     .pm-svc-pill svg { width: 12px; height: 12px; }
     .pm-svc-more { font-size: 10px; font-weight: 700; color: var(--text-muted); }
-    .pm-rt-bid { font-size: 11px; font-weight: 800; color: #2563eb; text-decoration: none; padding: 5px 12px; border-radius: 7px; background: rgba(37,99,235,0.08); white-space: nowrap; }
+    .pm-rt-bid { font-size: 11px; font-weight: 800; color: var(--info-text); text-decoration: none; padding: 5px 12px; border-radius: 7px; background: rgba(37,99,235,0.08); white-space: nowrap; }
 
     /* Bottom CTA */
     .pm-cta { display: flex; align-items: center; gap: 14px; background: linear-gradient(120deg,#1e3a8a,#2563eb); border-radius: 14px; padding: 18px 22px; margin-top: 20px; }
@@ -152,8 +152,8 @@
         </div>
         <div class="pm-diagram">
             <div class="pm-diag-col">
-                <span class="pm-diag-svc"><span class="pm-diag-ico" style="background:rgba(249,115,22,0.12);color:#f97316;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h0a2 2 0 0 0 2-2V2M5 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg></span>Catering</span>
-                <span class="pm-diag-svc"><span class="pm-diag-ico" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/></svg></span>Audio Visual</span>
+                <span class="pm-diag-svc"><span class="pm-diag-ico" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h0a2 2 0 0 0 2-2V2M5 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg></span>Catering</span>
+                <span class="pm-diag-svc"><span class="pm-diag-ico" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/></svg></span>Audio Visual</span>
                 <span class="pm-diag-svc"><span class="pm-diag-ico" style="background:rgba(236,72,153,0.12);color:#ec4899;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h6l2-9 4 18 2-9h6"/></svg></span>Decor &amp; Design</span>
             </div>
             <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
@@ -168,9 +168,9 @@
                 <div class="pm-diag-tag"><span>ONE EVENT. MULTIPLE SERVICES.</span></div>
             </div>
             <div class="pm-diag-col">
-                <span class="pm-diag-svc r"><span class="pm-diag-ico" style="background:rgba(139,92,246,0.12);color:#8b5cf6;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>Entertainment</span>
-                <span class="pm-diag-svc r"><span class="pm-diag-ico" style="background:rgba(249,115,22,0.12);color:#f97316;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>Photography</span>
-                <span class="pm-diag-svc r"><span class="pm-diag-ico" style="background:rgba(16,185,129,0.12);color:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span>Staffing</span>
+                <span class="pm-diag-svc r"><span class="pm-diag-ico" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>Entertainment</span>
+                <span class="pm-diag-svc r"><span class="pm-diag-ico" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>Photography</span>
+                <span class="pm-diag-svc r"><span class="pm-diag-ico" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span>Staffing</span>
             </div>
         </div>
     </div>
@@ -337,7 +337,7 @@
             </tbody>
         </table>
         </div>
-        @if($recent->count())<div style="font-size:11px;color:#10b981;font-weight:700;margin-top:10px;">● Live feed updates in real-time</div>@endif
+        @if($recent->count())<div style="font-size:11px;color:var(--ok-text);font-weight:700;margin-top:10px;">● Live feed updates in real-time</div>@endif
     </div>
 
     {{-- ════════ Bottom CTA ════════ --}}

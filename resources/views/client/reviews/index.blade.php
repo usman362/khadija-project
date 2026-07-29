@@ -22,11 +22,11 @@
     .rv-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; }
     .rv-stat-ico { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .rv-stat-ico svg { width: 18px; height: 18px; }
-    .rv-stat-ico.coral  { background: rgba(249,115,22,0.12); color: #f97316; }
-    .rv-stat-ico.amber  { background: rgba(245,158,11,0.12); color: #f59e0b; }
-    .rv-stat-ico.green  { background: rgba(16,185,129,0.12); color: #10b981; }
-    .rv-stat-ico.red    { background: rgba(239,68,68,0.12); color: #ef4444; }
-    .rv-stat-ico.indigo { background: rgba(99,102,241,0.12); color: #6366f1; }
+    .rv-stat-ico.coral  { background: rgba(249,115,22,0.12); color: var(--brand-text); }
+    .rv-stat-ico.amber  { background: rgba(245,158,11,0.12); color: var(--warn-text); }
+    .rv-stat-ico.green  { background: rgba(16,185,129,0.12); color: var(--ok-text); }
+    .rv-stat-ico.red    { background: rgba(239,68,68,0.12); color: var(--bad-text); }
+    .rv-stat-ico.indigo { background: rgba(99,102,241,0.12); color: var(--accent-text); }
     .rv-stat-label { font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
     .rv-stat-value { font-size: 22px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
     .rv-stat-sub { font-size: 10.5px; color: var(--text-muted); margin-top: 2px; }
@@ -34,9 +34,9 @@
     /* Rating filter chips */
     .rv-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
     .rv-chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary); font-size: 12.5px; font-weight: 600; text-decoration: none; }
-    .rv-chip.active { background: rgba(249,115,22,0.10); border-color: rgba(249,115,22,0.30); color: #f97316; }
+    .rv-chip.active { background: rgba(249,115,22,0.10); border-color: rgba(249,115,22,0.30); color: var(--brand-text); }
     .rv-chip .cnt { color: var(--text-muted); }
-    .rv-chip.active .cnt { color: #f97316; }
+    .rv-chip.active .cnt { color: var(--brand-text); }
 
     /* Toolbar */
     .rv-toolbar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
@@ -52,15 +52,15 @@
     .rv-rc-head { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-bottom: 1px solid var(--border-color); }
     .rv-rc-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 2px solid var(--border-color); }
     .rv-rc-stars { display: flex; align-items: center; gap: 8px; }
-    .rv-rc-stars .stars { color: #f59e0b; font-size: 15px; letter-spacing: 1px; }
+    .rv-rc-stars .stars { color: var(--warn-text); font-size: 15px; letter-spacing: 1px; }
     .rv-rc-stars .score { font-size: 15px; font-weight: 800; color: var(--text-primary); }
-    .rv-rc-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 700; color: #10b981; }
+    .rv-rc-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 700; color: var(--ok-text); }
     .rv-rc-badge svg { width: 11px; height: 11px; }
     .rv-rc-title { font-size: 14.5px; font-weight: 700; color: var(--text-primary); margin-top: 2px; }
     .rv-rc-meta { font-size: 11px; color: var(--text-muted); display: flex; gap: 12px; flex-wrap: wrap; margin-top: 2px; }
     .rv-rc-gateway { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 6px; background: var(--bg-card-hover); border: 1px solid var(--border-color); font-size: 11px; font-weight: 600; color: var(--text-secondary); }
     .rv-rc-gateway svg { width: 12px; height: 12px; }
-    .rv-rc-payout { font-size: 11px; font-weight: 700; color: #10b981; display: inline-flex; align-items: center; gap: 4px; }
+    .rv-rc-payout { font-size: 11px; font-weight: 700; color: var(--ok-text); display: inline-flex; align-items: center; gap: 4px; }
     .rv-rc-payout svg { width: 12px; height: 12px; }
     .rv-rc-kebab { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 16px; }
 
@@ -71,9 +71,9 @@
     .rv-metric { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 11.5px; }
     .rv-metric .lbl { color: var(--text-muted); }
     .rv-metric .val { color: var(--text-primary); font-weight: 600; }
-    .rv-metric-stars { color: #f59e0b; font-size: 11px; letter-spacing: 0.5px; }
-    .rv-ok { color: #10b981; }
-    .rv-warn { color: #f59e0b; }
+    .rv-metric-stars { color: var(--warn-text); font-size: 11px; letter-spacing: 0.5px; }
+    .rv-ok { color: var(--ok-text); }
+    .rv-warn { color: var(--warn-text); }
     .rv-pro-box { background: var(--bg-card-hover); border-radius: 10px; padding: 12px; text-align: center; }
     .rv-pro-name { font-size: 12px; font-weight: 700; color: var(--text-primary); }
     .rv-pro-role { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; }
@@ -86,16 +86,16 @@
     .rv-feedback { padding: 12px 18px; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .rv-feedback-text { flex: 1; min-width: 220px; font-size: 12.5px; color: var(--text-secondary); }
     .rv-feedback-text svg { width: 13px; height: 13px; color: var(--text-muted); vertical-align: -2px; margin-right: 4px; }
-    .rv-feedback-text a { color: #f97316; font-weight: 600; text-decoration: none; }
+    .rv-feedback-text a { color: var(--brand-text); font-weight: 600; text-decoration: none; }
     .rv-helpful { display: flex; align-items: center; gap: 12px; font-size: 11.5px; color: var(--text-muted); }
     .rv-helpful button { background: none; border: none; cursor: pointer; color: var(--text-muted); display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; }
     .rv-helpful svg { width: 13px; height: 13px; }
     .rv-ai-insight { padding: 11px 18px; border-top: 1px solid var(--border-color); background: rgba(99,102,241,0.04); display: flex; align-items: center; gap: 10px; }
-    .rv-ai-ico { width: 26px; height: 26px; border-radius: 7px; background: rgba(99,102,241,0.12); color: #6366f1; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .rv-ai-ico { width: 26px; height: 26px; border-radius: 7px; background: rgba(99,102,241,0.12); color: var(--accent-text); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .rv-ai-ico svg { width: 14px; height: 14px; }
     .rv-ai-body { flex: 1; font-size: 11.5px; color: var(--text-secondary); }
     .rv-ai-body b { color: var(--text-primary); }
-    .rv-ai-link { font-size: 11.5px; color: #f97316; text-decoration: none; font-weight: 600; white-space: nowrap; }
+    .rv-ai-link { font-size: 11.5px; color: var(--brand-text); text-decoration: none; font-weight: 600; white-space: nowrap; }
 
     /* Right rail */
     .rv-rail-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 16px; }
@@ -114,7 +114,7 @@
     .rv-tv-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px dashed var(--border-color); font-size: 12px; }
     .rv-tv-row:last-child { border-bottom: 0; }
     .rv-tv-row .lbl { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); }
-    .rv-tv-row .lbl svg { width: 13px; height: 13px; color: #10b981; }
+    .rv-tv-row .lbl svg { width: 13px; height: 13px; color: var(--ok-text); }
     .rv-tv-row .val { font-weight: 700; color: var(--text-primary); }
     .rv-hl-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; font-size: 11.5px; }
     .rv-hl-row svg { width: 13px; height: 13px; flex-shrink: 0; }
@@ -126,8 +126,8 @@
     .rv-pend-body { flex: 1; min-width: 0; }
     .rv-pend-name { font-size: 12px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .rv-pend-date { font-size: 10px; color: var(--text-muted); }
-    .rv-pend-btn { font-size: 10px; font-weight: 700; padding: 5px 9px; border-radius: 6px; background: rgba(249,115,22,0.10); color: #f97316; border: 1px solid rgba(249,115,22,0.25); cursor: pointer; white-space: nowrap; }
-    .rv-pend-left { font-size: 9.5px; color: #f59e0b; font-weight: 700; }
+    .rv-pend-btn { font-size: 10px; font-weight: 700; padding: 5px 9px; border-radius: 6px; background: rgba(249,115,22,0.10); color: var(--brand-text); border: 1px solid rgba(249,115,22,0.25); cursor: pointer; white-space: nowrap; }
+    .rv-pend-left { font-size: 9.5px; color: var(--warn-text); font-weight: 700; }
 
     @media (max-width: 1200px) { .rv-layout { grid-template-columns: 1fr; } .rv-rail { position: static; } .rv-stats { grid-template-columns: repeat(3, 1fr); } .rv-rc-body { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 700px) { .rv-stats { grid-template-columns: repeat(2, 1fr); } .rv-rc-body { grid-template-columns: 1fr; } }
@@ -234,9 +234,9 @@
                             <div class="rv-pro-name">Professional: {{ \Illuminate\Support\Str::limit($pro?->name ?? 'Pro', 14) }}</div>
                             <div class="rv-pro-role">{{ $pro?->profile?->headline ?? 'Event Professional' }}</div>
                             <div class="rv-pro-scores">
-                                <div><div class="num" style="color:#10b981;">{{ rand(88, 99) }}%</div><div class="lbl">Friction Score</div></div>
+                                <div><div class="num" style="color:var(--ok-text);">{{ rand(88, 99) }}%</div><div class="lbl">Friction Score</div></div>
                                 <div><div class="num">{{ rand(8, 20) }}</div><div class="lbl">Events Done</div></div>
-                                <div><div class="num" style="color:#f97316;">{{ rand(70, 90) }}%</div><div class="lbl">Repeat Hire</div></div>
+                                <div><div class="num" style="color:var(--brand-text);">{{ rand(70, 90) }}%</div><div class="lbl">Repeat Hire</div></div>
                             </div>
                         </div>
                     </div>
@@ -291,7 +291,7 @@
             @php $pct = $stats['total'] > 0 ? round(($stats['dist'][$s] / $stats['total']) * 100) : 0; @endphp
             <div class="rv-dist-row">
                 <span class="rv-dist-star">{{ $s }}</span>
-                <span style="color:#f59e0b;font-size:10px;">★</span>
+                <span style="color:var(--warn-text);font-size:10px;">★</span>
                 <div class="rv-dist-bar"><div class="rv-dist-fill" style="width:{{ $pct }}%;"></div></div>
                 <span class="rv-dist-val">{{ $stats['dist'][$s] }} ({{ $pct }}%)</span>
             </div>

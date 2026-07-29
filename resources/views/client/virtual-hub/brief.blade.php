@@ -23,7 +23,7 @@
     }
     .vhb-step-label { font-size: 13px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
     .vhb-step.is-active .vhb-step-num { background: #f97316; border-color: #f97316; color: #fff; box-shadow: 0 4px 10px rgba(249,115,22,0.35); }
-    .vhb-step.is-active .vhb-step-label { color: #f97316; }
+    .vhb-step.is-active .vhb-step-label { color: var(--brand-text); }
     .vhb-step.is-done .vhb-step-num { background: #f97316; border-color: #f97316; color: #fff; }
     .vhb-step-line { flex: 1; height: 2px; background: var(--border-color); margin: 0 16px; border-radius: 2px; min-width: 30px; }
     .vhb-step-line.is-active { background: #f97316; }
@@ -37,7 +37,7 @@
     .vhb-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
     .vhb-card-ico {
         width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
-        background: rgba(249,115,22,0.12); color: #f97316;
+        background: rgba(249,115,22,0.12); color: var(--brand-text);
         display: flex; align-items: center; justify-content: center;
     }
     .vhb-card-ico svg { width: 20px; height: 20px; }
@@ -47,7 +47,7 @@
     /* Fields */
     .vhb-field { margin-bottom: 14px; }
     .vhb-label { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
-    .vhb-label .req { color: #f97316; font-weight: 800; }
+    .vhb-label .req { color: var(--brand-text); font-weight: 800; }
     .vhb-input, .vhb-select {
         width: 100%; height: 40px; padding: 0 12px;
         border-radius: 9px; border: 1px solid var(--border-color);
@@ -72,7 +72,7 @@
 
     /* Sub-section heading inside a card */
     .vhb-subhead { font-size: 12px; font-weight: 700; color: var(--text-primary); margin: 2px 0 11px; line-height: 1.4; }
-    .vhb-subhead .req { color: #f97316; font-weight: 800; }
+    .vhb-subhead .req { color: var(--brand-text); font-weight: 800; }
     .vhb-subhead .hint { font-weight: 500; color: var(--text-muted); font-size: 11px; }
 
     /* Option lists (radios + checkboxes) */
@@ -104,7 +104,7 @@
 
     /* Tip / boost callout (peach) */
     .vhb-callout { display: flex; gap: 10px; background: rgba(249,115,22,0.07); border: 1px solid rgba(249,115,22,0.20); border-radius: 10px; padding: 12px 13px; }
-    .vhb-callout svg { width: 16px; height: 16px; color: #f97316; flex-shrink: 0; margin-top: 1px; }
+    .vhb-callout svg { width: 16px; height: 16px; color: var(--brand-text); flex-shrink: 0; margin-top: 1px; }
     .vhb-callout-body { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
     .vhb-callout-body b { color: var(--text-primary); font-weight: 700; }
     .vhb-callout-title { display: block; font-weight: 800; color: var(--text-primary); margin-bottom: 2px; }

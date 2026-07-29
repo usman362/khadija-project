@@ -15,7 +15,8 @@
 
 @push('styles')
 <style>
-    .pd { --pd-blue: #2563eb; }
+    /* Used for text as well as fills, so it follows the theme. */
+    .pd { --pd-blue: var(--info-text); }
 
     /* ── Stats strip (8 cards) ── */
     .pd-stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin-bottom: 16px; }
@@ -23,19 +24,19 @@
     .pd-stat-top { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 9px; min-height: 38px; }
     .pd-stat-ico { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .pd-stat-ico svg { width: 15px; height: 15px; }
-    .c-green { background: rgba(16,185,129,0.12); color: #10b981; }
-    .c-blue { background: rgba(37,99,235,0.12); color: #2563eb; }
+    .c-green { background: rgba(16,185,129,0.12); color: var(--ok-text); }
+    .c-blue { background: rgba(37,99,235,0.12); color: var(--info-text); }
     .c-teal { background: rgba(20,184,166,0.12); color: #14b8a6; }
-    .c-purple { background: rgba(139,92,246,0.12); color: #8b5cf6; }
-    .c-indigo { background: rgba(99,102,241,0.12); color: #6366f1; }
+    .c-purple { background: rgba(139,92,246,0.12); color: var(--accent-text); }
+    .c-indigo { background: rgba(99,102,241,0.12); color: var(--accent-text); }
     .c-cyan { background: rgba(6,182,212,0.12); color: #06b6d4; }
-    .c-orange { background: rgba(249,115,22,0.12); color: #f97316; }
+    .c-orange { background: rgba(249,115,22,0.12); color: var(--brand-text); }
     .pd-stat-label { font-size: 10px; color: var(--text-muted); font-weight: 600; line-height: 1.2; min-width: 0; }
     .pd-stat-ico { margin-top: 1px; }
     .pd-stat-info { margin-left: auto; width: 13px; height: 13px; color: var(--text-muted); flex-shrink: 0; }
     .pd-stat-val { font-size: 19px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; }
     .pd-stat-foot { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 6px; }
-    .pd-stat-delta { font-size: 9.5px; font-weight: 700; color: #10b981; min-width: 0; }
+    .pd-stat-delta { font-size: 9.5px; font-weight: 700; color: var(--ok-text); min-width: 0; }
     .pd-stat-delta.muted { color: var(--text-muted); }
     .pd-stat-spark { flex-shrink: 0; }
 
@@ -50,7 +51,7 @@
     .pd-card-title { font-size: 14px; font-weight: 800; color: var(--text-primary); }
     .pd-card-link { margin-left: auto; font-size: 11.5px; font-weight: 700; color: var(--pd-blue); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
     .pd-card-link svg { width: 12px; height: 12px; }
-    .pd-pill-count { background: rgba(239,68,68,0.14); color: #ef4444; font-size: 10px; font-weight: 800; min-width: 17px; height: 17px; padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; }
+    .pd-pill-count { background: rgba(239,68,68,0.14); color: var(--bad-text); font-size: 10px; font-weight: 800; min-width: 17px; height: 17px; padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; }
 
     /* ── Emergency Gigs card ── */
     .pd-emergency { background: linear-gradient(180deg, rgba(239,68,68,0.06), rgba(249,115,22,0.02)); border-color: rgba(239,68,68,0.22); }
@@ -58,19 +59,19 @@
     .pd-emerg-ico { width: 34px; height: 34px; border-radius: 9px; background: #ef4444; color: #fff; display: flex; align-items: center; justify-content: center; }
     .pd-emerg-ico svg { width: 18px; height: 18px; }
     .pd-emerg-title { font-size: 13.5px; font-weight: 800; color: var(--text-primary); letter-spacing: 0.3px; }
-    .pd-emerg-urgent { margin-left: auto; background: rgba(239,68,68,0.14); color: #ef4444; font-size: 8.5px; font-weight: 800; padding: 3px 7px; border-radius: 5px; letter-spacing: 0.5px; }
-    .pd-emerg-job { font-size: 15px; font-weight: 800; color: #ef4444; margin-bottom: 4px; }
+    .pd-emerg-urgent { margin-left: auto; background: rgba(239,68,68,0.14); color: var(--bad-text); font-size: 8.5px; font-weight: 800; padding: 3px 7px; border-radius: 5px; letter-spacing: 0.5px; }
+    .pd-emerg-job { font-size: 15px; font-weight: 800; color: var(--bad-text); margin-bottom: 4px; }
     .pd-emerg-sub { font-size: 12px; color: var(--text-secondary); margin-bottom: 2px; }
     .pd-emerg-meta { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 13px 0; }
     .pd-emerg-meta .k { font-size: 9.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.4px; }
     .pd-emerg-meta .v { font-size: 12px; font-weight: 700; color: var(--text-primary); margin-top: 2px; }
-    .pd-emerg-meta .v.pay { color: #16a34a; }
+    .pd-emerg-meta .v.pay { color: var(--ok-text); }
     .pd-emerg-meta .v svg { width: 11px; height: 11px; vertical-align: -1px; }
-    .pd-emerg-tag { font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 6px; background: rgba(16,185,129,0.14); color: #059669; display: inline-block; }
+    .pd-emerg-tag { font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 6px; background: rgba(16,185,129,0.14); color: var(--ok-text); display: inline-block; }
     .pd-accept { display: block; width: 100%; text-align: center; padding: 11px; border-radius: 10px; background: #ef4444; color: #fff; border: none; font-size: 13px; font-weight: 800; cursor: pointer; margin: 4px 0 12px; }
     .pd-accept:hover { background: #dc2626; }
     .pd-emerg-note { font-size: 11px; color: var(--text-muted); line-height: 1.45; text-align: center; }
-    .pd-emerg-countdown { text-align: center; font-size: 17px; font-weight: 800; color: #ef4444; margin-top: 12px; }
+    .pd-emerg-countdown { text-align: center; font-size: 17px; font-weight: 800; color: var(--bad-text); margin-top: 12px; }
 
     /* ── Priority Actions list ── */
     .pd-pa { display: flex; flex-direction: column; }
@@ -82,9 +83,9 @@
     .pd-pa-title { font-size: 12.5px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .pd-pa-sub { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .pd-pa-pri { font-size: 9.5px; font-weight: 800; padding: 2px 8px; border-radius: 6px; flex-shrink: 0; }
-    .pri-high { background: rgba(239,68,68,0.12); color: #dc2626; }
-    .pri-medium { background: rgba(245,158,11,0.14); color: #d97706; }
-    .pri-low { background: rgba(16,185,129,0.12); color: #059669; }
+    .pri-high { background: rgba(239,68,68,0.12); color: var(--bad-text); }
+    .pri-medium { background: rgba(245,158,11,0.14); color: var(--warn-text); }
+    .pri-low { background: rgba(16,185,129,0.12); color: var(--ok-text); }
     .pd-pa-foot { text-align: center; margin-top: 12px; }
     .pd-pa-foot a { font-size: 12px; font-weight: 700; color: var(--pd-blue); text-decoration: none; }
 
@@ -105,9 +106,9 @@
     .pd-g-date, .pd-g-budget { font-size: 11.5px; color: var(--text-secondary); white-space: nowrap; }
     .pd-g-budget { font-weight: 600; color: var(--text-primary); }
     .pd-g-status { font-size: 9.5px; font-weight: 800; padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
-    .st-confirmed { background: rgba(16,185,129,0.12); color: #059669; }
-    .st-inprogress { background: rgba(245,158,11,0.14); color: #d97706; }
-    .st-today { background: rgba(37,99,235,0.12); color: #2563eb; }
+    .st-confirmed { background: rgba(16,185,129,0.12); color: var(--ok-text); }
+    .st-inprogress { background: rgba(245,158,11,0.14); color: var(--warn-text); }
+    .st-today { background: rgba(37,99,235,0.12); color: var(--info-text); }
     .pd-g-staff { font-size: 11px; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
     .pd-g-staff .chat { display: inline-flex; align-items: center; gap: 3px; color: var(--text-muted); }
     .pd-g-staff .chat svg { width: 11px; height: 11px; }
@@ -131,7 +132,7 @@
     .pd-bid-leg .ct { font-weight: 700; color: var(--text-primary); }
     .pd-bid-leg .pc { color: var(--text-muted); width: 38px; text-align: right; }
     .pd-bid-rec { display: flex; gap: 10px; margin-top: 14px; padding: 11px 12px; border-radius: 10px; background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.16); }
-    .pd-bid-rec .ic { width: 26px; height: 26px; border-radius: 7px; background: rgba(37,99,235,0.14); color: #2563eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .pd-bid-rec .ic { width: 26px; height: 26px; border-radius: 7px; background: rgba(37,99,235,0.14); color: var(--info-text); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .pd-bid-rec .ic svg { width: 14px; height: 14px; }
     .pd-bid-rec-txt { font-size: 11px; color: var(--text-secondary); line-height: 1.45; }
     .pd-bid-rec-txt b { color: var(--text-primary); display: block; margin-bottom: 1px; }
@@ -142,8 +143,8 @@
     .pd-fin-box { background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 10px; padding: 11px 10px; }
     .pd-fin-box .k { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
     .pd-fin-box .v { font-size: 15px; font-weight: 800; color: var(--text-primary); }
-    .pd-fin-box .v.green { color: #10b981; }
-    .pd-fin-box .v.amber { color: #f59e0b; }
+    .pd-fin-box .v.green { color: var(--ok-text); }
+    .pd-fin-box .v.amber { color: var(--warn-text); }
     .pd-fin-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 13px; }
     .pd-fin-btn { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 10px 4px; border-radius: 9px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary); font-size: 10px; font-weight: 600; cursor: pointer; text-decoration: none; }
     .pd-fin-btn svg { width: 16px; height: 16px; color: var(--pd-blue); }
@@ -151,7 +152,7 @@
     /* ── Today's Schedule ── */
     .pd-sch-list { display: flex; flex-direction: column; gap: 0; }
     .pd-sch-row { display: flex; align-items: center; gap: 11px; padding: 9px 0; }
-    .pd-sch-ico { width: 28px; height: 28px; border-radius: 7px; background: rgba(37,99,235,0.10); color: #2563eb; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .pd-sch-ico { width: 28px; height: 28px; border-radius: 7px; background: rgba(37,99,235,0.10); color: var(--info-text); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .pd-sch-ico svg { width: 14px; height: 14px; }
     .pd-sch-time { font-size: 11.5px; font-weight: 700; color: var(--text-primary); width: 56px; flex-shrink: 0; }
     .pd-sch-body { flex: 1; min-width: 0; }
@@ -162,7 +163,7 @@
     .pd-map-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(37,99,235,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(37,99,235,0.08) 1px, transparent 1px); background-size: 24px 24px; }
     .pd-map-route { position: absolute; top: 30%; left: 18%; width: 60%; height: 40%; border-left: 3px solid #2563eb; border-bottom: 3px solid #2563eb; border-bottom-left-radius: 12px; }
     .pd-map-pin { position: absolute; width: 14px; height: 14px; }
-    .pd-map-pin svg { width: 14px; height: 14px; color: #ef4444; }
+    .pd-map-pin svg { width: 14px; height: 14px; color: var(--bad-text); }
     .pd-map-label { position: absolute; right: 10px; bottom: 8px; font-size: 10px; font-weight: 700; color: #1e40af; background: rgba(255,255,255,0.8); padding: 2px 7px; border-radius: 5px; }
     .pd-meta-row { display: flex; gap: 9px; margin-top: 11px; }
     .pd-meta-box { flex: 1; background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 9px; padding: 9px 10px; display: flex; align-items: center; gap: 8px; }
@@ -170,7 +171,7 @@
     .pd-meta-box .t { font-size: 11.5px; font-weight: 700; color: var(--text-primary); }
     .pd-meta-box .s { font-size: 10px; color: var(--text-muted); }
     .pd-traffic { display: flex; align-items: center; gap: 8px; margin-top: 9px; padding: 9px 10px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); border-radius: 9px; font-size: 11.5px; }
-    .pd-traffic svg { width: 15px; height: 15px; color: #10b981; flex-shrink: 0; }
+    .pd-traffic svg { width: 15px; height: 15px; color: var(--ok-text); flex-shrink: 0; }
     .pd-traffic b { color: var(--text-primary); }
 
     @media (min-width: 1680px) { .pd-stats { grid-template-columns: repeat(8, minmax(0,1fr)); } }

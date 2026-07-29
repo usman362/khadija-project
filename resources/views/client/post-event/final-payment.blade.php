@@ -29,7 +29,7 @@
         {{-- Completion banner --}}
         <div style="display:flex; gap:12px; align-items:flex-start; background:var(--pe-green-l); border:1px solid #bbf7d0; border-radius:12px; padding:14px 16px; margin-bottom:22px;">
             <svg viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.4" style="width:20px; height:20px; flex-shrink:0; margin-top:1px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            <div style="font-size:13px; color:#15803d; line-height:1.5;">
+            <div style="font-size:13px; color:var(--ok-text); line-height:1.5;">
                 <strong>Great news!</strong> Your vendor has marked the event as complete. Please review the final invoice and approve the release of funds.
             </div>
         </div>
@@ -49,7 +49,7 @@
 
                     <div style="display:flex; gap:10px; align-items:flex-start; background:var(--pe-green-l); border:1px solid #bbf7d0; border-radius:10px; padding:12px 14px; margin-top:16px;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.2" style="width:18px; height:18px; flex-shrink:0; margin-top:1px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        <div style="font-size:12.5px; color:#15803d; line-height:1.5;">Funds are held securely until the event is completed and the services materially meet the agreed contract.</div>
+                        <div style="font-size:12.5px; color:var(--ok-text); line-height:1.5;">Funds are held securely until the event is completed and the services materially meet the agreed contract.</div>
                     </div>
 
                     {{-- Payment mini timeline --}}
@@ -138,7 +138,7 @@
 
                     <div style="display:flex; gap:10px; align-items:flex-start; background:var(--pe-green-l); border:1px solid #bbf7d0; border-radius:10px; padding:12px 14px; margin-top:14px;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.2" style="width:18px; height:18px; flex-shrink:0; margin-top:1px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        <div style="font-size:12.5px; color:#15803d; line-height:1.5;"><strong>Secure Payment</strong> — Your payment will be released to the professional once you approve the event completion.</div>
+                        <div style="font-size:12.5px; color:var(--ok-text); line-height:1.5;"><strong>Secure Payment</strong> — Your payment will be released to the professional once you approve the event completion.</div>
                     </div>
                 </div>
             </div>
@@ -179,7 +179,7 @@
                                 Elite Events Co.
                                 <svg viewBox="0 0 24 24" fill="none" stroke="var(--pe-green)" stroke-width="3" style="width:14px; height:14px;"><polyline points="20 6 9 17 4 12"/></svg>
                             </div>
-                            <div style="font-size:12.5px; font-weight:700; color:var(--pe-ink-2);"><span style="color:#f59e0b;">★</span> 4.9 <span class="pe-muted" style="font-weight:600;">(128 reviews)</span></div>
+                            <div style="font-size:12.5px; font-weight:700; color:var(--pe-ink-2);"><span style="color:var(--warn-text);">★</span> 4.9 <span class="pe-muted" style="font-weight:600;">(128 reviews)</span></div>
                         </div>
                     </div>
                 </div>

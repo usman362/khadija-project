@@ -111,7 +111,7 @@
 
     .gb-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
 
-    .gb-err { color: #dc2626; font-size: 12.5px; font-weight: 700; margin-top: 8px; }
+    .gb-err { color: var(--bad-text); font-size: 12.5px; font-weight: 700; margin-top: 8px; }
 
     /* ---- Live preview ---- */
     .gb-pv-hd h4 { font-size: 15px; font-weight: 800; color: var(--text-primary); }

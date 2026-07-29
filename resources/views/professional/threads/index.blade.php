@@ -10,7 +10,7 @@
 <style>
     .th { --th: #2563eb; }
     .th-head h1 { font-size: 24px; font-weight: 800; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 9px; }
-    .th-head h1 svg { width: 18px; height: 18px; color: #2563eb; }
+    .th-head h1 svg { width: 18px; height: 18px; color: var(--info-text); }
     .th-head p { font-size: 13px; color: var(--text-muted); margin: 4px 0 18px; }
 
     .th-grid { display: grid; grid-template-columns: minmax(0,290px) minmax(0,1fr) minmax(0,300px); gap: 16px; align-items: start; }
@@ -49,10 +49,10 @@
     .th-th-av { width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; font-weight: 800; }
     .th-th-mid { flex: 1; min-width: 0; }
     .th-th-name { font-size: 16px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
-    .th-verified { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 800; color: #059669; background: rgba(16,185,129,0.12); border-radius: 5px; padding: 2px 7px; }
+    .th-verified { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 800; color: var(--ok-text); background: rgba(16,185,129,0.12); border-radius: 5px; padding: 2px 7px; }
     .th-verified svg { width: 11px; height: 11px; }
     .th-th-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .th-th-sub .star { color: #f59e0b; font-weight: 800; }
+    .th-th-sub .star { color: var(--warn-text); font-weight: 800; }
     .th-th-actions { display: flex; align-items: center; gap: 9px; }
     .th-icon-btn { width: 34px; height: 34px; border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; }
     .th-icon-btn svg { width: 16px; height: 16px; }
@@ -62,7 +62,7 @@
     .th-booking .bk { font-size: 12px; }
     .th-booking .bk .k { color: var(--text-muted); font-size: 11px; }
     .th-booking .bk .v { color: var(--text-primary); font-weight: 800; }
-    .th-booking .bk .v.green { color: #059669; }
+    .th-booking .bk .v.green { color: var(--ok-text); }
     .th-booking-btn { margin-left: auto; padding: 8px 14px; border: 1px solid var(--th); border-radius: 9px; background: var(--bg-card); color: var(--th); font-size: 12px; font-weight: 800; cursor: pointer; text-decoration: none; }
 
     .th-msgs { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-height: 240px; max-height: 420px; overflow-y: auto; }
@@ -111,7 +111,7 @@
     .th-commit-card p { font-size: 11.5px; color: var(--text-muted); margin: 5px 0 10px; line-height: 1.45; }
     .th-commit-foot { display: flex; align-items: center; justify-content: space-between; }
     .th-commit-foot .when { font-size: 10.5px; color: var(--text-muted); }
-    .th-commit-add { font-size: 11.5px; font-weight: 800; color: #059669; background: rgba(16,185,129,0.1); border: none; border-radius: 7px; padding: 5px 12px; cursor: pointer; }
+    .th-commit-add { font-size: 11.5px; font-weight: 800; color: var(--ok-text); background: rgba(16,185,129,0.1); border: none; border-radius: 7px; padding: 5px 12px; cursor: pointer; }
     .th-commit-add.added { color: var(--text-muted); background: var(--bg-card-hover); }
     .th-commit-all { display: block; text-align: center; margin-top: 12px; font-size: 12.5px; font-weight: 800; color: var(--th); text-decoration: none; }
 
@@ -124,7 +124,7 @@
     .th-info-row svg { width: 16px; height: 16px; color: var(--th); flex-shrink: 0; margin-top: 1px; }
     .th-info-row .k { font-size: 11px; color: var(--text-muted); }
     .th-info-row .v { font-size: 13px; font-weight: 700; color: var(--text-primary); }
-    .th-info-row .v.green { color: #059669; }
+    .th-info-row .v.green { color: var(--ok-text); }
     .th-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800; color: var(--th); text-decoration: none; margin-top: 8px; }
     .th-link svg { width: 13px; height: 13px; }
     .th-file { display: flex; align-items: center; gap: 11px; padding: 9px 0; }

@@ -66,7 +66,7 @@
     .pe-badge.pro { background:var(--pe-purple-l); color:var(--pe-purple); }
     .pe-badge.both { background:#e0e7ff; color:#4338ca; }
     .pe-badge.orange { background:#ffedd5; color:var(--pe-orange-d); }
-    .pe-badge.green { background:var(--pe-green-l); color:#15803d; }
+    .pe-badge.green { background:var(--pe-green-l); color:var(--ok-text); }
     .pe-ring { --v:92; width:60px; height:60px; border-radius:50%; display:grid; place-items:center; flex-shrink:0;
         background:conic-gradient(var(--pe-green) calc(var(--v)*1%), #e5e7eb 0); position:relative; }
     .pe-ring::before { content:''; position:absolute; inset:5px; border-radius:50%; background:#fff; }

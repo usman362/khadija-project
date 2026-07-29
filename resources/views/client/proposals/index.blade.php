@@ -19,20 +19,20 @@
     .pr-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px; display: flex; gap: 10px; align-items: center; }
     .pr-stat-ico { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .pr-stat-ico svg { width: 16px; height: 16px; }
-    .pr-stat-ico.coral  { background: rgba(249,115,22,0.12); color: #f97316; }
-    .pr-stat-ico.amber  { background: rgba(245,158,11,0.12); color: #f59e0b; }
-    .pr-stat-ico.green  { background: rgba(16,185,129,0.12); color: #10b981; }
-    .pr-stat-ico.indigo { background: rgba(99,102,241,0.12); color: #6366f1; }
-    .pr-stat-ico.purple { background: rgba(139,92,246,0.12); color: #8b5cf6; }
-    .pr-stat-ico.red    { background: rgba(239,68,68,0.12); color: #ef4444; }
+    .pr-stat-ico.coral  { background: rgba(249,115,22,0.12); color: var(--brand-text); }
+    .pr-stat-ico.amber  { background: rgba(245,158,11,0.12); color: var(--warn-text); }
+    .pr-stat-ico.green  { background: rgba(16,185,129,0.12); color: var(--ok-text); }
+    .pr-stat-ico.indigo { background: rgba(99,102,241,0.12); color: var(--accent-text); }
+    .pr-stat-ico.purple { background: rgba(139,92,246,0.12); color: var(--accent-text); }
+    .pr-stat-ico.red    { background: rgba(239,68,68,0.12); color: var(--bad-text); }
     .pr-stat-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
     .pr-stat-value { font-size: 20px; font-weight: 800; color: var(--text-primary); }
 
     .pr-tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 14px; flex-wrap: wrap; }
     .pr-tab { display: inline-flex; align-items: center; gap: 6px; padding: 10px 2px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-decoration: none; border-bottom: 2px solid transparent; margin-bottom: -1px; }
     .pr-tab .cnt { font-size: 11px; color: var(--text-muted); }
-    .pr-tab.active { color: #f97316; border-bottom-color: #f97316; }
-    .pr-tab.active .cnt { color: #f97316; }
+    .pr-tab.active { color: var(--brand-text); border-bottom-color: #f97316; }
+    .pr-tab.active .cnt { color: var(--brand-text); }
 
     .pr-toolbar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
     .pr-search { position: relative; flex: 1; min-width: 220px; }
@@ -55,18 +55,18 @@
     .pr-amt { font-weight: 800; color: var(--text-primary); }
     .pr-amt-sub { font-size: 10px; color: var(--text-muted); }
     .pr-pstatus { font-size: 10.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
-    .pr-ps-pending   { background: rgba(245,158,11,0.18); color: #d97706; }
-    .pr-ps-accepted  { background: rgba(16,185,129,0.15); color: #10b981; }
-    .pr-ps-in_progress { background: rgba(99,102,241,0.15); color: #6366f1; }
-    .pr-ps-completed { background: rgba(99,102,241,0.15); color: #6366f1; }
-    .pr-ps-declined  { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .pr-ps-pending   { background: rgba(245,158,11,0.18); color: var(--warn-text); }
+    .pr-ps-accepted  { background: rgba(16,185,129,0.15); color: var(--ok-text); }
+    .pr-ps-in_progress { background: rgba(99,102,241,0.15); color: var(--accent-text); }
+    .pr-ps-completed { background: rgba(99,102,241,0.15); color: var(--accent-text); }
+    .pr-ps-declined  { background: rgba(239,68,68,0.15); color: var(--bad-text); }
     .pr-ring { width: 38px; height: 38px; }
     .pr-actions-cell { display: flex; gap: 6px; }
     .pr-act-btn { width: 28px; height: 28px; border-radius: 7px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
-    .pr-act-btn:hover { color: #f97316; border-color: rgba(249,115,22,0.30); }
-    .pr-act-accept { color: #16a34a; border-color: rgba(22,163,74,0.30); }
-    .pr-act-accept:hover { color: #fff; background: #16a34a; border-color: #16a34a; }
-    .pr-act-decline { color: #ef4444; border-color: rgba(239,68,68,0.30); }
+    .pr-act-btn:hover { color: var(--brand-text); border-color: rgba(249,115,22,0.30); }
+    .pr-act-accept { color: var(--ok-text); border-color: rgba(22,163,74,0.30); }
+    .pr-act-accept:hover { color: #fff; background: #15803d; border-color: #16a34a; }
+    .pr-act-decline { color: var(--bad-text); border-color: rgba(239,68,68,0.30); }
     .pr-act-decline:hover { color: #fff; background: #ef4444; border-color: #ef4444; }
     .pr-act-btn svg { width: 13px; height: 13px; }
     /* Row "more actions" menu. The kebab used to be a bare link straight to the
@@ -75,10 +75,10 @@
     .pr-menu-pop { display: none; position: absolute; right: 0; top: calc(100% + 5px); z-index: 40; min-width: 178px; background: var(--bg-card,#fff); border: 1px solid var(--border-color,#e5e7eb); border-radius: 10px; box-shadow: 0 10px 28px rgba(15,23,42,.13); padding: 5px; }
     .pr-menu.open .pr-menu-pop { display: block; }
     .pr-menu-pop a, .pr-menu-pop button { display: block; width: 100%; text-align: left; background: none; border: 0; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--text-primary,#111827); text-decoration: none; padding: 8px 10px; border-radius: 7px; cursor: pointer; }
-    .pr-menu-pop a:hover, .pr-menu-pop button:hover { background: rgba(249,115,22,.10); color: #ea580c; }
+    .pr-menu-pop a:hover, .pr-menu-pop button:hover { background: rgba(249,115,22,.10); color: var(--brand-text); }
     .pr-menu-pop form { margin: 0; }
-    .pr-menu-pop .danger { color: #dc2626; }
-    .pr-menu-pop .danger:hover { background: rgba(220,38,38,.10); color: #b91c1c; }
+    .pr-menu-pop .danger { color: var(--bad-text); }
+    .pr-menu-pop .danger:hover { background: rgba(220,38,38,.10); color: var(--bad-text); }
 
     /* Right rail */
     .pr-rail-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 16px; }
@@ -95,7 +95,7 @@
     .pr-nba { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .pr-nba a { display: flex; align-items: center; gap: 7px; padding: 9px 10px; background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 8px; font-size: 11.5px; font-weight: 600; color: var(--text-primary); text-decoration: none; }
     .pr-nba a:hover { border-color: rgba(249,115,22,0.30); }
-    .pr-nba svg { width: 14px; height: 14px; color: #f97316; flex-shrink: 0; }
+    .pr-nba svg { width: 14px; height: 14px; color: var(--brand-text); flex-shrink: 0; }
 
     @media (max-width: 1200px) { .pr-layout { grid-template-columns: 1fr; } .pr-rail { position: static; } .pr-stats { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 700px) { .pr-stats { grid-template-columns: repeat(2, 1fr); } .pr-table { font-size: 11px; } }
@@ -192,7 +192,7 @@
                                     <div class="pr-prop-ico" style="background:{{ $icoColor }};">{{ $ico }}</div>
                                     <div>
                                         <div class="pr-prop-name">{{ \Illuminate\Support\Str::limit($p->event?->title ?? 'Proposal', 20) }}</div>
-                                        <div class="pr-prop-sub">{{ $p->supplier?->name ?? '—' }}@if($p->category) · <span style="color:#2563eb;font-weight:600;">{{ $p->category->name }}</span>@endif</div>
+                                        <div class="pr-prop-sub">{{ $p->supplier?->name ?? '—' }}@if($p->category) · <span style="color:var(--info-text);font-weight:600;">{{ $p->category->name }}</span>@endif</div>
                                     </div>
                                 </div>
                             </td>

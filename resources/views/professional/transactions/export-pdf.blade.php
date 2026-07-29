@@ -77,7 +77,7 @@
             background: #e5e7eb;
             color: #374151;
         }
-        .status.completed { background: #d1fae5; color: #065f46; }
+        .status.completed { background: #d1fae5; color: #047857; }
         .status.pending   { background: #fef3c7; color: #92400e; }
         .status.failed    { background: #fee2e2; color: #991b1b; }
         .empty {

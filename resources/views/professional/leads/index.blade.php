@@ -10,18 +10,22 @@
 @php
     $money = fn ($n) => '$' . number_format((float) $n, 0);
     $prioMap = [
-        'High'   => ['#dc2626', 'rgba(220,38,38,0.10)'],
-        'Medium' => ['#d97706', 'rgba(217,119,6,0.10)'],
-        'Low'    => ['#2563eb', 'rgba(37,99,235,0.10)'],
+        'High'   => ['var(--bad-text)',  'rgba(220,38,38,0.10)'],
+        'Medium' => ['var(--warn-text)', 'rgba(217,119,6,0.10)'],
+        'Low'    => ['var(--info-text)', 'rgba(37,99,235,0.10)'],
     ];
     $avatars = ['linear-gradient(135deg,#8b5cf6,#6d28d9)','linear-gradient(135deg,#2563eb,#1d4ed8)','linear-gradient(135deg,#10b981,#047857)','linear-gradient(135deg,#ec4899,#be185d)','linear-gradient(135deg,#f59e0b,#b45309)'];
     // Stage display config for the progress pipeline.
-    $pipeColors = ['new'=>'#2563eb','proposal'=>'#10b981','negotiation'=>'#8b5cf6','booked'=>'#1e3a8a'];
+    // Text colours, so they use the theme-aware tokens — the raw mid-tones read
+    // as dark-on-dark or light-on-light depending on which theme is active.
+    $pipeColors = ['new'=>'var(--info-text)','proposal'=>'var(--warn-text)','negotiation'=>'var(--accent-text)','booked'=>'var(--ok-text)'];
 @endphp
 
 @push('styles')
 <style>
-    .pl { --pl-blue: #2563eb; }
+    /* Text-only accent, so it follows the theme rather than sitting at one
+       mid-tone that is weak on the dark shell. */
+    .pl { --pl-blue: var(--info-text); }
     .pl-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px 22px; }
 
     /* ── Hero (funnel + title + feature row) ── */
@@ -61,14 +65,14 @@
 
     /* ── Section heading ── */
     .pl-sec-h { display: flex; align-items: center; gap: 9px; margin-bottom: 4px; }
-    .pl-sec-h svg { width: 20px; height: 20px; color: #2563eb; }
+    .pl-sec-h svg { width: 20px; height: 20px; color: var(--info-text); }
     .pl-sec-h b { font-size: 19px; font-weight: 800; color: var(--text-primary); }
     .pl-sec-sub { font-size: 12.5px; color: var(--text-muted); margin: 0 0 16px; }
 
     /* ── Detailed Section Breakdown (4 cols) ── */
     .pl-bd { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; }
     .pl-bd-col { border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; }
-    .pl-bd-h { font-size: 13.5px; font-weight: 800; color: #2563eb; margin-bottom: 6px; }
+    .pl-bd-h { font-size: 13.5px; font-weight: 800; color: var(--info-text); margin-bottom: 6px; }
     .pl-bd-sub { font-size: 11.5px; color: var(--text-muted); margin: 0 0 12px; line-height: 1.5; }
     .pl-bd-row { display: flex; gap: 10px; padding: 7px 0; align-items: flex-start; }
     .pl-bd-row .ic { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -78,7 +82,7 @@
     .pl-bd-funnel { display: flex; justify-content: center; padding: 10px 0; }
     .pl-bd-funnel svg { width: 120px; height: auto; }
     .pl-bd-note { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; margin: 10px 0 0; }
-    .pl-bd-note b { color: #2563eb; }
+    .pl-bd-note b { color: var(--info-text); }
     .pl-mock { background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 9px; overflow: hidden; margin-bottom: 12px; }
     .pl-mock-bar { display: flex; gap: 4px; padding: 7px 9px; background: #1e293b; }
     .pl-mock-bar i { width: 7px; height: 7px; border-radius: 50%; background: #475569; }
@@ -113,10 +117,10 @@
     .pl-chat-icons { display: flex; gap: 14px; padding-top: 8px; border-top: 1px solid var(--border-color); margin-top: 8px; }
     .pl-chat-icons svg { width: 15px; height: 15px; color: var(--text-muted); }
     /* proposal */
-    .pl-prop-amt { font-size: 22px; font-weight: 800; color: #10b981; }
+    .pl-prop-amt { font-size: 22px; font-weight: 800; color: var(--ok-text); }
     .pl-prop-k { font-size: 9.5px; color: var(--text-muted); }
     .pl-chk { display: flex; align-items: center; gap: 7px; font-size: 10.5px; color: var(--text-secondary); padding: 3px 0; }
-    .pl-chk svg { width: 13px; height: 13px; color: #10b981; flex-shrink: 0; }
+    .pl-chk svg { width: 13px; height: 13px; color: var(--ok-text); flex-shrink: 0; }
     /* follow-up flow */
     .pl-flow-step { display: flex; align-items: center; gap: 9px; padding: 7px 9px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-card); }
     .pl-flow-step .ic { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -127,7 +131,7 @@
     /* predictor gauge */
     .pl-gauge { width: 120px; height: 64px; margin: 4px auto 8px; position: relative; }
     .pl-gauge .pct { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; }
-    .pl-gauge .pct b { font-size: 22px; font-weight: 800; color: #10b981; display: block; line-height: 1; }
+    .pl-gauge .pct b { font-size: 22px; font-weight: 800; color: var(--ok-text); display: block; line-height: 1; }
     .pl-gauge .pct span { font-size: 8.5px; color: var(--text-muted); }
 
     .pl-cc-btn { display: flex; align-items: center; justify-content: center; gap: 6px; text-align: center; padding: 9px; border-radius: 8px; color: #fff; font-size: 11px; font-weight: 800; text-decoration: none; margin-top: 11px; }
@@ -136,7 +140,7 @@
     /* ── Bottom banner ── */
     .pl-banner { display: flex; align-items: center; gap: 16px; background: linear-gradient(135deg, rgba(37,99,235,0.07), rgba(139,92,246,0.05)); border: 1px solid rgba(37,99,235,0.18); border-radius: 16px; padding: 18px 22px; margin-top: 20px; }
     .pl-banner .badge { width: 46px; height: 46px; border-radius: 12px; background: rgba(37,99,235,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .pl-banner .badge svg { width: 24px; height: 24px; color: #2563eb; }
+    .pl-banner .badge svg { width: 24px; height: 24px; color: var(--info-text); }
     .pl-banner-txt { flex: 1; }
     .pl-banner-txt b { font-size: 16px; color: var(--text-primary); }
     .pl-banner-txt p { font-size: 12.5px; color: var(--text-muted); margin: 2px 0 0; }
@@ -183,22 +187,22 @@
             <div class="sub">Track leads from inquiry to booking.</div>
             <div class="pl-feats">
                 <div class="pl-feat">
-                    <span class="pl-feat-ico" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                    <span class="pl-feat-ico" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
                     <b>Remembers Every Customer</b>
                     <p>Never forget an important lead.</p>
                 </div>
                 <div class="pl-feat">
-                    <span class="pl-feat-ico" style="background:rgba(16,185,129,0.12);color:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+                    <span class="pl-feat-ico" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
                     <b>Tracks Deal Progress</b>
                     <p>See exactly where each lead stands.</p>
                 </div>
                 <div class="pl-feat">
-                    <span class="pl-feat-ico" style="background:rgba(239,68,68,0.12);color:#ef4444;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></span>
+                    <span class="pl-feat-ico" style="background:rgba(239,68,68,0.12);color:var(--bad-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></span>
                     <b>Prioritizes Hot Leads</b>
                     <p>Focus on the leads most likely to close.</p>
                 </div>
                 <div class="pl-feat">
-                    <span class="pl-feat-ico" style="background:rgba(139,92,246,0.12);color:#8b5cf6;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
+                    <span class="pl-feat-ico" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
                     <b>Organizes Sales Flow</b>
                     <p>Visualize your path to monthly goals.</p>
                 </div>
@@ -275,19 +279,19 @@
             <div class="pl-bd-col">
                 <div class="pl-bd-h">2. The Progress Pipeline</div>
                 <p class="pl-bd-sub">Shows how many leads are in each stage of the sales process.</p>
-                <div class="pl-bd-row"><span class="ic" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span><div><b>New Leads ({{ $stats['new'] }})</b><p>Just reached out</p></div></div>
-                <div class="pl-bd-row"><span class="ic" style="background:rgba(16,185,129,0.12);color:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><div><b>Proposal Sent ({{ $stats['proposal'] }})</b><p>Received your proposal</p></div></div>
-                <div class="pl-bd-row"><span class="ic" style="background:rgba(139,92,246,0.12);color:#8b5cf6;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><div><b>Negotiation ({{ $stats['negotiation'] }})</b><p>Discussing details</p></div></div>
-                <div class="pl-bd-row"><span class="ic" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.2 14.2l-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4z"/></svg></span><div><b>Booked ({{ $stats['booked'] }})</b><p>Contract signed</p></div></div>
+                <div class="pl-bd-row"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span><div><b>New Leads ({{ $stats['new'] }})</b><p>Just reached out</p></div></div>
+                <div class="pl-bd-row"><span class="ic" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><div><b>Proposal Sent ({{ $stats['proposal'] }})</b><p>Received your proposal</p></div></div>
+                <div class="pl-bd-row"><span class="ic" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><div><b>Negotiation ({{ $stats['negotiation'] }})</b><p>Discussing details</p></div></div>
+                <div class="pl-bd-row"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.2 14.2l-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4z"/></svg></span><div><b>Booked ({{ $stats['booked'] }})</b><p>Contract signed</p></div></div>
             </div>
             {{-- 3. Active Leads List --}}
             <div class="pl-bd-col">
                 <div class="pl-bd-h">3. The Active Leads List</div>
                 <p class="pl-bd-sub">Highlights key details about your most important leads.</p>
                 <div class="pl-bd-row"><span class="ic" style="background:rgba(100,116,139,0.12);color:#64748b;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><div><b>Client Profile</b><p>Who the lead is</p></div></div>
-                <div class="pl-bd-row"><span class="ic" style="background:rgba(16,185,129,0.12);color:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><div><b>Value Bracket</b><p>Estimated project value</p></div></div>
-                <div class="pl-bd-row"><span class="ic" style="background:rgba(239,68,68,0.12);color:#ef4444;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></span><div><b>Priority Tag</b><p>How hot the lead is</p></div></div>
-                <div class="pl-bd-row"><span class="ic" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div><b>Event Details</b><p>Location &amp; event date</p></div></div>
+                <div class="pl-bd-row"><span class="ic" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><div><b>Value Bracket</b><p>Estimated project value</p></div></div>
+                <div class="pl-bd-row"><span class="ic" style="background:rgba(239,68,68,0.12);color:var(--bad-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></span><div><b>Priority Tag</b><p>How hot the lead is</p></div></div>
+                <div class="pl-bd-row"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div><b>Event Details</b><p>Location &amp; event date</p></div></div>
             </div>
             {{-- 4. Navigation Gate --}}
             <div class="pl-bd-col">
@@ -312,7 +316,7 @@
     <div class="pl-cc">
         {{-- Direct Message Center --}}
         <div class="pl-cc-card">
-            <div class="pl-cc-h"><span class="ic" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><b>Direct Message Center</b></div>
+            <div class="pl-cc-h"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><b>Direct Message Center</b></div>
             <p>View all conversations in one place — email, text &amp; calls.</p>
             <div class="pl-cc-prev">
                 <div class="pl-chat-hd"><span class="pl-chat-av" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);">{{ $leads->first()['name'] ?? false ? strtoupper(substr($leads->first()['name'],0,1)) : 'L' }}</span><div><b>{{ \Illuminate\Support\Str::limit($leads->first()['name'] ?? 'New Lead', 16) }}</b><p>{{ \Illuminate\Support\Str::limit($leads->first()['location'] ?? 'Location', 14) }}</p></div></div>
@@ -329,7 +333,7 @@
         </div>
         {{-- Instant Proposal Generator --}}
         <div class="pl-cc-card">
-            <div class="pl-cc-h"><span class="ic" style="background:rgba(16,185,129,0.12);color:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><b>Instant Proposal Generator</b></div>
+            <div class="pl-cc-h"><span class="ic" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><b>Instant Proposal Generator</b></div>
             <p>Create and send professional proposals in minutes.</p>
             <div class="pl-cc-prev">
                 <div class="pl-prop-k">Proposal for</div>
@@ -341,23 +345,23 @@
                 <div class="pl-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Pricing Breakdown</div>
                 <div class="pl-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Terms &amp; Conditions</div>
             </div>
-            <a href="{{ route('professional.proposals.index') }}" class="pl-cc-btn" style="background:#10b981;">Create Proposal <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+            <a href="{{ route('professional.proposals.index') }}" class="pl-cc-btn" style="background:#047857;">Create Proposal <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         </div>
         {{-- Automatic Follow-Up Bots --}}
         <div class="pl-cc-card">
-            <div class="pl-cc-h"><span class="ic" style="background:rgba(139,92,246,0.12);color:#8b5cf6;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span><b>Automatic Follow-Up Bots</b></div>
+            <div class="pl-cc-h"><span class="ic" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span><b>Automatic Follow-Up Bots</b></div>
             <p>Never let a lead slip away. We follow up for you.</p>
             <div class="pl-cc-prev">
-                <div class="pl-flow-step"><span class="ic" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></span><span>Lead receives proposal</span></div>
+                <div class="pl-flow-step"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></span><span>Lead receives proposal</span></div>
                 <div class="pl-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div>
-                <div class="pl-flow-step"><span class="ic" style="background:rgba(217,119,6,0.12);color:#d97706;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span>No reply in 3 days</span></div>
+                <div class="pl-flow-step"><span class="ic" style="background:rgba(217,119,6,0.12);color:var(--warn-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span>No reply in 3 days</span></div>
                 <div class="pl-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div>
-                <div class="pl-flow-step"><span class="ic" style="background:rgba(139,92,246,0.12);color:#8b5cf6;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/></svg></span><span>Automatic friendly follow-up sent</span></div>
+                <div class="pl-flow-step"><span class="ic" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/></svg></span><span>Automatic friendly follow-up sent</span></div>
             </div>
         </div>
         {{-- Probability Predictor --}}
         <div class="pl-cc-card">
-            <div class="pl-cc-h"><span class="ic" style="background:rgba(249,115,22,0.12);color:#f97316;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><b>Probability Predictor</b></div>
+            <div class="pl-cc-h"><span class="ic" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><b>Probability Predictor</b></div>
             <p>AI predicts how likely a lead is to book your services.</p>
             <div class="pl-cc-prev">
                 @php $pct = max(0, min(100, (int) ($conversion ?: 82))); $deg = $pct * 1.8; @endphp

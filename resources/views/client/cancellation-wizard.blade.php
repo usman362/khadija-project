@@ -29,7 +29,7 @@
     .cw-prog-step { display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative; z-index: 1; }
     .cw-prog-num { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; border: 2px solid var(--border-color); background: var(--bg-card); color: var(--text-muted); }
     .cw-prog-step.active .cw-prog-num { background: var(--cw); border-color: var(--cw); color: #fff; }
-    .cw-prog-step.done .cw-prog-num { background: #10b981; border-color: #10b981; color: #fff; }
+    .cw-prog-step.done .cw-prog-num { background: #047857; border-color: #10b981; color: #fff; }
     .cw-prog-lbl { font-size: 12.5px; font-weight: 700; color: var(--text-muted); }
     .cw-prog-step.active .cw-prog-lbl { color: var(--text-primary); }
     .cw-prog-line { flex: 1; height: 2px; background: var(--border-color); margin: 20px -10px 0; }
@@ -72,7 +72,7 @@
     .cw-rec { font-size: 11px; font-weight: 800; color: var(--cw-indigo); background: rgba(79,70,229,0.12); border-radius: 6px; padding: 3px 9px; }
     .cw-path > p { font-size: 12.5px; color: var(--text-secondary); line-height: 1.55; margin: 0 0 12px; }
     .cw-chk { display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: var(--text-secondary); padding: 4px 0; }
-    .cw-chk svg { width: 16px; height: 16px; color: #10b981; flex-shrink: 0; }
+    .cw-chk svg { width: 16px; height: 16px; color: var(--ok-text); flex-shrink: 0; }
     .cw-path-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px; border: none; border-radius: 10px; color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; font-family: inherit; margin-top: 14px; }
     .cw-path-btn svg { width: 16px; height: 16px; }
     .cw-btn-indigo { background: linear-gradient(135deg, #6366f1, #4338ca); }
@@ -99,7 +99,7 @@
     .cw-log-row:first-child { border-top: none; }
     .cw-log-ic { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .cw-log-ic svg { width: 15px; height: 15px; }
-    .cw-log-ic.ok { background: rgba(16,185,129,0.12); color: #10b981; }
+    .cw-log-ic.ok { background: rgba(16,185,129,0.12); color: var(--ok-text); }
     .cw-log-ic.info { background: rgba(79,70,229,0.12); color: var(--cw-indigo); }
     .cw-log-row b { font-size: 13.5px; font-weight: 800; color: var(--text-primary); display: block; }
     .cw-log-row p { font-size: 12px; color: var(--text-muted); margin: 2px 0 0; }

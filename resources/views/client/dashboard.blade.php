@@ -42,9 +42,9 @@
         flex-shrink: 0;
     }
     .od-stat-ico svg { width: 16px; height: 16px; }
-    .od-stat-ico.coral  { background: rgba(249, 115, 22, 0.12); color: #f97316; }
-    .od-stat-ico.green  { background: rgba(16, 185, 129, 0.12); color: #10b981; }
-    .od-stat-ico.indigo { background: rgba(249, 115, 22, 0.12); color: #f97316; }
+    .od-stat-ico.coral  { background: rgba(249, 115, 22, 0.12); color: var(--brand-text); }
+    .od-stat-ico.green  { background: rgba(16, 185, 129, 0.12); color: var(--ok-text); }
+    .od-stat-ico.indigo { background: rgba(249, 115, 22, 0.12); color: var(--brand-text); }
     .od-stat-ico.pink   { background: rgba(236, 72, 153, 0.12); color: #ec4899; }
     .od-stat-label { font-size: 11.5px; color: var(--text-muted); font-weight: 500; }
     .od-stat-value { font-size: 21px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; margin-top: 2px; }
@@ -52,7 +52,7 @@
        no overlap (the old absolute sparkline collided with the text). */
     .od-stat-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .od-stat-meta { display: flex; align-items: center; gap: 8px; min-width: 0; }
-    .od-stat-delta { font-size: 11.5px; font-weight: 700; color: #10b981; display: inline-flex; align-items: center; gap: 2px; }
+    .od-stat-delta { font-size: 11.5px; font-weight: 700; color: var(--ok-text); display: inline-flex; align-items: center; gap: 2px; }
     .od-stat-delta.flat { color: var(--text-muted); }
     .od-stat-sub { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; }
     .od-stat-spark { flex-shrink: 0; opacity: 0.9; }
@@ -87,7 +87,7 @@
     .od-card-title { font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
     .od-card-link {
         font-size: 12.5px; font-weight: 600;
-        color: #f97316; text-decoration: none;
+        color: var(--brand-text); text-decoration: none;
     }
     .od-card-link:hover { text-decoration: underline; }
 
@@ -106,7 +106,7 @@
     }
     .od-emerg-icon svg { width: 22px; height: 22px; }
     .od-emerg-title { font-size: 12.5px; font-weight: 800; color: var(--text-primary); letter-spacing: 0.3px; }
-    .od-emerg-urgent { font-size: 9px; font-weight: 800; color: #ef4444; letter-spacing: 1.5px; margin-top: 4px; }
+    .od-emerg-urgent { font-size: 9px; font-weight: 800; color: var(--bad-text); letter-spacing: 1.5px; margin-top: 4px; }
     .od-emerg-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; margin: 9px 0 12px; }
     .od-emerg-btn {
         display: inline-flex; align-items: center; justify-content: center; gap: 7px;
@@ -135,8 +135,8 @@
         clip-path: polygon(50% 0%, 100% 14%, 100% 62%, 50% 100%, 0 62%, 0 14%);
         box-shadow: inset 0 0 0 2px rgba(245,158,11,0.55), 0 6px 16px rgba(0,0,0,0.25);
     }
-    .od-profile-badge .crown { width: 30px; height: 30px; color: #fbbf24; }
-    .od-profile-badge .stars { font-size: 9px; color: #fbbf24; letter-spacing: 1px; line-height: 1; }
+    .od-profile-badge .crown { width: 30px; height: 30px; color: var(--warn-text); }
+    .od-profile-badge .stars { font-size: 9px; color: var(--warn-text); letter-spacing: 1px; line-height: 1; }
     .od-profile-ribbon {
         position: absolute;
         bottom: 6px; left: 50%; transform: translateX(-50%);
@@ -154,11 +154,11 @@
         display: flex; align-items: center; gap: 6px;
         font-size: 15px; font-weight: 700; color: var(--text-primary);
     }
-    .od-profile-name .ic-check { color: #10b981; }
+    .od-profile-name .ic-check { color: var(--ok-text); }
     .od-profile-tier { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
     .od-profile-stats { font-size: 12.5px; color: var(--text-muted); margin-top: 4px; }
     .od-profile-rating { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 13px; }
-    .od-profile-rating .star { color: #f59e0b; }
+    .od-profile-rating .star { color: var(--warn-text); }
     .od-progress-wrap { margin-top: 14px; }
     .od-progress-bar { width: 100%; height: 5px; border-radius: 999px; background: var(--border-color); overflow: hidden; }
     .od-progress-fill { height: 100%; background: linear-gradient(90deg, #f59e0b, #f97316); border-radius: 999px; transition: width 0.4s ease; }
@@ -173,7 +173,7 @@
         padding: 7px 14px;
         font-size: 12.5px; font-weight: 600;
         background: rgba(249, 115, 22, 0.10);
-        color: #f97316;
+        color: var(--brand-text);
         border: 1px solid rgba(249, 115, 22, 0.25);
         border-radius: 8px;
         text-decoration: none;
@@ -200,15 +200,15 @@
         flex-shrink: 0;
     }
     .od-badge-ico svg { width: 17px; height: 17px; }
-    .od-badge.b-fast    .od-badge-ico { background: rgba(16,185,129,0.14);  color: #10b981; }
-    .od-badge.b-luxury  .od-badge-ico { background: rgba(245,158,11,0.14);  color: #f59e0b; }
-    .od-badge.b-repeat  .od-badge-ico { background: rgba(99,102,241,0.14);  color: #6366f1; }
-    .od-badge.b-trend   .od-badge-ico { background: rgba(249,115,22,0.14);  color: #f97316; }
+    .od-badge.b-fast    .od-badge-ico { background: rgba(16,185,129,0.14);  color: var(--ok-text); }
+    .od-badge.b-luxury  .od-badge-ico { background: rgba(245,158,11,0.14);  color: var(--warn-text); }
+    .od-badge.b-repeat  .od-badge-ico { background: rgba(99,102,241,0.14);  color: var(--accent-text); }
+    .od-badge.b-trend   .od-badge-ico { background: rgba(249,115,22,0.14);  color: var(--brand-text); }
     .od-badge.b-verify  .od-badge-ico { background: rgba(14,165,233,0.14);  color: #0ea5e9; }
-    .od-badge.b-fave    .od-badge-ico { background: rgba(239,68,68,0.14);   color: #ef4444; }
-    .od-badge.b-negot   .od-badge-ico { background: rgba(139,92,246,0.14);  color: #8b5cf6; }
+    .od-badge.b-fave    .od-badge-ico { background: rgba(239,68,68,0.14);   color: var(--bad-text); }
+    .od-badge.b-negot   .od-badge-ico { background: rgba(139,92,246,0.14);  color: var(--accent-text); }
     .od-badge.b-mega    .od-badge-ico { background: rgba(6,182,212,0.14);   color: #06b6d4; }
-    .od-badge.b-emerg   .od-badge-ico { background: rgba(245,158,11,0.14);  color: #f59e0b; }
+    .od-badge.b-emerg   .od-badge-ico { background: rgba(245,158,11,0.14);  color: var(--warn-text); }
     .od-badge.b-vip     .od-badge-ico { background: rgba(236,72,153,0.14);  color: #ec4899; }
     .od-badge-name { font-size: 9.5px; font-weight: 600; color: var(--text-secondary); line-height: 1.25; text-align: center; min-height: 24px; display: flex; align-items: flex-start; justify-content: center; }
 
@@ -240,7 +240,7 @@
     }
     .od-cal-tab.is-active {
         background: rgba(249, 115, 22, 0.10);
-        color: #f97316;
+        color: var(--brand-text);
         border-color: rgba(249, 115, 22, 0.30);
     }
     .od-cal {
@@ -285,8 +285,8 @@
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
     }
-    .od-cal-event.ev-coral  { background: rgba(249,115,22,0.15); color: #c2410c; }
-    .od-cal-event.ev-pink   { background: rgba(239,68,68,0.15);  color: #dc2626; }
+    .od-cal-event.ev-coral  { background: rgba(249,115,22,0.15); color: var(--brand-text); }
+    .od-cal-event.ev-pink   { background: rgba(239,68,68,0.15);  color: var(--bad-text); }
     .od-cal-event.ev-purple { background: rgba(99,102,241,0.15); color: #4338ca; }
     [data-theme="dark"] .od-cal-event.ev-coral  { color: #fdba74; }
     [data-theme="dark"] .od-cal-event.ev-pink   { color: #fca5a5; }
@@ -331,7 +331,7 @@
     .od-gig-thumb {
         width: 34px; height: 34px; border-radius: 8px;
         background: rgba(249, 115, 22, 0.15);
-        color: #f97316;
+        color: var(--brand-text);
         display: flex; align-items: center; justify-content: center;
         flex-shrink: 0;
     }
@@ -342,9 +342,9 @@
         font-size: 10.5px; font-weight: 700;
         padding: 3px 8px; border-radius: 999px;
     }
-    .od-pill.requested { background: rgba(249, 115, 22, 0.15); color: #f97316; }
-    .od-pill.confirmed { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-    .od-pill.pending   { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+    .od-pill.requested { background: rgba(249, 115, 22, 0.15); color: var(--brand-text); }
+    .od-pill.confirmed { background: rgba(16, 185, 129, 0.15); color: var(--ok-text); }
+    .od-pill.pending   { background: rgba(245, 158, 11, 0.15); color: var(--warn-text); }
 
     .od-empty-illus { padding: 26px 12px; text-align: center; color: var(--text-muted); font-size: 13px; }
     .od-empty-illus svg { width: 64px; height: 64px; opacity: 0.5; margin-bottom: 8px; }
@@ -369,7 +369,7 @@
     }
     .od-tab.is-active {
         background: rgba(249, 115, 22, 0.15);
-        color: #f97316;
+        color: var(--brand-text);
         border-color: rgba(249, 115, 22, 0.30);
     }
     .od-todo { display: flex; flex-direction: column; gap: 8px; }
@@ -394,9 +394,9 @@
         padding: 2px 7px; border-radius: 999px;
         text-transform: uppercase;
     }
-    .od-todo-pri.high   { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
-    .od-todo-pri.medium { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
-    .od-todo-pri.low    { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+    .od-todo-pri.high   { background: rgba(239, 68, 68, 0.15); color: var(--bad-text); }
+    .od-todo-pri.medium { background: rgba(245, 158, 11, 0.15); color: var(--warn-text); }
+    .od-todo-pri.low    { background: rgba(16, 185, 129, 0.15); color: var(--ok-text); }
 
     /* Attendee management mini table */
     .od-attendee-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-bottom: 11px; }
@@ -453,10 +453,10 @@
         flex-shrink: 0;
     }
     .od-activity-ico svg { width: 16px; height: 16px; }
-    .od-activity-ico.green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-    .od-activity-ico.blue  { background: rgba(99, 102, 241, 0.15); color: #6366f1; }
+    .od-activity-ico.green { background: rgba(16, 185, 129, 0.15); color: var(--ok-text); }
+    .od-activity-ico.blue  { background: rgba(99, 102, 241, 0.15); color: var(--accent-text); }
     .od-activity-ico.pink  { background: rgba(236, 72, 153, 0.15); color: #ec4899; }
-    .od-activity-ico.amber { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+    .od-activity-ico.amber { background: rgba(245, 158, 11, 0.15); color: var(--warn-text); }
     .od-activity-body { flex: 1; min-width: 0; }
     .od-activity-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
     .od-activity-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; display: flex; gap: 8px; align-items: center; }
@@ -944,8 +944,8 @@
         </div>
         <div class="od-attendee-stats">
             <div class="od-attendee-stat"><div class="od-attendee-stat-value">120</div><div class="od-attendee-stat-label">Total Guests</div></div>
-            <div class="od-attendee-stat"><div class="od-attendee-stat-value" style="color:#10b981;">75</div><div class="od-attendee-stat-label">Confirmed</div></div>
-            <div class="od-attendee-stat"><div class="od-attendee-stat-value" style="color:#ef4444;">10</div><div class="od-attendee-stat-label">Cancelled</div></div>
+            <div class="od-attendee-stat"><div class="od-attendee-stat-value" style="color:var(--ok-text);">75</div><div class="od-attendee-stat-label">Confirmed</div></div>
+            <div class="od-attendee-stat"><div class="od-attendee-stat-value" style="color:var(--bad-text);">10</div><div class="od-attendee-stat-label">Cancelled</div></div>
             <div class="od-attendee-stat"><div class="od-attendee-stat-value" style="color:var(--text-muted);">35</div><div class="od-attendee-stat-label">No Response</div></div>
         </div>
         <table class="od-attendee-table">
@@ -953,11 +953,11 @@
             <tbody>
                 @php
                     $od_attendees = [
-                        ['Sarah Johnson',  'sarah.j@email.com',   'Confirmed',   '#10b981'],
-                        ['Michael Brown',  'michael.b@email.com', 'Confirmed',   '#10b981'],
-                        ['Emily Davis',    'emily.d@email.com',   'No Response', '#64748b'],
-                        ['David Wilson',   'david.w@email.com',   'Cancelled',   '#ef4444'],
-                        ['Jessica Taylor', 'jessica.t@email.com', 'Confirmed',   '#10b981'],
+                        ['Sarah Johnson',  'sarah.j@email.com',   'Confirmed',   'var(--ok-text)'],
+                        ['Michael Brown',  'michael.b@email.com', 'Confirmed',   'var(--ok-text)'],
+                        ['Emily Davis',    'emily.d@email.com',   'No Response', 'var(--text-muted)'],
+                        ['David Wilson',   'david.w@email.com',   'Cancelled',   'var(--bad-text)'],
+                        ['Jessica Taylor', 'jessica.t@email.com', 'Confirmed',   'var(--ok-text)'],
                     ];
                 @endphp
                 @foreach($od_attendees as [$nm, $em, $st, $col])
@@ -966,8 +966,8 @@
                         <td style="color:var(--text-muted);font-size:11.5px;">{{ $em }}</td>
                         <td><span style="font-size:10.5px;font-weight:700;color:{{ $col }};">{{ $st }}</span></td>
                         <td style="text-align:right;">
-                            <button style="background:none;border:none;cursor:pointer;color:#f97316;padding:2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
-                            <button style="background:none;border:none;cursor:pointer;color:#ef4444;padding:2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+                            <button style="background:none;border:none;cursor:pointer;color:var(--brand-text);padding:2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
+                            <button style="background:none;border:none;cursor:pointer;color:var(--bad-text);padding:2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
                         </td>
                     </tr>
                 @endforeach

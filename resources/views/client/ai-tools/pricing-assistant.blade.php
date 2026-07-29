@@ -121,7 +121,7 @@
     .apa-tbl th:last-child, .apa-tbl td:last-child { text-align: right; }
     .apa-tbl td { font-size: 12.5px; color: var(--text-secondary); padding: 13px 8px; border-bottom: 1px solid var(--border-color); word-break: break-word; }
     .apa-tbl td.svc { font-weight: 700; color: var(--text-primary); }
-    .apa-tbl td.price { font-weight: 800; color: #16a34a; }
+    .apa-tbl td.price { font-weight: 800; color: var(--ok-text); }
     .apa-viewall { display: block; text-align: center; padding: 14px; margin-top: 4px; font-size: 13px; font-weight: 800; color: var(--apa-strong); text-decoration: none; }
     .apa-viewall svg { width: 14px; height: 14px; vertical-align: -2px; }
     .apa-tips-wrap { position: relative; }

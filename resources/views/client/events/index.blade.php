@@ -27,21 +27,21 @@
         cursor: pointer; white-space: nowrap;
     }
     .mg-viewtab svg { width: 14px; height: 14px; }
-    .mg-viewtab.active { background: rgba(249,115,22,0.10); color: #f97316; border-color: rgba(249,115,22,0.30); }
+    .mg-viewtab.active { background: rgba(249,115,22,0.10); color: var(--brand-text); border-color: rgba(249,115,22,0.30); }
 
     /* Stat cards */
     .mg-stats { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 12px; margin-bottom: 16px; }
     .mg-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; }
     .mg-stat-ico { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .mg-stat-ico svg { width: 18px; height: 18px; }
-    .mg-stat-ico.coral  { background: rgba(249,115,22,0.12); color: #f97316; }
-    .mg-stat-ico.green  { background: rgba(16,185,129,0.12); color: #10b981; }
-    .mg-stat-ico.amber  { background: rgba(245,158,11,0.12); color: #f59e0b; }
-    .mg-stat-ico.indigo { background: rgba(99,102,241,0.12); color: #6366f1; }
-    .mg-stat-ico.purple { background: rgba(139,92,246,0.12); color: #8b5cf6; }
+    .mg-stat-ico.coral  { background: rgba(249,115,22,0.12); color: var(--brand-text); }
+    .mg-stat-ico.green  { background: rgba(16,185,129,0.12); color: var(--ok-text); }
+    .mg-stat-ico.amber  { background: rgba(245,158,11,0.12); color: var(--warn-text); }
+    .mg-stat-ico.indigo { background: rgba(99,102,241,0.12); color: var(--accent-text); }
+    .mg-stat-ico.purple { background: rgba(139,92,246,0.12); color: var(--accent-text); }
     .mg-stat-label { font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
     .mg-stat-value { font-size: 22px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
-    .mg-stat-delta { font-size: 10.5px; color: #10b981; font-weight: 700; margin-top: 2px; }
+    .mg-stat-delta { font-size: 10.5px; color: var(--ok-text); font-weight: 700; margin-top: 2px; }
     .mg-stat-delta.flat { color: var(--text-muted); }
 
     /* Filter row */
@@ -72,7 +72,7 @@
         color: var(--text-muted); cursor: pointer;
         border-bottom: 2px solid transparent; margin-bottom: -1px;
     }
-    .mg-subtab.active { color: #f97316; border-bottom-color: #f97316; }
+    .mg-subtab.active { color: var(--brand-text); border-bottom-color: #f97316; }
 
     /* Master-list table */
     .mg-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
@@ -89,21 +89,21 @@
     .mg-table .ev-sub { font-size: 10.5px; color: var(--text-muted); margin-top: 1px; }
     .mg-table .num { text-align: center; font-weight: 600; color: var(--text-primary); }
     .mg-status-pill { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 999px; text-transform: capitalize; white-space: nowrap; }
-    .mg-status-confirmed   { background: rgba(16,185,129,0.15); color: #10b981; }
-    .mg-status-pending     { background: rgba(245,158,11,0.18); color: #d97706; }
-    .mg-status-published   { background: rgba(16,185,129,0.15); color: #10b981; }
-    .mg-status-in_progress { background: rgba(99,102,241,0.15); color: #6366f1; }
+    .mg-status-confirmed   { background: rgba(16,185,129,0.15); color: var(--ok-text); }
+    .mg-status-pending     { background: rgba(245,158,11,0.18); color: var(--warn-text); }
+    .mg-status-published   { background: rgba(16,185,129,0.15); color: var(--ok-text); }
+    .mg-status-in_progress { background: rgba(99,102,241,0.15); color: var(--accent-text); }
     .mg-status-not_started, .mg-status-not_scheduled { background: var(--border-color); color: var(--text-muted); }
-    .mg-status-cancelled   { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .mg-status-cancelled   { background: rgba(239,68,68,0.15); color: var(--bad-text); }
     .mg-row-kebab { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 16px; padding: 2px 6px; }
-    .mg-row-kebab:hover { color: #f97316; }
+    .mg-row-kebab:hover { color: var(--brand-text); }
     /* Row "more actions" menu — the kebab used to be a bare link to the event,
        which looked like a menu and behaved as a redirect. */
     .mg-menu { position: relative; display: inline-block; }
     .mg-menu-pop { display: none; position: absolute; right: 0; top: calc(100% + 5px); z-index: 40; min-width: 180px; background: var(--bg-card,#fff); border: 1px solid var(--border-color,#e5e7eb); border-radius: 10px; box-shadow: 0 10px 28px rgba(15,23,42,.13); padding: 5px; text-align: left; }
     .mg-menu.open .mg-menu-pop { display: block; }
     .mg-menu-pop a, .mg-menu-pop button { display: block; width: 100%; text-align: left; background: none; border: 0; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--text-primary,#111827); text-decoration: none; padding: 8px 10px; border-radius: 7px; cursor: pointer; }
-    .mg-menu-pop a:hover, .mg-menu-pop button:hover { background: rgba(249,115,22,.10); color: #ea580c; }
+    .mg-menu-pop a:hover, .mg-menu-pop button:hover { background: rgba(249,115,22,.10); color: var(--brand-text); }
     .mg-menu-pop form { margin: 0; }
 
     /* Professional Status Overview bar */
@@ -120,16 +120,16 @@
     .mg-act-row:last-child { border-bottom: 0; }
     .mg-act-dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .mg-act-dot svg { width: 14px; height: 14px; }
-    .mg-act-dot.green { background: rgba(16,185,129,0.15); color: #10b981; }
-    .mg-act-dot.amber { background: rgba(245,158,11,0.15); color: #f59e0b; }
-    .mg-act-dot.indigo{ background: rgba(99,102,241,0.15); color: #6366f1; }
+    .mg-act-dot.green { background: rgba(16,185,129,0.15); color: var(--ok-text); }
+    .mg-act-dot.amber { background: rgba(245,158,11,0.15); color: var(--warn-text); }
+    .mg-act-dot.indigo{ background: rgba(99,102,241,0.15); color: var(--accent-text); }
     .mg-act-body { flex: 1; min-width: 0; }
     .mg-act-text { font-size: 12.5px; color: var(--text-primary); }
     .mg-act-time { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; }
     .mg-qa-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .mg-qa { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; padding: 14px; border-radius: 10px; background: var(--bg-card-hover); border: 1px solid var(--border-color); text-decoration: none; color: var(--text-primary); position: relative; }
     .mg-qa:hover { border-color: rgba(249,115,22,0.30); }
-    .mg-qa svg { width: 18px; height: 18px; color: #6366f1; }
+    .mg-qa svg { width: 18px; height: 18px; color: var(--accent-text); }
     .mg-qa span { font-size: 12.5px; font-weight: 600; }
     .mg-qa-badge { position: absolute; top: 8px; right: 8px; background: #ef4444; color: #fff; font-size: 9px; font-weight: 700; min-width: 16px; height: 16px; border-radius: 999px; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
 
@@ -152,21 +152,21 @@
     .mg-pstat-row .lbl { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); }
     .mg-pstat-row .lbl svg { width: 13px; height: 13px; }
     .mg-pstat-row .val { font-weight: 700; color: var(--text-primary); }
-    .mg-rail-link { display: inline-flex; align-items: center; gap: 4px; margin-top: 10px; font-size: 12px; font-weight: 600; color: #f97316; text-decoration: none; }
+    .mg-rail-link { display: inline-flex; align-items: center; gap: 4px; margin-top: 10px; font-size: 12px; font-weight: 600; color: var(--brand-text); text-decoration: none; }
     .mg-rail-link svg { width: 12px; height: 12px; }
     .mg-pay-total { font-size: 24px; font-weight: 800; color: var(--text-primary); }
     .mg-pay-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; text-align: center; font-size: 10.5px; }
     .mg-pay-grid b { display: block; font-size: 14px; font-weight: 800; }
-    .mg-pay-grid .paid b { color: #10b981; }
-    .mg-pay-grid .pend b { color: #f59e0b; }
-    .mg-pay-grid .over b { color: #ef4444; }
+    .mg-pay-grid .paid b { color: var(--ok-text); }
+    .mg-pay-grid .pend b { color: var(--warn-text); }
+    .mg-pay-grid .over b { color: var(--bad-text); }
     .mg-dl-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--border-color); }
     .mg-dl-row:last-of-type { border-bottom: 0; }
     .mg-dl-bar { width: 3px; align-self: stretch; border-radius: 999px; background: #f59e0b; flex-shrink: 0; }
     .mg-dl-body { flex: 1; min-width: 0; }
     .mg-dl-title { font-size: 12.5px; font-weight: 700; color: var(--text-primary); }
     .mg-dl-sub { font-size: 10.5px; color: var(--text-muted); }
-    .mg-dl-due { font-size: 10.5px; color: #f59e0b; font-weight: 700; white-space: nowrap; }
+    .mg-dl-due { font-size: 10.5px; color: var(--warn-text); font-weight: 700; white-space: nowrap; }
 
     @media (max-width: 1200px) {
         .mg-layout { grid-template-columns: 1fr; }
@@ -522,8 +522,8 @@
                                 <td>{{ $event->starts_at?->format('M d, Y') ?? '—' }}</td>
                                 <td>{{ $event->starts_at?->format('g:i A') ?? '—' }}@if($event->ends_at) – {{ $event->ends_at->format('g:i A') }}@endif</td>
                                 <td class="num">{{ $needed }}</td>
-                                <td class="num" style="color:#10b981;">{{ $confirmed }}</td>
-                                <td class="num" style="color:#f59e0b;">{{ $pending }}</td>
+                                <td class="num" style="color:var(--ok-text);">{{ $confirmed }}</td>
+                                <td class="num" style="color:var(--warn-text);">{{ $pending }}</td>
                                 <td><span class="mg-status-pill mg-status-{{ $event->status }}">{{ ucfirst(str_replace('_', ' ', $event->status)) }}</span></td>
                                 <td style="white-space:nowrap;font-weight:600;color:var(--text-primary);">${{ number_format($budget, 0) }} / ${{ number_format($spent, 0) }}</td>
                                 <td style="padding-right:18px;text-align:right;">

@@ -46,10 +46,10 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    .bat-quota-ok        { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
-    .bat-quota-low       { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
-    .bat-quota-exhausted { background: rgba(239,68,68,0.12);  color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
-    .bat-quota-unlimited { background: rgba(99,102,241,0.12); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3); }
+    .bat-quota-ok        { background: rgba(16,185,129,0.12); color: var(--ok-text); border: 1px solid rgba(16,185,129,0.3); }
+    .bat-quota-low       { background: rgba(245,158,11,0.12); color: var(--warn-text); border: 1px solid rgba(245,158,11,0.3); }
+    .bat-quota-exhausted { background: rgba(239,68,68,0.12);  color: var(--bad-text); border: 1px solid rgba(239,68,68,0.3); }
+    .bat-quota-unlimited { background: rgba(99,102,241,0.12); color: var(--accent-text); border: 1px solid rgba(99,102,241,0.3); }
 
     /* Form card */
     .bat-card {
@@ -111,7 +111,7 @@
         background: rgba(99,102,241,0.08);
         border: 1px solid var(--border-color);
         border-radius: var(--radius-sm);
-        color: #a5b4fc;
+        color: var(--accent-text);
         font-weight: 700;
         font-size: 13px;
         display: flex;
@@ -186,10 +186,10 @@
         font-size: 16px; font-weight: 700; color: var(--text-primary);
         display: flex; align-items: center; gap: 8px;
     }
-    .bat-result-title svg { width: 20px; height: 20px; color: #10b981; }
+    .bat-result-title svg { width: 20px; height: 20px; color: var(--ok-text); }
     .bat-result-total {
         font-size: 22px; font-weight: 800;
-        color: #10b981;
+        color: var(--ok-text);
     }
 
     .bat-summary {
@@ -254,7 +254,7 @@
     }
     .bat-tips-title {
         font-size: 13px; font-weight: 700;
-        color: #f59e0b;
+        color: var(--warn-text);
         margin-bottom: 10px;
         display: flex; align-items: center; gap: 8px;
     }
@@ -285,7 +285,7 @@
         padding: 12px 16px;
         background: rgba(239,68,68,0.1);
         border: 1px solid rgba(239,68,68,0.3);
-        color: #f87171;
+        color: var(--bad-text);
         border-radius: var(--radius-sm);
         font-size: 13px;
         margin-bottom: 16px;
@@ -296,11 +296,11 @@
     .bat-levelbar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; background:var(--bg-secondary); border:1px solid var(--border-color); border-left:4px solid var(--lvl,#64748b); border-radius:12px; padding:12px 16px; margin-bottom:18px; }
     .bat-lvltag { font-size:10.5px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; color:#fff; background:var(--lvl,#64748b); padding:4px 11px; border-radius:999px; }
     .bat-levelbar .d { font-size:12.5px; color:var(--text-secondary); }
-    .bat-levelbar a.up { margin-left:auto; font-size:12px; font-weight:700; color:#f97316; text-decoration:none; }
+    .bat-levelbar a.up { margin-left:auto; font-size:12px; font-weight:700; color:var(--brand-text); text-decoration:none; }
     .bat-mrow { display:grid; grid-template-columns:1fr 160px 40px; gap:10px; margin-bottom:10px; align-items:center; }
     .bat-mtotals { display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-color); font-size:14px; font-weight:700; color:var(--text-primary); }
-    .bat-mtotals .rem.over { color:#ef4444; } .bat-mtotals .rem.ok { color:#10b981; }
-    .bat-addcat { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:#6366f1; background:rgba(99,102,241,.08); border:1px solid rgba(99,102,241,.25); border-radius:9px; padding:8px 14px; cursor:pointer; font-family:inherit; }
+    .bat-mtotals .rem.over { color:var(--bad-text); } .bat-mtotals .rem.ok { color:var(--ok-text); }
+    .bat-addcat { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--accent-text); background:rgba(99,102,241,.08); border:1px solid rgba(99,102,241,.25); border-radius:9px; padding:8px 14px; cursor:pointer; font-family:inherit; }
     .bat-xrow { background:none; border:1px solid var(--border-color); color:var(--text-muted); border-radius:8px; cursor:pointer; font-size:15px; height:38px; }
     .bat-amt-edit { width:120px; }
 </style>

@@ -75,7 +75,7 @@
         flex-shrink: 0;
     }
     [data-theme="dark"] .sp-more-btn { background: var(--bg-card-hover); }
-    .sp-more-btn svg { width: 14px; height: 14px; color: #6366f1; }
+    .sp-more-btn svg { width: 14px; height: 14px; color: var(--accent-text); }
 
     /* ── Unified filter card (active project bar + sub-filters) ── */
     .sp-filter-card {
@@ -103,7 +103,7 @@
     .sp-active-meta b { color: var(--text-primary); font-weight: 600; }
     .sp-active-spacer { flex: 1; }
     .sp-clear-link {
-        font-size: 12.5px; color: #f97316;
+        font-size: 12.5px; color: var(--brand-text);
         text-decoration: none; font-weight: 600;
     }
     .sp-save-btn {
@@ -214,7 +214,7 @@
         border-radius: 6px;
         display: inline-flex; align-items: center; gap: 4px;
     }
-    .sp-view-toggle button.is-active { background: rgba(99, 102, 241, 0.10); color: #6366f1; }
+    .sp-view-toggle button.is-active { background: rgba(99, 102, 241, 0.10); color: var(--accent-text); }
     [data-theme="dark"] .sp-view-toggle button.is-active { background: rgba(99, 102, 241, 0.18); color: #a5b4fc; }
     .sp-view-toggle button svg { width: 12px; height: 12px; }
 
@@ -230,15 +230,15 @@
         display: inline-flex; align-items: center; gap: 6px;
         padding: 4px 10px;
         background: rgba(16, 185, 129, 0.10);
-        color: #10b981;
+        color: var(--ok-text);
         border-radius: 999px;
         font-size: 11.5px; font-weight: 600;
         text-decoration: none;
     }
     .sp-chip svg { width: 12px; height: 12px; }
-    .sp-chip.blue   { background: rgba(99, 102, 241, 0.10); color: #6366f1; }
-    .sp-chip.purple { background: rgba(139, 92, 246, 0.10); color: #8b5cf6; }
-    .sp-best-match { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #f97316; font-weight: 700; }
+    .sp-chip.blue   { background: rgba(99, 102, 241, 0.10); color: var(--accent-text); }
+    .sp-chip.purple { background: rgba(139, 92, 246, 0.10); color: var(--accent-text); }
+    .sp-best-match { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--brand-text); font-weight: 700; }
     .sp-best-match svg { width: 12px; height: 12px; }
 
     /* ── Pro cards ──────────────────────────────────────────── */
@@ -268,7 +268,7 @@
     .sp-procard-catbadge { position: absolute; top: 10px; left: 10px; z-index: 3; background: rgba(255,255,255,.94); color: #0f1b35;
         font-size: 11px; font-weight: 800; padding: 5px 11px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px;
         box-shadow: 0 2px 10px rgba(15,27,53,.18); text-transform: capitalize; }
-    .sp-procard-catbadge svg { width: 13px; height: 13px; color: #f97316; }
+    .sp-procard-catbadge svg { width: 13px; height: 13px; color: var(--brand-text); }
     .sp-procard-media .sp-fav-btn { position: absolute; top: 10px; right: 10px; z-index: 3; background: rgba(255,255,255,.94);
         border: none; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
         color: #64748b; box-shadow: 0 2px 10px rgba(15,27,53,.18); cursor: pointer; }
@@ -288,7 +288,7 @@
     .sp-procard-verified {
         display: inline-flex; align-items: center; gap: 4px;
         font-size: 10.5px; font-weight: 700;
-        color: #10b981;
+        color: var(--ok-text);
         background: rgba(16, 185, 129, 0.10);
         padding: 2px 7px; border-radius: 4px;
         margin-bottom: 4px;
@@ -307,20 +307,20 @@
         flex-shrink: 0;
     }
     .sp-fav-btn svg { width: 16px; height: 16px; }
-    .sp-fav-btn:hover, .sp-fav-btn.is-saved { color: #ef4444; }
+    .sp-fav-btn:hover, .sp-fav-btn.is-saved { color: var(--bad-text); }
     .sp-procard-meta {
         display: flex; gap: 10px; flex-wrap: wrap;
         font-size: 11.5px; color: var(--text-muted);
     }
     .sp-procard-meta svg { width: 11px; height: 11px; vertical-align: middle; margin-right: 2px; }
-    .sp-procard-rating { color: #f59e0b; font-weight: 700; }
+    .sp-procard-rating { color: var(--warn-text); font-weight: 700; }
     .sp-popularity {
         display: flex; align-items: center; justify-content: space-between;
         font-size: 11px; color: var(--text-muted);
     }
     .sp-pop-label { display: flex; align-items: center; gap: 4px; }
     .sp-pop-label svg { width: 12px; height: 12px; }
-    .sp-pop-tag { color: #f97316; font-weight: 700; }
+    .sp-pop-tag { color: var(--brand-text); font-weight: 700; }
     .sp-procard-bottom {
         display: flex; align-items: center; justify-content: space-between;
         padding-top: 10px; margin-top: 6px;
@@ -337,18 +337,18 @@
         font-size: 10.5px; font-weight: 600;
         padding: 4px 8px;
         background: rgba(139, 92, 246, 0.10);
-        color: #8b5cf6;
+        color: var(--accent-text);
         border-radius: 6px;
     }
     .sp-rate-tag svg { width: 11px; height: 11px; }
-    .sp-rate-tag.hourly { background: rgba(59, 130, 246, 0.10); color: #3b82f6; }
+    .sp-rate-tag.hourly { background: rgba(59, 130, 246, 0.10); color: var(--info-text); }
     .sp-procard-trust {
         display: flex; gap: 10px; flex-wrap: wrap;
         font-size: 10.5px; color: var(--text-muted);
         align-items: center;
     }
     .sp-procard-trust span { display: inline-flex; align-items: center; gap: 3px; }
-    .sp-procard-trust svg { width: 10px; height: 10px; color: #10b981; }
+    .sp-procard-trust svg { width: 10px; height: 10px; color: var(--ok-text); }
     .sp-view-profile {
         flex-shrink: 0;
         padding: 7px 14px;
@@ -438,7 +438,7 @@
         font-size: 9.5px; font-weight: 700;
         padding: 2px 7px; border-radius: 999px;
         background: rgba(16, 185, 129, 0.15);
-        color: #10b981;
+        color: var(--ok-text);
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
@@ -450,7 +450,7 @@
         display: inline-flex; align-items: center; gap: 4px;
         margin-top: 10px;
         font-size: 12px; font-weight: 600;
-        color: #6366f1;
+        color: var(--accent-text);
         text-decoration: none;
     }
     .sp-rail-link svg { width: 12px; height: 12px; }
@@ -463,9 +463,9 @@
     .sp-budget-bars .over    { background: #ef4444; }
     .sp-budget-totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; font-size: 11px; text-align: center; }
     .sp-budget-totals b { display: block; font-size: 13.5px; font-weight: 800; }
-    .sp-budget-totals .avg-col b { color: #10b981; }
-    .sp-budget-totals .within-col b { color: #f59e0b; }
-    .sp-budget-totals .over-col b { color: #ef4444; }
+    .sp-budget-totals .avg-col b { color: var(--ok-text); }
+    .sp-budget-totals .within-col b { color: var(--warn-text); }
+    .sp-budget-totals .over-col b { color: var(--bad-text); }
 
     /* AI Recommendations */
     .sp-ai-row {
@@ -475,9 +475,9 @@
     }
     .sp-ai-row:last-of-type { border-bottom: 0; }
     .sp-ai-text { font-size: 11.5px; line-height: 1.4; color: var(--text-primary); }
-    .sp-ai-text b { color: #f97316; font-weight: 700; }
-    .sp-ai-match { font-size: 10.5px; font-weight: 700; color: #10b981; flex-shrink: 0; padding-top: 2px; }
-    .sp-ai-icon { width: 22px; height: 22px; border-radius: 50%; background: rgba(16,185,129,0.12); color: #10b981; display:flex; align-items:center; justify-content:center; flex-shrink: 0; }
+    .sp-ai-text b { color: var(--brand-text); font-weight: 700; }
+    .sp-ai-match { font-size: 10.5px; font-weight: 700; color: var(--ok-text); flex-shrink: 0; padding-top: 2px; }
+    .sp-ai-icon { width: 22px; height: 22px; border-radius: 50%; background: rgba(16,185,129,0.12); color: var(--ok-text); display:flex; align-items:center; justify-content:center; flex-shrink: 0; }
     .sp-ai-icon svg { width: 12px; height: 12px; }
 
     @media (max-width: 1200px) {

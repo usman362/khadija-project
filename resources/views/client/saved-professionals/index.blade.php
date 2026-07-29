@@ -14,9 +14,9 @@
     .mp-top { display: flex; gap: 12px; align-items: center; }
     .mp-av { width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg,#f97316,#ea580c); color: #fff; font-weight: 800; font-size: 17px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .mp-name { font-size: 14.5px; font-weight: 800; color: var(--text-primary); text-decoration: none; }
-    .mp-name:hover { color: #f97316; }
+    .mp-name:hover { color: var(--brand-text); }
     .mp-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
-    .mp-stars { color: #f59e0b; font-size: 12px; }
+    .mp-stars { color: var(--warn-text); font-size: 12px; }
     .mp-tags { display: flex; flex-wrap: wrap; gap: 6px; }
     .mp-tag { font-size: 10.5px; font-weight: 700; color: var(--text-secondary); background: var(--bg-card-hover, #f1f5f9); border-radius: 999px; padding: 3px 9px; }
     .mp-actions { display: flex; gap: 8px; margin-top: auto; }
@@ -24,14 +24,14 @@
     .mp-btn.primary { background: #f97316; color: #fff; border-color: #f97316; }
     .mp-btn.primary:hover { filter: brightness(1.05); }
     .mp-empty { background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: 14px; padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px; }
-    .mp-empty a { color: #f97316; font-weight: 700; text-decoration: none; }
+    .mp-empty a { color: var(--brand-text); font-weight: 700; text-decoration: none; }
 </style>
 @endpush
 
 @section('content')
 <div>
     @if(session('status'))
-        <div style="background:rgba(16,163,74,.12);border:1px solid rgba(16,163,74,.35);color:#16a34a;padding:11px 16px;border-radius:10px;margin-bottom:16px;font-size:13.5px;">{{ session('status') }}</div>
+        <div style="background:rgba(16,163,74,.12);border:1px solid rgba(16,163,74,.35);color:var(--ok-text);padding:11px 16px;border-radius:10px;margin-bottom:16px;font-size:13.5px;">{{ session('status') }}</div>
     @endif
 
     {{-- Worked with — derived from real bookings --}}

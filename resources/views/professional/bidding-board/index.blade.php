@@ -48,20 +48,20 @@
     .bb-stat-row { display: flex; gap: 16px; }
     .bb-stat span { display: block; font-size: 9.5px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; }
     .bb-stat b { font-size: 13.5px; font-weight: 800; color: var(--text-primary); white-space: nowrap; }
-    .bb-stat.t b { color: #c2410c; font-variant-numeric: tabular-nums; }
+    .bb-stat.t b { color: var(--brand-text); font-variant-numeric: tabular-nums; }
     .bb-ring { display: flex; align-items: center; gap: 9px; }
     .bb-match { width: 44px; height: 44px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff !important; font-weight: 800; flex-shrink: 0; }
     .bb-match b, .bb-match em { color: #fff !important; }
     .bb-match b { font-size: 12.5px; line-height: 1; } .bb-match em { font-size: 6.5px; font-style: normal; letter-spacing: .3px; opacity: .9; }
     .bb-ring-txt { display: flex; flex-direction: column; gap: 2px; }
     .bb-score-lbl { font-size: 9.5px; font-weight: 800; letter-spacing: .3px; text-transform: uppercase; }
-    .bb-stars { font-size: 11px; letter-spacing: .5px; color: #f59e0b; line-height: 1; }
+    .bb-stars { font-size: 11px; letter-spacing: .5px; color: var(--warn-text); line-height: 1; }
     .bb-stars i { color: var(--border-color); font-style: normal; }
 
     /* sealed-bid: flash, chip, modal */
-    .bb-flash { display: flex; align-items: center; gap: 8px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; font-size: 13px; font-weight: 600; padding: 11px 16px; border-radius: 12px; margin-bottom: 16px; }
+    .bb-flash { display: flex; align-items: center; gap: 8px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; font-size: 13px; font-weight: 600; padding: 11px 16px; border-radius: 12px; margin-bottom: 16px; }
     .bb-mybid { margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; letter-spacing: .2px; padding: 4px 9px; border-radius: 7px; background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; align-self: flex-start; }
-    .bb-mybid.sealed { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+    .bb-mybid.sealed { background: #f5f3ff; color: #4338ca; border-color: #ddd6fe; }
     .bb-bid.done { background: var(--bg-card); color: var(--bb); border: 1.5px solid var(--bb); }
     .bb-mylink { margin-left: 8px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 999px; padding: 7px 15px; font-size: 13px; font-weight: 700; color: var(--text-secondary); text-decoration: none; }
 
@@ -114,14 +114,14 @@
         color: var(--text-secondary); text-decoration: none; }
     .bb-pag-links a.on { background: #2563eb; border-color: transparent; color: #fff; }
 
-    .bb-full { display: block; text-align: center; margin-top: 10px; font-size: 12.5px; font-weight: 700; color: #60a5fa; text-decoration: none; }
+    .bb-full { display: block; text-align: center; margin-top: 10px; font-size: 12.5px; font-weight: 700; color: var(--info-text); text-decoration: none; }
     .bb-full:hover { text-decoration: underline; }
 
     .bb-rail { position: sticky; top: 84px; display: flex; flex-direction: column; gap: 16px; }
     .bb-rail-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; }
     .bb-rail-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
     .bb-rail-head h4 { font-size: 13.5px; font-weight: 800; color: var(--text-primary); }
-    .bb-live { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; color: #16a34a; background: rgba(22,163,74,.12); padding: 2px 8px; border-radius: 999px; }
+    .bb-live { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; color: var(--ok-text); background: rgba(22,163,74,.12); padding: 2px 8px; border-radius: 999px; }
     .bb-live b { font-size: 8px; line-height: 1; }
     .bb-clear { margin-left: auto; font-size: 11.5px; font-weight: 700; color: var(--bb); background: none; border: none; cursor: pointer; text-decoration: none; }
     .bb-ins { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--border-color); }
@@ -169,7 +169,7 @@
                     <div style="margin-top:2px;">{{ $lockedCount }} {{ $lockedCount === 1 ? 'request opens' : 'requests open' }} to you shortly. Counts below show what's unlocked to you.</div>
                 @endif
             </div>
-            <a href="{{ route('membership.plans') }}" style="color:#2563eb;font-weight:700;text-decoration:none;white-space:nowrap;">Upgrade to Elite →</a>
+            <a href="{{ route('membership.plans') }}" style="color:var(--info-text);font-weight:700;text-decoration:none;white-space:nowrap;">Upgrade to Elite →</a>
         </div>
     @endunless
 
@@ -408,7 +408,7 @@
                      style="margin-top:8px;font-size:12.5px;color:var(--text-muted);display:none;">
                     Platform commission ({{ rtrim(rtrim(number_format($commissionPct ?? 5, 2), '0'), '.') }}%):
                     <b id="bbFee" style="color:var(--text-primary);">$0</b>
-                    · You net <b id="bbNetAmt" style="color:#16a34a;">$0</b>
+                    · You net <b id="bbNetAmt" style="color:var(--ok-text);">$0</b>
                     <span style="display:block;margin-top:2px;">Deducted only on a finalized contract — never on bids that don't win.</span>
                 </div>
             </div>

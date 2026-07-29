@@ -21,10 +21,10 @@
     .bw-steps { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 20px; }
     .bw-step { flex: 1 1 0; min-width: 108px; text-align: center; text-decoration: none; }
     .bw-dot { width: 30px; height: 30px; margin: 0 auto 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 800; background: var(--bg-subtle, rgba(0,0,0,.05)); color: var(--text-muted); border: 1px solid var(--border-color); }
-    .bw-step.done .bw-dot { background: #16a34a; border-color: #16a34a; color: #fff; }
+    .bw-step.done .bw-dot { background: #15803d; border-color: #16a34a; color: #fff; }
     .bw-step.on .bw-dot { background: #f97316; border-color: #f97316; color: #fff; }
     .bw-step small { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-muted); }
-    .bw-step.on small { color: #f97316; }
+    .bw-step.on small { color: var(--brand-text); }
     .bw-step.done small { color: var(--text-secondary); }
 
     .bw-grid { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 20px; align-items: start; }
@@ -35,7 +35,7 @@
     .bw-card .lede { font-size: 13.5px; color: var(--text-secondary); line-height: 1.65; margin-bottom: 18px; }
     .bw-field { margin-bottom: 16px; }
     .bw-field label { display: block; font-size: 12.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
-    .bw-field .req { color: #dc2626; }
+    .bw-field .req { color: var(--bad-text); }
     .bw-field input[type=text], .bw-field input[type=number], .bw-field input[type=datetime-local],
     .bw-field select, .bw-field textarea {
         width: 100%; background: var(--bg-page, transparent); border: 1px solid var(--border-color);
@@ -102,7 +102,7 @@
         <p class="bw-sub">Tell professionals what you need, when and where — they review it and send you sealed proposals to compare.</p>
     </div>
     <div class="bw-acts">
-        @if($draftId)<span style="font-size:12px;color:#16a34a;font-weight:700;">✓ Draft saved</span>@endif
+        @if($draftId)<span style="font-size:12px;color:var(--ok-text);font-weight:700;">✓ Draft saved</span>@endif
         <a class="bw-btn" href="{{ route('client.events.index') }}">Exit</a>
     </div>
 </div>
@@ -177,7 +177,7 @@
             </div>
             {{-- No "Emergency" option: emergency is its own request type (ESR),
                  which broadcasts on a rush timeline, not a flavour of a BSR. --}}
-            <p class="bw-help">Need it urgently because something fell through? <a href="{{ route('client.esr.create') }}" style="color:#f97316;font-weight:700;">Post an emergency request</a> instead.</p>
+            <p class="bw-help">Need it urgently because something fell through? <a href="{{ route('client.esr.create') }}" style="color:var(--brand-text);font-weight:700;">Post an emergency request</a> instead.</p>
         </div>
 
     {{-- ── 2 · Event details ───────────────────────────────── --}}

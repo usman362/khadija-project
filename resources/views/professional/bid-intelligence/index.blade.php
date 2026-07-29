@@ -54,7 +54,7 @@
     /* ── Section heading ── */
     .bi-sec-h { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
     .bi-sec-h .ic { width: 30px; height: 30px; border-radius: 9px; background: rgba(37,99,235,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .bi-sec-h .ic svg { width: 17px; height: 17px; color: #2563eb; }
+    .bi-sec-h .ic svg { width: 17px; height: 17px; color: var(--info-text); }
     .bi-sec-h b { font-size: 19px; font-weight: 800; color: var(--text-primary); }
     .bi-sec-sub { font-size: 12.5px; color: var(--text-muted); margin: 0 0 16px; padding-left: 40px; }
 
@@ -77,7 +77,7 @@
     .bi-navmock .chk svg { width: 11px; height: 11px; color: #fff; }
     .bi-navmock .ln { flex: 1; height: 7px; border-radius: 4px; background: var(--border-color); }
     .bi-navmock .cal { width: 56px; height: 56px; border-radius: 12px; background: rgba(37,99,235,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .bi-navmock .cal svg { width: 28px; height: 28px; color: #2563eb; }
+    .bi-navmock .cal svg { width: 28px; height: 28px; color: var(--info-text); }
     .bi-bd-cta { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; background: rgba(37,99,235,0.06); border-radius: 11px; font-size: 13.5px; font-weight: 800; color: var(--bi-blue); text-decoration: none; }
     .bi-bd-cta svg { width: 15px; height: 15px; }
 
@@ -166,10 +166,10 @@
             <div>
                 <h1>Bid Intelligence</h1>
                 <div class="sub">Track your bid activity and follow up smarter.</div>
-                <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><div><b>Stops Guesswork</b><p>See exactly which clients are engaging with your bids.</p></div></div>
-                <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(245,158,11,0.12);color:#f59e0b;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></span><div><b>Boosts Wins</b><p>Learn what works so you can win more high-paying jobs.</p></div></div>
-                <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(16,185,129,0.12);color:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></span><div><b>Organizes Follow-Ups</b><p>Know who to call or email and when.</p></div></div>
-                <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(249,115,22,0.12);color:#f97316;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><div><b>Saves Energy</b><p>Focus your time on the bids that have the best chance.</p></div></div>
+                <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><div><b>Stops Guesswork</b><p>See exactly which clients are engaging with your bids.</p></div></div>
+                <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(245,158,11,0.12);color:var(--warn-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></span><div><b>Boosts Wins</b><p>Learn what works so you can win more high-paying jobs.</p></div></div>
+                <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></span><div><b>Organizes Follow-Ups</b><p>Know who to call or email and when.</p></div></div>
+                <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><div><b>Saves Energy</b><p>Focus your time on the bids that have the best chance.</p></div></div>
             </div>
         </div>
 
@@ -197,9 +197,9 @@
             {{-- 1. Target Header --}}
             <div class="bi-bd-col">
                 <div class="bi-bd-h">1. The Target Header <span style="color:var(--text-muted);font-weight:600;">(Top Section)</span></div>
-                <p class="bi-bd-note"><b style="color:#2563eb;">The Goal:</b> The target and arrow icon shows that this tool helps you aim for and hit your sales goals.</p>
+                <p class="bi-bd-note"><b style="color:var(--info-text);">The Goal:</b> The target and arrow icon shows that this tool helps you aim for and hit your sales goals.</p>
                 <div class="bi-bd-sep"></div>
-                <p class="bi-bd-note"><b style="color:#8b5cf6;">The Mission:</b> The text explains that tracking your past performance is the secret to winning more future jobs.</p>
+                <p class="bi-bd-note"><b style="color:var(--accent-text);">The Mission:</b> The text explains that tracking your past performance is the secret to winning more future jobs.</p>
             </div>
             {{-- 2. Donut Chart & Legend --}}
             <div class="bi-bd-col">
@@ -232,23 +232,23 @@
     <div class="bi-cc">
         {{-- Win/Loss Reports --}}
         <div class="bi-cc-card">
-            <div class="bi-cc-h"><span class="ic" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><div><b>Bid Activity</b><p>Rules-based insights on how your bids are moving.</p></div></div>
+            <div class="bi-cc-h"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><div><b>Bid Activity</b><p>Rules-based insights on how your bids are moving.</p></div></div>
             <div class="bi-cc-prev">
                 {{-- No "win rate" (a sealed-outcome aggregate, R8) and no AI label
                      (No-AI). Framed as bid activity a pro can act on. --}}
                 <div class="bi-ai-box" style="background:rgba(37,99,235,0.07);">
-                    <div class="k" style="color:#2563eb;">Insight</div>
+                    <div class="k" style="color:var(--info-text);">Insight</div>
                     <p>You have <b>{{ \App\Models\Bid::where('supplier_id', auth()->id())->where('status','submitted')->count() }}</b> active bids. Bids viewed by clients convert far more often than un-opened ones — follow up on the ones going quiet.</p>
                 </div>
                 <div class="bi-ai-box" style="background:rgba(16,185,129,0.07);">
-                    <div class="k" style="color:#10b981;">Recommendation</div>
+                    <div class="k" style="color:var(--ok-text);">Recommendation</div>
                     <p>Consider adjusting pricing or highlighting more value on bids that stall after being viewed.</p>
                 </div>
             </div>
         </div>
         {{-- Client Response Timers --}}
         <div class="bi-cc-card">
-            <div class="bi-cc-h"><span class="ic" style="background:rgba(139,92,246,0.12);color:#8b5cf6;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><b>Client Response Timers</b><p>See exactly how long clients spend reviewing your proposal.</p></div></div>
+            <div class="bi-cc-h"><span class="ic" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><b>Client Response Timers</b><p>See exactly how long clients spend reviewing your proposal.</p></div></div>
             <div class="bi-cc-prev">
                 <div class="bi-rt-title">Average Response Time</div>
                 @foreach($responseTimes as $rt)
@@ -258,7 +258,7 @@
         </div>
         {{-- Follow-Up Automation --}}
         <div class="bi-cc-card">
-            <div class="bi-cc-h"><span class="ic" style="background:rgba(16,185,129,0.12);color:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></span><div><b>Follow-Up Automation</b><p>Send one-click follow-up emails to clients who viewed your bid.</p></div></div>
+            <div class="bi-cc-h"><span class="ic" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></span><div><b>Follow-Up Automation</b><p>Send one-click follow-up emails to clients who viewed your bid.</p></div></div>
             <div class="bi-cc-prev">
                 <div class="bi-fu-note">Quick Follow-Up</div>
                 <div class="bi-fu-msg">Hi! Just following up on the proposal I sent over. Let me know if you have any questions!</div>
@@ -267,7 +267,7 @@
         </div>
         {{-- Competitor Benchmarks --}}
         <div class="bi-cc-card">
-            <div class="bi-cc-h"><span class="ic" style="background:rgba(249,115,22,0.12);color:#f97316;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></span><div><b>Competitor Benchmarks</b><p>See anonymous data on how your pricing compares locally.</p></div></div>
+            <div class="bi-cc-h"><span class="ic" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></span><div><b>Competitor Benchmarks</b><p>See anonymous data on how your pricing compares locally.</p></div></div>
             <div class="bi-cc-prev">
                 <div style="font-size:11.5px;font-weight:800;color:var(--text-primary);text-align:center;margin-bottom:8px;">Your Pricing vs Market</div>
                 <div class="bi-bm-amt">{{ $money($pricing['avg']) }}</div>

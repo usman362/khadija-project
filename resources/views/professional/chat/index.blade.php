@@ -16,7 +16,7 @@
 <style>
     .pm { --pm: #2563eb; }
     .pm-head h1 { font-size: 24px; font-weight: 800; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 9px; }
-    .pm-head h1 svg { width: 19px; height: 19px; color: #2563eb; }
+    .pm-head h1 svg { width: 19px; height: 19px; color: var(--info-text); }
     .pm-head p { font-size: 13px; color: var(--text-muted); margin: 4px 0 18px; }
 
     /* stats + actions */
@@ -32,7 +32,7 @@
     .pm-btn-primary { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px; border: none; border-radius: 11px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; font-size: 13.5px; font-weight: 800; cursor: pointer; font-family: inherit; }
     .pm-btn-primary svg { width: 15px; height: 15px; }
     .pm-btn-ghost { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 11px; background: var(--bg-card); color: var(--text-secondary); font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
-    .pm-btn-ghost svg { width: 14px; height: 14px; color: #2563eb; }
+    .pm-btn-ghost svg { width: 14px; height: 14px; color: var(--info-text); }
 
     /* main split */
     .pm-main { display: grid; grid-template-columns: minmax(0,340px) minmax(0,1fr); gap: 16px; align-items: start; }
@@ -74,7 +74,7 @@
     .pm-th-av { width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; font-weight: 800; }
     .pm-th-mid { flex: 1; min-width: 0; }
     .pm-th-name { font-size: 16px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
-    .pm-open { font-size: 10px; font-weight: 800; color: #059669; background: rgba(16,185,129,0.12); border-radius: 5px; padding: 2px 7px; }
+    .pm-open { font-size: 10px; font-weight: 800; color: var(--ok-text); background: rgba(16,185,129,0.12); border-radius: 5px; padding: 2px 7px; }
     .pm-th-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .pm-th-actions { display: flex; gap: 7px; }
     .pm-icon-btn { width: 34px; height: 34px; border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; }
@@ -90,10 +90,10 @@
     .pm-msg.me .pm-bubble { background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.2); }
     .pm-att { display: flex; gap: 9px; margin-top: 8px; flex-wrap: wrap; }
     .pm-att-item { display: flex; align-items: center; gap: 8px; border: 1px solid var(--border-color); border-radius: 9px; padding: 8px 11px; background: var(--bg-card); }
-    .pm-att-item svg { width: 16px; height: 16px; color: #dc2626; }
+    .pm-att-item svg { width: 16px; height: 16px; color: var(--bad-text); }
     .pm-att-item b { font-size: 12px; color: var(--text-primary); display: block; }
     .pm-att-item span { font-size: 10.5px; color: var(--text-muted); }
-    .pm-banner { display: flex; align-items: center; gap: 10px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.22); border-radius: 10px; padding: 11px 14px; margin: 0 18px; font-size: 12.5px; font-weight: 700; color: #059669; }
+    .pm-banner { display: flex; align-items: center; gap: 10px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.22); border-radius: 10px; padding: 11px 14px; margin: 0 18px; font-size: 12.5px; font-weight: 700; color: var(--ok-text); }
     .pm-banner svg { width: 16px; height: 16px; }
     .pm-banner a { margin-left: auto; color: var(--pm); font-weight: 800; text-decoration: none; }
     .pm-ai { display: flex; align-items: center; gap: 11px; background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.18); border-radius: 11px; padding: 13px 16px; margin: 14px 18px 0; }
@@ -138,11 +138,11 @@
     {{-- stats + actions --}}
     <div class="pm-top">
         <div class="pm-stats">
-            <div class="pm-stat"><div class="pm-stat-h"><span class="pm-stat-ico" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Unread</div><div class="v">{{ $stats['unread'] }}</div><div class="s">of {{ max($stats['total'], $stats['unread']) }}</div></div>
-            <div class="pm-stat"><div class="pm-stat-h"><span class="pm-stat-ico" style="background:rgba(217,119,6,0.12);color:#d97706;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>Priority</div><div class="v">{{ $stats['priority'] }}</div><div class="s">Needs attention</div></div>
-            <div class="pm-stat"><div class="pm-stat-h"><span class="pm-stat-ico" style="background:rgba(16,185,129,0.12);color:#059669;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></span>Response Time</div><div class="v">{{ $stats['response'] }}</div><div class="s" style="color:#059669;">↓ 12% vs last 30 days</div></div>
-            <div class="pm-stat"><div class="pm-stat-h"><span class="pm-stat-ico" style="background:rgba(220,38,38,0.12);color:#dc2626;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>Compliance</div><div class="v">{{ $stats['compliance'] }}</div><div class="s">Action required</div></div>
-            <div class="pm-stat"><div class="pm-stat-h"><span class="pm-stat-ico" style="background:rgba(37,99,235,0.12);color:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>Payment Secured</div><div class="v">{{ $money($stats['escrow']) }}</div><div class="s">Across {{ $stats['escrow_convos'] }} conversations</div></div>
+            <div class="pm-stat"><div class="pm-stat-h"><span class="pm-stat-ico" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Unread</div><div class="v">{{ $stats['unread'] }}</div><div class="s">of {{ max($stats['total'], $stats['unread']) }}</div></div>
+            <div class="pm-stat"><div class="pm-stat-h"><span class="pm-stat-ico" style="background:rgba(217,119,6,0.12);color:var(--warn-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>Priority</div><div class="v">{{ $stats['priority'] }}</div><div class="s">Needs attention</div></div>
+            <div class="pm-stat"><div class="pm-stat-h"><span class="pm-stat-ico" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></span>Response Time</div><div class="v">{{ $stats['response'] }}</div><div class="s" style="color:var(--ok-text);">↓ 12% vs last 30 days</div></div>
+            <div class="pm-stat"><div class="pm-stat-h"><span class="pm-stat-ico" style="background:rgba(220,38,38,0.12);color:var(--bad-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>Compliance</div><div class="v">{{ $stats['compliance'] }}</div><div class="s">Action required</div></div>
+            <div class="pm-stat"><div class="pm-stat-h"><span class="pm-stat-ico" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>Payment Secured</div><div class="v">{{ $money($stats['escrow']) }}</div><div class="s">Across {{ $stats['escrow_convos'] }} conversations</div></div>
         </div>
         <div class="pm-actions">
             <button type="button" class="pm-btn-primary" id="pm-create"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Message</button>

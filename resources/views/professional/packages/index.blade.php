@@ -13,9 +13,9 @@
     .pkl-media { height: 160px; background: linear-gradient(135deg,#1e3a5f,#2d1b69); position: relative; }
     .pkl-media img { width: 100%; height: 100%; object-fit: cover; }
     .pkl-badge { position: absolute; top: 10px; left: 10px; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; }
-    .pkl-badge.on { background: #16a34a; color: #fff; }
+    .pkl-badge.on { background: #15803d; color: #fff; }
     .pkl-badge.off { background: rgba(15,27,53,.7); color: #fff; }
-    .pkl-st-active   { background: #16a34a; color: #fff; }
+    .pkl-st-active   { background: #15803d; color: #fff; }
     .pkl-st-draft    { background: rgba(15,27,53,.7); color: #fff; }
     .pkl-st-paused   { background: #d97706; color: #fff; }
     .pkl-st-archived { background: #64748b; color: #fff; }
@@ -26,7 +26,7 @@
     .pkl-price small { font-size: 12px; font-weight: 600; color: var(--text-muted); }
     .pkl-actions { display: flex; gap: 8px; margin-top: 10px; }
     .pkl-btn { flex: 1; text-align: center; padding: 8px; border-radius: 9px; font-size: 13px; font-weight: 700; text-decoration: none; border: 1px solid var(--border-color); color: var(--text-secondary); background: transparent; cursor: pointer; }
-    .pkl-btn.del { color: #ef4444; border-color: rgba(239,68,68,.3); }
+    .pkl-btn.del { color: var(--bad-text); border-color: rgba(239,68,68,.3); }
     .pkl-empty { background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: 16px; padding: 56px 24px; text-align: center; color: var(--text-muted); }
     .pkl-empty h3 { color: var(--text-primary); margin: 0 0 8px; }
 </style>
@@ -39,7 +39,7 @@
     </div>
 
     @if(session('status'))
-        <div style="background:rgba(16,163,74,.12);border:1px solid rgba(16,163,74,.35);color:#16a34a;padding:11px 16px;border-radius:10px;margin-bottom:16px;font-size:13.5px;">{{ session('status') }}</div>
+        <div style="background:rgba(16,163,74,.12);border:1px solid rgba(16,163,74,.35);color:var(--ok-text);padding:11px 16px;border-radius:10px;margin-bottom:16px;font-size:13.5px;">{{ session('status') }}</div>
     @endif
 
     @if($packages->count())

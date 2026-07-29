@@ -36,9 +36,9 @@
 
         /* Request type + scope chips */
         .ev-type { font-size: 11px; font-weight: 800; border-radius: 6px; padding: 3px 9px; letter-spacing: .3px; }
-        .ev-type-BSR { background: rgba(37,99,235,.13); color: #2563eb; }
-        .ev-type-ESR { background: rgba(220,38,38,.13); color: #dc2626; }
-        .ev-type-DSR { background: rgba(124,58,237,.13); color: #7c3aed; }
+        .ev-type-BSR { background: rgba(37,99,235,.13); color: var(--info-text); }
+        .ev-type-ESR { background: rgba(220,38,38,.13); color: var(--bad-text); }
+        .ev-type-DSR { background: rgba(124,58,237,.13); color: var(--accent-text); }
         .ev-scope { font-size: 11px; font-weight: 700; border-radius: 6px; padding: 3px 9px; background: var(--bg-subtle, rgba(0,0,0,.04)); color: var(--text-secondary); border: 1px solid var(--border-color); }
 
         /* Tabs */
@@ -54,7 +54,7 @@
         .ev-req-row:last-child { border-bottom: 0; }
         .ev-req-row span { color: var(--text-muted); font-weight: 600; }
         .ev-req-row b { color: var(--text-primary); font-weight: 700; text-align: right; }
-        .ev-hint { display: block; margin-top: 9px; font-size: 12px; color: #b45309; }
+        .ev-hint { display: block; margin-top: 9px; font-size: 12px; color: var(--warn-text); }
 
         /* Proposals */
         .ev-sealed { display: flex; gap: 8px; background: rgba(37,99,235,.07); border: 1px solid rgba(37,99,235,.2); border-radius: 12px; padding: 11px 14px; font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; }
@@ -203,7 +203,7 @@
                             </div>
                             <form method="POST" action="{{ route('client.ai-artifacts.destroy', $art) }}" onsubmit="return confirm('Remove this result from your event?');">
                                 @csrf @method('DELETE')
-                                <button type="submit" style="border:none;background:none;color:#dc2626;font-size:12px;font-weight:700;cursor:pointer;">Remove</button>
+                                <button type="submit" style="border:none;background:none;color:var(--bad-text);font-size:12px;font-weight:700;cursor:pointer;">Remove</button>
                             </form>
                         </div>
                     @endforeach
@@ -309,7 +309,7 @@
                     </div>
                     <div>
                         <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 3px;">Budget</div>
-                        <div style="font-size: 14px; font-weight: 600; color:#16a34a;">{{ $event->budget ? '$'.number_format($event->budget, 2) : 'Not set' }}</div>
+                        <div style="font-size: 14px; font-weight: 600; color:var(--ok-text);">{{ $event->budget ? '$'.number_format($event->budget, 2) : 'Not set' }}</div>
                     </div>
                     @if($event->categories->count())
                     <div>

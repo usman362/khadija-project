@@ -33,24 +33,24 @@
     .cp-row { display: grid; grid-template-columns: 26px minmax(0,1fr) auto; gap: 14px; align-items: flex-start; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 15px 18px; margin-bottom: 11px; }
     .cp-row.sel { border-color: #f97316; box-shadow: 0 0 0 1px #f97316 inset; }
     .cp-name { font-size: 15px; font-weight: 800; color: var(--text-primary); text-decoration: none; }
-    .cp-name:hover { color: #f97316; }
+    .cp-name:hover { color: var(--brand-text); }
     .cp-facts { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 6px; font-size: 12px; color: var(--text-muted); align-items: center; }
     .cp-tag { border-radius: 6px; padding: 2px 8px; font-size: 10.5px; font-weight: 800; }
-    .cp-tag.ok { background: rgba(22,163,74,.13); color: #16a34a; }
+    .cp-tag.ok { background: rgba(22,163,74,.13); color: var(--ok-text); }
     .cp-tag.no { background: rgba(100,116,139,.15); color: var(--text-muted); }
     .cp-note { font-size: 13px; color: var(--text-secondary); margin-top: 8px; line-height: 1.6; }
     .cp-right { text-align: right; min-width: 210px; }
     .cp-amt { font-size: 19px; font-weight: 800; color: var(--text-primary); }
     .cp-budget { font-size: 11.5px; font-weight: 700; }
     .cp-state { display: inline-block; border-radius: 999px; padding: 3px 11px; font-size: 11px; font-weight: 800; margin-bottom: 6px; }
-    .cp-state.responded { background: rgba(37,99,235,.12); color: #2563eb; }
-    .cp-state.negotiating { background: rgba(124,58,237,.14); color: #7c3aed; }
-    .cp-state.accepted { background: rgba(22,163,74,.14); color: #16a34a; }
+    .cp-state.responded { background: rgba(37,99,235,.12); color: var(--info-text); }
+    .cp-state.negotiating { background: rgba(124,58,237,.14); color: var(--accent-text); }
+    .cp-state.accepted { background: rgba(22,163,74,.14); color: var(--ok-text); }
     .cp-state.declined, .cp-state.not_selected { background: rgba(100,116,139,.16); color: var(--text-muted); }
     .cp-acts { display: flex; gap: 6px; justify-content: flex-end; margin-top: 9px; flex-wrap: wrap; }
     .cp-btn { border: 1px solid var(--border-color); background: transparent; border-radius: 9px; padding: 6px 12px; font-size: 12px; font-weight: 700; color: var(--text-secondary); text-decoration: none; cursor: pointer; font-family: inherit; }
-    .cp-btn.go { background: #16a34a; border-color: #16a34a; color: #fff; }
-    .cp-btn.no { border-color: rgba(220,38,38,.4); color: #dc2626; }
+    .cp-btn.go { background: #15803d; border-color: #16a34a; color: #fff; }
+    .cp-btn.no { border-color: rgba(220,38,38,.4); color: var(--bad-text); }
 
     .cp-empty { background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: 14px; padding: 48px 20px; text-align: center; }
     .cp-empty b { display: block; font-size: 15px; color: var(--text-primary); margin-bottom: 6px; }

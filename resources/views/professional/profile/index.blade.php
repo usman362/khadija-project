@@ -123,7 +123,7 @@
         font-size: 12px;
         font-weight: 600;
         background: rgba(16,185,129,0.1);
-        color: #10b981;
+        color: var(--ok-text);
     }
     .pf-availability-badge {
         display: inline-block;
@@ -133,16 +133,16 @@
         font-weight: 600;
         margin-left: 6px;
     }
-    .pf-availability-badge.available { background: rgba(16,185,129,0.1); color: #10b981; }
-    .pf-availability-badge.busy { background: rgba(245,158,11,0.1); color: #f59e0b; }
-    .pf-availability-badge.not_available { background: rgba(239,68,68,0.1); color: #ef4444; }
+    .pf-availability-badge.available { background: rgba(16,185,129,0.1); color: var(--ok-text); }
+    .pf-availability-badge.busy { background: rgba(245,158,11,0.1); color: var(--warn-text); }
+    .pf-availability-badge.not_available { background: rgba(239,68,68,0.1); color: var(--bad-text); }
     .pf-avatar-actions { margin-top: 12px; display: flex; gap: 8px; justify-content: center; }
     .pf-avatar-remove {
         font-size: 12px; color: var(--text-muted); cursor: pointer;
         background: none; border: none;
         transition: var(--transition);
     }
-    .pf-avatar-remove:hover { color: #ef4444; }
+    .pf-avatar-remove:hover { color: var(--bad-text); }
 
     /* ── Sidebar Tabs ── */
     .pf-tabs {
@@ -237,13 +237,13 @@
     .pf-btn-outline:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
     .pf-btn-sm { padding: 6px 14px; font-size: 13px; }
     .pf-btn-danger { background: #ef4444; }
-    .pf-error { color: #ef4444; font-size: 12px; margin-top: 4px; }
+    .pf-error { color: var(--bad-text); font-size: 12px; margin-top: 4px; }
     .pf-success {
         padding: 12px 16px;
         background: rgba(16,185,129,0.1);
         border: 1px solid rgba(16,185,129,0.3);
         border-radius: var(--radius-sm);
-        color: #10b981;
+        color: var(--ok-text);
         font-size: 14px;
         margin-bottom: 16px;
     }
@@ -285,15 +285,15 @@
     .pf-photo { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 16 / 10; border: 2px solid transparent; background: #eef2f7; }
     .pf-photo.is-featured { border-color: #f59e0b; }
     .pf-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .pf-photo-badge { position: absolute; top: 8px; left: 8px; background: #f59e0b; color: #fff; font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 999px; }
+    .pf-photo-badge { position: absolute; top: 8px; left: 8px; background: #b45309; color: #fff; font-size: 11px; font-weight: 800; padding: 3px 9px; border-radius: 999px; }
     .pf-photo-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; opacity: 0; transition: opacity .15s; }
     .pf-photo:hover .pf-photo-actions { opacity: 1; }
     .pf-photo-actions form { margin: 0; }
     .pf-photo-btn { width: 28px; height: 28px; border-radius: 50%; border: none; background: rgba(255,255,255,.95); color: #0f1b35; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
-    .pf-photo-btn.del { color: #ef4444; }
+    .pf-photo-btn.del { color: var(--bad-text); }
     .pf-photo-addform { margin: 0; }
     .pf-photo-add { display: flex; flex-direction: column; align-items: center; justify-content: center; aspect-ratio: 16 / 10; border: 2px dashed var(--border-color); border-radius: 12px; cursor: pointer; color: var(--text-muted); font-size: 13px; font-weight: 700; text-align: center; line-height: 1.3; transition: border-color .15s, color .15s; }
-    .pf-photo-add:hover { border-color: #f97316; color: #f97316; }
+    .pf-photo-add:hover { border-color: #f97316; color: var(--brand-text); }
     .pf-photo-add input { display: none; }
 
     /* ── Portfolio & Certifications Repeatable ── */
@@ -416,7 +416,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
                 Account Modes
             </a>
-            <a href="{{ route('professional.profile.index', ['tab' => 'danger']) }}" class="pf-tab-link {{ $tab === 'danger' ? 'active' : '' }}" style="color:#f87171;">
+            <a href="{{ route('professional.profile.index', ['tab' => 'danger']) }}" class="pf-tab-link {{ $tab === 'danger' ? 'active' : '' }}" style="color:var(--bad-text);">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                 Danger Zone
             </a>
@@ -539,7 +539,7 @@
                         <div style="font-size:12px; color:var(--text-muted); margin-top:8px;">Flagged as a possible home address — a business license or state registration may be requested.</div>
                     @endif
                     @if($profile->address_locked_at)
-                        <div style="font-size:12px; color:#ef4444; margin-top:8px;">Attempt limit reached — please open a support ticket with proof (utility bill or business license).</div>
+                        <div style="font-size:12px; color:var(--bad-text); margin-top:8px;">Attempt limit reached — please open a support ticket with proof (utility bill or business license).</div>
                     @endif
                 </div>
                 <form action="{{ route('professional.profile.verify-address') }}" method="POST" style="margin:0;">
@@ -671,7 +671,7 @@
                         </label>
                     </form>
                 </div>
-                @error('portfolio_image')<div style="color:#ef4444;font-size:13px;margin-top:8px;">{{ $message }}</div>@enderror
+                @error('portfolio_image')<div style="color:var(--bad-text);font-size:13px;margin-top:8px;">{{ $message }}</div>@enderror
             </div>
 
             {{-- Focal-point picker: the pro drags to choose what stays in frame. --}}
@@ -893,13 +893,13 @@
                         <div style="background:rgba(16,185,129,0.08); border-left:3px solid #10b981; padding:10px 14px; border-radius:6px; margin-top:10px; font-size:13px;">
                             Verified on {{ $verifiedAt->format('M d, Y') }}
                             @if($number) · <span style="color:var(--text-muted);">#{{ $number }}</span> @endif
-                            · <a href="{{ asset('storage/' . $doc) }}" target="_blank" style="color:#10b981;">View document</a>
+                            · <a href="{{ asset('storage/' . $doc) }}" target="_blank" style="color:var(--ok-text);">View document</a>
                         </div>
                     @elseif($status === 'pending')
                         <div style="background:rgba(245,158,11,0.08); border-left:3px solid #f59e0b; padding:10px 14px; border-radius:6px; margin-top:10px; font-size:13px;">
                             Submitted — admin review in progress.
                             @if($number) · <span style="color:var(--text-muted);">#{{ $number }}</span> @endif
-                            · <a href="{{ asset('storage/' . $doc) }}" target="_blank" style="color:#f59e0b;">View submitted document</a>
+                            · <a href="{{ asset('storage/' . $doc) }}" target="_blank" style="color:var(--warn-text);">View submitted document</a>
                         </div>
                     @endif
 
@@ -1029,7 +1029,7 @@
             </div>
 
             @if(session('error'))
-                <div style="padding:12px 16px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#ef4444;border-radius:var(--radius-sm);font-size:13px;margin-bottom:16px;">{{ session('error') }}</div>
+                <div style="padding:12px 16px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:var(--bad-text);border-radius:var(--radius-sm);font-size:13px;margin-bottom:16px;">{{ session('error') }}</div>
             @endif
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
@@ -1046,7 +1046,7 @@
                             </div>
                         </div>
                         @if($activeMode === 'client')
-                            <span style="padding:3px 10px;background:rgba(16,185,129,0.15);color:#10b981;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;">Active</span>
+                            <span style="padding:3px 10px;background:rgba(16,185,129,0.15);color:var(--ok-text);border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;">Active</span>
                         @endif
                     </div>
                     @if($hasClient)
@@ -1082,7 +1082,7 @@
                             </div>
                         </div>
                         @if($activeMode === 'supplier')
-                            <span style="padding:3px 10px;background:rgba(16,185,129,0.15);color:#10b981;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;">Active</span>
+                            <span style="padding:3px 10px;background:rgba(16,185,129,0.15);color:var(--ok-text);border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;">Active</span>
                         @endif
                     </div>
                     @if($hasSupplier)
@@ -1120,7 +1120,7 @@
         {{-- Danger Zone --}}
         @if($tab === 'danger')
         <div class="pf-card" style="border-color: rgba(239,68,68,0.3);">
-            <div class="pf-card-title" style="color:#ef4444;">Delete Account</div>
+            <div class="pf-card-title" style="color:var(--bad-text);">Delete Account</div>
             <div class="pf-card-desc">
                 Once you submit a deletion request, your account will be locked and scheduled for permanent removal in
                 <strong style="color:var(--text-primary);">60 days</strong>. You can cancel the request anytime during the grace period by
@@ -1128,7 +1128,7 @@
             </div>
 
             <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px; padding: 16px 20px; margin-bottom: 24px;">
-                <div style="font-size:13px; font-weight:600; color:#f87171; margin-bottom:8px;">What happens next?</div>
+                <div style="font-size:13px; font-weight:600; color:var(--bad-text); margin-bottom:8px;">What happens next?</div>
                 <ul style="font-size:12.5px; color:var(--text-secondary); line-height:1.8; padding-left:18px; margin:0;">
                     <li>Your account is immediately locked — no further gigs, bookings, or messages.</li>
                     <li>You will be signed out on your next request.</li>
@@ -1139,7 +1139,7 @@
             </div>
 
             @if(session('error'))
-                <div style="padding:12px 16px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#ef4444; border-radius:var(--radius-sm); font-size:13px; margin-bottom:16px;">{{ session('error') }}</div>
+                <div style="padding:12px 16px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:var(--bad-text); border-radius:var(--radius-sm); font-size:13px; margin-bottom:16px;">{{ session('error') }}</div>
             @endif
 
             <form action="{{ route('account.deletion.request') }}" method="POST" onsubmit="return confirm('Are you absolutely sure? This will schedule your account for deletion.');">
@@ -1155,7 +1155,7 @@
                         @error('current_password') <div class="pf-error">{{ $message }}</div> @enderror
                     </div>
                     <div class="pf-form-full">
-                        <label class="pf-label">Type <strong style="color:#ef4444;">DELETE</strong> to confirm *</label>
+                        <label class="pf-label">Type <strong style="color:var(--bad-text);">DELETE</strong> to confirm *</label>
                         <input type="text" name="confirm_text" class="pf-input" required placeholder="DELETE" autocomplete="off"
                                data-validate="required|pattern:^DELETE$"
                                data-error-required="Type DELETE to confirm."

@@ -21,11 +21,11 @@
     .ms-hero { display: flex; gap: 18px; align-items: center; background: linear-gradient(135deg, rgba(249,115,22,0.06), rgba(139,92,246,0.06)); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
     .ms-hero-body { flex: 1; }
     .ms-hero h2 { font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0 0 6px; }
-    .ms-hero h2 span { color: #f97316; }
+    .ms-hero h2 span { color: var(--brand-text); }
     .ms-hero p { font-size: 13px; color: var(--text-muted); margin: 0 0 14px; }
     .ms-hero-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; background: #f97316; color: #fff; border: none; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: none; }
     .ms-hero-art { width: 90px; height: 90px; border-radius: 14px; background: rgba(249,115,22,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .ms-hero-art svg { width: 44px; height: 44px; color: #f97316; }
+    .ms-hero-art svg { width: 44px; height: 44px; color: var(--brand-text); }
 
     /* 4-step process */
     .ms-process-title { font-size: 14px; font-weight: 800; color: var(--text-primary); text-align: center; margin-bottom: 14px; }
@@ -35,10 +35,10 @@
     .ms-step { border-radius: 12px; padding: 16px 14px; position: relative; border: 1px solid transparent; }
     .ms-step.s1 { background: #ecfdf5; border-color: #d1fae5; color: #047857; }
     .ms-step.s2 { background: #fff7ed; border-color: #fed7aa; color: #c2410c; }
-    .ms-step.s3 { background: #fef2f2; border-color: #fecaca; color: #dc2626; }
-    .ms-step.s4 { background: #f5f3ff; border-color: #e9d5ff; color: #7c3aed; }
+    .ms-step.s3 { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
+    .ms-step.s4 { background: #f5f3ff; border-color: #e9d5ff; color: #4338ca; }
     .ms-step-num { width: 26px; height: 26px; border-radius: 50%; background: currentColor; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; margin-bottom: 10px; }
-    .ms-step.s1 .ms-step-num { background: #10b981; }
+    .ms-step.s1 .ms-step-num { background: #047857; }
     .ms-step.s2 .ms-step-num { background: #f97316; }
     .ms-step.s3 .ms-step-num { background: #ef4444; }
     .ms-step.s4 .ms-step-num { background: #8b5cf6; }
@@ -49,9 +49,9 @@
     .ms-wizbar { display: flex; align-items: center; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
     .ms-wizstep { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; color: var(--text-muted); }
     .ms-wizstep .n { width: 22px; height: 22px; border-radius: 50%; background: var(--border-color); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; }
-    .ms-wizstep.active { color: #f97316; }
+    .ms-wizstep.active { color: var(--brand-text); }
     .ms-wizstep.active .n { background: #f97316; color: #fff; }
-    .ms-wizstep.done .n { background: #10b981; color: #fff; }
+    .ms-wizstep.done .n { background: #047857; color: #fff; }
     .ms-wizline { flex: 1; height: 1px; background: var(--border-color); min-width: 14px; }
 
     /* Form */
@@ -59,7 +59,7 @@
     .ms-scope-o { border:2px solid var(--border-color); border-radius:14px; padding:15px; cursor:pointer; background:var(--bg-card); transition:border-color .15s, background .15s; }
     .ms-scope-o:hover { border-color:#f97316; }
     .ms-scope-o.sel { border-color:#ea580c; background:rgba(249,115,22,.07); }
-    .ms-scope-code { display:inline-flex; align-items:center; font-size:11.5px; font-weight:800; letter-spacing:.3px; color:#c2410c; background:rgba(249,115,22,.14); padding:3px 10px; border-radius:999px; }
+    .ms-scope-code { display:inline-flex; align-items:center; font-size:11.5px; font-weight:800; letter-spacing:.3px; color:var(--brand-text); background:rgba(249,115,22,.14); padding:3px 10px; border-radius:999px; }
     .ms-scope-o h5 { font-size:14px; font-weight:800; color:var(--text-primary); margin:9px 0 5px; }
     .ms-scope-o p { font-size:12px; color:var(--text-muted); line-height:1.45; margin:0; }
     .ms[data-scope="single"] [data-scope-only="multi"],
@@ -75,7 +75,7 @@
     .ms-field { margin-bottom: 14px; }
     .ms-grid2 .ms-field, .ms-grid3 .ms-field { margin-bottom: 0; }
     .ms-field label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; }
-    .ms-field label .req { color: #ef4444; }
+    .ms-field label .req { color: var(--bad-text); }
     .ms-input, .ms-select, .ms-textarea {
         width: 100%; height: 42px; padding: 0 12px;
         border-radius: 9px; border: 1px solid var(--border-color);
@@ -99,13 +99,13 @@
     .ms-detail-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
     .ms-detail-table th { text-align: left; padding: 8px 10px; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
     .ms-detail-table td { padding: 9px 10px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); }
-    .ms-detail-table .yes { color: #10b981; font-weight: 700; }
-    .ms-edit-link { color: #f97316; font-weight: 600; text-decoration: none; font-size: 11px; }
+    .ms-detail-table .yes { color: var(--ok-text); font-weight: 700; }
+    .ms-edit-link { color: var(--brand-text); font-weight: 600; text-decoration: none; font-size: 11px; }
 
     .ms-form-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
     .ms-btn { padding: 10px 18px; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); display: inline-flex; align-items: center; gap: 7px; text-decoration: none; }
     .ms-btn svg { width: 14px; height: 14px; }
-    .ms-btn.green { background: #10b981; color: #fff; border-color: #10b981; }
+    .ms-btn.green { background: #047857; color: #fff; border-color: #10b981; }
     .ms-btn.coral { background: #f97316; color: #fff; border-color: #f97316; }
 
     /* Right rail */
@@ -126,8 +126,8 @@
     .ms-readiness-ring { width: 90px; height: 90px; margin: 0 auto 8px; }
     .ms-readiness-label { text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
     .ms-check-row { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--text-secondary); padding: 4px 0; }
-    .ms-check-row svg { width: 13px; height: 13px; color: #10b981; }
-    .ms-ai-row { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: #6366f1; padding: 6px 0; cursor: pointer; }
+    .ms-check-row svg { width: 13px; height: 13px; color: var(--ok-text); }
+    .ms-ai-row { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--accent-text); padding: 6px 0; cursor: pointer; }
     .ms-ai-row svg { width: 13px; height: 13px; }
     .ms-risk-row { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--text-secondary); padding: 6px 0; border-bottom: 1px dashed var(--border-color); }
     .ms-risk-row:last-child { border-bottom: 0; }
@@ -288,7 +288,7 @@
     </div>
 
     <div class="ms-rail-card">
-        <div class="ms-rail-title">Risk Monitor <span style="font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:rgba(245,158,11,0.18);color:#d97706;">Medium Risk</span></div>
+        <div class="ms-rail-title">Risk Monitor <span style="font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:rgba(245,158,11,0.18);color:var(--warn-text);">Medium Risk</span></div>
         <div class="ms-risk-row"><span class="ms-risk-dot" style="background:#f59e0b;"></span>Weather risk on event day · 40% chance of rain</div>
         <div class="ms-risk-row"><span class="ms-risk-dot" style="background:#10b981;"></span>Backup generator not added · Recommended</div>
         <div class="ms-risk-row"><span class="ms-risk-dot" style="background:#ef4444;"></span>Vendor availability tight · Book soon</div>

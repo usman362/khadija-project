@@ -208,10 +208,12 @@
             @foreach($bookings as $booking)
                 @php
                     $colors = [
-                        'requested' => ['bg' => 'var(--accent-yellow)', 'soft' => 'var(--accent-yellow-soft)'],
-                        'confirmed' => ['bg' => 'var(--accent-green)', 'soft' => 'var(--accent-green-soft)'],
-                        'completed' => ['bg' => 'var(--accent-blue)', 'soft' => 'var(--accent-blue-soft)'],
-                        'cancelled' => ['bg' => 'var(--accent-red)', 'soft' => 'var(--accent-red-soft)'],
+                        // `bg` is a solid fill sitting under white initials, so it uses the
+                        // deep step of each ramp; `soft` stays the light tint behind body text.
+                        'requested' => ['bg' => '#b45309', 'soft' => 'var(--accent-yellow-soft)'],
+                        'confirmed' => ['bg' => '#047857', 'soft' => 'var(--accent-green-soft)'],
+                        'completed' => ['bg' => '#4338ca', 'soft' => 'var(--accent-blue-soft)'],
+                        'cancelled' => ['bg' => '#b91c1c', 'soft' => 'var(--accent-red-soft)'],
                     ];
                     $c = $colors[$booking->status] ?? $colors['requested'];
                     $counterparty = $booking->client?->name ?? 'Client';
