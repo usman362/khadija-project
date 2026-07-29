@@ -245,28 +245,77 @@
 </style>
 @endpush
 
+@php
+    /* ── Editable content ──────────────────────────────────────────────
+       Every read below names the shipped wording as its fallback, so an
+       un-seeded install, a section an admin has emptied, or one switched off
+       falls back to the original copy instead of a blank page. */
+
+    /** A field off a section, or the fallback. */
+    $t = function (string $section, string $field, string $fallback = '') use ($cms) {
+        $v = $cms[$section]?->{$field};
+        return filled($v) ? $v : $fallback;
+    };
+
+    /** A repeater's rows, or the fallback list when it is empty. */
+    $rows = function (string $section, string $key, array $fallback = []) use ($cms) {
+        $v = $cms[$section]?->item($key, []);
+        return filled($v) ? $v : $fallback;
+    };
+
+    /** One row's field, falling back to the shipped value at that index. */
+    $rf = fn (array $row, string $key, string $fallback = '') => filled($row[$key] ?? null) ? $row[$key] : $fallback;
+
+    /** A section's image, or the fallback URL. */
+    $img = fn (string $section, string $fallback) => $cms[$section]?->imageUrl($fallback) ?: $fallback;
+
+    /** A repeater row's image — stored path or pass-through URL. */
+    $rowImg = function (?string $path, string $fallback) {
+        if (! filled($path)) return $fallback;
+        return str_starts_with($path, 'http') ? $path : \Illuminate\Support\Facades\Storage::url($path);
+    };
+
+    /** Headline mark-up: "|" breaks a line, *stars* go orange, _underscores_ blue.
+        A tiny convention beats letting an admin paste raw HTML into a heading. */
+    $headline = function (string $text) {
+        $out = e($text);
+        $out = preg_replace('/\*(.+?)\*/', '<span class="o">$1</span>', $out);
+        $out = preg_replace('/_(.+?)_/', '<span class="b">$1</span>', $out);
+        return str_replace('|', '<br>', $out);
+    };
+
+    $shown = fn (string $section) => (bool) ($cms[$section] ?? null);
+@endphp
+
 {{-- ════════════ HERO ════════════ --}}
 <section class="lp-hero">
     <div class="lp-container lp-hero-grid">
         <div class="lp-hero-left">
-            <h1 class="lp-h1">Where Events<br>Come to Life.<br><span class="o">Your Vision.</span> <span class="b">Our Network.</span></h1>
-            <p class="lp-sub">The all-in-one marketplace to connect with verified event professionals or find top talent to plan, manage, and deliver unforgettable events.</p>
+            <h1 class="lp-h1">{!! $headline($t('hero', 'heading', 'Where Events|Come to Life.|*Your Vision.* _Our Network._')) !!}</h1>
+            <p class="lp-sub">{{ $t('hero', 'subheading', 'The all-in-one marketplace to connect with verified event professionals or find top talent to plan, manage, and deliver unforgettable events.') }}</p>
 
+            @php
+                /* The two cards are fixed in number and colour — only their words
+                   and photos are editable, so the row can never become three. */
+                $roleDefaults = [
+                    ['tone' => 'blue',   'role' => 'professional', 'title' => "I'm a Professional", 'text' => 'Grow your business and get discovered', 'cta' => 'Join as a Pro',
+                     'image' => 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=200&q=80&auto=format&fit=crop'],
+                    ['tone' => 'orange', 'role' => 'client',       'title' => "I'm a Client",       'text' => 'Find the perfect team for your event', 'cta' => 'Find Talent',
+                     'image' => 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop'],
+                ];
+                $roleRows = $rows('hero', 'roles', []);
+            @endphp
             <div class="lp-roles">
-                <div class="lp-role lp-role-blue">
-                    <img class="lp-role-img" src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=200&q=80&auto=format&fit=crop" alt="">
-                    <h3>I'm a Professional</h3>
-                    <p>Grow your business and get discovered</p>
-                    <a href="{{ route('register', ['role' => 'professional']) }}" class="lp-role-btn">Join as a Pro
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
-                </div>
-                <div class="lp-role lp-role-orange">
-                    <img class="lp-role-img" src="https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=200&q=80&auto=format&fit=crop" alt="">
-                    <h3>I'm a Client</h3>
-                    <p>Find the perfect team for your event</p>
-                    <a href="{{ route('register', ['role' => 'client']) }}" class="lp-role-btn">Find Talent
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
-                </div>
+                @foreach($roleDefaults as $i => $d)
+                    @php $r = $roleRows[$i] ?? []; @endphp
+                    <div class="lp-role lp-role-{{ $d['tone'] }}">
+                        <img class="lp-role-img" src="{{ $rowImg($r['image'] ?? null, $d['image']) }}" alt="">
+                        <h3>{{ $rf($r, 'title', $d['title']) }}</h3>
+                        <p>{{ $rf($r, 'text', $d['text']) }}</p>
+                        <a href="{{ route('register', ['role' => $d['role']]) }}" class="lp-role-btn">{{ $rf($r, 'cta', $d['cta']) }}
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+                    </div>
+                @endforeach
             </div>
 
             <div class="lp-trustbadge">
@@ -277,17 +326,17 @@
                     <img src="https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=80&q=80&auto=format&fit=crop" alt="">
                     <span>+</span>
                 </div>
-                <p><b>Trusted by event professionals &amp; clients</b><br>across the U.S.</p>
+                <p><b>{{ $cms['hero']?->item('trust_text') ?: 'Trusted by event professionals & clients' }}</b><br>{{ $cms['hero']?->item('trust_sub') ?: 'across the U.S.' }}</p>
             </div>
         </div>
 
         <div class="lp-hero-right">
-            <img class="lp-hero-photo" src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=900&q=80&auto=format&fit=crop" alt="Elegant event venue">
+            <img class="lp-hero-photo" src="{{ $img('hero', 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=900&q=80&auto=format&fit=crop') }}" alt="{{ $t('hero', 'heading') ? 'Event venue' : 'Elegant event venue' }}">
 
             {{-- Booking confirmed pill --}}
             <div class="lp-fcard lp-fc-confirm">
                 <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
-                <div><b>Booking Confirmed! 🎉</b><small>Your event is in great hands.</small></div>
+                <div><b>{{ $cms['hero']?->item('badge_title') ?: 'Booking Confirmed! 🎉' }}</b><small>{{ $cms['hero']?->item('badge_text') ?: 'Your event is in great hands.' }}</small></div>
             </div>
         </div>
     </div>
@@ -305,12 +354,14 @@
                 ['#f97316', '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>', 'Built for Events', 'Smart tools to plan with confidence'],
             ];
         @endphp
-        @foreach($trust as [$col, $path, $title, $desc])
+        @php $trustRows = $rows('trust_bar', 'items', []); @endphp
+        @foreach($trust as $i => [$col, $path, $title, $desc])
+            @php $r = $trustRows[$i] ?? []; @endphp
             <div class="lp-trust-item">
                 <span class="lp-trust-ic" style="background:linear-gradient(135deg,{{ $col }},{{ $col }}cc);box-shadow:0 5px 12px {{ $col }}40,inset 0 1.5px 0 rgba(255,255,255,0.4);">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">{!! $path !!}</svg>
                 </span>
-                <div><b>{{ $title }}</b><p>{!! $desc !!}</p></div>
+                <div><b>{{ $rf($r, 'title', $title) }}</b><p>{{ $rf($r, 'text', strip_tags(html_entity_decode($desc))) }}</p></div>
             </div>
         @endforeach
     </div>
@@ -320,8 +371,8 @@
 <section class="lp-section">
     <div class="lp-container">
         <div class="lp-cats-head">
-            <h2 class="lp-h2">Explore Popular Categories</h2>
-            <a href="{{ route('events-categories') }}" class="lp-viewall">View all categories
+            <h2 class="lp-h2">{{ $t('categories', 'heading', 'Explore Popular Categories') }}</h2>
+            <a href="{{ route('events-categories') }}" class="lp-viewall">{{ $t('categories', 'body', 'View all categories') }}
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         </div>
         <div class="lp-cat-wrap">
@@ -343,7 +394,7 @@
 <section class="lp-section lp-section-soft">
     <div class="lp-container">
         <div class="lp-head">
-            <h2 class="lp-h2">How GigResource Works
+            <h2 class="lp-h2">{{ $t('how_it_works', 'heading', 'How GigResource Works') }}
                 <span class="ic3d" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
             </h2>
         </div>
@@ -357,7 +408,9 @@
                     ['#fb923c', '#ea580c', '5', '<path d="M8 21h8m-4-4v4M5 3h14l-1 9a6 6 0 0 1-12 0L5 3z"/><path d="M5 7H3a2 2 0 0 0 0 4h2M19 7h2a2 2 0 0 1 0 4h-2"/>', 'Deliver &amp; Celebrate', 'Enjoy a seamless event experience.'],
                 ];
             @endphp
+            @php $stepRows = $rows('how_it_works', 'steps', []); @endphp
             @foreach($steps as $i => [$c1, $c2, $num, $path, $title, $desc])
+                @php $r = $stepRows[$i] ?? []; @endphp
                 <div class="lp-step">
                     <div class="lp-step-ic" style="background:linear-gradient(140deg,{{ $c1 }},{{ $c2 }});box-shadow:0 12px 24px {{ $c2 }}40,inset 0 2px 0 rgba(255,255,255,0.4);">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">{!! $path !!}</svg>
@@ -366,8 +419,8 @@
                     @if($i < 4)
                         <div class="lp-step-line"><svg viewBox="0 0 100 14" preserveAspectRatio="none"><line x1="0" y1="7" x2="100" y2="7" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="5 5"/></svg></div>
                     @endif
-                    <h4>{!! $title !!}</h4>
-                    <p>{!! $desc !!}</p>
+                    <h4>{{ $rf($r, 'title', html_entity_decode($title)) }}</h4>
+                    <p>{{ $rf($r, 'text', html_entity_decode($desc)) }}</p>
                 </div>
             @endforeach
         </div>
@@ -378,8 +431,8 @@
 <section class="lp-section">
     <div class="lp-container">
         <div class="lp-head">
-            <h2 class="lp-h2">Choose Your Level of Assistance</h2>
-            <p class="lp-lead">You're in control. Each level unlocks more capability — from fully manual to fully automated.</p>
+            <h2 class="lp-h2">{{ $t('assistance', 'heading', 'Choose Your Level of Assistance') }}</h2>
+            <p class="lp-lead">{{ $t('assistance', 'subheading', "You're in control. Each level unlocks more capability — from fully manual to fully automated.") }}</p>
         </div>
         <div class="lp-assist-grid">
             <div class="lp-acard">
@@ -439,7 +492,7 @@
     <div class="lp-container">
         <div class="lp-why-grid">
             <div class="lp-why-list">
-                <h3>Why Choose GigResource?</h3>
+                <h3>{{ $t('why_choose', 'heading', 'Why Choose GigResource?') }}</h3>
                 @php
                     $why = [
                         ['<path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/>', 'Quality You Can Trust', 'Every professional is verified &amp; reviewed'],
@@ -448,10 +501,12 @@
                         ['<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>', 'Flexible for Every Event', 'Any type, any size, in your area'],
                     ];
                 @endphp
-                @foreach($why as [$path, $t, $d])
+                @php $whyRows = $rows('why_choose', 'items', []); @endphp
+                @foreach($why as $i => [$path, $wt, $wd])
+                    @php $r = $whyRows[$i] ?? []; @endphp
                     <div class="lp-why-item">
                         <span class="lp-why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">{!! $path !!}</svg></span>
-                        <div><b>{!! $t !!}</b><p>{!! $d !!}</p></div>
+                        <div><b>{{ $rf($r, 'title', html_entity_decode($wt)) }}</b><p>{{ $rf($r, 'text', html_entity_decode($wd)) }}</p></div>
                     </div>
                 @endforeach
             </div>
@@ -472,7 +527,7 @@
             @endif
 
             <div class="lp-testi">
-                <h3>Loved by Our Community</h3>
+                <h3>{{ $t('testimonials', 'heading', 'Loved by Our Community') }}</h3>
                 <div class="lp-testi-card">
                     <div class="lp-testi-q">&ldquo;</div>
                     @if($featuredReview)
@@ -510,12 +565,14 @@
                     ['<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>', 'SUPPORT', 'Help Center', 'Guides &amp; help when you need it'],
                 ];
             @endphp
-            @foreach($vbTiles as [$icon, $word, $label, $sub])
+            @php $vbRows = $rows('value_band', 'items', []); @endphp
+            @foreach($vbTiles as $i => [$icon, $word, $label, $sub])
+                @php $r = $vbRows[$i] ?? []; @endphp
                 <div class="lp-vb-tile">
                     <span class="lp-vb-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">{!! $icon !!}</svg></span>
-                    <b>{{ $word }}</b>
-                    <span class="lp-vb-label">{!! $label !!}</span>
-                    <span class="lp-vb-sub">{!! $sub !!}</span>
+                    <b>{{ $rf($r, 'title', $word) }}</b>
+                    <span class="lp-vb-label">{{ $rf($r, 'text', html_entity_decode($label)) }}</span>
+                    <span class="lp-vb-sub">{{ $rf($r, 'note', html_entity_decode($sub)) }}</span>
                 </div>
             @endforeach
         </div>
@@ -526,8 +583,8 @@
 <section class="lp-section" id="pricing">
     <div class="lp-container">
         <div class="lp-head">
-            <h2 class="lp-h2">Simple, Transparent Pricing</h2>
-            <p class="lp-lead">Choose the plan that's right for you.</p>
+            <h2 class="lp-h2">{{ $t('pricing', 'heading', 'Simple, Transparent Pricing') }}</h2>
+            <p class="lp-lead">{{ $t('pricing', 'subheading', "Choose the plan that's right for you.") }}</p>
         </div>
         <div class="lp-pricing-grid">
             @foreach($plans as $index => $plan)
@@ -578,18 +635,19 @@
 <div class="lp-cta-wrap">
     <div class="lp-container">
         <div class="lp-cta">
-            <img class="bg" src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=1200&q=80&auto=format&fit=crop" alt="">
+            <img class="bg" src="{{ $img('cta_banner', 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=1200&q=80&auto=format&fit=crop') }}" alt="">
             <div class="lp-cta-txt">
-                <h2>Ready to Create Unforgettable Events?</h2>
-                <p>Join thousands of professionals and clients who trust GigResource to bring their events to life.</p>
+                <h2>{!! $headline($t('cta_banner', 'heading', 'Ready to Create|Unforgettable Events?')) !!}</h2>
+                <p>{{ $t('cta_banner', 'subheading', 'Join thousands of professionals and clients who trust GigResource to bring their events to life.') }}</p>
             </div>
+            @php $ctaBtns = $rows('cta_banner', 'buttons', []); @endphp
             <div class="lp-cta-btns">
                 <a href="{{ route('register', ['role' => 'professional']) }}" class="lp-btn lp-btn-white">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-                    Join as a Professional</a>
+                    {{ $rf($ctaBtns[0] ?? [], 'title', 'Join as a Professional') }}</a>
                 <a href="{{ route('register', ['role' => 'client']) }}" class="lp-btn lp-btn-orange">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    Hire Top Talent</a>
+                    {{ $rf($ctaBtns[1] ?? [], 'title', 'Hire Top Talent') }}</a>
             </div>
         </div>
     </div>

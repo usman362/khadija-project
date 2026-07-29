@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Faq;
 use App\Models\MembershipPlan;
+use App\Models\PageSection;
 use App\Models\Review;
 use App\Models\Setting;
 use Illuminate\View\View;
@@ -41,15 +42,22 @@ class LandingPageController extends Controller
             ->latest()
             ->first();
 
-        // Promo video — URL and poster come from settings so they can be
-        // swapped without a deploy. `homepage.video_url` empty means no video
-        // is configured, and the section renders as a still with no play
-        // control rather than a button that opens an empty player.
+        // Editable content, keyed by section. `cms('hero')` in the template
+        // returns the row or null; every read carries the shipped wording as a
+        // fallback, so a missing or emptied section degrades to the original
+        // copy rather than to a blank page.
+        $cms = collect(array_keys(config('page-sections.landing', [])))
+            ->mapWithKeys(fn ($key) => [$key => PageSection::block("landing.{$key}")]);
+
+        // Video: still readable from the older settings keys, so an install that
+        // set them before the content editor existed keeps working.
+        $videoSection = $cms['video'] ?? null;
         $video = [
-            'url'    => trim((string) Setting::get('homepage.video_url', '')),
-            'poster' => trim((string) Setting::get('homepage.video_poster', ''))
-                ?: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80&auto=format&fit=crop',
-            'title'  => trim((string) Setting::get('homepage.video_title', '')) ?: 'GigResource',
+            'url'    => trim((string) ($videoSection?->body ?: Setting::get('homepage.video_url', ''))),
+            'poster' => $videoSection?->imageUrl()
+                ?: (trim((string) Setting::get('homepage.video_poster', ''))
+                    ?: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80&auto=format&fit=crop'),
+            'title'  => trim((string) ($videoSection?->heading ?: Setting::get('homepage.video_title', ''))) ?: 'GigResource',
         ];
 
         return view('landing', compact(
@@ -58,7 +66,8 @@ class LandingPageController extends Controller
             'categories',
             'showcaseCategories',
             'featuredReview',
-            'video'
+            'video',
+            'cms'
         ));
     }
 

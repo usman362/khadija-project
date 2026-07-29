@@ -895,6 +895,14 @@ Route::middleware('auth')->group(function () {
         Route::patch('/membership-plans/{membership_plan}', [AdminMembershipPlanController::class, 'update'])->middleware('permission:membership_plans.update')->name('app.admin.membership-plans.update');
         Route::delete('/membership-plans/{membership_plan}', [AdminMembershipPlanController::class, 'destroy'])->middleware('permission:membership_plans.delete')->name('app.admin.membership-plans.destroy');
 
+        // Website Content — the words and pictures on the public pages.
+        Route::get('/content', [\App\Http\Controllers\Dashboard\AdminContentController::class, 'index'])
+            ->name('app.admin.content.index');
+        Route::get('/content/{key}', [\App\Http\Controllers\Dashboard\AdminContentController::class, 'edit'])
+            ->name('app.admin.content.edit');
+        Route::post('/content/{key}', [\App\Http\Controllers\Dashboard\AdminContentController::class, 'update'])
+            ->name('app.admin.content.update');
+
         // Settings
         Route::get('/settings/payments', [AdminSettingsController::class, 'paymentSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.payments');
         Route::post('/settings/payments', [AdminSettingsController::class, 'updatePaymentSettings'])->middleware('permission:payment_settings.manage')->name('app.admin.settings.payments.update');

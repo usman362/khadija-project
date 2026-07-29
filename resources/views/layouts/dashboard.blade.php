@@ -271,6 +271,13 @@
                             </a>
                         </li>
 
+                        <li class="nav-item {{ request()->routeIs('app.admin.content.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.admin.content.index') }}" class="nav-link">
+                                <i class="link-icon ic-orange" data-lucide="layout-template"></i>
+                                <span class="link-title">Website Content</span>
+                            </a>
+                        </li>
+
                         <li class="nav-item {{ request()->routeIs('app.admin.faqs.*') ? 'active' : '' }}">
                             <a href="{{ route('app.admin.faqs.index') }}" class="nav-link">
                                 <i class="link-icon ic-cyan" data-lucide="help-circle"></i>
