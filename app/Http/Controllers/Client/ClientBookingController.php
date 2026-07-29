@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\AgreementLog;
 use App\Models\Booking;
-use App\Models\Event;
+use App\Models\Payment;
 use App\Models\Review;
 use App\Notifications\ProposalAccepted;
 use App\Notifications\ProposalCancelled;
@@ -15,102 +15,95 @@ use Illuminate\View\View;
 
 class ClientBookingController extends Controller
 {
+    /** Tab key => [label, description]. The tabs are the only status filter. */
+    public const TABS = [
+        'all'         => 'All',
+        'upcoming'    => 'Upcoming',
+        'in_progress' => 'In Progress',
+        'pending'     => 'Pending',
+        'completed'   => 'Completed',
+        'cancelled'   => 'Cancelled',
+    ];
+
     public function index(Request $request): View
     {
         $user = $request->user();
 
-        // Stats
-        $stats = [
-            'all' => Booking::where('client_id', $user->id)->count(),
-            'upcoming' => Booking::where('client_id', $user->id)->where('status', 'confirmed')
-                ->whereHas('event', fn ($q) => $q->where('starts_at', '>', now()))->count(),
-            'in_progress' => Booking::where('client_id', $user->id)->where('status', 'confirmed')
-                ->whereHas('event', fn ($q) => $q->where('starts_at', '<=', now())->where('ends_at', '>=', now()))->count(),
-            'pending' => Booking::where('client_id', $user->id)->where('status', 'requested')->count(),
-            'completed' => Booking::where('client_id', $user->id)->where('status', 'completed')->count(),
-            'cancelled' => Booking::where('client_id', $user->id)->where('status', 'cancelled')->count(),
+        $counts = [
+            'all'         => (clone $this->base($user))->count(),
+            'upcoming'    => (clone $this->base($user))->tap($this->scope('upcoming'))->count(),
+            'in_progress' => (clone $this->base($user))->tap($this->scope('in_progress'))->count(),
+            'pending'     => (clone $this->base($user))->tap($this->scope('pending'))->count(),
+            'completed'   => (clone $this->base($user))->tap($this->scope('completed'))->count(),
+            'cancelled'   => (clone $this->base($user))->tap($this->scope('cancelled'))->count(),
         ];
 
-        // Build query with filters
-        $query = Booking::where('client_id', $user->id)
-            ->with(['event:id,title,starts_at,ends_at', 'event.categories:id,name', 'supplier:id,name'])
-            ->latest();
-
-        // Status tab filter
-        $tab = $request->string('tab')->toString() ?: 'all';
-        switch ($tab) {
-            case 'upcoming':
-                $query->where('status', 'confirmed')
-                    ->whereHas('event', fn ($q) => $q->where('starts_at', '>', now()));
-                break;
-            case 'in_progress':
-                $query->where('status', 'confirmed')
-                    ->whereHas('event', fn ($q) => $q->where('starts_at', '<=', now())->where('ends_at', '>=', now()));
-                break;
-            case 'pending':
-                $query->where('status', 'requested');
-                break;
-            case 'completed':
-                $query->where('status', 'completed');
-                break;
-            case 'cancelled':
-                $query->where('status', 'cancelled');
-                break;
+        $tab = $request->string('tab')->toString();
+        if (! array_key_exists($tab, self::TABS)) {
+            $tab = 'all';
         }
 
-        // Search
-        if ($request->filled('search')) {
-            $search = $request->string('search')->toString();
-            $query->where(function ($q) use ($search) {
-                $q->whereHas('event', fn ($eq) => $eq->where('title', 'like', "%{$search}%"))
-                  ->orWhereHas('supplier', fn ($sq) => $sq->where('name', 'like', "%{$search}%"));
+        $query = $this->base($user)
+            ->with(['event:id,title,starts_at,ends_at,location', 'event.categories:id,name', 'supplier:id,name'])
+            ->latest();
+
+        $query->tap($this->scope($tab));
+
+        if ($request->filled('q')) {
+            $q = $request->string('q')->toString();
+            $query->where(function ($w) use ($q) {
+                $w->whereHas('event', fn ($e) => $e->where('title', 'like', "%{$q}%"))
+                  ->orWhereHas('supplier', fn ($s) => $s->where('name', 'like', "%{$q}%"));
             });
         }
 
-        $bookings = $query->paginate(12)->withQueryString();
+        $bookings = $query->paginate(10)->withQueryString();
 
-        // Which bookings on this page has the client already reviewed? Keeps
-        // the "Leave a Review" CTA from appearing twice on the same card.
+        // Already-reviewed bookings, so the review CTA doesn't offer a second one.
         $reviewedBookingIds = Review::where('reviewer_id', $user->id)
             ->whereIn('booking_id', $bookings->pluck('id'))
             ->pluck('booking_id')
             ->all();
 
-        // ── Financial roll-up for the right rail. Uses the agreed price
-        // column when present, falls back to 0 so the math never NaNs.
-        $priceCol = \Illuminate\Support\Facades\Schema::hasColumn('bookings', 'total_amount')
-            ? 'total_amount'
-            : (\Illuminate\Support\Facades\Schema::hasColumn('bookings', 'agreed_price') ? 'agreed_price' : null);
-        $totalValue = $priceCol
-            ? (float) Booking::where('client_id', $user->id)->sum($priceCol)
-            : 0;
+        // Deposits are Payments tagged `booking_deposit`, carrying the event and
+        // supplier they were taken for — that pair is what identifies a booking.
+        // Anything not matched simply has no deposit shown; nothing is guessed.
+        $deposits = Payment::where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->get()
+            ->filter(fn ($p) => ($p->metadata['kind'] ?? null) === 'booking_deposit')
+            ->keyBy(fn ($p) => ($p->metadata['event_id'] ?? '') . ':' . ($p->metadata['supplier_id'] ?? ''));
+
+        $agreedTotal = (float) $this->base($user)->whereNotIn('status', ['cancelled'])->sum('price');
+        $depositsPaid = (float) $deposits->sum('amount');
+
         $financial = [
-            'total_value'     => $totalValue,
-            'locked_escrow'   => round($totalValue * 0.45),
-            'paid_out_ytd'    => round($totalValue * 0.55),
-            'pending_payouts' => round($totalValue * 0.12),
+            'agreed_total'  => $agreedTotal,
+            'deposits_paid' => $depositsPaid,
+            'outstanding'   => max(0, $agreedTotal - $depositsPaid),
         ];
 
-        // ── Upcoming milestones — synthesised from confirmed bookings whose
-        // event start date is within the next 60 days. Replace with a real
-        // milestones table once that schema is in.
-        $upcomingMilestones = Booking::where('client_id', $user->id)
+        // Real rows, not a synthesised schedule: confirmed bookings whose event
+        // has a start date still ahead of us.
+        $nextEvents = $this->base($user)
             ->where('status', 'confirmed')
-            ->whereHas('event', fn ($q) => $q->whereBetween('starts_at', [now(), now()->addDays(60)]))
-            ->with(['event:id,title,starts_at'])
-            ->orderBy('updated_at', 'desc')
-            ->take(5)
+            ->whereHas('event', fn ($q) => $q->whereNotNull('starts_at')->where('starts_at', '>=', now()))
+            ->with('event:id,title,starts_at')
             ->get()
-            ->map(fn ($b, $i) => [
-                'type'  => ['Setup Day', 'Deposit Due', 'Inspection Window', 'Walkthrough', 'Sign Off'][$i % 5],
-                'event' => $b->event?->title ?? 'Booking',
-                'date'  => $b->event?->starts_at?->format('M d, Y') ?? '—',
-                'count' => $i + 1,
-            ]);
+            ->sortBy(fn ($b) => $b->event?->starts_at)
+            ->take(4)
+            ->values();
 
-        return view('client.bookings.index', compact(
-            'stats', 'bookings', 'tab', 'reviewedBookingIds', 'financial', 'upcomingMilestones'
-        ));
+        return view('client.bookings.index', [
+            'tabs'               => self::TABS,
+            'tab'                => $tab,
+            'counts'             => $counts,
+            'bookings'           => $bookings,
+            'reviewedBookingIds' => $reviewedBookingIds,
+            'deposits'           => $deposits,
+            'financial'          => $financial,
+            'nextEvents'         => $nextEvents,
+        ]);
     }
 
     public function updateStatus(Request $request, Booking $booking): RedirectResponse
@@ -156,5 +149,32 @@ class ClientBookingController extends Controller
         }
 
         return back()->with('status', 'Booking status updated.');
+    }
+
+    // ── internals ───────────────────────────────────────────────────
+
+    private function base($user)
+    {
+        return Booking::where('client_id', $user->id);
+    }
+
+    /**
+     * One definition of each tab, used for both the counts and the list so the
+     * number on a tab always matches what opening it shows.
+     */
+    private function scope(string $tab): \Closure
+    {
+        return function ($query) use ($tab) {
+            match ($tab) {
+                'upcoming' => $query->where('status', 'confirmed')
+                    ->whereHas('event', fn ($q) => $q->where('starts_at', '>', now())),
+                'in_progress' => $query->where('status', 'confirmed')
+                    ->whereHas('event', fn ($q) => $q->where('starts_at', '<=', now())->where('ends_at', '>=', now())),
+                'pending'   => $query->where('status', 'requested'),
+                'completed' => $query->where('status', 'completed'),
+                'cancelled' => $query->where('status', 'cancelled'),
+                default     => $query,
+            };
+        };
     }
 }
