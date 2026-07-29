@@ -85,8 +85,15 @@ class LandingPageController extends Controller
             ->limit(8)
             ->get(['name', 'slug', 'thumbnail', 'cover_image'])
             ->map(fn (Category $c) => [
-                'name'  => $c->name,
-                'image' => asset('storage/' . ($c->cover_image ?: $c->thumbnail)),
+                'name' => $c->name,
+                // Thumbnail first. The two columns are not what their names
+                // suggest: `thumbnail` is the square 300×300 category artwork
+                // every category has, and `cover_image` is a wide 509×149 strip
+                // that only one category carries. Preferring the cover meant
+                // that single tile rendered as a cropped letterbox while the
+                // other 48 were square — the odd one out in the row. This is
+                // also the order /events-categories already uses.
+                'image' => asset('storage/' . ($c->thumbnail ?: $c->cover_image)),
                 'link'  => route('public.category', $c->slug),
             ])
             ->all();
