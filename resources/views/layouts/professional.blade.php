@@ -269,18 +269,13 @@
         [data-theme="light"] .cl-calendar-day:hover {
             background: rgba(0, 0, 0, 0.04);
         }
-        /* Unstyled inline elements follow the light theme's text colour.
-           Scoped to :not([class]) deliberately: as a bare `[data-theme="light"] span`
-           this outweighed every component class (0,2,1 vs 0,1,0) and stripped the
-           colour off anything built from a span — avatar initials, status pills,
-           badge counts — leaving them the same colour as whatever they sat on.
-           Elements that carry a class own their colour; only bare ones inherit. */
-        [data-theme="light"] p:not([class]),
-        [data-theme="light"] span:not([class]),
-        [data-theme="light"] td:not([class]),
-        [data-theme="light"] li:not([class]) {
-            color: inherit;
-        }
+        /* There used to be a blanket `[data-theme="light"] p, span, td, li
+           { color: inherit }` here. At 0,2,1 it outranked every component rule:
+           class-styled elements lost their colour, and narrowing it to
+           :not([class]) only moved the problem to bare elements a component
+           styles by descendant selector — the white <p> in the topbar banner
+           came out navy on blue. Components own their own colour; anything that
+           genuinely needs the theme's text colour uses var(--text-*). */
         [data-theme="light"] .cl-content p {
             color: #334155;
         }
@@ -507,10 +502,14 @@
         /* ══════ Professional topbar — blue welcome banner ══════ */
         .pro-topbar { display: flex; align-items: flex-start; gap: 16px; padding: 14px 26px 4px; position: sticky; top: 0; z-index: 100; background: var(--bg-primary); }
         .pro-banner { flex: 1; min-width: 0; display: flex; align-items: center; gap: 16px; background: linear-gradient(120deg, #3b82f6 0%, #2563eb 100%); border-radius: 14px; padding: 13px 18px; box-shadow: 0 6px 18px rgba(37,99,235,0.20); }
-        .pro-banner-avatar { width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 16px; }
+        /* Solid, not translucent. A 20%-white disc over the blue lands close enough
+           to the banner that white initials on it measured 3.6:1 — the letter read as
+           a smudge. Inverted: white disc, blue letter, 5.6:1. */
+        .pro-banner-avatar { width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0; background: #fff; border: 2px solid rgba(255,255,255,0.55); display: flex; align-items: center; justify-content: center; color: #1d4ed8; font-weight: 800; font-size: 16px; }
         .pro-banner-text { flex-shrink: 0; }
         .pro-banner-text h1 { font-size: 17px; font-weight: 800; color: #fff; margin: 0; }
-        .pro-banner-text p { font-size: 11.5px; color: rgba(255,255,255,0.82); margin: 2px 0 0; }
+        /* 0.82 alpha put this at 4.2:1 at 11.5px — under the 4.5 small-text bar. */
+        .pro-banner-text p { font-size: 11.5px; color: rgba(255,255,255,0.95); margin: 2px 0 0; }
         .pro-banner-search { flex: 1; min-width: 120px; position: relative; margin-left: 6px; }
         .pro-banner-search > svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); }
         .pro-banner-search input { width: 100%; height: 42px; border-radius: 10px; border: none; padding: 0 44px 0 40px; background: #fff; font-size: 13px; color: #1e293b; outline: none; }

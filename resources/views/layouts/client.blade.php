@@ -280,18 +280,13 @@
         [data-theme="light"] .cl-calendar-day:hover {
             background: rgba(0, 0, 0, 0.04);
         }
-        /* Unstyled inline elements follow the light theme's text colour.
-           Scoped to :not([class]) deliberately: as a bare `[data-theme="light"] span`
-           this outweighed every component class (0,2,1 vs 0,1,0) and stripped the
-           colour off anything built from a span — avatar initials, status pills,
-           badge counts — leaving them the same colour as whatever they sat on.
-           Elements that carry a class own their colour; only bare ones inherit. */
-        [data-theme="light"] p:not([class]),
-        [data-theme="light"] span:not([class]),
-        [data-theme="light"] td:not([class]),
-        [data-theme="light"] li:not([class]) {
-            color: inherit;
-        }
+        /* There used to be a blanket `[data-theme="light"] p, span, td, li
+           { color: inherit }` here. At 0,2,1 it outranked every component rule:
+           class-styled elements lost their colour, and narrowing it to
+           :not([class]) only moved the problem to bare elements a component
+           styles by descendant selector — the white <p> in the topbar banner
+           came out navy on blue. Components own their own colour; anything that
+           genuinely needs the theme's text colour uses var(--text-*). */
         [data-theme="light"] .cl-content p {
             color: #334155;
         }
@@ -634,10 +629,12 @@
         /* ══════ Client topbar — orange welcome banner ══════ */
         .cl-topbar { display: flex; align-items: center; gap: 16px; padding: 12px 26px 2px; position: sticky; top: 0; z-index: 100; background: var(--bg-primary); }
         .cl-banner { flex: 1; min-width: 0; display: flex; align-items: center; gap: 16px; background: linear-gradient(120deg, #fb923c 0%, #f97316 50%, #ea580c 100%); border-radius: 14px; padding: 12px 18px; box-shadow: 0 6px 20px rgba(249,115,22,0.25); }
-        .cl-banner-avatar { width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0; background: rgba(255,255,255,0.25); border: 2px solid rgba(255,255,255,0.45); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 16px; }
+        /* Same inversion as the professional banner — a translucent white disc over
+           the orange left the initial at 2.2:1. */
+        .cl-banner-avatar { width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0; background: #fff; border: 2px solid rgba(255,255,255,0.55); display: flex; align-items: center; justify-content: center; color: #c2410c; font-weight: 800; font-size: 16px; }
         .cl-banner-text { flex-shrink: 0; }
         .cl-banner-text h1 { font-size: 17px; font-weight: 800; color: #fff; margin: 0; line-height: 1.2; }
-        .cl-banner-text p { font-size: 11.5px; color: rgba(255,255,255,0.85); margin: 2px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 340px; }
+        .cl-banner-text p { font-size: 11.5px; color: #fff; margin: 2px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 340px; }
         .cl-banner-search { flex: 1; min-width: 120px; position: relative; margin-left: 6px; }
         .cl-banner-search > svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); pointer-events: none; z-index: 1; }
         .cl-banner-search form { margin: 0; }
