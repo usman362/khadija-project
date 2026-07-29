@@ -83,7 +83,9 @@ class ClientFinalizeController extends Controller
             'event'     => $finalization->event,
             'pro'       => $finalization->supplier,
             'bid'       => $finalization->bid,
-            'clientFee' => 2.99,
+            // One source for the fee, so the screen can never quote a number the
+            // charge does not use.
+            'clientFee' => (float) config('payments.client_request_fee', 0),
             'proRate'   => Commission::rateFor($finalization->supplier),
             // Which mode a charge would run in right now, so the screen can say
             // so plainly instead of implying real money moved.
@@ -264,6 +266,45 @@ class ClientFinalizeController extends Controller
                         : null,
                 ],
             ]);
+
+            // R10's client fee. The screen has always said "$2.99, charged once
+            // when this finalizes" — it was never actually collected, only
+            // displayed, so the promise was the only thing that existed.
+            //
+            // Its own row, not folded into the deposit: the deposit belongs to
+            // the professional and the fee belongs to GigResource, and the
+            // Bookings page reads deposits by `kind` to work out what a client
+            // still owes. Rolling them together would overstate every deposit
+            // by $2.99.
+            $fee = (float) config('payments.client_request_fee', 0);
+            $alreadyCharged = Payment::where('user_id', $f->client_id)
+                ->where('status', 'completed')
+                ->get()
+                ->contains(fn ($p) => ($p->metadata['kind'] ?? null) === 'client_request_fee'
+                    && (int) ($p->metadata['finalization_id'] ?? 0) === $f->id);
+
+            // Once per request instance (A15) — a retried submit must not charge twice.
+            if ($fee > 0 && ! $alreadyCharged) {
+                Payment::create([
+                    'user_id'        => $f->client_id,
+                    'gateway'        => $mode === 'live' ? 'stripe' : 'test',
+                    'status'         => 'completed',
+                    'amount'         => $fee,
+                    'currency'       => 'USD',
+                    'payment_method' => $mode === 'live' ? 'card' : 'test_card',
+                    'completed_at'   => now(),
+                    'metadata'       => [
+                        'kind'            => 'client_request_fee',
+                        'mode'            => $mode,
+                        'finalization_id' => $f->id,
+                        'event_id'        => $f->event_id,
+                        'supplier_id'     => $f->supplier_id,
+                        'note'            => $mode === 'test'
+                            ? 'Test-mode request fee — no real money moved.'
+                            : null,
+                    ],
+                ]);
+            }
 
             // Only now is it a booking. Everything before this was an agreement
             // in progress that either side could walk away from.
