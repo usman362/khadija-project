@@ -10,7 +10,12 @@
     .lp-head { text-align: center; max-width: 680px; margin: 0 auto 48px; }
     .lp-eyebrow { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 800; letter-spacing: .4px; color: var(--blue); text-transform: uppercase; background: var(--bg-soft-2); padding: 6px 14px; border-radius: 999px; margin-bottom: 16px; }
     .lp-h2 { font-size: 36px; font-weight: 800; letter-spacing: -0.8px; }
-    .lp-h2 .ic3d { display: inline-block; vertical-align: middle; margin-left: 8px; }
+    /* No `display` here on purpose. This selector outranks `.ic3d`, so setting
+       inline-block killed the flex centring and the glyph fell to the heading's
+       41px text baseline — 18px down inside a 30px tile, overflowing the bottom
+       by 5. It keeps the inline-flex it already has and only aligns the tile
+       against the heading text. */
+    .lp-h2 .ic3d { vertical-align: middle; margin-left: 8px; }
     .lp-lead { font-size: 16px; color: var(--muted); margin: 14px 0 0; line-height: 1.6; }
 
     /* ── HERO ───────────────────────────────────────── */
