@@ -44,7 +44,12 @@ class ClientBookingController extends Controller
         }
 
         $query = $this->base($user)
-            ->with(['event:id,title,starts_at,ends_at,location', 'event.categories:id,name', 'supplier:id,name'])
+            ->with([
+                'event:id,title,starts_at,ends_at,location,venue,guest_count,event_type,description',
+                'event.categories:id,name',
+                'supplier:id,name,email',
+                'supplier.profile:id,user_id,city,state,trade_license_verified_at,liability_insurance_verified_at',
+            ])
             ->latest();
 
         $query->tap($this->scope($tab));
@@ -59,11 +64,24 @@ class ClientBookingController extends Controller
 
         $bookings = $query->paginate(10)->withQueryString();
 
-        // Already-reviewed bookings, so the review CTA doesn't offer a second one.
-        $reviewedBookingIds = Review::where('reviewer_id', $user->id)
-            ->whereIn('booking_id', $bookings->pluck('id'))
-            ->pluck('booking_id')
-            ->all();
+        $ids = $bookings->pluck('id');
+
+        // The review this client already left, keyed by booking — the card shows
+        // the stars given rather than offering to leave a second one.
+        $myReviews = Review::where('reviewer_id', $user->id)
+            ->whereIn('booking_id', $ids)
+            ->get()
+            ->keyBy('booking_id');
+
+        // Status history, straight out of the agreement log. This is what the
+        // old five-step "milestone timeline" pretended to be: it drew Contract
+        // Signed / Deposit Paid / Checked-in / Inspection / Funds Released with
+        // dates derived from created_at, none of which was ever recorded.
+        $history = AgreementLog::where('subject_type', 'booking')
+            ->whereIn('subject_id', $ids)
+            ->orderBy('created_at')
+            ->get()
+            ->groupBy('subject_id');
 
         // Deposits are Payments tagged `booking_deposit`, carrying the event and
         // supplier they were taken for — that pair is what identifies a booking.
@@ -99,7 +117,8 @@ class ClientBookingController extends Controller
             'tab'                => $tab,
             'counts'             => $counts,
             'bookings'           => $bookings,
-            'reviewedBookingIds' => $reviewedBookingIds,
+            'myReviews'          => $myReviews,
+            'history'            => $history,
             'deposits'           => $deposits,
             'financial'          => $financial,
             'nextEvents'         => $nextEvents,
