@@ -255,6 +255,7 @@
                     $moves   = $booking->allowedTransitionsFor(auth()->user());
                     $review  = $myReviews->get($booking->id);
                     $log     = $history->get($booking->id) ?? collect();
+                    $agreement = $booking->latestAgreement;
 
                     $price      = (float) ($booking->price ?? 0);
                     $paid       = (float) ($deposit->amount ?? 0);
@@ -371,8 +372,20 @@
                                 <span class="v">{{ $booking->created_at?->format('M d, Y') ?? '—' }}</span>
                             </div>
                             <div class="bk-kv">
-                                <span class="k">Pro’s base</span>
-                                <span class="v {{ ($profile?->city || $profile?->state) ? '' : 'muted' }}">{{ trim(($profile?->city ? $profile->city . ', ' : '') . ($profile?->state ?? '')) ?: 'Not set' }}</span>
+                                <span class="k">Contract</span>
+                                <span class="v {{ $agreement ? '' : 'muted' }}">
+                                    @if(! $agreement)
+                                        Not created
+                                    @elseif($agreement->isFullyAccepted())
+                                        Signed by both <span class="bk-tag paid">✓</span>
+                                    @elseif($agreement->isRejected())
+                                        Rejected
+                                    @elseif($agreement->clientAccepted())
+                                        Awaiting professional
+                                    @else
+                                        Awaiting your signature
+                                    @endif
+                                </span>
                             </div>
                             <div class="bk-kv">
                                 <span class="k">Your review</span>
@@ -435,6 +448,19 @@
                             <a href="{{ route('client.events.show', $event) }}" class="bk-btn">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                                 View event
+                            </a>
+                        @endif
+                        {{-- The PDF route refuses anything not accepted by both sides,
+                             so the button only appears when it would actually work. --}}
+                        @if($agreement?->isFullyAccepted())
+                            <a href="{{ route('app.agreements.download', $agreement) }}" class="bk-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Contract PDF
+                            </a>
+                        @elseif($agreement)
+                            <a href="{{ route('app.agreements.show', $agreement) }}" class="bk-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                View contract
                             </a>
                         @endif
                         @if($booking->status === 'completed' && ! $review)

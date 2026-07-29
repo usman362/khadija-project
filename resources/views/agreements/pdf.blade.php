@@ -237,10 +237,10 @@
                     <td>{{ $event->title }}</td>
                 </tr>
             @endif
-            @if($event?->event_date)
+            @if($event?->starts_at)
                 <tr>
                     <td class="label">Event Date</td>
-                    <td>{{ \Carbon\Carbon::parse($event->event_date)->format('l, F j, Y') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($event->starts_at)->format('l, F j, Y') }}</td>
                 </tr>
             @endif
             @if($event?->location)

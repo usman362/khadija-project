@@ -49,6 +49,10 @@ class ClientBookingController extends Controller
                 'event.categories:id,name',
                 'supplier:id,name,email',
                 'supplier.profile:id,user_id,city,state,trade_license_verified_at,liability_insurance_verified_at',
+                // The contract itself. There is a real agreements table behind
+                // this, with a PDF service and a both-parties-accepted gate on
+                // the download — unlike the four invented PDF rows it replaces.
+                'latestAgreement',
             ])
             ->latest();
 

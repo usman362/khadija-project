@@ -43,7 +43,9 @@ class AgreementPdfService
         $agreement->loadMissing([
             'booking.client:id,name,email',
             'booking.supplier:id,name,email',
-            'booking.event:id,title,event_date,location',
+            // `starts_at`, not `event_date` — the latter has never been a column on
+            // events, so this eager-load threw and the PDF route 500'd every time.
+            'booking.event:id,title,starts_at,location',
             'generator:id,name',
         ]);
 
