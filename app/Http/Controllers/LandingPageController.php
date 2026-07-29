@@ -77,12 +77,13 @@ class LandingPageController extends Controller
      */
     private function showcaseCategories(): array
     {
+        // Deliberately the same query as /events-categories, just capped at
+        // eight instead of paginated, so the carousel is the first page of the
+        // browse grid rather than a separate selection of its own. No
+        // parent_id filter — that had limited it to top-level event types, so
+        // the two lists never agreed. Every active category has an image in one
+        // of the two columns, so no thumbnail filter is needed either.
         return Category::active()
-            ->whereNull('parent_id')
-            ->whereNotNull('thumbnail')
-            // Same order as /events-categories and the admin card grid —
-            // newest first — so a category added today shows up at the front
-            // of the carousel instead of alphabetically buried.
             ->orderByDesc('sort_order')
             ->orderByDesc('id')
             ->limit(8)
