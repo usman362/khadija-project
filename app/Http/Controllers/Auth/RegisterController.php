@@ -44,15 +44,16 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         $role = $data['role'] ?? 'client';
-        $allowedStates = implode(',', array_keys(config('geo.allowed_states', [])));
+        $allStates = implode(',', array_keys(config('geo.us_states', [])));
 
-        // Geo-restriction (Feedback v1.1 §7.1): platform is limited to 7
-        // launch states. Clients and professionals both pick their state from
-        // the hardcoded dropdown; influencers may leave it blank (they aren't
-        // geo-gated). Free Layer-1 check — no paid API.
+        // Anyone may register, wherever they are (Peter, 2026-07-30). The form
+        // no longer offers only the launch states, and it never names them —
+        // whether we operate where they live is worked out after the account
+        // exists and shown on the post-registration screen. Influencers are not
+        // geo-gated at all and may leave it blank.
         $stateRule = $role === 'influencer'
-            ? ['nullable', 'string', 'in:' . $allowedStates]
-            : ['required', 'string', 'in:' . $allowedStates];
+            ? ['nullable', 'string', 'in:' . $allStates]
+            : ['required', 'string', 'in:' . $allStates];
 
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
@@ -62,11 +63,16 @@ class RegisterController extends Controller
             'agree' => ['accepted'],
             'role' => ['sometimes', 'string', 'in:client,supplier,professional,influencer'],
             'state' => $stateRule,
+            'country' => ['nullable', 'string', 'in:' . implode(',', array_keys(config('geo.countries', [])))],
+            'city' => ['nullable', 'string', 'max:120'],
+            'expansion_opt_in' => ['nullable', 'boolean'],
             'g-recaptcha-response' => [new Recaptcha('register')],
         ], [
             'agree.accepted' => 'Please accept the Terms of Service and Privacy Policy to continue.',
             'state.required' => 'Please select your state.',
-            'state.in' => 'GigResource is currently available in Maryland, Pennsylvania, West Virginia, Virginia, New Jersey, Delaware, and Washington D.C.',
+            // Deliberately says nothing about which states we serve — that is
+            // only revealed after registration.
+            'state.in' => 'Please choose a state from the list.',
         ]);
     }
 
@@ -118,10 +124,21 @@ class RegisterController extends Controller
             $user->update(['phone' => $data['phone']]);
         }
 
-        // Persist launch-state captured at signup (§7.1) + remember it so later
-        // visits skip IP guessing.
+        // Location as given, plus the eligibility answer. Everyone is stored —
+        // an out-of-area registration is a demand signal and a waitlist entry,
+        // not a rejection, so the account stays active either way.
+        $country = $data['country'] ?? 'US';
+        $status  = \App\Support\ServiceArea::statusFor($country, $state);
+
+        $user->getOrCreateProfile()->update([
+            'city'                 => $data['city'] ?? null,
+            'state'                => $state,
+            'country'              => $country,
+            'service_area_status'  => $status,
+            'expansion_opt_in'     => (bool) ($data['expansion_opt_in'] ?? false),
+        ]);
+
         if ($state) {
-            $user->getOrCreateProfile()->update(['state' => $state]);
             app(\App\Domain\Geolocation\GeolocationService::class)->rememberState($state);
         }
 
@@ -147,6 +164,8 @@ class RegisterController extends Controller
                 ->with('status', 'Account created! Your affiliate application is now under review.');
         }
 
-        return null;
+        // Everyone lands on the welcome screen, which is where — and only
+        // where — we say whether we operate in their area.
+        return redirect()->route('register.welcome');
     }
 }

@@ -45,4 +45,43 @@ return [
 
     // 3-digit ZIP prefix → state (deterministic USPS allocations).
     'zip_prefixes' => $zipPrefixes,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Every state the registration form offers (Peter, 2026-07-30)
+    |--------------------------------------------------------------------------
+    | Registration no longer limits the dropdown to the launch area, and never
+    | tells the visitor which states those are. Anyone may register; whether we
+    | operate where they live is worked out afterwards and shown on the
+    | post-registration screen.
+    |
+    | `allowed_states` above stays the single source of truth for that decision
+    | — it is just no longer used to build the form.
+    */
+    'us_states' => [
+        'AL' => 'Alabama', 'AK' => 'Alaska', 'AZ' => 'Arizona', 'AR' => 'Arkansas',
+        'CA' => 'California', 'CO' => 'Colorado', 'CT' => 'Connecticut', 'DE' => 'Delaware',
+        'DC' => 'Washington D.C.', 'FL' => 'Florida', 'GA' => 'Georgia', 'HI' => 'Hawaii',
+        'ID' => 'Idaho', 'IL' => 'Illinois', 'IN' => 'Indiana', 'IA' => 'Iowa',
+        'KS' => 'Kansas', 'KY' => 'Kentucky', 'LA' => 'Louisiana', 'ME' => 'Maine',
+        'MD' => 'Maryland', 'MA' => 'Massachusetts', 'MI' => 'Michigan', 'MN' => 'Minnesota',
+        'MS' => 'Mississippi', 'MO' => 'Missouri', 'MT' => 'Montana', 'NE' => 'Nebraska',
+        'NV' => 'Nevada', 'NH' => 'New Hampshire', 'NJ' => 'New Jersey', 'NM' => 'New Mexico',
+        'NY' => 'New York', 'NC' => 'North Carolina', 'ND' => 'North Dakota', 'OH' => 'Ohio',
+        'OK' => 'Oklahoma', 'OR' => 'Oregon', 'PA' => 'Pennsylvania', 'RI' => 'Rhode Island',
+        'SC' => 'South Carolina', 'SD' => 'South Dakota', 'TN' => 'Tennessee', 'TX' => 'Texas',
+        'UT' => 'Utah', 'VT' => 'Vermont', 'VA' => 'Virginia', 'WA' => 'Washington',
+        'WV' => 'West Virginia', 'WI' => 'Wisconsin', 'WY' => 'Wyoming',
+        'PR' => 'Puerto Rico', 'VI' => 'U.S. Virgin Islands', 'GU' => 'Guam',
+    ],
+
+    // Countries offered at registration. US first because that is where the
+    // launch area is; the rest register as "coming soon" like anywhere else.
+    'countries' => [
+        'US' => 'United States',
+        'CA' => 'Canada',
+        'GB' => 'United Kingdom',
+        'AU' => 'Australia',
+        'OTHER' => 'Other',
+    ],
 ];

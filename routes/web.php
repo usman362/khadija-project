@@ -297,6 +297,15 @@ Route::get('/faq', function () {
 
 Auth::routes();
 
+// Post-registration welcome — the only place the service area is mentioned.
+// Registration itself never names the launch states (Peter, 2026-07-30).
+Route::middleware('auth')->group(function () {
+    Route::get('/welcome', [\App\Http\Controllers\Auth\RegistrationWelcomeController::class, 'show'])
+        ->name('register.welcome');
+    Route::post('/welcome/notify-me', [\App\Http\Controllers\Auth\RegistrationWelcomeController::class, 'optIn'])
+        ->name('register.welcome.opt-in');
+});
+
 // Role-themed login pages — separate URL per audience, all posting to the
 // same /login handler (auth is role-agnostic; only the look differs).
 //   /login                 → Client  (orange, default — defined by Auth::routes)

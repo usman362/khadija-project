@@ -17,6 +17,11 @@ class UserProfile extends Model
         'state',
         'country',
         'zip_code',
+        // Without these two here, update() drops them silently and every new
+        // account stays on the column default — an in-area registration would
+        // still be filed as "coming soon".
+        'service_area_status',
+        'expansion_opt_in',
         'website',
         'social_links',
         'company_name',
@@ -67,6 +72,7 @@ class UserProfile extends Model
             'certifications' => 'array',
             'languages' => 'array',
             'hourly_rate' => 'decimal:2',
+            'expansion_opt_in' => 'boolean',
             'notify_email_bookings' => 'boolean',
             'notify_email_messages' => 'boolean',
             'notify_email_events' => 'boolean',

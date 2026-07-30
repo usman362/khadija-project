@@ -290,20 +290,36 @@
                         @error('phone') <div class="rg-err">{{ $message }}</div> @enderror
                     </div>
 
+                    {{-- Every state, and no mention of where we operate. Anyone may
+                         register; whether we serve their area is worked out after the
+                         account exists and shown once, on /welcome (Peter, 2026-07-30).
+                         The old version offered only the 7 launch states, which both
+                         revealed the list and blocked everyone else outright. --}}
                     <div class="rg-field">
-                        <label class="rg-label">State</label>
+                        <label class="rg-label">Country</label>
+                        <select name="country" class="rg-select {{ $errors->has('country') ? 'is-invalid' : '' }}">
+                            @foreach(config('geo.countries', []) as $code => $label)
+                                <option value="{{ $code }}" {{ old('country', 'US') === $code ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        @error('country') <div class="rg-err">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div class="rg-field">
+                        <label class="rg-label">State / Province</label>
                         <select name="state" class="rg-select {{ $errors->has('state') ? 'is-invalid' : '' }}">
                             <option value="" {{ old('state') ? '' : 'selected' }} disabled>Select your state</option>
-                            @foreach(config('geo.allowed_states', []) as $code => $label)
+                            @foreach(config('geo.us_states', []) as $code => $label)
                                 <option value="{{ $code }}" {{ old('state') === $code ? 'selected' : '' }}>{{ $label }}</option>
                             @endforeach
                         </select>
-                        {{-- Read the configured list rather than restating it. The
-                             hardcoded line said "…NJ & NY" — NY is excluded from the
-                             launch area by name in the rules doc, and WV, which is in
-                             it, was missing. --}}
-                        <div class="rg-hint">Currently serving {{ implode(', ', array_keys(config('geo.allowed_states', []))) }}.</div>
                         @error('state') <div class="rg-err">{{ $message }}</div> @enderror
+                    </div>
+
+                    <div class="rg-field">
+                        <label class="rg-label">City <span style="font-weight:400;color:#94a3b8;">(optional)</span></label>
+                        <input type="text" name="city" class="rg-input {{ $errors->has('city') ? 'is-invalid' : '' }}" value="{{ old('city') }}" placeholder="Enter your city" maxlength="120">
+                        @error('city') <div class="rg-err">{{ $message }}</div> @enderror
                     </div>
 
                     <div class="rg-note">
