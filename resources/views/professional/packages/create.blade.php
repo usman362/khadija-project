@@ -290,10 +290,24 @@
                             <input type="text" name="availability" class="pc-input" maxlength="80" value="{{ old('availability', $p?->availability) }}" placeholder="Available Weekends">
                         </div>
                     </div>
+                    {{-- Not an input any more. A package is offered in the
+                         professional's own state only (Option B), so this is read
+                         from the profile rather than typed — a free-text box let a
+                         professional claim states they cannot legally serve. --}}
                     <div class="pc-field">
-                        <label>Serves Regions</label>
-                        <input type="text" name="serves_regions" class="pc-input" maxlength="120" value="{{ old('serves_regions', $p?->serves_regions) }}" placeholder="NY, NJ, CT">
-                        <div class="hint">Comma-separated states/regions you'll travel to.</div>
+                        <label>Service area</label>
+                        @php $proState = auth()->user()->profile?->state; @endphp
+                        <div class="pc-input" style="background:var(--bg-card-hover,#f8fafc);display:flex;align-items:center;">
+                            {{ $proState ? (config('geo.allowed_states')[$proState] ?? $proState) : 'Not set' }}
+                        </div>
+                        <div class="hint">
+                            @if($proState)
+                                Packages are offered in your own state. Update it in
+                                <a href="{{ route('professional.profile.index') }}">Profile &amp; Settings</a> and your packages follow.
+                            @else
+                                Set your state in <a href="{{ route('professional.profile.index') }}">Profile &amp; Settings</a> so clients can find this package.
+                            @endif
+                        </div>
                     </div>
                     <div class="pc-field" style="grid-column:1/-1;">
                         <label>Package Photos</label>

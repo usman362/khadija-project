@@ -186,7 +186,7 @@ class DemoProfessionalsSeeder extends Seeder
             [
                 'name' => 'Duy Nguyen', 'email' => 'duy.demo@example.test',
                 'company' => 'Skyline Films', 'headline' => 'Lead Cinematographer & Drone Pilot',
-                'city' => 'Los Angeles', 'state' => 'CA', 'rate' => 150, 'years' => 7, 'verified' => true,
+                'city' => 'Philadelphia', 'state' => 'PA', 'rate' => 150, 'years' => 7, 'verified' => true,
                 'skills' => ['Cinematography', 'Drone / Aerial', 'Same-Day Edits', 'Color Grading'],
                 'services' => ['Event Videography', 'Videography Services', 'Photography & Videography', 'Event Photography'],
                 'languages' => ['English', 'Vietnamese'],
@@ -196,7 +196,7 @@ class DemoProfessionalsSeeder extends Seeder
             [
                 'name' => 'Horizon Audio', 'email' => 'horizon.demo@example.test',
                 'company' => 'Horizon Audio', 'headline' => 'Premium Event DJ & A/V Visual Systems',
-                'city' => 'Austin', 'state' => 'TX', 'rate' => 130, 'years' => 10, 'verified' => true,
+                'city' => 'Baltimore', 'state' => 'MD', 'rate' => 130, 'years' => 10, 'verified' => true,
                 'skills' => ['DJ / MC', 'Sound Engineering', 'Lighting', 'Live Streaming'],
                 'services' => ['DJs & Sound Services', 'Lighting & Stage Setup', 'Music & Entertainment'],
                 'languages' => ['English', 'Spanish'],
@@ -206,7 +206,7 @@ class DemoProfessionalsSeeder extends Seeder
             [
                 'name' => 'Mix Masters', 'email' => 'mixmasters.demo@example.test',
                 'company' => 'Mix Masters', 'headline' => 'Wedding & Party DJ Specialists',
-                'city' => 'San Diego', 'state' => 'CA', 'rate' => 90, 'years' => 6, 'verified' => true,
+                'city' => 'Arlington', 'state' => 'VA', 'rate' => 90, 'years' => 6, 'verified' => true,
                 'availability' => 'busy',
                 'skills' => ['Open-Format DJ', 'MC / Emcee', 'Uplighting', 'Photo Booth'],
                 'services' => ['DJs & Sound Services', 'Music & Entertainment', 'Photo Booths'],
@@ -217,7 +217,7 @@ class DemoProfessionalsSeeder extends Seeder
             [
                 'name' => 'Elena Rossi', 'email' => 'elena.demo@example.test',
                 'company' => 'Rossi Studio', 'headline' => 'Fine-Art Wedding Photographer',
-                'city' => 'New York', 'state' => 'NY', 'rate' => 175, 'years' => 9, 'verified' => true,
+                'city' => 'Washington', 'state' => 'DC', 'rate' => 175, 'years' => 9, 'verified' => true,
                 'skills' => ['Photography', 'Editorial', 'Album Design', 'Engagement Shoots'],
                 'services' => ['Event Photography', 'Photography Services', 'Photography & Videography'],
                 'languages' => ['English', 'Italian'],
@@ -227,7 +227,7 @@ class DemoProfessionalsSeeder extends Seeder
             [
                 'name' => 'Bloom & Vine Co.', 'email' => 'bloomvine.demo@example.test',
                 'company' => 'Bloom & Vine Co.', 'headline' => 'Floral & Décor Designers',
-                'city' => 'Chicago', 'state' => 'IL', 'rate' => 120, 'years' => 8, 'verified' => true,
+                'city' => 'Pittsburgh', 'state' => 'PA', 'rate' => 120, 'years' => 8, 'verified' => true,
                 'skills' => ['Floral Design', 'Tablescapes', 'Arch & Backdrop', 'Installations'],
                 'services' => ['Floral Design & Arrangements', 'Floral Arrangements', 'Decor & Floral Services', 'Event Decor & Styling'],
                 'languages' => ['English'],
@@ -237,7 +237,7 @@ class DemoProfessionalsSeeder extends Seeder
             [
                 'name' => 'Grand Affair Planning', 'email' => 'grandaffair.demo@example.test',
                 'company' => 'Grand Affair', 'headline' => 'Full-Service Event Planners',
-                'city' => 'Miami', 'state' => 'FL', 'rate' => 200, 'years' => 12, 'verified' => true,
+                'city' => 'Virginia Beach', 'state' => 'VA', 'rate' => 200, 'years' => 12, 'verified' => true,
                 'skills' => ['Full Planning', 'Day-of Coordination', 'Vendor Sourcing', 'Budgeting'],
                 'services' => ['Event Planning & Production', 'Planning, Coordination & Management', 'Event Coordination'],
                 'languages' => ['English', 'Spanish', 'Portuguese'],
@@ -247,7 +247,7 @@ class DemoProfessionalsSeeder extends Seeder
             [
                 'name' => 'The Velvet Notes', 'email' => 'velvetnotes.demo@example.test',
                 'company' => 'The Velvet Notes', 'headline' => 'Live Jazz & Soul Band',
-                'city' => 'Nashville', 'state' => 'TN', 'rate' => 250, 'years' => 11, 'verified' => false,
+                'city' => 'Wilmington', 'state' => 'DE', 'rate' => 250, 'years' => 11, 'verified' => false,
                 'skills' => ['Live Band', 'Jazz / Soul', 'Ceremony Music', 'Custom Requests'],
                 'services' => ['Live Bands & Musical Acts', 'Solo Musicians & Vocalists', 'Music & Entertainment'],
                 'languages' => ['English'],
@@ -257,7 +257,7 @@ class DemoProfessionalsSeeder extends Seeder
             [
                 'name' => 'Lumière Lighting', 'email' => 'lumiere.demo@example.test',
                 'company' => 'Lumière Lighting', 'headline' => 'Event Lighting & Staging',
-                'city' => 'Las Vegas', 'state' => 'NV', 'rate' => 95, 'years' => 5, 'verified' => true,
+                'city' => 'Newark', 'state' => 'NJ', 'rate' => 95, 'years' => 5, 'verified' => true,
                 'skills' => ['Uplighting', 'Stage Design', 'Gobo / Monogram', 'Pin Spotting'],
                 'services' => ['Lighting Services', 'Lighting & Stage Setup', 'Spotlight & Stage Lighting'],
                 'languages' => ['English'],
@@ -267,7 +267,7 @@ class DemoProfessionalsSeeder extends Seeder
             [
                 'name' => 'Saffron Table Catering', 'email' => 'saffron.demo@example.test',
                 'company' => 'Saffron Table', 'headline' => 'Gourmet Event Catering',
-                'city' => 'Seattle', 'state' => 'WA', 'rate' => 45, 'years' => 9, 'verified' => true,
+                'city' => 'Silver Spring', 'state' => 'MD', 'rate' => 45, 'years' => 9, 'verified' => true,
                 'skills' => ['Plated Dinners', 'Stations', 'Dietary Menus', 'Bar Service'],
                 'services' => ['Catering Services', 'Catering Coordination', 'Food Services', 'Beverage Services'],
                 'languages' => ['English'],
@@ -277,7 +277,7 @@ class DemoProfessionalsSeeder extends Seeder
             [
                 'name' => 'Glow Studio', 'email' => 'glowstudio.demo@example.test',
                 'company' => 'Glow Studio', 'headline' => 'Bridal Hair & Makeup Artists',
-                'city' => 'Portland', 'state' => 'OR', 'rate' => 110, 'years' => 6, 'verified' => false,
+                'city' => 'Charleston', 'state' => 'WV', 'rate' => 110, 'years' => 6, 'verified' => false,
                 'availability' => 'not_available',
                 'skills' => ['Bridal Makeup', 'Hair Styling', 'Airbrush', 'On-Location Glam'],
                 'services' => ['Guest & Attendee Experience', 'Event Staffing'],

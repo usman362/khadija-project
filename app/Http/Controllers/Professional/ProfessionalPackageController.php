@@ -57,6 +57,11 @@ class ProfessionalPackageController extends Controller
 
         $data['user_id'] = $request->user()->id;
         $data['slug'] = Str::slug($data['title']) . '-' . Str::lower(Str::random(5));
+        // Option B (Peter, approved): a package is advertised in the
+        // professional's own state only. Derived, not submitted — a free-text
+        // field here let a professional claim states they cannot serve, and the
+        // seed data had an LA professional "serving NY, NJ, CT".
+        $data['serves_regions'] = $request->user()->profile?->state;
         $data = array_merge($data, $this->richFields($request));
 
         $images = $this->syncImages($request, $pipeline, $request->user()->id, []);
@@ -87,6 +92,9 @@ class ProfessionalPackageController extends Controller
         if ($images !== null) {
             $data['images'] = $images;
         }
+
+        // Re-derived on every save, so moving state moves the package with it.
+        $data['serves_regions'] = $request->user()->profile?->state;
 
         $package->update($data);
 
@@ -185,7 +193,6 @@ class ProfessionalPackageController extends Controller
             'coverage'        => ['nullable', 'string', 'max:80'],
             'guest_min'       => ['nullable', 'integer', 'min:0', 'max:1000000'],
             'guest_max'       => ['nullable', 'integer', 'min:0', 'max:1000000'],
-            'serves_regions'  => ['nullable', 'string', 'max:120'],
             'availability'    => ['nullable', 'string', 'max:80'],
             'savings_pct'     => ['nullable', 'integer', 'min:0', 'max:90'],
             'is_active'       => ['nullable', 'boolean'],
