@@ -1298,22 +1298,16 @@
                 {{-- ── AI TOOLS ───────────────────────────────────── --}}
                 {{-- Catalog-driven: every LIVE client + both AI tool auto-appears here. --}}
                 <li class="cl-nav-label">GigResource IQ</li>
+                {{-- One link, not thirteen. The Tools page already groups every tool
+                     into its suite (Planning / Marketplace / Operations / Automation),
+                     so listing each one here again was the same set in two places
+                     and thirteen rows of sidebar (Peter + Khadijah, 2026-07-30). --}}
                 <li class="cl-nav-item">
                     <a href="{{ route('ai-tools.index') }}" class="cl-nav-link {{ request()->routeIs('ai-tools.index') ? 'active' : '' }}">
                         <svg class="cl-nav-icon ic-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
                         Tools
                     </a>
                 </li>
-                @foreach(\App\Domain\AiFeatures\AiToolCatalog::forAudience('client') as $t)
-                    @if(($t['status'] ?? '') === 'live' && !empty($t['route']) && \Illuminate\Support\Facades\Route::has($t['route']))
-                        <li class="cl-nav-item">
-                            <a href="{{ route($t['route']) }}" class="cl-nav-link {{ request()->routeIs($t['route'].'*') ? 'active' : '' }}">
-                                <svg class="cl-nav-icon ic-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7v1a2 2 0 0 1-2 2h-1v1a1 1 0 0 1-2 0v-1H8v1a1 1 0 0 1-2 0v-1H5a2 2 0 0 1-2-2v-1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/><circle cx="9" cy="13" r="1"/><circle cx="15" cy="13" r="1"/></svg>
-                                {{ $t['name'] }}
-                            </a>
-                        </li>
-                    @endif
-                @endforeach
 
                 {{-- ── INSIGHTS & FINANCE ─────────────────────────── --}}
                 <li class="cl-nav-label">Insights &amp; Finance</li>
