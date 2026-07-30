@@ -298,7 +298,11 @@
                                 <option value="{{ $code }}" {{ old('state') === $code ? 'selected' : '' }}>{{ $label }}</option>
                             @endforeach
                         </select>
-                        <div class="rg-hint">Currently serving MD, VA, DC, DE, PA, NJ &amp; NY.</div>
+                        {{-- Read the configured list rather than restating it. The
+                             hardcoded line said "…NJ & NY" — NY is excluded from the
+                             launch area by name in the rules doc, and WV, which is in
+                             it, was missing. --}}
+                        <div class="rg-hint">Currently serving {{ implode(', ', array_keys(config('geo.allowed_states', []))) }}.</div>
                         @error('state') <div class="rg-err">{{ $message }}</div> @enderror
                     </div>
 
