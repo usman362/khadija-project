@@ -579,6 +579,11 @@ Route::middleware('auth')->group(function () {
     Route::prefix('client')->middleware('permission:dashboard.view')->group(function () {
         Route::get('/dashboard', [ClientDashboardController::class, 'index'])->name('client.dashboard');
 
+        // PROTOTYPE — Tool → Request handoff, for Monday's design review. Read
+        // only; it writes nothing. Delete once the real handoff ships.
+        Route::get('/prototype/tool-to-request', [\App\Http\Controllers\Client\PrototypeToolToRequestController::class, 'show'])
+            ->name('client.prototype.tool-to-request');
+
         // Was a second professional-search screen. /browse now carries the event
         // context that made this one different, so this only keeps old links
         // working — query string and all.
