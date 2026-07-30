@@ -1277,9 +1277,12 @@
                     </a>
                 </li>
                 <li class="cl-nav-item">
-                    <a href="{{ route('client.search.index') }}" class="cl-nav-link {{ request()->routeIs('client.search.*') ? 'active' : '' }}">
+                    {{-- One page for finding professionals, not two. /browse has the
+                         real filters; the old Search screen's only unique idea — the
+                         event you are sourcing for — moved there with it. --}}
+                    <a href="{{ route('public.browse') }}" class="cl-nav-link {{ request()->routeIs('public.browse') || request()->routeIs('client.search.*') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                        Search Professionals
+                        Find Professionals
                     </a>
                 </li>
                 <li class="cl-nav-item">

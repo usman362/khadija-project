@@ -35,6 +35,10 @@
         background-image: url('https://images.unsplash.com/photo-1519741497674-611481863552?w=1600&q=70&auto=format&fit=crop');
         background-size: cover; background-position: center; opacity: .12; z-index: 0; }
     .br-hero > .lp-container { position: relative; z-index: 1; }
+    .br-forevent { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #fff; border: 1px solid var(--line, #e7ebf2); border-radius: 12px; padding: 11px 16px; margin-bottom: 16px; }
+    .br-forevent .lbl { font-size: 13.5px; color: var(--muted, #64748b); }
+    .br-forevent .lbl b { color: var(--ink, #0f1b35); }
+    .br-forevent select { margin-left: auto; border: 1px solid var(--line, #e7ebf2); border-radius: 9px; padding: 7px 11px; font-size: 13px; font-family: inherit; background: #fff; cursor: pointer; max-width: 320px; }
     .br-h1 { font-size: 40px; font-weight: 800; letter-spacing: -1.1px; text-align: center; }
     .br-h1 .b { color: var(--blue); }
     .br-h1 .o { color: var(--orange); }
@@ -317,6 +321,35 @@
             </div>
         </div>
     </section>
+    @endif
+
+    {{-- Event context. This page replaced the separate "Search Professionals"
+         screen, whose one genuinely useful idea was knowing which event you were
+         sourcing for. Arriving with ?event= keeps that with you; arriving from
+         the menu is plain browsing. --}}
+    @if(!empty($myEvents) && $myEvents->isNotEmpty())
+        <div class="lp-container">
+            <form method="GET" action="{{ route('public.browse') }}" class="br-forevent">
+                @foreach(request()->except(['event', 'page']) as $k => $v)
+                    @if(is_scalar($v))<input type="hidden" name="{{ $k }}" value="{{ $v }}">@endif
+                @endforeach
+                <span class="lbl">
+                    @if($activeEvent)
+                        <b>Inviting for:</b> {{ $activeEvent->title }}
+                    @else
+                        <b>Browsing</b> — pick an event to keep it with you
+                    @endif
+                </span>
+                <select name="event" onchange="this.form.submit()">
+                    <option value="">Just browsing</option>
+                    @foreach($myEvents as $ev)
+                        <option value="{{ $ev->id }}" @selected($activeEvent?->id === $ev->id)>
+                            {{ \Illuminate\Support\Str::limit($ev->title, 42) }}
+                        </option>
+                    @endforeach
+                </select>
+            </form>
+        </div>
     @endif
 
     {{-- ══════════════ MAIN ══════════════ --}}

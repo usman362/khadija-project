@@ -579,9 +579,10 @@ Route::middleware('auth')->group(function () {
     Route::prefix('client')->middleware('permission:dashboard.view')->group(function () {
         Route::get('/dashboard', [ClientDashboardController::class, 'index'])->name('client.dashboard');
 
-        // Client-context professional search — reuses /browse data but
-        // frames it with the client's active project + budget rail.
-        Route::get('/search', [\App\Http\Controllers\Client\ClientSearchController::class, 'index'])
+        // Was a second professional-search screen. /browse now carries the event
+        // context that made this one different, so this only keeps old links
+        // working — query string and all.
+        Route::get('/search', fn (\Illuminate\Http\Request $r) => redirect()->route('public.browse', $r->query()))
             ->name('client.search.index');
 
         // Browse Packages — the client's package browsing IS the public Package

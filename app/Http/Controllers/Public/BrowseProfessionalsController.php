@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Domain\Auth\Enums\RoleName;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Event;
 use App\Models\Review;
 use App\Models\User;
 use App\Models\UserProfile;
@@ -231,7 +232,30 @@ class BrowseProfessionalsController extends Controller
                 ->sortBy(fn ($u) => $recentIds->search($u->id))
                 ->values();
 
+        // Event context, carried over from the Search page this replaced. A client
+        // who arrives while planning something keeps that event with them —
+        // "Inviting for: …" — instead of being sent to a separate page with a
+        // different set of filters (Peter + Khadijah, 2026-07-30).
+        $activeEvent = null;
+        $myEvents    = collect();
+
+        if ($user = $request->user()) {
+            $wanted = (int) $request->query('event', 0);
+
+            $myEvents = Event::where('client_id', $user->id)
+                ->whereIn('status', ['pending', 'published', 'confirmed'])
+                ->orderByDesc('starts_at')
+                ->take(20)
+                ->get(['id', 'title', 'starts_at']);
+
+            $activeEvent = $wanted
+                ? $myEvents->firstWhere('id', $wanted)
+                : null;
+        }
+
         return view('public.browse', [
+            'activeEvent' => $activeEvent,
+            'myEvents'    => $myEvents,
             'pros'       => $pros,
             'categories' => $categories,
             'cities'     => $cities,
