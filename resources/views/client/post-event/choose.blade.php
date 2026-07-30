@@ -64,7 +64,11 @@
                     'href'  => route('client.direct-offers.create'),
                     'tag'   => ['Targeted', ''],
                     'title' => 'Direct Offer (DSR)',
-                    'desc'  => 'Invite one or more specific professionals you already like. They accept, decline, or reply — no open bidding.',
+                    // What makes a DSR a DSR is that it is targeted, not broadcast —
+                    // NOT that it is one service. A6 caps it at one professional per
+                    // SERVICE at a time; a professional who offers several can be
+                    // asked for several. The old wording implied otherwise.
+                    'desc'  => 'Go straight to a professional you already want — one service or several, whatever they offer. They accept, decline, or reply. No open bidding.',
                     'cta'   => 'Send a Direct Offer',
                     'icon'  => '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
                 ],
