@@ -46,29 +46,27 @@
                     'cta'   => 'Browse packages',
                     'icon'  => '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
                 ],
+                // SSR and MSR were two cards for the same thing. They are the
+                // SCOPE of a bidding request, not separate types — you pick one
+                // service or several inside the form, exactly as ESR already
+                // works. One card (Peter, 2026-07-30). A Blade comment cannot go
+                // here: inside @php it is not stripped and lands in the PHP.
+
                 [
-                    'href'  => route('client.multi-service.index'),
+                    'href'  => route('client.bsr.step', 'service'),
                     'tag'   => ['Get bids', 'hot'],
-                    'title' => 'Multi-Service Request (MSR)',
-                    'desc'  => 'Post several services at once. Each service is its own gig — professionals bid on the ones they provide.',
-                    'cta'   => 'Start an MSR',
+                    'title' => 'Bidding Request (BSR)',
+                    'desc'  => 'Post one service or several — professionals bid on what they provide. Free to post; you only pay when you finalise.',
+                    'cta'   => 'Start a request',
                     'icon'  => '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
                 ],
                 [
                     'href'  => route('client.direct-offers.create'),
                     'tag'   => ['Targeted', ''],
-                    'title' => 'Direct Offer',
+                    'title' => 'Direct Offer (DSR)',
                     'desc'  => 'Invite one or more specific professionals you already like. They accept, decline, or reply — no open bidding.',
                     'cta'   => 'Send a Direct Offer',
                     'icon'  => '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
-                ],
-                [
-                    'href'  => route('client.multi-service.index', ['scope' => 'single']),
-                    'tag'   => ['Single service', ''],
-                    'title' => 'Single-Service Request (SSR)',
-                    'desc'  => 'Post one specific service for professionals to bid on — same quick brief, just pick a single service.',
-                    'cta'   => 'Start a request',
-                    'icon'  => '<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
                 ],
                 [
                     'href'  => route('client.esr.create'),

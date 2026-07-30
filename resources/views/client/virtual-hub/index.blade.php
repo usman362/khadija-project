@@ -208,7 +208,7 @@
 
     {{-- Recent RFPs --}}
     <div class="vh-card">
-        <div class="vh-sec-head"><span class="vh-sec-title">Recent Project Gigs (RFPs)</span><a href="{{ route('client.multi-service.index') }}" class="vh-sec-link">View all gigs →</a></div>
+        <div class="vh-sec-head"><span class="vh-sec-title">Recent Project Gigs (RFPs)</span><a href="{{ route('client.events.index') }}" class="vh-sec-link">View all gigs →</a></div>
         <div style="overflow-x:auto;">
             <table class="vh-rfp-table">
                 <thead><tr><th>Project Title</th><th>Type</th><th>Budget</th><th>Bids</th><th>Status</th><th>Posted</th></tr></thead>

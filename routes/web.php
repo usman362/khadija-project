@@ -625,11 +625,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/proposals/{bid}/reply', [\App\Http\Controllers\Client\ClientProposalController::class, 'reply'])
             ->middleware('permission:bookings.update')->name('client.proposals.reply');
 
-        // Multi-Service Request (MSR).
-        Route::get('/multi-service', [\App\Http\Controllers\Client\ClientMultiServiceController::class, 'index'])
+        // SSR/MSR were two names for one thing — the scope of a bidding request,
+        // not separate types (Peter, 2026-07-30). The BSR wizard is the single
+        // form now; this route stays only so old links and bookmarks land
+        // somewhere sensible instead of 404ing.
+        Route::get('/multi-service', fn () => redirect()->route('client.bsr.step', 'service'))
             ->name('client.multi-service.index');
-        Route::post('/multi-service', [\App\Http\Controllers\Client\ClientMultiServiceController::class, 'store'])
-            ->middleware('permission:events.create')->name('client.multi-service.store');
 
         // Emergency Service Request (ESR) — standalone rush flow (within 72h).
         Route::get('/esr/create', [\App\Http\Controllers\Client\ClientEsrController::class, 'create'])
