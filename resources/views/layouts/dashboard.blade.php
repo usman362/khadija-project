@@ -255,6 +255,13 @@
                                 <span class="link-title">Professional Verifications</span>
                             </a>
                         </li>
+
+                        <li class="nav-item {{ request()->routeIs('app.admin.waitlist.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.admin.waitlist.index') }}" class="nav-link">
+                                <i class="link-icon ic-orange" data-lucide="map-pin"></i>
+                                <span class="link-title">Expansion Waitlist</span>
+                            </a>
+                        </li>
                         @endrole
 
                         <li class="nav-item {{ request()->routeIs('app.roles.*') ? 'active' : '' }}">

@@ -911,6 +911,10 @@ Route::middleware('auth')->group(function () {
         Route::patch('/membership-plans/{membership_plan}', [AdminMembershipPlanController::class, 'update'])->middleware('permission:membership_plans.update')->name('app.admin.membership-plans.update');
         Route::delete('/membership-plans/{membership_plan}', [AdminMembershipPlanController::class, 'destroy'])->middleware('permission:membership_plans.delete')->name('app.admin.membership-plans.destroy');
 
+        // Expansion waitlist — where out-of-area signups are coming from.
+        Route::get('/waitlist', [\App\Http\Controllers\Dashboard\AdminWaitlistController::class, 'index'])
+            ->name('app.admin.waitlist.index');
+
         // Website Content — the words and pictures on the public pages.
         Route::get('/content', [\App\Http\Controllers\Dashboard\AdminContentController::class, 'index'])
             ->name('app.admin.content.index');
