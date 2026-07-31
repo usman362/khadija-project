@@ -77,6 +77,64 @@
     .cm-att-item svg { width: 16px; height: 16px; color: var(--bad-text); }
     .cm-att-item b { font-size: 12px; color: var(--text-primary); display: block; }
     .cm-att-item span { font-size: 10.5px; color: var(--text-muted); }
+    /* Filter row under the search box. */
+    .cm-filters { display: flex; gap: 8px; padding: 0 14px 12px; }
+    .cm-filters select { flex: 1; min-width: 0; padding: 7px 9px; border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-primary); font-size: 12px; font-family: inherit; cursor: pointer; }
+
+    /* Thread header actions. */
+    .cm-th-acts { margin-left: auto; display: flex; gap: 6px; }
+    .cm-th-acts a, .cm-th-acts button { width: 34px; height: 34px; border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+    .cm-th-acts a:hover, .cm-th-acts button:hover { color: var(--cm); border-color: var(--cm); }
+    .cm-th-acts svg { width: 16px; height: 16px; }
+
+    /* Conversation details panel. */
+    .cm-info { padding: 16px 18px; border-bottom: 1px solid var(--border-color); background: var(--bg-card-hover); }
+    .cm-info-who { display: flex; align-items: center; gap: 11px; margin-bottom: 12px; }
+    .cm-info-av { width: 40px; height: 40px; border-radius: 50%; background: var(--cm); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; flex-shrink: 0; }
+    .cm-info-who b { display: block; font-size: 14px; color: var(--text-primary); }
+    .cm-info-who span { font-size: 12px; color: var(--text-muted); }
+    .cm-info-rows > div { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; font-size: 12.5px; }
+    .cm-info-rows span { color: var(--text-muted); }
+    .cm-info-rows b { color: var(--text-primary); font-weight: 600; text-align: right; word-break: break-word; }
+    .cm-info-order { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color); font-size: 12.5px; }
+    .cm-info-order .ref { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .3px; color: var(--cm); background: rgba(234,88,12,0.12); padding: 2px 7px; border-radius: 5px; margin-bottom: 5px; }
+    .cm-info-order b { display: block; color: var(--text-primary); font-size: 13.5px; }
+    .cm-info-order > div { color: var(--text-muted); margin: 3px 0 7px; }
+    .cm-info-order a { color: var(--cm); font-weight: 700; text-decoration: none; }
+
+    /* Suggestion strip. */
+    .cm-suggest { display: flex; align-items: center; gap: 12px; margin: 0 18px 2px; padding: 12px 14px; border: 1px solid rgba(234,88,12,0.28); background: rgba(234,88,12,0.07); border-radius: 12px; }
+    .cm-suggest .spark { width: 17px; height: 17px; color: var(--cm); flex-shrink: 0; }
+    .cm-suggest b { display: block; font-size: 12.5px; color: var(--text-primary); }
+    .cm-suggest p { margin: 1px 0 0; font-size: 12px; color: var(--text-secondary); }
+    .cm-suggest button { margin-left: auto; flex-shrink: 0; padding: 6px 15px; border: 1px solid var(--cm); border-radius: 8px; background: var(--bg-card); color: var(--cm); font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+    /* Compose tabs + the panes they switch between. */
+    .cm-c-tabs { display: flex; gap: 4px; margin-bottom: 11px; border-bottom: 1px solid var(--border-color); }
+    .cm-c-tab { padding: 7px 12px; font-size: 12.5px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .cm-c-tab.on { color: var(--cm); border-bottom-color: var(--cm); }
+    .cm-c-pane { display: flex; flex-direction: column; gap: 6px; margin-bottom: 11px; max-height: 168px; overflow-y: auto; }
+    .cm-pick { text-align: left; padding: 8px 11px; border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-primary); font-size: 12.5px; font-family: inherit; cursor: pointer; }
+    .cm-pick:hover { border-color: var(--cm); }
+    .cm-pick.tpl b { display: block; font-size: 12.5px; margin-bottom: 2px; }
+    .cm-pick.tpl span { font-size: 11.5px; color: var(--text-muted); }
+
+    .cm-c-icons { display: flex; gap: 4px; position: relative; }
+    .cm-c-icons > button { width: 32px; height: 32px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-card); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+    .cm-c-icons > button:hover { color: var(--cm); border-color: var(--cm); }
+    .cm-c-icons svg { width: 15px; height: 15px; }
+    .cm-emoji { position: absolute; bottom: 38px; left: 0; display: flex; flex-wrap: wrap; gap: 2px; width: 176px; padding: 7px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; box-shadow: 0 8px 22px rgba(0,0,0,0.16); z-index: 20; }
+    .cm-emoji button { width: 30px; height: 30px; border: none; background: none; font-size: 17px; cursor: pointer; border-radius: 6px; }
+    .cm-emoji button:hover { background: var(--bg-card-hover); }
+
+    .cm-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; }
+    .chat-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; color: var(--text-primary); background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 999px; padding: 4px 6px 4px 10px; }
+    .chat-chip button { border: none; background: none; color: var(--text-muted); font-size: 15px; line-height: 1; cursor: pointer; padding: 0 3px; }
+
+    .cm-c-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; font-size: 12px; }
+    .cm-c-foot span { color: var(--bad-text); }
+    .cm-c-foot a { color: var(--cm); font-weight: 700; text-decoration: none; }
+
     .cm-compose { border-top: 1px solid var(--border-color); padding: 14px 18px 16px; }
     .cm-c-box textarea { width: 100%; box-sizing: border-box; min-height: 56px; padding: 11px 13px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); color: var(--text-primary); font-size: 13px; font-family: inherit; resize: vertical; outline: none; }
     .cm-c-box textarea:focus { border-color: var(--cm); }
@@ -117,9 +175,27 @@
                 <span class="cm-tab" data-tab="archived">Archived</span>
             </div>
             <div class="cm-search"><div class="cm-search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="cm-search" placeholder="Search messages..."></div></div>
+
+            {{-- Event filter + sort. Both do the work they claim: the dropdown
+                 is built from events that actually have a conversation, and the
+                 sort reorders the list in place. --}}
+            <div class="cm-filters">
+                <select id="cm-event">
+                    <option value="">All events</option>
+                    @foreach($eventFilters as $ev)
+                        <option value="{{ $ev['id'] }}">{{ \Illuminate\Support\Str::limit($ev['title'], 30) }}</option>
+                    @endforeach
+                </select>
+                <select id="cm-sort">
+                    <option value="latest">Sort: Latest</option>
+                    <option value="oldest">Sort: Oldest</option>
+                    <option value="unread">Sort: Unread first</option>
+                    <option value="name">Sort: Name</option>
+                </select>
+            </div>
             <div class="cm-list" id="cm-list">
                 @forelse($conversations as $c)
-                    <a href="{{ route('client.chat.show', $c['id']) }}" class="cm-conv {{ ($thread && $thread['id'] === $c['id']) ? 'active' : '' }}" data-name="{{ \Illuminate\Support\Str::lower($c['name'].' '.$c['subject']) }}" data-lastfrom="{{ $c['lastFromMe'] ? 'me' : 'them' }}">
+                    <a href="{{ route('client.chat.show', $c['id']) }}" class="cm-conv {{ ($thread && $thread['id'] === $c['id']) ? 'active' : '' }}" data-name="{{ \Illuminate\Support\Str::lower($c['name'].' '.$c['subject']) }}" data-lastfrom="{{ $c['lastFromMe'] ? 'me' : 'them' }}" data-event="{{ $c['event']['id'] ?? '' }}" data-unread="{{ $c['unread'] }}" data-at="{{ $c['sortAt'] }}" data-sortname="{{ \Illuminate\Support\Str::lower($c['name']) }}">
                         <span class="cm-conv-av">{{ $c['initials'] }}</span>
                         <div class="cm-conv-mid">
                             <div class="cm-conv-name">{{ $c['name'] }} <span>({{ $c['role'] }})</span></div>
@@ -147,7 +223,45 @@
                 <div class="cm-th-head">
                     <span class="cm-th-av">{{ $thread['initials'] }}</span>
                     <div class="cm-th-mid"><div class="cm-th-name">{{ $thread['name'] }} <span class="cm-open">OPEN</span></div><div class="cm-th-sub">{{ $thread['subject'] }}@if($thread['date']) · {{ $thread['date'] }}@endif</div></div>
+                    {{-- Every action here goes somewhere real. There is no call
+                         or video button because there is no calling feature. --}}
+                    <div class="cm-th-acts">
+                        @if($info && $info['profileUrl'])
+                            <a href="{{ $info['profileUrl'] }}" title="View profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+                        @endif
+                        @if($info && $info['booking'])
+                            <a href="{{ $info['booking']['url'] }}" title="View booking"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></a>
+                        @endif
+                        <button type="button" id="cm-info-toggle" title="Conversation details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></button>
+                    </div>
                 </div>
+
+                @if($info)
+                    <div class="cm-info" id="cm-info" style="display:none;">
+                        <div class="cm-info-who">
+                            <span class="cm-info-av">{{ $info['initials'] }}</span>
+                            <div>
+                                <b>{{ $info['name'] }}</b>
+                                @if($info['location'])<span>{{ $info['location'] }}</span>@endif
+                            </div>
+                        </div>
+                        <div class="cm-info-rows">
+                            @if($info['email'])<div><span>Email</span><b>{{ $info['email'] }}</b></div>@endif
+                            @if($info['phone'])<div><span>Phone</span><b>{{ $info['phone'] }}</b></div>@endif
+                            @if($info['member_since'])<div><span>On GigResource since</span><b>{{ $info['member_since'] }}</b></div>@endif
+                            <div><span>Your bookings with them</span><b>{{ $info['bookings'] }}</b></div>
+                            @if($info['spent'] > 0)<div><span>Total agreed</span><b>${{ number_format($info['spent'], 2) }}</b></div>@endif
+                        </div>
+                        @if($info['booking'])
+                            <div class="cm-info-order">
+                                <span class="ref">{{ $info['booking']['ref'] }}</span>
+                                <b>{{ $info['booking']['title'] }}</b>
+                                <div><span>${{ number_format($info['booking']['price'], 2) }}</span> · <span>{{ \Illuminate\Support\Str::headline($info['booking']['status']) }}</span> · <span>{{ $info['booking']['date'] }}</span></div>
+                                <a href="{{ $info['booking']['url'] }}">Open in Bookings →</a>
+                            </div>
+                        @endif
+                    </div>
+                @endif
                 <div class="cm-msgs" id="cm-msgs">
                     @forelse($thread['messages'] as $m)
                         <div class="cm-msg {{ $m['mine'] ? 'me' : '' }}">
@@ -162,10 +276,71 @@
                         <div style="text-align:center;color:var(--text-muted);font-size:13px;margin:auto;">No messages yet — start the conversation below.</div>
                     @endforelse
                 </div>
+                <div class="cm-suggest">
+                    <svg class="spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>
+                    <div><b>Suggestion</b><p>Ask for a written quote and confirm what's included.</p></div>
+                    <button type="button" id="cm-suggest-use">Use</button>
+                </div>
+
                 <div class="cm-compose">
+                    {{-- Tabs switch what the picker below offers. They are not a
+                         highlight that moves — Templates and Quick Replies each
+                         insert real text into the box. --}}
+                    <div class="cm-c-tabs">
+                        <span class="cm-c-tab on" data-pane="write">Message</span>
+                        <span class="cm-c-tab" data-pane="quick">Quick Replies</span>
+                        <span class="cm-c-tab" data-pane="templates">Templates</span>
+                    </div>
+
+                    @php
+                        // Written for the client's half of the conversation: the
+                        // things a client actually needs to say to a professional.
+                        $quickReplies = [
+                            'Thanks — that works for me.',
+                            'Could you send a written quote for this?',
+                            'What time would you arrive to set up?',
+                            "I'd like to move ahead. What do you need from me?",
+                            'Can we go over this on a call this week?',
+                        ];
+                        $templates = [
+                            'Ask what is included' => "Hi {name}, before we confirm — could you list exactly what's included at this price, and anything that would be charged on top?",
+                            'Confirm date and times' => "Hi {name}, just confirming the date and the timings. What time do you plan to arrive, and when would you finish?",
+                            'Request a written quote' => "Hi {name}, could you send a written quote covering the services we discussed? I'd like it in writing before we go ahead.",
+                            'Ask about changes' => "Hi {name}, we may need to change some details. How late can we make changes, and does anything cost extra?",
+                        ];
+                    @endphp
+
+                    <div class="cm-c-pane" data-pane="quick" style="display:none;">
+                        @foreach($quickReplies as $r)
+                            <button type="button" class="cm-pick" data-text="{{ $r }}">{{ $r }}</button>
+                        @endforeach
+                    </div>
+                    <div class="cm-c-pane" data-pane="templates" style="display:none;">
+                        @foreach($templates as $label => $body)
+                            <button type="button" class="cm-pick tpl" data-text="{{ str_replace('{name}', $thread['name'], $body) }}"><b>{{ $label }}</b><span>{{ \Illuminate\Support\Str::limit(str_replace('{name}', $thread['name'], $body), 64) }}</span></button>
+                        @endforeach
+                    </div>
+
                     <form class="cm-c-box" id="cm-form">
                         <textarea id="cm-input" placeholder="Type your message..."></textarea>
-                        <div class="cm-c-row"><button type="submit" class="cm-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Send</button></div>
+                        <div class="cm-chips" id="cm-chips" style="display:none;"></div>
+                        <div class="cm-c-row">
+                            <div class="cm-c-icons">
+                                <button type="button" id="cm-emoji-btn" title="Emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></button>
+                                <button type="button" id="cm-attach-btn" title="Attach a file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
+                                <input type="file" id="cm-file" multiple hidden>
+                                <div class="cm-emoji" id="cm-emoji" style="display:none;">
+                                    @foreach(['👍','🙏','😊','🎉','✅','❓','⏰','📸','🎵','💐'] as $e)
+                                        <button type="button" data-e="{{ $e }}">{{ $e }}</button>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <button type="submit" class="cm-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Send</button>
+                        </div>
+                        <div class="cm-c-foot">
+                            <span id="cm-note"></span>
+                            <a href="{{ route('client.notifications.index') }}">Manage Email Notifications</a>
+                        </div>
                     </form>
                 </div>
             @else
@@ -197,11 +372,16 @@
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
     const s = $('cm-search');
     let activeTab = 'inbox';
+    const evSel = $('cm-event');
+    const sortSel = $('cm-sort');
+
     function applyFilters() {
         const q = (s ? s.value : '').toLowerCase();
+        const ev = evSel ? evSel.value : '';
         let shown = 0;
         document.querySelectorAll('#cm-list .cm-conv').forEach((el) => {
             let ok = (el.dataset.name || '').includes(q);
+            if (ev) ok = ok && el.dataset.event === ev;
             if (activeTab === 'sent') ok = ok && el.dataset.lastfrom === 'me';
             else if (activeTab === 'drafts' || activeTab === 'archived') ok = false;
             el.style.display = ok ? '' : 'none';
@@ -213,11 +393,82 @@
             else empty.style.display = 'none';
         }
     }
+
+    // Reordering the rows in place, rather than reloading, so the sort keeps
+    // whatever the search and event filter have already narrowed to.
+    function applySort() {
+        const list = $('cm-list');
+        if (!list || !sortSel) return;
+        const rows = Array.from(list.querySelectorAll('.cm-conv'));
+        const by = sortSel.value;
+        rows.sort((a, b) => {
+            if (by === 'oldest') return (+a.dataset.at) - (+b.dataset.at);
+            if (by === 'name') return (a.dataset.sortname || '').localeCompare(b.dataset.sortname || '');
+            if (by === 'unread') {
+                const d = (+b.dataset.unread) - (+a.dataset.unread);
+                return d !== 0 ? d : (+b.dataset.at) - (+a.dataset.at);
+            }
+            return (+b.dataset.at) - (+a.dataset.at);
+        });
+        const anchor = $('cm-list-empty');
+        rows.forEach((r) => list.insertBefore(r, anchor));
+    }
+
     if (s) s.addEventListener('input', applyFilters);
+    if (evSel) evSel.addEventListener('change', applyFilters);
+    if (sortSel) sortSel.addEventListener('change', applySort);
     document.querySelectorAll('.cm-tab').forEach((t) => t.addEventListener('click', function () {
         document.querySelectorAll('.cm-tab').forEach((x) => x.classList.remove('on')); this.classList.add('on');
         activeTab = this.dataset.tab || 'inbox'; applyFilters();
     }));
+
+    // ── Thread controls ────────────────────────────────────────────────────
+    const infoPanel = $('cm-info');
+    if ($('cm-info-toggle') && infoPanel) $('cm-info-toggle').addEventListener('click', () => {
+        infoPanel.style.display = infoPanel.style.display === 'none' ? '' : 'none';
+    });
+
+    function insert(text) {
+        const i = $('cm-input');
+        if (!i) return;
+        i.value = i.value ? (i.value.replace(/\s*$/, '') + ' ' + text) : text;
+        i.focus();
+        i.selectionStart = i.selectionEnd = i.value.length;
+    }
+
+    // Tabs swap the pane; each pick writes into the box. Nothing here is a
+    // highlight that only moves.
+    document.querySelectorAll('.cm-c-tab').forEach((t) => t.addEventListener('click', function () {
+        document.querySelectorAll('.cm-c-tab').forEach((x) => x.classList.remove('on'));
+        this.classList.add('on');
+        const want = this.dataset.pane;
+        document.querySelectorAll('.cm-c-pane').forEach((p) => {
+            p.style.display = (p.dataset.pane === want) ? '' : 'none';
+        });
+    }));
+    document.querySelectorAll('.cm-pick').forEach((b) => b.addEventListener('click', function () {
+        insert(this.dataset.text || '');
+    }));
+    if ($('cm-suggest-use')) $('cm-suggest-use').addEventListener('click', () => {
+        insert("Could you send me a written quote for this, and confirm exactly what's included?");
+    });
+
+    const emoji = $('cm-emoji');
+    if ($('cm-emoji-btn') && emoji) {
+        $('cm-emoji-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            emoji.style.display = emoji.style.display === 'none' ? 'flex' : 'none';
+        });
+        emoji.addEventListener('click', (e) => {
+            const b = e.target.closest('button[data-e]');
+            if (b) { insert(b.dataset.e); emoji.style.display = 'none'; }
+        });
+        document.addEventListener('click', () => { emoji.style.display = 'none'; });
+    }
+
+    if ($('cm-attach-btn') && $('cm-file')) {
+        $('cm-attach-btn').addEventListener('click', () => $('cm-file').click());
+    }
 
     // Create Message → start a real conversation.
     const modal = $('cm-modal');
@@ -250,6 +501,9 @@ window.CHAT_LIVE = {
     box: '#cm-msgs', form: '#cm-form', input: '#cm-input',
     sendUrl: @json($thread['sendUrl']), showUrl: @json($thread['showUrl']), readUrl: @json($thread['readUrl']),
     meId: @json($thread['meId']), seen: @json(array_column($thread['messages'], 'id')),
+    fileInput: '#cm-file', chips: '#cm-chips',
+    uploadUrl: @json(route('attachments.store')), conversationId: @json($thread['id']),
+    onError: function (msg) { const n = document.getElementById('cm-note'); if (n) { n.textContent = msg; setTimeout(() => { n.textContent = ''; }, 6000); } },
     bubble: function (m, mine) {
         const esc = (x) => { const d = document.createElement('div'); d.textContent = x == null ? '' : x; return d.innerHTML; };
         const name = mine ? 'You' : ((m.sender && m.sender.name) || 'User');

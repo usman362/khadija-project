@@ -112,16 +112,23 @@ class ProfessionalChatController extends Controller
         $unread = $c->messages()->where('sender_id', '!=', $user->id)
             ->whereDoesntHave('reads', fn ($q) => $q->where('user_id', $user->id))->count();
 
-        // Derived tags from the linked booking / agreement state.
+        // Derived tags from the linked booking / verification state.
         $tags = [];
         $booking = $c->booking;
         if ($booking) {
+            // "Escrow" is a retired badge (Q14) — the visible wording is
+            // "In Secure Payment" everywhere else and was inconsistent here.
             $tags[] = $booking->status === 'confirmed'
-                ? ['Escrow Active', 'green']
+                ? ['In Secure Payment', 'green']
                 : ['Deposit Pending', 'amber'];
         }
-        $verified = optional($other?->profile)->trade_license_verified_at ?? null;
-        $tags[] = $verified ? ['W-9 Verified', 'green'] : ['W-9 Missing', 'red'];
+
+        // This read trade_license_verified_at and labelled it "W-9". A trade
+        // licence is not a tax form, and the client's W-9 status is not the
+        // pro's business in any case — the tag now says what the field is.
+        if (optional($other?->profile)->trade_license_verified_at) {
+            $tags[] = ['Licence Verified', 'green'];
+        }
 
         return [
             'id'      => $c->id,

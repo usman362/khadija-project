@@ -62,13 +62,58 @@ class ClientChatController extends Controller
             'currentUser' => $user,
             'conversations' => $list,
             'thread' => $thread,
+            'info' => $activeConv ? $this->info($activeConv, $user) : null,
             'stats' => $this->stats($conversations, $user),
             'tabCounts' => [
                 'inbox' => count($list),
                 'unread' => collect($list)->where('unread', '>', 0)->count(),
                 'sent' => collect($list)->where('lastFromMe', true)->count(),
+                'drafts' => 0,
             ],
+            // Drives the event filter above the list. Only events that actually
+            // have a conversation appear, so the dropdown can never offer a
+            // filter that returns nothing.
+            'eventFilters' => collect($list)->pluck('event')->filter()
+                ->unique('id')->sortBy('title')->values()->all(),
             'recipients' => User::where('id', '!=', $user->id)->select('id', 'name')->orderBy('name')->get(),
+        ];
+    }
+
+    /**
+     * The rail beside the thread: who the client is talking to, and the booking
+     * this conversation is about. The professional side shows the same panel
+     * pointed the other way.
+     */
+    private function info(Conversation $c, $user): array
+    {
+        $pro     = $c->participants->firstWhere('id', '!=', $user->id) ?? $c->participants->first();
+        $booking = $c->booking;
+        $event   = $c->event ?? $booking?->event;
+
+        $withThisPro = $pro
+            ? Booking::where('client_id', $user->id)->where('supplier_id', $pro->id)
+            : null;
+
+        return [
+            'name'         => $pro?->name ?? 'Professional',
+            'initials'     => $this->initials($pro?->name ?? 'P'),
+            'email'        => $pro?->email,
+            'phone'        => $pro?->phone ?? optional($pro?->profile)->phone,
+            'location'     => optional($pro?->profile)->city ?? optional($pro?->profile)->address,
+            'member_since' => optional($pro?->created_at)->format('M d, Y'),
+            'bookings'     => $withThisPro ? (clone $withThisPro)->count() : 0,
+            'spent'        => $withThisPro
+                ? (float) (clone $withThisPro)->whereIn('status', ['confirmed', 'completed'])->sum('price')
+                : 0.0,
+            'profileUrl'   => $pro ? route('public.professional.show', $pro->id) : null,
+            'booking'      => $booking ? [
+                'title'  => $event?->title ?? 'Booking',
+                'ref'    => 'BK-' . str_pad((string) $booking->id, 4, '0', STR_PAD_LEFT),
+                'price'  => (float) $booking->price,
+                'status' => $booking->status,
+                'date'   => optional($booking->created_at)->format('M d, Y'),
+                'url'    => route('client.bookings.index'),
+            ] : null,
         ];
     }
 
@@ -100,6 +145,8 @@ class ClientChatController extends Controller
             'tags' => $tags,
             'initials' => $this->initials($other?->name ?? 'C'),
             'lastFromMe' => $last && $last->sender_id === $user->id,
+            'event' => $event ? ['id' => $event->id, 'title' => $event->title] : null,
+            'sortAt' => optional($last?->created_at)->timestamp ?? optional($c->updated_at)->timestamp ?? 0,
         ];
     }
 

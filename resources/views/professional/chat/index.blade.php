@@ -47,6 +47,14 @@
     .pm-search-box { flex: 1; position: relative; }
     .pm-search-box svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--text-muted); }
     .pm-search-box input { width: 100%; box-sizing: border-box; padding: 9px 12px 9px 34px; border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-primary); font-size: 13px; font-family: inherit; }
+    .pm-c-pane { display: flex; flex-direction: column; gap: 6px; margin-bottom: 11px; max-height: 168px; overflow-y: auto; }
+    .pm-pick { text-align: left; padding: 8px 11px; border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-primary); font-size: 12.5px; font-family: inherit; cursor: pointer; }
+    .pm-pick:hover { border-color: var(--pm); }
+    .pm-pick.tpl b { display: block; font-size: 12.5px; margin-bottom: 2px; }
+    .pm-pick.tpl span { font-size: 11.5px; color: var(--text-muted); }
+    .pm-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; }
+    .chat-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; color: var(--text-primary); background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 999px; padding: 4px 6px 4px 10px; }
+    .chat-chip button { border: none; background: none; color: var(--text-muted); font-size: 15px; line-height: 1; cursor: pointer; padding: 0 3px; }
     .pm-filter { width: 38px; border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; }
     .pm-filter svg { width: 15px; height: 15px; }
     .pm-subbar { display: flex; align-items: center; justify-content: space-between; padding: 0 14px 10px; font-size: 11.5px; color: var(--text-muted); }
@@ -240,10 +248,39 @@
 
                 <div class="pm-compose">
                     <div class="pm-c-tabs">
-                        <span class="pm-c-tab on">Message</span><span class="pm-c-tab">Smart Reply</span><span class="pm-c-tab">Templates</span><span class="pm-c-tab">Quick Actions</span><span class="pm-c-tab">Notes</span>
+                        <span class="pm-c-tab on" data-pane="write">Message</span><span class="pm-c-tab" data-pane="quick">Quick Replies</span><span class="pm-c-tab" data-pane="templates">Templates</span>
                     </div>
+                    @php
+                        // The professional's half of the conversation.
+                        $quickReplies = [
+                            "Thanks — I've got that, I'll confirm shortly.",
+                            'Yes, that date is available.',
+                            'I can hold the date for 48 hours while you decide.',
+                            "I'll send a written quote today.",
+                            'Could you confirm the venue address and access times?',
+                        ];
+                        $templates = [
+                            'Confirm availability' => "Hi {name}, thanks for getting in touch. I'm available on that date. Shall I put together a quote for what you need?",
+                            'Send what is included' => "Hi {name}, here's exactly what's included at this price, and anything charged on top is listed separately so there are no surprises.",
+                            'Ask for event details' => "Hi {name}, to quote this properly could you confirm the venue, guest count, and the start and finish times?",
+                            'Confirm setup times' => "Hi {name}, confirming the plan for the day — I'd arrive to set up ahead of the start time, and pack down afterwards.",
+                        ];
+                    @endphp
+                    <div class="pm-c-pane" data-pane="quick" style="display:none;">
+                        @foreach($quickReplies as $r)
+                            <button type="button" class="pm-pick" data-text="{{ $r }}">{{ $r }}</button>
+                        @endforeach
+                    </div>
+                    <div class="pm-c-pane" data-pane="templates" style="display:none;">
+                        @foreach($templates as $label => $body)
+                            <button type="button" class="pm-pick tpl" data-text="{{ str_replace('{name}', $thread['name'], $body) }}"><b>{{ $label }}</b><span>{{ \Illuminate\Support\Str::limit(str_replace('{name}', $thread['name'], $body), 64) }}</span></button>
+                        @endforeach
+                    </div>
+
                     <form class="pm-c-box" id="pm-form">
                         <textarea id="pm-input" placeholder="Type your message..."></textarea>
+                        <div class="pm-chips" id="pm-chips" style="display:none;"></div>
+                        <input type="file" id="pm-file" multiple hidden>
                         <div class="pm-c-row">
                             <div class="pm-c-icons">
                                 <button type="button" title="Emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></button>
@@ -255,7 +292,10 @@
                             <button type="submit" class="pm-send" id="pm-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Send</button>
                         </div>
                         <div class="pm-c-foot">
-                            <label><input type="checkbox"> Internal only (not sent to client)</label>
+                            {{-- An "Internal only" checkbox sat here. It was never
+                                 submitted and there is no internal-note model, so it
+                                 promised privacy the send path could not keep. --}}
+                            <span id="pm-note" style="color:var(--bad-text);"></span>
                             <a href="{{ route('professional.notifications.index') }}" style="color:var(--pm);font-weight:700;text-decoration:none;">Manage Email Notifications</a>
                         </div>
                     </form>
@@ -313,11 +353,30 @@
         activeTab = this.dataset.tab || 'inbox'; applyFilters();
     }));
 
-    // Compose sub-tabs (Message / Smart Reply / Templates …) — local toggle only.
+    function insert(text) {
+        const i = $('pm-input');
+        if (!i) return;
+        i.value = i.value ? (i.value.replace(/\s*$/, '') + ' ' + text) : text;
+        i.focus();
+        i.selectionStart = i.selectionEnd = i.value.length;
+    }
+
+    // Compose sub-tabs swap the pane below; each pick writes into the box.
     document.querySelectorAll('.pm-c-tab').forEach((t) => t.addEventListener('click', function () {
         document.querySelectorAll('.pm-c-tab').forEach((x) => x.classList.remove('on'));
         this.classList.add('on');
+        const want = this.dataset.pane;
+        document.querySelectorAll('.pm-c-pane').forEach((p) => {
+            p.style.display = (p.dataset.pane === want) ? '' : 'none';
+        });
     }));
+    document.querySelectorAll('.pm-pick').forEach((b) => b.addEventListener('click', function () {
+        insert(this.dataset.text || '');
+    }));
+
+    // The paperclip is the second icon in the compose row.
+    const icons = document.querySelectorAll('.pm-c-icons > button');
+    if (icons[1] && $('pm-file')) icons[1].addEventListener('click', () => $('pm-file').click());
 
     // Suggestion "Use" → fill the compose box.
     const aiUse = $('pm-ai-use');
@@ -357,6 +416,9 @@ window.CHAT_LIVE = {
     box: '#pm-msgs', form: '#pm-form', input: '#pm-input',
     sendUrl: @json($thread['sendUrl']), showUrl: @json($thread['showUrl']), readUrl: @json($thread['readUrl']),
     meId: @json($thread['meId']), seen: @json(array_column($thread['messages'], 'id')),
+    fileInput: '#pm-file', chips: '#pm-chips',
+    uploadUrl: @json(route('attachments.store')), conversationId: @json($thread['id']),
+    onError: function (msg) { const n = document.getElementById('pm-note'); if (n) { n.textContent = msg; setTimeout(() => { n.textContent = ''; }, 6000); } },
     bubble: function (m, mine) {
         const esc = (s) => { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; };
         const name = mine ? 'You' : ((m.sender && m.sender.name) || 'User');
