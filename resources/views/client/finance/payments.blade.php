@@ -2,7 +2,7 @@
 
 @section('title', 'Payments')
 @section('page-title', 'Payments')
-@section('page-subtitle', 'Track settled deposits, secure payment, and vendor disbursements across your events.')
+@section('page-subtitle', 'Deposits, payments and disbursements.')
 
 @push('styles')
 <style>

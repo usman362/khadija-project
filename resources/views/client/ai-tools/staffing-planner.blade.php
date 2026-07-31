@@ -2,7 +2,7 @@
 
 @section('title', 'Staffing Planner')
 @section('page-title', 'Staffing Planner')
-@section('page-subtitle', 'Plan the perfect team. At the right time. Every time.')
+@section('page-subtitle', 'Plan the right team for the job.')
 
 {{-- Staffing Planner — deterministic, dynamic staffing planner (no LLM).
      Builds a positioned role timeline + coverage stats from event type +

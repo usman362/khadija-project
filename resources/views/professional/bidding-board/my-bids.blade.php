@@ -2,7 +2,7 @@
 
 @section('title', 'My Bids')
 @section('page-title', 'My Bids')
-@section('page-subtitle', 'Every request, bid, reply and outcome in one place')
+@section('page-subtitle', 'Every bid, reply and outcome.')
 
 {{-- Professional — My Bids.
 

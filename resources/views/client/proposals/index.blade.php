@@ -2,7 +2,7 @@
 
 @section('title', 'Proposals')
 @section('page-title', 'Proposals')
-@section('page-subtitle', 'Manage your submitted and received proposals all in one place.')
+@section('page-subtitle', "Proposals you've sent and received.")
 
 @push('styles')
 <style>

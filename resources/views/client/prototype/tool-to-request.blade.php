@@ -2,7 +2,7 @@
 
 @section('title', 'Prototype — Tool to Request')
 @section('page-title', 'Tool → Request')
-@section('page-subtitle', 'Prototype for review — nothing here is saved or posted.')
+@section('page-subtitle', 'Prototype — nothing here is saved.')
 
 @push('styles')
 <style>

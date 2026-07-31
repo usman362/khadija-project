@@ -2,7 +2,7 @@
 
 @section('title', 'Notification Preferences')
 @section('page-title', 'Notification Preferences')
-@section('page-subtitle', 'Control what you are notified about — and through which channels (email, push, SMS).')
+@section('page-subtitle', "Choose what you're told, and how.")
 
 @push('styles')
 <style>

@@ -2,7 +2,7 @@
 
 @section('title', 'My Professionals')
 @section('page-title', 'My Professionals')
-@section('page-subtitle', 'The professionals you\'ve hired and saved — re-book them in one click.')
+@section('page-subtitle', 'Professionals you hired or saved.')
 
 @push('styles')
 <style>

@@ -1,7 +1,7 @@
 @extends('layouts.client')
 @section('title', 'Post a Rush Request (ESR)')
 @section('page-title', 'Emergency Service Request (ESR)')
-@section('page-subtitle', 'For urgent, time-sensitive needs within 72 hours')
+@section('page-subtitle', 'For urgent needs within 72 hours.')
 
 @push('styles')
 <style>

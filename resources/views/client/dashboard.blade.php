@@ -1,7 +1,7 @@
 @extends('layouts.client')
 
 @section('title', 'Dashboard')
-@section('page-subtitle', 'Send offers, invite professionals, and build your dream team for the best event.')
+@section('page-subtitle', 'Send offers, hire, and plan your event.')
 
 @push('styles')
 <style>

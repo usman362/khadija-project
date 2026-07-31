@@ -2,7 +2,7 @@
 
 @section('title', 'Best Match')
 @section('page-title', 'Best Match')
-@section('page-subtitle', 'We find the perfect vendors for your event based on your theme, date, and budget.')
+@section('page-subtitle', 'Find vendors that fit your event.')
 
 {{-- Best Match — deterministic, dynamic matcher (no LLM). Ranks a
      vendor catalogue against the event theme/budget and the refine controls

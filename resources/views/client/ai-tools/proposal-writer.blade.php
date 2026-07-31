@@ -2,7 +2,7 @@
 
 @section('title', 'Proposal Builder')
 @section('page-title', 'Proposal Builder')
-@section('page-subtitle', 'Build a winning proposal in minutes, from your own templates.')
+@section('page-subtitle', 'Build a proposal from your templates.')
 
 {{-- Proposal Builder — deterministic, dynamic proposal generator (no LLM /
      no quota). Parses the event description + tone/focus/length and assembles

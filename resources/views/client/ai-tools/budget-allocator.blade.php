@@ -2,7 +2,7 @@
 
 @section('title', 'Budget Planner')
 @section('page-title', 'Budget Planner')
-@section('page-subtitle', 'Break your event budget into smart category allocations and a complete spending plan.')
+@section('page-subtitle', 'Split your budget across categories.')
 
 @push('styles')
 <style>

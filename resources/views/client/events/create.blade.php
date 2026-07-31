@@ -2,7 +2,7 @@
 
 @section('title', 'Create a Gig')
 @section('page-title', 'Create a New Gig')
-@section('page-subtitle', 'Fill in the details below and we will help you find the right professionals.')
+@section('page-subtitle', 'Tell us what you need.')
 
 {{-- Rich single-page gig builder (client / orange theme). Everything is visible
      on one page — the top step bar is anchor-nav that scrolls to each section.

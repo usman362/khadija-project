@@ -2,7 +2,7 @@
 
 @section('title', 'Cancellation & Rejection Wizard')
 @section('page-title', 'Cancellation & Rejection Wizard')
-@section('page-subtitle', 'Categorize your disagreement and choose how you would like to proceed.')
+@section('page-subtitle', "Choose how you'd like to resolve this.")
 
 {{-- Integrated Cancellation & Rejection Wizard — 3-step flow (Select Reason →
      Choose Outcome → Resolution Log). resolve() applies the chosen path to a

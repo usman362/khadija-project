@@ -2,7 +2,7 @@
 
 @section('title', 'Reviews')
 @section('page-title', 'Reviews')
-@section('page-subtitle', 'Client feedback and ratings about your hired professionals.')
+@section('page-subtitle', 'Feedback on professionals you hired.')
 
 @push('styles')
 <style>

@@ -2,7 +2,7 @@
 
 @section('title', 'Earnings')
 @section('page-title', 'Earnings')
-@section('page-subtitle', 'Track project funds, manage payouts, and monitor financial performance.')
+@section('page-subtitle', 'Funds, payouts and financial progress.')
 
 @push('styles')
 <style>

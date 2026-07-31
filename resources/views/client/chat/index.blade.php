@@ -2,7 +2,7 @@
 
 @section('title', 'Messages — Inbox')
 @section('page-title', 'Messages — Inbox')
-@section('page-subtitle', 'All your conversations, event updates, documents, and payments — organized in one place.')
+@section('page-subtitle', 'Every conversation in one place.')
 
 {{-- Client Messages — Inbox. Server-rendered, orange client theme. Live send +
      polling + read receipts via partials._chat_live. --}}

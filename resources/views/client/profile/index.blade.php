@@ -2,7 +2,7 @@
 
 @section('title', 'Account Settings')
 @section('page-title', 'Account Settings')
-@section('page-subtitle', 'Manage your profile, notifications, security and preferences.')
+@section('page-subtitle', 'Profile, security and preferences.')
 
 @push('styles')
 <style>

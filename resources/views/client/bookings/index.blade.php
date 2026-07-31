@@ -2,7 +2,7 @@
 
 @section('title', 'Bookings')
 @section('page-title', 'Bookings')
-@section('page-subtitle', 'Track contracts, payments and progress across every gig.')
+@section('page-subtitle', 'Contracts, payments and progress.')
 
 @push('styles')
 <style>

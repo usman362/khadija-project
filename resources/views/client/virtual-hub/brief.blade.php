@@ -2,7 +2,7 @@
 
 @section('title', 'Virtual & Hybrid Event Brief')
 @section('page-title', 'Virtual & Hybrid Event Brief')
-@section('page-subtitle', 'Post your event details and technical requirements. Qualified professionals will submit their bids.')
+@section('page-subtitle', 'Post your event and technical needs.')
 
 @push('styles')
 <style>

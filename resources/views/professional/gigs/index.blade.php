@@ -2,7 +2,7 @@
 
 @section('title', 'My Gigs')
 @section('page-title', 'My Gigs')
-@section('page-subtitle', 'Manage your gigs, bids and bookings in one place.')
+@section('page-subtitle', 'Your gigs, bids and bookings.')
 
 @php
     // ── Representative / derived figures ──

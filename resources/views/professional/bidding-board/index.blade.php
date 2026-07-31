@@ -2,7 +2,7 @@
 
 @section('title', 'Main Bidding Board')
 @section('page-title', 'Main Bidding Board')
-@section('page-subtitle', 'Find the perfect gigs and place your best bids')
+@section('page-subtitle', 'Find gigs and place your bids.')
 
 {{-- Professional — Main Bidding Board. Every open client gig in one place,
      filterable by request type (BSR / ESR / DSR) and by scope, with fit

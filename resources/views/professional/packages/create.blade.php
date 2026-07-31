@@ -4,7 +4,7 @@
 
 @section('title', $editing ? 'Edit Package' : 'Create a Package')
 @section('page-title', $editing ? 'Edit Package' : 'Create a Package for Package Search')
-@section('page-subtitle', 'Build a ready-made service bundle clients can discover and book')
+@section('page-subtitle', 'A ready-made bundle clients can book.')
 
 {{-- Professional — Create a Package for Package Search. A pro bundles 2+ of
      their own services (solo — one professional) into a fixed offering that

@@ -2,7 +2,7 @@
 
 @section('title', 'My Events')
 @section('page-title', 'My Events')
-@section('page-subtitle', 'Manage your events, master list, and professionals in one place.')
+@section('page-subtitle', 'Your events and who is working on them.')
 
 @push('styles')
 <style>

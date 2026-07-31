@@ -2,7 +2,7 @@
 
 @section('title', 'Virtual & Hybrid Hub')
 @section('page-title', 'Virtual & Hybrid Hub')
-@section('page-subtitle', 'Plan, connect, and manage unforgettable virtual, hybrid & livestream events.')
+@section('page-subtitle', 'Plan and run virtual and hybrid events.')
 
 @push('styles')
 <style>

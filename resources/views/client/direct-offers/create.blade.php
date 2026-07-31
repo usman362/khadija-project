@@ -2,7 +2,7 @@
 
 @section('title', 'Direct Offer / Request')
 @section('page-title', 'Send a Direct Offer / Request')
-@section('page-subtitle', 'Request services directly from a professional')
+@section('page-subtitle', 'Request services from one professional.')
 
 {{-- Client → Professional Direct Offer builder. The request type (SSR / MSR)
      reshapes the form: SSR = one service; MSR = multiple services, each handled

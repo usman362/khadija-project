@@ -2,7 +2,7 @@
 
 @section('title', 'Pricing Calculator')
 @section('page-title', 'Pricing Calculator')
-@section('page-subtitle', 'Get the right price. Win more gigs. Maximize your value.')
+@section('page-subtitle', 'Get the right price for the job.')
 
 {{-- Pricing Calculator — a deterministic pricing calculator (no LLM / no
      quota). Recommended price + market band are computed from a transparent

@@ -2,7 +2,7 @@
 
 @section('title', 'My Packages')
 @section('page-title', 'My Packages')
-@section('page-subtitle', 'Fixed service bundles clients can browse and book directly.')
+@section('page-subtitle', 'Bundles clients can book directly.')
 
 @push('styles')
 <style>
