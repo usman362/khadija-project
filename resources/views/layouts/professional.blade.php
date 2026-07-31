@@ -505,7 +505,6 @@
         /* Solid, not translucent. A 20%-white disc over the blue lands close enough
            to the banner that white initials on it measured 3.6:1 — the letter read as
            a smudge. Inverted: white disc, blue letter, 5.6:1. */
-        .pro-banner-avatar { width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0; background: #fff; border: 2px solid rgba(255,255,255,0.55); display: flex; align-items: center; justify-content: center; color: #1d4ed8; font-weight: 800; font-size: 16px; }
         .pro-banner-text { flex-shrink: 0; }
         .pro-banner-text h1 { font-size: 17px; font-weight: 800; color: #fff; margin: 0; }
         /* 0.82 alpha put this at 4.2:1 at 11.5px — under the 4.5 small-text bar. */
@@ -1154,7 +1153,6 @@
             </button>
 
             <div class="pro-banner">
-                <div class="pro-banner-avatar">{{ strtoupper(substr(auth()->user()?->name ?? 'P', 0, 1)) }}</div>
                 <div class="pro-banner-text">
                     <h1>Welcome back, {{ auth()->user()?->name ?? 'Professional User' }}! 👋</h1>
                     <p>Here's your business overview for today, {{ now()->format('M d, Y') }}.</p>

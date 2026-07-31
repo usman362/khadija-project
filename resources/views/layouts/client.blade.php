@@ -629,9 +629,6 @@
         /* ══════ Client topbar — orange welcome banner ══════ */
         .cl-topbar { display: flex; align-items: center; gap: 16px; padding: 12px 26px 2px; position: sticky; top: 0; z-index: 100; background: var(--bg-primary); }
         .cl-banner { flex: 1; min-width: 0; display: flex; align-items: center; gap: 16px; background: linear-gradient(120deg, #fb923c 0%, #f97316 50%, #ea580c 100%); border-radius: 14px; padding: 12px 18px; box-shadow: 0 6px 20px rgba(249,115,22,0.25); }
-        /* Same inversion as the professional banner — a translucent white disc over
-           the orange left the initial at 2.2:1. */
-        .cl-banner-avatar { width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0; background: #fff; border: 2px solid rgba(255,255,255,0.55); display: flex; align-items: center; justify-content: center; color: #c2410c; font-weight: 800; font-size: 16px; }
         .cl-banner-text { flex-shrink: 0; }
         .cl-banner-text h1 { font-size: 17px; font-weight: 800; color: #fff; margin: 0; line-height: 1.2; }
         .cl-banner-text p { font-size: 11.5px; color: #fff; margin: 2px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 340px; }
@@ -1362,9 +1359,8 @@
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
 
-            {{-- Orange welcome banner: avatar + greeting + search (matches reference) --}}
+            {{-- Orange welcome banner: greeting + search (matches reference) --}}
             <div class="cl-banner">
-                <div class="cl-banner-avatar">{{ strtoupper(substr(auth()->user()?->name ?? 'C', 0, 1)) }}</div>
                 <div class="cl-banner-text">
                     <h1>@yield('page-title', 'Welcome back, ' . (auth()->user()?->name ?? 'there') . '! 👋')</h1>
                     <p>@yield('page-subtitle', "Let's create amazing events together")</p>
