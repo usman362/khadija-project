@@ -18,12 +18,9 @@
         @php
             $__target    = $__active === 'supplier' ? 'client' : 'supplier';
             $__targetLbl = $__target === 'supplier' ? 'Professional' : 'Client';
-            $__currentLbl= $__active === 'supplier' ? 'Professional' : 'Client';
         @endphp
-        <div class="rs-current" title="Current mode">
-            <span class="rs-dot rs-dot-{{ $__active }}"></span>
-            <span class="rs-label">{{ $__currentLbl }}</span>
-        </div>
+        {{-- The current-mode pill is gone: it labelled the portal you were
+             already looking at, next to a button that names the other one. --}}
         <form action="{{ route('role.switch') }}" method="POST" class="rs-form">
             @csrf
             <input type="hidden" name="role" value="{{ $__target }}">
@@ -55,30 +52,6 @@
         gap: 8px;
         margin-right: 6px;
     }
-    /* Current-mode pill — green-tinted with a coloured status dot,
-       matching the reference "● PROFESSIONAL" chip. */
-    .rs-current {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 13px;
-        background: rgba(16,185,129,0.12);
-        border: 1px solid rgba(16,185,129,0.28);
-        border-radius: 30px;
-        font-size: 0.72rem;
-        font-weight: 700;
-        color: #10b981;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    .rs-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        flex-shrink: 0;
-    }
-    .rs-dot-client   { background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,0.6); }
-    .rs-dot-supplier { background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,0.6); }
 
     .rs-form { margin: 0; }
     .rs-btn {
@@ -115,7 +88,6 @@
     }
 
     @media (max-width: 768px) {
-        .rs-current .rs-label { display: none; }
         .rs-btn { padding: 6px 10px; font-size: 0.72rem; }
     }
 </style>
