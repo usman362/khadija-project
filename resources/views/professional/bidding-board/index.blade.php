@@ -5,7 +5,8 @@
 @section('page-subtitle', 'Find the perfect gigs and place your best bids')
 
 {{-- Professional — Main Bidding Board. Every open client gig in one place,
-     filterable by request type (SSR / MSR / ESR), with AI match-scores, live
+     filterable by request type (BSR / ESR / DSR) and by scope, with fit
+     scores, live
      time-left and market insights. Gigs are representative pending the live
      gig/bid pipeline. --}}
 
@@ -29,7 +30,10 @@
     .bb-media { position: relative; background: var(--bg-card-hover, var(--border-color)); }
     .bb-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .bb-type { position: absolute; left: 8px; top: 8px; font-size: 10px; font-weight: 800; letter-spacing: .3px; padding: 3px 9px; border-radius: 6px; color: #fff !important; }
-    .bb-type.ESR { background: #e11d48; } .bb-type.SSR { background: #2563eb; } .bb-type.MSR { background: #7c3aed; }
+    .bb-type.BSR { background: #2563eb; } .bb-type.ESR { background: #e11d48; } .bb-type.DSR { background: #7c3aed; }
+    /* Scope sits next to the type, deliberately quieter — it is the smaller
+       of the two questions and must not read as a fourth type. */
+    .bb-scope { position: absolute; top: 10px; left: 58px; background: rgba(15,23,42,0.72); color: #fff; font-size: 10px; font-weight: 800; letter-spacing: .3px; padding: 3px 7px; border-radius: 6px; }
 
     .bb-main { padding: 14px 16px; display: flex; flex-direction: column; min-width: 0; }
     .bb-top { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; }
@@ -246,6 +250,7 @@
                 <article class="bb-card">
                     <div class="bb-media">
                         <span class="bb-type {{ $g['type'] }}">{{ $g['type'] }}</span>
+                        <span class="bb-scope" title="{{ $g['scope'] === 'MSR' ? 'Multi-service request' : 'Single-service request' }}">{{ $g['scope'] }}</span>
                         <img src="https://images.unsplash.com/{{ $g['img'] }}?w=320&q=70&auto=format&fit=crop" alt="" loading="lazy">
                     </div>
 
@@ -351,30 +356,13 @@
                 <button class="bb-viewins">View Full Market Insights</button>
             </div>
 
-            <div class="bb-rail-card">
-                <div class="bb-rail-head">
-                    <h4>Filters</h4>
-                    <button class="bb-clear" type="button">Clear All</button>
-                </div>
-                <div class="bb-frow"><label>Request Type</label><select><option>All Types</option><option>ESR — Emergency Service Request</option><option>SSR — Single Service Request</option><option>MSR — Multi-Service Request</option></select></div>
-                <div class="bb-frow"><label>Category</label><select><option>All Categories</option><option>Photography</option><option>DJ &amp; Music</option><option>Catering</option><option>Décor</option></select></div>
-                {{-- 7-jurisdiction dropdown, not free text — a free-text location
-                     out-scopes the create forms, which only accept the 7 (F6). --}}
-                <div class="bb-frow"><label>Location</label>
-                    <select>
-                        <option value="">All areas</option>
-                        @foreach(config('geo.allowed_states', []) as $abbr => $name)
-                            <option value="{{ $abbr }}">{{ $name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="bb-frow"><label>Budget Range</label><input type="number" placeholder="Min $"></div>
-                <label class="bb-chk"><input type="checkbox" checked> Open Now</label>
-                <label class="bb-chk"><input type="checkbox"> Ending Soon</label>
-                <label class="bb-chk"><input type="checkbox"> High Match (80%+)</label>
-                <button class="bb-apply">Apply Filters</button>
-                <button class="bb-save">♡ Save Search</button>
-            </div>
+            {{-- A second "Filters" card used to sit here. Every control in it was
+                 decorative — no name, no form, and the buttons did nothing — while
+                 the real filters run above the results. It also listed SSR and MSR
+                 as request TYPES, which is the one thing the locked model says they
+                 are not: the types are BSR / ESR / DSR and SSR/MSR is the scope
+                 inside them. Two filter panels disagreeing about the model is worse
+                 than one, so the dead one is gone. --}}
 
             <div class="bb-rail-card bb-sealed">
                 <h4>🔒 Sealed Bidding is On</h4>

@@ -736,8 +736,12 @@ Route::middleware('auth')->group(function () {
         // Contracts hub (contracts, proposals, earnings, gig opportunities, bids pipeline)
         Route::get('/contracts', [\App\Http\Controllers\Professional\ProfessionalContractController::class, 'index'])->name('professional.contracts.index');
 
-        // Multi-Service Requests (browse & bid on multi-service event postings)
-        Route::get('/multi-service', [\App\Http\Controllers\Professional\ProfessionalMultiServiceController::class, 'index'])->name('professional.multi-service.index');
+        // Multi-Service Requests was its own page listing published events with
+        // 2+ categories — which is exactly the Bidding Board's `scope=multi`
+        // filter, running the same `categories >= 2` test twice. Kept as a
+        // redirect so old links and bookmarks land on the filtered board.
+        Route::get('/multi-service', fn () => redirect()->route('professional.bidding-board.index', ['scope' => 'multi']))
+            ->name('professional.multi-service.index');
 
         // Priority Actions (aggregated urgent items the pro must act on)
         Route::get('/priority-actions', [\App\Http\Controllers\Professional\ProfessionalPriorityController::class, 'index'])->name('professional.priority.index');

@@ -60,7 +60,12 @@ class ProfessionalBiddingBoardController extends Controller
         $base = Event::query()
             ->whereNotIn('status', ['completed', 'cancelled'])
             ->where(function ($outer) use ($user) {
-                $outer->where('is_published', true)
+                // A broadcast gig leaves the board once it is awarded. Only
+                // `completed` and `cancelled` were excluded before, so an event
+                // that already had a supplier — awarded to someone else — sat
+                // there taking bids nobody could win.
+                $outer->where(fn ($q1) => $q1->where('is_published', true)
+                                              ->whereNull('supplier_id'))
                       ->orWhere(fn ($q2) => $q2->where('source', 'direct_offer')
                                                 ->where('supplier_id', $user?->id));
             })
@@ -168,7 +173,12 @@ class ProfessionalBiddingBoardController extends Controller
         $open = Event::query()
             ->whereNotIn('status', ['completed', 'cancelled'])
             ->where(function ($outer) use ($user) {
-                $outer->where('is_published', true)
+                // A broadcast gig leaves the board once it is awarded. Only
+                // `completed` and `cancelled` were excluded before, so an event
+                // that already had a supplier — awarded to someone else — sat
+                // there taking bids nobody could win.
+                $outer->where(fn ($q1) => $q1->where('is_published', true)
+                                              ->whereNull('supplier_id'))
                       ->orWhere(fn ($q2) => $q2->where('source', 'direct_offer')
                                                 ->where('supplier_id', $user?->id));
             })
@@ -480,9 +490,15 @@ class ProfessionalBiddingBoardController extends Controller
     /** Map a real Event to the bidding-board gig card shape. */
     private function mapEvent(Event $e, int $bidCount = 0, ?Bid $myBid = null, ?\App\Models\User $viewer = null): array
     {
-        $cats  = $e->categories->pluck('name')->all();
-        // ESR is explicit (source), not guessed from service count.
-        $type  = $e->source === 'esr' ? 'ESR' : (count($cats) >= 2 ? 'MSR' : 'SSR');
+        $cats = $e->categories->pluck('name')->all();
+
+        // This used to read ESR / MSR / SSR — mixing the type with the scope on
+        // the one badge, so a card could say "MSR" while the tab above it said
+        // BSR. They are different questions and both get answered: typeOf() is
+        // how the request reaches professionals, scopeOf() is how many services
+        // are in it.
+        $type  = $this->typeOf($e);
+        $scope = $this->scopeOf($e) === 'multi' ? 'MSR' : 'SSR';
         $days  = $e->starts_at ? (int) round(now()->diffInDays($e->starts_at, false)) : null;
         $stock = ['photo-1519741497674-611481863552', 'photo-1511795409834-ef04bbd61622', 'photo-1530103862676-de8c9debad1d', 'photo-1492684223066-81342ee5ff30'];
 
@@ -493,6 +509,7 @@ class ProfessionalBiddingBoardController extends Controller
 
         return [
             'type'   => $type,
+            'scope'  => $scope,
             // A rush request is urgent by definition — don't let a needed-by
             // date further out quietly drop the flag that's the whole point.
             'urgent' => ! $expired && ($type === 'ESR' || ($days !== null && $days >= 0 && $days <= 3)),

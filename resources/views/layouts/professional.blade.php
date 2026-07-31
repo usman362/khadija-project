@@ -1008,12 +1008,9 @@
                         Bidding Board
                     </a>
                 </li>
-                <li class="cl-nav-item">
-                    <a href="{{ route('professional.multi-service.index') }}" class="cl-nav-link {{ request()->routeIs('professional.multi-service.*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
-                        Multi-Service Requests
-                    </a>
-                </li>
+                {{-- "Multi-Service Requests" was a second link to the Bidding Board
+                     filtered to multi-service gigs — same query, same page, one more
+                     thing in the sidebar. It is the board's scope filter now. --}}
                 <li class="cl-nav-item">
                     <a href="{{ route('professional.direct-offers.show') }}" class="cl-nav-link {{ request()->routeIs('professional.direct-offers.*') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
