@@ -147,6 +147,7 @@ class AiVendorMatchmakingController extends Controller
 
         $suppliers = \App\Models\User::query()
             ->whereHas('roles', fn ($r) => $r->where('name', \App\Domain\Auth\Enums\RoleName::SUPPLIER->value))
+            ->excludingSelf()
             ->whereHas('profile')
             ->with('profile:user_id,skills,hourly_rate,city,company_name,headline')
             ->withAvg(['reviewsReceived as reviews_avg' => fn ($q) => $q->where('is_hidden', false)], 'rating')

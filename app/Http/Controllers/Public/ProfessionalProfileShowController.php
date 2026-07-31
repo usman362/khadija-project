@@ -46,6 +46,7 @@ class ProfessionalProfileShowController extends Controller
         // Excludes the current pro and limits to 4 cards for the horizontal row.
         $similar = User::query()
             ->whereHas('roles', fn ($r) => $r->where('name', RoleName::SUPPLIER->value))
+            ->excludingSelf()
             ->where('users.id', '!=', $user->id)
             ->with('profile')
             ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')

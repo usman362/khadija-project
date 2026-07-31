@@ -33,6 +33,7 @@ class CategoryLandingController extends Controller
 
         $featured = User::query()
             ->whereHas('roles', fn ($r) => $r->where('name', RoleName::SUPPLIER->value))
+            ->excludingSelf()
             ->with('profile')
             ->whereHas('serviceCategories', fn (Builder $c) => $c->whereIn('categories.id', $branchIds))
             ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')
@@ -50,6 +51,7 @@ class CategoryLandingController extends Controller
         // Same population as the featured list, uncapped.
         $totalCount = User::query()
             ->whereHas('roles', fn ($r) => $r->where('name', RoleName::SUPPLIER->value))
+            ->excludingSelf()
             ->whereHas('serviceCategories', fn (Builder $c) => $c->whereIn('categories.id', $branchIds))
             ->count();
 

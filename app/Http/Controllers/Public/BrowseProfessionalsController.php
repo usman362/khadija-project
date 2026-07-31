@@ -48,6 +48,7 @@ class BrowseProfessionalsController extends Controller
         // hourly rate / verification badges without N+1 queries.
         $query = User::query()
             ->whereHas('roles', fn ($r) => $r->where('name', RoleName::SUPPLIER->value))
+            ->excludingSelf()
             ->with(['profile', 'serviceCategories:id,name,thumbnail']);
 
         // ── Keyword search across name + profile text fields ──────────

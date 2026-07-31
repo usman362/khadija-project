@@ -99,6 +99,7 @@ class VendorMatchmakingService
 
         $query = User::query()
             ->whereHas('roles', fn($q) => $q->where('name', RoleName::SUPPLIER->value))
+            ->excludingSelf()
             ->whereHas('profile')
             ->with('profile')
             ->whereNull('deletion_scheduled_at');

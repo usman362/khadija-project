@@ -29,6 +29,7 @@ class ClientDirectOfferController extends Controller
     {
         $pros = User::query()
             ->whereHas('roles', fn ($r) => $r->where('name', RoleName::SUPPLIER->value))
+            ->excludingSelf()
             ->with(['profile'])
             ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')
             ->limit(20)->get();
@@ -63,6 +64,12 @@ class ClientDirectOfferController extends Controller
 
         $user = $request->user();
         $pro  = User::findOrFail($data['professional_id']);
+
+        // The dropdown no longer offers you to yourself, but the id arrives in
+        // the request and an offer to yourself would create a booking where one
+        // account is both parties — a contract with itself, and commission
+        // taken on money that never moved.
+        abort_if($pro->id === $user->id, 422, 'You cannot send a direct offer to yourself.');
 
         $event = Event::create([
             'title'        => $data['event_name'] ?: ('Direct Offer to ' . $pro->name),

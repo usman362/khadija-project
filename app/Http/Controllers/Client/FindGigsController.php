@@ -54,6 +54,7 @@ class FindGigsController extends Controller
         // Real suppliers with a live review average + count (same aggregate /browse uses).
         $suppliers = User::query()
             ->whereHas('roles', fn ($r) => $r->where('name', RoleName::SUPPLIER->value))
+            ->excludingSelf()
             ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')
             ->withCount(['reviewsReceived as reviews_count' => fn ($r) => $r->where('is_hidden', false)])
             ->orderBy('id')

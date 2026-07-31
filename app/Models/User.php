@@ -422,6 +422,24 @@ class User extends Authenticatable
     }
 
     /**
+     * Scope: everyone except the person doing the looking.
+     *
+     * An account can hold both roles, so without this a user who is a client
+     * and a professional finds themselves in every list of professionals — to
+     * hire, to save, to send an offer to. Applied to the listings rather than
+     * left to each caller to remember, because forgetting it is silent.
+     *
+     * No-ops for a guest: the public pages use the same queries, and there is
+     * nobody to exclude.
+     */
+    public function scopeExcludingSelf(Builder $query, ?User $viewer = null): Builder
+    {
+        $viewer ??= auth()->user();
+
+        return $viewer ? $query->whereKeyNot($viewer->id) : $query;
+    }
+
+    /**
      * Scope: users whose grace period has expired and are ready for hard deletion.
      */
     public function scopeExpiredDeletionRequests(Builder $query): Builder

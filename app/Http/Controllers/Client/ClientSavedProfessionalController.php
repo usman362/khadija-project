@@ -28,6 +28,9 @@ class ClientSavedProfessionalController extends Controller
         // with how many times and the most recent engagement.
         $workedWith = Booking::where('created_by', $user->id)
             ->whereNotNull('supplier_id')
+            // Saving yourself is already blocked, but an older self-booking
+            // would still surface here as someone you have "worked with".
+            ->where('supplier_id', '!=', $user->id)
             ->with(['supplier.profile', 'supplier' => fn ($q) => $q->withAvg(
                 ['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating'
             )])
@@ -46,6 +49,7 @@ class ClientSavedProfessionalController extends Controller
         $savedIds = $user->savedProfessionals()->pluck('users.id');
 
         $saved = $user->savedProfessionals()
+            ->excludingSelf($user)
             ->with('profile')
             ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')
             ->get();
