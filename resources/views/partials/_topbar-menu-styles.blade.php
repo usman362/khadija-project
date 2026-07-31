@@ -52,5 +52,22 @@
     .tbm-item.danger { color: #dc2626; }
     .tbm-item.danger:hover { background: rgba(220, 38, 38, .10); }
     .tbm-pop form { margin: 0; }
+
+    /* Account trigger. Lived in the client layout with a hard-coded orange, so
+       the professional portal had no rule for it at all — it reads --brand now
+       and each portal colours its own. */
+    .cl-navbar-avatar {
+        width: 38px; height: 38px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        background: linear-gradient(135deg, var(--brand, #f97316), var(--brand-strong, #ea580c));
+        color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 15px;
+        cursor: pointer;
+        border: 2px solid var(--border-color);
+        text-decoration: none;
+    }
+    .cl-navbar-avatar:hover { opacity: 0.92; }
 </style>
 @endonce

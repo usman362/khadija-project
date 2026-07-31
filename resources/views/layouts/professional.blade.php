@@ -500,7 +500,7 @@
         .cl-navbar-left { display: flex; align-items: center; gap: 16px; }
 
         /* ══════ Professional topbar — blue welcome banner ══════ */
-        .pro-topbar { display: flex; align-items: flex-start; gap: 16px; padding: 14px 26px 4px; position: sticky; top: 0; z-index: 100; background: var(--bg-primary); }
+        .pro-topbar { display: flex; align-items: center; gap: 16px; padding: 12px 26px 2px; position: sticky; top: 0; z-index: 100; background: var(--bg-primary); }
         .pro-banner { flex: 1; min-width: 0; display: flex; align-items: center; gap: 16px; background: linear-gradient(120deg, #3b82f6 0%, #2563eb 100%); border-radius: 14px; padding: 13px 18px; box-shadow: 0 6px 18px rgba(37,99,235,0.20); }
         /* Solid, not translucent. A 20%-white disc over the blue lands close enough
            to the banner that white initials on it measured 3.6:1 — the letter read as
@@ -1176,7 +1176,7 @@
                     @include('partials._topbar-messages', ['portal' => 'professional'])
 
                     {{-- Notifications bell + account, both real dropdowns --}}
-                    @include('partials._topbar-menus', ['portal' => 'professional', 'trigger' => 'chip'])
+                    @include('partials._topbar-menus', ['portal' => 'professional', 'trigger' => 'avatar'])
             </div>
         </header>
 

@@ -746,19 +746,6 @@
         }
 
         /* Topbar profile avatar (far right) */
-        .cl-navbar-avatar {
-            width: 38px; height: 38px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            background: linear-gradient(135deg, #f97316, #ea580c);
-            color: #fff;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 15px;
-            cursor: pointer;
-            border: 2px solid var(--border-color);
-            text-decoration: none;
-        }
-        .cl-navbar-avatar:hover { opacity: 0.92; }
 
         .cl-nav-btn {
             width: 40px;
