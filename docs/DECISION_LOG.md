@@ -23,7 +23,7 @@ built and then quietly half-undone. That is the gap this document exists to clos
 
 ---
 
-## 1. Blocked — waiting on Peter
+## 1. Blocked — waiting on Sir Peter
 
 These are the only things stopping work. Everything else can proceed.
 
@@ -32,7 +32,7 @@ These are the only things stopping work. Everything else can proceed.
 | B1 | Client request fee — when it is charged | High | $2.99 upfront when the request is posted, or at finalization? Code currently charges at **finalization** (`config/payments.php`). Changing it later means re-doing refund logic. |
 | B2 | Bidding window values (R37) | High | How long does a BSR stay open? How long for an ESR? Nothing is in config, so the Admin page for this cannot be built. |
 | B3 | Live Event Upgrades — money rules | High | Four answers needed: how held funds are recorded, whether an overtime rate is mandatory on every bid, geofence rules for on-site upgrades, and the real fee (the "15% vs your standard 10%" in the spec matches neither the 3/5/1.5% commission nor the $2.99 request fee). |
-| B4 | AI modules — keep or remove | High | R29 forbids any feature that *claims or uses* AI. The naming sweep is done, but three modules still genuinely call OpenAI: **AI Agreement generation**, the **support chatbot**, and the **"AI-assisted marketplace"** line in the registration disclaimer. This is not a rename — it is keep-or-remove. Peter's own FAC-13 lists "D2 remove-AI" as done, so this may simply have been missed. |
+| B4 | AI modules — keep or remove | High | R29 forbids any feature that *claims or uses* AI. The naming sweep is done, but three modules still genuinely call OpenAI: **AI Agreement generation**, the **support chatbot**, and the **"AI-assisted marketplace"** line in the registration disclaimer. This is not a rename — it is keep-or-remove. Sir Peter's own FAC-13 lists "D2 remove-AI" as done, so this may simply have been missed. |
 | B5 | Brand button contrast | Low | White text on brand orange `#f97316` is 2.8:1 — below the accessibility standard we already committed to. Needs a darker orange for buttons, or dark text. |
 
 ---
@@ -47,7 +47,7 @@ Decided and unblocked. This is the build queue.
 | A2 | Refunds | High | Needs A1. |
 | A3 | Disputes | High | Needs A1 and the 4-step resolution flow already specified. |
 | A4 | Change orders | Medium | Needs A1. |
-| A5 | **My Gigs + Contracts → one workspace** | Medium | Khadijah 2026-07-31, Peter agreed. Verified: they are genuinely different data (My Gigs reads `Event.supplier_id` = the work; Contracts reads `Booking.supplier_id` = the agreement and the money). Merging is a UI change, not a data change. |
+| A5 | **My Gigs + Contracts → one workspace** | Medium | Khadijah 2026-07-31, Sir Peter agreed. Verified: they are genuinely different data (My Gigs reads `Event.supplier_id` = the work; Contracts reads `Booking.supplier_id` = the agreement and the money). Merging is a UI change, not a data change. |
 | A6 | **Live Event Upgrades (LEU)** | Medium | Agreed as a **platform-wide feature**, not a request type — available on BSR, ESR, DSR and Packages once an event is Live. Blocked by B3 for the money rules, then needs A1. |
 | A7 | Tool → Request: "Post as BSR" | Medium | Clickable prototype exists at `/client/prototype/tool-to-request` (writes nothing). Only the BSR leg is in the first pass. |
 | A8 | Restrict marketplace for out-of-area accounts | — | **Done 2026-07-31.** Moved to Built. |
@@ -57,7 +57,7 @@ Decided and unblocked. This is the build queue.
 
 ## 3. Built
 
-Verified against the code, most recent first. Safe for Peter to screenshot.
+Verified against the code, most recent first. Safe for Sir Peter to screenshot.
 
 | Item | Notes |
 |---|---|
@@ -70,7 +70,7 @@ Verified against the code, most recent first. Safe for Peter to screenshot.
 | Tool → Request prototype | For design review. Writes nothing, marked as a prototype on every screen. |
 | Find Professionals — one page | Search and Browse were two pages doing one job. |
 | Request types: BSR / ESR / DSR, with SSR/MSR as scope | 5 cards → 4, both sides. |
-| Registration: everyone signs up, eligibility comes after | Peter's rule, 30 Jul. |
+| Registration: everyone signs up, eligibility comes after | Sir Peter's rule, 30 Jul. |
 | R10 client fee actually collected | It was displayed in three places and charged nowhere. |
 | Homepage editable by an admin | Words, images and video, without a developer. |
 | Bookings module on real data | |
@@ -95,7 +95,7 @@ Kept as a list because it is the argument for this document existing.
 
 ---
 
-## 5. Locked rules — do not re-open without Peter
+## 5. Locked rules — do not re-open without Sir Peter
 
 From `GIGRESOURCE_RULES_MASTER.docx` (36 rules). These are settled; changing one
 is a decision, not a preference.
