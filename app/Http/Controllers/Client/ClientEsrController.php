@@ -83,6 +83,17 @@ class ClientEsrController extends Controller
             ]);
         }
 
+        // A rush request had no closing time at all, so it stayed open forever
+        // — the one request type where that is least defensible. The approved
+        // window is 24 hours (Khadijah, approved 2026-07-31), but it can never
+        // outlast the event itself: a request needed in six hours closes in
+        // six, not tomorrow. The client can still accept a bid at any point.
+        $neededBy = \Illuminate\Support\Carbon::parse($data['needed_by']);
+        $deadline = now()->addHours((int) config('bsr.esr.default_window_hours'));
+        if ($deadline->gt($neededBy)) {
+            $deadline = $neededBy;
+        }
+
         $event = Event::create([
             'title'        => $data['event_name'],
             'description'  => $data['description'] ?? null,
@@ -95,6 +106,7 @@ class ClientEsrController extends Controller
             'created_by'   => $user->id,
             'client_id'    => $user->id,
             'source'       => 'esr',   // marks it urgent on the Bidding Board
+            'proposal_deadline' => $deadline,
         ]);
 
         $event->categories()->sync($services->all());
