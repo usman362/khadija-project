@@ -135,7 +135,7 @@
     {{-- Advisor form (Help Me Plan / Coordinate It For Me) --}}
     <div class="ta-sec">
         <h3>🎯 Build Your Palette</h3>
-        <div style="font-size:12.5px;color:var(--text-muted);margin:-6px 0 14px;">{{ $isSemi ? 'We suggest a palette and styling you can reword or swap before using.' : 'AI builds a full palette, mood and décor plan from your details.' }}</div>
+        <div style="font-size:12.5px;color:var(--text-muted);margin:-6px 0 14px;">{{ $isSemi ? 'We suggest a palette and styling you can reword or swap before using.' : 'We build a full palette, mood and décor plan from your details.' }}</div>
         <form id="taForm">
             <div class="ta-form-grid">
                 <div class="ta-field">

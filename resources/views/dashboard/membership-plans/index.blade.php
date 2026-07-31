@@ -331,7 +331,7 @@
 <div class="mp-page">
     <div class="mp-header">
         <h2>Memberships built around what you actually want</h2>
-        <p>More visibility · more opportunities · more AI · more revenue · more trust. Powered by <strong>GigResource IQ™</strong>. Upgrade or downgrade anytime.</p>
+        <p>More visibility · more opportunities · more tools · more revenue · more trust. Powered by <strong>GigResource IQ™</strong>. Upgrade or downgrade anytime.</p>
     </div>
 
     <div class="mp-grid">
@@ -355,7 +355,7 @@
                 @endif
 
                 @php
-                    // The AI IQ level this plan unlocks (Peter's DIY wording).
+                    // The IQ tool level this plan unlocks (Peter's DIY wording).
                     $planLevels = config('ai-levels.plan_levels.' . $plan->slug, []);
                     $aiLevel = null;
                     foreach (['maximum', 'semi', 'manual'] as $lv) {
@@ -366,7 +366,7 @@
                 @if($aiLevel)
                     <div style="margin:2px 0 12px;">
                         <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#fff;background:{{ $aiColor }};padding:4px 11px;border-radius:999px;">
-                            ✨ AI: {{ config('ai-levels.labels.' . $aiLevel) }}
+                            ✨ Tools: {{ config('ai-levels.labels.' . $aiLevel) }}
                         </span>
                         <div style="font-size:11.5px;color:var(--text-muted,#6b7280);margin-top:7px;line-height:1.45;">{{ config('ai-levels.descriptions.' . $aiLevel) }}</div>
                     </div>
@@ -461,18 +461,18 @@
 
     {{-- ── GigResource IQ™ Suite comparison (by suite, not individual tools) ── --}}
     <div class="mp-compare">
-        <h3>🤖 GigResource IQ™ — AI by Suite</h3>
-        <p class="sub">You receive whole <strong>suites</strong>, not a list of tools — and any future AI added to a suite is included automatically.</p>
+        <h3>GigResource IQ™ — Tools by Suite</h3>
+        <p class="sub">You receive whole <strong>suites</strong>, not a list of tools — and any future tool added to a suite is included automatically.</p>
         <table class="mp-ctable">
-            <thead><tr><th>AI Suite</th><th>Starter</th><th>Professional</th><th>Elite</th></tr></thead>
+            <thead><tr><th>Tool Suite</th><th>Starter</th><th>Professional</th><th>Elite</th></tr></thead>
             <tbody>
                 <tr><td>🎯 Planning Suite</td><td class="partial">Basic</td><td class="yes">✓</td><td class="yes">✓</td></tr>
                 <tr><td>🤝 Marketplace Suite</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
                 <tr><td>💼 Business Suite</td><td class="no">—</td><td class="partial">Limited</td><td class="yes">✓</td></tr>
                 <tr><td>📄 Operations Suite</td><td class="no">—</td><td class="partial">Proposal tools</td><td class="yes">✓</td></tr>
                 <tr><td>🚀 Automation Suite</td><td class="no">—</td><td class="no">—</td><td class="partial">Coming soon</td></tr>
-                <tr><td>Future AI upgrades included</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-                <tr><td>AI assistance level</td><td class="partial">Manual</td><td class="partial">Manual + Semi</td><td class="imm">Manual + Semi + Max</td></tr>
+                <tr><td>Future tool upgrades included</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+                <tr><td>Assistance level</td><td class="partial">Manual</td><td class="partial">Manual + Semi</td><td class="imm">Manual + Semi + Max</td></tr>
             </tbody>
         </table>
     </div>

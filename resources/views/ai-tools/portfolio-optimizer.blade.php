@@ -109,7 +109,7 @@
     {{-- Interactive portfolio optimizer --}}
     <div class="po-tool">
         <h3>🔎 Score Your Profile</h3>
-        <div class="sub">{{ $isManual ? 'Enter your profile details to score your profile yourself — no suggestions.' : ($isSemi ? 'Enter your profile details for an estimated score plus prioritised AI suggestions.' : 'Enter your current profile details for an estimated score and prioritised improvement suggestions.') }}</div>
+        <div class="sub">{{ $isManual ? 'Enter your profile details to score your profile yourself — no suggestions.' : ($isSemi ? 'Enter your profile details for an estimated score plus prioritised suggestions.' : 'Enter your current profile details for an estimated score and prioritised improvement suggestions.') }}</div>
         <form id="poForm" class="po-form">
             <div>
                 <label class="po-lbl">Portfolio Photos</label>

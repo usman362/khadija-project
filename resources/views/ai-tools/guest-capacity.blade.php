@@ -144,7 +144,7 @@
     {{-- AI planner (Help Me Plan / Coordinate It For Me) --}}
     <div class="gc-gen">
         <h3>📐 Estimate Your Capacity</h3>
-        <div class="sub">{{ $isSemi ? 'We estimate comfort and legal capacity — you can adjust the figures and the score recalculates.' : 'Enter your space and guest details and AI estimates comfort, legal capacity and flow insights.' }}</div>
+        <div class="sub">{{ $isSemi ? 'We estimate comfort and legal capacity — you can adjust the figures and the score recalculates.' : 'Enter your space and guest details and we estimate comfort, legal capacity and flow insights.' }}</div>
         <form id="gcForm">
             <div class="gc-form-grid">
                 <div class="gc-field">

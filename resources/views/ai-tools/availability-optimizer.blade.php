@@ -109,7 +109,7 @@
     {{-- Interactive availability estimator --}}
     <div class="ao-tool">
         <h3>📊 Availability Estimator</h3>
-        <p class="desc">{{ $isManual ? 'Enter your working pattern to work out your weekly capacity, utilization and open slots yourself.' : 'Enter your working pattern to get an estimated weekly capacity, utilization and open-slot count' . ($isSemi ? ' plus AI suggestions to optimize it.' : '. Figures are planning estimates.') }}</p>
+        <p class="desc">{{ $isManual ? 'Enter your working pattern to work out your weekly capacity, utilization and open slots yourself.' : 'Enter your working pattern to get an estimated weekly capacity, utilization and open-slot count' . ($isSemi ? ' plus suggestions to optimize it.' : '. Figures are planning estimates.') }}</p>
 
         <form id="aoForm">
             <div class="ao-form-grid">

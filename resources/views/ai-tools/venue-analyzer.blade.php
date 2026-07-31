@@ -154,7 +154,7 @@
     {{-- Interactive analyzer (Help Me Plan / Coordinate It For Me) --}}
     <div class="va-form-card">
         <h3>📐 Analyze My Venue Space</h3>
-        <div class="sub">{{ $isSemi ? 'We suggest a capacity and space fit you can adjust before using.' : 'Enter the venue size and your guest count and AI works out capacity and space fit.' }}</div>
+        <div class="sub">{{ $isSemi ? 'We suggest a capacity and space fit you can adjust before using.' : 'Enter the venue size and your guest count and we work out capacity and space fit.' }}</div>
         <form id="vaForm">
             <div class="va-fgrid">
                 <div>

@@ -130,7 +130,7 @@
             <div class="sub">Enter your service and base price — we build the complete tiered package for you.</div>
         @else
             <h3>🧰 Build Your Package</h3>
-            <div class="sub">{{ $isSemi ? 'Fill in your package — use the ✨ helpers for suggestions you can edit.' : 'Fill in your package details. (AI assistance unlocks on higher membership tiers.)' }}</div>
+            <div class="sub">{{ $isSemi ? 'Fill in your package — use the ✨ helpers for suggestions you can edit.' : 'Fill in your package details. (Assistance unlocks on higher membership tiers.)' }}</div>
         @endif
 
         <form id="pbForm" class="pb-form" autocomplete="off">
