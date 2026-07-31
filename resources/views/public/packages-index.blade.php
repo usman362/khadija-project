@@ -89,7 +89,6 @@
     .pk-card { transition: transform .18s, box-shadow .18s; }
     .pk-cards.grid .pk-card:hover { transform: translateY(-3px); box-shadow: 0 16px 36px rgba(0,0,0,.12); }
     .pk-typebadge { position: absolute; top: 10px; left: 10px; font-size: 10.5px; font-weight: 800; letter-spacing: .3px; color: #fff; padding: 5px 11px; border-radius: 7px; }
-    .pk-typebadge.solo { background: var(--pk); } .pk-typebadge.coop { background: #7c3aed; }
     .pk-photos { position: absolute; bottom: 10px; left: 10px; font-size: 11px; font-weight: 700; color: #fff; background: rgba(0,0,0,.55); padding: 4px 9px; border-radius: 7px; display: inline-flex; align-items: center; gap: 5px; }
     .pk-heart { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.92); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     .pk-heart svg { width: 17px; height: 17px; color: #64748b; }
@@ -136,7 +135,6 @@
     .pk-avail b { color: var(--ink); }
     .pk-legend { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; font-size: 11.5px; color: var(--muted); }
     .pk-legend span::before { content: "●"; margin-right: 6px; }
-    .pk-legend .solo::before { color: var(--pk); } .pk-legend .coop::before { color: #7c3aed; }
     .pk-why { display: flex; gap: 10px; padding: 9px 0; }
     .pk-why svg { width: 18px; height: 18px; color: var(--pk); flex-shrink: 0; margin-top: 1px; }
     .pk-why b { display: block; font-size: 12.5px; font-weight: 800; color: var(--ink); }

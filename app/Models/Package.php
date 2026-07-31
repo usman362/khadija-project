@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 class Package extends Model
 {
     protected $fillable = [
-        'user_id', 'coop_partner_id', 'category_id', 'services', 'event_types',
+        'user_id', 'category_id', 'services', 'event_types',
         'title', 'slug', 'type', 'description', 'price', 'price_unit', 'duration',
         'coverage', 'team', 'guests', 'serves_regions', 'availability', 'savings_pct',
         'includes', 'images', 'is_active', 'status', 'sort_order',
@@ -33,12 +33,6 @@ class Package extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    /** The second professional on a co-op package (null for solo). */
-    public function coopPartner(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'coop_partner_id');
     }
 
     public function category(): BelongsTo

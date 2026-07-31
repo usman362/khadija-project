@@ -252,8 +252,8 @@ class ProfessionalPackageController extends Controller
             'services'        => $services,
             'event_types'     => $eventTypes,
             // Packages are solo-only (Team/Co-Op combined-force removed platform-wide).
+            // coop_partner_id used to be forced to null here; the column is gone.
             'type'            => 'solo',
-            'coop_partner_id' => null,
             'team'            => [],
             'includes'        => $this->cleanList($request->input('includes')),
             'guests'          => $this->guestLabel($request->integer('guest_min'), $request->integer('guest_max')),

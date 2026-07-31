@@ -42,7 +42,6 @@ class DemoPackagesSeeder extends Seeder
                 ['slug' => Str::slug($data['title'])],
                 [
                     'user_id'        => $supplier->id,
-                    'coop_partner_id'=> null,
                     'category_id'    => $category?->id,
                     'services'       => $data['services'],
                     'title'          => $data['title'],
