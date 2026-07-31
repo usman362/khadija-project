@@ -26,5 +26,5 @@
     .tb-icon-btn { position: relative; width: 38px; height: 38px; border-radius: 10px; border: none; background: transparent; color: var(--text-secondary); display: inline-flex; align-items: center; justify-content: center; text-decoration: none; flex-shrink: 0; }
     .tb-icon-btn:hover { background: var(--bg-card-hover); }
     .tb-icon-btn svg { width: 18px; height: 18px; }
-    .tb-icon-badge { position: absolute; top: -5px; right: -5px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: #ef4444; color: #fff; font-size: 9.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .tb-icon-badge { position: absolute; top: 4px; right: 4px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: #ef4444; color: #fff; font-size: 9.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; line-height: 1; border: 2px solid var(--bg-primary); }
 </style>

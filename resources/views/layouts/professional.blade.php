@@ -531,7 +531,7 @@
         .pro-icon-btn { position: relative; width: 38px; height: 38px; border-radius: 10px; border: none; background: transparent; color: var(--text-secondary); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; }
         .pro-icon-btn:hover { background: var(--bg-card-hover); }
         .pro-icon-btn svg { width: 18px; height: 18px; }
-        .pro-icon-badge { position: absolute; top: -5px; right: -5px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: #2563eb; color: #fff; font-size: 9.5px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+        .pro-icon-badge { position: absolute; top: 4px; right: 4px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: var(--brand, #2563eb); color: #fff; font-size: 9.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; line-height: 1; border: 2px solid var(--bg-primary); }
         .pro-icon-badge.red { background: #ef4444; }
         .pro-avatar-chip { display: inline-flex; align-items: center; gap: 8px; padding: 3px 8px 3px 3px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-card); cursor: pointer; }
         .pro-avatar-img { width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg,#2563eb,#1d4ed8); color: #fff; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; }
