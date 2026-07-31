@@ -100,7 +100,11 @@
             @endforeach
         </div>
 
-        <p class="rc-note">Not sure which to pick? <b>Shop Packages</b> is the fastest if a pro already offers what you need as a bundle. Choose <b>MSR</b> when you want professionals to compete on price for several services.</p>
+        {{-- This line still offered "MSR" as a fifth choice after the cards became
+     four. MSR is the scope inside a bidding request now, not a card you
+     can pick, so pointing at it left the reader looking for something
+     that is not on the screen. --}}
+        <p class="rc-note">Not sure which to pick? <b>Shop Packages</b> is the fastest if a pro already offers what you need as a bundle. Choose <b>Bidding Request</b> when you want professionals to compete on price — tick one service or several, and it handles both.</p>
     </div>
 </div>
 @endsection
