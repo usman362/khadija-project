@@ -39,7 +39,7 @@
     /* Both columns are one height. `align-items: start` used to size each
        to its own content, so the list ran on past the bottom of the thread
        and left a block of empty card under the compose box. */
-    .pm-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; display: flex; flex-direction: column; min-height: 620px; }
+    .pm-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; display: flex; flex-direction: column; height: 620px; }
 
     /* conversation list */
     .pm-tabs { display: flex; gap: 4px; padding: 12px 14px 0; border-bottom: 1px solid var(--border-color); }
@@ -80,7 +80,7 @@
     .pm-pager { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-top: 1px solid var(--border-color); font-size: 11.5px; color: var(--text-muted); }
 
     /* thread */
-    .pm-thread { display: flex; flex-direction: column; min-height: 620px; }
+    .pm-thread { display: flex; flex-direction: column; }
     .pm-th-head { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--border-color); }
     .pm-th-av { width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; font-weight: 800; }
     .pm-th-mid { flex: 1; min-width: 0; }

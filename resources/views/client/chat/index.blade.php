@@ -33,7 +33,7 @@
     /* Both columns are one height. `align-items: start` used to size each
        to its own content, so the list ran on past the bottom of the thread
        and left a block of empty card under the compose box. */
-    .cm-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; display: flex; flex-direction: column; min-height: 600px; }
+    .cm-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; display: flex; flex-direction: column; height: 600px; }
     .cm-tabs { display: flex; gap: 4px; padding: 12px 14px 0; border-bottom: 1px solid var(--border-color); }
     .cm-tab { display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; font-size: 12.5px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
     .cm-tab.on { color: var(--cm); border-bottom-color: var(--cm); }
@@ -59,7 +59,7 @@
     .cm-conv-badge { display: inline-block; min-width: 18px; height: 18px; line-height: 18px; text-align: center; background: #ef4444; color: #fff; font-size: 10px; font-weight: 800; border-radius: 999px; margin-top: 8px; padding: 0 5px; }
     .cm-pager { padding: 12px 14px; border-top: 1px solid var(--border-color); font-size: 11.5px; color: var(--text-muted); }
 
-    .cm-thread { display: flex; flex-direction: column; min-height: 600px; }
+    .cm-thread { display: flex; flex-direction: column; }
     .cm-th-head { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--border-color); }
     .cm-th-av { width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; font-weight: 800; background: #ea580c; }
     .cm-th-mid { flex: 1; min-width: 0; }
