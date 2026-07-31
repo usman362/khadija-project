@@ -14,7 +14,6 @@
     $accentSoft = $isPro ? 'rgba(37,99,235,.12)' : 'rgba(249,115,22,.12)';
     $suiteKeys = array_keys($suites);
     // The Automation Suite is a future ("Plan A") roadmap item — shown but not active.
-    $showComingSoon = ! array_key_exists('automation', $suites);
 @endphp
 
 @push('styles')
@@ -26,21 +25,16 @@
     .akt-scard { position: relative; text-align: left; background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 16px; padding: 16px; display: flex; align-items: flex-start; gap: 12px; cursor: pointer; transition: border-color .15s, box-shadow .15s, transform .1s; font-family: inherit; }
     .akt-scard:hover { border-color: var(--akt); transform: translateY(-1px); }
     .akt-scard.on { border-color: var(--akt); box-shadow: 0 0 0 1px var(--akt), 0 10px 24px -12px var(--akt); }
-    .akt-scard.soon { cursor: default; opacity: .72; }
-    .akt-scard.soon:hover { border-color: var(--border-color); transform: none; }
     /* White icon on a solid accent tile — dark symbols on the heavy colour read
        poorly (client feedback). Matches the tool-card icon treatment. */
     .akt-sic { width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--akt), var(--akt-d)); color: #fff; box-shadow: 0 8px 18px -8px var(--akt); }
     .akt-sic svg { width: 22px; height: 22px; }
-    .akt-scard.soon .akt-sic { background: var(--border-color); color: var(--text-muted); box-shadow: none; }
     .akt-sbody { min-width: 0; flex: 1; display: flex; flex-direction: column; }
     .akt-sname { display: block; font-size: 14px; font-weight: 800; color: var(--text-primary); }
     .akt-stag { display: block; font-size: 11.5px; color: var(--text-muted); line-height: 1.4; margin-top: 3px; }
     .akt-scount { font-size: 22px; font-weight: 800; color: var(--akt); line-height: 1; }
     .akt-scount small { display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); margin-top: 3px; text-transform: uppercase; letter-spacing: .3px; }
-    .akt-scard.soon .akt-scount { color: var(--text-muted); }
     .akt-here { position: absolute; top: -11px; left: 16px; font-size: 10px; font-weight: 800; color: #fff; background: var(--akt); padding: 3px 12px; border-radius: 999px; letter-spacing: .3px; }
-    .akt-soonpill { position: absolute; top: -11px; left: 16px; font-size: 10px; font-weight: 800; color: var(--text-muted); background: var(--bg-card); border: 1px solid var(--border-color); padding: 3px 12px; border-radius: 999px; }
 
     /* ── Suite banner ── */
     .akt-banner { display: flex; align-items: center; gap: 18px; background: linear-gradient(120deg, var(--akt-soft), transparent 70%); border: 1px solid var(--border-color); border-radius: 18px; padding: 20px 24px; margin-bottom: 20px; position: relative; overflow: hidden; }
@@ -105,18 +99,9 @@
             </button>
         @endforeach
 
-        @if($showComingSoon)
-            @php($auto = AiToolCatalog::suites()['automation'])
-            <div class="akt-scard soon">
-                <span class="akt-soonpill">Coming soon</span>
-                <span class="akt-sic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! AiToolCatalog::suiteIcon('automation') !!}</svg></span>
-                <span class="akt-sbody">
-                    <span class="akt-sname">{{ $auto['name'] }}</span>
-                    <span class="akt-stag">Workflow automation, analytics &amp; forecasting.</span>
-                </span>
-                <span class="akt-scount">—<small>Plan A</small></span>
-            </div>
-        @endif
+        {{-- An "Automation Suite — coming soon" card used to sit here. It
+             advertised a suite with no tools, no date and no plan behind it,
+             next to four that work. --}}
     </div>
 
     {{-- ── Suite panels (one shown at a time) ── --}}
