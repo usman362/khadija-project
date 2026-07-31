@@ -1384,6 +1384,8 @@
                     <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 </button>
 
+                @include('partials._topbar-messages', ['portal' => 'client'])
+
                 {{-- Notifications bell + account, both real dropdowns --}}
                 @include('partials._topbar-menus', ['portal' => 'client', 'trigger' => 'avatar'])
             </div>

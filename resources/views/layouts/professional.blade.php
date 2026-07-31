@@ -514,8 +514,9 @@
         .pro-banner-search input { width: 100%; height: 42px; border-radius: 10px; border: none; padding: 0 44px 0 40px; background: #fff; font-size: 13px; color: #1e293b; outline: none; }
         .pro-banner-search kbd { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 10px; color: var(--text-muted); background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 5px; padding: 2px 6px; }
 
-        .pro-topbar-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
-        .pro-topbar-controls { display: flex; align-items: center; gap: 12px; }
+        /* One flat row, matching the client topbar. This was a column wrapping a
+           row, which pushed the controls off the greeting's centre line. */
+        .pro-topbar-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
         .pro-avail { display: inline-flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 800; color: var(--ok-text); letter-spacing: 0.5px; cursor: pointer; }
         .pro-avail .dot { width: 7px; height: 7px; border-radius: 50%; background: #16a34a; }
         .pro-toggle { position: relative; width: 34px; height: 18px; display: inline-block; }
@@ -546,7 +547,7 @@
         .pro-btn-primary { background: #2563eb; border: none; color: #fff; }
         .pro-btn-primary:hover { background: #1d4ed8; }
         @media (max-width: 1200px) { .pro-banner-text { display: none; } }
-        @media (max-width: 860px) { .pro-topbar { flex-direction: column; } .pro-topbar-right { flex-direction: row; align-items: center; width: 100%; justify-content: space-between; flex-wrap: wrap; } .pro-avatar-meta { display: none; } }
+        @media (max-width: 860px) { .pro-topbar { flex-direction: column; } .pro-topbar-right { width: 100%; justify-content: flex-end; } .pro-avatar-meta { display: none; } }
 
         .cl-mobile-toggle {
             display: none;
@@ -1165,27 +1166,17 @@
             </div>
 
             <div class="pro-topbar-right">
-                <div class="pro-topbar-controls">
                     @include('partials._role_switcher')
-                    {{-- Real unread count; the badge was a hardcoded 5. --}}
-                    @php
-                        $proUnread = auth()->check()
-                            ? \App\Models\Message::where('recipient_id', auth()->id())
-                                ->whereDoesntHave('reads', fn ($q) => $q->where('user_id', auth()->id()))
-                                ->count()
-                            : 0;
-                    @endphp
-                    <a href="{{ route('professional.chat.index') }}" class="pro-icon-btn" title="Messages">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                        @if($proUnread > 0)<span class="pro-icon-badge red">{{ $proUnread > 9 ? '9+' : $proUnread }}</span>@endif
-                    </a>
+
                     <button class="cl-theme-toggle" id="theme-toggle" title="Toggle light / dark theme" aria-label="Toggle theme">
                         <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
                         <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                     </button>
+
+                    @include('partials._topbar-messages', ['portal' => 'professional'])
+
                     {{-- Notifications bell + account, both real dropdowns --}}
                     @include('partials._topbar-menus', ['portal' => 'professional', 'trigger' => 'chip'])
-                </div>
             </div>
         </header>
 
