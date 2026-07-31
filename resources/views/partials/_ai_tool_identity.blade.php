@@ -13,7 +13,7 @@
         $aiId_plan = $aiId_user->activeSubscription()?->plan?->name;
         // Clients & influencers get AI free at launch — label them clearly
         // instead of leaving the tier blank.
-        $aiId_tier = $aiId_plan ?: ($aiId_user->activeRole() === 'supplier' ? 'Free plan' : 'Free access');
+        $aiId_tier = $aiId_plan ?: ($aiId_user->activeRole() === 'professional' ? 'Free plan' : 'Free access');
 
         $aiId_key   = (string) request()->segment(2);
         $aiId_level = $aiId_key ? \App\Domain\AiFeatures\AiAccess::level($aiId_user, $aiId_key) : 'maximum';

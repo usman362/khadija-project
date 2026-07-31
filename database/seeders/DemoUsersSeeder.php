@@ -20,13 +20,13 @@ class DemoUsersSeeder extends Seeder
             [
                 'name' => 'Supplier User',
                 'email' => 'supplier@example.com',
-                'role' => RoleName::SUPPLIER->value,
+                'role' => RoleName::PROFESSIONAL->value,
                 'city' => 'Baltimore', 'state' => 'MD',
             ],
             [
                 'name' => 'Professional User',
                 'email' => 'professional@example.com',
-                'role' => RoleName::SUPPLIER->value,
+                'role' => RoleName::PROFESSIONAL->value,
                 'city' => 'Baltimore', 'state' => 'MD',
             ],
         ];

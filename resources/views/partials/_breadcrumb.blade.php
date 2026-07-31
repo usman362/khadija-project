@@ -5,7 +5,7 @@
     $bcUser = auth()->user();
     $bcRole = $bcUser?->activeRole();
 
-    if ($bcRole === 'supplier') {
+    if ($bcRole === 'professional') {
         $bcType = 'Professional'; $bcDash = 'professional.dashboard'; $bcAccent = '#2563eb';
     } elseif ($bcRole === 'client') {
         $bcType = 'Client'; $bcDash = 'client.dashboard'; $bcAccent = '#ea580c';

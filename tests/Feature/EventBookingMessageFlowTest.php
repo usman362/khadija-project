@@ -24,7 +24,7 @@ class EventBookingMessageFlowTest extends TestCase
         $client->assignRole(RoleName::CLIENT->value);
 
         $supplier = User::factory()->create();
-        $supplier->assignRole(RoleName::SUPPLIER->value);
+        $supplier->assignRole(RoleName::PROFESSIONAL->value);
 
         $createEvent = $this->actingAs($client)->post(route('events.store'), [
             'title' => 'Wedding Event',
@@ -79,7 +79,7 @@ class EventBookingMessageFlowTest extends TestCase
         $clientB->assignRole(RoleName::CLIENT->value);
 
         $supplier = User::factory()->create();
-        $supplier->assignRole(RoleName::SUPPLIER->value);
+        $supplier->assignRole(RoleName::PROFESSIONAL->value);
 
         $event = $this->actingAs($clientA)->post(route('events.store'), [
             'title' => 'Private Event',
@@ -109,7 +109,7 @@ class EventBookingMessageFlowTest extends TestCase
         $client->assignRole(RoleName::CLIENT->value);
 
         $supplier = User::factory()->create();
-        $supplier->assignRole(RoleName::SUPPLIER->value);
+        $supplier->assignRole(RoleName::PROFESSIONAL->value);
 
         $createEvent = $this->actingAs($client)->post(route('events.store'), [
             'title' => 'Detail Test Event',
@@ -150,7 +150,7 @@ class EventBookingMessageFlowTest extends TestCase
         $client->assignRole(RoleName::CLIENT->value);
 
         $supplier = User::factory()->create();
-        $supplier->assignRole(RoleName::SUPPLIER->value);
+        $supplier->assignRole(RoleName::PROFESSIONAL->value);
 
         $event = $this->actingAs($client)->post(route('events.store'), [
             'title' => 'Agreement Log Event',

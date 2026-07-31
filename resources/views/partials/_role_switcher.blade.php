@@ -6,7 +6,7 @@
 @php
     $__u = auth()->user();
     $__hasClient  = $__u?->hasRole(\App\Domain\Auth\Enums\RoleName::CLIENT->value);
-    $__hasSupplier = $__u?->hasRole(\App\Domain\Auth\Enums\RoleName::SUPPLIER->value);
+    $__hasSupplier = $__u?->hasRole(\App\Domain\Auth\Enums\RoleName::PROFESSIONAL->value);
     $__isAdmin    = $__u?->isAdmin();
     $__active     = $__u?->activeRole();
 @endphp
@@ -16,8 +16,8 @@
     @if($__hasClient && $__hasSupplier)
         {{-- Both roles: show compact toggle to switch to the OTHER one --}}
         @php
-            $__target    = $__active === 'supplier' ? 'client' : 'supplier';
-            $__targetLbl = $__target === 'supplier' ? 'Professional' : 'Client';
+            $__target    = $__active === 'professional' ? 'client' : 'professional';
+            $__targetLbl = $__target === 'professional' ? 'Professional' : 'Client';
         @endphp
         {{-- The current-mode pill is gone: it labelled the portal you were
              already looking at, next to a button that names the other one. --}}
@@ -32,8 +32,8 @@
     @else
         {{-- Only one role: quick-enable the other (opens shared modal) --}}
         @php
-            $__target    = $__hasClient ? 'supplier' : 'client';
-            $__targetLbl = $__target === 'supplier' ? 'Professional' : 'Client';
+            $__target    = $__hasClient ? 'professional' : 'client';
+            $__targetLbl = $__target === 'professional' ? 'Professional' : 'Client';
         @endphp
         <button type="button" class="rs-btn rs-btn-enable"
                 data-role-enable="{{ $__target }}"

@@ -1,5 +1,5 @@
 {{-- Role Enable Modal — shared across client and professional layouts.
-     Triggered by any button with [data-role-enable="supplier"] or [data-role-enable="client"].
+     Triggered by any button with [data-role-enable="professional"] or [data-role-enable="client"].
      The modal content is populated dynamically based on the clicked button. --}}
 
 <div id="roleEnableModal" class="rem-backdrop" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="remTitle">
@@ -339,7 +339,7 @@
         document.body.style.overflow = '';
     }
 
-    // Trigger: any element with [data-role-enable="client|supplier"]
+    // Trigger: any element with [data-role-enable="client|professional"]
     document.addEventListener('click', function (e) {
         const trigger = e.target.closest('[data-role-enable]');
         if (trigger) {

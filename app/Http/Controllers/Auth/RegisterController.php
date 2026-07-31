@@ -32,10 +32,10 @@ class RegisterController extends Controller
      */
     public function showRegistrationForm(Request $request)
     {
-        // "professional" is the public-facing name for the internal "supplier" role.
+        // "professional" is the public-facing name for the internal "professional" role.
         $role = $request->query('role', 'client');
         if ($role === 'professional') {
-            $role = 'supplier';
+            $role = 'professional';
         }
 
         return view('auth.register', compact('role'));
@@ -61,7 +61,7 @@ class RegisterController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'phone' => ['nullable', 'string', 'max:30'],
             'agree' => ['accepted'],
-            'role' => ['sometimes', 'string', 'in:client,supplier,professional,influencer'],
+            'role' => ['sometimes', 'string', 'in:client,professional,influencer'],
             'state' => $stateRule,
             'country' => ['nullable', 'string', 'in:' . implode(',', array_keys(config('geo.countries', [])))],
             'city' => ['nullable', 'string', 'max:120'],
@@ -80,7 +80,7 @@ class RegisterController extends Controller
     {
         $role  = $data['role'] ?? 'client';
         if ($role === 'professional') {   // public alias → internal supplier role
-            $role = 'supplier';
+            $role = 'professional';
         }
         $state = $data['state'] ?? null;
 

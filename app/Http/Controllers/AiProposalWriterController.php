@@ -73,7 +73,7 @@ class AiProposalWriterController extends Controller
             'proposal'    => $proposal,
             'level'       => $level,
             // Professional-facing tool → professional shell for suppliers.
-            'aiLayout'    => $user?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client',
+            'aiLayout'    => $user?->activeRole() === 'professional' ? 'layouts.professional' : 'layouts.client',
         ]);
     }
 

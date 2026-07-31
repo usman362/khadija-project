@@ -13,7 +13,7 @@ class RoleSwitchController extends Controller
     /** Roles eligible for the dual-mode switch. */
     private const SWITCHABLE_ROLES = [
         RoleName::CLIENT->value,
-        RoleName::SUPPLIER->value,
+        RoleName::PROFESSIONAL->value,
     ];
 
     /**
@@ -34,8 +34,8 @@ class RoleSwitchController extends Controller
 
         session(['active_role' => $target]);
 
-        return redirect()->route($target === RoleName::SUPPLIER->value ? 'professional.dashboard' : 'client.dashboard')
-            ->with('status', 'Switched to ' . ($target === RoleName::SUPPLIER->value ? 'Professional' : 'Client') . ' mode.');
+        return redirect()->route($target === RoleName::PROFESSIONAL->value ? 'professional.dashboard' : 'client.dashboard')
+            ->with('status', 'Switched to ' . ($target === RoleName::PROFESSIONAL->value ? 'Professional' : 'Client') . ' mode.');
     }
 
     /**
@@ -59,13 +59,13 @@ class RoleSwitchController extends Controller
         if ($user->hasRole($target)) {
             // Already has it — just switch
             session(['active_role' => $target]);
-            return redirect()->route($target === RoleName::SUPPLIER->value ? 'professional.dashboard' : 'client.dashboard');
+            return redirect()->route($target === RoleName::PROFESSIONAL->value ? 'professional.dashboard' : 'client.dashboard');
         }
 
         // Lock in their existing role as the primary before they gain a second
         // one, so "Become a X" never changes where they land at login.
         if (! $user->primary_role) {
-            $existing = $user->hasRole(RoleName::SUPPLIER->value) ? RoleName::SUPPLIER->value : RoleName::CLIENT->value;
+            $existing = $user->hasRole(RoleName::PROFESSIONAL->value) ? RoleName::PROFESSIONAL->value : RoleName::CLIENT->value;
             $user->update(['primary_role' => $existing]);
         }
 
@@ -79,8 +79,8 @@ class RoleSwitchController extends Controller
             'role'    => $target,
         ]);
 
-        $label = $target === RoleName::SUPPLIER->value ? 'Professional' : 'Client';
-        return redirect()->route($target === RoleName::SUPPLIER->value ? 'professional.dashboard' : 'client.dashboard')
+        $label = $target === RoleName::PROFESSIONAL->value ? 'Professional' : 'Client';
+        return redirect()->route($target === RoleName::PROFESSIONAL->value ? 'professional.dashboard' : 'client.dashboard')
             ->with('status', "{$label} mode enabled. Welcome to your new workspace!");
     }
 }

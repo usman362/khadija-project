@@ -1,6 +1,6 @@
 @php
     // Role drives the theme + left-panel content. Set in each page via
-    // @section('apRole', 'client'|'supplier'|'influencer'|'login').
+    // @section('apRole', 'client'|'professional'|'influencer'|'login').
     $apRole = trim($__env->yieldContent('apRole')) ?: 'client';
 
     $apThemes = [
@@ -17,7 +17,7 @@
                 ['head',  'Dedicated Support',       'Our support team is here to help you every step of the way.'],
             ],
         ],
-        'supplier' => [
+        'professional' => [
             'accent' => '#2563eb', 'accentDark' => '#1d4ed8', 'soft' => '#eaf1ff',
             'pageBg' => 'linear-gradient(180deg,#f3f7ff 0%,#eaf1fe 100%)',
             'panelBg' => '#eef4ff',

@@ -27,7 +27,7 @@ class BiddingBoardScopeTest extends TestCase
         $this->seed(\Database\Seeders\RolePermissionSeeder::class);
 
         $this->pro = User::factory()->create();
-        $this->pro->assignRole('supplier');
+        $this->pro->assignRole('professional');
         $this->pro->givePermissionTo('dashboard.view');
         $this->pro->getOrCreateProfile()->update(['country' => 'US', 'state' => 'MD', 'city' => 'Baltimore']);
         $this->pro = $this->pro->fresh();

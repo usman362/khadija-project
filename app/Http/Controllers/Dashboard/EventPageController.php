@@ -28,7 +28,7 @@ class EventPageController extends Controller
 
         return view('dashboard.events.index', [
             'events' => $query->paginate(12)->withQueryString(),
-            'suppliers' => User::query()->whereHas('roles', fn ($q) => $q->where('name', 'supplier'))->get(['id', 'name']),
+            'suppliers' => User::query()->whereHas('roles', fn ($q) => $q->where('name', 'professional'))->get(['id', 'name']),
             'selectedSource' => $request->string('source')->toString() ?: null,
         ]);
     }

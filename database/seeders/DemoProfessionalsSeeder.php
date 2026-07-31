@@ -35,7 +35,7 @@ class DemoProfessionalsSeeder extends Seeder
                 ['email' => $data['email']],
                 ['name' => $data['name'], 'password' => 'password'],
             );
-            $user->syncRoles([RoleName::SUPPLIER->value]);
+            $user->syncRoles([RoleName::PROFESSIONAL->value]);
 
             UserProfile::updateOrCreate(
                 ['user_id' => $user->id],

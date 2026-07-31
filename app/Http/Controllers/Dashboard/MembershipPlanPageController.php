@@ -39,7 +39,7 @@ class MembershipPlanPageController extends Controller
         // Match the user's ACTIVE portal mode (not hasRole), so a dual-role
         // user viewing in client mode gets the client layout.
         return match ($request->user()?->activeRole()) {
-            'supplier' => 'layouts.professional',
+            'professional' => 'layouts.professional',
             'client'   => 'layouts.client',
             default    => 'layouts.dashboard',
         };

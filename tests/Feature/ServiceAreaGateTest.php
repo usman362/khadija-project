@@ -88,7 +88,7 @@ class ServiceAreaGateTest extends TestCase
 
     public function test_coming_soon_professional_cannot_bid(): void
     {
-        $this->actingAs($this->user(ServiceArea::COMING_SOON, 'supplier'))
+        $this->actingAs($this->user(ServiceArea::COMING_SOON, 'professional'))
             ->post(route('professional.bidding-board.bid'), [])
             ->assertRedirect()
             ->assertSessionHas('error');

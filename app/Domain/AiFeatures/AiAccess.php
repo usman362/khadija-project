@@ -46,7 +46,7 @@ final class AiAccess
         }
 
         // Membership tiers only apply while the user is acting as a professional.
-        if ($user->activeRole() === 'supplier') {
+        if ($user->activeRole() === 'professional') {
             $slug   = $user->activeSubscription()?->plan?->slug;
             $levels = $slug ? config("ai-levels.plan_levels.{$slug}") : null;
 
@@ -112,7 +112,7 @@ final class AiAccess
             return false;
         }
 
-        return $user->activeRole() !== 'supplier';
+        return $user->activeRole() !== 'professional';
     }
 
     // ── GigResource IQ™ credit economy ─────────────────────────────────────
@@ -146,7 +146,7 @@ final class AiAccess
             return PHP_INT_MAX;
         }
 
-        if ($user->activeRole() === 'supplier') {
+        if ($user->activeRole() === 'professional') {
             $slug   = $user->activeSubscription()?->plan?->slug;
             $grants = (array) config('ai-levels.credits.plan_grants', []);
 

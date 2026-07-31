@@ -45,7 +45,7 @@ class EventPolicy
             return in_array($event->status, ['pending', 'confirmed', 'published'], true);
         }
 
-        if ($user->hasRole(RoleName::SUPPLIER->value) && $event->supplier_id === $user->id) {
+        if ($user->hasRole(RoleName::PROFESSIONAL->value) && $event->supplier_id === $user->id) {
             return in_array($event->status, ['confirmed', 'in_progress', 'published'], true);
         }
 

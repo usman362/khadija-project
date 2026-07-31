@@ -100,7 +100,7 @@ class InfluencerModuleTest extends TestCase
         ]);
 
         $client = $this->makeUserWithRole(RoleName::CLIENT->value);
-        $supplier = $this->makeUserWithRole(RoleName::SUPPLIER->value);
+        $supplier = $this->makeUserWithRole(RoleName::PROFESSIONAL->value);
         $client->update(['referred_by_influencer_id' => $influencer->id]);
 
         $event = Event::create([

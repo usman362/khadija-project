@@ -457,7 +457,7 @@
         @if($tab === 'modes')
         @php
             $hasClient    = $user->hasRole(\App\Domain\Auth\Enums\RoleName::CLIENT->value);
-            $hasSupplier  = $user->hasRole(\App\Domain\Auth\Enums\RoleName::SUPPLIER->value);
+            $hasSupplier  = $user->hasRole(\App\Domain\Auth\Enums\RoleName::PROFESSIONAL->value);
             $activeMode   = $user->activeRole();
         @endphp
         <div class="pf-card">
@@ -521,7 +521,7 @@
                                 <div style="font-size:12px;color:var(--text-muted);">Offer services, get hired</div>
                             </div>
                         </div>
-                        @if($activeMode === 'supplier')
+                        @if($activeMode === 'professional')
                             <span style="padding:3px 10px;background:rgba(16,185,129,0.15);color:var(--ok-text);border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;">Active</span>
                         @endif
                     </div>
@@ -530,15 +530,15 @@
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3" style="display:inline-block;vertical-align:middle;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>
                             Enabled
                         </div>
-                        @if($activeMode !== 'supplier')
+                        @if($activeMode !== 'professional')
                             <form action="{{ route('role.switch') }}" method="POST">
                                 @csrf
-                                <input type="hidden" name="role" value="supplier">
+                                <input type="hidden" name="role" value="professional">
                                 <button type="submit" class="pf-btn" style="width:100%;">Switch to Professional Mode</button>
                             </form>
                         @endif
                     @else
-                        <button type="button" class="pf-btn" data-role-enable="supplier"
+                        <button type="button" class="pf-btn" data-role-enable="professional"
                                 style="width:100%;background:linear-gradient(135deg,#10b981,#059669);">
                             Become a Professional
                         </button>

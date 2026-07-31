@@ -74,7 +74,7 @@ class AdminEventController extends Controller
         ];
 
         $suppliers = User::query()
-            ->whereHas('roles', fn ($q) => $q->where('name', 'supplier'))
+            ->whereHas('roles', fn ($q) => $q->where('name', 'professional'))
             ->get(['id', 'name']);
 
         $clients = User::query()

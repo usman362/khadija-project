@@ -22,8 +22,8 @@ class EloquentUserRegistrationService implements UserRegistrationServiceInterfac
             ]);
 
             // Assign role based on registration choice (client or supplier)
-            $role = $data->role === 'supplier'
-                ? RoleName::SUPPLIER->value
+            $role = $data->role === 'professional'
+                ? RoleName::PROFESSIONAL->value
                 : RoleName::CLIENT->value;
 
             $user->assignRole($role);

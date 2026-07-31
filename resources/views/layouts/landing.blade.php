@@ -7,7 +7,7 @@
     // Computed once here, used by all three.
     $__fgActive = auth()->user()?->activeRole();
     $__fgHref = match ($__fgActive) {
-        'supplier' => route('professional.bidding-board.index'),  // the real gig board
+        'professional' => route('professional.bidding-board.index'),  // the real gig board
         'client'   => route('public.packages'),                   // clients shop packages, not gigs
         // A guest can't reach the board — it's pro-only and there is no public gig
         // listing — so fall back to the professional directory rather than a dead

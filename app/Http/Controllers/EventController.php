@@ -24,7 +24,7 @@ class EventController extends Controller
         if (! $user->isAdmin()) {
             if ($user->hasRole(RoleName::CLIENT->value)) {
                 $query->where('client_id', $user->id);
-            } elseif ($user->hasRole(RoleName::SUPPLIER->value)) {
+            } elseif ($user->hasRole(RoleName::PROFESSIONAL->value)) {
                 $query->where('supplier_id', $user->id);
             } else {
                 $query->whereRaw('1 = 0');

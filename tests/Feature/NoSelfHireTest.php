@@ -28,13 +28,13 @@ class NoSelfHireTest extends TestCase
         // The case that matters: one account, both roles.
         $u = User::factory()->create(['name' => 'Dual Role Person']);
         $u->assignRole('client');
-        $u->assignRole('supplier');
+        $u->assignRole('professional');
         $u->givePermissionTo('dashboard.view');
         $u->getOrCreateProfile()->update(['country' => 'US', 'state' => 'MD', 'city' => 'Baltimore']);
         $this->both = $u->fresh();
 
         $o = User::factory()->create(['name' => 'Someone Else']);
-        $o->assignRole('supplier');
+        $o->assignRole('professional');
         $o->getOrCreateProfile()->update(['country' => 'US', 'state' => 'MD', 'city' => 'Baltimore']);
         $this->other = $o->fresh();
     }

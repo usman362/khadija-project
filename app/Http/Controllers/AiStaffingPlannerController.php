@@ -98,7 +98,7 @@ class AiStaffingPlannerController extends Controller
             'stats'      => $plan['stats'],
             'level'      => $level,
             // Professional-facing tool → professional shell for suppliers.
-            'aiLayout'   => $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client',
+            'aiLayout'   => $request->user()?->activeRole() === 'professional' ? 'layouts.professional' : 'layouts.client',
         ]);
     }
 

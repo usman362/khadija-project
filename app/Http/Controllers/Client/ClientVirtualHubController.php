@@ -39,7 +39,7 @@ class ClientVirtualHubController extends Controller
 
         // Top-matching professionals — real suppliers, framed as virtual pros.
         $pros = User::query()
-            ->whereHas('roles', fn ($r) => $r->where('name', RoleName::SUPPLIER->value))
+            ->whereHas('roles', fn ($r) => $r->where('name', RoleName::PROFESSIONAL->value))
             ->excludingSelf()
             ->with(['profile'])
             ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')

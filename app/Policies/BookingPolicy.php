@@ -69,7 +69,7 @@ class BookingPolicy
         // Role must actually match a participant slot — a client-role user
         // can't update as supplier even if somehow their id matches.
         if ($booking->client_id === $user->id   && $user->hasRole(RoleName::CLIENT->value))   return true;
-        if ($booking->supplier_id === $user->id && $user->hasRole(RoleName::SUPPLIER->value)) return true;
+        if ($booking->supplier_id === $user->id && $user->hasRole(RoleName::PROFESSIONAL->value)) return true;
 
         return false;
     }

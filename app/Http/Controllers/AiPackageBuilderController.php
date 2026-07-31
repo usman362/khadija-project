@@ -21,7 +21,7 @@ class AiPackageBuilderController extends Controller
     public function show(Request $request): View
     {
         $user     = $request->user();
-        $aiLayout = $user?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
+        $aiLayout = $user?->activeRole() === 'professional' ? 'layouts.professional' : 'layouts.client';
 
         $level = AiAccess::level($user, 'package-builder');
 

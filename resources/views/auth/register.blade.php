@@ -3,7 +3,7 @@
     // (old('role')) so the "I am a..." selector doesn't silently reset to Client;
     // otherwise from ?role= (e.g. "Join as a professional" link); else Client.
     $active = old('role', $role ?? 'client');
-    if (! in_array($active, ['client', 'supplier', 'influencer'], true)) {
+    if (! in_array($active, ['client', 'professional', 'influencer'], true)) {
         $active = 'client';
     }
 
@@ -14,7 +14,7 @@
 
     // Role chips — each carries its own brand colour; the active one is filled.
     $roles = [
-        'supplier'   => ['label' => 'Professional', 'c' => '#2563eb', 'cd' => '#1d4ed8', 'soft' => '#eff4ff'],
+        'professional'   => ['label' => 'Professional', 'c' => '#2563eb', 'cd' => '#1d4ed8', 'soft' => '#eff4ff'],
         'client'     => ['label' => 'Client',       'c' => '#f97316', 'cd' => '#ea580c', 'soft' => '#fff3ea'],
         'influencer' => ['label' => 'Influencer',   'c' => '#ec4899', 'cd' => '#db2777', 'soft' => '#fdf0f7'],
     ];
@@ -227,7 +227,7 @@
 
             <div class="rg-iam">I am a...</div>
             <div class="rg-roles">
-                <button type="button" class="rg-role" data-role="supplier" data-c="#2563eb" data-soft="#eff4ff" aria-pressed="{{ $active === 'supplier' ? 'true' : 'false' }}" style="{{ $active==='supplier' ? 'background:#2563eb;color:#fff;border-color:transparent;' : 'color:#2563eb;border-color:#bfd3ff;' }}">
+                <button type="button" class="rg-role" data-role="professional" data-c="#2563eb" data-soft="#eff4ff" aria-pressed="{{ $active === 'professional' ? 'true' : 'false' }}" style="{{ $active==='professional' ? 'background:#2563eb;color:#fff;border-color:transparent;' : 'color:#2563eb;border-color:#bfd3ff;' }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                     Professional
                 </button>
@@ -392,7 +392,7 @@
             c.addEventListener('click', function () { select(c.getAttribute('data-role')); });
         });
         var proLink = document.getElementById('rgProLink');
-        if (proLink) proLink.addEventListener('click', function (e) { e.preventDefault(); select('supplier'); window.scrollTo({top:0,behavior:'smooth'}); });
+        if (proLink) proLink.addEventListener('click', function (e) { e.preventDefault(); select('professional'); window.scrollTo({top:0,behavior:'smooth'}); });
     })();
 
     @if($showRecaptcha && $recaptchaSiteKey && $recaptchaVersion === 'v3')

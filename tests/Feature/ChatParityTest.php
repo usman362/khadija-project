@@ -28,7 +28,7 @@ class ChatParityTest extends TestCase
         $this->seed(\Database\Seeders\PermissionSeeder::class);
         $this->seed(\Database\Seeders\RolePermissionSeeder::class);
 
-        foreach ([['client', 'client'], ['pro', 'supplier']] as [$prop, $role]) {
+        foreach ([['client', 'client'], ['pro', 'professional']] as [$prop, $role]) {
             $u = User::factory()->create();
             $u->assignRole($role);
             $u->givePermissionTo('dashboard.view');

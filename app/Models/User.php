@@ -359,7 +359,7 @@ class User extends Authenticatable
     public function hasBothRoles(): bool
     {
         return $this->hasRole(RoleName::CLIENT->value)
-            && $this->hasRole(RoleName::SUPPLIER->value);
+            && $this->hasRole(RoleName::PROFESSIONAL->value);
     }
 
     /**
@@ -381,8 +381,8 @@ class User extends Authenticatable
             return RoleName::CLIENT->value;
         }
 
-        if ($this->hasRole(RoleName::SUPPLIER->value)) {
-            return RoleName::SUPPLIER->value;
+        if ($this->hasRole(RoleName::PROFESSIONAL->value)) {
+            return RoleName::PROFESSIONAL->value;
         }
 
         return null;
@@ -395,7 +395,7 @@ class User extends Authenticatable
 
     public function isProfessionalMode(): bool
     {
-        return $this->activeRole() === RoleName::SUPPLIER->value;
+        return $this->activeRole() === RoleName::PROFESSIONAL->value;
     }
 
     // ── Account Deletion Helpers ───────────────────────────────────

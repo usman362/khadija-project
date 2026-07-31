@@ -47,7 +47,7 @@ class BrowseProfessionalsController extends Controller
         // We eager-load the profile so the card can render city / headline /
         // hourly rate / verification badges without N+1 queries.
         $query = User::query()
-            ->whereHas('roles', fn ($r) => $r->where('name', RoleName::SUPPLIER->value))
+            ->whereHas('roles', fn ($r) => $r->where('name', RoleName::PROFESSIONAL->value))
             ->excludingSelf()
             ->with(['profile', 'serviceCategories:id,name,thumbnail']);
 

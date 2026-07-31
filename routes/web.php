@@ -197,7 +197,7 @@ Route::get('/sitemap.xml', function () {
 
         // Published professional profiles
         \App\Models\User::query()
-            ->whereHas('roles', fn ($r) => $r->where('name', \App\Domain\Auth\Enums\RoleName::SUPPLIER->value))
+            ->whereHas('roles', fn ($r) => $r->where('name', \App\Domain\Auth\Enums\RoleName::PROFESSIONAL->value))
             ->select('id', 'updated_at')
             ->chunk(500, function ($pros) use (&$urls) {
                 foreach ($pros as $pro) {
@@ -312,7 +312,7 @@ Route::middleware('auth')->group(function () {
 //   /professional/login    → Professional (blue)
 //   /affiliate/login       → Affiliate (orange)
 //   /admin/login           → Admin (dark "Admin Portal")
-Route::get('/professional/login', fn () => view('auth.login', ['loginRole' => 'supplier']))
+Route::get('/professional/login', fn () => view('auth.login', ['loginRole' => 'professional']))
     ->middleware('guest')->name('login.professional');
 Route::get('/affiliate/login', fn () => view('auth.login', ['loginRole' => 'influencer']))
     ->middleware('guest')->name('login.affiliate');
@@ -448,7 +448,7 @@ Route::middleware('auth')->group(function () {
 
         // Redirect client/supplier users based on active mode (session) with fallback
         $active = $user->activeRole();
-        if ($active === 'supplier') {
+        if ($active === 'professional') {
             return redirect()->route('professional.dashboard');
         }
         if ($active === 'client') {

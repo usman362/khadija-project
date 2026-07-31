@@ -602,9 +602,9 @@
                     // Badge + colour come from the plan module's own fields (admin-managed).
                     $badgeMap = ['primary' => '#2563eb', 'success' => '#10b981', 'warning' => '#f59e0b', 'danger' => '#ef4444', 'info' => '#0ea5e9', 'secondary' => '#64748b', 'orange' => '#f97316'];
                     $badgeColor = $badgeMap[$plan->badge_color] ?? '#2563eb';
-                    if ($pop)            { $ctaLabel = 'Get Started'; $ctaClass = 'lp-btn-blue';    $ctaRole = 'supplier'; }
+                    if ($pop)            { $ctaLabel = 'Get Started'; $ctaClass = 'lp-btn-blue';    $ctaRole = 'professional'; }
                     elseif ($loop->last) { $ctaLabel = 'Contact Sales';    $ctaClass = 'lp-btn-outline'; $ctaRole = null; }
-                    else                 { $ctaLabel = 'Get Started';      $ctaClass = 'lp-btn-outline'; $ctaRole = 'supplier'; }
+                    else                 { $ctaLabel = 'Get Started';      $ctaClass = 'lp-btn-outline'; $ctaRole = 'professional'; }
                     $ctaHref = $ctaRole ? route('register', ['role' => $ctaRole]) : route('about-us');
                 @endphp
                 <div class="lp-plan {{ $pop ? 'pop' : '' }}">

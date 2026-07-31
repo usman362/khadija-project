@@ -26,7 +26,7 @@ class DemoPackagesSeeder extends Seeder
 {
     public function run(): void
     {
-        $suppliers = User::whereHas('roles', fn ($r) => $r->where('name', RoleName::SUPPLIER->value))
+        $suppliers = User::whereHas('roles', fn ($r) => $r->where('name', RoleName::PROFESSIONAL->value))
             ->orderBy('id')->get();
 
         if ($suppliers->isEmpty()) {

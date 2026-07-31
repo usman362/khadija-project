@@ -48,12 +48,12 @@ class UserAccessUiTest extends TestCase
         $response = $this->actingAs($admin)->patch(route('app.users.update', $target), [
             'name' => $target->name,
             'email' => $target->email,
-            'roles' => [RoleName::SUPPLIER->value],
+            'roles' => [RoleName::PROFESSIONAL->value],
             'permissions' => ['messages.create'],
         ]);
 
         $response->assertRedirect();
-        $this->assertTrue($target->fresh()->hasRole(RoleName::SUPPLIER->value));
+        $this->assertTrue($target->fresh()->hasRole(RoleName::PROFESSIONAL->value));
         $this->assertTrue($target->fresh()->hasDirectPermission('messages.create'));
     }
 }

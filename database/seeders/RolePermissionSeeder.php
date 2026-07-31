@@ -15,7 +15,7 @@ class RolePermissionSeeder extends Seeder
 
         $adminRole = Role::findOrCreate(RoleName::ADMIN->value, 'web');
         $clientRole = Role::findOrCreate(RoleName::CLIENT->value, 'web');
-        $supplierRole = Role::findOrCreate(RoleName::SUPPLIER->value, 'web');
+        $supplierRole = Role::findOrCreate(RoleName::PROFESSIONAL->value, 'web');
         $influencerRole = Role::findOrCreate(RoleName::INFLUENCER->value, 'web');
 
         $adminRole->syncPermissions(

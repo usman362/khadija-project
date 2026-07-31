@@ -19,7 +19,7 @@ class AiToolkitController extends Controller
     {
         // Use the ACTIVE role (session mode), not hasRole — so a dual-role user
         // in client mode sees the client hub, not the professional one.
-        $isPro    = $request->user()?->activeRole() === 'supplier';
+        $isPro    = $request->user()?->activeRole() === 'professional';
         $audience = $isPro ? 'professional' : 'client';
 
         $tools  = AiToolCatalog::forAudience($audience);

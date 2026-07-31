@@ -28,7 +28,7 @@ class ClientDirectOfferController extends Controller
     public function create(Request $request): View
     {
         $pros = User::query()
-            ->whereHas('roles', fn ($r) => $r->where('name', RoleName::SUPPLIER->value))
+            ->whereHas('roles', fn ($r) => $r->where('name', RoleName::PROFESSIONAL->value))
             ->excludingSelf()
             ->with(['profile'])
             ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')

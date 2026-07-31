@@ -54,7 +54,7 @@ class LoginController extends Controller
         $isStandardUser = $user->hasAnyRole([
             RoleName::ADMIN->value,
             RoleName::CLIENT->value,
-            RoleName::SUPPLIER->value,
+            RoleName::PROFESSIONAL->value,
         ]);
 
         if (! $isStandardUser && $user->influencer) {
@@ -72,8 +72,8 @@ class LoginController extends Controller
         // page they use. The active-role session is reset to the primary here.
         $landRole = $this->primaryRoleFor($user);
 
-        if ($landRole === RoleName::SUPPLIER->value && $user->hasRole(RoleName::SUPPLIER->value)) {
-            session(['active_role' => RoleName::SUPPLIER->value]);
+        if ($landRole === RoleName::PROFESSIONAL->value && $user->hasRole(RoleName::PROFESSIONAL->value)) {
+            session(['active_role' => RoleName::PROFESSIONAL->value]);
             return redirect()->intended(route('professional.dashboard'));
         }
 
@@ -92,13 +92,13 @@ class LoginController extends Controller
     private function primaryRoleFor($user): string
     {
         $primary = $user->primary_role;
-        if (in_array($primary, [RoleName::SUPPLIER->value, RoleName::CLIENT->value], true) && $user->hasRole($primary)) {
+        if (in_array($primary, [RoleName::PROFESSIONAL->value, RoleName::CLIENT->value], true) && $user->hasRole($primary)) {
             return $primary;
         }
 
         // No stored primary_role: prefer CLIENT for a dual-role account so a client
         // never lands in the professional portal. A pure professional (no client
         // role) still resolves to supplier.
-        return $user->hasRole(RoleName::CLIENT->value) ? RoleName::CLIENT->value : RoleName::SUPPLIER->value;
+        return $user->hasRole(RoleName::CLIENT->value) ? RoleName::CLIENT->value : RoleName::PROFESSIONAL->value;
     }
 }

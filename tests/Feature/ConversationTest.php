@@ -35,7 +35,7 @@ class ConversationTest extends TestCase
         $this->client->assignRole(RoleName::CLIENT->value);
 
         $this->supplier = User::factory()->create();
-        $this->supplier->assignRole(RoleName::SUPPLIER->value);
+        $this->supplier->assignRole(RoleName::PROFESSIONAL->value);
     }
 
     public function test_user_can_create_direct_conversation(): void

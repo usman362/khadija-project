@@ -67,7 +67,7 @@ class AiPricingAssistantController extends Controller
 
         // Render inside the professional shell for suppliers, the client shell
         // otherwise — Pricing Assistant is a professional-facing tool.
-        $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
+        $aiLayout = $request->user()?->activeRole() === 'professional' ? 'layouts.professional' : 'layouts.client';
 
         $level = \App\Domain\AiFeatures\AiAccess::level($request->user(), 'pricing-assistant');
         if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {

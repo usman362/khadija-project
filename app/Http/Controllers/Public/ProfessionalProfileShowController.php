@@ -28,7 +28,7 @@ class ProfessionalProfileShowController extends Controller
     {
         // Gate: only show profiles for users who actually are suppliers.
         // Keeps random non-pro account IDs from being crawled as "pros".
-        abort_unless($user->hasRole(RoleName::SUPPLIER->value), 404);
+        abort_unless($user->hasRole(RoleName::PROFESSIONAL->value), 404);
 
         $this->rememberView($request, $user);
 
@@ -45,7 +45,7 @@ class ProfessionalProfileShowController extends Controller
         // "Similar pros" — same city if we have one, else just other suppliers.
         // Excludes the current pro and limits to 4 cards for the horizontal row.
         $similar = User::query()
-            ->whereHas('roles', fn ($r) => $r->where('name', RoleName::SUPPLIER->value))
+            ->whereHas('roles', fn ($r) => $r->where('name', RoleName::PROFESSIONAL->value))
             ->excludingSelf()
             ->where('users.id', '!=', $user->id)
             ->with('profile')

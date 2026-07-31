@@ -39,7 +39,7 @@ class EventPolicyTest extends TestCase
     public function test_supplier_cannot_create_event(): void
     {
         $supplier = User::factory()->create();
-        $supplier->assignRole(RoleName::SUPPLIER->value);
+        $supplier->assignRole(RoleName::PROFESSIONAL->value);
 
         $response = $this->actingAs($supplier)->post(route('events.store'), [
             'title' => 'Supplier event',

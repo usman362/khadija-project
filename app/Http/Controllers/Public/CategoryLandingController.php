@@ -32,7 +32,7 @@ class CategoryLandingController extends Controller
         $branchIds = $this->branchIds($category);
 
         $featured = User::query()
-            ->whereHas('roles', fn ($r) => $r->where('name', RoleName::SUPPLIER->value))
+            ->whereHas('roles', fn ($r) => $r->where('name', RoleName::PROFESSIONAL->value))
             ->excludingSelf()
             ->with('profile')
             ->whereHas('serviceCategories', fn (Builder $c) => $c->whereIn('categories.id', $branchIds))
@@ -50,7 +50,7 @@ class CategoryLandingController extends Controller
 
         // Same population as the featured list, uncapped.
         $totalCount = User::query()
-            ->whereHas('roles', fn ($r) => $r->where('name', RoleName::SUPPLIER->value))
+            ->whereHas('roles', fn ($r) => $r->where('name', RoleName::PROFESSIONAL->value))
             ->excludingSelf()
             ->whereHas('serviceCategories', fn (Builder $c) => $c->whereIn('categories.id', $branchIds))
             ->count();

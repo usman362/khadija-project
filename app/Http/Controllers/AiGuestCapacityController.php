@@ -15,7 +15,7 @@ class AiGuestCapacityController extends Controller
 {
     public function show(Request $request): View
     {
-        $aiLayout = $request->user()?->activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client';
+        $aiLayout = $request->user()?->activeRole() === 'professional' ? 'layouts.professional' : 'layouts.client';
 
         $level = \App\Domain\AiFeatures\AiAccess::level($request->user(), 'guest-capacity');
         if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {

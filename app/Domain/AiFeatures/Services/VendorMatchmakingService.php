@@ -98,7 +98,7 @@ class VendorMatchmakingService
         $budgetMax = !empty($input['budget']) ? (float) $input['budget'] : null;
 
         $query = User::query()
-            ->whereHas('roles', fn($q) => $q->where('name', RoleName::SUPPLIER->value))
+            ->whereHas('roles', fn($q) => $q->where('name', RoleName::PROFESSIONAL->value))
             ->excludingSelf()
             ->whereHas('profile')
             ->with('profile')
