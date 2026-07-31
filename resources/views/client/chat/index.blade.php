@@ -29,8 +29,11 @@
     .cm-btn-ghost { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 11px; background: var(--bg-card); color: var(--text-secondary); font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
     .cm-btn-ghost svg { width: 14px; height: 14px; color: var(--brand-text); }
 
-    .cm-main { display: grid; grid-template-columns: minmax(0,340px) minmax(0,1fr); gap: 16px; align-items: start; }
-    .cm-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; }
+    .cm-main { display: grid; grid-template-columns: minmax(0,340px) minmax(0,1fr); gap: 16px; }
+    /* Both columns are one height. `align-items: start` used to size each
+       to its own content, so the list ran on past the bottom of the thread
+       and left a block of empty card under the compose box. */
+    .cm-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; display: flex; flex-direction: column; min-height: 600px; }
     .cm-tabs { display: flex; gap: 4px; padding: 12px 14px 0; border-bottom: 1px solid var(--border-color); }
     .cm-tab { display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; font-size: 12.5px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
     .cm-tab.on { color: var(--cm); border-bottom-color: var(--cm); }
@@ -39,7 +42,7 @@
     .cm-search-box { flex: 1; position: relative; }
     .cm-search-box svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--text-muted); }
     .cm-search-box input { width: 100%; box-sizing: border-box; padding: 9px 12px 9px 34px; border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-primary); font-size: 13px; font-family: inherit; }
-    .cm-list { max-height: 600px; overflow-y: auto; }
+    .cm-list { flex: 1; min-height: 0; overflow-y: auto; }
     .cm-conv { display: flex; gap: 11px; padding: 13px 14px; border-top: 1px solid var(--border-color); cursor: pointer; text-decoration: none; }
     .cm-conv:hover { background: var(--bg-card-hover); }
     .cm-conv.active { background: rgba(234,88,12,0.06); border-left: 3px solid var(--cm); padding-left: 11px; }
@@ -63,7 +66,7 @@
     .cm-th-name { font-size: 16px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
     .cm-open { font-size: 10px; font-weight: 800; color: var(--ok-text); background: rgba(16,185,129,0.12); border-radius: 5px; padding: 2px 7px; }
     .cm-th-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    .cm-msgs { flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; max-height: 440px; }
+    .cm-msgs { flex: 1; min-height: 0; padding: 18px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
     .cm-msg { display: flex; gap: 11px; max-width: 78%; }
     .cm-msg.me { flex-direction: row-reverse; margin-left: auto; }
     .cm-msg-av { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 800; }

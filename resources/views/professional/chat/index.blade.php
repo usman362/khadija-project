@@ -35,8 +35,11 @@
     .pm-btn-ghost svg { width: 14px; height: 14px; color: var(--info-text); }
 
     /* main split */
-    .pm-main { display: grid; grid-template-columns: minmax(0,340px) minmax(0,1fr); gap: 16px; align-items: start; }
-    .pm-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; }
+    .pm-main { display: grid; grid-template-columns: minmax(0,340px) minmax(0,1fr); gap: 16px; }
+    /* Both columns are one height. `align-items: start` used to size each
+       to its own content, so the list ran on past the bottom of the thread
+       and left a block of empty card under the compose box. */
+    .pm-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; display: flex; flex-direction: column; min-height: 620px; }
 
     /* conversation list */
     .pm-tabs { display: flex; gap: 4px; padding: 12px 14px 0; border-bottom: 1px solid var(--border-color); }
@@ -59,7 +62,7 @@
     .pm-filter svg { width: 15px; height: 15px; }
     .pm-subbar { display: flex; align-items: center; justify-content: space-between; padding: 0 14px 10px; font-size: 11.5px; color: var(--text-muted); }
     .pm-subbar select { border: 1px solid var(--border-color); border-radius: 7px; background: var(--bg-card); color: var(--text-secondary); font-size: 11.5px; padding: 4px 8px; font-family: inherit; }
-    .pm-list { max-height: 620px; overflow-y: auto; }
+    .pm-list { flex: 1; min-height: 0; overflow-y: auto; }
     .pm-conv { display: flex; gap: 11px; padding: 13px 14px; border-top: 1px solid var(--border-color); cursor: pointer; text-decoration: none; }
     .pm-conv:hover { background: var(--bg-card-hover); }
     .pm-conv.active { background: rgba(37,99,235,0.06); border-left: 3px solid var(--pm); padding-left: 11px; }
@@ -87,7 +90,7 @@
     .pm-th-actions { display: flex; gap: 7px; }
     .pm-icon-btn { width: 34px; height: 34px; border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; }
     .pm-icon-btn svg { width: 16px; height: 16px; }
-    .pm-msgs { flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; max-height: 460px; }
+    .pm-msgs { flex: 1; min-height: 0; padding: 18px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
     .pm-msg { display: flex; gap: 11px; max-width: 78%; }
     .pm-msg.me { flex-direction: row-reverse; margin-left: auto; }
     .pm-msg-av { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 800; }
