@@ -8,7 +8,7 @@ use Illuminate\View\View;
 use Throwable;
 
 /**
- * AI Theme & Style Advisor (client). Generates cohesive event themes — colour
+ * Style & Inspiration (client). Generates cohesive event themes — colour
  * palettes, mood boards and matching vendor styles. Representative data.
  */
 class AiThemeAdvisorController extends Controller

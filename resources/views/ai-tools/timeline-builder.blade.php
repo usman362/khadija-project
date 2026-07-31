@@ -76,9 +76,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Build your run-of-show by hand — add each time slot yourself, no AI.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'AI suggests a timeline — edit the times and segments before you save.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and AI builds the entire run-of-show for you.'],
+        'manual'  => ['Do It Myself', '#64748b', 'Build your run-of-show by hand — add each time slot yourself, no suggestions.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'We suggest a timeline — edit the times and segments before you save.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and we build the entire run-of-show for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -90,7 +90,7 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — hand-built run-of-show, no AI --}}
+    {{-- Do It Myself — hand-built run-of-show, no suggestions --}}
     <div class="tb-form-card">
         <h3>🛠 Build My Run-of-Show</h3>
         <div class="sub">Add each slot yourself — set the time and what's happening.</div>
@@ -101,7 +101,7 @@
     {{-- Interactive builder --}}
     <div class="tb-form-card">
         <h3>🛠 Build My Run-of-Show</h3>
-        <div class="sub">{{ $isSemi ? "Enter your event — AI suggests a timeline you can edit." : "Enter your event details and AI builds the run-of-show with real clock times." }}</div>
+        <div class="sub">{{ $isSemi ? "Enter your event — we suggest a timeline you can edit." : "Enter your event details and we build the run-of-show with real clock times." }}</div>
         <form id="tbForm">
             <div class="tb-fgrid">
                 <div>

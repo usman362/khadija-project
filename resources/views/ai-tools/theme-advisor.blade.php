@@ -1,10 +1,10 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'Theme & Style Advisor')
-@section('page-title', 'Theme & Style Advisor')
+@section('title', 'Style & Inspiration')
+@section('page-title', 'Style & Inspiration')
 @section('page-subtitle', 'Cohesive themes, palettes & mood boards for your event')
 
-{{-- Theme & Style Advisor (client). auto-generated themes + colour palette +
+{{-- Style & Inspiration (client). auto-generated themes + colour palette +
      mood board + category filters. Representative data. --}}
 
 @push('styles')
@@ -92,9 +92,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Pick your own theme, colours and style ideas and assemble your board by hand — no AI.'],
-        'semi'    => ['Help Me Plan', '#7c3aed', 'AI suggests a palette, mood and décor — reword or swap any item before you use it.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and AI builds the full palette, mood board and styling for you.'],
+        'manual'  => ['Do It Myself', '#64748b', 'Pick your own theme, colours and style ideas and assemble your board by hand — no suggestions.'],
+        'semi'    => ['Help Me Plan', '#7c3aed', 'We suggest a palette, mood and décor — reword or swap any item before you use it.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and we build the full palette, mood board and styling for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -108,7 +108,7 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — hand-built style board, no AI --}}
+    {{-- Do It Myself — hand-built style board, no suggestions --}}
     <div class="ta-sec ta-mano">
         <h3>🎨 Build My Style Board</h3>
         <div class="ta-field" style="margin-bottom:12px;">
@@ -129,13 +129,13 @@
         <div id="tamIdeas"></div>
         <button type="button" id="tamAddIdea" class="ta-add">+ Add idea</button>
 
-        <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">Want the AI to suggest a palette, mood board and styling for you? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--ta-strong);font-weight:700;text-decoration:none;">Upgrade →</a></div>
+        <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">Want a palette, mood board and styling suggested for you? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--ta-strong);font-weight:700;text-decoration:none;">Upgrade →</a></div>
     </div>
     @else
     {{-- Advisor form (Help Me Plan / Coordinate It For Me) --}}
     <div class="ta-sec">
         <h3>🎯 Build Your Palette</h3>
-        <div style="font-size:12.5px;color:var(--text-muted);margin:-6px 0 14px;">{{ $isSemi ? 'AI suggests a palette and styling you can reword or swap before using.' : 'AI builds a full palette, mood and décor plan from your details.' }}</div>
+        <div style="font-size:12.5px;color:var(--text-muted);margin:-6px 0 14px;">{{ $isSemi ? 'We suggest a palette and styling you can reword or swap before using.' : 'AI builds a full palette, mood and décor plan from your details.' }}</div>
         <form id="taForm">
             <div class="ta-form-grid">
                 <div class="ta-field">
@@ -181,7 +181,7 @@
 
     {{-- Generated palette + guidance --}}
     <div class="ta-out" id="taOut">
-        <x-add-to-event tool-key="theme-advisor" tool-name="Theme & Style Advisor" :event-id="request('event_id')" />
+        <x-add-to-event tool-key="theme-advisor" tool-name="Style & Inspiration" :event-id="request('event_id')" />
         <div class="ta-sec">
             <h3>🎨 Your Suggested Palette</h3>
             <div class="ta-out-sum" id="taSummary"></div>

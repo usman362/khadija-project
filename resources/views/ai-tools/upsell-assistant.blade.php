@@ -63,9 +63,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Build your own add-on list by hand — add each extra and price, see the total. No AI.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'AI suggests add-ons and a bundle — tweak the prices and the totals update.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'AI spots the add-ons, bundles them, writes the pitch and shows the full picture.'],
+        'manual'  => ['Do It Myself', '#64748b', 'Build your own add-on list by hand — add each extra and price, see the total. No suggestions.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'We suggest add-ons and a bundle — tweak the prices and the totals update.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'We spot the add-ons, bundle them, write the pitch and shows the full picture.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -79,10 +79,10 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — hand-built add-on list, no AI --}}
+    {{-- Do It Myself — hand-built add-on list, no suggestions --}}
     <div class="us-tool">
         <h3>➕ Build My Add-on List</h3>
-        <p class="desc">Add each upsell you want to offer and its price — we will total the extra revenue. No AI.</p>
+        <p class="desc">Add each upsell you want to offer and its price — we will total the extra revenue. No suggestions.</p>
         <div id="usmRows" style="display:flex;flex-direction:column;gap:10px;"></div>
         <button type="button" id="usmAdd" style="margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--us);background:rgba(37,99,235,.09);border:1px solid rgba(37,99,235,.28);border-radius:10px;padding:9px 15px;cursor:pointer;font-family:inherit;">+ Add upsell</button>
         <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-color);font-size:14px;">Total extra revenue: <b id="usmTotal" style="color:#16a34a;font-size:20px;">$0</b></div>
@@ -92,7 +92,7 @@
     {{-- Interactive upsell finder (Help Me Plan / Coordinate It For Me) --}}
     <div class="us-tool">
         <h3>🔍 Upsell Finder</h3>
-        <p class="desc">{{ $isSemi ? 'Enter a booked service, event type and package price — AI suggests add-ons and a bundle you can edit before sending.' : 'Enter a booked service, event type and package price to get relevant add-on suggestions, a bundle and a message you can send. Prices are estimates you can adjust.' }}</p>
+        <p class="desc">{{ $isSemi ? 'Enter a booked service, event type and package price — we suggest add-ons and a bundle you can edit before sending.' : 'Enter a booked service, event type and package price to get relevant add-on suggestions, a bundle and a message you can send. Prices are estimates you can adjust.' }}</p>
 
         <form id="usForm">
             <div class="us-form-grid">

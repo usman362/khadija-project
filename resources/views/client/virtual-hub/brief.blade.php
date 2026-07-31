@@ -343,12 +343,12 @@
                 </div>
             </div>
 
-            <div class="vhb-subhead" style="margin-top:6px;">AI Gig Boost</div>
+            <div class="vhb-subhead" style="margin-top:6px;">Gig Boost</div>
             <div class="vhb-callout">
                 <label class="vhb-opt" style="gap:10px; align-items:flex-start;">
                     <input type="checkbox" checked>
                     <span class="vhb-callout-body">
-                        <b>Enable Smart Match:</b> Instantly notify the top 5 rated virtual professionals matching these requirements to submit a bid.
+                        <b>Enable Best Match:</b> Instantly notify the top 5 rated virtual professionals matching these requirements to submit a bid.
                         <span style="display:block; color:var(--text-muted); margin-top:3px;">(Boosts engagement instantly)</span>
                     </span>
                 </label>

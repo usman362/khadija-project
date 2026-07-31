@@ -184,7 +184,7 @@
                 </p>
             </div>
 
-            {{-- AI Toolkit results saved onto this event ("Add to my event") --}}
+            {{-- Tool results saved onto this event ("Add to my event") --}}
             @php
                 $aiArtifacts = $event->aiArtifacts;
             @endphp
@@ -348,7 +348,7 @@
                     </button>
                     <a href="{{ route('ai-tools.budget-allocator') }}" class="cl-btn cl-btn-ghost cl-btn-sm" style="justify-content:flex-start;">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                        Plan Budget with AI
+                        Plan Budget
                     </a>
                 </div>
             </div>

@@ -117,7 +117,7 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Score the venue factors yourself — we average them into an overall verdict, no AI.'],
+        'manual'  => ['Do It Myself', '#64748b', 'Score the venue factors yourself — we average them into an overall verdict, no suggestions.'],
         'semi'    => ['Help Me Plan', '#2563eb', 'the tool analyses the space — adjust the figures, verdict and notes and utilization recalculates live.'],
         'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your space and the tool analyses capacity, fit and gaps for you.'],
     ];
@@ -136,7 +136,7 @@
     {{-- Do It Myself — hand-built venue scorecard, no AI, computed client-side --}}
     <div class="va-form-card va-mano">
         <h3>🏛 Score My Venue</h3>
-        <div class="sub">Rate each factor yourself — we average them into an overall venue score. No AI.</div>
+        <div class="sub">Rate each factor yourself — we average them into an overall venue score. No suggestions.</div>
         <div style="margin-bottom:14px;">
             <label class="va-lbl">Venue Name (optional)</label>
             <input type="text" id="vamName" class="va-inp" placeholder="e.g. The Garden Estate">
@@ -154,7 +154,7 @@
     {{-- Interactive analyzer (Help Me Plan / Coordinate It For Me) --}}
     <div class="va-form-card">
         <h3>📐 Analyze My Venue Space</h3>
-        <div class="sub">{{ $isSemi ? 'AI suggests a capacity and space fit you can adjust before using.' : 'Enter the venue size and your guest count and AI works out capacity and space fit.' }}</div>
+        <div class="sub">{{ $isSemi ? 'We suggest a capacity and space fit you can adjust before using.' : 'Enter the venue size and your guest count and AI works out capacity and space fit.' }}</div>
         <form id="vaForm">
             <div class="va-fgrid">
                 <div>

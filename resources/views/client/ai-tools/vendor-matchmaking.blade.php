@@ -1,10 +1,10 @@
 @extends('layouts.client')
 
-@section('title', 'Smart Match')
-@section('page-title', 'Smart Match')
+@section('title', 'Best Match')
+@section('page-title', 'Best Match')
 @section('page-subtitle', 'We find the perfect vendors for your event based on your theme, date, and budget.')
 
-{{-- Smart Match — deterministic, dynamic matcher (no LLM). Ranks a
+{{-- Best Match — deterministic, dynamic matcher (no LLM). Ranks a
      vendor catalogue against the event theme/budget and the refine controls
      re-filter/re-rank live. Page-scoped — the shared layout is untouched. --}}
 
@@ -134,7 +134,7 @@
 @endphp
 <div class="vm" data-match-url="{{ route('ai-tools.vendor-matchmaking.match') }}" data-budget="{{ $event['budget'] }}" data-level="{{ $level }}">
 
-    @include('partials._ai_quota_badge', ['status' => $status, 'tool' => 'Smart Match'])
+    @include('partials._ai_quota_badge', ['status' => $status, 'tool' => 'Best Match'])
 
     {{-- Membership-level banner --}}
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-left:4px solid {{ $lvlColor }};border-radius:12px;padding:12px 16px;margin-bottom:18px;">
@@ -163,7 +163,7 @@
                     <circle cx="12.5" cy="20.5" r="2" fill="#fff" opacity="0.35"/>
                 </svg>
             </span>
-            <div class="vm-head-txt"><h1>Smart Match</h1><p>We find the perfect vendors for your event based on your theme, date, and budget.</p></div>
+            <div class="vm-head-txt"><h1>Best Match</h1><p>We find the perfect vendors for your event based on your theme, date, and budget.</p></div>
         </div>
         <a href="{{ route('ai-tools.budget-allocator') }}" class="vm-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to Toolkit</a>
     </div>
@@ -196,7 +196,7 @@
             </div>
 
             @if($isManual)
-            {{-- Do It Myself — browse the vendor directory and pick, no AI ranking --}}
+            {{-- Do It Myself — browse the vendor directory and pick, no suggestions ranking --}}
             <div class="vm-card">
                 <div class="vm-tm-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><b>Browse Vendors</b> <span style="font-size:12px;font-weight:600;color:var(--text-muted);margin-left:2px;">(<span id="vm-dir-count">{{ count($directory) }}</span>)</span></div>
                 <div id="vm-directory" style="display:flex;flex-direction:column;gap:12px;margin-top:6px;">
@@ -217,7 +217,7 @@
                 <div class="vm-empty" id="vm-dir-empty" style="display:none;">No vendors match these filters. Try widening your budget or category.</div>
             </div>
             @else
-            {{-- AI matches (Help Me Plan / Coordinate It For Me) --}}
+            {{-- Suggested matches (Help Me Plan / Coordinate It For Me) --}}
             <div class="vm-card">
                 <div class="vm-tm-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1-6.3-4.6L5.7 21l2.3-7.1-6-4.5h7.6z"/></svg><b>{{ $isMax ? 'Your Matched Team' : 'Top Matches For You' }}</b></div>
                 @if($isMax)<p style="font-size:12.5px;color:var(--text-muted);margin:2px 0 0;">Selected automatically from your event details. Review and connect when you're ready.</p>@endif
@@ -255,7 +255,7 @@
                 <button type="button" class="vm-btn" id="vm-filter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Apply Filters</button>
             </div>
             @elseif($isSemi)
-            {{-- Help Me Plan — AI ranks; refine to re-rank --}}
+            {{-- Help Me Plan — we rank; refine to re-rank --}}
             <div class="vm-card">
                 <div class="vm-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg><b>Refine Your Match</b></div>
                 <div class="vm-fld">

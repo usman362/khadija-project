@@ -2,7 +2,7 @@
      Expects $status from AiFeatureGate::status(). Optional $tool (display name).
      Surfaces the tier/quota state; hard enforcement is server-side in the controller. --}}
 @php
-    $aiTool    = $tool ?? 'This AI tool';
+    $aiTool    = $tool ?? 'This tool';
     $enabled   = $status['enabled'] ?? true;
     $unlimited = $status['unlimited'] ?? false;
     $remaining = (int) ($status['remaining'] ?? 0);
@@ -14,7 +14,7 @@
     <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; padding:14px 18px; margin-bottom:18px; border:1px solid rgba(245,158,11,0.35); background:rgba(245,158,11,0.10); border-radius:14px;">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" style="flex-shrink:0;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <div style="flex:1; min-width:200px;">
-            <div style="font-size:14px; font-weight:700; color:var(--text-primary, #1e293b);">Premium AI tool</div>
+            <div style="font-size:14px; font-weight:700; color:var(--text-primary, #1e293b);">Premium tool</div>
             <div style="font-size:12.5px; color:var(--text-muted, #64748b); margin-top:2px;">{{ $aiTool }} isn't included in your current plan. Upgrade to unlock it.</div>
         </div>
         <a href="{{ route('app.membership-plans.index') }}" style="display:inline-flex; align-items:center; gap:7px; padding:9px 18px; background:#f59e0b; color:#fff; font-size:13px; font-weight:700; border-radius:10px; white-space:nowrap;">

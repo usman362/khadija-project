@@ -91,9 +91,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Work out your own weekly capacity and open slots — just the math, no AI advice.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'Enter your pattern — AI estimates utilization and suggests how to optimize it.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'AI reads your pattern, optimizes availability and fills your calendar plan for you.'],
+        'manual'  => ['Do It Myself', '#64748b', 'Work out your own weekly capacity and open slots — just the math, no suggestions.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'Enter your pattern — we estimate utilization and suggest how to optimize it.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'We read your pattern, optimize availability and fill your calendar plan for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -241,7 +241,7 @@
 
         const payload = Object.fromEntries(new FormData(form).entries());
 
-        // Do It Myself — pure client-side math, no AI suggestions, no server call.
+        // Do It Myself — pure client-side math, no suggestions suggestions, no server call.
         if (LEVEL === 'manual') {
             load.classList.remove('on');
             run.disabled = false;
@@ -290,7 +290,7 @@
         }
     });
 
-    // Client-side capacity math mirroring the server (Do It Myself — no AI advice).
+    // Client-side capacity math mirroring the server (Do It Myself — no suggestions advice).
     function computeLocal(p) {
         const wd = parseFloat(p.working_days), hpd = parseFloat(p.hours_per_day);
         const gig = parseFloat(p.avg_gig_hours), bk = parseFloat(p.current_bookings_per_week);

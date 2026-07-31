@@ -347,9 +347,9 @@
             </div>
             <a href="{{ route('professional.proposals.index') }}" class="pl-cc-btn" style="background:#047857;">Create Proposal <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         </div>
-        {{-- Automatic Follow-Up Bots --}}
+        {{-- Automatic Follow-Ups --}}
         <div class="pl-cc-card">
-            <div class="pl-cc-h"><span class="ic" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span><b>Automatic Follow-Up Bots</b></div>
+            <div class="pl-cc-h"><span class="ic" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span><b>Automatic Follow-Ups</b></div>
             <p>Never let a lead slip away. We follow up for you.</p>
             <div class="pl-cc-prev">
                 <div class="pl-flow-step"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></span><span>Lead receives proposal</span></div>
@@ -361,8 +361,8 @@
         </div>
         {{-- Probability Predictor --}}
         <div class="pl-cc-card">
-            <div class="pl-cc-h"><span class="ic" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><b>Probability Predictor</b></div>
-            <p>AI predicts how likely a lead is to book your services.</p>
+            <div class="pl-cc-h"><span class="ic" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><b>Your Conversion Rate</b></div>
+            <p>The share of your leads that have gone on to book.</p>
             <div class="pl-cc-prev">
                 @php $pct = max(0, min(100, (int) ($conversion ?: 82))); $deg = $pct * 1.8; @endphp
                 <div class="pl-gauge">
@@ -371,7 +371,7 @@
                         <path d="M10 60 A50 50 0 0 1 110 60" stroke="url(#plg)" stroke-width="11" fill="none" stroke-linecap="round" stroke-dasharray="157" stroke-dashoffset="{{ 157 - (157 * $pct / 100) }}"/>
                         <defs><linearGradient id="plg" x1="10" y1="0" x2="110" y2="0"><stop stop-color="#ef4444"/><stop offset="0.5" stop-color="#f59e0b"/><stop offset="1" stop-color="#10b981"/></linearGradient></defs>
                     </svg>
-                    <div class="pct"><b>{{ $pct }}%</b><span>{{ $pct >= 60 ? 'High' : ($pct >= 35 ? 'Medium' : 'Low') }} Chance of Booking</span></div>
+                    <div class="pct"><b>{{ $pct }}%</b><span>{{ $pct >= 60 ? 'High' : ($pct >= 35 ? 'Medium' : 'Low') }} of leads booked</span></div>
                 </div>
                 <div class="pl-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Location Match</div>
                 <div class="pl-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>High Budget</div>

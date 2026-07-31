@@ -219,7 +219,7 @@
             <div class="pd-stat-foot"><span class="pd-stat-delta">Excellent</span><svg class="pd-stat-spark" width="40" height="18" viewBox="0 0 40 18" fill="none"><polyline points="0,8 8,9 16,7 24,8 32,6 40,7" stroke="#2563eb" stroke-width="1.6"/></svg></div>
         </div>
         <div class="pd-stat">
-            <div class="pd-stat-top"><span class="pd-stat-ico c-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span class="pd-stat-label">AI Visibility Score</span><svg class="pd-stat-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+            <div class="pd-stat-top"><span class="pd-stat-ico c-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span class="pd-stat-label">Visibility Score</span><svg class="pd-stat-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
             <div class="pd-stat-val">92<span style="font-size:12px;color:var(--text-muted);font-weight:700;">/100</span></div>
             <div class="pd-stat-foot"><span class="pd-stat-delta">Excellent</span><svg class="pd-stat-spark" width="40" height="18" viewBox="0 0 40 18" fill="none"><polyline points="0,11 8,8 16,9 24,5 32,6 40,3" stroke="#10b981" stroke-width="1.6"/></svg></div>
         </div>
@@ -362,7 +362,7 @@
             </div>
             <div class="pd-bid-rec">
                 <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5 10.1 7.6 12 3z"/></svg></span>
-                <div class="pd-bid-rec-txt"><b>AI Recommendation</b>Wedding packages are winning 21% more than DJ-only packages.</div>
+                <div class="pd-bid-rec-txt"><b>Recommendation</b>Wedding packages are winning 21% more than DJ-only packages.</div>
                 <svg class="pd-bid-rec-spark" width="44" height="26" viewBox="0 0 44 26" fill="none"><polyline points="0,22 9,16 18,18 27,9 36,11 44,3" stroke="#10b981" stroke-width="1.8"/></svg>
             </div>
         </div>

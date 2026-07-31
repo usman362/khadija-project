@@ -146,7 +146,7 @@
         </div>
         <div class="pm-actions">
             <button type="button" class="pm-btn-primary" id="pm-create"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Message</button>
-            <button type="button" class="pm-btn-ghost" id="pm-ai-compose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>AI Compose</button>
+            <button type="button" class="pm-btn-ghost" id="pm-ai-compose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>Compose</button>
         </div>
     </div>
 
@@ -234,13 +234,13 @@
 
                 <div class="pm-ai">
                     <svg class="spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>
-                    <div><b>AI Suggestion</b><p>Draft a thank you message and next steps summary.</p></div>
+                    <div><b>Suggestion</b><p>Draft a thank you message and next steps summary.</p></div>
                     <button type="button" id="pm-ai-use">Use</button>
                 </div>
 
                 <div class="pm-compose">
                     <div class="pm-c-tabs">
-                        <span class="pm-c-tab on">Message</span><span class="pm-c-tab">AI Reply</span><span class="pm-c-tab">Templates</span><span class="pm-c-tab">Quick Actions</span><span class="pm-c-tab">Notes</span>
+                        <span class="pm-c-tab on">Message</span><span class="pm-c-tab">Smart Reply</span><span class="pm-c-tab">Templates</span><span class="pm-c-tab">Quick Actions</span><span class="pm-c-tab">Notes</span>
                     </div>
                     <form class="pm-c-box" id="pm-form">
                         <textarea id="pm-input" placeholder="Type your message..."></textarea>
@@ -313,13 +313,13 @@
         activeTab = this.dataset.tab || 'inbox'; applyFilters();
     }));
 
-    // Compose sub-tabs (Message / AI Reply / Templates …) — local toggle only.
+    // Compose sub-tabs (Message / Smart Reply / Templates …) — local toggle only.
     document.querySelectorAll('.pm-c-tab').forEach((t) => t.addEventListener('click', function () {
         document.querySelectorAll('.pm-c-tab').forEach((x) => x.classList.remove('on'));
         this.classList.add('on');
     }));
 
-    // AI Suggestion "Use" → fill the compose box.
+    // Suggestion "Use" → fill the compose box.
     const aiUse = $('pm-ai-use');
     if (aiUse) aiUse.addEventListener('click', () => {
         const i = $('pm-input');
@@ -342,7 +342,7 @@
         this.disabled = false; this.style.opacity = '';
     });
 
-    // AI Compose → drop a polished draft into the active thread.
+    // Compose → drop a polished draft into the active thread.
     if ($('pm-ai-compose')) $('pm-ai-compose').addEventListener('click', () => {
         const i = $('pm-input');
         if (i) { i.value = "Hi! Thanks for reaching out. I'd love to help with your event — could you share the date, venue, and guest count so I can confirm availability and put together the right package for you?"; i.focus(); }

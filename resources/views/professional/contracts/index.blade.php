@@ -328,7 +328,7 @@
                      leak per R8 and an AI feature the No-AI rule forbids). Now it
                      just shows the client's stated budget — which IS visible to
                      responders — and the pro's net after commission, so they bid
-                     knowing their take-home. No suggestion, no win odds, no AI. --}}
+                     knowing their take-home. No suggestion, no win odds, no suggestions. --}}
                 <div class="pc-card pc-ai">
                     <div class="pc-card-head">
                         <span class="pc-card-title" style="font-size:13.5px;">Bid Helper</span>

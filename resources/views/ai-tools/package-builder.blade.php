@@ -14,9 +14,9 @@
     $isMax    = $level === 'maximum';
     $isLocked = $level === 'none';
     $lvlMeta  = [
-        'manual'  => ['Do It Myself', '#64748b', 'You build packages by hand — templates & structure, no AI.'],
-        'semi'    => ['Help Me Plan', 'var(--brand-strong, #2563eb)', 'AI suggests prices, descriptions and add-ons — you review and approve.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter a service and let AI auto-generate the whole tiered package.'],
+        'manual'  => ['Do It Myself', '#64748b', 'You build packages by hand — templates & structure, no suggestions.'],
+        'semi'    => ['Help Me Plan', 'var(--brand-strong, #2563eb)', 'We suggest prices, descriptions and add-ons — you review and approve.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter a service and we generate the whole tiered package.'],
         'none'    => ['Locked', '#ef4444', 'This tool is currently unavailable.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['manual'];
@@ -127,10 +127,10 @@
     <div class="pb-tool">
         @if($isMax)
             <h3>🤖 Auto-Generate Full Package</h3>
-            <div class="sub">Enter your service and base price — AI builds the complete tiered package for you.</div>
+            <div class="sub">Enter your service and base price — we build the complete tiered package for you.</div>
         @else
             <h3>🧰 Build Your Package</h3>
-            <div class="sub">{{ $isSemi ? 'Fill in your package — use the ✨ helpers for AI suggestions you can edit.' : 'Fill in your package details. (AI assistance unlocks on higher membership tiers.)' }}</div>
+            <div class="sub">{{ $isSemi ? 'Fill in your package — use the ✨ helpers for suggestions you can edit.' : 'Fill in your package details. (AI assistance unlocks on higher membership tiers.)' }}</div>
         @endif
 
         <form id="pbForm" class="pb-form" autocomplete="off">

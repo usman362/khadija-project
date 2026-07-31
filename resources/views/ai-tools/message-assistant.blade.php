@@ -128,7 +128,7 @@
 
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
-        if (LEVEL === 'manual' || !btn) return;   // Do It Myself has no AI draft
+        if (LEVEL === 'manual' || !btn) return;   // Do It Myself has no suggestions draft
         err.classList.remove('on');
         btn.disabled = true;
         out.innerHTML = '<p class="ma-empty">Drafting your message…</p>';

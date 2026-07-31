@@ -282,7 +282,7 @@
                     <li><a href="{{ $__fgHref }}">{{ $__fgLabel }}</a></li>
                     <li><a href="{{ route('public.browse') }}">Find Professionals</a></li>
                     <li><a href="{{ route('events-categories') }}">Categories</a></li>
-                    <li><a href="{{ url('/dashboard') }}">AI Toolkit <span class="lpf-new-badge">NEW</span></a></li>
+                    <li><a href="{{ url('/dashboard') }}">Tools <span class="lpf-new-badge">NEW</span></a></li>
                     <li><a href="{{ route('landing') }}#pricing">Pricing</a></li>
                 </ul>
             </div>

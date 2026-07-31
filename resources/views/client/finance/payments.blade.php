@@ -226,7 +226,7 @@
     </div>
 
     <div class="pay-rail-card">
-        <div class="pay-rail-title">AI Payment Insights <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:rgba(99,102,241,0.12);color:var(--accent-text);">BETA</span></div>
+        <div class="pay-rail-title">Payment Insights <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:rgba(99,102,241,0.12);color:var(--accent-text);">BETA</span></div>
         <div class="pay-insight"><svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><div class="body"><b>All payment checks on track.</b> No delays detected.</div></div>
         <div class="pay-insight"><svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg><div class="body"><b>1 vendor missing a W-9.</b> Upload to avoid tax hold.</div></div>
         <div class="pay-insight"><svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><div class="body">Projected 1099-NEC total: <b>${{ number_format($stats['tax_liability'], 0) }}</b></div></div>

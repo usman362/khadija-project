@@ -2,7 +2,7 @@
 
 @section('title', 'Create a Gig')
 @section('page-title', 'Create a New Gig')
-@section('page-subtitle', 'Fill in the details below and let our AI find the best vendors for you.')
+@section('page-subtitle', 'Fill in the details below and we will help you find the right professionals.')
 
 {{-- Rich single-page gig builder (client / orange theme). Everything is visible
      on one page — the top step bar is anchor-nav that scrolls to each section.
@@ -156,7 +156,7 @@
     <div class="gb-head">
         <div>
             <h1>Create a New Gig</h1>
-            <p>Fill in the details below and let our AI find the best vendors for you.</p>
+            <p>Fill in the details below and we will help you find the right professionals.</p>
         </div>
         <button type="button" class="gb-btn ghost" onclick="document.getElementById('gbForm').submit();">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
@@ -233,10 +233,10 @@
                 {{-- 2 · Describe Your Project --}}
                 <section class="gb-card" id="gb-describe">
                     <div class="gb-card-hd"><span class="ic">📝</span><h3>Describe Your Project</h3></div>
-                    <p class="gb-card-sub">Tell professionals what you're looking for. Not sure where to start? Let the AI assistant draft it.</p>
+                    <p class="gb-card-sub">Tell professionals what you're looking for. Not sure where to start? Start from a template.</p>
 
                     <div class="gb-ai">
-                        <div class="gb-ai-hd"><span>✨</span> AI Suggestions</div>
+                        <div class="gb-ai-hd"><span>✨</span> Suggestions</div>
                         <ul class="gb-ai-list">
                             <li>Mention the service, event type and location so vendors know if they're a fit.</li>
                             <li>Note your guest count and any key moments you want covered.</li>
@@ -413,16 +413,16 @@
     {{-- D) AI tools row --}}
     <div class="gb-tools">
         <h3>Smart Tools to Help You Create the Perfect Gig</h3>
-        <p>Use these AI helpers for suggestions and estimates while you plan.</p>
+        <p>Use these tools for suggestions and estimates while you plan.</p>
         <div class="gb-tools-grid">
             @php
                 $gbTools = [
                     ['route' => 'ai-tools.budget-allocator',   'icon' => '💵', 'name' => 'Budget Planner',    'desc' => 'Break a total budget into smart category estimates.'],
-                    ['route' => 'ai-tools.vendor-matchmaking', 'icon' => '🤝', 'name' => 'Smart Match',  'desc' => 'Get suggested vendors that fit your event.'],
+                    ['route' => 'ai-tools.vendor-matchmaking', 'icon' => '🤝', 'name' => 'Best Match',  'desc' => 'Get suggested vendors that fit your event.'],
                     ['route' => 'ai-tools.timeline-builder',   'icon' => '🗓️', 'name' => 'Timeline Builder',    'desc' => 'Draft a day-of schedule for your event.'],
                     ['route' => 'ai-tools.checklist-generator','icon' => '✅', 'name' => 'Smart Checklist',  'desc' => 'Generate a planning checklist to stay on track.'],
                     ['route' => 'ai-tools.venue-analyzer',     'icon' => '🏛️', 'name' => 'Venue Compatibility Check',      'desc' => 'Review venue notes for fit and considerations.'],
-                    ['route' => 'ai-tools.theme-advisor',      'icon' => '🎨', 'name' => 'Theme & Style Advisor','desc' => 'Explore theme and styling suggestions.'],
+                    ['route' => 'ai-tools.theme-advisor',      'icon' => '🎨', 'name' => 'Style & Inspiration','desc' => 'Explore theme and styling suggestions.'],
                 ];
             @endphp
             @foreach($gbTools as $tool)
@@ -483,7 +483,7 @@
         });
     }
 
-    // ---- Apply AI Suggestions -> fill description ----
+    // ---- Apply Suggestions -> fill description ----
     document.getElementById('gbApply').addEventListener('click', function () {
         var catNames = selectedCatNames();
         var category = catNames.length ? catNames.join(' and ') : 'vendor';

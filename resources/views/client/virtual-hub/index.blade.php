@@ -133,7 +133,7 @@
             <div class="vh-cc-stat"><div class="vh-cc-stat-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Live Attendees</div><div class="vh-cc-stat-val">1,248</div><div class="vh-cc-stat-sub">↑ 12% last hr</div></div>
             <div class="vh-cc-stat"><div class="vh-cc-stat-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Stream Health</div><div class="vh-cc-stat-val">Excellent</div><div class="vh-cc-stat-sub">1080p · 6 Mbps</div></div>
             <div class="vh-cc-stat"><div class="vh-cc-stat-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/></svg>Active Channels</div><div class="vh-cc-stat-val">3</div><div class="vh-cc-stat-sub">Zoom · YT · Web</div></div>
-            <div class="vh-cc-stat"><div class="vh-cc-stat-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>AI Alerts</div><div class="vh-cc-stat-val">0</div><div class="vh-cc-stat-sub">All systems normal</div></div>
+            <div class="vh-cc-stat"><div class="vh-cc-stat-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Stream Alerts</div><div class="vh-cc-stat-val">0</div><div class="vh-cc-stat-sub">All systems normal</div></div>
         </div>
         <div class="vh-cc-stats-2">
             <div class="vh-cc-stat"><div class="vh-cc-stat-head">Languages Active</div><div class="vh-cc-stat-val">3</div><div class="vh-cc-stat-sub" style="color:var(--text-muted);">EN · ES · FR</div></div>
@@ -165,7 +165,7 @@
         @php
             $vhSvcDefaults = [
                 ['Livestream Directors', '📹'], ['Broadcast Engineers', '🎚'], ['Virtual Venue Architects', '🏛'],
-                ['Digital Engagement', '💬'], ['Hybrid AV Integrators', '🔌'], ['AI Moderators', '🤖'],
+                ['Digital Engagement', '💬'], ['Hybrid AV Integrators', '🔌'], ['Virtual Moderators', '🤖'],
             ];
             $vhSvcs = $categories->count() ? $categories->map(fn($c) => [$c->name, $c->icon ?: '🎯'])->toArray() : $vhSvcDefaults;
         @endphp
@@ -236,7 +236,7 @@
     <div class="vh-feats">
         <div class="vh-feat"><div class="vh-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><div class="vh-feat-name">Virtual Venue Builder</div></div>
         <div class="vh-feat"><div class="vh-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="vh-feat-name">Engagement Tools</div></div>
-        <div class="vh-feat"><div class="vh-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div><div class="vh-feat-name">AI Stream Assistant</div></div>
+        <div class="vh-feat"><div class="vh-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div><div class="vh-feat-name">Stream Assistant</div></div>
         <div class="vh-feat"><div class="vh-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></div><div class="vh-feat-name">Analytics Dashboard</div></div>
     </div>
 </div>{{-- /.vh-main --}}
@@ -254,9 +254,9 @@
         <div class="vh-mon-row"><span>CDN Status</span><span class="ok">Excellent</span></div>
     </div>
 
-    {{-- AI Alerts --}}
+    {{-- Stream Alerts --}}
     <div class="vh-rail-card">
-        <div class="vh-rail-head"><div class="vh-rail-title">AI Alerts</div><span style="font-size:10px;color:var(--ok-text);font-weight:700;">All Clear</span></div>
+        <div class="vh-rail-head"><div class="vh-rail-title">Stream Alerts</div><span style="font-size:10px;color:var(--ok-text);font-weight:700;">All Clear</span></div>
         @foreach(['Stream Health', 'Audio Sync', 'Internet Stability', 'Chat Moderation', 'Translation Feeds'] as $a)
             <div class="vh-alert-row"><span>{{ $a }}</span><span class="ok">Excellent</span></div>
         @endforeach

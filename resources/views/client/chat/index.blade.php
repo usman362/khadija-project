@@ -103,7 +103,7 @@
         </div>
         <div class="cm-actions">
             <button type="button" class="cm-btn-primary" id="cm-create"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Message</button>
-            <button type="button" class="cm-btn-ghost" id="cm-ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>AI Compose</button>
+            <button type="button" class="cm-btn-ghost" id="cm-ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>Compose</button>
         </div>
     </div>
 
@@ -235,7 +235,7 @@
         this.disabled = false; this.style.opacity = '';
     });
 
-    // AI Compose → drop a polished draft into the active thread.
+    // Compose → drop a polished draft into the active thread.
     if ($('cm-ai')) $('cm-ai').addEventListener('click', () => {
         const i = $('cm-input');
         if (i) { i.value = "Hi! Following up on our event — could you please confirm the final details and timeline? Happy to share anything you need from my side. Thank you!"; i.focus(); }

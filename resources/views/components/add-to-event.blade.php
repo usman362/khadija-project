@@ -33,7 +33,7 @@
 <div class="ate" data-ate>
     <div class="ate-head">📌 Add this to your event <span class="ate-mode">{{ $auto ? 'Auto-attach' : 'Manual' }}</span></div>
     <div class="ate-note">{{ $auto
-        ? 'Your plan supports one-click auto-attach — save this AI result straight to your event.'
+        ? 'Your plan supports one-click auto-attach — save this result straight to your event.'
         : 'Free plan: generate a result, then save it to your event below.' }}</div>
     <form method="POST" action="{{ route('client.ai-artifacts.store') }}" class="ate-form">
         @csrf

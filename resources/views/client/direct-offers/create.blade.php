@@ -203,9 +203,9 @@
 
         {{-- AI Summary (green) --}}
         <div class="do-sec ai">
-            <div class="do-sec-hd"><h4>AI Request Summary</h4><span class="do-tag">AI GENERATED</span></div>
+            <div class="do-sec-hd"><h4>Request Summary</h4><span class="do-tag">AUTO-DRAFTED</span></div>
             <div class="do-sec-bd">
-                <div class="do-ai-row"><span class="ck">✓</span> AI drafts a clear, structured request from your inputs so the pro understands scope instantly.</div>
+                <div class="do-ai-row"><span class="ck">✓</span> We draft a clear, structured request from your inputs so the pro understands scope instantly.</div>
                 <div class="do-ai-row"><span class="ck">✓</span> Suggests a fair budget band based on your services, location and guest count.</div>
                 <div class="do-ai-row" data-types="MSR"><span class="ck">✓</span> For an <b id="doTypeLbl">{{ $type }}</b>, each requested service is sent as its own separate agreement.</div>
             </div>
@@ -225,7 +225,7 @@
         <div class="do-rcard">
             <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>How direct offers work</h4>
             <div class="do-step"><span class="do-step-n">1</span><span class="do-step-b"><b>Pick your pro &amp; services</b>Choose who you're offering to and exactly what you need.</span></div>
-            <div class="do-step"><span class="do-step-n">2</span><span class="do-step-b"><b>Send the request</b>AI drafts a clear brief from your inputs and delivers it to the pro.</span></div>
+            <div class="do-step"><span class="do-step-n">2</span><span class="do-step-b"><b>Send the request</b>We draft a clear brief from your inputs and delivers it to the pro.</span></div>
             <div class="do-step"><span class="do-step-n">3</span><span class="do-step-b"><b>They respond</b>The pro can accept, counter, or ask questions — replies land on your Proposals page.</span></div>
         </div>
         <div class="do-rcard">

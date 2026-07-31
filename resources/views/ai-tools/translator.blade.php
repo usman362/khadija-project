@@ -35,8 +35,8 @@
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
         'manual'  => ['Do It Myself', '#64748b', 'Browse the event phrasebook yourself — look up phrases by hand, no auto-translate.'],
-        'semi'    => ['Help Me Plan', '#7c3aed', 'AI suggests a translation — edit the wording before you use it.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Type a phrase and AI translates it for you automatically.'],
+        'semi'    => ['Help Me Plan', '#7c3aed', 'We suggest a translation — edit the wording before you use it.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Type a phrase and we translate it for you automatically.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -94,7 +94,7 @@
             <h3>{{ $isSemi ? '✨ Suggested Translation' : '✨ Translation' }}</h3>
             <div class="det" id="trTargetDet">{{ $isSemi ? 'Edit the suggestion before you use it' : 'Pick a language and translate' }}</div>
             <div id="trOut"><p class="tr-empty">The translation and closest phrasebook matches will appear here.</p></div>
-            <p class="tr-note">Live translation of any free text activates once an AI key is configured. Until then, this built-in phrasebook covers the most common event phrases across five languages.</p>
+            <p class="tr-note">Live translation of any free text activates once a translation service is configured. Until then, this built-in phrasebook covers the most common event phrases across five languages.</p>
         </div>
     </div>
     @endif

@@ -48,7 +48,7 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Assemble your own draft by hand — add, edit and remove your own clauses. No AI.'],
+        'manual'  => ['Do It Myself', '#64748b', 'Assemble your own draft by hand — add, edit and remove your own clauses. No suggestions.'],
         'semi'    => ['Help Me Plan', '#7c3aed', 'instantly drafts the agreement — reword any clause before you use it.'],
         'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your details and instantly drafts the full agreement for you.'],
     ];
@@ -64,10 +64,10 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — hand-built agreement, no AI --}}
+    {{-- Do It Myself — hand-built agreement, no suggestions --}}
     <div class="ca-card ca-mano">
         <h3>📝 Build My Agreement</h3>
-        <div style="font-size:12.5px;color:var(--text-muted);margin:-6px 0 14px;">Assemble your own draft by hand — add, edit and remove clauses. No AI.</div>
+        <div style="font-size:12.5px;color:var(--text-muted);margin:-6px 0 14px;">Assemble your own draft by hand — add, edit and remove clauses. No suggestions.</div>
         <label class="ca-lbl">Agreement Title</label>
         <input class="ca-in" id="camTitle" placeholder="e.g. Service Agreement — Wedding Floral &amp; Décor">
         <div id="camClauses"></div>

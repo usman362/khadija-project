@@ -155,20 +155,20 @@
                 {{-- STEP 2 --}}
                 <div>
                     <div class="cw-step-h"><span class="cw-step-n">2</span><b>Step 2: Choose Resolution Path</b></div>
-                    <p class="cw-step-help">Pick the best path for your situation. You can renegotiate with AI or cancel the gig.</p>
+                    <p class="cw-step-help">Pick the best path for your situation. You can renegotiate the terms or cancel the gig.</p>
 
                     <div class="cw-path sel-a" data-path="negotiate">
                         <div class="cw-path-h">
                             <span class="cw-path-radio"></span>
                             <span class="cw-path-ico" style="color:var(--cw-indigo);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>
-                            <b>Path A: Return to AI Negotiation Lounge</b>
+                            <b>Path A: Return to Negotiation Lounge</b>
                             <span class="cw-rec">Recommended</span>
                         </div>
-                        <p>We'll archive this draft and re-open the chat with AI. Your rejection reason will be used as a prompt to generate a new Version 2 draft.</p>
+                        <p>We'll archive this draft and re-open the chat. Your rejection reason is carried over so the Version 2 draft starts from it.</p>
                         <div class="cw-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Current draft will be saved as Version 1</div>
-                        <div class="cw-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Your reason will be sent to AI Assistant</div>
-                        <div class="cw-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI will generate updated terms for you</div>
-                        <button type="button" class="cw-path-btn cw-btn-indigo" data-act="negotiate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Proceed with AI Negotiation</button>
+                        <div class="cw-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Your reason is carried into the new draft</div>
+                        <div class="cw-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Updated terms are drafted from your reason</div>
+                        <button type="button" class="cw-path-btn cw-btn-indigo" data-act="negotiate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Proceed with Negotiation</button>
                     </div>
 
                     <div class="cw-path" data-path="void">

@@ -131,9 +131,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Build your own staff roster by hand — add each role yourself, no AI plan.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'AI suggests a roster — adjust the event and staff counts, then regenerate.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and AI builds the whole staffing plan for you.'],
+        'manual'  => ['Do It Myself', '#64748b', 'Build your own staff roster by hand — add each role yourself, no suggested plan.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'We suggest a roster — adjust the event and staff counts, then regenerate.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and we build the whole staffing plan for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -180,7 +180,7 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — build your own roster by hand, no AI --}}
+    {{-- Do It Myself — build your own roster by hand, no suggestions --}}
     <div class="sp-card sp-mb">
         <div class="sp-tl-h"><b>🛠 Build My Staff Roster</b><span style="font-size:12.5px;color:var(--text-muted);">Total staff: <b id="spm-total" style="color:var(--sp);">0</b></span></div>
         <div id="spmRows" style="display:flex;flex-direction:column;gap:10px;"></div>
@@ -258,7 +258,7 @@
                 <span class="sp-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
                 <div class="sp-step"><span class="sp-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span><b>2. Suggests Staff</b><p>We recommend the right roles and team size.</p></div>
                 <span class="sp-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-                <div class="sp-step"><span class="sp-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><b>3. Build Schedule</b><p>AI creates the perfect timeline for every team member.</p></div>
+                <div class="sp-step"><span class="sp-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><b>3. Build Schedule</b><p>We build the timeline for every team member.</p></div>
                 <span class="sp-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
                 <div class="sp-step"><span class="sp-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span><b>4. Review &amp; Adjust</b><p>Make changes easily with drag-and-drop scheduling.</p></div>
                 <span class="sp-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
@@ -280,7 +280,7 @@
         <div class="sp-sec-h">Powerful Features Built for Stress-Free Events</div>
         <div class="sp-feats">
             <div><span class="sp-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><b>Team Recommendations</b><p>Get smart role suggestions based on event type, guests, and needs.</p></div>
-            <div><span class="sp-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><b>Perfect Timing</b><p>AI ensures no overlaps or gaps in your event schedule.</p></div>
+            <div><span class="sp-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><b>Perfect Timing</b><p>The schedule is checked for overlaps and gaps.</p></div>
             <div><span class="sp-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span><b>Role-Based Planning</b><p>Assign tasks and responsibilities to every team member.</p></div>
             <div><span class="sp-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><b>Real-Time Updates</b><p>Make changes and notify your team instantly in one click.</p></div>
             <div><span class="sp-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></span><b>Mobile Friendly</b><p>Access your schedule anytime, anywhere on any device.</p></div>

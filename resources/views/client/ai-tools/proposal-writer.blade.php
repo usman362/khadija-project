@@ -2,7 +2,7 @@
 
 @section('title', 'Proposal Builder')
 @section('page-title', 'Proposal Builder')
-@section('page-subtitle', 'Create winning proposals in seconds with the power of AI.')
+@section('page-subtitle', 'Build a winning proposal in minutes, from your own templates.')
 
 {{-- Proposal Builder — deterministic, dynamic proposal generator (no LLM /
      no quota). Parses the event description + tone/focus/length and assembles
@@ -117,8 +117,8 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Write your proposal yourself — templates & structure, no AI.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'Write a draft, then let AI improve, rewrite or expand it — you approve.'],
+        'manual'  => ['Do It Myself', '#64748b', 'Write your proposal yourself — templates & structure, no suggestions.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'Write a draft, then let the tool improve, rewrite or expand it — you approve.'],
         'maximum' => ['Coordinate It For Me', '#16a34a', 'Describe the event and instantly writes the whole proposal for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -158,7 +158,7 @@
                     </g>
                 </svg>
             </span>
-            <div class="pw-head-txt"><h1>Proposal Builder</h1><p>Create winning proposals in seconds with the power of AI.</p></div>
+            <div class="pw-head-txt"><h1>Proposal Builder</h1><p>Build a winning proposal in minutes, from your own templates.</p></div>
         </div>
         <a href="{{ route('ai-tools.budget-allocator') }}" class="pw-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to Toolkit</a>
     </div>
@@ -182,7 +182,7 @@
             @endif
 
             <div class="pw-gen">
-                <div class="pw-sec-num">{{ $isManual ? 'Write Your Proposal' : ($isSemi ? 'Your Draft — refine with AI' : '2. Your Auto-generated Proposal') }}</div>
+                <div class="pw-sec-num">{{ $isManual ? 'Write Your Proposal' : ($isSemi ? 'Your Draft — refine it' : '2. Your Auto-generated Proposal') }}</div>
                 @if($isSemi || $isMax)
                 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px;">
                     <button type="button" class="pw-assist" data-assist="improve">✨ Improve</button>
@@ -211,7 +211,7 @@
             <div class="pw-card">
                 <div class="pw-side-h"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><b>Why Use Proposal Builder?</b></div>
                 <div class="pw-why-row"><span class="pw-why-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><b>Save Time</b><p>Generate professional proposals in seconds.</p></div></div>
-                <div class="pw-why-row"><span class="pw-why-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><div><b>Personalized</b><p>AI customizes your message to match the client's event theme.</p></div></div>
+                <div class="pw-why-row"><span class="pw-why-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><div><b>Personalized</b><p>Your message is tailored to the client's event theme.</p></div></div>
                 <div class="pw-why-row"><span class="pw-why-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span><div><b>Win More Gigs</b><p>Stand out with well-written, tailored proposals every time.</p></div></div>
                 <div class="pw-why-row"><span class="pw-why-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><div><b>Error-Free</b><p>Polished, professional, and ready to send.</p></div></div>
             </div>
@@ -274,7 +274,7 @@
     <div class="pw-card pw-mb">
         <div class="pw-feat-h">Powerful Features</div>
         <div class="pw-feats">
-            <div class="pw-feat"><span class="pw-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><b>Smart Personalization</b><p>AI reads the event details and tailors your proposal automatically.</p></div>
+            <div class="pw-feat"><span class="pw-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><b>Personalization</b><p>The event details are pulled in and the proposal is built around them.</p></div>
             <div class="pw-feat"><span class="pw-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><circle cx="16" cy="16" r="2.5"/><path d="M11.5 7.5 9 10.5M15 14l-1.5-5"/></svg></span><b>Multiple Tones</b><p>Choose from professional, friendly, confident, or creative tones.</p></div>
             <div class="pw-feat"><span class="pw-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span><b>One-Click Copy</b><p>Copy your proposal instantly to send across any platform.</p></div>
             <div class="pw-feat"><span class="pw-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span><b>Download Options</b><p>Download as .txt or .docx for easy sharing and record keeping.</p></div>

@@ -91,9 +91,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Score your own profile — enter your details and see your rating, no AI suggestions.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'AI scores your profile and suggests prioritised improvements you can act on.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'AI audits your whole profile, benchmarks it and hands you a full improvement plan.'],
+        'manual'  => ['Do It Myself', '#64748b', 'Score your own profile — enter your details and see your rating, no suggestions.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'We score your profile and suggest prioritised improvements you can act on.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'We audit your whole profile, benchmark it and hand you a full improvement plan.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -109,7 +109,7 @@
     {{-- Interactive portfolio optimizer --}}
     <div class="po-tool">
         <h3>🔎 Score Your Profile</h3>
-        <div class="sub">{{ $isManual ? 'Enter your profile details to score your profile yourself — no AI suggestions.' : ($isSemi ? 'Enter your profile details for an estimated score plus prioritised AI suggestions.' : 'Enter your current profile details for an estimated score and prioritised improvement suggestions.') }}</div>
+        <div class="sub">{{ $isManual ? 'Enter your profile details to score your profile yourself — no suggestions.' : ($isSemi ? 'Enter your profile details for an estimated score plus prioritised AI suggestions.' : 'Enter your current profile details for an estimated score and prioritised improvement suggestions.') }}</div>
         <form id="poForm" class="po-form">
             <div>
                 <label class="po-lbl">Portfolio Photos</label>
@@ -249,7 +249,7 @@
         const payload = Object.fromEntries(new FormData(form).entries());
         payload.has_video = form.querySelector('[name="has_video"]').checked ? 1 : 0;
 
-        // Do It Myself — score locally with a mirrored rubric, no AI actions.
+        // Do It Myself — score locally with a mirrored rubric, no suggestions actions.
         if (LEVEL === 'manual') {
             loading.classList.remove('open');
             submit.disabled = false;
@@ -261,7 +261,7 @@
             }
             render(local);
             const acts = document.getElementById('poActs');
-            acts.innerHTML = ''; acts.style.display = 'none';   // no AI suggestions at this level
+            acts.innerHTML = ''; acts.style.display = 'none';   // no suggestions suggestions at this level
             out.classList.add('open');
             out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             return;
@@ -294,7 +294,7 @@
         }
     });
 
-    // Client-side scoring mirroring the server rubric (Do It Myself — no AI actions).
+    // Client-side scoring mirroring the server rubric (Do It Myself — no suggestions actions).
     function computeLocal(p) {
         const photos = parseInt(p.num_photos, 10), reviews = parseInt(p.num_reviews, 10);
         const rating = parseFloat(p.avg_rating), resp = parseFloat(p.response_hours), cats = parseInt(p.categories_listed, 10);

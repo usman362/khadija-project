@@ -82,9 +82,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Enter your own room size, guests and space-per-guest — the math runs right here, no AI.'],
-        'semi'    => ['Help Me Plan', '#0ea5e9', 'AI estimates your capacity — adjust the comfort and legal figures and the score updates live.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your space and AI works out comfort, legal capacity and flow for you.'],
+        'manual'  => ['Do It Myself', '#64748b', 'Enter your own room size, guests and space-per-guest — the math runs right here.'],
+        'semi'    => ['Help Me Plan', '#0ea5e9', 'We estimate your capacity — adjust the comfort and legal figures and the score updates live.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your space and we work out comfort, legal capacity and flow for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -101,7 +101,7 @@
     {{-- Do It Myself — hand-built capacity calculator, no AI, computed client-side --}}
     <div class="gc-gen">
         <h3>📐 Build My Capacity Estimate</h3>
-        <div class="sub">Enter your own numbers and adjust space-per-guest — the math runs right here, no AI.</div>
+        <div class="sub">Enter your own numbers and adjust space-per-guest — the math runs right here.</div>
         <div class="gc-form-grid">
             <div class="gc-field">
                 <label>Room Size (sq ft)</label>
@@ -144,7 +144,7 @@
     {{-- AI planner (Help Me Plan / Coordinate It For Me) --}}
     <div class="gc-gen">
         <h3>📐 Estimate Your Capacity</h3>
-        <div class="sub">{{ $isSemi ? 'AI estimates comfort and legal capacity — you can adjust the figures and the score recalculates.' : 'Enter your space and guest details and AI estimates comfort, legal capacity and flow insights.' }}</div>
+        <div class="sub">{{ $isSemi ? 'We estimate comfort and legal capacity — you can adjust the figures and the score recalculates.' : 'Enter your space and guest details and AI estimates comfort, legal capacity and flow insights.' }}</div>
         <form id="gcForm">
             <div class="gc-form-grid">
                 <div class="gc-field">

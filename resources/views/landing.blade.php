@@ -459,13 +459,13 @@
             <div class="lp-acard">
                 <div class="lp-acard-top">
                     <span class="lp-acard-ic" style="background:linear-gradient(135deg,#60a5fa,#2563eb);box-shadow:0 8px 16px rgba(37,99,235,0.32),inset 0 1.5px 0 rgba(255,255,255,0.4);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-                    <div><h3>Semi-Assisted</h3><span class="tagline">AI guides the way.</span></div>
+                    <div><h3>Semi-Assisted</h3><span class="tagline">Guided, step by step.</span></div>
                     <img class="lp-acard-img" src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=300&q=80&auto=format&fit=crop" alt="">
                 </div>
                 <div class="lp-acard-body">
                     <ul>
                         <li><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Smart suggestions</li>
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI recommendations</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Guided recommendations</li>
                         <li><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Templates &amp; best practices</li>
                     </ul>
                     <a href="{{ route('register', ['role' => 'client']) }}" class="lp-acard-foot" style="color:var(--blue);">Best for growing planners
@@ -475,13 +475,13 @@
             <div class="lp-acard">
                 <div class="lp-acard-top">
                     <span class="lp-acard-ic" style="background:linear-gradient(135deg,#fb923c,#ea580c);box-shadow:0 8px 16px rgba(234,88,12,0.32),inset 0 1.5px 0 rgba(255,255,255,0.4);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20l-2-9-4 3-4-7-4 7-4-3-2 9z"/></svg></span>
-                    <div><h3>Maximum Assistance</h3><span class="tagline">AI handles the details.</span></div>
+                    <div><h3>Maximum Assistance</h3><span class="tagline">The details handled for you.</span></div>
                     <img class="lp-acard-img" src="https://images.unsplash.com/photo-1519741497674-611481863552?w=300&q=80&auto=format&fit=crop" alt="">
                 </div>
                 <div class="lp-acard-body">
                     <ul>
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI matches &amp; outreach</li>
-                        <li><svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI negotiation assistant</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Best Match &amp; outreach</li>
+                        <li><svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Negotiation support</li>
                         <li><svg viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Smart booking workflows</li>
                     </ul>
                     <a href="{{ route('register', ['role' => 'client']) }}" class="lp-acard-foot" style="color:var(--orange-dark);">Best for busy professionals &amp; clients

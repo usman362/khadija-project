@@ -31,7 +31,7 @@ final class AiToolCatalog
             ['key' => 'venue-analyzer',     'name' => 'Venue Compatibility Check',       'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.venue-analyzer', 'purpose' => 'Reviews venue details and recommends vendors, equipment & logistics.'],
             ['key' => 'checklist-generator','name' => 'Smart Checklist',  'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.checklist-generator', 'purpose' => 'Builds a personalised event-planning checklist with budget & vendor status.'],
             ['key' => 'guest-capacity',     'name' => 'Guest Capacity Calculator','audience' => 'client',      'status' => 'live',    'route' => 'ai-tools.guest-capacity', 'purpose' => 'Estimates staffing, seating, food, beverage and venue capacity.'],
-            ['key' => 'theme-advisor',      'name' => 'Theme & Style Advisor','audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.theme-advisor', 'purpose' => 'Recommends colours, décor, themes and styling.'],
+            ['key' => 'theme-advisor',      'name' => 'Style & Inspiration','audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.theme-advisor', 'purpose' => 'Recommends colours, décor, themes and styling.'],
 
             // ── PROFESSIONAL ──────────────────────────────────────────
             ['key' => 'pricing-assistant',  'name' => 'Pricing Calculator',    'audience' => 'professional', 'status' => 'live',    'route' => 'ai-tools.pricing-assistant',  'purpose' => 'Calculates competitive pricing from labour, equipment, demand & market rates.'],

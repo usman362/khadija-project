@@ -10,12 +10,12 @@
         <h1 class="pe-h1">Package Combinations</h1>
         <p class="pe-sub">Fulfil all your requested services by combining these packages.</p>
 
-        {{-- AI Tip --}}
+        {{-- Tip --}}
         <div class="pe-aitip" style="margin-bottom:22px;">
             <span class="ic">✨</span>
             <div>
-                <h4>AI Tip</h4>
-                <p>When no single package covers everything, our AI bundles the best combinations to give you full coverage at the best value.</p>
+                <h4>Tip</h4>
+                <p>When no single package covers everything, we bundle the best combinations to give you full coverage at the best value.</p>
             </div>
         </div>
 

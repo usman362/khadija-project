@@ -8,7 +8,7 @@
 
     <div class="pe-container pe-main">
         <h1 class="pe-h1">Service Details</h1>
-        <p class="pe-sub">Tell us about each service so our AI can find the best packages.</p>
+        <p class="pe-sub">Tell us about each service so we can find the best packages.</p>
 
         <div class="pe-grid">
             {{-- Main --}}
@@ -16,7 +16,7 @@
                 <div class="pe-aitip" style="margin-bottom:18px;">
                     <span class="ic">✨</span>
                     <div>
-                        <h4>AI Tip</h4>
+                        <h4>Tip</h4>
                         <p>The more details you provide, the more accurate and personalised your package matches will be.</p>
                     </div>
                 </div>
@@ -81,12 +81,12 @@
                 </div>
 
                 <div class="pe-rail-card">
-                    <h4>AI Service Check</h4>
+                    <h4>Service Check</h4>
                     <div style="display:flex; align-items:center; gap:14px;">
                         <div class="pe-ring" style="--v:{{ $match }}"><b>{{ $match }}%</b></div>
                         <div>
                             <div style="font-size:13.5px; font-weight:800; color:var(--pe-green);">High Match Potential</div>
-                            <p class="pe-muted" style="margin:4px 0 0;">Great! You've added enough detail for our AI to find strong matches.</p>
+                            <p class="pe-muted" style="margin:4px 0 0;">Great! You've added enough detail for us to find strong matches.</p>
                         </div>
                     </div>
                 </div>

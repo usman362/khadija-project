@@ -102,9 +102,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Build your own checklist by hand — add each task yourself, no AI plan.'],
+        'manual'  => ['Do It Myself', '#64748b', 'Build your own checklist by hand — add each task yourself, no suggested plan.'],
         'semi'    => ['Help Me Plan', '#f97316', 'instantly drafts a milestone plan and budget split — tweak the amounts before you use it.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and AI builds the full plan, milestones and budget for you.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and we build the full plan, milestones and budget for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -118,19 +118,19 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — hand-built checklist, no AI --}}
+    {{-- Do It Myself — hand-built checklist, no suggestions --}}
     <div class="ep-form-card">
         <h3>🗓 Build My Checklist</h3>
-        <div class="sub">Add each task yourself — set a name, priority and due date. No AI, fully yours.</div>
+        <div class="sub">Add each task yourself — set a name, priority and due date. Fully yours.</div>
         <div id="epmRows" style="display:flex;flex-direction:column;gap:10px;"></div>
         <button type="button" id="epmAdd" style="margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--ep-strong);background:rgba(249,115,22,.09);border:1px solid rgba(249,115,22,.28);border-radius:10px;padding:9px 15px;cursor:pointer;font-family:inherit;">+ Add task</button>
-        <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">Want the AI to build this plan for you automatically? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--ep-strong);font-weight:700;text-decoration:none;">Upgrade →</a></div>
+        <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">Want this plan built for you automatically? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--ep-strong);font-weight:700;text-decoration:none;">Upgrade →</a></div>
     </div>
     @else
     {{-- Interactive planner (Help Me Plan / Coordinate It For Me) --}}
     <div class="ep-form-card">
         <h3>🗓 Plan My Event</h3>
-        <div class="sub">{{ $isSemi ? "Enter your details and instantly drafts a plan you can adjust." : "Enter your details and AI builds the full milestone plan, vendor list and budget split." }}</div>
+        <div class="sub">{{ $isSemi ? "Enter your details and instantly drafts a plan you can adjust." : "Enter your details and we build the full milestone plan, vendor list and budget split." }}</div>
         <form id="epForm">
             <div class="ep-fgrid">
                 <div>

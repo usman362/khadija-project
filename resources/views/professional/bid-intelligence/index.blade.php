@@ -234,7 +234,7 @@
         <div class="bi-cc-card">
             <div class="bi-cc-h"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><div><b>Bid Activity</b><p>Rules-based insights on how your bids are moving.</p></div></div>
             <div class="bi-cc-prev">
-                {{-- No "win rate" (a sealed-outcome aggregate, R8) and no AI label
+                {{-- No "win rate" (a sealed-outcome aggregate, R8) and no suggestions label
                      (No-AI). Framed as bid activity a pro can act on. --}}
                 <div class="bi-ai-box" style="background:rgba(37,99,235,0.07);">
                     <div class="k" style="color:var(--info-text);">Insight</div>

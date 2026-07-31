@@ -58,9 +58,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Work out your own bid by hand — enter your bid and cost, see your margin. No AI.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'AI suggests a bid — adjust the amount and your margin updates before you send it.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter the job details and AI computes your best bid, range and win odds.'],
+        'manual'  => ['Do It Myself', '#64748b', 'Work out your own bid by hand — enter your bid and cost, see your margin. No suggestions.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'We suggest a bid — adjust the amount and your margin updates before you send it.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter the job details and we compute your best bid, range and win odds.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -74,10 +74,10 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — plain margin worksheet, no AI --}}
+    {{-- Do It Myself — plain margin worksheet, no suggestions --}}
     <div class="bo-tool">
         <h3>🧮 Work Out My Bid</h3>
-        <div class="sub">Enter the bid you're considering and your own cost — we will show the margin. No AI, just the math.</div>
+        <div class="sub">Enter the bid you're considering and your own cost — we will show the margin. Just the math.</div>
         <div class="bo-form">
             <div><label class="bo-lbl">Your Bid ($)</label><input type="number" id="bomBid" class="bo-in" min="0" step="0.01" placeholder="e.g. 1720"></div>
             <div><label class="bo-lbl">Your Cost / Base Price ($)</label><input type="number" id="bomCost" class="bo-in" min="0" step="0.01" placeholder="e.g. 1200"></div>
@@ -92,7 +92,7 @@
     {{-- Interactive bid optimizer (Help Me Plan / Coordinate It For Me) --}}
     <div class="bo-tool">
         <h3>⚡ Optimize a Bid</h3>
-        <div class="sub">{{ $isSemi ? 'Enter the job details — AI suggests a bid you can adjust before sending.' : 'Enter the job details and get an estimated bid, range and win probability. Results are estimates to guide your decision.' }}</div>
+        <div class="sub">{{ $isSemi ? 'Enter the job details — we suggest a bid you can adjust before sending.' : 'Enter the job details and get an estimated bid, range and win probability. Results are estimates to guide your decision.' }}</div>
         <form id="boForm" class="bo-form">
             <div>
                 <label class="bo-lbl">Client Budget ($)</label>

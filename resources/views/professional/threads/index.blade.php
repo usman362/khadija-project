@@ -223,7 +223,7 @@
                 <div class="th-compose">
                     <div class="th-c-tabs">
                         <span class="th-c-tab on">Message</span><span class="th-c-tab">Files</span><span class="th-c-tab">Templates</span><span class="th-c-tab">Quick Replies</span><span class="th-c-tab">Notes</span>
-                        <span class="th-c-ai" id="th-ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>AI Assist</span>
+                        <span class="th-c-ai" id="th-ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>Assist</span>
                     </div>
                     <div class="th-c-icons"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg></div>
                     <form class="th-c-box" id="th-form">
@@ -231,14 +231,14 @@
                         <button type="submit" class="th-send" id="th-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Send</button>
                     </form>
                     <div class="th-consent">
-                        <input type="checkbox" checked> <span>Include this chat's agreements in the final contract via AI.</span>
+                        <input type="checkbox" checked> <span>Include this chat's agreed points in the final contract.</span>
                         <span class="meta">(Requires consent from both parties. Currently: You ✓ | Client ✓ | Status: Waiting)</span>
                     </div>
                 </div>
 
                 @if(!empty($thread['commitments']))
                     <div class="th-commit">
-                        <div class="th-commit-h"><b>AI Extracted Commitments</b><span class="beta">Beta</span><button type="button" class="manage">Manage in Contract</button></div>
+                        <div class="th-commit-h"><b>Extracted Commitments</b><span class="beta">Beta</span><button type="button" class="manage">Manage in Contract</button></div>
                         <p class="th-commit-sub">Key terms found in this conversation that can be added to your contract.</p>
                         <div class="th-commit-grid">
                             @foreach($thread['commitments'] as $cm)

@@ -311,9 +311,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Build your budget by hand — add categories & amounts yourself, no AI.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'AI recommends a budget split — you adjust the amounts before saving.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and AI allocates the entire budget across categories.'],
+        'manual'  => ['Do It Myself', '#64748b', 'Build your budget by hand — add categories & amounts yourself, no suggestions.'],
+        'semi'    => ['Help Me Plan', '#2563eb', 'We recommend a budget split — you adjust the amounts before saving.'],
+        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and we allocate the entire budget across categories.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -365,7 +365,7 @@
         </a>
     </div>
 @elseif($isManual)
-    {{-- Manual (Do It Myself) — hand-build the budget, no AI --}}
+    {{-- Manual (Do It Myself) — hand-build the budget, no suggestions --}}
     <div class="bat-card">
         <div class="bat-card-title">Your Budget Planner</div>
         <div class="bat-card-desc">Set your total, then add categories and amounts yourself. We'll track what's left.</div>

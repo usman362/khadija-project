@@ -8,7 +8,7 @@
 
     <div class="pe-container pe-main">
         <h1 class="pe-h1">What does your event need?</h1>
-        <p class="pe-sub">Select the services you need and our AI will find the best packages.</p>
+        <p class="pe-sub">Select the services you need and we will find the best packages.</p>
 
         <div class="pe-grid">
             {{-- Main --}}
@@ -75,8 +75,8 @@
                 <div class="pe-aitip" style="margin-bottom:18px;">
                     <span class="ic">✨</span>
                     <div>
-                        <h4>AI Tip</h4>
-                        <p>The more services you add, the more accurate our AI matches will be.</p>
+                        <h4>Tip</h4>
+                        <p>The more services you add, the more accurate your matches will be.</p>
                     </div>
                 </div>
 
@@ -108,7 +108,7 @@
                 </div>
 
                 <div class="pe-rail-card pe-rail-why">
-                    <h4 style="color:var(--pe-purple);">✨ AI Suggestion</h4>
+                    <h4 style="color:var(--pe-purple);">✨ Suggestion</h4>
                     <p class="pe-muted" style="margin:-6px 0 12px;">Based on similar events:</p>
                     @foreach($aiSuggested as $suggest)
                         <div class="pe-rail-row" style="border-bottom:none; padding:5px 0;">

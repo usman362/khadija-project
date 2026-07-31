@@ -223,7 +223,7 @@
                     <div>
                         <div class="rv-col-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Contract &amp; Compliance</div>
                         <div class="rv-metric"><span class="lbl">W-9 Submission</span><span class="val rv-ok">Instant ✓</span></div>
-                        <div class="rv-metric"><span class="lbl">AI Annex Compliance</span><span class="val rv-ok">100% ✓</span></div>
+                        <div class="rv-metric"><span class="lbl">Annex Compliance</span><span class="val rv-ok">100% ✓</span></div>
                         <div class="rv-metric"><span class="lbl">Contract Exceptions</span><span class="val">0</span></div>
                         <div class="rv-metric"><span class="lbl">Timeline Adherence</span><span class="val rv-ok">100% ✓</span></div>
                         <div class="rv-metric"><span class="lbl">Insurance Provided</span><span class="val rv-ok">Yes ✓</span></div>
@@ -255,7 +255,7 @@
 
                 <div class="rv-ai-insight">
                     <div class="rv-ai-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>
-                    <div class="rv-ai-body"><b>AI Reputation Insight</b> — This professional has maintained {{ rand(95, 100) }}% contract compliance across {{ rand(8, 20) }} completed events.</div>
+                    <div class="rv-ai-body"><b>Reputation Insight</b> — This professional has maintained {{ rand(95, 100) }}% contract compliance across {{ rand(8, 20) }} completed events.</div>
                 </div>
             </div>
         @empty
@@ -304,13 +304,13 @@
         <div class="rv-tv-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified Reviews</span><span class="val">{{ $stats['positive'] }} ({{ $stats['positive_pct'] }}%)</span></div>
         <div class="rv-tv-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Secure Payment</span><span class="val">{{ (int)round($stats['total'] * 0.67) }} (67%)</span></div>
         <div class="rv-tv-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Stripe Verified</span><span class="val">{{ (int)round($stats['total'] * 0.33) }} (33%)</span></div>
-        <div class="rv-tv-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>AI Verified (Annex A)</span><span class="val">{{ (int)round($stats['total'] * 0.83) }} (83%)</span></div>
+        <div class="rv-tv-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified (Annex A)</span><span class="val">{{ (int)round($stats['total'] * 0.83) }} (83%)</span></div>
         <div class="rv-tv-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Identity Verified</span><span class="val">{{ $stats['total'] }} (100%)</span></div>
     </div>
 
-    {{-- Review Highlights (AI) --}}
+    {{-- Review Highlights --}}
     <div class="rv-rail-card">
-        <div class="rv-rail-title" style="margin-bottom:10px;">Review Highlights (AI)</div>
+        <div class="rv-rail-title" style="margin-bottom:10px;">Review Highlights</div>
         <div class="rv-hl-row"><svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="rv-hl-label">Most Mentioned</span><span class="rv-hl-val">Communication, Punctuality</span></div>
         <div class="rv-hl-row"><svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span class="rv-hl-label">Top Strength</span><span class="rv-hl-val">Timeliness &amp; Reliability</span></div>
         <div class="rv-hl-row"><svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg><span class="rv-hl-label">Improvement</span><span class="rv-hl-val">Budget Management</span></div>
