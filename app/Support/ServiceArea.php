@@ -27,6 +27,8 @@ final class ServiceArea
      */
     public static function statusFor(?string $country, ?string $state): string
     {
+        $country = self::countryCode($country);
+
         if ($country !== null && $country !== 'US') {
             return self::COMING_SOON;
         }
@@ -44,6 +46,32 @@ final class ServiceArea
         $status = $user?->profile?->service_area_status;
 
         return $status === null || $status === self::SUPPORTED;
+    }
+
+    /**
+     * Country to its ISO code.
+     *
+     * The registration form posts a code, but the column has also been written
+     * with the label ("United States") by seeders and by older profile forms.
+     * Comparing the raw value put every demo professional out of area despite
+     * all of them sitting in launch states, so the comparison is done on the
+     * code and both spellings are accepted.
+     */
+    public static function countryCode(?string $country): ?string
+    {
+        if ($country === null || $country === '') {
+            return null;
+        }
+
+        $countries = config('geo.countries', []);
+
+        if (array_key_exists($country, $countries)) {
+            return $country;
+        }
+
+        $code = array_search($country, $countries, true);
+
+        return $code === false ? $country : $code;
     }
 
     /** "Baltimore, Maryland, United States" — for the message shown to the user. */

@@ -45,7 +45,7 @@ class DemoProfessionalsSeeder extends Seeder
                     'bio'              => $data['bio'],
                     'city'             => $data['city'],
                     'state'            => $data['state'],
-                    'country'          => 'United States',
+                    'country'          => 'US',
                     'hourly_rate'      => $data['rate'],
                     'experience_years' => $data['years'],
                     // The "Currently taking work" filter reads this. Left null by the

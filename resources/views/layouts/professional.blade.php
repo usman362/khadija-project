@@ -1216,6 +1216,7 @@
             @include('partials._breadcrumb')
             @include('partials._ai_tool_identity')
 
+            @include('partials._service_area_banner')
             @yield('content')
         </div>
     </main>

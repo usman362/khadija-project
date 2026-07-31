@@ -2,11 +2,30 @@
 
 namespace App\Models;
 
+use App\Support\ServiceArea;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserProfile extends Model
 {
+    /**
+     * Keep service_area_status derived, never typed.
+     *
+     * It gates the whole marketplace, and four different controllers can write
+     * a profile's country or state. Deriving it here means a user who moves
+     * into a launch state is un-gated by the same save that records the move,
+     * and one who moves out cannot keep transacting because a controller
+     * forgot to recompute.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (self $profile) {
+            if ($profile->isDirty(['country', 'state'])) {
+                $profile->service_area_status = ServiceArea::statusFor($profile->country, $profile->state);
+            }
+        });
+    }
+
     protected $fillable = [
         'user_id',
         'bio',

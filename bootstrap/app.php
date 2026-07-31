@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission'      => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'check.deletion.status'   => \App\Http\Middleware\CheckAccountDeletionStatus::class,
             'ai.level'                => \App\Http\Middleware\EnsureAiLevel::class,
+            'service.area'            => \App\Http\Middleware\EnsureServiceArea::class,
         ]);
 
         // Run canonical-host redirect FIRST (before anything else) so a
@@ -28,8 +29,13 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         // Automatically gate every authenticated request through the deletion check
+        // and the service-area check. Both are appended rather than attached to
+        // route groups so a new route is covered the day it is written — the
+        // service-area rule in particular has to fail closed, since the cost of
+        // missing one is a booking we cannot legally service.
         $middleware->web(append: [
             \App\Http\Middleware\CheckAccountDeletionStatus::class,
+            \App\Http\Middleware\EnsureServiceArea::class,
             \App\Http\Middleware\SecurityHeaders::class,
         ]);
 
