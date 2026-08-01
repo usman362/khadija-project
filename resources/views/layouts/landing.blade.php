@@ -151,6 +151,12 @@
         @media (max-width: 980px) {
             .lpn-links { display: none; }
             .lpn-burger { display: inline-flex; align-items: center; justify-content: center; }
+            /* The bar had a fixed 26px gap and a brand that refused to shrink,
+               so everything to its right ran off the edge on a phone. */
+            .lpn-inner { gap: 12px; }
+            .lpn-brand { flex-shrink: 1; min-width: 0; }
+            .lpn-logo-img { height: 38px; max-width: 100%; object-fit: contain; }
+            .lpn-actions { gap: 10px; min-width: 0; }
             .lpn-ic span { display: none; }
             .lpf-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
         }
@@ -173,6 +179,12 @@
 
 <nav class="lpn" aria-label="Main navigation">
     <div class="lp-container lpn-inner">
+        {{-- Menu button lives at the far left on mobile, where Sir Peter asked
+             for it and where it cannot be pushed off-screen. It sat inside
+             .lpn-actions, which does not shrink, so on a phone the logo ate the
+             width and the burger — the only way back to the navigation — was
+             clipped along with everything after it. --}}
+        <button type="button" class="lpn-burger" id="lpnBurger" aria-label="Menu" aria-expanded="false" aria-controls="lpnMobile">&#9776;</button>
         <a href="{{ route('landing') }}" class="lpn-brand" aria-label="{{ config('app.name') }} home">
             <img src="{{ asset('gigresource-logos/gigresource-logo-light.png') }}" alt="{{ config('app.name') }}" class="lpn-logo-img">
         </a>
@@ -244,7 +256,6 @@
                 <a href="{{ route('login') }}" class="lp-btn lp-btn-outline">Log In</a>
                 <a href="{{ route('register') }}" class="lp-btn lp-btn-orange">Sign Up</a>
             @endauth
-            <button type="button" class="lpn-burger" id="lpnBurger" aria-label="Menu">&#9776;</button>
         </div>
     </div>
     {{-- Mobile dropdown --}}
@@ -335,7 +346,9 @@
         var mobile = document.getElementById('lpnMobile');
         if (burger && mobile) {
             burger.addEventListener('click', function () {
-                mobile.style.display = mobile.style.display === 'none' ? 'block' : 'none';
+                var open = mobile.style.display === 'none' || mobile.style.display === '';
+                mobile.style.display = open ? 'block' : 'none';
+                burger.setAttribute('aria-expanded', open ? 'true' : 'false');
             });
         }
         // Touch-friendly dropdown toggles
