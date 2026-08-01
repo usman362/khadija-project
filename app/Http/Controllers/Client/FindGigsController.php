@@ -135,7 +135,7 @@ class FindGigsController extends Controller
         $q        = trim((string) $request->query('q', ''));
         $loc      = trim((string) $request->query('loc', ''));
         $budgetMin= (int) $request->query('budget_min', 0);
-        $sort     = (string) $request->query('sort', 'recommended');
+        $sort     = (string) $request->query('sort', 'rating');
 
         if (in_array($type, ['SSR', 'MSR', 'ESR'], true)) {
             $gigs = $gigs->where('type', $type);
@@ -153,11 +153,14 @@ class FindGigsController extends Controller
             $gigs = $gigs->where('price_lo', '>=', $budgetMin);
         }
 
+        // "Recommended" used to be the default and sorted by nothing at all —
+        // it returned catalogue order under a word that implies a judgement.
+        // Every option now states what it sorts by.
         $gigs = match ($sort) {
             'rating'    => $gigs->sortByDesc('rating'),
             'price_low' => $gigs->sortBy('price_lo'),
             'price_high'=> $gigs->sortByDesc('price_lo'),
-            default     => $gigs, // 'recommended' — catalogue order
+            default     => $gigs->sortByDesc('rating'),   // 'rating' is the default
         };
 
         $gigs = $gigs->values();

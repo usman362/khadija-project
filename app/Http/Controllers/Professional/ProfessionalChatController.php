@@ -116,11 +116,15 @@ class ProfessionalChatController extends Controller
         $tags = [];
         $booking = $c->booking;
         if ($booking) {
-            // "Escrow" is a retired badge (Q14) — the visible wording is
-            // "In Secure Payment" everywhere else and was inconsistent here.
+            // This was "Escrow Active", and I renamed it to "In Secure Payment"
+            // earlier today. TO_FIX_Professional_Search_Screens (18 Jul) rules
+            // out both: delete the badge, and "nothing is renamed to a
+            // payment-area label" while that labelling is deferred. So the
+            // money state is not stated here at all — only whether the booking
+            // is confirmed, which is a fact about the job, not the funds.
             $tags[] = $booking->status === 'confirmed'
-                ? ['In Secure Payment', 'green']
-                : ['Deposit Pending', 'amber'];
+                ? ['Booking Confirmed', 'green']
+                : ['Awaiting Confirmation', 'amber'];
         }
 
         // This read trade_license_verified_at and labelled it "W-9". A trade

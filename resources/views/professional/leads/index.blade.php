@@ -347,16 +347,18 @@
             </div>
             <a href="{{ route('professional.proposals.index') }}" class="pl-cc-btn" style="background:#047857;">Create Proposal <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         </div>
-        {{-- Automatic Follow-Ups --}}
+        {{-- Follow-Up Reminders — manual by design. TO_FIX_Lead_Pipeline_CRM:
+             "no wording implies the platform contacts the lead automatically;
+             the pro sends every message." --}}
         <div class="pl-cc-card">
-            <div class="pl-cc-h"><span class="ic" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span><b>Automatic Follow-Ups</b></div>
-            <p>Never let a lead slip away. We follow up for you.</p>
+            <div class="pl-cc-h"><span class="ic" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span><b>Follow-Up Reminders</b></div>
+            <p>Set a reminder to follow up — you send it.</p>
             <div class="pl-cc-prev">
                 <div class="pl-flow-step"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></span><span>Lead receives proposal</span></div>
                 <div class="pl-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div>
                 <div class="pl-flow-step"><span class="ic" style="background:rgba(217,119,6,0.12);color:var(--warn-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span>No reply in 3 days</span></div>
                 <div class="pl-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div>
-                <div class="pl-flow-step"><span class="ic" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/></svg></span><span>Automatic friendly follow-up sent</span></div>
+                <div class="pl-flow-step"><span class="ic" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/></svg></span><span>You get a reminder to follow up</span></div>
             </div>
         </div>
         {{-- Probability Predictor --}}

@@ -114,7 +114,6 @@
             @foreach(request()->except(['sort','page']) as $k => $v)<input type="hidden" name="{{ $k }}" value="{{ $v }}">@endforeach
             <label for="fg-sort-sel">Sort by:</label>
             <select id="fg-sort-sel" name="sort" onchange="this.form.submit()">
-                <option value="recommended" @selected($f['sort']==='recommended')>Recommended</option>
                 <option value="rating" @selected($f['sort']==='rating')>Top Rated</option>
                 <option value="price_low" @selected($f['sort']==='price_low')>Price: Low to High</option>
                 <option value="price_high" @selected($f['sort']==='price_high')>Price: High to Low</option>

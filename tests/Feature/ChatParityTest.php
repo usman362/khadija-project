@@ -116,7 +116,7 @@ class ChatParityTest extends TestCase
         $this->assertSame('Garden Wedding', $filters[0]['title']);
     }
 
-    public function test_the_professional_tag_says_secure_payment_not_escrow(): void
+    public function test_the_conversation_tag_states_no_money_position(): void
     {
         $this->conversation(withBooking: true);
 
@@ -127,8 +127,12 @@ class ChatParityTest extends TestCase
 
         $names = array_column($tags, 0);
 
-        $this->assertContains('In Secure Payment', $names);
-        $this->assertNotContains('Escrow Active', $names, 'the Escrow badge is retired (Q14)');
+        // TO_FIX_Professional_Search_Screens (18 Jul): delete the escrow badge,
+        // and while payment-area labelling is deferred, do not rename it to one.
+        // Both spellings are wrong; the tag says where the booking stands.
+        $this->assertNotContains('Escrow Active', $names);
+        $this->assertNotContains('In Secure Payment', $names);
+        $this->assertContains('Booking Confirmed', $names);
     }
 
     public function test_no_conversation_claims_a_w9_status(): void
