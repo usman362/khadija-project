@@ -33,6 +33,7 @@ These are the only things stopping work. Everything else can proceed.
 | B2 | Bidding window values (R37) | High | How long does a BSR stay open? How long for an ESR? Nothing is in config, so the Admin page for this cannot be built. |
 | B3 | Live Event Upgrades — money rules | High | Four answers needed: how held funds are recorded, whether an overtime rate is mandatory on every bid, geofence rules for on-site upgrades, and the real fee (the "15% vs your standard 10%" in the spec matches neither the 3/5/1.5% commission nor the $2.99 request fee). |
 | B4 | AI modules — keep or remove | High | R29 forbids any feature that *claims or uses* AI. The naming sweep is done, but three modules still genuinely call OpenAI: **AI Agreement generation**, the **support chatbot**, and the **"AI-assisted marketplace"** line in the registration disclaimer. This is not a rename — it is keep-or-remove. Sir Peter's own FAC-13 lists "D2 remove-AI" as done, so this may simply have been missed. |
+| B6 | **A pro awarded two services on one request gets one booking** | High | Not a decision — a defect found while answering A10. `Booking` is keyed on (event, supplier) with no service, so awarding a second service to the same professional on the same request either does nothing (`firstOrCreate` on bid accept) or overwrites the first price (`updateOrCreate` on finalize). Reachable today: multi-service requests already take per-service bids. Needs a decision on whether to fix narrowly now or fold into A10. |
 | B5 | Brand button contrast | Low | White text on brand orange `#f97316` is 2.8:1 — below the accessibility standard we already committed to. Needs a darker orange for buttons, or dark text. |
 
 ---
@@ -49,7 +50,7 @@ Decided and unblocked. This is the build queue.
 | A4 | Change orders | Medium | Needs A1. |
 | A5 | **My Gigs + Contracts → one workspace** | Medium | Khadijah 2026-07-31, Sir Peter agreed. Verified: they are genuinely different data (My Gigs reads `Event.supplier_id` = the work; Contracts reads `Booking.supplier_id` = the agreement and the money). Merging is a UI change, not a data change. |
 | A6 | **Live Event Upgrades (LEU)** | Medium | Agreed as a **platform-wide feature**, not a request type — available on BSR, ESR, DSR and Packages once an event is Live. Blocked by B3 for the money rules, then needs A1. |
-| A10 | **Per-service budgets on a multi-service request** | Under review | Asked of Khadijah 2026-07-31. Bids are already per service and the platform already issues one contract per service (R12). What is missing is a budget per service — the event carries one range — and a board that lists each service as its own row. Three product calls in it: whether the client must split the budget, whether the split must reconcile to the total, and whether N services become N board cards. |
+| A10 | **Each service in a multi-service request as its own gig** | **Approved — Phase 2** | Khadijah, 2026-08-02: own budget, bids, milestones and contract per service; different professionals can win different services in one event. Not to delay current priorities, but recorded now so it is not redesigned later. Of the four: **bids are already per service** (unique on event+supplier+category); **budget, milestones and contract are not**. Milestones need A1. See B6 — the contract half is a live bug, not just a gap. |
 | A7 | Tool → Request: "Post as BSR" | Medium | Clickable prototype exists at `/client/prototype/tool-to-request` (writes nothing). Only the BSR leg is in the first pass. |
 | A8 | Restrict marketplace for out-of-area accounts | — | **Done 2026-07-31.** Moved to Built. |
 | A9 | Co-Op / Team removal | — | **Done 2026-07-31.** Moved to Built. |
@@ -92,6 +93,7 @@ Kept as a list because it is the argument for this document existing.
 | Client request fee is live | Displayed in three places, charged nowhere, until 30 Jul. |
 | Demo professionals are in the launch states | All 10 were outside them; a column default had filed every account as out-of-area. |
 | The Tools page cannot group by suite | It could — `AiToolCatalog::suites()` already existed. (My error, corrected.) |
+| One contract per service (R12) is implemented | The *rule* is settled; the data model is not. A booking is per event+supplier. My error, 2026-08-02, corrected the same day. |
 | Direct Offer is limited to one service | A6 caps at one professional **per service**; the form already accepted several. |
 
 ---
