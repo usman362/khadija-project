@@ -41,7 +41,7 @@
                 [
                     'href'  => route('public.packages'),
                     'tag'   => ['Ready-made', 'hot'],
-                    'title' => 'Shop Packages',
+                    'title' => 'Browse Packages',
                     'desc'  => 'Browse fixed service bundles from professionals and book instantly — one contract, one payment.',
                     'cta'   => 'Browse packages',
                     'icon'  => '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
@@ -80,6 +80,14 @@
                     'cta'   => 'Post a Rush Request',
                     'icon'  => '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
                 ],
+                [
+                    'href'  => route('client.virtual-hub.brief'),
+                    'tag'   => ['Online', ''],
+                    'title' => 'Virtual & Hybrid Hub',
+                    'desc'  => 'Streaming, AV and hybrid production. Post the technical brief and professionals bid on it like any other gig.',
+                    'cta'   => 'Post a virtual brief',
+                    'icon'  => '<path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/>',
+                ],
             ];
         @endphp
 
@@ -104,7 +112,7 @@
      four. MSR is the scope inside a bidding request now, not a card you
      can pick, so pointing at it left the reader looking for something
      that is not on the screen. --}}
-        <p class="rc-note">Not sure which to pick? <b>Shop Packages</b> is the fastest if a pro already offers what you need as a bundle. Choose <b>Bidding Request</b> when you want professionals to compete on price — tick one service or several, and it handles both.</p>
+        <p class="rc-note">Not sure which to pick? <b>Browse Packages</b> is the fastest if a pro already offers what you need as a bundle. Choose <b>Bidding Request</b> when you want professionals to compete on price — tick one service or several, and it handles both.</p>
     </div>
 </div>
 @endsection
