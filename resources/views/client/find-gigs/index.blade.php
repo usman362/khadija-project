@@ -1,7 +1,7 @@
 @extends('layouts.client')
 
-@section('title', 'Browse Packages')
-@section('page-title', 'Browse Packages')
+@section('title', 'Shop Packages')
+@section('page-title', 'Shop Packages')
 @section('page-subtitle', 'Browse packages and book a team.')
 
 {{-- Client — Find Gigs. The client-side mirror of the professional bidding board:

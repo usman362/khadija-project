@@ -1191,19 +1191,7 @@
                 <li class="cl-nav-item">
                     <a href="{{ route('public.packages') }}" class="cl-nav-link {{ request()->routeIs('public.packages') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                        Browse Packages
-                    </a>
-                </li>
-                <li class="cl-nav-item">
-                    <a href="{{ route('client.events.index') }}" class="cl-nav-link {{ request()->routeIs('client.events.*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                        My Events
-                    </a>
-                </li>
-                <li class="cl-nav-item">
-                    <a href="{{ route('client.virtual-hub.index') }}" class="cl-nav-link {{ request()->routeIs('client.virtual-hub.*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-                        Virtual &amp; Hybrid Hub
+                        Shop Packages
                     </a>
                 </li>
                 <li class="cl-nav-item">
@@ -1216,15 +1204,27 @@
                     </a>
                 </li>
                 <li class="cl-nav-item">
+                    <a href="{{ route('client.direct-offers.create') }}" class="cl-nav-link {{ request()->routeIs('client.direct-offers.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>
+                        Direct Offer
+                    </a>
+                </li>
+                <li class="cl-nav-item">
                     <a href="{{ route('client.esr.create') }}" class="cl-nav-link {{ request()->routeIs('client.esr.*') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                         Emergency (ESR)
                     </a>
                 </li>
                 <li class="cl-nav-item">
-                    <a href="{{ route('client.direct-offers.create') }}" class="cl-nav-link {{ request()->routeIs('client.direct-offers.*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>
-                        Direct Offer
+                    <a href="{{ route('client.virtual-hub.index') }}" class="cl-nav-link {{ request()->routeIs('client.virtual-hub.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                        Virtual &amp; Hybrid Hub
+                    </a>
+                </li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('client.events.index') }}" class="cl-nav-link {{ request()->routeIs('client.events.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                        My Events
                     </a>
                 </li>
                 <li class="cl-nav-item">
@@ -1240,7 +1240,6 @@
                     </a>
                 </li>
 
-                {{-- ── COMMUNICATION ──────────────────────────────── --}}
                 <li class="cl-nav-label">Communication</li>
                 <li class="cl-nav-item">
                     <a href="{{ route('client.chat.index') }}" class="cl-nav-link {{ request()->routeIs('client.chat.*') ? 'active' : '' }}">

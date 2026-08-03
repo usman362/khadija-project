@@ -41,7 +41,7 @@
                 [
                     'href'  => route('public.packages'),
                     'tag'   => ['Ready-made', 'hot'],
-                    'title' => 'Browse Packages',
+                    'title' => 'Shop Packages',
                     'desc'  => 'Browse fixed service bundles from professionals and book instantly — one contract, one payment.',
                     'cta'   => 'Browse packages',
                     'icon'  => '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
@@ -112,7 +112,7 @@
      four. MSR is the scope inside a bidding request now, not a card you
      can pick, so pointing at it left the reader looking for something
      that is not on the screen. --}}
-        <p class="rc-note">Not sure which to pick? <b>Browse Packages</b> is the fastest if a pro already offers what you need as a bundle. Choose <b>Bidding Request</b> when you want professionals to compete on price — tick one service or several, and it handles both.</p>
+        <p class="rc-note">Not sure which to pick? <b>Shop Packages</b> is the fastest if a pro already offers what you need as a bundle. Choose <b>Bidding Request</b> when you want professionals to compete on price — tick one service or several, and it handles both.</p>
     </div>
 </div>
 @endsection
