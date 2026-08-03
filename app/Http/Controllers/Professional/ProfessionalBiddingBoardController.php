@@ -15,25 +15,25 @@ use Illuminate\View\View;
  * Professional — Main Bidding Board.
  *
  * Every OPEN client gig in one place to bid on. Gigs are REAL published Events
- * (not completed/cancelled). ESR is read from the event's source — a rush
+ * (not completed/cancelled). ER is read from the event's source — a rush
  * request can be single-service, so counting services would mislabel it;
  * SSR vs MSR is then the service count. Match-score and images are
  * representative fields until the scoring model lands.
  */
 class ProfessionalBiddingBoardController extends Controller
 {
-    /** Non-Elite tiers unlock ESR/MSR this many minutes after posting. */
+    /** Non-Elite tiers unlock ER/MSR this many minutes after posting. */
     private const TIER_DELAY_MINUTES = 60;
 
     /**
-     * Board tabs = the request TYPE. Peter's model (2026-07-27): BSR is
-     * broadcast bidding, ESR is the same mechanism with urgency on top, DSR is
+     * Board tabs = the request TYPE. Peter's model (2026-07-27): BR is
+     * broadcast bidding, ER is the same mechanism with urgency on top, DR is
      * targeted at one professional and never bid on. SSR and MSR are NOT types
      * here — they are the scope (single vs multi service) inside each, and are
      * filtered separately. Packages and Invite Only are in the mockups but have
      * no model yet — see the note in index().
      */
-    public const TABS = ['all', 'BSR', 'ESR', 'DSR', 'saved'];
+    public const TABS = ['all', 'BR', 'ER', 'DR', 'saved'];
 
     /** Scope filter — the service count, which is what single vs multi means. */
     public const SCOPES = ['', 'single', 'multi'];
@@ -90,12 +90,12 @@ class ProfessionalBiddingBoardController extends Controller
         }
         if ($tab === 'saved') {
             $base->whereIn('id', $savedIds->all() ?: [0]);
-        } elseif ($tab === 'DSR') {
+        } elseif ($tab === 'DR') {
             $base->where('source', 'direct_offer');
-        } elseif ($tab === 'ESR') {
+        } elseif ($tab === 'ER') {
             $base->where('source', 'esr');
-        } elseif ($tab === 'BSR') {
-            // Bidding, but not the emergency flavour — ESR has its own tab so a
+        } elseif ($tab === 'BR') {
+            // Bidding, but not the emergency flavour — ER has its own tab so a
             // pro can spot the time-critical ones without scanning everything.
             $base->where('source', '!=', 'direct_offer')->where(fn ($w) => $w->whereNull('source')->orWhere('source', '!=', 'esr'));
         }
@@ -114,7 +114,7 @@ class ProfessionalBiddingBoardController extends Controller
             $events = $events->filter(fn ($e) => $this->scopeOf($e) === $scope)->values();
         }
 
-        // Tiered early access — ESR + MSR only. Elite sees them on post; Pro and
+        // Tiered early access — ER + MSR only. Elite sees them on post; Pro and
         // Starter unlock 60 minutes later. SSR is open to every tier. Locked
         // gigs are withheld, and the count is stated as "unlocked to you" in the
         // view rather than claiming none exist.
@@ -188,9 +188,9 @@ class ProfessionalBiddingBoardController extends Controller
 
         return [
             'all'   => $open->count(),
-            'BSR'   => $open->filter(fn ($e) => $this->typeOf($e) === 'BSR')->count(),
-            'ESR'   => $open->where('source', 'esr')->count(),
-            'DSR'   => $open->where('source', 'direct_offer')->count(),
+            'BR'   => $open->filter(fn ($e) => $this->typeOf($e) === 'BR')->count(),
+            'ER'   => $open->where('source', 'esr')->count(),
+            'DR'   => $open->where('source', 'direct_offer')->count(),
             'saved' => $savedIds->count(),
         ];
     }
@@ -238,9 +238,9 @@ class ProfessionalBiddingBoardController extends Controller
     private function typeOf(Event $e): string
     {
         return match ($e->source) {
-            'esr'          => 'ESR',
-            'direct_offer' => 'DSR',
-            default        => 'BSR',
+            'esr'          => 'ER',
+            'direct_offer' => 'DR',
+            default        => 'BR',
         };
     }
 
@@ -268,19 +268,19 @@ class ProfessionalBiddingBoardController extends Controller
         return back()->with('status', $msg);
     }
 
-    /** Elite is the tier with immediate ESR/MSR access. */
+    /** Elite is the tier with immediate ER/MSR access. */
     private function isElite(?\App\Models\User $user): bool
     {
         return $user?->activeSubscription()?->plan?->slug === 'enterprise';
     }
 
     /**
-     * Tiered early access, ESR + MSR only: Elite immediately, Pro and Starter
+     * Tiered early access, ER + MSR only: Elite immediately, Pro and Starter
      * 60 minutes after posting. SSR is open to every tier.
      */
     private function isLockedFor(Event $e, ?\App\Models\User $user): bool
     {
-        $tiered = $e->source === 'esr' || $e->categories->count() >= 2;   // ESR or MSR
+        $tiered = $e->source === 'esr' || $e->categories->count() >= 2;   // ER or MSR
         if (! $tiered || $this->isElite($user)) {
             return false;
         }
@@ -375,7 +375,7 @@ class ProfessionalBiddingBoardController extends Controller
         $user = $request->user();
 
         $state = in_array($request->query('state'), self::BID_STATES, true) ? $request->query('state') : 'all';
-        $type  = in_array($request->query('type'), ['BSR', 'ESR', 'DSR'], true) ? $request->query('type') : '';
+        $type  = in_array($request->query('type'), ['BR', 'ER', 'DR'], true) ? $request->query('type') : '';
         $scope = in_array($request->query('scope'), self::SCOPES, true) ? (string) $request->query('scope') : '';
         $q     = trim((string) $request->query('q', ''));
 
@@ -399,7 +399,7 @@ class ProfessionalBiddingBoardController extends Controller
                 'bid'       => $b,
                 'event'     => $e,
                 'state'     => $this->bidState($b, $award, $user),
-                'type'      => $e ? $this->typeOf($e) : 'BSR',
+                'type'      => $e ? $this->typeOf($e) : 'BR',
                 'scope'     => $e ? $this->scopeOf($e) : 'single',
                 'lastReply' => $b->replies->last(),
                 'net'       => Commission::netOf($b->amount, $user),
@@ -425,7 +425,7 @@ class ProfessionalBiddingBoardController extends Controller
         // that changed its own count when you clicked it would be useless.
         $everyRow = $all->map(fn (Bid $b) => [
             'state' => $this->bidState($b, $b->event ? $awards->get($b->event->id) : null, $user),
-            'type'  => $b->event ? $this->typeOf($b->event) : 'BSR',
+            'type'  => $b->event ? $this->typeOf($b->event) : 'BR',
         ]);
 
         return view('professional.bidding-board.my-bids', [
@@ -441,9 +441,9 @@ class ProfessionalBiddingBoardController extends Controller
                 'expired'      => $everyRow->where('state', 'expired')->count(),
             ],
             'typeCounts' => [
-                'BSR' => $everyRow->where('type', 'BSR')->count(),
-                'ESR' => $everyRow->where('type', 'ESR')->count(),
-                'DSR' => $everyRow->where('type', 'DSR')->count(),
+                'BR' => $everyRow->where('type', 'BR')->count(),
+                'ER' => $everyRow->where('type', 'ER')->count(),
+                'DR' => $everyRow->where('type', 'DR')->count(),
             ],
             // Net of commission, because that is what the pro actually receives.
             'payout' => [
@@ -492,9 +492,9 @@ class ProfessionalBiddingBoardController extends Controller
     {
         $cats = $e->categories->pluck('name')->all();
 
-        // This used to read ESR / MSR / SSR — mixing the type with the scope on
+        // This used to read ER / MSR / SSR — mixing the type with the scope on
         // the one badge, so a card could say "MSR" while the tab above it said
-        // BSR. They are different questions and both get answered: typeOf() is
+        // BR. They are different questions and both get answered: typeOf() is
         // how the request reaches professionals, scopeOf() is how many services
         // are in it.
         $type  = $this->typeOf($e);
@@ -512,7 +512,7 @@ class ProfessionalBiddingBoardController extends Controller
             'scope'  => $scope,
             // A rush request is urgent by definition — don't let a needed-by
             // date further out quietly drop the flag that's the whole point.
-            'urgent' => ! $expired && ($type === 'ESR' || ($days !== null && $days >= 0 && $days <= 3)),
+            'urgent' => ! $expired && ($type === 'ER' || ($days !== null && $days >= 0 && $days <= 3)),
             'expired' => $expired,
             'title'  => $e->title,
             'desc'   => Str::limit($e->description ?: 'Open gig — full details available on request.', 140),
@@ -520,9 +520,9 @@ class ProfessionalBiddingBoardController extends Controller
             'date'   => $e->starts_at ? $e->starts_at->format('M j, Y') : 'Flexible',
             'guests' => 50 + ($e->id % 250),
             'tags'   => $cats ?: ['General'],
-            // ESR budget is a single fixed figure; SSR/MSR quote a range.
+            // ER budget is a single fixed figure; SSR/MSR quote a range.
             'budget' => $e->budget
-                ? ($type === 'ESR'
+                ? ($type === 'ER'
                     ? '$' . number_format($e->budget)
                     : '$' . number_format($e->budget * 0.85) . ' – $' . number_format($e->budget))
                 : 'Open budget',

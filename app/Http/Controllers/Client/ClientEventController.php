@@ -212,12 +212,12 @@ class ClientEventController extends Controller
             ->get();
 
         // Request type and scope, the same model the professional board uses:
-        // BSR is broadcast bidding, ESR is that with urgency, DSR is targeted at
+        // BR is broadcast bidding, ER is that with urgency, DR is targeted at
         // one professional. SSR/MSR is the SCOPE — the service count.
         $type  = match ($event->source) {
-            'esr'          => 'ESR',
-            'direct_offer' => 'DSR',
-            default        => 'BSR',
+            'esr'          => 'ER',
+            'direct_offer' => 'DR',
+            default        => 'BR',
         };
         $scope = $event->categories->count() >= 2 ? 'MSR' : 'SSR';
 

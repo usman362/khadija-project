@@ -49,9 +49,9 @@
     .mb-title:hover { color: var(--info-text); }
     .mb-meta { font-size: 12px; color: var(--text-secondary); margin-top: 5px; display: flex; gap: 9px; flex-wrap: wrap; align-items: center; }
     .mb-chip { display: inline-flex; align-items: center; border-radius: 6px; padding: 2px 8px; font-size: 10.5px; font-weight: 800; }
-    .mb-chip.BSR { background: rgba(37,99,235,.12); color: var(--info-text); }
-    .mb-chip.ESR { background: rgba(220,38,38,.12); color: var(--bad-text); }
-    .mb-chip.DSR { background: rgba(124,58,237,.12); color: var(--accent-text); }
+    .mb-chip.BR { background: rgba(37,99,235,.12); color: var(--info-text); }
+    .mb-chip.ER { background: rgba(220,38,38,.12); color: var(--bad-text); }
+    .mb-chip.DR { background: rgba(124,58,237,.12); color: var(--accent-text); }
     .mb-chip.scope { background: rgba(100,116,139,.14); color: var(--text-secondary); }
     .mb-right { text-align: right; min-width: 200px; }
     .mb-amt { font-size: 18px; font-weight: 800; color: var(--text-primary); }
@@ -112,14 +112,14 @@
         @endforeach
     </div>
 
-    {{-- Request type. Same model as the board: BSR / ESR / DSR are the types,
+    {{-- Request type. Same model as the board: BR / ER / DR are the types,
          single vs multi service is the scope filter below. --}}
     <div class="mb-tabs">
         <a class="mb-tab {{ $f['type'] === '' ? 'on' : '' }}"
            href="{{ route('professional.bidding-board.my-bids', array_filter(array_merge($f, ['type' => null]))) }}">
             All types <span class="n">{{ $counts['all'] }}</span>
         </a>
-        @foreach(['BSR', 'ESR', 'DSR'] as $key)
+        @foreach(['BR', 'ER', 'DR'] as $key)
             <a class="mb-tab {{ $f['type'] === $key ? 'on' : '' }}"
                href="{{ route('professional.bidding-board.my-bids', array_filter(array_merge($f, ['type' => $key]))) }}">
                 {{ $key }} <span class="n">{{ $typeCounts[$key] }}</span>

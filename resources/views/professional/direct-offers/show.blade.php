@@ -1,6 +1,6 @@
 @extends('layouts.professional')
 
-@section('title', 'Direct Offer Received')
+@section('title', 'Direct Request Received')
 
 @push('styles')
 <style>
@@ -94,7 +94,7 @@
     {{-- header card --}}
     <div class="do-card" style="margin-bottom:18px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
-            <a href="{{ route('professional.chat.index') }}" class="do-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Back to Direct Offers</a>
+            <a href="{{ route('professional.chat.index') }}" class="do-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Back to Direct Requests</a>
             <span class="do-pill">{{ $offer['status'] }}</span>
         </div>
         <div class="do-h-top">

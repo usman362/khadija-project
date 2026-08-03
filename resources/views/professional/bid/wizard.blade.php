@@ -3,7 +3,7 @@
 @section('title', 'Submit Your Bid')
 @section('page-title', 'Submit Your Bid')
 
-{{-- Screen 4 of the professional BSR set — the six-step proposal builder.
+{{-- Screen 4 of the professional BR set — the six-step proposal builder.
 
      The board's inline form takes an amount and a note, which is enough to
      place a number. This collects what the client's Compare screen actually
@@ -20,9 +20,9 @@
     .bd-opp-h { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin-bottom: 8px; }
     .bd-opp-h b { font-size: 16px; font-weight: 800; color: var(--text-primary); }
     .bd-tag { font-size: 10.5px; font-weight: 800; border-radius: 6px; padding: 3px 9px; }
-    .bd-tag.BSR { background: rgba(37,99,235,.14); color: var(--info-text); }
-    .bd-tag.ESR { background: rgba(220,38,38,.16); color: var(--bad-text); }
-    .bd-tag.DSR { background: rgba(124,58,237,.16); color: var(--accent-text); }
+    .bd-tag.BR { background: rgba(37,99,235,.14); color: var(--info-text); }
+    .bd-tag.ER { background: rgba(220,38,38,.16); color: var(--bad-text); }
+    .bd-tag.DR { background: rgba(124,58,237,.16); color: var(--accent-text); }
     .bd-tag.sc  { background: rgba(148,163,184,.16); color: var(--text-secondary); }
     .bd-opp-meta { display: flex; gap: 18px; flex-wrap: wrap; font-size: 12.5px; color: var(--text-secondary); font-weight: 600; }
     .bd-dl { color: var(--warn-text); font-weight: 800; }

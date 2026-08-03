@@ -1,6 +1,6 @@
 @extends('layouts.client')
-@section('title', 'Post a Rush Request (ESR)')
-@section('page-title', 'Emergency Service Request (ESR)')
+@section('title', 'Post a Rush Request (ER)')
+@section('page-title', 'Emergency Request (ER)')
 @section('page-subtitle', 'For urgent needs within 72 hours.')
 
 @push('styles')
@@ -76,7 +76,7 @@
     <div class="esr-alert">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         <div>
-            <b>This is an Emergency Service Request.</b>
+            <b>This is an Emergency Request.</b>
             <p>Use this only for genuine time-sensitive needs within the next 72 hours. Verified professionals are notified with priority, and you'll see responses on your Proposals page.</p>
         </div>
     </div>
@@ -86,7 +86,7 @@
         @csrf
 
         {{-- 0. Single or multi. A rush request can be either — one urgent gap to
-             fill, or several at once. Unlike a Direct Offer it still publishes to
+             fill, or several at once. Unlike a Direct Request it still publishes to
              the board and every professional bids; it is not aimed at one pro. --}}
         <div class="esr-scope">
             <div class="esr-scope-o {{ $scope === 'single' ? 'sel' : '' }}" data-scope-pick="single">
@@ -169,7 +169,7 @@
             <ul class="esr-rlist">
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span><b>Single service</b> — one urgent gap, one agreement.</span></li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span><b>Multi-service</b> — several gaps; each is bid on and agreed separately.</span></li>
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span>Either way this goes out to <b>every available professional</b> — it isn't sent to one pro like a Direct Offer.</span></li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span>Either way this goes out to <b>every available professional</b> — it isn't sent to one pro like a Direct Request.</span></li>
             </ul>
         </div>
         <div class="esr-rcard">

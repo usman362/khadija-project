@@ -5,7 +5,7 @@
 {{-- Step 0 — Choose Route. Packages are ONE route of five, not the whole
      product (Fix Spec 07.14). Package Search is the synchronous "buy a bundle"
      wizard; SSR/MSR/ESR are postings that end at Publish then take bids on
-     Proposals; Direct Offer is a targeted, non-bidding invite. --}}
+     Proposals; Direct Request is a targeted, non-bidding invite. --}}
 
 @push('styles')
 <style>
@@ -57,7 +57,7 @@
                 [
                     'href'  => route('client.bsr.step', 'service'),
                     'tag'   => ['Get bids', 'hot'],
-                    'title' => 'Bidding Request (BSR)',
+                    'title' => 'Bidding Request (BR)',
                     'desc'  => 'Post one service or several — professionals bid on what they provide. Free to post; you only pay when you finalise.',
                     'cta'   => 'Start a request',
                     'icon'  => '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
@@ -65,19 +65,19 @@
                 [
                     'href'  => route('client.direct-offers.create'),
                     'tag'   => ['Targeted', ''],
-                    'title' => 'Direct Offer (DSR)',
+                    'title' => 'Direct Request (DR)',
                     // What makes a DSR a DSR is that it is targeted, not broadcast —
                     // NOT that it is one service. A6 caps it at one professional per
                     // SERVICE at a time; a professional who offers several can be
                     // asked for several. The old wording implied otherwise.
                     'desc'  => 'Go straight to a professional you already want — one service or several, whatever they offer. They accept, decline, or reply. No open bidding.',
-                    'cta'   => 'Send a Direct Offer',
+                    'cta'   => 'Send a Direct Request',
                     'icon'  => '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
                 ],
                 [
                     'href'  => route('client.esr.create'),
                     'tag'   => ['Urgent', 'hot'],
-                    'title' => 'Emergency Service Request (ESR)',
+                    'title' => 'Emergency Request (ER)',
                     'desc'  => 'Time-sensitive need within 72 hours — verified professionals are notified with priority so you get fast responses.',
                     'cta'   => 'Post a Rush Request',
                     'icon'  => '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',

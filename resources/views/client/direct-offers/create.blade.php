@@ -1,18 +1,18 @@
 @extends('layouts.client')
 
-@section('title', 'Direct Offer / Request')
-@section('page-title', 'Send a Direct Offer / Request')
+@section('title', 'Direct Request')
+@section('page-title', 'Send a Direct Request')
 @section('page-subtitle', 'Request services from one professional.')
 
-{{-- Client → Professional Direct Offer builder. The request type (SSR / MSR)
+{{-- Client → Professional Direct Request builder. The request type (SSR / MSR)
      reshapes the form: SSR = one service; MSR = multiple services, each handled
      as its own separate agreement (Team/Co-Op combined-force removed platform-
      wide). Type switching is pure-JS via data attributes. Representative submit
      (no backend yet). --}}
 
 @php
-    // ESR is its own standalone "Post a Rush Request" workflow — NOT a Direct
-    // Offer type (per Peter). Direct Offer supports single / multi service only.
+    // ER is its own standalone "Post a Rush Request" workflow — NOT a Direct
+    // Offer type (per Peter). Direct Request supports single / multi service only.
     $types = [
         ['SSR', 'Single Service Request', 'One specific service from this pro — simplest request.'],
         ['MSR', 'Multi-Service Request', 'Several services — each handled as its own separate agreement.'],
@@ -90,7 +90,6 @@
     /* hide sections not valid for the current type */
     .do[data-type="SSR"] [data-types]:not([data-types~="SSR"]),
     .do[data-type="MSR"] [data-types]:not([data-types~="MSR"]),
-    .do[data-type="ESR"] [data-types]:not([data-types~="ESR"]) { display: none; }
     .do[data-type="SSR"] .do-svc-multi { display: none; }
     .do:not([data-type="SSR"]) .do-svc-single { display: none; }
 
@@ -176,13 +175,12 @@
                     </div>
                     <div class="do-hint">SSR — a single, specific service from this professional.</div>
                 </div>
-                {{-- MSR / ESR: multiple services --}}
+                {{-- MSR / ER: multiple services --}}
                 <div class="do-svc-multi">
                     <div class="do-field">
                         <label>Services requested (pick all that apply)</label>
                         <x-service-picker :categories="$categories" name="services" :selected="old('services', [])" />
                     </div>
-                    <div class="do-hint" data-types="ESR">ESR — the lead professional coordinates the entire event scope across all selected services.</div>
                 </div>
             </div>
         </div>
@@ -215,7 +213,7 @@
             <p>The professional will receive this as a <b id="doTypeLbl2">{{ $type }}</b> and can accept, counter, or ask questions.</p>
             <button type="submit" class="do-btn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                Send Direct Offer
+                Send Direct Request
             </button>
         </div>
     </form>

@@ -3,9 +3,9 @@
 @section('title', 'Create a Bidding Service Request')
 @section('page-title', 'Create a Request')
 
-{{-- Screen 1 of the client BSR set — the 7-step create wizard.
+{{-- Screen 1 of the client BR set — the 7-step create wizard.
 
-     One wizard, not two: a BSR is the same request type whether it needs one
+     One wizard, not two: a BR is the same request type whether it needs one
      service or several. Scope (SSR / MSR) follows from how many services get
      picked in step 1, which is literally what single vs multi service means, so
      it isn't asked as a separate question and there is no "switch to the other
@@ -175,8 +175,8 @@
                     </label>
                 @endforeach
             </div>
-            {{-- No "Emergency" option: emergency is its own request type (ESR),
-                 which broadcasts on a rush timeline, not a flavour of a BSR. --}}
+            {{-- No "Emergency" option: emergency is its own request type (ER),
+                 which broadcasts on a rush timeline, not a flavour of a BR. --}}
             <p class="bw-help">Need it urgently because something fell through? <a href="{{ route('client.esr.create') }}" style="color:var(--brand-text);font-weight:700;">Post an emergency request</a> instead.</p>
         </div>
 
@@ -297,7 +297,7 @@
         <h3>Review &amp; publish</h3>
         <p class="lede">This is what professionals will see. You can edit any of it after publishing, right up until you choose someone.</p>
 
-        <div class="bw-rev"><span>Request type</span><b>BSR — open to bidding</b></div>
+        <div class="bw-rev"><span>Request type</span><b>BR — open to bidding</b></div>
         <div class="bw-rev"><span>Scope</span><b>{{ $isMulti ? 'MSR — multi-service' : 'SSR — single service' }}</b></div>
         <div class="bw-rev"><span>Services</span><b>{{ $svcNames->implode(', ') ?: '—' }}</b></div>
         <div class="bw-rev"><span>Name</span><b>{{ $data['title'] ?? '—' }}</b></div>

@@ -32,7 +32,7 @@ class FindGigsController extends Controller
         ['Cinematic Videography',         'Videography',    'SSR', 1800, 3200,  'A highlight film and full-length edit, with drone coverage available on request.'],
         ['Venue Styling & Lighting',      'Lighting',       'SSR', 1200, 2600,  'Ambient uplighting, dance-floor wash and custom monogram projection.'],
         ['Photo + Video + DJ Bundle',     'Photography',    'MSR', 5525, 6500,  'A coordinated photo, video and music team for a seamless celebration.'],
-        ['Grand Gala Production',         'Event Planning', 'ESR',15300,18000,  'Full production for large galas: catering, AV, lighting and event staffing.'],
+        ['Grand Gala Production',         'Event Planning', 'ER',15300,18000,  'Full production for large galas: catering, AV, lighting and event staffing.'],
         ['Birthday Party Décor',          'Floral & Décor', 'SSR',  510,  900,  'Themed balloon installs, backdrops and table styling with setup and teardown.'],
         ['Conference AV & Staging',       'Lighting',       'MSR', 4420, 5200,  'Stage, screens, sound and technicians for multi-day conferences.'],
         ['Intimate Wedding Package',      'Photography',    'SSR', 1400, 2000,  'Photography and coordination for elopements and micro-weddings.'],
@@ -73,7 +73,7 @@ class FindGigsController extends Controller
                 'id'      => $i + 1,
                 'title'   => $title,
                 'type'    => $type,
-                'featured'=> $type === 'ESR',
+                'featured'=> $type === 'ER',
                 'pro'     => $pro?->name ?: 'Verified Professional',
                 'pro_id'  => $pro?->id,
                 'cat'     => $cat,
@@ -137,7 +137,7 @@ class FindGigsController extends Controller
         $budgetMin= (int) $request->query('budget_min', 0);
         $sort     = (string) $request->query('sort', 'rating');
 
-        if (in_array($type, ['SSR', 'MSR', 'ESR'], true)) {
+        if (in_array($type, ['SSR', 'MSR', 'ER'], true)) {
             $gigs = $gigs->where('type', $type);
         }
         if ($catFilter !== '') {
@@ -170,7 +170,7 @@ class FindGigsController extends Controller
             'all' => $allGigs->count(),
             'SSR' => $allGigs->where('type', 'SSR')->count(),
             'MSR' => $allGigs->where('type', 'MSR')->count(),
-            'ESR' => $allGigs->where('type', 'ESR')->count(),
+            'ER' => $allGigs->where('type', 'ER')->count(),
         ];
 
         // Real categories for the filter dropdown (skip seed "Test" junk).

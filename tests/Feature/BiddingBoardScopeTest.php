@@ -9,9 +9,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * The board's model: type is how a request reaches professionals (BSR / ESR /
- * DSR) and scope is how many services are in it (SSR / MSR). They used to share
- * one badge, so a card could say MSR while the tab above it said BSR.
+ * The board's model: type is how a request reaches professionals (BR / ER /
+ * DR) and scope is how many services are in it (SSR / MSR). They used to share
+ * one badge, so a card could say MSR while the tab above it said BR.
  */
 class BiddingBoardScopeTest extends TestCase
 {
@@ -51,7 +51,7 @@ class BiddingBoardScopeTest extends TestCase
             'starts_at'    => now()->addMonth(),
         ], $attrs));
 
-        // ESR and MSR gigs are held back from non-Elite tiers for 60 minutes
+        // ER and MSR gigs are held back from non-Elite tiers for 60 minutes
         // after posting. These tests are about scope and type, not that delay,
         // so the gig is backdated past the window — written straight to the
         // row because Eloquent stamps created_at itself on insert.
@@ -85,7 +85,7 @@ class BiddingBoardScopeTest extends TestCase
 
         $gig = $this->gigs()[0];
 
-        $this->assertSame('BSR', $gig['type'], 'a broadcast gig is type BSR whatever its size');
+        $this->assertSame('BR', $gig['type'], 'a broadcast gig is type BR whatever its size');
         $this->assertSame('MSR', $gig['scope'], 'three services is multi-service scope');
     }
 
@@ -95,7 +95,7 @@ class BiddingBoardScopeTest extends TestCase
 
         $gig = $this->gigs()[0];
 
-        $this->assertSame('ESR', $gig['type']);
+        $this->assertSame('ER', $gig['type']);
         $this->assertSame('SSR', $gig['scope']);
     }
 

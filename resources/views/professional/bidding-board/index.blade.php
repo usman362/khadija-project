@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Find gigs and place your bids.')
 
 {{-- Professional — Main Bidding Board. Every open client gig in one place,
-     filterable by request type (BSR / ESR / DSR) and by scope, with fit
+     filterable by request type (BR / ER / DR) and by scope, with fit
      scores, live
      time-left and market insights. Gigs are representative pending the live
      gig/bid pipeline. --}}
@@ -30,7 +30,7 @@
     .bb-media { position: relative; background: var(--bg-card-hover, var(--border-color)); }
     .bb-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .bb-type { position: absolute; left: 8px; top: 8px; font-size: 10px; font-weight: 800; letter-spacing: .3px; padding: 3px 9px; border-radius: 6px; color: #fff !important; }
-    .bb-type.BSR { background: #2563eb; } .bb-type.ESR { background: #e11d48; } .bb-type.DSR { background: #7c3aed; }
+    .bb-type.BR { background: #2563eb; } .bb-type.ER { background: #e11d48; } .bb-type.DR { background: #7c3aed; }
     /* Scope sits next to the type, deliberately quieter — it is the smaller
        of the two questions and must not read as a fourth type. */
     .bb-scope { position: absolute; top: 10px; left: 58px; background: rgba(15,23,42,0.72); color: #fff; font-size: 10px; font-weight: 800; letter-spacing: .3px; padding: 3px 7px; border-radius: 6px; }
@@ -184,15 +184,15 @@
     @php $ff = $filters; @endphp
     <div class="bb-bar">
         <div class="bb-tabs">
-            {{-- Type, not scope. Peter's model: BSR is broadcast bidding, ESR is
-                 that same mechanism with urgency, DSR goes to one professional
+            {{-- Type, not scope. Peter's model: BR is broadcast bidding, ER is
+                 that same mechanism with urgency, DR goes to one professional
                  and is never bid on. Single vs multi service is the SCOPE
-                 filter below, because both BSR and DSR carry either. --}}
+                 filter below, because both BR and DR carry either. --}}
             @foreach([
                 ['all', 'All Requests', ''],
-                ['BSR', 'BSR', 'Bidding Service Request'],
-                ['ESR', '🔥 ESR', 'Emergency — open to everyone'],
-                ['DSR', 'DSR', 'Direct — sent to you'],
+                ['BR', 'BR', 'Bidding Service Request'],
+                ['ER', '🔥 ER', 'Emergency — open to everyone'],
+                ['DR', 'DR', 'Direct — sent to you'],
                 ['saved', '★ Saved', ''],
             ] as [$key, $label, $sub])
                 <a class="bb-tab {{ $ff['tab'] === $key ? 'on' : '' }}"
@@ -360,7 +360,7 @@
                  decorative — no name, no form, and the buttons did nothing — while
                  the real filters run above the results. It also listed SSR and MSR
                  as request TYPES, which is the one thing the locked model says they
-                 are not: the types are BSR / ESR / DSR and SSR/MSR is the scope
+                 are not: the types are BR / ER / DR and SSR/MSR is the scope
                  inside them. Two filter panels disagreeing about the model is worse
                  than one, so the dead one is gone. --}}
 
@@ -486,7 +486,7 @@
                     var o = document.createElement('option');
                     o.value = s.id; o.textContent = s.name; svcSel.appendChild(o);
                 });
-                // Show the picker only when there's more than one service (MSR/ESR).
+                // Show the picker only when there's more than one service (MSR/ER).
                 svcWrap.style.display = services.length > 1 ? 'block' : 'none';
             }
             updateNet();

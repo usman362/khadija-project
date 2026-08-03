@@ -4,7 +4,7 @@
     'selected' => [],
     'accent' => '#f97316',
     'accentStrong' => '#ea580c',
-    'valueField' => 'id', // 'id' (Direct Offer) or 'name' (MSR store matches on name)
+    'valueField' => 'id', // 'id' (Direct Request) or 'name' (MSR store matches on name)
     // Single-service mode: picking one service clears the previous pick, so a
     // single-service request (SSR, or an ESR scoped to one service) can't be
     // submitted with two. Flip it live by setting data-svc-single on the root.

@@ -15,10 +15,9 @@ use Illuminate\View\View;
  * Client → Professional Direct Offer / Request builder.
  *
  * The client sends a direct request to a chosen professional. The request type
- * reshapes the form (Peter's "minor changes to the documents per SSR/MSR/ESR"):
+ * reshapes the form (Peter's "minor changes to the documents per SSR/MSR"):
  *   • SSR — Single Service Request   (one service, no team)
  *   • MSR — Multiple Service Request (several services + team collaboration)
- *   • ESR — Event-wide Service Request (full event scope + full team)
  *
  * The professional-side receiving view already exists
  * (ProfessionalDirectOfferController). This is the sending side.
@@ -37,7 +36,7 @@ class ClientDirectOfferController extends Controller
         $categories  = Category::active()->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
         $selectedPro = $request->query('pro') ? $pros->firstWhere('id', (int) $request->query('pro')) : $pros->first();
         // Default to SSR — a direct offer is normally one service to one pro.
-        $type        = in_array($request->query('type'), ['SSR', 'MSR', 'ESR'], true) ? $request->query('type') : 'SSR';
+        $type        = in_array($request->query('type'), ['SSR', 'MSR'], true) ? $request->query('type') : 'SSR';
 
         return view('client.direct-offers.create', compact('pros', 'categories', 'selectedPro', 'type'));
     }
@@ -59,7 +58,7 @@ class ClientDirectOfferController extends Controller
             'services.*'      => ['integer', 'exists:categories,id'],
             'service_single'  => ['nullable', 'string', 'max:120'],
             'budget_min'      => ['nullable', 'integer', 'min:0'],
-            'request_type'    => ['nullable', 'in:SSR,MSR,ESR'],
+            'request_type'    => ['nullable', 'in:SSR,MSR'],
         ]);
 
         $user = $request->user();

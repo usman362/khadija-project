@@ -30,7 +30,7 @@
     .fg-media { position: relative; background: var(--bg-card-hover, var(--border-color)); }
     .fg-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .fg-type { position: absolute; left: 8px; top: 8px; font-size: 10px; font-weight: 800; letter-spacing: .3px; padding: 3px 9px; border-radius: 6px; color: #fff !important; }
-    .fg-type.ESR { background: #e11d48; } .fg-type.SSR { background: #2563eb; } .fg-type.MSR { background: #7c3aed; }
+    .fg-type.ER { background: #e11d48; } .fg-type.SSR { background: #2563eb; } .fg-type.MSR { background: #7c3aed; }
 
     .fg-main { padding: 14px 16px; display: flex; flex-direction: column; min-width: 0; }
     .fg-top { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; }
@@ -106,7 +106,7 @@
     <div class="fg-bar">
         <div class="fg-tabs">
             <a href="{{ route('client.find-gigs.index', array_merge(request()->except(['type','page']), [])) }}" class="fg-tab {{ $f['type'] === '' ? 'on' : '' }}">All Packages <span class="n">{{ $counts['all'] }}</span></a>
-            <a href="{{ route('client.find-gigs.index', array_merge(request()->except('page'), ['type' => 'ESR'])) }}" class="fg-tab {{ $f['type'] === 'ESR' ? 'on' : '' }}">🔥 ESR <span class="sub">(Emergency Service Request)</span> <span class="n">{{ $counts['ESR'] }}</span></a>
+            <a href="{{ route('client.find-gigs.index', array_merge(request()->except('page'), ['type' => 'ER'])) }}" class="fg-tab {{ $f['type'] === 'ER' ? 'on' : '' }}">🔥 ER <span class="sub">(Emergency Request)</span> <span class="n">{{ $counts['ER'] }}</span></a>
             <a href="{{ route('client.find-gigs.index', array_merge(request()->except('page'), ['type' => 'SSR'])) }}" class="fg-tab {{ $f['type'] === 'SSR' ? 'on' : '' }}">SSR <span class="sub">(Single Service Request)</span> <span class="n">{{ $counts['SSR'] }}</span></a>
             <a href="{{ route('client.find-gigs.index', array_merge(request()->except('page'), ['type' => 'MSR'])) }}" class="fg-tab {{ $f['type'] === 'MSR' ? 'on' : '' }}">MSR <span class="sub">(Multi-Service Request)</span> <span class="n">{{ $counts['MSR'] }}</span></a>
         </div>
@@ -149,7 +149,7 @@
                         </div>
                         <div class="fg-tags">
                             <span class="fg-tagx">{{ $g['cat'] }}</span>
-                            <span class="fg-tagx">{{ $g['type'] === 'MSR' ? 'Multi-Service' : ($g['type'] === 'ESR' ? 'Emergency' : 'Single Service') }}</span>
+                            <span class="fg-tagx">{{ $g['type'] === 'MSR' ? 'Multi-Service' : ($g['type'] === 'ER' ? 'Emergency' : 'Single Service') }}</span>
                         </div>
                     </div>
 
@@ -202,7 +202,7 @@
                         <option value="">All Types</option>
                         <option value="SSR" @selected($f['type']==='SSR')>SSR — Single Service Request</option>
                         <option value="MSR" @selected($f['type']==='MSR')>MSR — Multi-Service Request</option>
-                        <option value="ESR" @selected($f['type']==='ESR')>ESR — Emergency Service Request</option>
+                        <option value="ER" @selected($f['type']==='ER')>ER — Emergency Request</option>
                     </select>
                 </div>
                 <div class="fg-frow">

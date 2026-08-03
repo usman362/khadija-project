@@ -36,9 +36,9 @@
 
         /* Request type + scope chips */
         .ev-type { font-size: 11px; font-weight: 800; border-radius: 6px; padding: 3px 9px; letter-spacing: .3px; }
-        .ev-type-BSR { background: rgba(37,99,235,.13); color: var(--info-text); }
-        .ev-type-ESR { background: rgba(220,38,38,.13); color: var(--bad-text); }
-        .ev-type-DSR { background: rgba(124,58,237,.13); color: var(--accent-text); }
+        .ev-type-BR { background: rgba(37,99,235,.13); color: var(--info-text); }
+        .ev-type-ER { background: rgba(220,38,38,.13); color: var(--bad-text); }
+        .ev-type-DR { background: rgba(124,58,237,.13); color: var(--accent-text); }
         .ev-scope { font-size: 11px; font-weight: 700; border-radius: 6px; padding: 3px 9px; background: var(--bg-subtle, rgba(0,0,0,.04)); color: var(--text-secondary); border: 1px solid var(--border-color); }
 
         /* Tabs */
@@ -97,7 +97,7 @@
                         <span class="cl-badge cl-badge-{{ $event->status }}">{{ ucfirst(str_replace('_', ' ', $event->status)) }}</span>
                     @endif
                     {{-- Request TYPE and SCOPE, the same model the professional board
-                         uses: BSR is broadcast bidding, ESR is that with urgency, DSR
+                         uses: BR is broadcast bidding, ER is that with urgency, DR
                          targets one professional. SSR/MSR is the service count. --}}
                     <span class="ev-type ev-type-{{ $type }}">{{ $type }}</span>
                     <span class="ev-scope">{{ $scope }} · {{ $scope === 'MSR' ? 'multi-service' : 'single service' }}</span>
@@ -361,7 +361,7 @@
         <div class="cl-card">
             <h3 style="font-size:16px;font-weight:600;margin-bottom:14px;">What you asked for</h3>
             <div class="ev-req">
-                <div class="ev-req-row"><span>Request type</span><b>{{ $type }} — {{ $type === 'BSR' ? 'open to bidding' : ($type === 'ESR' ? 'emergency, open to bidding' : 'direct to one professional') }}</b></div>
+                <div class="ev-req-row"><span>Request type</span><b>{{ $type }} — {{ $type === 'BR' ? 'open to bidding' : ($type === 'ER' ? 'emergency, open to bidding' : 'direct to one professional') }}</b></div>
                 <div class="ev-req-row"><span>Scope</span><b>{{ $scope }} — {{ $scope === 'MSR' ? 'multi-service' : 'single service' }}</b></div>
                 <div class="ev-req-row"><span>Services requested</span><b>{{ $event->categories->pluck('name')->implode(', ') ?: '—' }}</b></div>
                 <div class="ev-req-row"><span>Event date</span><b>{{ $event->starts_at?->format('M j, Y · g:i A') ?? 'Flexible' }}</b></div>
@@ -425,7 +425,7 @@
             @empty
                 <div class="ev-empty">
                     <b>No proposals yet</b>
-                    <p>{{ $type === 'DSR' ? 'The professional you sent this to has not responded yet.' : 'Professionals are being notified. Proposals appear here as they come in.' }}</p>
+                    <p>{{ $type === 'DR' ? 'The professional you sent this to has not responded yet.' : 'Professionals are being notified. Proposals appear here as they come in.' }}</p>
                 </div>
             @endforelse
         </div>

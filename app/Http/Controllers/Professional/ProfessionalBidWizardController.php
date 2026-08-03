@@ -86,7 +86,7 @@ class ProfessionalBidWizardController extends Controller
             'steps'     => self::STEPS,
             'data'      => $data,
             'existing'  => $existing,
-            'type'      => match ($event->source) { 'esr' => 'ESR', 'direct_offer' => 'DSR', default => 'BSR' },
+            'type'      => match ($event->source) { 'esr' => 'ER', 'direct_offer' => 'DR', default => 'BR' },
             'scope'     => $event->categories->count() >= 2 ? 'MSR' : 'SSR',
             'rate'      => $rate,
             'net'       => $amount > 0 ? Commission::netOf($amount, $user) : null,

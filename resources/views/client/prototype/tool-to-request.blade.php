@@ -168,10 +168,10 @@
             <div class="pt-panel">
                 <p style="margin:0;font-size:13.5px;color:var(--text-secondary);line-height:1.6;">
                     Design only — not built, and not in the first pass. It would work the same
-                    way as “Post as BSR”: the tool's output opens
+                    way as “Post as BR”: the tool's output opens
                     {{ $outcomeKey === 'esr' ? 'the rush request' : ($outcomeKey === 'dsr' ? 'the direct offer' : 'a saved draft') }}
                     with the fields it already knows filled in.
-                    Worth deciding after the BSR handoff has been used, so the pattern is proven once
+                    Worth deciding after the BR handoff has been used, so the pattern is proven once
                     before it is repeated four times.
                 </p>
             </div>
