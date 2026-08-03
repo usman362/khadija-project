@@ -9,7 +9,9 @@
 
 @push('styles')
 <style>
-    .rc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; }
+    .rc-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; }
+    @media (max-width:1180px) { .rc-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media (max-width:640px)  { .rc-grid { grid-template-columns:1fr; } }
     .rc-card { display:flex; flex-direction:column; gap:10px; background:var(--pe-card); border:1px solid var(--pe-line);
         border-radius:16px; padding:22px; text-decoration:none; color:inherit; position:relative;
         transition:border-color .15s, transform .15s, box-shadow .15s; }
@@ -21,7 +23,7 @@
     .rc-ic svg { width:24px; height:24px; }
     .rc-card h3 { font-size:16px; font-weight:800; margin:0; display:flex; align-items:center; gap:8px; }
     .rc-card p { font-size:13px; color:var(--pe-muted); margin:0; line-height:1.5; }
-    .rc-tag { font-size:10px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; padding:3px 8px;
+    .rc-tag { white-space:nowrap; font-size:10px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; padding:3px 8px;
         border-radius:999px; background:var(--pe-line-2); color:var(--pe-muted); }
     .rc-tag.hot { background:#fff7ed; color:var(--pe-orange-d); }
     .rc-tag.soon { background:#eef2ff; color:#4f46e5; }
@@ -84,8 +86,8 @@
                     'href'  => route('client.virtual-hub.brief'),
                     'tag'   => ['Online', ''],
                     'title' => 'Virtual & Hybrid Hub',
-                    'desc'  => 'Streaming, AV and hybrid production. Post the technical brief and professionals bid on it like any other gig.',
-                    'cta'   => 'Post a virtual brief',
+                    'desc'  => 'Search and connect with verified virtual professionals.',
+                    'cta'   => 'Start a request',
                     'icon'  => '<path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/>',
                 ],
             ];
