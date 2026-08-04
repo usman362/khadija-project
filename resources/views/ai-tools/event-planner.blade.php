@@ -102,9 +102,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Build your own checklist by hand — add each task yourself, no suggested plan.'],
-        'semi'    => ['Help Me Plan', '#f97316', 'instantly drafts a milestone plan and budget split — tweak the amounts before you use it.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and we build the full plan, milestones and budget for you.'],
+        'manual'  => ['Starter', '#64748b', 'Build your own checklist by hand — add each task yourself, no suggested plan.'],
+        'semi'    => ['Semi', '#f97316', 'instantly drafts a milestone plan and budget split — tweak the amounts before you use it.'],
+        'maximum' => ['Maximum', '#16a34a', 'Enter your event and we build the full plan, milestones and budget for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -118,7 +118,7 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — hand-built checklist, no suggestions --}}
+    {{-- Starter — hand-built checklist, no suggestions --}}
     <div class="ep-form-card">
         <h3>🗓 Build My Checklist</h3>
         <div class="sub">Add each task yourself — set a name, priority and due date. Fully yours.</div>
@@ -127,7 +127,7 @@
         <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">Want this plan built for you automatically? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--ep-strong);font-weight:700;text-decoration:none;">Upgrade →</a></div>
     </div>
     @else
-    {{-- Interactive planner (Help Me Plan / Coordinate It For Me) --}}
+    {{-- Interactive planner (Semi / Maximum) --}}
     <div class="ep-form-card">
         <h3>🗓 Plan My Event</h3>
         <div class="sub">{{ $isSemi ? "Enter your details and instantly drafts a plan you can adjust." : "Enter your details and we build the full milestone plan, vendor list and budget split." }}</div>
@@ -332,7 +332,7 @@
 
         const budgetEl = document.getElementById('epBudget');
         if (LEVEL === 'semi') {
-            // Help Me Plan — amounts are editable, with a live running total.
+            // Semi — amounts are editable, with a live running total.
             budgetEl.innerHTML = (res.budget_split || []).map((b, i) => `
                 <div class="ep-bs"><span>${esc(b.category)}</span>
                     <span class="amt">$<input type="number" class="ep-bamt" data-i="${i}" value="${Math.round(b.amount)}" style="width:86px;text-align:right;padding:5px 8px;border:1px solid var(--border-color);border-radius:8px;background:var(--bg-body,var(--bg-card));color:var(--text-primary);font-weight:800;font-family:inherit;font-size:12.5px;"></span>
@@ -345,7 +345,7 @@
             budgetEl.querySelectorAll('.ep-bamt').forEach(inp => inp.addEventListener('input', recalc));
             recalc();
         } else {
-            // Coordinate It For Me — read-only.
+            // Maximum — read-only.
             budgetEl.innerHTML = (res.budget_split || []).map(b => `
                 <div class="ep-bs"><span>${esc(b.category)}</span><span class="amt">${money(b.amount)}</span></div>`).join('');
         }
@@ -355,7 +355,7 @@
     }
 })();
 
-// Do It Myself — hand-built checklist (no AI, no server call).
+// Starter — hand-built checklist (no AI, no server call).
 (function () {
     const rows = document.getElementById('epmRows');
     const add = document.getElementById('epmAdd');

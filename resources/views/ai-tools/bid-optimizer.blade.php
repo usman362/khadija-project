@@ -58,9 +58,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Work out your own bid by hand — enter your bid and cost, see your margin. No suggestions.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'We suggest a bid — adjust the amount and your margin updates before you send it.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter the job details and we compute your best bid, range and win odds.'],
+        'manual'  => ['Starter', '#64748b', 'Work out your own bid by hand — enter your bid and cost, see your margin. No suggestions.'],
+        'semi'    => ['Semi', '#2563eb', 'We suggest a bid — adjust the amount and your margin updates before you send it.'],
+        'maximum' => ['Maximum', '#16a34a', 'Enter the job details and we compute your best bid, range and win odds.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -74,7 +74,7 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — plain margin worksheet, no suggestions --}}
+    {{-- Starter — plain margin worksheet, no suggestions --}}
     <div class="bo-tool">
         <h3>🧮 Work Out My Bid</h3>
         <div class="sub">Enter the bid you're considering and your own cost — we will show the margin. Just the math.</div>
@@ -89,7 +89,7 @@
         <div style="margin-top:14px;font-size:12px;color:var(--text-muted);">Want us to suggest the winning bid + win probability? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--bo,#2563eb);font-weight:700;text-decoration:none;">Upgrade →</a></div>
     </div>
     @else
-    {{-- Interactive bid optimizer (Help Me Plan / Coordinate It For Me) --}}
+    {{-- Interactive bid optimizer (Semi / Maximum) --}}
     <div class="bo-tool">
         <h3>⚡ Optimize a Bid</h3>
         <div class="sub">{{ $isSemi ? 'Enter the job details — we suggest a bid you can adjust before sending.' : 'Enter the job details and get an estimated bid, range and win probability. Results are estimates to guide your decision.' }}</div>
@@ -212,7 +212,7 @@
         const boBid = document.getElementById('boBid');
         const boMeta = document.getElementById('boMeta');
         if (LEVEL === 'semi') {
-            // Help Me Plan — the suggested bid is editable; margin recomputes live.
+            // Semi — the suggested bid is editable; margin recomputes live.
             const base = parseFloat(form.your_base_price.value) || 0;
             boBid.innerHTML = '$<input id="boEditBid" type="number" min="0" step="1" value="' + Math.round(res.suggested_bid) + '" style="width:160px;font-size:28px;font-weight:800;border:1px solid var(--border-color);border-radius:8px;padding:2px 10px;background:var(--bg-card);color:var(--text-primary);font-family:inherit;">';
             const recompute = () => {
@@ -223,7 +223,7 @@
             document.getElementById('boEditBid').addEventListener('input', recompute);
             recompute();
         } else {
-            // Coordinate It For Me — read-only.
+            // Maximum — read-only.
             boBid.textContent = '$' + fmt(res.suggested_bid);
             boMeta.textContent =
                 'Range $' + fmt(res.bid_range.low) + '–$' + fmt(res.bid_range.high) +
@@ -241,7 +241,7 @@
     function fmt(n) { return Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 }); }
 })();
 
-// Do It Myself — plain margin worksheet (no AI, no server call).
+// Starter — plain margin worksheet (no AI, no server call).
 (function () {
     const bidEl = document.getElementById('bomBid');
     const costEl = document.getElementById('bomCost');

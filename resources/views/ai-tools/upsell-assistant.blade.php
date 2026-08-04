@@ -63,9 +63,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Build your own add-on list by hand — add each extra and price, see the total. No suggestions.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'We suggest add-ons and a bundle — tweak the prices and the totals update.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'We spot the add-ons, bundle them, write the pitch and shows the full picture.'],
+        'manual'  => ['Starter', '#64748b', 'Build your own add-on list by hand — add each extra and price, see the total. No suggestions.'],
+        'semi'    => ['Semi', '#2563eb', 'We suggest add-ons and a bundle — tweak the prices and the totals update.'],
+        'maximum' => ['Maximum', '#16a34a', 'We spot the add-ons, bundle them, write the pitch and shows the full picture.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -79,7 +79,7 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — hand-built add-on list, no suggestions --}}
+    {{-- Starter — hand-built add-on list, no suggestions --}}
     <div class="us-tool">
         <h3>➕ Build My Add-on List</h3>
         <p class="desc">Add each upsell you want to offer and its price — we will total the extra revenue. No suggestions.</p>
@@ -89,7 +89,7 @@
         <div style="margin-top:12px;font-size:12px;color:var(--text-muted);">Want us to find the best add-ons + write the pitch for you? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--us);font-weight:700;text-decoration:none;">Upgrade →</a></div>
     </div>
     @else
-    {{-- Interactive upsell finder (Help Me Plan / Coordinate It For Me) --}}
+    {{-- Interactive upsell finder (Semi / Maximum) --}}
     <div class="us-tool">
         <h3>🔍 Upsell Finder</h3>
         <p class="desc">{{ $isSemi ? 'Enter a booked service, event type and package price — we suggest add-ons and a bundle you can edit before sending.' : 'Enter a booked service, event type and package price to get relevant add-on suggestions, a bundle and a message you can send. Prices are estimates you can adjust.' }}</p>
@@ -135,7 +135,7 @@
     @endif
 
     @if($isMax)
-    {{-- Coordinate It For Me — full picture (stats + current booking + suggested add-ons) --}}
+    {{-- Maximum — full picture (stats + current booking + suggested add-ons) --}}
     <div class="us-stats">@foreach($stats as [$lbl, $val, $tone])<div class="us-stat {{ $tone }}"><b>{{ $val }}</b><div class="l">{{ $lbl }}</div></div>@endforeach</div>
     <div class="us-grid">
         <div class="us-card">
@@ -244,7 +244,7 @@
         document.getElementById('usBundleName').textContent   = b.name || 'Bundle';
         document.getElementById('usScript').textContent       = x.script || '';
 
-        // Help Me Plan — prices are editable; the bundle recomputes live (top 3, 12% off).
+        // Semi — prices are editable; the bundle recomputes live (top 3, 12% off).
         function paintBundle(price, saves, uplift) {
             document.getElementById('usBundlePrice').textContent  = '$' + fmt(price);
             document.getElementById('usBundleSave').textContent   = saves ? ('saves $' + fmt(saves)) : '';
@@ -270,7 +270,7 @@
     function esc(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
 })();
 
-// Do It Myself — hand-built add-on list (no AI, no server call).
+// Starter — hand-built add-on list (no AI, no server call).
 (function () {
     const rows = document.getElementById('usmRows');
     const add = document.getElementById('usmAdd');

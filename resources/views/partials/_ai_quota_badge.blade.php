@@ -24,8 +24,8 @@
     </div>
 @elseif($unlimited)
     {{-- Intentionally no badge. Peter: stop marketing the tool as simply
-         "Unlimited" — the AI level banner (Do It Myself / Help Me Plan /
-         Coordinate It For Me) already states the user's entitlement, so a
+         "Unlimited" — the level banner (Starter / Semi / Maximum) already
+         states the user's entitlement, so a
          second "Unlimited on your plan" pill was redundant. --}}
 @elseif($remaining <= 0)
     <div style="display:inline-flex; align-items:center; gap:7px; padding:6px 14px; margin-bottom:18px; border-radius:999px; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#ef4444; font-size:12.5px; font-weight:700;">

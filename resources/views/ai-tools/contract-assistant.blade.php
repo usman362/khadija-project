@@ -27,13 +27,13 @@
     .ca-err { display: none; font-size: 12.5px; color: #dc2626; background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.3); border-radius: 9px; padding: 10px; margin-bottom: 12px; }
     .ca-err.on { display: block; }
 
-    /* Help Me Plan — editable draft fields */
+    /* Semi — editable draft fields */
     .ca-edit { width: 100%; border: 1px solid var(--border-color); border-radius: 9px; padding: 9px 11px; font-size: 12.5px; color: var(--text-primary); background: var(--bg-body, var(--bg-card)); font-family: inherit; margin-bottom: 10px; }
     .ca-edit:focus { outline: none; border-color: var(--ca); box-shadow: 0 0 0 3px rgba(124,58,237,.15); }
     .ca-edit-h { font-weight: 800; }
     textarea.ca-edit { line-height: 1.55; resize: vertical; }
 
-    /* Do It Myself — hand-built agreement builder */
+    /* Starter — hand-built agreement builder */
     .ca-crow { border: 1px solid var(--border-color); border-radius: 11px; padding: 12px; margin-bottom: 12px; position: relative; }
     .ca-crow .ca-del { position: absolute; top: 10px; right: 10px; border: none; background: rgba(220,38,38,.1); color: #dc2626; border-radius: 8px; width: 30px; height: 30px; cursor: pointer; font-size: 16px; }
     .ca-crow-h { padding-right: 44px; }
@@ -48,9 +48,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Assemble your own draft by hand — add, edit and remove your own clauses. No suggestions.'],
-        'semi'    => ['Help Me Plan', '#7c3aed', 'instantly drafts the agreement — reword any clause before you use it.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your details and instantly drafts the full agreement for you.'],
+        'manual'  => ['Starter', '#64748b', 'Assemble your own draft by hand — add, edit and remove your own clauses. No suggestions.'],
+        'semi'    => ['Semi', '#7c3aed', 'instantly drafts the agreement — reword any clause before you use it.'],
+        'maximum' => ['Maximum', '#16a34a', 'Enter your details and instantly drafts the full agreement for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -64,7 +64,7 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — hand-built agreement, no suggestions --}}
+    {{-- Starter — hand-built agreement, no suggestions --}}
     <div class="ca-card ca-mano">
         <h3>📝 Build My Agreement</h3>
         <div style="font-size:12.5px;color:var(--text-muted);margin:-6px 0 14px;">Assemble your own draft by hand — add, edit and remove clauses. No suggestions.</div>
@@ -179,8 +179,8 @@
     });
 
     function render(res) {
-        // "Help Me Plan" renders the title, summary and every clause as editable
-        // fields the user can reword; "Coordinate It For Me" is read-only.
+        // "Semi" renders the title, summary and every clause as editable
+        // fields the user can reword; "Maximum" is read-only.
         const editable = LEVEL === 'semi';
         titleEl.textContent = '📝 ' + (res.title || 'Draft Agreement');
         let html = '';
@@ -207,7 +207,7 @@
     }
 })();
 
-// Do It Myself — hand-built agreement builder (no AI, no server call).
+// Starter — hand-built agreement builder (no AI, no server call).
 (function () {
     const wrap = document.getElementById('camClauses');
     const add  = document.getElementById('camAdd');

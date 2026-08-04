@@ -79,7 +79,7 @@
     .cg-tf-item { display: flex; align-items: center; gap: 11px; padding: 10px 16px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--text-primary); }
     .cg-tf-item:last-child { border-bottom: none; }
     .cg-tf-item .box { width: 17px; height: 17px; border-radius: 5px; border: 2px solid var(--border-color); flex-shrink: 0; }
-    /* Help Me Plan — editable task input */
+    /* Semi — editable task input */
     .cg-edit { flex: 1; min-width: 0; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-body, var(--bg-card)); color: var(--text-primary); font-size: 13px; font-family: inherit; }
     .cg-edit:focus { outline: none; border-color: var(--cg); box-shadow: 0 0 0 3px rgba(22,163,74,.14); }
     @media (max-width: 700px) { .cg-form-grid { grid-template-columns: 1fr; } }
@@ -91,9 +91,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Build your checklist by hand — add each task yourself, no suggested plan.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'instantly drafts a milestone checklist — reword any task before you use it.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and we build the full milestone checklist for you.'],
+        'manual'  => ['Starter', '#64748b', 'Build your checklist by hand — add each task yourself, no suggested plan.'],
+        'semi'    => ['Semi', '#2563eb', 'instantly drafts a milestone checklist — reword any task before you use it.'],
+        'maximum' => ['Maximum', '#16a34a', 'Enter your event and we build the full milestone checklist for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -107,7 +107,7 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — hand-built checklist, no suggestions --}}
+    {{-- Starter — hand-built checklist, no suggestions --}}
     <div class="cg-gen">
         <h3>🧩 Build My Checklist</h3>
         <div class="sub">Add each task yourself — name it, pick a timeframe and a due date. Fully yours.</div>
@@ -117,7 +117,7 @@
     </div>
     @else
     @php $pct = round($budget['spent'] / $budget['total'] * 100); @endphp
-    {{-- Generator (Help Me Plan / Coordinate It For Me) --}}
+    {{-- Generator (Semi / Maximum) --}}
     <div class="cg-gen">
         <h3>🧩 Generate Your Checklist</h3>
         <div class="sub">{{ $isSemi ? 'Enter your event details and instantly drafts a milestone checklist you can reword.' : 'Enter your event details and we build the full milestone checklist with estimated due dates.' }}</div>
@@ -287,8 +287,8 @@
         wrap.innerHTML = '';
         (res.groups || []).forEach(function (g) {
             const items = (g.items || []).map(function (it) {
-                // Help Me Plan (semi) → each task is an editable input the client
-                // can reword; Coordinate It For Me (maximum) → read-only text.
+                // Semi (semi) → each task is an editable input the client
+                // can reword; Maximum (maximum) → read-only text.
                 if (LEVEL === 'semi') {
                     return '<div class="cg-tf-item"><span class="box"></span>' +
                         '<input type="text" class="cg-edit" value="' + esc(it) + '"></div>';
@@ -313,7 +313,7 @@
     }
 })();
 
-// Do It Myself — hand-built checklist (no AI, no server call).
+// Starter — hand-built checklist (no AI, no server call).
 (function () {
     const rows = document.getElementById('cgmRows');
     const add  = document.getElementById('cgmAdd');

@@ -14,9 +14,9 @@
     $isMax    = $level === 'maximum';
     $isLocked = $level === 'none';
     $lvlMeta  = [
-        'manual'  => ['Do It Myself', '#64748b', 'You build packages by hand — templates & structure, no suggestions.'],
-        'semi'    => ['Help Me Plan', 'var(--brand-strong, #2563eb)', 'We suggest prices, descriptions and add-ons — you review and approve.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter a service and we generate the whole tiered package.'],
+        'manual'  => ['Starter', '#64748b', 'You build packages by hand — templates & structure, no suggestions.'],
+        'semi'    => ['Semi', 'var(--brand-strong, #2563eb)', 'We suggest prices, descriptions and add-ons — you review and approve.'],
+        'maximum' => ['Maximum', '#16a34a', 'Enter a service and we generate the whole tiered package.'],
         'none'    => ['Locked', '#ef4444', 'This tool is currently unavailable.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['manual'];

@@ -34,9 +34,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Browse the event phrasebook yourself — look up phrases by hand, no auto-translate.'],
-        'semi'    => ['Help Me Plan', '#7c3aed', 'We suggest a translation — edit the wording before you use it.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Type a phrase and we translate it for you automatically.'],
+        'manual'  => ['Starter', '#64748b', 'Browse the event phrasebook yourself — look up phrases by hand, no auto-translate.'],
+        'semi'    => ['Semi', '#7c3aed', 'We suggest a translation — edit the wording before you use it.'],
+        'maximum' => ['Maximum', '#16a34a', 'Type a phrase and we translate it for you automatically.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -52,7 +52,7 @@
     <div class="tr-stats">@foreach($stats as [$lbl, $val, $tone])<div class="tr-stat {{ $tone }}"><b>{{ $val }}</b><div class="l">{{ $lbl }}</div></div>@endforeach</div>
 
     @if($isManual)
-    {{-- Do It Myself — browse the phrasebook by hand, no auto-translate --}}
+    {{-- Starter — browse the phrasebook by hand, no auto-translate --}}
     <div class="tr-card">
         <h3>📖 Event Phrasebook</h3>
         <div class="det">Pick a language and browse the common booking phrases yourself.</div>
@@ -71,7 +71,7 @@
         </div>
     </div>
     @else
-    {{-- Help Me Plan / Coordinate It For Me — the translator --}}
+    {{-- Semi / Maximum — the translator --}}
     <div class="tr-grid">
         <div class="tr-card">
             <h3>🌐 Phrase to translate</h3>
@@ -157,7 +157,7 @@
     function render(res) {
         det.textContent = res.target_language + (res.matched ? ' · phrasebook match' : ' · no exact match');
         let html = '<div class="tr-tag">' + (LEVEL === 'semi' ? 'SUGGESTED — EDIT AS NEEDED' : (res.matched ? 'TRANSLATED' : 'NOTE')) + '</div>';
-        // Help Me Plan: the translation is editable; Coordinate It For Me: read-only.
+        // Semi: the translation is editable; Maximum: read-only.
         if (LEVEL === 'semi') {
             html += '<textarea class="tr-text tr-out" id="trEdit" style="min-height:80px;">' + esc(res.translation) + '</textarea>';
         } else {
@@ -175,7 +175,7 @@
     }
 })();
 
-// Do It Myself — browse the phrasebook by hand (no compute call).
+// Starter — browse the phrasebook by hand (no compute call).
 (function () {
     const langs = document.getElementById('trmLangs');
     const list = document.getElementById('trmList');

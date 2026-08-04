@@ -72,9 +72,9 @@ class AiVendorMatchmakingController extends Controller
             $all = array_merge($all, $this->rank($kw, 'all', $event['budget'], 80));
         }
 
-        // Level drives the experience: Do It Myself (browse the directory and
-        // pick), Help Me Plan (AI ranks, you refine), Coordinate It For Me (AI
-        // auto-picks the team, read-only). Admins can preview any level.
+        // Level drives the experience: Starter (browse the directory and
+        // pick), Semi (ranked by the scoring rules, you refine), Maximum (the
+        // rules pick the team for you, read-only). Admins can preview any level.
         $level = AiAccess::level($request->user(), 'vendor-matchmaking');
         if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {
             $level = $request->query('preview');
@@ -208,7 +208,7 @@ class AiVendorMatchmakingController extends Controller
     }
 
     /**
-     * The full vendor catalogue formatted for manual (Do It Myself) browsing —
+     * The full vendor catalogue formatted for Starter-level browsing —
      * no match score, no "why matched": the client filters and picks for
      * themselves. Carries the fields the directory cards + client-side filter
      * need (category + price power the on-page filtering).

@@ -63,7 +63,7 @@
     .ta-list { margin: 0; padding-left: 18px; }
     .ta-list li { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 5px; }
 
-    /* Help Me Plan — editable suggestion fields */
+    /* Semi — editable suggestion fields */
     .ta-edit { padding: 7px 10px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-body, var(--bg-card)); color: var(--text-primary); font-size: 13px; font-family: inherit; }
     .ta-edit:focus { outline: none; border-color: var(--ta); box-shadow: 0 0 0 3px rgba(124,58,237,.15); }
     .ta-pal-info .ta-edit-name { width: 100%; font-weight: 800; margin-bottom: 5px; }
@@ -73,7 +73,7 @@
     .ta-list-edit li { margin-bottom: 8px; }
     .ta-list-edit .ta-edit { width: 100%; }
 
-    /* Do It Myself — hand-built style board */
+    /* Starter — hand-built style board */
     .ta-mano h4 { font-size: 13px; font-weight: 800; color: var(--text-primary); margin: 16px 0 10px; }
     .ta-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 9px; }
     .ta-row input[type="color"] { width: 42px; height: 38px; padding: 2px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-body, var(--bg-card)); cursor: pointer; flex: 0 0 auto; }
@@ -92,9 +92,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Pick your own theme, colours and style ideas and assemble your board by hand — no suggestions.'],
-        'semi'    => ['Help Me Plan', '#7c3aed', 'We suggest a palette, mood and décor — reword or swap any item before you use it.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and we build the full palette, mood board and styling for you.'],
+        'manual'  => ['Starter', '#64748b', 'Pick your own theme, colours and style ideas and assemble your board by hand — no suggestions.'],
+        'semi'    => ['Semi', '#7c3aed', 'We suggest a palette, mood and décor — reword or swap any item before you use it.'],
+        'maximum' => ['Maximum', '#16a34a', 'Enter your event and we build the full palette, mood board and styling for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -108,7 +108,7 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — hand-built style board, no suggestions --}}
+    {{-- Starter — hand-built style board, no suggestions --}}
     <div class="ta-sec ta-mano">
         <h3>🎨 Build My Style Board</h3>
         <div class="ta-field" style="margin-bottom:12px;">
@@ -132,7 +132,7 @@
         <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">Want a palette, mood board and styling suggested for you? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--ta-strong);font-weight:700;text-decoration:none;">Upgrade →</a></div>
     </div>
     @else
-    {{-- Advisor form (Help Me Plan / Coordinate It For Me) --}}
+    {{-- Advisor form (Semi / Maximum) --}}
     <div class="ta-sec">
         <h3>🎯 Build Your Palette</h3>
         <div style="font-size:12.5px;color:var(--text-muted);margin:-6px 0 14px;">{{ $isSemi ? 'We suggest a palette and styling you can reword or swap before using.' : 'We build a full palette, mood and décor plan from your details.' }}</div>
@@ -309,8 +309,8 @@
 
     function render(res) {
         document.getElementById('taSummary').textContent = res.summary || '';
-        // "Help Me Plan" renders every suggestion as an editable field the user
-        // can reword or swap; "Coordinate It For Me" is read-only.
+        // "Semi" renders every suggestion as an editable field the user
+        // can reword or swap; "Maximum" is read-only.
         const editable = LEVEL === 'semi';
 
         const paletteEl = document.getElementById('taPalette');
@@ -368,7 +368,7 @@
     }
 })();
 
-// Do It Myself — hand-built style board (no AI, no server call).
+// Starter — hand-built style board (no AI, no server call).
 (function () {
     const swWrap   = document.getElementById('tamSwatches');
     const addSw    = document.getElementById('tamAddSw');

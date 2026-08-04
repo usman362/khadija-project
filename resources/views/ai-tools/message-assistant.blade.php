@@ -37,9 +37,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Write your own message by hand — by hand, just your words.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'instantly drafts message options — edit the wording before you send.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Pick a purpose and tone and instantly writes the whole message for you.'],
+        'manual'  => ['Starter', '#64748b', 'Write your own message by hand — by hand, just your words.'],
+        'semi'    => ['Semi', '#2563eb', 'instantly drafts message options — edit the wording before you send.'],
+        'maximum' => ['Maximum', '#16a34a', 'Pick a purpose and tone and instantly writes the whole message for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -82,7 +82,7 @@
             </form>
         </div>
         @if($isManual)
-        {{-- Do It Myself — write your own message by hand --}}
+        {{-- Starter — write your own message by hand --}}
         <div class="ma-card">
             <h3>✉️ Your Message</h3>
             <label class="ma-lbl">Subject</label>
@@ -128,7 +128,7 @@
 
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
-        if (LEVEL === 'manual' || !btn) return;   // Do It Myself has no suggestions draft
+        if (LEVEL === 'manual' || !btn) return;   // Starter has no suggestions draft
         err.classList.remove('on');
         btn.disabled = true;
         out.innerHTML = '<p class="ma-empty">Drafting your message…</p>';
@@ -187,7 +187,7 @@
     }
 })();
 
-// Do It Myself — copy the hand-written message (no AI, no server call).
+// Starter — copy the hand-written message (no AI, no server call).
 (function () {
     const copyBtn = document.getElementById('mamCopy');
     if (!copyBtn) return;

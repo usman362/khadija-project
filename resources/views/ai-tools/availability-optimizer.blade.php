@@ -91,9 +91,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Work out your own weekly capacity and open slots — just the math, no suggestions.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'Enter your pattern — we estimate utilization and suggest how to optimize it.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'We read your pattern, optimize availability and fill your calendar plan for you.'],
+        'manual'  => ['Starter', '#64748b', 'Work out your own weekly capacity and open slots — just the math, no suggestions.'],
+        'semi'    => ['Semi', '#2563eb', 'Enter your pattern — we estimate utilization and suggest how to optimize it.'],
+        'maximum' => ['Maximum', '#16a34a', 'We read your pattern, optimize availability and fill your calendar plan for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -152,7 +152,7 @@
     </div>
 
     @if($isMax)
-    {{-- Coordinate It For Me — full auto dashboard (calendar + opportunities + forecast) --}}
+    {{-- Maximum — full auto dashboard (calendar + opportunities + forecast) --}}
     {{-- Stat tiles --}}
     <div class="ao-stats">
         @foreach($stats as [$lbl, $val, $sub, $tone])
@@ -241,7 +241,7 @@
 
         const payload = Object.fromEntries(new FormData(form).entries());
 
-        // Do It Myself — pure client-side math, no suggestions suggestions, no server call.
+        // Starter — pure client-side math, no suggestions suggestions, no server call.
         if (LEVEL === 'manual') {
             load.classList.remove('on');
             run.disabled = false;
@@ -290,7 +290,7 @@
         }
     });
 
-    // Client-side capacity math mirroring the server (Do It Myself — no suggestions advice).
+    // Client-side capacity math mirroring the server (Starter — no suggestions advice).
     function computeLocal(p) {
         const wd = parseFloat(p.working_days), hpd = parseFloat(p.hours_per_day);
         const gig = parseFloat(p.avg_gig_hours), bk = parseFloat(p.current_bookings_per_week);

@@ -68,7 +68,7 @@
     .gc-gen-btn:disabled { opacity: .6; cursor: not-allowed; }
     .gc-err { display: none; margin-top: 12px; padding: 10px 14px; background: rgba(220,38,38,.1); border: 1px solid rgba(220,38,38,.3); color: #dc2626; border-radius: 10px; font-size: 12.5px; }
     .gc-err.on { display: block; }
-    /* Help Me Plan — editable capacity figure inside a stat card */
+    /* Semi — editable capacity figure inside a stat card */
     .gc-edit { width: 100%; max-width: 130px; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-body, var(--bg-card)); color: var(--text-primary); font-size: 22px; font-weight: 800; font-family: inherit; }
     .gc-edit:focus { outline: none; border-color: var(--gc); box-shadow: 0 0 0 3px rgba(14,165,233,.15); }
     .gc-mano { margin-top: 4px; }
@@ -82,9 +82,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Enter your own room size, guests and space-per-guest — the math runs right here.'],
-        'semi'    => ['Help Me Plan', '#0ea5e9', 'We estimate your capacity — adjust the comfort and legal figures and the score updates live.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your space and we work out comfort, legal capacity and flow for you.'],
+        'manual'  => ['Starter', '#64748b', 'Enter your own room size, guests and space-per-guest — the math runs right here.'],
+        'semi'    => ['Semi', '#0ea5e9', 'We estimate your capacity — adjust the comfort and legal figures and the score updates live.'],
+        'maximum' => ['Maximum', '#16a34a', 'Enter your space and we work out comfort, legal capacity and flow for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -98,7 +98,7 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — hand-built capacity calculator, no AI, computed client-side --}}
+    {{-- Starter — hand-built capacity calculator, no AI, computed client-side --}}
     <div class="gc-gen">
         <h3>📐 Build My Capacity Estimate</h3>
         <div class="sub">Enter your own numbers and adjust space-per-guest — the math runs right here.</div>
@@ -141,7 +141,7 @@
         </div>
     </div>
     @else
-    {{-- AI planner (Help Me Plan / Coordinate It For Me) --}}
+    {{-- AI planner (Semi / Maximum) --}}
     <div class="gc-gen">
         <h3>📐 Estimate Your Capacity</h3>
         <div class="sub">{{ $isSemi ? 'We estimate comfort and legal capacity — you can adjust the figures and the score recalculates.' : 'Enter your space and guest details and we estimate comfort, legal capacity and flow insights.' }}</div>
@@ -257,7 +257,7 @@
     const LEVEL  = document.querySelector('.gc')?.dataset.level || 'maximum';
 
     // Comfort score from guests vs comfort capacity — mirrors the server formula
-    // so "Help Me Plan" can recompute live when the user edits the figures.
+    // so "Semi" can recompute live when the user edits the figures.
     const state = { expected: 0, comfort: 0, legal: 0 };
     function computeScore(guests, comfort) {
         comfort = Math.max(comfort, 1);
@@ -339,7 +339,7 @@
             : 'You’re about <b style="color:#d97706;">' + Math.abs(room) + ' guests over</b> the comfort estimate — consider a larger space or a different seating style.';
     }
 
-    // Help Me Plan — recompute the score + bar live when a figure is edited.
+    // Semi — recompute the score + bar live when a figure is edited.
     function onSemiEdit() {
         const cEl = document.querySelector('.gc-edit[data-cap="comfort"]');
         const lEl = document.querySelector('.gc-edit[data-cap="legal"]');
@@ -362,7 +362,7 @@
         state.legal    = Number(cap.legal)    || 0;
         const score = res.comfort_score_pct != null ? res.comfort_score_pct : computeScore(state.expected, state.comfort);
 
-        // Stats — in "Help Me Plan" the comfort + legal figures are editable.
+        // Stats — in "Semi" the comfort + legal figures are editable.
         const stats = document.getElementById('gcStats');
         if (LEVEL === 'semi') {
             stats.innerHTML =
@@ -400,7 +400,7 @@
     }
 })();
 
-// Do It Myself — hand-built capacity calculator (no AI, no server call).
+// Starter — hand-built capacity calculator (no AI, no server call).
 (function () {
     const sqftEl   = document.getElementById('gcmSqft');
     const layoutEl = document.getElementById('gcmLayout');

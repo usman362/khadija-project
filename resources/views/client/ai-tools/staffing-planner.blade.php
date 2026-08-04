@@ -131,9 +131,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Build your own staff roster by hand — add each role yourself, no suggested plan.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'We suggest a roster — adjust the event and staff counts, then regenerate.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and we build the whole staffing plan for you.'],
+        'manual'  => ['Starter', '#64748b', 'Build your own staff roster by hand — add each role yourself, no suggested plan.'],
+        'semi'    => ['Semi', '#2563eb', 'We suggest a roster — adjust the event and staff counts, then regenerate.'],
+        'maximum' => ['Maximum', '#16a34a', 'Enter your event and we build the whole staffing plan for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -180,7 +180,7 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — build your own roster by hand, no suggestions --}}
+    {{-- Starter — build your own roster by hand, no suggestions --}}
     <div class="sp-card sp-mb">
         <div class="sp-tl-h"><b>🛠 Build My Staff Roster</b><span style="font-size:12.5px;color:var(--text-muted);">Total staff: <b id="spm-total" style="color:var(--sp);">0</b></span></div>
         <div id="spmRows" style="display:flex;flex-direction:column;gap:10px;"></div>
@@ -227,7 +227,7 @@
 
         <div class="sp-allset"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg><span id="sp-allset-txt">All set! Your team, perfectly timed.</span></div>
 
-        {{-- adjust panel (Help Me Plan only — the assistive tune-and-regenerate) --}}
+        {{-- adjust panel (Semi only — the assistive tune-and-regenerate) --}}
         @if($isSemi)
         <div class="sp-adjust open" id="sp-adjust">
             <div class="fld"><label>Event Type</label><select id="sp-in-type">@foreach($eventTypes as $k => $v)<option value="{{ $k }}" @selected($k === $event['type'])>{{ $v }}</option>@endforeach</select></div>
@@ -363,10 +363,10 @@
     $('sp-view-timeline')?.addEventListener('click', function () { $('sp-timeline-view').style.display = ''; $('sp-list-view').style.display = 'none'; this.classList.add('on'); $('sp-view-list').classList.remove('on'); });
     $('sp-view-list')?.addEventListener('click', function () { $('sp-timeline-view').style.display = 'none'; $('sp-list-view').style.display = ''; this.classList.add('on'); $('sp-view-timeline').classList.remove('on'); });
 
-    // Regenerate (Help Me Plan only).
+    // Regenerate (Semi only).
     $('sp-regen')?.addEventListener('click', function () { regenerate(this); });
 
-    // Quick Actions. Adjust panel only exists at the Help Me Plan level.
+    // Quick Actions. Adjust panel only exists at the Semi level.
     function openAdjust() { const el = $('sp-adjust'); if (!el) return; el.classList.add('open'); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
     function csv() {
         const rows = [['Role', 'Staff', 'Start', 'End']].concat(current.roles.map((r) => [r.name, r.count, r.start_label, r.end_label]));
@@ -386,7 +386,7 @@
     $('sp-create')?.addEventListener('click', openAdjust);
 })();
 
-// Do It Myself — hand-built roster (no AI, no server call).
+// Starter — hand-built roster (no AI, no server call).
 (function () {
     const rows = document.getElementById('spmRows');
     const add = document.getElementById('spmAdd');

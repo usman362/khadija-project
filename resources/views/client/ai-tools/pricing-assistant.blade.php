@@ -149,9 +149,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Work out your own price — a manual rate worksheet, no suggestions.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'We suggest a competitive price and market context — you set the final number.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'the tool analyses the market and sets your optimal price automatically.'],
+        'manual'  => ['Starter', '#64748b', 'Work out your own price — a manual rate worksheet, no suggestions.'],
+        'semi'    => ['Semi', '#2563eb', 'We suggest a competitive price and market context — you set the final number.'],
+        'maximum' => ['Maximum', '#16a34a', 'the tool analyses the market and sets your optimal price automatically.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -202,7 +202,7 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — manual rate worksheet, no suggestions --}}
+    {{-- Starter — manual rate worksheet, no suggestions --}}
     <div class="apa-card" style="margin-bottom:20px; max-width:520px;">
         <div class="apa-sec-num">Your Price Worksheet</div>
         <p class="apa-sec-sub">Work out your own quote — enter your rate, hours and any extras.</p>
@@ -397,7 +397,7 @@
 (function () {
     const root = document.querySelector('.apa');
     if (!root) return;
-    if (!document.getElementById('apa-calc')) return; // Do It Myself (manual) — no suggestions form
+    if (!document.getElementById('apa-calc')) return; // Starter (manual) — no suggestions form
     const url = root.dataset.calcUrl;
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
     const $ = (id) => document.getElementById(id);
@@ -473,7 +473,7 @@
     syncLabels();
 })();
 
-// Do It Myself — manual price worksheet (no AI)
+// Starter — manual price worksheet (no AI)
 (function () {
     const rate = document.getElementById('pm-rate');
     if (!rate) return;

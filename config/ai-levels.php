@@ -63,18 +63,24 @@ return [
     ],
 
     // Human labels + short descriptions per level (for badges / tooltips / pricing UI).
-    // Client-facing level names (Peter's "DIY" wording). Internal keys stay
-    // manual/semi/maximum; only the display labels change.
+    // The three tool-package levels, shared by professionals and clients.
+    // Internal keys stay manual/semi/maximum; these are what a user sees.
+    //
+    // Renamed twice by Peter: "Help Me Plan" and "Coordinate It For Me" became
+    // Semi and Maximum, then on 2026-07-21 "Do It Myself" became Starter. The
+    // old wording said a machine did the work for you, which R29 forbids —
+    // every level is rules-based, and the depth is how much the templates and
+    // calculators fill in, not how clever anything is.
     'labels' => [
         'none'    => 'Locked',
-        'manual'  => 'Do It Myself',
-        'semi'    => 'Help Me Plan',
-        'maximum' => 'Coordinate It For Me',
+        'manual'  => 'Starter',
+        'semi'    => 'Semi',
+        'maximum' => 'Maximum',
     ],
     'descriptions' => [
-        'manual'  => 'Do it yourself — templates & frameworks, no AI.',
-        'semi'    => 'AI helps you plan — suggestions & rewrites you approve.',
-        'maximum' => 'AI coordinates it for you — auto-generates the whole thing.',
+        'manual'  => 'Templates and frameworks — you fill them in yourself.',
+        'semi'    => 'The fields you have already answered are filled in for you; you edit the rest.',
+        'maximum' => 'The full draft is prepared from your details, ready for you to review and change.',
     ],
 
     // ── Phase 4: free-beta usage cap ───────────────────────────────────────

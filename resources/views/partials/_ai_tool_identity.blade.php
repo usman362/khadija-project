@@ -1,6 +1,6 @@
 {{-- AI-tool identity strip (Peter): under each AI tool show WHO the user is —
      their name/business, their membership tier (if any), and the AI level they
-     get on this tool (Do It Myself / Help Me Plan / Coordinate It For Me).
+     get on this tool (Starter / Semi / Maximum).
      Self-gating: renders only on the ai-tools/* pages. --}}
 @php
     $aiId_show = request()->is('ai-tools/*') || request()->is('ai-tools');

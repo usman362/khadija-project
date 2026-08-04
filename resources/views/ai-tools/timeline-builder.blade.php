@@ -76,9 +76,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Build your run-of-show by hand — add each time slot yourself, no suggestions.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'We suggest a timeline — edit the times and segments before you save.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your event and we build the entire run-of-show for you.'],
+        'manual'  => ['Starter', '#64748b', 'Build your run-of-show by hand — add each time slot yourself, no suggestions.'],
+        'semi'    => ['Semi', '#2563eb', 'We suggest a timeline — edit the times and segments before you save.'],
+        'maximum' => ['Maximum', '#16a34a', 'Enter your event and we build the entire run-of-show for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -90,7 +90,7 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — hand-built run-of-show, no suggestions --}}
+    {{-- Starter — hand-built run-of-show, no suggestions --}}
     <div class="tb-form-card">
         <h3>🛠 Build My Run-of-Show</h3>
         <div class="sub">Add each slot yourself — set the time and what's happening.</div>
@@ -267,7 +267,7 @@
     }
 })();
 
-// Do It Myself — manual run-of-show builder (no AI)
+// Starter — manual run-of-show builder (no AI)
 (function () {
     const rows = document.getElementById('tbmRows');
     if (!rows) return;

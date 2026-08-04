@@ -92,13 +92,13 @@
     .va-bd .st.tight { background: rgba(217,119,6,.12); color: #d97706; }
     .va-bd .st.over { background: rgba(220,38,38,.12); color: #dc2626; }
 
-    /* Help Me Plan — editable output fields */
+    /* Semi — editable output fields */
     .va-edit { width: 100%; padding: 7px 10px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-body, var(--bg-card)); color: var(--text-primary); font-size: 13px; font-family: inherit; }
     .va-edit:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
     .va-metric .va-edit { max-width: 150px; padding: 4px 8px; font-size: 22px; font-weight: 800; }
     .va-verdict .va-edit { max-width: 340px; font-size: 15px; font-weight: 800; }
 
-    /* Do It Myself — hand-built venue scorecard */
+    /* Starter — hand-built venue scorecard */
     .va-mano h4 { font-size: 13px; font-weight: 800; color: var(--text-primary); margin: 4px 0 12px; }
     .va-frow { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
     .va-frow .fname { flex: 1; min-width: 140px; }
@@ -117,9 +117,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Score the venue factors yourself — we average them into an overall verdict, no suggestions.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'the tool analyses the space — adjust the figures, verdict and notes and utilization recalculates live.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter your space and the tool analyses capacity, fit and gaps for you.'],
+        'manual'  => ['Starter', '#64748b', 'Score the venue factors yourself — we average them into an overall verdict, no suggestions.'],
+        'semi'    => ['Semi', '#2563eb', 'the tool analyses the space — adjust the figures, verdict and notes and utilization recalculates live.'],
+        'maximum' => ['Maximum', '#16a34a', 'Enter your space and the tool analyses capacity, fit and gaps for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -133,7 +133,7 @@
     </div>
 
     @if($isManual)
-    {{-- Do It Myself — hand-built venue scorecard, no AI, computed client-side --}}
+    {{-- Starter — hand-built venue scorecard, no AI, computed client-side --}}
     <div class="va-form-card va-mano">
         <h3>🏛 Score My Venue</h3>
         <div class="sub">Rate each factor yourself — we average them into an overall venue score. No suggestions.</div>
@@ -151,7 +151,7 @@
         <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">Want us to analyse the space, gaps and hidden costs for you? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:#15803d;font-weight:700;text-decoration:none;">Upgrade →</a></div>
     </div>
     @else
-    {{-- Interactive analyzer (Help Me Plan / Coordinate It For Me) --}}
+    {{-- Interactive analyzer (Semi / Maximum) --}}
     <div class="va-form-card">
         <h3>📐 Analyze My Venue Space</h3>
         <div class="sub">{{ $isSemi ? 'We suggest a capacity and space fit you can adjust before using.' : 'Enter the venue size and your guest count and we work out capacity and space fit.' }}</div>
@@ -291,7 +291,7 @@
     const errEl = document.getElementById('vaErr');
     const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     const LEVEL = document.querySelector('.va')?.dataset.level || 'maximum';
-    let lastGuests = 0; // captured from the form so "Help Me Plan" can recompute utilization live
+    let lastGuests = 0; // captured from the form so "Semi" can recompute utilization live
 
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const num = n => Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
@@ -336,8 +336,8 @@
     });
 
     function render(res) {
-        // "Help Me Plan" renders the key figures/verdict/notes as editable fields
-        // and recomputes utilization live; "Coordinate It For Me" is read-only.
+        // "Semi" renders the key figures/verdict/notes as editable fields
+        // and recomputes utilization live; "Maximum" is read-only.
         const editable = LEVEL === 'semi';
 
         const v = res.verdict || '';
@@ -380,7 +380,7 @@
     }
 })();
 
-// Do It Myself — hand-built venue scorecard (no AI, no server call).
+// Starter — hand-built venue scorecard (no AI, no server call).
 (function () {
     const rows = document.getElementById('vamRows');
     const add  = document.getElementById('vamAdd');

@@ -91,9 +91,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Score your own profile — enter your details and see your rating, no suggestions.'],
-        'semi'    => ['Help Me Plan', '#2563eb', 'We score your profile and suggest prioritised improvements you can act on.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'We audit your whole profile, benchmark it and hand you a full improvement plan.'],
+        'manual'  => ['Starter', '#64748b', 'Score your own profile — enter your details and see your rating, no suggestions.'],
+        'semi'    => ['Semi', '#2563eb', 'We score your profile and suggest prioritised improvements you can act on.'],
+        'maximum' => ['Maximum', '#16a34a', 'We audit your whole profile, benchmark it and hand you a full improvement plan.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -158,7 +158,7 @@
     </div>
 
     @if($isMax)
-    {{-- Coordinate It For Me — full auto audit dashboard --}}
+    {{-- Maximum — full auto audit dashboard --}}
     <div class="po-stats">
         @foreach($stats as [$lbl, $val, $tone])
             <div class="po-stat"><b>{{ $val }}</b><div class="l">{{ $lbl }}</div></div>
@@ -249,7 +249,7 @@
         const payload = Object.fromEntries(new FormData(form).entries());
         payload.has_video = form.querySelector('[name="has_video"]').checked ? 1 : 0;
 
-        // Do It Myself — score locally with a mirrored rubric, no suggestions actions.
+        // Starter — score locally with a mirrored rubric, no suggestions actions.
         if (LEVEL === 'manual') {
             loading.classList.remove('open');
             submit.disabled = false;
@@ -294,7 +294,7 @@
         }
     });
 
-    // Client-side scoring mirroring the server rubric (Do It Myself — no suggestions actions).
+    // Client-side scoring mirroring the server rubric (Starter — no suggestions actions).
     function computeLocal(p) {
         const photos = parseInt(p.num_photos, 10), reviews = parseInt(p.num_reviews, 10);
         const rating = parseFloat(p.avg_rating), resp = parseFloat(p.response_hours), cats = parseInt(p.categories_listed, 10);

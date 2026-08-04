@@ -33,9 +33,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Do It Myself', '#64748b', 'Write your own review by hand — by hand, just your words.'],
-        'semi'    => ['Help Me Plan', '#ea580c', 'instantly drafts a review — edit the wording before you post it.'],
-        'maximum' => ['Coordinate It For Me', '#16a34a', 'Enter a few thoughts and instantly writes the full review for you.'],
+        'manual'  => ['Starter', '#64748b', 'Write your own review by hand — by hand, just your words.'],
+        'semi'    => ['Semi', '#ea580c', 'instantly drafts a review — edit the wording before you post it.'],
+        'maximum' => ['Maximum', '#16a34a', 'Enter a few thoughts and instantly writes the full review for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -491,7 +491,7 @@
     });
     $('rw-save-notes')?.addEventListener('click', function () { const o = this.textContent; this.textContent = 'Saved!'; setTimeout(() => { this.textContent = o; }, 1400); });
 
-    // Do It Myself starts with a blank box the user fills — don't seed AI text.
+    // Starter starts with a blank box the user fills — don't seed AI text.
     if (LEVEL !== 'manual') showFmt('detailed');
 })();
 </script>
