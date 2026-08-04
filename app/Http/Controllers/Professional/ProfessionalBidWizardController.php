@@ -191,7 +191,7 @@ class ProfessionalBidWizardController extends Controller
             ['Service match', $myCatIds->intersect($wanted)->isNotEmpty() ? 'Eligible' : 'Not listed', $myCatIds->intersect($wanted)->isNotEmpty()],
             ['Service area', $p?->state ?: ($p?->city ?: 'Not set'), (bool) ($p?->state || $p?->city)],
             ['Verification', $p?->trade_license_verified_at ? 'Verified' : 'Not verified', (bool) $p?->trade_license_verified_at],
-            ['Insurance / COI', $p?->liability_insurance_verified_at ? 'Verified' : 'Not on file', (bool) $p?->liability_insurance_verified_at],
+            ['Insurance / COI', \App\Support\InsuranceRequirement::isCovered($p) ? 'Verified' : (\App\Support\InsuranceRequirement::hasLapsed($p) ? 'Expired' : 'Not on file'), \App\Support\InsuranceRequirement::isCovered($p)],
         ];
     }
 

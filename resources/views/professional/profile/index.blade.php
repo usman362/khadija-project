@@ -843,6 +843,13 @@
             </div>
 
             @php
+                // Which of this professional's categories oblige them to carry
+                // cover, and whether the certificate on file still counts.
+                $insuranceRequiredFor  = \App\Support\InsuranceRequirement::triggeringCategories($user);
+                $insuranceLapsed       = \App\Support\InsuranceRequirement::hasLapsed($profile);
+                $insuranceExpiringSoon = \App\Support\InsuranceRequirement::isExpiringSoon($profile);
+                $insuranceDaysLeft     = \App\Support\InsuranceRequirement::daysRemaining($profile);
+
                 $badgeMeta = [
                     'trade_license' => [
                         'label' => 'Trade License',
@@ -889,10 +896,37 @@
                         </div>
                     </div>
 
+                    @if($key === 'liability_insurance' && $insuranceRequiredFor)
+                        {{-- Say which of their categories put them in scope, so the
+                             requirement does not read as arbitrary. --}}
+                        <div style="background:rgba(59,130,246,0.08); border-left:3px solid #3b82f6; padding:10px 14px; border-radius:6px; margin-top:10px; font-size:13px;">
+                            <b>Required for your services.</b>
+                            Proof of insurance is needed to work in
+                            {{ collect($insuranceRequiredFor)->join(', ', ' and ') }}.
+                        </div>
+                    @endif
+
+                    @if($key === 'liability_insurance' && $insuranceLapsed)
+                        <div style="background:rgba(239,68,68,0.08); border-left:3px solid #ef4444; padding:10px 14px; border-radius:6px; margin-top:10px; font-size:13px;">
+                            <b>This policy has expired.</b>
+                            It ran out on {{ $profile->liability_insurance_expires_on->format('M d, Y') }}.
+                            Clients no longer see you as insured — upload the renewed certificate below.
+                        </div>
+                    @elseif($key === 'liability_insurance' && $insuranceExpiringSoon)
+                        <div style="background:rgba(245,158,11,0.08); border-left:3px solid #f59e0b; padding:10px 14px; border-radius:6px; margin-top:10px; font-size:13px;">
+                            <b>Expires in {{ $insuranceDaysLeft }} {{ $insuranceDaysLeft === 1 ? 'day' : 'days' }}</b>
+                            — on {{ $profile->liability_insurance_expires_on->format('M d, Y') }}.
+                            Upload the renewal before then so your cover does not lapse mid-booking.
+                        </div>
+                    @endif
+
                     @if($status === 'verified')
                         <div style="background:rgba(16,185,129,0.08); border-left:3px solid #10b981; padding:10px 14px; border-radius:6px; margin-top:10px; font-size:13px;">
                             Verified on {{ $verifiedAt->format('M d, Y') }}
                             @if($number) · <span style="color:var(--text-muted);">#{{ $number }}</span> @endif
+                            @if($key === 'liability_insurance' && $profile->liability_insurance_expires_on)
+                                · <span style="color:var(--text-muted);">valid to {{ $profile->liability_insurance_expires_on->format('M d, Y') }}</span>
+                            @endif
                             · <a href="{{ asset('storage/' . $doc) }}" target="_blank" style="color:var(--ok-text);">View document</a>
                         </div>
                     @elseif($status === 'pending')
@@ -915,6 +949,35 @@
                                 <label class="pf-label">Upload Proof (PDF or image, max 5MB) *</label>
                                 <input type="file" name="document" class="pf-input" accept=".pdf,.jpg,.jpeg,.png,.webp" {{ $status === 'none' ? 'required' : '' }}>
                             </div>
+
+                            @if($key === 'liability_insurance')
+                                {{-- What a certificate of insurance actually has to
+                                     carry. The expiry is the one that matters: without
+                                     it the Insured badge never stops being true. --}}
+                                <div>
+                                    <label class="pf-label">Insurance Company *</label>
+                                    <input type="text" name="insurer" class="pf-input" maxlength="160"
+                                           value="{{ old('insurer', $profile->liability_insurance_insurer) }}"
+                                           placeholder="e.g. Hartford" required>
+                                </div>
+                                <div>
+                                    <label class="pf-label">Coverage Amount (USD) *</label>
+                                    <input type="number" name="coverage" class="pf-input" min="1" step="1"
+                                           value="{{ old('coverage', $profile->liability_insurance_coverage) }}"
+                                           placeholder="1000000" required>
+                                </div>
+                                <div>
+                                    <label class="pf-label">Policy Start Date *</label>
+                                    <input type="date" name="effective_from" class="pf-input"
+                                           value="{{ old('effective_from', $profile->liability_insurance_effective_from?->format('Y-m-d')) }}" required>
+                                </div>
+                                <div>
+                                    <label class="pf-label">Policy Expiry Date *</label>
+                                    <input type="date" name="expires_on" class="pf-input"
+                                           min="{{ now()->addDay()->format('Y-m-d') }}"
+                                           value="{{ old('expires_on', $profile->liability_insurance_expires_on?->format('Y-m-d')) }}" required>
+                                </div>
+                            @endif
                         </div>
                         <div style="margin-top:12px; display:flex; gap:8px;">
                             <button type="submit" class="pf-btn pf-btn-sm">

@@ -132,8 +132,9 @@ class ClientProposalController extends Controller
                 'rating'     => $st ? round((float) $st->avg_rating, 1) : null,
                 'reviews'    => $st ? (int) $st->total : 0,
                 'years'      => $p?->experience_years,
-                'insured'    => (bool) $p?->liability_insurance_verified_at,
-                'verified'   => (bool) ($p?->trade_license_verified_at && $p?->liability_insurance_verified_at && $p?->workers_comp_verified_at),
+                'insured'    => \App\Support\InsuranceRequirement::isCovered($p),
+                'verified'   => (bool) ($p?->trade_license_verified_at && $p?->workers_comp_verified_at)
+                    && \App\Support\InsuranceRequirement::isCovered($p),
                 'city'       => $p?->city,
                 'overBudget' => $event->budget && $b->amount > $event->budget,
                 'state'      => match (true) {

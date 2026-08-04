@@ -92,7 +92,7 @@ class BrowseProfessionalsController extends Controller
 
         // ── Insurance ───────────────────────────────────────────────
         if ($insured) {
-            $query->whereHas('profile', fn (Builder $p) => $p->whereNotNull('liability_insurance_verified_at'));
+            $query->whereHas('profile', fn (Builder $p) => $p->insuranceCurrent());
         }
 
         // ── Currently taking work ───────────────────────────────────
@@ -112,8 +112,8 @@ class BrowseProfessionalsController extends Controller
         if ($verified) {
             $query->whereHas('profile', function (Builder $p) {
                 $p->whereNotNull('trade_license_verified_at')
-                  ->whereNotNull('liability_insurance_verified_at')
-                  ->whereNotNull('workers_comp_verified_at');
+                  ->whereNotNull('workers_comp_verified_at')
+                  ->insuranceCurrent();
             });
         }
 
@@ -137,6 +137,8 @@ class BrowseProfessionalsController extends Controller
                 $query
                     ->orderByRaw('(SELECT CASE WHEN trade_license_verified_at IS NOT NULL
                                                 AND liability_insurance_verified_at IS NOT NULL
+                                                AND (liability_insurance_expires_on IS NULL
+                                                     OR liability_insurance_expires_on >= CURDATE())
                                                 AND workers_comp_verified_at IS NOT NULL
                                            THEN 1 ELSE 0 END
                                   FROM user_profiles WHERE user_profiles.user_id = users.id) DESC')

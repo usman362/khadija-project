@@ -68,6 +68,10 @@ class UserProfile extends Model
         'liability_insurance_number',
         'liability_insurance_doc',
         'liability_insurance_verified_at',
+        'liability_insurance_insurer',
+        'liability_insurance_coverage',
+        'liability_insurance_effective_from',
+        'liability_insurance_expires_on',
         'workers_comp_number',
         'workers_comp_doc',
         'workers_comp_verified_at',
@@ -100,6 +104,9 @@ class UserProfile extends Model
             'notify_sms' => 'boolean',
             'trade_license_verified_at' => 'datetime',
             'liability_insurance_verified_at' => 'datetime',
+            'liability_insurance_effective_from' => 'date',
+            'liability_insurance_expires_on' => 'date',
+            'liability_insurance_coverage' => 'integer',
             'workers_comp_verified_at' => 'datetime',
             'address_flagged_home' => 'boolean',
             'address_verification_attempts' => 'integer',
@@ -209,5 +216,36 @@ class UserProfile extends Model
             ->take($limit)
             ->values()
             ->all();
+    }
+    /**
+     * SQL for "the insurance on file is still in date", for the places that
+     * build raw conditions. A NULL expiry means the certificate predates the
+     * expiry field — treated as current rather than retroactively marking
+     * existing professionals uninsured.
+     */
+    public const INSURANCE_CURRENT_SQL =
+        'liability_insurance_verified_at IS NOT NULL
+         AND (liability_insurance_expires_on IS NULL OR liability_insurance_expires_on >= CURDATE())';
+
+    /**
+     * Verified and not expired.
+     *
+     * Checking the verified stamp alone was the old behaviour, and it never
+     * stopped being true — a policy verified in 2025 still read as insured in
+     * 2027, on the pages a client uses to choose who to hire.
+     */
+    public function scopeInsuranceCurrent($query)
+    {
+        return $query->whereNotNull('liability_insurance_verified_at')
+            ->where(function ($q) {
+                $q->whereNull('liability_insurance_expires_on')
+                  ->orWhereDate('liability_insurance_expires_on', '>=', now()->toDateString());
+            });
+    }
+
+    /** Same test, for a profile already in hand. */
+    public function getHasCurrentInsuranceAttribute(): bool
+    {
+        return \App\Support\InsuranceRequirement::isCovered($this);
     }
 }

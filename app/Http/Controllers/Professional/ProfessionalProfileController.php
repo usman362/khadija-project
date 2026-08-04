@@ -452,10 +452,22 @@ class ProfessionalProfileController extends Controller
      */
     public function submitVerification(Request $request): RedirectResponse
     {
+        $isInsurance = $request->input('badge') === 'liability_insurance';
+
         $validated = $request->validate([
             'badge' => ['required', 'in:trade_license,liability_insurance,workers_comp'],
             'number' => ['nullable', 'string', 'max:100'],
             'document' => ['required', 'file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:5120'], // 5MB
+
+            // A certificate of insurance is only worth anything with these on
+            // it. Required for insurance, ignored for the other two badges.
+            'insurer' => [Rule::requiredIf($isInsurance), 'nullable', 'string', 'max:160'],
+            'coverage' => [Rule::requiredIf($isInsurance), 'nullable', 'integer', 'min:1'],
+            'effective_from' => [Rule::requiredIf($isInsurance), 'nullable', 'date'],
+            // Cover that has already run out is not cover.
+            'expires_on' => [Rule::requiredIf($isInsurance), 'nullable', 'date', 'after:today', 'after:effective_from'],
+        ], [
+            'expires_on.after' => 'The policy must not have expired already.',
         ]);
 
         $profile = $request->user()->getOrCreateProfile();
@@ -471,11 +483,22 @@ class ProfessionalProfileController extends Controller
 
         $path = $validated['document']->store("verification/{$badge}", 'public');
 
-        $profile->update([
+        $attributes = [
             $docCol => $path,
             $numberCol => $validated['number'] ?? null,
             $verifiedCol => null, // always re-enters review queue
-        ]);
+        ];
+
+        if ($isInsurance) {
+            $attributes += [
+                'liability_insurance_insurer' => $validated['insurer'],
+                'liability_insurance_coverage' => $validated['coverage'],
+                'liability_insurance_effective_from' => $validated['effective_from'],
+                'liability_insurance_expires_on' => $validated['expires_on'],
+            ];
+        }
+
+        $profile->update($attributes);
 
         return back()->with('status', ucfirst(str_replace('_', ' ', $badge)) . ' submitted for verification. Our team will review it shortly.');
     }

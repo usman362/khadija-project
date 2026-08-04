@@ -40,6 +40,8 @@ class CategoryLandingController extends Controller
             ->withCount(['reviewsReceived as reviews_count' => fn ($r) => $r->where('is_hidden', false)])
             ->orderByRaw('(SELECT CASE WHEN trade_license_verified_at IS NOT NULL
                                         AND liability_insurance_verified_at IS NOT NULL
+                                        AND (liability_insurance_expires_on IS NULL
+                                             OR liability_insurance_expires_on >= CURDATE())
                                         AND workers_comp_verified_at IS NOT NULL
                                    THEN 1 ELSE 0 END
                           FROM user_profiles WHERE user_profiles.user_id = users.id) DESC')

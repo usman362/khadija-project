@@ -48,7 +48,7 @@ class ClientBookingController extends Controller
                 'event:id,title,starts_at,ends_at,location,venue,guest_count,event_type,description',
                 'event.categories:id,name',
                 'supplier:id,name,email',
-                'supplier.profile:id,user_id,city,state,trade_license_verified_at,liability_insurance_verified_at',
+                'supplier.profile:id,user_id,city,state,trade_license_verified_at,liability_insurance_verified_at,liability_insurance_expires_on',
                 // The contract itself. There is a real agreements table behind
                 // this, with a PDF service and a both-parties-accepted gate on
                 // the download — unlike the four invented PDF rows it replaces.

@@ -432,7 +432,8 @@
                         $p = $pro->profile;
                         $avg = round((float) ($pro->reviews_avg ?? 0), 1);
                         $cnt = (int) ($pro->reviews_count ?? 0);
-                        $isVerified = $p && $p->trade_license_verified_at && $p->liability_insurance_verified_at && $p->workers_comp_verified_at;
+                        $isVerified = $p && $p->trade_license_verified_at && $p->workers_comp_verified_at
+                            && \App\Support\InsuranceRequirement::isCovered($p);
                         $isTop = $avg >= 4.5 && $cnt > 0;
                         $gallery = collect($p ? $p->portfolioHeroUrls(4) : []);
                         $rate = $p?->hourly_rate;
