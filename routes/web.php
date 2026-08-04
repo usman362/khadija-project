@@ -816,9 +816,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/messages', [ProfessionalChatController::class, 'index'])->middleware('permission:messages.view_any')->name('professional.chat.index');
         Route::get('/messages/{conversation}', [ProfessionalChatController::class, 'show'])->middleware('permission:messages.view')->name('professional.chat.show');
 
-        // Threads (per-conversation deep view + AI extracted commitments)
-        Route::get('/threads', [\App\Http\Controllers\Professional\ProfessionalThreadController::class, 'index'])->middleware('permission:messages.view_any')->name('professional.threads.index');
-        Route::get('/threads/{conversation}', [\App\Http\Controllers\Professional\ProfessionalThreadController::class, 'show'])->middleware('permission:messages.view')->name('professional.threads.show');
+        // Threads is hidden for now — Messages is the one inbox professionals
+        // use. Both pages showed the same conversations, so two entries in the
+        // nav only split a professional's replies across two places.
+        //
+        // The routes stay, pointing at Messages, so old links and bookmarks
+        // land on the working inbox instead of a 404. The controller and view
+        // are untouched: bringing Threads back is putting these two lines and
+        // the sidebar item back.
+        Route::get('/threads', fn () => redirect()->route('professional.chat.index'))
+            ->middleware('permission:messages.view_any')->name('professional.threads.index');
+        Route::get('/threads/{conversation}', fn ($conversation) => redirect()->route('professional.chat.show', $conversation))
+            ->middleware('permission:messages.view')->name('professional.threads.show');
 
         // Reviews
         Route::get('/reviews', [ProfessionalReviewController::class, 'index'])->name('professional.reviews.index');

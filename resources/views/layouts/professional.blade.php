@@ -1068,12 +1068,10 @@
                         Messages
                     </a>
                 </li>
-                <li class="cl-nav-item">
-                    <a href="{{ route('professional.threads.index') }}" class="cl-nav-link {{ request()->routeIs('professional.threads.*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 6.1H3"/><path d="M21 12.1H3"/><path d="M15.1 18H3"/></svg>
-                        Threads
-                    </a>
-                </li>
+                {{-- Threads is hidden for now — Messages covers this, and two
+                     inboxes side by side only split the same conversations in
+                     two. The page and its routes still exist; the routes send
+                     you to Messages. --}}
                 <li class="cl-nav-item">
                     <a href="{{ route('professional.earnings.index') }}" class="cl-nav-link {{ request()->routeIs('professional.earnings.*') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
