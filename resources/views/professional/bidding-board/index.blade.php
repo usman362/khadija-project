@@ -190,7 +190,7 @@
                  filter below, because both BR and DR carry either. --}}
             @foreach([
                 ['all', 'All Requests', ''],
-                ['BR', 'BR', 'Bidding Service Request'],
+                ['BR', 'BR', 'Bidding — open to all professionals'],
                 ['ER', '🔥 ER', 'Emergency — open to everyone'],
                 ['DR', 'DR', 'Direct — sent to you'],
                 ['saved', '★ Saved', ''],

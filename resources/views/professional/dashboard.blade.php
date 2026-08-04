@@ -225,8 +225,8 @@
         </div>
         <div class="pd-stat">
             <div class="pd-stat-top"><span class="pd-stat-ico c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span class="pd-stat-label">Payment Pending</span></div>
-            <div class="pd-stat-val">$4,250</div>
-            <div class="pd-stat-foot"><span class="pd-stat-delta muted">2 payments</span><svg class="pd-stat-spark" width="40" height="18" viewBox="0 0 40 18" fill="none"><polyline points="0,9 8,10 16,8 24,11 32,7 40,8" stroke="#f97316" stroke-width="1.6"/></svg></div>
+            <div class="pd-stat-val">${{ number_format($stats['pending_payout'] ?? 0, 2) }}</div>
+            <div class="pd-stat-foot"><span class="pd-stat-delta muted">{{ $stats['pending_count'] ?? 0 }} {{ ($stats['pending_count'] ?? 0) === 1 ? 'payment' : 'payments' }}</span><svg class="pd-stat-spark" width="40" height="18" viewBox="0 0 40 18" fill="none"><polyline points="0,9 8,10 16,8 24,11 32,7 40,8" stroke="#f97316" stroke-width="1.6"/></svg></div>
         </div>
     </div>
 
@@ -376,7 +376,7 @@
             <div class="pd-fin-grid">
                 <div class="pd-fin-box"><div class="k">Available Balance</div><div class="v">$4,250.00</div></div>
                 <div class="pd-fin-box"><div class="k">Secure Payment Held</div><div class="v">$7,850.00</div></div>
-                <div class="pd-fin-box"><div class="k">Pending Payout</div><div class="v">$3,200.00</div></div>
+                <div class="pd-fin-box"><div class="k">Pending Payout</div><div class="v">${{ number_format($stats['pending_payout'] ?? 0, 2) }}</div></div>
                 <div class="pd-fin-box"><div class="k">Released This Month</div><div class="v green">$9,640.00</div></div>
                 <div class="pd-fin-box"><div class="k">Taxes Owed</div><div class="v amber">$1,250.00</div></div>
                 <div class="pd-fin-box"><div class="k">Est. Profit (MTD)</div><div class="v">$6,450.00</div></div>

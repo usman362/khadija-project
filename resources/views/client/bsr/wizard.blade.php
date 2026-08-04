@@ -1,6 +1,6 @@
 @extends('layouts.client')
 
-@section('title', 'Create a Bidding Service Request')
+@section('title', 'Create a Bidding Request')
 @section('page-title', 'Create a Request')
 
 {{-- Screen 1 of the client BR set — the 7-step create wizard.
@@ -98,7 +98,7 @@
 
 <div class="bw-top">
     <div>
-        <div class="bw-h">Create a Bidding Service Request</div>
+        <div class="bw-h">Create a Bidding Request</div>
         <p class="bw-sub">Tell professionals what you need, when and where — they review it and send you sealed proposals to compare.</p>
     </div>
     <div class="bw-acts">

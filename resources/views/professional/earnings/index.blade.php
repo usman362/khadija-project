@@ -54,7 +54,7 @@
                 </div>
                 <div>
                     <div class="cl-stat-label">Total Earnings</div>
-                    <div class="cl-stat-value">${{ number_format($stats['total_earnings'] ?? 0, 2) }}</div>
+                    <div class="cl-stat-value">${{ number_format($stats['earned'] ?? 0, 2) }}</div>
                 </div>
             </div>
         </div>
@@ -112,14 +112,52 @@
         </form>
     </div>
 
-    {{-- Empty State --}}
+    {{-- Each booking, with what actually arrives after commission. The gross is
+         shown beside it so the two figures never look like a discrepancy. --}}
     <div class="cl-card">
-        <div class="cl-empty">
-            <div class="cl-empty-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        @if ($earnings->total() > 0)
+            <div style="overflow-x: auto;">
+                <table class="cl-table" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Gig</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Client paid</th>
+                            <th style="text-align: right;">You receive</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($earnings as $row)
+                            <tr>
+                                <td>{{ $row['date'] }}</td>
+                                <td>{{ $row['description'] }}</td>
+                                <td><span class="cl-badge">{{ $row['status'] }}</span></td>
+                                <td style="text-align: right;">${{ number_format($row['gross'], 2) }}</td>
+                                <td style="text-align: right; font-weight: 600;">${{ number_format($row['net'], 2) }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
-            <div class="cl-empty-title">No earnings recorded yet</div>
-            <div class="cl-empty-text">Complete gigs to start earning. Your earnings will appear here.</div>
-        </div>
+
+            @if ($earnings->hasPages())
+                <div style="margin-top: 16px;">{{ $earnings->links() }}</div>
+            @endif
+        @else
+            <div class="cl-empty">
+                <div class="cl-empty-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div class="cl-empty-title">
+                    {{ $search !== '' ? 'Nothing matches that search' : 'No earnings recorded yet' }}
+                </div>
+                <div class="cl-empty-text">
+                    {{ $search !== ''
+                        ? 'Try a different gig or client name.'
+                        : 'Complete gigs to start earning. Your earnings will appear here.' }}
+                </div>
+            </div>
+        @endif
     </div>
 @endsection

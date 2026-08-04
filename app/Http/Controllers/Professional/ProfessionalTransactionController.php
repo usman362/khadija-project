@@ -4,11 +4,10 @@ namespace App\Http\Controllers\Professional;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
-use App\Support\Commission;
+use App\Support\Earnings;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -16,11 +15,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  * Professional → Transactions page.
  *
  * Data source note:
- *   We don't yet store "transactions" for professionals in a dedicated table —
- *   this controller is the UI scaffold from client feedback (pagination,
- *   activity feed, export CSV/PDF, content filters). The methods here return
- *   empty paginators, but the view structure + controller contract are in
- *   place so wiring real queries later is a drop-in.
+ *   There is no dedicated transactions table yet — each of this professional's
+ *   bookings is one transaction row. The money totals come from
+ *   App\Support\Earnings, shared with the Earnings page.
  */
 class ProfessionalTransactionController extends Controller
 {
@@ -52,35 +49,15 @@ class ProfessionalTransactionController extends Controller
         $transactions = $this->loadTransactions($request, $filters);
         $activity     = $this->loadActivity($request, $filters);
 
-        // Real earnings summary from this professional's bookings. Commission is
-        // deducted at payout (Starter 5% / Pro 3% / Elite 1.5%), so what the pro
-        // can actually withdraw is the NET — the gross was letting them request
-        // more than the processor will ever release.
-        $user   = $request->user();
-        $base   = Booking::where('supplier_id', $user->id);
-        $gross  = (float) (clone $base)->where('status', 'completed')->sum('price');
-        $earned = Commission::netOf($gross, $user);
+        // Commission is deducted at payout (Starter 5% / Pro 3% / Elite 1.5%),
+        // so what the pro can actually withdraw is the NET. Computed in
+        // App\Support\Earnings so this page and the Earnings page cannot drift
+        // apart again — they were reporting different Pending totals for the
+        // same account at the same moment.
+        $user  = $request->user();
+        $stats = Earnings::forProfessional($user);
 
-        // Payout ledger — withdrawn = paid out, held = still-requested.
-        $payoutBase = \App\Models\Payout::where('user_id', $user->id);
-        $withdrawn  = (float) (clone $payoutBase)->where('status', 'paid')->sum('amount');
-        $requested  = (float) (clone $payoutBase)->where('status', 'requested')->sum('amount');
-
-        $pendingGross = (float) (clone $base)->whereIn('status', ['pending', 'confirmed'])->sum('price');
-
-        $stats = [
-            'total'          => (clone $base)->count(),
-            'earned'         => $earned,
-            'gross'          => $gross,
-            'commission'     => round($gross - $earned, 2),
-            'commissionPct'  => Commission::rateFor($user),
-            'pending'        => Commission::netOf($pendingGross, $user),
-            'withdrawn'      => $withdrawn,
-            // What the pro can still withdraw: net earned minus paid-out minus in-flight requests.
-            'available'      => max(0.0, $earned - $withdrawn - $requested),
-        ];
-
-        $payouts = (clone $payoutBase)->latest()->take(20)->get();
+        $payouts = \App\Models\Payout::where('user_id', $user->id)->latest()->take(20)->get();
 
         return view('professional.transactions.index', [
             'stats'          => $stats,
@@ -103,15 +80,11 @@ class ProfessionalTransactionController extends Controller
             'method' => ['nullable', 'string', 'max:40'],
         ]);
 
-        // Same net basis as the summary above — a gross figure here would let
-        // the pro withdraw the platform's commission along with their own money.
-        $user       = $request->user();
-        $base       = Booking::where('supplier_id', $user->id);
-        $earned     = Commission::netOf((float) (clone $base)->where('status', 'completed')->sum('price'), $user);
-        $payoutBase = \App\Models\Payout::where('user_id', $user->id);
-        $withdrawn  = (float) (clone $payoutBase)->where('status', 'paid')->sum('amount');
-        $requested  = (float) (clone $payoutBase)->where('status', 'requested')->sum('amount');
-        $available  = max(0.0, $earned - $withdrawn - $requested);
+        // The guard reads the same figure the screen shows. When these were two
+        // separate copies of the query, any change to one silently let the
+        // other approve — or refuse — the wrong amount.
+        $user      = $request->user();
+        $available = Earnings::forProfessional($user)['available'];
 
         if ($data['amount'] > $available) {
             return back()->withErrors([
