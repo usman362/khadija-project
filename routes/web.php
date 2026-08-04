@@ -584,6 +584,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/prototype/tool-to-request', [\App\Http\Controllers\Client\PrototypeToolToRequestController::class, 'show'])
             ->name('client.prototype.tool-to-request');
 
+        // Rule R31 — which tools each paid add-on unlocks, as a 2-tab table.
+        Route::get('/toolkit/tiers', [\App\Http\Controllers\Client\ToolkitTierController::class, 'index'])
+            ->name('client.toolkit.tiers');
+
         // Was a second professional-search screen. /browse now carries the event
         // context that made this one different, so this only keeps old links
         // working — query string and all.

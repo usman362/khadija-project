@@ -1,7 +1,7 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'Translator')
-@section('page-title', 'Translator')
+@section('title', 'Language')
+@section('page-title', 'Language')
 @section('page-subtitle', 'A built-in event phrasebook across five languages')
 
 @push('styles')
