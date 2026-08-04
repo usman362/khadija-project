@@ -18,6 +18,11 @@ class Category extends Model
         'thumbnail',
         'icon',
         'parent_id',
+        'taxonomy_version',
+        'kind',
+        'archetype',
+        'popularity_tier',
+        'cross_fit_alt',
         'is_active',
         'sort_order',
     ];
@@ -26,6 +31,53 @@ class Category extends Model
         'is_active' => 'boolean',
         'sort_order' => 'integer',
     ];
+
+    /** The three kinds of row in the v2 tree. */
+    public const EVENT_TYPE = 'event_type';
+    public const SERVICE_CATEGORY = 'service_category';
+    public const SERVICE = 'service';
+
+    /**
+     * Two category trees live in this table at once — the original one and Sir
+     * Peter's V2 rebuild — so that V2 can be imported and checked before
+     * anything switches over.
+     *
+     * This is a global scope rather than a query scope on purpose. Of the
+     * roughly fifty places that query categories, a third never call
+     * ->active(); relying on those being updated is how the other tree would
+     * leak onto a live page.
+     *
+     * Use Category::anyTaxonomy() to deliberately see across both — the import
+     * and switch commands do, nothing else should.
+     */
+    protected static function booted(): void
+    {
+        static::addGlobalScope('taxonomy', function ($query) {
+            $query->where('categories.taxonomy_version', config('taxonomy.version', 'v1'));
+        });
+
+        static::creating(function (self $category) {
+            $category->taxonomy_version ??= config('taxonomy.version', 'v1');
+        });
+    }
+
+    /** Escape hatch: query both trees. */
+    public function scopeAnyTaxonomy($query)
+    {
+        return $query->withoutGlobalScope('taxonomy');
+    }
+
+    /** Rows of one v2 kind: event types, service categories, or services. */
+    public function scopeOfKind($query, string $kind)
+    {
+        return $query->where('kind', $kind);
+    }
+
+    /** How relevant each service category is to each archetype. */
+    public function relevance(): HasMany
+    {
+        return $this->hasMany(CategoryRelevance::class);
+    }
 
     // Parent category
     public function parent(): BelongsTo

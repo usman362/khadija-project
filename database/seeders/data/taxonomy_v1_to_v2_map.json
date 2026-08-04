@@ -1,0 +1,35 @@
+{
+ "_note": "Where each old category's professionals land in the V2 tree. V2 was written from scratch and deliberately reuses none of the old titles, so only two matched by name — the rest are proposed here and should be checked before the switch. Anything listed under _uncertain is a genuine judgement call, not a typo.",
+ "_uncertain": [
+  "Music & Entertainment — 24 professionals, the largest group. Read as musical acts and sent to 'DJs, Live Bands & Musicians'. If these are magicians, dancers and hosts rather than musicians, 'Entertainment, Performers & Activities' is the right home.",
+  "DJs & Sound Services — the DJ half points one way and the sound half at 'Audio, Visual, Lighting & Staging'. Sent to the DJ category on the basis that the name leads with it."
+ ],
+ "map": {
+  "Music & Entertainment": "DJs, Live Bands & Musicians",
+  "Photography Services": "Photography & Videography",
+  "Planning, Coordination & Management": "Event Planning & Day-Of Coordination",
+  "Videography Services": "Photography & Videography",
+  "Event Decor & Styling": "Decor, Floral & Balloon Design",
+  "Event Staffing": "Event Staffing & Guest Services",
+  "Event Photography": "Photography & Videography",
+  "DJs & Sound Services": "DJs, Live Bands & Musicians",
+  "Beverage Services": "Bar, Beverage & Mixology Services",
+  "Event Planning & Production": "Event Planning & Day-Of Coordination",
+  "Catering Services": "Catering & Food Services",
+  "Floral Arrangements": "Decor, Floral & Balloon Design",
+  "Food Services": "Catering & Food Services",
+  "Event Coordination": "Event Planning & Day-Of Coordination",
+  "Guest & Attendee Experience": "Event Staffing & Guest Services",
+  "Event Videography": "Photography & Videography",
+  "Photography & Videography": "Photography & Videography",
+  "Lighting & Stage Setup": "Audio, Visual, Lighting & Staging",
+  "Decor & Floral Services": "Decor, Floral & Balloon Design",
+  "Catering Coordination": "Catering & Food Services",
+  "Photo Booths": "Photo Booths & Interactive Experiences",
+  "Spotlight & Stage Lighting": "Audio, Visual, Lighting & Staging",
+  "Floral Design & Arrangements": "Decor, Floral & Balloon Design",
+  "Lighting Services": "Audio, Visual, Lighting & Staging",
+  "Solo Musicians & Vocalists": "DJs, Live Bands & Musicians",
+  "Live Bands & Musical Acts": "DJs, Live Bands & Musicians"
+ }
+}

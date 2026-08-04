@@ -1,0 +1,3035 @@
+{
+ "source": "GigResource_Category_Taxonomy_V2_2026-08-02.xlsx",
+ "event_types": [
+  {
+   "name": "Charity Event",
+   "archetype": "Fundraising & Charity Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Chinese New Year Party",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Christmas Party",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Cinco de Mayo Celebration",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "EDIT",
+   "was": "Cinco de Mayo"
+  },
+  {
+   "name": "Client Appreciation Event",
+   "archetype": "Corporate & Business Events",
+   "disposition": "EDIT",
+   "was": "Client Appreciation"
+  },
+  {
+   "name": "Club Event",
+   "archetype": "Nightlife & Social Parties",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Cocktail Party",
+   "archetype": "Nightlife & Social Parties",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Coffee Shop Event",
+   "archetype": "Hospitality & Venue-Hosted Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "College Reunion",
+   "archetype": "Reunions & Group Gatherings",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Coming Out Party",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Comic-Con / Pop Culture Event",
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Community Event",
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Convention Center Event",
+   "archetype": "Corporate & Business Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Corporate Event",
+   "archetype": "Corporate & Business Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Country Club Event",
+   "archetype": "Hospitality & Venue-Hosted Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "County Fair",
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "disposition": "EDIT",
+   "was": "County Fairs"
+  },
+  {
+   "name": "Customer Appreciation Day",
+   "archetype": "Corporate & Business Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Dinner Party",
+   "archetype": "Nightlife & Social Parties",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Diwali Celebration",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "EDIT",
+   "was": "Happy Diwali Celebration"
+  },
+  {
+   "name": "Easter Celebration",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Engagement Party",
+   "archetype": "Wedding & Related Ceremonies",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Election Day Party",
+   "archetype": "Civic, Political & Awareness Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Divorce Party",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Earth Day Event",
+   "archetype": "Civic, Political & Awareness Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Family Gathering",
+   "archetype": "Reunions & Group Gatherings",
+   "disposition": "EDIT",
+   "was": "Family Gatherings"
+  },
+  {
+   "name": "Farm Fair",
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Father's Day Party",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Family Reunion",
+   "archetype": "Reunions & Group Gatherings",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Flea Market",
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Food Truck Festival",
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Fraternity Function",
+   "archetype": "Reunions & Group Gatherings",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Fundraiser",
+   "archetype": "Fundraising & Charity Events",
+   "disposition": "EDIT",
+   "was": "Fundraiser Event"
+  },
+  {
+   "name": "Bootcamp Graduation",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Gender Reveal",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Funeral Service",
+   "archetype": "Memorial & End-of-Life Services",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Graduation Party",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Grand Opening",
+   "archetype": "Corporate & Business Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Halloween Party",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Hanukkah Celebration",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "High School Reunion",
+   "archetype": "Reunions & Group Gatherings",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Hispanic Heritage Month Celebration",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "EDIT",
+   "was": "Hispanic Heritage Month"
+  },
+  {
+   "name": "Holiday Party",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Hotel Event",
+   "archetype": "Hospitality & Venue-Hosted Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Homecoming Party",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Inauguration Party",
+   "archetype": "Civic, Political & Awareness Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Fourth of July Celebration",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "EDIT",
+   "was": "July 4th Party"
+  },
+  {
+   "name": "Housewarming Party",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "EDIT",
+   "was": "Housewarming Event"
+  },
+  {
+   "name": "Juneteenth Celebration",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Karaoke Night",
+   "archetype": "Nightlife & Social Parties",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Kwanzaa Celebration",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Kentucky Derby Party",
+   "archetype": "Nightlife & Social Parties",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "LGBTQ+ History Month Celebration",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "EDIT",
+   "was": "LGBTQ+ History Month"
+  },
+  {
+   "name": "March Madness Party",
+   "archetype": "Nightlife & Social Parties",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Mardi Gras Party",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Memorial Day Party",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Mother's Day Party",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Music & Arts Festival",
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "New Year's Eve Party",
+   "archetype": "Nightlife & Social Parties",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Nursing Home Event",
+   "archetype": "Hospitality & Venue-Hosted Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Office Holiday Party",
+   "archetype": "Corporate & Business Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Real Estate Event",
+   "archetype": "Real Estate & Property Events",
+   "disposition": "EDIT",
+   "was": "Real Estate Events"
+  },
+  {
+   "name": "Other Event",
+   "archetype": "General / Flexible Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Paint & Sip Night",
+   "archetype": "Nightlife & Social Parties",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Pet & Animal Fair",
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Pool Party",
+   "archetype": "Nightlife & Social Parties",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Pride Event",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Private Party",
+   "archetype": "General / Flexible Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Product Launch",
+   "archetype": "Corporate & Business Events",
+   "disposition": "EDIT",
+   "was": "Product Launch Event"
+  },
+  {
+   "name": "Prom Night",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Rehearsal Dinner",
+   "archetype": "Wedding & Related Ceremonies",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Religious Ceremony",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Resort Event",
+   "archetype": "Hospitality & Venue-Hosted Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Restaurant Event",
+   "archetype": "Hospitality & Venue-Hosted Events",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Retirement & Going-Away Party",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "EDIT",
+   "was": "Retirement & Going Away"
+  },
+  {
+   "name": "Retirement Party",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "KEEP",
+   "was": null
+  },
+  {
+   "name": "Anniversary Party",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Award Ceremony",
+   "archetype": "Corporate & Business Events",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Art Gallery Opening",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Baby Shower",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Bachelor Party",
+   "archetype": "Wedding & Related Ceremonies",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Bachelorette Party",
+   "archetype": "Wedding & Related Ceremonies",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Bar/Bat Mitzvah",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Beach Party",
+   "archetype": "Nightlife & Social Parties",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Birthday Party",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Block Party",
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Bridal Shower",
+   "archetype": "Wedding & Related Ceremonies",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Business Conference",
+   "archetype": "Corporate & Business Events",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Silent Auction",
+   "archetype": "Fundraising & Charity Events",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Spring Fling",
+   "archetype": "Nightlife & Social Parties",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "St. Patrick's Day Party",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Summer Camp Event",
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Sweet 16",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Sporting Event / Watch Party",
+   "archetype": "Nightlife & Social Parties",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Tailgate Party",
+   "archetype": "Nightlife & Social Parties",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Thanksgiving Celebration",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Trade Show",
+   "archetype": "Corporate & Business Events",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Trivia Night",
+   "archetype": "Nightlife & Social Parties",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "University Event",
+   "archetype": "Reunions & Group Gatherings",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Valentine's Day Party",
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Veterans Day Event",
+   "archetype": "Civic, Political & Awareness Events",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Vow Renewal",
+   "archetype": "Wedding & Related Ceremonies",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Wedding",
+   "archetype": "Wedding & Related Ceremonies",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Welcome Party",
+   "archetype": "Milestone & Personal Celebrations",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Wine Tasting",
+   "archetype": "Nightlife & Social Parties",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Workshop / Seminar",
+   "archetype": "Corporate & Business Events",
+   "disposition": "ADD",
+   "was": null
+  },
+  {
+   "name": "Year-End Party",
+   "archetype": "Corporate & Business Events",
+   "disposition": "ADD",
+   "was": null
+  }
+ ],
+ "service_categories": [
+  {
+   "name": "Catering & Food Services",
+   "rationale": "The single most universally-booked service across nearly every event archetype -- full-service, buffet, food trucks, specialty diets."
+  },
+  {
+   "name": "Bakery, Desserts & Cake Design",
+   "rationale": "Split out from catering because it's booked independently even when a separate caterer is hired (wedding cakes, dessert tables)."
+  },
+  {
+   "name": "Bar, Beverage & Mixology Services",
+   "rationale": "Distinct licensing/staffing needs from food catering; essential for weddings and social events, common everywhere else."
+  },
+  {
+   "name": "DJs, Live Bands & Musicians",
+   "rationale": "Music is the #1 most-requested entertainment booking across weddings, corporate, and social events."
+  },
+  {
+   "name": "Entertainment, Performers & Activities",
+   "rationale": "Non-musical entertainment -- magicians, dancers, kids entertainers, interactive activities -- kept separate from DJs/Bands since booking needs differ."
+  },
+  {
+   "name": "Photography & Videography",
+   "rationale": "Near-universal booking for milestone and wedding events; increasingly common at corporate events for content/marketing."
+  },
+  {
+   "name": "Event Planning & Day-Of Coordination",
+   "rationale": "The connective-tissue service that spans every archetype, from full-service planning to single-day coordination."
+  },
+  {
+   "name": "Decor, Floral & Balloon Design",
+   "rationale": "Visual styling is one of the top 3 line items on almost every event budget; balloons kept as a subtype here rather than a rival category."
+  },
+  {
+   "name": "Event Rentals & Furnishings",
+   "rationale": "Tables, tents, lounge furniture, dance floors -- the physical infrastructure layer nearly every in-person event needs."
+  },
+  {
+   "name": "Venues & Event Spaces",
+   "rationale": "Listing/booking the physical location itself is a distinct marketplace vertical from the services delivered inside it."
+  },
+  {
+   "name": "Audio, Visual, Lighting & Staging",
+   "rationale": "Technical production -- sound, lighting design, staging -- especially essential for corporate and civic events."
+  },
+  {
+   "name": "Officiants, Hosts & Ceremonial Leaders",
+   "rationale": "Weddings, memorials, and civic events all need a ceremonial or MC figure; kept distinct from entertainment performers."
+  },
+  {
+   "name": "Hair, Makeup & Wardrobe Styling",
+   "rationale": "A well-established standalone gig category (bridal beauty teams) with its own professional certifications."
+  },
+  {
+   "name": "Transportation & Valet Services",
+   "rationale": "Guest and wedding-party transport, valet parking -- a recurring need distinct from general event logistics."
+  },
+  {
+   "name": "Security & Crowd Management",
+   "rationale": "Essential at festivals, civic events, and large corporate gatherings; a distinct licensed-professional category."
+  },
+  {
+   "name": "Event Staffing & Guest Services",
+   "rationale": "The people layer -- servers, ushers, registration staff, coat check -- that supports every other category."
+  },
+  {
+   "name": "Photo Booths & Interactive Experiences",
+   "rationale": "Now common enough at weddings, corporate, and social events to be its own booking category rather than a photography add-on."
+  },
+  {
+   "name": "Party Rentals & Inflatables",
+   "rationale": "Family-facing rentals (bounce houses, water slides) with distinct vendors from general event rentals."
+  },
+  {
+   "name": "Invitations, Printing & Signage",
+   "rationale": "Pre-event and on-site print/design needs -- invites, seating charts, banners, badges -- grouped since one vendor type often covers all three."
+  },
+  {
+   "name": "Favors, Gifting & Awards",
+   "rationale": "Take-home items and recognition pieces -- guest favors, corporate gifts, trophies -- share vendors (engravers, branders)."
+  },
+  {
+   "name": "Cleaning, Sanitation & Waste Services",
+   "rationale": "Post-event cleanup and portable sanitation, a recurring practical need across outdoor and large-scale events."
+  },
+  {
+   "name": "Event Technology & Livestreaming",
+   "rationale": "Ticketing, RFID, livestreaming, hybrid platforms -- a fast-growing modern category with no true home in a traditional taxonomy."
+  },
+  {
+   "name": "Trade Show & Exhibit Services",
+   "rationale": "Corporate-specific booth design/build/staffing needs distinct enough from general AV and rentals to warrant its own category."
+  },
+  {
+   "name": "Fundraising & Auction Services",
+   "rationale": "Charity/fundraiser-specific tooling (auction platforms, auctioneers, donor management) that doesn't fit elsewhere."
+  },
+  {
+   "name": "Funeral & Memorial Services",
+   "rationale": "A distinct, sensitive service vertical (officiants, caskets, tributes) that shouldn't be folded into general planning."
+  },
+  {
+   "name": "Pet Services for Events",
+   "rationale": "A small but real niche (pet-friendly coordination, therapy animals, mobile petting zoos) worth keeping visible as its own category."
+  },
+  {
+   "name": "Property Staging & Real Estate Event Services",
+   "rationale": "Serves the Real Estate Event type specifically -- staging, open-house coordination, property photography."
+  }
+ ],
+ "services": [
+  {
+   "category": "Catering & Food Services",
+   "name": "Full-Service Catering",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Catering & Food Services",
+   "name": "Buffet Catering",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Catering & Food Services",
+   "name": "Plated Dinner Service",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Catering & Food Services",
+   "name": "Food Truck Booking",
+   "tier": "Popular",
+   "cross_fit": "Entertainment, Performers & Activities"
+  },
+  {
+   "category": "Catering & Food Services",
+   "name": "Food Stations & Live Cooking",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Catering & Food Services",
+   "name": "Passed Hors d'Oeuvres",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Catering & Food Services",
+   "name": "Boxed Lunch Catering",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Catering & Food Services",
+   "name": "Vegan & Vegetarian Catering",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Catering & Food Services",
+   "name": "Kosher & Halal Catering",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Catering & Food Services",
+   "name": "Allergen-Friendly Catering",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Catering & Food Services",
+   "name": "BBQ & Grill Catering",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Catering & Food Services",
+   "name": "Brunch Catering",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Catering & Food Services",
+   "name": "Coffee & Espresso Cart",
+   "tier": "Popular",
+   "cross_fit": "Bar, Beverage & Mixology Services"
+  },
+  {
+   "category": "Catering & Food Services",
+   "name": "Popcorn & Snack Carts",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Catering & Food Services",
+   "name": "Late-Night Snack Service",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Catering & Food Services",
+   "name": "Custom Menu Tasting Sessions",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Bakery, Desserts & Cake Design",
+   "name": "Custom Wedding Cakes",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Bakery, Desserts & Cake Design",
+   "name": "Birthday & Celebration Cakes",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Bakery, Desserts & Cake Design",
+   "name": "Cupcake Towers",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Bakery, Desserts & Cake Design",
+   "name": "Dessert Tables & Displays",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Bakery, Desserts & Cake Design",
+   "name": "Candy Buffets",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Bakery, Desserts & Cake Design",
+   "name": "Donut Walls",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Bakery, Desserts & Cake Design",
+   "name": "Macaron Towers",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Bakery, Desserts & Cake Design",
+   "name": "Chocolate Fountains",
+   "tier": "Popular",
+   "cross_fit": "Catering & Food Services"
+  },
+  {
+   "category": "Bakery, Desserts & Cake Design",
+   "name": "Ice Cream Carts",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Bakery, Desserts & Cake Design",
+   "name": "Cake Pops & Favors",
+   "tier": "Niche",
+   "cross_fit": "Favors, Gifting & Awards"
+  },
+  {
+   "category": "Bakery, Desserts & Cake Design",
+   "name": "Specialty Diet Desserts (Gluten-Free/Vegan)",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Bakery, Desserts & Cake Design",
+   "name": "Groom's Cakes",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Bar, Beverage & Mixology Services",
+   "name": "Professional Bartenders",
+   "tier": "Essential",
+   "cross_fit": "Event Staffing & Guest Services"
+  },
+  {
+   "category": "Bar, Beverage & Mixology Services",
+   "name": "Mobile Bar Rentals",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Bar, Beverage & Mixology Services",
+   "name": "Signature Cocktail Design",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Bar, Beverage & Mixology Services",
+   "name": "Craft Beer & Wine Service",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Bar, Beverage & Mixology Services",
+   "name": "Non-Alcoholic & Mocktail Bars",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Bar, Beverage & Mixology Services",
+   "name": "Champagne Towers",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Bar, Beverage & Mixology Services",
+   "name": "Coffee & Tea Service",
+   "tier": "Popular",
+   "cross_fit": "Catering & Food Services"
+  },
+  {
+   "category": "Bar, Beverage & Mixology Services",
+   "name": "Luxury Glam Bars",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Bar, Beverage & Mixology Services",
+   "name": "Beverage Catering Packages",
+   "tier": "Popular",
+   "cross_fit": "Catering & Food Services"
+  },
+  {
+   "category": "Bar, Beverage & Mixology Services",
+   "name": "Kegerator Rentals",
+   "tier": "Niche",
+   "cross_fit": "Event Rentals & Furnishings"
+  },
+  {
+   "category": "Bar, Beverage & Mixology Services",
+   "name": "Juice & Smoothie Bars",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "DJs, Live Bands & Musicians",
+   "name": "Wedding DJs",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "DJs, Live Bands & Musicians",
+   "name": "Party & Club DJs",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "DJs, Live Bands & Musicians",
+   "name": "Live Bands",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "DJs, Live Bands & Musicians",
+   "name": "Solo Musicians & Acoustic Acts",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "DJs, Live Bands & Musicians",
+   "name": "String Quartets & Chamber Ensembles",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "DJs, Live Bands & Musicians",
+   "name": "Cultural & Folk Musicians",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "DJs, Live Bands & Musicians",
+   "name": "Karaoke Hosting",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "DJs, Live Bands & Musicians",
+   "name": "MC & Emcee Services",
+   "tier": "Popular",
+   "cross_fit": "Officiants, Hosts & Ceremonial Leaders"
+  },
+  {
+   "category": "DJs, Live Bands & Musicians",
+   "name": "Silent Disco Setups",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "DJs, Live Bands & Musicians",
+   "name": "Mobile Sound Systems",
+   "tier": "Popular",
+   "cross_fit": "Audio, Visual, Lighting & Staging"
+  },
+  {
+   "category": "Entertainment, Performers & Activities",
+   "name": "Magicians",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Entertainment, Performers & Activities",
+   "name": "Dancers & Dance Troupes",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Entertainment, Performers & Activities",
+   "name": "Caricature Artists",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Entertainment, Performers & Activities",
+   "name": "Comedians",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Entertainment, Performers & Activities",
+   "name": "Circus & Aerial Performers",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Entertainment, Performers & Activities",
+   "name": "Costumed Characters",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Entertainment, Performers & Activities",
+   "name": "Face Painters",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Entertainment, Performers & Activities",
+   "name": "Balloon Twisters",
+   "tier": "Popular",
+   "cross_fit": "Decor, Floral & Balloon Design"
+  },
+  {
+   "category": "Entertainment, Performers & Activities",
+   "name": "Fire Performers",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Entertainment, Performers & Activities",
+   "name": "Casino & Game Night Rentals",
+   "tier": "Popular",
+   "cross_fit": "Event Rentals & Furnishings"
+  },
+  {
+   "category": "Entertainment, Performers & Activities",
+   "name": "Lawn Games & Yard Activities",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Entertainment, Performers & Activities",
+   "name": "Escape Room Experiences",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Entertainment, Performers & Activities",
+   "name": "Trivia Hosts",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Entertainment, Performers & Activities",
+   "name": "Carnival Ride Rentals",
+   "tier": "Niche",
+   "cross_fit": "Party Rentals & Inflatables"
+  },
+  {
+   "category": "Entertainment, Performers & Activities",
+   "name": "Kids Entertainers & Clowns",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Photography & Videography",
+   "name": "Wedding Photography",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Photography & Videography",
+   "name": "Event Photography",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Photography & Videography",
+   "name": "Videography & Cinematic Films",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Photography & Videography",
+   "name": "Drone Photography",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Photography & Videography",
+   "name": "Live Streaming Services",
+   "tier": "Popular",
+   "cross_fit": "Event Technology & Livestreaming"
+  },
+  {
+   "category": "Photography & Videography",
+   "name": "Photo Editing & Album Design",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Photography & Videography",
+   "name": "Same-Day Edit Videography",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Photography & Videography",
+   "name": "Portrait & Headshot Stations",
+   "tier": "Popular",
+   "cross_fit": "Photo Booths & Interactive Experiences"
+  },
+  {
+   "category": "Photography & Videography",
+   "name": "360 Video Booths",
+   "tier": "Popular",
+   "cross_fit": "Photo Booths & Interactive Experiences"
+  },
+  {
+   "category": "Photography & Videography",
+   "name": "Engagement & Pre-Event Shoots",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Planning & Day-Of Coordination",
+   "name": "Full-Service Event Planning",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Planning & Day-Of Coordination",
+   "name": "Day-Of Coordination",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Planning & Day-Of Coordination",
+   "name": "Wedding Planning",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Planning & Day-Of Coordination",
+   "name": "Corporate Event Management",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Planning & Day-Of Coordination",
+   "name": "Vendor Sourcing & Management",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Planning & Day-Of Coordination",
+   "name": "Timeline & Logistics Planning",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Planning & Day-Of Coordination",
+   "name": "Budget Planning Consultation",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Planning & Day-Of Coordination",
+   "name": "Destination Event Planning",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Planning & Day-Of Coordination",
+   "name": "Nonprofit & Fundraiser Event Management",
+   "tier": "Popular",
+   "cross_fit": "Fundraising & Auction Services"
+  },
+  {
+   "category": "Event Planning & Day-Of Coordination",
+   "name": "Rehearsal Coordination",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Decor, Floral & Balloon Design",
+   "name": "Bridal & Ceremony Florals",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Decor, Floral & Balloon Design",
+   "name": "Centerpiece Design",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Decor, Floral & Balloon Design",
+   "name": "Balloon Arches & Columns",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Decor, Floral & Balloon Design",
+   "name": "Balloon Garlands",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Decor, Floral & Balloon Design",
+   "name": "Balloon Drops",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Decor, Floral & Balloon Design",
+   "name": "Backdrop Design & Rental",
+   "tier": "Popular",
+   "cross_fit": "Event Rentals & Furnishings"
+  },
+  {
+   "category": "Decor, Floral & Balloon Design",
+   "name": "Draping & Fabric Design",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Decor, Floral & Balloon Design",
+   "name": "Table Linens & Styling",
+   "tier": "Popular",
+   "cross_fit": "Event Rentals & Furnishings"
+  },
+  {
+   "category": "Decor, Floral & Balloon Design",
+   "name": "Themed Decor Design",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Decor, Floral & Balloon Design",
+   "name": "Seasonal & Holiday Decor",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Decor, Floral & Balloon Design",
+   "name": "Candle & Ambient Lighting Decor",
+   "tier": "Popular",
+   "cross_fit": "Audio, Visual, Lighting & Staging"
+  },
+  {
+   "category": "Decor, Floral & Balloon Design",
+   "name": "Arch & Chuppah Design",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Decor, Floral & Balloon Design",
+   "name": "Aisle & Ceremony Decor",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Decor, Floral & Balloon Design",
+   "name": "Neon Sign Rentals",
+   "tier": "Niche",
+   "cross_fit": "Event Rentals & Furnishings"
+  },
+  {
+   "category": "Event Rentals & Furnishings",
+   "name": "Tables & Chairs",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Rentals & Furnishings",
+   "name": "Tents & Canopies",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Rentals & Furnishings",
+   "name": "Lounge Furniture Rentals",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Rentals & Furnishings",
+   "name": "Linens & Chair Covers",
+   "tier": "Popular",
+   "cross_fit": "Decor, Floral & Balloon Design"
+  },
+  {
+   "category": "Event Rentals & Furnishings",
+   "name": "Dance Floor Rentals",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Rentals & Furnishings",
+   "name": "Staging & Riser Rentals",
+   "tier": "Popular",
+   "cross_fit": "Audio, Visual, Lighting & Staging"
+  },
+  {
+   "category": "Event Rentals & Furnishings",
+   "name": "China, Glassware & Flatware Rentals",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Rentals & Furnishings",
+   "name": "Heaters & Fans",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Rentals & Furnishings",
+   "name": "Portable Restroom Rentals",
+   "tier": "Popular",
+   "cross_fit": "Cleaning, Sanitation & Waste Services"
+  },
+  {
+   "category": "Event Rentals & Furnishings",
+   "name": "Generators & Power Rentals",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Rentals & Furnishings",
+   "name": "Tableware & Charger Plates",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Rentals & Furnishings",
+   "name": "Photo Backdrops & Props Rentals",
+   "tier": "Niche",
+   "cross_fit": "Photo Booths & Interactive Experiences"
+  },
+  {
+   "category": "Venues & Event Spaces",
+   "name": "Banquet Halls",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Venues & Event Spaces",
+   "name": "Outdoor & Garden Venues",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Venues & Event Spaces",
+   "name": "Barn & Rustic Venues",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Venues & Event Spaces",
+   "name": "Rooftop & Skyline Venues",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Venues & Event Spaces",
+   "name": "Hotel Event Spaces",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Venues & Event Spaces",
+   "name": "Warehouse & Industrial Venues",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Venues & Event Spaces",
+   "name": "Country Club Venues",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Venues & Event Spaces",
+   "name": "Waterfront Venues",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Venues & Event Spaces",
+   "name": "Private Estate Rentals",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Venues & Event Spaces",
+   "name": "Conference Centers",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Audio, Visual, Lighting & Staging",
+   "name": "AV Equipment Rental",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Audio, Visual, Lighting & Staging",
+   "name": "Uplighting & Ambient Lighting",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Audio, Visual, Lighting & Staging",
+   "name": "Stage Design & Setup",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Audio, Visual, Lighting & Staging",
+   "name": "Projector & Screen Rental",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Audio, Visual, Lighting & Staging",
+   "name": "Sound System Rental & Operation",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Audio, Visual, Lighting & Staging",
+   "name": "Lighting Design (Event-Wide)",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Audio, Visual, Lighting & Staging",
+   "name": "LED Wall & Video Display",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Audio, Visual, Lighting & Staging",
+   "name": "Microphones & PA Systems",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Audio, Visual, Lighting & Staging",
+   "name": "Special FX Lighting (Lasers, Haze)",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Audio, Visual, Lighting & Staging",
+   "name": "Teleprompter Services",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Officiants, Hosts & Ceremonial Leaders",
+   "name": "Wedding Officiants",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Officiants, Hosts & Ceremonial Leaders",
+   "name": "Religious Ceremony Leaders",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Officiants, Hosts & Ceremonial Leaders",
+   "name": "Funeral Officiants",
+   "tier": "Popular",
+   "cross_fit": "Funeral & Memorial Services"
+  },
+  {
+   "category": "Officiants, Hosts & Ceremonial Leaders",
+   "name": "Master of Ceremonies (MC)",
+   "tier": "Popular",
+   "cross_fit": "DJs, Live Bands & Musicians"
+  },
+  {
+   "category": "Officiants, Hosts & Ceremonial Leaders",
+   "name": "Celebrant Services",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Officiants, Hosts & Ceremonial Leaders",
+   "name": "Vow Renewal Officiants",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Officiants, Hosts & Ceremonial Leaders",
+   "name": "Cultural Ceremony Leaders",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Officiants, Hosts & Ceremonial Leaders",
+   "name": "Keynote & Guest Speakers",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Hair, Makeup & Wardrobe Styling",
+   "name": "Bridal Hair & Makeup",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Hair, Makeup & Wardrobe Styling",
+   "name": "Event Hairstyling",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Hair, Makeup & Wardrobe Styling",
+   "name": "Airbrush Makeup",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Hair, Makeup & Wardrobe Styling",
+   "name": "Groom Grooming Services",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Hair, Makeup & Wardrobe Styling",
+   "name": "Wardrobe Styling & Fittings",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Hair, Makeup & Wardrobe Styling",
+   "name": "Spray Tanning",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Hair, Makeup & Wardrobe Styling",
+   "name": "Mobile Beauty Squads",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Hair, Makeup & Wardrobe Styling",
+   "name": "Fashion & Costume Design",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Transportation & Valet Services",
+   "name": "Limousine & Luxury Car Service",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Transportation & Valet Services",
+   "name": "Party Bus Rentals",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Transportation & Valet Services",
+   "name": "Shuttle Services",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Transportation & Valet Services",
+   "name": "Chauffeur Services",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Transportation & Valet Services",
+   "name": "Valet Parking Services",
+   "tier": "Essential",
+   "cross_fit": "Security & Crowd Management"
+  },
+  {
+   "category": "Transportation & Valet Services",
+   "name": "Classic & Vintage Car Rentals",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Transportation & Valet Services",
+   "name": "Guest Transportation Coordination",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Transportation & Valet Services",
+   "name": "Airport Transfer Services",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Security & Crowd Management",
+   "name": "Event Security Guards",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Security & Crowd Management",
+   "name": "Crowd Control & Barricading",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Security & Crowd Management",
+   "name": "VIP & Executive Protection",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Security & Crowd Management",
+   "name": "Bag Check & Screening Services",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Security & Crowd Management",
+   "name": "Parking Attendants & Traffic Control",
+   "tier": "Popular",
+   "cross_fit": "Transportation & Valet Services"
+  },
+  {
+   "category": "Security & Crowd Management",
+   "name": "ID Verification Services",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Staffing & Guest Services",
+   "name": "Wait Staff & Servers",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Staffing & Guest Services",
+   "name": "Bartenders (Staffing Only)",
+   "tier": "Popular",
+   "cross_fit": "Bar, Beverage & Mixology Services"
+  },
+  {
+   "category": "Event Staffing & Guest Services",
+   "name": "Coat Check Attendants",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Staffing & Guest Services",
+   "name": "Registration & Check-In Staff",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Staffing & Guest Services",
+   "name": "Greeters & Ushers",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Staffing & Guest Services",
+   "name": "Concierge Services",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Staffing & Guest Services",
+   "name": "Event Captains & Supervisors",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Staffing & Guest Services",
+   "name": "Cleanup Crew Staffing",
+   "tier": "Popular",
+   "cross_fit": "Cleaning, Sanitation & Waste Services"
+  },
+  {
+   "category": "Event Staffing & Guest Services",
+   "name": "Brand Ambassadors",
+   "tier": "Popular",
+   "cross_fit": "Trade Show & Exhibit Services"
+  },
+  {
+   "category": "Event Staffing & Guest Services",
+   "name": "Hospitality Staffing Agencies",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Photo Booths & Interactive Experiences",
+   "name": "Classic Photo Booths",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Photo Booths & Interactive Experiences",
+   "name": "360 Photo Booths",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Photo Booths & Interactive Experiences",
+   "name": "GIF Booths",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Photo Booths & Interactive Experiences",
+   "name": "Mirror Photo Booths",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Photo Booths & Interactive Experiences",
+   "name": "Green Screen Photo Booths",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Photo Booths & Interactive Experiences",
+   "name": "Digital Guestbook Stations",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Photo Booths & Interactive Experiences",
+   "name": "Selfie Stations",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Photo Booths & Interactive Experiences",
+   "name": "Roaming Photographers with Instant Prints",
+   "tier": "Niche",
+   "cross_fit": "Photography & Videography"
+  },
+  {
+   "category": "Party Rentals & Inflatables",
+   "name": "Bounce House Rentals",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Party Rentals & Inflatables",
+   "name": "Water Slide Rentals",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Party Rentals & Inflatables",
+   "name": "Obstacle Course Rentals",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Party Rentals & Inflatables",
+   "name": "Carnival Game Rentals",
+   "tier": "Popular",
+   "cross_fit": "Entertainment, Performers & Activities"
+  },
+  {
+   "category": "Party Rentals & Inflatables",
+   "name": "Kids Craft Stations",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Party Rentals & Inflatables",
+   "name": "Petting Zoo & Pony Rides",
+   "tier": "Niche",
+   "cross_fit": "Pet Services for Events"
+  },
+  {
+   "category": "Invitations, Printing & Signage",
+   "name": "Custom Invitations & Save-the-Dates",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Invitations, Printing & Signage",
+   "name": "Event Signage & Banners",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Invitations, Printing & Signage",
+   "name": "Name Badge Printing",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Invitations, Printing & Signage",
+   "name": "Seating Chart Design",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Invitations, Printing & Signage",
+   "name": "Menu & Program Printing",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Invitations, Printing & Signage",
+   "name": "Vinyl Banners & Backdrops",
+   "tier": "Niche",
+   "cross_fit": "Event Rentals & Furnishings"
+  },
+  {
+   "category": "Invitations, Printing & Signage",
+   "name": "Digital Invitations",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Invitations, Printing & Signage",
+   "name": "Table Number & Place Card Design",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Favors, Gifting & Awards",
+   "name": "Wedding & Party Favors",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Favors, Gifting & Awards",
+   "name": "Corporate Gifting",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Favors, Gifting & Awards",
+   "name": "Awards & Trophy Design",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Favors, Gifting & Awards",
+   "name": "Branded Swag & Merchandise",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Favors, Gifting & Awards",
+   "name": "Guest Welcome Bags",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Favors, Gifting & Awards",
+   "name": "Custom Engraving Services",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Cleaning, Sanitation & Waste Services",
+   "name": "Post-Event Cleanup Crews",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Cleaning, Sanitation & Waste Services",
+   "name": "Portable Restroom Servicing",
+   "tier": "Popular",
+   "cross_fit": "Event Rentals & Furnishings"
+  },
+  {
+   "category": "Cleaning, Sanitation & Waste Services",
+   "name": "Waste & Recycling Removal",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Cleaning, Sanitation & Waste Services",
+   "name": "Venue Sanitation Services",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Cleaning, Sanitation & Waste Services",
+   "name": "Deep Cleaning Services",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Technology & Livestreaming",
+   "name": "Online Ticketing Platforms",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Technology & Livestreaming",
+   "name": "RFID Wristband & Badge Systems",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Technology & Livestreaming",
+   "name": "Event Mobile Apps",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Technology & Livestreaming",
+   "name": "Livestream Production",
+   "tier": "Popular",
+   "cross_fit": "Photography & Videography"
+  },
+  {
+   "category": "Event Technology & Livestreaming",
+   "name": "Digital Signage",
+   "tier": "Popular",
+   "cross_fit": "Invitations, Printing & Signage"
+  },
+  {
+   "category": "Event Technology & Livestreaming",
+   "name": "Virtual & Hybrid Event Platforms",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Technology & Livestreaming",
+   "name": "Point-of-Sale & Cashless Payment Systems",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Event Technology & Livestreaming",
+   "name": "VR & AR Experience Stations",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Trade Show & Exhibit Services",
+   "name": "Custom Booth Design & Build",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Trade Show & Exhibit Services",
+   "name": "Trade Show Booth Rental",
+   "tier": "Essential",
+   "cross_fit": "Event Rentals & Furnishings"
+  },
+  {
+   "category": "Trade Show & Exhibit Services",
+   "name": "Exhibit Graphics & Displays",
+   "tier": "Popular",
+   "cross_fit": "Invitations, Printing & Signage"
+  },
+  {
+   "category": "Trade Show & Exhibit Services",
+   "name": "Product Demo Staffing",
+   "tier": "Popular",
+   "cross_fit": "Event Staffing & Guest Services"
+  },
+  {
+   "category": "Trade Show & Exhibit Services",
+   "name": "Lead Retrieval Technology",
+   "tier": "Niche",
+   "cross_fit": "Event Technology & Livestreaming"
+  },
+  {
+   "category": "Trade Show & Exhibit Services",
+   "name": "Booth Installation & Dismantle",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Fundraising & Auction Services",
+   "name": "Silent Auction Platforms",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Fundraising & Auction Services",
+   "name": "Live Auctioneers",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Fundraising & Auction Services",
+   "name": "Donor Management Software",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Fundraising & Auction Services",
+   "name": "Raffle & Ticketed Giveaway Services",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Fundraising & Auction Services",
+   "name": "Sponsorship Package Design",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Fundraising & Auction Services",
+   "name": "Peer-to-Peer Fundraising Tools",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Funeral & Memorial Services",
+   "name": "Funeral Officiants & Ceremony Leaders",
+   "tier": "Essential",
+   "cross_fit": "Officiants, Hosts & Ceremonial Leaders"
+  },
+  {
+   "category": "Funeral & Memorial Services",
+   "name": "Casket & Urn Services",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Funeral & Memorial Services",
+   "name": "Memorial Displays & Tribute Videos",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Funeral & Memorial Services",
+   "name": "Grief & Bereavement Support",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Funeral & Memorial Services",
+   "name": "Floral Tributes",
+   "tier": "Popular",
+   "cross_fit": "Decor, Floral & Balloon Design"
+  },
+  {
+   "category": "Funeral & Memorial Services",
+   "name": "Repast & Reception Catering",
+   "tier": "Popular",
+   "cross_fit": "Catering & Food Services"
+  },
+  {
+   "category": "Funeral & Memorial Services",
+   "name": "Headstone & Monument Services",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Funeral & Memorial Services",
+   "name": "Livestreaming for Remote Mourners",
+   "tier": "Niche",
+   "cross_fit": "Event Technology & Livestreaming"
+  },
+  {
+   "category": "Pet Services for Events",
+   "name": "Pet-Friendly Event Coordination",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Pet Services for Events",
+   "name": "Mobile Petting Zoos",
+   "tier": "Popular",
+   "cross_fit": "Party Rentals & Inflatables"
+  },
+  {
+   "category": "Pet Services for Events",
+   "name": "Pet Costume & Styling",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Pet Services for Events",
+   "name": "Pet Sitting During Events",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Pet Services for Events",
+   "name": "Therapy Animal Appearances",
+   "tier": "Niche",
+   "cross_fit": null
+  },
+  {
+   "category": "Property Staging & Real Estate Event Services",
+   "name": "Home Staging",
+   "tier": "Essential",
+   "cross_fit": null
+  },
+  {
+   "category": "Property Staging & Real Estate Event Services",
+   "name": "Open House Coordination",
+   "tier": "Popular",
+   "cross_fit": null
+  },
+  {
+   "category": "Property Staging & Real Estate Event Services",
+   "name": "Property Photography",
+   "tier": "Popular",
+   "cross_fit": "Photography & Videography"
+  },
+  {
+   "category": "Property Staging & Real Estate Event Services",
+   "name": "Curb Appeal Styling",
+   "tier": "Popular",
+   "cross_fit": "Decor, Floral & Balloon Design"
+  },
+  {
+   "category": "Property Staging & Real Estate Event Services",
+   "name": "Real Estate Signage",
+   "tier": "Niche",
+   "cross_fit": "Invitations, Printing & Signage"
+  }
+ ],
+ "relevance": [
+  {
+   "archetype": "Milestone & Personal Celebrations",
+   "category": "Catering & Food Services",
+   "tier": "Essential",
+   "signature": "Birthday & Celebration Cakes, Candy Buffets, Balloon Arches & Columns, Balloon Drops, Classic Photo Booths, Kids Entertainers & Clowns"
+  },
+  {
+   "archetype": "Milestone & Personal Celebrations",
+   "category": "Bakery, Desserts & Cake Design",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Milestone & Personal Celebrations",
+   "category": "Decor, Floral & Balloon Design",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Milestone & Personal Celebrations",
+   "category": "Entertainment, Performers & Activities",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Milestone & Personal Celebrations",
+   "category": "Photography & Videography",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Milestone & Personal Celebrations",
+   "category": "Event Rentals & Furnishings",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Milestone & Personal Celebrations",
+   "category": "Event Staffing & Guest Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Milestone & Personal Celebrations",
+   "category": "Bar, Beverage & Mixology Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Milestone & Personal Celebrations",
+   "category": "Event Planning & Day-Of Coordination",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Milestone & Personal Celebrations",
+   "category": "Photo Booths & Interactive Experiences",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Milestone & Personal Celebrations",
+   "category": "DJs, Live Bands & Musicians",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Milestone & Personal Celebrations",
+   "category": "Audio, Visual, Lighting & Staging",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Milestone & Personal Celebrations",
+   "category": "Invitations, Printing & Signage",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Milestone & Personal Celebrations",
+   "category": "Favors, Gifting & Awards",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Milestone & Personal Celebrations",
+   "category": "Party Rentals & Inflatables",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Wedding & Related Ceremonies",
+   "category": "Event Planning & Day-Of Coordination",
+   "tier": "Essential",
+   "signature": "Wedding Planning, Custom Wedding Cakes, Bridal & Ceremony Florals, Wedding Photography, Bridal Hair & Makeup, Wedding Officiants, Limousine & Luxury Car Service"
+  },
+  {
+   "archetype": "Wedding & Related Ceremonies",
+   "category": "Catering & Food Services",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Wedding & Related Ceremonies",
+   "category": "Bakery, Desserts & Cake Design",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Wedding & Related Ceremonies",
+   "category": "Decor, Floral & Balloon Design",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Wedding & Related Ceremonies",
+   "category": "Photography & Videography",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Wedding & Related Ceremonies",
+   "category": "Bar, Beverage & Mixology Services",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Wedding & Related Ceremonies",
+   "category": "Officiants, Hosts & Ceremonial Leaders",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Wedding & Related Ceremonies",
+   "category": "Hair, Makeup & Wardrobe Styling",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Wedding & Related Ceremonies",
+   "category": "Event Rentals & Furnishings",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Wedding & Related Ceremonies",
+   "category": "DJs, Live Bands & Musicians",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Wedding & Related Ceremonies",
+   "category": "Transportation & Valet Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Wedding & Related Ceremonies",
+   "category": "Venues & Event Spaces",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Wedding & Related Ceremonies",
+   "category": "Invitations, Printing & Signage",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Wedding & Related Ceremonies",
+   "category": "Audio, Visual, Lighting & Staging",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Wedding & Related Ceremonies",
+   "category": "Favors, Gifting & Awards",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Wedding & Related Ceremonies",
+   "category": "Photo Booths & Interactive Experiences",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Wedding & Related Ceremonies",
+   "category": "Event Staffing & Guest Services",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Corporate & Business Events",
+   "category": "Audio, Visual, Lighting & Staging",
+   "tier": "Essential",
+   "signature": "Custom Booth Design & Build, AV Equipment Rental, Name Badge Printing, Online Ticketing Platforms, Corporate Gifting"
+  },
+  {
+   "archetype": "Corporate & Business Events",
+   "category": "Event Technology & Livestreaming",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Corporate & Business Events",
+   "category": "Trade Show & Exhibit Services",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Corporate & Business Events",
+   "category": "Invitations, Printing & Signage",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Corporate & Business Events",
+   "category": "Catering & Food Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Corporate & Business Events",
+   "category": "Event Staffing & Guest Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Corporate & Business Events",
+   "category": "Photography & Videography",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Corporate & Business Events",
+   "category": "Favors, Gifting & Awards",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Corporate & Business Events",
+   "category": "Event Planning & Day-Of Coordination",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Corporate & Business Events",
+   "category": "Security & Crowd Management",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Corporate & Business Events",
+   "category": "Transportation & Valet Services",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Corporate & Business Events",
+   "category": "Entertainment, Performers & Activities",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Corporate & Business Events",
+   "category": "Venues & Event Spaces",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Memorial & End-of-Life Services",
+   "category": "Funeral & Memorial Services",
+   "tier": "Essential",
+   "signature": "Funeral Officiants & Ceremony Leaders, Casket & Urn Services, Floral Tributes, Memorial Displays & Tribute Videos, Repast & Reception Catering"
+  },
+  {
+   "archetype": "Memorial & End-of-Life Services",
+   "category": "Catering & Food Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Memorial & End-of-Life Services",
+   "category": "Decor, Floral & Balloon Design",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Memorial & End-of-Life Services",
+   "category": "Officiants, Hosts & Ceremonial Leaders",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Memorial & End-of-Life Services",
+   "category": "Invitations, Printing & Signage",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Memorial & End-of-Life Services",
+   "category": "Event Staffing & Guest Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Memorial & End-of-Life Services",
+   "category": "Photography & Videography",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Memorial & End-of-Life Services",
+   "category": "Transportation & Valet Services",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Memorial & End-of-Life Services",
+   "category": "Venues & Event Spaces",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Memorial & End-of-Life Services",
+   "category": "Event Technology & Livestreaming",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "category": "Decor, Floral & Balloon Design",
+   "tier": "Essential",
+   "signature": "Cultural & Folk Musicians, Balloon Garlands, Food Truck Booking, Seasonal & Holiday Decor"
+  },
+  {
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "category": "Catering & Food Services",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "category": "Entertainment, Performers & Activities",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "category": "Event Rentals & Furnishings",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "category": "Event Staffing & Guest Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "category": "Photography & Videography",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "category": "DJs, Live Bands & Musicians",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "category": "Security & Crowd Management",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "category": "Transportation & Valet Services",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "category": "Audio, Visual, Lighting & Staging",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Cultural, Religious & Holiday Celebrations",
+   "category": "Officiants, Hosts & Ceremonial Leaders",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "category": "Entertainment, Performers & Activities",
+   "tier": "Essential",
+   "signature": "Food Truck Booking, Carnival Game Rentals, Event Security Guards, Portable Restroom Rentals"
+  },
+  {
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "category": "Catering & Food Services",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "category": "Security & Crowd Management",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "category": "Event Rentals & Furnishings",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "category": "Event Staffing & Guest Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "category": "Transportation & Valet Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "category": "Cleaning, Sanitation & Waste Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "category": "DJs, Live Bands & Musicians",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "category": "Audio, Visual, Lighting & Staging",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "category": "Photography & Videography",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "category": "Decor, Floral & Balloon Design",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "category": "Pet Services for Events",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Fairs, Festivals & Large Public Events",
+   "category": "Party Rentals & Inflatables",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Reunions & Group Gatherings",
+   "category": "Catering & Food Services",
+   "tier": "Essential",
+   "signature": "Buffet Catering, Lounge Furniture Rentals, Event Photography, Tents & Canopies"
+  },
+  {
+   "archetype": "Reunions & Group Gatherings",
+   "category": "Event Rentals & Furnishings",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Reunions & Group Gatherings",
+   "category": "Decor, Floral & Balloon Design",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Reunions & Group Gatherings",
+   "category": "Entertainment, Performers & Activities",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Reunions & Group Gatherings",
+   "category": "Photography & Videography",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Reunions & Group Gatherings",
+   "category": "Venues & Event Spaces",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Reunions & Group Gatherings",
+   "category": "Event Staffing & Guest Services",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Reunions & Group Gatherings",
+   "category": "Event Planning & Day-Of Coordination",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Reunions & Group Gatherings",
+   "category": "DJs, Live Bands & Musicians",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Fundraising & Charity Events",
+   "category": "Fundraising & Auction Services",
+   "tier": "Essential",
+   "signature": "Silent Auction Platforms, Live Auctioneers, Sponsorship Package Design, Raffle & Ticketed Giveaway Services"
+  },
+  {
+   "archetype": "Fundraising & Charity Events",
+   "category": "Catering & Food Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Fundraising & Charity Events",
+   "category": "Officiants, Hosts & Ceremonial Leaders",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Fundraising & Charity Events",
+   "category": "Event Rentals & Furnishings",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Fundraising & Charity Events",
+   "category": "Audio, Visual, Lighting & Staging",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Fundraising & Charity Events",
+   "category": "Favors, Gifting & Awards",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Fundraising & Charity Events",
+   "category": "Photography & Videography",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Fundraising & Charity Events",
+   "category": "Event Planning & Day-Of Coordination",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Fundraising & Charity Events",
+   "category": "Invitations, Printing & Signage",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Nightlife & Social Parties",
+   "category": "Bar, Beverage & Mixology Services",
+   "tier": "Essential",
+   "signature": "Professional Bartenders, Party & Club DJs, Luxury Glam Bars, Karaoke Hosting"
+  },
+  {
+   "archetype": "Nightlife & Social Parties",
+   "category": "DJs, Live Bands & Musicians",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Nightlife & Social Parties",
+   "category": "Entertainment, Performers & Activities",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Nightlife & Social Parties",
+   "category": "Catering & Food Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Nightlife & Social Parties",
+   "category": "Decor, Floral & Balloon Design",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Nightlife & Social Parties",
+   "category": "Event Staffing & Guest Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Nightlife & Social Parties",
+   "category": "Photography & Videography",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Nightlife & Social Parties",
+   "category": "Event Rentals & Furnishings",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Nightlife & Social Parties",
+   "category": "Audio, Visual, Lighting & Staging",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Nightlife & Social Parties",
+   "category": "Photo Booths & Interactive Experiences",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Real Estate & Property Events",
+   "category": "Property Staging & Real Estate Event Services",
+   "tier": "Essential",
+   "signature": "Home Staging, Open House Coordination, Property Photography"
+  },
+  {
+   "archetype": "Real Estate & Property Events",
+   "category": "Catering & Food Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Real Estate & Property Events",
+   "category": "Decor, Floral & Balloon Design",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Real Estate & Property Events",
+   "category": "Photography & Videography",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Real Estate & Property Events",
+   "category": "Invitations, Printing & Signage",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Real Estate & Property Events",
+   "category": "Event Staffing & Guest Services",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Civic, Political & Awareness Events",
+   "category": "Officiants, Hosts & Ceremonial Leaders",
+   "tier": "Essential",
+   "signature": "Keynote & Guest Speakers, Event Security Guards, AV Equipment Rental"
+  },
+  {
+   "archetype": "Civic, Political & Awareness Events",
+   "category": "Security & Crowd Management",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Civic, Political & Awareness Events",
+   "category": "Audio, Visual, Lighting & Staging",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Civic, Political & Awareness Events",
+   "category": "Catering & Food Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Civic, Political & Awareness Events",
+   "category": "Invitations, Printing & Signage",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Civic, Political & Awareness Events",
+   "category": "Entertainment, Performers & Activities",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Civic, Political & Awareness Events",
+   "category": "Photography & Videography",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Hospitality & Venue-Hosted Events",
+   "category": "Venues & Event Spaces",
+   "tier": "Essential",
+   "signature": "Banquet Halls, Hotel Event Spaces, Full-Service Catering, Hospitality Staffing Agencies"
+  },
+  {
+   "archetype": "Hospitality & Venue-Hosted Events",
+   "category": "Catering & Food Services",
+   "tier": "Essential",
+   "signature": null
+  },
+  {
+   "archetype": "Hospitality & Venue-Hosted Events",
+   "category": "Audio, Visual, Lighting & Staging",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Hospitality & Venue-Hosted Events",
+   "category": "Event Staffing & Guest Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Hospitality & Venue-Hosted Events",
+   "category": "Entertainment, Performers & Activities",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Hospitality & Venue-Hosted Events",
+   "category": "Decor, Floral & Balloon Design",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "Hospitality & Venue-Hosted Events",
+   "category": "Photography & Videography",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "Hospitality & Venue-Hosted Events",
+   "category": "Transportation & Valet Services",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "General / Flexible Events",
+   "category": "Catering & Food Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "General / Flexible Events",
+   "category": "Decor, Floral & Balloon Design",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "General / Flexible Events",
+   "category": "Entertainment, Performers & Activities",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "General / Flexible Events",
+   "category": "Event Rentals & Furnishings",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "General / Flexible Events",
+   "category": "Event Staffing & Guest Services",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "General / Flexible Events",
+   "category": "Photography & Videography",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "General / Flexible Events",
+   "category": "Event Planning & Day-Of Coordination",
+   "tier": "Common",
+   "signature": null
+  },
+  {
+   "archetype": "General / Flexible Events",
+   "category": "Audio, Visual, Lighting & Staging",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "General / Flexible Events",
+   "category": "Bar, Beverage & Mixology Services",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "General / Flexible Events",
+   "category": "Bakery, Desserts & Cake Design",
+   "tier": "Occasional",
+   "signature": null
+  },
+  {
+   "archetype": "General / Flexible Events",
+   "category": "Favors, Gifting & Awards",
+   "tier": "Occasional",
+   "signature": null
+  }
+ ]
+}
