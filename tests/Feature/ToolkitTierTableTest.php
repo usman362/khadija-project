@@ -12,7 +12,7 @@ use Tests\TestCase;
  * a subset of the 12 tools, shown as a tab table rather than toggle buttons.
  *
  *   Manual   nothing, always, both sides — a preset, not a list
- *   Semi     six chosen tools, $2.99 one-time
+ *   Semi     $2.99 one-time — 5 tools for a client, 6 for a professional
  *   Maximum  all twelve, $5.99 one-time
  *
  * Professionals are gated by membership on top of that: Starter gets Manual
@@ -47,7 +47,7 @@ class ToolkitTierTableTest extends TestCase
         foreach ([ToolkitTiers::CLIENT, ToolkitTiers::PROFESSIONAL] as $audience) {
             $this->assertSame(0, ToolkitTiers::countFor('manual', $audience), "Manual must unlock nothing for {$audience}");
             $this->assertSame(
-                $audience === ToolkitTiers::CLIENT ? 8 : 6,
+                $audience === ToolkitTiers::CLIENT ? 5 : 6,
                 ToolkitTiers::countFor('semi', $audience),
                 "the Semi subset is wrong for {$audience}",
             );
@@ -80,34 +80,55 @@ class ToolkitTierTableTest extends TestCase
 
     public function test_timeline_builder_stays_at_semi(): void
     {
-        // Khadijah's revised client list of 2026-08-05 names 11 of the 12
-        // tools and leaves Timeline Builder out of BOTH tiers — an omission,
-        // not a decision. It is the one assignment confirmed live on the
-        // screen Peter reviewed (R31, 2026-07-24), so it stays at Semi until
-        // he says otherwise.
+        // Khadijah's draft left it out of both tiers, which read as an
+        // omission rather than a decision. Peter then traced it: confirmed
+        // live at Semi on 2026-07-24, locked into R31, and explicitly kept
+        // untouched by every revision since.
         $row = ToolkitTiers::table('semi', ToolkitTiers::CLIENT)->firstWhere('title', 'Timeline Builder');
 
         $this->assertTrue($row['included']);
     }
 
-    public function test_the_client_semi_set_matches_khadijahs_revised_list(): void
+    public function test_the_client_semi_set_is_the_five_peter_settled_on(): void
     {
         $semi = ToolkitTiers::table('semi', ToolkitTiers::CLIENT)
             ->where('included', true)->pluck('title')->sort()->values()->all();
 
         $this->assertSame([
             'Budget Planner',
-            'Guest Capacity Calculator',
             'Message Builder',
             'Review Builder',
             'Smart Checklist',
-            'Style & Inspiration',
             'Timeline Builder',
-            'Venue Compatibility Check',
         ], $semi);
+    }
 
-        // Moved to Maximum-only by her revision.
-        foreach (['Best Match', 'Guided Event Planner', 'Contract Assistant', 'Language'] as $tool) {
+    public function test_the_planning_suite_splits_three_to_four(): void
+    {
+        // Peter, 2026-08-05, on the Planning suite specifically.
+        foreach (['Budget Planner', 'Smart Checklist', 'Timeline Builder'] as $tool) {
+            $this->assertTrue(
+                ToolkitTiers::unlocks('semi', $tool, ToolkitTiers::CLIENT),
+                "{$tool} is one of the three Planning tools at Semi",
+            );
+        }
+
+        foreach (['Guided Event Planner', 'Guest Capacity Calculator',
+                  'Venue Compatibility Check', 'Style & Inspiration'] as $tool) {
+            $this->assertFalse(
+                ToolkitTiers::unlocks('semi', $tool, ToolkitTiers::CLIENT),
+                "{$tool} is Maximum-only",
+            );
+        }
+    }
+
+    public function test_the_other_two_suites_keep_khadijahs_revision(): void
+    {
+        // Peter did not restate these, and he had already accepted her change.
+        $this->assertTrue(ToolkitTiers::unlocks('semi', 'Review Builder', ToolkitTiers::CLIENT));
+        $this->assertTrue(ToolkitTiers::unlocks('semi', 'Message Builder', ToolkitTiers::CLIENT));
+
+        foreach (['Best Match', 'Contract Assistant', 'Language'] as $tool) {
             $this->assertFalse(
                 ToolkitTiers::unlocks('semi', $tool, ToolkitTiers::CLIENT),
                 "{$tool} is Maximum-only on the client side",

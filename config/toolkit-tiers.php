@@ -50,25 +50,36 @@ return [
 
     'semi_tools' => [
 
-        // Client side revised by Khadijah 2026-08-05 and accepted by Peter
-        // ("the changes were only intended for the Client Toolkit"). Semi is
-        // the essential planning set; Maximum adds the tools that save the
-        // most time, so there is a clear reason to upgrade.
+        // Five tools, settled across two messages on 2026-08-05.
+        //
+        // Planning suite — Peter, in his own words: "current Client Semi tier
+        // ($2.99) is 3 tools: Budget Planner, Smart Checklist, Timeline
+        // Builder. Maximum-only ($5.99) is 4 tools: Guided Event Planner,
+        // Guest Capacity Calculator, Venue Compatibility Check, Style &
+        // Inspiration." That supersedes Khadijah's earlier draft, which had
+        // put the last three in Semi.
+        //
+        // Marketplace and Operations — he did not restate those, so Khadijah's
+        // revision stands there, which he had already accepted: Review Builder
+        // in, Best Match out; Message Builder in, Contract Assistant and
+        // Language out.
+        //
+        // 3 + 1 + 1 = 5, matching the note on his corrected sheet: "Semi =
+        // $2.99 one-time, the 5-tool subset below (CORRECTED)".
         'client' => [
+            // Planning
             'Budget Planner',
-            'Venue Compatibility Check',
             'Smart Checklist',
-            'Guest Capacity Calculator',
-            'Style & Inspiration',
-            'Review Builder',
-            'Message Builder',
-
-            // Not in her list — but not in her Maximum list either, so this is
-            // an omission rather than a decision, and it is the one assignment
-            // confirmed live on the screen Peter reviewed (R31, 2026-07-24).
-            // Kept at Semi until he answers; dropping a confirmed tool on a
-            // silence would be inventing a decision in the losing direction.
+            // Confirmed live at Semi on 2026-07-24 and locked into R31. Peter
+            // has now traced it through every later revision: never moved,
+            // never re-opened.
             'Timeline Builder',
+
+            // Marketplace
+            'Review Builder',
+
+            // Operations
+            'Message Builder',
         ],
 
         'professional' => [
