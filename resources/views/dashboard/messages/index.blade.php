@@ -26,7 +26,7 @@
             @endcan
         </div>
 
-        <form method="GET" action="{{ route('app.messages.index') }}" class="row g-2 mb-3">
+        <form method="GET" action="{{ route('app.chat.index') }}" class="row g-2 mb-3">
             <div class="col-md-3">
                 <label class="form-label small">Booking</label>
                 <select name="booking_id" class="form-select form-select-sm">

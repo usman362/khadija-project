@@ -68,7 +68,7 @@
                             <div class="pe-rail-row"><span class="k">Total Amount</span><span class="v">${{ number_format($order['total']) }}</span></div>
                             <div class="pe-rail-row"><span class="k">Deposit Due</span><span class="v">${{ number_format($order['deposit']) }}</span></div>
                         </div>
-                        <a href="#" class="pe-muted" style="display:inline-block; font-weight:700; text-decoration:none; color:var(--pe-orange); margin-bottom:14px;">View Full Contract</a>
+                        {{-- Removed 2026-08-05: no contract exists at this step to open. --}}
                         <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer;">
                             <input type="checkbox" style="width:17px; height:17px; margin-top:1px; accent-color:var(--pe-orange); flex-shrink:0;">
                             <span style="font-size:12.5px; color:var(--pe-ink-2);">I have read and agree to the Terms &amp; Conditions and accept the contract.</span>

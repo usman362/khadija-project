@@ -86,7 +86,8 @@
                                 <div class="pe-cz-pricec">
                                     @php $low = (int) preg_replace('/[^0-9]/', '', explode('–', $line['budget'])[0]); @endphp
                                     <span class="p">${{ number_format($low) }}</span>
-                                    <a href="#" onclick="return false;">Edit</a>
+                                    {{-- Removed 2026-08-05: it was already inert (onclick returned false),
+                                         so it only looked clickable. --}}
                                 </div>
                             </div>
                         @endforeach

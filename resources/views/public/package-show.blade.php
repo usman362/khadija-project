@@ -108,7 +108,10 @@
                     <div class="pk-price">{{ $package->priceLabel() }}
                         <small>{{ $package->duration ? $package->duration : 'Package price' }}</small>
                     </div>
-                    <a href="{{ auth()->check() ? route('client.chat.index') : route('login') }}" class="pk-cta pk-cta-primary">Request this Package</a>
+                    {{-- Was the general inbox, which dropped the client into every
+                         conversation they have. This opens a request addressed to
+                         this professional, with them already selected. --}}
+                    <a href="{{ auth()->check() ? route('client.direct-offers.create', ['pro' => $pro?->id]) : route('login') }}" class="pk-cta pk-cta-primary">Request this Package</a>
                     <a href="{{ route('public.professional.show', $pro) }}" class="pk-cta pk-cta-ghost">View {{ \Illuminate\Support\Str::limit($pro?->name, 18) }}'s profile</a>
                     <div class="pk-trust">
                         <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Secure, protected payment</span>

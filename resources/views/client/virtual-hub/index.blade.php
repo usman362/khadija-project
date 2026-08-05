@@ -161,7 +161,7 @@
 
     {{-- Specialized virtual services --}}
     <div class="vh-card">
-        <div class="vh-sec-head"><span class="vh-sec-title">Explore Specialized Virtual Services</span><a href="{{ route('client.search.index') }}" class="vh-sec-link">View all categories →</a></div>
+        <div class="vh-sec-head"><span class="vh-sec-title">Explore Specialized Virtual Services</span><a href="{{ route('events-categories') }}" class="vh-sec-link">View all categories →</a></div>
         @php
             $vhSvcDefaults = [
                 ['Livestream Directors', '📹'], ['Broadcast Engineers', '🎚'], ['Virtual Venue Architects', '🏛'],

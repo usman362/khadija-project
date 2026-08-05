@@ -361,8 +361,11 @@
                     <div class="pk-why"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg><div><b>Seamless Experience</b><span>Professionals coordinate for you</span></div></div>
                     <div class="pk-why"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div><b>One Contract</b><span>One payment, one point of contact</span></div></div>
                     <div class="pk-why"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg><div><b>Customizable</b><span>Adjust services to fit your needs</span></div></div>
-                    {{-- Was href="#". There is a real page for this. --}}
-                    <a class="pk-howbtn" href="{{ route('public.how-it-works') }}">How Packages Work</a>
+                    {{-- Button removed 2026-08-05 (Khadijah): it pointed at the
+                         general "How it works" page, which says nothing about
+                         packages. The four points above already explain them,
+                         so a button that leads somewhere else only misleads.
+                         Restore it if a packages-specific page is ever built. --}}
                 </div>
 
                 @if($recent->count())
