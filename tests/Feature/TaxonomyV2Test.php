@@ -187,4 +187,24 @@ class TaxonomyV2Test extends TestCase
 
         $this->assertSame([$target->id], $landed->values()->all(), 'both spellings must land on the same v2 category');
     }
+    public function test_the_trademark_does_not_come_back_through_the_new_tree(): void
+    {
+        // Sir Peter ruled on 2026-08-03 that "Comic-Con" cannot be used. The
+        // V2 sheet is dated a day earlier and still carried it, so importing
+        // put the trademark straight back onto a public page.
+        $this->importV2();
+
+        $this->assertSame(
+            0,
+            Category::anyTaxonomy()
+                ->where(fn ($q) => $q->where('name', 'like', '%Comic%')->orWhere('slug', 'like', '%comic%'))
+                ->count(),
+        );
+
+        $this->assertStringNotContainsString(
+            'Comic',
+            file_get_contents(base_path('database/seeders/data/taxonomy_v2.json')),
+            'the source file must not carry it either, or the next import undoes this',
+        );
+    }
 }

@@ -62,10 +62,11 @@
    "was": null
   },
   {
-   "name": "Comic-Con / Pop Culture Event",
+   "name": "Pop Culture Event",
    "archetype": "Fairs, Festivals & Large Public Events",
    "disposition": "KEEP",
-   "was": null
+   "was": null,
+   "note": "Renamed from the sheet: the original title carried a registered trademark, which Sir Peter ruled out on 2026-08-03. This sheet is dated 2026-08-02 and predates that instruction."
   },
   {
    "name": "Community Event",

@@ -67,13 +67,42 @@ those leaves professionals listed under nothing.
 
 Rolling back is setting it to `v1` again — v1 rows are never deleted.
 
-## Approval
+## Approval and switch — done 2026-08-05
 
-Khadijah approved the design on 2026-08-04, and flagged in the same note that
-per R45 this is a design deliverable "pending Peter's review/approval (not
-PM's), given how many direct pivots Peter personally drove on this." The
-checklist row is still assigned to PM.
+Khadijah approved the design on 08-04 and flagged that R45 put the sign-off
+with Peter. Peter then said the service category lists are **her** approval,
+which closed it. On the mapping she asked for professionals to land in "the
+most specific service group available" rather than a broad bucket.
 
-Everything above is therefore built but **not switched on**. If Sir Peter
-revises the sheet, re-export it to `taxonomy_v2.json` and re-run the import —
-names are data, and the structure does not change with them.
+**Switched on 2026-08-05.** `TAXONOMY_VERSION=v2`. The old 360 rows are still
+in the table, hidden by the global scope — rolling back is setting the value
+to `v1` again.
+
+What the remap did:
+
+| | before | after |
+|---|---|---|
+| professional → category | 156 | 13 |
+| event → category | 16 | 9 |
+| packages | 10 | 10 |
+
+The counts fall because the old tree repeated the same category under several
+spellings — one caterer alone held nineteen links to five distinct names. Every
+user and every event that had a category still has one; that was checked
+against a dump taken before the switch.
+
+Three things the switch surfaced, all now fixed:
+
+* **Case-sensitive matching.** "Food services" was stranded while "Food
+  Services" moved. The old tree carries both, each with professionals attached.
+* **The pivots' unique index.** Updating in place collided as soon as two of a
+  professional's categories collapsed into one — which is the normal case when
+  27 categories replace 360, not an edge case. Pivots are rebuilt and
+  deduplicated instead.
+* **The trademark came back.** The V2 sheet is dated 08-02 and still carried
+  "Comic-Con"; Peter ruled it out on 08-03. The live tree had been fixed by an
+  earlier migration, but the new tree reintroduced it. Renamed in the row and
+  in the source file, with a test on both.
+
+If Sir Peter revises the sheet, re-export to `taxonomy_v2.json` and re-run the
+import — it matches on slug and updates in place.

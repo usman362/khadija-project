@@ -30,6 +30,15 @@
   "Floral Design & Arrangements": "Decor, Floral & Balloon Design",
   "Lighting Services": "Audio, Visual, Lighting & Staging",
   "Solo Musicians & Vocalists": "DJs, Live Bands & Musicians",
-  "Live Bands & Musical Acts": "DJs, Live Bands & Musicians"
- }
+  "Live Bands & Musical Acts": "DJs, Live Bands & Musicians",
+  "Beverage & Bar Services": "Bar, Beverage & Mixology Services",
+  "Guest Services & Event Staffing": "Event Staffing & Guest Services",
+  "Food Truck & Mobile Kitchen Services": "Catering & Food Services",
+  "Personal & Private Chefs": "Catering & Food Services",
+  "Catering & Food Trucks Services": "Catering & Food Services",
+  "Awards, Branding & Gifting": "Favors, Gifting & Awards",
+  "Baby Shower": "Baby Shower",
+  "Food Truck Festival": "Food Truck Festival"
+ },
+ "_also_mapped": "Below: the categories nothing in category_user pointed at, but events, packages and bids did. Two are event types rather than service categories, and V2 happens to carry both names unchanged."
 }
