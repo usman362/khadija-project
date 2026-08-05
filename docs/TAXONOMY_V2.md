@@ -59,9 +59,10 @@ those leaves professionals listed under nothing.
 1. `taxonomy:import-v2`
 2. Check `database/seeders/data/taxonomy_v1_to_v2_map.json` — V2 was written
    from scratch and reuses none of the old titles, so only 2 of 26 matched by
-   name. The rest are proposed there, with two genuine judgement calls listed
-   under `_uncertain` (chiefly **Music & Entertainment**, the largest group at
-   24 professionals — musicians or performers?).
+   name. The rest are proposed there. Read the counts carefully: the old tree
+   repeats each name, so "Music & Entertainment — 24" is 24 *rows* and only
+   **3 professionals**, and their other categories say plainly that all three
+   are musicians.
 3. `taxonomy:switch --remap`
 4. `TAXONOMY_VERSION=v2` in `.env`, then `php artisan config:clear`
 
