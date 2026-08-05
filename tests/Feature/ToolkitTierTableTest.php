@@ -46,7 +46,11 @@ class ToolkitTierTableTest extends TestCase
     {
         foreach ([ToolkitTiers::CLIENT, ToolkitTiers::PROFESSIONAL] as $audience) {
             $this->assertSame(0, ToolkitTiers::countFor('manual', $audience), "Manual must unlock nothing for {$audience}");
-            $this->assertSame(6, ToolkitTiers::countFor('semi', $audience), "Semi is a six-tool subset for {$audience}");
+            $this->assertSame(
+                $audience === ToolkitTiers::CLIENT ? 8 : 6,
+                ToolkitTiers::countFor('semi', $audience),
+                "the Semi subset is wrong for {$audience}",
+            );
             $this->assertSame(12, ToolkitTiers::countFor('maximum', $audience), "Maximum is everything for {$audience}");
         }
     }
@@ -65,6 +69,8 @@ class ToolkitTierTableTest extends TestCase
 
         $this->assertContains('Budget Planner', $client->all());
         $this->assertContains('Bid Calculator', $pro->all());
+        // Best Match is Semi for professionals but Maximum-only for clients.
+        $this->assertNotContains('Best Match', $client->all());
         $this->assertNotContains('Bid Calculator', $client->all(), 'a professional tool must not appear in the client set');
 
         // Message Builder is shared and sits at Semi on both sides.
@@ -74,16 +80,52 @@ class ToolkitTierTableTest extends TestCase
 
     public function test_timeline_builder_stays_at_semi(): void
     {
-        // The one assignment confirmed live back on 2026-07-24.
+        // Khadijah's revised client list of 2026-08-05 names 11 of the 12
+        // tools and leaves Timeline Builder out of BOTH tiers — an omission,
+        // not a decision. It is the one assignment confirmed live on the
+        // screen Peter reviewed (R31, 2026-07-24), so it stays at Semi until
+        // he says otherwise.
         $row = ToolkitTiers::table('semi', ToolkitTiers::CLIENT)->firstWhere('title', 'Timeline Builder');
 
         $this->assertTrue($row['included']);
     }
 
-    public function test_review_builder_is_maximum_only_on_both_sides(): void
+    public function test_the_client_semi_set_matches_khadijahs_revised_list(): void
     {
+        $semi = ToolkitTiers::table('semi', ToolkitTiers::CLIENT)
+            ->where('included', true)->pluck('title')->sort()->values()->all();
+
+        $this->assertSame([
+            'Budget Planner',
+            'Guest Capacity Calculator',
+            'Message Builder',
+            'Review Builder',
+            'Smart Checklist',
+            'Style & Inspiration',
+            'Timeline Builder',
+            'Venue Compatibility Check',
+        ], $semi);
+
+        // Moved to Maximum-only by her revision.
+        foreach (['Best Match', 'Guided Event Planner', 'Contract Assistant', 'Language'] as $tool) {
+            $this->assertFalse(
+                ToolkitTiers::unlocks('semi', $tool, ToolkitTiers::CLIENT),
+                "{$tool} is Maximum-only on the client side",
+            );
+        }
+    }
+
+    public function test_a_shared_tool_can_sit_at_a_different_tier_on_each_side(): void
+    {
+        // Review Builder is one of the four tools both sides use, and the two
+        // sides landed on different answers: Khadijah put it in the client's
+        // Semi set on 2026-08-05, while Peter's professional sheet keeps it
+        // Maximum-only. Both are deliberate, so the tier is per side.
+        $this->assertTrue(ToolkitTiers::unlocks('semi', 'Review Builder', ToolkitTiers::CLIENT));
+        $this->assertFalse(ToolkitTiers::unlocks('semi', 'Review Builder', ToolkitTiers::PROFESSIONAL));
+
+        // Maximum is everything, so it carries the tool on both sides.
         foreach ([ToolkitTiers::CLIENT, ToolkitTiers::PROFESSIONAL] as $audience) {
-            $this->assertFalse(ToolkitTiers::unlocks('semi', 'Review Builder', $audience));
             $this->assertTrue(ToolkitTiers::unlocks('maximum', 'Review Builder', $audience));
         }
     }

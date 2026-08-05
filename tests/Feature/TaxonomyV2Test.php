@@ -158,4 +158,33 @@ class TaxonomyV2Test extends TestCase
             'an event type points at an archetype with no service categories behind it',
         );
     }
+    public function test_a_lowercase_spelling_of_the_same_category_is_remapped_too(): void
+    {
+        // The old tree carries "Food Services" and "Food services" as separate
+        // rows, each with professionals attached. A case-sensitive match moved
+        // one and stranded the other.
+        $properCase = $this->v1('Catering Services');
+        $lowerCase = Category::create([
+            'name' => 'Catering services',
+            'slug' => 'catering-services-lower',
+            'taxonomy_version' => 'v1',
+            'is_active' => true,
+        ]);
+        $this->importV2();
+
+        $pro = User::factory()->create();
+        DB::table('category_user')->insert([
+            ['user_id' => $pro->id, 'category_id' => $properCase->id],
+            ['user_id' => $pro->id, 'category_id' => $lowerCase->id],
+        ]);
+
+        $this->artisan('taxonomy:switch --remap')->assertSuccessful();
+
+        $target = Category::anyTaxonomy()->where('taxonomy_version', 'v2')
+            ->where('name', 'Catering & Food Services')->firstOrFail();
+
+        $landed = DB::table('category_user')->where('user_id', $pro->id)->pluck('category_id')->unique();
+
+        $this->assertSame([$target->id], $landed->values()->all(), 'both spellings must land on the same v2 category');
+    }
 }

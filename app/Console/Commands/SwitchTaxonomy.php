@@ -36,6 +36,20 @@ class SwitchTaxonomy extends Command
         'bids'           => 'category_id',
     ];
 
+    /**
+     * Pivots, and the column naming the other side of the pair.
+     *
+     * These carry a unique index on (owner, category). Twenty-seven new
+     * categories replace three hundred and sixty old ones, so two of a
+     * professional's categories routinely collapse into one — and updating the
+     * rows in place hits that index and rolls the whole remap back. They are
+     * rebuilt instead.
+     */
+    private const PIVOTS = [
+        'category_user'  => 'user_id',
+        'category_event' => 'event_id',
+    ];
+
     public function handle(): int
     {
         if (Category::anyTaxonomy()->where('taxonomy_version', 'v2')->doesntExist()) {
@@ -112,8 +126,6 @@ class SwitchTaxonomy extends Command
             ->whereIn('kind', [Category::SERVICE_CATEGORY, Category::EVENT_TYPE])
             ->pluck('id', 'name');
 
-        $v1 = Category::anyTaxonomy()->where('taxonomy_version', 'v1')->pluck('id', 'name');
-
         $missing = collect($map)->reject(fn ($to) => $v2->has($to));
         if ($missing->isNotEmpty()) {
             $this->error('These targets do not exist in v2:');
@@ -122,32 +134,90 @@ class SwitchTaxonomy extends Command
             return;
         }
 
+        // Matched on the lowercased name. The old tree holds the same category
+        // under several spellings — "Food Services" and "Food services" are
+        // separate rows, each with professionals attached — and a
+        // case-sensitive match left the lowercase ones behind with no category
+        // at all, which is the very failure the switch exists to prevent.
+        $lookup = collect($map)->mapWithKeys(fn ($to, $from) => [mb_strtolower($from) => $to]);
+
         $moved = 0;
+        $unmapped = collect();
 
-        DB::transaction(function () use ($map, $v1, $v2, &$moved) {
-            foreach ($map as $from => $to) {
-                $oldId = $v1->get($from);
-                $newId = $v2->get($to);
+        DB::transaction(function () use ($lookup, $v2, &$moved, &$unmapped) {
+            $old = Category::anyTaxonomy()->where('taxonomy_version', 'v1')->get(['id', 'name']);
 
-                if (! $oldId) {
-                    continue;                       // that old category is already gone
+            // old category id => new category id, for the ones we can place
+            $redirect = [];
+
+            foreach ($old as $category) {
+                $target = $lookup->get(mb_strtolower($category->name));
+
+                if ($target === null) {
+                    $unmapped->push($category);
+
+                    continue;
                 }
 
-                foreach (self::DEPENDENTS as $table => $column) {
-                    $moved += DB::table($table)->where($column, $oldId)->update([$column => $newId]);
+                $redirect[$category->id] = $v2->get($target);
+            }
+
+            if ($redirect === []) {
+                return;
+            }
+
+            $oldIds = array_keys($redirect);
+
+            // Pivots: collect the pairs, redirect them, drop the duplicates a
+            // many-to-one move creates, then write them back.
+            foreach (self::PIVOTS as $table => $ownerColumn) {
+                $pairs = DB::table($table)
+                    ->whereIn('category_id', $oldIds)
+                    ->get([$ownerColumn, 'category_id']);
+
+                if ($pairs->isEmpty()) {
+                    continue;
+                }
+
+                $rebuilt = $pairs
+                    ->map(fn ($row) => [
+                        $ownerColumn  => $row->$ownerColumn,
+                        'category_id' => $redirect[$row->category_id],
+                    ])
+                    ->unique(fn (array $row) => $row[$ownerColumn] . ':' . $row['category_id'])
+                    // Skip any pair the owner already has on the new tree.
+                    ->reject(fn (array $row) => DB::table($table)
+                        ->where($ownerColumn, $row[$ownerColumn])
+                        ->where('category_id', $row['category_id'])
+                        ->exists())
+                    ->values();
+
+                DB::table($table)->whereIn('category_id', $oldIds)->delete();
+
+                if ($rebuilt->isNotEmpty()) {
+                    DB::table($table)->insert($rebuilt->all());
+                }
+
+                $moved += $rebuilt->count();
+            }
+
+            // Plain foreign keys — no pair to collide, so a straight update.
+            foreach (array_diff_key(self::DEPENDENTS, self::PIVOTS) as $table => $column) {
+                foreach ($redirect as $from => $to) {
+                    $moved += DB::table($table)->where($column, $from)->update([$column => $to]);
                 }
             }
         });
 
         $this->info("Re-homed {$moved} link(s) onto v2.");
 
-        $unmapped = $v1->keys()->reject(fn ($name) => isset($map[$name]));
-        $stillUsed = $unmapped->filter(function ($name) use ($v1) {
-            $id = $v1->get($name);
-
-            return collect(self::DEPENDENTS)
-                ->contains(fn ($col, $table) => DB::table($table)->where($col, $id)->exists());
-        });
+        // Only worth reporting the ones something still points at — the old
+        // tree has hundreds of categories nobody ever used.
+        $stillUsed = $unmapped
+            ->filter(fn ($category) => collect(self::DEPENDENTS)
+                ->contains(fn ($col, $table) => DB::table($table)->where($col, $category->id)->exists()))
+            ->pluck('name')
+            ->unique();
 
         if ($stillUsed->isNotEmpty()) {
             $this->warn('These old categories are still in use but have no entry in the mapping file:');

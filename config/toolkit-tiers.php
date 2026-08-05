@@ -50,13 +50,25 @@ return [
 
     'semi_tools' => [
 
+        // Client side revised by Khadijah 2026-08-05 and accepted by Peter
+        // ("the changes were only intended for the Client Toolkit"). Semi is
+        // the essential planning set; Maximum adds the tools that save the
+        // most time, so there is a clear reason to upgrade.
         'client' => [
-            'Budget Planner',          // a budget is the first thing anyone needs
-            'Guided Event Planner',    // the entry point into planning
-            'Smart Checklist',         // everyday, low-complexity utility
-            'Timeline Builder',        // confirmed live at Semi 2026-07-24
-            'Best Match',              // finding a professional at all is core
-            'Message Builder',         // everyday contact with a professional
+            'Budget Planner',
+            'Venue Compatibility Check',
+            'Smart Checklist',
+            'Guest Capacity Calculator',
+            'Style & Inspiration',
+            'Review Builder',
+            'Message Builder',
+
+            // Not in her list — but not in her Maximum list either, so this is
+            // an omission rather than a decision, and it is the one assignment
+            // confirmed live on the screen Peter reviewed (R31, 2026-07-24).
+            // Kept at Semi until he answers; dropping a confirmed tool on a
+            // silence would be inventing a decision in the losing direction.
+            'Timeline Builder',
         ],
 
         'professional' => [
