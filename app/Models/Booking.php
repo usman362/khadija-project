@@ -50,6 +50,46 @@ class Booking extends Model
         'confirmed->cancelled' => ['client', 'supplier'],  // either side can cancel mid-flight
     ];
 
+    /**
+     * A confirmed booking is what makes a professional the one doing the job,
+     * so the event records it too.
+     *
+     * The event carries its own supplier_id, and three separate places used to
+     * be responsible for keeping it in step — accepting a bid, sending a
+     * proposal, finalizing. Accepting a bid never did, which is how the same
+     * professional showed 3 jobs on Contracts and Gig Operations Hub but 1 on
+     * My Gigs: those pages count bookings, My Gigs counts events.
+     *
+     * The count was the visible half. The other half was worse — the bidding
+     * board decides what is still open by looking for events with no supplier,
+     * so an awarded job stayed on the board and other professionals kept
+     * bidding on work that was already taken.
+     *
+     * Only confirmed and completed bookings claim the event. A `requested`
+     * booking is a proposal nobody has accepted; if that took the job off the
+     * board, sending a proposal would lock everyone else out.
+     */
+    protected static function booted(): void
+    {
+        static::saved(function (self $booking) {
+            if (! in_array($booking->status, ['confirmed', 'completed'], true)) {
+                return;
+            }
+
+            $event = $booking->event;
+
+            // Never overwrite an event already awarded to someone else — that
+            // would be a second professional silently taking the first one's
+            // job. Two confirmed bookings on one event is its own problem
+            // (R12, one contract per service); it is not this method's to fix.
+            if ($event === null || $event->supplier_id !== null) {
+                return;
+            }
+
+            $event->forceFill(['supplier_id' => $booking->supplier_id])->saveQuietly();
+        });
+    }
+
     /** Is moving from the current status to $to allowed by the graph? */
     public function canTransitionTo(string $to): bool
     {
