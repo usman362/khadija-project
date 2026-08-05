@@ -4,92 +4,92 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Which toolkit tier unlocks which tools
+    | Which toolkit tier unlocks which tools — Rule R31
     |--------------------------------------------------------------------------
     |
-    | Rule R31: access is gated by tool SUBSET per tier, not by automation
-    | depth. Semi unlocks one set of the 12 Client Toolkit tools; Maximum
-    | unlocks more. Manual gets no toolkit access at all.
+    | Answered in full by Peter on 2026-08-05
+    | (GigResource_Toolkit_Suite_and_Tier_Assignment_2026-08-05.xlsx).
     |
-    | This is deliberately NOT config/ai-levels.php. That file says how deeply
-    | a tool may automate; this one says whether the client can open it.
+    | Access is a tool SUBSET per tier, not automation depth — that second
+    | thing is config/ai-levels.php and is a different question entirely.
     |
-    | 'confirmed' is the important column. R31 says the breakdown must come
-    | from Peter and warns "do not invent it", so only what is actually
-    | confirmed is marked true:
+    | Manual is a preset: ALWAYS zero tools, on both sides. It is not evaluated
+    | per tool, so no tool is ever listed under it.
     |
-    |   Timeline Builder — Semi, seen live on the screen Peter reviewed.
-    |
-    | The rest carry Khadijah's proposal of 2026-08-04, which she flagged in
-    | the same note as needing Peter's confirmation. Until 'confirmed' is true
-    | the tier table shows them as awaiting confirmation rather than stating
-    | them as fact to a paying client.
-    |
-    | Her proposal was written against an older tool list and named five tools
-    | that are not in the client 12 — Pricing Calculator, Proposal Builder and
-    | Staffing Elements are professional tools, and SMART Checkout and Legal
-    | Responsibility Check do not exist in the catalogue. Those are dropped
-    | here; the three client tools she did not mention (Smart Checklist,
-    | Message Builder, Language) have no proposal at all.
-    |
-    | To lock a row: set its tier from Peter's answer and flip confirmed to
-    | true. Nothing else needs touching.
+    | Maximum is not a curated set — it is everything. Only the Semi subset is
+    | chosen, six a side.
     |
     */
 
-    'tiers' => ['semi' => 'Semi Tools', 'maximum' => 'Maximum Tools'],
+    'tiers' => ['manual' => 'Manual', 'semi' => 'Semi', 'maximum' => 'Maximum'],
 
-    // tool title => ['tier' => semi|maximum|null, 'confirmed' => bool, 'note' => ?string]
-    'tools' => [
+    // One-time purchases, not subscriptions. Both sides pay the same.
+    'prices' => ['manual' => 0.00, 'semi' => 2.99, 'maximum' => 5.99],
 
-        'Timeline Builder' => [
-            'tier' => 'semi',
-            'confirmed' => true,
-            'note' => 'Confirmed from the live screen.',
+    /*
+    | Toolkit access is a purchased entitlement tied to account status — it is
+    | not perpetual or portable if the account is closed (Peter, 2026-08-05).
+    */
+    'requires_active_account' => true,
+
+    // Manual unlocks nothing, by rule rather than by an empty list.
+    'manual_unlocks_nothing' => true,
+
+    // Maximum unlocks all 12 on its side; only Semi is a chosen subset.
+    'maximum_unlocks_everything' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | The Semi subset — six tools a side
+    |--------------------------------------------------------------------------
+    |
+    | Names match AiToolCatalog exactly. Everything not listed here is
+    | Maximum-only.
+    |
+    */
+
+    'semi_tools' => [
+
+        'client' => [
+            'Budget Planner',          // a budget is the first thing anyone needs
+            'Guided Event Planner',    // the entry point into planning
+            'Smart Checklist',         // everyday, low-complexity utility
+            'Timeline Builder',        // confirmed live at Semi 2026-07-24
+            'Best Match',              // finding a professional at all is core
+            'Message Builder',         // everyday contact with a professional
         ],
 
-        'Budget Planner' => [
-            'tier' => 'semi',
-            'confirmed' => false,
-            'note' => "Khadijah's proposal, 2026-08-04.",
+        'professional' => [
+            'Availability Scheduler',  // you cannot take work without a calendar
+            'Bid Calculator',          // needed to bid competitively at all
+            'Proposal Builder',        // the proposal IS the bid submission
+            'Pricing Calculator',      // feeds every bid and proposal
+            'Portfolio Optimizer',     // a strong portfolio is what gets you chosen
+            'Message Builder',         // everyday contact with a client
         ],
-        'Guided Event Planner' => [
-            'tier' => 'maximum',
-            'confirmed' => false,
-            'note' => "Khadijah's proposal, 2026-08-04.",
-        ],
-        'Style & Inspiration' => [
-            'tier' => 'maximum',
-            'confirmed' => false,
-            'note' => "Khadijah's proposal, 2026-08-04 (listed under its old name, Theme & Style Advisor).",
-        ],
-        'Best Match' => [
-            'tier' => 'maximum',
-            'confirmed' => false,
-            'note' => "Khadijah's proposal, 2026-08-04 (listed under its old name, SMART Match).",
-        ],
-        'Review Builder' => [
-            'tier' => 'maximum',
-            'confirmed' => false,
-            'note' => "Khadijah's proposal, 2026-08-04.",
-        ],
-
-        // She proposed "Venue Capacity Calculator" — a name that sits between
-        // these two real tools, so neither can take it.
-        'Venue Compatibility Check' => ['tier' => null, 'confirmed' => false, 'note' => null],
-        'Guest Capacity Calculator' => ['tier' => null, 'confirmed' => false, 'note' => null],
-
-        // Not mentioned in any proposal.
-        'Smart Checklist'    => ['tier' => null, 'confirmed' => false, 'note' => null],
-        'Contract Assistant' => ['tier' => null, 'confirmed' => false, 'note' => null],
-        'Message Builder'    => ['tier' => null, 'confirmed' => false, 'note' => null],
-        'Language'           => ['tier' => null, 'confirmed' => false, 'note' => null],
     ],
 
     /*
-    | Maximum is expected to be a superset of Semi — everything Semi unlocks,
-    | plus more — unless Peter says otherwise (his words, via the spec).
+    |--------------------------------------------------------------------------
+    | Which tiers a professional may buy
+    |--------------------------------------------------------------------------
+    |
+    | Re-coupled to membership by Peter on 2026-08-05, after an interim
+    | decoupled model that stood for part of the same day. The membership fee
+    | still governs commission, early access and visibility on its own — the
+    | toolkit is a separate one-time purchase on top.
+    |
+    | Elite is offered Maximum only: the top membership has nothing lower to
+    | choose from.
+    |
+    | Clients have no membership, so they may buy either tier.
+    |
     */
-    'maximum_includes_semi' => true,
+
+    'purchasable_by_plan' => [
+        'starter'      => ['manual'],
+        'professional' => ['manual', 'semi', 'maximum'],   // Semi, upgradable to Maximum
+        'enterprise'   => ['manual', 'maximum'],           // Elite — Maximum only
+    ],
 
 ];

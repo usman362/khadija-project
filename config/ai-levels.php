@@ -66,14 +66,16 @@ return [
     // The three tool-package levels, shared by professionals and clients.
     // Internal keys stay manual/semi/maximum; these are what a user sees.
     //
-    // Renamed twice by Peter: "Help Me Plan" and "Coordinate It For Me" became
-    // Semi and Maximum, then on 2026-07-21 "Do It Myself" became Starter. The
-    // old wording said a machine did the work for you, which R29 forbids —
-    // every level is rules-based, and the depth is how much the templates and
-    // calculators fill in, not how clever anything is.
+    // Settled by Peter 2026-08-05: "Manual / Semi / Maximum are now the ONLY
+    // toolkit-tier labels, for both Client and Professional." That retires
+    // "Do It Myself / Help Me Plan / Coordinate It For Me" (which claimed a
+    // machine did the work, against R29), the client-facing
+    // "Basic / Plus / Premium", and the 2026-07-21 amendment that had briefly
+    // renamed the base level to "Starter" — Starter is a membership name, not
+    // a tier label.
     'labels' => [
         'none'    => 'Locked',
-        'manual'  => 'Starter',
+        'manual'  => 'Manual',
         'semi'    => 'Semi',
         'maximum' => 'Maximum',
     ],
