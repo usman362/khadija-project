@@ -1,14 +1,3 @@
-@extends('layouts.professional')
-
-@section('title', 'Contracts')
-
-{{-- ════════════════════════════════════════════════════════════════
-     Professional Contracts hub. Wired to REAL data (bookings, events,
-     reviews) via ProfessionalContractController. Earnings split + AI
-     Smart Bid Assistant are derived/illustrative (no payment ledger /
-     AI backend yet) — clearly noted.
-═══════════════════════════════════════════════════════════════════ --}}
-
 @php
     $money = fn ($n) => '$' . number_format((float) $n, ($n == (int) $n) ? 0 : 2);
     $tot = max($totalRevenue, 0.01);
@@ -167,8 +156,6 @@
     @media (max-width: 760px)  { .pc-stats { grid-template-columns: repeat(2, minmax(0,1fr)); } .pc-sub2 { grid-template-columns: 1fr; } .pc-opps { grid-template-columns: 1fr 1fr; } }
 </style>
 @endpush
-
-@section('content')
 <div class="pc">
 
     @if($errors->any())
@@ -295,7 +282,7 @@
                 <div class="pc-card">
                     <div class="pc-card-head">
                         <span class="pc-card-title">Live Gig Opportunities</span>
-                        <a href="{{ route('professional.gigs.index') }}" class="pc-card-link">View All Gigs <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+                        <a href="{{ route('professional.gig-hub.index', ['tab' => 'gigs']) }}" class="pc-card-link">View All Gigs <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
                     </div>
                     @if($opportunities->count())
                         <div class="pc-opps">
@@ -378,7 +365,7 @@
             <div class="pc-card">
                 <div class="pc-card-head">
                     <span class="pc-card-title">Upcoming Gig Schedule</span>
-                    <a href="{{ route('professional.gigs.index') }}" class="pc-card-link">View Calendar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+                    <a href="{{ route('professional.gig-hub.index', ['tab' => 'gigs']) }}" class="pc-card-link">View Calendar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
                 </div>
                 @forelse($upcoming as $b)
                     <div class="pc-sch-row">
@@ -434,4 +421,3 @@
         </div>
     </div>
 </div>
-@endsection

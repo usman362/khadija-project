@@ -10,7 +10,13 @@ use Illuminate\View\View;
 
 class ProfessionalGigController extends Controller
 {
-    public function index(Request $request): View
+    /**
+     * Merged into the Gig Operations Hub as its "Gigs" tab (R42, amended
+     * 2026-08-05). The page's own route now redirects there; this method
+     * still assembles exactly the same data, so the merge changed where the
+     * list is shown and nothing about what it shows.
+     */
+    public function indexData(Request $request): array
     {
         $user = $request->user();
         $view = $request->string('view')->toString() ?: 'my-gigs';
@@ -83,10 +89,10 @@ class ProfessionalGigController extends Controller
 
         $categories = Category::active()->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
 
-        return view('professional.gigs.index', compact(
+        return compact(
             'myGigs', 'stats', 'browseEvents', 'browseStats',
             'calendarEvents', 'categories', 'month', 'year', 'view'
-        ));
+        );
     }
 
     public function show(Request $request, Event $event): View

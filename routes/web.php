@@ -738,7 +738,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [ProfessionalDashboardController::class, 'index'])->name('professional.dashboard');
 
         // Contracts hub (contracts, proposals, earnings, gig opportunities, bids pipeline)
-        Route::get('/contracts', [\App\Http\Controllers\Professional\ProfessionalContractController::class, 'index'])->name('professional.contracts.index');
+        // Merged into the Gig Operations Hub as its Contracts tab (R42,
+        // amended 2026-08-05). The route stays so links and bookmarks land on
+        // the tab rather than a 404.
+        Route::get('/contracts', fn () => redirect()->route('professional.gig-hub.index', ['tab' => 'contracts']))
+            ->name('professional.contracts.index');
 
         // Multi-Service Requests was its own page listing published events with
         // 2+ categories — which is exactly the Bidding Board's `scope=multi`
@@ -799,7 +803,10 @@ Route::middleware('auth')->group(function () {
         // into the pro's Create-a-Package form so pros keep their ability to list.
         Route::get('/gigs/create', fn () => redirect()->route('professional.packages.create'))
             ->name('professional.gigs.create');
-        Route::get('/gigs', [ProfessionalGigController::class, 'index'])->middleware('permission:events.view_any')->name('professional.gigs.index');
+        // Merged into the Gig Operations Hub as its My Gigs tab (R42,
+        // amended 2026-08-05). Same reason as Contracts above.
+        Route::get('/gigs', fn () => redirect()->route('professional.gig-hub.index', ['tab' => 'gigs']))
+            ->middleware('permission:events.view_any')->name('professional.gigs.index');
         Route::get('/gigs/{event}', [ProfessionalGigController::class, 'show'])->middleware('permission:events.view')->name('professional.gigs.show');
 
         // Proposals (Bookings from professional's perspective)

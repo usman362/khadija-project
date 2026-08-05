@@ -26,7 +26,13 @@ use Illuminate\View\View;
  */
 class ProfessionalContractController extends Controller
 {
-    public function index(Request $request): View
+    /**
+     * Merged into the Gig Operations Hub as its "Contracts" tab (R42, amended
+     * 2026-08-05). $money is passed in from the Payments & Payouts source so
+     * this tab cannot compute its own figure — Sir Peter's condition on the
+     * merge.
+     */
+    public function indexData(Request $request, array $money = []): array
     {
         $user       = $request->user();
         $now        = now();
@@ -108,10 +114,10 @@ class ProfessionalContractController extends Controller
             ->take(4)
             ->values();
 
-        return view('professional.contracts.index', compact(
+        return compact(
             'stats', 'contracts', 'tabCounts', 'pipeline',
             'sumPaid', 'sumEscrow', 'sumPending', 'totalRevenue',
             'opportunities', 'upcoming'
-        ));
+        );
     }
 }

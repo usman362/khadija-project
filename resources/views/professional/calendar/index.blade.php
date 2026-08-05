@@ -205,7 +205,7 @@
                     <div class="mc-empty">No upcoming events. Win a gig or get assigned a shift to see it here.</div>
                 @endforelse
             </div>
-            <a href="{{ route('professional.gigs.index') }}" class="mc-viewcal">View Calendar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+            <a href="{{ route('professional.gig-hub.index', ['tab' => 'gigs']) }}" class="mc-viewcal">View Calendar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         </div>
     </div>
 
@@ -244,7 +244,7 @@
                     </div>
                 </div>
                 <p class="mc-bd-note">The <b>"View Calendar"</b> button takes you to the full monthly calendar and advanced tools.</p>
-                <a href="{{ route('professional.gigs.index') }}" class="mc-bd-cta">View Calendar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+                <a href="{{ route('professional.gig-hub.index', ['tab' => 'gigs']) }}" class="mc-bd-cta">View Calendar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
             </div>
         </div>
     </div>
