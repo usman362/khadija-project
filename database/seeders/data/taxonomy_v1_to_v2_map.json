@@ -38,7 +38,23 @@
   "Catering & Food Trucks Services": "Catering & Food Services",
   "Awards, Branding & Gifting": "Favors, Gifting & Awards",
   "Baby Shower": "Baby Shower",
-  "Food Truck Festival": "Food Truck Festival"
+  "Food Truck Festival": "Food Truck Festival",
+  "Balloon & Thematic Installations": "Decor, Floral & Balloon Design",
+  "Balloon Arches & Installations": "Decor, Floral & Balloon Design",
+  "Balloon Decor & Installations": "Decor, Floral & Balloon Design",
+  "Flags, Banners & Patriotic Decor": "Decor, Floral & Balloon Design",
+  "Beverage Service": "Bar, Beverage & Mixology Services",
+  "Bartenders & Mixology Services": "Bar, Beverage & Mixology Services",
+  "BBQ Smokehouse Catering": "Catering & Food Services",
+  "AV Setup & Operation": "Audio, Visual, Lighting & Staging",
+  "Awards & Recognition": "Favors, Gifting & Awards",
+  "Auction Platforms": "Fundraising & Auction Services",
+  "Wedding Planning & Ceremony Services": "Event Planning & Day-Of Coordination",
+  "Hosts, Speakers & Ceremonial Leaders": "Officiants, Hosts & Ceremonial Leaders",
+  "Ceremony & Venue Services": "Venues & Event Spaces",
+  "Pet Entertainment & Activities": "Pet Services for Events",
+  "Anime Convention": "Pop Culture Event"
  },
- "_also_mapped": "Below: the categories nothing in category_user pointed at, but events, packages and bids did. Two are event types rather than service categories, and V2 happens to carry both names unchanged."
+ "_also_mapped": "Below: the categories nothing in category_user pointed at, but events, packages and bids did. Two are event types rather than service categories, and V2 happens to carry both names unchanged.",
+ "_server_only": "Added 2026-08-05 after the live run: the server carried sixteen categories the local database never had. All are attached to events, packages or bids rather than to professionals. 'Anime Convention' is an event type, not a service category, and lands on Pop Culture Event."
 }
