@@ -28,21 +28,40 @@ class InfluencerModuleTest extends TestCase
         $this->get('/join-as-influencer')->assertOk();
     }
 
-    public function test_guest_can_submit_application(): void
+    public function test_a_guest_who_applies_gets_an_account_and_lands_on_their_status(): void
     {
+        // Applying creates an account now, so the form takes a password and
+        // signs the applicant in. This test predated that and posted without
+        // one, so it was failing validation rather than testing anything.
         $response = $this->post('/join-as-influencer', [
             'full_name' => 'Jane Doe',
             'email' => 'jane@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
             'social_media_links' => 'https://instagram.com/jane, https://youtube.com/@jane',
             'audience_description' => 'Event planners and creators',
             'monthly_reach' => 50000,
+            'agree' => '1',
         ]);
-        $response->assertRedirect(route('influencer.join'));
+
+        $response->assertRedirect(route('influencer.status'));
 
         $this->assertDatabaseHas('influencers', [
             'email' => 'jane@example.com',
             'status' => 'pending',
         ]);
+        $this->assertDatabaseHas('users', ['email' => 'jane@example.com']);
+        $this->assertAuthenticated();
+    }
+
+    public function test_applying_without_a_password_or_the_terms_is_refused(): void
+    {
+        $this->post('/join-as-influencer', [
+            'full_name' => 'Jane Doe',
+            'email' => 'jane@example.com',
+        ])->assertSessionHasErrors(['password', 'agree']);
+
+        $this->assertDatabaseMissing('influencers', ['email' => 'jane@example.com']);
     }
 
     public function test_admin_can_approve_influencer(): void

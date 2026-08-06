@@ -408,7 +408,7 @@ class AgreementTest extends TestCase
 
         $agreement = Agreement::where('booking_id', $this->booking->id)->first();
 
-        $this->assertDatabaseHas('agreement_logs', [
+        $this->assertDatabaseHas('agreement_log', [
             'subject_type' => 'agreement',
             'subject_id' => $agreement->id,
             'to_status' => 'pending_review',
@@ -432,7 +432,7 @@ class AgreementTest extends TestCase
         $this->actingAs($this->client)
             ->post("/app/agreements/{$agreement->id}/accept");
 
-        $this->assertDatabaseHas('agreement_logs', [
+        $this->assertDatabaseHas('agreement_log', [
             'subject_type' => 'agreement',
             'subject_id' => $agreement->id,
             'from_status' => 'pending_review',
@@ -488,10 +488,29 @@ class AgreementTest extends TestCase
             'source' => 'ai',
         ]);
 
+        // Also make one the filter must leave out.
+        Agreement::create([
+            'booking_id' => $this->booking->id,
+            'generated_by' => $this->client->id,
+            'title' => 'Accepted Agreement',
+            'content' => '<p>Content</p>',
+            'status' => 'accepted',
+            'version' => 2,
+            'source' => 'ai',
+        ]);
+
         $response = $this->actingAs($this->client)
             ->get('/app/agreements?status=pending_review');
 
         $response->assertOk();
-        $response->assertSee('Pending Agreement');
+
+        // Asserted on what the filter returns, not on the agreement's title:
+        // the list shows the event's title, so the old assertion was looking
+        // for a string this page has never rendered.
+        $listed = $response->viewData('agreements');
+
+        $this->assertCount(1, $listed);
+        $this->assertSame('Pending Agreement', $listed->first()->title);
+        $this->assertSame('pending_review', $response->viewData('selectedStatus'));
     }
 }

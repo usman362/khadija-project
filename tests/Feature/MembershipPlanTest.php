@@ -34,6 +34,19 @@ class MembershipPlanTest extends TestCase
         $this->supplier = User::factory()->create();
         $this->supplier->assignRole(RoleName::PROFESSIONAL->value);
 
+        // Paid plans hand off to the payment gateway, so the tests that need a
+        // live subscription use a free one. This split did not exist when
+        // these tests were written, which is why they had been failing.
+        $this->freePlan = MembershipPlan::create([
+            'name' => 'Free Plan',
+            'slug' => 'free-plan',
+            'price' => 0,
+            'billing_cycle' => '12_month',
+            'duration_days' => 30,
+            'is_active' => true,
+            'sort_order' => 0,
+        ]);
+
         $this->plan = MembershipPlan::create([
             'name' => 'Test Plan',
             'slug' => 'test-plan',
@@ -76,18 +89,30 @@ class MembershipPlanTest extends TestCase
         $response->assertSee('Test Plan');
     }
 
-    public function test_client_can_subscribe_to_plan(): void
+    public function test_a_free_plan_starts_straight_away(): void
     {
         $response = $this->actingAs($this->client)
-            ->post("/app/membership-plans/{$this->plan->id}/subscribe");
+            ->post("/app/membership-plans/{$this->freePlan->id}/subscribe");
 
         $response->assertRedirect();
         $response->assertSessionHas('status');
 
         $this->assertDatabaseHas('user_subscriptions', [
             'user_id' => $this->client->id,
-            'membership_plan_id' => $this->plan->id,
+            'membership_plan_id' => $this->freePlan->id,
             'status' => 'active',
+        ]);
+    }
+
+    public function test_a_paid_plan_goes_to_payment_before_anything_starts(): void
+    {
+        $this->actingAs($this->client)
+            ->post("/app/membership-plans/{$this->plan->id}/subscribe")
+            ->assertRedirect(route('app.payments.initiate', $this->plan));
+
+        $this->assertDatabaseMissing('user_subscriptions', [
+            'user_id' => $this->client->id,
+            'membership_plan_id' => $this->plan->id,
         ]);
     }
 
@@ -95,13 +120,13 @@ class MembershipPlanTest extends TestCase
     {
         // First subscription
         $this->actingAs($this->client)
-            ->post("/app/membership-plans/{$this->plan->id}/subscribe");
+            ->post("/app/membership-plans/{$this->freePlan->id}/subscribe");
 
         // Create a second plan
         $plan2 = MembershipPlan::create([
-            'name' => 'Premium Plan',
-            'slug' => 'premium-plan',
-            'price' => 49.99,
+            'name' => 'Second Free Plan',
+            'slug' => 'second-free-plan',
+            'price' => 0,
             'billing_cycle' => '12_month',
             'duration_days' => 30,
             'is_active' => true,
@@ -115,7 +140,7 @@ class MembershipPlanTest extends TestCase
         // First subscription should be cancelled
         $this->assertDatabaseHas('user_subscriptions', [
             'user_id' => $this->client->id,
-            'membership_plan_id' => $this->plan->id,
+            'membership_plan_id' => $this->freePlan->id,
             'status' => 'cancelled',
         ]);
 
@@ -131,7 +156,7 @@ class MembershipPlanTest extends TestCase
     {
         // Subscribe first
         $this->actingAs($this->client)
-            ->post("/app/membership-plans/{$this->plan->id}/subscribe");
+            ->post("/app/membership-plans/{$this->freePlan->id}/subscribe");
 
         // Cancel
         $response = $this->actingAs($this->client)
