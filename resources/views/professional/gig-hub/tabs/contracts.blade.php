@@ -254,7 +254,25 @@
                                 <td><span class="pc-badge {{ $stClass }}">{{ $stLabel }}</span></td>
                                 <td>
                                     <span class="pc-actions">
-                                        @if($c->status === 'confirmed')
+                                        {{-- Every step of a gig's life is driven from here. Accept and
+                                             Decline used to sit on the Proposals page while Mark as
+                                             delivered sat here, so a professional had to know which
+                                             page carried which step of the same booking (Issue 8:
+                                             one page edits, the others summarise). --}}
+                                        {{-- Only Decline. A professional cannot accept their own
+                                             proposal — the booking's state machine makes
+                                             requested→confirmed the client's move, so an Accept
+                                             button here would always be refused. It was on the
+                                             Proposals page and never worked. --}}
+                                        @if($c->status === 'requested')
+                                            <form method="POST" action="{{ route('professional.proposals.update-status', $c) }}" style="margin:0; display:inline;"
+                                                  onsubmit="return confirm('Withdraw this proposal? The client will be told.');">
+                                                @csrf @method('PATCH')
+                                                <input type="hidden" name="status" value="cancelled">
+                                                <button type="submit" class="pc-act" title="Withdraw this proposal" style="border:none;cursor:pointer;color:var(--bad-text);">Withdraw</button>
+                                            </form>
+                                        @endif
+@if($c->status === 'confirmed')
                                             <form method="POST" action="{{ route('professional.proposals.update-status', $c) }}" style="margin:0;" onsubmit="return confirm('Mark this work as delivered? The client will be asked to review and release payment.');">
                                                 @csrf @method('PATCH')
                                                 <input type="hidden" name="status" value="completed">

@@ -248,17 +248,14 @@
                     <div class="cl-booking-actions">
                         <span class="cl-badge cl-badge-{{ $booking->status }}">{{ ucfirst($booking->status) }}</span>
 
+                        {{-- Managing a gig happens in the Gig Operations Hub, which owns it from
+                             proposal to delivery (Issue 8: one page edits, the others summarise).
+                             The Accept button that used to sit here never worked — accepting a
+                             proposal is the client's move, and the booking's state machine
+                             refused it every time. --}}
                         @if($booking->status === 'requested')
-                            <form method="POST" action="{{ route('professional.proposals.update-status', $booking) }}" style="display:inline;">
-                                @csrf @method('PATCH')
-                                <input type="hidden" name="status" value="confirmed">
-                                <button type="submit" class="cl-btn cl-btn-primary cl-btn-sm">Accept</button>
-                            </form>
-                            <form method="POST" action="{{ route('professional.proposals.update-status', $booking) }}" style="display:inline;">
-                                @csrf @method('PATCH')
-                                <input type="hidden" name="status" value="cancelled">
-                                <button type="submit" class="cl-btn cl-btn-ghost cl-btn-sm" style="color: var(--accent-red);">Decline</button>
-                            </form>
+                            <a href="{{ route('professional.gig-hub.index', ['tab' => 'contracts']) }}"
+                               class="cl-btn cl-btn-ghost cl-btn-sm">Manage in Gig Hub</a>
                         @endif
 
                         {{-- The third action. Accept / Decline alone made a client's
