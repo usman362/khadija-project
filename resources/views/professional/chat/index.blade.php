@@ -245,7 +245,7 @@
 
                 <div class="pm-ai">
                     <svg class="spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>
-                    <div><b>Suggestion</b><p>Draft a thank you message and next steps summary.</p></div>
+                    <div><b>Message Template</b><p>Insert a ready-made thank-you and next-steps message, then edit it.</p></div>
                     <button type="button" id="pm-ai-use">Use</button>
                 </div>
 

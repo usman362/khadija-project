@@ -331,10 +331,15 @@
             </div>
             <a href="{{ route('professional.chat.index') }}" class="pl-cc-btn" style="background:#2563eb;">Open Message Center <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         </div>
-        {{-- Instant Proposal Generator --}}
+        {{-- Was "Instant Proposal Generator". Removed rather than renamed
+             (R29, investigated for Sir Peter 2026-08-05): it generated nothing
+             — no template, no pricing rule, no written language. It was a
+             picture of a proposal with a button that opened the ordinary
+             proposals page. A rename would have promised a template library
+             that does not exist. --}}
         <div class="pl-cc-card">
-            <div class="pl-cc-h"><span class="ic" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><b>Instant Proposal Generator</b></div>
-            <p>Create and send professional proposals in minutes.</p>
+            <div class="pl-cc-h"><span class="ic" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><b>Send a Proposal</b></div>
+            <p>Open the proposal form and write one.</p>
             <div class="pl-cc-prev">
                 <div class="pl-prop-k">Proposal for</div>
                 <div style="font-size:11px;font-weight:800;color:var(--text-primary);margin-bottom:6px;">{{ \Illuminate\Support\Str::limit($leads->first()['name'] ?? 'New Lead', 20) }}</div>

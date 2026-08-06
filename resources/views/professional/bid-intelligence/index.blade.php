@@ -256,13 +256,15 @@
                 @endforeach
             </div>
         </div>
-        {{-- Follow-Up Automation --}}
+        {{-- Follow-Up Reminder. Renamed from "Follow-Up Automation" (R29):
+             nothing is automated — the button opens Messages and the
+             professional writes and sends it. --}}
         <div class="bi-cc-card">
-            <div class="bi-cc-h"><span class="ic" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></span><div><b>Follow-Up Automation</b><p>Send one-click follow-up emails to clients who viewed your bid.</p></div></div>
+            <div class="bi-cc-h"><span class="ic" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></span><div><b>Follow-Up Reminder</b><p>Send one-click follow-up emails to clients who viewed your bid.</p></div></div>
             <div class="bi-cc-prev">
                 <div class="bi-fu-note">Quick Follow-Up</div>
                 <div class="bi-fu-msg">Hi! Just following up on the proposal I sent over. Let me know if you have any questions!</div>
-                <a href="{{ route('professional.chat.index') }}" class="bi-fu-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Send Follow-Up Email</a>
+                <a href="{{ route('professional.chat.index') }}" class="bi-fu-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Write Follow-Up</a>
             </div>
         </div>
         {{-- Competitor Benchmarks --}}
