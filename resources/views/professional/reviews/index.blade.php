@@ -6,8 +6,16 @@
      Professional "Reviews, Ratings & Reputation" — the flow for a pro to
      give feedback to a client after a completed event. REAL: pending
      completed booking to rate + posting a Review (reviewer = pro). The
-     3-area scores average into Review.rating. Echo Effect / Re-Shape /
-     Vanish / Peer Mediate are illustrative (not modelled yet).
+     3-area scores average into Review.rating.
+
+     Cleaned 2026-08-05. The page described a whole feature set that does not
+     exist: an Echo Effect paying clients reward tokens by text, a Midnight
+     Trigger firing at 12:00 AM, and Re-Shape / Vanish / Peer Mediate for
+     changing, hiding and disputing a review. There is no token table, no SMS,
+     no scheduled job and no route to edit a review once posted. It also told
+     the professional their feedback was anonymous and encrypted; reviews
+     store reviewer_id, so it is neither. That one mattered most — a
+     professional writes differently believing nobody can tell it was them.
 ═══════════════════════════════════════════════════════════════════ --}}
 
 @push('styles')
@@ -158,7 +166,7 @@
             {{-- STEP 1 --}}
             <div class="pr-card">
                 <div class="pr-step-badge"><span class="n">STEP 1</span><span class="t">INITIALIZE</span></div>
-                <div class="pr-step-title">The Midnight Trigger</div>
+                <div class="pr-step-title">After the event</div>
                 <div class="pr-step-sub">Start the feedback process right after your event ends.</div>
 
                 <div class="pr-evt">
@@ -232,7 +240,7 @@
             {{-- STEP 3 --}}
             <div class="pr-card">
                 <div class="pr-step-badge"><span class="n">STEP 3</span><span class="t">SUBMISSION</span></div>
-                <div class="pr-step-title">Nurture &amp; Echo Submission</div>
+                <div class="pr-step-title">Post your feedback</div>
                 <div class="pr-step-sub">Lock in your feedback and help the community grow.</div>
 
                 <div class="pr-overall">
@@ -248,7 +256,8 @@
                 <div class="pr-next">
                     <div class="pr-next-h">What Happens Next?</div>
                     <div class="pr-next-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><p>Your feedback is locked into the marketplace so other pros can make smarter decisions.</p></div>
-                    <div class="pr-next-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg><p><b>The Echo Effect is activated!</b> The client receives a <b>reward token</b> via text to book you again.</p></div>
+                    {{-- Removed: said the client receives a reward token by text
+                         to book the professional again. No token, no text. --}}
                 </div>
                 <div class="pr-why"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg><p><b>Why?</b> Your feedback protects the community and boosts your reputation.</p></div>
             </div>
@@ -262,51 +271,31 @@
                     <div class="pr-side-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Improves the quality of events for everyone.</div>
                     <div class="pr-side-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Boosts your reputation as a trusted professional.</div>
                 </div>
-                <div class="pr-side-card">
-                    <div class="pr-side-h" style="text-align:center;">THE ECHO EFFECT</div>
-                    <div class="pr-echo-flow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="19 12 12 19 5 12"/></svg></div>
-                    <p class="pr-echo-txt">Happy clients get reward tokens when you submit feedback. They use these tokens to book you again → <b>More gigs for you!</b></p>
-                </div>
+                {{-- "THE ECHO EFFECT" card removed: it said submitting feedback
+                     sends the client a reward token by text which brings the
+                     professional more work. None of that exists. --}}
+
+                {{-- Was "Safe · Fair · Anonymous — All feedback is encrypted,
+                     secure". Reviews store reviewer_id and the reviewer can be
+                     seen, so this says what is actually true. It matters:
+                     a professional writes differently believing nobody can
+                     tell it was them. --}}
                 <div class="pr-side-card pr-safe">
-                    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-                    <div><b>Safe · Fair · Anonymous</b><p>All feedback is encrypted, secure, and used to build trust.</p></div>
+                    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+                    <div><b>Your name is on it</b><p>Reviews are posted under your business name, not anonymously, and a rating is final once posted.</p></div>
                 </div>
             </div>
         </div>
     </form>
 
-    {{-- ════════ Bottom options ════════ --}}
-    <div class="pr-opts-title">NEED TO MAKE A CHANGE? YOU'VE GOT OPTIONS.</div>
-    <div class="pr-opts">
-        <div class="pr-card">
-            <div class="pr-opt-h"><span class="pr-opt-ico" style="background:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span><div class="pr-opt-nm">RE-SHAPE <span>(Adjust a Rating)</span></div></div>
-            <p class="pr-opt-desc">Adjust a score if you and the client cleared up a misunderstanding.</p>
-            <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Only you can change your rating</div>
-            <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Text review stays locked</div>
-            <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Keeps your feedback honest</div>
-        </div>
-        <div class="pr-card">
-            <div class="pr-opt-h"><span class="pr-opt-ico" style="background:#8b5cf6;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 10h.01M15 10h.01M12 2a8 8 0 0 0-8 8v12l3-3 2 2 3-3 3 3 2-2 3 3V10a8 8 0 0 0-8-8z"/></svg></span><div class="pr-opt-nm">VANISH <span>(Temporary Hold)</span></div></div>
-            <p class="pr-opt-desc">Hide a review for up to 48 hours if needed.</p>
-            <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Moves review to a 48-hour holding tank</div>
-            <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Client can restore it anytime</div>
-            <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Auto-deletes after time expires</div>
-        </div>
-        <div class="pr-card">
-            <div class="pr-opt-h"><span class="pr-opt-ico" style="background:#14b8a6;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 7h18M6 7l-3 6h6zM18 7l-3 6h6z"/></svg></span><div class="pr-opt-nm">PEER MEDIATE <span>(Get Help)</span></div></div>
-            <p class="pr-opt-desc">Need help with an unfair review situation?</p>
-            <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Escalate to our Peer Mediation Panel</div>
-            <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>3 verified pros review anonymously</div>
-            <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Fair decision based on facts</div>
-        </div>
-        <div class="pr-card">
-            <div class="pr-opt-h"><span class="pr-opt-ico" style="background:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg></span><div class="pr-opt-nm">TIPS FOR GIVING GREAT FEEDBACK</div></div>
-            <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Be specific and professional</div>
-            <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Focus on facts, not emotions</div>
-            <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Help improve future events</div>
-            <div class="pr-opt-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Keep the community positive</div>
-        </div>
-    </div>
+    {{-- "NEED TO MAKE A CHANGE? YOU'VE GOT OPTIONS." removed 2026-08-05.
+         It offered Re-Shape (adjust a posted score), Vanish (hide a review in
+         a 48-hour holding tank) and Peer Mediate (escalate to a mediation
+         panel). None exist: a review cannot be edited, there is no hidden
+         state, and the dispute module is not built. A professional would post
+         a rating believing they could soften it later. --}}
+
+
 </div>
 
 <script>
