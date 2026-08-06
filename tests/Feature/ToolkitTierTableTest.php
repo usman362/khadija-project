@@ -190,4 +190,18 @@ class ToolkitTierTableTest extends TestCase
             ->assertSuccessful()
             ->assertViewHas('tab', 'semi');
     }
+    public function test_both_sidebars_link_to_the_page(): void
+    {
+        // It was built and reachable by URL but not linked anywhere, so
+        // nobody could find it.
+        foreach (['client', 'professional'] as $role) {
+            $sidebar = file_get_contents(resource_path("views/layouts/{$role}.blade.php"));
+
+            $this->assertStringContainsString(
+                "route('client.toolkit.tiers')",
+                $sidebar,
+                "the {$role} sidebar has no way into the toolkit tiers page",
+            );
+        }
+    }
 }
