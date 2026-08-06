@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Event;
 use App\Models\Shift;
 use App\Support\Earnings;
+use App\Support\GigStats;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -49,19 +50,17 @@ class ProfessionalGigHubController extends Controller
         $now  = now();
         $base = fn () => Booking::where('supplier_id', $user->id);
 
-        $counts = $base()->selectRaw('status, count(*) as c')->groupBy('status')->pluck('c', 'status');
-        $cReq  = (int) ($counts['requested'] ?? 0);
-        $cConf = (int) ($counts['confirmed'] ?? 0);
-        $cComp = (int) ($counts['completed'] ?? 0);
-
-        $inProgress = $base()->where('status', 'confirmed')
-            ->whereHas('event', fn ($q) => $q->where('starts_at', '<=', $now)->where('ends_at', '>=', $now))
-            ->count();
+        // Counted in App\Support\GigStats, so "active" and "in progress"
+        // mean the same thing on every tab of this page. They did not: this
+        // page called a gig in progress when its event was running, and the
+        // Contracts tab called a gig active when it was confirmed or merely
+        // requested. Both words now have one definition.
+        $counted = GigStats::forProfessional($user);
 
         $stats = [
-            'active'      => $cConf + $cReq,
-            'in_progress' => $inProgress,
-            'completed'   => $cComp,
+            'active'      => $counted['active'],
+            'in_progress' => $counted['inProgress'],
+            'completed'   => $counted['completed'],
         ];
 
         $gigs = $base()->whereIn('status', ['confirmed', 'requested', 'completed'])

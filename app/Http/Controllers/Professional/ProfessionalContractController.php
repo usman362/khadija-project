@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Professional;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Support\GigStats;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -77,12 +78,14 @@ class ProfessionalContractController extends Controller
             ->take(8)
             ->get();
 
+        $counted = GigStats::forProfessional($user);
+
         $tabCounts = [
-            'active'    => $cConfirmed + $cRequested,
+            'active'    => $counted['active'],
             'upcoming'  => $base()->where('status', 'confirmed')
                                 ->whereHas('event', fn ($q) => $q->where('starts_at', '>', $now))->count(),
-            'completed' => $cCompleted,
-            'cancelled' => $cCancelled,
+            'completed' => $counted['completed'],
+            'cancelled' => $counted['cancelled'],
         ];
 
         // ── Bids pipeline (real status counts where modelled) ─────

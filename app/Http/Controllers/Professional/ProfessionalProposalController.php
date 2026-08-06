@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Professional;
 use App\Http\Controllers\Controller;
 use App\Models\AgreementLog;
 use App\Models\Booking;
+use App\Support\GigStats;
 use App\Models\Conversation;
 use App\Models\Event;
 use App\Models\User;
@@ -22,14 +23,17 @@ class ProfessionalProposalController extends Controller
         $user = $request->user();
 
         // Stats
+        // Same source as the Gig Operations Hub, so a professional cannot see
+        // one number here and another there for the same set of gigs.
+        $counted = GigStats::forProfessional($user);
+
         $stats = [
-            'all' => Booking::where('supplier_id', $user->id)->count(),
-            'pending' => Booking::where('supplier_id', $user->id)->where('status', 'requested')->count(),
-            'accepted' => Booking::where('supplier_id', $user->id)->where('status', 'confirmed')->count(),
-            'in_progress' => Booking::where('supplier_id', $user->id)->where('status', 'confirmed')
-                ->whereHas('event', fn ($q) => $q->where('starts_at', '<=', now())->where('ends_at', '>=', now()))->count(),
-            'completed' => Booking::where('supplier_id', $user->id)->where('status', 'completed')->count(),
-            'cancelled' => Booking::where('supplier_id', $user->id)->where('status', 'cancelled')->count(),
+            'all'         => $counted['total'],
+            'pending'     => $counted['pending'],
+            'accepted'    => $counted['booked'],
+            'in_progress' => $counted['inProgress'],
+            'completed'   => $counted['completed'],
+            'cancelled'   => $counted['cancelled'],
         ];
 
         // Build query with filters
