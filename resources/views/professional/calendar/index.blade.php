@@ -290,17 +290,18 @@
                 @endforeach
             </div>
         </div>
-        {{-- Phone Synchronization --}}
-        <div class="mc-cc-card">
-            <div class="mc-cc-h"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></span><b>Phone Synchronization</b></div>
-            <p>Sync with your phone so your schedule is always updated.</p>
-            <div class="mc-sync">
-                <div class="mc-sync-app"><span class="box"><svg viewBox="0 0 24 24" fill="currentColor" style="color:var(--text-primary);"><path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.572-2.27 1.206-2.98.804-.94 2.142-1.64 3.248-1.68.03.13.05.28.05.43zm4.565 15.71c-.03.07-.463 1.58-1.518 3.12-.945 1.34-1.94 2.71-3.43 2.71-1.517 0-1.9-.88-3.63-.88-1.698 0-2.302.91-3.67.91-1.377 0-2.332-1.26-3.428-2.8-1.287-1.82-2.323-4.63-2.323-7.28 0-4.28 2.797-6.55 5.552-6.55 1.448 0 2.675.95 3.6.95.865 0 2.222-1.01 3.902-1.01.613 0 2.886.06 4.374 2.19-.13.09-2.383 1.37-2.383 4.19 0 3.26 2.854 4.42 2.955 4.46z"/></svg></span><span>Apple<br>Calendar</span></div>
-                <div class="mc-sync-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></div>
-                <div class="mc-sync-app"><span class="box"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="16" rx="2" fill="#fff" stroke="#e2e8f0"/><rect x="4" y="5" width="16" height="4" rx="2" fill="#4285f4"/><text x="12" y="18" font-size="8" font-weight="800" fill="#34a853" text-anchor="middle">31</text></svg></span><span>Google<br>Calendar</span></div>
-            </div>
-            <div class="mc-sync-done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Synced Successfully</div>
-        </div>
+        {{-- Phone Synchronization panel removed 2026-08-05.
+
+             It showed Apple and Google Calendar with a tick and the words
+             "Synced Successfully", and none of it existed — no calendar
+             integration is built at all. A professional reading that would
+             believe their outside commitments were reaching GigResource and
+             could double-book on the strength of it.
+
+             Sir Peter has asked for calendar sync as a real feature (his
+             Gap #5, 2026-08-05). When it is built, this panel comes back
+             showing the actual connection state instead of a fixed tick. --}}
+
         {{-- Travel Time Calculator --}}
         <div class="mc-cc-card">
             <div class="mc-cc-h"><span class="ic" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3v-5l2-5h11l3 5h2v5h-2"/><circle cx="7.5" cy="17.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/></svg></span><b>Travel Time Calculator</b></div>

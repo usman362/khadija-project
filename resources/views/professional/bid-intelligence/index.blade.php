@@ -267,24 +267,29 @@
                 <a href="{{ route('professional.chat.index') }}" class="bi-fu-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Write Follow-Up</a>
             </div>
         </div>
-        {{-- Competitor Benchmarks --}}
+        {{-- Was "Competitor Benchmarks", showing Low / Market Avg / High
+             around the professional's own bid.
+
+             There was no market in it. The three figures were this
+             professional's own average multiplied by 0.69, 0.94 and 1.19 —
+             the controller's own comment called them a "market scaffold".
+             So the card compared a professional to themselves and labelled
+             it the competition.
+
+             Their average bid is real, so that stays. The invented band is
+             gone rather than relabelled: a number with nothing behind it is
+             what Sir Peter's rules on claims and metrics forbid, and pricing
+             against it is a decision a professional would actually act on. --}}
         <div class="bi-cc-card">
-            <div class="bi-cc-h"><span class="ic" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></span><div><b>Competitor Benchmarks</b><p>See anonymous data on how your pricing compares locally.</p></div></div>
+            <div class="bi-cc-h"><span class="ic" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span><div><b>Your Bid Pricing</b><p>What you have been bidding, on average.</p></div></div>
             <div class="bi-cc-prev">
-                <div style="font-size:11.5px;font-weight:800;color:var(--text-primary);text-align:center;margin-bottom:8px;">Your Pricing vs Market</div>
                 <div class="bi-bm-amt">{{ $money($pricing['avg']) }}</div>
                 <div class="bi-bm-k">Your Average Bid</div>
-                <div class="bi-bm-bar"><span class="knob" style="left:{{ $pricing['pos'] }}%;"></span></div>
-                <div class="bi-bm-scale">
-                    <div><div class="a">{{ $money($pricing['low']) }}</div><div class="b">Low</div></div>
-                    <div><div class="a">{{ $money($pricing['mid']) }}</div><div class="b">Market Avg</div></div>
-                    <div><div class="a">{{ $money($pricing['high']) }}</div><div class="b">High</div></div>
-                </div>
             </div>
         </div>
     </div>
 
-    {{-- ════════ Bottom banner ════════ --}}
+{{-- ════════ Bottom banner ════════ --}}
     <div class="bi-banner">
         <span class="badge">
             <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">

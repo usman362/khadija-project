@@ -125,16 +125,10 @@ class ProfessionalBidIntelligenceController extends Controller
             ['key' => 'lost',      'color' => self::COLORS['lost'],      'days' => $avgDays($base()->where('status', 'cancelled'), 1.5)],
         ];
 
-        // ── Competitor benchmark band (avg real, market scaffold) ──
-        $pricing = [
-            'avg'  => $avgBid,
-            'low'  => (int) round($avgBid * 0.69),
-            'mid'  => (int) round($avgBid * 0.94),
-            'high' => (int) round($avgBid * 1.19),
-        ];
-        // Position of the pro's avg along the low→high band (%).
-        $span = max(1, $pricing['high'] - $pricing['low']);
-        $pricing['pos'] = max(4, min(96, (int) round(($avgBid - $pricing['low']) / $span * 100)));
+        // Only the professional's own average is real, so only that is
+        // shown. The low/mid/high band that used to sit beside it was this
+        // same number times 0.69, 0.94 and 1.19, labelled as the market.
+        $pricing = ['avg' => $avgBid];
 
         $stats = array_merge($counts, [
             'total'    => $total,
