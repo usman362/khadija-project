@@ -5,13 +5,22 @@ namespace App\Http\Controllers\Auth;
 use App\Domain\Auth\Enums\RoleName;
 use App\Http\Controllers\Controller;
 use App\Rules\Recaptcha;
+use App\Support\LoginLockout;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
-    use AuthenticatesUsers;
+    // The throttle hooks below replace the trait's, so the one piece of it
+    // still wanted — the ordinary "those credentials don't match" response —
+    // is aliased through. `parent::` cannot reach a trait method: the trait is
+    // flattened into THIS class, and Controller::__call turns the miss into a
+    // BadMethodCallException at runtime rather than a compile error.
+    use AuthenticatesUsers {
+        sendFailedLoginResponse as protected baseSendFailedLoginResponse;
+    }
 
     /**
      * Where to redirect users after login.
@@ -43,6 +52,83 @@ class LoginController extends Controller
         $rules['g-recaptcha-response'] = [new Recaptcha('login')];
 
         $request->validate($rules);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Rule R56 — 3 attempts per rolling 24 hours, then locked until reset
+    |--------------------------------------------------------------------------
+    |
+    | Laravel's own throttle is 5 tries with a one-minute cooldown that lifts
+    | itself. R56 wants both numbers changed AND the cooldown removed, so the
+    | count is retuned here and the lock itself lives on the user record — see
+    | App\Support\LoginLockout for why it cannot be a rate limiter alone.
+    |
+    */
+
+    /** R56: three, not Laravel's five. */
+    public function maxAttempts(): int
+    {
+        return LoginLockout::MAX_ATTEMPTS;
+    }
+
+    /** R56: a rolling 24 hours, not Laravel's one minute. */
+    public function decayMinutes(): int
+    {
+        return LoginLockout::WINDOW_HOURS * 60;
+    }
+
+    /**
+     * A locked account is refused before the password is even checked — the
+     * lock is the answer, whether or not they have since remembered it.
+     */
+    protected function hasTooManyLoginAttempts(Request $request): bool
+    {
+        $email = $request->input($this->username());
+
+        return LoginLockout::isLocked($email) || LoginLockout::remaining($email) === 0;
+    }
+
+    /** Count the failure, and lock on the third. */
+    protected function incrementLoginAttempts(Request $request): void
+    {
+        LoginLockout::recordFailure($request->input($this->username()));
+    }
+
+    /** Signing in clears the counter. It never clears a lock. */
+    protected function clearLoginAttempts(Request $request): void
+    {
+        LoginLockout::clearCounter($request->input($this->username()));
+    }
+
+    /**
+     * The failure that locks the account says so, rather than repeating
+     * "wrong password" and leaving them to discover it on the next try.
+     */
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        if (LoginLockout::isLocked($request->input($this->username()))) {
+            return $this->sendLockoutResponse($request);
+        }
+
+        return $this->baseSendFailedLoginResponse($request);
+    }
+
+    /**
+     * What a locked-out person is told.
+     *
+     * R26 forbids "Blocked" / "Rejected" / "Unsupported", and there is a
+     * practical reason beyond tone: the only way out is a password reset, so
+     * the message has to say that or the account is a dead end.
+     */
+    protected function sendLockoutResponse(Request $request)
+    {
+        throw ValidationException::withMessages([
+            $this->username() => [
+                'For your security this account is paused after 3 incorrect passwords. '
+                . 'Reset your password to sign in again.',
+            ],
+        ])->status(423);
     }
 
     /**

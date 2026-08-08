@@ -62,6 +62,7 @@ class User extends Authenticatable
             'password'              => 'hashed',
             'deletion_requested_at' => 'datetime',
             'deletion_scheduled_at' => 'datetime',
+            'login_locked_at'       => 'datetime',
         ];
     }
 
