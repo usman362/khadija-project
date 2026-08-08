@@ -19,6 +19,17 @@
     .do-btn svg { width:15px; height:15px; }
 
     .do-summary { display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:22px; padding-top:18px; border-top:1px solid var(--border-color); margin-top:6px; }
+
+    /* Payout ladder (R61) — the three memberships against this offer. */
+    .do-ladder { padding-top:16px; border-top:1px solid var(--border-color); margin-top:18px; }
+    .do-ladder-rows { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:9px; }
+    .do-step { border:1px solid var(--border-color); border-radius:10px; padding:10px 12px; display:flex; flex-direction:column; gap:2px; background:var(--bg-secondary); }
+    .do-step.is-mine { border-color:var(--accent-green, #16a34a); background:var(--accent-green-soft, rgba(22,163,74,.08)); }
+    .do-step-t { font-size:11.5px; font-weight:800; letter-spacing:.02em; text-transform:uppercase; color:var(--text-secondary); }
+    .do-step-t em { font-style:normal; font-weight:700; text-transform:none; letter-spacing:0; color:var(--accent-green, #16a34a); }
+    .do-step-n { font-size:19px; font-weight:800; color:var(--text-primary); }
+    .do-step-r { font-size:11.5px; color:var(--text-secondary); }
+    @media (max-width: 700px) { .do-ladder-rows { grid-template-columns:1fr; } }
     .do-req { display:flex; align-items:center; gap:13px; }
     .do-req-av { width:54px; height:54px; border-radius:50%; background:#2563eb; color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; flex-shrink:0; }
     .do-req b { font-size:15px; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:6px; }
@@ -139,6 +150,23 @@
                 <div class="do-k" style="color:var(--bad-text);margin-top:3px;font-weight:700;">{{ $offer['days_remaining'] }} Days Remaining</div>
             </div>
         </div>
+
+        {{-- Rule R61: every membership can receive a Direct Offer. What
+             changes is what you keep, so the offer says so plainly. --}}
+        @if($offer['offer_max'] > 0)
+            <div class="do-ladder">
+                <div class="do-k">Your payout on this offer</div>
+                <div class="do-ladder-rows">
+                    @foreach($ladder as $step)
+                        <div class="do-step {{ $step['current'] ? 'is-mine' : '' }}">
+                            <span class="do-step-t">{{ $step['label'] }}@if($step['current']) <em>your plan</em>@endif</span>
+                            <span class="do-step-n">${{ number_format($step['net']) }}</span>
+                            <span class="do-step-r">after {{ rtrim(rtrim(number_format($step['rate'], 1), '0'), '.') }}% commission</span>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
     </div>
 
     {{-- 2-column: content + sticky actions --}}

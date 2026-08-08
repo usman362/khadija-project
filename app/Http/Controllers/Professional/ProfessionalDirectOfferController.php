@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Professional;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Event;
+use App\Support\Commission;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -30,8 +31,14 @@ class ProfessionalDirectOfferController extends Controller
             ? (clone $query)->find((int) $id)
             : (clone $query)->whereIn('status', ['pending', 'confirmed'])->latest()->first();
 
+        $offer = $event ? $this->mapEvent($event) : $this->sampleOffer($id);
+
         return view('professional.direct-offers.show', [
-            'offer' => $event ? $this->mapEvent($event) : $this->sampleOffer($id),
+            'offer' => $offer,
+            // Rule R61: no tier gate on who receives an offer, so the ladder
+            // carries the membership argument instead — this offer's own
+            // amount at each published commission rate.
+            'ladder' => Commission::ladderFor((float) $offer['offer_max'], $request->user()),
         ]);
     }
 

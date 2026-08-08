@@ -45,4 +45,38 @@ final class Commission
     {
         return round($gross - self::on($gross, $user), 2);
     }
+
+    /**
+     * The same gross seen from all three memberships — Rule R61, 2026-08-07.
+     *
+     * Direct Offers have no membership gate: Starter, Pro and Elite all
+     * receive them. Elite is worth something because of what it keeps, not
+     * because of what it is shown, so the offer carries the ladder and marks
+     * the row the viewer is on.
+     *
+     * Nothing here is estimated — it is this offer's own amount at the three
+     * published rates.
+     *
+     * @return list<array{slug:string, label:string, rate:float, net:float, current:bool}>
+     */
+    public static function ladderFor(float $gross, ?User $user = null): array
+    {
+        $mine = $user?->activeSubscription()?->plan?->slug;
+        $labels = ['starter' => 'Starter', 'professional' => 'Pro', 'enterprise' => 'Elite'];
+
+        $ladder = [];
+        foreach (self::RATES as $slug => $rate) {
+            $ladder[] = [
+                'slug'    => $slug,
+                'label'   => $labels[$slug],
+                'rate'    => $rate,
+                'net'     => round($gross - round($gross * ($rate / 100), 2), 2),
+                // A pro with no active subscription is on Starter terms, and
+                // the ladder should say so rather than highlight nothing.
+                'current' => $slug === ($mine ?? 'starter'),
+            ];
+        }
+
+        return $ladder;
+    }
 }
