@@ -50,22 +50,18 @@ return [
 
     'semi_tools' => [
 
-        // Five tools, settled across two messages on 2026-08-05.
+        // Five tools, as R31 records them after Peter's 2026-08-05 spreadsheet
+        // correction: "Client Semi is now (5) = Budget Planner, Smart
+        // Checklist, Timeline Builder, Best Match, Message Builder; Client
+        // Maximum-only is now (7) = Guided Event Planner, Guest Capacity
+        // Calculator, Venue Compatibility Check, Style & Inspiration, Review
+        // Builder, Contract Assistant, Language."
         //
-        // Planning suite — Peter, in his own words: "current Client Semi tier
-        // ($2.99) is 3 tools: Budget Planner, Smart Checklist, Timeline
-        // Builder. Maximum-only ($5.99) is 4 tools: Guided Event Planner,
-        // Guest Capacity Calculator, Venue Compatibility Check, Style &
-        // Inspiration." That supersedes Khadijah's earlier draft, which had
-        // put the last three in Semi.
-        //
-        // Marketplace and Operations — he did not restate those, so Khadijah's
-        // revision stands there, which he had already accepted: Review Builder
-        // in, Best Match out; Message Builder in, Contract Assistant and
-        // Language out.
-        //
-        // 3 + 1 + 1 = 5, matching the note on his corrected sheet: "Semi =
-        // $2.99 one-time, the 5-tool subset below (CORRECTED)".
+        // The Marketplace slot was previously read from Khadijah's draft as
+        // Review Builder. The correction reverses that pair: Best Match is
+        // Semi, Review Builder is Maximum-only. It is the right way round —
+        // finding a professional is how a client starts, and Review Builder
+        // only has anything to write about after an event is over.
         'client' => [
             // Planning
             'Budget Planner',
@@ -76,7 +72,7 @@ return [
             'Timeline Builder',
 
             // Marketplace
-            'Review Builder',
+            'Best Match',
 
             // Operations
             'Message Builder',

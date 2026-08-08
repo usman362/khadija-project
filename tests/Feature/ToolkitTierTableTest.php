@@ -99,8 +99,6 @@ class ToolkitTierTableTest extends TestCase
 
         $this->assertContains('Budget Planner', $client->all());
         $this->assertContains('Bid Calculator', $pro->all());
-        // Best Match is Semi for professionals but Maximum-only for clients.
-        $this->assertNotContains('Best Match', $client->all());
         $this->assertNotContains('Bid Calculator', $client->all(), 'a professional tool must not appear in the client set');
 
         // Message Builder is shared and sits at Semi on both sides.
@@ -125,12 +123,40 @@ class ToolkitTierTableTest extends TestCase
             ->where('included', true)->pluck('title')->sort()->values()->all();
 
         $this->assertSame([
+            'Best Match',
             'Budget Planner',
             'Message Builder',
-            'Review Builder',
             'Smart Checklist',
             'Timeline Builder',
         ], $semi);
+    }
+
+    public function test_the_marketplace_slot_is_best_match_not_review_builder(): void
+    {
+        // The pair was the wrong way round until 2026-08-08. Khadijah's draft
+        // had put Review Builder in Semi; Peter's spreadsheet correction of
+        // 2026-08-05, recorded in R31, reverses it — Best Match is Semi,
+        // Review Builder is Maximum-only. Finding a professional is where a
+        // client starts; Review Builder has nothing to write about until the
+        // event is over.
+        $this->assertTrue(ToolkitTiers::unlocks('semi', 'Best Match', ToolkitTiers::CLIENT));
+        $this->assertFalse(ToolkitTiers::unlocks('semi', 'Review Builder', ToolkitTiers::CLIENT));
+    }
+
+    public function test_the_client_maximum_only_set_is_the_seven_r31_lists(): void
+    {
+        $locked = ToolkitTiers::table('semi', ToolkitTiers::CLIENT)
+            ->where('included', false)->pluck('title')->sort()->values()->all();
+
+        $this->assertSame([
+            'Contract Assistant',
+            'Guest Capacity Calculator',
+            'Guided Event Planner',
+            'Language',
+            'Review Builder',
+            'Style & Inspiration',
+            'Venue Compatibility Check',
+        ], $locked);
     }
 
     public function test_the_planning_suite_splits_three_to_four(): void
@@ -152,13 +178,13 @@ class ToolkitTierTableTest extends TestCase
         }
     }
 
-    public function test_the_other_two_suites_keep_khadijahs_revision(): void
+    public function test_the_other_two_suites_follow_the_r31_correction(): void
     {
-        // Peter did not restate these, and he had already accepted her change.
-        $this->assertTrue(ToolkitTiers::unlocks('semi', 'Review Builder', ToolkitTiers::CLIENT));
+        // Marketplace gives Semi one tool, Operations gives it one.
+        $this->assertTrue(ToolkitTiers::unlocks('semi', 'Best Match', ToolkitTiers::CLIENT));
         $this->assertTrue(ToolkitTiers::unlocks('semi', 'Message Builder', ToolkitTiers::CLIENT));
 
-        foreach (['Best Match', 'Contract Assistant', 'Language'] as $tool) {
+        foreach (['Review Builder', 'Contract Assistant', 'Language'] as $tool) {
             $this->assertFalse(
                 ToolkitTiers::unlocks('semi', $tool, ToolkitTiers::CLIENT),
                 "{$tool} is Maximum-only on the client side",
@@ -168,15 +194,14 @@ class ToolkitTierTableTest extends TestCase
 
     public function test_a_shared_tool_can_sit_at_a_different_tier_on_each_side(): void
     {
-        // Review Builder is one of the four tools both sides use, and the two
-        // sides landed on different answers: Khadijah put it in the client's
-        // Semi set on 2026-08-05, while Peter's professional sheet keeps it
-        // Maximum-only. Both are deliberate, so the tier is per side.
-        $this->assertTrue(ToolkitTiers::unlocks('semi', 'Review Builder', ToolkitTiers::CLIENT));
-        $this->assertFalse(ToolkitTiers::unlocks('semi', 'Review Builder', ToolkitTiers::PROFESSIONAL));
-
-        // Maximum is everything, so it carries the tool on both sides.
+        // Message Builder is one of the four tools both sides use, and both
+        // sides put it at Semi. Review Builder is the counter-example: shared,
+        // but Maximum-only on each side — so the tier is resolved per side
+        // rather than once per tool.
         foreach ([ToolkitTiers::CLIENT, ToolkitTiers::PROFESSIONAL] as $audience) {
+            $this->assertTrue(ToolkitTiers::unlocks('semi', 'Message Builder', $audience));
+            $this->assertFalse(ToolkitTiers::unlocks('semi', 'Review Builder', $audience));
+            // Maximum is everything, so it carries both on both sides.
             $this->assertTrue(ToolkitTiers::unlocks('maximum', 'Review Builder', $audience));
         }
     }
