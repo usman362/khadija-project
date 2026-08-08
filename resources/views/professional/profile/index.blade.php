@@ -238,6 +238,9 @@
     .pf-btn-sm { padding: 6px 14px; font-size: 13px; }
     .pf-btn-danger { background: #ef4444; }
     .pf-error { color: var(--bad-text); font-size: 12px; margin-top: 4px; }
+    /* R47 — explains why the State field is fixed, so it does not read as broken. */
+    .pf-hint { color: var(--text-muted); font-size: 11.5px; margin-top: 5px; line-height: 1.5; }
+    .pf-hint a { color: var(--brand-text, #2563eb); font-weight: 600; }
     .pf-success {
         padding: 12px 16px;
         background: rgba(16,185,129,0.1);
@@ -492,9 +495,30 @@
                         <label class="pf-label">City</label>
                         <input type="text" name="city" class="pf-input" value="{{ old('city', $profile->city) }}">
                     </div>
+                    {{-- Rule R47 — the state this account works in. Fixed once
+                         set: a second state means a second account, because
+                         editing this field would carry this account's reviews,
+                         badges and booking history into a state it was never
+                         licensed in. An account without one yet can still pick
+                         it, from the seven (R9) rather than free text. --}}
                     <div>
-                        <label class="pf-label">State / Province</label>
-                        <input type="text" name="state" class="pf-input" value="{{ old('state', $profile->state) }}">
+                        <label class="pf-label">State</label>
+                        @if(\App\Support\ProfessionalStateAccount::ownerMaySetState(auth()->user()))
+                            <select name="state" class="pf-input">
+                                <option value="">Select your state…</option>
+                                @foreach(config('geo.allowed_states', []) as $code => $label)
+                                    <option value="{{ $code }}" @selected(old('state', $profile->state) === $code)>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                            <div class="pf-hint">You can only set this once — see below.</div>
+                        @else
+                            <input type="text" class="pf-input" value="{{ $profile->state }}" disabled>
+                            <div class="pf-hint">
+                                {{ \App\Support\ProfessionalStateAccount::secondAccountExplanation(auth()->user()) }}
+                                <a href="{{ route('register', ['role' => 'professional']) }}">Open an account for another state</a>.
+                            </div>
+                        @endif
+                        @error('state') <div class="pf-error">{{ $message }}</div> @enderror
                     </div>
                     <div>
                         <label class="pf-label">Country</label>

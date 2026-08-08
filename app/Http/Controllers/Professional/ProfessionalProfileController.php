@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Professional;
 
 use App\Domain\ActivityLog\Services\ActivityLogger;
 use App\Http\Controllers\Controller;
+use App\Support\ProfessionalStateAccount;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -82,7 +83,16 @@ class ProfessionalProfileController extends Controller
             'gender' => ['nullable', 'in:male,female,other,prefer_not_to_say'],
             'address' => ['nullable', 'string', 'max:255'],
             'city' => ['nullable', 'string', 'max:100'],
-            'state' => ['nullable', 'string', 'max:100'],
+            // Rule R47 — a professional's registered state is fixed once set.
+            // Working in a second state means a second account, not editing
+            // this field: flipping it would carry this account's reviews,
+            // badges and booking history into a state it was never licensed
+            // in, and would silently move every package and gig it owns under
+            // R38. An account that has no state yet may still set one, and it
+            // has to come from the seven (R9), not from free text.
+            'state' => ProfessionalStateAccount::ownerMaySetState($user)
+                ? ['nullable', 'string', Rule::in(array_keys(config('geo.allowed_states', [])))]
+                : ['prohibited'],
             'country' => ['nullable', 'string', 'max:100'],
             'zip_code' => ['nullable', 'string', 'max:20'],
             'website' => ['nullable', 'url', 'max:255'],
@@ -101,7 +111,9 @@ class ProfessionalProfileController extends Controller
             'gender' => $validated['gender'] ?? null,
             'address' => $validated['address'] ?? null,
             'city' => $validated['city'] ?? null,
-            'state' => $validated['state'] ?? null,
+            // Absent from the payload on a locked account, so the stored
+            // value stands rather than being nulled by the ?? below.
+            'state' => $validated['state'] ?? $user->profile?->state,
             'country' => $validated['country'] ?? null,
             'zip_code' => $validated['zip_code'] ?? null,
             'website' => $validated['website'] ?? null,
@@ -488,6 +500,14 @@ class ProfessionalProfileController extends Controller
             $numberCol => $validated['number'] ?? null,
             $verifiedCol => null, // always re-enters review queue
         ];
+
+        // R47 — a trade licence is proof of ONE state's licensing, and this
+        // account works in one state. Stamped from the account rather than
+        // asked for, because there is only one answer it can have: a licence
+        // for anywhere else belongs on that state's own account.
+        if ($badge === 'trade_license') {
+            $attributes['trade_license_state'] = \App\Support\StateMatching::stateOf($request->user());
+        }
 
         if ($isInsurance) {
             $attributes += [

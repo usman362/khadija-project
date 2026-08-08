@@ -63,6 +63,9 @@ class UserProfile extends Model
         'notify_sms',
         // Verification badges
         'trade_license_number',
+        // R47 — which of the seven jurisdictions issued it. An account's
+        // licence has to be for the state that account works in.
+        'trade_license_state',
         'trade_license_doc',
         'trade_license_verified_at',
         'liability_insurance_number',
