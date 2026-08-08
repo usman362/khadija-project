@@ -46,8 +46,11 @@ class ProfessionalChatController extends Controller
             ->with([
                 'participants:id,name,email',
                 'booking:id,event_id,status,price',
-                'booking.event:id,title,starts_at',
-                'event:id,title,starts_at',
+                // `location` is here for R52's booking panel. Leaving it out
+                // of the select does not error — the attribute is simply null,
+                // so the panel silently drops its Location row.
+                'booking.event:id,title,starts_at,location',
+                'event:id,title,starts_at,location',
                 'messages' => fn ($q) => $q->latest()->limit(1),
                 'messages.sender:id,name',
             ])
@@ -80,12 +83,22 @@ class ProfessionalChatController extends Controller
         // Conversation Info rail (client + related order) for the active thread.
         $info = $activeConv ? $this->info($activeConv, $user) : null;
 
+        // Rule R52 — the booking-context panel Threads used to own, now shown
+        // here beside the conversation. It is null when the conversation has
+        // no booking behind it, and the view renders nothing at all in that
+        // case: the old page drew the whole panel with an em dash in every
+        // field, which looks like a page that failed to load.
+        $bookingPanel = $activeConv?->booking
+            ? $this->bookingPanel($activeConv)
+            : null;
+
         return [
             'currentUser' => $user,
             'conversations' => $list,
             'thread' => $thread,
             'categories' => $categories,
             'info' => $info,
+            'bookingPanel' => $bookingPanel,
             'stats' => $this->stats($conversations, $user),
             'tabCounts' => [
                 'inbox' => count($list),
@@ -177,6 +190,66 @@ class ProfessionalChatController extends Controller
                 'date'     => optional($booking->created_at)->format('M d, Y'),
             ] : null,
         ];
+    }
+
+    /**
+     * Rule R52 — the booking-context panel, moved here from Threads.
+     *
+     * Only ever built for a conversation that HAS a booking, so every field
+     * below has something real behind it. Threads rendered the panel for every
+     * conversation and filled it with em dashes when there was no booking.
+     *
+     * Quick Actions carries two entries, not the four Threads drew. Share
+     * Contract and Schedule Call go to pages that exist. "Send Payment Link"
+     * and "Create Invoice" were `<button type="button">` with no handler and
+     * no feature anywhere behind them — the platform has no way to issue
+     * either, so they are not brought across.
+     */
+    private function bookingPanel(Conversation $c): array
+    {
+        $booking = $c->booking;
+        $event   = $c->event ?? $booking->event;
+
+        return [
+            'project'  => $event?->title,
+            'date'     => optional($event?->starts_at)->format('M j, Y'),
+            'location' => $event?->location,
+            'status'   => Str::headline($booking->status),
+            'total'    => $booking->price ? '$' . number_format((float) $booking->price) : null,
+
+            'files' => $c->messages->flatMap->attachments->map(fn ($a) => [
+                'name' => $a->file_name,
+                'ext'  => strtoupper(pathinfo($a->file_name, PATHINFO_EXTENSION) ?: 'FILE'),
+                'size' => $this->size($a->file_size),
+                'date' => optional($a->created_at)->format('M j'),
+            ])->values()->all(),
+
+            'includeInContract' => (bool) $c->include_in_contract,
+            'toggleUrl'         => route('professional.chat.contract-toggle', $c->id),
+            'bookingUrl'        => route('professional.gig-hub.index', ['tab' => 'contracts']),
+            'calendarUrl'       => route('professional.calendar.index'),
+        ];
+    }
+
+    /**
+     * Record whether this conversation should feed the final contract.
+     *
+     * On Threads this checkbox was pre-ticked and wired to nothing, so a
+     * professional had every reason to think their agreed points were going
+     * into the contract. It now persists — and contract generation, when it
+     * is built, has a real answer to read.
+     */
+    public function toggleContractInclusion(Request $request, Conversation $conversation)
+    {
+        $this->authorize('view', $conversation);
+
+        $conversation->update([
+            'include_in_contract' => $request->boolean('include'),
+        ]);
+
+        return back()->with('status', $conversation->include_in_contract
+            ? 'This conversation will be included with the contract.'
+            : 'This conversation will not be included with the contract.');
     }
 
     /** Full thread payload for the active conversation. */

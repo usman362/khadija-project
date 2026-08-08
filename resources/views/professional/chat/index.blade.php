@@ -36,6 +36,38 @@
 
     /* main split */
     .pm-main { display: grid; grid-template-columns: minmax(0,340px) minmax(0,1fr); gap: 16px; }
+    /* R52 — a third column only when the conversation has a booking behind
+       it. `has-panel` is set by the view, so a conversation without one keeps
+       the two-column layout instead of leaving a gap where a panel would be. */
+    .pm-main.has-panel { grid-template-columns: minmax(0,280px) minmax(0,1fr) 280px; }
+
+    /* ── Booking-context panel ────────────────────────────────── */
+    .cx-book { display:flex; flex-direction:column; gap:14px; }
+    .cx-book-card { background: var(--bg-card); border:1px solid var(--border-color); border-radius:14px; padding:15px 16px; }
+    .cx-book-h { font-size:13px; font-weight:800; margin-bottom:11px; }
+    .cx-book-row { display:flex; justify-content:space-between; gap:10px; padding:6px 0; font-size:12.5px; border-top:1px solid var(--border-color); }
+    .cx-book-row:first-of-type { border-top:0; }
+    .cx-book-row span { color: var(--text-muted); }
+    .cx-book-row b { text-align:right; }
+    .cx-book-link { display:inline-block; margin-top:10px; font-size:12.5px; font-weight:700; color:var(--pm); text-decoration:none; }
+    .cx-book-check { margin-top:12px; padding-top:11px; border-top:1px solid var(--border-color); }
+    .cx-book-check label { display:flex; gap:8px; align-items:flex-start; font-size:12px; line-height:1.5; color:var(--text-secondary); cursor:pointer; }
+    .cx-book-check input { margin-top:2px; flex-shrink:0; }
+    .cx-book-save { margin-top:8px; font-size:12px; }
+    .cx-book-empty { font-size:12px; color:var(--text-muted); margin:0; }
+    .cx-file { display:grid; grid-template-columns:auto 1fr; gap:4px 9px; padding:8px 0; border-top:1px solid var(--border-color); font-size:12px; }
+    .cx-file:first-of-type { border-top:0; }
+    .cx-file-ext { grid-row:span 2; align-self:center; font-size:9.5px; font-weight:800; color:#fff; background:var(--pm); border-radius:5px; padding:5px 6px; }
+    .cx-file-name { font-weight:700; word-break:break-all; }
+    .cx-file-meta { color:var(--text-muted); font-size:11.5px; }
+    .cx-qa { display:flex; align-items:center; gap:9px; padding:9px 0; font-size:12.5px; font-weight:700; color:var(--text-primary); text-decoration:none; border-top:1px solid var(--border-color); }
+    .cx-qa:first-of-type { border-top:0; }
+    .cx-qa svg { width:15px; height:15px; flex-shrink:0; color:var(--pm); }
+    /* Peter, 2026-08-07: where a third column would squeeze the content, drop
+       to two and let the page run longer. Below this width the message thread
+       falls under ~560px, which is too narrow to read a conversation in, so
+       the panel moves to a full-width row beneath it instead. */
+    @media (max-width: 1400px) { .pm-main.has-panel { grid-template-columns: minmax(0,300px) minmax(0,1fr); } .cx-book { grid-column: 1 / -1; flex-direction:row; flex-wrap:wrap; } .cx-book-card { flex:1 1 260px; } }
     /* Both columns are one height. `align-items: start` used to size each
        to its own content, so the list ran on past the bottom of the thread
        and left a block of empty card under the compose box. */
@@ -133,7 +165,7 @@
     .pm-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); gap: 10px; padding: 60px; text-align: center; }
     .pm-empty svg { width: 42px; height: 42px; color: var(--border-color); }
 
-    @media (max-width: 1100px) { .pm-top { grid-template-columns: 1fr; } .pm-stats { grid-template-columns: repeat(3, minmax(0,1fr)); } .pm-main { grid-template-columns: 1fr; } }
+    @media (max-width: 1100px) { .pm-top { grid-template-columns: 1fr; } .pm-stats { grid-template-columns: repeat(3, minmax(0,1fr)); } .pm-main, .pm-main.has-panel { grid-template-columns: 1fr; } }
     @media (max-width: 640px) { .pm-stats { grid-template-columns: repeat(2, minmax(0,1fr)); } }
 </style>
 @endpush
@@ -162,7 +194,7 @@
     </div>
 
     {{-- split --}}
-    <div class="pm-main">
+    <div class="pm-main {{ $bookingPanel ? 'has-panel' : '' }}">
         {{-- conversation list --}}
         <div class="pm-card">
             <div class="pm-tabs">
@@ -307,6 +339,14 @@
                 <div class="pm-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Select a conversation to view the thread.</div>
             @endif
         </div>
+
+        {{-- Rule R52 — Threads' booking-context panel, now here beside the
+             conversation. The controller passes null when the conversation
+             has no booking, so nothing renders at all rather than a panel
+             full of em dashes. --}}
+        @if($bookingPanel)
+            @include('professional.chat._booking-panel')
+        @endif
     </div>
 </div>
 

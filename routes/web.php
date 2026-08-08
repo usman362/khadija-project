@@ -837,6 +837,11 @@ Route::middleware('auth')->group(function () {
         // Messages (Chat)
         Route::get('/messages', [ProfessionalChatController::class, 'index'])->middleware('permission:messages.view_any')->name('professional.chat.index');
         Route::get('/messages/{conversation}', [ProfessionalChatController::class, 'show'])->middleware('permission:messages.view')->name('professional.chat.show');
+        // R52 — the booking panel's "include this chat in the final contract"
+        // checkbox. It was decoration on the old Threads page; this is what
+        // makes it an answer the platform actually keeps.
+        Route::post('/messages/{conversation}/contract-inclusion', [ProfessionalChatController::class, 'toggleContractInclusion'])
+            ->middleware('permission:messages.view')->name('professional.chat.contract-toggle');
 
         // Threads is hidden for now — Messages is the one inbox professionals
         // use. Both pages showed the same conversations, so two entries in the

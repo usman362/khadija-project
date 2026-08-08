@@ -18,6 +18,14 @@ class Conversation extends Model
         'booking_id',
         'event_id',
         'created_by',
+        // R52 — the professional's answer to "include this chat's agreed
+        // points in the final contract". Nothing generates contracts from it
+        // yet; it records the choice so the choice exists to be honoured.
+        'include_in_contract',
+    ];
+
+    protected $casts = [
+        'include_in_contract' => 'boolean',
     ];
 
     // ----- Relationships -----
