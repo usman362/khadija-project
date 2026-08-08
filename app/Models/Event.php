@@ -42,6 +42,9 @@ class Event extends Model
         // Rule R38 — the state this request belongs to. Stamped from the
         // client's account on create; see booted().
         'state',
+        // Rule R60 — may the booked professional see this event's guest list?
+        // Per event, the client's choice, private until they say otherwise.
+        'share_attendees',
     ];
 
     /**
@@ -83,7 +86,14 @@ class Event extends Model
             'budget_max' => 'decimal:2',
             'sealed_proposals' => 'boolean',
             'questions_enabled' => 'boolean',
+            'share_attendees' => 'boolean',
         ];
+    }
+
+    /** Rule R60 — this event's guest list. Never queried across events. */
+    public function attendees(): HasMany
+    {
+        return $this->hasMany(EventAttendee::class);
     }
 
     /** @deprecated Use categories() instead */

@@ -398,16 +398,11 @@
     .od-todo-pri.medium { background: rgba(245, 158, 11, 0.15); color: var(--warn-text); }
     .od-todo-pri.low    { background: rgba(16, 185, 129, 0.15); color: var(--ok-text); }
 
-    /* Attendee management mini table */
-    .od-attendee-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-bottom: 11px; }
-    .od-attendee-stat { padding: 8px 6px; border-radius: 8px; background: var(--bg-card-hover); text-align: center; }
-    .od-attendee-stat-value { font-size: 16px; font-weight: 800; color: var(--text-primary); }
-    .od-attendee-stat-label { font-size: 10.5px; color: var(--text-muted); }
-    .od-attendee-table { width: 100%; font-size: 12.5px; border-collapse: collapse; }
-    .od-attendee-table th, .od-attendee-table td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border-color); }
-    .od-attendee-table th { color: var(--text-muted); font-size: 10.5px; text-transform: uppercase; font-weight: 700; }
-    .od-attendee-table td { color: var(--text-primary); }
-    .od-attendee-table td:nth-child(2) { max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* Attendee summary — one line per event, linking to that event's list (R60) */
+    .od-att-row { display: block; padding: 9px 0; border-bottom: 1px solid var(--border-color); text-decoration: none; }
+    .od-att-row:last-child { border-bottom: 0; }
+    .od-att-name { display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .od-att-counts { display: block; font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
 
     /* Achievements medal — layered gold "coin" with a ring, matching the
        reference award-rosette look (was a flat orange disc). */
@@ -477,7 +472,6 @@
         .od-stats { grid-template-columns: 1fr; }
         .od-badges { grid-template-columns: repeat(2, 1fr); }
         .od-mini-grid { grid-template-columns: repeat(2, 1fr); }
-        .od-attendee-stats { grid-template-columns: repeat(2, 1fr); }
     }
 </style>
 @endpush
@@ -934,45 +928,35 @@
         </div>
     </div>
 
+    {{-- Attendee Management — Rule R60.
+
+         This card used to be an account-wide table: 120/75/10/35 hardcoded,
+         five invented guests with invented email addresses, and Add / Import /
+         edit / delete buttons wired to nothing. Worse than fabricated, it was
+         ungrouped — a client running two weddings the same month saw one flat
+         list with nothing saying which guest belonged to which event. That is
+         Developer Checklist row 223, and R60's answer is that the list lives
+         on the event and the dashboard shows a summary that links back. --}}
     <div class="od-card">
         <div class="od-card-head">
             <span class="od-card-title">Attendee Management</span>
-            <div style="display:flex;gap:6px;">
-                <button class="od-card-link" style="background:none;border:1px solid var(--border-color);padding:5px 10px;border-radius:6px;cursor:pointer;">Add Attendee</button>
-                <button class="od-card-link" style="background:none;border:1px solid var(--border-color);padding:5px 10px;border-radius:6px;cursor:pointer;">Import List</button>
-            </div>
+            <a class="od-card-link" href="{{ route('client.events.index') }}">Manage Events</a>
         </div>
-        <div class="od-attendee-stats">
-            <div class="od-attendee-stat"><div class="od-attendee-stat-value">120</div><div class="od-attendee-stat-label">Total Guests</div></div>
-            <div class="od-attendee-stat"><div class="od-attendee-stat-value" style="color:var(--ok-text);">75</div><div class="od-attendee-stat-label">Confirmed</div></div>
-            <div class="od-attendee-stat"><div class="od-attendee-stat-value" style="color:var(--bad-text);">10</div><div class="od-attendee-stat-label">Cancelled</div></div>
-            <div class="od-attendee-stat"><div class="od-attendee-stat-value" style="color:var(--text-muted);">35</div><div class="od-attendee-stat-label">No Response</div></div>
-        </div>
-        <table class="od-attendee-table">
-            <thead><tr><th>Attendee Name</th><th>Email / Phone</th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>
-            <tbody>
-                @php
-                    $od_attendees = [
-                        ['Sarah Johnson',  'sarah.j@email.com',   'Confirmed',   'var(--ok-text)'],
-                        ['Michael Brown',  'michael.b@email.com', 'Confirmed',   'var(--ok-text)'],
-                        ['Emily Davis',    'emily.d@email.com',   'No Response', 'var(--text-muted)'],
-                        ['David Wilson',   'david.w@email.com',   'Cancelled',   'var(--bad-text)'],
-                        ['Jessica Taylor', 'jessica.t@email.com', 'Confirmed',   'var(--ok-text)'],
-                    ];
-                @endphp
-                @foreach($od_attendees as [$nm, $em, $st, $col])
-                    <tr>
-                        <td style="font-weight:600;">{{ $nm }}</td>
-                        <td style="color:var(--text-muted);font-size:11.5px;">{{ $em }}</td>
-                        <td><span style="font-size:10.5px;font-weight:700;color:{{ $col }};">{{ $st }}</span></td>
-                        <td style="text-align:right;">
-                            <button style="background:none;border:none;cursor:pointer;color:var(--brand-text);padding:2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
-                            <button style="background:none;border:none;cursor:pointer;color:var(--bad-text);padding:2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+        @forelse($attendeeSummaries as $row)
+            <a class="od-att-row" href="{{ route('client.events.show', ['event' => $row['id'], 'tab' => 'attendees']) }}">
+                <span class="od-att-name">{{ $row['title'] }}</span>
+                <span class="od-att-counts">
+                    {{ $row['total'] }} Guests
+                    · <b style="color:var(--ok-text);">{{ $row['confirmed'] }}</b> Confirmed
+                    · <b style="color:var(--bad-text);">{{ $row['cancelled'] }}</b> Cancelled
+                    · <b style="color:var(--text-muted);">{{ $row['no_response'] }}</b> No Response
+                </span>
+            </a>
+        @empty
+            <p style="font-size:12.5px;color:var(--text-muted);margin:6px 0 0;">
+                No guest lists yet. Open an event and add guests there — each event keeps its own list.
+            </p>
+        @endforelse
     </div>
 
     {{-- Your Achievements --}}

@@ -45,12 +45,31 @@ class ClientDashboardController extends Controller
             ->take(5)
             ->get();
 
+        // Rule R60 — one summary line per event that has a guest list, each
+        // linking back to that event's own Attendee Management. The widget
+        // this replaces was an account-wide table with no event grouping at
+        // all, which is Developer Checklist row 223.
+        $withGuests = Event::where('client_id', $user->id)
+            ->whereHas('attendees')
+            ->orderByRaw('starts_at is null, starts_at asc')
+            ->limit(5)
+            ->get(['id', 'title']);
+
+        $summaries = \App\Models\EventAttendee::summariesFor($withGuests->pluck('id'));
+
+        $attendeeSummaries = $withGuests->map(fn (Event $event) => array_merge(
+            ['id' => $event->id, 'title' => $event->title],
+            $summaries->get($event->id, ['total' => 0, 'confirmed' => 0, 'cancelled' => 0, 'no_response' => 0]),
+        ));
+
         // Active subscription
         $subscription = UserSubscription::where('user_id', $user->id)
             ->where('status', 'active')
             ->with('plan')
             ->first();
 
-        return view('client.dashboard', compact('stats', 'recentEvents', 'recentBookings', 'subscription'));
+        return view('client.dashboard', compact(
+            'stats', 'recentEvents', 'recentBookings', 'subscription', 'attendeeSummaries'
+        ));
     }
 }

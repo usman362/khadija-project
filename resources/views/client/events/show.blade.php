@@ -158,6 +158,8 @@
             'overview'     => ['Overview', null],
             'requirements' => ['Requirements', $event->categories->count()],
             'proposals'    => ['Proposals', $bids->count()],
+            // R60 — the guest list lives on the event it belongs to.
+            'attendees'    => ['Attendees', $attendeeSummary['total']],
             'questions'    => ['Questions', $questions->count()],
             'files'        => ['Files', null],
             'activity'     => ['Activity', $activity->count()],
@@ -429,6 +431,11 @@
                 </div>
             @endforelse
         </div>
+    @endif
+
+    {{-- ── Attendees (Rule R60) ─────────────────────────────── --}}
+    @if($tab === 'attendees')
+        @include('client.events._attendees')
     @endif
 
     {{-- ── Questions ────────────────────────────────────────── --}}

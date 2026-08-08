@@ -121,6 +121,18 @@ class ProfessionalGigController extends Controller
             'messages.sender:id,name',
         ]);
 
-        return view('professional.gigs.show', compact('event'));
+        // Rule R60 — the guest list, but only for the professional actually
+        // booked on this event AND only if the client has shared it. Two
+        // conditions, not one: a professional who merely bid on the event has
+        // no reason to hold its guests' contact details, and the client's
+        // choice is per event and revocable.
+        $attendees = ($isOwnGig && $event->share_attendees)
+            ? $event->attendees()->orderBy('name')->get()
+            : null;
+
+        return view('professional.gigs.show', [
+            'event'     => $event,
+            'attendees' => $attendees,
+        ]);
     }
 }

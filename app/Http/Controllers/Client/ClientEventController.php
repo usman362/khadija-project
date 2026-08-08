@@ -223,7 +223,7 @@ class ClientEventController extends Controller
 
         // Which tab is open. Everything is rendered server-side and switched by
         // query string, so a tab is linkable and survives a reload.
-        $tab = in_array($request->query('tab'), ['overview', 'requirements', 'proposals', 'questions', 'files', 'activity'], true)
+        $tab = in_array($request->query('tab'), ['overview', 'requirements', 'proposals', 'attendees', 'questions', 'files', 'activity'], true)
             ? $request->query('tab')
             : 'overview';
 
@@ -262,9 +262,16 @@ class ClientEventController extends Controller
             ->sortByDesc('at')
             ->values();
 
+        // Rule R60 — the guest list belongs to this event and is only ever
+        // read one event at a time. summaryFor() is the same call the
+        // dashboard's summary line uses, so the two cannot disagree.
+        $attendees = $event->attendees()->orderBy('name')->get();
+        $attendeeSummary = \App\Models\EventAttendee::summaryFor($event);
+
         return view('client.events.show', compact(
             'event', 'categories', 'selectedCategoryIds', 'bids',
-            'type', 'scope', 'tab', 'award', 'questions', 'activity'
+            'type', 'scope', 'tab', 'award', 'questions', 'activity',
+            'attendees', 'attendeeSummary'
         ));
     }
 

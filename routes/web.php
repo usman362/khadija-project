@@ -718,6 +718,18 @@ Route::middleware('auth')->group(function () {
         Route::patch('/events/{event}', [ClientEventController::class, 'update'])->middleware('permission:events.update')->name('client.events.update');
         Route::post('/events/{event}/publish', [ClientEventController::class, 'publish'])->middleware('permission:events.publish')->name('client.events.publish');
 
+        // Rule R60 — Attendee Management. Nested under the event on purpose:
+        // there is no route to an attendee that does not name the event they
+        // belong to, which is the whole correction the rule makes.
+        Route::middleware('permission:events.update')->group(function () {
+            $a = \App\Http\Controllers\Client\EventAttendeeController::class;
+            Route::post('/events/{event}/attendees', [$a, 'store'])->name('client.attendees.store');
+            Route::patch('/events/{event}/attendees/{attendee}', [$a, 'update'])->name('client.attendees.update');
+            Route::delete('/events/{event}/attendees/{attendee}', [$a, 'destroy'])->name('client.attendees.destroy');
+            Route::post('/events/{event}/attendees/import', [$a, 'import'])->name('client.attendees.import');
+            Route::post('/events/{event}/attendees/share', [$a, 'share'])->name('client.attendees.share');
+        });
+
         // "Add to my event" — save an AI-tool result onto an event.
         Route::post('/ai-artifacts', [\App\Http\Controllers\Client\EventAiArtifactController::class, 'store'])->name('client.ai-artifacts.store');
         Route::delete('/ai-artifacts/{artifact}', [\App\Http\Controllers\Client\EventAiArtifactController::class, 'destroy'])->name('client.ai-artifacts.destroy');

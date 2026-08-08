@@ -278,6 +278,37 @@
                     </button>
                 </div>
             @endif
+
+            {{-- Rule R60 — the client's guest list, shown only because they
+                 chose to share it with the professional booked on this event.
+                 They can turn it off again, and it is read here rather than
+                 exported: an emailed PDF leaves no trail and cannot be
+                 withdrawn. Rendered as nothing when not shared, so there is
+                 no locked panel advertising data the client kept private. --}}
+            @if($attendees !== null)
+                <div class="cl-card">
+                    <div style="font-size:15px;font-weight:600;margin-bottom:3px;">Guest list</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">
+                        Shared with you by the client for this event. {{ $attendees->count() }}
+                        {{ \Illuminate\Support\Str::plural('guest', $attendees->count()) }}.
+                    </div>
+                    @foreach($attendees as $guest)
+                        <div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--border-color);font-size:13px;">
+                            <div>
+                                <div style="font-weight:600;">{{ $guest->name }}</div>
+                                @if($guest->dietary || $guest->accessibility)
+                                    <div style="font-size:11.5px;color:var(--text-muted);">
+                                        {{ collect([$guest->dietary, $guest->accessibility])->filter()->implode(' · ') }}
+                                    </div>
+                                @endif
+                            </div>
+                            <span style="font-size:11.5px;color:var(--text-muted);white-space:nowrap;">
+                                {{ \App\Models\EventAttendee::STATUSES[$guest->rsvp_status] }}
+                            </span>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
     </div>
 
