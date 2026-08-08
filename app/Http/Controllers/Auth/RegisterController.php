@@ -9,6 +9,7 @@ use App\Domain\Influencer\DataTransferObjects\InfluencerApplicationData;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Rules\Recaptcha;
+use App\Support\AgeEligibility;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -55,7 +56,15 @@ class RegisterController extends Controller
             ? ['nullable', 'string', 'in:' . $allStates]
             : ['required', 'string', 'in:' . $allStates];
 
+        // Rule R62 — Clients and Professionals must be 18+. Influencers are
+        // out of scope here on purpose; R24 governs their age separately, and
+        // R62 exists as its own rule so that scope stays clean.
+        $dobRule = AgeEligibility::appliesTo($role)
+            ? ['required', 'date', 'before_or_equal:' . AgeEligibility::latestEligibleBirthdate()->toDateString()]
+            : ['nullable', 'date'];
+
         return Validator::make($data, [
+            'date_of_birth' => $dobRule,
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
@@ -70,6 +79,9 @@ class RegisterController extends Controller
         ], [
             'agree.accepted' => 'Please accept the Terms of Service and Privacy Policy to continue.',
             'state.required' => 'Please select your state.',
+            'date_of_birth.required'        => 'Please enter your date of birth.',
+            'date_of_birth.before_or_equal' => 'You must be at least ' . AgeEligibility::MINIMUM_AGE
+                . ' years old to open an account.',
             // Deliberately says nothing about which states we serve — that is
             // only revealed after registration.
             'state.in' => 'Please choose a state from the list.',
@@ -136,6 +148,9 @@ class RegisterController extends Controller
             'country'              => $country,
             'service_area_status'  => $status,
             'expansion_opt_in'     => (bool) ($data['expansion_opt_in'] ?? false),
+            // R62 — kept on the account so the eligibility answer survives the
+            // request that validated it.
+            'date_of_birth'        => $data['date_of_birth'] ?? null,
         ]);
 
         if ($state) {

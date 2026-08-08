@@ -290,6 +290,24 @@
                         @error('phone') <div class="rg-err">{{ $message }}</div> @enderror
                     </div>
 
+                    {{-- Rule R62 — Clients and Professionals must be 18+.
+                         Influencers are governed by R24 instead, so the field
+                         is only required on the two account types this rule
+                         covers. `max` is a courtesy, not the gate: the server
+                         re-checks the same date. --}}
+                    @if($active !== 'influencer')
+                        <div class="rg-field">
+                            <label class="rg-label">Date of Birth</label>
+                            <input type="date" name="date_of_birth"
+                                   class="rg-input {{ $errors->has('date_of_birth') ? 'is-invalid' : '' }}"
+                                   value="{{ old('date_of_birth') }}"
+                                   max="{{ \App\Support\AgeEligibility::latestEligibleBirthdate()->toDateString() }}"
+                                   required>
+                            <div class="rg-hint">You must be at least 18 to open an account.</div>
+                            @error('date_of_birth') <div class="rg-err">{{ $message }}</div> @enderror
+                        </div>
+                    @endif
+
                     {{-- Every state, and no mention of where we operate. Anyone may
                          register; whether we serve their area is worked out after the
                          account exists and shown once, on /welcome (Peter, 2026-07-30).
