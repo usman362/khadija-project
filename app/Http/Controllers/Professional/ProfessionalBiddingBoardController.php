@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Bid;
 use App\Models\Event;
 use App\Support\Commission;
+use App\Support\StateMatching;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -70,6 +71,12 @@ class ProfessionalBiddingBoardController extends Controller
                                                 ->where('supplier_id', $user?->id));
             })
             ->with('categories:id,name');
+
+        // Rule R38 — the board is a search surface, and search HIDES what the
+        // viewer cannot act on. A gig in another state is not a shorter list;
+        // it is work this professional is not permitted to take, and showing
+        // it only produces bids that have to be refused later.
+        StateMatching::scopeForViewer($base, $user);
 
         if ($q !== '') {
             $like = '%' . str_replace(['%', '_'], ['\\%', '\\_'], $q) . '%';

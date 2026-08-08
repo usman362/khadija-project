@@ -172,6 +172,17 @@ class ProfessionalBidWizardController extends Controller
         abort_if(in_array($event->status, ['completed', 'cancelled'], true), 410,
             'This request is closed.');
 
+        // Rule R38 — same-state only, and the ratification is explicit that
+        // enforcement is server-side authoritative. The board already filters
+        // the list, but a filtered list is a courtesy: this URL is reachable
+        // directly, and this is where the rule actually holds.
+        abort_unless(
+            \App\Support\StateMatching::matches($event->state, \App\Support\StateMatching::stateOf($user))
+                || ! \App\Support\StateMatching::appliesTo($user),
+            403,
+            'This request is in another state.'
+        );
+
         // Past the deadline the request no longer accepts proposals.
         if ($event->proposal_deadline && $event->proposal_deadline->isPast()) {
             abort(410, 'The proposal deadline for this request has passed.');

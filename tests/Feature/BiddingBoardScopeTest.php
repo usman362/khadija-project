@@ -40,6 +40,12 @@ class BiddingBoardScopeTest extends TestCase
     {
         $client = User::factory()->create();
 
+        // R38 puts the client's own state on the gig, and the board only shows
+        // a professional gigs in their state. These tests are about type and
+        // scope, so the client is placed alongside the pro rather than having
+        // every case disappear behind a rule they are not exercising.
+        $client->getOrCreateProfile()->update(['country' => 'US', 'state' => 'MD', 'city' => 'Baltimore']);
+
         $event = Event::create(array_merge([
             'title'        => 'Gig ' . (++self::$n),
             'created_by'   => $client->id,

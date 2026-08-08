@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\User;
+use App\Support\StateMatching;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -31,6 +32,7 @@ class ClientDirectOfferController extends Controller
             ->excludingSelf()
             ->with(['profile'])
             ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')
+            ->tap(fn ($q) => StateMatching::scopeUsersForViewer($q, $request->user()))
             ->limit(20)->get();
 
         $categories  = Category::active()->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
@@ -69,6 +71,16 @@ class ClientDirectOfferController extends Controller
         // account is both parties — a contract with itself, and commission
         // taken on money that never moved.
         abort_if($pro->id === $user->id, 422, 'You cannot send a direct offer to yourself.');
+
+        // Rule R38 — same-state only, re-checked here because the id arrives
+        // in the request and the filtered dropdown is only a courtesy. A
+        // Direct Offer is the one route with no board in front of it, so this
+        // is the sole gate between the two accounts.
+        abort_unless(
+            StateMatching::allows($user, $pro),
+            422,
+            'That professional works in a different state.'
+        );
 
         $event = Event::create([
             'title'        => $data['event_name'] ?: ('Direct Offer to ' . $pro->name),

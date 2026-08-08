@@ -13,10 +13,22 @@ class Package extends Model
         'title', 'slug', 'type', 'description', 'price', 'price_unit', 'duration',
         'coverage', 'team', 'guests', 'serves_regions', 'availability', 'savings_pct',
         'includes', 'images', 'is_active', 'status', 'sort_order',
+        // Rule R38, Option B — a package is bookable only in its owner's own
+        // state. Stamped from the professional's account on create.
+        'state',
     ];
 
     /** Canonical package lifecycle (Q11). Only ACTIVE is publicly browsable. */
     public const STATUSES = ['draft', 'active', 'paused', 'archived'];
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $package) {
+            if ($package->state === null && $package->user_id) {
+                $package->state = \App\Support\StateMatching::stateOf(User::find($package->user_id));
+            }
+        });
+    }
 
     protected $casts = [
         'services'   => 'array',

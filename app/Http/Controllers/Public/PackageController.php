@@ -49,6 +49,11 @@ class PackageController extends Controller
                     ->withCount(['reviewsReceived as reviews_count' => fn ($r) => $r->where('is_hidden', false)])
                     ->with('profile:user_id,city,state'),
             ])
+            // Rule R38, Option B — a package is bookable only in its owner's
+            // own state, so the catalogue shows a client only what they could
+            // actually buy. A signed-out visitor sees everything; the gate is
+            // on transacting, and there is no pair to match without a viewer.
+            ->tap(fn ($qr) => \App\Support\StateMatching::scopeForViewer($qr, $request->user()))
             ->when($q !== '', fn ($qr) => $qr->where(fn ($w) => $w
                 ->where('title', 'like', "%{$q}%")
                 ->orWhere('description', 'like', "%{$q}%")))

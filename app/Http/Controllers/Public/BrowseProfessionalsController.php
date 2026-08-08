@@ -51,6 +51,12 @@ class BrowseProfessionalsController extends Controller
             ->excludingSelf()
             ->with(['profile', 'serviceCategories:id,name,thumbnail']);
 
+        // Rule R38 — a client only matches professionals in their own state,
+        // and search HIDES what is ineligible rather than showing it greyed
+        // out. This page is login-gated, so there is always a viewer whose
+        // state decides the list.
+        \App\Support\StateMatching::scopeUsersForViewer($query, $request->user());
+
         // ── Keyword search across name + profile text fields ──────────
         // skills/portfolio are JSON arrays on UserProfile, so a LIKE on
         // the raw text is good enough for MVP (no fulltext index needed).
@@ -138,7 +144,7 @@ class BrowseProfessionalsController extends Controller
                     ->orderByRaw('(SELECT CASE WHEN trade_license_verified_at IS NOT NULL
                                                 AND liability_insurance_verified_at IS NOT NULL
                                                 AND (liability_insurance_expires_on IS NULL
-                                                     OR liability_insurance_expires_on >= CURDATE())
+                                                     OR liability_insurance_expires_on >= CURRENT_DATE)
                                                 AND workers_comp_verified_at IS NOT NULL
                                            THEN 1 ELSE 0 END
                                   FROM user_profiles WHERE user_profiles.user_id = users.id) DESC')
@@ -178,7 +184,7 @@ class BrowseProfessionalsController extends Controller
             ->whereNull('parent_id')
             ->whereNotNull('thumbnail')
             ->withCount(['professionals as pros_count'])
-            ->having('pros_count', '>', 0)
+            ->whereHas('professionals')
             ->orderByDesc('pros_count')
             ->orderBy('name')
             ->limit(30)
@@ -196,7 +202,7 @@ class BrowseProfessionalsController extends Controller
             $trending = Category::active()
                 ->whereNotNull('thumbnail')
                 ->withCount(['professionals as pros_count'])
-                ->having('pros_count', '>', 0)
+                ->whereHas('professionals')
                 ->orderByDesc('pros_count')
                 ->limit(60)
                 ->get(['id', 'name', 'slug', 'thumbnail', 'short_description'])

@@ -1,0 +1,194 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Event;
+use App\Models\Package;
+use App\Models\User;
+use App\Support\StateMatching;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+/**
+ * Rule R38, locked 2026-07-27 and ratified 2026-08-07 — a client and a
+ * professional only match inside the SAME state. Not merely the same
+ * 7-jurisdiction service area: no interstate bidding or booking at all.
+ *
+ * The distinction that matters, and the reason this is a separate class from
+ * ServiceArea: both a Maryland client and a Delaware professional pass the
+ * service-area gate, because both states are in the launch area. R38 is the
+ * second question, about the PAIR, and they fail it.
+ *
+ * Ratified alongside it: enforcement is server-side authoritative and
+ * re-checked at the point of transacting; search HIDES the ineligible; and
+ * influencers are carved out (R26).
+ */
+class SameStateMatchingTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+    }
+
+    private function user(string $role, string $state, string $city = 'Baltimore'): User
+    {
+        $user = User::factory()->create(['primary_role' => $role]);
+        $user->assignRole($role);
+        $user->givePermissionTo(['dashboard.view', 'bookings.view_any', 'bookings.update', 'events.create']);
+        $user->getOrCreateProfile()->update([
+            'country'             => 'US',
+            'state'               => $state,
+            'city'                => $city,
+            'service_area_status' => 'supported',
+        ]);
+
+        return $user->fresh();
+    }
+
+    private function gigFrom(User $client): Event
+    {
+        return Event::create([
+            'title'        => 'Anniversary Dinner',
+            'created_by'   => $client->id,
+            'client_id'    => $client->id,
+            'is_published' => true,
+            'status'       => 'published',
+            'starts_at'    => now()->addMonth(),
+        ]);
+    }
+
+    public function test_both_sides_can_be_in_the_service_area_and_still_not_match(): void
+    {
+        // The whole rule in one assertion. Maryland and Delaware are both
+        // launch states, so ServiceArea passes each of them — and R38 still
+        // says no, because they are not the same state as each other.
+        $client = $this->user('client', 'MD');
+        $pro    = $this->user('professional', 'DE', 'Dover');
+
+        $this->assertTrue(\App\Support\ServiceArea::allows($client));
+        $this->assertTrue(\App\Support\ServiceArea::allows($pro));
+        $this->assertFalse(StateMatching::allows($client, $pro));
+    }
+
+    public function test_a_gig_takes_the_state_of_the_client_who_raised_it(): void
+    {
+        $gig = $this->gigFrom($this->user('client', 'PA', 'Philadelphia'));
+
+        $this->assertSame('PA', $gig->fresh()->state);
+    }
+
+    public function test_a_package_takes_the_state_of_the_professional_who_owns_it(): void
+    {
+        $pro = $this->user('professional', 'VA', 'Richmond');
+
+        $package = Package::create([
+            'user_id' => $pro->id,
+            'title'   => 'Full Day Coverage',
+            'slug'    => 'full-day-coverage',
+            'price'   => 1200,
+            'status'  => 'active',
+            'is_active' => true,
+        ]);
+
+        $this->assertSame('VA', $package->fresh()->state);
+    }
+
+    public function test_the_bidding_board_hides_a_gig_from_another_state(): void
+    {
+        $mine     = $this->gigFrom($this->user('client', 'MD'));
+        $elsewhere = $this->gigFrom($this->user('client', 'DE', 'Dover'));
+        $pro      = $this->user('professional', 'MD');
+
+        $page = $this->actingAs($pro)->get(route('professional.bidding-board.index'));
+
+        $page->assertSuccessful();
+        $page->assertSee($mine->title);
+        $ids = collect($page->viewData('gigs'))->pluck('event_id');
+        $this->assertContains($mine->id, $ids->all());
+        $this->assertNotContains($elsewhere->id, $ids->all());
+    }
+
+    public function test_a_professional_cannot_bid_on_an_out_of_state_gig_by_url(): void
+    {
+        // Search hiding it is a courtesy; this is the rule. The ratification
+        // is explicit that enforcement is server-side authoritative.
+        $gig = $this->gigFrom($this->user('client', 'DE', 'Dover'));
+        $pro = $this->user('professional', 'MD');
+
+        $this->actingAs($pro)
+            ->get(route('professional.bid.step', ['event' => $gig->id]))
+            ->assertForbidden();
+    }
+
+    public function test_a_professional_can_still_bid_in_their_own_state(): void
+    {
+        $gig = $this->gigFrom($this->user('client', 'MD'));
+        $pro = $this->user('professional', 'MD');
+
+        $this->actingAs($pro)
+            ->get(route('professional.bid.step', ['event' => $gig->id]))
+            ->assertSuccessful();
+    }
+
+    public function test_a_client_cannot_send_a_direct_offer_across_a_state_line(): void
+    {
+        // Direct Offer has no board in front of it, so this check is the only
+        // thing standing between the two accounts.
+        $client = $this->user('client', 'MD');
+        $pro    = $this->user('professional', 'DE', 'Dover');
+
+        $this->actingAs($client)
+            ->post(route('client.direct-offers.store'), [
+                'professional_id' => $pro->id,
+                'event_name'      => 'Garden Party',
+            ])
+            ->assertStatus(422);
+
+        $this->assertDatabaseMissing('events', ['title' => 'Garden Party']);
+    }
+
+    public function test_browse_only_lists_professionals_in_the_clients_state(): void
+    {
+        $near = $this->user('professional', 'MD');
+        $far  = $this->user('professional', 'DE', 'Dover');
+        $client = $this->user('client', 'MD');
+
+        $page = $this->actingAs($client)->get(route('public.browse'));
+
+        $page->assertSuccessful();
+        $page->assertSee($near->name);
+        $page->assertDontSee($far->name);
+    }
+
+    public function test_an_influencer_is_carved_out(): void
+    {
+        // R26 exempts influencers from geo-restriction entirely, and they are
+        // never a party to a booking — so there is no pair for R38 to judge.
+        $influencer = $this->user('influencer', 'CA');
+        $pro        = $this->user('professional', 'MD');
+
+        $this->assertFalse(StateMatching::appliesTo($influencer));
+        $this->assertTrue(StateMatching::allows($influencer, $pro));
+    }
+
+    public function test_an_unknown_state_matches_nobody(): void
+    {
+        // "Same state?" with a blank on one side is not a yes. Letting NULL
+        // through would make the rule opt-in for every row that predates it.
+        $this->assertFalse(StateMatching::matches(null, 'MD'));
+        $this->assertFalse(StateMatching::matches('MD', null));
+        $this->assertFalse(StateMatching::matches(null, null));
+    }
+
+    public function test_the_comparison_ignores_case(): void
+    {
+        // The column is written uppercase, but profiles have been saved both
+        // ways by older forms and seeders — the same trap that stranded
+        // "Food services" during the taxonomy remap.
+        $this->assertTrue(StateMatching::matches('md', 'MD'));
+    }
+}

@@ -225,7 +225,7 @@ class UserProfile extends Model
      */
     public const INSURANCE_CURRENT_SQL =
         'liability_insurance_verified_at IS NOT NULL
-         AND (liability_insurance_expires_on IS NULL OR liability_insurance_expires_on >= CURDATE())';
+         AND (liability_insurance_expires_on IS NULL OR liability_insurance_expires_on >= CURRENT_DATE)';
 
     /**
      * Verified and not expired.

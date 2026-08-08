@@ -39,7 +39,34 @@ class Event extends Model
         'proposal_deadline',
         'sealed_proposals',
         'questions_enabled',
+        // Rule R38 — the state this request belongs to. Stamped from the
+        // client's account on create; see booted().
+        'state',
     ];
+
+    /**
+     * Rule R38 — every request carries the registered state of the account
+     * that raised it.
+     *
+     * Stamped here rather than in each of the five controllers that create an
+     * Event (post-event wizard, direct offer, ESR, the prototype bridge, the
+     * seeders). A request that reached the board with no state would be
+     * invisible to everyone, since NULL matches nobody — so the one place
+     * that cannot be forgotten is the model itself.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (self $event) {
+            if ($event->state !== null) {
+                return;
+            }
+
+            $owner = $event->client_id ?? $event->created_by;
+            $event->state = $owner
+                ? \App\Support\StateMatching::stateOf(User::find($owner))
+                : null;
+        });
+    }
 
     protected function casts(): array
     {
