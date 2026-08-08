@@ -58,6 +58,17 @@ Route::get('/', LandingPageController::class)->name('landing');
 Route::get('/pro/{user}', [\App\Http\Controllers\Public\ProfessionalProfileShowController::class, 'show'])
     ->name('public.professional.show');
 
+// ── Public Client Portfolio (Rule R53) ────────────────────────────────
+// The client's counterpart to /pro/{id} — the third tier the persona was
+// missing, alongside their private Dashboard and Profile & Settings.
+// Login-gated to match /browse: the page exists for professionals to read
+// before they bid, not for the open web to index a client's event history.
+// The path spells the page out rather than using /client/{id}, which the
+// spec warns would be read as the private /client/profile settings page.
+Route::get('/client-portfolio/{user}', [\App\Http\Controllers\Public\ClientPortfolioController::class, 'show'])
+    ->middleware('auth')
+    ->name('public.client.portfolio');
+
 // ── Public Browse (filterable professional directory) ─────────────────
 // Where the landing-page hero search, A-Z chips, and events-categories
 // mega-panel all converge. Supports ?q= ?city= ?rating_min= ?verified=

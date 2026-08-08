@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Review;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Support\ResponseStats;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -57,15 +58,23 @@ class ProfessionalProfileShowController extends Controller
             ->limit(4)
             ->get();
 
-        // Trust signals: estimated response time and reply rate. Without a
-        // message-response table yet these are derived defaults — verified
-        // pros get the stronger numbers, new pros get gentler placeholders.
-        // Uses centralized User::isVerified() (all three docs approved).
         $isFullyVerified = $user->isVerified();
 
+        // These two used to be derived from the verification badges: a fully
+        // verified pro got a flattering fixed pair of figures and everyone
+        // else got a gentler pair, with no message data behind either.
+        // Verification says a licence was checked; it says nothing about how
+        // fast anyone answers. They are now measured from the messages
+        // themselves, by the same code the client portfolio uses.
+        //
+        // The retired strings are deliberately not quoted here — a test
+        // greps this file for them, and a comment naming them would keep it
+        // failing forever or force the check to be loosened.
+        $response = ResponseStats::for($user);
+
         $responseSignals = [
-            'response_time' => $isFullyVerified ? 'Within 2 hours'  : 'Within 24 hours',
-            'reply_rate'    => $isFullyVerified ? '98%'             : '—',
+            'response_time' => ResponseStats::describe($response['hours']),
+            'reply_rate'    => $response['rate'] === null ? '—' : $response['rate'] . '%',
             'member_since'  => $user->created_at?->format('M Y'),
         ];
 

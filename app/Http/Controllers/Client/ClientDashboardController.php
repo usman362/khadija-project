@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Event;
 use App\Models\UserSubscription;
+use App\Support\ClientStats;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -15,14 +16,19 @@ class ClientDashboardController extends Controller
     {
         $user = $request->user();
 
-        // Stats — client only
+        // The figures this page shares with the public Client Portfolio come
+        // from ClientStats, so the two screens cannot disagree about the same
+        // account — Rule R53's single-source-of-truth requirement, and the
+        // defect already found between Earnings and Transactions.
+        $public = ClientStats::for($user);
+
         $stats = [
-            'total_events' => Event::where('client_id', $user->id)->count(),
+            'total_events' => $public['total_events'],
             'open_events' => Event::where('client_id', $user->id)->whereIn('status', ['pending', 'published', 'confirmed'])->count(),
             'upcoming_events' => Event::where('client_id', $user->id)->where('starts_at', '>', now())->count(),
             'total_bookings' => Booking::where('client_id', $user->id)->count(),
             'active_bookings' => Booking::where('client_id', $user->id)->whereIn('status', ['requested', 'confirmed'])->count(),
-            'completed_bookings' => Booking::where('client_id', $user->id)->where('status', 'completed')->count(),
+            'completed_bookings' => $public['completed_events'],
         ];
 
         // Recent events
