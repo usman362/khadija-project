@@ -48,16 +48,24 @@ class ToolkitTiers
     /**
      * One row per tool for the given tier — what the tab table renders.
      *
+     * Included tools come first, then the rest (Peter, 2026-08-07): the tab
+     * answers "what am I buying", so the answer should not be scattered
+     * through twelve rows. PHP's sort is stable, so catalog order survives
+     * inside each of the two groups.
+     *
      * @return Collection<int, array{title:string, suite:?string, purpose:?string, included:bool}>
      */
     public static function table(string $tier, string $audience): Collection
     {
-        return self::toolsFor($audience)->map(fn (array $tool) => [
-            'title'    => $name = $tool['name'] ?? '',
-            'route'    => $tool['route'] ?? null,
-            'purpose'  => $tool['purpose'] ?? null,
-            'included' => self::unlocks($tier, $name, $audience),
-        ]);
+        return self::toolsFor($audience)
+            ->map(fn (array $tool) => [
+                'title'    => $name = $tool['name'] ?? '',
+                'route'    => $tool['route'] ?? null,
+                'purpose'  => $tool['purpose'] ?? null,
+                'included' => self::unlocks($tier, $name, $audience),
+            ])
+            ->sortByDesc('included')
+            ->values();
     }
 
     /** What one tier costs, as a one-time purchase. */

@@ -55,6 +55,36 @@ class ToolkitTierTableTest extends TestCase
         }
     }
 
+    public function test_included_tools_are_listed_before_the_rest(): void
+    {
+        // Peter, 2026-08-07: the six you get should read as a block at the
+        // top, not be picked out of twelve interleaved rows.
+        foreach ([ToolkitTiers::CLIENT, ToolkitTiers::PROFESSIONAL] as $audience) {
+            $flags = ToolkitTiers::table('semi', $audience)->pluck('included')->all();
+
+            $this->assertSame(
+                array_values($flags),
+                collect($flags)->sortDesc()->values()->all(),
+                "the {$audience} Semi table still interleaves included and excluded tools",
+            );
+        }
+    }
+
+    public function test_ordering_does_not_scramble_the_tools_within_a_group(): void
+    {
+        // A stable sort, not a re-shuffle: the catalog order still holds
+        // inside the included block and inside the excluded block.
+        $catalog = ToolkitTiers::toolsFor(ToolkitTiers::CLIENT)->pluck('name');
+        $rows    = ToolkitTiers::table('semi', ToolkitTiers::CLIENT);
+
+        foreach ([true, false] as $group) {
+            $shown = $rows->where('included', $group)->pluck('title')->values();
+            $expected = $catalog->filter(fn ($n) => $shown->contains($n))->values();
+
+            $this->assertSame($expected->all(), $shown->all());
+        }
+    }
+
     public function test_the_prices_are_free_two_ninety_nine_and_five_ninety_nine(): void
     {
         $this->assertSame(0.0, ToolkitTiers::price('manual'));
