@@ -154,7 +154,9 @@
                     <div class="do-field"><label>Event Date</label><input type="date" class="do-input" name="event_date"></div>
                     <div class="do-field"><label>Guest Count</label><input type="number" class="do-input" name="guests" placeholder="150"></div>
                 </div>
-                <div class="do-field"><label>Venue / Location</label><input class="do-input" name="venue" placeholder="The Grand Garden Estate, Chicago, IL"></div>
+                <div class="do-field"><label>Venue / Location</label><input class="do-input" name="venue" {{-- Placeholder text is still copy: this one named Chicago on a
+                     seven-jurisdiction marketplace (R9). --}}
+                    placeholder="The Grand Ballroom, Baltimore, MD"></div>
             </div>
         </div>
 

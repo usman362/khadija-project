@@ -1,7 +1,7 @@
 @extends('layouts.client')
 
-@section('title', 'Earnings')
-@section('page-title', 'Earnings')
+@section('title', 'Spending')
+@section('page-title', 'Spending')
 @section('page-subtitle', 'Funds, payouts and financial progress.')
 
 @push('styles')
@@ -227,7 +227,7 @@
 
     {{-- Earnings trend (sparkline) --}}
     <div class="ea-rail-card">
-        <div class="ea-rail-head"><div class="ea-rail-title">Earnings Trend</div><span class="ea-rail-sel">This Month</span></div>
+        <div class="ea-rail-head"><div class="ea-rail-title">Spending Trend</div><span class="ea-rail-sel">This Month</span></div>
         <div class="ea-trend-big">${{ number_format($stats['total_earnings'], 0) }}</div>
         <div class="ea-trend-up">↑ Project total</div>
         @php

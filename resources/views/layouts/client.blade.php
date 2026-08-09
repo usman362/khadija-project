@@ -1306,7 +1306,11 @@
                 <li class="cl-nav-item">
                     <a href="{{ route('client.earnings.index') }}" class="cl-nav-link {{ request()->routeIs('client.earnings.*') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
-                        Earnings
+                        {{-- A client does not earn — this page has always shown
+                             what they SPEND. The label was rationalised in code
+                             as "for a planner, earnings reads as managed project
+                             funds", which is a way of saying the word is wrong. --}}
+                        Spending
                     </a>
                 </li>
                 <li class="cl-nav-item">

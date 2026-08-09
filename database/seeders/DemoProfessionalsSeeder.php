@@ -168,11 +168,48 @@ class DemoProfessionalsSeeder extends Seeder
         return $pool;
     }
 
+    /**
+     * Put this professional's existing review-chain events back in their city.
+     *
+     * R9 wants locations from the seven jurisdictions and R38 files each event
+     * under a state; a chain written when the demo professionals lived in
+     * California says neither. The state comes from the event's own client,
+     * per R38, not from the professional — a client in Philadelphia hiring a
+     * Baltimore professional is a Pennsylvania event.
+     */
+    private function repairChainLocations(User $supplier, array $data): void
+    {
+        $stale = Event::where('supplier_id', $supplier->id)
+            ->where('location', '<>', $data['city'] . ', ' . $data['state'])
+            ->with('client.profile')
+            ->get();
+
+        foreach ($stale as $event) {
+            $clientState = strtoupper($event->client?->profile?->state ?: $data['state']);
+            $clientCity  = $event->client?->profile?->city ?: $data['city'];
+
+            $event->forceFill([
+                'location' => $clientCity . ', ' . $clientState,
+                'state'    => $clientState,
+            ])->saveQuietly();
+        }
+    }
+
     /** Build a few Event → Booking → Review chains so the pro shows a rating. */
     private function seedReviews(User $supplier, array $reviewers, array $data): void
     {
         if ($supplier->reviewsReceived()->count() > 0) {
-            return; // already seeded
+            // Already seeded — but idempotent has a cost. This method skips a
+            // professional who has reviews, so any chain written before the
+            // demo cities were moved in-area kept its old location and was
+            // never revisited: 59 events still saying San Diego, Nashville
+            // and Chicago on a seven-jurisdiction marketplace.
+            //
+            // Skipping is still right — re-seeding would double the reviews —
+            // so the existing rows are repaired instead of rebuilt.
+            $this->repairChainLocations($supplier, $data);
+
+            return;
         }
 
         $count    = rand(4, 9);

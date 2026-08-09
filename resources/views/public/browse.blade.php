@@ -498,7 +498,16 @@
                             <div class="br-chips">
                                 @if($isVerified)<span class="br-chip verif">VERIFIED PRO</span>@endif
                                 @if($isTop)<span class="br-chip top">TOP RATED</span>@endif
-                                <span class="br-chip quick">QUICK RESPONDER</span>
+                                {{-- A "QUICK RESPONDER" chip sat here on every
+                                     card unconditionally, including on
+                                     professionals nobody had ever messaged.
+                                     The response data exists (ResponseStats)
+                                     but is not loaded by this query, and
+                                     computing it per card would be a query
+                                     per professional on a paginated grid. An
+                                     unconditional badge is not a weaker
+                                     version of the real one — it is a claim
+                                     about someone the page cannot support. --}}
                             </div>
 
                             <div class="br-pro-meta">
@@ -507,7 +516,15 @@
                                 @else
                                     <span class="star">★ New on GigResource</span>
                                 @endif
-                                <span>Recommended by past clients</span>
+                                {{-- Shown on every card, including one with no
+                                     reviews at all. It now needs enough real
+                                     reviews to mean something: three or more,
+                                     averaging 4.5. Both figures are already
+                                     loaded for the stars above, so this costs
+                                     nothing and says something true. --}}
+                                @if($cnt >= 3 && $avg >= 4.5)
+                                    <span>Recommended by past clients</span>
+                                @endif
                             </div>
 
                             <div class="br-pro-foot">
