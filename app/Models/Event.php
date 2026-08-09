@@ -122,6 +122,18 @@ class Event extends Model
         return $this->belongsTo(User::class, 'supplier_id');
     }
 
+    /**
+     * The bids placed on this request.
+     *
+     * Bid has always pointed at Event; the reverse was never declared, so
+     * anything asking "did this gig get a bid" had to go the long way round.
+     * Reporting asks exactly that, twice.
+     */
+    public function bids(): HasMany
+    {
+        return $this->hasMany(Bid::class);
+    }
+
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);

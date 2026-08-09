@@ -262,6 +262,13 @@
                                 <span class="link-title">Expansion Waitlist</span>
                             </a>
                         </li>
+
+                        <li class="nav-item {{ request()->routeIs('app.admin.reports.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.admin.reports.index') }}" class="nav-link">
+                                <i class="link-icon ic-blue" data-lucide="bar-chart-3"></i>
+                                <span class="link-title">Reports</span>
+                            </a>
+                        </li>
                         @endrole
 
                         <li class="nav-item {{ request()->routeIs('app.roles.*') ? 'active' : '' }}">
