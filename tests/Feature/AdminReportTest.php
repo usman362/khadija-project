@@ -255,6 +255,26 @@ class AdminReportTest extends TestCase
             ->assertSuccessful()->assertViewHas('range', '30');
     }
 
+    public function test_the_dropdown_shows_the_range_the_page_is_actually_on(): void
+    {
+        // It did not. The array keys are numeric strings, which PHP casts to
+        // int on the way into a foreach, so `$range === $value` compared
+        // '90' to 90 and was never true — no option carried `selected` and
+        // the browser fell back to showing the first one. The page said one
+        // range and the figures were another.
+        //
+        // Asserted on the rendered option, not on the view variable: the old
+        // test checked assertViewHas() and passed all the way through this.
+        $page = $this->actingAs($this->admin)
+            ->get(route('app.admin.reports.index', ['range' => '30']));
+
+        $this->assertMatchesRegularExpression(
+            '/<option value="' . trim('30', "'") . '"[^>]*\bselected\b/',
+            $page->getContent(),
+            'the Last 30 days option is not marked selected',
+        );
+    }
+
     public function test_the_csv_carries_the_same_figures(): void
     {
         $this->completedBooking($this->gig(), 1000);

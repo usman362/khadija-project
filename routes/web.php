@@ -734,6 +734,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/ai-artifacts', [\App\Http\Controllers\Client\EventAiArtifactController::class, 'store'])->name('client.ai-artifacts.store');
         Route::delete('/ai-artifacts/{artifact}', [\App\Http\Controllers\Client\EventAiArtifactController::class, 'destroy'])->name('client.ai-artifacts.destroy');
 
+        // Reporting — this client's own numbers (Peter, 2026-08-09).
+        Route::get('/reports', [\App\Http\Controllers\Client\ClientReportController::class, 'index'])
+            ->name('client.reports.index');
+        Route::get('/reports/csv', [\App\Http\Controllers\Client\ClientReportController::class, 'csv'])
+            ->name('client.reports.csv');
+
         // Client Bookings
         Route::get('/bookings', [ClientBookingController::class, 'index'])->middleware('permission:bookings.view_any')->name('client.bookings.index');
         Route::patch('/bookings/{booking}/status', [ClientBookingController::class, 'updateStatus'])->middleware('permission:bookings.update')->name('client.bookings.update-status');
@@ -871,6 +877,12 @@ Route::middleware('auth')->group(function () {
         // Reviews
         Route::get('/reviews', [ProfessionalReviewController::class, 'index'])->name('professional.reviews.index');
         Route::post('/reviews', [ProfessionalReviewController::class, 'store'])->name('professional.reviews.store');
+
+        // Reporting — this professional's own numbers (Peter, 2026-08-09).
+        Route::get('/reports', [\App\Http\Controllers\Professional\ProfessionalReportController::class, 'index'])
+            ->name('professional.reports.index');
+        Route::get('/reports/csv', [\App\Http\Controllers\Professional\ProfessionalReportController::class, 'csv'])
+            ->name('professional.reports.csv');
 
         // Transactions
         Route::get('/transactions', [ProfessionalTransactionController::class, 'index'])->name('professional.transactions.index');

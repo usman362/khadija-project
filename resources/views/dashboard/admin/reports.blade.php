@@ -32,7 +32,7 @@
         <form method="GET" class="d-flex gap-2">
             <select name="range" class="form-select form-select-sm" onchange="this.form.submit()">
                 @foreach($ranges as $value => $label)
-                    <option value="{{ $value }}" @selected($range === $value)>{{ $label }}</option>
+                    <option value="{{ $value }}" @selected($range === (string) $value)>{{ $label }}</option>
                 @endforeach
             </select>
         </form>
