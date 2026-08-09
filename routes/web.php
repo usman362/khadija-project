@@ -606,6 +606,22 @@ Route::middleware('auth')->group(function () {
         Route::post('/{case}/escalate', [$d, 'requestOutsideEscalation'])->name('escalate');
     });
 
+    // ── Cancellations, both directions (checklist row 155) ────────
+    //
+    // One set of routes for both parties, like disputes: a client cancelling
+    // and a professional reporting a no-show on the same booking are two
+    // accounts of one morning, and the only useful way to read either is
+    // beside the other.
+    Route::prefix('cancellations')->name('cancellations.')->group(function () {
+        $c = \App\Http\Controllers\Cancellations\CancellationController::class;
+
+        Route::get('/', [$c, 'index'])->name('index');
+        Route::get('/report', [$c, 'create'])->name('create');
+        Route::post('/', [$c, 'store'])->name('store');
+        Route::get('/{cancellation}', [$c, 'show'])->name('show');
+        Route::post('/{cancellation}/withdraw', [$c, 'withdraw'])->name('withdraw');
+    });
+
     // ── Client Panel ──────────────────────────────────────────────
     Route::prefix('client')->middleware('permission:dashboard.view')->group(function () {
         Route::get('/dashboard', [ClientDashboardController::class, 'index'])->name('client.dashboard');

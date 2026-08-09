@@ -1338,6 +1338,12 @@
                         Disputes
                     </a>
                 </li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('cancellations.index') }}" class="cl-nav-link {{ request()->routeIs('cancellations.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                        Cancellations
+                    </a>
+                </li>
 
                 {{-- ── ACCOUNT ────────────────────────────────────── --}}
                 <li class="cl-nav-label">Account</li>

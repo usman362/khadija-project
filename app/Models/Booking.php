@@ -177,6 +177,29 @@ class Booking extends Model
         return $this->hasMany(Agreement::class);
     }
 
+    /**
+     * The signed money terms — agreed price, deposit percent and amount.
+     *
+     * The cancellation policy computes its refund on the held balance, which
+     * is the agreed price less the deposit, so this is where those two
+     * figures have to come from. Reading the booking's own `price` instead
+     * would quote against a number nobody signed.
+     */
+    public function finalizations(): HasMany
+    {
+        return $this->hasMany(Finalization::class);
+    }
+
+    public function latestFinalization(): HasOne
+    {
+        return $this->hasOne(Finalization::class)->latestOfMany('id');
+    }
+
+    public function cancellationRequests(): HasMany
+    {
+        return $this->hasMany(CancellationRequest::class);
+    }
+
     public function latestAgreement(): HasOne
     {
         return $this->hasOne(Agreement::class)->latestOfMany('version');
