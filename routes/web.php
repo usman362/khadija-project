@@ -586,6 +586,26 @@ Route::middleware('auth')->group(function () {
         Route::post('/{key}', [\App\Http\Controllers\Dashboard\AdminAiToolController::class, 'update'])->name('update');
     });
 
+    // ── Dispute Resolution, party side (R34 Phase 2) ──────────────
+    //
+    // One set of routes for clients and professionals, not two. §1 of the
+    // architecture puts both parties through an identical workflow, and the
+    // controller draws whichever portal the person is currently in. Two
+    // parallel route sets would have been two places to forget a rule.
+    Route::prefix('disputes')->name('disputes.')->group(function () {
+        $d = \App\Http\Controllers\Disputes\DisputeController::class;
+
+        Route::get('/', [$d, 'index'])->name('index');
+        Route::get('/file', [$d, 'create'])->name('create');
+        Route::post('/', [$d, 'store'])->name('store');
+        Route::get('/{case}', [$d, 'show'])->name('show');
+        Route::post('/{case}/evidence', [$d, 'addEvidence'])->name('evidence');
+        Route::post('/{case}/respond', [$d, 'respond'])->name('respond');
+        Route::post('/{case}/review', [$d, 'escalateToReview'])->name('review');
+        Route::post('/{case}/withdraw', [$d, 'withdraw'])->name('withdraw');
+        Route::post('/{case}/escalate', [$d, 'requestOutsideEscalation'])->name('escalate');
+    });
+
     // ── Client Panel ──────────────────────────────────────────────
     Route::prefix('client')->middleware('permission:dashboard.view')->group(function () {
         Route::get('/dashboard', [ClientDashboardController::class, 'index'])->name('client.dashboard');
@@ -986,6 +1006,22 @@ Route::middleware('auth')->group(function () {
             ->name('app.admin.reports.index');
         Route::get('/reports/csv', [\App\Http\Controllers\Dashboard\AdminReportController::class, 'csv'])
             ->name('app.admin.reports.csv');
+
+        // Dispute Resolution (R34) — the staff queue and one case.
+        Route::get('/disputes', [\App\Http\Controllers\Dashboard\AdminDisputeController::class, 'index'])
+            ->name('app.admin.disputes.index');
+        Route::get('/disputes/{case}', [\App\Http\Controllers\Dashboard\AdminDisputeController::class, 'show'])
+            ->name('app.admin.disputes.show');
+        Route::post('/disputes/{case}/classify', [\App\Http\Controllers\Dashboard\AdminDisputeController::class, 'classify'])
+            ->name('app.admin.disputes.classify');
+        Route::post('/disputes/{case}/assign', [\App\Http\Controllers\Dashboard\AdminDisputeController::class, 'assign'])
+            ->name('app.admin.disputes.assign');
+        Route::post('/disputes/{case}/decide', [\App\Http\Controllers\Dashboard\AdminDisputeController::class, 'decide'])
+            ->name('app.admin.disputes.decide');
+        Route::post('/disputes/{case}/close', [\App\Http\Controllers\Dashboard\AdminDisputeController::class, 'close'])
+            ->name('app.admin.disputes.close');
+        Route::post('/disputes/{case}/note', [\App\Http\Controllers\Dashboard\AdminDisputeController::class, 'note'])
+            ->name('app.admin.disputes.note');
 
         // Expansion waitlist — where out-of-area signups are coming from.
         Route::get('/waitlist', [\App\Http\Controllers\Dashboard\AdminWaitlistController::class, 'index'])

@@ -117,13 +117,21 @@ final class DisputeStates
         self::DRAFT . '>' . self::WITHDRAWN              => ['client', 'professional'],
 
         self::DIRECT_RESOLUTION . '>' . self::AWAITING_RESPONSE     => ['client', 'professional', 'intake_specialist'],
-        self::DIRECT_RESOLUTION . '>' . self::FORMAL_INVESTIGATION  => ['client', 'professional', 'intake_specialist'],
+
+        // Staff as well as the parties. Reclassifying a case to severity 4 or
+        // 5 takes it out of direct resolution there and then (§2), and whoever
+        // makes that call — intake, a fraud specialist, a senior reviewer —
+        // has to be allowed to make the move it implies. Listing only intake
+        // here left a safety case sitting in a negotiation between the two
+        // people it was about, with the reclassification saved and the
+        // transition silently refused.
+        self::DIRECT_RESOLUTION . '>' . self::FORMAL_INVESTIGATION  => ['client', 'professional', 'intake_specialist', 'fraud_specialist', 'senior_reviewer', 'super_admin'],
         self::DIRECT_RESOLUTION . '>' . self::CLOSED                => ['intake_specialist', 'senior_reviewer', 'super_admin'],
         self::DIRECT_RESOLUTION . '>' . self::WITHDRAWN             => ['client', 'professional'],
         self::DIRECT_RESOLUTION . '>' . self::EXPIRED               => ['system'],
 
         self::AWAITING_RESPONSE . '>' . self::DIRECT_RESOLUTION     => ['client', 'professional'],
-        self::AWAITING_RESPONSE . '>' . self::FORMAL_INVESTIGATION  => ['client', 'professional', 'intake_specialist'],
+        self::AWAITING_RESPONSE . '>' . self::FORMAL_INVESTIGATION  => ['client', 'professional', 'intake_specialist', 'fraud_specialist', 'senior_reviewer', 'super_admin'],
         self::AWAITING_RESPONSE . '>' . self::CLOSED                => ['intake_specialist', 'senior_reviewer', 'super_admin'],
         self::AWAITING_RESPONSE . '>' . self::WITHDRAWN             => ['client', 'professional'],
         self::AWAITING_RESPONSE . '>' . self::EXPIRED               => ['system'],

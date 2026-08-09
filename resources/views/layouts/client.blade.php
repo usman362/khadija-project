@@ -1331,6 +1331,13 @@
                         Reports
                     </a>
                 </li>
+                {{-- Rule R34 — both parties reach the same module. --}}
+                <li class="cl-nav-item">
+                    <a href="{{ route('disputes.index') }}" class="cl-nav-link {{ request()->routeIs('disputes.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M5 8h14"/><path d="M5 8 2 15h6z"/><path d="M19 8l-3 7h6z"/></svg>
+                        Disputes
+                    </a>
+                </li>
 
                 {{-- ── ACCOUNT ────────────────────────────────────── --}}
                 <li class="cl-nav-label">Account</li>

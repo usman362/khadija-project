@@ -269,6 +269,14 @@
                                 <span class="link-title">Reports</span>
                             </a>
                         </li>
+
+                        {{-- Rule R34 — the dispute queue, worked in priority order. --}}
+                        <li class="nav-item {{ request()->routeIs('app.admin.disputes.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.admin.disputes.index') }}" class="nav-link">
+                                <i class="link-icon ic-red" data-lucide="gavel"></i>
+                                <span class="link-title">Disputes</span>
+                            </a>
+                        </li>
                         @endrole
 
                         <li class="nav-item {{ request()->routeIs('app.roles.*') ? 'active' : '' }}">

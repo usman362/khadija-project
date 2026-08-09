@@ -440,8 +440,9 @@ class DisputeResolutionPhase1Test extends TestCase
                 $scanned++;
 
                 foreach (DecisionGuide::BANNED_WORDING as $banned) {
-                    $this->assertStringNotContainsStringIgnoringCase(
-                        $banned, $string,
+                    // Whole words — "fair" inside "Fairfax" is a Virginia city.
+                    $this->assertDoesNotMatchRegularExpression(
+                        '/\b' . preg_quote($banned, '/') . '\b/i', $string,
                         basename($path) . " says \"{$banned}\" in a string: \"{$string}\"",
                     );
                 }
