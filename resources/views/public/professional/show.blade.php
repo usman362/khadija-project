@@ -108,14 +108,29 @@
 .pp-icon-btn:hover { background: rgba(255,255,255,0.28); transform: translateY(-1px); }
 .pp-icon-btn svg { width: 16px; height: 16px; }
 
+/*
+ * Checklist row 209 — the business name was missing from the header.
+ *
+ * The row guessed a data-binding gap. It was this rule. The body is pulled
+ * 60px up so the avatar straddles the banner, and with `align-items: flex-end`
+ * the text column — which is taller than the avatar — had its own top dragged
+ * well above the cover's bottom edge. The name was rendered the whole time;
+ * it was painted behind the banner, which is why the page looked like it had
+ * only the two-letter initials on it.
+ *
+ * Aligning to the start and pushing the text columns down by the overlap
+ * keeps the avatar over the banner and puts every line of text below it.
+ */
 .pp-hero-body {
     padding: 0 28px 24px;
     display: flex;
     gap: 20px;
-    align-items: flex-end;
+    align-items: flex-start;
     margin-top: -60px;
     flex-wrap: wrap;
 }
+.pp-hero-meta, .pp-hero-cta { margin-top: 64px; }
+@media (max-width: 720px) { .pp-hero-meta, .pp-hero-cta { margin-top: 12px; } }
 .pp-hero-avatar {
     width: 128px; height: 128px;
     border-radius: 50%;
@@ -599,6 +614,88 @@
 }
 @media (max-width: 720px) { .pp-sticky-cta { display: flex; } }
 
+/* ── Target-mockup sections (checklist rows 165–236) ───────── */
+
+/* Row 210 — the cover tiles four portfolio photos across the gradient.
+   The gradient stays underneath, so a professional with no photos gets
+   today's banner rather than four empty boxes. */
+.pp-cover-tiles { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(4, 1fr); }
+.pp-cover-tiles img { width: 100%; height: 100%; object-fit: cover; opacity: .82; }
+.pp-cover-tiles.n1 { grid-template-columns: 1fr; }
+.pp-cover-tiles.n2 { grid-template-columns: repeat(2, 1fr); }
+.pp-cover-tiles.n3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 720px) { .pp-cover-tiles { grid-template-columns: repeat(2, 1fr); } }
+
+/* Row 167 — Portfolio Highlights */
+.pp-hl-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+@media (max-width: 720px) { .pp-hl-grid { grid-template-columns: repeat(2, 1fr); } }
+.pp-hl { position: relative; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden;
+         border: 1px solid var(--line, #e6eaf1); background: #f1f5f9; cursor: zoom-in; padding: 0; display: block; }
+.pp-hl img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .25s ease; }
+.pp-hl:hover img { transform: scale(1.05); }
+.pp-hl-more { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px;
+              font-size: 13px; font-weight: 700; color: var(--brand, #2563eb); background: none; border: 0; cursor: pointer; padding: 0; }
+
+/* Full gallery — a lightbox on this page rather than a second page. The
+   photos are already loaded; sending someone to a new URL to see the fifth
+   one costs a round trip and loses their place on the profile. */
+.pp-lightbox { position: fixed; inset: 0; background: rgba(8, 14, 28, .92); z-index: 900;
+               display: none; padding: 24px; overflow: auto; }
+.pp-lightbox[open], .pp-lightbox.is-open { display: block; }
+.pp-lightbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+                    gap: 12px; max-width: 1100px; margin: 56px auto 24px; }
+.pp-lightbox-grid img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px; }
+.pp-lightbox-close { position: fixed; top: 16px; right: 20px; background: #fff; color: #0f1b35;
+                     border: 0; border-radius: 999px; width: 38px; height: 38px; font-size: 20px; cursor: pointer; }
+.pp-lightbox-title { color: #fff; text-align: center; font-size: 14px; font-weight: 600; margin-top: 8px; }
+
+/* Row 166 — Popular Packages */
+.pp-pkg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.pp-pkg { border: 1px solid var(--line, #e6eaf1); border-radius: 13px; overflow: hidden;
+          display: flex; flex-direction: column; background: #fff; }
+.pp-pkg img { width: 100%; height: 112px; object-fit: cover; }
+.pp-pkg-body { padding: 12px 13px; display: flex; flex-direction: column; gap: 5px; flex: 1; }
+.pp-pkg-name { font-size: 14px; font-weight: 700; color: var(--ink, #0f1b35); }
+.pp-pkg-desc { font-size: 12.5px; color: var(--muted, #64748b); line-height: 1.5; }
+.pp-pkg-price { font-size: 16px; font-weight: 800; color: var(--ink, #0f1b35); margin-top: auto; }
+.pp-pkg-unit  { font-size: 11.5px; font-weight: 600; color: var(--muted, #64748b); }
+
+/* Row 207 — Availability */
+.pp-av-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.pp-av-tag { font-size: 12px; font-weight: 700; padding: 5px 11px; border-radius: 999px; border: 1px solid transparent; }
+.pp-av-free { background: rgba(16,185,129,.1); color: #047857; border-color: rgba(16,185,129,.28); }
+.pp-av-busy { background: rgba(100,116,139,.1); color: #475569; border-color: rgba(100,116,139,.25); }
+.pp-av-dates { display: flex; flex-wrap: wrap; gap: 6px; }
+.pp-av-date { font-size: 12px; font-weight: 600; padding: 4px 9px; border-radius: 8px;
+              background: #f1f5f9; color: #475569; }
+
+/* Row 208 — By The Numbers */
+.pp-num-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
+.pp-num { text-align: center; padding: 12px 8px; border-radius: 12px; background: #f8fafc;
+          border: 1px solid var(--line, #e6eaf1); }
+.pp-num-v { font-size: 21px; font-weight: 800; color: var(--ink, #0f1b35); }
+.pp-num-k { font-size: 11.5px; color: var(--muted, #64748b); margin-top: 3px; line-height: 1.4; }
+
+/* Row 234 — the six-step strip */
+.pp-steps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+@media (max-width: 900px) { .pp-steps { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 520px) { .pp-steps { grid-template-columns: repeat(2, 1fr); } }
+.pp-step-n { width: 24px; height: 24px; border-radius: 999px; background: var(--brand, #2563eb);
+             color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center;
+             justify-content: center; margin-bottom: 6px; }
+.pp-step-t { font-size: 12.5px; font-weight: 700; color: var(--ink, #0f1b35); }
+.pp-step-d { font-size: 11.5px; color: var(--muted, #64748b); line-height: 1.45; margin-top: 2px; }
+
+/* Rows 165 and 235 — sidebar boxes */
+.pp-kv { display: flex; justify-content: space-between; gap: 10px; padding: 9px 0;
+         border-top: 1px solid var(--line, #e6eaf1); font-size: 13px; }
+.pp-kv:first-of-type { border-top: 0; }
+.pp-kv dt { color: var(--muted, #64748b); margin: 0; }
+.pp-kv dd { margin: 0; font-weight: 700; color: var(--ink, #0f1b35); text-align: right; }
+.pp-kv-note { font-size: 11.5px; color: var(--muted, #64748b); line-height: 1.5; margin-top: 8px; }
+.pp-area-map { border-radius: 11px; overflow: hidden; border: 1px solid var(--line, #e6eaf1); margin-bottom: 10px; }
+.pp-area-map svg { display: block; width: 100%; height: auto; }
+
 </style>
 @endpush
 
@@ -608,6 +705,22 @@
     $isVerified = $pro->isVerified();
     $isNew      = $pro->isNewVendor();
     $primaryHref = auth()->check() ? route('client.chat.index', ['to' => $pro->id]) : route('login');
+
+    /*
+     * Checklist row 209 — the page showed the avatar initials and nothing
+     * else, and the breadcrumb trailed off after "Browse Professionals".
+     *
+     * The cause was not the template: the header already prints the account
+     * name. It is that a professional trades as a business, and the business
+     * name lives in company_name while the header only ever read the personal
+     * one. A photographer whose account says "Elena Ruiz" and whose business
+     * is "ER Photography" was unnamed on the page a client hires from.
+     *
+     * One display name, used by the header, the breadcrumb and the page title,
+     * so the three cannot disagree.
+     */
+    $displayName = trim((string) ($profile->company_name ?: '')) ?: $pro->name;
+    $traderName  = $profile->company_name && $profile->company_name !== $pro->name ? $pro->name : null;
 @endphp
 
 <div class="pp-page">
@@ -618,13 +731,25 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         <a href="{{ route('public.browse') }}">Browse Professionals</a>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        <span class="current">{{ $pro->name }}</span>
+        <span class="current">{{ $displayName }}</span>
     </nav>
 
     {{-- ── Hero ─────────────────────────────────────────────── --}}
     <div class="pp-hero">
         <div class="pp-hero-cover"
              @if($pro->cover_image_url) style="background-image: url('{{ $pro->cover_image_url }}');" @endif>
+
+            {{-- Row 210 — real work across the banner. Fewer than four photos
+                 tiles however many there are; none leaves the gradient alone,
+                 which is what the page does today and is the right fallback. --}}
+            @if(! $pro->cover_image_url && count($coverPhotos) > 0)
+                <div class="pp-cover-tiles n{{ count($coverPhotos) }}" aria-hidden="true">
+                    @foreach($coverPhotos as $photo)
+                        <img src="{{ $photo }}" alt="" loading="lazy">
+                    @endforeach
+                </div>
+            @endif
+
             <div class="pp-hero-actions-top">
                 <button type="button" class="pp-icon-btn" aria-label="Save" title="Save" onclick="this.classList.toggle('saved')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
@@ -639,11 +764,22 @@
             <img src="{{ $pro->avatar_url }}" alt="{{ $pro->name }}" class="pp-hero-avatar">
             <div class="pp-hero-meta">
                 <div class="pp-hero-name">
-                    {{ $pro->name }}
+                    {{ $displayName }}
                     @if($isFullyVerified)
                         <span class="verified-check" title="Verified credentials">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                         </span>
+                    @endif
+                    {{-- Who the client is actually dealing with, under the
+                         trading name — both matter on a contract.
+
+                         Inline on the name row, not a line of its own. The
+                         hero body sits over the cover with a negative margin
+                         sized for a two-line stack, so a third line pushed
+                         the business name up behind the banner and hid the
+                         one thing this row exists to show. --}}
+                    @if($traderName)
+                        <span style="font-size:14px;font-weight:600;opacity:.6;margin-left:8px;">with {{ $traderName }}</span>
                     @endif
                 </div>
                 @if($profile->headline)
@@ -754,6 +890,10 @@
                         Skills &amp; Specialties
                     </h3>
                     <div class="pp-chips">
+                        {{-- Row 236 asked whether the live page caps this at
+                             four. It does not — every skill on file renders,
+                             and always has. The four-vs-eight difference is a
+                             demo-data gap, not a display bug. --}}
                         @foreach((array) $profile->skills as $skill)
                             <span class="pp-chip">{{ $skill }}</span>
                         @endforeach
@@ -761,49 +901,207 @@
                 </div>
             @endif
 
-            @if(!empty($profile->portfolio))
+            {{-- ── Row 167: Portfolio Highlights ─────────────────
+                 Directly under Skills, as the row specifies. Selection is
+                 featured-first then the professional's own saved order —
+                 professional-curated, one of the options the row listed, and
+                 already how every other surface on the site picks. The full
+                 set opens in a lightbox here rather than on a second page. --}}
+            @if(count($highlights) > 0)
                 <div class="pp-card">
                     <h3 class="pp-card-title">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                        Portfolio
-                        <span style="margin-left:auto;font-size:12px;color:#64748b;font-weight:500;">{{ count((array) $profile->portfolio) }} {{ \Illuminate\Support\Str::plural('project', count((array) $profile->portfolio)) }}</span>
+                        Portfolio Highlights
+                    </h3>
+                    <div class="pp-hl-grid">
+                        @foreach($highlights as $photo)
+                            <button type="button" class="pp-hl" data-pp-open-gallery
+                                    aria-label="Open the full gallery">
+                                <img src="{{ $photo }}" alt="Work by {{ $displayName }}" loading="lazy">
+                            </button>
+                        @endforeach
+                    </div>
+                    @if($portfolioCount > count($highlights))
+                        <button type="button" class="pp-hl-more" data-pp-open-gallery>
+                            View full gallery ({{ number_format($portfolioCount) }})
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </button>
+                    @endif
+                </div>
+            @endif
+
+            {{-- ── Row 166: Popular Packages ─────────────────────
+                 The professional's own Package Builder rows (R51), filtered
+                 to the publicly browsable state — confirmed as the data
+                 source, not new pricing infrastructure.
+
+                 No "Most Popular" tag. The row says the rule must be defined
+                 and must not default to list order, and nothing records which
+                 package a booking came from, so it cannot be counted yet. --}}
+            @if($packages->isNotEmpty())
+                <div class="pp-card">
+                    <h3 class="pp-card-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></svg>
+                        Packages
+                        <a href="{{ route('public.packages', ['q' => $displayName]) }}"
+                           style="margin-left:auto;font-size:12px;font-weight:600;">See all</a>
+                    </h3>
+                    <div class="pp-pkg-grid">
+                        @foreach($packages as $package)
+                            @php $hero = $package->heroUrls(1)[0] ?? $package->fallbackHeroUrl(480); @endphp
+                            <div class="pp-pkg">
+                                <img src="{{ $hero }}" alt="{{ $package->title }}" loading="lazy">
+                                <div class="pp-pkg-body">
+                                    <div class="pp-pkg-name">{{ $package->title }}</div>
+                                    @if($package->description)
+                                        <div class="pp-pkg-desc">{{ \Illuminate\Support\Str::limit($package->description, 90) }}</div>
+                                    @endif
+                                    <div class="pp-pkg-price">
+                                        ${{ number_format($package->price) }}
+                                        @if($package->price_unit)
+                                            <span class="pp-pkg-unit">{{ $package->price_unit }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+            {{-- ── Row 207: Availability ─────────────────────────
+                 Read from the same two sources My Calendar reads — assigned
+                 shifts and booked events — so this page and the professional's
+                 own calendar cannot disagree.
+
+                 Worded as "already booked", never as "free". A day with
+                 nothing on GigResource is a day with nothing ON GIGRESOURCE;
+                 the professional may be working elsewhere, and a profile that
+                 promised availability would be making their commitment. --}}
+            <div class="pp-card">
+                <h3 class="pp-card-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    Availability
+                </h3>
+                <div class="pp-av-tags">
+                    @foreach($availability['windows'] as $window)
+                        <span class="pp-av-tag {{ $window['free'] ? 'pp-av-free' : 'pp-av-busy' }}">
+                            {{ $window['label'] }} — {{ $window['free'] ? 'nothing booked' : 'already booked' }}
+                        </span>
+                    @endforeach
+                </div>
+
+                @if(count($availability['busy']) > 0)
+                    <div class="pp-card-body" style="margin-bottom:8px;">Already booked on GigResource:</div>
+                    <div class="pp-av-dates">
+                        @foreach(array_slice($availability['busy'], 0, 12) as $date)
+                            <span class="pp-av-date">{{ \Illuminate\Support\Carbon::parse($date)->format('M j') }}</span>
+                        @endforeach
+                        @if(count($availability['busy']) > 12)
+                            <span class="pp-av-date">+{{ count($availability['busy']) - 12 }} more</span>
+                        @endif
+                    </div>
+                @else
+                    <div class="pp-card-body">Nothing booked through GigResource in the next two months.</div>
+                @endif
+
+                <p class="pp-kv-note">
+                    This shows work booked through GigResource only. Message {{ $displayName }} to
+                    confirm a specific date.
+                </p>
+            </div>
+
+            {{-- ── Row 208: By The Numbers ───────────────────────
+                 Counted from the platform's own records. A figure the data
+                 cannot support prints a dash, never a plausible number.
+
+                 The target listed "99% Cancellation Rate" here. Row 208 flags
+                 it as almost certainly meaning completion, and says do not
+                 build the label as written — a 99% cancellation rate beside a
+                 5.0 rating would destroy the trust this section exists to
+                 build. Shipped as completion; awaiting the Owner's word. --}}
+            @php
+                $n = fn ($v) => $v === null ? '—' : number_format($v);
+                $pct = fn ($v) => $v === null ? '—' : $v . '%';
+
+                $numberTiles = [
+                    [$numbers['years'] ? $numbers['years'] . '+' : '—',
+                     $yearsAreStated ? 'Years in business' : 'Years on GigResource'],
+                    [$n($numbers['events_completed']), 'Events completed'],
+                    [$pct($numbers['repeat_clients']), 'Repeat clients'],
+                    [$pct($numbers['completion_rate']), 'Completed as booked'],
+                    [\App\Support\ResponseStats::describe($numbers['response_hours']), 'Typical reply time'],
+                ];
+            @endphp
+            <div class="pp-card">
+                <h3 class="pp-card-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    By The Numbers
+                </h3>
+                <div class="pp-num-grid">
+                    @foreach($numberTiles as [$value, $label])
+                        <div class="pp-num">
+                            <div class="pp-num-v">{{ $value }}</div>
+                            <div class="pp-num-k">{{ $label }}</div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- ── Row 234: how booking works ────────────────────
+                 Static and platform-wide. The same six steps on every
+                 professional's page, so none of them can describe a process
+                 GigResource does not run. --}}
+            <div class="pp-card">
+                <h3 class="pp-card-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    How booking works on {{ config('app.name') }}
+                </h3>
+                <div class="pp-steps">
+                    @foreach($howItWorks as $i => [$title, $detail])
+                        <div>
+                            <div class="pp-step-n">{{ $i + 1 }}</div>
+                            <div class="pp-step-t">{{ $title }}</div>
+                            <div class="pp-step-d">{{ $detail }}</div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Written-up projects — the portfolio entries that are a
+                 description and a link rather than a photograph. The
+                 photographs are in Portfolio Highlights above; showing them
+                 twice on one page is how the old Portfolio card and the new
+                 Highlights section would have read as two portfolios. --}}
+            @php
+                $writtenProjects = collect((array) $profile->portfolio)
+                    ->filter(fn ($item) => is_array($item)
+                        && ($item['type'] ?? null) !== 'image'
+                        && empty($item['image'])
+                        && ! (($item['url'] ?? null) && preg_match('/\.(jpe?g|png|webp|gif|avif)(\?.*)?$/i', $item['url'])))
+                    ->values();
+            @endphp
+            @if($writtenProjects->isNotEmpty())
+                <div class="pp-card">
+                    <h3 class="pp-card-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        Selected Projects
+                        <span style="margin-left:auto;font-size:12px;color:#64748b;font-weight:500;">{{ $writtenProjects->count() }} {{ \Illuminate\Support\Str::plural('project', $writtenProjects->count()) }}</span>
                     </h3>
                     <div class="pp-gallery">
-                        @foreach((array) $profile->portfolio as $item)
-                            @php
-                                $url = $item['url'] ?? null;
-                                $img = $item['image'] ?? null;
-                                // Treat URL as image if it ends with a common image extension.
-                                if (!$img && $url && preg_match('/\.(jpe?g|png|webp|gif|avif)(\?.*)?$/i', $url)) {
-                                    $img = $url;
-                                }
-                            @endphp
-                            @if($img)
-                                <a href="{{ $url ?: $img }}" target="_blank" rel="noopener" class="pp-gallery-item">
-                                    <img src="{{ $img }}" alt="{{ $item['title'] ?? '' }}" loading="lazy">
-                                    @if(!empty($item['title']))
-                                        <div class="pp-gallery-caption">
-                                            {{ $item['title'] }}
-                                            @if(!empty($item['description']))
-                                                <small>{{ \Illuminate\Support\Str::limit($item['description'], 40) }}</small>
-                                            @endif
-                                        </div>
-                                    @endif
-                                </a>
-                            @else
-                                <div class="pp-gallery-item no-image">
-                                    <div class="title">{{ $item['title'] ?? 'Project' }}</div>
-                                    @if(!empty($item['description']))
-                                        <div class="desc">{{ $item['description'] }}</div>
-                                    @endif
-                                    @if($url)
-                                        <a href="{{ $url }}" target="_blank" rel="noopener" class="link">
-                                            View project
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-                                        </a>
-                                    @endif
-                                </div>
-                            @endif
+                        @foreach($writtenProjects as $item)
+                            <div class="pp-gallery-item no-image">
+                                <div class="title">{{ $item['title'] ?? 'Project' }}</div>
+                                @if(!empty($item['description']))
+                                    <div class="desc">{{ $item['description'] }}</div>
+                                @endif
+                                @if(!empty($item['url']))
+                                    <a href="{{ $item['url'] }}" target="_blank" rel="noopener" class="link">
+                                        View project
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                                    </a>
+                                @endif
+                            </div>
                         @endforeach
                     </div>
                 </div>
@@ -903,6 +1201,60 @@
                 @endif
             </div>
 
+            {{-- ── Row 165: Accepted On GigResource ──────────────
+                 Three lines, not the target's four. "Live Event Upgrades" is
+                 deliberately absent: it belongs to Rule R41's reserved stub,
+                 pulled 2026-08-03 on the Owner's explicit instruction that
+                 nothing from that discussion returns until they approve it.
+                 Row 165 and Open Decisions row 37 both say hold it, and this
+                 comment is here so nobody adds it back as a tidy-up. --}}
+            <div class="pp-card">
+                <div class="pp-ver-head">Accepted on {{ config('app.name') }}</div>
+                <dl style="margin:0;">
+                    @foreach($acceptedOn as [$label, $value, $note])
+                        <div class="pp-kv" title="{{ $note }}">
+                            <dt>{{ $label }}</dt>
+                            <dd>{{ $value }}</dd>
+                        </div>
+                    @endforeach
+                </dl>
+                <p class="pp-kv-note">
+                    Money is held by the licensed payment processor and released once the work is
+                    confirmed. {{ config('app.name') }} does not hold your funds.
+                </p>
+            </div>
+
+            {{-- ── Row 235: Service Area ─────────────────────────
+                 Coverage is a state, not a radius — R38 keeps a booking
+                 inside one jurisdiction, so "within 40 miles" would describe
+                 a different marketplace. The graphic is drawn inline rather
+                 than pulled from a map provider: a public profile should not
+                 report every visitor to a third party. --}}
+            <div class="pp-card">
+                <div class="pp-ver-head">Service Area</div>
+                @if($serviceArea['state'])
+                    <div class="pp-area-map">
+                        <svg viewBox="0 0 300 120" role="img" aria-label="Service area: {{ $serviceArea['state_name'] }}">
+                            <defs>
+                                <linearGradient id="pp-area-g" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#2563eb" stop-opacity=".16"/>
+                                    <stop offset="100%" stop-color="#7c3aed" stop-opacity=".16"/>
+                                </linearGradient>
+                            </defs>
+                            <rect width="300" height="120" fill="url(#pp-area-g)"/>
+                            <circle cx="150" cy="60" r="34" fill="none" stroke="#2563eb" stroke-opacity=".35" stroke-width="1.5"/>
+                            <circle cx="150" cy="60" r="20" fill="none" stroke="#2563eb" stroke-opacity=".55" stroke-width="1.5"/>
+                            <circle cx="150" cy="60" r="6" fill="#2563eb"/>
+                            <text x="150" y="102" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">
+                                {{ $serviceArea['state'] }}
+                            </text>
+                        </svg>
+                    </div>
+                @endif
+                <div class="pp-card-body">{{ $serviceArea['headline'] }}</div>
+                <p class="pp-kv-note">{{ $serviceArea['note'] }}</p>
+            </div>
+
             {{-- Verified Credentials --}}
             <div class="pp-card pp-card-verified">
                 <div class="pp-ver-head">Verified Credentials</div>
@@ -979,6 +1331,48 @@
         </div>
     @endif
 </div>
+
+{{-- ── Full gallery (row 167) ──────────────────────────────────
+     A lightbox on this page rather than a second URL. The photos are already
+     on the page; sending someone away to see the fifth one costs a round trip
+     and loses their place. Closes on Escape and on the backdrop, and the
+     trigger buttons are real buttons, so it works from the keyboard. --}}
+@if(count($galleryPhotos) > 0)
+    <div class="pp-lightbox" id="pp-gallery" role="dialog" aria-modal="true" aria-label="Full portfolio gallery">
+        <button type="button" class="pp-lightbox-close" data-pp-close-gallery aria-label="Close gallery">&times;</button>
+        <div class="pp-lightbox-title">{{ $displayName }} — {{ number_format($portfolioCount) }} {{ \Illuminate\Support\Str::plural('photo', $portfolioCount) }}</div>
+        <div class="pp-lightbox-grid">
+            @foreach($galleryPhotos as $photo)
+                <img src="{{ $photo }}" alt="Work by {{ $displayName }}" loading="lazy">
+            @endforeach
+        </div>
+    </div>
+    <script>
+        (function () {
+            const box = document.getElementById('pp-gallery');
+            if (!box) return;
+
+            let opener = null;
+
+            const open = (e) => {
+                opener = e.currentTarget;
+                box.classList.add('is-open');
+                document.body.style.overflow = 'hidden';
+                box.querySelector('[data-pp-close-gallery]')?.focus();
+            };
+            const close = () => {
+                box.classList.remove('is-open');
+                document.body.style.overflow = '';
+                opener?.focus();
+            };
+
+            document.querySelectorAll('[data-pp-open-gallery]').forEach(b => b.addEventListener('click', open));
+            box.querySelector('[data-pp-close-gallery]').addEventListener('click', close);
+            box.addEventListener('click', (e) => { if (e.target === box) close(); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+        })();
+    </script>
+@endif
 
 {{-- ── Mobile sticky CTA bar ───────────────────────────────── --}}
 <div class="pp-sticky-cta" aria-label="Quick actions">

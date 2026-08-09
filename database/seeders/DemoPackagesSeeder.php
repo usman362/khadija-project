@@ -34,8 +34,24 @@ class DemoPackagesSeeder extends Seeder
             return;
         }
 
+        $byEmail = $suppliers->keyBy('email');
+
         foreach ($this->packages() as $i => $data) {
-            $supplier = $suppliers[$i % $suppliers->count()];
+            /*
+             * Owned by a professional who actually does this work.
+             *
+             * This was round-robin — `$suppliers[$i % count]` — which handed
+             * "Corporate Conference — Catering & AV" to a wedding
+             * photographer, "Full-Service Wedding Planning" to a florist and
+             * a DJ package to a live jazz band. On /browse-packages nobody
+             * looked at the owner. On the professional's own profile page the
+             * packages sit under their name, and a caterer's package on a
+             * photographer's profile is the first thing anyone notices.
+             *
+             * Named per package rather than matched by keyword: a fuzzy match
+             * would put this back one renamed headline from now.
+             */
+            $supplier = $byEmail[$data['owner']] ?? $suppliers[$i % $suppliers->count()];
             $category = $this->resolveCategory($data['category']);
 
             $package = Package::firstOrCreate(
@@ -67,9 +83,14 @@ class DemoPackagesSeeder extends Seeder
                 ],
             );
 
-            // firstOrCreate leaves an existing row alone, but the service area is
-            // derived rather than authored — so it is re-synced on every run and a
-            // professional who moves state takes their packages with them.
+            // firstOrCreate leaves an existing row alone, but the owner and the
+            // service area are both derived rather than authored — so they are
+            // re-synced on every run. Without the owner line, rows seeded before
+            // this fix keep their round-robin professional forever.
+            if ($package->user_id !== $supplier->id) {
+                $package->update(['user_id' => $supplier->id]);
+            }
+
             if ($package->serves_regions !== $supplier->profile?->state) {
                 $package->update(['serves_regions' => $supplier->profile?->state]);
             }
@@ -92,7 +113,7 @@ class DemoPackagesSeeder extends Seeder
     {
         return [
             [
-                'title' => 'Elegant Wedding Photo & Video Package', 'category' => 'Photograph', 'type' => 'solo',
+                'title' => 'Elegant Wedding Photo & Video Package', 'owner' => 'elena.demo@example.test', 'category' => 'Photograph', 'type' => 'solo',
                 'services' => ['Photography', 'Videography', 'Floral Design', 'Planning / Coordination'],
                 'price' => 3250, 'price_unit' => 'from', 'duration' => 'Up to 10 Hours', 'coverage' => 'Up to 10 Hours',
                 'team' => ['1 Lead Photographer', '1 Videographer', '1 Floral Designer'], 'guests' => 'Up to 150',
@@ -102,7 +123,7 @@ class DemoPackagesSeeder extends Seeder
                 'sort' => 96,
             ],
             [
-                'title' => 'Ultimate Visual Bundle', 'category' => 'Photograph', 'type' => 'solo',
+                'title' => 'Ultimate Visual Bundle', 'owner' => 'duy.demo@example.test', 'category' => 'Photograph', 'type' => 'solo',
                 'services' => ['Photography', 'Videography'],
                 'price' => 4850, 'price_unit' => 'from', 'duration' => 'Up to 12 Hours', 'coverage' => 'Up to 12 Hours',
                 'team' => ['1 Lead Photographer', '1 Assistant', '1 Videographer', '1 Drone Pilot'], 'guests' => 'Up to 200',
@@ -112,7 +133,7 @@ class DemoPackagesSeeder extends Seeder
                 'sort' => 94,
             ],
             [
-                'title' => 'Luxury Event Styling & Floral Experience', 'category' => 'Floral', 'type' => 'solo',
+                'title' => 'Luxury Event Styling & Floral Experience', 'owner' => 'bloomvine.demo@example.test', 'category' => 'Floral', 'type' => 'solo',
                 'services' => ['Floral Design', 'Decor & Design', 'Lighting & Tech', 'Planning / Coordination'],
                 'price' => 2950, 'price_unit' => 'from', 'duration' => 'Setup + Event Day', 'coverage' => 'Setup + Event Day',
                 'team' => ['2 Designers', '2 Floral Stylists', '1 Tech Specialist'], 'guests' => 'Up to 150',
@@ -122,7 +143,7 @@ class DemoPackagesSeeder extends Seeder
                 'sort' => 92,
             ],
             [
-                'title' => 'Complete Celebration — Photo, DJ & Décor', 'category' => 'DJ', 'type' => 'solo',
+                'title' => 'Complete Celebration — Photo, DJ & Décor', 'owner' => 'mixmasters.demo@example.test', 'category' => 'DJ', 'type' => 'solo',
                 'services' => ['Photography', 'DJ / Entertainment', 'Decor & Design', 'Lighting & Tech'],
                 'price' => 5600, 'price_unit' => 'from', 'duration' => 'Up to 8 Hours', 'coverage' => 'Up to 8 Hours',
                 'team' => ['1 Photographer', '1 DJ + MC', '1 Décor Lead', '1 Lighting Tech'], 'guests' => 'Up to 250',
@@ -132,7 +153,7 @@ class DemoPackagesSeeder extends Seeder
                 'sort' => 90,
             ],
             [
-                'title' => 'Corporate Conference — Catering & AV', 'category' => 'Cater', 'type' => 'solo',
+                'title' => 'Corporate Conference — Catering & AV', 'owner' => 'saffron.demo@example.test', 'category' => 'Cater', 'type' => 'solo',
                 'services' => ['Catering / Food', 'Lighting & Tech', 'Planning / Coordination'],
                 'price' => 8400, 'price_unit' => 'from', 'duration' => 'Multi-day', 'coverage' => 'Up to 3 Days',
                 'team' => ['Catering crew (6)', '2 AV Technicians', '1 Event Coordinator'], 'guests' => 'Up to 400',
@@ -142,7 +163,7 @@ class DemoPackagesSeeder extends Seeder
                 'sort' => 82,
             ],
             [
-                'title' => 'Full-Service Wedding Planning', 'category' => 'Planning', 'type' => 'solo',
+                'title' => 'Full-Service Wedding Planning', 'owner' => 'grandaffair.demo@example.test', 'category' => 'Planning', 'type' => 'solo',
                 'services' => ['Planning / Coordination', 'Decor & Design', 'Floral Design'],
                 'price' => 4200, 'price_unit' => 'from', 'duration' => '3–6 months lead', 'coverage' => 'Planning + Event Day',
                 'team' => ['1 Lead Planner', '1 Day-of Coordinator', '1 Assistant'], 'guests' => 'Up to 200',
@@ -152,7 +173,7 @@ class DemoPackagesSeeder extends Seeder
                 'sort' => 88,
             ],
             [
-                'title' => 'Cinematic Videography + Drone', 'category' => 'Video', 'type' => 'solo',
+                'title' => 'Cinematic Videography + Drone', 'owner' => 'duy.demo@example.test', 'category' => 'Video', 'type' => 'solo',
                 'services' => ['Videography'],
                 'price' => 2600, 'price_unit' => 'from', 'duration' => 'Full day', 'coverage' => 'Up to 10 Hours',
                 'team' => ['1 Lead Videographer', '1 Drone Pilot'], 'guests' => 'Up to 180',
@@ -162,7 +183,7 @@ class DemoPackagesSeeder extends Seeder
                 'sort' => 74,
             ],
             [
-                'title' => 'DJ & Live Sound — Reception Party', 'category' => 'DJ', 'type' => 'solo',
+                'title' => 'DJ & Live Sound — Reception Party', 'owner' => 'horizon.demo@example.test', 'category' => 'DJ', 'type' => 'solo',
                 'services' => ['DJ / Entertainment', 'Lighting & Tech'],
                 'price' => 1200, 'price_unit' => 'from', 'duration' => '5 hours', 'coverage' => 'Up to 5 Hours',
                 'team' => ['1 DJ + MC', '1 Sound Tech'], 'guests' => 'Up to 150',
@@ -172,7 +193,7 @@ class DemoPackagesSeeder extends Seeder
                 'sort' => 66,
             ],
             [
-                'title' => 'Birthday & Celebration Décor', 'category' => 'Decor', 'type' => 'solo',
+                'title' => 'Birthday & Celebration Décor', 'owner' => 'lumiere.demo@example.test', 'category' => 'Decor', 'type' => 'solo',
                 'services' => ['Decor & Design', 'Floral Design'],
                 'price' => 550, 'price_unit' => 'from', 'duration' => 'Per event', 'coverage' => 'Setup + Event Day',
                 'team' => ['1 Décor Stylist', '1 Assistant'], 'guests' => 'Up to 80',
@@ -182,7 +203,7 @@ class DemoPackagesSeeder extends Seeder
                 'sort' => 44,
             ],
             [
-                'title' => 'Grand Gala Production Package', 'category' => 'Planning', 'type' => 'solo',
+                'title' => 'Grand Gala Production Package', 'owner' => 'grandaffair.demo@example.test', 'category' => 'Planning', 'type' => 'solo',
                 'services' => ['Planning / Coordination', 'Catering / Food', 'Lighting & Tech', 'DJ / Entertainment'],
                 'price' => 15000, 'price_unit' => 'from', 'duration' => 'Per event', 'coverage' => 'Full Production',
                 'team' => ['1 Production Lead', 'Catering crew (8)', '2 AV Techs', '1 DJ', 'Event staff (6)'], 'guests' => 'Up to 500',

@@ -55,12 +55,21 @@ class DemoProfessionalsSeeder extends Seeder
                     'availability'     => $data['availability'] ?? 'available',
                     'skills'           => $data['skills'],
                     'languages'        => $data['languages'],
-                    // No portfolio: these accounts never uploaded anything, and
-                    // seeding stock photos as their "work" put one wedding bouquet on
-                    // eight of the ten pros — including the DJ and the lighting company.
-                    // Left empty, the search card falls back to the artwork of the
-                    // services they actually offer, which is local and matches the trade.
-                    'portfolio'        => [],
+                    // Portfolio photos, one distinct set per professional.
+                    //
+                    // This column was deliberately left empty before, and the
+                    // reason was sound: a single shared stock set put one
+                    // wedding bouquet on eight of the ten pros, including the
+                    // DJ and the lighting company.
+                    //
+                    // It has to be filled now — the profile page's Portfolio
+                    // Highlights and photo cover both read it, and with it
+                    // empty the most important section on the page renders for
+                    // nobody. So each pro carries their OWN trade-matched set
+                    // below: the florist gets florals, the DJ gets a booth,
+                    // the caterer gets plated food. That answers the original
+                    // objection rather than reversing the decision behind it.
+                    'portfolio'        => self::portfolioFor($data['photos'] ?? []),
                 ] + ($data['verified'] ? [
                     'trade_license_number'            => 'TL-' . rand(10000, 99999),
                     'trade_license_verified_at'       => now()->subDays(rand(30, 200)),
@@ -261,13 +270,34 @@ class DemoProfessionalsSeeder extends Seeder
         }
     }
 
+    /**
+     * Turn a list of stock photo ids into portfolio entries.
+     *
+     * The first is marked featured, because portfolioImageItems() sorts
+     * featured-first and the profile's Highlights grid and cover both take
+     * the first four from that order — so "featured" is the cover shot.
+     */
+    private static function portfolioFor(array $photoIds): array
+    {
+        return collect($photoIds)
+            ->values()
+            ->map(fn (string $id, int $i) => [
+                'type'     => 'image',
+                'featured' => $i === 0,
+                'hero'     => "https://images.unsplash.com/{$id}?w=1200&q=70&auto=format&fit=crop",
+                'square'   => "https://images.unsplash.com/{$id}?w=600&h=600&q=70&auto=format&fit=crop",
+            ])
+            ->all();
+    }
+
     /** @return array<int, array<string, mixed>> */
     private function professionals(): array
     {
         return [
             [
                 'name' => 'Duy Nguyen', 'email' => 'duy.demo@example.test',
-                'company' => 'Skyline Films', 'headline' => 'Lead Cinematographer & Drone Pilot',
+                'company' => 'Skyline Films',
+                'photos' => ['photo-1485846234645-a62644f84728', 'photo-1524270000000-000000000000', 'photo-1516035069371-29a1b244cc32', 'photo-1500051638674-ff996a0ec29e', 'photo-1502920917128-1aa500764cbd'], 'headline' => 'Lead Cinematographer & Drone Pilot',
                 'city' => 'Philadelphia', 'state' => 'PA', 'rate' => 150, 'years' => 7, 'verified' => true,
                 'skills' => ['Cinematography', 'Drone / Aerial', 'Same-Day Edits', 'Color Grading'],
                 'services' => ['Videography & Cinematic Films', 'Event Photography', 'Drone Photography'],
@@ -277,7 +307,8 @@ class DemoProfessionalsSeeder extends Seeder
             ],
             [
                 'name' => 'Horizon Audio', 'email' => 'horizon.demo@example.test',
-                'company' => 'Horizon Audio', 'headline' => 'Premium Event DJ & A/V Visual Systems',
+                'company' => 'Horizon Audio',
+                'photos' => ['photo-1470229722913-7c0e2dbbafd3', 'photo-1493225457124-a3eb161ffa5f', 'photo-1533174072545-7a4b6ad7a6c3', 'photo-1516450360452-9312f5e86fc7', 'photo-1571266028243-e4733b0f0bb0'], 'headline' => 'Premium Event DJ & A/V Visual Systems',
                 'city' => 'Baltimore', 'state' => 'MD', 'rate' => 130, 'years' => 10, 'verified' => true,
                 'skills' => ['DJ / MC', 'Sound Engineering', 'Lighting', 'Live Streaming'],
                 'services' => ['Wedding DJs', 'Party & Club DJs', 'Uplighting & Ambient Lighting'],
@@ -287,7 +318,8 @@ class DemoProfessionalsSeeder extends Seeder
             ],
             [
                 'name' => 'Mix Masters', 'email' => 'mixmasters.demo@example.test',
-                'company' => 'Mix Masters', 'headline' => 'Wedding & Party DJ Specialists',
+                'company' => 'Mix Masters',
+                'photos' => ['photo-1516450360452-9312f5e86fc7', 'photo-1514525253161-7a46d19cd819', 'photo-1459749411175-04bf5292ceea', 'photo-1470229722913-7c0e2dbbafd3', 'photo-1493225457124-a3eb161ffa5f'], 'headline' => 'Wedding & Party DJ Specialists',
                 'city' => 'Arlington', 'state' => 'VA', 'rate' => 90, 'years' => 6, 'verified' => true,
                 'availability' => 'busy',
                 'skills' => ['Open-Format DJ', 'MC / Emcee', 'Uplighting', 'Photo Booth'],
@@ -298,7 +330,8 @@ class DemoProfessionalsSeeder extends Seeder
             ],
             [
                 'name' => 'Elena Rossi', 'email' => 'elena.demo@example.test',
-                'company' => 'Rossi Studio', 'headline' => 'Fine-Art Wedding Photographer',
+                'company' => 'Rossi Studio',
+                'photos' => ['photo-1519741497674-611481863552', 'photo-1511285560929-80b456fea0bc', 'photo-1465495976277-4387d4b0b4c6', 'photo-1520854221256-17451cc331bf', 'photo-1522673607200-164d1b6ce486'], 'headline' => 'Fine-Art Wedding Photographer',
                 'city' => 'Washington', 'state' => 'DC', 'rate' => 175, 'years' => 9, 'verified' => true,
                 'skills' => ['Photography', 'Editorial', 'Album Design', 'Engagement Shoots'],
                 'services' => ['Event Photography', 'Wedding Photography'],
@@ -308,7 +341,8 @@ class DemoProfessionalsSeeder extends Seeder
             ],
             [
                 'name' => 'Bloom & Vine Co.', 'email' => 'bloomvine.demo@example.test',
-                'company' => 'Bloom & Vine Co.', 'headline' => 'Floral & Décor Designers',
+                'company' => 'Bloom & Vine Co.',
+                'photos' => ['photo-1519225421980-715cb0215aed', 'photo-1478146896981-b80fe463b330', 'photo-1526047932273-341f2a7631f9', 'photo-1490818387583-1baba5e638af', 'photo-1567696911980-2eed69a46042'], 'headline' => 'Floral & Décor Designers',
                 'city' => 'Pittsburgh', 'state' => 'PA', 'rate' => 120, 'years' => 8, 'verified' => true,
                 'skills' => ['Floral Design', 'Tablescapes', 'Arch & Backdrop', 'Installations'],
                 'services' => ['Bridal & Ceremony Florals', 'Centerpiece Design', 'Balloon Arches & Columns'],
@@ -318,7 +352,8 @@ class DemoProfessionalsSeeder extends Seeder
             ],
             [
                 'name' => 'Grand Affair Planning', 'email' => 'grandaffair.demo@example.test',
-                'company' => 'Grand Affair', 'headline' => 'Full-Service Event Planners',
+                'company' => 'Grand Affair',
+                'photos' => ['photo-1511578314322-379afb476865', 'photo-1464366400600-7168b8af9bc3', 'photo-1505236858219-8359eb29e329', 'photo-1531058020387-3be344556be6', 'photo-1492684223066-81342ee5ff30'], 'headline' => 'Full-Service Event Planners',
                 'city' => 'Virginia Beach', 'state' => 'VA', 'rate' => 200, 'years' => 12, 'verified' => true,
                 'skills' => ['Full Planning', 'Day-of Coordination', 'Vendor Sourcing', 'Budgeting'],
                 'services' => ['Full-Service Event Planning', 'Day-Of Coordination', 'Corporate Event Management'],
@@ -328,7 +363,8 @@ class DemoProfessionalsSeeder extends Seeder
             ],
             [
                 'name' => 'The Velvet Notes', 'email' => 'velvetnotes.demo@example.test',
-                'company' => 'The Velvet Notes', 'headline' => 'Live Jazz & Soul Band',
+                'company' => 'The Velvet Notes',
+                'photos' => ['photo-1511192336575-5a79af67a629', 'photo-1415201364774-f6f0bb35f28f', 'photo-1524230572899-a752b3835840', 'photo-1501612780327-45045538702b', 'photo-1508973379184-7517410fb0bc'], 'headline' => 'Live Jazz & Soul Band',
                 'city' => 'Wilmington', 'state' => 'DE', 'rate' => 250, 'years' => 11, 'verified' => false,
                 'skills' => ['Live Band', 'Jazz / Soul', 'Ceremony Music', 'Custom Requests'],
                 'services' => ['Live Bands', 'Solo Musicians & Acoustic Acts'],
@@ -338,7 +374,8 @@ class DemoProfessionalsSeeder extends Seeder
             ],
             [
                 'name' => 'Lumière Lighting', 'email' => 'lumiere.demo@example.test',
-                'company' => 'Lumière Lighting', 'headline' => 'Event Lighting & Staging',
+                'company' => 'Lumière Lighting',
+                'photos' => ['photo-1492684223066-81342ee5ff30', 'photo-1519671482749-fd09be7ccebf', 'photo-1533174072545-7a4b6ad7a6c3', 'photo-1470229722913-7c0e2dbbafd3', 'photo-1478146896981-b80fe463b330'], 'headline' => 'Event Lighting & Staging',
                 'city' => 'Newark', 'state' => 'NJ', 'rate' => 95, 'years' => 5, 'verified' => true,
                 'skills' => ['Uplighting', 'Stage Design', 'Gobo / Monogram', 'Pin Spotting'],
                 'services' => ['Uplighting & Ambient Lighting', 'Stage Design & Setup', 'AV Equipment Rental'],
@@ -348,7 +385,8 @@ class DemoProfessionalsSeeder extends Seeder
             ],
             [
                 'name' => 'Saffron Table Catering', 'email' => 'saffron.demo@example.test',
-                'company' => 'Saffron Table', 'headline' => 'Gourmet Event Catering',
+                'company' => 'Saffron Table',
+                'photos' => ['photo-1555244162-803834f70033', 'photo-1414235077428-338989a2e8c0', 'photo-1504674900247-0877df9cc836', 'photo-1476224203421-9ac39bcb3327', 'photo-1467003909585-2f8a72700288'], 'headline' => 'Gourmet Event Catering',
                 'city' => 'Silver Spring', 'state' => 'MD', 'rate' => 45, 'years' => 9, 'verified' => true,
                 'skills' => ['Plated Dinners', 'Stations', 'Dietary Menus', 'Bar Service'],
                 'services' => ['Full-Service Catering', 'Buffet Catering', 'Professional Bartenders'],
@@ -358,7 +396,8 @@ class DemoProfessionalsSeeder extends Seeder
             ],
             [
                 'name' => 'Glow Studio', 'email' => 'glowstudio.demo@example.test',
-                'company' => 'Glow Studio', 'headline' => 'Bridal Hair & Makeup Artists',
+                'company' => 'Glow Studio',
+                'photos' => ['photo-1487412720507-e7ab37603c6f', 'photo-1595476108010-b4d1f102b1b1', 'photo-1522337360788-8b13dee7a37e', 'photo-1560066984-138dadb4c035', 'photo-1519699047748-de8e457a634e'], 'headline' => 'Bridal Hair & Makeup Artists',
                 'city' => 'Charleston', 'state' => 'WV', 'rate' => 110, 'years' => 6, 'verified' => false,
                 'availability' => 'not_available',
                 'skills' => ['Bridal Makeup', 'Hair Styling', 'Airbrush', 'On-Location Glam'],
