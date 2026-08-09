@@ -104,20 +104,39 @@ class DemoProfessionalsSeeder extends Seeder
         $user->serviceCategories()->sync($ids);
     }
 
-    /** A small pool of client accounts used as review authors. */
+    /**
+     * A small pool of client accounts used as review authors.
+     *
+     * Each one is placed in a launch state. They were created with none, and
+     * under R38 an account with no state matches nobody — so signing in as one
+     * showed an empty Browse page and no gigs. They exist to author reviews
+     * rather than to be logged into, which is why nobody noticed, but a client
+     * row with no state is data that reads as broken.
+     *
+     * The states chosen are ones that actually have professionals, spread
+     * across five of the seven. Putting them all in one place, or in a state
+     * with nobody in it, would move the empty page rather than fix it.
+     */
     private function reviewerPool(): array
     {
         $pool = [];
         foreach ([
-            ['Olivia Bennett', 'olivia.demo@example.test'],
-            ['Marcus Lee', 'marcus.demo@example.test'],
-            ['Priya Sharma', 'priya.demo@example.test'],
-            ['James Carter', 'james.demo@example.test'],
-            ['Sofia Alvarez', 'sofia.demo@example.test'],
-        ] as [$name, $email]) {
+            ['Olivia Bennett', 'olivia.demo@example.test', 'MD', 'Baltimore'],
+            ['Marcus Lee',     'marcus.demo@example.test', 'PA', 'Philadelphia'],
+            ['Priya Sharma',   'priya.demo@example.test',  'VA', 'Richmond'],
+            ['James Carter',   'james.demo@example.test',  'DC', 'Washington'],
+            ['Sofia Alvarez',  'sofia.demo@example.test',  'DE', 'Wilmington'],
+        ] as [$name, $email, $state, $city]) {
             $u = User::firstOrCreate(['email' => $email], ['name' => $name, 'password' => 'password']);
             $u->syncRoles([RoleName::CLIENT->value]);
-            $pool[] = $u;
+            $u->update(['primary_role' => RoleName::CLIENT->value]);
+            $u->getOrCreateProfile()->update([
+                'country'             => 'US',
+                'state'               => $state,
+                'city'                => $city,
+                'service_area_status' => \App\Support\ServiceArea::SUPPORTED,
+            ]);
+            $pool[] = $u->fresh();
         }
 
         return $pool;
