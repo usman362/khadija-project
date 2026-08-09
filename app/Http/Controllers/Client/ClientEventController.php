@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Event;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class ClientEventController extends Controller
@@ -141,6 +142,19 @@ class ClientEventController extends Controller
             'video' => ['nullable', 'file', 'mimetypes:video/mp4,video/quicktime,video/webm', 'max:51200'],
             'documents' => ['nullable', 'array', 'max:5'],
             'documents.*' => ['file', 'mimes:pdf,doc,docx,png,jpg,jpeg', 'max:10240'],
+
+            // R55 — required only when something is actually being uploaded.
+            // Asking a client who attached nothing to attest to rights over
+            // nothing would train everyone to tick it without reading.
+            'rights_attested' => [
+                Rule::requiredIf(fn () => $request->hasFile('inspiration_photos')
+                    || $request->hasFile('video')
+                    || $request->hasFile('documents')),
+                'accepted',
+            ],
+        ], [
+            'rights_attested.required' => 'Please confirm you have the right to upload these files.',
+            'rights_attested.accepted' => 'Please confirm you have the right to upload these files.',
         ]);
 
         // Merge the optional event time into the start date.
@@ -149,17 +163,44 @@ class ClientEventController extends Controller
             $startsAt = \Illuminate\Support\Carbon::parse($startsAt)->setTimeFromTimeString($validated['event_time']);
         }
 
-        // Persist uploaded media on the public disk; store relative paths in JSON.
+        // Rules R54 and R55 — event media through the one pipeline.
+        //
+        // These went straight to the PUBLIC disk: a client's wedding and
+        // birthday photographs on URLs that needed no sign-in. R55 says
+        // plainly that such photographs will contain children and that this
+        // is not a reason to refuse them — which makes where they are stored
+        // the thing that matters. They are private now, and the JSON holds
+        // uploaded_files ids rather than raw paths.
+        //
+        // R55's attestation is the uploader's, captured with the wording they
+        // were shown. It is an attestation and not a detector on purpose: no
+        // automated check can tell whether a guardian agreed, and one that
+        // merely spotted a child would flag every real event photograph on
+        // the platform — turning R55 into the blanket ban it exists to
+        // prevent.
+        $pipeline = app(\App\Domain\Uploads\UploadPipeline::class);
+        $attested = $request->boolean('rights_attested');
+
+        $store = function ($file) use ($pipeline, $request, $attested) {
+            $record = $pipeline->accept($file, 'event_media', $request->user(), $attested);
+
+            return $record->status === \App\Models\UploadedFile::REJECTED ? null : (string) $record->id;
+        };
+
         $media = ['photos' => [], 'video' => null, 'documents' => []];
         foreach ((array) $request->file('inspiration_photos', []) as $photo) {
-            $media['photos'][] = $photo->store('event-media/photos', 'public');
+            $media['photos'][] = $store($photo);
         }
         if ($request->hasFile('video')) {
-            $media['video'] = $request->file('video')->store('event-media/videos', 'public');
+            $media['video'] = $store($request->file('video'));
         }
         foreach ((array) $request->file('documents', []) as $doc) {
-            $media['documents'][] = $doc->store('event-media/documents', 'public');
+            $media['documents'][] = $store($doc);
         }
+
+        $media['photos']    = array_values(array_filter($media['photos']));
+        $media['documents'] = array_values(array_filter($media['documents']));
+
         $hasMedia = $media['photos'] || $media['video'] || $media['documents'];
 
         $event = Event::create([

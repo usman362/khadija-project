@@ -936,6 +936,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/attachments', [MessageAttachmentController::class, 'store'])->middleware('permission:messages.create')->name('attachments.store');
     Route::get('/attachments/{attachment}/download', [MessageAttachmentController::class, 'download'])->name('attachments.download');
 
+    // Rule R54 — the only way to read a file the pipeline stored privately.
+    // Verification documents used to sit on the public disk, reachable by
+    // anyone who guessed the path; this checks who is asking first.
+    Route::get('/files/{file}', [\App\Http\Controllers\UploadedFileController::class, 'show'])
+        ->name('uploads.show');
+
     // Legacy messages redirect
     Route::redirect('/app/messages', '/app/chat');
     Route::post('/app/messages', [MessagePageController::class, 'store'])->middleware('permission:messages.create')->name('app.messages.store');
@@ -1014,6 +1020,13 @@ Route::middleware('auth')->group(function () {
         Route::patch('/faqs/{faq}/toggle', [AdminFaqController::class, 'toggleStatus'])->name('app.admin.faqs.toggle');
 
         // Professional Verifications (trade license / insurance / workers' comp)
+        // Rule R54's moderation queue — where a Manual Review decision goes,
+        // and R55's removal power over anything already released.
+        Route::get('/uploads', [\App\Http\Controllers\Dashboard\AdminUploadModerationController::class, 'index'])->name('app.admin.uploads.index');
+        Route::post('/uploads/{file}/release', [\App\Http\Controllers\Dashboard\AdminUploadModerationController::class, 'release'])->name('app.admin.uploads.release');
+        Route::post('/uploads/{file}/reject', [\App\Http\Controllers\Dashboard\AdminUploadModerationController::class, 'reject'])->name('app.admin.uploads.reject');
+        Route::post('/uploads/{file}/remove', [\App\Http\Controllers\Dashboard\AdminUploadModerationController::class, 'remove'])->name('app.admin.uploads.remove');
+
         Route::get('/verifications', [\App\Http\Controllers\Dashboard\AdminVerificationController::class, 'index'])->name('app.admin.verifications.index');
         Route::post('/verifications/{profile}/approve', [\App\Http\Controllers\Dashboard\AdminVerificationController::class, 'approve'])->name('app.admin.verifications.approve');
         Route::post('/verifications/{profile}/reject', [\App\Http\Controllers\Dashboard\AdminVerificationController::class, 'reject'])->name('app.admin.verifications.reject');

@@ -34,6 +34,15 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(SettingsService::class, fn () => new SettingsService());
+
+        // Rule R54 — the malware scanner behind the upload pipeline. Bound
+        // from config so choosing a vendor (Open Decisions row 39) is one env
+        // line rather than a change to every upload path. Until then the
+        // bound scanner reports NOT SCANNED, never clean.
+        $this->app->bind(
+            \App\Domain\Uploads\Contracts\MalwareScanner::class,
+            fn () => app(config('uploads.scanner', \App\Domain\Uploads\Scanners\UnavailableScanner::class)),
+        );
     }
 
     /**

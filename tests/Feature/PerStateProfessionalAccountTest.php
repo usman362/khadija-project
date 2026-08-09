@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Support\ProfessionalStateAccount;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
@@ -172,7 +173,7 @@ class PerStateProfessionalAccountTest extends TestCase
         $this->actingAs($pro)->post(route('professional.profile.verification.submit'), [
             'badge'    => 'trade_license',
             'number'   => 'MD-99812',
-            'document' => \Illuminate\Http\UploadedFile::fake()->create('licence.pdf', 40, 'application/pdf'),
+            'document' => $this->pdf('licence.pdf'),
         ]);
 
         $this->assertSame('MD', $pro->fresh()->profile->trade_license_state);
@@ -220,4 +221,21 @@ class PerStateProfessionalAccountTest extends TestCase
             ProfessionalStateAccount::secondAccountExplanation($this->pro('MD')),
         );
     }
+
+    /**
+     * A PDF whose first bytes actually say PDF.
+     *
+     * R54's pipeline reads the file header, so `fake()->create('x.pdf')` — all
+     * zero bytes — is correctly rejected as contents that do not match the
+     * name. The fixture has to be a real one for the test to be about what it
+     * claims to be about.
+     */
+    private function pdf(string $name = 'document.pdf'): UploadedFile
+    {
+        return UploadedFile::fake()->createWithContent(
+            $name,
+            "%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\ntrailer<</Root 1 0 R>>",
+        );
+    }
+
 }

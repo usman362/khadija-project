@@ -154,7 +154,7 @@ class InsuranceRequirementTest extends TestCase
             'coverage'       => 1000000,
             'effective_from' => now()->toDateString(),
             'expires_on'     => now()->addYear()->toDateString(),
-            'document'       => UploadedFile::fake()->create('coi.pdf', 100, 'application/pdf'),
+            'document'       => $this->pdf('coi.pdf'),
         ])->assertSessionHasNoErrors();
 
         $profile = $pro->fresh()->profile;
@@ -176,7 +176,7 @@ class InsuranceRequirementTest extends TestCase
             'coverage'       => 1000000,
             'effective_from' => now()->subYears(2)->toDateString(),
             'expires_on'     => now()->subDay()->toDateString(),
-            'document'       => UploadedFile::fake()->create('coi.pdf', 100, 'application/pdf'),
+            'document'       => $this->pdf('coi.pdf'),
         ])->assertSessionHasErrors('expires_on');
     }
 
@@ -188,9 +188,26 @@ class InsuranceRequirementTest extends TestCase
         $this->actingAs($pro)->post(route('professional.profile.verification.submit'), [
             'badge'    => 'trade_license',
             'number'   => 'TL-1',
-            'document' => UploadedFile::fake()->create('licence.pdf', 100, 'application/pdf'),
+            'document' => $this->pdf('licence.pdf'),
         ])->assertSessionHasNoErrors();
 
         $this->assertNotNull($pro->fresh()->profile->trade_license_doc);
     }
+
+    /**
+     * A PDF whose first bytes actually say PDF.
+     *
+     * R54's pipeline reads the file header, so `fake()->create('x.pdf')` — all
+     * zero bytes — is correctly rejected as contents that do not match the
+     * name. The fixture has to be a real one for the test to be about what it
+     * claims to be about.
+     */
+    private function pdf(string $name = 'document.pdf'): UploadedFile
+    {
+        return UploadedFile::fake()->createWithContent(
+            $name,
+            "%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\ntrailer<</Root 1 0 R>>",
+        );
+    }
+
 }

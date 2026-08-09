@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Professional;
 
 use App\Domain\ActivityLog\Services\ActivityLogger;
+use App\Domain\Uploads\UploadPipeline;
 use App\Http\Controllers\Controller;
 use App\Support\ProfessionalStateAccount;
 use Illuminate\Http\RedirectResponse;
@@ -488,15 +489,29 @@ class ProfessionalProfileController extends Controller
         $numberCol = "{$badge}_number";
         $verifiedCol = "{$badge}_verified_at";
 
-        // Clean up old doc if replacing
-        if ($profile->$docCol) {
-            Storage::disk('public')->delete($profile->$docCol);
+        // Rule R54 — through the one pipeline, not straight to disk.
+        //
+        // This wrote to the PUBLIC disk, which put a professional's trade
+        // licence, insurance certificate and workers' comp document on URLs
+        // that needed no sign-in: the path was the only thing between the
+        // file and anyone who guessed it. The pipeline quarantines it, checks
+        // that its contents match its name, records that no malware scanner
+        // is configured, and holds it for the admin review these documents
+        // already went to. `uploaded_files.id` replaces the raw path.
+        $record = app(UploadPipeline::class)
+            ->accept($validated['document'], 'verification', $request->user());
+
+        if ($record->status === \App\Models\UploadedFile::REJECTED) {
+            return back()->withErrors(['document' => $record->decision_reason]);
         }
 
-        $path = $validated['document']->store("verification/{$badge}", 'public');
+        // Clean up the previous submission once the new one is safely stored.
+        if ($profile->$docCol) {
+            $this->deleteVerificationDocument($profile->$docCol);
+        }
 
         $attributes = [
-            $docCol => $path,
+            $docCol => (string) $record->id,
             $numberCol => $validated['number'] ?? null,
             $verifiedCol => null, // always re-enters review queue
         ];
@@ -538,7 +553,7 @@ class ProfessionalProfileController extends Controller
         $docCol = "{$badge}_doc";
 
         if ($profile->$docCol) {
-            Storage::disk('public')->delete($profile->$docCol);
+            $this->deleteVerificationDocument($profile->$docCol);
         }
 
         $profile->update([
@@ -548,5 +563,24 @@ class ProfessionalProfileController extends Controller
         ]);
 
         return back()->with('status', 'Verification document removed.');
+    }
+
+    /**
+     * Delete a verification document, whichever era it came from.
+     *
+     * Since R54 the column holds an uploaded_files id; before it, a raw path
+     * on the public disk. Both exist in the same table until the older rows
+     * age out, so both are handled rather than leaving the old files behind
+     * on a disk anyone can read.
+     */
+    private function deleteVerificationDocument(string $reference): void
+    {
+        if (ctype_digit($reference)) {
+            \App\Models\UploadedFile::find($reference)?->delete();
+
+            return;
+        }
+
+        Storage::disk('public')->delete($reference);
     }
 }

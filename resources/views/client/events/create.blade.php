@@ -112,6 +112,10 @@
     .gb-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
 
     .gb-err { color: var(--bad-text); font-size: 12.5px; font-weight: 700; margin-top: 8px; }
+    /* R55 — the uploader's rights-and-permission attestation. */
+    .gb-attest { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 10px; font-size: 12.5px; line-height: 1.55; cursor: pointer; }
+    .gb-attest input { margin-top: 3px; flex-shrink: 0; }
+    .gb-attest small { display: block; color: var(--text-muted); margin-top: 3px; }
 
     /* ---- Live preview ---- */
     .gb-pv-hd h4 { font-size: 15px; font-weight: 800; color: var(--text-primary); }
@@ -280,6 +284,25 @@
                             <input type="file" name="documents[]" multiple>
                         </label>
                     </div>
+
+                    {{-- Rule R55 — event photographs will contain children,
+                         and the rule is explicit that this is NOT a reason to
+                         refuse them. What it asks for is the uploader's
+                         responsibility for rights and permission, including a
+                         parent or guardian's where that applies. Stated as an
+                         attestation rather than checked by a detector: no
+                         automated test can tell whether a guardian agreed, and
+                         one that merely spotted a child would flag every real
+                         event photo — turning R55 into the blanket ban it
+                         exists to prevent. --}}
+                    <label class="gb-attest">
+                        <input type="checkbox" name="rights_attested" value="1" {{ old('rights_attested') ? 'checked' : '' }}>
+                        <span>
+                            {{ config('uploads.minors.attestation') }}
+                            <small>GigResource can still remove anything that breaks our privacy or safety rules.</small>
+                        </span>
+                    </label>
+                    @error('rights_attested') <div class="gb-err">{{ $message }}</div> @enderror
                 </section>
 
                 {{-- 4 · Timeline --}}

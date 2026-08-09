@@ -47,6 +47,26 @@ return [
             'report' => false,
         ],
 
+        /*
+        | Rule R54's quarantine and private storage.
+        |
+        | Not reachable over HTTP at all — no `url`, and it lives outside
+        | storage/app/public, so nothing here is served by the web server.
+        | Files on it are read only through UploadedFileController, which
+        | checks who is asking first.
+        |
+        | MessageAttachmentController has been writing to a disk by this name
+        | since it was built, and the disk did not exist: every chat
+        | attachment upload was throwing. It exists now.
+        */
+        'private' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private'),
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
