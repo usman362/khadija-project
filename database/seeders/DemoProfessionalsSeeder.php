@@ -93,15 +93,41 @@ class DemoProfessionalsSeeder extends Seeder
             return;
         }
 
-        $ids = Category::whereIn('name', $serviceNames)->pluck('id')->all();
+        $matched = Category::whereIn('name', $serviceNames)->get();
 
-        if ($ids === []) {
-            $this->command?->warn("  No categories matched for {$user->name} — skipped.");
+        /*
+         * A professional lists SERVICES — the Sub-Sub level — not the 27 Sub
+         * categories above them. R45 says so, and R61's feed depends on it:
+         * relatedness is "same parent, different child", so a professional
+         * attached to a top-level category has no parent to share and can
+         * never be shown related work.
+         *
+         * These names are older than Taxonomy V2 and several of them now land
+         * on a Sub category rather than a service. Where that happens the
+         * category is expanded into its own services instead of attached as
+         * itself — which is what the professional actually offers anyway.
+         */
+        $ids = $matched->where('kind', 'service')->pluck('id');
+
+        $categoriesHit = $matched->where('kind', 'service_category')->pluck('id');
+
+        if ($categoriesHit->isNotEmpty()) {
+            $ids = $ids->merge(
+                Category::whereIn('parent_id', $categoriesHit)->where('kind', 'service')
+                    ->orderBy('sort_order')->orderBy('name')
+                    ->pluck('id')->take(4)
+            );
+        }
+
+        $ids = $ids->unique()->values();
+
+        if ($ids->isEmpty()) {
+            $this->command?->warn("  No services matched for {$user->name} — skipped.");
 
             return;
         }
 
-        $user->serviceCategories()->sync($ids);
+        $user->serviceCategories()->sync($ids->all());
     }
 
     /**
@@ -207,7 +233,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'Skyline Films', 'headline' => 'Lead Cinematographer & Drone Pilot',
                 'city' => 'Philadelphia', 'state' => 'PA', 'rate' => 150, 'years' => 7, 'verified' => true,
                 'skills' => ['Cinematography', 'Drone / Aerial', 'Same-Day Edits', 'Color Grading'],
-                'services' => ['Event Videography', 'Videography Services', 'Photography & Videography', 'Event Photography'],
+                'services' => ['Videography & Cinematic Films', 'Event Photography', 'Drone Photography'],
                 'languages' => ['English', 'Vietnamese'],
                 'bio' => 'Award-winning cinematographer capturing weddings and brand films with a cinematic, story-first approach.',
                 'eventTitle' => 'Wedding Film',
@@ -217,7 +243,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'Horizon Audio', 'headline' => 'Premium Event DJ & A/V Visual Systems',
                 'city' => 'Baltimore', 'state' => 'MD', 'rate' => 130, 'years' => 10, 'verified' => true,
                 'skills' => ['DJ / MC', 'Sound Engineering', 'Lighting', 'Live Streaming'],
-                'services' => ['DJs & Sound Services', 'Lighting & Stage Setup', 'Music & Entertainment'],
+                'services' => ['Wedding DJs', 'Party & Club DJs', 'Uplighting & Ambient Lighting'],
                 'languages' => ['English', 'Spanish'],
                 'bio' => 'Full-service DJ and A/V production for weddings, corporate galas, and festivals.',
                 'eventTitle' => 'Corporate Gala',
@@ -228,7 +254,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'city' => 'Arlington', 'state' => 'VA', 'rate' => 90, 'years' => 6, 'verified' => true,
                 'availability' => 'busy',
                 'skills' => ['Open-Format DJ', 'MC / Emcee', 'Uplighting', 'Photo Booth'],
-                'services' => ['DJs & Sound Services', 'Music & Entertainment', 'Photo Booths'],
+                'services' => ['Wedding DJs', 'Party & Club DJs'],
                 'languages' => ['English'],
                 'bio' => 'High-energy DJs who read the room and keep the dance floor packed all night.',
                 'eventTitle' => 'Birthday Party',
@@ -238,7 +264,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'Rossi Studio', 'headline' => 'Fine-Art Wedding Photographer',
                 'city' => 'Washington', 'state' => 'DC', 'rate' => 175, 'years' => 9, 'verified' => true,
                 'skills' => ['Photography', 'Editorial', 'Album Design', 'Engagement Shoots'],
-                'services' => ['Event Photography', 'Photography Services', 'Photography & Videography'],
+                'services' => ['Event Photography', 'Wedding Photography'],
                 'languages' => ['English', 'Italian'],
                 'bio' => 'Timeless, editorial-style photography for couples who love art and authenticity.',
                 'eventTitle' => 'Wedding Photography',
@@ -248,7 +274,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'Bloom & Vine Co.', 'headline' => 'Floral & Décor Designers',
                 'city' => 'Pittsburgh', 'state' => 'PA', 'rate' => 120, 'years' => 8, 'verified' => true,
                 'skills' => ['Floral Design', 'Tablescapes', 'Arch & Backdrop', 'Installations'],
-                'services' => ['Floral Design & Arrangements', 'Floral Arrangements', 'Decor & Floral Services', 'Event Decor & Styling'],
+                'services' => ['Bridal & Ceremony Florals', 'Centerpiece Design', 'Balloon Arches & Columns'],
                 'languages' => ['English'],
                 'bio' => 'Lush, seasonal florals and full-room décor that transform any venue.',
                 'eventTitle' => 'Wedding Florals',
@@ -258,7 +284,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'Grand Affair', 'headline' => 'Full-Service Event Planners',
                 'city' => 'Virginia Beach', 'state' => 'VA', 'rate' => 200, 'years' => 12, 'verified' => true,
                 'skills' => ['Full Planning', 'Day-of Coordination', 'Vendor Sourcing', 'Budgeting'],
-                'services' => ['Event Planning & Production', 'Planning, Coordination & Management', 'Event Coordination'],
+                'services' => ['Full-Service Event Planning', 'Day-Of Coordination', 'Corporate Event Management'],
                 'languages' => ['English', 'Spanish', 'Portuguese'],
                 'bio' => 'From concept to last dance — we plan luxury weddings and corporate events end to end.',
                 'eventTitle' => 'Luxury Wedding',
@@ -268,7 +294,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'The Velvet Notes', 'headline' => 'Live Jazz & Soul Band',
                 'city' => 'Wilmington', 'state' => 'DE', 'rate' => 250, 'years' => 11, 'verified' => false,
                 'skills' => ['Live Band', 'Jazz / Soul', 'Ceremony Music', 'Custom Requests'],
-                'services' => ['Live Bands & Musical Acts', 'Solo Musicians & Vocalists', 'Music & Entertainment'],
+                'services' => ['Live Bands', 'Solo Musicians & Acoustic Acts'],
                 'languages' => ['English'],
                 'bio' => 'A seven-piece live band bringing timeless jazz and soul to weddings and galas.',
                 'eventTitle' => 'Reception Music',
@@ -278,7 +304,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'Lumière Lighting', 'headline' => 'Event Lighting & Staging',
                 'city' => 'Newark', 'state' => 'NJ', 'rate' => 95, 'years' => 5, 'verified' => true,
                 'skills' => ['Uplighting', 'Stage Design', 'Gobo / Monogram', 'Pin Spotting'],
-                'services' => ['Lighting Services', 'Lighting & Stage Setup', 'Spotlight & Stage Lighting'],
+                'services' => ['Uplighting & Ambient Lighting', 'Stage Design & Setup', 'AV Equipment Rental'],
                 'languages' => ['English'],
                 'bio' => 'We sculpt rooms with light — from intimate receptions to large-scale productions.',
                 'eventTitle' => 'Event Lighting',
@@ -288,7 +314,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'company' => 'Saffron Table', 'headline' => 'Gourmet Event Catering',
                 'city' => 'Silver Spring', 'state' => 'MD', 'rate' => 45, 'years' => 9, 'verified' => true,
                 'skills' => ['Plated Dinners', 'Stations', 'Dietary Menus', 'Bar Service'],
-                'services' => ['Catering Services', 'Catering Coordination', 'Food Services', 'Beverage Services'],
+                'services' => ['Full-Service Catering', 'Buffet Catering', 'Professional Bartenders'],
                 'languages' => ['English'],
                 'bio' => 'Seasonal, locally-sourced menus crafted for weddings and corporate events.',
                 'eventTitle' => 'Catered Dinner',
@@ -299,7 +325,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'city' => 'Charleston', 'state' => 'WV', 'rate' => 110, 'years' => 6, 'verified' => false,
                 'availability' => 'not_available',
                 'skills' => ['Bridal Makeup', 'Hair Styling', 'Airbrush', 'On-Location Glam'],
-                'services' => ['Guest & Attendee Experience', 'Event Staffing'],
+                'services' => ['Wait Staff & Servers', 'Registration & Check-In Staff'],
                 'languages' => ['English'],
                 'bio' => 'On-location glam for brides and bridal parties — flawless, photo-ready looks.',
                 'eventTitle' => 'Bridal Glam',

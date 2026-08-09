@@ -8,6 +8,7 @@ use App\Models\Review;
 use App\Models\UserSubscription;
 use App\Support\Commission;
 use App\Support\Earnings;
+use App\Support\OpportunityFeed;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -51,6 +52,19 @@ class ProfessionalDashboardController extends Controller
             ->with('plan')
             ->first();
 
-        return view('professional.dashboard', compact('stats', 'recentBookings', 'subscription'));
+        // Rule R61 — the Opportunity Feed, Option B. Replaces the Emergency
+        // Gigs card, which was a hardcoded "DJ Needed Tonight" with a
+        // hardcoded countdown and an Accept button wired to nothing.
+        //
+        // The toggle defaults OFF: services first, then related work below.
+        // Peter's own concern was an empty feed for a professional who has
+        // not listed much yet, and narrowing by default is the thing that
+        // would cause it.
+        $myServicesOnly = $request->boolean('my_services');
+        $feed = OpportunityFeed::for($user, $myServicesOnly);
+
+        return view('professional.dashboard', compact(
+            'stats', 'recentBookings', 'subscription', 'feed', 'myServicesOnly'
+        ));
     }
 }

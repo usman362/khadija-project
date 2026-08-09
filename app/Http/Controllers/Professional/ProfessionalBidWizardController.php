@@ -183,6 +183,22 @@ class ProfessionalBidWizardController extends Controller
             'This request is in another state.'
         );
 
+        // Rule R61 — "Bid/Respond stays gated to actual listed services."
+        // The feed's related block shows work outside them on purpose and
+        // says it is not actionable; this is the half that makes that true.
+        // A professional who has listed nothing is not blocked — they have
+        // not opted out of anything, and the feed already asks them to add
+        // their services rather than assuming they have none.
+        $mine = \App\Support\FitScore::servicesOf($user);
+
+        if ($mine->isNotEmpty() && $event->source !== 'direct_offer') {
+            abort_unless(
+                $event->categories->pluck('id')->intersect($mine)->isNotEmpty(),
+                403,
+                'Add this service to your profile before bidding on it.',
+            );
+        }
+
         // Past the deadline the request no longer accepts proposals.
         if ($event->proposal_deadline && $event->proposal_deadline->isPast()) {
             abort(410, 'The proposal deadline for this request has passed.');

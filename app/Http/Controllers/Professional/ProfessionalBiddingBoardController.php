@@ -548,114 +548,14 @@ class ProfessionalBiddingBoardController extends Controller
     }
 
     /**
-     * Fit Score — one rules-based 0–100 value, no AI ranking:
-     * category 40 · proximity 20 · availability 20 · rating/history 20.
+     * Fit Score — now App\Support\FitScore.
      *
-     * Two of those four were amended by Rule R61 on 2026-08-07, both for the
-     * same underlying reason: under R38 every gig a professional can see is
-     * already in their state, so a component that only asked "in your area?"
-     * scored a flat 20 on every visible row. Twenty of a hundred points that
-     * cannot separate any row from any other row is not a weak signal, it is
-     * a constant, and the displayed percentage carried a permanent +20 floor.
-     *
-     *   Category 40 becomes GRADED — 40 for a service the professional
-     *   actually lists, 20 for a different service under the same category,
-     *   0 for anything else. That also settles a question the original rule
-     *   left open (binary or partial credit) and is what makes the feed's
-     *   "related" block definable at all: relatedness is structural, from the
-     *   R45 taxonomy, not a threshold on this score.
-     *
-     *   In-area 20 becomes PROXIMITY. City is the finest granularity both
-     *   sides actually record — profiles have a city, events have a location
-     *   string, and neither has coordinates — so this is city-level, not
-     *   drive time. Real travel distance needs geocoding the platform does
-     *   not have; the honest version of the amendment is the one that uses
-     *   data that exists.
+     * Moved out when the Opportunity Feed needed the same number. Two copies
+     * would be two chances to disagree, and one gig showing 90% here and 70%
+     * in the feed is how a professional stops believing the figure anywhere.
      */
     private function fitScore(Event $e, ?\App\Models\User $viewer): int
     {
-        if (! $viewer) {
-            return 0;
-        }
-
-        return min(100,
-            $this->categoryPoints($e, $viewer)
-            + $this->proximityPoints($e, $viewer)
-            + $this->availabilityPoints($e, $viewer)
-            + $this->ratingPoints($viewer)
-        );
-    }
-
-    /**
-     * R61 — 40 exact service · 20 same category, different service · 0 else.
-     *
-     * A professional's services come from the category_user pivot, which is
-     * what they actually listed. Reading them off their published packages
-     * instead — as this did — meant a professional with no packages scored
-     * zero on category no matter what they do for a living.
-     */
-    private function categoryPoints(Event $e, \App\Models\User $viewer): int
-    {
-        $mine = $viewer->serviceCategories()->pluck('categories.id');
-
-        if ($mine->isEmpty()) {
-            return 0;
-        }
-
-        $wanted = $e->categories->pluck('id');
-
-        if ($wanted->intersect($mine)->isNotEmpty()) {
-            return 40;
-        }
-
-        // Same Sub category, different Sub-Sub service — a DJ seeing a
-        // live-band request. Both sides are resolved to their parent, so two
-        // services that sit under one category count as related even though
-        // neither is the other.
-        $parentsOf = fn ($ids) => \App\Models\Category::whereIn('id', $ids)
-            ->pluck('parent_id')->filter()->unique();
-
-        return $parentsOf($wanted)->intersect($parentsOf($mine))->isNotEmpty() ? 20 : 0;
-    }
-
-    /**
-     * R61 — proximity, at the finest granularity both sides record.
-     *
-     * An unlocatable request sits mid rather than at zero, matching how an
-     * unrated professional is treated below: absent information should not
-     * read as a bad answer.
-     */
-    private function proximityPoints(Event $e, \App\Models\User $viewer): int
-    {
-        $city = $viewer->profile?->city;
-
-        if (! $e->location || ! $city) {
-            return 10;
-        }
-
-        return Str::contains(Str::lower($e->location), Str::lower($city)) ? 20 : 8;
-    }
-
-    /** Nothing else already booked on that date. */
-    private function availabilityPoints(Event $e, \App\Models\User $viewer): int
-    {
-        if (! $e->starts_at) {
-            return 20;   // an undated request cannot clash
-        }
-
-        $clash = \App\Models\Booking::where('supplier_id', $viewer->id)
-            ->whereIn('status', ['confirmed', 'completed'])
-            ->whereHas('event', fn ($q) => $q->whereDate('starts_at', $e->starts_at->toDateString()))
-            ->exists();
-
-        return $clash ? 0 : 20;
-    }
-
-    /** Scaled from the professional's average review; unrated sits mid. */
-    private function ratingPoints(\App\Models\User $viewer): int
-    {
-        $avg = (float) $viewer->reviewsReceived()->where('is_hidden', false)->avg('rating');
-
-        return $avg > 0 ? (int) round(($avg / 5) * 20) : 10;
+        return \App\Support\FitScore::for($e, $viewer);
     }
 }

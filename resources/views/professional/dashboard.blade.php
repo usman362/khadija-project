@@ -233,28 +233,8 @@
     {{-- ════════ Row 1 ════════ --}}
     <div class="pd-row pd-row-1">
 
-        {{-- Emergency Gigs --}}
-        <div class="pd-card pd-emergency">
-            <div class="pd-emerg-head">
-                <span class="pd-emerg-ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h6l-1 8 10-12h-6l1-8z"/></svg></span>
-                <span class="pd-emerg-title">EMERGENCY GIGS</span>
-                <span class="pd-emerg-urgent">URGENT</span>
-            </div>
-            <div class="pd-emerg-job">DJ Needed Tonight</div>
-            <div class="pd-emerg-sub">Previous DJ Canceled</div>
-            <div class="pd-emerg-sub">Private Birthday — 50 Guests</div>
-            <div class="pd-emerg-meta">
-                <div><div class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;vertical-align:-1px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Location</div><div class="v">Baltimore, MD</div></div>
-                <div><div class="k">Date</div><div class="v">Tonight</div></div>
-                <div><div class="k">Payout</div><div class="v pay">$1,200 - $1,800</div></div>
-                <div><div class="k">Start</div><div class="v">8:00 PM</div></div>
-                <div><div class="k">End</div><div class="v">9:00 PM</div></div>
-                <div><div class="k">Priority</div><div class="v"><span class="pd-emerg-tag">High</span></div></div>
-            </div>
-            <button class="pd-accept">Accept Now</button>
-            <div class="pd-emerg-note">Be first to respond. High payout for quick availability!</div>
-            <div class="pd-emerg-countdown">02h 15m left</div>
-        </div>
+        {{-- Opportunity Feed — Rule R61, Option B --}}
+        @include('professional._opportunity-feed')
 
         {{-- Priority Actions --}}
         <div class="pd-card">
