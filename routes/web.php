@@ -738,6 +738,18 @@ Route::middleware('auth')->group(function () {
         Route::patch('/events/{event}', [ClientEventController::class, 'update'])->middleware('permission:events.update')->name('client.events.update');
         Route::post('/events/{event}/publish', [ClientEventController::class, 'publish'])->middleware('permission:events.publish')->name('client.events.publish');
 
+        // Rule R33 — what a client does with an expired request.
+        Route::prefix('events/{event}')->middleware('permission:events.update')->group(function () {
+            $l = \App\Http\Controllers\Client\ClientEventLifecycleController::class;
+
+            Route::post('/reopen',    [$l, 'reopen'])->name('client.events.reopen');
+            Route::post('/extend',    [$l, 'extend'])->name('client.events.extend');
+            Route::get('/extension/success', [$l, 'success'])->name('client.events.extension.success');
+            Route::get('/extension/cancel',  [$l, 'cancel'])->name('client.events.extension.cancel');
+            Route::post('/close',     [$l, 'close'])->name('client.events.close');
+            Route::post('/duplicate', [$l, 'duplicate'])->name('client.events.duplicate');
+        });
+
         // Rule R60 — Attendee Management. Nested under the event on purpose:
         // there is no route to an attendee that does not name the event they
         // belong to, which is the whole correction the rule makes.

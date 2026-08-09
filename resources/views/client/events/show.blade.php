@@ -88,11 +88,15 @@
                 <div class="ev-chips">
                     {{-- Publish state once; the workflow status only when it adds
                          something beyond "published" (confirmed / completed / …). --}}
-                    @if($event->is_published)
-                        <span class="cl-badge cl-badge-published">Published</span>
-                    @else
-                        <span class="cl-badge" style="background:#fef3c7;color:#b45309;">Draft</span>
-                    @endif
+                    {{-- Rule R33 §8 — the listing status in the client's own
+                         words. "Open for Proposals", not "Open for Bidding";
+                         the Bidding Board and R8's sealed bidding keep their
+                         names, because those are the mechanism. --}}
+                    @php $lifecycle = \App\Domain\Requests\RequestLifecycle::statusFor($event); @endphp
+                    <span class="cl-badge {{ $lifecycle === 'expired' ? '' : 'cl-badge-published' }}"
+                          @if($lifecycle === 'expired') style="background:#fef3c7;color:#b45309;" @endif>
+                        {{ \App\Domain\Requests\RequestLifecycle::LABELS[$lifecycle] }}
+                    </span>
                     @if(! in_array($event->status, ['published', 'pending'], true))
                         <span class="cl-badge cl-badge-{{ $event->status }}">{{ ucfirst(str_replace('_', ' ', $event->status)) }}</span>
                     @endif
@@ -138,6 +142,105 @@
             @endif
         </div>
     </div>
+
+    {{-- ── Rule R33: an expired request, and what to do with it ──
+         Only rendered when the request has actually expired. The options
+         come from RequestLifecycle, never from this view: a page that
+         offers a tier the backend refuses takes the client's money and
+         then says no. --}}
+    @if($lifecycle === 'expired')
+        @php
+            // No `use` here — Blade compiles this block inline, and a PHP
+            // `use` statement inside an if-block is a parse error.
+            $r33     = \App\Domain\Requests\RequestLifecycle::class;
+            $inGrace = $r33::inGracePeriod($event);
+            $options = $r33::extensionOptions($event);
+            $used    = $r33::paidExtensionsUsed($event);
+            $isEsr   = $r33::isEsr($event);
+        @endphp
+
+        <div class="cl-card" style="border:1px solid #fcd34d;background:#fffbeb;padding:18px 20px;margin-bottom:20px;">
+            <div style="font-size:15px;font-weight:800;color:#92400e;margin-bottom:5px;">
+                This request has expired
+            </div>
+            <p style="font-size:13px;color:#78350f;line-height:1.6;margin:0 0 14px;">
+                The proposal deadline passed{{ $event->proposal_deadline ? ' on ' . $event->proposal_deadline->format('M j, g:i A') : '' }}.
+                Nothing has been deleted — your proposals, messages and documents are all still here, and
+                no new proposals can arrive until you reopen it.
+            </p>
+
+            @if($inGrace)
+                {{-- §2 — the free reopen, once, inside 24 hours. --}}
+                <form method="POST" action="{{ route('client.events.reopen', $event) }}"
+                      style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px;">
+                    @csrf
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:700;color:#92400e;margin-bottom:4px;">
+                            Reopen free — new deadline
+                        </label>
+                        <input type="datetime-local" name="proposal_deadline" required
+                               max="{{ $event->starts_at?->format('Y-m-d\TH:i') }}"
+                               style="padding:8px 10px;border:1px solid #fcd34d;border-radius:9px;font-size:13px;">
+                    </div>
+                    <button type="submit" class="cl-btn cl-btn-primary cl-btn-sm">Reopen at no cost</button>
+                    <span style="font-size:11.5px;color:#92400e;align-self:center;">
+                        Free for the first 24 hours after the deadline. Doesn't use one of your extensions.
+                    </span>
+                </form>
+            @endif
+
+            @if($isEsr)
+                {{-- §5 — an emergency request's window is hours. Every paid
+                     tier would land past the event, so none is offered. --}}
+                <p style="font-size:12.5px;color:#78350f;line-height:1.6;margin:0 0 12px;">
+                    Emergency requests can't be extended by days — the event is too close. You can close
+                    this request, copy it as a new one, or turn it into a standard request if it is no
+                    longer urgent.
+                </p>
+            @elseif($options !== [])
+                <div style="font-size:12px;font-weight:700;color:#92400e;margin-bottom:8px;">
+                    Extend it ({{ 3 - $used }} of 3 left)
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                    @foreach($options as $option)
+                        <form method="POST" action="{{ route('client.events.extend', $event) }}">
+                            @csrf
+                            <input type="hidden" name="days" value="{{ $option['days'] }}">
+                            <input type="hidden" name="gateway" value="stripe">
+                            <button type="submit" class="cl-btn cl-btn-ghost cl-btn-sm"
+                                    style="border-color:#fcd34d;color:#92400e;">
+                                +{{ $option['days'] }} days — ${{ number_format($option['price'], 2) }}
+                                <span style="display:block;font-size:10.5px;font-weight:600;opacity:.75;">
+                                    until {{ $option['new_deadline']->format('M j') }}
+                                </span>
+                            </button>
+                        </form>
+                    @endforeach
+                </div>
+            @elseif($used >= 3)
+                <p style="font-size:12.5px;color:#78350f;line-height:1.6;margin:0 0 12px;">
+                    You've used all three extensions on this request. You can close it, or copy it as a
+                    fresh request — a copy starts over with a new set of extensions.
+                </p>
+            @else
+                <p style="font-size:12.5px;color:#78350f;line-height:1.6;margin:0 0 12px;">
+                    There isn't room to extend this one — a new deadline would fall after the event itself.
+                    Move the event date first, or close and copy it.
+                </p>
+            @endif
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <form method="POST" action="{{ route('client.events.duplicate', $event) }}">
+                    @csrf
+                    <button type="submit" class="cl-btn cl-btn-ghost cl-btn-sm">Copy as a new request</button>
+                </form>
+                <form method="POST" action="{{ route('client.events.close', $event) }}">
+                    @csrf
+                    <button type="submit" class="cl-btn cl-btn-ghost cl-btn-sm">Close this request</button>
+                </form>
+            </div>
+        </div>
+    @endif
 
     <div class="ev-stats">
         <div class="ev-stat"><b>{{ $evProposals }}</b><span>Proposals</span></div>

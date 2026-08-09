@@ -199,9 +199,17 @@ class ProfessionalBidWizardController extends Controller
             );
         }
 
-        // Past the deadline the request no longer accepts proposals.
-        if ($event->proposal_deadline && $event->proposal_deadline->isPast()) {
-            abort(410, 'The proposal deadline for this request has passed.');
+        /*
+         * Rule R33 §7 — no new proposal while the listing is not open.
+         *
+         * Asked of the lifecycle rather than of the deadline alone. The
+         * deadline check missed two cases the rule cares about: a request
+         * the client closed by hand, and a request whose event date has
+         * already gone by. Both looked open here purely because nobody had
+         * set a deadline in the past.
+         */
+        if (! \App\Domain\Requests\RequestLifecycle::acceptsProposals($event)) {
+            abort(410, 'This request is not accepting proposals right now.');
         }
     }
 

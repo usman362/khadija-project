@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Professional;
 
+use App\Domain\Requests\RequestLifecycle;
 use App\Http\Controllers\Controller;
 use App\Models\Bid;
 use App\Models\Event;
@@ -114,6 +115,36 @@ class ProfessionalBiddingBoardController extends Controller
         };
 
         $events = $base->get();
+
+        /*
+         * Rule R33 §7 — an expired listing takes no new proposals, so it does
+         * not belong on a board whose entire purpose is finding work to bid
+         * on. Same reasoning as the R38 filter above: search hides what the
+         * viewer cannot act on, and a gig that would refuse the bid is worse
+         * than a shorter list.
+         *
+         * Filtered here rather than in SQL because expiry is derived — a
+         * stored flag would need a scheduled job and would be wrong for
+         * everyone who loaded the page before it ran.
+         *
+         * Direct offers are exempt: they are unpublished by design and reach
+         * this pro by name, not by deadline.
+         */
+        $events = $events->filter(
+            fn ($e) => $e->source === 'direct_offer' || RequestLifecycle::acceptsProposals($e),
+        )->values();
+
+        /*
+         * §2's ranking — Published Today, then Extended, then older active.
+         *
+         * Applied on top of whatever sort the professional chose, so a
+         * reopened listing is never boosted to the very top. Without it,
+         * paying to extend repeatedly would buy permanent first place, which
+         * is the thing the rule names.
+         */
+        $events = $events
+            ->sortBy(fn ($e) => RequestLifecycle::rankBucket($e), SORT_REGULAR, false)
+            ->values();
 
         // Scope is a service COUNT, which SQL can't filter on before the
         // categories are loaded — so it is applied here.

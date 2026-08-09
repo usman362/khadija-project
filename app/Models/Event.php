@@ -45,6 +45,10 @@ class Event extends Model
         // Rule R60 — may the booked professional see this event's guest list?
         // Per event, the client's choice, private until they say otherwise.
         'share_attendees',
+        // Rule R33 — the client's own decision to close, and the last time
+        // the listing was reactivated. Expiry itself is derived, never stored.
+        'closed_at',
+        'reopened_at',
     ];
 
     /**
@@ -69,6 +73,35 @@ class Event extends Model
                 ? \App\Support\StateMatching::stateOf(User::find($owner))
                 : null;
         });
+
+        /*
+         * Rule R33 §6 and §3 — the notices.
+         *
+         * Here rather than in the controllers for the same reason the state
+         * stamp above is: five places create or edit an Event, and a rule
+         * that has to be remembered in five places is a rule that will be
+         * missed in one. §6 allows exactly two notice types and forbids
+         * repeating the first-publication blast on a reactivation, so the
+         * decision between them belongs somewhere it cannot be re-made
+         * inconsistently.
+         */
+        static::updated(function (self $event) {
+            $changes = $event->getChanges();
+
+            // First publication only — never again for this listing.
+            if (($changes['is_published'] ?? null) && $event->reopened_at === null) {
+                \App\Domain\Requests\EventNotifier::published($event);
+            }
+
+            // §3 — a material change is worth re-reading a proposal over. A
+            // typo in the title is not, and firing at eight professionals
+            // over one is how a notification channel stops being read.
+            $major = \App\Domain\Requests\RequestLifecycle::majorChanges($changes);
+
+            if ($major !== []) {
+                \App\Domain\Requests\EventNotifier::changed($event, $major);
+            }
+        });
     }
 
     protected function casts(): array
@@ -87,7 +120,27 @@ class Event extends Model
             'sealed_proposals' => 'boolean',
             'questions_enabled' => 'boolean',
             'share_attendees' => 'boolean',
+            'closed_at' => 'datetime',
+            'reopened_at' => 'datetime',
         ];
+    }
+
+    /* ── Rule R33 ───────────────────────────────────────────── */
+
+    public function extensions(): HasMany
+    {
+        return $this->hasMany(EventExtension::class);
+    }
+
+    /** What a client or professional is told this listing's status is. */
+    public function lifecycleStatus(): string
+    {
+        return \App\Domain\Requests\RequestLifecycle::statusFor($this);
+    }
+
+    public function lifecycleLabel(): string
+    {
+        return \App\Domain\Requests\RequestLifecycle::label($this);
     }
 
     /** Rule R60 — this event's guest list. Never queried across events. */
