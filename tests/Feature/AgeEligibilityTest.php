@@ -15,8 +15,10 @@ use Tests\TestCase;
  * Three boundaries the rule draws, each with a test here, because each is a
  * plausible over-reach:
  *
- *   Influencers are out of scope. R24 governs their age separately and R62
- *   was written as its own rule to keep that scope clean.
+ *   Influencers are gated too, but by R24 rather than R62 — same minimum,
+ *   different citation. Row 82 caught that R24's own side was never built,
+ *   which left the one group whose age rule came first as the only group
+ *   with no gate at all.
  *
  *   Attendees are out of scope. Minors may be at an event booked through the
  *   platform (R55). This governs who holds the account, nothing else.
@@ -94,14 +96,33 @@ class AgeEligibilityTest extends TestCase
         $this->register(['date_of_birth' => null])->assertSessionHasErrors('date_of_birth');
     }
 
-    public function test_an_influencer_is_not_asked_for_it_here(): void
+    /**
+     * Checklist row 82 — an influencer IS age-gated, under R24.
+     *
+     * This test used to assert the opposite, and it was encoding a gap rather
+     * than a rule. R62 was written separately so R24's influencer-only scope
+     * stayed clean, and the effect was that the one group whose age rule came
+     * FIRST ended up as the only group with no gate at all: an influencer
+     * could register with no date of birth.
+     *
+     * Both rules state the same minimum. Only the citation differs, which is
+     * why ruleFor() exists.
+     */
+    public function test_an_influencer_is_age_gated_too_under_r24(): void
     {
-        // R24's business, not R62's. Requiring it here would fold the two
-        // rules together, which is the thing R62 was written to avoid.
-        $this->assertFalse(AgeEligibility::appliesTo('influencer'));
+        $this->assertTrue(AgeEligibility::appliesTo('influencer'));
+        $this->assertSame('R24', AgeEligibility::ruleFor('influencer'));
+        $this->assertSame('R62', AgeEligibility::ruleFor('professional'));
 
         $this->register(['role' => 'influencer', 'date_of_birth' => null, 'state' => null])
-            ->assertSessionHasNoErrors();
+            ->assertSessionHasErrors('date_of_birth');
+    }
+
+    public function test_an_adult_influencer_registers_normally(): void
+    {
+        $this->register([
+            'role' => 'influencer', 'date_of_birth' => '1995-06-01', 'state' => null,
+        ])->assertSessionHasNoErrors();
     }
 
     public function test_the_date_of_birth_is_kept_on_the_account(): void
@@ -135,13 +156,21 @@ class AgeEligibilityTest extends TestCase
         $this->assertTrue(AgeEligibility::isUnderage($user->fresh()));
     }
 
-    public function test_the_rule_does_not_reach_an_influencer_account(): void
+    /**
+     * An influencer account with no date of birth is UNKNOWN, exactly like a
+     * client or professional account that predates the rule — not eligible
+     * and not underage.
+     *
+     * This asserted 'not_applicable' before, which is what let an influencer
+     * through with nothing on file. See the row-82 note above.
+     */
+    public function test_an_influencer_with_no_date_of_birth_is_unknown_not_exempt(): void
     {
         $user = User::factory()->create(['primary_role' => 'influencer']);
         $user->getOrCreateProfile();
 
-        $this->assertSame('not_applicable', AgeEligibility::statusFor($user->fresh()));
-        $this->assertTrue(AgeEligibility::isEligible($user->fresh()));
+        $this->assertSame('unknown', AgeEligibility::statusFor($user->fresh()));
+        $this->assertFalse(AgeEligibility::isEligible($user->fresh()));
         $this->assertFalse(AgeEligibility::isUnderage($user->fresh()));
     }
 }

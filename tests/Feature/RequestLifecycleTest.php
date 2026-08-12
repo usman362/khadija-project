@@ -128,6 +128,52 @@ class RequestLifecycleTest extends TestCase
         $this->assertTrue(RequestLifecycle::acceptsProposals($this->event()));
     }
 
+    /**
+     * Checklist row 90 — a working end-to-end bypass, closed.
+     *
+     * An SSR already in exclusive negotiation at step 3 of 7 still offered a
+     * full six-step bid wizard to another professional, auto-save and
+     * computed commission included. The cause: starting a finalization does
+     * not claim the event — supplier_id is only stamped when a booking is
+     * confirmed, several steps later — so between "you selected them" and the
+     * signed contract the request looked wide open to everybody.
+     */
+    public function test_a_request_in_exclusive_negotiation_takes_no_more_proposals(): void
+    {
+        $event = $this->event();
+
+        $this->assertTrue(RequestLifecycle::acceptsProposals($event));
+
+        \App\Models\Finalization::create([
+            'event_id'    => $event->id,
+            'client_id'   => $this->client->id,
+            'supplier_id' => $this->pro->id,
+            'status'      => 'in_progress',
+        ]);
+
+        $this->assertTrue(RequestLifecycle::inExclusiveNegotiation($event));
+        $this->assertFalse(RequestLifecycle::acceptsProposals($event));
+    }
+
+    /** Walking away from a finalization genuinely reopens the request. */
+    public function test_a_cancelled_finalization_reopens_the_request(): void
+    {
+        $event = $this->event();
+
+        $finalization = \App\Models\Finalization::create([
+            'event_id'    => $event->id,
+            'client_id'   => $this->client->id,
+            'supplier_id' => $this->pro->id,
+            'status'      => 'in_progress',
+        ]);
+
+        $this->assertFalse(RequestLifecycle::acceptsProposals($event));
+
+        $finalization->update(['status' => 'cancelled']);
+
+        $this->assertTrue(RequestLifecycle::acceptsProposals($event->fresh()));
+    }
+
     /* ── §2 Grace period ────────────────────────────────────── */
 
     public function test_the_free_reopen_is_available_for_24_hours(): void

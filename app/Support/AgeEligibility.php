@@ -14,9 +14,11 @@ use Illuminate\Support\Carbon;
  *   It is an ACCOUNT-HOLDER rule, not a guest-list rule. Minors may attend an
  *   event booked through the platform (R55) — nothing here touches attendees.
  *
- *   Influencers are OUT of scope. R24 governs their age separately, and R62
- *   was written as a new rule precisely so R24's Influencer-only scope stays
- *   clean. Widening this one to cover them would undo that.
+ *   Influencers are covered TOO, but by R24 rather than R62. R62 was written
+ *   as a separate rule so R24's Influencer-only scope stayed clean — and for
+ *   a while that left R24's own side unbuilt, so the one group whose age rule
+ *   came first was the only group with no age gate. Checklist row 82 caught
+ *   it. Both rules point at the same minimum here; only the citation differs.
  *
  *   Enforcement is SERVER-SIDE authoritative, to R38's standard. The form
  *   field is a convenience; `isEligible()` is the answer.
@@ -31,12 +33,28 @@ final class AgeEligibility
 {
     public const MINIMUM_AGE = 18;
 
-    /** Roles the rule covers. Influencers are governed by R24 instead. */
+    /** Roles R62 covers by name. */
     public const GOVERNED_ROLES = ['client', 'professional'];
 
+    /**
+     * Roles R24 covers: influencers, and the professionals they refer.
+     *
+     * A referred professional is already a professional, so R62 has them —
+     * this constant exists so the citation is right when the gate fires on
+     * the influencer path.
+     */
+    public const R24_ROLES = ['influencer'];
+
+    /** Every role with an age gate, whichever rule states it. */
     public static function appliesTo(?string $role): bool
     {
-        return in_array($role, self::GOVERNED_ROLES, true);
+        return in_array($role, [...self::GOVERNED_ROLES, ...self::R24_ROLES], true);
+    }
+
+    /** Which rule to cite when refusing this role. */
+    public static function ruleFor(?string $role): string
+    {
+        return in_array($role, self::R24_ROLES, true) ? 'R24' : 'R62';
     }
 
     /** The latest date of birth that is still 18 today. */

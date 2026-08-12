@@ -107,10 +107,38 @@ final class RequestLifecycle
         return self::statusFor($event) === self::EXPIRED;
     }
 
-    /** §7 — no new proposal can come in while a listing is expired. */
+    /**
+     * §7 — no new proposal can come in while a listing is expired.
+     *
+     * And none while the client is finalising with somebody, which checklist
+     * row 90 caught as a working end-to-end bypass: an SSR already in
+     * exclusive negotiation at step 3 of 7 still offered a full six-step bid
+     * wizard to another professional, auto-save and computed commission
+     * included.
+     *
+     * The cause is that starting a finalization does not claim the event —
+     * `supplier_id` is only stamped when a BOOKING is confirmed, several
+     * steps later. So between "you selected Epic Eats" and the signed
+     * contract, the request looked wide open to everybody else. Somebody was
+     * being invited to price work that was already spoken for.
+     */
     public static function acceptsProposals(Event $event): bool
     {
-        return self::statusFor($event) === self::OPEN;
+        return self::statusFor($event) === self::OPEN && ! self::inExclusiveNegotiation($event);
+    }
+
+    /**
+     * Is the client already finalising with a professional?
+     *
+     * Cancelled finalizations do not count — the client walked away from that
+     * one and the request genuinely is open again, which is exactly what the
+     * cancel path exists to do.
+     */
+    public static function inExclusiveNegotiation(Event $event): bool
+    {
+        return \App\Models\Finalization::where('event_id', $event->id)
+            ->where('status', '!=', 'cancelled')
+            ->exists();
     }
 
     /* ── §2 Grace period ── */
