@@ -523,6 +523,34 @@
     $gigsHired     = \App\Models\Booking::where('client_id', $user->id)->where('status', 'confirmed')->count();
     $gigsDone      = $stats['completed_bookings'] ?? 0;
 
+    /*
+     * Checklist row 191 — "Active Gigs: 21" disagreed with the Gigs Overview
+     * beside it.
+     *
+     * They were counting different things under one word. The tile read
+     * OPEN EVENTS; the overview counts BOOKINGS by status. An event with no
+     * professional hired yet is a request, not an active gig.
+     *
+     * Active now means what the overview means: requested plus hired. The two
+     * widgets add up because one of them is the other's total.
+     */
+    $activeGigs = $gigsRequested + $gigsBidding + $gigsHired;
+
+    /*
+     * Rows 192 and 222 — the profile and badge widgets.
+     *
+     * Both were entirely hardcoded: "Trusted Planner", "Tier 3 of 6", "15
+     * completed events", "4.6 (86 reviews)", "35 / 50", and ten badge icons
+     * every client saw whether they had earned any. The figures did not even
+     * agree with each other — 15 completed on one line, 35 on the next.
+     *
+     * Real numbers now, from the same ClientStats the Reports page and the
+     * public portfolio read. No tier and no badges are claimed: the badge
+     * rulebook is still PROPOSED, not locked, and inventing a ladder here
+     * would be inventing the rule it is waiting on.
+     */
+    $clientFigures = \App\Support\ClientStats::for($user);
+
     // Upcoming bookings — confirmed + future.
     $upcomingBookings = \App\Models\Booking::where('client_id', $user->id)
         ->whereIn('status', ['confirmed', 'requested'])
@@ -612,7 +640,7 @@
             </div>
             <div>
                 <div class="od-stat-label">Active Gigs</div>
-                <div class="od-stat-value">{{ $stats['open_events'] ?? 0 }}</div>
+                <div class="od-stat-value">{{ $activeGigs }}</div>
             </div>
         </div>
         <div class="od-stat-foot">
@@ -690,77 +718,61 @@
         <div class="od-profile-row">
             <div class="od-profile-badge">
                 <svg class="crown" viewBox="0 0 24 24" fill="currentColor"><path d="M2 6l4 4 6-7 6 7 4-4v12H2z"/><circle cx="2" cy="5" r="1.4"/><circle cx="22" cy="5" r="1.4"/><circle cx="12" cy="2.5" r="1.4"/></svg>
-                <span class="stars">★★★★★</span>
-                <span class="od-profile-ribbon">TRUSTED PLANNER</span>
+                @if($clientFigures['rating'])
+                    <span class="stars">{{ str_repeat('★', (int) round($clientFigures['rating'])) }}</span>
+                @endif
             </div>
             <div class="od-profile-info">
                 <div class="od-profile-name">
-                    Trusted Planner
-                    <svg class="ic-check" width="15" height="15" viewBox="0 0 24 24" fill="#10b981" stroke="#fff" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="16 9 11 14 8 11" fill="none"/></svg>
+                    {{ $user->name }}
+                    @if($user->hasVerifiedEmail())
+                        <svg class="ic-check" width="15" height="15" viewBox="0 0 24 24" fill="#10b981" stroke="#fff" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="16 9 11 14 8 11" fill="none"/></svg>
+                    @endif
                 </div>
-                <div class="od-profile-tier">Tier 3 of 6</div>
-                <div class="od-profile-stats">15 completed events</div>
-                <div class="od-profile-rating"><span class="star">★ ★ ★ ★ ★</span><span style="color:var(--text-muted);">4.6 (86 reviews)</span></div>
+                <div class="od-profile-stats">
+                    {{ number_format($clientFigures['completed_events']) }} {{ \Illuminate\Support\Str::plural('event', $clientFigures['completed_events']) }} completed
+                </div>
+                <div class="od-profile-rating">
+                    @if($clientFigures['reviews_count'] > 0)
+                        <span class="star">★</span>
+                        <span style="color:var(--text-muted);">
+                            {{ number_format($clientFigures['rating'], 1) }}
+                            ({{ $clientFigures['reviews_count'] }} from professionals)
+                        </span>
+                    @else
+                        <span style="color:var(--text-muted);">No reviews from professionals yet</span>
+                    @endif
+                </div>
             </div>
         </div>
-        <div class="od-progress-wrap">
-            <div class="od-progress-bar"><div class="od-progress-fill" style="width: 70%;"></div></div>
-            <div class="od-progress-meta">
-                <span>Next Tier: Elite Planner</span>
-                <span>35 / 50 events</span>
-            </div>
-        </div>
-        <a href="{{ route('client.profile.index') }}" class="od-profile-cta">View Profile</a>
+        {{-- No tier bar. The badge and tier rulebook is still proposed, not
+             locked, so a ladder here would invent the rule it is waiting on.
+             What was here read "Tier 3 of 6 · 15 completed events" above
+             "35 / 50 events" — two different totals for one client. --}}
+        <a href="{{ route('public.client.portfolio', $user) }}" class="od-profile-cta">View my public profile</a>
     </div>
 
-    {{-- Client Special Badges --}}
+    {{-- Client Special Badges — checklist row 192.
+
+         The widget showed ten badge icons to every client, earned or not,
+         while a count elsewhere on the page said something different. Nobody
+         had ten badges; nobody had any, because no badge has an award rule
+         yet — the badge rulebook is PROPOSED, not locked.
+
+         So it shows what is true. Ten decorative icons implying ten
+         achievements is the kind of thing a client notices on the first
+         screen and stops trusting the rest of the page over. --}}
     <div class="od-card od-a-badges">
         <div class="od-card-head">
-            <span class="od-card-title">Client Special Badges</span>
+            <span class="od-card-title">Client Badges</span>
         </div>
-        <div class="od-badges">
-            <div class="od-badge b-fast">
-                <div class="od-badge-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-                <div class="od-badge-name">Fast Payer</div>
-            </div>
-            <div class="od-badge b-luxury">
-                <div class="od-badge-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-                <div class="od-badge-name">Luxury Host</div>
-            </div>
-            <div class="od-badge b-repeat">
-                <div class="od-badge-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></div>
-                <div class="od-badge-name">Repeat Booker</div>
-            </div>
-            <div class="od-badge b-trend">
-                <div class="od-badge-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
-                <div class="od-badge-name">Trendsetter</div>
-            </div>
-            <div class="od-badge b-verify">
-                <div class="od-badge-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
-                <div class="od-badge-name">Verified Business</div>
-            </div>
-            <div class="od-badge b-fave">
-                <div class="od-badge-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
-                <div class="od-badge-name">Community Favorite</div>
-            </div>
-            <div class="od-badge b-negot">
-                <div class="od-badge-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h6l3 3 3-3h6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg></div>
-                <div class="od-badge-name">Top Negotiator</div>
-            </div>
-            <div class="od-badge b-emerg">
-                <div class="od-badge-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13.73 21a2 2 0 0 1-3.46 0"/><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg></div>
-                <div class="od-badge-name">Emergency Organizer</div>
-            </div>
-            <div class="od-badge b-mega">
-                <div class="od-badge-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-                <div class="od-badge-name">Mega Event Planner</div>
-            </div>
-            <div class="od-badge b-vip">
-                <div class="od-badge-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/></svg></div>
-                <div class="od-badge-name">VIP Client</div>
-            </div>
-        </div>
+        <p style="font-size:12.5px;color:var(--text-muted);line-height:1.6;margin:0;">
+            You have no badges yet. Badges are awarded from what you actually do on
+            GigResource — events completed, paying on time, and coming back to the
+            same professionals.
+        </p>
     </div>
+
 
     </div>{{-- /.od-row-a --}}
 

@@ -10,21 +10,29 @@ class DemoUsersSeeder extends Seeder
 {
     public function run(): void
     {
+        /*
+         * Checklist row 179 — no placeholder identities anywhere.
+         *
+         * These are the demo LOGINS, so the emails stay exactly as they are.
+         * Only the names change: a marketplace that greets you as "Client
+         * User" and lists "Professional User" in its search results reads as
+         * unfinished on the first screen anybody sees.
+         */
         $users = [
             [
-                'name' => 'Client User',
+                'name' => 'Dana Whitfield',   // was 'Client User' — row 179
                 'email' => 'client@example.com',
                 'role' => RoleName::CLIENT->value,
                 'city' => 'Baltimore', 'state' => 'MD',
             ],
             [
-                'name' => 'Supplier User',
+                'name' => 'Marcus Hale',      // was 'Supplier User' — row 179
                 'email' => 'supplier@example.com',
                 'role' => RoleName::PROFESSIONAL->value,
                 'city' => 'Baltimore', 'state' => 'MD',
             ],
             [
-                'name' => 'Professional User',
+                'name' => 'Priya Raghavan',   // was 'Professional User' — row 179
                 'email' => 'professional@example.com',
                 'role' => RoleName::PROFESSIONAL->value,
                 'city' => 'Baltimore', 'state' => 'MD',
