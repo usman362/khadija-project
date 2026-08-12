@@ -178,8 +178,56 @@ class ProfessionalBiddingBoardController extends Controller
         $myBids = Bid::where('supplier_id', $user?->id)
             ->whereIn('event_id', $ids)->get()->keyBy('event_id');
 
-        $gigs = $events->map(function ($e) use ($bidCounts, $myBids, $user, $savedIds) {
-            $g = $this->mapEvent($e, (int) ($bidCounts[$e->id] ?? 0), $myBids->get($e->id), $user);
+        /*
+         * Checklist row 162 (R12) — an MSR renders as one gig PER SERVICE.
+         *
+         * "DJ + Lighting + MC" was one card. It is three jobs: three separate
+         * contracts, three separate bids, three different professionals in
+         * the usual case. A lighting company scrolling the board had to open
+         * a card titled after somebody else's trade to find out whether their
+         * own service was in it.
+         *
+         * Bids already carry a category_id, so the data supported this; only
+         * the board did not.
+         *
+         * What is deliberately NOT split: the budget. The row's example shows
+         * a figure per service, but a request has ONE budget covering all of
+         * them — there is no per-service budget anywhere in the data. Dividing
+         * it up would invent three numbers the client never gave. Each card
+         * shows the request's budget, labelled as covering the whole request,
+         * until a client can enter one per service.
+         */
+        $perService = collect();
+
+        foreach ($events as $e) {
+            $services = $e->categories->unique('id')->values();
+
+            if ($this->scopeOf($e) !== 'multi' || $services->count() < 2) {
+                $perService->push([$e, null]);
+                continue;
+            }
+
+            foreach ($services as $service) {
+                $perService->push([$e, $service]);
+            }
+        }
+
+        $gigs = $perService->map(function ($pair) use ($myBids, $user, $savedIds) {
+            [$e, $service] = $pair;
+
+            // Counted for THIS service line, not for the whole request — the
+            // shared count was the other half of the same problem: "12 bids"
+            // on a card when eleven of them were for a different trade.
+            $count = Bid::where('event_id', $e->id)
+                ->when($service, fn ($q) => $q->where('category_id', $service->id))
+                ->count();
+
+            $mine = $service
+                ? Bid::where('event_id', $e->id)->where('supplier_id', $user?->id)
+                      ->where('category_id', $service->id)->first()
+                : $myBids->get($e->id);
+
+            $g = $this->mapEvent($e, $count, $mine, $user, $service);
             $g['saved'] = $savedIds->contains($e->id);
 
             return $g;
@@ -526,9 +574,10 @@ class ProfessionalBiddingBoardController extends Controller
     }
 
     /** Map a real Event to the bidding-board gig card shape. */
-    private function mapEvent(Event $e, int $bidCount = 0, ?Bid $myBid = null, ?\App\Models\User $viewer = null): array
+    private function mapEvent(Event $e, int $bidCount = 0, ?Bid $myBid = null, ?\App\Models\User $viewer = null, ?\App\Models\Category $service = null): array
     {
-        $cats = $e->categories->pluck('name')->all();
+        // On an MSR this card is ONE service line of the request (row 162).
+        $cats = $service ? [$service->name] : $e->categories->pluck('name')->all();
 
         // This used to read ER / MSR / SSR — mixing the type with the scope on
         // the one badge, so a card could say "MSR" while the tab above it said
@@ -552,18 +601,23 @@ class ProfessionalBiddingBoardController extends Controller
             // date further out quietly drop the flag that's the whole point.
             'urgent' => ! $expired && ($type === 'ER' || ($days !== null && $days >= 0 && $days <= 3)),
             'expired' => $expired,
-            'title'  => $e->title,
+            'title'  => $service ? $service->name . ' — ' . $e->title : $e->title,
+            'service_id'   => $service?->id,
+            'service_name' => $service?->name,
             'desc'   => Str::limit($e->description ?: 'Open gig — full details available on request.', 140),
             'loc'    => $e->location ?: 'Location flexible',
             'date'   => $e->starts_at ? $e->starts_at->format('M j, Y') : 'Flexible',
             'guests' => 50 + ($e->id % 250),
             'tags'   => $cats ?: ['General'],
             // ER budget is a single fixed figure; SSR/MSR quote a range.
+            // One budget covers the whole request. See the note above the
+            // per-service split: dividing it would invent a figure per line.
             'budget' => $e->budget
                 ? ($type === 'ER'
                     ? '$' . number_format($e->budget)
                     : '$' . number_format($e->budget * 0.85) . ' – $' . number_format($e->budget))
                 : 'Open budget',
+            'budget_is_whole_request' => $service !== null,
             'time'   => $expired ? 'Expired' : (($days !== null && $days >= 0) ? ($days . ($days === 1 ? ' day left' : ' days left')) : 'Open'),
             'match'  => $fit,
             // Stars must track the percentage — 80/93/96% can't all be 5 stars.

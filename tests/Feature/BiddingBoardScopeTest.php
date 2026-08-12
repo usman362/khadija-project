@@ -111,9 +111,21 @@ class BiddingBoardScopeTest extends TestCase
         $this->event(2);
         $this->event(4);
 
-        $this->assertCount(3, $this->gigs());
+        /*
+         * Counted in CARDS, not requests — checklist row 162 split an MSR
+         * into one card per service line (R12). One single-service request
+         * plus a two-service and a four-service one is 1 + 2 + 4 = 7 jobs a
+         * professional can bid on, which is the number the board should show.
+         */
+        $this->assertCount(7, $this->gigs());
         $this->assertCount(1, $this->gigs(['scope' => 'single']));
-        $this->assertCount(2, $this->gigs(['scope' => 'multi']));
+        $this->assertCount(6, $this->gigs(['scope' => 'multi']));
+
+        // The filter still selects on the REQUEST's service count.
+        $this->assertSame(
+            [2, 4],
+            collect($this->gigs(['scope' => 'multi']))->countBy('event_id')->values()->sort()->values()->all(),
+        );
     }
 
     public function test_an_awarded_gig_leaves_the_board(): void
@@ -124,7 +136,11 @@ class BiddingBoardScopeTest extends TestCase
         $ids = array_column($this->gigs(), 'event_id');
 
         $this->assertNotContains($awarded->id, $ids, 'a gig already awarded to another pro is not biddable');
-        $this->assertCount(1, $ids);
+
+        // Two cards, both from the one remaining request: row 162 splits a
+        // two-service MSR into its two service lines.
+        $this->assertCount(2, $ids);
+        $this->assertCount(1, array_unique($ids));
     }
 
     public function test_the_old_multi_service_page_redirects_to_the_filtered_board(): void
@@ -132,5 +148,75 @@ class BiddingBoardScopeTest extends TestCase
         $this->actingAs($this->pro)
             ->get(route('professional.multi-service.index'))
             ->assertRedirect(route('professional.bidding-board.index', ['scope' => 'multi']));
+    }
+
+    /**
+     * Checklist row 162 (R12) — an MSR is one card per service line.
+     *
+     * "DJ + Lighting + MC" was a single card. It is three jobs: three
+     * contracts, three bids, three professionals in the usual case. A
+     * lighting company had to open a card titled after somebody else's trade
+     * to find out whether their own service was even in it.
+     */
+    public function test_a_multi_service_request_becomes_one_card_per_service(): void
+    {
+        $event = $this->event(3);
+
+        $cards = collect($this->gigs())->where('event_id', $event->id);
+
+        $this->assertCount(3, $cards);
+        $this->assertCount(3, $cards->pluck('service_id')->unique());
+
+        // Each card is titled by its own service, not by the request alone.
+        foreach ($cards as $card) {
+            $this->assertStringContainsString($card['service_name'], $card['title']);
+            $this->assertSame([$card['service_name']], $card['tags']);
+        }
+    }
+
+    /** A single-service request is still one card, with no service split. */
+    public function test_a_single_service_request_is_not_split(): void
+    {
+        $event = $this->event(1);
+
+        $cards = collect($this->gigs())->where('event_id', $event->id);
+
+        $this->assertCount(1, $cards);
+        $this->assertNull($cards->first()['service_id']);
+    }
+
+    /**
+     * The other half of the same problem: a shared bid count read "12 bids"
+     * on a card where eleven were for a different trade.
+     */
+    public function test_the_bid_count_is_per_service_not_per_request(): void
+    {
+        $event    = $this->event(2);
+        $services = $event->categories()->pluck('categories.id')->all();
+
+        \App\Models\Bid::create([
+            'event_id' => $event->id, 'supplier_id' => User::factory()->create()->id,
+            'category_id' => $services[0], 'amount' => 900, 'status' => 'submitted',
+        ]);
+
+        $cards = collect($this->gigs())->where('event_id', $event->id)->keyBy('service_id');
+
+        $this->assertSame(1, $cards[$services[0]]['bids']);
+        $this->assertSame(0, $cards[$services[1]]['bids']);
+    }
+
+    /**
+     * The budget is NOT split. A request carries one budget covering every
+     * service; there is no per-service budget anywhere in the data, so
+     * dividing it would invent a figure per line the client never gave.
+     */
+    public function test_the_budget_is_not_divided_between_services(): void
+    {
+        $event = $this->event(2);
+
+        $cards = collect($this->gigs())->where('event_id', $event->id);
+
+        $this->assertCount(1, $cards->pluck('budget')->unique(), 'each line shows the request budget');
+        $this->assertTrue($cards->first()['budget_is_whole_request']);
     }
 }
