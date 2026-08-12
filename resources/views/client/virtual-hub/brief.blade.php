@@ -286,7 +286,7 @@
             <div class="vhb-subhead">Physical Venue Details <span class="hint">(Only for Hybrid Events)</span></div>
             <div class="vhb-field">
                 <label class="vhb-label">Venue Name &amp; Location</label>
-                <input type="text" name="location" class="vhb-input" value="{{ old('location') }}" placeholder="e.g., TechCenter, San Francisco, CA">
+                <input type="text" name="location" class="vhb-input" value="{{ old('location') }}" placeholder="e.g., TechCenter, Arlington, VA">
             </div>
             <div class="vhb-field">
                 <label class="vhb-label">On-Site Internet Speed <span class="hint">(if known)</span></label>

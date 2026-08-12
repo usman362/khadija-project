@@ -41,7 +41,7 @@ class AiAvailabilityOptimizerController extends Controller
                 [0, 'confirmed', '9:00 AM', 'Corporate AV Setup'],
                 [0, 'open', '2:00 PM', 'Open — 2 slots'],
                 [1, 'tight', '11:00 AM', 'Tight turnaround'],
-                [2, 'confirmed', '5:00 PM', 'Wedding — Chicago'],
+                [2, 'confirmed', '5:00 PM', 'Wedding — Baltimore'],
                 [3, 'open', '10:00 AM', 'Open opportunity'],
                 [4, 'confirmed', '6:00 PM', 'Birthday DJ set'],
                 [5, 'confirmed', '4:00 PM', 'Wedding reception'],

@@ -160,7 +160,7 @@
                 </div>
                 <div class="full">
                     <label class="ep-lbl">Location (optional)</label>
-                    <input type="text" name="location" class="ep-inp" maxlength="200" placeholder="e.g. Los Angeles, CA">
+                    <input type="text" name="location" class="ep-inp" maxlength="200" placeholder="e.g. Baltimore, MD">
                 </div>
             </div>
             <button type="submit" class="ep-go" id="epGo">{{ $isSemi ? '✨ Suggest My Plan' : '🤖 Build My Full Plan' }}</button>

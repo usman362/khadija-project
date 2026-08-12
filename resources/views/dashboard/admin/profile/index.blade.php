@@ -355,7 +355,7 @@
                     </div>
                     <div>
                         <label class="pf-label">City</label>
-                        <input type="text" name="city" class="pf-input" value="{{ old('city', $profile->city) }}" placeholder="Los Angeles">
+                        <input type="text" name="city" class="pf-input" value="{{ old('city', $profile->city) }}" placeholder="Baltimore">
                     </div>
                     <div>
                         <label class="pf-label">State / Province</label>

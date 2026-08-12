@@ -550,10 +550,13 @@
 
         .cl-user-card:hover { background: rgba(255, 255, 255, 0.06); }
 
+        /* Row 145 — holds the avatar image now, not a CSS letter. The
+           gradient stays as the backdrop while the image loads. */
         .cl-user-avatar {
             width: 38px;
             height: 38px;
             border-radius: 10px;
+            overflow: hidden;
             background: linear-gradient(135deg, #f97316, #ea580c);
             display: flex;
             align-items: center;
@@ -1374,7 +1377,7 @@
 
         <div class="cl-sidebar-footer">
             <a href="{{ route('client.profile.index') }}" class="cl-user-card" title="View profile">
-                <div class="cl-user-avatar">{{ strtoupper(substr(auth()->user()?->name ?? 'U', 0, 1)) }}</div>
+                <div class="cl-user-avatar"><img src="{{ auth()->user()?->avatar_url }}" alt="" style="width:100%;height:100%;border-radius:inherit;object-fit:cover;display:block;"></div>
                 <div class="cl-user-info">
                     <div class="cl-user-name">{{ auth()->user()?->name }}</div>
                 </div>

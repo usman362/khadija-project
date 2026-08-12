@@ -225,7 +225,7 @@
                     <div class="gb-row">
                         <div class="gb-field" style="margin-bottom:0;">
                             <label class="gb-label">Location</label>
-                            <input type="text" name="location" id="gbLocation" class="gb-input" placeholder="e.g. Miami, FL" value="{{ old('location') }}">
+                            <input type="text" name="location" id="gbLocation" class="gb-input" placeholder="e.g. Baltimore, MD" value="{{ old('location') }}">
                         </div>
                         <div class="gb-field" style="margin-bottom:0;">
                             <label class="gb-label">Venue</label>

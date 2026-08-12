@@ -41,15 +41,28 @@ class AiPricingAssistantController extends Controller
         'Event Lighting & Sound' => 900,
     ];
 
-    /** Local cost-of-market index by city (1.0 = national baseline). */
+    /*
+     * Rule R27 — the seven jurisdictions and nothing else.
+     *
+     * This table named Los Angeles, Beverly Hills, San Francisco, New York,
+     * Miami, Chicago and Austin. GigResource does not operate in any of them,
+     * and a pricing tool quoting a Los Angeles rate tells a Baltimore
+     * professional something about a market they cannot work in.
+     *
+     * The multipliers are relative to the platform's own baseline rather than
+     * a "national" one — there is no national market here, there are seven
+     * jurisdictions. DC carries the highest index of the seven; the rural
+     * ends of WV the lowest. These are ordering assumptions, not measured
+     * data, and the tool says so on screen.
+     */
     private const LOCATION_INDEX = [
-        'Los Angeles, CA'  => 1.00,
-        'Beverly Hills, CA' => 1.18,
-        'San Francisco, CA' => 1.12,
-        'New York, NY'     => 1.15,
-        'Miami, FL'        => 1.02,
-        'Chicago, IL'      => 0.98,
-        'Austin, TX'       => 0.94,
+        'Washington, DC'   => 1.12,
+        'Arlington, VA'    => 1.08,
+        'Baltimore, MD'    => 1.00,
+        'Philadelphia, PA' => 1.02,
+        'Newark, NJ'       => 1.04,
+        'Wilmington, DE'   => 0.96,
+        'Charleston, WV'   => 0.90,
     ];
 
     private const EXPERIENCE = ['Beginner' => 0.82, 'Intermediate' => 1.00, 'Expert' => 1.22];
@@ -61,7 +74,7 @@ class AiPricingAssistantController extends Controller
         $locations    = array_keys(self::LOCATION_INDEX);
 
         // Default scenario (matches the reference: DJ in LA, mid-tier).
-        $result = $this->compute('DJ Performance', 'Los Angeles, CA', 'Intermediate', 4, 'Premium', 100);
+        $result = $this->compute('DJ Performance', 'Baltimore, MD', 'Intermediate', 4, 'Premium', 100);
 
         $recent = $this->recentCalculations($request);
 
@@ -93,7 +106,7 @@ class AiPricingAssistantController extends Controller
 
         $result = $this->compute(
             $data['service_type'],
-            $data['location'] ?? 'Los Angeles, CA',
+            $data['location'] ?? 'Baltimore, MD',
             $data['experience'] ?? 'Intermediate',
             (float) ($data['duration'] ?? 4),
             $data['equipment'] ?? 'Premium',
@@ -151,7 +164,7 @@ class AiPricingAssistantController extends Controller
 
         $city = trim(explode(',', $location)[0]);
         $available = 8 + ($size % 9);          // illustrative local supply
-        $demand    = ($dateMult > 1.0 || $sizeFct >= 1.1 || in_array($city, ['Los Angeles', 'New York', 'Beverly Hills'], true))
+        $demand    = ($dateMult > 1.0 || $sizeFct >= 1.1 || in_array($city, ['Washington', 'Arlington', 'Newark'], true))
             ? 'High demand' . ($dateNote ? " ({$dateNote})" : '')
             : 'Steady demand';
 
@@ -231,7 +244,7 @@ class AiPricingAssistantController extends Controller
             $service  = $ev->category?->name && isset(self::SERVICE_RATES[$ev->category->name])
                 ? $ev->category->name
                 : 'DJ Performance';
-            $location = $ev->location ?: 'Los Angeles, CA';
+            $location = $ev->location ?: 'Baltimore, MD';
             $est = $this->compute($service, $location, 'Intermediate', 4, 'Premium', 100, $ev->starts_at?->toDateString());
             $rows[] = [
                 'service'  => $service,

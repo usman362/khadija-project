@@ -147,7 +147,7 @@ class AiAgreementBuilderController extends Controller
                 ['type' => 'ai', 'title' => 'Event Details', 'conf' => 98, 'fields' => [
                     ['Event Name', 'Luxury Wedding Reception'], ['Event Type', 'Wedding Ceremony & Reception'],
                     ['Date', 'June 15, 2025'], ['Time', '5:00 PM – 11:00 PM'],
-                    ['Venue', 'The Grand Garden Estate, Chicago, IL'], ['Guest Count', '150 guests'],
+                    ['Venue', 'The Grand Garden Estate, Baltimore, MD'], ['Guest Count', '150 guests'],
                 ]],
                 ['type' => 'ai', 'title' => 'Project Timeline', 'conf' => 95, 'fields' => [
                     ['Setup', '8:00 AM'], ['Event', '5:00 PM – 11:00 PM'], ['Breakdown', 'by 11:30 PM'],

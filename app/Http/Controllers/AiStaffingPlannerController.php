@@ -80,7 +80,7 @@ class AiStaffingPlannerController extends Controller
             'name'     => self::EVENT_TYPES['wedding'],
             'date'     => 'May 24, 2025',
             'guests'   => 150,
-            'location' => 'Los Angeles, CA',
+            'location' => 'Baltimore, MD',
         ];
 
         $plan = $this->plan('wedding', 150, 10);
@@ -127,7 +127,7 @@ class AiStaffingPlannerController extends Controller
                 'name'     => ($data['event_name'] ?? '') ?: self::EVENT_TYPES[$type],
                 'date'     => ($data['date'] ?? '') ?: 'May 24, 2025',
                 'guests'   => $guests,
-                'location' => ($data['location'] ?? '') ?: 'Los Angeles, CA',
+                'location' => ($data['location'] ?? '') ?: 'Baltimore, MD',
             ],
             'roles' => $plan['roles'],
             'axis'  => $plan['axis'],

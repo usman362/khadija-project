@@ -1180,7 +1180,7 @@
 
             <div class="pro-banner">
                 <div class="pro-banner-text">
-                    <h1>Welcome back, {{ auth()->user()?->name ?? 'Professional User' }}! 👋</h1>
+                    <h1>Welcome back, {{ auth()->user()?->name ?? 'there' }}! 👋</h1>
                     <p>Your business at a glance, {{ now()->format('M d') }}.</p>
                 </div>
                 <div class="pro-banner-search">

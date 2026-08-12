@@ -434,7 +434,7 @@
 
                 <div>
                     <label class="bat-label">Location (optional)</label>
-                    <input type="text" name="location" class="bat-input" maxlength="200" placeholder="e.g. Austin, TX">
+                    <input type="text" name="location" class="bat-input" maxlength="200" placeholder="e.g. Baltimore, MD">
                 </div>
                 <div>
                     <label class="bat-label">Event Date (optional)</label>

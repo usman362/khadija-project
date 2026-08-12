@@ -9,7 +9,15 @@
     $portal      = $portal ?? 'client';
     $trigger     = $trigger ?? 'avatar';
     $me          = auth()->user();
-    $initial     = strtoupper(substr($me?->name ?? 'U', 0, 1));
+    /*
+     * Checklist row 145 — one avatar, one generator.
+     *
+     * This used to be a single letter drawn in CSS while the profile page
+     * rendered avatar_url: two initials, a per-user hue, and any photo the
+     * person had actually uploaded. Same account, two different avatars on
+     * one page load. avatar_url is the real generator, so it wins.
+     */
+    $avatarUrl   = $me?->avatar_url;
     // Real rows only — no placeholder count. An empty bell means nothing new.
     $notes       = $me ? $me->unreadNotifications()->latest()->limit(6)->get() : collect();
     $noteCount   = $notes->count();
@@ -54,12 +62,12 @@
 <div class="tbm" data-row-menu>
     @if($trigger === 'chip')
         <button class="pro-avatar-chip" type="button" aria-haspopup="true" aria-expanded="false" title="Account">
-            <span class="pro-avatar-img">{{ $initial }}</span>
-            <span class="pro-avatar-meta"><b>{{ $me?->name ?? 'Professional User' }}</b><span>PRO</span></span>
+            <img class="pro-avatar-img" src="{{ $avatarUrl }}" alt="">
+            <span class="pro-avatar-meta"><b>{{ $me?->name ?? 'Your account' }}</b><span>PRO</span></span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
     @else
-        <button class="cl-navbar-avatar" type="button" aria-haspopup="true" aria-expanded="false" title="{{ $me?->name }}">{{ $initial }}</button>
+        <button class="cl-navbar-avatar" type="button" aria-haspopup="true" aria-expanded="false" title="{{ $me?->name }}" aria-label="Your account"><img src="{{ $avatarUrl }}" alt="" style="width:100%;height:100%;border-radius:inherit;object-fit:cover;display:block;"></button>
     @endif
     <div class="tbm-pop" data-row-menu-pop>
         <div class="tbm-user">

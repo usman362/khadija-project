@@ -510,10 +510,10 @@
        has no real scheduled events so the calendar isn't blank, matching
        the mockup. Replaced automatically once real events exist. */
     $demoCalEvents = $eventsByDate->isEmpty() ? [
-        6  => ['Wedding Miami, FL',          'ev-coral'],
-        8  => ['Corporate Event Orlando, FL','ev-purple'],
-        13 => ['Private Party Tampa, FL',    'ev-purple'],
-        21 => ['Brand Launch Miami, FL',     'ev-coral'],
+        6  => ['Wedding, Baltimore MD',        'ev-coral'],
+        8  => ['Corporate Event, Arlington VA','ev-purple'],
+        13 => ['Private Party, Philadelphia PA','ev-purple'],
+        21 => ['Brand Launch, Washington DC',  'ev-coral'],
         26 => ['Memorial Day',               'ev-pink'],
     ] : [];
 

@@ -172,7 +172,7 @@ class ProfessionalDirectOfferController extends Controller
                 'Event Date'    => 'June 15, 2025',
                 'Event Time'    => '5:00 PM – 11:00 PM',
                 'Guest Count'   => '150 Guests',
-                'Venue'         => 'The Grand Garden Estate, 1234 Garden Lane, Chicago, IL 60601',
+                'Venue'         => 'The Grand Garden Estate, 1234 Garden Lane, Baltimore, MD 21201',
             ],
 
             'services' => [
