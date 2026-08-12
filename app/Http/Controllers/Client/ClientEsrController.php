@@ -88,10 +88,33 @@ class ClientEsrController extends Controller
         // window is 24 hours (Khadijah, approved 2026-07-31), but it can never
         // outlast the event itself: a request needed in six hours closes in
         // six, not tomorrow. The client can still accept a bid at any point.
+        /*
+         * Checklist row 108 (R7) — bidding closes at least five hours before
+         * the event starts.
+         *
+         * The cap used to be the event itself, so bidding could stay open
+         * until the moment the professional was supposed to be on site. Win a
+         * rush job at 6:58 for a 7:00 start and nobody gets there — and the
+         * client, who raised an EMERGENCY request, has no one to fall back
+         * on.
+         */
         $neededBy = \Illuminate\Support\Carbon::parse($data['needed_by']);
+        $buffer   = (int) config('bsr.esr.closes_hours_before_start');
+        $latest   = $neededBy->copy()->subHours($buffer);
+
         $deadline = now()->addHours((int) config('bsr.esr.default_window_hours'));
-        if ($deadline->gt($neededBy)) {
-            $deadline = $neededBy;
+
+        if ($deadline->gt($latest)) {
+            $deadline = $latest;
+        }
+
+        // Nothing left to bid in. Refused rather than published with a
+        // deadline already behind it, which would be a request nobody could
+        // answer dressed up as an open one.
+        if ($deadline->isPast()) {
+            return back()->withInput()->withErrors([
+                'needed_by' => "An emergency request needs at least {$buffer} hours before it starts, so professionals have time to reach you. For anything sooner, message a professional directly.",
+            ]);
         }
 
         $event = Event::create([

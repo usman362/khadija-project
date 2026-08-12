@@ -33,6 +33,12 @@ return [
     // measured in days is not an emergency.
     'esr' => [
         'default_window_hours' => env('ESR_DEFAULT_WINDOW_HOURS', 24),
+
+        // Rule R7 — bidding closes at least this long before the event
+        // starts. Checklist row 108: the deadline used to cap at the event
+        // itself, so a professional could win a rush job with no time left to
+        // travel to it, and the client had nobody to fall back on.
+        'closes_hours_before_start' => env('ESR_CLOSE_BUFFER_HOURS', 5),
     ],
 
     // Either kind can be closed by the client as soon as they accept a bid —

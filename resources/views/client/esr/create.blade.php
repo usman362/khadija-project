@@ -31,6 +31,8 @@
     .esr-req { color:var(--brand-text); }
     .esr-input, .esr-select, .esr-textarea { width:100%; border:1px solid var(--border-color,#e5e7eb); border-radius:10px; padding:11px 12px; font-size:14px; font-family:inherit; color:var(--text-primary,#111827); background:var(--bg-card,#fff); outline:none; }
     .esr-input:focus, .esr-select:focus, .esr-textarea:focus { border-color:#f97316; box-shadow:0 0 0 3px rgba(249,115,22,.12); }
+    .esr-hint { font-size:11.5px; color:var(--text-secondary,#6b7280); margin:5px 0 0; line-height:1.45; }
+    .esr-err { font-size:11.5px; color:#b91c1c; font-weight:600; margin:5px 0 0; line-height:1.45; }
     .esr-textarea { min-height:80px; resize:vertical; }
     .esr-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     .esr-grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
@@ -118,7 +120,17 @@
                 </div>
             </div>
             <div class="esr-grid3">
-                <div class="esr-field"><label>Needed by <span class="esr-req">*</span></label><input type="datetime-local" name="needed_by" class="esr-input" required value="{{ old('needed_by') }}"></div>
+                @php $esrBuffer = (int) config('bsr.esr.closes_hours_before_start'); @endphp
+                <div class="esr-field">
+                    <label for="esr-needed-by">Needed by <span class="esr-req">*</span></label>
+                    <input type="datetime-local" id="esr-needed-by" name="needed_by" class="esr-input" required
+                           min="{{ now()->addHours($esrBuffer)->format('Y-m-d\TH:i') }}"
+                           value="{{ old('needed_by') }}"
+                           aria-describedby="esr-needed-by-hint">
+                    {{-- Rule R7. Said before they submit, not only after it is refused. --}}
+                    <p class="esr-hint" id="esr-needed-by-hint">At least {{ $esrBuffer }} hours from now, so professionals have time to reach you.</p>
+                    @error('needed_by')<p class="esr-err">{{ $message }}</p>@enderror
+                </div>
                 <div class="esr-field"><label>Location</label><input name="location" class="esr-input" value="{{ old('location') }}" placeholder="Venue or city"></div>
                 <div class="esr-field"><label>Guest count</label><input type="number" name="guest_count" class="esr-input" value="{{ old('guest_count') }}" placeholder="e.g. 150"></div>
             </div>
