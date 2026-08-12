@@ -231,7 +231,12 @@
                 <div style="font-weight:700;color:var(--text-primary);">Service Agreement</div>
                 <div class="pg-cc-line"></div><div class="pg-cc-line" style="width:70%;"></div>
                 <div style="margin-top:5px;">Total: <b style="color:var(--text-primary);">$4,000.00</b></div>
-                <div style="margin-top:4px;">50% Deposit · 50% Final</div>
+                {{-- Checklist row 242, answered: this shows the locked
+                     DEFAULT, not the top of the range. 50/50 is legal (the
+                     band is 15-50%) but it is the maximum, and a sample
+                     contract should read as the typical case a professional
+                     will actually see, not the edge one. --}}
+                <div style="margin-top:4px;">30% Deposit · 70% Final</div>
                 <a href="{{ route('ai-agreement.build') }}" class="pg-cc-btn" style="background:#047857;">Sign Contract</a>
             </div>
         </div>
