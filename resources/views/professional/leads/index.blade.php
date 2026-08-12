@@ -9,6 +9,15 @@
 
 @php
     $money = fn ($n) => '$' . number_format((float) $n, 0);
+    // Row 137 — one colour per stage, distinct from the priority palette.
+    // Theme-aware tokens, same reason as $pipeColors below: the raw mid-tones
+    // read as dark-on-dark or light-on-light depending on the active theme.
+    $stageChip = [
+        'New Lead'      => 'var(--info-text)',
+        'Proposal Sent' => 'var(--accent-text)',
+        'Negotiation'   => 'var(--warn-text)',
+        'Booked'        => 'var(--ok-text)',
+    ];
     $prioMap = [
         'High'   => ['var(--bad-text)',  'rgba(220,38,38,0.10)'],
         'Medium' => ['var(--warn-text)', 'rgba(217,119,6,0.10)'],
@@ -58,7 +67,14 @@
     .pl-lead-name { font-size: 15px; font-weight: 800; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .pl-lead-meta { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
     .pl-lead-val { font-size: 15px; font-weight: 800; color: var(--text-primary); white-space: nowrap; }
-    .pl-prio { font-size: 12.5px; font-weight: 800; padding: 6px 16px; border-radius: 999px; white-space: nowrap; min-width: 84px; text-align: center; }
+    /* Row 137 — the stage is where a lead sits in the pipeline; the priority
+       is how hard to chase it. They were two pills of the same shape, so a
+       glance could not tell which was which. The stage is now a square-cornered
+       outline chip, the priority stays the filled round pill. */
+    .pl-prio { font-size: 11.5px; font-weight: 800; padding: 6px 14px; border-radius: 999px; white-space: nowrap; min-width: 118px; text-align: center; }
+    .pl-stage-chip { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 5px; white-space: nowrap;
+        border: 1px solid currentColor; background: transparent; letter-spacing: .01em; }
+    .pl-lead-age { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
     .pl-viewall { display: block; text-align: center; padding: 14px; margin-top: 8px; font-size: 14px; font-weight: 800; color: var(--pl-blue); text-decoration: none; }
     .pl-viewall svg { width: 16px; height: 16px; vertical-align: -3px; margin-left: 4px; }
     .pl-empty { padding: 30px 10px; text-align: center; color: var(--text-muted); font-size: 13px; }
@@ -244,9 +260,20 @@
                 <div class="pl-lead-mid">
                     <div class="pl-lead-name">{{ $lead['name'] }}</div>
                     <div class="pl-lead-meta">{{ \Illuminate\Support\Str::limit($lead['location'], 24) }} · {{ $lead['date'] ? $lead['date']->format('M d, Y') : 'Date TBD' }}</div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+                        {{-- Stage first, in its own shape — where the lead sits. --}}
+                        <span class="pl-stage-chip" style="color:{{ $stageChip[$lead['stage']] ?? 'var(--text-muted)' }};">{{ $lead['stage'] }}</span>
+                        {{-- Row 134 — age from the page's one shared today. --}}
+                        @if($lead['ageDays'] !== null)
+                            <span class="pl-lead-age">{{ $lead['ageDays'] === 0 ? 'Today' : $lead['ageDays'] . ($lead['ageDays'] === 1 ? ' day old' : ' days old') }}</span>
+                        @endif
+                    </div>
                 </div>
-                <div class="pl-lead-val">@if($lead['valueLow'] === null)Budget not stated@else{{ $money($lead['valueLow']) }} – {{ $money($lead['valueHigh']) }}@endif</div>
-                <span class="pl-prio" style="color:{{ $pc }};background:{{ $pbg }};">{{ $lead['priority'] }}</span>
+                {{-- Row 138 — a range only where the client gave one. Every row
+                     used to print a ±20% band around a single stated figure. --}}
+                <div class="pl-lead-val">@if($lead['valueLow'] === null)Budget not stated@elseif($lead['isRange']){{ $money($lead['valueLow']) }} – {{ $money($lead['valueHigh']) }}@else{{ $money($lead['valueLow']) }}@endif</div>
+                {{-- Named, so the pill cannot be mistaken for another stage. --}}
+                <span class="pl-prio" style="color:{{ $pc }};background:{{ $pbg }};">Priority: {{ $lead['priority'] }}</span>
             </div>
         @empty
             <div class="pl-empty">No active leads yet. New marketplace opportunities and client requests will appear here automatically.</div>
