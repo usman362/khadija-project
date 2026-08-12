@@ -246,7 +246,7 @@
                      only way to reach it was to type it into the address bar. --}}
                 <div class="pk-rail-sec">2. Occasion</div>
                 <p class="pk-rail-hint">Show packages suited to one kind of event</p>
-                <select name="event_type" class="pk-svcsearch" style="cursor:pointer;">
+                <select name="event_type" class="pk-svcsearch" style="cursor:pointer;" aria-label="Any occasion">
                     <option value="">Any occasion</option>
                     @foreach($occasions as $o)
                         <option value="{{ $o }}" @selected($f['event_type'] === $o)>{{ $o }}</option>

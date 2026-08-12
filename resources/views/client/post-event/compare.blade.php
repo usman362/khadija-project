@@ -38,8 +38,8 @@
         <p class="pe-sub">Compare the top matches and choose the best package for your event.</p>
 
         <div class="pe-toggle-row">
-            <span class="pe-toggle" onclick="this.classList.toggle('on')"><span class="sw"></span> Show Differences Only</span>
-            <span class="pe-toggle on" onclick="this.classList.toggle('on')"><span class="sw"></span> Expert Comparison</span>
+            <button type="button" class="pe-toggle" onclick="this.classList.toggle('on'); this.setAttribute('aria-pressed', this.classList.contains('on'));" aria-pressed="false"><span class="sw"></span> Show Differences Only</button>
+            <button type="button" class="pe-toggle on" onclick="this.classList.toggle('on'); this.setAttribute('aria-pressed', this.classList.contains('on'));" aria-pressed="true"><span class="sw"></span> Expert Comparison</button>
         </div>
 
         <div class="pe-grid">
@@ -90,12 +90,12 @@
             <aside class="pe-rail">
                 <div class="pe-rail-card">
                     <h4>Comparison Tools</h4>
-                    <div class="pe-rail-row" onclick="void(0)" style="cursor:pointer;">
+                    <div class="pe-rail-row">
                         <span class="k">Show differences</span><span class="v">Off</span>
                     </div>
-                    <div class="pe-rail-row" onclick="window.print()" style="cursor:pointer;">
+                    <button type="button" class="pe-rail-row" onclick="window.print()" style="cursor:pointer;width:100%;text-align:left;background:none;border:0;font:inherit;">
                         <span class="k">Print comparison</span><span class="v">→</span>
-                    </div>
+                    </button>
                     <p class="pe-muted" style="margin:12px 0 0;">Side-by-side view helps you weigh services, price and match before you choose.</p>
                 </div>
                 @include('client.post-event._rail')

@@ -66,9 +66,9 @@
             }
         });
 
-        /* Mark every <img> with decoding="async" so the browser decodes
+        /* Mark every <img alt=""> with decoding="async" so the browser decodes
            images off-thread and doesn't block paint. We do this in JS at
-           the end so we don't have to touch every <img> tag in markup. */
+           the end so we don't have to touch every <img alt=""> tag in markup. */
         document.querySelectorAll('img:not([decoding])').forEach(function (img) {
             img.setAttribute('decoding', 'async');
         });

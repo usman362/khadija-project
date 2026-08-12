@@ -177,7 +177,7 @@
                     @if(!empty($events) && count($events) > 1)
                         <div class="vm-ev-item"><div class="k">Event:</div><div class="v">
                             <select onchange="location.href='{{ route('ai-tools.vendor-matchmaking') }}?event='+this.value"
-                                    style="width:100%;border:1px solid var(--border-color);border-radius:8px;padding:6px 9px;font-size:12.5px;font-weight:700;color:var(--text-primary);background:var(--bg-card);font-family:inherit;cursor:pointer;">
+                                    style="width:100%;border:1px solid var(--border-color);border-radius:8px;padding:6px 9px;font-size:12.5px;font-weight:700;color:var(--text-primary);background:var(--bg-card);font-family:inherit;cursor:pointer;" aria-label="Choose an event">
                                 @foreach($events as $ev)
                                     <option value="{{ $ev['id'] }}" @selected(($selectedEvent ?? null) == $ev['id'])>{{ \Illuminate\Support\Str::limit($ev['title'], 42) }}</option>
                                 @endforeach

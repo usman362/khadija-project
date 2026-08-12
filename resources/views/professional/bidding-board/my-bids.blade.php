@@ -140,7 +140,7 @@
         <input type="hidden" name="state" value="{{ $f['state'] }}">
         <input type="hidden" name="type" value="{{ $f['type'] }}">
         <input class="mb-search" type="search" name="q" value="{{ $f['q'] }}" placeholder="Search event, client or service…">
-        <select name="scope">
+        <select name="scope" aria-label="Single &amp; multi-service">
             <option value="">Single &amp; multi-service</option>
             <option value="single" @selected($f['scope'] === 'single')>SSR — single service</option>
             <option value="multi" @selected($f['scope'] === 'multi')>MSR — multi-service</option>

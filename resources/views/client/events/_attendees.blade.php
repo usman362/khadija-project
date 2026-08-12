@@ -69,7 +69,7 @@
                                     @csrf @method('PATCH')
                                     <input type="hidden" name="name" value="{{ $guest->name }}">
                                     <select name="rsvp_status" onchange="this.form.submit()" class="at-rsvp"
-                                            style="color:{{ $statusColour[$guest->rsvp_status] }};">
+                                            style="color:{{ $statusColour[$guest->rsvp_status] }};" aria-label="rsvp_status === $value)>">
                                         @foreach(\App\Models\EventAttendee::STATUSES as $value => $label)
                                             <option value="{{ $value }}" @selected($guest->rsvp_status === $value)>{{ $label }}</option>
                                         @endforeach

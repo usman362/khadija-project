@@ -89,7 +89,7 @@
                 </div>
                 <div class="po-field">
                     <label class="po-label">Payout Method</label>
-                    <select name="payout_method" class="po-select">
+                    <select name="payout_method" class="po-select" aria-label="PayPal">
                         <option value="paypal">PayPal</option>
                         <option value="bank">Bank Transfer</option>
                         <option value="other">Other</option>

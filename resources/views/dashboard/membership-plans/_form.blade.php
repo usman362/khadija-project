@@ -12,7 +12,7 @@
     </div>
     <div class="col-md-3 mb-3">
         <label class="form-label">Contract Term <span class="text-danger">*</span></label>
-        <select name="billing_cycle" class="form-select" required>
+        <select name="billing_cycle" class="form-select" required aria-label="Billing cycle">
             @foreach(['6_month' => '6 Months', '12_month' => '12 Months', '18_month' => '18 Months'] as $val => $label)
                 <option value="{{ $val }}" {{ ($plan?->billing_cycle ?? '12_month') === $val ? 'selected' : '' }}>{{ $label }}</option>
             @endforeach
@@ -45,7 +45,7 @@
     </div>
     <div class="col-md-3 mb-3">
         <label class="form-label">Badge Color</label>
-        <select name="badge_color" class="form-select">
+        <select name="badge_color" class="form-select" aria-label="None">
             <option value="">None</option>
             @foreach(['primary' => 'Blue', 'success' => 'Green', 'warning' => 'Yellow', 'danger' => 'Red', 'info' => 'Cyan', 'dark' => 'Dark'] as $val => $label)
                 <option value="{{ $val }}" {{ $plan?->badge_color === $val ? 'selected' : '' }}>{{ $label }}</option>
@@ -99,7 +99,7 @@
                         <input type="text" name="features[]" class="form-control form-control-sm" value="{{ $feature->feature }}" placeholder="Feature description">
                     </div>
                     <div class="col-md-4">
-                        <select name="feature_codes[]" class="form-select form-select-sm">
+                        <select name="feature_codes[]" class="form-select form-select-sm" aria-label="— No gate —">
                             <option value="">— No gate —</option>
                             @foreach($aiFeatureCodes as $code)
                                 <option value="{{ $code }}" @selected($feature->feature_code === $code)>{{ \App\Domain\AiFeatures\AiFeatureCode::label($code) }}</option>
@@ -120,7 +120,7 @@
                     <input type="text" name="features[]" class="form-control form-control-sm" placeholder="Feature description">
                 </div>
                 <div class="col-md-4">
-                    <select name="feature_codes[]" class="form-select form-select-sm">
+                    <select name="feature_codes[]" class="form-select form-select-sm" aria-label="— No gate —">
                         <option value="">— No gate —</option>
                         @foreach($aiFeatureCodes as $code)
                             <option value="{{ $code }}">{{ \App\Domain\AiFeatures\AiFeatureCode::label($code) }}</option>

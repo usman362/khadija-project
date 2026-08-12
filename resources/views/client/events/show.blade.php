@@ -653,7 +653,7 @@
                         <div class="cl-modal-title">Edit Event</div>
                         <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Update your event details below.</p>
                     </div>
-                    <button type="button" class="cl-modal-close" onclick="document.getElementById('editEventModal').classList.remove('show')">
+                    <button type="button" class="cl-modal-close" onclick="document.getElementById('editEventModal').classList.remove('show')" aria-label="Close">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
                 </div>

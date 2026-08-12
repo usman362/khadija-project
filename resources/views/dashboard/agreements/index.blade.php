@@ -20,7 +20,7 @@
         <form method="GET" action="{{ route('app.agreements.index') }}" class="row g-2 mb-3">
             <div class="col-md-3">
                 <label class="form-label small">Status</label>
-                <select name="status" class="form-select form-select-sm">
+                <select name="status" class="form-select form-select-sm" aria-label="All statuses">
                     <option value="">All statuses</option>
                     @foreach(['draft', 'pending_review', 'client_accepted', 'supplier_accepted', 'fully_accepted', 'rejected'] as $status)
                         <option value="{{ $status }}" {{ $selectedStatus === $status ? 'selected' : '' }}>{{ ucfirst(str_replace('_', ' ', $status)) }}</option>

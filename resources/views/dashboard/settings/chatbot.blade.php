@@ -43,14 +43,14 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Enabled</label>
-                    <select name="enabled" class="form-select">
+                    <select name="enabled" class="form-select" aria-label="Yes — show chatbot widget">
                         <option value="1" @selected($settings['enabled'])>Yes — show chatbot widget</option>
                         <option value="0" @selected(!$settings['enabled'])>No — hide chatbot</option>
                     </select>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Model</label>
-                    <select name="model" class="form-select">
+                    <select name="model" class="form-select" aria-label="GPT-4o Mini (fast, cheap)">
                         <option value="gpt-4o-mini" @selected($settings['model'] === 'gpt-4o-mini')>GPT-4o Mini (fast, cheap)</option>
                         <option value="gpt-4o"      @selected($settings['model'] === 'gpt-4o')>GPT-4o (smart, expensive)</option>
                         <option value="gpt-4-turbo" @selected($settings['model'] === 'gpt-4-turbo')>GPT-4 Turbo</option>

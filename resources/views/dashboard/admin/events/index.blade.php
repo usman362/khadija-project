@@ -88,7 +88,7 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Status</label>
-                            <select name="status" class="form-select">
+                            <select name="status" class="form-select" aria-label="All Status">
                                 <option value="all">All Status</option>
                                 @foreach(['pending','published','confirmed','in_progress','completed','cancelled'] as $s)
                                     <option value="{{ $s }}" {{ ($filters['status'] ?? '') === $s ? 'selected' : '' }}>
@@ -100,7 +100,7 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Source</label>
-                            <select name="source" class="form-select">
+                            <select name="source" class="form-select" aria-label="All Sources">
                                 <option value="">All Sources</option>
                                 @foreach(['user','ai','system'] as $src)
                                     <option value="{{ $src }}" {{ ($filters['source'] ?? '') === $src ? 'selected' : '' }}>
@@ -112,7 +112,7 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Published</label>
-                            <select name="published" class="form-select">
+                            <select name="published" class="form-select" aria-label="All">
                                 <option value="">All</option>
                                 <option value="yes" {{ ($filters['published'] ?? '') === 'yes' ? 'selected' : '' }}>Published</option>
                                 <option value="no" {{ ($filters['published'] ?? '') === 'no' ? 'selected' : '' }}>Unpublished</option>
@@ -127,7 +127,7 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Sort By</label>
-                            <select name="sort" class="form-select">
+                            <select name="sort" class="form-select" aria-label="Newest First">
                                 <option value="latest" {{ ($filters['sort'] ?? '') === 'latest' ? 'selected' : '' }}>Newest First</option>
                                 <option value="oldest" {{ ($filters['sort'] ?? '') === 'oldest' ? 'selected' : '' }}>Oldest First</option>
                                 <option value="title_asc" {{ ($filters['sort'] ?? '') === 'title_asc' ? 'selected' : '' }}>Title A-Z</option>
@@ -240,7 +240,7 @@
                                                             </div>
                                                             <div class="col-md-6 mb-3">
                                                                 <label class="form-label">Client <span class="text-danger">*</span></label>
-                                                                <select name="client_id" class="form-select" required>
+                                                                <select name="client_id" class="form-select" required aria-label="Select Client">
                                                                     <option value="">Select Client</option>
                                                                     @foreach($clients as $client)
                                                                         <option value="{{ $client->id }}" {{ $event->client_id == $client->id ? 'selected' : '' }}>{{ $client->name }}</option>
@@ -249,7 +249,7 @@
                                                             </div>
                                                             <div class="col-md-6 mb-3">
                                                                 <label class="form-label">Professional</label>
-                                                                <select name="supplier_id" class="form-select">
+                                                                <select name="supplier_id" class="form-select" aria-label="No Professional">
                                                                     <option value="">No Professional</option>
                                                                     @foreach($suppliers as $supplier)
                                                                         <option value="{{ $supplier->id }}" {{ $event->supplier_id == $supplier->id ? 'selected' : '' }}>{{ $supplier->name }}</option>
@@ -258,7 +258,7 @@
                                                             </div>
                                                             <div class="col-md-4 mb-3">
                                                                 <label class="form-label">Categories</label>
-                                                                <select name="category_ids[]" class="form-select" multiple size="4">
+                                                                <select name="category_ids[]" class="form-select" multiple size="4" aria-label="id }}' >">
                                                                     @foreach($categories as $cat)
                                                                         <option value="{{ $cat->id }}" {{ $event->categories->contains('id', $cat->id) ? 'selected' : '' }}>{{ $cat->name }}</option>
                                                                     @endforeach
@@ -267,7 +267,7 @@
                                                             </div>
                                                             <div class="col-md-4 mb-3">
                                                                 <label class="form-label">Status <span class="text-danger">*</span></label>
-                                                                <select name="status" class="form-select" required>
+                                                                <select name="status" class="form-select" required aria-label="status === $s ? 'selected' : '' }}>">
                                                                     @foreach(['pending','published','confirmed','in_progress','completed','cancelled'] as $s)
                                                                         <option value="{{ $s }}" {{ $event->status === $s ? 'selected' : '' }}>{{ ucfirst(str_replace('_', ' ', $s)) }}</option>
                                                                     @endforeach
@@ -342,7 +342,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Client <span class="text-danger">*</span></label>
-                                <select name="client_id" class="form-select" required>
+                                <select name="client_id" class="form-select" required aria-label="Select Client">
                                     <option value="">Select Client</option>
                                     @foreach($clients as $client)
                                         <option value="{{ $client->id }}">{{ $client->name }}</option>
@@ -351,7 +351,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Professional</label>
-                                <select name="supplier_id" class="form-select">
+                                <select name="supplier_id" class="form-select" aria-label="No Professional">
                                     <option value="">No Professional</option>
                                     @foreach($suppliers as $supplier)
                                         <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
@@ -360,7 +360,7 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Categories</label>
-                                <select name="category_ids[]" class="form-select" multiple size="4">
+                                <select name="category_ids[]" class="form-select" multiple size="4" aria-label="id }}'>">
                                     @foreach($categories as $cat)
                                         <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                                     @endforeach
@@ -369,7 +369,7 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Status <span class="text-danger">*</span></label>
-                                <select name="status" class="form-select" required>
+                                <select name="status" class="form-select" required aria-label="Status">
                                     @foreach(['pending','published','confirmed','in_progress','completed','cancelled'] as $s)
                                         <option value="{{ $s }}">{{ ucfirst(str_replace('_', ' ', $s)) }}</option>
                                     @endforeach

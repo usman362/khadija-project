@@ -153,7 +153,7 @@
                 </div>
                 <div class="gc-field">
                     <label>Seating Style</label>
-                    <select name="seating_style" required>
+                    <select name="seating_style" required aria-label="Banquet (seated dining)">
                         <option value="banquet">Banquet (seated dining)</option>
                         <option value="theater">Theater (rows of chairs)</option>
                         <option value="cocktail">Cocktail (standing / mingling)</option>

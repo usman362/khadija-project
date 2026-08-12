@@ -177,7 +177,7 @@
         </div>
     @endunless
 
-    {{-- Tabs, search and filters. These were <span>s and a dead <select>: the
+    {{-- Tabs, search and filters. These were <span>s and a dead <select aria-label="All services">: the
          strip looked interactive but nothing was wired, and "Invite Only" /
          "Bookmarked" had no data at all. Every control below is a real query
          parameter the controller reads. --}}
@@ -210,7 +210,7 @@
         <input type="hidden" name="tab" value="{{ $ff['tab'] }}">
         <input class="bb-f-search" type="search" name="q" value="{{ $ff['q'] }}"
                placeholder="Search by event, service or location…">
-        <select name="category">
+        <select name="category" aria-label="All services">
             <option value="">All services</option>
             @foreach($categories as $c)
                 <option value="{{ $c->id }}" @selected($ff['catId'] === $c->id)>{{ $c->name }}</option>
@@ -222,12 +222,12 @@
             <option value="single" @selected($ff['scope'] === 'single')>SSR — single service</option>
             <option value="multi" @selected($ff['scope'] === 'multi')>MSR — multi-service</option>
         </select>
-        <select name="closing">
+        <select name="closing" aria-label="Any deadline">
             <option value="">Any deadline</option>
             <option value="48h" @selected($ff['window'] === '48h')>Next 48 hours</option>
             <option value="week" @selected($ff['window'] === 'week')>This week</option>
         </select>
-        <select name="sort">
+        <select name="sort" aria-label="Closing soonest">
             <option value="deadline" @selected($ff['sort'] === 'deadline')>Closing soonest</option>
             <option value="newest" @selected($ff['sort'] === 'newest')>Newest</option>
             <option value="budget" @selected($ff['sort'] === 'budget')>Budget: high to low</option>

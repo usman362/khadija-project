@@ -136,7 +136,7 @@
                     <div class="do-field">
                         <label>Service</label>
                         <select class="do-input"
-                                onchange="window.location = '{{ route('client.direct-offers.create') }}?service=' + this.value">
+                                onchange="window.location = '{{ route('client.direct-offers.create') }}?service=' + this.value" aria-label="Choose a service…">
                             <option value="">Choose a service…</option>
                             @foreach($categories as $cat)
                                 <option value="{{ $cat->id }}" @selected(($serviceId ?? 0) === $cat->id)>{{ $cat->name }}</option>
@@ -175,7 +175,7 @@
                 @endif
                 <div class="do-field">
                     <label>Send to</label>
-                    <select name="professional_id" class="do-input">
+                    <select name="professional_id" class="do-input" aria-label="id }}' > —">
                         @foreach($pros as $p)
                             <option value="{{ $p->id }}" @selected($selectedPro && $selectedPro->id === $p->id)>{{ $p->name }} — {{ $p->profile->headline ?? 'Professional' }}</option>
                         @endforeach
@@ -210,7 +210,7 @@
                 <div class="do-svc-single">
                     <div class="do-field">
                         <label>Service requested</label>
-                        <select class="do-input" name="service_single">
+                        <select class="do-input" name="service_single" aria-label="Service single">
                             @foreach($categories as $cat)<option>{{ $cat->name }}</option>@endforeach
                         </select>
                     </div>
@@ -235,7 +235,7 @@
                     <div class="do-field"><label>Budget Range (max)</label><input type="number" class="do-input" name="budget_max" placeholder="8500"></div>
                 </div>
                 <div class="do-field"><label>Preferred Payment</label>
-                    <select class="do-input" name="payment"><option>Deposit + balance before event</option><option>Milestone payments</option><option>Full on completion</option></select>
+                    <select class="do-input" name="payment" aria-label="Deposit + balance before event"><option>Deposit + balance before event</option><option>Milestone payments</option><option>Full on completion</option></select>
                 </div>
             </div>
         </div>

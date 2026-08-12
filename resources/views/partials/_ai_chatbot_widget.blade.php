@@ -93,7 +93,7 @@
     <div id="aicHistory" class="aic-history" aria-hidden="true">
         <div class="aic-history-header">
             <div class="aic-history-title">Conversation History</div>
-            <button type="button" class="aic-icon-btn" id="aicHistoryCloseBtn">
+            <button type="button" class="aic-icon-btn" id="aicHistoryCloseBtn" aria-label="Close the history">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
@@ -136,7 +136,7 @@
             </button>
 
             <textarea id="aicInput" class="aic-input" rows="1" placeholder="Type your message…" maxlength="4000"></textarea>
-            <button type="button" class="aic-send-btn" id="aicSendBtn" disabled>
+            <button type="button" class="aic-send-btn" id="aicSendBtn" disabled aria-label="Send">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </button>
         </div>

@@ -59,7 +59,7 @@
             <div class="ma-err" id="maErr"></div>
             <form id="maForm">
                 <label class="ma-lbl">Purpose</label>
-                <select class="ma-sel" name="purpose">
+                <select class="ma-sel" name="purpose" aria-label="Follow up after sending a quote">
                     <option value="follow up after sending a quote">Follow up after sending a quote</option>
                     <option value="request more details">Request more details</option>
                     <option value="confirm booking">Confirm booking</option>

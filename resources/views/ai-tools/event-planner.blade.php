@@ -135,7 +135,7 @@
             <div class="ep-fgrid">
                 <div>
                     <label class="ep-lbl">Event Type</label>
-                    <select name="event_type" class="ep-inp" required>
+                    <select name="event_type" class="ep-inp" required aria-label="Wedding">
                         <option value="Wedding">Wedding</option>
                         <option value="Birthday Party">Birthday Party</option>
                         <option value="Corporate Event">Corporate Event</option>
@@ -366,7 +366,7 @@
         div.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;';
         div.innerHTML =
             '<input type="text" placeholder="Task name" class="ep-inp" style="flex:2;min-width:150px;">' +
-            '<select class="ep-inp" style="flex:0 0 auto;width:auto;">' + priorities.map(p => '<option ' + (p === pri ? 'selected' : '') + '>' + p + '</option>').join('') + '</select>' +
+            '<select class="ep-inp" style="flex:0 0 auto;width:auto;" aria-label="' + p + '">' + priorities.map(p => '<option ' + (p === pri ? 'selected' : '') + '>' + p + '</option>').join('') + '</select>' +
             '<input type="date" class="ep-inp" style="flex:0 0 auto;width:auto;">' +
             '<button type="button" title="Remove" style="border:none;background:rgba(220,38,38,.1);color:#dc2626;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px;flex:0 0 auto;">&times;</button>';
         div.querySelector('input[type="text"]').value = name;

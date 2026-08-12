@@ -52,7 +52,7 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label small text-secondary">Status</label>
-                <select name="status" class="form-select form-select-sm">
+                <select name="status" class="form-select form-select-sm" aria-label="All">
                     <option value="">All</option>
                     <option value="published" @selected(request('status') === 'published')>Published</option>
                     <option value="draft"     @selected(request('status') === 'draft')>Draft</option>
@@ -61,7 +61,7 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label small text-secondary">Category</label>
-                <select name="category" class="form-select form-select-sm">
+                <select name="category" class="form-select form-select-sm" aria-label="All categories">
                     <option value="">All categories</option>
                     @foreach($categories as $cat)
                         <option value="{{ $cat->id }}" @selected((int)request('category') === $cat->id)>{{ $cat->name }}</option>
@@ -118,13 +118,13 @@
                                 <i data-lucide="external-link" style="width:14px;height:14px;"></i>
                             </a>
                         @endif
-                        <a href="{{ route('app.admin.blog.posts.edit', $post) }}" class="btn btn-sm btn-outline-primary">
+                        <a href="{{ route('app.admin.blog.posts.edit', $post) }}" class="btn btn-sm btn-outline-primary" aria-label="Edit">
                             <i data-lucide="edit" style="width:14px;height:14px;"></i>
                         </a>
                         <form action="{{ route('app.admin.blog.posts.destroy', $post) }}" method="POST" class="d-inline"
                               onsubmit="return confirm('Delete this post permanently?');">
                             @csrf @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Delete">
                                 <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
                             </button>
                         </form>

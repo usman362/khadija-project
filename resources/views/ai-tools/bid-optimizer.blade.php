@@ -108,7 +108,7 @@
             </div>
             <div>
                 <label class="bo-lbl">Turnaround</label>
-                <select name="turnaround" class="bo-in">
+                <select name="turnaround" class="bo-in" aria-label="Standard">
                     <option value="standard">Standard</option>
                     <option value="rush">Rush</option>
                 </select>

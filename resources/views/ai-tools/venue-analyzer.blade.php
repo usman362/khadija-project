@@ -167,7 +167,7 @@
                 </div>
                 <div>
                     <label class="va-lbl">Seating Style</label>
-                    <select name="seating_style" class="va-inp" required>
+                    <select name="seating_style" class="va-inp" required aria-label="Banquet (seated dinner)">
                         <option value="banquet">Banquet (seated dinner)</option>
                         <option value="theater">Theater (rows)</option>
                         <option value="cocktail">Cocktail (standing)</option>

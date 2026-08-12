@@ -140,7 +140,7 @@
             <div class="ta-form-grid">
                 <div class="ta-field">
                     <label>Event Type</label>
-                    <select name="event_type" required>
+                    <select name="event_type" required aria-label="Wedding">
                         <option value="Wedding">Wedding</option>
                         <option value="Birthday Party">Birthday Party</option>
                         <option value="Corporate Event">Corporate Event</option>
@@ -151,7 +151,7 @@
                 </div>
                 <div class="ta-field">
                     <label>Season</label>
-                    <select name="season" required>
+                    <select name="season" required aria-label="Spring">
                         <option value="spring">Spring</option>
                         <option value="summer">Summer</option>
                         <option value="fall">Fall</option>
@@ -164,7 +164,7 @@
                 </div>
                 <div class="ta-field">
                     <label>Formality</label>
-                    <select name="formality" required>
+                    <select name="formality" required aria-label="Casual">
                         <option value="casual">Casual</option>
                         <option value="semi-formal">Semi-formal</option>
                         <option value="formal">Formal</option>

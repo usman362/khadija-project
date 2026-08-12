@@ -52,7 +52,7 @@
     </div>
     <div style="display:flex;gap:8px;align-items:center;">
         <form method="GET">
-            <select name="range" class="rp-select" onchange="this.form.submit()">
+            <select name="range" class="rp-select" onchange="this.form.submit()" aria-label="Range">
                 @foreach($ranges as $value => $label)
                     <option value="{{ $value }}" @selected($range === (string) $value)>{{ $label }}</option>
                 @endforeach

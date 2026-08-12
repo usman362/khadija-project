@@ -340,7 +340,7 @@
                         <b>Browsing</b> — pick an event to keep it with you
                     @endif
                 </span>
-                <select name="event" onchange="this.form.submit()">
+                <select name="event" onchange="this.form.submit()" aria-label="Just browsing">
                     <option value="">Just browsing</option>
                     @foreach($myEvents as $ev)
                         <option value="{{ $ev->id }}" @selected($activeEvent?->id === $ev->id)>
@@ -414,7 +414,7 @@
                             @if($cityF)<input type="hidden" name="city" value="{{ $cityF }}">@endif
                             @if($ratingF)<input type="hidden" name="rating_min" value="{{ $ratingF }}">@endif
                             @if($verF)<input type="hidden" name="verified" value="1">@endif
-                            <select name="sort" class="br-sort" {{-- submit handled by the live filter script --}}>
+                            <select name="sort" class="br-sort" {{-- submit handled by the live filter script --}} aria-label="Sort by: Top-Rated">
                                 <option value="top" @selected($sortF==='top')>Sort by: Top-Rated</option>
                                 <option value="rating" @selected($sortF==='rating')>Sort by: Highest Rating</option>
                                 <option value="newest" @selected($sortF==='newest')>Sort by: Newest</option>

@@ -29,7 +29,7 @@
         <form method="GET" action="{{ route('app.chat.index') }}" class="row g-2 mb-3">
             <div class="col-md-3">
                 <label class="form-label small">Booking</label>
-                <select name="booking_id" class="form-select form-select-sm">
+                <select name="booking_id" class="form-select form-select-sm" aria-label="All bookings">
                     <option value="">All bookings</option>
                     @foreach($bookings as $booking)
                         <option value="{{ $booking->id }}" {{ (int)$selectedBookingId === $booking->id ? 'selected' : '' }}>#{{ $booking->id }} - {{ $booking->event?->title }}</option>
@@ -38,7 +38,7 @@
             </div>
             <div class="col-md-2">
                 <label class="form-label small">Source</label>
-                <select name="source" class="form-select form-select-sm">
+                <select name="source" class="form-select form-select-sm" aria-label="All sources">
                     <option value="">All sources</option>
                     <option value="user" {{ ($selectedSource ?? null) === 'user' ? 'selected' : '' }}>User</option>
                     <option value="ai" {{ ($selectedSource ?? null) === 'ai' ? 'selected' : '' }}>AI</option>
@@ -103,7 +103,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Booking</label>
-                        <select name="booking_id" class="form-select" required>
+                        <select name="booking_id" class="form-select" required aria-label="Select booking">
                             <option value="">Select booking</option>
                             @foreach($bookings as $booking)
                                 <option value="{{ $booking->id }}" {{ (int)$selectedBookingId === $booking->id ? 'selected' : '' }}>#{{ $booking->id }} - {{ $booking->event?->title }}</option>

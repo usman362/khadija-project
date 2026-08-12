@@ -111,7 +111,7 @@
                     </div>
                     <div>
                         <label class="ca-lbl">Cancellation terms</label>
-                        <select class="ca-sel" name="cancellation">
+                        <select class="ca-sel" name="cancellation" aria-label="Standard">
                             <option value="standard">Standard</option>
                             <option value="flexible">Flexible</option>
                             <option value="strict">Strict</option>

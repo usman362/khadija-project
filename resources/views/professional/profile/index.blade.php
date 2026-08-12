@@ -465,7 +465,7 @@
                     </div>
                     <div>
                         <label class="pf-label">Gender</label>
-                        <select name="gender" class="pf-select">
+                        <select name="gender" class="pf-select" aria-label="Select Gender">
                             <option value="">Select Gender</option>
                             <option value="male" {{ old('gender', $profile->gender) === 'male' ? 'selected' : '' }}>Male</option>
                             <option value="female" {{ old('gender', $profile->gender) === 'female' ? 'selected' : '' }}>Female</option>
@@ -504,7 +504,7 @@
                     <div>
                         <label class="pf-label">State</label>
                         @if(\App\Support\ProfessionalStateAccount::ownerMaySetState(auth()->user()))
-                            <select name="state" class="pf-input">
+                            <select name="state" class="pf-input" aria-label="Select your state…">
                                 <option value="">Select your state…</option>
                                 @foreach(config('geo.allowed_states', []) as $code => $label)
                                     <option value="{{ $code }}" @selected(old('state', $profile->state) === $code)>{{ $label }}</option>
@@ -589,7 +589,7 @@
                     </div>
                     <div>
                         <label class="pf-label">Availability</label>
-                        <select name="availability" class="pf-select">
+                        <select name="availability" class="pf-select" aria-label="Select Status">
                             <option value="">Select Status</option>
                             <option value="available" {{ old('availability', $profile->availability) === 'available' ? 'selected' : '' }}>Available</option>
                             <option value="busy" {{ old('availability', $profile->availability) === 'busy' ? 'selected' : '' }}>Busy</option>

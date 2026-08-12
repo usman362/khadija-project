@@ -257,6 +257,7 @@
         @media (max-width: 560px) { .apx-card { padding: 28px 22px; } .apx-top { padding: 18px 20px; } }
     </style>
     @stack('head')
+    @include('partials._a11y')
 </head>
 <body>
     <div class="apx-top">

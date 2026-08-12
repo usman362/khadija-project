@@ -233,7 +233,7 @@
     {{-- Filter row --}}
     <form method="GET" action="{{ route('professional.gig-hub.index', ['tab' => 'gigs']) }}" class="mg-filter-row">
         <input type="hidden" name="view" value="my-gigs">
-        <select name="status" class="mg-filter-select" onchange="this.form.submit()">
+        <select name="status" class="mg-filter-select" onchange="this.form.submit()" aria-label="All Statuses">
             <option value="">All Statuses</option>
             @foreach (['pending', 'published', 'confirmed', 'in_progress', 'completed', 'cancelled'] as $s)
                 <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ ucfirst(str_replace('_', ' ', $s)) }}</option>
@@ -360,7 +360,7 @@
 
         {{-- Gig Overview donut --}}
         <div class="mg-rail-card">
-            <div class="mg-rail-head"><div class="mg-rail-title">Gig Overview</div><select class="mg-rail-sel"><option>All Time</option></select></div>
+            <div class="mg-rail-head"><div class="mg-rail-title">Gig Overview</div><select class="mg-rail-sel" aria-label="All Time"><option>All Time</option></select></div>
             @php
                 $gvTotal = max(1, $stats['total']);
                 $gvPie = [
@@ -397,7 +397,7 @@
 
         {{-- Earnings Summary --}}
         <div class="mg-rail-card">
-            <div class="mg-rail-head"><div class="mg-rail-title">Earnings Summary</div><select class="mg-rail-sel"><option>All Time</option></select></div>
+            <div class="mg-rail-head"><div class="mg-rail-title">Earnings Summary</div><select class="mg-rail-sel" aria-label="All Time"><option>All Time</option></select></div>
             <div style="font-size:11px;color:var(--text-muted);">Total Earned</div>
             <div class="mg-pay-total">${{ number_format($totalEarned, 0) }}</div>
             <div class="mg-pay-grid">

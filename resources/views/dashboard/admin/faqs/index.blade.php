@@ -68,14 +68,14 @@
                     <input type="text" class="form-control form-control-sm" name="search" value="{{ request('search') }}" placeholder="Search FAQs...">
                 </div>
                 <div class="col-md-3">
-                    <select class="form-select form-select-sm" name="status">
+                    <select class="form-select form-select-sm" name="status" aria-label="All Status">
                         <option value="">All Status</option>
                         <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
                         <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <select class="form-select form-select-sm" name="category">
+                    <select class="form-select form-select-sm" name="category" aria-label="All Categories">
                         <option value="">All Categories</option>
                         @foreach($categories as $cat)
                             <option value="{{ $cat }}" {{ request('category') === $cat ? 'selected' : '' }}>{{ $cat }}</option>

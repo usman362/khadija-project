@@ -398,7 +398,7 @@
             <div class="bat-form-grid">
                 <div>
                     <label class="bat-label">Event Type *</label>
-                    <select name="event_type" class="bat-select" required>
+                    <select name="event_type" class="bat-select" required aria-label="Select type...">
                         <option value="">Select type...</option>
                         <option value="Wedding">Wedding</option>
                         <option value="Birthday Party">Birthday Party</option>
@@ -421,7 +421,7 @@
                 <div class="bat-full">
                     <label class="bat-label">Total Budget *</label>
                     <div class="bat-input-group">
-                        <select name="currency" class="bat-currency">
+                        <select name="currency" class="bat-currency" aria-label="USD">
                             <option value="USD">USD</option>
                             <option value="CAD">CAD</option>
                             <option value="EUR">EUR</option>

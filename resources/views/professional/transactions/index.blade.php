@@ -223,7 +223,7 @@
             <form method="POST" action="{{ route('professional.transactions.payout') }}" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                 @csrf
                 <div style="position:relative;"><span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-muted);">$</span><input type="number" name="amount" min="1" step="1" placeholder="Amount" required style="padding:9px 12px 9px 22px;border:1px solid var(--border-color);border-radius:9px;width:140px;font-family:inherit;background:var(--bg-card);color:var(--text-primary);"></div>
-                <select name="method" style="padding:9px 12px;border:1px solid var(--border-color);border-radius:9px;font-family:inherit;background:var(--bg-card);color:var(--text-primary);"><option value="bank">Bank transfer</option><option value="paypal">PayPal</option><option value="stripe">Stripe</option></select>
+                <select name="method" style="padding:9px 12px;border:1px solid var(--border-color);border-radius:9px;font-family:inherit;background:var(--bg-card);color:var(--text-primary);" aria-label="Bank transfer"><option value="bank">Bank transfer</option><option value="paypal">PayPal</option><option value="stripe">Stripe</option></select>
                 <button type="submit" style="padding:9px 18px;border:none;border-radius:9px;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;">Request Payout</button>
             </form>
         </div>
@@ -259,7 +259,7 @@
             <input type="date" name="date_from" class="cl-form-input" value="{{ $filters['date_from'] }}">
             <input type="date" name="date_to" class="cl-form-input" value="{{ $filters['date_to'] }}">
 
-            <select name="status" class="cl-form-select" style="padding: 10px 14px;">
+            <select name="status" class="cl-form-select" style="padding: 10px 14px;" aria-label="All Status">
                 <option value="">All Status</option>
                 <option value="pending" {{ $filters['status'] === 'pending' ? 'selected' : '' }}>Pending</option>
                 <option value="completed" {{ $filters['status'] === 'completed' ? 'selected' : '' }}>Completed</option>
@@ -267,7 +267,7 @@
             </select>
 
             {{-- Content-type filter: events / services / professionals / bookings / payouts --}}
-            <select name="content_type" class="cl-form-select" style="padding: 10px 14px;" title="Filter the results by content type">
+            <select name="content_type" class="cl-form-select" style="padding: 10px 14px;" title="Filter the results by content type" aria-label="Filter:">
                 @foreach($contentFilters as $value => $label)
                     <option value="{{ $value }}" {{ $filters['content_type'] === $value ? 'selected' : '' }}>
                         Filter: {{ $label }}

@@ -217,7 +217,7 @@
                                 <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></span>
                                 <span class="meta"><b>{{ $svc }}</b><span>Included in this package</span></span>
                                 <input type="checkbox" name="services[]" value="{{ $svc }}" style="display:none;" @checked(in_array($svc, $pServices)) onchange="pcSvcSync()">
-                                <span class="pc-toggle {{ in_array($svc, $pServices) ? 'on' : '' }}" onclick="pcSvcToggle(this)"></span>
+                                <button type="button" class="pc-toggle {{ in_array($svc, $pServices) ? 'on' : '' }}" onclick="pcSvcToggle(this)" aria-pressed="{{ in_array($svc, $pServices) ? 'true' : 'false' }}"></button>
                             </label>
                         @endforeach
                     </div>
@@ -240,7 +240,7 @@
                         </div>
                         <div class="pc-field">
                             <label>Price Basis <span class="req">*</span></label>
-                            <select name="price_unit" class="pc-select">
+                            <select name="price_unit" class="pc-select" aria-label="price_unit ?? 'from')===$val)>">
                                 @foreach(['from' => 'Starting at', 'flat' => 'Flat rate', 'hourly' => 'Per hour'] as $val => $lbl)
                                     <option value="{{ $val }}" @selected(old('price_unit', $p?->price_unit ?? 'from')===$val)>{{ $lbl }}</option>
                                 @endforeach

@@ -16,7 +16,7 @@
                 <div class="pe-card">
                     <div class="pe-svc-grid">
                         @foreach($services as $service)
-                            <div class="pe-svc {{ $service['selected'] ? 'on' : '' }}" data-svc="{{ $service['name'] }}" onclick="peToggleSvc(this)">
+                            <button type="button" class="pe-svc {{ $service['selected'] ? 'on' : '' }}" data-svc="{{ $service['name'] }}" onclick="peToggleSvc(this)" aria-pressed="{{ $service['selected'] ? 'true' : 'false' }}">
                                 <div class="ic">
                                     @switch($service['icon'])
                                         @case('camera')
@@ -58,7 +58,7 @@
                                         @default
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="34" height="34"><polygon points="12 2 15 9 22 9 16 14 18 21 12 17 6 21 8 14 2 9 9 9 12 2"/></svg>
                                     @endswitch
-                                </div>
+                                </button>
                                 <div class="nm">{{ $service['name'] }}</div>
                                 <span class="chk">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg>

@@ -88,12 +88,12 @@
 
 <form method="GET" action="{{ route('client.proposals.compare', $event) }}" class="cp-bar">
     <input class="s" type="search" name="q" value="{{ $f['q'] }}" placeholder="Search professional or city…">
-    <select name="only">
+    <select name="only" aria-label="All professionals">
         <option value="">All professionals</option>
         <option value="verified" @selected($f['only'] === 'verified')>Fully verified only</option>
         <option value="insured" @selected($f['only'] === 'insured')>Insured only</option>
     </select>
-    <select name="sort">
+    <select name="sort" aria-label="Lowest bid first">
         <option value="amount" @selected($f['sort'] === 'amount')>Lowest bid first</option>
         <option value="rating" @selected($f['sort'] === 'rating')>Highest rated</option>
         <option value="years" @selected($f['sort'] === 'years')>Most experienced</option>

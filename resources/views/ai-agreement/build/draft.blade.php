@@ -120,7 +120,7 @@
                                     @if($ftype==='textarea')
                                         <textarea placeholder="Enter {{ strtolower($flabel) }}…">{{ is_string($fval) ? $fval : '' }}</textarea>
                                     @elseif($ftype==='select')
-                                        <select>
+                                        <select aria-label="Select…">
                                             <option value="">Select…</option>
                                             @foreach((array) $fval as $opt)<option>{{ $opt }}</option>@endforeach
                                         </select>

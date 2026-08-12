@@ -131,7 +131,7 @@
             <div class="card-body">
                 <div class="mb-3">
                     <label class="form-label">Status *</label>
-                    <select name="status" class="form-select">
+                    <select name="status" class="form-select" aria-label="status ?? 'draft') === 'draft')>Draft">
                         <option value="draft"     @selected(old('status', $post->status ?? 'draft') === 'draft')>Draft</option>
                         <option value="published" @selected(old('status', $post->status ?? '') === 'published')>Published</option>
                         <option value="archived"  @selected(old('status', $post->status ?? '') === 'archived')>Archived</option>
@@ -150,7 +150,7 @@
         <div class="card mb-3">
             <div class="card-header"><h6 class="mb-0">Category</h6></div>
             <div class="card-body">
-                <select name="blog_category_id" class="form-select">
+                <select name="blog_category_id" class="form-select" aria-label="— Uncategorized —">
                     <option value="">— Uncategorized —</option>
                     @foreach($categories as $cat)
                         <option value="{{ $cat->id }}" @selected((int)old('blog_category_id', $post->blog_category_id ?? 0) === $cat->id)>
@@ -171,7 +171,7 @@
             <div class="card-header"><h6 class="mb-0">Featured Image</h6></div>
             <div class="card-body">
                 @if(isset($post) && $post->featured_image)
-                    <img src="{{ $post->featuredImageUrl() }}" class="featured-preview mb-2" id="imgPreview">
+                    <img src="{{ $post->featuredImageUrl() }}" class="featured-preview mb-2" id="imgPreview" alt="">
                     <div class="form-check mb-2">
                         <input type="checkbox" name="remove_image" value="1" class="form-check-input" id="removeImg">
                         <label class="form-check-label small" for="removeImg">Remove current image</label>

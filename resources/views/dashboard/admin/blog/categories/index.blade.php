@@ -87,13 +87,13 @@
                             <td class="text-end">
                                 <button class="btn btn-sm btn-outline-primary"
                                         data-bs-toggle="modal"
-                                        data-bs-target="#editCat{{ $category->id }}">
+                                        data-bs-target="#editCat{{ $category->id }}" aria-label="Edit">
                                     <i data-lucide="edit" style="width:14px;height:14px;"></i>
                                 </button>
                                 <form action="{{ route('app.admin.blog.categories.destroy', $category) }}" method="POST" class="d-inline"
                                       onsubmit="return confirm('Delete this category? Posts will become uncategorized.')">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Delete">
                                         <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
                                     </button>
                                 </form>

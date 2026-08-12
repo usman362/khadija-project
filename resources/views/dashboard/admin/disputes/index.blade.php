@@ -30,14 +30,14 @@
         </p>
     </div>
     <form method="GET" class="d-flex gap-2">
-        <select name="state" class="form-select form-select-sm" onchange="this.form.submit()">
+        <select name="state" class="form-select form-select-sm" onchange="this.form.submit()" aria-label="Open cases">
             <option value="open" @selected($state === 'open')>Open cases</option>
             <option value="all"  @selected($state === 'all')>All cases</option>
             @foreach($states as $key => $label)
                 <option value="{{ $key }}" @selected($state === $key)>{{ $label }}</option>
             @endforeach
         </select>
-        <select name="priority" class="form-select form-select-sm" onchange="this.form.submit()">
+        <select name="priority" class="form-select form-select-sm" onchange="this.form.submit()" aria-label="Any priority">
             <option value="all" @selected($priority === 'all')>Any priority</option>
             @foreach($priorities as $key => $label)
                 <option value="{{ $key }}" @selected($priority === $key)>{{ $label }}</option>

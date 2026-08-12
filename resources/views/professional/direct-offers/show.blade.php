@@ -265,10 +265,10 @@
 
             <div class="do-card">
                 <div class="do-sec-h" style="font-size:14px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Estimate &amp; Planning</div>
-                <div class="do-fld"><label>Target Profit Margin</label><select><option>{{ $offer['planning']['target_margin'] }}</option></select></div>
+                <div class="do-fld"><label>Target Profit Margin</label><select aria-label="Your response"><option>{{ $offer['planning']['target_margin'] }}</option></select></div>
                 <div class="do-twocol">
-                    <div class="do-fld"><label>Staff Availability</label><select><option>{{ $offer['planning']['staff'] }}</option></select></div>
-                    <div class="do-fld"><label>Potential Conflicts</label><select><option>{{ $offer['planning']['conflicts'] }}</option></select></div>
+                    <div class="do-fld"><label>Staff Availability</label><select aria-label="Your response"><option>{{ $offer['planning']['staff'] }}</option></select></div>
+                    <div class="do-fld"><label>Potential Conflicts</label><select aria-label="Your response"><option>{{ $offer['planning']['conflicts'] }}</option></select></div>
                 </div>
             </div>
         </div>

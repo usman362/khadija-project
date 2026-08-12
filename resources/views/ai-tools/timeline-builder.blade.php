@@ -121,7 +121,7 @@
             <div class="tb-fgrid">
                 <div>
                     <label class="tb-lbl">Event Type</label>
-                    <select name="event_type" class="tb-inp" required>
+                    <select name="event_type" class="tb-inp" required aria-label="Wedding">
                         <option value="Wedding">Wedding</option>
                         <option value="Corporate Event">Corporate Event</option>
                         <option value="Conference">Conference</option>

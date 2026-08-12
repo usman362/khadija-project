@@ -208,7 +208,7 @@
                 <span class="pm-filter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></span>
             </div>
             <div class="pm-subbar">
-                <select><option>All Events</option></select>
+                <select aria-label="All Events"><option>All Events</option></select>
                 <span>Sort: Latest</span>
             </div>
             <div class="pm-list" id="pm-list">

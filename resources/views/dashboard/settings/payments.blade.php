@@ -44,7 +44,7 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Active Gateway</label>
-                    <select name="active_gateway" class="form-select">
+                    <select name="active_gateway" class="form-select" aria-label="Stripe">
                         <option value="stripe" @selected(($settings['active_gateway'] ?? 'stripe') === 'stripe')>Stripe</option>
                         <option value="paypal" @selected(($settings['active_gateway'] ?? '') === 'paypal')>PayPal</option>
                     </select>
@@ -52,7 +52,7 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Mode</label>
-                    <select name="mode" class="form-select">
+                    <select name="mode" class="form-select" aria-label="Test / Sandbox">
                         <option value="test" @selected(($settings['mode'] ?? 'test') === 'test')>Test / Sandbox</option>
                         <option value="live" @selected(($settings['mode'] ?? '') === 'live')>Live</option>
                     </select>

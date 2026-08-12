@@ -276,7 +276,7 @@
 
     {{-- Reputation Overview --}}
     <div class="rv-rail-card">
-        <div class="rv-rail-head"><div class="rv-rail-title">Reputation Overview</div><select class="rv-rail-sel"><option>This Year</option></select></div>
+        <div class="rv-rail-head"><div class="rv-rail-title">Reputation Overview</div><select class="rv-rail-sel" aria-label="This Year"><option>This Year</option></select></div>
         @php
             $avgPct = $stats['avg'] > 0 ? ($stats['avg'] / 5) * 100 : 0;
         @endphp
@@ -322,7 +322,7 @@
         <div class="rv-rail-head"><div class="rv-rail-title">Pending Review Requests</div></div>
         @forelse($pendingReviews as $pr)
             <div class="rv-pend-row">
-                <img src="{{ $pr->supplier?->avatar_url ?? \App\Models\User::placeholderAvatarUri() }}" class="rv-pend-avatar" loading="lazy">
+                <img src="{{ $pr->supplier?->avatar_url ?? \App\Models\User::placeholderAvatarUri() }}" class="rv-pend-avatar" loading="lazy" alt="">
                 <div class="rv-pend-body">
                     <div class="rv-pend-name">{{ \Illuminate\Support\Str::limit($pr->event?->title ?? 'Booking', 18) }}</div>
                     <div class="rv-pend-date">{{ $pr->supplier?->name ?? '' }} · {{ $pr->event?->starts_at?->format('M d, Y') ?? '' }}</div>

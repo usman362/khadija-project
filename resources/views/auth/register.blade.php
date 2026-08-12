@@ -315,7 +315,7 @@
                          revealed the list and blocked everyone else outright. --}}
                     <div class="rg-field">
                         <label class="rg-label">Country</label>
-                        <select name="country" class="rg-select {{ $errors->has('country') ? 'is-invalid' : '' }}">
+                        <select name="country" class="rg-select {{ $errors->has('country') ? 'is-invalid' : '' }}" aria-label="Country">
                             @foreach(config('geo.countries', []) as $code => $label)
                                 <option value="{{ $code }}" {{ old('country', 'US') === $code ? 'selected' : '' }}>{{ $label }}</option>
                             @endforeach
@@ -325,7 +325,7 @@
 
                     <div class="rg-field">
                         <label class="rg-label">State / Province</label>
-                        <select name="state" class="rg-select {{ $errors->has('state') ? 'is-invalid' : '' }}">
+                        <select name="state" class="rg-select {{ $errors->has('state') ? 'is-invalid' : '' }}" aria-label="Select your state">
                             <option value="" {{ old('state') ? '' : 'selected' }} disabled>Select your state</option>
                             @foreach(config('geo.us_states', []) as $code => $label)
                                 <option value="{{ $code }}" {{ old('state') === $code ? 'selected' : '' }}>{{ $label }}</option>

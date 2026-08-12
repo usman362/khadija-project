@@ -29,7 +29,7 @@
         <form method="GET" action="{{ route('app.bookings.index') }}" class="row g-2 mb-3">
             <div class="col-md-3">
                 <label class="form-label small">Source (ownership)</label>
-                <select name="source" class="form-select form-select-sm">
+                <select name="source" class="form-select form-select-sm" aria-label="All sources">
                     <option value="">All sources</option>
                     <option value="user" {{ ($selectedSource ?? null) === 'user' ? 'selected' : '' }}>User</option>
                     <option value="ai" {{ ($selectedSource ?? null) === 'ai' ? 'selected' : '' }}>AI</option>
@@ -135,7 +135,7 @@
                                     <div class="modal-body">
                                         <div class="mb-3">
                                             <label class="form-label">Status</label>
-                                            <select name="status" class="form-select">
+                                            <select name="status" class="form-select" aria-label="status === $status ? 'selected' : '' }}>">
                                                 @foreach(['requested', 'confirmed', 'cancelled', 'completed'] as $status)
                                                     <option value="{{ $status }}" {{ $booking->status === $status ? 'selected' : '' }}>{{ ucfirst($status) }}</option>
                                                 @endforeach
@@ -177,7 +177,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Published Event</label>
-                        <select name="event_id" class="form-select" required>
+                        <select name="event_id" class="form-select" required aria-label="Select event">
                             <option value="">Select event</option>
                             @foreach($events as $event)
                                 <option value="{{ $event->id }}">{{ $event->title }}</option>

@@ -29,7 +29,7 @@
         <form method="GET" action="{{ route('app.events.index') }}" class="row g-2 mb-3">
             <div class="col-md-3">
                 <label class="form-label small">Source (ownership)</label>
-                <select name="source" class="form-select form-select-sm">
+                <select name="source" class="form-select form-select-sm" aria-label="All sources">
                     <option value="">All sources</option>
                     <option value="user" {{ $selectedSource === 'user' ? 'selected' : '' }}>User</option>
                     <option value="ai" {{ $selectedSource === 'ai' ? 'selected' : '' }}>AI</option>
@@ -101,7 +101,7 @@
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Status</label>
-                                                <select name="status" class="form-select" required>
+                                                <select name="status" class="form-select" required aria-label="status === $status ? 'selected' : '' }}>">
                                                     @foreach(['pending', 'published', 'confirmed', 'in_progress', 'completed', 'cancelled'] as $status)
                                                         <option value="{{ $status }}" {{ $event->status === $status ? 'selected' : '' }}>{{ ucfirst(str_replace('_', ' ', $status)) }}</option>
                                                     @endforeach
@@ -121,7 +121,7 @@
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">Professional</label>
-                                                <select name="supplier_id" class="form-select">
+                                                <select name="supplier_id" class="form-select" aria-label="None">
                                                     <option value="">None</option>
                                                     @foreach($suppliers as $supplier)
                                                         <option value="{{ $supplier->id }}" {{ $event->supplier_id === $supplier->id ? 'selected' : '' }}>{{ $supplier->name }}</option>
@@ -170,7 +170,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Professional</label>
-                            <select name="supplier_id" class="form-select">
+                            <select name="supplier_id" class="form-select" aria-label="None">
                                 <option value="">None</option>
                                 @foreach($suppliers as $supplier)
                                     <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>

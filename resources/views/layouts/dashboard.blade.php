@@ -70,7 +70,7 @@
                     <img src="{{ asset('gigresource-logos/gigresource-logo-dark.png') }}" alt="GigResource" id="brand-logo-light">
                     <img src="{{ asset('gigresource-logos/gigresource-logo-light.png') }}" alt="GigResource" id="brand-logo-dark" class="logo-hidden">
                 </a>
-                <div class="sidebar-toggler">
+                <div class="sidebar-toggler" aria-label="Toggle the sidebar">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -417,7 +417,7 @@
 
         <div class="page-wrapper">
             <nav class="navbar">
-                <a href="#" class="sidebar-toggler"><i data-lucide="menu"></i></a>
+                <a href="#" class="sidebar-toggler" aria-label="Toggle the sidebar"><i data-lucide="menu"></i></a>
                 <div class="navbar-content ms-auto">
                     <ul class="navbar-nav">
                         <li class="theme-switcher-wrapper nav-item">
@@ -434,7 +434,7 @@
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="messageDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Messages">
                                 <i data-lucide="mail"></i>
                             </a>
                             <div class="dropdown-menu p-0" aria-labelledby="messageDropdown">

@@ -326,7 +326,7 @@
                     </div>
                     <div>
                         <label class="pf-label">Gender</label>
-                        <select name="gender" class="pf-select">
+                        <select name="gender" class="pf-select" aria-label="Select Gender">
                             <option value="">Select Gender</option>
                             <option value="male" {{ old('gender', $profile->gender) === 'male' ? 'selected' : '' }}>Male</option>
                             <option value="female" {{ old('gender', $profile->gender) === 'female' ? 'selected' : '' }}>Female</option>

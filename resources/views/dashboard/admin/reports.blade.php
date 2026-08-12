@@ -30,7 +30,7 @@
     </div>
     <div class="d-flex gap-2 align-items-center">
         <form method="GET" class="d-flex gap-2">
-            <select name="range" class="form-select form-select-sm" onchange="this.form.submit()">
+            <select name="range" class="form-select form-select-sm" onchange="this.form.submit()" aria-label="Range">
                 @foreach($ranges as $value => $label)
                     <option value="{{ $value }}" @selected($range === (string) $value)>{{ $label }}</option>
                 @endforeach

@@ -68,7 +68,7 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Model</label>
-                    <select name="model" class="form-select">
+                    <select name="model" class="form-select" aria-label="GPT-4o (Best quality)">
                         <option value="gpt-4o" @selected(($settings['model'] ?? 'gpt-4o-mini') === 'gpt-4o')>GPT-4o (Best quality)</option>
                         <option value="gpt-4o-mini" @selected(($settings['model'] ?? 'gpt-4o-mini') === 'gpt-4o-mini')>GPT-4o Mini (Faster, cheaper)</option>
                         <option value="gpt-4-turbo" @selected(($settings['model'] ?? '') === 'gpt-4-turbo')>GPT-4 Turbo</option>

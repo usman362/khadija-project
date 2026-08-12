@@ -200,9 +200,14 @@
         @media (max-width: 640px) { .ipx-search { display: none; } .ipx-profile-meta { display: none; } .ipx-content { padding: 18px 16px 32px; } }
     </style>
     @stack('styles')
+    @include('partials._a11y')
 </head>
 <body>
-<div class="ipx-overlay" onclick="document.body.classList.remove('ipx-open')"></div>
+{{-- A backdrop is decorative, so it stays a div and is hidden from
+         assistive tech. What was missing is the keyboard way out: Escape,
+         wired below. Closing a drawer by clicking outside it is a mouse
+         gesture, and it was the only one there was. --}}
+    <div class="ipx-overlay" aria-hidden="true" onclick="document.body.classList.remove('ipx-open')"></div>
 
 {{-- ── Sidebar ── --}}
 <aside class="ipx-sb">
@@ -253,7 +258,7 @@
 
 {{-- ── Top bar ── --}}
 <header class="ipx-top">
-    <button type="button" class="ipx-burger" onclick="document.body.classList.toggle('ipx-open')">
+    <button type="button" class="ipx-burger" onclick="document.body.classList.toggle('ipx-open')" aria-label="Open the menu">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
     <div class="ipx-search">
@@ -262,8 +267,8 @@
     </div>
     <div class="ipx-top-right">
         <a href="{{ $ip_url('influencer.invite.promote') }}" class="ipx-create"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Create</span></a>
-        <button class="ipx-iconbtn"><span class="ipx-dot"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
-        <button class="ipx-iconbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg></button>
+        <button class="ipx-iconbtn" aria-label="Notifications"><span class="ipx-dot"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></button>
+        <button class="ipx-iconbtn" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg></button>
         <div class="ipx-profile">
             <img src="{{ $ip_user?->avatar_url ?? asset('gigresource-logos/gigresource-icon.png') }}" alt="" class="ipx-avatar">
             <div class="ipx-profile-meta">
@@ -284,5 +289,11 @@
 </main>
 
 @stack('scripts')
+<script>
+    // Escape closes the mobile drawer (WCAG 2.1.1 — keyboard operable).
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') document.body.classList.remove('ipx-open');
+    });
+</script>
 </body>
 </html>

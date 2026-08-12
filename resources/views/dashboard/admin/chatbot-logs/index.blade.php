@@ -67,7 +67,7 @@
                         <td>
                             @if($c->user)
                                 <div class="d-flex align-items-center">
-                                    <img src="{{ $c->user->avatar_url }}" class="rounded-circle me-2" style="width:32px;height:32px;object-fit:cover;">
+                                    <img src="{{ $c->user->avatar_url }}" class="rounded-circle me-2" style="width:32px;height:32px;object-fit:cover;" alt="">
                                     <div>
                                         <div class="small"><strong>{{ $c->user->name }}</strong>
                                             @if($c->user->trashed())

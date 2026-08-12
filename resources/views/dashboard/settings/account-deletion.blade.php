@@ -60,7 +60,7 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Charge a Fee?</label>
-                    <select name="enabled" class="form-select">
+                    <select name="enabled" class="form-select" aria-label="Yes — require payment">
                         <option value="1" @selected($settings['enabled'])>Yes — require payment</option>
                         <option value="0" @selected(!$settings['enabled'])>No — free restoration</option>
                     </select>

@@ -56,7 +56,7 @@
                         {{-- Parent Category --}}
                         <div class="mb-3">
                             <label class="form-label fw-bold">Parent Category</label>
-                            <select name="parent_id" class="form-select @error('parent_id') is-invalid @enderror">
+                            <select name="parent_id" class="form-select @error('parent_id') is-invalid @enderror" aria-label="-- None --">
                                 <option value="">-- None --</option>
                                 @foreach($parentCategories as $cat)
                                     <option value="{{ $cat['id'] }}" {{ old('parent_id') == $cat['id'] ? 'selected' : '' }}>
@@ -72,7 +72,7 @@
                         {{-- Icon --}}
                         <div class="mb-3">
                             <label class="form-label fw-bold">Icon (Lucide)</label>
-                            <select name="icon" class="form-select @error('icon') is-invalid @enderror">
+                            <select name="icon" class="form-select @error('icon') is-invalid @enderror" aria-label="-- Select an icon --">
                                 <option value="">-- Select an icon --</option>
                                 @foreach(['layers','calendar','music','camera','utensils','palette','mic','gift','heart','star','award','briefcase','home','map-pin','users','truck','flower-2','cake','sparkles','party-popper','wine','tent','clapperboard','megaphone','lightbulb'] as $ico)
                                     <option value="{{ $ico }}" {{ old('icon') === $ico ? 'selected' : '' }}>{{ $ico }}</option>
@@ -167,7 +167,7 @@
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                target.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;">';
+                target.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;" alt="">';
             };
             reader.readAsDataURL(input.files[0]);
         }

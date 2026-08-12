@@ -147,7 +147,7 @@
         <div class="bw-two">
             <div class="bw-field">
                 <label>Event type</label>
-                <select name="event_type">
+                <select name="event_type" aria-label="Not sure yet">
                     <option value="">Not sure yet</option>
                     @foreach($eventTypes as $t)
                         <option value="{{ $t->name }}" @selected(($data['event_type'] ?? '') === $t->name)>{{ $t->name }}</option>
@@ -156,7 +156,7 @@
             </div>
             <div class="bw-field">
                 <label>This request is for <span class="req">*</span></label>
-                <select name="organization_type">
+                <select name="organization_type" aria-label="Organization type">
                     @foreach($orgTypes as $k => $l)
                         <option value="{{ $k }}" @selected(($data['organization_type'] ?? 'individual') === $k)>{{ $l }}</option>
                     @endforeach

@@ -207,7 +207,7 @@
                 @endforeach
             </div>
             <div class="bl-sort">
-                <select onchange="window.location.href=this.value">
+                <select onchange="window.location.href=this.value" aria-label="'latest']) }}' >Latest First">
                     @php
                         $sortBase = array_filter(['category' => $activeCategory, 'q' => $search ?: null]);
                     @endphp

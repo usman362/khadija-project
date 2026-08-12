@@ -51,7 +51,7 @@
 
         {{-- Chat Header (hidden initially) --}}
         <div class="chat-header d-none" id="chat-header">
-            <button class="btn btn-sm btn-light d-md-none me-2" id="back-to-list">
+            <button class="btn btn-sm btn-light d-md-none me-2" id="back-to-list" aria-label="Back">
                 <i data-lucide="arrow-left" style="width:16px;height:16px"></i>
             </button>
             <div class="chat-header-info">

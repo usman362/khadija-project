@@ -49,7 +49,7 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">reCAPTCHA Version</label>
-                    <select name="version" class="form-select">
+                    <select name="version" class="form-select" aria-label="v2 (Checkbox - 'I'm not a robot')">
                         <option value="v2" @selected(($settings['version'] ?? 'v2') === 'v2')>v2 (Checkbox - "I'm not a robot")</option>
                         <option value="v3" @selected(($settings['version'] ?? 'v2') === 'v3')>v3 (Invisible / Score-based)</option>
                     </select>

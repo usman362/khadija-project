@@ -125,7 +125,7 @@
             <div class="cg-form-grid">
                 <div class="cg-field">
                     <label>Event Type</label>
-                    <select name="event_type" required>
+                    <select name="event_type" required aria-label="Select type…">
                         <option value="">Select type…</option>
                         <option value="Wedding">Wedding</option>
                         <option value="Birthday Party">Birthday Party</option>
@@ -324,7 +324,7 @@
         div.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;';
         div.innerHTML =
             '<input type="text" placeholder="Task name" class="cg-edit" style="flex:2;min-width:150px;">' +
-            '<select class="cg-edit" style="flex:0 0 auto;width:auto;">' + timeframes.map(t => '<option ' + (t === tf ? 'selected' : '') + '>' + t + '</option>').join('') + '</select>' +
+            '<select class="cg-edit" style="flex:0 0 auto;width:auto;" aria-label="' + t + '">' + timeframes.map(t => '<option ' + (t === tf ? 'selected' : '') + '>' + t + '</option>').join('') + '</select>' +
             '<input type="date" class="cg-edit" style="flex:0 0 auto;width:auto;">' +
             '<button type="button" title="Remove" style="border:none;background:rgba(220,38,38,.1);color:#dc2626;border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px;flex:0 0 auto;">&times;</button>';
         div.querySelector('input[type="text"]').value = name;

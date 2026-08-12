@@ -181,7 +181,7 @@
             </div>
             <div class="vhb-field">
                 <label class="vhb-label">Event Type <span class="req">*</span></label>
-                <select name="event_type" class="vhb-select">
+                <select name="event_type" class="vhb-select" aria-label="Hybrid Event (Physical + Virtual)">
                     <option>Hybrid Event (Physical + Virtual)</option>
                     <option>Fully Virtual Event</option>
                     <option>Livestream / Broadcast</option>
@@ -212,7 +212,7 @@
             </div>
             <div class="vhb-field">
                 <label class="vhb-label">Time Zone <span class="req">*</span></label>
-                <select class="vhb-select">
+                <select class="vhb-select" aria-label="Choose an option">
                     <option selected>(GMT-05:00) Eastern Time (US &amp; Canada)</option>
                     <option>(GMT-06:00) Central Time (US &amp; Canada)</option>
                     <option>(GMT-07:00) Mountain Time (US &amp; Canada)</option>
@@ -290,7 +290,7 @@
             </div>
             <div class="vhb-field">
                 <label class="vhb-label">On-Site Internet Speed <span class="hint">(if known)</span></label>
-                <select class="vhb-select">
+                <select class="vhb-select" aria-label="Select speed type">
                     <option selected disabled value="">Select speed type</option>
                     <option>Standard (up to 100 Mbps)</option>
                     <option>High-Speed (100–500 Mbps)</option>
@@ -310,7 +310,7 @@
             <div class="vhb-field">
                 <label class="vhb-label">Estimated Production Budget <span class="req">*</span></label>
                 <div class="vhb-budget-row">
-                    <select class="vhb-select"><option selected>USD $</option><option>EUR €</option><option>GBP £</option></select>
+                    <select class="vhb-select" aria-label="USD $"><option selected>USD $</option><option>EUR €</option><option>GBP £</option></select>
                     <input type="text" name="budget_min" class="vhb-input" value="{{ old('budget_min', '$5,000') }}">
                     <span class="to">to</span>
                     <input type="text" name="budget_max" class="vhb-input" value="{{ old('budget_max', '$15,000') }}">

@@ -44,7 +44,7 @@
                             </div>
                             <div class="pe-field">
                                 <label class="pe-label">Estimated Budget <span class="pe-req">*</span></label>
-                                <select name="budget" class="pe-select">
+                                <select name="budget" class="pe-select" aria-label="Select Budget Range">
                                     <option value="">Select Budget Range</option>
                                     <option>$2,000 – $5,000</option>
                                     <option>$5,000 – $8,000</option>

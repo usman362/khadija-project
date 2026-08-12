@@ -465,7 +465,7 @@
     {{-- Filter row --}}
     <form method="GET" action="{{ route('client.events.index') }}" class="mg-filter-row">
         <input type="hidden" name="tab" value="masterlist">
-        <select name="status" class="mg-filter-select" onchange="this.form.submit()">
+        <select name="status" class="mg-filter-select" onchange="this.form.submit()" aria-label="All Events">
             <option value="">All Events</option>
             @foreach (['pending', 'published', 'confirmed', 'in_progress', 'completed', 'cancelled'] as $s)
                 <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ ucfirst(str_replace('_', ' ', $s)) }}</option>
@@ -628,13 +628,13 @@
                 <div class="cl-calendar-month">{{ $currentDate->format('F Y') }}</div>
                 <div class="cl-calendar-nav">
                     <a href="{{ route('client.events.index', ['month' => $prevMonth->month, 'year' => $prevMonth->year]) }}" style="text-decoration:none;">
-                        <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+                        <button type="button" aria-label="Filter events"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
                     </a>
                     <a href="{{ route('client.events.index', ['month' => now()->month, 'year' => now()->year]) }}" style="text-decoration:none;">
                         <button class="today-btn">Today</button>
                     </a>
                     <a href="{{ route('client.events.index', ['month' => $nextMonth->month, 'year' => $nextMonth->year]) }}" style="text-decoration:none;">
-                        <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+                        <button type="button" aria-label="Change the view"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
                     </a>
                 </div>
             </div>
@@ -742,7 +742,7 @@
                     </div>
                 </div>
                 <div style="min-width: 150px;">
-                    <select name="status" class="cl-form-select" style="padding: 10px 14px;">
+                    <select name="status" class="cl-form-select" style="padding: 10px 14px;" aria-label="All Status">
                         <option value="">All Status</option>
                         @foreach (['pending', 'published', 'confirmed', 'in_progress', 'completed', 'cancelled'] as $s)
                             <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ ucfirst(str_replace('_', ' ', $s)) }}</option>
@@ -750,7 +750,7 @@
                     </select>
                 </div>
                 <div style="min-width: 150px;">
-                    <select name="category" class="cl-form-select" style="padding: 10px 14px;">
+                    <select name="category" class="cl-form-select" style="padding: 10px 14px;" aria-label="All Categories">
                         <option value="">All Categories</option>
                         @foreach ($categories as $cat)
                             <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
@@ -854,7 +854,7 @@
 
         {{-- Event Overview donut --}}
         <div class="mg-rail-card">
-            <div class="mg-rail-head"><div class="mg-rail-title">Event Overview</div><select class="mg-rail-sel"><option>This Month</option></select></div>
+            <div class="mg-rail-head"><div class="mg-rail-title">Event Overview</div><select class="mg-rail-sel" aria-label="This Month"><option>This Month</option></select></div>
             @php
                 $evTotal = max(1, $stats['total']);
                 $evPie = [
@@ -891,7 +891,7 @@
 
         {{-- Payment Summary --}}
         <div class="mg-rail-card">
-            <div class="mg-rail-head"><div class="mg-rail-title">Payment Summary</div><select class="mg-rail-sel"><option>This Month</option></select></div>
+            <div class="mg-rail-head"><div class="mg-rail-title">Payment Summary</div><select class="mg-rail-sel" aria-label="This Month"><option>This Month</option></select></div>
             <div style="font-size:11px;color:var(--text-muted);">Total Spent</div>
             <div class="mg-pay-total">${{ number_format($payment['total'], 0) }}</div>
             <div class="mg-pay-grid">

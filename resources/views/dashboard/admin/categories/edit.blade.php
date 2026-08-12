@@ -38,7 +38,7 @@
                             <label class="form-label fw-bold">Cover Image</label>
                             @if($category->cover_image)
                                 <div class="mb-2" style="height:100px; width:200px; border-radius:8px; overflow:hidden;">
-                                    <img src="{{ asset('storage/' . $category->cover_image) }}" style="width:100%;height:100%;object-fit:cover;">
+                                    <img src="{{ asset('storage/' . $category->cover_image) }}" style="width:100%;height:100%;object-fit:cover;" alt="">
                                 </div>
                             @endif
                             <input type="file" name="cover_image" class="form-control @error('cover_image') is-invalid @enderror"
@@ -53,7 +53,7 @@
                             <label class="form-label fw-bold">Thumbnail Image</label>
                             @if($category->thumbnail)
                                 <div class="mb-2" style="height:80px; width:80px; border-radius:8px; overflow:hidden;">
-                                    <img src="{{ asset('storage/' . $category->thumbnail) }}" style="width:100%;height:100%;object-fit:cover;">
+                                    <img src="{{ asset('storage/' . $category->thumbnail) }}" style="width:100%;height:100%;object-fit:cover;" alt="">
                                 </div>
                             @endif
                             <input type="file" name="thumbnail" class="form-control @error('thumbnail') is-invalid @enderror"
@@ -66,7 +66,7 @@
                         {{-- Parent Category --}}
                         <div class="mb-3">
                             <label class="form-label fw-bold">Parent Category</label>
-                            <select name="parent_id" class="form-select">
+                            <select name="parent_id" class="form-select" aria-label="-- None --">
                                 <option value="">-- None --</option>
                                 @foreach($parentCategories as $cat)
                                     <option value="{{ $cat['id'] }}" {{ old('parent_id', $category->parent_id) == $cat['id'] ? 'selected' : '' }}>
@@ -79,7 +79,7 @@
                         {{-- Icon --}}
                         <div class="mb-3">
                             <label class="form-label fw-bold">Icon (Lucide)</label>
-                            <select name="icon" class="form-select">
+                            <select name="icon" class="form-select" aria-label="-- Select an icon --">
                                 <option value="">-- Select an icon --</option>
                                 @foreach(['layers','calendar','music','camera','utensils','palette','mic','gift','heart','star','award','briefcase','home','map-pin','users','truck','flower-2','cake','sparkles','party-popper','wine','tent','clapperboard','megaphone','lightbulb'] as $ico)
                                     <option value="{{ $ico }}" {{ old('icon', $category->icon) === $ico ? 'selected' : '' }}>{{ $ico }}</option>
@@ -147,7 +147,7 @@
 
                     <div id="coverPreview" style="height: 150px; border-radius: 10px; overflow: hidden; background: linear-gradient(135deg, #1e3a5f, #2d1b69); margin-bottom: 16px;">
                         @if($category->cover_image)
-                            <img src="{{ asset('storage/' . $category->cover_image) }}" style="width:100%;height:100%;object-fit:cover;">
+                            <img src="{{ asset('storage/' . $category->cover_image) }}" style="width:100%;height:100%;object-fit:cover;" alt="">
                         @else
                             <div class="d-flex align-items-center justify-content-center h-100">
                                 <i data-lucide="image" style="width:40px;height:40px;opacity:0.3;"></i>
@@ -183,7 +183,7 @@
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                target.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;">';
+                target.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;" alt="">';
             };
             reader.readAsDataURL(input.files[0]);
         }

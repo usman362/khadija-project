@@ -152,10 +152,10 @@
     {{-- Filters --}}
     <div class="vh-card">
         <div class="vh-filters">
-            <select class="vh-filter"><option>All Platforms</option><option>Zoom</option><option>YouTube</option><option>RTMP</option></select>
-            <select class="vh-filter"><option>All Categories</option></select>
-            <select class="vh-filter"><option>All Languages</option></select>
-            <select class="vh-filter"><option>Any Budget</option></select>
+            <select class="vh-filter" aria-label="All Platforms"><option>All Platforms</option><option>Zoom</option><option>YouTube</option><option>RTMP</option></select>
+            <select class="vh-filter" aria-label="All Categories"><option>All Categories</option></select>
+            <select class="vh-filter" aria-label="All Languages"><option>All Languages</option></select>
+            <select class="vh-filter" aria-label="Any Budget"><option>Any Budget</option></select>
         </div>
     </div>
 
@@ -188,7 +188,7 @@
                 @php $rate = $pro->profile?->hourly_rate ?: rand(80, 400); $match = [98, 95, 93, 91][$i] ?? 90; @endphp
                 <div class="vh-pro">
                     <div class="vh-pro-top">
-                        <img src="{{ $pro->avatar_url }}" class="vh-pro-avatar" loading="lazy">
+                        <img src="{{ $pro->avatar_url }}" class="vh-pro-avatar" loading="lazy" alt="">
                         <div><div class="vh-pro-match">{{ $match }}% Match</div><div class="vh-pro-avail"><span class="dot"></span>Available</div></div>
                     </div>
                     <div class="vh-pro-name">{{ \Illuminate\Support\Str::limit($pro->name, 16) }}</div>

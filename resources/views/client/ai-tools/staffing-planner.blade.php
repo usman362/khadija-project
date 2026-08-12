@@ -230,9 +230,9 @@
         {{-- adjust panel (Semi only — the assistive tune-and-regenerate) --}}
         @if($isSemi)
         <div class="sp-adjust open" id="sp-adjust">
-            <div class="fld"><label>Event Type</label><select id="sp-in-type">@foreach($eventTypes as $k => $v)<option value="{{ $k }}" @selected($k === $event['type'])>{{ $v }}</option>@endforeach</select></div>
+            <div class="fld"><label>Event Type</label><select id="sp-in-type" aria-label="Staffing option">@foreach($eventTypes as $k => $v)<option value="{{ $k }}" @selected($k === $event['type'])>{{ $v }}</option>@endforeach</select></div>
             <div class="fld"><label>Guest Count</label><input type="number" id="sp-in-guests" min="10" max="2000" value="{{ $event['guests'] }}"></div>
-            <div class="fld"><label>Start Time</label><select id="sp-in-start">@for($h = 6; $h <= 20; $h++)<option value="{{ $h }}" @selected($h === 10)>{{ $h <= 12 ? $h : $h - 12 }}:00 {{ $h < 12 ? 'AM' : 'PM' }}</option>@endfor</select></div>
+            <div class="fld"><label>Start Time</label><select id="sp-in-start" aria-label="Staffing option">@for($h = 6; $h <= 20; $h++)<option value="{{ $h }}" @selected($h === 10)>{{ $h <= 12 ? $h : $h - 12 }}:00 {{ $h < 12 ? 'AM' : 'PM' }}</option>@endfor</select></div>
             <div class="fld" style="flex:0 0 auto;"><button type="button" class="sp-banner" style="all:unset;display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;font-size:13px;font-weight:800;padding:10px 18px;border-radius:9px;cursor:pointer;" id="sp-regen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Regenerate Plan</button></div>
         </div>
         @endif
@@ -408,9 +408,9 @@
         div.innerHTML =
             '<input type="text" placeholder="Role (e.g. Server Team)" class="spm-inp" style="flex:2;min-width:150px;padding:9px 12px;border:1px solid var(--border-color);border-radius:9px;background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:13px;">' +
             '<input type="number" min="1" max="99" value="' + count + '" title="How many" class="spm-inp spm-count" style="width:70px;padding:9px 10px;border:1px solid var(--border-color);border-radius:9px;background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:13px;">' +
-            '<select class="spm-inp" style="width:auto;padding:9px 10px;border:1px solid var(--border-color);border-radius:9px;background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:13px;">' + hourOpts(start) + '</select>' +
+            '<select aria-label="Shift start time" class="spm-inp" style="width:auto;padding:9px 10px;border:1px solid var(--border-color);border-radius:9px;background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:13px;">' + hourOpts(start) + '</select>' +
             '<span style="color:var(--text-muted);font-size:12px;">to</span>' +
-            '<select class="spm-inp" style="width:auto;padding:9px 10px;border:1px solid var(--border-color);border-radius:9px;background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:13px;">' + hourOpts(end) + '</select>' +
+            '<select aria-label="Shift end time" class="spm-inp" style="width:auto;padding:9px 10px;border:1px solid var(--border-color);border-radius:9px;background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:13px;">' + hourOpts(end) + '</select>' +
             '<button type="button" title="Remove" style="border:none;background:rgba(220,38,38,.1);color:var(--bad-text);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:16px;flex:0 0 auto;">&times;</button>';
         div.querySelector('input[type="text"]').value = name;
         div.querySelector('.spm-count').addEventListener('input', recompute);

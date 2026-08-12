@@ -54,7 +54,7 @@
             </div>
             <div class="col-md-2">
                 <label class="form-label small text-secondary">Action</label>
-                <select name="action" class="form-select form-select-sm">
+                <select name="action" class="form-select form-select-sm" aria-label="All Actions">
                     <option value="">All Actions</option>
                     <option value="login"            @selected(request('action') === 'login')>Login</option>
                     <option value="logout"           @selected(request('action') === 'logout')>Logout</option>
@@ -77,7 +77,7 @@
                 <input type="date" name="to" class="form-control form-control-sm" value="{{ request('to') }}">
             </div>
             <div class="col-md-1 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary btn-sm w-100">
+                <button type="submit" class="btn btn-primary btn-sm w-100" aria-label="Filter">
                     <i data-lucide="filter" style="width:14px;height:14px;"></i>
                 </button>
             </div>
@@ -117,7 +117,7 @@
                         <td>
                             @if($log->user)
                                 <div class="d-flex align-items-center">
-                                    <img src="{{ $log->user->avatar_url }}" class="rounded-circle me-2" style="width:32px;height:32px;object-fit:cover;">
+                                    <img src="{{ $log->user->avatar_url }}" class="rounded-circle me-2" style="width:32px;height:32px;object-fit:cover;" alt="">
                                     <div>
                                         <div class="small"><strong>{{ $log->user->name }}</strong>
                                             @if($log->user->trashed())
