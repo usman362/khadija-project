@@ -33,6 +33,20 @@ class BiddingWindowTest extends TestCase
         $this->client = $u->fresh();
     }
 
+    /** A bookable service under either taxonomy — kind for v2, a parent for v1. */
+    private function service(string $name, string $slug): Category
+    {
+        $parent = Category::firstOrCreate(
+            ['slug' => 'window-services'],
+            ['name' => 'Services', 'kind' => Category::SERVICE_CATEGORY, 'is_active' => true],
+        );
+
+        return Category::create([
+            'name' => $name, 'slug' => $slug,
+            'kind' => Category::SERVICE, 'parent_id' => $parent->id, 'is_active' => true,
+        ]);
+    }
+
     public function test_the_approved_windows_are_configured(): void
     {
         $this->assertSame(5, (int) config('bsr.default_proposal_window_days'));
@@ -41,7 +55,9 @@ class BiddingWindowTest extends TestCase
 
     public function test_a_rush_request_closes_in_twenty_four_hours(): void
     {
-        $category = Category::create(['name' => 'Photography', 'slug' => 'photography']);
+        // kind + parent: an event type would now be refused as the service
+        // requested, so the fixture has to say which this is.
+        $category = $this->service('Photography', 'photography');
 
         $this->actingAs($this->client)->post(route('client.esr.store'), [
             'event_name'  => 'Replacement DJ needed',
@@ -67,7 +83,7 @@ class BiddingWindowTest extends TestCase
 
     public function test_the_window_never_outlasts_the_event_itself(): void
     {
-        $category = Category::create(['name' => 'Catering', 'slug' => 'catering']);
+        $category = $this->service('Catering', 'catering');
 
         // Needed in six hours — bidding cannot still be open tomorrow.
         $neededBy = now()->addHours(6);

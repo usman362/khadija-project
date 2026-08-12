@@ -73,6 +73,37 @@ class Category extends Model
         return $query->where('kind', $kind);
     }
 
+    /**
+     * The things a client can actually ask a professional to do — the ONE
+     * source for every service picker on every request flow.
+     *
+     * Checklist row 91. Three flows each had their own idea of what a service
+     * was: the emergency form filtered nothing at all, so "Baby Shower",
+     * "Birthday Party" and "Award Ceremony" sat in the list as though a client
+     * could book one; the direct offer filtered on kind; and the broadcast
+     * form filtered on parent_id, a first-taxonomy idiom. Three answers, three
+     * different catalogues, and one of them let an event type be submitted as
+     * the service requested.
+     *
+     * Written to hold under both taxonomies, because the version is a config
+     * switch with a rollback: under v2 a service is a row of kind `service`,
+     * and under v1 it is any row with a parent.
+     */
+    public function scopeBookableServices($query)
+    {
+        return config('taxonomy.version', 'v1') === 'v2'
+            ? $query->ofKind(self::SERVICE)
+            : $query->whereNotNull('parent_id');
+    }
+
+    /** The counterpart: occasions, never bookable on their own. */
+    public function scopeEventTypes($query)
+    {
+        return config('taxonomy.version', 'v1') === 'v2'
+            ? $query->ofKind(self::EVENT_TYPE)
+            : $query->whereNull('parent_id');
+    }
+
     /** How relevant each service category is to each archetype. */
     public function relevance(): HasMany
     {

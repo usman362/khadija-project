@@ -25,7 +25,7 @@ class ProfessionalProfileController extends Controller
         // The service picker only renders on the Professional tab, so only pay
         // for the category list there.
         $categories = $tab === 'professional'
-            ? \App\Models\Category::active()->whereNotNull('parent_id')
+            ? \App\Models\Category::active()->bookableServices()
                 ->orderBy('name')->get(['id', 'name'])
             : collect();
 

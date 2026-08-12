@@ -87,7 +87,8 @@ class ProfessionalGigController extends Controller
             ->whereYear('starts_at', $year)
             ->get(['id', 'title', 'starts_at', 'ends_at', 'status']);
 
-        $categories = Category::active()->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
+        $categories = Category::active()->bookableServices()
+            ->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
 
         return compact(
             'myGigs', 'stats', 'browseEvents', 'browseStats',

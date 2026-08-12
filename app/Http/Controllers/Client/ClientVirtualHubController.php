@@ -32,7 +32,10 @@ class ClientVirtualHubController extends Controller
 
         // Specialized virtual-service categories (real, falls back to a
         // curated default list if the taxonomy isn't seeded yet).
-        $categories = Category::active()
+        // bookableServices(): unfiltered, this row listed "Baby Shower" as a
+        // virtual SERVICE beside Event Staffing and Beverage Catering. An
+        // occasion is not something a professional can be booked to perform.
+        $categories = Category::active()->bookableServices()
             ->orderBy('sort_order')->orderBy('name')
             ->take(6)
             ->get(['id', 'name', 'icon']);

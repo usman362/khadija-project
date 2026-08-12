@@ -15,8 +15,19 @@
         $bcType = 'Account'; $bcDash = null; $bcAccent = '#64748b';
     }
 
-    // The current page's own title (each view sets @section('page-title')).
-    $bcPage  = trim(strip_tags($__env->yieldContent('page-title')));
+    /*
+     * The current page's own title (each view sets @section('page-title')).
+     *
+     * yieldContent returns RENDERED html, so a title containing "&" arrives
+     * here already escaped as "&amp;". Printing that through {{ }} escapes it a
+     * second time, which is why the Virtual & Hybrid Hub breadcrumb read
+     * "Virtual &amp; Hybrid Hub" on screen while the page's own heading — the
+     * same string, printed once — was fine.
+     *
+     * Decoded back to plain text here so the single escape at output is the
+     * only one.
+     */
+    $bcPage  = trim(html_entity_decode(strip_tags($__env->yieldContent('page-title')), ENT_QUOTES | ENT_HTML5));
     $bcOnDash = $bcDash && \Illuminate\Support\Facades\Route::has($bcDash) && request()->routeIs($bcDash);
 @endphp
 <nav aria-label="Breadcrumb" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:12.5px; font-weight:600; color:var(--text-muted, #94a3b8); margin:0 0 16px;">

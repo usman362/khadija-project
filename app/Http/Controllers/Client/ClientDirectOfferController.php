@@ -70,7 +70,7 @@ class ClientDirectOfferController extends Controller
         // service they do not provide is the same bug from the other end.
         $categories = $selectedPro
             ? $selectedPro->serviceCategories()->select('categories.id', 'categories.name')->get()
-            : Category::active()->where('kind', 'service')
+            : Category::active()->bookableServices()
                 ->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
 
         $type = in_array($request->query('type'), ['SSR', 'MSR'], true) ? $request->query('type') : 'SSR';
@@ -94,7 +94,7 @@ class ClientDirectOfferController extends Controller
             'guests'          => ['nullable', 'integer', 'min:1', 'max:1000000'],
             'venue'           => ['nullable', 'string', 'max:200'],
             'services'        => ['nullable', 'array'],
-            'services.*'      => ['integer', 'exists:categories,id'],
+            'services.*'      => ['integer', 'exists:categories,id', new \App\Rules\BookableService],
             'service_single'  => ['nullable', 'string', 'max:120'],
             'budget_min'      => ['nullable', 'integer', 'min:0'],
             'request_type'    => ['nullable', 'in:SSR,MSR'],
@@ -157,7 +157,10 @@ class ClientDirectOfferController extends Controller
         // Attach requested services as categories.
         $categoryIds = collect($data['services'] ?? []);
         if ($categoryIds->isEmpty() && ! empty($data['service_single'])) {
-            $categoryIds = Category::active()->where('name', $data['service_single'])
+            // bookableServices(): the name arrives as free text, and an event
+            // type answering to it would be filed as the service requested.
+            $categoryIds = Category::active()->bookableServices()
+                ->where('name', $data['service_single'])
                 ->limit(1)->pluck('id');
         }
         if ($categoryIds->isNotEmpty()) {

@@ -237,7 +237,7 @@ class ProfessionalBiddingBoardController extends Controller
             'gigs'          => $gigs,
             'counts'        => $this->tabCounts($user, $savedIds),
             'filters'       => compact('tab', 'scope', 'q', 'catId', 'city', 'window', 'sort', 'view'),
-            'categories'    => \App\Models\Category::active()->whereNotNull('parent_id')
+            'categories'    => \App\Models\Category::active()->bookableServices()
                                 ->orderBy('name')->get(['id', 'name'])->unique('name')->take(60),
             'page'          => $page,
             'perPage'       => $perPage,

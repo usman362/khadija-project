@@ -36,7 +36,10 @@ class ClientEsrController extends Controller
 
     public function create(Request $request): View
     {
-        $categories = Category::active()->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
+        // Row 91 — this list had no filter at all, so Baby Shower and
+        // Birthday Party sat among the services a client could request.
+        $categories = Category::active()->bookableServices()
+            ->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
 
         return view('client.esr.create', [
             'categories' => $categories,
@@ -64,7 +67,7 @@ class ClientEsrController extends Controller
             'budget_min'   => ['nullable', 'integer', 'min:0'],
             'scope'        => ['nullable', 'in:single,multi'],
             'services'     => ['required', 'array', 'min:1'],
-            'services.*'   => ['integer', 'exists:categories,id'],
+            'services.*'   => ['integer', 'exists:categories,id', new \App\Rules\BookableService],
         ], [
             'services.required' => 'Select at least one service you need.',
             'reason.required'   => 'Tell us why this is urgent.',

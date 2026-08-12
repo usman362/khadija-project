@@ -73,9 +73,12 @@ class ClientBsrController extends Controller
             'steps'     => self::STEPS,
             'data'      => $data,
             'scope'     => ($data['scope'] ?? 'single'),
-            'categories' => Category::active()->whereNotNull('parent_id')
+            // Row 91 — one shared definition of a bookable service, so this
+            // form's catalogue cannot drift from the emergency and direct
+            // offer forms the way it had.
+            'categories' => Category::active()->bookableServices()
                 ->orderBy('name')->get(['id', 'name'])->unique('name')->values(),
-            'eventTypes' => Category::active()->whereNull('parent_id')
+            'eventTypes' => Category::active()->eventTypes()
                 ->orderBy('name')->get(['id', 'name']),
             'characteristics' => self::CHARACTERISTICS,
             'orgTypes'        => self::ORG_TYPES,
@@ -175,7 +178,7 @@ class ClientBsrController extends Controller
         return match ($step) {
             'service' => [
                 'services'          => ['required', 'array', 'min:1', 'max:12'],
-                'services.*'        => ['integer', 'exists:categories,id'],
+                'services.*'        => ['integer', 'exists:categories,id', new \App\Rules\BookableService],
                 'event_type'        => ['nullable', 'string', 'max:80'],
                 'organization_type' => ['required', 'in:' . implode(',', array_keys(self::ORG_TYPES))],
                 'characteristic'    => ['required', 'in:' . implode(',', array_keys(self::CHARACTERISTICS))],
