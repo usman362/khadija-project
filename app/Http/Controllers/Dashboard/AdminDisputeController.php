@@ -296,6 +296,39 @@ class AdminDisputeController extends Controller
             'revision_reason' => $previous ? $request->string('revision_reason')->toString() : null,
         ]);
 
+        /*
+         * Checklist row 181 — the decision reaches the ledger.
+         *
+         * This is one of the three features the row said were blocked on it.
+         * Posting here records what the platform DECIDED; it moves no money,
+         * which is §8's whole point — the processor settles it separately and
+         * the entry stays `pending` until it confirms.
+         */
+        $decision = $case->decisions()->latest('id')->first();
+
+        try {
+            if (! empty($data['amount_to_client'])) {
+                \App\Domain\Money\HeldFunds::refund(
+                    $case->booking, (float) $data['amount_to_client'],
+                    "Dispute {$case->reference}: " . $decision->resolutionTypeLabel(),
+                    $decision, $user,
+                );
+            }
+
+            if (! empty($data['amount_to_professional'])) {
+                \App\Domain\Money\HeldFunds::release(
+                    $case->booking, (float) $data['amount_to_professional'],
+                    "Dispute {$case->reference}: " . $decision->resolutionTypeLabel(),
+                    $decision, $user,
+                );
+            }
+        } catch (\RuntimeException $e) {
+            // The decision stands and stays on the record; only the money
+            // movement failed. Silently swallowing it would leave a decision
+            // nobody could act on and no sign of why.
+            $case->log('ledger_refused', $user, $role, ['reason' => $e->getMessage(), 'visible' => false]);
+        }
+
         $case->log($previous ? 'decision_revised' : 'decision_issued', $user, $role, [
             'field' => 'resolution_type',
             'old'   => $previous?->resolution_type,
