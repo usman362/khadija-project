@@ -48,13 +48,40 @@ class ClientEventController extends Controller
         $baseEvents = Event::where('client_id', $user->id);
         $bookingBase = \App\Models\Booking::where('client_id', $user->id);
 
+        /*
+         * Checklist rows 86, 101 and 125 — the tiles never reconciled with
+         * the list, and this is why: they were counting two different things
+         * under one heading.
+         *
+         * "Total Events" counted EVENTS. "Confirmed", "Pending" and "Paid"
+         * counted BOOKINGS. A client with one event and three professionals
+         * on it saw Total 1 next to Confirmed 3, and no arrangement of those
+         * numbers adds up — which is what R1/R6 mean by one counting unit.
+         *
+         * Every tile counts EVENTS now, and each is a subset of the total, so
+         * they reconcile by construction. Total Spent stays money and is
+         * labelled as money; that one is honestly a different unit.
+         */
+        $eventStats = (clone $baseEvents)
+            ->selectRaw('status, count(*) as c')->groupBy('status')->pluck('c', 'status');
+
         $stats = [
-            'total'       => (clone $baseEvents)->count(),
-            'open'        => (clone $baseEvents)->whereIn('status', ['pending', 'published'])->count(),
-            'upcoming'    => (clone $baseEvents)->where('starts_at', '>', now())->count(),
-            'confirmed'   => (clone $bookingBase)->where('status', 'confirmed')->count(),
-            'pending'     => (clone $bookingBase)->where('status', 'requested')->count(),
-            'paid'        => (clone $bookingBase)->where('status', 'completed')->count(),
+            'total'     => (int) $eventStats->sum(),
+
+            // Live and taking proposals — the two statuses that mean "still
+            // looking", counted the same way the list's own filter counts them.
+            'open'      => (int) (($eventStats['pending'] ?? 0) + ($eventStats['published'] ?? 0)),
+
+            'confirmed' => (int) ($eventStats['confirmed'] ?? 0),
+            'completed' => (int) ($eventStats['completed'] ?? 0),
+            'cancelled' => (int) ($eventStats['cancelled'] ?? 0),
+
+            'upcoming'  => (clone $baseEvents)->where('starts_at', '>', now())->count(),
+
+            // Kept for the right-rail breakdown, which is explicitly about
+            // professionals rather than events — and says so on screen.
+            'pending'   => (clone $bookingBase)->where('status', 'requested')->count(),
+            'paid'      => (clone $bookingBase)->where('status', 'completed')->count(),
             'total_budget' => 0,
         ];
 

@@ -442,23 +442,26 @@
     <div class="mg-stats">
         <div class="mg-stat">
             <div class="mg-stat-ico coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-            <div><div class="mg-stat-label">Total Events</div><div class="mg-stat-value">{{ $stats['total'] }}</div><div class="mg-stat-delta flat">This month</div></div>
+            {{-- Rows 86/101/125: every tile counts EVENTS, and each is a subset of
+     this one, so they add up. "This month" was wrong as well — the figure
+     was never date-scoped. --}}
+                            <div><div class="mg-stat-label">Total Events</div><div class="mg-stat-value">{{ $stats['total'] }}</div><div class="mg-stat-delta flat">All time</div></div>
         </div>
         <div class="mg-stat">
             <div class="mg-stat-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div><div class="mg-stat-label">Confirmed</div><div class="mg-stat-value">{{ $stats['confirmed'] }}</div><div class="mg-stat-delta flat">Pros booked</div></div>
+            <div><div class="mg-stat-label">Booked</div><div class="mg-stat-value">{{ $stats['confirmed'] }}</div><div class="mg-stat-delta flat">Events with a pro hired</div></div>
         </div>
         <div class="mg-stat">
             <div class="mg-stat-ico amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-            <div><div class="mg-stat-label">Pending</div><div class="mg-stat-value">{{ $stats['pending'] }}</div><div class="mg-stat-delta flat">Awaiting</div></div>
+            <div><div class="mg-stat-label">Open</div><div class="mg-stat-value">{{ $stats['open'] }}</div><div class="mg-stat-delta flat">Taking proposals</div></div>
         </div>
         <div class="mg-stat">
             <div class="mg-stat-ico indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg></div>
-            <div><div class="mg-stat-label">Paid</div><div class="mg-stat-value">{{ $stats['paid'] }}</div><div class="mg-stat-delta flat">Completed</div></div>
+            <div><div class="mg-stat-label">Completed</div><div class="mg-stat-value">{{ $stats['completed'] }}</div><div class="mg-stat-delta flat">Events finished</div></div>
         </div>
         <div class="mg-stat">
             <div class="mg-stat-ico purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-            <div><div class="mg-stat-label">Total Spent</div><div class="mg-stat-value">${{ number_format($totalSpent, 0) }}</div><div class="mg-stat-delta flat">This month</div></div>
+            <div><div class="mg-stat-label">Total Spent</div><div class="mg-stat-value">${{ number_format($totalSpent, 0) }}</div><div class="mg-stat-delta flat">On completed events</div></div>
         </div>
     </div>
 
@@ -551,7 +554,7 @@
             </div>
             @if($events->hasPages())
                 <div style="padding:14px 18px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);flex-wrap:wrap;gap:10px;">
-                    <span>Showing {{ $events->firstItem() }} to {{ $events->lastItem() }} of {{ $events->total() }} events</span>
+                    <span>Showing {{ $events->firstItem() }} to {{ $events->lastItem() }} of {{ $events->total() }} matching this filter</span>
                     {{ $events->onEachSide(1)->links() }}
                 </div>
             @endif
@@ -796,13 +799,39 @@
                                 <span class="cl-badge cl-badge-{{ $event->status }}">{{ ucfirst(str_replace('_', ' ', $event->status)) }}</span>
                             </div>
                         </div>
+                        {{-- Checklist rows 85 and 102 — the action belongs to
+                             the card's own status, not to a template.
+
+                             Both rows are the same fault seen twice: a draft
+                             lost "Continue Draft" and a request in negotiation
+                             lost its way back in, because every card got the
+                             same generic pair. "Compare Proposals" on a card
+                             with nought proposals is the tell. The client is
+                             left without the one action that actually moves
+                             that particular request forward. --}}
+                        @php
+                            $proposalCount = $event->bookings->where('status', 'requested')->count();
+                            $negotiating   = \App\Domain\Requests\RequestLifecycle::inExclusiveNegotiation($event);
+                        @endphp
                         <div class="cl-event-actions">
-                            @if(!$event->is_published)
+                            @if(! $event->is_published)
+                                {{-- A draft's one job is to be finished. --}}
+                                <a href="{{ route('client.events.show', $event) }}" class="cl-btn cl-btn-primary cl-btn-sm"
+                                   style="background:#f97316;border-color:#f97316;">Continue Draft</a>
                                 <form method="POST" action="{{ route('client.events.publish', $event) }}" style="display:inline;">
                                     @csrf
-                                    <button type="submit" class="cl-btn cl-btn-primary cl-btn-sm">Publish</button>
+                                    <button type="submit" class="cl-btn cl-btn-ghost cl-btn-sm">Publish</button>
                                 </form>
+                            @elseif($negotiating)
+                                <a href="{{ route('client.events.show', $event) }}" class="cl-btn cl-btn-primary cl-btn-sm">Open Negotiation</a>
+                            @elseif($proposalCount > 1)
+                                <a href="{{ route('client.proposals.compare', $event) }}" class="cl-btn cl-btn-primary cl-btn-sm">
+                                    Compare Proposals ({{ $proposalCount }})
+                                </a>
+                            @elseif($proposalCount === 1)
+                                <a href="{{ route('client.events.show', $event) }}" class="cl-btn cl-btn-primary cl-btn-sm">Review Proposal</a>
                             @endif
+
                             <a href="{{ route('client.events.show', $event) }}" class="cl-btn cl-btn-ghost cl-btn-sm">View</a>
                         </div>
                     </div>
