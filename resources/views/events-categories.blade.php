@@ -6,8 +6,11 @@
     $seoTitle       = 'Explore Event Categories | GigResource';
     $seoDescription = 'Explore every event category we cover — weddings, corporate events, birthdays, festivals, conferences and more. Browse real categories and find the right professionals for your occasion.';
 
-    // Real, active parent categories passed from the route (with full subtree).
-    $cats = $allCategories ?? collect();
+    // Event types (v2) / parent categories (v1). Service categories are a
+    // separate list — they are not children of event types.
+    $cats        = $allCategories ?? collect();
+    $serviceCats = $serviceCategories ?? collect();
+    $isV2        = $isV2 ?? $serviceCats->isNotEmpty();
 
     // Real category image → full URL, or a neutral fallback. Two shapes of
     // asset live on a category: a square photo thumbnail and a wide promo
@@ -124,9 +127,11 @@
     .ec-side-title-mt { margin-top: 16px; border-top: 1px solid var(--line-soft, var(--line)); padding-top: 14px; }
     .ec-side-none { font-size: 13px; color: var(--muted); padding: 0 4px; }
 
-    /* The tree carries all 360 categories, so it scrolls inside the panel
-       and every branch stays collapsed until the visitor opens it. */
+    /* Event types and services are two lists now. Each scrolls on its own
+       so 106 occasions don't bury Catering under a single heading. */
     .ec-tree { max-height: 460px; overflow-y: auto; padding-right: 4px; }
+    .ec-shop-left:has(#ecServiceTree) #ecTree,
+    #ecServiceTree { max-height: 280px; }
     .ec-tree::-webkit-scrollbar { width: 7px; }
     .ec-tree::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; }
     .ec-tree-nested { margin-left: 13px; padding-left: 9px; border-left: 1px solid var(--line-soft, var(--line)); }
@@ -339,31 +344,36 @@
     {{-- ══════════════ EXPLORE BY CATEGORY — FILTER BAR ══════════════ --}}
     <section class="ec-filterbar">
         <div class="lp-container">
-            {{-- Both selects scope the browser below by slug. The subcategory list
-                 holds every descendant of every root, tagged with its root so the
-                 script can narrow it to the chosen category instead of offering
-                 311 options at once. --}}
+            {{-- Event-type dropdown + service-category dropdown (v2). On v1 the
+                 second list is still every descendant, tagged with its root. --}}
             <div class="ec-fb-selects">
-                <select class="ec-select" id="ecCatSelect" aria-label="Category">
-                    <option value="">All categories</option>
+                <select class="ec-select" id="ecCatSelect" aria-label="{{ $isV2 ? 'Event type' : 'Category' }}">
+                    <option value="">{{ $isV2 ? 'All event types' : 'All categories' }}</option>
                     @foreach($cats as $cat)
                         <option value="{{ $cat->slug }}" @selected($branch && $branch->id === $cat->id)>{{ Str::title($cat->name) }}</option>
                     @endforeach
                 </select>
-                <select class="ec-select" id="ecSubSelect" aria-label="Subcategory">
-                    <option value="">All subcategories</option>
-                    @foreach($cats as $cat)
-                        @php
-                            $flatten = function ($node) use (&$flatten) {
-                                return ($node->allChildren ?? collect())
-                                    ->flatMap(fn ($k) => collect([$k])->merge($flatten($k)));
-                            };
-                        @endphp
-                        @foreach($flatten($cat) as $desc)
-                            <option value="{{ $desc->slug }}" data-root="{{ $cat->slug }}"
-                                    @selected($branch && $branch->id === $desc->id)>{{ Str::title($desc->name) }}</option>
+                <select class="ec-select" id="ecSubSelect" aria-label="{{ $isV2 ? 'Service category' : 'Subcategory' }}">
+                    <option value="">{{ $isV2 ? 'All service categories' : 'All subcategories' }}</option>
+                    @if($serviceCats->isNotEmpty())
+                        @foreach($serviceCats as $svcCat)
+                            <option value="{{ $svcCat->slug }}"
+                                    @selected($branch && $branch->id === $svcCat->id)>{{ Str::title($svcCat->name) }}</option>
                         @endforeach
-                    @endforeach
+                    @else
+                        @foreach($cats as $cat)
+                            @php
+                                $flatten = function ($node) use (&$flatten) {
+                                    return ($node->allChildren ?? collect())
+                                        ->flatMap(fn ($k) => collect([$k])->merge($flatten($k)));
+                                };
+                            @endphp
+                            @foreach($flatten($cat) as $desc)
+                                <option value="{{ $desc->slug }}" data-root="{{ $cat->slug }}"
+                                        @selected($branch && $branch->id === $desc->id)>{{ Str::title($desc->name) }}</option>
+                            @endforeach
+                        @endforeach
+                    @endif
                 </select>
             </div>
         </div>
@@ -392,7 +402,7 @@
                                aria-label="Search categories" autocomplete="off">
                     </form>
 
-                    <div class="ec-side-title">Categories</div>
+                    <div class="ec-side-title">{{ $isV2 ? 'Event Types' : 'Categories' }}</div>
                     @if($cats->isNotEmpty())
                         <div class="ec-tree" id="ecTree">
                             @include('partials._ec-tree-item', ['categories' => $cats, 'depth' => 0, 'branch' => $branch])
@@ -401,11 +411,18 @@
                         <p class="ec-side-none">No categories yet.</p>
                     @endif
 
+                    @if($serviceCats->isNotEmpty())
+                        <div class="ec-side-title ec-side-title-mt">Services</div>
+                        <div class="ec-tree" id="ecServiceTree">
+                            @include('partials._ec-tree-item', ['categories' => $serviceCats, 'depth' => 0, 'branch' => $branch])
+                        </div>
+                    @endif
+
                     <div class="ec-side-title ec-side-title-mt">Quick Stats</div>
                     <div class="ec-stats">
                         <div class="ec-stat"><span>Total Categories</span><b class="v-b">{{ number_format($stats['total']) }}</b></div>
-                        <div class="ec-stat"><span>Main Categories</span><b class="v-o">{{ number_format($stats['parents']) }}</b></div>
-                        <div class="ec-stat"><span>Subcategories</span><b class="v-g">{{ number_format($stats['subcategories']) }}</b></div>
+                        <div class="ec-stat"><span>{{ $isV2 ? 'Event Types' : 'Main Categories' }}</span><b class="v-o">{{ number_format($stats['parents']) }}</b></div>
+                        <div class="ec-stat"><span>{{ $isV2 ? 'Service Categories' : 'Subcategories' }}</span><b class="v-g">{{ number_format($stats['subcategories']) }}</b></div>
                         <div class="ec-stat"><span>Showing</span><b class="v-n" id="ecShowing">{{ number_format($stats['showing']) }}</b></div>
                     </div>
                 </aside>
@@ -440,6 +457,12 @@
                                     // whole — letterboxed — while square/6:5 art fills the box.
                                     $isBanner = empty($cat->thumbnail) && ! empty($cat->cover_image);
                                     $cardImg  = $isBanner ? asset('storage/' . $cat->cover_image) : $thumbUrl($cat);
+                                    $kicker   = $cat->parent?->name
+                                        ?? match ($cat->kind) {
+                                            \App\Models\Category::SERVICE_CATEGORY => 'Service Category',
+                                            \App\Models\Category::EVENT_TYPE       => 'Event Type',
+                                            default                                => 'Main Category',
+                                        };
                                 @endphp
                                 <a class="ec-card" href="{{ route('public.category', $cat->slug) }}">
                                     <div class="ec-card-img {{ $isBanner ? 'is-banner' : '' }}"
@@ -451,7 +474,7 @@
                                         @endif
                                     </div>
                                     <div class="ec-card-body">
-                                        <span class="ec-card-parent">{{ $cat->parent?->name ?? 'Main Category' }}</span>
+                                        <span class="ec-card-parent">{{ $kicker }}</span>
                                         <h3>{{ Str::title($cat->name) }}</h3>
                                         @if($cat->short_description)
                                             <p>{{ Str::limit(strip_tags((string) $cat->short_description), 80) }}</p>
@@ -543,8 +566,7 @@
     // ── Category tree: disclosure toggles ─────────────────────────────
     // Branches ship collapsed (`hidden` in the markup) so the panel opens at a
     // readable size; clicking the chevron reveals that level only.
-    var tree = document.getElementById('ecTree');
-    if (tree) {
+    document.querySelectorAll('.ec-tree').forEach(function (tree) {
         tree.addEventListener('click', function (e) {
             var btn = e.target.closest('.ec-tree-toggle');
             if (!btn || btn.classList.contains('ec-tree-leaf')) return;
@@ -571,7 +593,7 @@
             }
             tree.scrollTop = Math.max(0, active.offsetTop - tree.clientHeight / 2);
         }
-    }
+    });
 
     // ── AJAX browsing: paging, tree drill-in, search and chips swap the ──
     // results in place instead of reloading the page. Every entry point is a
@@ -638,11 +660,14 @@
     }
 
     function markActiveTree(url) {
-        if (!tree) return;
+        var trees = document.querySelectorAll('.ec-tree');
+        if (!trees.length) return;
         var inSlug = new URL(url, location.origin).searchParams.get('in');
-        tree.querySelectorAll('.ec-tree-row.active').forEach(function (r) { r.classList.remove('active'); });
+        trees.forEach(function (tree) {
+            tree.querySelectorAll('.ec-tree-row.active').forEach(function (r) { r.classList.remove('active'); });
+        });
         if (!inSlug) return;
-        var link = tree.querySelector('.ec-tree-link[href*="in=' + inSlug + '"]');
+        var link = document.querySelector('.ec-tree .ec-tree-link[href*="in=' + inSlug + '"]');
         if (!link) return;
         var row = link.closest('.ec-tree-row');
         row.classList.add('active');
@@ -717,7 +742,7 @@
     // they all point at /events-categories with different query strings.
     document.addEventListener('click', function (e) {
         if (!results) return;
-        var a = e.target.closest('#ecPag a, #ecTree .ec-tree-link, #ecResults .ec-fchip a, #ecResults .ec-fchip-clear, #ecResults .ec-empty a');
+        var a = e.target.closest('#ecPag a, .ec-tree .ec-tree-link, #ecResults .ec-fchip a, #ecResults .ec-fchip-clear, #ecResults .ec-empty a');
         if (!a || e.metaKey || e.ctrlKey || e.shiftKey || a.target === '_blank') return;
         var href = a.getAttribute('href') || '';
         if (href.indexOf('/events-categories') === -1) return;

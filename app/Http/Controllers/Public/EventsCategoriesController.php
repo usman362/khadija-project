@@ -10,8 +10,9 @@ use Illuminate\View\View;
 
 /**
  * Public "Explore by Category" browser — the visitor-facing counterpart to
- * the admin Categories screen: a full category tree down the left, a real
- * paginated card grid on the right.
+ * the admin Categories screen: event types down the left, a paginated card
+ * grid on the right. On V2, service categories sit in their own Services
+ * list — they are not mixed into Event Types (they share parent_id = null).
  *
  * The tree drills in (?in=<slug> scopes the grid to that branch) and the
  * search box filters by name. Both survive paging via withQueryString().
@@ -23,14 +24,30 @@ class EventsCategoriesController extends Controller
 
     public function __invoke(Request $request): View
     {
-        // Parent categories with their full subtree — feeds the sidebar tree
-        // and the marketing rows further down the page. Alphabetical, matching
-        // the admin Categories tree (allChildren sorts by name too).
-        $allCategories = Category::active()
+        // V2 has two kinds of root: Event Types (the occasion) and Service
+        // Categories (Catering, Bakery, …). They are siblings, not a tree —
+        // the archetype links them, not parent_id. Listing every root under
+        // one "Categories" heading mixed services into the event list.
+        $isV2 = config('taxonomy.version') === 'v2';
+
+        $eventQuery = Category::active()
             ->whereNull('parent_id')
             ->with('allChildren')
-            ->orderBy('name')
-            ->get();
+            ->orderBy('name');
+
+        if ($isV2) {
+            $eventQuery->ofKind(Category::EVENT_TYPE);
+        }
+
+        $allCategories = $eventQuery->get();
+
+        $serviceCategories = $isV2
+            ? Category::active()
+                ->ofKind(Category::SERVICE_CATEGORY)
+                ->with('allChildren')
+                ->orderBy('name')
+                ->get()
+            : collect();
 
         $search = trim((string) $request->query('q', ''));
         $inSlug = (string) $request->query('in', '');
@@ -45,6 +62,10 @@ class EventsCategoriesController extends Controller
 
         if ($branch) {
             $query->whereIn('id', $this->branchIds($branch));
+        } elseif ($search === '' && $isV2) {
+            // Unfiltered browse is the event-type wall. Services appear when
+            // the visitor picks one from the Services list, or searches.
+            $query->ofKind(Category::EVENT_TYPE);
         }
 
         if ($search !== '') {
@@ -64,15 +85,21 @@ class EventsCategoriesController extends Controller
             ->fragment('ec-browse');
 
         return view('events-categories', [
-            'allCategories' => $allCategories,
-            'categories'    => $categories,
-            'descCounts'    => $this->descendantCounts(),
-            'branch'        => $branch,
-            'search'        => $search,
-            'stats'         => [
+            'allCategories'     => $allCategories,
+            'serviceCategories' => $serviceCategories,
+            'categories'        => $categories,
+            'descCounts'        => $this->descendantCounts(),
+            'branch'            => $branch,
+            'search'            => $search,
+            'isV2'              => $isV2,
+            'stats'             => [
                 'total'         => Category::active()->count(),
-                'parents'       => Category::active()->whereNull('parent_id')->count(),
-                'subcategories' => Category::active()->whereNotNull('parent_id')->count(),
+                'parents'       => $isV2
+                    ? Category::active()->ofKind(Category::EVENT_TYPE)->count()
+                    : Category::active()->whereNull('parent_id')->count(),
+                'subcategories' => $isV2
+                    ? Category::active()->ofKind(Category::SERVICE_CATEGORY)->count()
+                    : Category::active()->whereNotNull('parent_id')->count(),
                 'showing'       => $categories->total(),
             ],
         ]);

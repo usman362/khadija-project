@@ -1,0 +1,1370 @@
+---
+description: Claude Code project memory (imported)
+alwaysApply: true
+---
+
+# Claude Code memory
+
+Imported from Claude Code on 2026-08-09. Treat this as project memory and follow it.
+
+
+## memory/MEMORY.md
+
+# Memory Index
+
+- [Public site light redesign](public-site-light-redesign.md) — dark→light migration DONE (07.23.2026), zero views left on `layouts.public`; read the two conversion traps before touching any hero.
+- [Service picker rollout](service-picker-rollout.md) — reusable `<x-service-picker>` (search + keyword pills + contained checkbox grid) replacing flat category walls per Peter's ESR mockup; done on Direct Offer + MSR; package-create + data cleanup pending.
+- [Production hosting](production-hosting.md) — cPanel host; app moved from dashboard.gigresource.com → main gigresource.com; doc root = public_html (index.php shim → public/); deploy gotchas.
+- [Compliance copy rules](compliance-copy-rules.md) — Peter's banned claims (no 24/7/guarantees/metrics/expert-advice), AI-first framing, geo-restriction config, DMCA setup.
+- [Influencer portal build](influencer-portal-build.md) — new rich creator portal (layout+dashboard done); building section-by-section, full analytics tracking.
+- [AI Agreement Builder](ai-agreement-builder.md) — new guided 4-screen flow (Phase 1→Draft→Phase 2→Phase 3); representative data, green=AI-fill/amber=required, needs real wiring.
+- [AI tools catalog](ai-tools-catalog.md) — AiToolCatalog is the source of truth (20 tools, ALL live); role-aware via `$aiLayout`; `/ai-tools` hub; data is representative.
+- [AI IQ levels (Starter/Semi/Maximum)](ai-iq-levels.md) — Peter's 3-layer AI architecture; `config/ai-levels.php` + `AiAccess` resolver + per-tool behaviour (Package Builder done). Pros tier-gated, clients/influencers free. `AI_FEATURES_FREE_FOR_ALL=true` in .env right now.
+- [Browse page real data](browse-page-real-data.md) — `/browse` off hardcoded decoration; READ the portfolio dual-format trap + demo-imagery decision.
+- [Browse page light rebuild](browse-light-rebuild.md) — `/browse` rebuilt on `layouts.landing` (light); use `.lp-container` not `.container`; DemoProfessionalsSeeder for demo pros. NOTE `/browse` is now login-gated (auth middleware).
+- [Post an Event flow](post-event-flow.md) — Peter's exact 11-step client booking wizard at `/client/post-event` (PostEventController); package instant-book model, representative from step 5.
+- [Handoff pack 08.08](handoff-pack-0808.md) — 216-file pack, rulebook now R1–R63, new folder 17; READ the Client-Semi count-vs-membership trap and the list of locked-but-unbuilt rules.
+- [Handover QA pass](handover-qa-pass.md) — senior QA of the client's 191-file Gig-Resource-Handover (07.25.2026); 23 findings, per-file XLSX + PDF report; read the dedup/zip method before reviewing any future pack.
+- [Doc-verify pass](doc-verify-pass.md) — full verification of the app vs Peter's 53 workflow docs (07.24.2026); 6 phases, findings+fixes; ESR fee resolved by docs, My Professionals surface built.
+- [Backend wiring #59 status](backend-wiring-59.md) — what's real-model-backed (Pro Transactions, Influencer Analytics) vs remaining new-backend builds (RFP, bid-intelligence, leads, direct-offers, virtual-hub, tracking pipeline).
+- [Peter requirements backlog](peter-requirements-backlog.md) — running list of client (Peter) requests: done vs pending, scope flags. Packages subsystem, top-nav header, Event Types pages, search-card redesign, sealed bids, event-integration + the canonical client/pro product model.
+- [Workflows master spec](workflows-master-spec.md) — CANONICAL ~48-workflow lifecycle (reconciled 07.15.2026); THE big finding = `/client/post-event` is ordering-not-bidding, fix = 5-route chooser→Publish→async Proposals; fee schedule, build order, open conflicts (geo WV/NY, escrow, ESR fees). Read before any request/booking build.
+- [Team Mode removal](team-mode-removal.md) — Co-Op/"combined force" removal: DONE in code 07.31.2026 (UI 07.16, storage dropped 07.31); "dormant" columns were NOT harmless — read why before leaving any retired feature's data in place.
+- [Packages vs MSR](packages-vs-msr.md) — Peter's rule: Package Service Search (pro-created bundles clients browse — now SOLO-ONLY, co-op being removed) ≠ MSR (client gig post pros bid on). NEVER mix; FindGigsController currently mixes. Includes rich target design.
+- [BSR bidding workflow](bsr-bidding-workflow.md) — THE request-type model: **BSR** (bidding, broadcast) · **ESR** (emergency, uses BSR) · **DSR** (direct, one pro, no bidding) — and **SSR/MSR are the SCOPE inside each, not types**. 8 screens first, Admin bidding-window page later. Read before touching any request flow.
+- [Request types & ESR](request-types-esr.md) — SSR/MSR/Direct Offer/ESR are 4 parallel client request workflows, each single- OR multi-service. ESR BUILT incl. scope chooser (07.23.2026); key rule = ESR broadcasts to the board, Direct Offer targets one pro — never blur them.
+- [Pro↔category relation](pro-category-relation.md) — `category_user` pivot powering category landing pages + `/browse?category=`; READ the duplicate-name save trap before touching it.
+- [Category taxonomy V2](category-taxonomy-v2.md) — 106/27/241 tree SUPERSEDES the 503 list; LIVE 08.05.2026 (TAXONOMY_VERSION=v2; rollback = v1). READ the row-count-vs-professional-count trap before quoting any category number.
+- [Legacy categories import](legacy-categories-import.md) — 360-category 4-level tree + images imported from OLD live site via public API into `CategorySeeder`; source = live (local dumps were stale); how to refresh.
+- [AI token economy plan](ai-token-economy-plan.md) — Peter's DeepSeek AI-Router + credit/token limiting & cost-model plan to prevent abuse; ~60% foundation (level gating + action cap + tokens_used col) exists; big billable phase, 3 open decisions.
+- [Budget/timeline constraint](budget-timeline-constraint.md) — ~1 month of paid Claude (~until early Aug 2026) to finish; then ChatGPT/free. Work efficiently, prioritize big items, leave handoff docs.
+- [Service-area gate](service-area-gate.md) — out-of-area accounts can register but can't transact; fail-closed middleware + admin waitlist. READ the two data bugs a default column value caused.
+- [Meeting completed-list](meeting-completed-list.md) — when Ali says he's going into a meeting, hand over the completed-work list unprompted: asked-for vs found-ourselves, deploy state checked first.
+- [Client comms style](client-comms-style.md) — Peter & Khadijah are non-technical: **client messages in English** (Roman Urdu is for Ali only), no git/commit/repo/file names, short plain messages, deliverables as PDF.
+
+
+## memory/ai-agreement-builder.md
+
+---
+name: ai-agreement-builder
+description: "New AI Agreement Builder — guided 4-screen flow (Phase 1 → Draft → Phase 2 → Phase 3), representative data, needs real wiring."
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+---
+
+Built the **AI Agreement Builder** (Peter's "AI agreement processing between professionals & clients" vision) as a guided flow. Controller `app/Http/Controllers/AiAgreementBuilderController.php`, views under `resources/views/ai-agreement/build/`, routes in the shared auth group.
+
+Flow + routes:
+- **Phase 1** `ai-agreement.build` (`/ai-agreement/build`) — Discovery & AI Evidence Collection (evidence cards + confidence + missing-info detector).
+- **Draft** `ai-agreement.draft` (`/ai-agreement/draft`) — generated draft where each section is tagged **🟢 AI GENERATED (auto-filled)** or **🟠 REQUIRED (user fills)** + an AI Confidence Score. This is Peter's "green = AI fill, non-green = user fills" request.
+- **Phase 2** `ai-agreement.negotiate` — Collaboration & Negotiation (clauses w/ status chips + redlines, version history, comment thread, AI suggestions).
+- **Phase 3** `ai-agreement.finalize` — Execution & Finalization (readiness check, e-signatures, secure archive/compliance, download PDF).
+
+Each screen uses the role-aware `$aiLayout` pattern (supplier → `layouts.professional`, else `layouts.client`) — same trick as the [[ai-tools-role-aware-layout]] fix.
+
+**Constraint / next step:** all evidence/clauses/signatures/sections data is **REPRESENTATIVE** (private `sample*()` methods in the controller) — NOT wired to real bookings/conversations/files yet. Peter explicitly said the green AI-fill "has to be coded". Real work remaining: populate green sections from real booking + conversation + attachments (+ Claude API/rules), real e-signature + PDF/archive backend, and an entry-point button from the booking/agreement page. Views won't need to change — just swap the sample data.
+
+Related existing agreement feature (separate): `AgreementPageController` at `/app/agreements` (generate-from-booking + accept/reject + PDF) — the builder is the new guided front-end, not yet connected to it.
+
+
+## memory/ai-iq-levels.md
+
+---
+name: ai-iq-levels
+description: "GigResource IQ tool levels — displayed as Starter/Semi/Maximum (keys stay manual/semi/maximum); 3-layer architecture, resolver, per-tool behaviour"
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+  modified: 2026-08-04T23:51:53.072Z
+---
+
+> **CORRECTION 2026-08-05 — the user-facing level names are `Starter · Semi ·
+> Maximum`.** Internal keys stay `manual/semi/maximum`, but the *displayed*
+> label for the base level is **Starter**, not "Manual". Peter renamed
+> "Help Me Plan"→Semi and "Coordinate It For Me"→Maximum, then amended
+> 2026-07-21: "Do It Myself"→**Starter**. Anything below written as
+> "Do It Myself / Help Me Plan / Coordinate It For Me" is retired wording.
+>
+> **The trap that made this recur:** each of the 20 tool blades kept its own
+> hardcoded `$lvlMeta` copy of the three labels instead of reading
+> `config('ai-levels.labels')`, so the earlier R29 sweep fixed the config and
+> the cards kept saying the old thing. Peter re-flagged it as Critical on
+> 2026-08-04. Fixed 08.05 (commit c882215) — all 20 now read the config, and
+> `tests/Feature/ToolLevelWordingTest.php` walks every tool page and fails if
+> the wording comes back. The level *descriptions* were violations too
+> ("AI helps you plan"); they now describe how much of the form is filled in.
+
+Building Peter's 3-layer AI architecture ("GigResource IQ™"). Every AI tool can run at 3 levels: **Starter** (no AI, DIY form), **Semi** (assists, user approves), **Maximum** (full draft prepared). Three layers stack: **Layer 1** admin master switch (already built — `AiToolSetting` + `AiToolCatalog::disabledKeys()` + admin UI) → **Layer 2** membership (which level a user unlocks) → **Layer 3** the tool actually behaving differently per level.
+
+**Business rule (Peter's zero-users launch strategy):** membership tiers apply ONLY to PROFESSIONALS (Starter=Core=Manual, Professional=Pro-Grow=Manual+Semi, Elite/enterprise=Elite=Manual+Semi+Maximum). CLIENTS & INFLUENCERS get every level FREE at launch (capped later by usage quotas, not tier). Monetize clients/influencers at 1000 clients / 500 influencers.
+
+**Phase 1 DONE (commit 67011aa):**
+- `config/ai-levels.php` — single source: `plan_levels` (starter/professional/enterprise → level arrays), `professional_default`=['manual'], `free_roles`=[client,influencer], `tool_modes` (per AiToolCatalog key → supported levels; auto-capable tools get maximum, advisory tools cap at semi), `labels`/`descriptions`.
+- `app/Domain/AiFeatures/AiAccess.php` — resolver. `level(?User,$toolKey)` → none|manual|semi|maximum (highest available). `unlockedLevels(User)`, `can(User,$toolKey,$minLevel)`, `label($level)`. Logic: admin-disabled tool → none; `AI_FEATURES_FREE_FOR_ALL` env or admin → all; `activeRole()==='supplier'` → plan's levels (default manual); else (client/influencer) → all free. **GOTCHA fixed:** null plan slug made `config("ai-levels.plan_levels.{$slug}")` return the whole array — guard with `$slug ? ... : null`.
+- AI tools hub (`resources/views/ai-tools/index.blade.php`) shows a colour-coded level badge per tool (`.akt-lvl` / `lvl-manual|semi|maximum|none`).
+- **NOTE:** `.env` has `AI_FEATURES_FREE_FOR_ALL=true` (launch/UAT — everyone gets Maximum). Flip to `false` to activate real tier gating. Verified with flag off: Starter/no-plan pro=Manual, Professional=Semi, Elite=Maximum, client/influencer=Maximum.
+
+**Phase 2 DONE (commit 9e5b532) — first Layer-3 tool = AI Package Builder** (`AiPackageBuilderController` + `resources/views/ai-tools/package-builder.blade.php`): `show()` resolves `$level` and passes it; view renders 3 experiences (Manual=plain form+Save, Semi=form + per-field ✨ helpers, Maximum=Auto-Generate Full Package). `compute()` is action-aware (`full`/`price`/`description`/`addons`) and server-gated (`AiAccess::can` — semi actions need semi+, full needs maximum). **Admin demo override: `?preview=manual|semi|maximum`** on the tool URL (admins only) — use this to demo all 3 without switching accounts. All verified live.
+
+**Existing pre-built infra this builds on:** `AiFeatureGate` + `AiFeatureUsage` (usage metering / monthly quotas), `AiFeatureCode` (3 codes so far: ai.budget_allocator/vendor_matchmaking/review_writer), `MembershipPlanSeeder` (plans starter/professional/enterprise with per-feature quotas + comments Manual/Semi/Maximum), `User::aiFeatureAccess()`/`activeSubscription()`.
+
+**Phase 3 DONE (commits fc65dd2 + 7ca71d6):**
+- **Proposal Writer** — 2nd bespoke Layer-3 tool (`AiProposalWriterController` + `client/ai-tools/proposal-writer.blade.php`): Manual = blank editable proposal textarea (no AI); Semi = draft + ✨ Improve/Rewrite(by tone)/Expand; Maximum = description→full auto-generate + assists. `generate()` action-aware (full/improve/rewrite/expand), server-gated, admin `?preview=`.
+- **Broad gate for ALL 20 tools (Option B)** — `app/Http/Middleware/EnsureAiLevel.php` (alias `ai.level` in bootstrap/app.php) applied to every `Route::post('/ai-tools/…')` in web.php. Reads tool key = 2nd URL segment, blocks users below Semi (Manual/none) with a 403 "upgrade to unlock AI". So membership tiers are now enforced platform-wide in one place; Package Builder + Proposal Writer keep their finer per-action gates on top. Under the launch flag everyone is Maximum → nothing blocked.
+
+**Deep bespoke 3-mode DONE (7 tools, all live-verified via admin `?preview=`):** Package Builder, Proposal Writer, Budget Allocator (21aedef), Pricing Assistant (cefbd3f), Timeline Builder (ee55f9d), Vendor Matchmaking (eb6cfd7 — Manual=browse dir+filter, Semi=rank top3+refine, Max=auto top5 read-only), **Event Planner (b191eac — Manual=hand-built checklist builder no dashboard, Semi=AI plan w/ editable budget inputs+live total, Max=full plan read-only).** Pattern: controller resolves level via AiAccess + admin `?preview`; view @php flags+$lvlMeta+banner (data-level on root); JS reads LEVEL from dataset, branches render (semi editable / max read-only), separate manual-builder IIFE, all listeners null-guarded.
+
+**Checklist Generator (a972b93)** — 8th deep 3-mode tool, built in Cursor (not this session) following the handoff doc, verified live here (manual hand-built builder w/ flatpickr dates, semi 22 editable inputs, max read-only). Semi banner uses blue #2563eb since tool brand green clashes with maximum green.
+
+**Handoff doc for continuing in other tools/editors:** `AI_3MODE_HANDOFF.md` in repo root (commit 641ba65) — full pattern, verify steps, remaining list, billable-DO-NOT-START section. User is continuing 3-mode work in **Cursor** and asking me to verify each here.
+
+**Guest Capacity Planner (3d9d87a)** — 9th deep 3-mode tool, built in Cursor, verified live here (manual hand-built calc: comfort=floor(sqft/per), legal=floor(sqft/7) computing live 1400/10→140, 1400/7→200; semi 2 editable result figures w/ live recompute; max read-only — the interactive range inputs remaining in max are the representative what-if sliders + AI chat widget, NOT the result). Semi banner uses brand sky-blue #0ea5e9.
+
+**Theme & Style Advisor (325df5f)** — 10th deep 3-mode tool, built in Cursor, verified live (manual style-board builder: color swatches + live palette strip + style ideas, add/remove all working; semi 22 editable palette fields; max read-only 0 editable). Minor cosmetic: a just-added swatch shows in the palette strip only after its color input is touched (not a blocker).
+
+**Venue Analyzer (3cd5c7d)** — 11th deep 3-mode tool, built in Cursor, verified live (manual scorecard: 5 factor sliders 0-100 + add/remove factor + live average score; semi 6 editable result fields w/ live utilization recompute on Estimated Capacity edit; max read-only 0 editable). Semi banner blue (brand green clashes w/ maximum green).
+
+**Contract Assistant (e27cbc8)** — 12th deep 3-mode tool, built in Cursor, verified live (manual hand-built clause builder add/remove + no AI + stats hidden; semi "✨ Suggest Draft Agreement" 14 editable fields; max "🤖 Draft My Agreement" read-only). COMPLIANCE: "not legal advice — have a professional review before signing" disclaimer confirmed VISIBLE in all 3 modes (manual hardcoded; semi/max from compute() `disclaimer` key). Semi banner brand purple #7c3aed.
+
+**Review Writer (68f16fd)** — 13th deep 3-mode tool, built HERE (not Cursor) + verified live (manual blank contenteditable review box + no AI/tabs/tone; semi AI draft contenteditable + regenerate; max read-only). rw-review-text DIV is `contenteditable` when !max, blank in manual; JS null-guards AI listeners + skips seeding in manual; Copy now copies box innerText. Semi banner brand orange #ea580c. Note: user is running Cursor + me in parallel — Cursor took Message Assistant, I took Review Writer (different files, no conflict).
+
+**Translator (f2f1ad7)** — 14th deep 3-mode tool, built HERE + verified live (manual = 29-phrase phrasebook browser with live language switch Hola→Bonjour→Hallo, no compute; semi = editable translation textarea `#trEdit`; max = read-only div). Controller passes phrasebook+languages for manual browse. Semi banner brand purple #7c3aed.
+
+**Staffing Planner (cc37744)** — 15th deep 3-mode tool, built HERE + verified live (manual = hand-built roster builder rows name+count+start/end w/ live total 10→14; semi = AI plan + adjust panel open-by-default + regenerate 11→27; max = read-only timeline no adjust). Adjust panel gated to `@if($isSemi)`. Semi banner blue #2563eb.
+
+**Bid Optimizer (9403d81)** — 16th deep 3-mode tool, built HERE + verified live (manual = margin worksheet bid+cost→profit/margin $520/30%; semi = editable suggested bid w/ live margin recompute 1600/25%→1800/33%; max = read-only bid+range+win). Semi banner blue #2563eb.
+
+**Availability Optimizer (8f5f688)** — 17th deep 3-mode tool, built HERE + verified (manual = local capacity math no suggestions cap40/util60/4slots; semi = AI compute + 4 suggestions, dashboard hidden; max = compute + suggestions + full representative calendar/opportunities/forecast). Escalation model: representative dashboard gated to @if(isMax); manual computes client-side via mirrored formula. Semi banner blue.
+
+**Portfolio Optimizer (58e01a6)** — 18th deep 3-mode tool, built HERE + verified (manual = local rubric score 100/100 grade A, actions hidden; semi = AI score 53/100 + 6 actions, dashboard hidden; max = score + actions + full audit/gallery/benchmark dashboard). Same escalation as availability (dashboard @if isMax, manual computeLocal mirror). Semi banner blue.
+
+**Upsell Assistant (d77808e)** — 19th deep 3-mode tool, built HERE + verified (manual = hand-built add-on list seed $1,449 + live total; semi = AI add-ons w/ editable prices + live bundle recompute $1,580→$2,020 uplift 85.4%→109.2% + script; max = read-only + full stats/booking/addons dashboard). Semi banner blue.
+
+**Message Assistant (b1259eb)** — 20th + FINAL deep 3-mode tool, built HERE + verified (manual = blank subject+body composer + copy, no AI; semi = 3 editable draft textareas edits persist; max = 3 read-only). Cursor never got to it; I built it. Semi banner blue.
+
+## ✅ DEEP 3-MODE 100% COMPLETE — all 20 auto-capable AI tools done + live-verified.
+Package Builder, Proposal Writer, Budget Allocator, Pricing, Timeline, Vendor Matchmaking, Event Planner, Checklist Generator, Guest Capacity, Theme Advisor, Venue Analyzer, Contract Assistant, Review Writer, Translator, Staffing, Bid Optimizer, Availability Optimizer, Portfolio Optimizer, Upsell Assistant, Message Assistant. Every tool: Manual (no AI, hand-built), Semi (AI + editable), Maximum (AI read-only), banner + admin ?preview override.
+
+**Phase 5 DONE (e6c5732):** The plans page already existed (`dashboard.membership-plans.index` via `Dashboard\MembershipPlanPageController`, portal-aware, subscribe/cancel/history). Gap closed: (1) added named route `membership.plans` → GET /membership → same controller, auth-only — this AUTO-WIRES all 20 AI-tool "Upgrade for more AI" banners (they already did `Route::has('membership.plans') ? route(...) : '/#pricing'`, so they now hit the real page instead of the landing anchor). (2) each plan card now shows the AI IQ level it unlocks (Starter→Do It Myself grey, Professional→Help Me Plan blue, Elite→Coordinate It For Me green) from config/ai-levels.php. Real plan prices (MembershipPlanSeeder): Starter $1, Professional $29.99 "Most Popular", Elite $99.99 "Best Value", all 6-month. Verified live.
+
+**Phase 4 DONE (de30a42):** free-beta monthly action cap for clients/influencers. config `ai-levels.free_beta.monthly_actions` (env AI_FREE_BETA_MONTHLY, default 60, 0=off). AiAccess::isFreeBetaUser (non-supplier non-admin = same set that gets levels free) + freeBetaCap() + const BETA_ACTION_PREFIX='ai_action:'. User::aiFreeBetaUsedThisMonth()/aiFreeBetaRemaining() count only 'ai_action:' rows (no collision w/ per-plan PlanFeature quotas). EnsureAiLevel middleware blocks at cap (429 + reset note) + records 1 row per SUCCESSFUL compute (status<400). Pros unaffected (own quotas), admins exempt. Verified live: client at 60→429, under cap→200+records, remaining decrements. NOTE: test changed olivia.demo@example.test password to 'password' (demo acct, reseed resets it).
+
+**Next big items (not started):** full QA pass (task #9), backend wiring of representative data (task #59), billable event-integration (Peter confirmed, needs scope/quote). AI IQ module (Phases 1-5) now COMPLETE.
+
+**Optional Phase 4 polish (not done):** show clients their remaining free AI actions in the tool banner (User::aiFreeBetaRemaining() is ready) — nice-to-have UI. Phase 4 = free-beta usage cap for clients/influencers (extend AiFeatureCode to all tools + wire "N free actions/month" via AiFeatureGate). Phase 5 = client-facing pricing/membership page (none exists yet — only admin `app.admin.membership-plans`) + admin matrix view. **All 20 tool compute endpoints were empirically tested (2 distinct inputs each) + all 20 GET pages load 200 — every tool is genuinely dynamic (fixed 2 runtime bugs: staffing 500, pricing view JS).**
+
+**Compliance flag for Peter:** Tier 3 "Elite Auto-Pilot" marketing ("auto-submits winning bids", "automated digital employee", "auto-negotiate") collides with the Platform Disclaimer ("we do not manage negotiations on your behalf") + banned-claims rules. Frame Maximum as "AI drafts → you approve" with confirmation checkpoints. See [[compliance-copy-rules]].
+
+Related: [[ai-tools-catalog]], [[compliance-copy-rules]]
+
+
+## memory/ai-token-economy-plan.md
+
+---
+name: ai-token-economy-plan
+description: "Peter's plan for AI provider (DeepSeek) + per-user token/credit limiting & cost modeling to prevent abuse. Big billable phase; ~60% foundation already exists."
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+---
+
+Peter (client) laid out the AI **cost-control / abuse-prevention** architecture (relayed by Ali 2026-07-11). This is a large billable phase — flag scope before building. Ties into [[ai-iq-levels]].
+
+**Reality check Peter is missing:** the 20 AI tools currently run on **local rule/template engines** in our own server — **zero token cost**, already no-human-intervention. Peter assumes DeepSeek is the engine; it isn't yet. So core decision = keep local (free) vs move some/all tools to **DeepSeek** (better quality, costs tokens, needs limiting) vs **hybrid** (reco: cheap tools local, premium via DeepSeek).
+
+**Already built (~60% of Peter's limiting system):** level gating Manual/Semi/Maximum (`config/ai-levels.php` + `app/Domain/AiFeatures/AiAccess.php` + `EnsureAiLevel` middleware); per-user monthly **action cap** w/ 429 at limit (`free_beta.monthly_actions`, env `AI_FREE_BETA_MONTHLY`=60); `AiFeatureUsage` table with a **`tokens_used` column already present** (records 0 today); server-side key handling; `tool_modes` mapping 20 tools→allowed levels.
+
+**New work Peter wants:**
+1. **AI Router** abstraction (`AiRouter::complete()`) + DeepSeek driver (env key, `max_tokens`, timeout) — swappable providers, web/app code unchanged.
+2. **Credit weighting** replacing flat 1/action: Light=1 (rewrite/short), Standard=2 (proposal/checklist/package desc), Advanced=4 (full event plan/contract/venue analysis), Visual=5–8 (image/portfolio/theme analysis).
+3. **Plan credit grants:** Manual/Core=0, Semi/Pro-Grow=100, Maximum/Elite=400 + paid **credit packs**.
+4. **Dual+ ceilings enforced simultaneously:** visible credit allowance **+ hidden monthly token budget + per-request output-token cap + rate limit** (per min/hour). First limit hit = stop.
+5. **Per-tool sub-limits** (Peter's table — e.g. Event Planner 5 revisions/event, Vendor Matchmaking 10 lists, Message Assistant 100/mo at Max).
+6. **Real token accounting** from DeepSeek response into `tokens_used`.
+7. **User UI = "AI Assist Credits"** (never show raw tokens). Provider hidden behind name "AI Copilot" / "GigResource IQ™".
+8. **Maximum AI = system-initiated actions** (software detects trigger e.g. event-date change → then calls AI for personalized output; NOT continuous polling; fixed reminders sent with no AI cost).
+9. **Cost-model spreadsheet** Peter explicitly wants: per tool (avg uses/mo, avg tokens/use, monthly tokens, monthly cost, memberships) → totals per role/tier and at 100/1k/10k/100k users. He calls it the most valuable pre-launch exercise (~80–90% accurate before launch, replace w/ real data after).
+
+**Illustrative cost/user Peter floated (NOT for pricing yet):** Client Manual $0, Client Semi $0.30–1, Client Max $1–3, Pro-Grow $2–6, Elite $5–15, Influencer $0.50–2.
+
+**BUILT (2026-07-13) — credit metering pilot live:** `config/ai-levels.php` `credits` block (weights light1/std2/adv4/visual6, per-tool `tool_weight`, `plan_grants` starter0/professional100/enterprise400, `free_role_grant` 100). `ai_feature_usages.credits` column (migration). `AiAccess::creditsEnabled()/creditCost()/monthlyCreditGrant()`. `User::aiCreditsGrant()/aiCreditsUsedThisMonth()/aiCreditsRemaining()`. `EnsureAiLevel` meters credits (deduct per action, 429 at limit, records `credits`) when enabled, else falls back to old free-beta action cap. Visible **"AI Assist Credits"** badge = `partials/_ai_credits_badge` (in AI-tools hub). Env toggles: `AI_CREDITS_ENABLED` (default true), `AI_FREE_ROLE_CREDITS` (default 100). Verified: client grant 100 → 3×event-planner(4) = used 12/rem 88; costs correct. NOTE this is now LIVE alongside `AI_FEATURES_FREE_FOR_ALL=true` (everyone Maximum level, but metered by credits).
+
+**Still pending (Phase 2 of this):** DeepSeek AI Router + real token accounting; per-tool sub-limits (Peter's table); paid credit packs (payment integration); cost-model spreadsheet; admin UI to edit grants/weights; focal-point picker already shipped separately.
+
+**Open decisions:** (1) engine local/DeepSeek/hybrid; (2) confirm credit values + grants (currently my defaults per Peter's numbers); (3) do credit packs charge real money (payment integration) or just cap usage. Don't advertise Elite as "unlimited" — say "generous monthly AI usage, subject to fair-use limits."
+
+**Peter's fuller plan relayed 2026-07-13 (Sat msg) — mostly resolves the above:** He leans **DeepSeek as the single primary provider** for launch (one API account, our own per-user limits enforced inside GigResource, not by DeepSeek), keep it **modular behind the AI Router** so only the router changes to swap/add providers later. Confirms credit grants **0/100/400** + credit packs, dual limits (visible allowance + hidden token ceiling + max-output-tokens + rate limit), Maximum AI = system-initiated on triggers (not polling; fixed reminders cost no AI). **Explicitly confirms the platform can launch fully WITHOUT generative AI** — the whole marketplace (packages, bidding, contracts, payments, messaging, scheduling) is non-AI; AI is an optional premium layer. His no-AI contingency includes a **tool-rename map** (AI Event Planner→Guided Event Planner, AI Vendor Matchmaking→Recommended Matches/Smart Match via weighted scoring, AI Proposal Writer→Proposal Builder, etc.) — avoid calling something "AI" if no model runs. **Reality vs plan (verified 2026-07-13):** foundation ~60% built (credit config/grants/weights EXACT match, EnsureAiLevel metering, tokens_used+credits cols, local fallbacks). Gaps = central **AI Router** (each service still calls OpenAI directly — no router yet), **DeepSeek** driver (only OpenAI wired), hidden token-ceiling + rate-limit enforcement, per-tool count caps (current model = shared credit pool not per-tool counts), credit packs, cost-model spreadsheet, no-AI rebrand.
+
+
+## memory/ai-tools-catalog.md
+
+---
+name: ai-tools-catalog
+description: "AI tools are catalog-driven (AiToolCatalog) — 20 tools, 15 live; build a planned tool by flipping its status + adding route/view."
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+---
+
+All AI tools are governed by a single source of truth: **`app/Domain/AiFeatures/AiToolCatalog.php`** — every tool has `key, name, audience (client|professional|both), status (live|planned), route, purpose`. Sidebars/hub/gating read from it so the client↔pro line-up can't drift (this fixed Peter's "AI tools mixed up" complaint).
+
+**Suites (GigResource IQ™):** the 20 tools roll up into 5 branded suites — Planning / Marketplace / Business / Operations / Automation(future). Mapping in `AiToolCatalog::SUITE_OF` + meta in `suites()`; `groupedForAudience()` returns the user's tools grouped by suite. Suites group by GOAL so they mix audiences (e.g. Marketplace = Vendor Matchmaking[client] + Staffing[pro] + Review Writer[both]). The hub renders suite-grouped. **Membership restructure DONE** (Peter/ChatGPT): `MembershipPlanSeeder` = Starter $1 / Professional $29.99 / Elite $99.99, all 6-month, suite-labelled features + 6-value framing; membership page (`dashboard/membership-plans/index.blade.php`) has the "AI by Suite" + "Opportunity Access" comparison tables. Opportunity early-access (SSR/MSR/ESR: Pro after 60 min, Elite immediate) is a **config flag** in `config/opportunities.php` — enforce when the live SSR/MSR/ESR pipeline lands. Still pending: top-level suite nav.
+
+**Hub:** `/ai-tools` (`ai-tools.index`, `AiToolkitController`) renders each user their tools grouped by GigResource IQ™ suite, live = "Use tool", planned = "Coming soon". Role-aware via the `$aiLayout` pattern — see [[ai-tools-role-aware-layout]] (controllers set `$aiLayout = hasRole('supplier') ? 'layouts.professional' : 'layouts.client'`; views `@extends($aiLayout ?? ...)`).
+
+**Nav + admin (added 2026-07-02):** Client & professional **sidebars are catalog-driven** — they `@foreach(AiToolCatalog::forAudience('client'|'professional'))` and render every LIVE tool (12 each: 8 role + 4 both) + an "AI Toolkit" hub link, so new tools auto-appear in nav. Layout per tool uses `$aiLayout = activeRole() === 'supplier' ? 'layouts.professional' : 'layouts.client'` (activeRole, NOT hasRole — so dual-role users see the shell for their current mode). **Admin control**: `ai_tool_settings` table (tool_key, enabled) + `Dashboard\AdminAiToolController` + `/app/ai-tools` (`app.ai-tools-admin.*`, role:admin) — admin toggles each tool; `AiToolCatalog::disabledKeys()` (memoized, try/catch-guarded) makes `forAudience()`/`groupedForAudience()` exclude disabled tools, so disabling hides them from both sidebars + the hub. Nav link in `layouts.dashboard` under `@role('admin')`.
+
+**To build a planned tool:** create `AiXController@show` (representative data array) + `resources/views/ai-tools/<key>.blade.php` (`@extends($aiLayout)`, theme-aware vars `--bg-card/--text-primary/--border-color`) + route `/ai-tools/<key>` + flip the catalog entry `status: planned→live` and set `route`. It auto-appears in the hub.
+
+**Status: 20 tools, ALL 20 LIVE (0 planned).** Every tool from Peter's mockups is built — the 9 dashboard tools (Event Planner, Timeline Builder, Venue Analyzer, Guest Capacity Planner, Theme & Style Advisor, Checklist Generator, Availability Optimizer, Package Builder, Portfolio Optimizer) plus the 5 input→output tools approved earlier (Bid Optimizer, Upsell Assistant [pro]; Contract Assistant, Message Assistant, Translator [both]) plus the original 6 (Budget Allocator, Vendor Matchmaking, Pricing Assistant, Proposal Writer, Staffing Planner, Review Writer).
+
+**ALL 20 TOOLS ARE NOW FULLY FUNCTIONAL** (real input→output, verified live). ROOT CAUSE of the meeting failure: every "AI" tool called OpenAI via `SettingsService::getOpenAIKey()` which was unconfigured → "AI service unavailable" on every click. FIX = each tool now has a **deterministic local engine** (pure PHP rules/math, no API). Pattern: `<Controller>@compute(Request)` validates input → real logic → `response()->json(['success'=>true,'result'=>[...]])`; view has an id'd `<form>` + `@push('scripts')` fetch (JSON POST, `X-CSRF-TOKEN` from `meta[name=csrf-token]`, Accept json, same-origin) that renders `data.result`. Reference impl: `resources/views/client/ai-tools/budget-allocator.blade.php`.
+
+- **6 POST tools** (Budget Allocator, Vendor Matchmaking, Review Writer had OpenAI; Pricing/Staffing/Proposal were already deterministic): the 3 OpenAI ones now do **try-AI-if-key-else-local** — `BudgetAllocatorService::allocateLocally()`, `VendorMatchmakingService::rankLocally()` (ranks REAL DB professionals!), `ReviewWriterService::composeLocally()`. If an OpenAI key is later added in Settings, they auto-upgrade to AI; without it they always return real output.
+- **14 display-only tools**: each got a `compute()` method + POST route `ai-tools.<slug>.compute` (in `routes/web.php` after the GET routes) + wired form. Engines are pure rules/math (venue capacity, timeline clock-times, checklist due-dates, bid win-prob, package tiers, portfolio score, color-palette derivation, contract clauses w/ real amounts, message templates). **Translator** is the one limitation — a 29-phrase event phrasebook (5 langs); arbitrary free-text translation needs an API key.
+
+Verified 14/14 `compute()` return `success:true` + Venue Analyzer proven live end-to-end. Tools still NOT wired to a user's own bookings/calendar/portfolio (inputs are user-entered, not auto-filled) — that's the next depth level.
+
+**DE-AI REBRAND (2026-07-13, commit 3d796b2) — compliance, Peter+Khadijah:** Since tools run on local engines (no AI), marketing them as "AI" = false-advertising risk. **Dropped "AI" from all user-facing names/copy** (`AiToolCatalog` `name` fields + ~30 views). Rename map: Budget Allocator→**Budget Planner**, Vendor Matchmaking→**Smart Match**, Event Planner→**Guided Event Planner**, Venue Analyzer→**Venue Compatibility Check**, Checklist Generator→**Smart Checklist**, Guest Capacity Planner→**Guest Capacity Calculator**, Pricing Assistant→**Pricing Calculator**, Bid Optimizer→**Bid Calculator**, Availability Optimizer→**Availability Scheduler**, Review Writer→**Review Builder**, Message Assistant→**Message Builder**; Timeline Builder/Proposal Builder/Package Builder/Staffing Planner/Portfolio Optimizer/Upsell Assistant/Contract Assistant/Theme & Style Advisor/Translator = same minus "AI". Hub title "GigResource IQ™ — Smart Productivity Tools", `page-title` "GigResource IQ™"; sidebar section label "AI Tools"→"GigResource IQ"; suite taglines + landing copy ("AI-Powered Support"→"Guided Support", "brings more AI"→"more capability", "AI-powered booking"→"Smart booking") de-AI'd; credit badge "AI Credits"→**"IQ Credits"**. **Internal unchanged:** route names (`ai-tools.*`), catalog `key`s, controller class names (AiXController), config keys, `AiAccess`/credit logic all still use old identifiers — only labels changed. Tiers (Semi/Maximum level names) NOT yet renamed (Peter wants Manual/Assisted/Auto — separate pass). Plan: re-introduce AI later as "Now AI-enhanced" upgrade without another rename. See [[compliance-copy-rules]].
+
+
+## memory/backend-wiring-59.md
+
+---
+name: backend-wiring-59
+description: Task
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+  modified: 2026-07-23T14:59:07.986Z
+---
+
+Task #59 = "(B) Backend builds for representative subsystems". Task #58 (wire the easy stuff) is already DONE, so #59 is the harder remainder. Status after audit (July 2026):
+
+**Already real-model-backed (no wiring needed):**
+- Professional Dashboard — Booking/Review/UserSubscription.
+- **Professional Transactions** (commit 80dfe89) — wired to the pro's Bookings: list + stats + activity feed + CSV/PDF export. `withdrawn` stays 0 (no pro payout table yet).
+- **Influencer Analytics** — ALREADY fully wired: controller pulls real `dailyStats` (InfluencerDailyStat), `campaigns` (InfluencerCampaign), `content` (InfluencerContent); views `@foreach` them. Representative is only a FALLBACK for influencers with zero tracked data (so charts don't break). Verified: influencer #1 (client@example.com) shows real 30-day stats / 6 campaigns / 7 content / real analytics_meta. **DID NOT change any code — already correct.**
+
+**AI tools** are intentionally representative (Peter's brief allows it) — NOT part of #59.
+
+**DONE since this note (verified end-to-end 2026-07-22):**
+- **RFP / Proposals pipeline is REAL** — built on Event + Bid + Booking (NOT the planned Rfp* tables). Full loop works: MSR store creates a published Event (the RFP); pros place real sealed Bids on the Bidding Board; ClientProposalController aggregates real bids with pending/won stats + pipeline value; accept() → bid 'won' + confirmed Booking (contract); decline() + reply() (counter-offer via BidReply). ProfessionalProposalController is Booking-backed. Routes all exist. Tinker end-to-end passed (event→bid→accept→booking). **No build needed.**
+- **Sealed Bids** — fully real (bids.is_public + Bid::amountVisibleTo + toggle route). See [[request-types-esr]] area.
+- **Event-integration** ("Add to my event") — built this session across 7 AI tools (event_ai_artifacts table).
+
+**Audited 2026-07-22 — all REAL (graceful empty-state fallbacks only, not fake):** Leads CRM (Booking/Conversation/Event), Client + Pro Direct Offer (Event source='direct_offer' → accept=confirmed Booking), Virtual Hub discovery/gigs, Bid Intelligence (computed from real Bookings/Conversations/Events). Virtual Hub **brief now posts a real Event** (commit 72ee59e, source='virtual_hub').
+
+**Payout ledger DONE (commit 28c11a7):** `payouts` table + Payout model; Transactions `withdrawn` = paid payouts, new `available` = earned − withdrawn − held; requestPayout() action + panel. True fund-holding escrow still needs the payment gateway.
+
+**Genuinely remaining (all infra-gated / large — nothing quick left):**
+- Professional **Bid Intelligence** — real, but match-score is still representative (needs a scoring model).
+- Influencer analytics **WRITE side** — a real click/conversion tracking pipeline that populates InfluencerDailyStat in production (only the demo seeder writes it now). Large.
+- **True fund-holding escrow** — needs the payment gateway. The payout *ledger* is done (see above); this is the money-custody half.
+
+**BLOCKED, not remaining — needs Peter, do not guess (money copy):** the ESR fee text contradicts itself. `ClientEsrController` docblock says "$2.99 posting at post; $8.99 ESR service fee only on a finalized agreement", but `client/esr/create.blade.php` says "$0 to post — you only pay a single $2.99 when you finalize". `DECISION_Client_Fee_SuccessOnly_0717_FINAL.docx` (dated after the 0714 UI review) suggests success-only is the newer model, which would make the view right and the docblock stale — but then the $8.99 ESR service fee is missing entirely. Resolve from `ESR_Rush_Request_Workflow_v1_0720.docx` (listed in the Master Document Index, not yet on disk).
+
+Also: QA smoke-test of ~100 GET routes done (commit 29214c5 fixed the one bug — /client/multi-service 500 on null activeEvent). See [[ai-iq-levels]] for the AI IQ module (separate, complete).
+
+NOTE: QA/testing changed some demo-account passwords to 'password' (olivia.demo, client@example.com, mixmasters.demo, qa.affiliate) — reseed resets them.
+
+
+## memory/browse-light-rebuild.md
+
+---
+name: browse-light-rebuild
+description: /browse rebuilt light on layouts.landing; use .lp-container not .container; DemoProfessionalsSeeder is demo-only.
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+---
+
+Rebuilt public `/browse` (`resources/views/public/browse.blade.php`) to the light reference design, extending **`layouts.landing`** (light) instead of the old dark `layouts.public`. Hero + search + trust badges + trending-vibes carousel + 3-column (Power Filters | provider cards | map/compare/recently-viewed) + CTA + trust strip.
+
+**Gotcha (cost a lot of debugging):** `layouts.landing` centres content with **`.lp-container`** (max-width 1320px, padded), NOT `.container`. Plain `.container` is unstyled there → full-viewport edge-to-edge stretch. Any new page on the landing layout must use `.lp-container`. See [[public-site-light-redesign]].
+
+**Demo data:** added `database/seeders/DemoProfessionalsSeeder.php` — ~10 realistic suppliers + reviews + portfolios so `/browse` looks full. It is **demo-only** (not in the production seed chain) — live `/browse` will be empty until real pros sign up OR the seeder is run on prod (`php artisan db:seed --class=DemoProfessionalsSeeder`).
+
+Compliance: swapped Peter's banned claims out of the reference (no "24/7" → "Dedicated Support"; no reply-time metric → "Quick Reply Times"; no "% Recommend"). See [[compliance-copy-rules]].
+
+
+## memory/browse-page-real-data.md
+
+---
+name: browse-page-real-data
+description: "/browse rebuilt on real data (trending categories, city counts, session recently-viewed, pro avatars) + the two image traps: portfolio dual-format and demo stock photos"
+metadata:
+  type: project
+---
+
+**Done 07.26.2026.** `/browse` was largely decoration invented in the Blade; it now reads the DB.
+
+**Replaced:**
+- 6 hard-coded "trending vibes" (Unsplash + keyword guesses like `?q=wedding`) → real categories that
+  **have professionals**, own artwork, live counts, filtering by `?category=` ([[pro-category-relation]]).
+  **Dedupe by name** — the legacy tree repeats a service under many event types, so the raw top-6 came
+  back as three copies of "DJs & Sound Services".
+- Fake "Venue / Location Map" (4 pins at fixed CSS %) → **"Where they are"**: real city counts over the
+  whole filtered set, each a city filter.
+- "Compare Pros" card (two `href="#"` buttons) → **removed**, no such feature exists.
+- "Recently Viewed" (was: first 3 search results) → real session history written by
+  `ProfessionalProfileShowController::rememberView()`, newest first, hidden until non-empty.
+- Card now carries the **pro's own avatar** beside the name (Freelancer's identity anchor). Hero = the
+  WORK, avatar = WHO.
+
+**TRAP 1 — portfolio column has TWO shapes.** Uploads write `['type'=>'image','hero'=>…,'square'=>…]`;
+older/seeded rows hold a **bare URL string**. `portfolioImageItems()` only recognised the structured one,
+so 10 of 12 pros read as having NO portfolio and every card fell to a placeholder. Now normalised, and
+`portfolioHeroUrls()` passes absolute URLs through instead of handing them to `Storage::url()` (which
+would emit `/storage/https://…`). Any new code reading `portfolio` must handle both.
+
+**TRAP 2 — location counts can't GROUP BY the main query.** It carries withAvg/withCount subselects and a
+HAVING on the rating alias → trips `only_full_group_by`. Materialise the filtered ids first, then count.
+
+**TRAP 3 — `$f + ['city'=>…]` silently drops the filter.** The union operator keeps the LEFT value, and
+`$f` already has an empty `'city'`. Use `array_merge`.
+
+**Demo imagery decision (Ali, 07.26.2026):** `DemoProfessionalsSeeder` used to fill each pro's portfolio
+with Unsplash URLs — 9 photos over 31 slots, one wedding bouquet on 8 of 10 pros including the DJ. Those
+accounts never uploaded anything, so `'portfolio' => []` is the truth; the card falls back to the
+artwork of the services they offer, and a pro with neither gets a monogram.
+
+**ui-avatars.com is gone.** `User::getAvatarUrlAttribute()` now draws an initials SVG data URI locally
+(stable hue per id); `User::placeholderAvatarUri()` covers null relations. Watch the initials builder:
+words not starting with a letter/digit are skipped and the result is XML-escaped, or "Bloom & Vine Co."
+yields `B&` and breaks the SVG.
+
+Related: [[browse-light-rebuild]], [[pro-category-relation]], [[compliance-copy-rules]].
+
+
+## memory/bsr-bidding-workflow.md
+
+---
+name: bsr-bidding-workflow
+description: "APPROVED 2026-07-27: the broadcast bidding flow becomes its own process named BSR (Bidding Service Request), separate from SSR/MSR/ESR/Direct Offer. 8 client+pro screens first, Admin bidding-window settings as a later phase."
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+  modified: 2026-07-27T10:42:59.757Z
+---
+
+**Approved in the Peter ↔ Khadijah ↔ Ali thread, 2026-07-27.** Peter's final word: "Ok I agree".
+
+**THE MODEL — settled 2026-07-27 (second message, supersedes the first).** Two *delivery mechanisms*, each
+carrying a *scope*; SSR and MSR are the SCOPE, never the type:
+
+| Type | What it is | Goes to | Scope |
+|---|---|---|---|
+| **BSR** — Bidding Service Request | broadcast, professionals bid | every eligible pro | SSR (single) or MSR (multi) |
+| **ESR** — Emergency | *uses the BSR mechanism*, urgency flag on top | every eligible pro | SSR or MSR |
+| **DSR** — Direct Service Request (was "Direct Offer") | targeted, NO bidding | one chosen pro only | SSR or MSR |
+
+Peter's exact reasoning: "a MSRs as a stand alone would be the same as BSRs so the normal transaction would be
+a single and MSRs would be a multiple transactions"; "the ESRs are actually still using the BSRs (SSRs and
+MSRs) because … the client is open to every professional to get a quicker solution. They wouldn't want a DSR
+(because DSRs is limited to finding a preference)"; a DSR is "not [a] bidding service request, directly
+focused on the one professional of choice".
+
+**DSR fallback:** a DSR is never offered to other professionals — *unless the client/professional deal doesn't
+work out*, at which point the client may switch path or pick a different professional. That re-route is a
+client action, not an automatic broadcast.
+
+**CORRECTION — an earlier note in this file said BSR meant single-service only and MSR stayed separate. That
+was wrong.** Standalone MSR *is* a BSR. Don't reintroduce that reading.
+
+**What this means for the code:** the database model already matches — `source='user'` + published + no
+`supplier_id` = BSR; `source='esr'` = ESR; `source='direct_offer'` + `supplier_id` + unpublished = DSR; scope
+is the attached-category count everywhere. The work is naming/labels and the board's tab structure, not a
+schema change.
+
+**Lifecycle Peter signed off on** (he is happy with this and does not want it re-litigated):
+client posts → pros are notified → pros review and bid → client reviews one or all bids → chat / negotiate →
+client selects a winner. The client may edit the event description, documents etc. **until** a winner is
+selected; **either side may back out until a final agreement is made**. Once a pro is selected as winner:
+chat / message / create the agreement data.
+
+**Tier access stays:** the same **60-minute** wait before Starter and Mid-level gain access. (Peter added
+"I think we can remove the rest" about the other tier rules — *not decided*, he wanted Khadijah's opinion.)
+
+**Sequencing agreed with the client** (my proposal, Khadijah restated it, Peter agreed):
+1. The **8 SSR/BSR client + professional screens first** — those are what users actually touch.
+2. The **Admin bidding-window settings page is its own later phase**; until it exists the bidding windows
+   run on **fixed values in config**.
+
+**Scope reality check I gave them (accepted):** this is a new build, not a revision. The new Bidding Board
+and My Bids are far deeper than what is live (extra request-type tabs, saved opportunities, market insights,
+table/card views, export, saved views, payout overview); the client SSR detail page becomes six tabs. The
+Admin page alone (9 tabs, draft→approve→publish, versioning + rollback, threshold rule engine with overlap
+detection, shared platform clock, 11-scenario test harness, 6 permissions) is bigger than the 8 screens
+combined.
+
+**Naming is SETTLED — build as BSR.** Khadijah's instruction is explicit ("designating it under a distinct
+process name (Bidding Service Requests / BSRs). Please proceed with development matching these exact rules")
+and Peter agreed. The mockups and R35/R37 still say SSR only because they predate the rename — they are the
+screen *design*, not the naming authority. Do not re-open this; Ali confirmed 2026-07-27 that Khadijah's
+wording governs.
+
+**Open / undecided — do NOT assume:**
+- **Pro → coworker sharing.** Peter wants pros to share opportunities with coworkers, "almost the same as
+  freelancer website for this one area" — but explicitly said "we can go back and forth with Khadijah before
+  going forward". Not in the 8 screens. Not approved.
+- **"We can remove the rest"** (tier rules beyond the 60-minute window) — vague, awaiting Khadijah.
+
+Source material lives in `~/Downloads/SSR-Professional` — 10 screen mockups + the Forms Master Inventory docx
+(96 forms audited, 16 gaps still open).
+
+Related: [[request-types-esr]] (the 4 existing request types and the Direct-Offer-vs-broadcast rule that must
+not be blurred), [[workflows-master-spec]], [[peter-requirements-backlog]], [[budget-timeline-constraint]].
+
+
+## memory/budget-timeline-constraint.md
+
+---
+name: budget-timeline-constraint
+description: "Hard constraint: ~1 month of paid Claude access to finish the GigResource work; after that Ali switches to ChatGPT/free tier. Work efficiently and prioritize."
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+---
+
+**The client (Peter) stated** (relayed by Ali 2026-07-11): only **~1 month of paid Claude usage** budget to get everything done; after that it's not affordable and the work continues on ChatGPT or the free tier. So one month from ~2026-07-11 (≈ until early August 2026). (Constraint holds regardless of who pays — plan the remaining GigResource work around it.)
+
+**How to apply:**
+- **Be efficient** — minimize wasted turns, don't re-investigate settled facts, act when the answer is clear. Ali already dislikes over-analysis ("bhai tum reply kardia kro", "short").
+- **Prioritize high-value / billable phases** from [[peter-requirements-backlog]] — get the big revenue/launch-critical items built while Claude is available, rather than polishing small things.
+- **Leave good handoff artifacts** — as the month ends, produce clear docs/seeders/comments so remaining work can continue in a cheaper tool (Cursor/ChatGPT/free) without Claude's context. (A Cursor handoff doc was done before.)
+- Cheaper tools can handle well-specified, mechanical work; save Claude turns for architecture, debugging, and anything needing real reasoning across the codebase.
+
+
+## memory/category-taxonomy-v2.md
+
+---
+name: category-taxonomy-v2
+description: "Peter's 2026-08-02 V2 taxonomy (106/27/241) SUPERSEDES the 503-service list; dispositions already filled in, so it is buildable, not blocked."
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+  modified: 2026-08-04T23:40:07.312Z
+---
+
+`02_Trackers/GigResource_Category_Taxonomy_V2_2026-08-02.xlsx` in the 2026-08-03
+handoff pack **replaces** `GigResource_New_Category_Taxonomy_2026-08-02.xlsx`
+(the 503-service pass). Its README says so explicitly.
+
+Shape: **106 Event Types (main) · 27 Service Categories (sub) · 241 Services (sub-sub)**.
+The 241 is deliberate curation, not a shortfall.
+
+The Main tier already carries Peter's dispositions per row — **62 KEEP, 13 EDIT,
+3 REMOVE, 31 ADD**. The Sub tier is a fresh 27-category design, not derived from
+the old 28 "main category" titles.
+
+**Approval, settled 2026-08-05.** Khadijah approved the design 08.04, flagging
+that R45 put the sign-off with Peter, not her. Peter then said service category
+lists are *her* approval — so it is approved, and R45's routing is superseded on
+this point. **Do not re-route category-list questions to Peter.**
+
+**Built 2026-08-05, not switched on.** Imported alongside the live tree behind
+`categories.taxonomy_version` + a global scope; commands are
+`taxonomy:import-v2` and `taxonomy:switch --remap`. See `docs/TAXONOMY_V2.md`.
+The switch refuses while anything still points at v1.
+
+**SWITCHED ON 2026-08-05** — `TAXONOMY_VERSION=v2`. Rollback = set it to `v1`;
+the 360 old rows are never deleted, only hidden by the scope.
+
+**Counting trap, cost me twice:** the old tree repeats each category name up to
+seven times, so `category_user` row counts are NOT professional counts.
+"Music & Entertainment — 24" was 24 rows and **3 professionals**; "19 caterers"
+was one. Always `distinct()` the user before quoting a number to the client.
+
+**Three bugs the switch surfaced** (all fixed, all tested): case-sensitive name
+matching stranded the lowercase spellings; updating the pivots in place hit
+their unique index the moment two categories collapsed into one (the normal
+case, not an edge case) so they are rebuilt+deduped; and the V2 sheet, dated
+08-02, still carried the "Comic-Con" trademark Peter banned on 08-03 — the
+migration had only fixed the *old* tree, so switching put it back on a public
+page.
+
+Still open for Khadijah: V2 has **no pyrotechnics/fireworks category**, though
+she requires COI from that trade — nearest is "Fire Performers" (a performer,
+not a pyrotechnician). See [[compliance-copy-rules]].
+
+Two separate image-review trackers exist and are complete (28 main, 503 sub-sub) —
+those were reviewed against the OLD 503 list, so re-check coverage once V2's 241
+land.
+
+
+## memory/client-comms-style.md
+
+---
+name: client-comms-style
+description: "How to write to Peter and Khadijah — short, plain, and NO developer jargon (no git/commit/repo/file paths). Deliverables go as PDF."
+metadata: 
+  node_type: memory
+  type: feedback
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+  modified: 2026-08-08T11:39:52.219Z
+---
+
+**Khadijah and Peter are non-technical. Never mention git, commits, repositories,
+branches, file paths, table or column names, or framework terms in anything sent
+to them.** Ali corrected this on 2026-07-31 after a draft said "it's in the repo,
+commit 7ed9aab": *"yeh git etc ka nhi bola kro commit krdia repo etc bs normal
+message banaya kro"*.
+
+**Why:** it reads as noise to them at best, and at worst it makes a finished
+piece of work sound unfinished — they cannot tell whether "committed to the repo"
+means they can use it. Say what changed and what they can do with it.
+
+**Address Peter as "Sir Peter"** in anything written for the client side —
+documents, headings and messages alike (Ali, 2026-07-31). "Waiting on Peter" as
+a section heading reads like an internal ticket about him; "Waiting on Sir
+Peter" is how the team refers to him.
+
+**Everything sent to the client is written in ENGLISH.** Ali and I talk in Roman
+Urdu; that is the internal channel and it stops at him. On 2026-08-08 I drafted a
+message to Sir Peter in Roman Urdu and Ali pulled me up on it — Peter does not
+read it. Two languages in one reply is the trap: the explanation to Ali is Roman
+Urdu, the block he forwards is English, every time.
+
+**How to apply:**
+- Messages stay short and plain — Ali's earlier rule still stands: *"jo ek pagal
+  ko bhi samjh ajaye"*. One idea per line.
+- Translate, do not omit: "the money record" not `booking_ledger`; "the sign-up
+  page" not `auth/register.blade.php`; "checked in the product" not "verified
+  against the code".
+- **Send the file itself**, never Markdown and never a file path.
+  - **Khadijah prefers XLSX** for anything she maintains — trackers, the decision
+    log, checklists (stated 2026-07-31). Build with `openpyxl`: filters on, freeze
+    panes, and dropdown validation on Status/Priority so her wording stays
+    consistent as she edits.
+  - **PDF for anything to be read rather than edited** — Sir Peter's decision
+    sheets, reports. Render with the project's dompdf (`Pdf::loadHTML(...)`).
+- Keep the technical version in the repo for Ali; send the plain version onward.
+  `docs/DECISION_LOG.md` and the PDF are the same content at two reading levels.
+
+**When they already have a file for something, fill in THEIR file — never invent
+a parallel one.** Ali caught this on 2026-08-04: *"peter ka jo format hai
+checklist wo follow kia hai?"* I had built a nice 5-column status sheet with my
+own status words, when their `GigResource_Developer_Change_Checklist_*.xlsx`
+already defines 8 columns (User Type · Web Page / Screen · Priority · Issue Type
+· Change Needed · **Assigned To** · **Status** · **Notes**), `▸` group rows, and a
+locked dropdown: **Not Started / In Progress / Ready for Review / PM Approved**,
+with Assigned To = Developer / PM.
+
+**Why:** a parallel file cannot be merged back into their tracker, and my own
+status words silently break the PM's workflow. Their vocabulary also encodes
+something mine lost — *Ready for Review* is a claim I get to make, *PM Approved*
+is Khadijah's to make. Never stamp PM Approved myself.
+
+**How to apply:** copy their file, fill only Status / Assigned To / Notes, leave
+structure, widths, freeze panes and validation untouched. Map "blocked on the
+client" to Status = Not Started **+ Assigned To = PM** — that is what the column
+is for. Extra material goes on a new tab, not by reshaping theirs.
+
+Related: [[peter-requirements-backlog]], [[budget-timeline-constraint]].
+
+
+## memory/compliance-copy-rules.md
+
+---
+name: compliance-copy-rules
+description: "Peter's legal/compliance copy rules — banned claims and the AI-first framing for all GigResource pages"
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+---
+
+From Peter Zylstra's Developer Feedback v1.1 (June 2026) — applies to ALL user-facing copy (landing, register, dashboards, emails, plan features):
+
+**Banned claims (legal risk — never write these):**
+- Hard unverified metrics ("25,000+ professionals", "150,000+ events", "$50M+ paid", "500+ influencers", "100+ countries")
+- "24/7" anything (admin is NOT available 24/7)
+- "Background-checked" as a blanket claim (checks are optional, professional-paid)
+- "Guaranteed" outcomes ("Success Guaranteed", "marketplace guarantee", "GigResource Guarantee")
+- Blanket data-privacy promises ("your data is safe and private")
+- "Expert advice / expert recommendations" and "we manage negotiations" — the platform offers neither
+
+**Why:** Peter: "we dont give out expert advice or recommendations, nor we dont manage negotiations. Our Level of Assistance is about getting AI involved more on each level."
+
+**How to apply:** frame assistance as **AI-powered** ("AI recommendations", "AI negotiation assistant", "AI handles the details"); use defensible value copy (escrow-protected payments, profile/business verification, privacy controls, help center). Plan-feature rows live in the `plan_features` DB table — check there too (one "Priority support 24/7" row was fixed).
+
+**Geo-restriction (§7.1):** launch limited to MD, VA, DC, DE, PA, NJ, NY. `config/geo.php` holds `allowed_states` + a 3-digit `zip_prefixes` map (built with `array_replace`, NOT spread — spread renumbers integer keys). Registration: professionals = hardcoded state dropdown; clients = zip validation.
+
+**Address verification + geolocation (§7.2–7.5) — SCAFFOLD DONE (don't rebuild):** `app/Domain/AddressVerification/` (AddressStatus labels, AddressFilter=Layer-1 free PO Box/blank/junk filter [REAL, no API], AddressVerificationGuard=paid-API go-live lock, providers USPS/Google=stubs awaiting keys, AddressVerificationService=risk-based state machine attempts→lockout) + `app/Domain/Geolocation/GeolocationService.php` (session [wired in RegisterController] + Cloudflare CF-Region headers = REAL; HTML5 + MaxMind = stubs). Config `config/address_verification.php`. DB: `user_profiles.address_status` + attempts/flagged_home/verified_at/locked_at/meta (migration 2026_06_18_000001). UI: professional profile General tab → "Business Address Verification" card + `professional.profile.verify-address` POST. Clients = frictionless (full addr only at booking, `PRIVATE_CLIENT_HIDDEN`). Doc: `docs/address-verification.md`. **LAUNCH SWITCH `ADDRESS_VERIFICATION_GO_LIVE`** (`.env`, default false): pre-launch NO paid call — filter-passing addrs → "Manual Review Required", 0 attempts spent. At launch: provision USPS/Google account, implement provider `verify()` (TODO markers), set flag=true + `ADDRESS_VERIFICATION_DRIVER`/key + `config:clear`. Another dormant go-live flag alongside [[production-hosting]] payments lock + the AI_FEATURES flag above.
+
+**DMCA (§1.3):** `/dmca-policy` (PolicyPage slug `dmca-policy`) + notice form → `dmca_reports` table; uploads require rights confirm() and are logged ("Image upload (rights confirmed)").
+
+**Platform disclaimer (§1.2) — DONE (June 2026):** the banned-claim limitations are now positively surfaced, so don't re-build this. (a) Onboarding notice partial `partials/_onboarding_disclaimer.blade.php` included in BOTH register forms (above submit). (b) Dedicated page `/platform-disclaimer` (route name `platform-disclaimer`) renders `policies.show`; content seeded by `PlatformDisclaimerSeeder` (idempotent `updateOrCreate`, registered in DatabaseSeeder; PolicyPage slug `platform-disclaimer`). Linked in both footers (landing bottom-bar + dark `partials/footer.blade.php` Policies col).
+
+**Notification prefs (§3.1) — DONE:** moved off the profile tab into dedicated pages — `client.notifications.index` (`/client/notifications`, orange) + `professional.notifications.index` (`/professional/notifications`, blue); views in `resources/views/{client,professional}/notifications/index.blade.php`, post to existing `*.profile.update.notifications` PATCH. Profile "Notifications" tab + priority-page "Go to Notification Settings" link repoint here; in-profile notification blocks removed. Admin profile still uses the old inline tab (out of v1.1 scope).
+
+**Button style guide (§4.2) — DONE:** `docs/button-style-guide.md` — role colour fixed (client=orange `--accent-orange #f97316`, professional=blue `--accent-blue #2563eb`), size varies; variants + existing-class map + checklist. No global `.btn` added (collides with existing per-component classes).
+
+**AI tools by tier (§8.3) — DONE:** infra already existed (`app/Domain/AiFeatures/` — AiFeatureCode, AiFeatureGate, `User::aiFeatureAccess`, `ai_feature_usages`); was un-seeded + 2 controllers ungated. Fixed: AI entitlements now seeded as structured rows inside `MembershipPlanSeeder` (each plan's `features[]` accepts `['feature'=>…,'feature_code'=>'ai.x','quota_monthly'=>N]`; loop handles string|array). Matrix: Review Writer = Starter 10/mo, Pro/Ent unlimited; Budget Allocator + Vendor Matchmaking = Pro/Ent only (30/mo / unlimited), locked on Starter. Wired AiFeatureGate authorize+recordUsage+status into AiVendorMatchmakingController + AiReviewWriterController (Budget Allocator already did). Shared badge `partials/_ai_quota_badge.blade.php`. Deterministic tools (Pricing/Proposal/Staffing) stay free (no LLM). Doc: `docs/ai-tools-by-tier.md`. Also fixed latent banned claim in seeder: Enterprise "Priority support 24/7" → "Priority support".
+
+**LAUNCH SWITCH — `AI_FEATURES_FREE_FOR_ALL`:** `.env` currently `true` → ALL users get unlimited AI regardless of plan (`User::aiFeatureAccess` short-circuits). Gating is wired but DORMANT (like the payments go-live lock). At launch: set `=false` (already false in `.env.example`) + `php artisan config:clear`, together with membership/Stripe go-live — else demo accounts w/o subscription get locked out. Admins always bypass.
+
+Related: [[public-site-light-redesign]]
+
+
+## memory/doc-verify-pass.md
+
+---
+name: doc-verify-pass
+description: "Full verification of the built app against Peter's 53 workflow docs (GigResource_All_Workflows_Updated_0719c_2) — findings + fixes, 6 phases"
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+  modified: 2026-07-24T09:13:35.213Z
+---
+
+**Peter's ask (2026-07-24):** verify every built page against ALL the workflow documentation and fix/add whatever it points out. Source = `~/Downloads/GigResource_All_Workflows_Updated_0719c_2/` (37 current + 16 older `.docx` + `Integration_Diagnosis_REPORT.md` + `README_START_HERE.md`). Extract docx→text with the python zipfile+regex snippet (Word XML → strip tags). The Master Document Index xlsx is a **catalogue only** (titles + Drive links, not content) — the real content is these docx.
+
+Done in 6 phases, each its own commit:
+
+**Phase 1 — Money (`3a6a94f`).** Transactions summed booking prices RAW, never deducting commission — a pro could withdraw the platform's cut. Now net everywhere (earned/pending/withdraw-ceiling), tile shows the deduction. Commission rate centralised in `App\Support\Commission` (slugs are DB values `starter`/`professional`/`enterprise`, NOT the Starter/Pro/Elite labels). **ESR fee question RESOLVED by docs, not Peter:** `$8.99` appears in NO current doc; canon is "single $2.99 only when something finalizes" — the ESR page was already right, only the `ClientEsrController` docblock was stale.
+
+**Phase 2 — Bidding board (`c832faf`).** Killed the sealed-bid leak ("Avg. Winning Bid"/"Win Rate" computed from sealed amounts, shown to competitors — docs forbid it; request-COUNT metrics are fine, AMOUNT-derived are not). Implemented tiered early access (ESR+MSR: Elite T=0, Pro/Starter T+60min; SSR open to all) with locked-gig withholding + banner. Real Fit Score (category 40 · in-area 20 · availability 20 · rating 20; pro categories come from their published packages since no user→category link). Expired state on past-dated gigs. ESR budget = single fixed figure, SSR/MSR = range.
+
+**Phase 3 — Packages (`923b2cf`).** Package had only boolean `is_active`; locked model (Q11) is 4 states **draft·active·paused·archived**. Added `status` column (backfilled), `Package::STATUSES`, status-based `active()` scope, `setStatus` action (Publish/Pause/Archive, owner-guarded), public 404 guard reads status. `is_active` kept === (status==='active'). Discovery = "one system, /browse ·/search ·/event-types are views" — no code change needed.
+
+**Phase 4 — Trust/onboarding (`e85e4ee`).** 7 jurisdictions (MD·PA·WV·VA·NJ·DE·DC, no NY) already correct in `config/geo.php` + register gate. Plan prices $4.99/$39.99/$59.99 correct, no retired IQ/escrow tiers. Added the missing **18+ affirmation** to the register agree checkbox (controller already validates `agree`). Full ID verification = gateway-gated $4.99 step. Verification = one pipeline, badges as outputs — no code change.
+
+**Phase 5 — Post-booking (no commit, verified clean).** Contract-parties-only reviews (2026-07-17 rule) ALREADY enforced across all 3 store paths (client / pro / generic `ReviewController`) + completed trigger; non-party → 403 confirmed. 7-day auto-accept fund release = gateway-gated (correctly absent).
+
+**Phase 6 — Platform/growth (`e3134e6`).** The ONE explicit "NEEDED / does not exist" gap in all 53 docs: the client **"My Professionals / Saved Vendors"** surface. BUILT — `saved_professionals` pivot + `User::savedProfessionals()`, `ClientSavedProfessionalController`, `/client/my-professionals`, sidebar nav. Two groups: Worked With (derived from bookings) + Saved (explicit pins); Re-book/Invite deep-links into Direct Offer `?pro=`. Influencer commission 5/7.5/10/12.5 already correct.
+
+**Still genuinely open (infra/gateway-gated, not doc gaps):** true fund-holding escrow, 7-day auto-accept release, influencer analytics write-side pipeline, Bid Intelligence match-score model. See [[backend-wiring-59]]. Money model canon lives in these docs; deposit = 30% default negotiable 15–50% non-refundable (LOCKED 2026-07-19c). Related: [[request-types-esr]], [[packages-vs-msr]], [[workflows-master-spec]].
+
+
+## memory/handoff-pack-0808.md
+
+---
+name: handoff-pack-0808
+description: "The 2026-08-08 handoff pack (216 files) — R1→R63 rulebook, new folder 17, and the Client Semi tier bug it exposed. Diff method + what is still unbuilt."
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+  modified: 2026-08-09T00:45:07.516Z
+---
+
+**`~/Downloads/GigResource_Handoff_Package__DEVELOPER__20260808_300AM`** — 216
+files, reviewed 2026-08-08. Hash-diffed against the 08-03 pack (177 files):
+**46 truly new · 41 changed in place · 7 removed · 0 moved**. Reuse that diff
+before reading a future pack — 129 files were unchanged and did not need
+re-reading.
+
+**The rulebook jumped R48 → R63.** `GigResource_Rules_Quick_Reference_R1-R63.docx`
+replaces the R1-R48 file. The new folder **`17_Marketplace_Eligibility_and_State_Policy`**
+(13 files, all dated 08-07) is where the current decisions live.
+
+**The bug this pass found.** R31's 2026-08-05 spreadsheet correction sets
+Client Semi = Budget Planner · Smart Checklist · Timeline Builder · **Best
+Match** · Message Builder. We had **Review Builder** in the Marketplace slot
+instead, read from Khadijah's earlier draft. Fixed 2026-08-08 (`03af332`).
+
+**Why nothing caught it:** both sets are five tools, so every count assertion
+passed while the wrong tool shipped. `ToolkitTierTableTest` now pins the Semi
+set *and* the Maximum-only set by name. **Never assert a config subset by size
+alone** — the count is the one property a swap preserves.
+
+**Built 2026-08-08:** R56 login limit (`f8f297c`) · R62 18+ gate (`1b84714`) ·
+R38 same-state matching (`ad17680`) · R61's Fit Score amendments (`1ce11b3`) ·
+R53 Client Portfolio Page (`5de58af`) · R52 Messages/Threads merge (`ef12d6a`) ·
+R60 Attendee Management (`f96eac8`) · R47 per-state accounts (`0e8c1fe`).
+
+R54 + R55 upload pipeline (`1ba4873`).
+
+**Still locked but not built:** R57 SSN/DOB — needs legal/tax counsel and the
+exact trigger threshold, so it is not a coding decision.
+
+**Every upload now goes through `App\Domain\Uploads\UploadPipeline`** with a
+purpose from `config/uploads.php`; an unknown purpose throws by design. The
+scanner is bound from config and currently reports **not_scanned, never
+clean** — do not "simplify" that to a boolean. Verification docs and event
+media were on the PUBLIC disk before this; they are private and read through
+`UploadedFileController`. The `private` disk itself did not exist in
+`config/filesystems.php`, so every chat attachment upload had been throwing.
+
+**R47's real gap was the editable state field**, not the multi-account model —
+emails were already unique, phone was already shareable, and R38 already scoped
+each account. A professional could flip `profile.state` (free text, 100 chars)
+and carry their reviews into a state they were never licensed in. Now fixed
+once set; clients deliberately untouched (R38 finding 15 is still open).
+
+**Four R53 sections ship switched off** in `config/client-portfolio.php` —
+badges, event history, favourite professionals, working style. Each is built,
+not stubbed; one flag each once Peter answers. Same for the R60
+professional-access toggle's exact wording and the `/client-portfolio/{id}`
+URL, both flagged as recommendations.
+
+**Three traps the 08-08 build hit, worth not repeating:**
+
+`parent::` cannot reach a method that comes from a **trait** used in the same
+class — the trait is flattened into that class, so `parent::` misses it and
+`Controller::__call` turns it into a runtime `BadMethodCallException`. Every
+login 500'd and the tests still passed, because they only read the database and
+the counter was written before the response failed. Alias the trait method
+(`use T { m as protected baseM; }`) and put `withoutExceptionHandling()` in
+`setUp()` for anything auth-shaped.
+
+**Migrations must run on SQLite too.** `UPDATE ... JOIN` is MySQL-only; so are
+`CURDATE()` and `HAVING` on a non-aggregate query, both of which were sitting in
+`/browse` and are why that page had never had a passing test. Use
+`CURRENT_DATE`, `whereHas`, and a portable per-group backfill loop.
+
+**R38 is fail-closed and that is deliberate** — a row with no state matches
+nobody. It hid 74 demo events on the dev DB (none published+unassigned, so no
+board row was lost); the six demo clients behind them still need states.
+
+Related: [[service-area-gate]] (a different question from R38),
+[[pro-category-relation]], [[category-taxonomy-v2]]
+
+**Read before quoting the feed rule:** "related" is **structural** — same Sub
+category, different Sub-Sub — *not* a Fit Score threshold. The memo's arithmetic
+is the reason: off-category caps at 60 for an established pro and ~40 for a new
+one, so any threshold above 40 locks out exactly the professionals the feature
+exists for.
+
+Related: [[peter-requirements-backlog]], [[handover-qa-pass]], [[packages-vs-msr]]
+
+
+## memory/handover-qa-pass.md
+
+---
+name: handover-qa-pass
+description: "Senior QA of the client's Gig-Resource-Handover pack (191 files, 10 phases) — 23 findings; deliverables are a per-file XLSX checklist + PDF report"
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+  modified: 2026-07-25T12:47:39.696Z
+---
+
+**Ali's ask (2026-07-25):** review EVERY file in `~/Downloads/Gig-Resource-Handover` (the client's updated
+pack), phase-wise, senior-QA depth, nothing missed — then produce a report + checklist of done vs remaining.
+
+**Deliverables produced (in ~/Downloads):**
+- `GigResource_Handover_QA_Checklist.xlsx` — all 191 files individually: folder, type, QA phase, status,
+  verdict. 133 clean · 16 with findings · 42 format duplicates · **0 unreviewed**. Filterable + Summary sheet.
+- `GigResource_Handover_QA_Report.pdf` — scope/method, confirmed-correct list, and the 23 findings grouped
+  as governing-rule violations / missing surfaces / needs-your-decision.
+
+**Method that mattered (reuse this):**
+- Extract every docx/md/html to text (`zipfile` + regex on `word/document.xml`), hash-compare to dedupe.
+- **The 39 root-level .docx are format duplicates of the nested .md** — proven by hash after stripping
+  markdown syntax (only diffs were list markers `1.` `2.`). Don't review twice; don't report as conflicts.
+- All 6 zips are re-bundles, BUT **5 files exist only inside zips** (Notification `00_README.md` +
+  architecture/flow/ui_center/ui_preferences PNGs, and a PDF of the Open Items Register). Always diff zip
+  entries against loose files.
+- Verify by live request, not by reading: e.g. actually POSTed an ESR dated 30 days out to prove the
+  72-hour rule is unenforced.
+
+**Key findings (full list in the PDF):**
+- **Live governing-rule violations, all small:** Lead-Pipeline CRM still shows 3 No-AI features (Instant
+  Proposal Generator / Automatic Follow-Up Bots / Probability Predictor); "AI Recommendations" panel on
+  client Search; "Recommended" sort on the bidding board; free-text location filter (must be the
+  7-jurisdiction dropdown); ESR 72h window unenforced; A6 one-pro-per-service unenforced; deposit 15–50%
+  band unenforced.
+- **Spec'd but not built:** Opportunity Center (pro triage hub), Dispute Resolution, Content Moderation,
+  Fraud Prevention, Support/Ticketing, the FAC-04 6-stage order machine (app has 4 booking states),
+  per-service MSR rows on the board, A17 completion rollup, change-order flow, demo-data rebuild.
+- **Needs Peter:** `GigResource_Rules_Quick_Reference_R1-R31` is **missing from the pack** (the master
+  rulebook here defines only R1–R13, yet Peter cites R29/R30) · A16 "no prefix" naming vs his own current
+  "Guided Event Planner / Smart Match / Smart Checklist" list · influencer per-Elite-pro payout basis ·
+  confirm the 0718 escrow decision is superseded by "Secure Payment".
+
+**Corrections to earlier assumptions (don't repeat them):**
+- **Co-Op / Team removal IS done** — only dead CSS (`.pk-typebadge.coop`) and explanatory comments remain.
+  [[team-mode-removal]] saying "not executed" is stale.
+- R10 "never escrow/credits" **passes** — remaining hits are internal variable names (`$escrow`,
+  `?escrow=1`), never visible copy.
+- A14 earnings privacy and the no-junk-fee rule both pass.
+
+Related: [[doc-verify-pass]] (the earlier 53-workflow pass), [[peter-requirements-backlog]],
+[[backend-wiring-59]], [[request-types-esr]].
+
+
+## memory/influencer-portal-build.md
+
+---
+name: influencer-portal-build
+description: New rich influencer/affiliate creator portal being built section-by-section against client mockups
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+---
+
+Building a NEW rich influencer ("creator") portal from client mockups (`~/Downloads/influencers-programs-pages/` — ~30 JPGs across Analytics, Badges & Tiers, Invite & Earn More, Resources + dashboard.png + sidebar). Light theme, 3-column (sidebar + main + right rail), 3D hexagon badges.
+
+**⚠️ THEME IS NOW GREEN (2026-07, Peter's direction):** the influencer brand accent was recolored orange→GREEN across the layout + all influencer views. `layouts/influencer-portal.blade.php` CSS vars `--orange`/`--orange-dark`/`--orange-soft` were KEPT (to avoid churn across ~40 views) but now hold GREEN values `#16a34a`/`#15803d`/`#ecfdf3` (there's a comment saying so). All hardcoded orange/amber hexes (f97316/ea580c/fff3ea/ffe2cd/c2410c/d97706/fef3c7/fbbf24 + rgba 249,115,22) were swept to green. Blue `#2563eb` secondary kept. Also fixed the "BIG arrows" Peter flagged: `.bt-rail-cta`/`.iv-rail-cta` arrow SVGs had no width/height → rendered huge; now constrained to 15px. If adding new CTA arrow links, give the svg an explicit size. Approach agreed: **foundation → section-by-section**, and **full analytics tracking** (real DB models, not illustrative).
+
+**Existing influencer system (pre-build):** models `Influencer` (full_name, email, social_media_links, audience_description, monthly_reach, referral_code, commission_tier[CommissionTier enum], status[InfluencerStatus], total_earnings, available_balance, paid_out, total_referrals + relations user/referrals/payoutRequests/referredUsers, referralUrl(), isApproved()), `InfluencerReferral` (commission_amount, status[ReferralStatus pending/earned/paid/cancelled], type[ReferralType], base_amount, commission_rate, booking_id), `InfluencerPayoutRequest`. Domain enums in `app/Domain/Influencer/Enums/`. Controllers: InfluencerDashboardController (index/referrals/payouts/requestPayout), JoinAsInfluencerController, ReferralLandingController, AdminInfluencerController. Routes under `Route::prefix('influencer')->name('influencer.')` guarded by `permission:influencer.dashboard.view` etc. (approved influencers get these perms). `/join-as-influencer` is an APPLICATION (no password). User has `influencer()` hasOne.
+
+**PHASE 1 DONE:**
+- `layouts/influencer-portal.blade.php` — `ipx-` prefixed; data-driven sidebar nav array `$ip_nav` (Dashboard, Invite & Earn More▼, Referral Center, Marketing Center, Leaderboards & Challenges, Commissions, Payouts, Analytics▼, Resources▼, Badges & Tiers▼) + Need Help card + top bar (search/+Create/notif/profile). Has `$ip_url` helper (route-or-`#`) — NOTE this is layout-scoped, NOT available in child @section; child views must redefine their own `$ip_url`.
+- Migration `2026_06_23_000001` added `followers_count`, `engagement_rate`, `profile_score` to `influencers` (+ model fillable/casts).
+- `influencer/dashboard/index.blade.php` rebuilt on the portal layout (`dx-` prefix): metric tiles, SVG earnings line chart from a 6-month `$earningsSeries` (added to controller index), audience snapshot donut, recent referrals, available-balance rail, profile completeness, tier CTA, quick access. All real data.
+- Local test: attached Influencer id=1 to `client@example.com` + granted that user the `influencer.*` permissions so the portal is testable locally.
+
+**PHASE 2 DONE — Badges & Tiers** (5 pages: Main Tiers/Current Tier/Progress/All Badges/Tier Benefits): `InfluencerBadgesController`, views `influencer/badges/*` (shared `_styles.blade.php`), reusable `<x-influencer.hex-badge color icon size>` 3D hexagon component. config('influencer.tiers') extended with color/icon/tagline/benefits per tier; config('influencer.badges') = 8 achievement badges (earned/locked from real referrals/earnings/profile/tier). All dynamic from referral count → tier progression.
+
+**PHASE 3 DONE — Invite & Earn More** (7 pages: Invite Tools/Earn/Promote/Become/Onboarding/Success Stories/FAQs): `InfluencerInviteController`, views `influencer/invite/*` (shared `_styles`). Invite Tools = real referralUrl/code + copy-JS + social share links + impact stats; Earn = real earnings/pending/paid + how-you-earn + 6mo chart + commission tiers; Onboarding = real setup checklist.
+
+**PHASE 4 DONE — Analytics + FULL TRACKING** (6 pages: Performance/Campaign Performance/Audience Insights/Content Metrics/Reports/Getting Started + CSV Export): NEW models/tables `InfluencerCampaign`, `InfluencerContent`, `InfluencerDailyStat` + `influencers.analytics_meta` JSON (migration 2026_06_23_000002). `InfluencerAnalyticsController` computes from them; `InfluencerAnalyticsSeeder` seeds demo data (6 campaigns, 7 content, 30 daily stats, audience/channel/device JSON) per influencer (idempotent). Charts = inline SVG line/bars + conic-gradient donuts. Influencer model now has campaigns()/content()/dailyStats() relations.
+
+**PHASE 5 DONE — Resources** (5 pages: Resource Library/Academy/Tutorials/Featured Articles/Getting Started): NEW shared content model `InfluencerResource` + table `influencer_resources` (migration 2026_06_23_000003: title/slug/description/body/type[guide|video|template|checklist|tool|webinar|article|course]/category/level/lessons/duration_minutes/downloads/badge/is_featured/published_at). `InfluencerResourceSeeder` seeds 24 rows (14 resources, 4 articles, 6 courses; idempotent — delete+reseed). `InfluencerResourceController` (library/academy/tutorials/articles/gettingStarted, each `guard()`s on auth user influencer). Views `influencer/resources/*` (shared `_styles.blade.php`, `rs-` prefix). Library = featured cards + popular/types-donut/recent; Academy = course stats + browse-by-category + course cards (level/lessons/duration). Routes `influencer.resources.{library,academy,tutorials,articles,getting-started}` already wired into sidebar `$ip_nav`.
+
+**PHASE 6 DONE — Program sections (4 pages, no mockups, sensible dynamic):** `InfluencerProgramController` (referralCenter/marketing/leaderboards/commissions, each `guard()`s on auth user influencer) + views `influencer/program/*` (shared `_styles.blade.php` `pg-` prefix + `_copy_js.blade.php` delegated `[data-copy]` clipboard). **Referral Center** = link/code copy + tiles (total/converted/pending/$earned) + recent referrals table + referrals-by-source bars; sidebar `Referral Center` repointed from `influencer.dashboard.referrals` → new `influencer.referral-center`. **Marketing Center** = referral link + promo banner cards + swipe-copy (link interpolated, copy-JS) + brand assets + compliance note. **Leaderboards** = rank tiles + Top Referrers (ranked by total_referrals, gold/silver/bronze, "You" highlighted) + Active Challenges (3, real progress bars). **Commissions** = earnings tiles (total/available/pending/paid) + config tier table (current highlighted, "You" pill) + commission history table. Routes `influencer.{referral-center,marketing,leaderboards,commissions}`.
+- To populate this with real data: `InfluencerReferralSeeder` (NEW) seeds realistic referral rows for demo influencers 1 & 2 (30 & 14 rows, mixed pending/earned/paid/cancelled) + recomputes each influencer's aggregates (total_referrals/total_earnings/available_balance/paid_out) + commission_tier. Enum case names are UPPERCASE: `ReferralStatus::{PENDING,EARNED,PAID,CANCELLED}`, `ReferralType::{SIGNUP_BONUS,BOOKING_COMMISSION}`, `CommissionTier::{STARTER,RISING,PRO,ELITE}`.
+- Existing `/referrals` + `/payouts` (InfluencerDashboardController) still extend OLD `layouts.dashboard` — NOT yet ported to portal (Payouts still linked in sidebar → old layout). Could restyle later.
+
+**INFLUENCER PORTAL COMPLETE** — all 6 phases done: Dashboard + Badges(5) + Invite(7) + Analytics(6) + Resources(5) + Program(4) = 28 pages, all dynamic.
+
+**AFFILIATE SIGNUP FLOW (self-serve, Peter's choice — model B):** The old `/join-as-influencer` was an application-only form (no password, attached to `auth()->id()`, guests created orphans, no success alert, no emails) → confusing dead-end. Rebuilt as **self-serve signup with password**:
+- `join.blade.php` now has password + password_confirmation fields (eye toggles) + `agree` checkbox + success/error flash blocks (`session('status')`/`session('error')` were missing — that's why "no alert").
+- `JoinAsInfluencerController@store` creates a `User` (hashed pw, NO role yet), creates a PENDING `Influencer` linked to it (DTO + `apply()` now take `userId`), `Auth::login()`s them, redirects to `influencer.status`. `show()` redirects already-applied users to status.
+- `influencer.status` route (`/affiliate/status`, auth-only NOT permission-gated) + `status()` method + `influencer/status.blade.php` (auth-pro, pending/approved/rejected card). Approved users auto-redirect to portal.
+- `LoginController@authenticated()` routes affiliate-only accounts: approved+influencer-role → `influencer.dashboard`, else → `influencer.status`. (Standard users with admin/client/supplier role fall through to `/dashboard`.)
+- Emails (MAIL_MAILER=log locally): `InfluencerApplicationReceived` (sent in `apply()`, non-fatal) + `InfluencerApplicationApproved` (via NEW listener `SendInfluencerApprovalEmail` on `InfluencerApproved`, registered in DomainServiceProvider). Views under `emails/influencer/` extend `emails.layouts.base`.
+- **⚠️ CRITICAL: the `influencer` Spatie role was MISSING from the DB** (only admin/client/supplier existed; the 4 `influencer.*` perms existed but weren't attached to a role) → `approve()` threw RoleDoesNotExist, so approval silently broke. Fixed by running `RolePermissionSeeder` (idempotent; creates influencer role w/ dashboard.view + influencer.dashboard.view/referrals.view/payouts.view/payouts.request). **Production MUST run `php artisan db:seed --class=RolePermissionSeeder && php artisan permission:cache-reset` or affiliate approvals will fail.**
+- Note: `User` uses SoftDeletes (Influencer does NOT) — `unique:users,email` counts soft-deleted rows, so a soft-deleted email blocks re-signup. Verified end-to-end in browser: guest signup → success alert + pending status page → admin approve → login → portal. Ready test login: **qa.affiliate@example.test / password123** (approved, 11 referrals). Orphan influencers (user_id null) were cleaned.
+
+**DEPLOY (local → prod):** `git pull` + run the 3 NEW migrations (`2026_06_23_000001/000002/000003`) + `php artisan view:clear`. Seeders are MANUAL: run `InfluencerResourceSeeder` to populate the content library (safe program content). Do NOT run `InfluencerAnalyticsSeeder` / `InfluencerReferralSeeder` on production — they create DEMO analytics/referral/commission data on real influencer accounts. None are registered in `DatabaseSeeder` (intentional). Banned `@php(` inline = 0 across all portal views (converted to `@php…@endphp`).
+
+Related: [[public-site-light-redesign]]
+
+
+## memory/legacy-categories-import.md
+
+---
+name: legacy-categories-import
+description: "How the 360 event categories (4-level tree + images) were imported from the old GigResource site into khadija-project, and how to refresh them."
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+---
+
+The new project's event-category taxonomy is the **exact live tree from the old GigResource site** (hosted at `bingo-agency.com/gigresource.com`). Peter wants these categories at all costs; everything else deleted.
+
+**Source of truth = the LIVE site, not any local dump.** The local `gigresource.sql` (Dec) and `~/Downloads/gigresso_platform.sql` (Jun 13) were BOTH stale — only 175 categories, 3 levels. The live DB had grown to **360 categories, 49 roots, 4 levels deep** (ids up to 600+). Restructured after June.
+
+**Pull current live data via the public API** (no auth, CORS open):
+`https://bingo-agency.com/gigresource.com/adminlab/upload/<file>` for images, and the category list from:
+`https://bingo-agency.com/gigresource.com/adminlab/api/fetchAllCategories.php` (returns all categories as JSON, `parent_id` = tree; `image`/`cover_image` = filenames in `adminlab/upload/`).
+
+**Import pipeline → permanent seeder:**
+- `database/seeders/CategorySeeder.php` — wipes categories (FK-safe: clears `category_event` + nulls `events.category_id`), then 2-pass insert (all rows first, then remap `parent_id` via old→new id map — handles any depth). `sort_order = old_id` so admin can show "newest first". Registered in `DatabaseSeeder`.
+- `database/seeders/data/legacy_categories.json` (360 rows) + `database/seeders/assets/categories/` (~130MB, 360 images) ship with the repo so reinstall reproduces it.
+- Admin ordering matches legacy: cards `orderByDesc('sort_order')` (newest first), tree `orderBy('name')` (alphabetical, recursive/infinite via `_tree_item.blade.php` + `Category::allChildren`).
+- Card image uses `cover_image ?: thumbnail` (most legacy rows only have `image`→thumbnail).
+
+**To refresh again:** re-fetch the API JSON, download images (parallel curl), regenerate the JSON + assets, `php artisan db:seed --class=CategorySeeder`.
+
+Note: live data has genuine duplicate titles (e.g. "Livestock Shows & Animal Handlers" ×2, "Unique Themes" ×4) — kept faithful; Ali may later ask to dedupe. See [[peter-requirements-backlog]].
+
+
+## memory/meeting-completed-list.md
+
+---
+name: meeting-completed-list
+description: "When Ali says he's heading into a meeting, hand him the completed-work list unprompted — grouped as asked-for vs found-ourselves."
+metadata: 
+  node_type: memory
+  type: feedback
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+  modified: 2026-08-08T11:22:35.505Z
+---
+
+**When Ali says he is going into a meeting ("meeting me jaraha hun" or similar),
+give him the completed list straight away** — he should not have to ask a second
+time. Established 2026-08-05.
+
+**Why:** he presents to Peter and Khadijah live and needs it in the moment, not
+after a round trip. Peter also said plainly that seeing work *on the website*
+beats seeing it in a meeting video, so the list is only worth giving once the
+work is actually deployed.
+
+**How to apply:**
+- Build it from `git log` since the last meeting, not from memory.
+- Two groups, and keep them apart:
+  1. **What they asked for** — their own requests, closed.
+  2. **What we found ourselves** — defects nobody reported. This is the part
+     that lands; give it its own heading and say each one in terms of what it
+     would have cost a real user (a professional double-booking, a client
+     seeing a figure that was never real).
+- Plain language throughout, per [[client-comms-style]] — no file names, no
+  rule numbers, no test counts except a single closing line.
+- End with what is **waiting on them**, so the meeting produces decisions.
+- **Check the deploy state first.** If commits are unpushed or the server is
+  behind, say so before the list — half a demo is worse than none.
+
+Related: [[client-comms-style]], [[peter-requirements-backlog]]
+
+
+## memory/packages-vs-msr.md
+
+---
+name: packages-vs-msr
+description: "Package Service Search vs MSRs are TWO separate concepts — never mix them (Peter's explicit rule)."
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+---
+
+Peter's explicit rule (2026-07-13): **Package Service Search ≠ Multiple Service Requests (MSR). Do NOT mix these two ideas.**
+
+- **Packages (Package Service Search):** the *professional* creates a package = a bundle of multiple services they can deliver in ONE event, either **Solo Multi-Pro** (one pro does several services) or **Co-Op Partnership** (two+ pros collaborate, e.g. "Elena Rossi Photography × Duy Nguyen Films"). The *client* just **browses/searches** these packages (no bidding). This is a catalog/shop experience → public `/packages` ([[peter-requirements-backlog]]). Provider type maps to `Package.type` = `solo` / `co-op` (already exists).
+
+- **MSR (Multiple Service Request):** the *client* creates it inside a **gig post** (an Event spanning multiple services). Professionals then **bid** on it (sealed bids, bidding board). This is the RFP/bid flow, SSR/MSR/ESR live on the professional bidding board + client Find-Gigs.
+
+**Where the code currently MIXES them (to fix):** `FindGigsController` maps real `Package` rows into SSR/MSR "type" card shapes — that conflates a package with an MSR. Packages should be typed solo/co-op, not SSR/MSR.
+
+**Target design for Package Service Search** (Peter's richer mockup): "Find the Perfect Package" hero + 4 value props (One Contract·One Payment / Professionally Coordinated / Better Value Bundle Pricing / Customizable); left rail = **Service Mix Matcher** (AND-match checkboxes across ~12 services: Photography, Videography, Floral, Catering, Decor, Lighting, DJ, Planning, Rentals, Transportation, Beauty, Invitations) + **Provider Type** (All / Solo Multi-Pros Only / Co-Op Partnerships Only); list/grid cards showing multi-service tags, "MULTI-SERVICE PRO", co-op partner (proA × proB), Event Coverage hrs, Team on Event Day (roles), Guests Served, "Starting at $X Total Package", "Save X% vs booking separately", View/Customize Package; right rail = "Where Packages Are Available" map, "Why Package Bundles?", "Recently Viewed". Needs schema additions: services[] (multi), coverage_hours, team[], guests_served, coop_partner_id, savings_pct, photos.
+
+
+## memory/peter-requirements-backlog.md
+
+---
+name: peter-requirements-backlog
+description: "Running backlog of Peter (client) requirements/requests — what's done vs pending, with scope flags. Check before starting dashboard/marketplace work."
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+---
+
+Peter Zylstra (client, Eastern/Maryland time) sends requirements via chat (often with AI-generated mockups from ChatGPT/Gemini/Claude). Ali/Khadija relay them. Rule: **big/new work is billable — flag upfront + get scope/payment confirm before building** (Peter has agreed AI-assisted dev is worth it; still confirm scope on large items). Portal colours: **Professional=blue, Client=orange, Influencer=green**.
+
+## 2026-07-14 — CURRENT DIRECTIVE (Ali) + DEFERRED list (REMIND before starting new UI)
+**Ali's rule now: do NOT build new UI/new pages. Make the EXISTING UI actually FUNCTIONAL** (wire representative/static screens to real backends). Handle whatever current issues come first; the items below are parked — **remind Ali about them** when current issues are cleared.
+
+**Deferred — make existing UI functional (priority order, do first when resumed):**
+1. **MSR "Request for Proposal"** (`client/multi-service/index.blade.php`) — form is representative, doesn't submit. Wire submit → real MSR/event save + surfaces to pros. (Ali's pick to start.)
+2. **Direct Offer** submit → real offer to a pro.
+3. **Package "View/Customize Package"** (`public.package`) — currently just links; needs real book/request/checkout flow (#5 booking).
+4. **Order Management / Event Completion** — real status lifecycle (representative now).
+5. **Payments** — no gateway yet (big).
+
+**Deferred — 21 legal policies (Peter sent 2026-07-14, files in ~/Downloads/bucket 1 and bucket 2/):** Drop into the EXISTING `PolicyPage` system (model + `PolicyPageSeeder` + `app/admin/policies` manager + routes like privacy-policy/payment-policy/cancellation-policy/dmca-policy). **Bucket 1 (9, footer):** Terms of Service, Privacy, Cookie, Refund & Cancellation, Cancellation & Reactivation, Community Guidelines, Accessibility Statement, DMCA, SMS/Text. **Bucket 2 (12, contextual):** Master Fee Schedule→pricing; Professional/Client Service Agreement + Project Contract + E-Signature Consent→signup/booking; Influencer Program Agreement→influencer signup; Insurance/COI→pro onboarding; Reviews & Feedback→reviews; Dispute Resolution + FTC Disclosure + Limitation of Liability→Legal page; Earnings Disclaimer→earnings. **NOT ready to publish:** drafts have unfilled `[BRACKET]/[SET]` blanks, need US-counsel sign-off, and site-vs-policy conflicts resolved first (Peter's explicit caveat). Task = seed 21 PolicyPage rows from the .md files + wire footer (Bucket 1) + contextual links (Bucket 2), keep unpublished/draft until legal clears. Big content-integration task.
+
+**Deferred — NEW UI (parked, don't build yet):**
+- **Event-type picker** for MSR/ESR/Post-Event: replace the 5-option `<select>` (multi-service view line ~156) with search + A-Z alphabet bar (empty letters greyed) + Popular, from ONE shared `config/event-types.php` (~40-50 occasions). Peter's mockup = alphabet-bar layout.
+- **MSR "Select the Services" picker + event→services cascade** (multi-service view): currently a static grid of ~20 service cards. Peter wants (a) an easier way to browse all services (search/filter — many options), and (b) **cascading dependency**: when a client picks the Event Type, ONLY services related/subcategorized to that event show (e.g. event "DJ"/music → only music-related services), so unrelated services aren't mixed in. Needs an event→category mapping. Same "parked new UI" bucket as the event-type picker.
+- **ESR standalone "Post a Rush Request"** workflow — see [[request-types-esr]] (currently only a derived label, not a real flow).
+- **Grand-opening / "Coming Soon" email-capture page** (Peter: capture launch-interest users).
+- **Domain email**: Peter on wehost.pk (cPanel, free domain email). Reco = **Zoho Mail free** (5 mailboxes, domain-tied via MX = portable, no host lock-in) over cPanel email; then wire app SMTP in prod `.env` (currently `MAIL_MAILER=log`).
+
+**⚠️ DEPLOY GAP:** All recent session work (Smart Match dynamic, de-AI rebrand, dual-role login fix, theme-flash fix, no-store logout security, role-brand colors, influencer logout, ESR/packages memory) is **committed locally / on GitHub but the LIVE cPanel server has NOT pulled** — Peter keeps testing live and seeing old behavior. Every "still broken" report traces to this. Deploy = live server `git pull` + `php artisan migrate` + `db:seed --class=DemoUsersSeeder` + `optimize:clear` (NOT CategorySeeder — it nulls events.category_id). Last 2 commits (icon colors, no-store) may still need `git push`.
+
+## DONE (recent, all pushed)
+- Login lands users in `primary_role` (a793a16) — pro who switched to client + logged out now logs back in as pro. See [[backend-wiring-59]] context isn't this — this is auth.
+- Search Professionals pagination fixed — was oversized default Tailwind arrows → custom `pagination/gr-nav` view (8b91031).
+- AI Tools hub: removed Client/Professional/Both audience tag (admin-only info) (815631a).
+- Pricing cards capped to 8 features + "more to know" toggle — BOTH public `landing.blade.php` and `dashboard/membership-plans/index.blade.php`.
+- Client "Find Gigs" → **"Browse Packages"** rename (de63223) — label only; pro-side "Find Gigs" (their find-work) left as-is.
+- Professional welcome banner lightened: dark navy `#1e3a8a` → `#3b82f6→#2563eb` (5b8ee33); accent `#2563eb` unchanged.
+- AI IQ module (20 tools 3-mode + gating + pricing + Phase 4 cap) — see [[ai-iq-levels]].
+
+## PENDING — Peter's requirements (mostly big / billable / needs scope)
+
+**1. Packages subsystem — MVP DONE (2026-07-13, commit dc263e9).** Real `Package` model+table (user, category, title, type solo/co-op, price+unit, duration, includes[], images[] via ImagePipelineService, is_active). `ProfessionalPackageController` CRUD; **Create-a-Package form** (`professional/packages/create`, reused for edit) + **My Packages** grid + sidebar links (`professional.packages.*`). Client **Browse Packages** (`FindGigsController`/`client.find-gigs`) now prepends real published packages (with pro's real rating/reviews) ahead of the representative CATALOG. **Still pending:** public package **detail page** + **book/checkout** flow; co-op multi-pro packages (currently just tagged MSR); package search filters tuned for packages. Packages ≠ MSR (MSR = client posts job, pros bid; Package = pro bundles own services).
+
+**2. Top-nav dashboard header — ⛔ ON HOLD / DO NOT BUILD (Ali override 2026-07-21).** Ali explicitly said the **sidebar stays** — do not convert dashboards to a top-nav. A top-nav attempt (commit 9ac8e02) was fully reverted (a6e69b9). Despite the "Peter's repeated ask" note below, get Ali's explicit go before ever touching the sidebar→top-nav again. (Original ask, parked:)** Remove the left sidebar; replace with a horizontal top-nav (Dashboard · Find Work · My Work · Customers · Finance · AI Copilot · Insights · Account) + dropdown mega-menus. Rules: **only ONE dropdown open at a time**; don't oversize (normal width); use the real GigResource logo (not the mockup); apply to ALL user dashboards. Reference already live on public header (`layouts/landing.blade.php`: Find Gigs / Find Professionals▾ / Categories▾ / Resources▾ / Pricing). Dropdown subtitles: if no webpage exists for it, either remove the subtitle OR build the page if it's important. Rename "Professional" nav item to "AI Tools" as a dropdown (per one message). Also wants the 3-section header (top-nav + AI-tool hero + welcome/stats band).
+
+**3. New public/browse pages (Categories dropdown):** Shop Packages, **Event Types** (browse by occasion — weddings/corporate/birthday/etc., mockup provided), Trending Packages. New builds → "Packages & Discovery" phase. Peter also managing event-categories data.
+
+**4. Search card premium redesign + image system (big, billable).** Airbnb/Zillow/Behance style: hero images, **multiple image sizes + smart/auto cropping**, featured cover-photo selection, bigger cards, per-category hero templates, hover image carousel, optional video hero. New image pipeline backend.
+
+**5. Sealed bids.** Professional bid amounts sealed from everyone except the bidder; bidder must **opt-in** to make their bid public.
+
+**6. Event-integration (Peter confirmed wants it; scope given; awaiting build go).** "Add to my event" on AI tools + store generated data on the event + open tools pre-filled from event flow; level-gated (free=manual entry, Semi/Max=auto-attach). Billable phase.
+
+**7. AI tool renames** (e.g. "AI Review Writer") — Peter OK with renaming; **check with Khadija first**, decide together.
+
+**8. Elevated cards "sit above background"** — tinted page bg + white cards + soft shadow. WHICH page? (unanswered — ask Ali).
+
+## Future / dependent (billable, not started)
+- Notification engine (~60+ triggers) — Peter building the email system first, said "you can add on".
+- Ticketing / complaint system.
+
+## Product model (Peter's canonical split)
+- **Clients:** Post an Event (create gigs=job posts), Browse Packages, Search Professionals, AI Tools (client set), My Events, My Requests, Bookings, Proposals, Messages, Contracts, Payments, Reviews. **No "Find Gigs" for clients** (they don't browse other clients' gigs).
+- **Professionals:** Find Gigs (their find-work / bid on client jobs), Create a Package, AI Tools (pro set), Direct Offers, SSR/MSR/ESR, Saved Gigs, Bid History, Team Opportunities.
+- Clients should NOT browse other clients' gigs. "Create a Gig" = a client concept; pros create packages.
+
+
+## memory/post-event-flow.md
+
+---
+name: post-event-flow
+description: "Client 'Post an Event' = Peter's exact 11-step booking wizard at /client/post-event (PostEventController); package-matching model, representative from step 5 on."
+metadata:
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+---
+
+Peter's approved **"Post an Event" 11-step client booking journey** (from his ChatGPT mockup, 11 screenshots that were in `~/Downloads/postEvent`). Built exactly to design in the client (orange) portal theme.
+
+**Route/controller:** `App\Http\Controllers\Client\PostEventController` under `Route::prefix('post-event')->name('client.post-event.')` inside the existing `Route::prefix('client')->middleware('permission:dashboard.view')` group. 12 routes: GET each step + `POST /` (`store-info`). Entry: **client sidebar "Post an Event"** (top of Manage Events) → `client.post-event.event-info`.
+
+**The 11 steps** (wizard keys): event-info → build → service-details → review-search → results → compare → customize → combinations → checkout → confirmed → final-payment. Steps 1-4 collect the client's real request (persisted in `session('post_event')`, shown in the right-rail "Your Event At A Glance"); steps 5-11 (package matching / combinations / checkout+escrow / order tracking / final payment) are **representative** pending a live package-matching + escrow pipeline — markup mirrors the final design.
+
+**Design system:** `resources/views/client/post-event/` — `_styles.blade.php` (all `.pe-*` classes: wizard bar, cards, rail, buttons, service grid, rings, badges), `_wizard.blade.php` (progress bar; done=green✓ / active=orange / upcoming=grey), `_rail.blade.php` (event-at-a-glance). Each step view `@extends('layouts.client')` + `@include('client.post-event._styles')` then `.pe-wrap` → `_wizard` → `.pe-container.pe-main` → `.pe-grid` + `<aside class="pe-rail">`. Controller holds representative `packages()/addons()/combinations_()/order()` data arrays.
+
+**KEY MODEL NOTE:** this is a **package instant-book** funnel (client → AI-matched multi-service packages → book+escrow deposit) — DIFFERENT from the existing **bidding** model ([[ai-tools-catalog]]'s Bidding Board where pros bid on posted gigs). Both coexist; this is the MSR fulfilment path. **Khadija was also building these steps** — coordinate to avoid divergence.
+
+**COMPLIANCE fix:** Peter's own mockup used "24/7 Customer Support" (a [[compliance-copy-rules]] banned claim) — replaced everywhere with "Dedicated support". Verified 0 occurrences of "24/7" in the module.
+
+
+## memory/pro-category-relation.md
+
+---
+name: pro-category-relation
+description: category_user pivot — the real pro↔category link that powers category landing pages and ?category= on /browse; includes the duplicate-name save trap
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+  modified: 2026-07-26T15:45:51.917Z
+---
+
+**Built 07.26.2026.** Before this there was NO link between professionals and categories — only
+`category_event` (categories ↔ events). Discovery guessed with `LIKE '%<full category name>%'` against
+the pro's free-text `headline`/`bio`/`skills`, which matched nothing ("Fine-Art Wedding Photographer"
+never contains "Photography Services"). Result: all 360 category landing pages showed **0 pros**, and
+the "Browse all <category>" button passed `/browse` the same doomed `?q=`.
+
+**What exists now:**
+- `category_user` pivot · `User::serviceCategories()` · `Category::professionals()`
+- Professional profile → Professional tab → **"Services You Offer"** card (`<x-service-picker>`, blue
+  accent), route `professional.profile.update.services` (PATCH).
+- `/browse?category=<slug>` — real relation filter, matches the category **and every descendant**, so a
+  group page returns the specialists under it. Category landing pages link with this, not `?q=`.
+- `DemoProfessionalsSeeder` has a `'services' => [names…]` key per pro and an `attachServices()` helper.
+
+**THE TRAP — read before touching the save:** the legacy tree repeats the same service name under many
+event types ("Event Photography" exists a dozen times). `<x-service-picker>` dedupes by NAME, so the
+form can only ever submit ONE id per name. Syncing those ids verbatim drops the pro from every other
+branch — the first save cut Duy Nguyen from 21 pivot rows to 6. `updateServices()` therefore expands the
+picked ids → names → **all** ids with those names before `sync()`. Same reason the seeder matches on
+name. Any new surface that writes `category_user` must do the same expansion.
+
+**Also fixed on the landing page (same pass):** `4.8★ Avg rating` and `24h Avg quote time` were
+hard-coded literals in the Blade — invented platform data and a banned claim per
+[[compliance-copy-rules]]. Removed. The pro count is real but now renders only when > 0 ("0+ Pros
+available" read as broken), alongside a real subcategory count.
+
+**Still open:** `/browse` is `auth`-gated (Ali's call 07.26.2026: leave it). So guests clicking
+"Browse all <category>", or top-nav "Find Gigs" / "Browse Professionals", still hit `/login`.
+
+Related: [[browse-light-rebuild]], [[legacy-categories-import]], [[service-picker-rollout]].
+
+
+## memory/production-hosting.md
+
+---
+name: production-hosting
+description: "Production deploy target, host layout, and the dashboard→main-domain migration"
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+---
+
+The Laravel app (GigResource) is deployed on a cPanel shared host (user `gigresso@drh1`).
+
+**Payments go-live lock (Peter: no real charges until launch, but testing must work):** real money is blocked until `PAYMENTS_GO_LIVE=true` in `.env` (`config/payments.php`, default false). `App\Domain\Payments\PaymentGuard::assertLiveChargeAllowed($mode,$key)` is called at all 4 charge points (Stripe + PayPal × subscription + reactivation) and throws `PaymentsNotLiveException` for any live mode or `sk_live_` key while the flag is off. TEST mode + test keys/cards work fully for testing. **To actually go live: (1) set `PAYMENTS_GO_LIVE=true` in `.env`, AND (2) Admin → Payment Settings → Mode = Live with live keys.** Both are required.
+
+**June 2026 migration:** the app was moved from the subdomain `dashboard.gigresource.com` to the **main domain `gigresource.com`**. The old `gigresource.com` was a legacy *plain-PHP* GigResource site (about.php, bookings.php, adminlab/, user uploads, gigresource.sql) — it was backed up + downloaded, then `public_html` cleared, and the Laravel app `rsync`'d in from the subdomain's `public_html`. After verification the `dashboard.gigresource.com` subdomain is being deleted.
+
+**Host layout:**
+- Doc root for a domain = `~/domains/<domain>/public_html`.
+- The Laravel **project root IS `public_html`** (app/, resources/, vendor/, storage/, public/ all live there). A small `public_html/index.php` shim + `.htaccess` forward requests into `public/index.php`, so the cPanel doc root stays `public_html` (no need to point it at `/public`).
+- DB credentials are unchanged across the move (same database). `.env` is NOT in git — it travels with the file copy; on migration only `APP_URL` (and `SESSION_DOMAIN` if subdomain-scoped) needs updating.
+
+**Deploy steps that matter after moving/pulling:** update `.env` APP_URL → `https://gigresource.com`, `rm -f public/storage && php artisan storage:link` (symlink stores an absolute path), `php artisan optimize:clear`, `chmod -R 775 storage bootstrap/cache`. Server has **no npm** — don't rely on `npm run build`; assets ship with the repo/copy.
+
+Security caveat with doc-root=`public_html`: verify `https://gigresource.com/.env` and `/.git/config` return 403/404 (not 200) — otherwise secrets are web-exposed.
+
+`CANONICAL_HOST` env (see `app/Http/Middleware/CanonicalDomainRedirect.php`) can 301 stray hosts to the canonical domain, but it reads `env()` directly so it breaks under `php artisan config:cache` — avoid config:cache or move it into a config file. Related: [[public-site-light-redesign]]
+
+
+## memory/public-site-light-redesign.md
+
+---
+name: public-site-light-redesign
+description: Public marketing site is being migrated dark→light; homepage uses a new self-contained light layout
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+  modified: 2026-07-23T11:49:16.915Z
+---
+
+The public-facing marketing site (GigResource) is being redesigned from the old **dark** theme to a **light** theme matching the client mockups (white bg, navy text, blue #2563eb + orange #f97316 accents — same palette as the dashboards).
+
+**Architecture decision (2026-06-11):** The homepage was rebuilt against a NEW self-contained light layout `resources/views/layouts/landing.blade.php` (its own light navbar + footer + inline-SVG hexagon logo, real routes + @auth/@guest states). The view `resources/views/landing.blade.php` (`@extends('layouts.landing')`, `lp-` prefixed classes) holds all reference sections: hero w/ floating cards, 5-col trust bar, categories carousel, 5-step How-It-Works, 3 assistance cards, why-choose + video + testimonial, gradient metrics bar, pricing, CTA banner.
+
+**MIGRATION COMPLETE (2026-07-23).** Every view is off the dark layout — `grep -rn "layouts\.public"` over `resources/views/` + `app/` returns nothing. `layouts/public.blade.php` and `partials/_public_styles.blade.php` are dead code, left on disk. The last pages converted were `errors/_layout`, `public/professional/show`, `policies/show`, `blog/show`. **Peter rejects any dark public page on sight — if one reappears, convert it, don't ship it.**
+
+**Two traps when converting a page to `layouts.landing`:**
+1. *Hero over a photo* — convert line-aware. Rules for the hero block keep explicit `rgba(255,255,255,…)` / `#fff`; only the body region moves to light tokens. Blanket search-replace turns hero text white-on-white.
+2. *Scrim gradients silently vanish.* `linear-gradient(… , var(--bg-dark) 100%)` — `--bg-dark` doesn't exist in the light layout, and one invalid stop makes the browser drop the **entire** gradient, washing out the hero title. End the gradient on an explicit `rgba(11,15,26,0.86)`.
+
+Also: the landing header is **in flow**, not fixed — old pages carry `padding-top: 180px` (mobile 140px) to clear the old fixed navbar. Cut it to ~72px / 48px or the page opens on a band of blank white.
+
+Same class of bug inside the dashboards: `layouts/professional.blade.php` defines `--text-primary` / `--text-secondary` / `--text-muted` / `--border-color`, but **not** `--text-white` or `--text-light`. Views using the latter fell back to inherited colour. Use the pro tokens — they flip with that layout's own light/dark toggle.
+
+Real/dynamic data on the homepage: `LandingPageController` provides `$plans` (MembershipPlan + features → pricing cards), `$metrics` (real aggregates w/ marketing floor), `$featuredReview` (testimonial fallback to illustrative). Category tiles + hero "Top Match" card are curated/illustrative because the live Category table is junk test rows and there are 0 reviews / no review-backed top pro.
+
+**Auth pages redesign (2026-06-19):** register + login rebuilt to the new light two-column mockups via a shared `resources/views/layouts/auth-pro.blade.php` (`apx-` prefixed classes). Role-themed by a `@php` map keyed on `@section('apRole', …)`: **client/affiliate/login = orange #f97316, professional = blue #2563eb**. Left panel = "Join Event Pro Marketplace" + role tagline + 4 benefits + trust band (Trusted by Global Brands / Fast Campaign Launches / Secure Payments / Real-Time Analytics); right = form card with **placeholder** Google/Apple OAuth buttons (no Socialite backend — "Soon" badge). Pages: `auth/register.blade.php` (role-driven client|supplier via `?role=`, geo zip/state PRESERVED, onboarding disclaimer kept), `auth/login.blade.php`, `influencer/join.blade.php` (affiliate — kept its real *application* fields: full_name/email/social/audience/reach, NOT a password account). RegisterController now also validates `phone` (nullable → saved to user) + `agree` (ToS, accepted). **Four SEPARATE login pages** (per audience, all post to the one `Auth::routes()` POST `/login` handler — auth is role-agnostic, only the look differs):
+- `/login` → **Client** (orange) — default; `auth/login.blade.php` reads `$loginRole` (default 'client').
+- `/professional/login` (route `login.professional`) → **Professional** (blue) — renders `auth.login` with `loginRole='supplier'`.
+- `/affiliate/login` (route `login.affiliate`) → **Affiliate** (orange) — `loginRole='influencer'`.
+- `/admin/login` (route `admin.login`) → **Admin** — separate view `auth/admin-login.blade.php`, clean dark-navy "Admin Portal" card (no marketing/OAuth, NO fake metrics).
+All three user logins share `auth/login.blade.php` (themed via `$loginRole` → heading "Professional/Affiliate Sign In", matching register link, cross-links). The `/professional/login` & `/affiliate/login` GET routes + `/admin/login` sit right after `Auth::routes();` in web.php, all `guest` middleware.
+
+Related: [[dont-edit-dashboard-layouts]]
+
+
+## memory/request-types-esr.md
+
+---
+name: request-types-esr
+description: "ESR = Emergency/Rush Service Request — its own standalone workflow (parallel to SSR/MSR/Direct Offer), NOT just an MSR link. Currently only a derived label."
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+  modified: 2026-07-23T12:12:37.749Z
+---
+
+Peter's request-type model (clarified 2026-07-14). Four PARALLEL client request workflows, each single- OR multi-service:
+
+- **SSR** = Single Service Request = "Post a Gig / Create a Gig / Post an Event" (one service).
+- **MSR** = Multi-Service Request (several services in one gig; pros bid — see [[packages-vs-msr]]).
+- **Direct Offer** = client invites a specific pro directly (`ClientDirectOfferController`).
+- **ESR** = **Emergency / Rush / Last-Minute Service Request**. Its OWN standalone workflow, parallel to the above, with **single- and multi-service variants** (same pattern as Direct Offer). Keep the label wording "Emergency / Urgent / Last-Minute" — don't reword.
+
+**Peter's rule:** ESR must be a REAL workflow, **not just web-linked to the MSR page**. UI: *"Need help now? Post your request and verified pros can apply right away."* → button **"Post a Rush Request"**. Rush post = urgent flag + short deadline; verified pros can apply/bid immediately.
+
+**Current state (2026-07-23): BUILT.** `ClientEsrController` + `client/esr/create` (routes `client.esr.create` / `client.esr.store`). Publishes a real Event with `source='esr'`, which flows through the normal bids → proposals → award → booking engine.
+
+**Single/multi scope (added 2026-07-23, answering Peter's "could an ESR actually be an SSR and an MSR?"):** yes — two-card chooser at the top of the ESR form, `scope=single|multi`, defaults to multi, deep-linkable via `?scope=single`.
+
+**The distinction Peter was checking, and the thing not to blur:** scope is the *only* thing Direct Offer and ESR share. A Direct Offer is **targeted** — one named pro, `supplier_id` set, `is_published=false`, never hits the board. An ESR is **broadcast** — published, every available pro bids. The ESR rail says this in copy on purpose; don't "unify" the two flows.
+
+Scope is not a column — it's derived from the attached category count, which is literally what single-vs-multi service means. Guard in `store()` rejects `scope=single` with >1 service.
+
+`<x-service-picker>` has a `single` prop for this. Enforce single-select **inside** the component, never from page JS — the picker owns its chips + counters, so an outside handler unchecking boxes leaves them stale. Flip it live by dispatching `svc:single` (`{detail:{on:true}}`) at the picker root; switching multi→single keeps the first pick.
+
+**Pro bidding board (verified 2026-07-23):** `ProfessionalBiddingBoardController::mapEvent()` reads `source === 'esr' ? 'ESR' : (count($cats) >= 2 ? 'MSR' : 'SSR')` — correct. The `urgent` flag also forces true for ESR, because it otherwise came only from "starts within 3 days" and an ESR dated further out lost the flag that is the whole point. Direct Offers never reach the board (query filters `is_published=true`; offers are false).
+
+Left alone: `FindGigsController` still carries a hardcoded representative CATALOG with its own SSR/MSR/ESR labels — demo data, not derived from events.
+
+Also note packages ([[packages-vs-msr]]) are a SEPARATE concept (pro-authored bundles clients browse) — never fold ESR/MSR into packages.
+
+
+## memory/service-area-gate.md
+
+---
+name: service-area-gate
+description: "Out-of-area accounts register but can't transact — EnsureServiceArea (fail-closed) + /app/admin/waitlist. Includes two data bugs a column default caused."
+metadata:
+  type: project
+---
+
+Peter's registration rule (2026-07-30) is: everyone registers, eligibility is
+revealed afterwards. Built 2026-07-31 (`97f5912`, `9537596`).
+
+**The line is writes, not pages.** An out-of-area account keeps its profile,
+its planning tools and a browsable marketplace; it cannot commit, because every
+commitment ends in a contract we can't service in that state.
+`app/Http/Middleware/EnsureServiceArea.php` is appended to the **web group**,
+not hung off route groups, so it **fails closed** — a transactional route added
+later is gated the day it's written. Non-GET blocked except an account-scoped
+allowlist (profile, password, logout, waitlist opt-in, `ai-tools.` compute);
+GET blocked only at the front doors of the request wizards. Admins exempt.
+
+**Two bugs found only by writing the test — both would have shipped as an outage:**
+1. `service_area_status` was added with `default('coming_soon')`, which
+   backfilled **every existing row** as out-of-area regardless of location —
+   all 15 accounts, including the 10 demo pros seeded into the launch states
+   for Peter's screenshots. Harmless while nothing read the column; a total
+   lockout the moment the gate enforces it. Fixed by a re-runnable backfill
+   migration that derives status from the location already on the profile.
+2. Even after backfilling, every demo pro was still `coming_soon`: `country` is
+   stored as `"United States"` in places while `ServiceArea` compared to `"US"`.
+   `ServiceArea::countryCode()` now resolves both.
+
+**Design rule that came out of it:** `service_area_status` is **derived, never
+typed** — recomputed in `UserProfile::booted()` on `saving` when country/state
+are dirty, because four controllers can write those fields. Move into a launch
+state and the same save un-gates you.
+
+Admin side: `/app/admin/waitlist` (`AdminWaitlistController`), read-only by
+design — opening a state has legal/payment consequences and shouldn't be a
+button. Grouped by state largest-first (the "where do we open next" list) with
+opt-in counts; profiles with no state group under "Not given" rather than being
+dropped from the total.
+
+Tests: `ServiceAreaGateTest` (11), `AdminWaitlistTest` (4).
+Related: [[peter-requirements-backlog]], [[compliance-copy-rules]].
+
+
+## memory/service-picker-rollout.md
+
+---
+name: service-picker-rollout
+description: "Reusable service-picker component (Peter's ESR-style mockup) replacing flat category chip-walls; where applied + what's pending."
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+---
+
+Peter (07.20.2026) disliked the service pages "spreading out" — the full 360-category tree dumped as a giant flat chip/checkbox wall. He sent an ESR-style mockup and asked to apply that style across the service pages.
+
+**Solution:** `resources/views/components/service-picker.blade.php` — `<x-service-picker>` with search bar + "Search" button, removable "Selected keywords" pills + "Clear all", and an "Or browse all services" contained + scrollable 4-col checkbox grid + live "N selected" counter. Self-contained CSS/JS via `@once`. Dedupes legacy tree by name (360 → ~177). Key prop: `valueField` = `'id'` (Direct Offer) or `'name'` (MSR — its store() matches `whereIn('name')`). Watch the label+checkbox double-toggle — component listens on checkbox `change`, not label click.
+
+**Applied:** `client/direct-offers/create` (MSR mode, IDs); `client/multi-service` (names) + softened the 4-step cards to tinted bg (Peter: "softer colors in the steps"). Commit 6c8282b.
+
+**Reference:** `client/esr/create` is Peter's style inspiration — already has its own contained scroll box (`esr-services`, category IDs); left as-is. Could swap to the shared component for full consistency if asked.
+
+**Pending / open:**
+- `professional/packages/create` — Peter unsure ("maybe this one too, but i dont know"); NOT done. Different context (pro building a bundle, blue theme). Confirm before applying.
+- **Data cleanup (separate task):** legacy category taxonomy has near-duplicate names ("Beverage Service / Services / Stations", "Balloon Decor & Arches / Installations") + event-types mixed with services. Picker style is fixed but the underlying [[legacy-categories-import]] data still reads messy. Real fix = curate/flatten the service taxonomy.
+
+Related: [[peter-requirements-backlog]], [[request-types-esr]], [[packages-vs-msr]].
+
+
+## memory/team-mode-removal.md
+
+---
+name: team-mode-removal
+description: "DECISION 07.15.2026 — remove Team Mode / Co-Op 'combined force' platform-wide. DONE in code 07.31.2026 (UI 07.16, storage dropped 07.31); only Peter/Khadija's .md policy edits remain."
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+---
+
+**Peter's DECISION (2026-07-15, formal doc): remove Team Mode / Co-Op "combined force" across the ENTIRE site — UI, docs, policies.** Reason: a "lead professional = sole contracting party & payee, liable for the whole team" directly contradicts the governing rule "**each professional is independent, paid separately**" (per-service = separate gig). Removing it eliminates a pile of contradictions. Also flagged in the MSR review ("delete the Co-Op branch — [LEGAL] separate from an MSR") and the Direct Offer punch list (delete §⑤ Team Collaboration).
+
+## Code scope (~12 files, verified by grep 07.15)
+- **Model/DB:** `app/Models/Package.php` (type solo/co-op, `isCoop()`, `coopPartner()`, team[] fields/casts); migrations `2026_07_13_000002_create_packages_table`, `..._000004_add_rich_fields_to_packages` (co-op/team columns); `database/seeders/DemoPackagesSeeder.php` (coop partners).
+- **Controllers:** `Professional/ProfessionalPackageController`, `Public/PackageController`, `Client/FindGigsController`.
+- **Views:** `professional/packages/create.blade.php` (11 hits — co-op type selector + partner picker + team fields), `public/packages-index.blade.php` (9 — badges/filter), `public/package-show.blade.php`, `client/direct-offers/create.blade.php` (§⑤ Team Collaboration).
+- **Docs/policies (Peter/Khadija's .md, NOT in repo):** strike "combined-force teaming" clause from the Direct Offer definition + MSR Co-Op branch + anywhere Co-Op appears.
+
+## Safe removal plan (billable, but 90% deletions in existing UI — NO new UI)
+1. Remove co-op TYPE selector + partner picker + team fields from pro Create-a-Package → packages become **solo-only**.
+2. Remove Co-Op badges/filters from packages-index + package-show + PackageController/FindGigsController.
+3. Delete §⑤ Team Collaboration from Direct Offer form (part of the Direct Offer build).
+4. Seeder → all packages solo.
+5. **Keep the DB column DORMANT (don't hard-drop)** — safer/reversible; drop later via migration if Peter never revisits teaming.
+Fold into the MSR/Direct-Offer build pass. See [[workflows-master-spec]], [[packages-vs-msr]].
+
+**Status: UI removal EXECUTED 2026-07-16** (Phase 1, Ali greenlit). Commits: `2258551` (packages: pro create solo-only, public search provider filter/CO-OP badge/team fact gone, PackageController/ProfessionalPackageController/FindGigsController/DemoPackagesSeeder de-co-op'd), `4cf81bf` (Direct Offer create Team Collaboration section removed + "No overlapping bids" copy fixed). DB columns type/coop_partner_id/team kept dormant (not dropped). Package model still has coopPartner()/isCoop() (dormant, harmless — type always 'solo' now). Policy/doc .md updates (strike "combined-force teaming") = Peter/Khadija's side, still pending.
+
+## FINISHED 2026-07-31 — storage dropped (commit `c733237`)
+The 07.16 pass removed the UI and left the storage "dormant, harmless". It was
+not harmless: two weeks later the DB still had **4 packages with a real
+`coop_partner_id`** and **4 typed `co-op`**, plus `Package::coopPartner()` and
+the column in `$fillable`. Invisible — the badge markup was already gone so the
+CSS was dead, and `type` is never rendered — which is exactly why it survived.
+Dormant storage of a retired product is a query away from resurrecting it.
+
+Migration `2026_07_31_120000_drop_coop_partner_from_packages` drops the column
+AND normalises the 4 `co-op` rows to `solo`; `down()` recreates the column (so
+the 07.13 migration can still roll back in order) but not the values.
+Also gone: the `coopPartner()` relation, the `$fillable` entry, the forced
+`'coop_partner_id' => null` in ProfessionalPackageController, the seeder key,
+and the dead `.pk-typebadge.coop` / `.pk-legend .coop` CSS.
+
+Guarded by `tests/Feature/PackagesSoloOnlyTest.php` (3 tests). One of them
+matters more than it looks: `Public/PackageController` carries a "Packages are
+solo-only" **comment with no filter under it** — correct now that every package
+is solo, but anyone tidying that comment into code would silently hide packages.
+
+**Still open:** the policy/doc `.md` edits (strike "combined-force teaming") are
+Peter/Khadija's side, never done.
+
+
+## memory/workflows-master-spec.md
+
+---
+name: workflows-master-spec
+description: "Canonical GigResource lifecycle spec (Peter's ~48-workflow set, reconciled 07.15.2026) + the big post-event architecture fix + open conflicts. Read before building any client/pro request/booking flow."
+metadata: 
+  node_type: memory
+  type: project
+  originSessionId: 85789cbb-33fa-475d-a481-c0a769b18371
+---
+
+Peter delivered the **full platform workflow set** (~48 workflows, 6 categories) as the canonical spec, reconciled/dated **2026-07-15** (earlier versions had version-drift — older docs weren't updated as new ones were added; the 07.15 set is authoritative). Source docs are Claude-generated reviews Peter runs against a [LEGAL] counsel-reviewed policy set + [FLOW] flowchart + [YOU] chat statements. **These reviews are high-quality and mostly accurate** — I verified key claims against code.
+
+## THE BIG FINDING (highest-priority build)
+**`/client/post-event` is a package SHOPPING/ordering wizard (synchronous → ends at Checkout), NOT a posting-and-bidding flow.** 7 of its 10 steps are package ops (Results → Compare → Customize → Combinations → Checkout). No posting is created, no pro ever responds. Peter's instinct was right.
+**Fix (no new UI — re-scope existing screens):**
+1. Add **Step 1 "Choose Route"**: SSR · MSR · ESR · Direct Offer · Package Search. Packages become ONE route of five, not the whole product.
+2. Posting routes (SSR/MSR/ESR) **end at "Publish"** — then bids arrive asynchronously on **`/client/proposals`** (this async surface is "the missing half" — page exists but isn't wired to a posting→bid loop).
+3. **Bidding Board (`/professional/bidding-board`) is already built & correct** — just needs MSR/ESR listings + bid form + net-commission shown, fed from published postings.
+4. Keep package steps 5–10, scoped to Package route only. Nothing is deleted — the package flow is real, just mis-scoped.
+
+## Core architecture (confirmed correct in code — do NOT redo)
+- **Per-service = separate gig**: each requested service is awarded, contracted, and paid separately. MSR review findings #24–28 confirm this is built right and consistent.
+- **MSR and ESR use the SAME per-service bidding model** — whatever is built for MSR bids serves ESR.
+- **Direct Offer = NON-bidding**: targeted invite to specific pro(s); pro Accept/Decline/Reply. Same service → one pro at a time (sequential re-offer if declined); different services → different pros in parallel. Partial-fill: accepted services lock, unfilled stay OPEN → client re-routes remainder via the same 5-route chooser (2nd Direct Offer / MSR / ESR / Package). See [[request-types-esr]].
+- **Universal counter loop**: Accept / Decline / **Reply** everywhere (unlimited back-and-forth until deal/no-deal). Several screens show only Accept/Decline — **Reply button missing** (My Proposals, ESR response) — must add.
+
+## Confirmed fee schedule ([LEGAL])
+Posting: **$2.99** per post (regardless of outcome). Service fee: **$4.99** per finalized SSR/MSR-gig/Direct Offer; **$8.99** ESR — charged ONLY on finalized agreement, "never on deals that fall through." **$4.99** one-time ID verification (+18+ +ToS/Privacy/E-Sign = preconditions to post). Commission Starter 5% / Pro 3% / Elite 1.5% (professional-absorbed, deducted by processor at payout). See [[peter-requirements-backlog]] pricing.
+
+## PROGRESS (2026-07-16, Ali greenlit)
+- **Phase 1 DONE + committed:** geo NY→WV (`72468c7`), Team/Co-Op removal (`2258551`,`4cf81bf`), RFP→MSR (`a8f8da2`). See [[team-mode-removal]].
+- **Phase 2 keystone DONE (`7d17734`):** `/client/post-event` now opens on a **Choose Route** step (`client.post-event.choose`) — Shop Packages / MSR / Direct Offer (live) + SSR / ESR ("Coming soon"). All "Post an Event" entry points repointed to it; package wizard is now just the Package Search route. Verified rendered as client@example.com.
+- **Phase 2 core loop LIVE + verified end-to-end (`51f8fcd`, `2c4682d`):** MSR "Publish Request" (`ClientMultiServiceController::store`) creates a real published `Event` (services = categories) → surfaces on the pro **Bidding Board** (already queries published events) → pro `placeBid` (sealed-bids, exists) → **client `/client/proposals` now sourced from `Bid`** shows the incoming bid with real amount/status/pipeline. Proven: Event #85 + $4,200 bid visible on Proposals.
+- **Phase 2 loop EXTENDED (07.16, all verified):** net-commission preview on pro bid form (`b82c012`); client **Accept/Decline award** on Proposals (`ca6a0a1`); pro **award status** "You won/Not selected" on My Bids (`a370b53`); **Reply/counter-offer negotiation** both sides via `bid_replies` table + shared `_bid-thread` partial (`029cdac`). Full loop now: post→publish→bid(net)→proposals→Accept/Decline/Reply→award visible both sides.
+- **Award→Booking + Direct Offer wired (07.16, verified):** accepting a bid creates a confirmed `Booking` (price=bid amount, source 'bid') shown on client Bookings (`43bb35e`, also fixed a pre-existing 500 there — escrow sweep had broken the `locked_escrow` array key). Direct Offer builder now submits (`2d21b6f`): creates a targeted Event (supplier_id set, is_published=FALSE so NOT on open board, source 'direct_offer').
+- **Direct Offer loop COMPLETE both sides (`c39d0fc`):** pro Direct Offer page loads the real targeted offer + Accept (→ confirmed Booking) / Decline. Full DO chain works: client sends → pro sees real offer → responds → booking.
+- **Remaining Phase 2 (NOT done):** funding/Payment-Secured status on Booking (gateway deferred); **per-service MSR rows** on Bidding Board (bids are per-event not per-service — needs a category_id on bids, a schema change); SSR + ESR client flows (route chooser shows them "coming soon"); ESR pages both sides.
+- **FULL LIFECYCLE FUNCTIONAL (07.16, verified end-to-end):** post → bid(net commission) → Proposals → Accept/Decline/Reply(counter) → award → confirmed Booking → pro **Mark Delivered** (completed) → client **Review** (5★). Plus Direct Offer both sides. Commits `2b69816` (mark delivered) + `6dd70d5` (review). Deploy is Ali's responsibility (he confirmed).
+- **Per-service MSR bidding DONE (`c934897`):** bids.category_id added; each service in an MSR is its own gig, bid/awarded/paid separately (Peter's core rule). Bid modal has a service picker for MSR/ESR gigs. Verified: pro holds 2 separate bids on one event.
+- **SSR live (`83d1dea`) + ESR built (`5f513dc`):** all 5 request routes now functional. ESR = standalone rush flow → Event source 'esr' → surfaces on Bidding Board with priority → reuses the whole bid→proposals→award→booking→review engine. New `ClientEsrController` + `client/esr/create` view + sidebar "Emergency (ESR)".
+- **~20 commits on 2026-07-16, DEPLOY-PENDING** (main; deploy is Ali's job). **Entire request-types system + transaction lifecycle now functional** (was representative). Remaining (smaller/optional): dedicated pro "Respond to ESR" page (pros currently respond via the Bidding Board where ESR gigs show); funding/Payment-Secured (needs a gateway); pro-side reply/counter on Direct Offers.
+
+## Build order (Peter's, phased — big billable core)
+1. Route chooser + Step 0 eligibility → 2. Service details (scope·deliverables·specs·deadline per service) + engagement terms + $2.99 + Publish → 3. MSR/ESR on Bidding Board + bid form + commission → 4. `/client/proposals` async surface (the missing half) → 5. Award → contract → funding → 6. Completion Notice + 7-day/3-day review clocks + My Bids → 7. Direct Offer both sides + ESR pages both sides (new pages, reuse MSR backend, build from Peter's mockups).
+
+## OPEN CONFLICTS — need Peter's decision (do NOT guess)
+- **Geo states — RESOLVED 2026-07-16 (Peter):** authoritative 7 = **MD, PA, WV, VA, NJ, DE, DC** (NY dropped "for the time being"). Code still has NY, not WV → needs update: `config/geo.php` ZIP mappings (remove NY 004/005/100–149, add WV zips 247–268), `allowed_states`, and the RegisterController `state.in` error message. NJ trademark caveat (a NJ "Gig Resources LLC" staffing co exists — different purpose/name; Peter aware, keeping NJ for now). Small but multi-spot geo change, NOT yet applied.
+- **"Escrow"** still in workflow docs + checkout; counsel = highest-priority "do not describe as escrow." Site already switched to "Secure Payment" — docs must match. See [[compliance-copy-rules]].
+- **ESR fees mockup wrong**: shows $4.99+$9.99=$14.98 due on PUBLISH; should be $2.99 posting + $8.99 service on finalization.
+- **"Risk Monitor" / "Event Readiness"** (client MSR screen) — exist in NO doc. Spec or remove?
+- **ESR tier-3 access**: mockup "Other Tiers notified if still unfilled" vs [YOU] "Starter unlocks with Pro at 60-min mark." Tier labels Top/Mid/Other ≠ Starter/Pro/Elite.
+- Pro-side add-on fees (Travel/Rush/Equipment/**Other**) — not in schedule; "Other Fees" catch-all = junk-fee risk. Allow pro-set fees or not?
+- Sealed bids & 60-min early access are BUILT/stated but absent from [LEGAL] — policy set must catch up (update policy, not UI).
+- **Escrow/payment/deposit = DEFERRED (Peter has NO payment plan, 2026-07-16).** Peter said he doesn't know the escrow/payment setup and "Claude keeps asking." STOP asking him about escrow/deposit authority/payment provider. Stance: keep compliant **"Secure Payment"** placeholder wording, build NO real money movement now; real payment (Stripe/deposit split/escrow-like hold) waits until Peter picks a processor. Treat all fee/deposit UI as representative until then.
+
+## PER-PHASE CHECK (Peter's ask 07.16) — cross-page compatibility + calculations
+Peter did the 7 pages, found errors his review-AI can't fix (it can't edit our real code — I can). Each phase MUST verify: (1) **linked pages agree** — shared values come from ONE source of truth, not hardcoded per-page demo numbers; (2) **calculations are mathematically correct** — budget totals, per-service sums, commission %, deposit splits, fees — computed server-side from real data with correct rounding, consistent across every page, and correct when real-time data changes. Many current screens have hardcoded demo math (e.g. $18,900 totals, commission previews) that don't actually compute — must derive from real data when wired.
+
+## Team Mode removed — see [[team-mode-removal]] (DECISION 07.15.2026).
