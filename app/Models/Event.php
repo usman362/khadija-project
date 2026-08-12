@@ -85,6 +85,25 @@ class Event extends Model
          * decision between them belongs somewhere it cannot be re-made
          * inconsistently.
          */
+        /*
+         * Checklist row 89 — the publish stamp.
+         *
+         * "Posted" is when the request went out to professionals, and half the
+         * publish paths set `published_at` while the other half only flipped
+         * `is_published`. Pages then fell back to `created_at`, which is when
+         * the ROW was made — a draft written a fortnight before it was posted
+         * claims to have been posted a fortnight ago, and a row backfilled by
+         * an import claims to have been posted after bids it already holds.
+         *
+         * Stamped here, in the one place every path goes through, for the same
+         * reason the state stamp above is.
+         */
+        static::saving(function (self $event) {
+            if ($event->is_published && $event->published_at === null) {
+                $event->published_at = now();
+            }
+        });
+
         static::updated(function (self $event) {
             $changes = $event->getChanges();
 
@@ -130,6 +149,24 @@ class Event extends Model
     public function extensions(): HasMany
     {
         return $this->hasMany(EventExtension::class);
+    }
+
+    /**
+     * When this request went out to professionals — the one answer every
+     * screen showing a "Posted" date should use.
+     *
+     * `created_at` is when the row was made, which for a draft is not the same
+     * day and for an imported row is not the same event. Null until it is
+     * actually published: an unposted request has no posted date, and saying
+     * "posted 3 weeks ago" about a draft is worse than saying nothing.
+     */
+    public function postedAt(): ?\Illuminate\Support\Carbon
+    {
+        if (! $this->is_published && $this->published_at === null) {
+            return null;
+        }
+
+        return $this->published_at ?? $this->created_at;
     }
 
     /** What a client or professional is told this listing's status is. */

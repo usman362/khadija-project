@@ -132,9 +132,50 @@ class ClientEventController extends Controller
 
         $categories = Category::active()->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
 
+        /*
+         * Checklist row 84 — "Recent Professional Activity".
+         *
+         * The panel used to list the three most recently touched events as
+         * "Activity on <title>" timestamped `updated_at`. Neither half was
+         * true: `updated_at` moves on any save at all, including one nobody
+         * made deliberately, and "activity" named nothing that happened. That
+         * is how the feed came to contradict the card sitting beside it.
+         *
+         * Each row now stands for one record that exists, timestamped when
+         * that record was written. If nothing has happened, the panel says so.
+         */
+        $activity = collect();
+
+        foreach ((clone $baseEvents)->whereNotNull('published_at')->latest('published_at')->take(4)->get() as $ev) {
+            $activity->push([
+                'kind'  => 'posted',
+                'text'  => 'You posted',
+                'about' => $ev->title,
+                'when'  => $ev->postedAt(),
+            ]);
+        }
+
+        foreach ((clone $bookingBase)->with(['supplier:id,name', 'event:id,title'])->latest()->take(4)->get() as $bk) {
+            $activity->push([
+                'kind'  => $bk->status === 'cancelled' ? 'cancelled' : 'proposal',
+                'text'  => match ($bk->status) {
+                    'cancelled' => ($bk->supplier?->name ?? 'A professional') . ' withdrew',
+                    'confirmed' => 'You confirmed ' . ($bk->supplier?->name ?? 'a professional'),
+                    'completed' => ($bk->supplier?->name ?? 'A professional') . ' completed',
+                    default     => 'Proposal from ' . ($bk->supplier?->name ?? 'a professional'),
+                },
+                'about' => $bk->event?->title ?? 'a request',
+                // updated_at is right here and wrong above: a booking's status
+                // IS what changed, so the moment it changed is the news.
+                'when'  => $bk->status === 'requested' ? $bk->created_at : $bk->updated_at,
+            ]);
+        }
+
+        $activity = $activity->filter(fn ($a) => $a['when'] !== null)->sortByDesc('when')->take(4)->values();
+
         return view('client.events.index', compact(
             'events', 'stats', 'calendarEvents', 'categories', 'month', 'year',
-            'totalSpent', 'proStatus', 'payment', 'deadlines'
+            'totalSpent', 'proStatus', 'payment', 'deadlines', 'activity'
         ));
     }
 

@@ -60,10 +60,14 @@ class BiddingBoardScopeTest extends TestCase
         // ER and MSR gigs are held back from non-Elite tiers for 60 minutes
         // after posting. These tests are about scope and type, not that delay,
         // so the gig is backdated past the window — written straight to the
-        // row because Eloquent stamps created_at itself on insert.
+        // row because Eloquent stamps both of these itself on insert.
+        //
+        // published_at as well as created_at: "posted" now means the publish
+        // stamp, and backdating only created_at left the gig looking posted
+        // this second.
         \Illuminate\Support\Facades\DB::table('events')
             ->where('id', $event->id)
-            ->update(['created_at' => now()->subHours(2)]);
+            ->update(['created_at' => now()->subHours(2), 'published_at' => now()->subHours(2)]);
 
         $ids = [];
         for ($i = 0; $i < $services; $i++) {

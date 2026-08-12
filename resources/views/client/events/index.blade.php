@@ -123,6 +123,7 @@
     .mg-act-dot.green { background: rgba(16,185,129,0.15); color: var(--ok-text); }
     .mg-act-dot.amber { background: rgba(245,158,11,0.15); color: var(--warn-text); }
     .mg-act-dot.indigo{ background: rgba(99,102,241,0.15); color: var(--accent-text); }
+    .mg-act-dot.red   { background: rgba(239,68,68,0.15);  color: var(--danger-text, #b91c1c); }
     .mg-act-body { flex: 1; min-width: 0; }
     .mg-act-text { font-size: 12.5px; color: var(--text-primary); }
     .mg-act-time { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; }
@@ -586,11 +587,14 @@
         <div class="mg-row2">
             <div class="mg-card">
                 <div class="mg-rail-head"><div class="mg-rail-title">Recent Professional Activity</div></div>
-                @forelse($events->take(3) as $ev)
+                {{-- Every row is one record that exists, timestamped when that
+                     record was written — not "Activity on X" over an updated_at
+                     that moves whenever anything at all is saved. --}}
+                @forelse($activity as $a)
                     <div class="mg-act-row">
-                        <div class="mg-act-dot green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-                        <div class="mg-act-body"><div class="mg-act-text">Activity on <b>{{ \Illuminate\Support\Str::limit($ev->title, 24) }}</b></div></div>
-                        <div class="mg-act-time">{{ $ev->updated_at?->diffForHumans() ?? '' }}</div>
+                        <div class="mg-act-dot {{ $a['kind'] === 'cancelled' ? 'red' : 'green' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        <div class="mg-act-body"><div class="mg-act-text">{{ $a['text'] }} <b>{{ \Illuminate\Support\Str::limit($a['about'], 24) }}</b></div></div>
+                        <div class="mg-act-time">{{ $a['when']->diffForHumans() }}</div>
                     </div>
                 @empty
                     <div style="font-size:12px;color:var(--text-muted);padding:12px 0;text-align:center;">No recent activity</div>

@@ -261,7 +261,11 @@
                         </div>
                         <div>
                             <div class="gig-detail-label">Posted</div>
-                            <div class="gig-detail-value">{{ $event->created_at->diffForHumans() }}</div>
+                            {{-- postedAt(), not created_at: created_at is when the
+                                 row was made, so a request drafted a fortnight
+                                 before it went out claimed to have been posted a
+                                 fortnight ago. --}}
+                            <div class="gig-detail-value">{{ $event->postedAt()?->diffForHumans() ?? 'Not yet posted' }}</div>
                         </div>
                     </div>
                 </div>
