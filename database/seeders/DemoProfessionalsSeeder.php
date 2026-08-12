@@ -83,6 +83,63 @@ class DemoProfessionalsSeeder extends Seeder
             $this->attachServices($user, $data['services'] ?? []);
             $this->seedReviews($user, $reviewers, $data);
         }
+
+        $this->seedMultiStateProfessional();
+    }
+
+    /**
+     * Checklist row 212 — R47 has no way to be verified without one.
+     *
+     * R47 says a professional working in more than one of the seven states
+     * registers a fully separate account per state, each with its own email
+     * and its own licence, each scoped to that state alone. Nothing in the
+     * demo data showed that, so the rule could be built and still not be
+     * demonstrable — which is how a rule ends up shipped and wrong.
+     *
+     * One person, two accounts, deliberately sharing a phone number (the
+     * question Peter resolved on 2026-08-03: the phone MAY be shared, the
+     * email and licence may not).
+     */
+    private function seedMultiStateProfessional(): void
+    {
+        $accounts = [
+            ['Ridgeline Sound (MD)', 'ridgeline.md.demo@example.test', 'MD', 'Baltimore'],
+            ['Ridgeline Sound (VA)', 'ridgeline.va.demo@example.test', 'VA', 'Arlington'],
+        ];
+
+        foreach ($accounts as [$name, $email, $state, $city]) {
+            $user = User::firstOrCreate(['email' => $email], ['name' => $name, 'password' => 'password']);
+            $user->syncRoles([RoleName::PROFESSIONAL->value]);
+
+            UserProfile::updateOrCreate(['user_id' => $user->id], [
+                'company_name'     => 'Ridgeline Sound',
+                'headline'         => 'Live Sound & Staging',
+                'bio'              => 'Live sound, staging and backline for concerts, festivals and corporate stages.',
+                'city'             => $city,
+                'state'            => $state,
+                'country'          => 'US',
+                'hourly_rate'      => 140,
+                'experience_years' => 11,
+                'availability'     => 'available',
+                'skills'           => ['Live Sound', 'Staging', 'Backline', 'Monitor Engineering'],
+                'languages'        => ['English'],
+                'portfolio'        => self::portfolioFor([
+                    'photo-1470229722913-7c0e2dbbafd3', 'photo-1493225457124-a3eb161ffa5f',
+                    'photo-1533174072545-7a4b6ad7a6c3', 'photo-1516450360452-9312f5e86fc7',
+                ]),
+
+                // Same trading name and the same phone; a DIFFERENT licence,
+                // issued by the state that account works in. That is the whole
+                // shape of R47 in one pair of rows.
+                'trade_license_number'      => 'TL-' . strtoupper($state) . '-' . rand(10000, 99999),
+                'trade_license_state'       => $state,
+                'trade_license_verified_at' => now()->subDays(rand(30, 200)),
+            ]);
+
+            $this->attachServices($user, ['Wedding DJs', 'Uplighting & Ambient Lighting']);
+        }
+
+        $this->command?->info('  Seeded the two-state professional (R47).');
     }
 
     /**

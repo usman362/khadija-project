@@ -141,9 +141,16 @@ class ProfessionalLeadController extends Controller
             $low  = (int) round($budget * 0.8 / 100) * 100;
             $high = (int) round($budget * 1.2 / 100) * 100;
         } else {
-            // No budget on record — show a typical event band.
-            $low  = 2500;
-            $high = 4500;
+            /*
+             * No budget on record means no value to show.
+             *
+             * This used to print a "typical event band" of $2,500-$4,500,
+             * which is a figure the platform invented about somebody else's
+             * event and then displayed to a professional deciding whether to
+             * chase it. A dash is the honest answer.
+             */
+            $low  = null;
+            $high = null;
         }
 
         // Priority: soon + high budget = High, else Medium, else Low.

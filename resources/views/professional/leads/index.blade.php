@@ -245,7 +245,7 @@
                     <div class="pl-lead-name">{{ $lead['name'] }}</div>
                     <div class="pl-lead-meta">{{ \Illuminate\Support\Str::limit($lead['location'], 24) }} · {{ $lead['date'] ? $lead['date']->format('M d, Y') : 'Date TBD' }}</div>
                 </div>
-                <div class="pl-lead-val">{{ $money($lead['valueLow']) }} – {{ $money($lead['valueHigh']) }}</div>
+                <div class="pl-lead-val">@if($lead['valueLow'] === null)Budget not stated@else{{ $money($lead['valueLow']) }} – {{ $money($lead['valueHigh']) }}@endif</div>
                 <span class="pl-prio" style="color:{{ $pc }};background:{{ $pbg }};">{{ $lead['priority'] }}</span>
             </div>
         @empty
@@ -317,7 +317,7 @@
         {{-- Direct Message Center --}}
         <div class="pl-cc-card">
             <div class="pl-cc-h"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><b>Direct Message Center</b></div>
-            <p>View all conversations in one place — email, text &amp; calls.</p>
+            <p>Every conversation with this lead, in one place — on-platform messaging.</p>
             <div class="pl-cc-prev">
                 <div class="pl-chat-hd"><span class="pl-chat-av" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);">{{ $leads->first()['name'] ?? false ? strtoupper(substr($leads->first()['name'],0,1)) : 'L' }}</span><div><b>{{ \Illuminate\Support\Str::limit($leads->first()['name'] ?? 'New Lead', 16) }}</b><p>{{ \Illuminate\Support\Str::limit($leads->first()['location'] ?? 'Location', 14) }}</p></div></div>
                 <div class="pl-bub them">Hi! I'd like to learn more about your services.<span class="t">11:30 AM</span></div>
@@ -343,7 +343,7 @@
             <div class="pl-cc-prev">
                 <div class="pl-prop-k">Proposal for</div>
                 <div style="font-size:11px;font-weight:800;color:var(--text-primary);margin-bottom:6px;">{{ \Illuminate\Support\Str::limit($leads->first()['name'] ?? 'New Lead', 20) }}</div>
-                <div class="pl-prop-amt">{{ $money($leads->first()['valueHigh'] ?? 4750) }}</div>
+                <div class="pl-prop-amt">{{ ($v = $leads->first()['valueHigh'] ?? null) ? $money($v) : '—' }}</div>
                 <div class="pl-prop-k" style="margin-bottom:8px;">Estimated Total</div>
                 <div class="pl-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Event Details</div>
                 <div class="pl-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Services Included</div>
