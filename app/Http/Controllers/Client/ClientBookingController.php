@@ -17,26 +17,30 @@ class ClientBookingController extends Controller
 {
     /** Tab key => [label, description]. The tabs are the only status filter. */
     public const TABS = [
-        'all'         => 'All',
-        'upcoming'    => 'Upcoming',
-        'in_progress' => 'In Progress',
-        'pending'     => 'Pending',
-        'completed'   => 'Completed',
-        'cancelled'   => 'Cancelled',
+        'all'                 => 'All',
+        'upcoming'            => 'Upcoming',
+        'in_progress'         => 'In Progress',
+        'awaiting_completion' => 'Awaiting Completion',
+        'pending'             => 'Pending',
+        'completed'           => 'Completed',
+        'cancelled'           => 'Cancelled',
     ];
+
+    /** The buckets that partition every booking. `all` is their sum. */
+    public const STATUS_BUCKETS = ['upcoming', 'in_progress', 'awaiting_completion', 'pending', 'completed', 'cancelled'];
 
     public function index(Request $request): View
     {
         $user = $request->user();
 
-        $counts = [
-            'all'         => (clone $this->base($user))->count(),
-            'upcoming'    => (clone $this->base($user))->tap($this->scope('upcoming'))->count(),
-            'in_progress' => (clone $this->base($user))->tap($this->scope('in_progress'))->count(),
-            'pending'     => (clone $this->base($user))->tap($this->scope('pending'))->count(),
-            'completed'   => (clone $this->base($user))->tap($this->scope('completed'))->count(),
-            'cancelled'   => (clone $this->base($user))->tap($this->scope('cancelled'))->count(),
-        ];
+        // Every bucket counted the same way, and `all` is their SUM rather than
+        // a separate query — so a booking that fits no bucket is impossible by
+        // construction, not merely unlikely.
+        $counts = [];
+        foreach (self::STATUS_BUCKETS as $bucket) {
+            $counts[$bucket] = (clone $this->base($user))->tap($this->scope($bucket))->count();
+        }
+        $counts['all'] = array_sum($counts);
 
         $tab = $request->string('tab')->toString();
         if (! array_key_exists($tab, self::TABS)) {
@@ -182,17 +186,57 @@ class ClientBookingController extends Controller
     }
 
     /**
+     * The event is still ahead of us. Held apart from scope() so the tab and
+     * the catch-all below are built from the same predicate — a second copy is
+     * how the gap this fixes got in.
+     */
+    private function startsLater(): \Closure
+    {
+        return fn ($q) => $q->where('starts_at', '>', now());
+    }
+
+    /**
+     * The event is running right now. An event with no end time counts as
+     * running for the rest of its day rather than dropping out the instant it
+     * starts.
+     */
+    private function runningNow(): \Closure
+    {
+        return fn ($q) => $q
+            ->where('starts_at', '<=', now())
+            ->where(fn ($w) => $w
+                ->where('ends_at', '>=', now())
+                ->orWhere(fn ($n) => $n->whereNull('ends_at')->where('starts_at', '>=', now()->subDay())));
+    }
+
+    /**
      * One definition of each tab, used for both the counts and the list so the
      * number on a tab always matches what opening it shows.
+     *
+     * Checklist row 92. Bookings have four statuses — requested, confirmed,
+     * completed, cancelled — but the tiles sliced `confirmed` into Upcoming
+     * and In Progress by event date and offered nowhere else for it to go. A
+     * booking still badged CONFIRMED whose event had already finished fell
+     * through every bucket: the page read "4 All Bookings" over tiles summing
+     * to 2, and the two missing ones were exactly the confirmed pair.
+     *
+     * `awaiting_completion` is that missing bucket, defined as the negation of
+     * the two date tabs rather than as a date test of its own, so the six
+     * buckets partition the set by construction. It also carries the meaning
+     * worth surfacing: the event has happened and the professional has not
+     * marked it complete yet.
      */
     private function scope(string $tab): \Closure
     {
         return function ($query) use ($tab) {
             match ($tab) {
                 'upcoming' => $query->where('status', 'confirmed')
-                    ->whereHas('event', fn ($q) => $q->where('starts_at', '>', now())),
+                    ->whereHas('event', $this->startsLater()),
                 'in_progress' => $query->where('status', 'confirmed')
-                    ->whereHas('event', fn ($q) => $q->where('starts_at', '<=', now())->where('ends_at', '>=', now())),
+                    ->whereHas('event', $this->runningNow()),
+                'awaiting_completion' => $query->where('status', 'confirmed')
+                    ->whereDoesntHave('event', $this->startsLater())
+                    ->whereDoesntHave('event', $this->runningNow()),
                 'pending'   => $query->where('status', 'requested'),
                 'completed' => $query->where('status', 'completed'),
                 'cancelled' => $query->where('status', 'cancelled'),

@@ -212,6 +212,11 @@
                 ['all',         'All Bookings', 'brand',  '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'],
                 ['upcoming',    'Upcoming',     'indigo', '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'],
                 ['in_progress', 'In Progress',  'amber',  '<polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>'],
+                // A confirmed booking whose event has already finished used to
+                // land in no tile at all, so the tiles summed short of the
+                // total. This is where it goes, and the label says what it is
+                // waiting for.
+                ['awaiting_completion', 'Awaiting Completion', 'amber', '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'],
                 ['pending',     'Pending',      'violet', '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'],
                 ['completed',   'Completed',    'green',  '<polyline points="20 6 9 17 4 12"/>'],
                 ['cancelled',   'Cancelled',    'red',    '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>'],
@@ -507,12 +512,16 @@
         <div class="bk-rc">
             <h4>By status</h4>
             @php
+                // Every bucket has a slice. The ring's centre prints the sum of
+                // the slices below, not a separately-counted total — that pair
+                // is what read "4 Total" over slices adding to 2.
                 $slices = [
-                    ['In Progress', $counts['in_progress'], '#059669'],
-                    ['Upcoming',    $counts['upcoming'],    '#4338ca'],
-                    ['Completed',   $counts['completed'],   '#6d28d9'],
-                    ['Pending',     $counts['pending'],     '#b45309'],
-                    ['Cancelled',   $counts['cancelled'],   '#b91c1c'],
+                    ['In Progress',         $counts['in_progress'],         '#059669'],
+                    ['Upcoming',            $counts['upcoming'],            '#4338ca'],
+                    ['Awaiting Completion', $counts['awaiting_completion'], '#0891b2'],
+                    ['Completed',           $counts['completed'],           '#6d28d9'],
+                    ['Pending',             $counts['pending'],             '#b45309'],
+                    ['Cancelled',           $counts['cancelled'],           '#b91c1c'],
                 ];
                 $shown = array_sum(array_column($slices, 1));
                 $cursor = 0; $stops = [];
@@ -527,7 +536,7 @@
             @endphp
             <div class="bk-donut" style="background: {{ $ring }};">
                 <div class="hole"></div>
-                <div class="mid"><span class="n">{{ $counts['all'] }}</span><span class="l">Total</span></div>
+                <div class="mid"><span class="n">{{ $shown }}</span><span class="l">Total</span></div>
             </div>
             <div class="bk-leg">
                 @foreach($slices as [$lbl, $val, $col])

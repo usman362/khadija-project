@@ -76,7 +76,12 @@ class ClientReviewController extends Controller
             ->take(4)
             ->get();
 
-        return view('client.reviews.index', compact('stats', 'reviews', 'star', 'pendingReviews'));
+        // Row 100 — the right-rail panels, derived rather than hardcoded. Both
+        // come back empty when there is nothing to derive them from.
+        $trust      = \App\Domain\Reviews\ReviewInsights::trust($user->id);
+        $highlights = \App\Domain\Reviews\ReviewInsights::highlights($user->id);
+
+        return view('client.reviews.index', compact('stats', 'reviews', 'star', 'pendingReviews', 'trust', 'highlights'));
     }
 
     /**

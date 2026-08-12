@@ -221,15 +221,25 @@ class BrowseProfessionalsController extends Controller
         // the filtered ids first keeps the counts correct under every filter.
         $filteredIds = (clone $query)->reorder()->get()->pluck('id');
 
-        $locationCounts = $filteredIds->isEmpty()
+        //
+        // Checklist row 147. The panel used to show the top six cities and
+        // stop, so it summed to 7 beside a header reading "Found: 13 Pros" —
+        // two numbers over one result set that did not agree. The six rows
+        // stay (a sidebar listing forty cities helps nobody), but everything
+        // they leave out is now counted into a final row, so the column adds
+        // up to the total the page reports. Pros with no city on file land
+        // there too, rather than vanishing.
+        $allCityCounts = $filteredIds->isEmpty()
             ? collect()
             : UserProfile::whereIn('user_id', $filteredIds)
                 ->whereNotNull('city')->where('city', '!=', '')
                 ->select('city', DB::raw('COUNT(*) as total'))
                 ->groupBy('city')
                 ->orderByDesc('total')
-                ->limit(6)
                 ->pluck('total', 'city');
+
+        $locationCounts = $allCityCounts->take(6);
+        $locationOther  = max(0, $filteredIds->count() - (int) $locationCounts->sum());
 
         // ── Recently viewed ─────────────────────────────────────────
         // Real session history written when a profile is opened, in the order
@@ -283,6 +293,7 @@ class BrowseProfessionalsController extends Controller
             'trending'        => $trending,
             'rateCeiling'     => $rateCeiling,
             'locationCounts'  => $locationCounts,
+            'locationOther'   => $locationOther,
             'recentPros'      => $recentPros,
             'badges'     => UserProfile::BADGES,
         ]);

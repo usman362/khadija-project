@@ -597,6 +597,15 @@
                                 <span class="br-loc-count">{{ $locCount }}</span>
                             </a>
                         @endforeach
+                        {{-- Whatever the six rows above leave out, so the column
+                             adds up to the "Found" count in the header. Not a
+                             link: "elsewhere" is not a filter. --}}
+                        @if(($locationOther ?? 0) > 0)
+                            <div class="br-loc-row" style="cursor:default;">
+                                <span class="br-loc-name" style="color:var(--ink-3,#64748b);">Other cities &amp; not stated</span>
+                                <span class="br-loc-count">{{ $locationOther }}</span>
+                            </div>
+                        @endif
                         @if($cityF)
                             <a class="br-loc-clear" href="{{ route('public.browse', array_filter(array_diff_key($f, ['city' => 1]))) }}">Clear city filter</a>
                         @endif
