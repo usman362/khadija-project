@@ -71,6 +71,21 @@
 </style>
 @endpush
 
+@push('styles')
+<style>
+    .tb-tabs { display:flex; gap:6px; border-bottom:1px solid var(--border-color); margin-bottom:14px; flex-wrap:wrap; }
+    .tb-tab { background:none; border:0; border-bottom:2px solid transparent; padding:9px 12px; cursor:pointer;
+              font-family:inherit; font-size:12.5px; font-weight:700; color:var(--text-muted); }
+    .tb-tab.is-on { color:var(--text-primary); border-bottom-color:#2563eb; }
+    .tb-sched { width:100%; border-collapse:collapse; font-size:13px; min-width:720px; }
+    .tb-sched th { text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.04em;
+                   color:var(--text-muted); padding:0 12px 8px 0; font-weight:700; }
+    .tb-sched td { padding:11px 12px 11px 0; border-top:1px solid var(--border-color); vertical-align:top; }
+    .tb-pill { font-size:11px; font-weight:700; padding:3px 9px; border-radius:999px;
+               background:rgba(37,99,235,.1); color:#1d4ed8; }
+</style>
+@endpush
+
 @section('content')
 @php
     $level = $level ?? 'maximum';
@@ -154,8 +169,31 @@
         @endforeach
     </div>
 
+    {{-- Checklist rows 197, 224 and 225 — the two timeline views.
+
+         Row 197 asks for an operational schedule beside the workflow Gantt,
+         "reading the SAME event data". So the table is DERIVED from the very
+         tracks the Gantt draws (App\Support\TimelineSchedule), not handed a
+         second dataset — two datasets is how the tabs end up disagreeing, and
+         a client standing in a venue reading one of them has no way to know
+         which is right.
+
+         Rows 224 and 225 are the other half: the second tab gets NO toolbar
+         of its own. An Export button here would duplicate Export Timeline
+         below, and a Notifications button would duplicate the bell already in
+         the top nav. Both are deliberately absent. --}}
+    @php $schedule = \App\Support\TimelineSchedule::fromTracks($tracks, $hours); @endphp
+
     <div class="tb-card">
-        <h3>📅 Event Day Timeline · Sat, June 14</h3>
+        <div class="tb-tabs" role="tablist">
+            <button type="button" class="tb-tab is-on" role="tab" aria-selected="true"
+                    data-tb-tab="workflow">Timeline View (Workflow)</button>
+            <button type="button" class="tb-tab" role="tab" aria-selected="false"
+                    data-tb-tab="schedule">Interactive Event Timeline (Operational Schedule)</button>
+        </div>
+
+        <div data-tb-panel="workflow">
+            <h3>📅 Event Day Timeline · Sat, June 14</h3>
         <div style="min-width:680px;">
             <div class="tb-hours">
                 <div class="sp"></div>
@@ -171,6 +209,57 @@
                     </div>
                 </div>
             @endforeach
+        </div>
+        </div>
+
+        <div data-tb-panel="schedule" hidden>
+            <h3>🕒 Operational Schedule</h3>
+            <div style="overflow-x:auto;">
+                <table class="tb-sched">
+                    <thead>
+                        <tr>
+                            <th>Time</th><th>Activity</th><th>Assigned To</th>
+                            <th>Status</th><th>Notes &amp; Attachments</th><th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($schedule as $row)
+                            <tr>
+                                <td style="white-space:nowrap;">
+                                    <b>{{ $row['time'] }}</b>
+                                    <div style="font-size:11px;color:var(--text-muted);">to {{ $row['ends'] }}</div>
+                                </td>
+                                <td>{{ $row['activity'] }}</td>
+                                <td>
+                                    <span style="display:inline-flex;align-items:center;gap:6px;">
+                                        <i style="width:9px;height:9px;border-radius:50%;background:{{ $row['colour'] }};display:inline-block;"></i>
+                                        {{ $row['track'] }}
+                                    </span>
+                                </td>
+                                <td><span class="tb-pill">Scheduled</span></td>
+                                {{-- Wired to what already exists rather than
+                                     rebuilt here, exactly as the row asks. --}}
+                                <td>
+                                    <a href="{{ Route::has('client.chat.index') ? route('client.chat.index') : '#' }}"
+                                       style="font-size:12px;font-weight:600;">Messages</a>
+                                </td>
+                                <td>
+                                    <a href="{{ Route::has('client.events.index') ? route('client.events.index') : '#' }}"
+                                       style="font-size:12px;font-weight:600;">Open event</a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="6" style="padding:20px;text-align:center;color:var(--text-muted);">
+                                Build a run-of-show above and it appears here as a schedule.
+                            </td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <p style="font-size:11.5px;color:var(--text-muted);margin:10px 0 0;">
+                The same run-of-show as the workflow view, read as times rather than bars.
+                Changing one changes both.
+            </p>
         </div>
     </div>
 
@@ -191,6 +280,23 @@
 @endsection
 
 @push('scripts')
+<script>
+// Rows 197/224/225 — switch the two timeline views. No toolbar on the second
+// tab: Export and Notifications already exist on this page and in the top nav.
+document.querySelectorAll('[data-tb-tab]').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+        var want = tab.dataset.tbTab;
+        document.querySelectorAll('[data-tb-tab]').forEach(function (t) {
+            var on = t.dataset.tbTab === want;
+            t.classList.toggle('is-on', on);
+            t.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        document.querySelectorAll('[data-tb-panel]').forEach(function (p) {
+            p.hidden = p.dataset.tbPanel !== want;
+        });
+    });
+});
+</script>
 <script>
 (function () {
     const form = document.getElementById('tbForm');
