@@ -1,6 +1,14 @@
 @php
     $money = fn ($n) => '$' . number_format((float) $n, 0);
-    $statusMap = ['confirmed'=>['Confirmed','#059669'], 'requested'=>['In Progress','#d97706'], 'completed'=>['Completed','#6366f1'], 'cancelled'=>['Cancelled','#dc2626']];
+    // Row 133 — the badge comes from GigStats' own definitions now. The map
+    // that used to sit here badged a `requested` booking "In Progress" while
+    // the In Progress count above it meant an event running right now: the
+    // same two words for two different things, on one screen.
+    $gigDeposits = \App\Support\GigStatus::depositsFor($gigs);
+    // Row 130 — the sample cards read from the page's one shared today rather
+    // than carrying dates typed in by hand, which drifted out of date the
+    // moment they were written.
+    $sampleDate = $today->copy()->addDays(21)->format('M j');
     $thumbs = ['linear-gradient(135deg,#f59e0b,#b45309)','linear-gradient(135deg,#10b981,#047857)','linear-gradient(135deg,#8b5cf6,#6d28d9)','linear-gradient(135deg,#2563eb,#1d4ed8)','linear-gradient(135deg,#ec4899,#be185d)'];
 @endphp
 
@@ -85,6 +93,8 @@
     .pg-cc-line { height: 5px; border-radius: 3px; background: var(--border-color); margin: 4px 0; }
     .pg-cc-btn { display: block; text-align: center; padding: 6px; border-radius: 7px; color: #fff; font-size: 10px; font-weight: 800; text-decoration: none; margin-top: 8px; }
     .pg-cc-chk { display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: var(--text-secondary); padding: 2px 0; }
+    .pg-cc-lbl { font-size: 8.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+        color: var(--text-muted); margin: 5px 0 1px; }
     .pg-cc-chk svg { width: 11px; height: 11px; color: var(--ok-text); }
     .pg-cc-tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border-color); margin-bottom: 7px; }
     .pg-cc-tab { font-size: 9.5px; font-weight: 700; padding-bottom: 5px; color: var(--text-muted); }
@@ -142,13 +152,13 @@
             </div>
             <div class="pg-scores">
                 <div class="pg-score"><div><div class="pg-score-k">Active Gigs</div><div class="pg-score-v">{{ $stats['active'] }}</div></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-                <div class="pg-score"><div><div class="pg-score-k">In Progress</div><div class="pg-score-v">{{ $stats['in_progress'] }}</div></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></div>
+                <div class="pg-score"><div><div class="pg-score-k">Work in Progress</div><div class="pg-score-v">{{ $stats['in_progress'] }}</div></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></div>
                 <div class="pg-score"><div><div class="pg-score-k">Completed</div><div class="pg-score-v">{{ $stats['completed'] }}</div></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></div>
             </div>
             @forelse($gigs as $i => $g)
                 @php
                     $ev = $g->event;
-                    [$stLabel, $stColor] = $statusMap[$g->status] ?? [ucfirst($g->status), '#64748b'];
+                    [$stLabel, $stColor] = \App\Support\GigStatus::for($g, $gigDeposits);
                     $cr = $crew->get($g->event_id);
                     $crewTxt = $cr ? ((int)$cr->filled).'/'.((int)$cr->total) : '—';
                     $mc = optional($msg->get($g->id))->messages_count ?? 0;
@@ -186,11 +196,11 @@
                 <p class="pg-bd-sub">This bar gives a quick status report of your business health.</p>
                 <div class="pg-mini-scores">
                     <div class="pg-mini"><div class="k">Active</div><div class="v">{{ $stats['active'] }}</div></div>
-                    <div class="pg-mini"><div class="k">In Progress</div><div class="v">{{ $stats['in_progress'] }}</div></div>
+                    <div class="pg-mini"><div class="k">Work in Progress</div><div class="v">{{ $stats['in_progress'] }}</div></div>
                     <div class="pg-mini"><div class="k">Completed</div><div class="v">{{ $stats['completed'] }}</div></div>
                 </div>
-                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><p><b>Active Gigs:</b> total upcoming jobs currently booked on the calendar.</p></div>
-                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/></svg><p><b>In Progress:</b> jobs happening right now or needing active prep.</p></div>
+                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><p><b>Active Gigs:</b> everything still live — proposals awaiting the client, plus accepted jobs not yet delivered.</p></div>
+                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/></svg><p><b>Work in Progress:</b> accepted jobs whose event is running right now — the same set the badge of that name marks.</p></div>
                 <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg><p><b>Completed:</b> finished jobs ready for final billing or archiving.</p></div>
             </div>
             <div>
@@ -198,8 +208,8 @@
                 <p class="pg-bd-sub">This section highlights the most urgent events on your schedule.</p>
                 <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p><b style="color:var(--accent-text);">The Job Details:</b> event name, date, location, and service.</p></div>
                 <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><p><b style="color:var(--ok-text);">The Paycheck:</b> estimated price range of the contract.</p></div>
-                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg><p><b style="color:var(--brand-text);">Booking Status:</b> color codes — <b style="color:var(--ok-text);">Confirmed</b> (green) / In Progress (orange).</p></div>
-                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p><b style="color:var(--info-text);">The Crew Counter:</b> staffing levels (6/6 fully staffed; 3/5 = hire 2 more).</p></div>
+                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg><p><b style="color:var(--brand-text);">Booking Status:</b> Awaiting Client, Booked, <b style="color:var(--ok-text);">Payment Secured</b>, <b style="color:var(--brand-text);">Work in Progress</b>, Awaiting Payment, Paid.</p></div>
+                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p><b style="color:var(--info-text);">The Crew Counter:</b> staffing levels (6 of 6 fully staffed; 3 of 5 means 2 to fill).</p></div>
                 <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p><b style="color:var(--info-text);">The Message Bubble:</b> unread questions or updates from the client or crew.</p></div>
             </div>
             <div>
@@ -254,10 +264,15 @@
             <div class="pg-cc-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><b>Menu &amp; Inventory</b></div>
             <p>Keep track of supplies and equipment.</p>
             <div class="pg-cc-prev">
+                {{-- Row 150 — food is bought by weight and equipment is counted,
+                     so the two lists take different units. They were one list
+                     before, which is how equipment ended up weighed. --}}
                 <div class="pg-cc-tabs"><span class="pg-cc-tab on">Menu</span><span class="pg-cc-tab">Inventory</span></div>
-                <div class="pg-cc-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Chicken (30 lbs)</div>
-                <div class="pg-cc-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Salmon (20 lbs)</div>
-                <div class="pg-cc-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Chafing Dishes (6)</div>
+                <div class="pg-cc-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Chicken · 30 lbs</div>
+                <div class="pg-cc-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Salmon · 20 lbs</div>
+                <div class="pg-cc-lbl">Inventory</div>
+                <div class="pg-cc-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Chafing dishes &times; 6</div>
+                <div class="pg-cc-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Serving tables &times; 4</div>
             </div>
         </div>
         <div class="pg-cc-card">
@@ -265,9 +280,15 @@
             <p>View all important job details in one place.</p>
             <div class="pg-cc-prev">
                 <div style="font-weight:700;color:var(--text-primary);">Event Details</div>
-                <div>Outdoor Wedding · Jun 14</div>
-                <div style="margin-top:4px;">Guests: 120 · Budget: $2k–$4k</div>
-                <div style="margin-top:5px;">Assigned Crew: 3 / 5</div>
+                <div>Outdoor Wedding · {{ $sampleDate }}</div>
+                {{-- Row 131 — an awarded gig has a contract value. The range was
+                     what the client advertised BEFORE anyone was chosen, and
+                     showing it beside the signed $4,000 invited the question of
+                     which one the professional is actually being paid. --}}
+                <div style="margin-top:4px;">Guests: 120 · Contract: $4,000</div>
+                {{-- Row 132 — the same two numbers said twice, and the second
+                     time as the thing a professional needs to act on. --}}
+                <div style="margin-top:5px;">Assigned Crew: 3 of 5 · <b style="color:var(--warn-text);">2 to fill</b></div>
                 <div class="pg-prog"><i style="width:60%;"></i></div>
                 <a href="{{ route('professional.team.index') }}" class="pg-cc-btn" style="background:#2563eb;">Manage Crew</a>
             </div>

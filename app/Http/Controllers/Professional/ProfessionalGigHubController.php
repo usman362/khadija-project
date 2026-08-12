@@ -74,7 +74,10 @@ class ProfessionalGigHubController extends Controller
         $crew = collect();
         if (! empty($eventIds)) {
             $crew = Shift::whereIn('event_id', $eventIds)
-                ->selectRaw('event_id, count(*) as total, sum(case when status = "open" then 0 else 1 end) as filled')
+                // Single quotes: "open" is a string literal in MySQL but an
+                // identifier in standard SQL, so the double-quoted form only
+                // worked by accident.
+                ->selectRaw("event_id, count(*) as total, sum(case when status = 'open' then 0 else 1 end) as filled")
                 ->groupBy('event_id')
                 ->get()
                 ->keyBy('event_id');
@@ -95,8 +98,19 @@ class ProfessionalGigHubController extends Controller
         // the reason Earnings and Transactions used to disagree.
         $money = Earnings::forProfessional($user);
 
+        /*
+         * Checklist row 130 — one "today" for the whole page.
+         *
+         * Every countdown on this screen used to take its own now(), and the
+         * sample cards carried dates typed in by hand that bore no relation to
+         * the clock at all. Two figures a professional reads side by side must
+         * be measured from the same instant, or the smaller disagreements look
+         * like bugs and the larger ones are.
+         */
+        $today = $now;
+
         return view('professional.gig-hub.index', array_merge(
-            compact('tab', 'stats', 'gigs', 'crew', 'msg', 'money'),
+            compact('tab', 'stats', 'gigs', 'crew', 'msg', 'money', 'today'),
             $tab === 'gigs'      ? $this->gigsTab($request) : [],
             $tab === 'contracts' ? $this->contractsTab($request, $money) : [],
         ));

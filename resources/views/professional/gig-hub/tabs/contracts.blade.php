@@ -66,6 +66,14 @@
     .b-pending   { background: rgba(245,158,11,0.14); color: var(--warn-text); }
     .b-completed { background: rgba(99,102,241,0.12); color: var(--accent-text); }
     .b-cancelled { background: rgba(239,68,68,0.12); color: var(--bad-text); }
+    /* Row 133's approved states. Payment Secured and Paid are money claims,
+       so they are only used when the money is actually there. */
+    .b-awaiting-client  { background: rgba(245,158,11,0.14); color: var(--warn-text); }
+    .b-booked           { background: rgba(37,99,235,0.12); color: var(--info-text); }
+    .b-payment-secured  { background: rgba(16,185,129,0.12); color: var(--ok-text); }
+    .b-work-in-progress { background: rgba(249,115,22,0.14); color: var(--brand-text); }
+    .b-awaiting-payment { background: rgba(99,102,241,0.12); color: var(--accent-text); }
+    .b-paid             { background: rgba(4,120,87,0.14); color: var(--ok-text); }
     .pc-actions { display: inline-flex; gap: 5px; }
     .pc-act { width: 26px; height: 26px; border-radius: 7px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; }
     .pc-act svg { width: 13px; height: 13px; }
@@ -231,8 +239,11 @@
                             @php
                                 $ev = $c->event;
                                 $svc = $ev?->categories->first()?->name;
-                                $statusMap = ['confirmed' => ['Confirmed','b-confirmed'], 'requested' => ['In Progress','b-progress'], 'completed' => ['Completed','b-completed'], 'cancelled' => ['Cancelled','b-cancelled']];
-                                [$stLabel, $stClass] = $statusMap[$c->status] ?? [ucfirst($c->status), 'b-pending'];
+                                // Row 133 — same source as the Overview tab, so the
+                                // two tabs of one page cannot label the same gig
+                                // differently. They did.
+                                [$stLabel, , $stKey] = \App\Support\GigStatus::for($c, $contractDeposits);
+                                $stClass = 'b-' . str_replace('_', '-', $stKey);
                             @endphp
                             <tr>
                                 <td>

@@ -117,10 +117,14 @@ class ProfessionalContractController extends Controller
             ->take(4)
             ->values();
 
+        // Row 133 — one deposit lookup for the whole table, so the badge can
+        // say "Payment Secured" only where payment actually was.
+        $contractDeposits = \App\Support\GigStatus::depositsFor($contracts);
+
         return compact(
             'stats', 'contracts', 'tabCounts', 'pipeline',
             'sumPaid', 'sumEscrow', 'sumPending', 'totalRevenue',
-            'opportunities', 'upcoming'
+            'opportunities', 'upcoming', 'contractDeposits'
         );
     }
 }

@@ -413,7 +413,9 @@
             <div class="mg-rail-head"><div class="mg-rail-title">Upcoming Deadlines</div></div>
             @php $upcomingGigs = $myGigs->filter(fn($g) => $g->starts_at && $g->starts_at->isFuture())->sortBy('starts_at')->take(4); @endphp
             @forelse($upcomingGigs as $dl)
-                @php $daysLeft = (int) ceil(now()->diffInHours($dl->starts_at, false) / 24); @endphp
+                {{-- Row 130 — the page's one shared today, so this countdown and the ones
+                     on the other tabs are measured from the same instant. --}}
+                @php $daysLeft = (int) ceil($today->diffInHours($dl->starts_at, false) / 24); @endphp
                 <div class="mg-dl-row">
                     <span class="mg-dl-bar"></span>
                     <div class="mg-dl-body">
