@@ -254,32 +254,50 @@ class ProfessionalBiddingBoardController extends Controller
     }
 
     /** Counts for the tab strip — over the whole board, not the current page. */
+    /**
+     * Row 111 — "All Opportunities: 54" against tabs summing to 47.
+     *
+     * The header total and the tabs were computed from different queries:
+     * this one skipped the R38 state filter and the R33 expiry filter the
+     * LIST applies, so it counted gigs the professional could never see.
+     *
+     * One pipeline now, and `all` is the SUM of the type tabs rather than a
+     * separately-counted set — so they cannot drift apart whatever the
+     * filters do. Saved is deliberately outside the sum: a saved gig is also
+     * a BR or an ER, and adding it would double-count it.
+     */
     private function tabCounts(?\App\Models\User $user, \Illuminate\Support\Collection $savedIds): array
     {
-        $open = Event::query()
+        $query = Event::query()
             ->whereNotIn('status', ['completed', 'cancelled'])
             ->where(function ($outer) use ($user) {
-                // A broadcast gig leaves the board once it is awarded. Only
-                // `completed` and `cancelled` were excluded before, so an event
-                // that already had a supplier — awarded to someone else — sat
-                // there taking bids nobody could win.
                 $outer->where(fn ($q1) => $q1->where('is_published', true)
                                               ->whereNull('supplier_id'))
                       ->orWhere(fn ($q2) => $q2->where('source', 'direct_offer')
                                                 ->where('supplier_id', $user?->id));
             })
-            ->with('categories:id')
-            ->get()
+            ->with('categories:id');
+
+        // The same two filters the list applies, in the same order.
+        StateMatching::scopeForViewer($query, $user);
+
+        $open = $query->get()
+            ->filter(fn ($e) => $e->source === 'direct_offer' || RequestLifecycle::acceptsProposals($e))
             ->reject(fn ($e) => $this->isLockedFor($e, $user));
 
+        $br = $open->filter(fn ($e) => $this->typeOf($e) === 'BR')->count();
+        $er = $open->where('source', 'esr')->count();
+        $dr = $open->where('source', 'direct_offer')->count();
+
         return [
-            'all'   => $open->count(),
-            'BR'   => $open->filter(fn ($e) => $this->typeOf($e) === 'BR')->count(),
-            'ER'   => $open->where('source', 'esr')->count(),
-            'DR'   => $open->where('source', 'direct_offer')->count(),
+            'all'   => $br + $er + $dr,
+            'BR'    => $br,
+            'ER'    => $er,
+            'DR'    => $dr,
             'saved' => $savedIds->count(),
         ];
     }
+
 
     /** This pro's own bid pipeline, for the right rail. */
     private function myActivity(?\App\Models\User $user): array
@@ -607,7 +625,18 @@ class ProfessionalBiddingBoardController extends Controller
             'desc'   => Str::limit($e->description ?: 'Open gig — full details available on request.', 140),
             'loc'    => $e->location ?: 'Location flexible',
             'date'   => $e->starts_at ? $e->starts_at->format('M j, Y') : 'Flexible',
-            'guests' => 50 + ($e->id % 250),
+            /*
+             * Checklist row 110 — this read `50 + ($e->id % 250)`.
+             *
+             * A guest count invented from the primary key, sitting beside a
+             * description that stated the real number: "catering for 200"
+             * with a 114 Guests icon. Two independent cards were reported
+             * with the same fault because every card had it.
+             *
+             * The real figure, or nothing. A professional prices a job on
+             * head count.
+             */
+            'guests' => $e->guest_count ?: null,
             'tags'   => $cats ?: ['General'],
             // ER budget is a single fixed figure; SSR/MSR quote a range.
             // One budget covers the whole request. See the note above the
@@ -618,7 +647,22 @@ class ProfessionalBiddingBoardController extends Controller
                     : '$' . number_format($e->budget * 0.85) . ' – $' . number_format($e->budget))
                 : 'Open budget',
             'budget_is_whole_request' => $service !== null,
-            'time'   => $expired ? 'Expired' : (($days !== null && $days >= 0) ? ($days . ($days === 1 ? ' day left' : ' days left')) : 'Open'),
+            /*
+             * Rows 106, 139, 141 and 151 — one countdown, one format, and
+             * computed from THIS listing's own deadline.
+             *
+             * The urgent cards all rendered `data-countdown="6300"` — the
+             * same hardcoded hour and three quarters — which is why two
+             * events five days apart showed the same time to the second.
+             * Nothing was being computed at all.
+             *
+             * It counts to the PROPOSAL DEADLINE, not the event date: the
+             * deadline is what a professional is racing, and a three-day-out
+             * deadline read as "Tomorrow" because the card was measuring the
+             * wrong thing and rounding it.
+             */
+            'time'    => self::timeLeft($e),
+            'seconds' => self::secondsLeft($e),
             'match'  => $fit,
             // Stars must track the percentage — 80/93/96% can't all be 5 stars.
             'rating' => max(1, (int) ceil($fit / 20)),
@@ -630,6 +674,43 @@ class ProfessionalBiddingBoardController extends Controller
             // individually (MSR = each service is its own gig).
             'services' => $e->categories->unique('name')->map(fn ($c) => ['id' => $c->id, 'name' => $c->name])->values()->all(),
         ];
+    }
+
+    /**
+     * "Xd Yh left" — the one format, everywhere (row 151).
+     *
+     * Floors rather than rounds. Rounding is what turned three days into
+     * "Tomorrow": a deadline 3 days and 2 hours out is 3 days left, not 4,
+     * and never 1.
+     */
+    private static function timeLeft(Event $e): string
+    {
+        $seconds = self::secondsLeft($e);
+
+        if ($seconds === null) {
+            return 'Open';
+        }
+
+        if ($seconds <= 0) {
+            return 'Closed';
+        }
+
+        $days  = intdiv($seconds, 86400);
+        $hours = intdiv($seconds % 86400, 3600);
+
+        return $days > 0
+            ? "{$days}d {$hours}h left"
+            : ($hours > 0 ? "{$hours}h left" : 'Under an hour left');
+    }
+
+    /** Seconds to this listing's own proposal deadline. Null when it has none. */
+    private static function secondsLeft(Event $e): ?int
+    {
+        if ($e->proposal_deadline === null) {
+            return null;
+        }
+
+        return (int) max(0, now()->diffInSeconds($e->proposal_deadline, false));
     }
 
     /**

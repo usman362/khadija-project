@@ -264,7 +264,10 @@
                         <div class="bb-meta">
                             <span>📍 {{ $g['loc'] }}</span>
                             <span>📅 {{ $g['date'] }}</span>
-                            @if($g['guests'])<span>👥 {{ $g['guests'] }} Guests</span>@endif
+                            {{-- Row 110: the real head count, or nothing. It used to be derived
+     from the event id, so a card said 114 Guests beside its own
+     description reading "catering for 200". --}}
+                            @if($g['guests'])<span>👥 {{ number_format($g['guests']) }} Guests</span>@endif
                             <span>🏠 Indoor</span>
                         </div>
                         <div class="bb-tags">
@@ -281,7 +284,15 @@
                         <div class="bb-stat"><span>Budget</span><b>{{ $g['budget'] }}</b></div>
                         <div class="bb-stat t">
                             <span>Time Left</span>
-                            @if($g['urgent'])<b data-countdown="6300">--:--:--</b>@else<b>{{ $g['time'] }}</b>@endif
+                            {{-- Rows 141 and 151: every urgent card carried
+                                 data-countdown="6300" — the same hardcoded
+                                 hour and three quarters — which is why two
+                                 events five days apart showed the same time
+                                 to the second. Nothing was computed.
+
+                                 One format for every card now, from that
+                                 listing's own deadline. --}}
+                            <b @if($g['urgent'] && $g['seconds']) data-countdown="{{ $g['seconds'] }}" @endif>{{ $g['time'] }}</b>
                         </div>
                         <div class="bb-ring">
                             <span class="bb-match" style="background: {{ $mc }};"><b>{{ $g['match'] }}%</b><em>MATCH</em></span>
@@ -423,27 +434,36 @@
 @push('scripts')
 <script>
     (function () {
+        // Row 151 — one format everywhere: "Xd Yh left", counting down from
+        // each listing's own remaining seconds. The old ticker rendered
+        // HH:MM:SS from a value every card shared, so it was both the wrong
+        // format and the wrong number.
         var els = document.querySelectorAll('[data-countdown]');
         if (!els.length) return;
-        function pad(n) { return (n < 10 ? '0' : '') + n; }
-        function fmt(s) {
-            var h = Math.floor(s / 3600);
-            var m = Math.floor((s % 3600) / 60);
-            var sec = s % 60;
-            return pad(h) + ':' + pad(m) + ':' + pad(sec);
+
+        function label(s) {
+            if (s <= 0) return 'Closed';
+            var d = Math.floor(s / 86400);
+            var h = Math.floor((s % 86400) / 3600);
+            if (d > 0) return d + 'd ' + h + 'h left';
+            if (h > 0) return h + 'h left';
+            return 'Under an hour left';
         }
+
         var timers = [];
         els.forEach(function (el) {
             timers.push(parseInt(el.getAttribute('data-countdown'), 10) || 0);
         });
+
         function tick() {
             els.forEach(function (el, i) {
-                if (timers[i] > 0) { timers[i]--; }
-                el.textContent = fmt(timers[i]);
+                if (timers[i] > 0) timers[i]--;
+                el.textContent = label(timers[i]);
             });
         }
+
         tick();
-        setInterval(tick, 1000);
+        setInterval(tick, 60000);   // minutes are the unit; no need to tick per second
     })();
 
     // Sealed-bid modal
