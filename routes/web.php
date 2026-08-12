@@ -793,6 +793,8 @@ Route::middleware('auth')->group(function () {
         // "Add to my event" — save an AI-tool result onto an event.
         Route::post('/ai-artifacts', [\App\Http\Controllers\Client\EventAiArtifactController::class, 'store'])->name('client.ai-artifacts.store');
         Route::delete('/ai-artifacts/{artifact}', [\App\Http\Controllers\Client\EventAiArtifactController::class, 'destroy'])->name('client.ai-artifacts.destroy');
+        // Row 194 — pull one of your own saved results into this request.
+        Route::post('/events/{event}/ai-artifacts/{artifact}/copy', [\App\Http\Controllers\Client\EventAiArtifactController::class, 'copy'])->name('client.ai-artifacts.copy');
 
         // Reporting — this client's own numbers (Peter, 2026-08-09).
         Route::get('/reports', [\App\Http\Controllers\Client\ClientReportController::class, 'index'])

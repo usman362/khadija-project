@@ -309,10 +309,25 @@ class ClientEventController extends Controller
         $attendees = $event->attendees()->orderBy('name')->get();
         $attendeeSummary = \App\Models\EventAttendee::summaryFor($event);
 
+        /*
+         * Row 194 — the client's own toolkit results, from their other
+         * events, offered for pulling into this one. Their own only: somebody
+         * else's budget is not a library to browse.
+         */
+        $availableArtifacts = \App\Models\EventAiArtifact::where('user_id', $request->user()->id)
+            ->where('event_id', '!=', $event->id)
+            ->latest('id')
+            ->get()
+            ->unique(fn ($a) => $a->tool_key . '|' . $a->title)
+            ->reject(fn ($a) => $event->aiArtifacts
+                ->contains(fn ($on) => $on->tool_key === $a->tool_key && $on->title === $a->title))
+            ->take(20)
+            ->values();
+
         return view('client.events.show', compact(
             'event', 'categories', 'selectedCategoryIds', 'bids',
             'type', 'scope', 'tab', 'award', 'questions', 'activity',
-            'attendees', 'attendeeSummary'
+            'attendees', 'attendeeSummary', 'availableArtifacts'
         ));
     }
 

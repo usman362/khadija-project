@@ -293,11 +293,16 @@
             @php
                 $aiArtifacts = $event->aiArtifacts;
             @endphp
-            @if($aiArtifacts->isNotEmpty())
+            @if($aiArtifacts->isNotEmpty() || ($availableArtifacts ?? collect())->isNotEmpty())
             <div class="cl-card" style="margin-top:20px;">
                 {{-- R29 is platform-wide: no feature may claim or imply AI. The tools are
                      rules-based calculators and templates, so the heading says that. --}}
                 <h3 style="font-size:16px;font-weight:600;margin-bottom:14px;">Toolkit Results ({{ $aiArtifacts->count() }})</h3>
+                @if($aiArtifacts->isEmpty())
+                    <p style="font-size:13px;color:var(--text-muted);margin:0 0 12px;">
+                        Nothing on this request yet.
+                    </p>
+                @endif
                 <div style="display:flex;flex-direction:column;gap:10px;">
                     @foreach($aiArtifacts as $art)
                         <div style="display:flex;align-items:center;gap:12px;border:1px solid var(--border-color);border-radius:12px;padding:11px 13px;">
@@ -313,6 +318,47 @@
                         </div>
                     @endforeach
                 </div>
+
+                {{-- Checklist row 194 — "Add Tool Data".
+
+                     The bridge only ever ran one way: a tool pushed its result
+                     onto an event. A client on an open request had no way to
+                     reach for something they had already worked out, and had
+                     to go back and run the tool again.
+
+                     What comes across is a COPY and a normal field — editable
+                     and removable like any other detail. The row is explicit
+                     that it is never locked or authoritative, which matters
+                     given R29: these are calculators, and a figure a
+                     calculator produced is still the client's to change. --}}
+                @if(($availableArtifacts ?? collect())->isNotEmpty())
+                    <details style="margin-top:14px;">
+                        <summary style="cursor:pointer;font-size:13px;font-weight:700;color:var(--accent-orange,#f97316);">
+                            + Add tool data from your other events
+                        </summary>
+                        <div style="display:flex;flex-direction:column;gap:8px;margin-top:11px;">
+                            @foreach($availableArtifacts as $art)
+                                <div style="display:flex;align-items:center;gap:12px;border:1px dashed var(--border-color);border-radius:11px;padding:10px 12px;">
+                                    <span style="font-size:18px;">{{ $art->icon() }}</span>
+                                    <div style="flex:1;min-width:0;">
+                                        <div style="font-size:13px;font-weight:700;">{{ $art->title }}</div>
+                                        <div style="font-size:11.5px;color:var(--text-muted);">
+                                            {{ $art->tool_name }} · saved {{ $art->created_at->diffForHumans() }}
+                                        </div>
+                                    </div>
+                                    <form method="POST" action="{{ route('client.ai-artifacts.copy', [$event, $art]) }}">
+                                        @csrf
+                                        <button type="submit" class="cl-btn cl-btn-ghost cl-btn-sm">Add</button>
+                                    </form>
+                                </div>
+                            @endforeach
+                        </div>
+                        <p style="font-size:11.5px;color:var(--text-muted);margin:10px 0 0;">
+                            Adding a result copies it here — your original stays on the other event, and this
+                            copy is yours to edit or remove.
+                        </p>
+                    </details>
+                @endif
             </div>
             @endif
 

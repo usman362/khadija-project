@@ -44,6 +44,19 @@ class ProfessionalProfileSectionsTest extends TestCase
         $this->seed(\Database\Seeders\RolePermissionSeeder::class);
 
         $this->pro = $this->account('professional');
+
+        /*
+         * A fixed name, not faker's.
+         *
+         * These tests assert on the RAW page body, and faker occasionally
+         * produces a name with an apostrophe — "O'Brien" renders as
+         * O&#039;Brien and the assertion fails perhaps one run in twenty. A
+         * test that fails intermittently is one nobody trusts, and the
+         * template is what is under test here, not faker's output.
+         */
+        $this->pro->forceFill(['name' => 'Elena Ruiz'])->save();
+        $this->pro->refresh();
+
         $this->pro->getOrCreateProfile()->update([
             'company_name'     => 'ER Photography',
             'headline'         => 'Weddings and editorial',
