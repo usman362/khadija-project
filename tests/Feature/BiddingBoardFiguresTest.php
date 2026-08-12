@@ -201,6 +201,40 @@ class BiddingBoardFiguresTest extends TestCase
         );
     }
 
+    /* ── Row 140: one "unlocked to you" rule ────────────────── */
+
+    /**
+     * A gig withheld by the 60-minute tier delay is out of the tab counts and
+     * out of the list — one rule, applied in both places. What it must never
+     * do is read as "none exist", so the banner states how many are waiting.
+     */
+    public function test_a_locked_gig_is_out_of_the_counts_and_named_in_the_banner(): void
+    {
+        $this->gig(['title' => 'Open to everyone']);
+        $this->gig(['title' => 'Just posted emergency', 'source' => 'esr', 'published_at' => now()]);
+
+        $page   = $this->board();
+        $counts = $page->viewData('counts');
+
+        $this->assertSame(1, $counts['all'], 'the locked emergency is not counted');
+        $this->assertSame(0, $counts['ER']);
+        $this->assertSame(1, $page->viewData('lockedCount'));
+
+        $page->assertSee('opens', false);
+        $page->assertSee("unlocked to you", false);
+    }
+
+    /** Once the delay has passed the same gig counts normally. */
+    public function test_the_lock_lifts_after_the_delay(): void
+    {
+        $this->gig(['title' => 'Older emergency', 'source' => 'esr', 'published_at' => now()->subHours(2)]);
+
+        $page = $this->board();
+
+        $this->assertSame(1, $page->viewData('counts')['ER']);
+        $this->assertSame(0, $page->viewData('lockedCount'));
+    }
+
     /** And it counts only what this professional can actually see (R38, R33). */
     public function test_the_tabs_exclude_what_the_list_excludes(): void
     {
