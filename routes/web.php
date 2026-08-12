@@ -622,6 +622,18 @@ Route::middleware('auth')->group(function () {
         Route::post('/{cancellation}/withdraw', [$c, 'withdraw'])->name('withdraw');
     });
 
+    // ── The forms audit's ten forms (rows 183–246) ────────────────
+    Route::prefix('forms')->name('forms.')->group(function () {
+        $f = \App\Http\Controllers\Forms\FormController::class;
+
+        Route::get('/', [$f, 'index'])->name('index');
+        Route::get('/new/{key}', [$f, 'create'])->name('create');
+        Route::post('/new/{key}', [$f, 'store'])->name('store');
+        Route::get('/{submission}', [$f, 'show'])->name('show');
+        Route::post('/{submission}/respond', [$f, 'respond'])->name('respond');
+        Route::post('/{submission}/withdraw', [$f, 'withdraw'])->name('withdraw');
+    });
+
     // ── Client Panel ──────────────────────────────────────────────
     Route::prefix('client')->middleware('permission:dashboard.view')->group(function () {
         Route::get('/dashboard', [ClientDashboardController::class, 'index'])->name('client.dashboard');
