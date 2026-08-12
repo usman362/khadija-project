@@ -121,10 +121,49 @@
         @endif
         <input type="hidden" name="request_type" id="doType" value="{{ $type }}">
 
+        {{-- Checklist row 193 — service first, then the professional.
+
+             This section used to open with every professional in the state,
+             so a photography brief could go to a florist and only come back
+             when they declined it. Choosing the service narrows the list to
+             people who actually do that work. Arriving from a profile page
+             skips this: the professional is already chosen, and the services
+             offered are only theirs. --}}
+        @unless($selectedPro)
+            <div class="do-sec req">
+                <div class="do-sec-hd"><h4>What do you need?</h4><span class="do-tag">START HERE</span></div>
+                <div class="do-sec-bd">
+                    <div class="do-field">
+                        <label>Service</label>
+                        <select class="do-input"
+                                onchange="window.location = '{{ route('client.direct-offers.create') }}?service=' + this.value">
+                            <option value="">Choose a service…</option>
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat->id }}" @selected(($serviceId ?? 0) === $cat->id)>{{ $cat->name }}</option>
+                            @endforeach
+                        </select>
+                        <p style="font-size:11.5px;color:var(--text-muted);margin-top:5px;">
+                            We only show professionals who offer this.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @endunless
+
         {{-- Choose Professional --}}
         <div class="do-sec req">
             <div class="do-sec-hd"><h4>Choose Professional</h4><span class="do-tag">YOUR INPUT</span></div>
             <div class="do-sec-bd">
+                @if(! $selectedPro && ($serviceId ?? 0) === 0)
+                    <p style="font-size:13px;color:var(--text-muted);margin:0;">
+                        Choose a service above first.
+                    </p>
+                @elseif($pros->isEmpty())
+                    <p style="font-size:13px;color:var(--text-muted);margin:0;">
+                        No professional in your state offers this yet. Try another service, or post it
+                        to the board so anyone who can do it may reply.
+                    </p>
+                @endif
                 @if($selectedPro)
                     <div class="do-pro" style="margin-bottom:12px;">
                         <img class="do-pro-av" src="{{ $selectedPro->avatar_url }}" alt="">

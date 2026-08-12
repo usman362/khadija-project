@@ -25,22 +25,59 @@ use Illuminate\View\View;
  */
 class ClientDirectOfferController extends Controller
 {
+    /**
+     * Checklist row 193 — service first, then the professional.
+     *
+     * The form used to open with a dropdown of every professional in the
+     * state, so a client could send a photography brief to a florist and only
+     * find out when the florist declined it. Picking the service first means
+     * the list can only contain people who do that work.
+     *
+     * Two ways in, both supported:
+     *   ?service=<id>  the normal route — choose the work, then who does it.
+     *   ?pro=<id>      "Hire This Professional" from a profile — that person
+     *                  is fixed, and the services offered are only THEIRS.
+     *
+     * R6 still holds: a Direct Offer caps at one professional per SERVICE, not
+     * one service per offer. A client may send one professional several
+     * services in a single offer, which is why services stays an array.
+     */
     public function create(Request $request): View
     {
+        $user      = $request->user();
+        $serviceId = (int) $request->query('service', 0);
+        $proId     = (int) $request->query('pro', 0);
+
         $pros = User::query()
             ->whereHas('roles', fn ($r) => $r->where('name', RoleName::PROFESSIONAL->value))
             ->excludingSelf()
-            ->with(['profile'])
+            ->with(['profile', 'serviceCategories:id,name'])
             ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')
-            ->tap(fn ($q) => StateMatching::scopeUsersForViewer($q, $request->user()))
+            ->tap(fn ($q) => StateMatching::scopeUsersForViewer($q, $user))
+            // Only people who actually offer the chosen service. This is the
+            // whole fix — the filter, not a warning after the fact.
+            ->when($serviceId > 0, fn ($q) => $q->whereHas(
+                'serviceCategories', fn ($c) => $c->where('categories.id', $serviceId),
+            ))
             ->limit(20)->get();
 
-        $categories  = Category::active()->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
-        $selectedPro = $request->query('pro') ? $pros->firstWhere('id', (int) $request->query('pro')) : $pros->first();
-        // Default to SSR — a direct offer is normally one service to one pro.
-        $type        = in_array($request->query('type'), ['SSR', 'MSR'], true) ? $request->query('type') : 'SSR';
+        $selectedPro = $proId > 0
+            ? User::with('serviceCategories:id,name')->find($proId)
+            : ($serviceId > 0 ? $pros->first() : null);
 
-        return view('client.direct-offers.create', compact('pros', 'categories', 'selectedPro', 'type'));
+        // Arriving from a profile page fixes the professional, so the service
+        // list narrows to what that person actually does. Offering them a
+        // service they do not provide is the same bug from the other end.
+        $categories = $selectedPro
+            ? $selectedPro->serviceCategories()->select('categories.id', 'categories.name')->get()
+            : Category::active()->where('kind', 'service')
+                ->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
+
+        $type = in_array($request->query('type'), ['SSR', 'MSR'], true) ? $request->query('type') : 'SSR';
+
+        return view('client.direct-offers.create', compact(
+            'pros', 'categories', 'selectedPro', 'type', 'serviceId',
+        ));
     }
 
     /**
@@ -71,6 +108,27 @@ class ClientDirectOfferController extends Controller
         // account is both parties — a contract with itself, and commission
         // taken on money that never moved.
         abort_if($pro->id === $user->id, 422, 'You cannot send a direct offer to yourself.');
+
+        /*
+         * Row 193's actual bug, guarded at the point it matters.
+         *
+         * The filtered list is a courtesy; the ids arrive in the request and
+         * a stale tab or a typed URL bypasses the form entirely. A florist
+         * receiving a photography brief is the thing the row is about, so it
+         * is refused here rather than left for them to decline.
+         */
+        $asked = collect($request->input('services', []))->map(fn ($id) => (int) $id)->filter();
+
+        if ($asked->isNotEmpty()) {
+            $offered = $pro->serviceCategories()->pluck('categories.id');
+            $unknown = $asked->diff($offered);
+
+            abort_unless(
+                $unknown->isEmpty(),
+                422,
+                'That professional does not offer one of the services you selected.',
+            );
+        }
 
         // Rule R38 — same-state only, re-checked here because the id arrives
         // in the request and the filtered dropdown is only a courtesy. A
