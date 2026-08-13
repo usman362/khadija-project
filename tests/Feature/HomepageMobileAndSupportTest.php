@@ -166,6 +166,72 @@ class HomepageMobileAndSupportTest extends TestCase
         $this->assertCount(0, $this->get(route('landing'))->assertOk()->viewData('popularCities'));
     }
 
+    /**
+     * The states variant, built alongside cities so Sir Peter can pick.
+     * Exercised directly rather than through the page, because the page
+     * renders whichever grouping the constant names and switching a constant
+     * mid-test would prove nothing about the other branch.
+     */
+    public function test_the_states_grouping_uses_full_names_and_real_links(): void
+    {
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
+        $this->pro('Baltimore', 'MD');
+        $this->pro('Silver Spring', 'MD');
+        $this->pro('Arlington', 'VA');
+
+        $c = new \App\Http\Controllers\LandingPageController();
+        $m = new \ReflectionMethod($c, 'popularStates');
+        $m->setAccessible(true);
+        $rows = collect($m->invoke($c));
+
+        $md = $rows->firstWhere('state', 'MD');
+
+        $this->assertSame('Maryland', $md['city'], 'the full name, not the abbreviation');
+        $this->assertSame(2, $md['count'], 'both Maryland cities counted together');
+        $this->assertStringContainsString('state=MD', $md['link']);
+        $this->assertSame(['MD', 'VA'], $rows->pluck('state')->all(), 'ordered by headcount');
+    }
+
+    /** A state we do not operate in never appears, whatever its headcount. */
+    public function test_the_states_grouping_excludes_states_we_do_not_serve(): void
+    {
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
+        $this->pro('Los Angeles', 'CA');
+        $this->pro('Austin', 'TX');
+
+        $c = new \App\Http\Controllers\LandingPageController();
+        $m = new \ReflectionMethod($c, 'popularStates');
+        $m->setAccessible(true);
+
+        $this->assertSame([], $m->invoke($c));
+    }
+
+    /** And the browse page's new state filter actually narrows the list. */
+    public function test_browse_filters_by_state(): void
+    {
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
+        $this->pro('Baltimore', 'MD');
+        $this->pro('Arlington', 'VA');
+
+        $viewer = User::factory()->create(['primary_role' => 'client']);
+        $viewer->assignRole('client');
+        $viewer->getOrCreateProfile()->update(['country' => 'US', 'state' => 'MD', 'city' => 'Baltimore']);
+
+        $page = $this->actingAs($viewer->fresh())->get(route('public.browse', ['state' => 'MD']))->assertOk();
+
+        $this->assertSame('MD', $page->viewData('filters')['state']);
+
+        // A state we do not operate in is discarded rather than queried.
+        $bad = $this->actingAs($viewer->fresh())->get(route('public.browse', ['state' => 'CA']))->assertOk();
+        $this->assertSame('', $bad->viewData('filters')['state']);
+    }
+
     /* ── Row 122: Contact Support opens support ─────────────── */
 
     public function test_the_support_form_exists_and_asks_what_a_ticket_needs(): void

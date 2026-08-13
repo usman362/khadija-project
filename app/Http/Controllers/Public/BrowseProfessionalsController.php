@@ -35,6 +35,10 @@ class BrowseProfessionalsController extends Controller
     {
         $q         = trim((string) $request->query('q', ''));
         $city      = trim((string) $request->query('city', ''));
+        // Uppercased and checked against the operating list, so the parameter
+        // cannot be used to query a state we do not serve.
+        $state     = strtoupper(trim((string) $request->query('state', '')));
+        $state     = array_key_exists($state, config('geo.allowed_states', [])) ? $state : '';
         $catSlug   = trim((string) $request->query('category', ''));
         $ratingMin = (float) $request->query('rating_min', 0);
         $verified  = (bool) $request->query('verified', false);
@@ -109,6 +113,13 @@ class BrowseProfessionalsController extends Controller
         // ── City filter ─────────────────────────────────────────────
         if ($city !== '') {
             $query->whereHas('profile', fn ($p) => $p->where('city', 'like', $city . '%'));
+        }
+
+        // ── State filter ────────────────────────────────────────────
+        // Added for the homepage's "Where our professionals are" section, so a
+        // state card has somewhere real to land.
+        if ($state !== '') {
+            $query->whereHas('profile', fn ($p) => $p->where('state', $state));
         }
 
         // ── Verified-only filter ────────────────────────────────────
@@ -281,6 +292,7 @@ class BrowseProfessionalsController extends Controller
             'filters'    => [
                 'q'          => $q,
                 'city'       => $city,
+                'state'      => $state,
                 'rating_min' => $ratingMin,
                 'verified'   => $verified,
                 'insured'    => $insured,

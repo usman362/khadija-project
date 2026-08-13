@@ -36,6 +36,7 @@ class LandingPageController extends Controller
         // "Where our professionals are" — Khadijah's request, after Bark's
         // Popular Cities section.
         $popularCities = $this->popularCities();
+        $cityGrouping  = self::CITY_GROUPING;
 
         // Featured testimonial — newest substantive 5-star review, if any.
         $featuredReview = Review::query()
@@ -70,6 +71,7 @@ class LandingPageController extends Controller
             'categories',
             'showcaseCategories',
             'popularCities',
+            'cityGrouping',
             'featuredReview',
             'video',
             'cms'
@@ -93,8 +95,64 @@ class LandingPageController extends Controller
      */
     public const CITY_MIN_PROFESSIONALS = 2;
 
+    /**
+     * Whether that section groups by city or by state.
+     *
+     * Sir Peter has not picked yet, so both are built and this is the switch —
+     * 'city' or 'state', one word. States carry a lower bar on purpose: with
+     * seven of them, a state holding two professionals is a real answer to
+     * "do you cover Maryland?", whereas a city holding two is thin.
+     */
+    public const CITY_GROUPING = 'city';
+
+    public const STATE_MIN_PROFESSIONALS = 1;
+
     /** @return array<int, array{city:string, state:string, count:int, link:string}> */
     private function popularCities(): array
+    {
+        return self::CITY_GROUPING === 'state'
+            ? $this->popularStates()
+            : $this->popularCitiesByCity();
+    }
+
+    /**
+     * The same section grouped by state instead.
+     *
+     * Names come from config('geo.allowed_states'), which is the same list the
+     * registration gate uses — so a state cannot appear here that someone
+     * could not actually register in.
+     *
+     * @return array<int, array{city:string, state:string, count:int, link:string}>
+     */
+    private function popularStates(): array
+    {
+        $names = config('geo.allowed_states', []);
+
+        return \App\Models\UserProfile::query()
+            ->whereHas('user', fn ($u) => $u->whereHas('roles', fn ($r) => $r->where('name', 'professional')))
+            ->whereNotNull('state')->where('state', '!=', '')
+            ->whereIn('state', array_keys($names))
+            ->selectRaw('state, COUNT(*) as total')
+            ->groupBy('state')
+            ->havingRaw('COUNT(*) >= ?', [self::STATE_MIN_PROFESSIONALS])
+            ->orderByDesc('total')
+            ->orderBy('state')
+            ->limit(8)
+            ->get()
+            ->map(fn ($r) => [
+                // 'city' carries the display name so the view stays one block
+                // for both groupings — renaming the key would mean two views
+                // and two chances for them to drift.
+                'city'  => $names[$r->state] ?? $r->state,
+                'state' => $r->state,
+                'count' => (int) $r->total,
+                'link'  => route('public.browse', ['state' => $r->state]),
+            ])
+            ->all();
+    }
+
+    /** @return array<int, array{city:string, state:string, count:int, link:string}> */
+    private function popularCitiesByCity(): array
     {
         return \App\Models\UserProfile::query()
             ->whereHas('user', fn ($u) => $u->whereHas('roles', fn ($r) => $r->where('name', 'professional')))

@@ -433,7 +433,11 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                         {{ $c['city'] }}
                     </span>
-                    <span class="lp-city-state">{{ $c['state'] }}</span>
+                    {{-- Grouped by state the heading already IS the state, so the
+                         abbreviation underneath would say the same thing twice. --}}
+                    @if($cityGrouping !== 'state')
+                        <span class="lp-city-state">{{ $c['state'] }}</span>
+                    @endif
                     <span class="lp-city-count"><b>{{ $c['count'] }}</b> {{ $c['count'] === 1 ? 'professional' : 'professionals' }}</span>
                 </a>
             @endforeach
