@@ -30,7 +30,7 @@ class Event extends Model
         'supplier_id',
         'source',
         'category_id',
-        // BSR wizard fields
+        // BR wizard fields
         'event_type',
         'organization_type',
         'characteristic',
@@ -56,7 +56,7 @@ class Event extends Model
      * that raised it.
      *
      * Stamped here rather than in each of the five controllers that create an
-     * Event (post-event wizard, direct offer, ESR, the prototype bridge, the
+     * Event (post-event wizard, direct offer, ER, the prototype bridge, the
      * seeders). A request that reached the board with no state would be
      * invisible to everyone, since NULL matches nobody — so the one place
      * that cannot be forgotten is the model itself.

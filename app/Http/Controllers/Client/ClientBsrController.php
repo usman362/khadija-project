@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
 /**
- * Client — create a BSR (Bidding Service Request).
+ * Client — create a BR (Bidding Request).
  *
- * A BSR is the broadcast bidding route: the client posts, every eligible
+ * A BR is the broadcast bidding route: the client posts, every eligible
  * professional is notified, and they bid. Scope is SSR (one service) or MSR
  * (several) — the same request type either way, which is why this is one wizard
  * with a scope choice rather than two separate forms.
@@ -37,7 +37,7 @@ class ClientBsrController extends Controller
     ];
 
     /** Request characteristics. "Emergency" is absent on purpose — that is the
-     *  ESR request type, not a characteristic of a BSR. */
+     *  ER request type, not a characteristic of a BR. */
     public const CHARACTERISTICS = [
         'standard'   => ['Standard', 'Typical timeline and scope.'],
         'urgent'     => ['Urgent', 'Shorter timeline than standard.'],
@@ -390,7 +390,7 @@ class ClientBsrController extends Controller
             'questions_enabled' => (bool) ($d['questions_enabled'] ?? true),
             'client_id'         => $user->id,
             'created_by'        => $user->id,
-            'source'            => 'user',      // BSR — broadcast, no supplier_id
+            'source'            => 'user',      // BR — broadcast, no supplier_id
         ];
 
         if ($publish) {

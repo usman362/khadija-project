@@ -3,7 +3,7 @@
 @section('title', 'Finalize With ' . ($pro->name ?? 'Professional'))
 @section('page-title', 'Finalize With Professional')
 
-{{-- Screen 4 of the client BSR set — the seven-step agreement.
+{{-- Screen 4 of the client BR set — the seven-step agreement.
 
      Accepting a bid used to jump straight to a confirmed booking. Peter's rule
      is that either side may back out until a final agreement is made, so each

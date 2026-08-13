@@ -15,7 +15,7 @@ use RuntimeException;
  * Rule R33 — what a client does with an expired request.
  *
  * Reopen it free inside the first 24 hours, pay to extend it, close it, or
- * duplicate it. ESR takes a different path (§5) and this controller enforces
+ * duplicate it. ER takes a different path (§5) and this controller enforces
  * that rather than letting the view decide: a view that offers an option the
  * backend refuses is a view that takes the client's money and then says no.
  */

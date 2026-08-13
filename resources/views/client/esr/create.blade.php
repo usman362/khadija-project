@@ -44,7 +44,7 @@
     .esr-svc { display:flex; gap:8px; align-items:center; border:1.5px solid var(--border-color,#e5e7eb); border-radius:10px; padding:9px 11px; cursor:pointer; font-size:13px; }
     .esr-svc:has(input:checked) { border-color:#f97316; background:rgba(249,115,22,0.10); }
     .esr-svc input { accent-color:#f97316; }
-    /* Single vs multi scope chooser — an ESR can be either, same as SSR/MSR. */
+    /* Single vs multi scope chooser — an ER can be either, same as SSR/MSR. */
     .esr-scope { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
     .esr-scope-o { border:2px solid var(--border-color,#e5e7eb); border-radius:14px; padding:15px; cursor:pointer; background:var(--bg-card,#fff); transition:border-color .15s, background .15s; }
     .esr-scope-o:hover { border-color:#f97316; }

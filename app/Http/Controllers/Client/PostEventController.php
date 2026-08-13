@@ -66,7 +66,7 @@ class PostEventController extends Controller
     // ── Step 0: Choose Route ────────────────────────────────────────────────
     /**
      * The posting entry point. Packages are ONE route of five, not the whole
-     * product (Fix Spec 07.14). SSR/MSR/ESR end at Publish then bids arrive
+     * product (Fix Spec 07.14). SSR/MSR/ER end at Publish then bids arrive
      * async on Proposals; Direct Offer is a targeted non-bidding invite;
      * Package Search is the synchronous "buy a bundle" wizard below.
      */

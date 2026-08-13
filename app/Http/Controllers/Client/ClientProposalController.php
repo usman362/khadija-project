@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Client-side Proposals view. A "proposal" here is a professional's bid on
  * one of the client's published events (Fix Spec: after a posting is
  * published, bids arrive asynchronously here). Sourced from the Bid model
- * so the loop is real: MSR/SSR/ESR publish → pro bids on the Bidding Board
+ * so the loop is real: MSR/SSR/ER publish → pro bids on the Bidding Board
  * → the bid appears on this page for the client to review and act on.
  *
  * Route: GET /client/proposals

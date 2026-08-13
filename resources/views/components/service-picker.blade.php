@@ -6,7 +6,7 @@
     'accentStrong' => '#ea580c',
     'valueField' => 'id', // 'id' (Direct Request) or 'name' (MSR store matches on name)
     // Single-service mode: picking one service clears the previous pick, so a
-    // single-service request (SSR, or an ESR scoped to one service) can't be
+    // single-service request (SSR, or an ER scoped to one service) can't be
     // submitted with two. Flip it live by setting data-svc-single on the root.
     'single' => false,
 ])
@@ -121,7 +121,7 @@
         grid.querySelectorAll('.svc-item').forEach(function (item) {
             var cb = item.querySelector('input');
             cb.addEventListener('change', function () {
-                // Read the attribute per-event, not at init — the ESR page flips
+                // Read the attribute per-event, not at init — the ER page flips
                 // single mode when the client switches scope.
                 if (cb.checked && root.getAttribute('data-svc-single') === '1') {
                     grid.querySelectorAll('.svc-item').forEach(function (other) {

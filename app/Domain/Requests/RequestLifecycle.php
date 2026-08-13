@@ -222,7 +222,7 @@ final class RequestLifecycle
     /**
      * Whether a paid extension is available at all.
      *
-     * §5 — ESR gets none. Its 72-hour eligibility window and sub-5-hour
+     * §5 — ER gets none. Its 72-hour eligibility window and sub-5-hour
      * response deadline mean even the 3-day tier lands past the event date
      * essentially every time, so the option is removed rather than offered
      * and then refused.
@@ -234,7 +234,7 @@ final class RequestLifecycle
             && self::extensionsRemaining($event) > 0;
     }
 
-    /** §5 — what an expired ESR client is offered instead. */
+    /** §5 — what an expired ER client is offered instead. */
     public static function esrOptions(): array
     {
         return ['close', 'duplicate', 'convert_to_ssr'];

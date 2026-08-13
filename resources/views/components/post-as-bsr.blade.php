@@ -6,9 +6,9 @@
 
 @php
     /*
-     * Checklist row 226, Phase 1 — "Post as BSR" from a tool result.
+     * Checklist row 226, Phase 1 — "Post as BR" from a tool result.
      *
-     * The five-outcome vision (BSR / ESR / Direct Offer / Save Draft / Attach
+     * The five-outcome vision (BR / ER / Direct Offer / Save Draft / Attach
      * to Existing Event) is not built here on purpose: the approved Phase 1
      * scope is this one leg from three tools, to prove the handoff before
      * committing to five outcomes across twelve tools. "Attach to Existing

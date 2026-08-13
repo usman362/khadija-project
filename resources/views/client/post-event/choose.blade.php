@@ -4,7 +4,7 @@
 
 {{-- Step 0 — Choose Route. Packages are ONE route of five, not the whole
      product (Fix Spec 07.14). Package Search is the synchronous "buy a bundle"
-     wizard; SSR/MSR/ESR are postings that end at Publish then take bids on
+     wizard; SSR/MSR/ER are postings that end at Publish then take bids on
      Proposals; Direct Request is a targeted, non-bidding invite. --}}
 
 @push('styles')
@@ -50,7 +50,7 @@
                 ],
                 // SSR and MSR were two cards for the same thing. They are the
                 // SCOPE of a bidding request, not separate types — you pick one
-                // service or several inside the form, exactly as ESR already
+                // service or several inside the form, exactly as ER already
                 // works. One card (Peter, 2026-07-30). A Blade comment cannot go
                 // here: inside @php it is not stripped and lands in the PHP.
 
@@ -66,7 +66,7 @@
                     'href'  => route('client.direct-offers.create'),
                     'tag'   => ['Targeted', ''],
                     'title' => 'Direct Request (DR)',
-                    // What makes a DSR a DSR is that it is targeted, not broadcast —
+                    // What makes a DR a DR is that it is targeted, not broadcast —
                     // NOT that it is one service. A6 caps it at one professional per
                     // SERVICE at a time; a professional who offers several can be
                     // asked for several. The old wording implied otherwise.

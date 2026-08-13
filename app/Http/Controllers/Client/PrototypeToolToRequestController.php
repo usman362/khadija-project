@@ -12,7 +12,7 @@ use Illuminate\View\View;
  * PROTOTYPE — Tool → Request handoff.
  *
  * Built for Monday's design review (Khadijah, 2026-07-30): show Peter the whole
- * idea before we commit a week to building it, when only the "Post as BSR" leg
+ * idea before we commit a week to building it, when only the "Post as BR" leg
  * is planned for the first pass.
  *
  * Nothing here writes anything. Every screen is clearly marked as a prototype,
@@ -20,7 +20,7 @@ use Illuminate\View\View;
  * are proposals — "Attach to Existing Event" is real today (nine tools carry an
  * "Add to my event" button), the rest are not.
  *
- * Tool names, routes and the BSR step list are read from the real catalog and
+ * Tool names, routes and the BR step list are read from the real catalog and
  * the real wizard, so the prototype cannot drift from the product while the
  * conversation is still going.
  */
@@ -37,13 +37,13 @@ class PrototypeToolToRequestController extends Controller
      */
     private const OUTCOMES = [
         'bsr' => [
-            'label'  => 'Post as BSR',
+            'label'  => 'Post as BR',
             'blurb'  => 'Opens the bidding request with everything the tool worked out already filled in. Professionals bid.',
             'status' => 'first',
             'icon'   => '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
         ],
         'esr' => [
-            'label'  => 'Post as ESR',
+            'label'  => 'Post as ER',
             'blurb'  => 'Same, but flagged as a rush — within 72 hours, professionals notified with priority.',
             'status' => 'proposed',
             'icon'   => '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',

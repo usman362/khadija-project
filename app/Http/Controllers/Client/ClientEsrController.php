@@ -10,22 +10,22 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Emergency Service Request (ESR) — a standalone "Post a Rush Request" flow
- * for time-sensitive needs within 72 hours (Peter's request-types spec: ESR
+ * Emergency Request (ER) — a standalone "Post a Rush Request" flow
+ * for time-sensitive needs within 72 hours (Peter's request-types spec: ER
  * is its OWN flow, not an MSR link). It reuses the whole downstream engine:
- * an ESR publishes a real Event (source 'esr') that surfaces on the pro
+ * an ER publishes a real Event (source 'esr') that surfaces on the pro
  * Bidding Board with priority, then flows through bids → proposals → award →
  * booking → review exactly like SSR/MSR.
  *
  * Fees: success-only. $0 to post; the client pays a single $2.99 when an
  * agreement finalizes, and nothing at all if the request goes unfilled. (This
- * used to claim "$2.99 at post + $8.99 ESR service fee" — an earlier model.
+ * used to claim "$2.99 at post + $8.99 ER service fee" — an earlier model.
  * $8.99 appears in no current workflow doc, and the Integration Diagnosis is
  * explicit: "a single $2.99 only when something finalizes.")
  */
 class ClientEsrController extends Controller
 {
-    /** Urgency reasons an ESR can cite. */
+    /** Urgency reasons an ER can cite. */
     public const REASONS = [
         'professional_cancelled' => 'A professional cancelled or is unavailable',
         'no_show'                => 'A professional did not arrive as scheduled',

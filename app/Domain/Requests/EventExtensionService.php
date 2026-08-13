@@ -85,7 +85,7 @@ final class EventExtensionService
             ->firstWhere('days', $days);
 
         if ($option === null) {
-            // Covers all four refusals — not expired, an ESR, the cap is
+            // Covers all four refusals — not expired, an ER, the cap is
             // reached, or this tier would land past the event date — because
             // extensionOptions() is the one place that decides.
             throw new RuntimeException('That extension is not available for this event.');

@@ -3,7 +3,7 @@
 @section('title', 'Compare Proposals — ' . $event->title)
 @section('page-title', 'Compare Proposals')
 
-{{-- Screen 3 of the client BSR set.
+{{-- Screen 3 of the client BR set.
 
      Two columns from Peter's mockup are deliberately absent: Distance and
      Response Time. No coordinates are stored on a professional's profile and
