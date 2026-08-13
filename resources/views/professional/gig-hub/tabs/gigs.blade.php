@@ -336,7 +336,7 @@
                 <div class="mg-act-row">
                     <div class="mg-act-dot green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
                     <div class="mg-act-body"><div class="mg-act-text">Activity on <b>{{ \Illuminate\Support\Str::limit($g->title, 24) }}</b></div></div>
-                    <div class="mg-act-time">{{ $g->updated_at?->diffForHumans() ?? '' }}</div>
+                    <div class="mg-act-time">{{ $g->updated_at?->humanAgo() ?? '' }}</div>
                 </div>
             @empty
                 <div style="font-size:12px;color:var(--text-muted);padding:12px 0;text-align:center;">No recent activity</div>

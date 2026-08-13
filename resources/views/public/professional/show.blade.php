@@ -1127,7 +1127,7 @@
                                 <span class="pp-review-stars" aria-label="{{ $r->rating }} out of 5">
                                     {{ str_repeat('★', $r->rating) }}{{ str_repeat('☆', 5 - $r->rating) }}
                                 </span>
-                                <span class="pp-review-date">{{ $r->created_at->diffForHumans() }}</span>
+                                <span class="pp-review-date">{{ $r->created_at->humanAgo() }}</span>
                             </div>
                             @if($r->title)
                                 <div class="pp-review-title">{{ $r->title }}</div>

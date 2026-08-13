@@ -84,7 +84,7 @@
                         <td class="small" style="max-width:280px;">{{ \Illuminate\Support\Str::limit($c->title, 60) }}</td>
                         <td class="small">{{ $c->messages_count }}</td>
                         <td class="small">{{ number_format($c->total_tokens) }}</td>
-                        <td class="small">{{ $c->last_message_at?->diffForHumans() ?? '—' }}</td>
+                        <td class="small">{{ $c->last_message_at?->humanAgo() ?? '—' }}</td>
                         <td class="text-end">
                             <a href="{{ route('app.admin.chatbot-logs.show', $c) }}" class="btn btn-sm btn-outline-primary">
                                 <i data-lucide="eye" style="width:14px;height:14px;"></i> View

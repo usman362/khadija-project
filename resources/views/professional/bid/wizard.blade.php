@@ -126,7 +126,7 @@
         @if($event->guest_count)<span>👥 {{ number_format($event->guest_count) }} guests</span>@endif
         <span>{{ $event->categories->pluck('name')->implode(', ') }}</span>
         @if($event->proposal_deadline)
-            <span class="bd-dl">⏱️ Closes {{ $event->proposal_deadline->format('M j, g:i A') }} · {{ $event->proposal_deadline->diffForHumans() }}</span>
+            <span class="bd-dl">⏱️ Closes {{ $event->proposal_deadline->format('M j, g:i A') }} · {{ $event->proposal_deadline->humanAgo() }}</span>
         @endif
     </div>
 </div>
@@ -326,7 +326,7 @@
             </b></div>
             @if($event->proposal_deadline)
                 <div class="bd-el"><span>Deadline</span><b>{{ $event->proposal_deadline->format('M j, g:i A') }}</b></div>
-                <div class="bd-el"><span>Time left</span><b>{{ $event->proposal_deadline->diffForHumans(null, true) }}</b></div>
+                <div class="bd-el"><span>Time left</span><b>{{ $event->proposal_deadline->humanAgo(true) }}</b></div>
             @endif
         </div>
 

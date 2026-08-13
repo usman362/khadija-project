@@ -90,7 +90,7 @@
                                 @endif
                             </td>
                         @endforeach
-                        <td class="text-muted small">{{ $profile->updated_at->diffForHumans() }}</td>
+                        <td class="text-muted small">{{ $profile->updated_at->humanAgo() }}</td>
                     </tr>
                 @empty
                     <tr><td colspan="5" class="text-center text-muted py-4">No submissions in this filter.</td></tr>

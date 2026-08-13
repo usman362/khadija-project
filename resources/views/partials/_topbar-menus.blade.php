@@ -47,7 +47,7 @@
             @endphp
             <a class="tbm-item" href="{{ $url ?: route($notifRoute) }}">
                 <span class="tbm-note unread">{{ \Illuminate\Support\Str::limit($msg, 110) }}</span>
-                <span class="sub">{{ $n->created_at?->diffForHumans() }}</span>
+                <span class="sub">{{ $n->created_at?->humanAgo() }}</span>
             </a>
         @empty
             <div class="tbm-empty">Nothing new right now.</div>

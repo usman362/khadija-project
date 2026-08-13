@@ -142,13 +142,13 @@
                 @if($r['years'])<span>{{ $r['years'] }} yrs experience</span>@endif
                 @if($r['city'])<span>📍 {{ $r['city'] }}</span>@endif
                 @if($b->category)<span>{{ $b->category->name }}</span>@endif
-                <span>Submitted {{ $b->created_at->diffForHumans() }}</span>
+                <span>Submitted {{ $b->created_at->humanAgo() }}</span>
             </div>
             @if($b->note)<p class="cp-note">{{ $b->note }}</p>@endif
             @if($b->replies->isNotEmpty())
                 @php $last = $b->replies->last(); @endphp
                 <p class="cp-note" style="border-top:1px dashed var(--border-color);padding-top:8px;">
-                    Last message from <b>{{ $last->user?->name ?? 'them' }}</b> {{ $last->created_at->diffForHumans() }}@if($last->counter_amount) — countered at <b>${{ number_format($last->counter_amount) }}</b>@endif
+                    Last message from <b>{{ $last->user?->name ?? 'them' }}</b> {{ $last->created_at->humanAgo() }}@if($last->counter_amount) — countered at <b>${{ number_format($last->counter_amount) }}</b>@endif
                 </p>
             @endif
         </div>

@@ -26,7 +26,7 @@
             <div style="margin-bottom:8px;text-align:{{ $mine ? 'right' : 'left' }};">
                 <div style="display:inline-block;max-width:85%;text-align:left;background:{{ $mine ? 'rgba(37,99,235,.10)' : 'rgba(128,128,128,.10)' }};border-radius:10px;padding:7px 11px;">
                     <div style="font-size:11px;font-weight:700;opacity:.75;">{{ $mine ? 'You' : ($r->user?->name ?? 'Them') }}
-                        <span style="font-weight:500;opacity:.7;">· {{ $r->created_at->diffForHumans() }}</span></div>
+                        <span style="font-weight:500;opacity:.7;">· {{ $r->created_at->humanAgo() }}</span></div>
                     @if($r->counter_amount)
                         <div style="font-weight:800;color:var(--ok-text);font-size:13px;">Counter-offer: ${{ number_format($r->counter_amount) }}</div>
                     @endif

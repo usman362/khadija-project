@@ -185,7 +185,7 @@
                     <div class="dx-list-av">{{ strtoupper(substr($r->referredUser->name ?? 'U', 0, 2)) }}</div>
                     <div class="dx-list-main">
                         <b>{{ $r->referredUser->name ?? 'New referral' }}</b>
-                        <span>{{ ucfirst($r->type?->value ?? 'signup') }} &middot; {{ $r->created_at->diffForHumans() }}</span>
+                        <span>{{ ucfirst($r->type?->value ?? 'signup') }} &middot; {{ $r->created_at->humanAgo() }}</span>
                     </div>
                     <div style="text-align:right;">
                         <div style="font-family:var(--ff); font-weight:700; color:var(--ink); font-size:13.5px;">${{ number_format($r->commission_amount, 2) }}</div>

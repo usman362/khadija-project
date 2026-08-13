@@ -39,7 +39,7 @@
             'response_hours' => \App\Support\ResponseStats::describe($value),
             'rating'         => number_format($value, 1),
             'member_since'   => $value->format('M Y'),
-            'last_active'    => $value->diffForHumans(),
+            'last_active'    => $value->humanAgo(),
             default          => number_format($value),
         };
     };

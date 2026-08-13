@@ -204,7 +204,7 @@
                             </td>
                             <td>
                                 <div style="color:var(--text-primary);font-weight:600;">{{ $p->created_at?->format('M d, Y') ?? '—' }}</div>
-                                <div style="font-size:10px;color:var(--text-muted);">{{ $p->created_at?->diffForHumans() }}</div>
+                                <div style="font-size:10px;color:var(--text-muted);">{{ $p->created_at?->humanAgo() }}</div>
                             </td>
                             <td><div class="pr-amt">${{ number_format($amount ?: rand(2000, 12000), 0) }}</div><div class="pr-amt-sub">Total</div></td>
                             <td><span class="pr-pstatus pr-ps-{{ $pipe }}">{{ ucfirst(str_replace('_', ' ', $pipe)) }}</span></td>

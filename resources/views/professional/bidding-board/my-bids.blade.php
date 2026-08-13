@@ -168,7 +168,7 @@
                             @if($bid->category)<span>{{ $bid->category->name }}</span>@endif
                             @if($e?->client)<span>{{ $e->client->name }}</span>@endif
                             @if($e?->starts_at)<span>📅 {{ $e->starts_at->format('M j, Y') }}</span>@endif
-                            <span>Bid {{ $bid->created_at->diffForHumans() }}</span>
+                            <span>Bid {{ $bid->created_at->humanAgo() }}</span>
                         </div>
 
                         {{-- The negotiation thread, unchanged — this is where

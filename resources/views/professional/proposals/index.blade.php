@@ -242,7 +242,7 @@
                                     {{ $booking->event->starts_at->format('M d, Y') }}
                                 </span>
                             @endif
-                            <span>{{ $booking->created_at->diffForHumans() }}</span>
+                            <span>{{ $booking->created_at->humanAgo() }}</span>
                         </div>
                     </div>
                     <div class="cl-booking-actions">

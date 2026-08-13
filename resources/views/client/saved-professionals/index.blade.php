@@ -56,7 +56,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mp-meta">Last worked together {{ $row['last']?->diffForHumans() }}{{ $row['completed'] ? ' · ' . $row['completed'] . ' completed' : '' }}</div>
+                        <div class="mp-meta">Last worked together {{ $row['last']?->humanAgo() }}{{ $row['completed'] ? ' · ' . $row['completed'] . ' completed' : '' }}</div>
                         <div class="mp-actions">
                             <a href="{{ route('client.direct-offers.create', ['pro' => $pro->id]) }}" class="mp-btn primary">Re-book</a>
                             <a href="{{ route('client.chat.index') }}" class="mp-btn">Message</a>

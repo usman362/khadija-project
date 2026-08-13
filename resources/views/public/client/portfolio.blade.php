@@ -252,7 +252,7 @@
                                  is tied to a booking record, because the query
                                  requires one. --}}
                             <span class="cp-tag">Verified Booking</span>
-                            <span class="cp-review-when">{{ $review->created_at->diffForHumans() }}</span>
+                            <span class="cp-review-when">{{ $review->created_at->humanAgo() }}</span>
                         </div>
                         @if($review->comment)<p>{{ $review->comment }}</p>@endif
                     </div>

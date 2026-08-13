@@ -221,7 +221,7 @@
                             <td>${{ number_format($g->budget ?? rand(3000, 25000), 0) }}</td>
                             <td>{{ rand(4, 18) }}</td>
                             <td><span class="vh-rfp-status">{{ ucfirst($g->status) }}</span></td>
-                            <td style="color:var(--text-muted);font-size:11px;">{{ $g->created_at?->diffForHumans() }}</td>
+                            <td style="color:var(--text-muted);font-size:11px;">{{ $g->created_at?->humanAgo() }}</td>
                         </tr>
                     @empty
                         <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">No project gigs yet.</td></tr>

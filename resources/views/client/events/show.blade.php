@@ -309,7 +309,7 @@
                             <span style="font-size:20px;">{{ $art->icon() }}</span>
                             <div style="flex:1;min-width:0;">
                                 <div style="font-size:13.5px;font-weight:700;color:var(--text-primary);">{{ $art->title }}</div>
-                                <div style="font-size:11.5px;color:var(--text-muted);">{{ $art->tool_name }} · {{ $art->created_at->diffForHumans() }}{{ $art->mode === 'auto' ? ' · auto-attached' : '' }}</div>
+                                <div style="font-size:11.5px;color:var(--text-muted);">{{ $art->tool_name }} · {{ $art->created_at->humanAgo() }}{{ $art->mode === 'auto' ? ' · auto-attached' : '' }}</div>
                             </div>
                             <form method="POST" action="{{ route('client.ai-artifacts.destroy', $art) }}" onsubmit="return confirm('Remove this result from your event?');">
                                 @csrf @method('DELETE')
@@ -343,7 +343,7 @@
                                     <div style="flex:1;min-width:0;">
                                         <div style="font-size:13px;font-weight:700;">{{ $art->title }}</div>
                                         <div style="font-size:11.5px;color:var(--text-muted);">
-                                            {{ $art->tool_name }} · saved {{ $art->created_at->diffForHumans() }}
+                                            {{ $art->tool_name }} · saved {{ $art->created_at->humanAgo() }}
                                         </div>
                                     </div>
                                     <form method="POST" action="{{ route('client.ai-artifacts.copy', [$event, $art]) }}">
@@ -557,7 +557,7 @@
                             @if($prof?->headline)<span>{{ $prof->headline }}</span>@endif
                             @if($prof?->city)<span>📍 {{ $prof->city }}</span>@endif
                             @if($bid->category)<span>{{ $bid->category->name }}</span>@endif
-                            <span>Submitted {{ $bid->created_at->diffForHumans() }}</span>
+                            <span>Submitted {{ $bid->created_at->humanAgo() }}</span>
                         </div>
                         @if($bid->note)<p class="ev-prop-note">{{ $bid->note }}</p>@endif
                     </div>
@@ -598,7 +598,7 @@
                 <div class="ev-q">
                     <div class="ev-q-head">
                         <b>{{ $q['reply']->user?->name ?? 'Professional' }}</b>
-                        <span>{{ $q['reply']->created_at->diffForHumans() }}</span>
+                        <span>{{ $q['reply']->created_at->humanAgo() }}</span>
                     </div>
                     <p>{{ $q['reply']->note }}</p>
                     <a class="cl-btn cl-btn-ghost cl-btn-sm" href="{{ route('client.proposals.compare', $event) }}">Reply on the proposal</a>
@@ -633,7 +633,7 @@
                         <span class="ev-act-ico">{{ $a['icon'] }}</span>
                         <div>
                             <div style="font-size:13.5px;color:var(--text-primary);font-weight:600;">{{ $a['text'] }}</div>
-                            <div style="font-size:11.5px;color:var(--text-muted);">{{ $a['at']->format('M j, Y · g:i A') }} · {{ $a['at']->diffForHumans() }}</div>
+                            <div style="font-size:11.5px;color:var(--text-muted);">{{ $a['at']->format('M j, Y · g:i A') }} · {{ $a['at']->humanAgo() }}</div>
                         </div>
                     </div>
                 @endforeach

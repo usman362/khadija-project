@@ -214,7 +214,7 @@
                                 </div>
                                 <div class="flex-grow-1">
                                     <p class="fw-bold mb-0">{{ $event->title }}</p>
-                                    <p class="text-secondary fs-12px mb-0">{{ $event->created_at?->diffForHumans() }}</p>
+                                    <p class="text-secondary fs-12px mb-0">{{ $event->created_at?->humanAgo() }}</p>
                                 </div>
                             </div>
                             @endforeach

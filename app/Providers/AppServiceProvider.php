@@ -54,6 +54,33 @@ class AppServiceProvider extends ServiceProvider
         // bare ->links() call (framework-agnostic, replaces the oversized default).
         \Illuminate\Pagination\Paginator::defaultView('pagination.gr');
 
+        /*
+         * Checklist row 146 — one relative time, rounded rather than truncated.
+         *
+         * Carbon reports the largest WHOLE unit, so 54 days reads "1 month
+         * ago" — technically one month and twenty-four days, but a reader
+         * takes it as about a month and is out by nearly four weeks. It was
+         * spotted on a notification whose event was 54 days old.
+         *
+         * ->humanAgo() rounds to the nearest unit instead, so 54 days reads
+         * "2 months ago". A macro rather than a helper function because every
+         * caller already has a Carbon instance in hand.
+         *
+         * NOT named ago(): Carbon already defines a real ago() method, and a
+         * real method always wins over a macro — the macro would be registered,
+         * report itself present, and never once be called.
+         */
+        \Illuminate\Support\Carbon::macro('humanAgo', function (...$args) {
+            /** @var \Illuminate\Support\Carbon $this */
+            $options = ['options' => \Carbon\CarbonInterface::ROUND];
+
+            if ($args !== [] && $args[count($args) - 1] === true) {
+                $options['syntax'] = \Carbon\CarbonInterface::DIFF_ABSOLUTE;
+            }
+
+            return $this->diffForHumans($options);
+        });
+
         // Public header mega-menu → real top-level categories (with children) that
         // have imagery, so the "All Categories" menu reflects the live taxonomy.
         \Illuminate\Support\Facades\View::composer('partials.navbar', function ($view) {

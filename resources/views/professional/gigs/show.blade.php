@@ -265,7 +265,7 @@
                                  row was made, so a request drafted a fortnight
                                  before it went out claimed to have been posted a
                                  fortnight ago. --}}
-                            <div class="gig-detail-value">{{ $event->postedAt()?->diffForHumans() ?? 'Not yet posted' }}</div>
+                            <div class="gig-detail-value">{{ $event->postedAt()?->humanAgo() ?? 'Not yet posted' }}</div>
                         </div>
                     </div>
                 </div>

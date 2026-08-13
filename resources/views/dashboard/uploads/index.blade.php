@@ -76,7 +76,7 @@
                             <span style="color:#64748b;">—</span>
                         @endif
                     </td>
-                    <td style="font-size:12px;color:#64748b;">{{ $file->created_at->diffForHumans() }}</td>
+                    <td style="font-size:12px;color:#64748b;">{{ $file->created_at->humanAgo() }}</td>
                     <td style="text-align:right;white-space:nowrap;">
                         @if($file->isReleasable())
                             <a class="btn btn-sm btn-secondary" href="{{ route('uploads.show', $file) }}">View</a>

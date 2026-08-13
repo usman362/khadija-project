@@ -594,7 +594,7 @@
                     <div class="mg-act-row">
                         <div class="mg-act-dot {{ $a['kind'] === 'cancelled' ? 'red' : 'green' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
                         <div class="mg-act-body"><div class="mg-act-text">{{ $a['text'] }} <b>{{ \Illuminate\Support\Str::limit($a['about'], 24) }}</b></div></div>
-                        <div class="mg-act-time">{{ $a['when']->diffForHumans() }}</div>
+                        <div class="mg-act-time">{{ $a['when']->humanAgo() }}</div>
                     </div>
                 @empty
                     <div style="font-size:12px;color:var(--text-muted);padding:12px 0;text-align:center;">No recent activity</div>
@@ -798,7 +798,7 @@
                                 @endif
                                 <span>
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                    {{ $event->created_at->diffForHumans() }}
+                                    {{ $event->created_at->humanAgo() }}
                                 </span>
                                 <span class="cl-badge cl-badge-{{ $event->status }}">{{ ucfirst(str_replace('_', ' ', $event->status)) }}</span>
                             </div>
