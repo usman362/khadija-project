@@ -175,6 +175,20 @@
     .lp-testi-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
     .lp-testi-dots i.on { width: 20px; border-radius: 99px; background: var(--blue); }
 
+    /* ── WHERE OUR PROFESSIONALS ARE (Khadijah, after Bark) ────── */
+    .lp-cities { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .lp-city { display: block; text-decoration: none; background: #fff; border: 1px solid var(--line);
+        border-radius: 14px; padding: 16px 18px; transition: transform .14s, box-shadow .14s, border-color .14s; }
+    .lp-city:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--blue); }
+    .lp-city:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+    .lp-city-name { font-size: 15px; font-weight: 800; color: var(--ink); display: flex; align-items: center; gap: 7px; }
+    .lp-city-name svg { width: 15px; height: 15px; color: var(--blue); flex-shrink: 0; }
+    .lp-city-state { font-size: 11.5px; font-weight: 700; color: var(--muted); margin-top: 2px; }
+    .lp-city-count { font-size: 12.5px; color: var(--text); margin-top: 8px; }
+    .lp-city-count b { color: var(--ink); }
+    @media (max-width: 900px) { .lp-cities { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 560px) { .lp-cities { grid-template-columns: 1fr; } }
+
     /* ── VALUE BAND (5 value tiles, no unverified numbers) ─────── */
     .lp-metrics-wrap { padding: 36px 0; }
     .lp-valueband { background: linear-gradient(100deg, var(--blue-onwhite-2) 0%, var(--blue-onwhite) 45%, var(--orange-onwhite) 100%); border-radius: 22px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 34px 0; box-shadow: var(--shadow-lg); }
@@ -397,6 +411,36 @@
         @endforeach
     </div>
 </div>
+
+{{-- ════════════ WHERE OUR PROFESSIONALS ARE ════════════ --}}
+{{-- Khadijah's request, after Bark's Popular Cities. A city only appears once
+     it holds enough professionals to be worth a click — see
+     LandingPageController::CITY_MIN_PROFESSIONALS. The section hides itself
+     entirely rather than showing one lonely city, because a nearly-empty
+     directory reads worse than no directory. --}}
+@if(count($popularCities ?? []))
+<section class="lp-section">
+    <div class="lp-container">
+        <div class="lp-cats-head">
+            <h2 class="lp-h2">Where our professionals are</h2>
+            <a href="{{ route('public.browse') }}" class="lp-viewall">Browse all professionals
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+        </div>
+        <div class="lp-cities">
+            @foreach($popularCities as $c)
+                <a href="{{ $c['link'] }}" class="lp-city">
+                    <span class="lp-city-name">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        {{ $c['city'] }}
+                    </span>
+                    <span class="lp-city-state">{{ $c['state'] }}</span>
+                    <span class="lp-city-count"><b>{{ $c['count'] }}</b> {{ $c['count'] === 1 ? 'professional' : 'professionals' }}</span>
+                </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
 
 {{-- ════════════ EXPLORE POPULAR CATEGORIES ════════════ --}}
 {{-- Row 121 — the showcase only takes categories that have artwork, so on an

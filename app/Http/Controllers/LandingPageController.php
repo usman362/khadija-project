@@ -33,6 +33,10 @@ class LandingPageController extends Controller
         // category's public landing page.
         $showcaseCategories = $this->showcaseCategories();
 
+        // "Where our professionals are" — Khadijah's request, after Bark's
+        // Popular Cities section.
+        $popularCities = $this->popularCities();
+
         // Featured testimonial — newest substantive 5-star review, if any.
         $featuredReview = Review::query()
             ->where('is_hidden', false)
@@ -65,6 +69,7 @@ class LandingPageController extends Controller
             'faqs',
             'categories',
             'showcaseCategories',
+            'popularCities',
             'featuredReview',
             'video',
             'cms'
@@ -75,6 +80,45 @@ class LandingPageController extends Controller
      * Real top-level categories that have imagery, as showcase tiles
      * (name, image URL, category landing link).
      */
+    /**
+     * Cities with enough professionals to be worth a click.
+     *
+     * The threshold is the whole point. Bark's version works because each of
+     * their cities holds hundreds; ours would otherwise print "Philadelphia —
+     * 1 professional", which makes the marketplace look emptier than it is. A
+     * city appears on its own once it crosses the line, and never before.
+     *
+     * Set by Khadijah 2026-08-13. One number, in one place, so changing it is
+     * a config edit rather than a code change.
+     */
+    public const CITY_MIN_PROFESSIONALS = 2;
+
+    /** @return array<int, array{city:string, state:string, count:int, link:string}> */
+    private function popularCities(): array
+    {
+        return \App\Models\UserProfile::query()
+            ->whereHas('user', fn ($u) => $u->whereHas('roles', fn ($r) => $r->where('name', 'professional')))
+            ->whereNotNull('city')->where('city', '!=', '')
+            ->whereNotNull('state')->where('state', '!=', '')
+            // Only where we actually operate. A city we cannot trade in has no
+            // business advertising itself on the front page.
+            ->whereIn('state', array_keys(config('geo.allowed_states', [])))
+            ->selectRaw('city, state, COUNT(*) as total')
+            ->groupBy('city', 'state')
+            ->havingRaw('COUNT(*) >= ?', [self::CITY_MIN_PROFESSIONALS])
+            ->orderByDesc('total')
+            ->orderBy('city')
+            ->limit(8)
+            ->get()
+            ->map(fn ($r) => [
+                'city'  => $r->city,
+                'state' => $r->state,
+                'count' => (int) $r->total,
+                'link'  => route('public.browse', ['city' => $r->city]),
+            ])
+            ->all();
+    }
+
     private function showcaseCategories(): array
     {
         // Deliberately the same query as /events-categories, just capped at

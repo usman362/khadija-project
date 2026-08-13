@@ -113,6 +113,59 @@ class HomepageMobileAndSupportTest extends TestCase
         $this->get(route('landing'))->assertOk()->assertDontSee('Explore Popular Categories', false);
     }
 
+    /* ── Popular Cities (Khadijah, 2026-08-13) ──────────────── */
+
+    private function pro(string $city, string $state = 'MD'): void
+    {
+        $u = User::factory()->create(['primary_role' => 'professional']);
+        $u->assignRole('professional');
+        $u->getOrCreateProfile()->update(['country' => 'US', 'state' => $state, 'city' => $city]);
+    }
+
+    /**
+     * The threshold is the whole point of the feature. Bark's version works
+     * because each city holds hundreds; ours would otherwise advertise
+     * "Philadelphia — 1 professional" on the front page.
+     */
+    public function test_a_city_below_the_threshold_is_not_advertised(): void
+    {
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
+        $this->pro('Baltimore'); $this->pro('Baltimore');
+        $this->pro('Philadelphia', 'PA');   // one only
+
+        $cities = collect($this->get(route('landing'))->assertOk()->viewData('popularCities'));
+
+        $this->assertSame(['Baltimore'], $cities->pluck('city')->all());
+        $this->assertSame(2, $cities->first()['count']);
+    }
+
+    /** With nothing over the line, the section is withheld rather than left thin. */
+    public function test_the_section_is_withheld_when_no_city_qualifies(): void
+    {
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
+        $this->pro('Baltimore');   // one only
+
+        $page = $this->get(route('landing'))->assertOk();
+
+        $this->assertCount(0, $page->viewData('popularCities'));
+        $page->assertDontSee('Where our professionals are', false);
+    }
+
+    /** A city we cannot trade in has no business on the front page. */
+    public function test_out_of_area_cities_are_excluded(): void
+    {
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
+        $this->pro('Los Angeles', 'CA'); $this->pro('Los Angeles', 'CA');
+
+        $this->assertCount(0, $this->get(route('landing'))->assertOk()->viewData('popularCities'));
+    }
+
     /* ── Row 122: Contact Support opens support ─────────────── */
 
     public function test_the_support_form_exists_and_asks_what_a_ticket_needs(): void
