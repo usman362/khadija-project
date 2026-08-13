@@ -32,6 +32,15 @@
             </div>
         </div>
         <div class="vm-why"><b>Why matched?</b> {{ $m['why'] }}</div>
+        {{-- Row 226 / R40's fifth leg. Only a real professional gets this:
+             the shortlist is topped up from a representative catalogue when
+             the live pool is thin, and an offer to a catalogue entry would be
+             addressed to nobody. The id is what tells them apart. --}}
+        @if(!empty($m['id']))
+            <a class="vm-offer" href="{{ route('client.direct-offers.create', ['pro' => $m['id']]) }}">
+                Send {{ $m['name'] }} a direct offer →
+            </a>
+        @endif
     </div>
 @empty
     <div class="vm-empty">No vendors match these filters. Try widening your budget or lowering the match threshold.</div>

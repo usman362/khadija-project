@@ -65,6 +65,11 @@
     .vm-match-price { display: block; font-size: 20px; font-weight: 800; color: var(--text-primary); margin-top: 10px; }
     .vm-why { font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; background: var(--vm-soft); border-radius: 10px; padding: 11px 14px; margin-top: 14px; overflow-wrap: break-word; word-break: break-word; }
     .vm-why b { color: var(--vm-strong); }
+    .vm-offer { display: inline-block; margin-top: 12px; font-size: 12.5px; font-weight: 800;
+        color: #fff; background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+        border-radius: 10px; padding: 9px 16px; text-decoration: none; }
+    .vm-offer:hover { filter: brightness(1.07); }
+    .vm-offer:focus-visible { outline: 3px solid #6d28d9; outline-offset: 2px; }
     .vm-empty { padding: 28px 12px; text-align: center; color: var(--text-muted); font-size: 13px; }
     .vm-more { display: block; text-align: center; padding: 16px; margin-top: 8px; font-size: 14px; font-weight: 800; color: var(--vm-strong); text-decoration: none; cursor: pointer; }
     .vm-more svg { width: 15px; height: 15px; vertical-align: -3px; margin-left: 4px; }
@@ -340,6 +345,8 @@
         }
         return h;
     }
+    const offerUrl = @json(route('client.direct-offers.create', ['pro' => '__PRO__']));
+
     function renderMatches(matches) {
         if (!matches.length) { $('vm-matches').innerHTML = '<div class="vm-empty">No vendors match these filters. Try widening your budget or lowering the match threshold.</div>'; return; }
         $('vm-matches').innerHTML = matches.map((m) => {
@@ -350,7 +357,12 @@
                 + '<div class="vm-stars">' + stars(m.rating) + '<span class="vm-reviews">(' + m.reviews + ')</span></div>'
                 + '<div class="vm-tags">' + tags + '</div></div>'
                 + '<div class="vm-match-right"><span class="vm-match-pct">' + m.match + '% Match</span><span class="vm-match-price">' + money(m.price) + '</span></div>'
-                + '</div><div class="vm-why"><b>Why matched?</b> ' + esc(m.why) + '</div></div>';
+                + '</div><div class="vm-why"><b>Why matched?</b> ' + esc(m.why) + '</div>'
+                // Mirrors the Blade partial: a direct offer only for a real
+                // professional. Without this the control would disappear the
+                // moment a filter re-rendered the list.
+                + (m.id ? '<a class="vm-offer" href="' + offerUrl.replace('__PRO__', m.id) + '">Send ' + esc(m.name) + ' a direct offer →</a>' : '')
+                + '</div>';
         }).join('');
     }
 

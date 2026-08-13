@@ -145,10 +145,19 @@ class AiVendorMatchmakingController extends Controller
     {
         $grads = ['#8b5cf6,#6d28d9', '#10b981,#047857', '#f59e0b,#b45309', '#ec4899,#be185d', '#6366f1,#4338ca', '#06b6d4,#0e7490', '#22c55e,#15803d', '#f97316,#c2410c'];
 
+        /*
+         * Rule R38 — this tool does not print a number, it names people and
+         * says hire them. Unscoped it recommended professionals the client is
+         * not allowed to transact with, and the Direct Offer at the end of
+         * that recommendation would have been refused with a 422 after they
+         * had chosen someone. A recommendation you are forbidden to act on is
+         * worse than no recommendation.
+         */
         $suppliers = \App\Models\User::query()
             ->whereHas('roles', fn ($r) => $r->where('name', \App\Domain\Auth\Enums\RoleName::PROFESSIONAL->value))
             ->excludingSelf()
             ->whereHas('profile')
+            ->tap(fn ($q) => \App\Support\StateMatching::scopeUsersForViewer($q, auth()->user()))
             ->with('profile:user_id,skills,hourly_rate,city,company_name,headline')
             ->withAvg(['reviewsReceived as reviews_avg' => fn ($q) => $q->where('is_hidden', false)], 'rating')
             ->withCount(['reviewsReceived as reviews_count' => fn ($q) => $q->where('is_hidden', false)])
@@ -198,6 +207,10 @@ class AiVendorMatchmakingController extends Controller
                 'why'       => $why,
                 'grad'      => $grads[$s->id % count($grads)],
                 'initials'  => $this->initials($name),
+                // The id is what separates a person you can send an offer to
+                // from a catalogue entry that only looks like one. The filler
+                // rows below carry neither, and the card checks for it.
+                'id'        => $s->id,
                 'real'      => true,
             ];
         }
