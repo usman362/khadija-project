@@ -1375,6 +1375,13 @@
         </nav>
 
 
+        {{-- Row 122 — the client portal had no way to reach the platform at
+             all. Every other portal's "Contact Support" either went nowhere or
+             went to the wrong place; this side simply had nothing. --}}
+        <a href="{{ route('forms.create', 'support_request') }}" class="cl-nav-item" style="margin:0 12px 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.7 8a7 7 0 0 0-13.4 0"/><path d="M3 14v-2a2 2 0 0 1 2-2h1v6H5a2 2 0 0 1-2-2z"/><path d="M21 14v-2a2 2 0 0 0-2-2h-1v6h1a2 2 0 0 0 2-2z"/><path d="M18 16v1a3 3 0 0 1-3 3h-3"/></svg>
+            <span>Contact Support</span>
+        </a>
         <div class="cl-sidebar-footer">
             <a href="{{ route('client.profile.index') }}" class="cl-user-card" title="View profile">
                 <div class="cl-user-avatar"><img src="{{ auth()->user()?->avatar_url }}" alt="" style="width:100%;height:100%;border-radius:inherit;object-fit:cover;display:block;"></div>

@@ -91,6 +91,47 @@ final class FormRegistry
                 ],
             ],
 
+            /* ── Row 122 — Support Request ────────────────────── */
+            /*
+             * The row asked what "Contact Support" actually opens. It opened
+             * nothing: href="#" in the influencer portal, the About page from
+             * the FAQ, and the client↔professional chat from the professional
+             * side — which is messaging between two users, not a way to reach
+             * the platform. No portal had a ticket form, and the client side
+             * had no support entry point at all.
+             *
+             * A form key rather than a ticket subsystem: this table already
+             * records who submitted what and when, which is the whole of what
+             * a first-line ticket is. The separate ticketing module stays out
+             * of scope.
+             */
+            'support_request' => [
+                'title'    => 'Contact Support',
+                'row'      => 122,
+                'audience' => self::ANYONE,
+                'purpose'  => 'Ask the GigResource team for help with your account, a booking, or a payment.',
+                'fields'   => [
+                    ['name' => 'topic', 'label' => 'What do you need help with', 'type' => 'select', 'required' => true,
+                     'options' => [
+                         'account'    => 'My account or sign-in',
+                         'booking'    => 'A booking or request',
+                         'payment'    => 'A payment or payout',
+                         'profile'    => 'My profile or verification',
+                         'technical'  => 'Something on the site is not working',
+                         'other'      => 'Something else',
+                     ]],
+                    ['name' => 'subject', 'label' => 'Subject', 'type' => 'text', 'required' => true,
+                     'note' => 'One line — enough to tell us what this is about.'],
+                    ['name' => 'detail', 'label' => 'Tell us what happened', 'type' => 'textarea', 'required' => true,
+                     'note' => 'Include dates, names and any reference numbers you have. The more specific, the faster this gets answered.'],
+                    ['name' => 'contact_email', 'label' => 'Reply to', 'type' => 'text', 'required' => false,
+                     'note' => 'Leave blank to use the address on your account.'],
+                    // No certification: asking someone to sign a declaration
+                    // before they can report a broken page is a reason not to
+                    // report it.
+                ],
+            ],
+
             /* ── Row 184 — Content / User Report ──────────────── */
             'content_report' => [
                 'title'    => 'Report Content',

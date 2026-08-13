@@ -233,7 +233,11 @@
         .lp-step-line { display: none; }
         .lp-assist-grid { grid-template-columns: 1fr; }
         .lp-why-grid { grid-template-columns: 1fr; }
-        .lp-valueband { grid-template-columns: 1fr 1fr 1fr; gap: 22px 0; }
+        /* Row 98 — minmax(0,1fr), not a bare 1fr. A bare 1fr track cannot
+           shrink below its content's min-width, and .lp-vb-sub is 150px wide
+           before padding, so three tiles demanded ~560px and the grid pushed
+           straight past the viewport. That is what cut the fifth tile off. */
+        .lp-valueband { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px 0; }
         .lp-vb-tile:nth-child(3) { border-right: none; }
         .lp-pricing-grid { grid-template-columns: 1fr; max-width: 420px; }
         .lp-plan.pop { transform: none; }
@@ -246,6 +250,22 @@
         .lp-works-grid { grid-template-columns: 1fr; }
         .lp-roles { grid-template-columns: 1fr; }
         .lp-cta { padding: 36px 28px; }
+
+        /* Five tiles across two columns on a phone: 2 + 2 + 1, the last one
+           spanning so it centres rather than sitting in a half-empty row. */
+        /* Row 97 — the hero card photo is deliberately bled off the corner at
+           -8px, and the card clips it. At desktop width that reads as a design
+           choice; on a phone the card is small enough that a cropped circle
+           just reads as broken, so it sits fully inside the card instead. The
+           heading padding shrinks to match, or the text runs under it. */
+        .lp-role-img { right: 14px; top: 14px; width: 74px; height: 74px; }
+        .lp-role h3, .lp-role p { padding-right: 96px; }
+
+        .lp-valueband { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 0; padding: 28px 0; }
+        .lp-vb-tile { border-right: none; padding: 4px 12px; }
+        .lp-vb-tile:nth-child(odd) { border-right: 1px solid rgba(255,255,255,0.2); }
+        .lp-vb-tile:last-child { grid-column: 1 / -1; border-right: none; }
+        .lp-vb-sub { max-width: 100%; }
     }
 </style>
 @endpush
@@ -373,6 +393,10 @@
 </div>
 
 {{-- ════════════ EXPLORE POPULAR CATEGORIES ════════════ --}}
+{{-- Row 121 — the showcase only takes categories that have artwork, so on an
+     install where none do the whole section is withheld rather than left as a
+     heading over an empty row. --}}
+@if(count($showcaseCategories ?? []))
 <section class="lp-section">
     <div class="lp-container">
         <div class="lp-cats-head">
@@ -394,6 +418,7 @@
         </div>
     </div>
 </section>
+@endif
 
 {{-- ════════════ HOW IT WORKS ════════════ --}}
 <section class="lp-section lp-section-soft">

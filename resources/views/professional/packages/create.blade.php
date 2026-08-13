@@ -374,7 +374,9 @@
             <div class="pc-scard pc-help">
                 <h4>🎧 Need Help?</h4>
                 <p>Our support team is here to help you create the perfect package.</p>
-                <a href="{{ route('professional.chat.index') }}">Contact Support →</a>
+                {{-- Row 122 — pointed at client↔professional messaging, which
+                     reaches another user rather than the platform. --}}
+                <a href="{{ route('forms.create', 'support_request') }}">Contact Support →</a>
             </div>
         </aside>
     </div>

@@ -83,7 +83,21 @@ class LandingPageController extends Controller
         // parent_id filter — that had limited it to top-level event types, so
         // the two lists never agreed. Every active category has an image in one
         // of the two columns, so no thumbnail filter is needed either.
+        /*
+         * Checklist row 121 — only categories that actually HAVE artwork.
+         *
+         * Without this, a category with neither image renders
+         * asset('storage/') — the string "/storage", which is a broken image
+         * icon sitting in a row of photographs. The row asks for one
+         * consistent style across every thumbnail, and a broken tile fails
+         * that more obviously than any illustration would.
+         *
+         * The showcase is the eight most recent categories that can be shown
+         * properly, rather than the eight most recent full stop.
+         */
         return Category::active()
+            ->where(fn ($q) => $q->whereNotNull('thumbnail')->where('thumbnail', '!=', '')
+                                 ->orWhere(fn ($w) => $w->whereNotNull('cover_image')->where('cover_image', '!=', '')))
             ->orderByDesc('sort_order')
             ->orderByDesc('id')
             ->limit(8)
