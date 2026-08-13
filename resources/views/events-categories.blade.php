@@ -66,7 +66,7 @@
     .ec-hero > .lp-container { position: relative; z-index: 1; }
     .ec-h1 { font-size: 40px; font-weight: 800; letter-spacing: -1.1px; text-align: center; }
     .ec-h1 .b { background: linear-gradient(135deg, #8b5cf6, #ec4899 52%, #f97316); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
-    .ec-h1 .o { color: var(--orange); }
+    .ec-h1 .o { color: var(--orange-dark); }
     .ec-hero-sub { text-align: center; color: var(--text); font-size: 16px; margin: 12px auto 26px; max-width: 640px; }
 
     /* search bar */
@@ -241,7 +241,7 @@
     .ec-pag .grpag-item > a, .ec-pag .grpag-item > span {
         border-color: var(--line); color: var(--ink-2); background: #fff; }
     .ec-pag .grpag-item > a:hover { background: var(--bg-soft-2, #eef2f8); border-color: var(--blue); color: var(--blue); }
-    .ec-pag .grpag-item.active > span { background: linear-gradient(135deg, var(--blue-light, var(--blue)), var(--blue-dark, var(--blue)));
+    .ec-pag .grpag-item.active > span { background: linear-gradient(135deg, var(--blue-onwhite, #2563eb), var(--blue-onwhite-2, #1d4ed8));
         border-color: transparent; color: #fff; box-shadow: 0 6px 16px -6px rgba(37,99,235,.7); }
 
     .ec-empty { background: #fff; border: 1px solid var(--line); border-radius: 16px;
@@ -285,7 +285,7 @@
     .ec-cta p { color: var(--text); font-size: 14px; margin: 8px 0 16px; max-width: 480px; }
     .ec-cta-actions { display: flex; gap: 10px; flex-wrap: wrap; }
     .ec-btn-blue { border: none; border-radius: 11px; padding: 12px 22px; font-size: 13.5px; font-weight: 800;
-        color: #fff; background: linear-gradient(135deg, var(--blue-light, var(--blue)), var(--blue-dark, var(--blue))); text-decoration: none; }
+        color: #fff; background: linear-gradient(135deg, var(--blue-onwhite, #2563eb), var(--blue-onwhite-2, #1d4ed8)); text-decoration: none; }
     .ec-btn-ghost { border: 1px solid var(--line); background: #fff; border-radius: 11px; padding: 12px 22px;
         font-size: 13.5px; font-weight: 700; color: var(--ink-2); text-decoration: none; }
     .ec-cta-emoji { font-size: 76px; line-height: 1; }

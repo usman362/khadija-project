@@ -41,7 +41,7 @@
     .br-forevent select { margin-left: auto; border: 1px solid var(--line, #e7ebf2); border-radius: 9px; padding: 7px 11px; font-size: 13px; font-family: inherit; background: #fff; cursor: pointer; max-width: 320px; }
     .br-h1 { font-size: 40px; font-weight: 800; letter-spacing: -1.1px; text-align: center; }
     .br-h1 .b { color: var(--blue); }
-    .br-h1 .o { color: var(--orange); }
+    .br-h1 .o { color: var(--orange-dark); }
     .br-hero-sub { text-align: center; color: var(--text); font-size: 16px; margin: 12px 0 26px; }
 
     /* search bar */

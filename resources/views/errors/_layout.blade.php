@@ -102,7 +102,9 @@
         transition: transform 0.2s, opacity 0.2s, background 0.2s, border-color 0.2s;
     }
     .err-btn-primary {
-        background: linear-gradient(135deg, var(--blue-light, #3b82f6), var(--blue-dark, #1d4ed8));
+        /* Contrast: the light stop is what the white label sits on, and
+           #3b82f6 measured 3.68:1 against a 4.5 requirement. */
+        background: linear-gradient(135deg, var(--blue-onwhite, #2563eb), var(--blue-onwhite-2, #1d4ed8));
         color: #fff;
         box-shadow: 0 10px 24px rgba(37,99,235,0.24);
     }

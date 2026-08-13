@@ -38,9 +38,9 @@
     .fq-section { padding: 56px 0; }
     .fq-head { text-align: center; max-width: 640px; margin: 0 auto 40px; }
     .fq-eyebrow { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; }
-    .fq-eyebrow.orange { color: var(--orange-dark); }
+    .fq-eyebrow.orange { color: var(--orange-onwhite, #c2410c); }
     .fq-eyebrow.pill { background: var(--bg-soft-2); color: var(--blue); padding: 6px 14px; border-radius: 999px; }
-    .fq-eyebrow.pill.orange { background: rgba(249,115,22,0.1); color: var(--orange-dark); }
+    .fq-eyebrow.pill.orange { background: rgba(249,115,22,0.1); color: var(--orange-onwhite, #c2410c); }
     .fq-h2 { font-size: 33px; font-weight: 800; letter-spacing: -0.6px; color: var(--ink); line-height: 1.15; margin-top: 14px; }
 
     /* ── HERO ───────────────────────────────────────── */
@@ -48,7 +48,7 @@
     .fq-hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, var(--bg-soft-2) 0%, transparent 100%); z-index: 0; }
     .fq-hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 44px; align-items: center; }
     .fq-h1 { font-size: 52px; font-weight: 800; letter-spacing: -1.4px; line-height: 1.06; color: var(--ink); margin: 14px 0 0; }
-    .fq-h1 .o { color: var(--orange); }
+    .fq-h1 .o { color: var(--orange-dark); }
     .fq-h1 .b { color: var(--blue); }
     .fq-hero p.sub { font-size: 16px; color: var(--muted); line-height: 1.65; margin: 22px 0 26px; max-width: 430px; }
     .fq-search { position: relative; max-width: 440px; }

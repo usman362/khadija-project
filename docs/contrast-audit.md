@@ -97,11 +97,64 @@ Two of the rows above are not colour changes at all:
 - **Hero "Your Vision."** was 0.2 short at display size. Moved to `--orange-dark`
   (3.56), which is not a visible change at 54px.
 
-## What is not covered here
+## Second pass — every portal, both themes (2026-08-13)
 
-- Dark theme has not been measured. It should be, before launch, because the
-  same tokens are re-pointed there and a pass in light does not imply a pass in
-  dark.
-- Only the landing page was swept. The dashboards reuse these tokens, so the
-  same pairings will recur, but the sweep should be repeated per portal.
-- A manual screen-reader pass is still outstanding and cannot be automated.
+The two gaps above are now closed. Swept and passing at zero remaining
+failures:
+
+| Surface | Light | Dark |
+|---|---|---|
+| Landing, About, FAQ, How It Works | pass | n/a (public is light-only) |
+| Client dashboard, events list | pass | pass |
+| Professional dashboard, gig hub, bidding board, leads | pass | pass |
+| Influencer dashboard, tiers | pass | n/a (portal is light-only) |
+| Error pages (401/403/404) | pass | pass |
+
+Most fixes landed on **tokens** rather than rules, so screens beyond those
+listed inherit them. The pattern repeated everywhere: a colour chosen to look
+right on white, then reused as text on a 10–15% tint of itself, which costs
+roughly 0.3–1.0 of contrast and drops a 4.8 to a 4.2.
+
+Fixed at token level: the client portal's six semantic text colours, the
+influencer portal's green and muted, the public palette's `--muted` and
+`--faint`, and the breadcrumb accent shared by all three portals.
+
+Fixed as one-offs: the client primary button (including two inline styles that
+overrode the class fix), the achievement medal, today's date badge, the
+emergency button, the professional match-score trio, chat tags, lead avatars,
+the influencer status pills and log-out button, and the shared error-page
+button.
+
+### One I introduced
+
+The Contact Support link added earlier used `cl-nav-item` — the `<li>` class,
+not `cl-nav-link` — so it had no colour rule and fell back to the browser
+default `#0000ee` on a dark navy sidebar: 1.97:1. Fixed in both layouts.
+
+## What is still not covered
+
+- **A manual screen-reader pass.** Cannot be automated, still outstanding.
+- **Pages behind flows I did not walk** — the wizards, message threads, and
+  admin tables past the first screen. The token fixes reach them, but they have
+  not been measured.
+- **Sibling backgrounds.** The checker walks ancestors, so an element painted
+  *underneath* a label by a sibling is invisible to it. Both donut widgets hit
+  this. Where it mattered I verified against the markup instead; a future run
+  should use `elementsFromPoint` rather than an ancestor walk.
+
+## The checker's own bugs, in order found
+
+Recorded because every one of them produced confident, wrong numbers, and none
+would have been visible in a screenshot:
+
+1. Read only `background-color`, so white-on-gradient measured as
+   white-on-white — five fake failures.
+2. Took the **darkest** gradient stop as worst case; for white text it is the
+   **lightest**. Understated the primary button by a full point.
+3. Treated any `::before` as the background, including a 3px indicator bar —
+   invented a 1.24 failure on the active nav item.
+4. Skipped semi-transparent layers instead of compositing, so dark-theme cards
+   measured against a light ancestor.
+5. Read `::before` but not `::after` — donut holes are drawn either way.
+6. Composited a pseudo-element *underneath* its own element's background; the
+   layer list is reversed before compositing, so it has to be pushed first.

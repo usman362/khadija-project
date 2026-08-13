@@ -55,8 +55,13 @@
             --ink: #0f1b35;
             --ink-2: #1e293b;
             --text: #475569;
-            --muted: #64748b;
-            --faint: #94a3b8;
+            /* Contrast: #64748b measured 4.19-4.27 where it sits on the light
+               tinted panels (#eef3fb, #eaf1fe) rather than pure white. */
+            --muted: #556070;
+            /* --faint is used for small labels on the soft-grey panels, where
+               #94a3b8 measured 2.43:1. Anything carrying words has to clear
+               4.5 wherever it lands. */
+            --faint: #667085;
             --line: #e6eaf1;
             --line-soft: #eef2f7;
             --bg: #ffffff;

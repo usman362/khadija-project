@@ -22,7 +22,7 @@
     .bl-hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 44px; align-items: center; }
     .bl-eyebrow { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; color: var(--orange-dark); }
     .bl-h1 { font-size: 48px; font-weight: 800; letter-spacing: -1.3px; line-height: 1.1; color: var(--ink); margin: 14px 0 0; }
-    .bl-h1 .o { color: var(--orange); }
+    .bl-h1 .o { color: var(--orange-dark); }
     .bl-h1 .b { color: var(--blue); }
     .bl-hero p.sub { font-size: 16px; color: var(--muted); line-height: 1.65; margin: 20px 0 26px; max-width: 460px; }
     .bl-search { position: relative; max-width: 440px; }

@@ -12,7 +12,7 @@
     /* ════════ About page (light) — page-scoped ════════ */
     .ab-section { padding: 70px 0; }
     .ab-eyebrow { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; }
-    .ab-eyebrow.orange { color: var(--orange-dark); }
+    .ab-eyebrow.orange { color: var(--orange-onwhite, #c2410c); }
     .ab-eyebrow.pill { background: var(--bg-soft-2); color: var(--blue); padding: 6px 14px; border-radius: 999px; letter-spacing: 1px; }
     .ab-h2 { font-size: 34px; font-weight: 800; letter-spacing: -0.6px; color: var(--ink); line-height: 1.15; }
     .ab-head { text-align: center; max-width: 640px; margin: 0 auto 50px; }
@@ -23,7 +23,7 @@
     .ab-hero::before { content: ''; position: absolute; top: -140px; right: -100px; width: 480px; height: 480px; background: radial-gradient(circle, rgba(37,99,235,0.09), transparent 70%); z-index: 0; }
     .ab-hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 48px; align-items: center; }
     .ab-h1 { font-size: 50px; font-weight: 800; letter-spacing: -1.4px; line-height: 1.08; color: var(--ink); margin: 16px 0 0; }
-    .ab-h1 .o { color: var(--orange); }
+    .ab-h1 .o { color: var(--orange-dark); }
     .ab-h1 .b { color: var(--blue); }
     .ab-hero p.sub { font-size: 16.5px; color: var(--muted); line-height: 1.65; margin: 22px 0 28px; max-width: 480px; }
     .ab-hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
