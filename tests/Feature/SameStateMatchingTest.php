@@ -213,6 +213,76 @@ class SameStateMatchingTest extends TestCase
         $this->assertNull($trending->firstWhere('slug', 'ice-sculpture'));
     }
 
+    /* ── The packages page: the numbers around a scoped list ── */
+
+    private function package(User $pro, string $service = 'Photography', string $occasion = 'Wedding'): \App\Models\Package
+    {
+        return \App\Models\Package::create([
+            'user_id' => $pro->id, 'title' => 'Package ' . uniqid(), 'slug' => 'pkg-' . uniqid(),
+            'type' => 'solo', 'price' => 1000, 'services' => [$service],
+            'event_types' => [$occasion], 'is_active' => true, 'status' => 'active',
+        ]);
+    }
+
+    /**
+     * The list on /packages was scoped to the viewer's state; the numbers
+     * printed AROUND it were not. Every one of them is a promise about what
+     * the click returns, so counted platform-wide they overstated it.
+     */
+    public function test_the_service_filter_counts_what_the_filter_will_return(): void
+    {
+        $client = $this->user('client', 'MD');
+        $this->package($this->user('professional', 'MD'));
+        $this->package($this->user('professional', 'DE', 'Dover'));
+        $this->package($this->user('professional', 'VA', 'Arlington'));
+
+        $page = $this->actingAs($client)->get(route('public.packages'))->assertSuccessful();
+
+        $this->assertSame(1, $page->viewData('serviceCounts')['Photography']);
+        $this->assertCount(1, $page->viewData('packages'), 'the count and the list are one number');
+    }
+
+    /**
+     * "Where Packages Are Available" is a claim about availability, so naming
+     * a city whose packages this client cannot book answers it wrongly.
+     */
+    public function test_the_availability_panel_names_only_cities_the_client_can_book_in(): void
+    {
+        $client = $this->user('client', 'MD');
+        $this->package($this->user('professional', 'MD', 'Baltimore'));
+        $this->package($this->user('professional', 'DE', 'Dover'));
+
+        $availability = $this->actingAs($client)->get(route('public.packages'))
+            ->assertSuccessful()->viewData('availability');
+
+        $this->assertSame(['Baltimore'], array_keys($availability->all()));
+        $this->assertSame(1, $availability->sum(), 'the cities add up to the packages on the page');
+    }
+
+    /** "Keep browsing" has to lead somewhere bookable. */
+    public function test_related_packages_are_not_suggested_across_a_state_line(): void
+    {
+        $far = $this->user('professional', 'DE', 'Dover');
+        $this->package($far);
+        $shown = $this->package($this->user('professional', 'MD'));
+
+        $more = $this->actingAs($this->user('client', 'MD'))
+            ->get(route('public.package', $shown->slug))->assertSuccessful()->viewData('more');
+
+        $this->assertCount(0, $more, 'a package they cannot book is a dead end, not a recommendation');
+    }
+
+    /** And a signed-out visitor still sees the whole catalogue. */
+    public function test_a_signed_out_visitor_is_not_narrowed_to_a_state(): void
+    {
+        $this->package($this->user('professional', 'MD'));
+        $this->package($this->user('professional', 'DE', 'Dover'));
+
+        $page = $this->get(route('public.packages'))->assertSuccessful();
+
+        $this->assertSame(2, $page->viewData('serviceCounts')['Photography']);
+    }
+
     public function test_an_influencer_is_carved_out(): void
     {
         // R26 exempts influencers from geo-restriction entirely, and they are

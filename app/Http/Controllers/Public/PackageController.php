@@ -75,10 +75,20 @@ class PackageController extends Controller
 
         $packages = $base->paginate(12)->withQueryString();
 
-        // Left-rail service counts (ignoring the current service selection).
+        /*
+         * Left-rail service counts (ignoring the current service selection).
+         *
+         * Scoped to the viewer for the same reason the list above is. These
+         * numbers are a promise about what the filter will return, and the
+         * filter runs against the R38-scoped list — so counted platform-wide
+         * they offered a Maryland client "Photography (14)" and delivered two.
+         */
+        $forViewer = fn () => Package::active()
+            ->tap(fn ($qr) => \App\Support\StateMatching::scopeForViewer($qr, $request->user()));
+
         $serviceCounts = [];
         foreach (self::SERVICES as $svc) {
-            $serviceCounts[$svc] = Package::active()
+            $serviceCounts[$svc] = $forViewer()
                 ->whereJsonContains('services', $svc)
                 ->count();
         }
@@ -87,7 +97,12 @@ class PackageController extends Controller
         // professional's city. Not capped: it used to take(6), which silently
         // dropped four cities, so the list added up to less than the package
         // count printed at the top of the page.
-        $availability = Package::active()
+        // Scoped too, and this one is the reason the note above matters: the
+        // panel is headed "Where Packages Are Available", so listing a city
+        // whose packages this client cannot book answers the question wrongly.
+        // It also restores the invariant the take(6) fix established — the
+        // cities add up to the packages on the page.
+        $availability = $forViewer()
             ->with('user.profile:user_id,city')
             ->get()
             ->groupBy(fn ($p) => $p->user?->profile?->city ?: 'Other')
@@ -97,7 +112,7 @@ class PackageController extends Controller
         // Recently viewed (session ids, newest first), excluding what's on-page already.
         $recentIds = collect(session('recent_packages', []))->take(4);
         $recent = $recentIds->isNotEmpty()
-            ? Package::active()->whereIn('id', $recentIds)->get()
+            ? $forViewer()->whereIn('id', $recentIds)->get()
                 ->sortBy(fn ($p) => $recentIds->search($p->id))->values()
             : collect();
 
@@ -138,7 +153,11 @@ class PackageController extends Controller
         ]);
 
         // A few more packages from the same pro (or category) to keep browsing.
+        // Rule R38 — "keep browsing" has to lead somewhere bookable. Suggesting
+        // a package from a state this client cannot transact in is a dead end
+        // dressed as a recommendation.
         $more = Package::active()
+            ->tap(fn ($qr) => \App\Support\StateMatching::scopeForViewer($qr, auth()->user()))
             ->where('id', '!=', $package->id)
             ->where(function ($q) use ($package) {
                 $q->where('user_id', $package->user_id)

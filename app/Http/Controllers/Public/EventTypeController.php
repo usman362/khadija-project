@@ -34,8 +34,12 @@ class EventTypeController extends Controller
 
         $counts = [];
         foreach ($names as $name) {
+            // Scoped to the viewer: the tile's number is a promise about what
+            // the packages page will show, and that page is R38-scoped.
             $counts[$name] = \App\Support\Occasions::known($name)
-                ? \App\Models\Package::active()->forOccasion($name)->count()
+                ? \App\Models\Package::active()
+                    ->tap(fn ($qr) => \App\Support\StateMatching::scopeForViewer($qr, auth()->user()))
+                    ->forOccasion($name)->count()
                 : 0;
         }
 
