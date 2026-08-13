@@ -42,6 +42,16 @@
             --blue-dark: #1d4ed8;
             --orange: #f97316;
             --orange-dark: #ea580c;
+            /* Contrast audit (docs/contrast-audit.md). The shades above are
+               fine as tints, borders, and backgrounds behind DARK text. They
+               are not fine under white text: #f97316 gives 2.80:1 and #ea580c
+               3.56:1, against a 4.5 requirement. These are the same hues one
+               step darker, used only where white sits on top. */
+            --orange-onwhite: #c2410c;   /* 5.18:1 with #fff */
+            --orange-onwhite-2: #9a3412; /* 7.31:1 — the far end of gradients */
+            --blue-onwhite: #2563eb;     /* 5.17:1 */
+            --blue-onwhite-2: #1d4ed8;   /* 6.70:1 */
+            --green-onwhite: #047857;    /* 5.48:1 */
             --ink: #0f1b35;
             --ink-2: #1e293b;
             --text: #475569;
@@ -108,9 +118,9 @@
         .lp-btn:active { transform: translateY(1px); }
         .lp-btn-outline { background: #fff; border-color: var(--line); color: var(--ink); }
         .lp-btn-outline:hover { border-color: var(--blue); color: var(--blue); }
-        .lp-btn-orange { background: linear-gradient(135deg, #fb923c, var(--orange-dark)); color: #fff; box-shadow: 0 8px 20px rgba(234, 88, 12, 0.28); }
+        .lp-btn-orange { background: linear-gradient(135deg, var(--orange-onwhite), var(--orange-onwhite-2)); color: #fff; box-shadow: 0 8px 20px rgba(234, 88, 12, 0.28); }
         .lp-btn-orange:hover { box-shadow: 0 10px 26px rgba(234, 88, 12, 0.38); }
-        .lp-btn-blue { background: linear-gradient(135deg, var(--blue-light), var(--blue-dark)); color: #fff; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28); }
+        .lp-btn-blue { background: linear-gradient(135deg, var(--blue-onwhite), var(--blue-onwhite-2)); color: #fff; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28); }
         .lp-btn-blue:hover { box-shadow: 0 10px 26px rgba(37, 99, 235, 0.38); }
         .lpn-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); display: block; }
         .lpn-avatar-btn { background: none; border: none; padding: 0; cursor: pointer; display: flex; border-radius: 50%; }
@@ -136,7 +146,7 @@
         .lpf-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 11px; }
         .lpf-col a { font-size: 13.5px; color: #94a0ba; transition: color .15s; display: inline-flex; align-items: center; gap: 7px; }
         .lpf-col a:hover { color: #fff; }
-        .lpf-new-badge { font-size: 8.5px; font-weight: 800; background: var(--orange); color: #fff; padding: 1px 6px; border-radius: 5px; letter-spacing: .5px; }
+        .lpf-new-badge { font-size: 8.5px; font-weight: 800; background: var(--orange-onwhite); color: #fff; padding: 1px 6px; border-radius: 5px; letter-spacing: .5px; }
         .lpf-news p { font-size: 13.5px; color: #94a0ba; line-height: 1.6; margin: 0 0 14px; }
         .lpf-news-form { display: flex; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 11px; padding: 5px; }
         .lpf-news-form input { flex: 1; min-width: 0; background: none; border: none; outline: none; color: #fff; font-size: 13px; padding: 8px 10px; font-family: inherit; }
@@ -144,7 +154,7 @@
         .lpf-news-form button { background: var(--blue); border: none; border-radius: 8px; width: 38px; height: 36px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .lpf-news-form button:hover { background: var(--blue-dark); }
         .lpf-news-ok { font-size: 12.5px; color: #34d399; margin: 10px 0 0; display: none; }
-        .lpf-bottom { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 44px; padding-top: 24px; font-size: 12.5px; color: #6b7896; }
+        .lpf-bottom { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; border-top: 1px solid rgba(255, 255, 255, 0.08); margin-top: 44px; padding-top: 24px; font-size: 12.5px; color: #97a3bd; }
         .lpf-bottom a { color: #94a0ba; }
         .lpf-bottom a:hover { color: #fff; }
 

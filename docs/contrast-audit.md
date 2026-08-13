@@ -43,40 +43,59 @@ The primary button is the one that matters. It is the most-clicked control on
 the site, and at 2.26:1 its label is roughly half as legible as the standard
 requires.
 
-### Not verified
+### The call-to-action band — a real fault, found by chasing the "unverified"
 
-One block — the "Ready to Create Unforgettable Events?" call to action —
-reported white-on-white, which is almost certainly the checker failing to find
-a background painted by a pseudo-element rather than a real failure. It is
-listed here as unverified rather than counted as a defect.
+The CTA reported white-on-white, and that part was indeed the checker: its
+background is a `::before` gradient, which the walker did not read.
 
-## The fix, and why it needs the Owner
+Reading it properly turned up something the sweep would otherwise have missed.
+The overlay is **semi-transparent over an admin-replaceable photograph**, so
+its contrast depends on the picture. Composited against a bright photo, the
+orange end gave **2.89:1** — failing even the 3.0 large-text threshold — while
+against a dark photo it passed at 5.03. Nobody would have known until someone
+swapped the image.
+
+The overlay is now `rgba(15,27,53,.94) → rgba(29,78,216,.90) → rgba(154,52,18,.90)`,
+whose worst case over a pure-white photo is 14.56 / 5.47 / 5.92 — all clear of
+4.5 whatever picture an admin uploads.
+
+## Status: FIXED 2026-08-13
+
+All nine failures below are resolved and re-measured at zero remaining on the
+landing page in light theme. The Owner approved the change via Ali. What
+follows is the record of what was wrong and what was altered.
+
+## The fix
 
 Every failure above is white text on a brand colour that is too light, or a
 brand colour used as text on white. There are only two remedies: darken the
-colour, or stop using white on it. Both change how the brand looks, so this is
-the Owner's call rather than a silent correction.
+colour, or stop using white on it.
 
-The smallest change that passes, keeping the same hues:
+The change made, keeping the same hues one step darker on the standard ramp:
 
-| Token | Now | Proposed | With white |
+| Token | Was | Now | With white |
 |---|---|---|---|
-| Orange (white text on it) | `#fb923c` → `#ea580c` | `#c2410c` | 2.26 → **5.18** |
-| Green (white text on it) | `#10b981` | `#047857` | 2.54 → **5.48** |
-| Blue (white text on it) | `#3b82f6` | `#2563eb` | 3.68 → **5.17** |
+| Orange under white text | `#fb923c` → `#ea580c` | `#c2410c` → `#9a3412` | 2.26 → **5.18** |
+| Green under white text | `#10b981` | `#047857` | 2.54 → **5.48** |
+| Blue under white text | `#3b82f6` | `#2563eb` → `#1d4ed8` | 3.68 → **5.17** |
 
-These are the same colours one step darker on the standard ramp — orange-700,
-emerald-700, blue-600. The lighter shades stay exactly as they are everywhere
-they are used as a *background behind dark text*, as a border, or as a tint;
-only the pairing with white text changes.
+These live as `--orange-onwhite`, `--blue-onwhite` and `--green-onwhite`, used
+*only* where white text sits on the colour. `--orange` and `--blue` themselves
+are untouched, so every tint, border, and dark-text-on-light use looks exactly
+as it did. Gradients needed both stops moved, not just the dark end — the light
+stop is the one white text has to survive.
+
+The plan-badge colour map was the same problem in data rather than CSS: it is
+admin-chosen and carries white text, and four of its seven entries failed.
+"BEST VALUE" on `#10b981` measured 2.54:1. Each entry moved one step darker.
 
 Two of the rows above are not colour changes at all:
 
-- **Rating stars** — if a numeric rating sits beside them ("4.8 ★★★★★"), the
-  stars are decorative and the ratio does not apply. Confirm the number is
-  always present and mark them `aria-hidden`.
-- **Hero "Your Vision."** at 2.80 against a 3.0 requirement is 0.2 short and is
-  large display text. `#ea580c` clears it without a visible change at that size.
+- **Rating stars** — they repeat a rating already written beside them, so they
+  are decoration and the ratio does not apply to them. Marked `aria-hidden`,
+  which also stops a screen reader announcing "black star" five times.
+- **Hero "Your Vision."** was 0.2 short at display size. Moved to `--orange-dark`
+  (3.56), which is not a visible change at 54px.
 
 ## What is not covered here
 

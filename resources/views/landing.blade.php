@@ -24,18 +24,18 @@
     .lp-hero::after { content: ''; position: absolute; bottom: -180px; left: -140px; width: 460px; height: 460px; background: radial-gradient(circle, rgba(249,115,22,0.08), transparent 70%); z-index: 0; }
     .lp-hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr); gap: 50px; align-items: center; }
     .lp-h1 { font-size: 54px; font-weight: 800; letter-spacing: -1.6px; line-height: 1.06; }
-    .lp-h1 .o { color: var(--orange); }
+    .lp-h1 .o { color: var(--orange-dark); }   /* 2.80 -> 3.56 at display size */
     .lp-h1 .b { color: var(--blue); }
     .lp-sub { font-size: 17px; color: var(--muted); line-height: 1.6; margin: 22px 0 28px; max-width: 470px; }
     .lp-roles { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 510px; }
     .lp-role { border-radius: var(--radius); padding: 20px 20px 20px; position: relative; overflow: hidden; min-height: 168px; display: flex; flex-direction: column; color: #fff; }
-    .lp-role-blue { background: linear-gradient(150deg, #3b82f6, #1d4ed8); }
-    .lp-role-orange { background: linear-gradient(150deg, #fb923c, #ea580c); }
+    .lp-role-blue { background: linear-gradient(150deg, var(--blue-onwhite), var(--blue-onwhite-2)); }
+    .lp-role-orange { background: linear-gradient(150deg, var(--orange-onwhite), var(--orange-onwhite-2)); }
     .lp-role-img { position: absolute; right: -8px; top: -8px; width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,0.35); }
     .lp-role h3 { color: #fff; font-size: 17px; font-weight: 800; margin-bottom: 6px; padding-right: 84px; }
     .lp-role p { font-size: 12.5px; color: rgba(255,255,255,0.9); line-height: 1.45; margin: 0; padding-right: 84px; }
     .lp-role .lp-role-btn { margin-top: auto; display: inline-flex; align-items: center; gap: 6px; background: #fff; color: var(--ink); font-weight: 800; font-size: 13px; padding: 9px 15px; border-radius: 9px; align-self: flex-start; }
-    .lp-role-orange .lp-role-btn { color: var(--orange-dark); }
+    .lp-role-orange .lp-role-btn { color: var(--orange-onwhite); }  /* 3.56 -> 5.18 */
     .lp-role-blue .lp-role-btn { color: var(--blue-dark); }
     .lp-trustbadge { display: flex; align-items: center; gap: 14px; margin-top: 30px; }
     .lp-avatars { display: flex; }
@@ -177,7 +177,7 @@
 
     /* ── VALUE BAND (5 value tiles, no unverified numbers) ─────── */
     .lp-metrics-wrap { padding: 36px 0; }
-    .lp-valueband { background: linear-gradient(100deg, #1d4ed8 0%, #2563eb 45%, #ea580c 100%); border-radius: 22px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 34px 0; box-shadow: var(--shadow-lg); }
+    .lp-valueband { background: linear-gradient(100deg, var(--blue-onwhite-2) 0%, var(--blue-onwhite) 45%, var(--orange-onwhite) 100%); border-radius: 22px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 34px 0; box-shadow: var(--shadow-lg); }
     .lp-vb-tile { text-align: center; padding: 4px 18px; border-right: 1px solid rgba(255,255,255,0.2); display: flex; flex-direction: column; align-items: center; gap: 5px; }
     .lp-vb-tile:last-child { border-right: none; }
     .lp-vb-ic { width: 44px; height: 44px; border-radius: 13px; background: rgba(255,255,255,0.16); display: flex; align-items: center; justify-content: center; margin-bottom: 5px; box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.25); }
@@ -211,7 +211,13 @@
     /* ── CTA BANNER ─────────────────────────────────── */
     .lp-cta-wrap { padding: 30px 0 80px; }
     .lp-cta { position: relative; border-radius: 24px; overflow: hidden; padding: 52px 56px; display: flex; align-items: center; justify-content: space-between; gap: 30px; flex-wrap: wrap; }
-    .lp-cta::before { content: ''; position: absolute; inset: 0; background: linear-gradient(100deg, rgba(15,27,53,0.92), rgba(29,78,216,0.86) 55%, rgba(234,88,12,0.82)); z-index: 1; }
+    /* Contrast audit. This overlay sits over an ADMIN-REPLACEABLE photo, so its
+       worst case is a bright image underneath. At the old orange end —
+       rgba(234,88,12,0.82) — white text over a light photo measured 2.89:1,
+       failing even the 3.0 large-text threshold, and nobody would know until
+       someone swapped the picture. Deepened so the worst case clears 4.5:1
+       whatever the photograph is. */
+    .lp-cta::before { content: ''; position: absolute; inset: 0; background: linear-gradient(100deg, rgba(15,27,53,0.94), rgba(29,78,216,0.90) 55%, rgba(154,52,18,0.90)); z-index: 1; }
     .lp-cta img.bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
     .lp-cta-txt { position: relative; z-index: 2; }
     .lp-cta-txt h2 { color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -0.8px; max-width: 440px; }
@@ -499,7 +505,7 @@
             </div>
             <div class="lp-acard">
                 <div class="lp-acard-top">
-                    <span class="lp-acard-ic" style="background:linear-gradient(135deg,#fb923c,#ea580c);box-shadow:0 8px 16px rgba(234,88,12,0.32),inset 0 1.5px 0 rgba(255,255,255,0.4);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20l-2-9-4 3-4-7-4 7-4-3-2 9z"/></svg></span>
+                    <span class="lp-acard-ic" style="background:linear-gradient(135deg,var(--orange-onwhite),var(--orange-onwhite-2));box-shadow:0 8px 16px rgba(234,88,12,0.32),inset 0 1.5px 0 rgba(255,255,255,0.4);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20l-2-9-4 3-4-7-4 7-4-3-2 9z"/></svg></span>
                     <div><h3>Maximum Assistance</h3><span class="tagline">The details handled for you.</span></div>
                     <img class="lp-acard-img" src="https://images.unsplash.com/photo-1519741497674-611481863552?w=300&q=80&auto=format&fit=crop" alt="">
                 </div>
@@ -565,14 +571,14 @@
                         <div class="lp-testi-by">
                             <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=120&q=80&auto=format&fit=crop" alt="">
                             <div><b>{{ optional($featuredReview->reviewer)->name ?? 'Verified Client' }}</b><small>GigResource Member</small></div>
-                            <span class="st">★★★★★</span>
+                            <span class="st" aria-hidden="true">★★★★★</span>
                         </div>
                     @else
                         <p>GigResource helped me find amazing vendors and grew my business 3X faster. The tools and support make my job so much easier!</p>
                         <div class="lp-testi-by">
                             <img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=120&q=80&auto=format&fit=crop" alt="">
                             <div><b>Sarah J.</b><small>Wedding Planner</small></div>
-                            <span class="st">★★★★★</span>
+                            <span class="st" aria-hidden="true">★★★★★</span>
                         </div>
                     @endif
                 </div>
@@ -625,7 +631,10 @@
                     $priceDisplay = $isFree ? 'Free' : '$' . rtrim(rtrim(number_format($plan->price, 2), '0'), '.');
                     $priceSuffix = $isFree ? '' : trim($plan->billingLabel());
                     // Badge + colour come from the plan module's own fields (admin-managed).
-                    $badgeMap = ['primary' => '#2563eb', 'success' => '#10b981', 'warning' => '#f59e0b', 'danger' => '#ef4444', 'info' => '#0ea5e9', 'secondary' => '#64748b', 'orange' => '#f97316'];
+                    // Contrast audit: these carry WHITE text, so every entry has to clear
+                    // 4.5:1. The old map's success/warning/info/orange did not —
+                    // "BEST VALUE" on #10b981 measured 2.54:1.
+                    $badgeMap = ['primary' => '#2563eb', 'success' => '#047857', 'warning' => '#b45309', 'danger' => '#dc2626', 'info' => '#0369a1', 'secondary' => '#475569', 'orange' => '#c2410c'];
                     $badgeColor = $badgeMap[$plan->badge_color] ?? '#2563eb';
                     if ($pop)            { $ctaLabel = 'Get Started'; $ctaClass = 'lp-btn-blue';    $ctaRole = 'professional'; }
                     elseif ($loop->last) { $ctaLabel = 'Contact Sales';    $ctaClass = 'lp-btn-outline'; $ctaRole = null; }
