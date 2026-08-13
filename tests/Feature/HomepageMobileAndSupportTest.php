@@ -167,6 +167,38 @@ class HomepageMobileAndSupportTest extends TestCase
     }
 
     /**
+     * The bug this section shipped with, and the reason it mattered.
+     *
+     * /browse is login-gated, and Rule R38 shows a signed-in client only
+     * professionals in their OWN state. So a Maryland client saw "Arlington,
+     * VA — 2 professionals" on the homepage, clicked, and landed on an empty
+     * page. They were promised two people and shown none, which is worse than
+     * never having offered.
+     */
+    public function test_a_signed_in_client_is_only_shown_places_they_can_hire_in(): void
+    {
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
+        $this->pro('Baltimore', 'MD'); $this->pro('Baltimore', 'MD');
+        $this->pro('Arlington', 'VA'); $this->pro('Arlington', 'VA');
+
+        // Signed out: no state declared yet, so the whole map is fair marketing.
+        // Sorted: an equal count ties alphabetically, and the order is not
+        // what this test is about.
+        $out = collect($this->get(route('landing'))->assertOk()->viewData('popularCities'));
+        $this->assertSame(['Arlington', 'Baltimore'], $out->pluck('city')->sort()->values()->all());
+
+        $client = User::factory()->create(['primary_role' => 'client']);
+        $client->assignRole('client');
+        $client->getOrCreateProfile()->update(['country' => 'US', 'state' => 'MD', 'city' => 'Baltimore']);
+
+        // Signed in as Maryland: Arlington would be an empty page, so it is gone.
+        $in = collect($this->actingAs($client->fresh())->get(route('landing'))->assertOk()->viewData('popularCities'));
+        $this->assertSame(['Baltimore'], $in->pluck('city')->all());
+    }
+
+    /**
      * The states variant, built alongside cities so Sir Peter can pick.
      * Exercised directly rather than through the page, because the page
      * renders whichever grouping the constant names and switching a constant

@@ -35,7 +35,7 @@ class LandingPageController extends Controller
 
         // "Where our professionals are" — Khadijah's request, after Bark's
         // Popular Cities section.
-        $popularCities = $this->popularCities();
+        $popularCities = $this->popularCities(auth()->user());
         $cityGrouping  = self::CITY_GROUPING;
 
         // Featured testimonial — newest substantive 5-star review, if any.
@@ -107,12 +107,26 @@ class LandingPageController extends Controller
 
     public const STATE_MIN_PROFESSIONALS = 1;
 
-    /** @return array<int, array{city:string, state:string, count:int, link:string}> */
-    private function popularCities(): array
+    /**
+     * @return array<int, array{city:string, state:string, count:int, link:string}>
+     *
+     * The viewer matters. /browse is login-gated and Rule R38 shows a signed-in
+     * client only professionals in their OWN state — so advertising "Arlington,
+     * VA — 2 professionals" to a Maryland client sends them to an empty page.
+     * They were promised two people and shown none, which is worse than never
+     * having offered.
+     *
+     * A signed-out visitor has declared no state yet, so they see everywhere.
+     */
+    private function popularCities(?\App\Models\User $viewer = null): array
     {
+        $onlyState = \App\Support\StateMatching::appliesTo($viewer)
+            ? \App\Support\StateMatching::stateOf($viewer)
+            : null;
+
         return self::CITY_GROUPING === 'state'
-            ? $this->popularStates()
-            : $this->popularCitiesByCity();
+            ? $this->popularStates($onlyState)
+            : $this->popularCitiesByCity($onlyState);
     }
 
     /**
@@ -124,11 +138,12 @@ class LandingPageController extends Controller
      *
      * @return array<int, array{city:string, state:string, count:int, link:string}>
      */
-    private function popularStates(): array
+    private function popularStates(?string $onlyState = null): array
     {
         $names = config('geo.allowed_states', []);
 
         return \App\Models\UserProfile::query()
+            ->when($onlyState, fn ($q) => $q->where('state', $onlyState))
             ->whereHas('user', fn ($u) => $u->whereHas('roles', fn ($r) => $r->where('name', 'professional')))
             ->whereNotNull('state')->where('state', '!=', '')
             ->whereIn('state', array_keys($names))
@@ -152,9 +167,10 @@ class LandingPageController extends Controller
     }
 
     /** @return array<int, array{city:string, state:string, count:int, link:string}> */
-    private function popularCitiesByCity(): array
+    private function popularCitiesByCity(?string $onlyState = null): array
     {
         return \App\Models\UserProfile::query()
+            ->when($onlyState, fn ($q) => $q->where('state', $onlyState))
             ->whereHas('user', fn ($u) => $u->whereHas('roles', fn ($r) => $r->where('name', 'professional')))
             ->whereNotNull('city')->where('city', '!=', '')
             ->whereNotNull('state')->where('state', '!=', '')
