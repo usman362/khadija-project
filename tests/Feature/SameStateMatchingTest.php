@@ -283,6 +283,51 @@ class SameStateMatchingTest extends TestCase
         $this->assertSame(2, $page->viewData('serviceCounts')['Photography']);
     }
 
+    /* ── Category landing pages ─────────────────────────────── */
+
+    /**
+     * The page prints "N Pros available" over a button to /browse, which is
+     * R38-scoped. Counted platform-wide, it advertised a number the click
+     * could not honour, and filled the page with faces to match.
+     *
+     * "available" is the word on screen, which is what makes it a claim
+     * rather than a statistic.
+     */
+    public function test_a_category_page_counts_only_pros_the_visitor_can_hire(): void
+    {
+        $category = \App\Models\Category::create([
+            'name' => 'Photography Services', 'slug' => 'photography-services',
+            'kind' => \App\Models\Category::SERVICE_CATEGORY, 'is_active' => true,
+        ]);
+
+        $near = $this->user('professional', 'MD');
+        $far  = $this->user('professional', 'DE', 'Dover');
+        $category->professionals()->attach([$near->id, $far->id]);
+
+        $page = $this->actingAs($this->user('client', 'MD'))
+            ->get(route('public.category', 'photography-services'))->assertSuccessful();
+
+        $this->assertSame(1, $page->viewData('totalCount'));
+        $this->assertSame([$near->name], $page->viewData('featured')->pluck('name')->all());
+    }
+
+    /** Signed out, the category page is still the whole category. */
+    public function test_a_category_page_is_not_narrowed_for_a_visitor_with_no_account(): void
+    {
+        $category = \App\Models\Category::create([
+            'name' => 'Photography Services', 'slug' => 'photography-services',
+            'kind' => \App\Models\Category::SERVICE_CATEGORY, 'is_active' => true,
+        ]);
+
+        $category->professionals()->attach([
+            $this->user('professional', 'MD')->id,
+            $this->user('professional', 'DE', 'Dover')->id,
+        ]);
+
+        $this->assertSame(2, $this->get(route('public.category', 'photography-services'))
+            ->assertSuccessful()->viewData('totalCount'));
+    }
+
     public function test_an_influencer_is_carved_out(): void
     {
         // R26 exempts influencers from geo-restriction entirely, and they are

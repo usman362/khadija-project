@@ -31,9 +31,22 @@ class CategoryLandingController extends Controller
         // Services". Every page showed zero pros as a result.
         $branchIds = $this->branchIds($category);
 
+        /*
+         * Rule R38 — both figures on this page describe who the visitor can
+         * hire, and the button underneath them goes to /browse, which shows a
+         * signed-in client only their own state. Counted platform-wide the
+         * page told a Maryland client "34 Pros available" and handed them a
+         * shorter list, with the same eight faces on the page unreachable.
+         *
+         * A signed-out visitor still sees the whole category: this page is
+         * public and indexed, and someone with no account has no state yet.
+         */
+        $inState = fn ($q) => \App\Support\StateMatching::scopeUsersForViewer($q, auth()->user());
+
         $featured = User::query()
             ->whereHas('roles', fn ($r) => $r->where('name', RoleName::PROFESSIONAL->value))
             ->excludingSelf()
+            ->tap($inState)
             ->with('profile')
             ->whereHas('serviceCategories', fn (Builder $c) => $c->whereIn('categories.id', $branchIds))
             ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')
@@ -54,6 +67,7 @@ class CategoryLandingController extends Controller
         $totalCount = User::query()
             ->whereHas('roles', fn ($r) => $r->where('name', RoleName::PROFESSIONAL->value))
             ->excludingSelf()
+            ->tap($inState)
             ->whereHas('serviceCategories', fn (Builder $c) => $c->whereIn('categories.id', $branchIds))
             ->count();
 
