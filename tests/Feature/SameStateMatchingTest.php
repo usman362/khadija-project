@@ -164,6 +164,55 @@ class SameStateMatchingTest extends TestCase
         $page->assertDontSee($far->name);
     }
 
+    /**
+     * The count on a tile has to be the count the click produces.
+     *
+     * The "Trending" strip above the results counted every professional in the
+     * category platform-wide, and then filtered the page by R38. A Maryland
+     * client read "3 professionals", clicked, and met one. Promising three and
+     * showing one is the same fault the homepage's city section shipped with,
+     * which is why it is worth a test of its own rather than a quiet edit.
+     */
+    public function test_a_trending_tile_counts_only_professionals_the_viewer_can_hire(): void
+    {
+        $category = \App\Models\Category::create([
+            'name' => 'DJs & Sound Services', 'slug' => 'djs-sound',
+            'kind' => \App\Models\Category::SERVICE_CATEGORY,
+            'is_active' => true, 'thumbnail' => 'categories/djs.jpg',
+        ]);
+
+        $category->professionals()->attach([
+            $this->user('professional', 'MD')->id,
+            $this->user('professional', 'DE', 'Dover')->id,
+            $this->user('professional', 'VA', 'Arlington')->id,
+        ]);
+
+        $client = $this->user('client', 'MD');
+
+        $tile = collect($this->actingAs($client)->get(route('public.browse'))
+            ->assertSuccessful()->viewData('trending'))->firstWhere('slug', 'djs-sound');
+
+        $this->assertNotNull($tile, 'the category has a professional this client can hire');
+        $this->assertSame(1, $tile->pros_count, 'three exist; one is reachable');
+    }
+
+    /** And a category with nobody reachable is not offered at all. */
+    public function test_a_trending_tile_with_nobody_reachable_is_withheld(): void
+    {
+        $category = \App\Models\Category::create([
+            'name' => 'Ice Sculpture', 'slug' => 'ice-sculpture',
+            'kind' => \App\Models\Category::SERVICE_CATEGORY,
+            'is_active' => true, 'thumbnail' => 'categories/ice.jpg',
+        ]);
+
+        $category->professionals()->attach($this->user('professional', 'DE', 'Dover')->id);
+
+        $trending = collect($this->actingAs($this->user('client', 'MD'))
+            ->get(route('public.browse'))->assertSuccessful()->viewData('trending'));
+
+        $this->assertNull($trending->firstWhere('slug', 'ice-sculpture'));
+    }
+
     public function test_an_influencer_is_carved_out(): void
     {
         // R26 exempts influencers from geo-restriction entirely, and they are

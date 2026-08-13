@@ -191,11 +191,22 @@ class BrowseProfessionalsController extends Controller
         // Unsplash photos and keyword guesses. These are real top-level
         // categories that actually have professionals behind them, carrying
         // their own artwork, and each one filters this page by the relation.
+        /*
+         * The count has to be the count the click produces.
+         *
+         * This tile prints "12 professionals" and then filters the page — and
+         * the page is R38-scoped to the viewer's own state. Counted
+         * platform-wide, a Maryland client was shown 12 and landed on one. The
+         * same fault the homepage's city section shipped with, so the same
+         * fix: count what this viewer can actually reach.
+         */
+        $inState = fn ($q) => \App\Support\StateMatching::scopeUsersForViewer($q, $request->user());
+
         $trending = Category::active()
             ->whereNull('parent_id')
             ->whereNotNull('thumbnail')
-            ->withCount(['professionals as pros_count'])
-            ->whereHas('professionals')
+            ->withCount(['professionals as pros_count' => $inState])
+            ->whereHas('professionals', $inState)
             ->orderByDesc('pros_count')
             ->orderBy('name')
             ->limit(30)
@@ -212,8 +223,8 @@ class BrowseProfessionalsController extends Controller
         if ($trending->isEmpty()) {
             $trending = Category::active()
                 ->whereNotNull('thumbnail')
-                ->withCount(['professionals as pros_count'])
-                ->whereHas('professionals')
+                ->withCount(['professionals as pros_count' => $inState])
+                ->whereHas('professionals', $inState)
                 ->orderByDesc('pros_count')
                 ->limit(60)
                 ->get(['id', 'name', 'slug', 'thumbnail', 'short_description'])
