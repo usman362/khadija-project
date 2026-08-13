@@ -491,6 +491,8 @@
         </div>
 
         <x-add-to-event tool-key="budget-allocator" tool-name="Budget Allocator" :event-id="request('event_id')" />
+        {{-- Row 226 Phase 1 — the other leg: post it as a bidding request. --}}
+        <x-post-as-bsr tool-key="budget-allocator" tool-name="Budget Planner" form-id="batForm" />
     </div>
 @endif
 

@@ -176,6 +176,8 @@
     {{-- Computed results --}}
     <div class="ep-out" id="epOut">
         <x-add-to-event tool-key="event-planner" tool-name="Guided Event Planner" :event-id="request('event_id')" />
+        {{-- Row 226 Phase 1 — the other leg: post it as a bidding request. --}}
+        <x-post-as-bsr tool-key="event-planner" tool-name="Guided Event Planner" form-id="epForm" />
         <div class="ep-out-summary" id="epSummary"></div>
         <div class="ep-grid">
             <div class="ep-card">

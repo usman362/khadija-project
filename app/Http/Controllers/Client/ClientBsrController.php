@@ -158,6 +158,87 @@ class ClientBsrController extends Controller
         return redirect()->route('client.bsr.step', 'review');
     }
 
+    /**
+     * Checklist row 226, Phase 1 — start a bidding request from a tool result.
+     *
+     * The approved scope is this ONE leg from three tools (Budget Planner,
+     * Guided Event Planner, Timeline Builder), to prove the handoff before
+     * committing to five outcomes across twelve tools. The other four legs of
+     * R40's vision are deliberately absent, and the clickable prototype of the
+     * full five stays where it is for Sir Peter's review.
+     *
+     * What carries across is what the client TYPED — the event type, date,
+     * guest count, budget and location they gave the tool. Not the tool's
+     * output: a suggested timeline is a suggestion, and a request that
+     * silently asks professionals to bid against a machine's guess is not what
+     * the client wrote. Nothing is published; this seeds the wizard and stops.
+     */
+    public const FROM_TOOL = ['budget-allocator', 'event-planner', 'timeline-builder'];
+
+    public function fromTool(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'tool_key'    => ['required', 'string', 'in:' . implode(',', self::FROM_TOOL)],
+            'tool_name'   => ['required', 'string', 'max:80'],
+            'event_type'  => ['nullable', 'string', 'max:120'],
+            'event_date'  => ['nullable', 'date'],
+            'guest_count' => ['nullable', 'integer', 'min:1', 'max:1000000'],
+            'budget'      => ['nullable', 'numeric', 'min:0', 'max:99999999'],
+            'location'    => ['nullable', 'string', 'max:200'],
+        ]);
+
+        // An event type the client typed into a tool is free text; it only
+        // becomes the request's event type if it names one we actually have.
+        $eventType = null;
+        if (filled($data['event_type'] ?? null)) {
+            $eventType = Category::active()->eventTypes()
+                ->whereRaw('LOWER(name) = ?', [mb_strtolower(trim($data['event_type']))])
+                ->value('name');
+        }
+
+        $budget = isset($data['budget']) ? (float) $data['budget'] : null;
+
+        Session::put(self::KEY, array_filter([
+            'from_tool'      => $data['tool_key'],
+            'from_tool_name' => $data['tool_name'],
+            'event_type'     => $eventType,
+            // $eventType, not the raw text: a working title is only built
+            // from an event type we recognise. "Sarah and Alex's big day"
+            // typed into a budget calculator is a private note, and promoting
+            // it to the title professionals see on the board is a step the
+            // client never took. Left blank, the wizard asks for one.
+            'title'          => $this->titleFrom($eventType, $data['event_date'] ?? null),
+            'starts_at'      => isset($data['event_date'])
+                ? \Illuminate\Support\Carbon::parse($data['event_date'])->format('Y-m-d\TH:i')
+                : null,
+            'guest_count'    => $data['guest_count'] ?? null,
+            'location'       => $data['location'] ?? null,
+            // One figure, carried as the range's own middle rather than split
+            // into a band nobody stated. The client can widen it in the wizard.
+            'budget_min'     => $budget,
+            'budget_max'     => $budget,
+        ], fn ($v) => $v !== null && $v !== ''));
+
+        // Straight to the first step regardless: services, organisation type
+        // and characteristic are things no tool asked for, and they are what
+        // the wizard needs before anything else.
+        return redirect()
+            ->route('client.bsr.step', 'service')
+            ->with('status', $data['tool_name'] . ' details carried over. Choose the services you need — you can change everything else as you go.');
+    }
+
+    /** A working title, so the client edits one rather than writes one. */
+    private function titleFrom(?string $eventType, ?string $date): ?string
+    {
+        if (! filled($eventType)) {
+            return null;
+        }
+
+        $when = $date ? \Illuminate\Support\Carbon::parse($date)->format('F Y') : null;
+
+        return $when ? "{$eventType} — {$when}" : $eventType;
+    }
+
     public function discard(Request $request): RedirectResponse
     {
         Session::forget(self::KEY);

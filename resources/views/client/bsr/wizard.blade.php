@@ -84,6 +84,17 @@
 @if(session('status'))
     <div class="cl-card" style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:12px 16px;margin-bottom:16px;font-size:13.5px;">✅ {{ session('status') }}</div>
 @endif
+
+{{-- Row 226 — where the pre-filled answers came from, said out loud and kept
+     visible for the whole wizard. A form that fills itself in without saying
+     why is a form the client stops trusting the moment one figure looks off. --}}
+@if(!empty($data['from_tool_name']))
+    <div class="cl-card" style="background:rgba(37,99,235,.06);border:1px solid rgba(37,99,235,.28);padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--text-secondary);">
+        <b style="color:var(--text-primary);">Started from {{ $data['from_tool_name'] }}.</b>
+        What you entered there has been filled in below — every field is still yours to change, and
+        nothing goes out to professionals until you publish.
+    </div>
+@endif
 @if($errors->any())
     <div class="cl-card" style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:12px 16px;margin-bottom:16px;font-size:13.5px;">
         @foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach
