@@ -249,8 +249,14 @@
         <a href="{{ route('public.faq') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Help Center</a>
         {{-- Row 122 — this was href="#". It looked like support and opened nothing. --}}
         <a href="{{ route('forms.create', 'support_request') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Contact Support</a>
-        <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 1 1-4.5-7.8L21 3v9z"/></svg> Live Chat</a>
-        <a href="#" class="ipx-help-cta">Go to Support Center <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+        {{-- Removed 2026-08-14, finishing what row 122 started one line above.
+             "Live Chat" opened nothing, and unlike a broken link it also
+             advertised a service that does not exist: there is no staffed
+             real-time support channel, and the messaging in the app is
+             between users, not with us. "Go to Support Center" opened nothing
+             either and named a place that was never built — with Help Center
+             and Contact Support directly above it, it added a third door to
+             two rooms. --}}
     </div>
 
     <form action="{{ route('logout') }}" method="POST" class="ipx-logout-form">@csrf

@@ -230,10 +230,11 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
                 Back to Order Details
             </a>
-            <a href="#" class="pe-btn pe-btn-ghost">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Download Invoice
-            </a>
+            {{-- Removed 2026-08-14, on the same reasoning as the button taken
+                 out of confirmed.blade.php on 2026-08-05: there is no invoice
+                 route anywhere in the app, so this offered a document nothing
+                 can produce. A button that does nothing reads as a broken
+                 page, not as a feature still to come. --}}
         </div>
         @endif
     </div>

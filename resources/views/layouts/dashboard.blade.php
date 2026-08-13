@@ -70,11 +70,18 @@
                     <img src="{{ asset('gigresource-logos/gigresource-logo-dark.png') }}" alt="GigResource" id="brand-logo-light">
                     <img src="{{ asset('gigresource-logos/gigresource-logo-light.png') }}" alt="GigResource" id="brand-logo-dark" class="logo-hidden">
                 </a>
-                <div class="sidebar-toggler" aria-label="Toggle the sidebar">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
+                {{-- Removed 2026-08-14. Both sidebar togglers in this layout came
+                     from the HTML theme kit under /html, where the kit's own JS
+                     bound them. Nothing in this application ever did — no
+                     script, no stylesheet, not one reference outside these two
+                     lines. They collapsed nothing.
+
+                     Worth removing rather than leaving: each carried
+                     aria-label="Toggle the sidebar", so a screen reader
+                     announced a control that was not there. A silent decoration
+                     is untidy; a decoration that announces itself as a control
+                     is a lie told specifically to the people who cannot see it
+                     do nothing. --}}
             </div>
 
             <div class="sidebar-body">
@@ -417,7 +424,9 @@
 
         <div class="page-wrapper">
             <nav class="navbar">
-                <a href="#" class="sidebar-toggler" aria-label="Toggle the sidebar"><i data-lucide="menu"></i></a>
+                {{-- Removed 2026-08-14 with its twin in the sidebar above; see
+                     the note there. This one was an <a href="#">, so clicking
+                     it also jumped the page to the top. --}}
                 <div class="navbar-content ms-auto">
                     <ul class="navbar-nav">
                         <li class="theme-switcher-wrapper nav-item">
