@@ -87,6 +87,28 @@ class InfluencerBadgesController extends Controller
             return $b + ['slug' => $slug, 'earned' => $earned];
         })->values()->all();
 
+        /*
+         * Checklist row 115 — the Elite benefit, with the figure behind it.
+         *
+         * Elite influencers can see which of the professionals they referred
+         * are actually being paid. Stating a benefit is easy; this counts it,
+         * so the line on the tier card is a number rather than a promise.
+         *
+         * Counted for every tier, not only Elite, because the locked card has
+         * to say what is waiting rather than an empty space — but only Elite
+         * is shown the names.
+         */
+        $referredProIds = \App\Models\InfluencerReferral::where('influencer_id', $influencer->id)
+            ->pluck('referred_user_id')
+            ->filter()
+            ->unique();
+
+        $paidProfessionals = $referredProIds->isEmpty() ? 0 : \App\Models\Booking::query()
+            ->whereIn('supplier_id', $referredProIds)
+            ->whereIn('status', ['confirmed', 'completed'])
+            ->distinct()
+            ->count('supplier_id');
+
         return [
             'tiers' => $tiers,
             'tierKeys' => $keys,
@@ -96,6 +118,12 @@ class InfluencerBadgesController extends Controller
             'referralsToNext' => $referralsToNext,
             'progressPct' => $progressPct,
             'badges' => $badges,
+            'isElite' => $currentKey === 'elite',
+            'paidProfessionals' => $paidProfessionals,
+            // Row 113 — the same referral list every other page reads, drawn
+            // here rather than by the view running its own query. Four pages
+            // each fetching their own is how they came to disagree.
+            'recentReferrals' => $influencer->referrals()->with('referredUser:id,name')->latest()->limit(5)->get(),
         ];
     }
 }

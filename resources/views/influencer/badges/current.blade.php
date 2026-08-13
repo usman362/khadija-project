@@ -47,9 +47,14 @@
         {{-- recent activity + how to earn --}}
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:18px;">
             <div class="bt-panel" style="margin-top:0;">
-                <h3 style="font-size:15px;">Recent Activity</h3>
+                {{-- Row 113 — named for what it is, and stating its scope. The
+                     four pages showing referral activity all read one list now;
+                     what differed was how much of it each showed, with none of
+                     them saying so. --}}
+                <h3 style="font-size:15px;">Recent Referrals</h3>
+                <div style="font-size:11.5px;color:var(--muted);margin-top:2px;">Your 5 most recent, newest first.</div>
                 <div style="margin-top:12px;">
-                    @forelse($influencer->referrals()->latest()->limit(5)->get() as $r)
+                    @forelse($recentReferrals as $r)
                         <div style="display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--line);">
                             <div style="width:30px;height:30px;border-radius:8px;background:#dcfce7;display:flex;align-items:center;justify-content:center;color:#16a34a;flex-shrink:0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
                             <div style="flex:1;min-width:0;"><div style="font-family:var(--ff);font-size:13px;font-weight:600;color:var(--ink);">{{ $r->referredUser->name ?? 'New referral' }}</div><div style="font-size:11.5px;color:var(--muted);">{{ $r->created_at->format('M j, Y') }}</div></div>

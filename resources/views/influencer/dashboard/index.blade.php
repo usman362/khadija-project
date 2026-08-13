@@ -176,7 +176,10 @@
         </div>
 
         <div class="dx-panel">
-            <div class="dx-panel-head"><h3>Recent Referrals</h3><a href="{{ route('influencer.dashboard.referrals') }}">View all →</a></div>
+            {{-- Row 113 — every panel showing referrals states how much of the
+                 list it is showing, so two pages differing is legible rather
+                 than looking like two different datasets. --}}
+            <div class="dx-panel-head"><h3>Recent Referrals <span style="font-weight:500;color:var(--muted);font-size:11.5px;">· 10 most recent</span></h3><a href="{{ route('influencer.dashboard.referrals') }}">View all →</a></div>
             @forelse($recentReferrals as $r)
                 <div class="dx-list-row">
                     <div class="dx-list-av">{{ strtoupper(substr($r->referredUser->name ?? 'U', 0, 2)) }}</div>

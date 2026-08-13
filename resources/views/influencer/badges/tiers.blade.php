@@ -6,13 +6,41 @@
 <div class="ipx-breadcrumb"><a href="{{ route('influencer.badges.current') }}">Badges &amp; Tiers</a> <span class="sep">›</span> Main Tiers</div>
 
 <div class="bt-head">
-    <h1>Main Tiers</h1>
-    <p>Advance through our tiers by referring members, staying active, and making an impact.</p>
+    {{-- Row 114 — "Tier" alone reads as a membership plan, which is a different
+         thing a user pays for. Named here and on every pill below. --}}
+    <h1>Influencer Tiers</h1>
+    <p>Your influencer tier is earned by referring members — it is not a membership plan, and there is nothing to buy.</p>
 </div>
 
 <div class="bt-info">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
     Your tier reflects your activity. The more members you refer, the higher you climb — and the more you earn.
+</div>
+
+{{-- Row 144 — a percentage nobody can read without knowing what it is a
+     percentage OF. Both figures below are the ones the code actually uses:
+     the rate is applied to the booking price, and the signup bonus is a flat
+     amount per referral. --}}
+<div class="bt-panel" style="margin-top:14px;">
+    <h3>What your commission applies to</h3>
+    <div class="sub">Two separate things, paid on different events.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px;">
+        <div style="border:1px solid var(--line);border-radius:12px;padding:13px 15px;">
+            <div style="font-size:12px;font-weight:800;color:var(--ink);margin-bottom:4px;">Booking commission</div>
+            <p style="font-size:12.5px;color:var(--muted);line-height:1.55;margin:0;">
+                Your tier rate ({{ collect($tiers)->pluck('rate')->implode('% / ') }}%) applied to the
+                <b>agreed price of each booking</b> made by someone you referred. Not the professional's
+                own earnings, and not the platform's fee.
+            </p>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:12px;padding:13px 15px;">
+            <div style="font-size:12px;font-weight:800;color:var(--ink);margin-bottom:4px;">Signup bonus</div>
+            <p style="font-size:12.5px;color:var(--muted);line-height:1.55;margin:0;">
+                A flat ${{ number_format((float) config('influencer.signup_bonus', 5), 2) }} each time
+                someone registers through your link. Paid once per person, whether or not they ever book.
+            </p>
+        </div>
+    </div>
 </div>
 
 <div class="bt-layout">
@@ -24,7 +52,7 @@
                     @elseif($key === 'pro')<div class="bt-tier-flag" style="background:#7c3aed;">Most Popular</div>@endif
                     <div class="bt-tier-badge"><x-influencer.hex-badge :color="$t['color']" :icon="$t['icon']" size="74" /></div>
                     <h3>{{ $t['label'] }}</h3>
-                    <span class="bt-tier-pill">Tier {{ $idx + 1 }} · {{ $t['rate'] }}%</span>
+                    <span class="bt-tier-pill">Influencer Tier {{ $idx + 1 }} · {{ $t['rate'] }}%</span>
                     <div class="bt-tier-tag">{{ $t['tagline'] }}</div>
                     <div class="bt-req-lbl">Requirement</div>
                     <div class="bt-req">{{ $t['min_referrals'] == 0 ? 'Start here' : $t['min_referrals'].'+ referrals' }}</div>
@@ -34,6 +62,30 @@
                     @endforeach
                 </div>
             @endforeach
+        </div>
+
+        {{-- Row 115 — the Elite data benefit, placed on the tiers screen where
+             the tier it belongs to is being read. Elite sees the figure; every
+             other tier sees what unlocking it gets them, which is the point of
+             putting it here at all. --}}
+        <div class="bt-panel">
+            <h3>Elite: see how your referred professionals are doing</h3>
+            <div class="sub">Elite is the only tier that can see which professionals you referred have been booked and paid.</div>
+            @if($isElite)
+                <div style="display:flex;align-items:center;gap:14px;margin-top:12px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;">
+                    <div style="font-family:var(--ff);font-size:30px;font-weight:800;color:var(--ink);line-height:1;">{{ $paidProfessionals }}</div>
+                    <div style="font-size:12.5px;color:var(--muted);line-height:1.5;">
+                        {{ $paidProfessionals === 1 ? 'professional you referred has' : 'professionals you referred have' }}
+                        been booked and paid on the platform.
+                        <a href="{{ route('influencer.dashboard.referrals') }}" style="color:var(--blue);font-weight:700;text-decoration:none;">See your referrals →</a>
+                    </div>
+                </div>
+            @else
+                <div style="display:flex;align-items:center;gap:12px;margin-top:12px;padding:14px 16px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:12.5px;line-height:1.5;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <span>Reach Elite ({{ $tiers['elite']['min_referrals'] }}+ referrals) to unlock this.</span>
+                </div>
+            @endif
         </div>
 
         <div class="bt-panel">

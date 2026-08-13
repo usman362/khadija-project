@@ -7,7 +7,7 @@
 <div class="an-head"><div><h1>Reports</h1><p>Summaries of your performance, ready to review or export.</p></div></div>
 
 <div class="an-tiles" style="margin-top:18px;">
-    <div class="an-tile"><div class="lbl">Clicks (30d)</div><div class="v">{{ $fmt($totals['clicks']) }}</div></div>
+    <div class="an-tile"><div class="lbl">Referral Link Clicks (30d)</div><div class="v">{{ $fmt($totals['clicks']) }}</div></div>
     <div class="an-tile"><div class="lbl">Conversions (30d)</div><div class="v">{{ $fmt($totals['conversions']) }}</div></div>
     <div class="an-tile"><div class="lbl">Earnings (30d)</div><div class="v">${{ $fmt($totals['earnings']) }}</div></div>
     <div class="an-tile"><div class="lbl">Conversion Rate</div><div class="v">{{ $totals['conversion_rate'] }}%</div></div>
