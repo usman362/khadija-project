@@ -96,6 +96,18 @@ class LandingPageController extends Controller
          * properly, rather than the eight most recent full stop.
          */
         return Category::active()
+            /*
+             * Service categories, not event types. Khadijah caught this: the
+             * section is headed "Explore Popular Categories" but the query had
+             * no kind filter, and because it sorts by sort_order then id, the
+             * event types won every slot — the carousel was eight event types
+             * under a heading promising categories, duplicating the page that
+             * already exists for them at /events-categories.
+             *
+             * A visitor reading "Categories" here expects the things they can
+             * hire someone for.
+             */
+            ->ofKind(Category::SERVICE_CATEGORY)
             ->where(fn ($q) => $q->whereNotNull('thumbnail')->where('thumbnail', '!=', '')
                                  ->orWhere(fn ($w) => $w->whereNotNull('cover_image')->where('cover_image', '!=', '')))
             ->orderByDesc('sort_order')

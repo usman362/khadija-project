@@ -66,12 +66,28 @@ class HomepageMobileAndSupportTest extends TestCase
 
     /* ── Row 121: no broken tiles in the showcase ───────────── */
 
-    private function category(string $name, ?string $thumb): Category
+    private function category(string $name, ?string $thumb, string $kind = Category::SERVICE_CATEGORY): Category
     {
         return Category::create([
             'name' => $name, 'slug' => \Illuminate\Support\Str::slug($name),
-            'kind' => Category::EVENT_TYPE, 'is_active' => true, 'thumbnail' => $thumb,
+            'kind' => $kind, 'is_active' => true, 'thumbnail' => $thumb,
         ]);
+    }
+
+    /**
+     * The section is headed "Explore Popular Categories" and had no kind
+     * filter, so event types — which sort first — took every slot. Eight event
+     * types under a heading promising categories, duplicating the page that
+     * already exists for them.
+     */
+    public function test_the_showcase_holds_service_categories_not_event_types(): void
+    {
+        $this->category('Catering & Food Services', 'categories/catering.jpg');
+        $this->category('Wedding', 'categories/wedding.jpg', Category::EVENT_TYPE);
+
+        $shown = collect($this->get(route('landing'))->assertOk()->viewData('showcaseCategories'));
+
+        $this->assertSame(['Catering & Food Services'], $shown->pluck('name')->all());
     }
 
     public function test_a_category_with_no_artwork_is_not_shown_as_a_broken_image(): void
