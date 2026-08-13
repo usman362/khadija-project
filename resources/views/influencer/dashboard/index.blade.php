@@ -50,8 +50,8 @@
     .dx-list-main b { font-family: var(--ff); font-size: 13.5px; font-weight: 600; color: var(--ink); display: block; }
     .dx-list-main span { font-size: 12px; color: var(--muted); }
     .dx-pill { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
-    .dx-pill-green { background: #dcfce7; color: #16a34a; } .dx-pill-amber { background: #dcfce7; color: #15803d; }
-    .dx-pill-gray { background: #eef1f6; color: #7a879c; } .dx-pill-blue { background: var(--blue-soft); color: var(--blue); }
+    .dx-pill-green { background: #dcfce7; color: #15803d; } .dx-pill-amber { background: #dcfce7; color: #166534; }  /* 3.00 -> 4.79 on the tint */
+    .dx-pill-gray { background: #eef1f6; color: #55617a; }  /* 3.21 -> 4.75 */ .dx-pill-blue { background: var(--blue-soft); color: var(--blue); }
 
     .dx-empty { text-align: center; padding: 26px 10px; color: var(--muted); font-size: 13px; }
     .dx-empty svg { width: 34px; height: 34px; color: #cdd6e4; margin-bottom: 8px; }

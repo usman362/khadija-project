@@ -243,7 +243,10 @@
         <div class="bb-list">
             @foreach($gigs as $g)
                 @php
-                    $mc = $g['match'] >= 90 ? '#16a34a' : ($g['match'] >= 80 ? '#65a30d' : '#d97706');
+                    // Contrast: this colour is used BOTH as text on white and as a fill
+                    // behind white text, and the ratio is the same either way. The
+                    // old trio measured 3.30 / 3.09 / 3.19 against 4.5.
+                    $mc = $g['match'] >= 90 ? '#15803d' : ($g['match'] >= 80 ? '#4d7c0f' : '#b45309');
                     $ml = $g['match'] >= 90 ? 'Excellent' : ($g['match'] >= 80 ? 'Great' : 'Good');
                     $rf = (int) round($g['rating']);
                 @endphp

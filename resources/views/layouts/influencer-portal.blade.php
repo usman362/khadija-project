@@ -77,10 +77,14 @@
         :root {
             /* Influencer brand accent = GREEN (per Peter). Var names kept as
                --orange* to avoid churn across the many views; values are green. */
-            --orange: #16a34a; --orange-dark: #15803d; --orange-soft: #ecfdf3;
-            --green: #16a34a; --green-dark: #15803d; --green-soft: #ecfdf3;
+            /* Contrast: #16a34a is 3.30:1 with white and 3.00:1 on its own
+               #dcfce7 tint, both under 4.5. #15803d clears each. The lighter
+               green stays available for fills behind dark text. */
+            --orange: #15803d; --orange-dark: #166534; --orange-soft: #ecfdf3;
+            --green: #15803d; --green-dark: #166534; --green-soft: #ecfdf3;
+            --green-light: #16a34a;
             --blue: #2563eb; --blue-soft: #eaf1ff;
-            --ink: #0f1b35; --text: #3b4760; --muted: #7a879c; --line: #eef1f6;
+            --ink: #0f1b35; --text: #3b4760; --muted: #5c6880; --line: #eef1f6;  /* muted was 3.64 on white */
             --bg: #f6f8fc; --card: #ffffff;
             --ff: 'Plus Jakarta Sans', system-ui, sans-serif; --ff-body: 'Inter', system-ui, sans-serif;
             --sb: 256px; --top: 68px; --radius: 16px; --shadow: 0 1px 3px rgba(15,27,53,.04), 0 8px 24px rgba(15,27,53,.04);
@@ -139,7 +143,7 @@
         .ipx-logout-btn {
             width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
             padding: 10px; border: 1px solid rgba(239,68,68,0.22); border-radius: 10px;
-            background: rgba(239,68,68,0.08); color: #ef4444; font-family: var(--ff);
+            background: rgba(239,68,68,0.08); color: #b91c1c; font-family: var(--ff);  /* 3.39 -> 6.47 on the tint */
             font-weight: 700; font-size: 13px; cursor: pointer; transition: background .15s;
         }
         .ipx-logout-btn:hover { background: rgba(239,68,68,0.16); }

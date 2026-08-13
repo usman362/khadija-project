@@ -23,7 +23,10 @@
         'Medium' => ['var(--warn-text)', 'rgba(217,119,6,0.10)'],
         'Low'    => ['var(--info-text)', 'rgba(37,99,235,0.10)'],
     ];
-    $avatars = ['linear-gradient(135deg,#8b5cf6,#6d28d9)','linear-gradient(135deg,#2563eb,#1d4ed8)','linear-gradient(135deg,#10b981,#047857)','linear-gradient(135deg,#ec4899,#be185d)','linear-gradient(135deg,#f59e0b,#b45309)'];
+    // These carry white initials, so the LIGHT stop of each gradient is what
+    // the letters have to survive: #10b981 gave 2.54 and #8b5cf6 4.23 against
+    // a 4.5 requirement. Each light stop moved to its darker sibling.
+    $avatars = ['linear-gradient(135deg,#6d28d9,#5b21b6)','linear-gradient(135deg,#2563eb,#1d4ed8)','linear-gradient(135deg,#047857,#065f46)','linear-gradient(135deg,#be185d,#9d174d)','linear-gradient(135deg,#b45309,#92400e)'];
     // Stage display config for the progress pipeline.
     // Text colours, so they use the theme-aware tokens — the raw mid-tones read
     // as dark-on-dark or light-on-light depending on which theme is active.

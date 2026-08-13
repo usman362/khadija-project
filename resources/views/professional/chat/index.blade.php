@@ -8,7 +8,9 @@
 
 @php
     $money = fn ($n) => '$' . number_format((float) $n, 0);
-    $tagColors = ['green' => ['#059669','rgba(16,185,129,0.12)'], 'amber' => ['#d97706','rgba(217,119,6,0.12)'], 'red' => ['#dc2626','rgba(220,38,38,0.12)'], 'blue' => ['#2563eb','rgba(37,99,235,0.12)']];
+    // Contrast: the text sits on its own 12% tint over white, so it needs
+    // 4.5:1 against that. #059669 gave 3.77 and #d97706 3.19.
+    $tagColors = ['green' => ['#047857','rgba(16,185,129,0.12)'], 'amber' => ['#b45309','rgba(217,119,6,0.12)'], 'red' => ['#dc2626','rgba(220,38,38,0.12)'], 'blue' => ['#2563eb','rgba(37,99,235,0.12)']];
     $typeColor = ['direct' => '#2563eb', 'booking' => '#059669', 'event' => '#7c3aed'];
 @endphp
 

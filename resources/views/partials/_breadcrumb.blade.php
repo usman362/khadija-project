@@ -30,14 +30,14 @@
     $bcPage  = trim(html_entity_decode(strip_tags($__env->yieldContent('page-title')), ENT_QUOTES | ENT_HTML5));
     $bcOnDash = $bcDash && \Illuminate\Support\Facades\Route::has($bcDash) && request()->routeIs($bcDash);
 @endphp
-<nav aria-label="Breadcrumb" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:12.5px; font-weight:600; color:var(--text-muted, #94a3b8); margin:0 0 16px;">
+<nav aria-label="Breadcrumb" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:12.5px; font-weight:600; color:var(--text-muted, #475569); margin:0 0 16px;">
     <span style="color:{{ $bcAccent }}; font-weight:800;">{{ $bcType }}</span>
     @if($bcDash && \Illuminate\Support\Facades\Route::has($bcDash))
         <span style="opacity:.45;">›</span>
         @if($bcOnDash)
             <span style="color:var(--text-primary, #1e293b);">Dashboard</span>
         @else
-            <a href="{{ route($bcDash) }}" style="color:var(--text-muted, #94a3b8); text-decoration:none;">Dashboard</a>
+            <a href="{{ route($bcDash) }}" style="color:var(--text-muted, #475569); text-decoration:none;">Dashboard</a>
         @endif
     @endif
     @if($bcPage && ! $bcOnDash && strtolower($bcPage) !== 'dashboard')
