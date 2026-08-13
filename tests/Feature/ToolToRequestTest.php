@@ -140,6 +140,7 @@ class ToolToRequestTest extends TestCase
             [
                 'budget-allocator', 'event-planner', 'timeline-builder',
                 'checklist-generator', 'theme-advisor', 'venue-analyzer', 'guest-capacity',
+                'contract-assistant',
             ],
             \App\Http\Controllers\Client\ClientBsrController::FROM_TOOL,
         );
@@ -156,6 +157,7 @@ class ToolToRequestTest extends TestCase
             'theme-advisor'       => 'views/ai-tools/theme-advisor.blade.php',
             'venue-analyzer'      => 'views/ai-tools/venue-analyzer.blade.php',
             'guest-capacity'      => 'views/ai-tools/guest-capacity.blade.php',
+            'contract-assistant'  => 'views/ai-tools/contract-assistant.blade.php',
         ];
 
         $this->assertSame(

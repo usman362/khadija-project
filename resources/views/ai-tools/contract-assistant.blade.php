@@ -124,6 +124,8 @@
         <div class="ca-card">
             <h3 id="caTitle">📝 Draft Agreement</h3>
             <x-add-to-event tool-key="contract-assistant" tool-name="Contract Assistant" :event-id="request('event_id')" />
+        {{-- Row 226 — post it as a request: bidding, urgent, or a draft. --}}
+        <x-post-as-request tool-key="contract-assistant" tool-name="Contract Assistant" form-id="caForm" />
             <div id="caOut"><p class="ca-empty">Fill in the details and generate a draft agreement — it will appear here.</p></div>
             <div class="ca-disc" id="caDisc" style="display:none;"></div>
         </div>

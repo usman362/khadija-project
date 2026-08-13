@@ -10,9 +10,10 @@
      *
      * Phase 1 was one outcome from three tools, to prove the handoff before
      * committing to five outcomes across twelve. This is Phase 2: three
-     * outcomes, on the tools whose inputs describe an event. Which tools, and
-     * why the other four are excluded, is recorded on
-     * ClientBsrController::FROM_TOOL.
+     * outcomes, on the eight tools whose inputs describe an event. Which
+     * tools, which the spec excepts, and the one exclusion that is a
+     * disagreement with the spec rather than an application of it, are all
+     * recorded on ClientBsrController::FROM_TOOL.
      *
      * The two legs still not here, and why:
      *   Attach to an existing event — already built, on the event page itself
@@ -23,7 +24,7 @@
      * The facts a request needs — what kind of event, when, how many guests,
      * what budget, where — are the tool's own INPUTS, not its output. So this
      * reads the tool's form at submit time rather than depending on each tool
-     * to hand them over. One component, seven tools, no per-tool JavaScript.
+     * to hand them over. One component, eight tools, no per-tool JavaScript.
      *
      * The three buttons are not presented as equals. Bidding is the ordinary
      * route and leads; the other two are alternatives beside it, because a
@@ -99,7 +100,7 @@
         event_type:  ['event_type'],
         event_date:  ['event_date', 'date'],
         guest_count: ['guest_count'],
-        budget:      ['budget', 'total_budget'],
+        budget:      ['budget', 'total_budget', 'total_price'],
         location:    ['location']
     };
 

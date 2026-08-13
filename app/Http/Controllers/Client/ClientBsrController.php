@@ -178,18 +178,27 @@ class ClientBsrController extends Controller
      *
      * Phase 1 proved the handoff on three. The test for the rest is not "is it
      * a client tool" but "do its INPUTS describe an event someone could be
-     * asked to work at". By that test four of the twelve are excluded, and it
-     * is worth naming them rather than leaving a gap:
+     * asked to work at".
      *
+     * The row's own spec names three exceptions and they are right:
+     *
+     *   vendor-matchmaking — already runs against a chosen event; its next
+     *                        step is a direct offer to a professional it
+     *                        named, which is a different leg
      *   review-writer      — a review is written after the job is done
-     *   contract-assistant — describes a booking that already exists
-     *   message-assistant  — a message, not an event
-     *   translator         — a phrase, not an event
+     *   translator         — a phrase is not a planning artefact
      *
-     * A "turn this into a request" button on the Review Builder would be an
-     * invitation to nothing. vendor-matchmaking is excluded for the opposite
-     * reason: it already runs against a chosen event and its natural next step
-     * is a direct offer to a professional it named, which is a different leg.
+     * message-assistant is a fourth, and this is a DISAGREEMENT with the spec
+     * worth flagging rather than burying. Its inputs are a recipient, a tone,
+     * a purpose and some talking points; not one of them is a fact a request
+     * needs. The control would render a panel promising "what you entered
+     * above is carried across" over nothing at all — a promise the click
+     * cannot keep. If the Owner wants it there anyway it needs its own copy,
+     * because this copy would be false.
+     *
+     * contract-assistant IS included, on the spec's side rather than mine: a
+     * client can draft terms before asking anyone, and it carries a date and
+     * a price, which are two facts a request actually uses.
      */
     public const FROM_TOOL = [
         'budget-allocator',
@@ -199,6 +208,7 @@ class ClientBsrController extends Controller
         'theme-advisor',
         'venue-analyzer',
         'guest-capacity',
+        'contract-assistant',
     ];
 
     /** The outcomes a tool result can become. */
