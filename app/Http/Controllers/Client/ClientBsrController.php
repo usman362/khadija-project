@@ -173,13 +173,43 @@ class ClientBsrController extends Controller
      * silently asks professionals to bid against a machine's guess is not what
      * the client wrote. Nothing is published; this seeds the wizard and stops.
      */
-    public const FROM_TOOL = ['budget-allocator', 'event-planner', 'timeline-builder'];
+    /**
+     * Row 226, Phase 2 — which tools may hand off, and why these.
+     *
+     * Phase 1 proved the handoff on three. The test for the rest is not "is it
+     * a client tool" but "do its INPUTS describe an event someone could be
+     * asked to work at". By that test four of the twelve are excluded, and it
+     * is worth naming them rather than leaving a gap:
+     *
+     *   review-writer      — a review is written after the job is done
+     *   contract-assistant — describes a booking that already exists
+     *   message-assistant  — a message, not an event
+     *   translator         — a phrase, not an event
+     *
+     * A "turn this into a request" button on the Review Builder would be an
+     * invitation to nothing. vendor-matchmaking is excluded for the opposite
+     * reason: it already runs against a chosen event and its natural next step
+     * is a direct offer to a professional it named, which is a different leg.
+     */
+    public const FROM_TOOL = [
+        'budget-allocator',
+        'event-planner',
+        'timeline-builder',
+        'checklist-generator',
+        'theme-advisor',
+        'venue-analyzer',
+        'guest-capacity',
+    ];
+
+    /** The outcomes a tool result can become. */
+    public const OUTCOMES = ['bidding', 'emergency', 'draft'];
 
     public function fromTool(Request $request): RedirectResponse
     {
         $data = $request->validate([
             'tool_key'    => ['required', 'string', 'in:' . implode(',', self::FROM_TOOL)],
             'tool_name'   => ['required', 'string', 'max:80'],
+            'outcome'     => ['required', 'string', 'in:' . implode(',', self::OUTCOMES)],
             'event_type'  => ['nullable', 'string', 'max:120'],
             'event_date'  => ['nullable', 'date'],
             'guest_count' => ['nullable', 'integer', 'min:1', 'max:1000000'],
@@ -198,7 +228,7 @@ class ClientBsrController extends Controller
 
         $budget = isset($data['budget']) ? (float) $data['budget'] : null;
 
-        Session::put(self::KEY, array_filter([
+        $carried = array_filter([
             'from_tool'      => $data['tool_key'],
             'from_tool_name' => $data['tool_name'],
             'event_type'     => $eventType,
@@ -217,14 +247,75 @@ class ClientBsrController extends Controller
             // into a band nobody stated. The client can widen it in the wizard.
             'budget_min'     => $budget,
             'budget_max'     => $budget,
-        ], fn ($v) => $v !== null && $v !== ''));
+        ], fn ($v) => $v !== null && $v !== '');
 
-        // Straight to the first step regardless: services, organisation type
-        // and characteristic are things no tool asked for, and they are what
-        // the wizard needs before anything else.
+        return match ($data['outcome']) {
+            'emergency' => $this->toEmergency($carried, $data['tool_name']),
+            'draft'     => $this->toDraft($request, $carried, $data['tool_name']),
+            default     => $this->toBidding($carried, $data['tool_name']),
+        };
+    }
+
+    /**
+     * Straight to the first step regardless: services, organisation type and
+     * characteristic are things no tool asked for, and they are what the
+     * wizard needs before anything else.
+     */
+    private function toBidding(array $carried, string $toolName): RedirectResponse
+    {
+        Session::put(self::KEY, $carried);
+
         return redirect()
             ->route('client.bsr.step', 'service')
-            ->with('status', $data['tool_name'] . ' details carried over. Choose the services you need — you can change everything else as you go.');
+            ->with('status', $toolName . ' details carried over. Choose the services you need — you can change everything else as you go.');
+    }
+
+    /**
+     * An emergency request, prefilled.
+     *
+     * The ER form reads old(), so flashing the carried facts as input fills it
+     * with no view change and no second copy of the mapping.
+     *
+     * Deliberately NOT gated on how far away the date is. The temptation was
+     * to refuse anything months out as "not an emergency", but no rule sets a
+     * maximum — R7 only sets the five-hour floor, which the ER form already
+     * enforces — and inventing one here would reject requests the platform
+     * allows. What the form does ask is why it is urgent, in the client's own
+     * words. A gate made of their own answer is better than a number I chose.
+     *
+     * `reason` is not carried: no tool asks why something is urgent, and
+     * picking one for them would put words in their mouth on a form they sign.
+     */
+    private function toEmergency(array $carried, string $toolName): RedirectResponse
+    {
+        return redirect()
+            ->route('client.esr.create')
+            ->withInput(array_filter([
+                'event_name'  => $carried['title'] ?? null,
+                'needed_by'   => isset($carried['starts_at'])
+                    ? \Illuminate\Support\Carbon::parse($carried['starts_at'])->format('Y-m-d\TH:i')
+                    : null,
+                'location'    => $carried['location'] ?? null,
+                'guest_count' => $carried['guest_count'] ?? null,
+                'budget_min'  => $carried['budget_min'] ?? null,
+            ], fn ($v) => $v !== null && $v !== ''))
+            ->with('status', $toolName . ' details carried over. Tell us why this is urgent and which services you need.');
+    }
+
+    /**
+     * Saved, not sent. Nothing is published and no professional is notified —
+     * the client came to a tool to think, and "I will come back to this" is a
+     * real answer to what should happen next.
+     */
+    private function toDraft(Request $request, array $carried, string $toolName): RedirectResponse
+    {
+        $event = $this->persist($request, $carried, publish: false);
+
+        Session::put(self::KEY, $carried + ['draft_id' => $event->id]);
+
+        return redirect()
+            ->route('client.bsr.resume', $event)
+            ->with('status', 'Saved as a draft from ' . $toolName . '. Nothing has been posted — it is in My Events until you publish it.');
     }
 
     /** A working title, so the client edits one rather than writes one. */

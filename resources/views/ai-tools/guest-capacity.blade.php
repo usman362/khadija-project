@@ -180,6 +180,8 @@
     </div>
 
     <x-add-to-event tool-key="guest-capacity" tool-name="Guest Capacity Calculator" :event-id="request('event_id')" />
+        {{-- Row 226 — post it as a request: bidding, urgent, or a draft. --}}
+        <x-post-as-request tool-key="guest-capacity" tool-name="Guest Capacity Calculator" form-id="gcForm" />
 
     <div class="gc-grid">
         <div>

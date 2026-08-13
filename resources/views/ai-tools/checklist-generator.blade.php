@@ -162,6 +162,8 @@
         <div class="cg-out-sum" id="cgSummary"></div>
         <div id="cgGroups"></div>
         <x-add-to-event tool-key="checklist-generator" tool-name="Smart Checklist" :event-id="request('event_id')" />
+        {{-- Row 226 — post it as a request: bidding, urgent, or a draft. --}}
+        <x-post-as-request tool-key="checklist-generator" tool-name="Smart Checklist" form-id="cgForm" />
     </div>
     <div class="cg-stats">
         @foreach($stats as [$lbl, $val, $tone])

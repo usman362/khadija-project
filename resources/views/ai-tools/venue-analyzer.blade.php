@@ -191,6 +191,8 @@
     {{-- Computed analysis --}}
     <div class="va-out" id="vaOut">
         <x-add-to-event tool-key="venue-analyzer" tool-name="Venue Compatibility Check" :event-id="request('event_id')" />
+        {{-- Row 226 — post it as a request: bidding, urgent, or a draft. --}}
+        <x-post-as-request tool-key="venue-analyzer" tool-name="Venue Compatibility Check" form-id="vaForm" />
         <div class="va-verdict" id="vaVerdict"></div>
         <div class="va-metrics">
             <div class="va-metric"><b id="vaReq"></b><div class="l">Space Needed (sq ft)</div></div>

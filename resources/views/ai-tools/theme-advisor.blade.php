@@ -182,6 +182,8 @@
     {{-- Generated palette + guidance --}}
     <div class="ta-out" id="taOut">
         <x-add-to-event tool-key="theme-advisor" tool-name="Style & Inspiration" :event-id="request('event_id')" />
+        {{-- Row 226 — post it as a request: bidding, urgent, or a draft. --}}
+        <x-post-as-request tool-key="theme-advisor" tool-name="Style & Inspiration" form-id="taForm" />
         <div class="ta-sec">
             <h3>🎨 Your Suggested Palette</h3>
             <div class="ta-out-sum" id="taSummary"></div>

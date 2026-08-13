@@ -156,8 +156,8 @@
     {{-- Computed schedule --}}
     <div class="tb-out" id="tbOut">
         <x-add-to-event tool-key="timeline-builder" tool-name="Timeline Builder" :event-id="request('event_id')" />
-        {{-- Row 226 Phase 1 — the other leg: post it as a bidding request. --}}
-        <x-post-as-bsr tool-key="timeline-builder" tool-name="Timeline Builder" form-id="tbForm" />
+        {{-- Row 226 — post it as a request: bidding, urgent, or a draft. --}}
+        <x-post-as-request tool-key="timeline-builder" tool-name="Timeline Builder" form-id="tbForm" />
         <div class="tb-out-summary" id="tbSummary"></div>
         <div class="tb-card">
             <h3>📋 Suggested Run-of-Show</h3>
