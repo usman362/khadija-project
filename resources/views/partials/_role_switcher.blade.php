@@ -84,7 +84,7 @@
         border-color: #6366f1;
     }
     [data-theme="light"] .rs-btn-enable {
-        color: #6366f1;
+        color: #4f46e5;   /* 4.47 -> 6.29 on white */
     }
 
     @media (max-width: 768px) {

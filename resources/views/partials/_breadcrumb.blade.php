@@ -6,11 +6,11 @@
     $bcRole = $bcUser?->activeRole();
 
     if ($bcRole === 'professional') {
-        $bcType = 'Professional'; $bcDash = 'professional.dashboard'; $bcAccent = '#2563eb';
+        $bcType = 'Professional'; $bcDash = 'professional.dashboard'; $bcAccent = '#2563eb'; // 5.17 on white
     } elseif ($bcRole === 'client') {
-        $bcType = 'Client'; $bcDash = 'client.dashboard'; $bcAccent = '#ea580c';
+        $bcType = 'Client'; $bcDash = 'client.dashboard'; $bcAccent = '#c2410c';   // 3.56 -> 5.18 on white
     } elseif ($bcUser?->hasRole('influencer')) {
-        $bcType = 'Influencer'; $bcDash = 'influencer.dashboard'; $bcAccent = '#16a34a';
+        $bcType = 'Influencer'; $bcDash = 'influencer.dashboard'; $bcAccent = '#15803d'; // 3.28 -> 4.72 on white
     } else {
         $bcType = 'Account'; $bcDash = null; $bcAccent = '#64748b';
     }

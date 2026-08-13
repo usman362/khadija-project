@@ -99,12 +99,15 @@
             --accent-purple: #a855f7;
             --accent-purple-soft: rgba(168, 85, 247, 0.1);
             /* Darker step of each ramp — clears 4.5:1 on white and on the tints. */
-            --ok-text: #047857;
-            --warn-text: #b45309;
-            --bad-text: #b91c1c;
-            --brand-text: #c2410c;
-            --info-text: #1d4ed8;
-            --accent-text: #4338ca;
+            /* Contrast: these sit on their own 15%-tinted backgrounds, not on
+               plain white, so they need to clear 4.5:1 against the TINT. warn
+               measured 4.30 and brand 4.25/4.44 there — one step darker each. */
+            --ok-text: #065f46;
+            --warn-text: #92400e;
+            --bad-text: #991b1b;
+            --brand-text: #9a3412;
+            --info-text: #1e40af;
+            --accent-text: #3730a3;
         }
 
         [data-theme="light"] .cl-navbar {
@@ -845,7 +848,10 @@
         }
 
         .cl-btn-primary {
-            background: linear-gradient(135deg, #f97316, #ea580c);
+            /* Contrast: white on #f97316 measured 2.80:1. Both stops carry the
+               label, so both moved — the light end is the one it has to
+               survive. */
+            background: linear-gradient(135deg, #c2410c, #9a3412);
             color: #fff;
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
         }
@@ -1378,7 +1384,7 @@
         {{-- Row 122 — the client portal had no way to reach the platform at
              all. Every other portal's "Contact Support" either went nowhere or
              went to the wrong place; this side simply had nothing. --}}
-        <a href="{{ route('forms.create', 'support_request') }}" class="cl-nav-item" style="margin:0 12px 8px;">
+        <a href="{{ route('forms.create', 'support_request') }}" class="cl-nav-link" style="margin:0 12px 8px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.7 8a7 7 0 0 0-13.4 0"/><path d="M3 14v-2a2 2 0 0 1 2-2h1v6H5a2 2 0 0 1-2-2z"/><path d="M21 14v-2a2 2 0 0 0-2-2h-1v6h1a2 2 0 0 0 2-2z"/><path d="M18 16v1a3 3 0 0 1-3 3h-3"/></svg>
             <span>Contact Support</span>
         </a>

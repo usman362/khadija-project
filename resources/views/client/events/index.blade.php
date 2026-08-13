@@ -63,7 +63,7 @@
         cursor: pointer; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
     }
     .mg-filter-btn svg { width: 14px; height: 14px; }
-    .mg-filter-btn.coral { background: #f97316; color: #fff; border-color: #f97316; }
+    .mg-filter-btn.coral { background: #c2410c; color: #fff; border-color: #c2410c; }  /* 2.80 -> 5.18 */
 
     /* Sub-tabs */
     .mg-subtabs { display: flex; gap: 22px; border-bottom: 1px solid var(--border-color); margin-bottom: 4px; }
@@ -417,7 +417,7 @@
 
     {{-- Header button row (greeting lives in the topbar) --}}
     <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
-        <button class="cl-btn cl-btn-primary" style="background:#f97316;border-color:#f97316;" onclick="window.location.href='{{ route('client.post-event.choose') }}'">
+        <button class="cl-btn cl-btn-primary" style="background:#c2410c;border-color:#c2410c;" onclick="window.location.href='{{ route('client.post-event.choose') }}'">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Post New Event
         </button>
@@ -821,7 +821,7 @@
                             @if(! $event->is_published)
                                 {{-- A draft's one job is to be finished. --}}
                                 <a href="{{ route('client.events.show', $event) }}" class="cl-btn cl-btn-primary cl-btn-sm"
-                                   style="background:#f97316;border-color:#f97316;">Continue Draft</a>
+                                   style="background:#c2410c;border-color:#c2410c;">Continue Draft</a>
                                 <form method="POST" action="{{ route('client.events.publish', $event) }}" style="display:inline;">
                                     @csrf
                                     <button type="submit" class="cl-btn cl-btn-ghost cl-btn-sm">Publish</button>

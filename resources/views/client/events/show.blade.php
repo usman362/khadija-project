@@ -118,7 +118,7 @@
                 @if(!$event->is_published)
                     <form method="POST" action="{{ route('client.events.publish', $event) }}" style="display:inline;">
                         @csrf
-                        <button type="submit" class="cl-btn cl-btn-primary cl-btn-sm" style="background:#f97316;border-color:#f97316;">
+                        <button type="submit" class="cl-btn cl-btn-primary cl-btn-sm" style="background:#c2410c;border-color:#c2410c;">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
                             Publish Event
                         </button>
@@ -397,7 +397,7 @@
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
                         </div>
                         <p style="color: var(--text-muted); font-size: 14px; margin-bottom:14px;">No professionals yet. {{ $event->is_published ? 'Find and invite pros to start receiving proposals.' : 'Publish your event so professionals can find it — or search and invite them directly.' }}</p>
-                        <a href="{{ route('client.search.index') }}" class="cl-btn cl-btn-primary cl-btn-sm" style="background:#f97316;border-color:#f97316;">Find Professionals</a>
+                        <a href="{{ route('client.search.index') }}" class="cl-btn cl-btn-primary cl-btn-sm" style="background:#c2410c;border-color:#c2410c;">Find Professionals</a>
                     </div>
                 @endif
             </div>
@@ -541,7 +541,7 @@
             <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
                 <h3 style="font-size:16px;font-weight:600;">Proposals received ({{ $bids->count() }})</h3>
                 @if($bids->count() > 1)
-                    <a class="cl-btn cl-btn-primary cl-btn-sm" style="background:#f97316;border-color:#f97316;"
+                    <a class="cl-btn cl-btn-primary cl-btn-sm" style="background:#c2410c;border-color:#c2410c;"
                        href="{{ route('client.proposals.compare', $event) }}">Compare proposals</a>
                 @endif
             </div>
@@ -700,7 +700,7 @@
                 </div>
                 <div class="cl-modal-footer">
                     <button type="button" class="cl-btn cl-btn-ghost" onclick="document.getElementById('editEventModal').classList.remove('show')">Cancel</button>
-                    <button type="submit" class="cl-btn cl-btn-primary" style="background:#f97316;border-color:#f97316;">
+                    <button type="submit" class="cl-btn cl-btn-primary" style="background:#c2410c;border-color:#c2410c;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
                         Save Changes
                     </button>

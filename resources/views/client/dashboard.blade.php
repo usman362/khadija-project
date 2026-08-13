@@ -111,7 +111,7 @@
     .od-emerg-btn {
         display: inline-flex; align-items: center; justify-content: center; gap: 7px;
         width: 100%; padding: 10px;
-        background: #ef4444; color: #fff;
+        background: #dc2626; color: #fff;
         border-radius: 9px; font-size: 12px; font-weight: 700;
         text-decoration: none;
     }
@@ -271,7 +271,7 @@
     .od-cal-day.has-event { background: rgba(249, 115, 22, 0.05); }
     .od-cal-num { font-weight: 600; color: var(--text-primary); font-size: 11.5px; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; }
     /* Today — number sits in a solid orange circle (matches reference). */
-    .od-cal-day.today .od-cal-num { background: #f97316; color: #fff; border-radius: 50%; font-weight: 800; }
+    .od-cal-day.today .od-cal-num { background: #c2410c; color: #fff;  /* 2.80 -> 5.18 */ border-radius: 50%; font-weight: 800; }
     .od-cal-event {
         font-size: 8.5px; line-height: 1.15;
         padding: 2px 4px;
@@ -410,7 +410,9 @@
         position: relative;
         width: 84px; height: 84px;
         border-radius: 50%;
-        background: radial-gradient(circle at 50% 35%, #fcd34d 0%, #f59e0b 55%, #d97706 100%);
+        /* Contrast: white numerals on #fcd34d measured 1.44:1 against a 3.0
+           requirement. The lightest stop is what the text has to survive. */
+        background: radial-gradient(circle at 50% 35%, #d97706 0%, #b45309 55%, #92400e 100%);
         display: flex; align-items: center; justify-content: center;
         color: #fff;
         font-size: 24px; font-weight: 900;
