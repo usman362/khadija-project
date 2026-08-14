@@ -592,6 +592,32 @@ class ProfessionalBiddingBoardController extends Controller
     }
 
     /** Map a real Event to the bidding-board gig card shape. */
+    /**
+     * What a professional is shown for a request's budget.
+     *
+     * Only figures the client actually gave. A range needs both ends; with one
+     * end only, that end is stated as a ceiling rather than padded outwards
+     * into a range they never offered.
+     */
+    private function budgetLabel(Event $e, string $type): string
+    {
+        $min = $e->budget_min !== null ? (float) $e->budget_min : null;
+        $max = $e->budget_max !== null ? (float) $e->budget_max : null;
+        $one = $e->budget !== null ? (float) $e->budget : null;
+
+        if ($type === 'ER') {
+            return $one !== null ? '$' . number_format($one) : 'Open budget';
+        }
+
+        if ($min !== null && $max !== null && $max > $min) {
+            return '$' . number_format($min) . ' – $' . number_format($max);
+        }
+
+        $single = $max ?? $min ?? $one;
+
+        return $single !== null ? 'Up to $' . number_format($single) : 'Open budget';
+    }
+
     private function mapEvent(Event $e, int $bidCount = 0, ?Bid $myBid = null, ?\App\Models\User $viewer = null, ?\App\Models\Category $service = null): array
     {
         // On an MSR this card is ONE service line of the request (row 162).
@@ -638,14 +664,21 @@ class ProfessionalBiddingBoardController extends Controller
              */
             'guests' => $e->guest_count ?: null,
             'tags'   => $cats ?: ['General'],
-            // ER budget is a single fixed figure; SSR/MSR quote a range.
-            // One budget covers the whole request. See the note above the
-            // per-service split: dividing it would invent a figure per line.
-            'budget' => $e->budget
-                ? ($type === 'ER'
-                    ? '$' . number_format($e->budget)
-                    : '$' . number_format($e->budget * 0.85) . ' – $' . number_format($e->budget))
-                : 'Open budget',
+            /*
+             * The client's own range, not a manufactured one.
+             *
+             * This read `budget * 0.85` to `budget` — a lower bound nobody
+             * entered, over a `budget` column that persist() fills with the
+             * range's FLOOR. So a client offering $2,000–$3,000 was shown to
+             * every professional as $1,700–$2,000: the top of what they saw
+             * was the bottom of what was offered, and both figures were
+             * invented while budget_min and budget_max sat in the same row
+             * unread. Professionals price against this.
+             *
+             * ER stays a single fixed figure. One budget still covers the
+             * whole request — see the note above the per-service split.
+             */
+            'budget' => $this->budgetLabel($e, $type),
             'budget_is_whole_request' => $service !== null,
             /*
              * Rows 106, 139, 141 and 151 — one countdown, one format, and
