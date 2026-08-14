@@ -18,16 +18,16 @@
     $selectedVals = collect($selected)->map(fn ($v) => (string) $v)->all();
     $valOf = fn ($cat) => (string) ($valueField === 'name' ? $cat->name : $cat->id);
 
-    // Event → services cascade: flatten each event type's themes to keywords.
-    $etThemes = config('event-service-map.themes', []);
-    $svcCascade = [];
-    foreach (config('event-service-map.map', []) as $type => $themes) {
-        $kw = [];
-        foreach ($themes as $t) {
-            $kw = array_merge($kw, $etThemes[$t] ?? []);
-        }
-        $svcCascade[$type] = array_values(array_unique($kw));
-    }
+    /*
+     * Event type → what matters for it, from Peter's Category Masterlist.
+     *
+     * This replaces config/event-service-map.php, a hand-written keyword guess
+     * that named 48 event types of which only 22 exist — so on 84 of the 106
+     * live event types it did nothing, while the approved 139-row matrix
+     * covering all 106 was never read. See App\Domain\Taxonomy\ServiceRelevance
+     * for why this ORDERS rather than hides.
+     */
+    $relevance = \App\Domain\Taxonomy\ServiceRelevance::forBrowser();
 @endphp
 
 @once
@@ -74,6 +74,14 @@
     .svc-cascade b { font-weight: 800; }
     .svc-cascade button { margin-left: auto; border: none; background: none; color: var(--svc-strong, #ea580c); font-weight: 800; font-size: 12px; cursor: pointer; text-decoration: underline; padding: 0; font-family: inherit; }
     .svc-item.cascade-hide { display: none; }
+    /* The tier the Category Masterlist gives this service for the chosen event
+       type. Shown so the order has a stated reason rather than being a silent
+       reshuffle the client cannot account for. */
+    .svc-item[data-tier]::after { content: attr(data-tier); margin-left: auto; font-size: 10px; font-weight: 800;
+        letter-spacing: .3px; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; }
+    .svc-item[data-tier="Essential"]::after  { background: #dcfce7; color: #15803d; }
+    .svc-item[data-tier="Common"]::after     { background: #e0e7ff; color: #3730a3; }
+    .svc-item[data-tier="Occasional"]::after { background: var(--bg-muted, #f3f4f6); color: var(--text-muted, #6b7280); }
 
     @media (max-width: 900px) { .svc-grid { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 680px) { .svc-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -84,7 +92,7 @@
 @push('scripts')
 <script>
 (function () {
-    var CASCADE = @json($svcCascade);
+    var RELEVANCE = @json($relevance);
     function initPicker(root) {
         var grid     = root.querySelector('.svc-grid');
         var selBox   = root.querySelector('.svc-selected');
@@ -175,28 +183,65 @@
             refresh();
         });
 
-        // Event → services cascade: narrow the grid to what fits the chosen type.
+        /*
+         * Event type → what matters for it, from the Category Masterlist.
+         *
+         * Everything stays on the page. A tier is a ranking, not a permission:
+         * the old keyword version HID every service it did not recognise, which
+         * both lost the Essential/Common/Occasional distinction the file exists
+         * to make and — because it recognised only 22 of 106 event types — did
+         * nothing at all most of the time. Ordering keeps the client's choice
+         * intact and still puts the right things first.
+         *
+         * The original DOM order is remembered so clearing the event type puts
+         * the grid back exactly as it was rather than leaving it shuffled.
+         */
         var cascadeBox  = root.querySelector('[data-svc-cascade]');
         var cascadeType = root.querySelector('[data-svc-cascade-type]');
         var cascadeAll  = root.querySelector('[data-svc-cascade-all]');
-        function applyCascade(type) {
-            var kws = type ? CASCADE[type] : null;
-            var items = grid.querySelectorAll('.svc-item');
-            if (!kws || !kws.length) {
-                items.forEach(function (i) { i.classList.remove('cascade-hide'); });
+        var naturalOrder = Array.prototype.slice.call(grid.querySelectorAll('.svc-item'));
+
+        function tierOf(item, tiers) {
+            var parent = item.getAttribute('data-parent');
+            return (parent && tiers) ? (tiers[parent] || null) : null;
+        }
+
+        function applyRelevance(type) {
+            var arche = type ? RELEVANCE.archetypeOf[String(type).toLowerCase()] : null;
+            var tiers = arche ? RELEVANCE.tiers[arche] : null;
+
+            naturalOrder.forEach(function (i) {
+                i.classList.remove('cascade-hide');
+                i.removeAttribute('data-tier');
+            });
+
+            if (!tiers) {
+                // Back to the order the server sent, untouched.
+                naturalOrder.forEach(function (i) { grid.insertBefore(i, grid.querySelector('.svc-none')); });
                 if (cascadeBox) cascadeBox.hidden = true;
                 return;
             }
-            items.forEach(function (i) {
-                var n = i.getAttribute('data-name') || '';
-                var keep = kws.some(function (k) { return n.indexOf(k) !== -1; }) || i.querySelector('input').checked;
-                i.classList.toggle('cascade-hide', !keep);
+
+            var ranked = naturalOrder.slice().sort(function (a, b) {
+                var ra = RELEVANCE.order.indexOf(tierOf(a, tiers));
+                var rb = RELEVANCE.order.indexOf(tierOf(b, tiers));
+                if (ra === -1) ra = RELEVANCE.order.length;
+                if (rb === -1) rb = RELEVANCE.order.length;
+                return ra - rb || naturalOrder.indexOf(a) - naturalOrder.indexOf(b);
             });
+
+            ranked.forEach(function (i) {
+                var t = tierOf(i, tiers);
+                if (t) i.setAttribute('data-tier', t);
+                grid.insertBefore(i, grid.querySelector('.svc-none'));
+            });
+
             if (cascadeType) cascadeType.textContent = type;
             if (cascadeBox) cascadeBox.hidden = false;
         }
-        if (cascadeAll) cascadeAll.addEventListener('click', function () { applyCascade(null); });
-        document.addEventListener('etp:change', function (e) { applyCascade(e.detail && e.detail.value); });
+
+        if (cascadeAll) cascadeAll.addEventListener('click', function () { applyRelevance(null); });
+        document.addEventListener('etp:change', function (e) { applyRelevance(e.detail && e.detail.value); });
 
         refresh();
     }
@@ -228,13 +273,22 @@
     </div>
     <div class="svc-cascade" data-svc-cascade hidden>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        Showing services that fit <b data-svc-cascade-type></b>.
-        <button type="button" data-svc-cascade-all>Show all</button>
+        {{-- Says ordered, because ordered is what happens. The previous copy
+             read "Showing services that fit …" with a "Show all" button beside
+             it, which told the client things were being hidden from them. Now
+             nothing is. --}}
+        Sorted for <b data-svc-cascade-type></b> — everything is still here, most relevant first.
+        <button type="button" data-svc-cascade-all>Sort A–Z</button>
     </div>
     <div class="svc-grid">
         @foreach($svcList as $cat)
             @php($val = $valOf($cat))
-            <label class="svc-item {{ in_array($val, $selectedVals) ? 'sel' : '' }}" data-name="{{ \Illuminate\Support\Str::lower($cat->name) }}">
+            {{-- data-parent is the SERVICE CATEGORY this service sits under.
+                 The masterlist ranks categories, not individual services, so
+                 that id is what the relevance lookup needs. --}}
+            <label class="svc-item {{ in_array($val, $selectedVals) ? 'sel' : '' }}"
+                   data-name="{{ \Illuminate\Support\Str::lower($cat->name) }}"
+                   data-parent="{{ $cat->parent_id }}">
                 <input type="checkbox" name="{{ $name }}[]" value="{{ $val }}" @checked(in_array($val, $selectedVals))>
                 <span class="svc-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
                 <span class="svc-text">{{ $cat->name }}</span>

@@ -50,6 +50,11 @@ class ImportTaxonomyV2 extends Command
             }
         });
 
+        // The archetype and tier maps are cached forever, so a reimport that
+        // did not clear them would leave the picker sorting by the taxonomy it
+        // just replaced — correct data on disk, stale answers on screen.
+        \App\Domain\Taxonomy\ServiceRelevance::forget();
+
         $this->report();
 
         return self::SUCCESS;
