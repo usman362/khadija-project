@@ -65,7 +65,7 @@
     .et-tile h4 { font-size: 15px; font-weight: 800; color: #fff; margin: 0 0 2px; }
     .et-tile p { font-size: 11.5px; color: #e2e8f0; margin: 0; }
     .et-tile .arw { position: absolute; right: 12px; bottom: 12px; width: 26px; height: 26px; border-radius: 50%; background: #fff; color: var(--et); display: flex; align-items: center; justify-content: center; font-weight: 800; }
-    .et-subgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+    .et-subgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
 
     /* Popular Event Types cards */
     .et-pop { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px; }
@@ -100,6 +100,7 @@
     .et-cta .b1 { background: var(--et); color: #fff; border-radius: 11px; padding: 11px 20px; font-weight: 800; text-decoration: none; font-size: 14px; }
     .et-cta .b2 { background: #fff; color: var(--et); border: 1px solid var(--et); border-radius: 11px; padding: 11px 20px; font-weight: 800; text-decoration: none; font-size: 14px; }
 
+    @media (max-width: 1180px) { .et-subgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 1000px) { .et-browse { grid-template-columns: 1fr; } .et-rail { display: flex; flex-wrap: wrap; } .et-rail a { flex: 1 1 44%; } .et-pop { grid-template-columns: repeat(2,1fr); } .et-more { grid-template-columns: repeat(2,1fr); } }
     @media (max-width: 640px) { .et-fgrid, .et-subgrid { grid-template-columns: 1fr; } .et-hero-card { grid-row: auto; } .et-pop { grid-template-columns: 1fr; } .et-cta { flex-direction: column; text-align: center; } }
 </style>

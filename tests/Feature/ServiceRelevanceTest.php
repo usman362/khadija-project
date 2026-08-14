@@ -124,4 +124,39 @@ class ServiceRelevanceTest extends TestCase
 
         $this->assertStringContainsString('data-parent="{{ $cat->parent_id }}"', $markup);
     }
+
+    /* ── The word "Category" meant three things at once ─────── */
+
+    /**
+     * The Owner's note: the title "Categories" should say Event or Event Type,
+     * and "Shop Packages is in two locations, it sounds repetitive".
+     *
+     * Both are the same problem. This page's default view is the event-type
+     * wall — 106 occasions — while every heading on it said "Category", which
+     * on this site also means one of the 27 service categories and, loosely,
+     * one of the 241 services. One word for three tiers is how "Trivia Night"
+     * came to sit under a heading about categories without looking wrong to
+     * anyone who built it.
+     */
+    public function test_the_page_names_the_thing_it_is_actually_showing(): void
+    {
+        $markup = $this->stripComments(resource_path('views/events-categories.blade.php'));
+
+        $this->assertStringContainsString('Explore by <span class="b">Event Type</span>', $markup);
+        $this->assertStringNotContainsString('Explore by <span class="b">Category</span>', $markup);
+        $this->assertStringNotContainsString('Search categories or services', $markup);
+    }
+
+    /** Shop Packages had its own place in the bar and a second one in a menu. */
+    public function test_shop_packages_appears_once_in_the_public_nav(): void
+    {
+        $nav = $this->stripComments(resource_path('views/layouts/landing.blade.php'));
+
+        $this->assertSame(1, substr_count($nav, 'Shop Packages'), 'the same link twice, two inches apart');
+    }
+
+    private function stripComments(string $path): string
+    {
+        return preg_replace('/\{\{--.*?--\}\}/s', '', file_get_contents($path));
+    }
 }

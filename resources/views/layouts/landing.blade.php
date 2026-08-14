@@ -216,11 +216,15 @@
                 </div>
             </div>
             <div class="lpn-item">
-                <span class="lpn-link">Categories <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg></span>
+                {{-- Was "Categories". What a client browses here is the occasion
+                     they are hosting, so it is named for that. --}}
+                <span class="lpn-link">Event Types <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg></span>
                 <div class="lpn-menu">
-                    <a href="{{ route('public.packages') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span style="display:flex;flex-direction:column;gap:1px;"><span style="font-weight:600;">Shop Packages</span><span style="font-size:11px;color:var(--muted);font-weight:500;">Browse complete event solutions</span></span></a>
+                    {{-- "Shop Packages" was here as well as in the bar above it —
+                         the same link twice, two inches apart. It keeps its own
+                         top-level place. --}}
                     <a href="{{ route('public.event-types') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3h.01"/><path d="M22 8h.01"/><path d="M15 2c0 2 .5 3.5 2 5"/><path d="M11.5 13.5 21 4"/></svg><span style="display:flex;flex-direction:column;gap:1px;"><span style="font-weight:600;">Event Types</span><span style="font-size:11px;color:var(--muted);font-weight:500;">Browse by occasion</span></span></a>
-                    <a href="{{ route('events-categories') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><span style="display:flex;flex-direction:column;gap:1px;"><span style="font-weight:600;">View All Categories</span><span style="font-size:11px;color:var(--muted);font-weight:500;">Explore everything</span></span></a>
+                    <a href="{{ route('events-categories') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><span style="display:flex;flex-direction:column;gap:1px;"><span style="font-weight:600;">Everything We Cover</span><span style="font-size:11px;color:var(--muted);font-weight:500;">Event types, service categories and services</span></span></a>
                 </div>
             </div>
             <div class="lpn-item">

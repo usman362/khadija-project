@@ -58,6 +58,11 @@ class EventsCategoriesController extends Controller
             ? Category::active()->where('slug', $inSlug)->first()
             : null;
 
+        // Whether the grid below is purely the event-type wall. The page's
+        // headings say "event types" only while that is what it is showing;
+        // drilling into a branch or searching brings services in with them.
+        $eventTypeWall = false;
+
         $query = Category::active()->with('parent:id,name,slug');
 
         if ($branch) {
@@ -66,6 +71,7 @@ class EventsCategoriesController extends Controller
             // Unfiltered browse is the event-type wall. Services appear when
             // the visitor picks one from the Services list, or searches.
             $query->ofKind(Category::EVENT_TYPE);
+            $eventTypeWall = true;
         }
 
         if ($search !== '') {
@@ -92,6 +98,7 @@ class EventsCategoriesController extends Controller
             'branch'            => $branch,
             'search'            => $search,
             'isV2'              => $isV2,
+            'eventTypeWall'     => $eventTypeWall,
             'stats'             => [
                 'total'         => Category::active()->count(),
                 'parents'       => $isV2

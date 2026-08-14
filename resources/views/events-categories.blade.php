@@ -322,8 +322,12 @@
     {{-- ══════════════ HERO ══════════════ --}}
     <section class="ec-hero">
         <div class="lp-container">
-            <h1 class="ec-h1">Explore by <span class="b">Category</span> <span class="o">✨</span></h1>
-            <p class="ec-hero-sub">Every kind of event, every kind of professional — browse the categories we cover and find the right people for your occasion.</p>
+            {{-- "Category" everywhere on this page meant three different things
+                 at once — the occasion, the kind of service, and the service
+                 itself. The default view is the event-type wall, so that is what
+                 it is called. --}}
+            <h1 class="ec-h1">Explore by <span class="b">Event Type</span> <span class="o">✨</span></h1>
+            <p class="ec-hero-sub">Every kind of event, every kind of professional — browse the event types we cover and find the right people for your occasion.</p>
 
             {{-- Searches the category browser below. It used to post to /browse,
                  which sits behind auth — a guest typing here just landed on the
@@ -331,7 +335,7 @@
             <form action="{{ route('events-categories') }}" method="GET" class="ec-search" data-ec-filter>
                 <div class="ec-sfield">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="text" name="q" value="{{ $search }}" placeholder="Search categories or services...">
+                    <input type="text" name="q" value="{{ $search }}" placeholder="Search event types or services...">
                 </div>
                 <button type="submit" class="ec-find">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -384,8 +388,8 @@
         <div class="lp-container">
             <div class="ec-shead">
                 <div>
-                    <h2>Browse all <span class="b">Categories</span></h2>
-                    <p>Drill into the tree on the left, or search — every card opens that category's professionals.</p>
+                    <h2>Browse all <span class="b">{{ $eventTypeWall ? 'Event Types' : 'Results' }}</span></h2>
+                    <p>Drill into the tree on the left, or search — every card opens {{ $eventTypeWall ? "that event type's" : 'its' }} professionals.</p>
                 </div>
             </div>
 
@@ -399,7 +403,7 @@
                         <input type="hidden" name="in" value="{{ $branch?->slug }}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                         <input type="search" name="q" value="{{ $search }}" placeholder="Type 3+ letters to search…"
-                               aria-label="Search categories" autocomplete="off">
+                               aria-label="Search event types and services" autocomplete="off">
                     </form>
 
                     <div class="ec-side-title">{{ $isV2 ? 'Event Types' : 'Categories' }}</div>
@@ -408,7 +412,7 @@
                             @include('partials._ec-tree-item', ['categories' => $cats, 'depth' => 0, 'branch' => $branch])
                         </div>
                     @else
-                        <p class="ec-side-none">No categories yet.</p>
+                        <p class="ec-side-none">No event types yet.</p>
                     @endif
 
                     @if($serviceCats->isNotEmpty())
@@ -420,7 +424,10 @@
 
                     <div class="ec-side-title ec-side-title-mt">Quick Stats</div>
                     <div class="ec-stats">
-                        <div class="ec-stat"><span>Total Categories</span><b class="v-b">{{ number_format($stats['total']) }}</b></div>
+                        {{-- "Total Categories" counted event types, service categories and
+                             services together — three different things under one word,
+                             which is what made the number unreadable. --}}
+                        <div class="ec-stat"><span>Everything We Cover</span><b class="v-b">{{ number_format($stats['total']) }}</b></div>
                         <div class="ec-stat"><span>{{ $isV2 ? 'Event Types' : 'Main Categories' }}</span><b class="v-o">{{ number_format($stats['parents']) }}</b></div>
                         <div class="ec-stat"><span>{{ $isV2 ? 'Service Categories' : 'Subcategories' }}</span><b class="v-g">{{ number_format($stats['subcategories']) }}</b></div>
                         <div class="ec-stat"><span>Showing</span><b class="v-n" id="ecShowing">{{ number_format($stats['showing']) }}</b></div>
