@@ -145,6 +145,7 @@ class ClientBsrController extends Controller
             'title'             => $event->title,
             'starts_at'         => $event->starts_at?->format('Y-m-d\TH:i'),
             'location'          => $event->location,
+            'event_state'       => $event->state,
             'venue'             => $event->venue,
             'guest_count'       => $event->guest_count,
             'description'       => $event->description,
@@ -369,6 +370,9 @@ class ClientBsrController extends Controller
                 'title'       => ['required', 'string', 'max:200'],
                 'starts_at'   => ['nullable', 'date'],
                 'location'    => ['nullable', 'string', 'max:200'],
+                // R38 / R71 — the state the WORK happens in, asked here beside
+                // the address rather than assumed from the account.
+                'event_state' => ['nullable', 'string', 'in:' . implode(',', array_keys(config('geo.allowed_states', [])))],
                 'venue'       => ['nullable', 'string', 'max:200'],
                 'guest_count' => ['nullable', 'integer', 'min:1', 'max:1000000'],
             ],
@@ -479,6 +483,7 @@ class ClientBsrController extends Controller
             'characteristic'    => $d['characteristic'] ?? 'standard',
             'starts_at'         => $startsAt,
             'location'          => $d['location'] ?? null,
+            'state'             => \App\Support\StateMatching::requestState($user, $d['event_state'] ?? null),
             'venue'             => $d['venue'] ?? null,
             'guest_count'       => $d['guest_count'] ?? null,
             'budget_min'        => $d['budget_min'] ?? null,

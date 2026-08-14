@@ -151,6 +151,12 @@ class ClientDirectOfferController extends Controller
             'created_by'   => $user->id,
             'client_id'    => $user->id,
             'supplier_id'  => $pro->id,            // the invited professional
+            // R38 / R71 — a Direct Offer needs no state question: the client
+            // chose this professional, and the gate above has already refused
+            // any pair across a state line. So the work is where that person
+            // is, and taking it from them keeps the offer and the rule
+            // agreeing by construction rather than by coincidence.
+            'state'        => StateMatching::stateOf($pro),
             'source'       => 'direct_offer',
         ]);
 

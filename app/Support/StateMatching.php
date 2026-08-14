@@ -88,6 +88,35 @@ final class StateMatching
         return $query->where($column, $state ?? '__none__');
     }
 
+    /**
+     * The state a REQUEST belongs to — R38's closing amendment, and R71.
+     *
+     * The rule as locked compares professional.state to the EVENT's state, and
+     * the review that locked it was explicit about why: a client registered in
+     * Virginia may hold an event at their office in Maryland. Before this, the
+     * event's state was stamped from the client's account, so the column was
+     * named for the event and filled from the person — the very substitution
+     * the rule forbids. A Maryland event then went out to Virginia
+     * professionals and to nobody who could actually work it.
+     *
+     * The client's own state stays the DEFAULT, because it is right nearly
+     * every time and asking twice for the same answer is its own kind of bug.
+     * It is now a default rather than the only possibility.
+     *
+     * An unsupported state is not honoured: the seven jurisdictions are the
+     * whole marketplace, so a request outside them has nobody to reach.
+     */
+    public static function requestState(?User $client, ?string $chosen): ?string
+    {
+        $chosen = strtoupper(trim((string) $chosen));
+
+        if ($chosen !== '' && array_key_exists($chosen, config('geo.allowed_states', []))) {
+            return $chosen;
+        }
+
+        return self::stateOf($client);
+    }
+
     /** Narrow a query of USERS by the state on their profile. */
     public static function scopeUsersForViewer(Builder $query, ?User $viewer): Builder
     {

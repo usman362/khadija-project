@@ -107,15 +107,25 @@ class BestMatchDirectOfferTest extends TestCase
         $this->assertStringNotContainsString('vm-offer', $html);
     }
 
-    /** The link lands on a form that opens, with that professional chosen. */
+    /**
+     * The link lands on a form that opens, with that professional chosen.
+     *
+     * The name is set rather than left to the factory: this assertion ran
+     * unescaped, so a faker name carrying an apostrophe rendered as
+     * O&#039;Brien and failed perhaps one run in twenty. A test that fails
+     * occasionally is worse than one that fails always — it teaches people to
+     * re-run rather than to look.
+     */
     public function test_the_offer_link_opens_the_form_on_that_professional(): void
     {
         $pro    = $this->user('professional', 'MD');
         $client = $this->user('client', 'MD');
 
+        $pro->update(['name' => 'Bayside Sound']);
+
         $this->actingAs($client)
             ->get(route('client.direct-offers.create', ['pro' => $pro->id]))
             ->assertOk()
-            ->assertSee($pro->name, false);
+            ->assertSee('Bayside Sound');
     }
 }

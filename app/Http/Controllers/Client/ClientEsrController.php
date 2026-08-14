@@ -62,6 +62,9 @@ class ClientEsrController extends Controller
             'reason'       => ['required', 'in:' . implode(',', array_keys(self::REASONS))],
             'needed_by'    => ['required', 'date'],
             'location'     => ['nullable', 'string', 'max:200'],
+            // R38 / R71 — the state the work happens in. See
+            // StateMatching::requestState for why this is asked, not assumed.
+            'event_state'  => ['nullable', 'string', 'in:' . implode(',', array_keys(config('geo.allowed_states', [])))],
             'guest_count'  => ['nullable', 'integer', 'min:1', 'max:1000000'],
             'description'  => ['nullable', 'string', 'max:2000'],
             'budget_min'   => ['nullable', 'integer', 'min:0'],
@@ -128,6 +131,7 @@ class ClientEsrController extends Controller
             'starts_at'    => $data['needed_by'],
             'budget'       => $data['budget_min'] ?? null,
             'location'     => $data['location'] ?? null,
+            'state'        => \App\Support\StateMatching::requestState($user, $data['event_state'] ?? null),
             'guest_count'  => $data['guest_count'] ?? null,
             'created_by'   => $user->id,
             'client_id'    => $user->id,

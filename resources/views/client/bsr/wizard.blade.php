@@ -36,6 +36,7 @@
     .bw-field { margin-bottom: 16px; }
     .bw-field label { display: block; font-size: 12.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
     .bw-field .req { color: var(--bad-text); }
+    .bw-field .bw-hint { font-size: 11.5px; color: var(--text-muted); margin-top: 5px; line-height: 1.4; }
     .bw-field input[type=text], .bw-field input[type=number], .bw-field input[type=datetime-local],
     .bw-field select, .bw-field textarea {
         width: 100%; background: var(--bg-page, transparent); border: 1px solid var(--border-color);
@@ -215,6 +216,20 @@
             <div class="bw-field">
                 <label>Location</label>
                 <input type="text" name="location" value="{{ $data['location'] ?? '' }}" placeholder="Baltimore, MD">
+            </div>
+            <div class="bw-field">
+                {{-- R38 / R71 — the state the event happens in, which decides
+                     which professionals ever see this request. Defaulted to the
+                     client's own state because that is the answer nearly every
+                     time; asked because it is not the answer every time. --}}
+                <label for="bwEventState">State the event is in</label>
+                <select name="event_state" id="bwEventState">
+                    @foreach(config('geo.allowed_states', []) as $code => $name)
+                        <option value="{{ $code }}"
+                            @selected(($data['event_state'] ?? auth()->user()?->profile?->state) === $code)>{{ $name }}</option>
+                    @endforeach
+                </select>
+                <p class="bw-hint">Professionals in this state are the ones who can bid.</p>
             </div>
             <div class="bw-field">
                 <label>Venue</label>
