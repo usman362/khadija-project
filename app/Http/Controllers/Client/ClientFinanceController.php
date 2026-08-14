@@ -77,24 +77,31 @@ class ClientFinanceController extends Controller
 
         $transactions = $query->paginate(6)->withQueryString();
 
-        // Top-card metrics (escrow/Stripe split is a derived placeholder).
+        /*
+         * Only figures that come from a booking row.
+         *
+         * These cards used to carry "IRS 1099 Liability" (total x 0.27), "Net
+         * Cash Position" (total x 0.20), "Stripe Outflow" (settled x 0.55),
+         * processing fees at 2.9%, and a 62/38 gateway split — every one of
+         * them a percentage applied to a real total and then shown to the
+         * client as a figure. A source comment called them placeholders
+         * pending the Stripe Connect sandbox, but the comment was in the file
+         * and the numbers were on the screen. The 1099 line was the worst of
+         * them: a tax figure nobody calculated, presented to someone who might
+         * act on it at tax time. There is also no Stripe Connect integration
+         * to be pending — neither professionals nor influencers are paid
+         * through one.
+         *
+         * What is left is the Owner's own three states, which the booking
+         * status already distinguishes: agreed but not yet paid, actually
+         * paid, and still awaiting the professional's confirmation. A budget
+         * is a plan; only these are money.
+         */
         $stats = [
-            'stripe_outflow' => round($s['settled'] * 0.55),     // ~ portion settled via Stripe
-            'escrow_locked'  => $s['inEscrow'],
-            'tax_liability'  => round($s['total'] * 0.27),        // 1099 reportable estimate
-            'net_cash'       => max(0, round($s['total'] * 0.20)),// available balance proxy
-            'total_payments' => $s['total'],
-            'processing_fees'=> round($s['settled'] * 0.029, 2),  // ~2.9% Stripe fee
-        ];
-
-        // Payment-methods summary + fee breakdown (derived split).
-        $methods = [
-            'escrow' => round($s['total'] * 0.62),
-            'stripe' => round($s['total'] * 0.38),
-        ];
-        $fees = [
-            'platform' => round($s['settled'] * 0.029, 2),
-            'gateway'  => round($s['settled'] * 0.016, 2),
+            'agreed_unpaid' => $s['inEscrow'],   // confirmed — a price both sides accepted
+            'paid'          => $s['settled'],    // completed — money that actually moved
+            'awaiting'      => $s['pending'],    // requested — not yet accepted
+            'total_agreed'  => $s['total'],
         ];
 
         $activeEvent = Event::where('client_id', $user->id)
@@ -102,7 +109,7 @@ class ClientFinanceController extends Controller
             ->latest('starts_at')->first();
 
         return view('client.finance.payments', compact(
-            'stats', 'transactions', 'methods', 'fees', 'activeEvent'
+            'stats', 'transactions', 'activeEvent'
         ));
     }
 
@@ -119,12 +126,22 @@ class ClientFinanceController extends Controller
         $vendors = $query->paginate(8)->withQueryString();
 
         // Top cards — for a planner "earnings" reads as managed project funds.
+        /*
+         * Same three states as the payments page, on a client screen that used
+         * to call them earnings.
+         *
+         * "Available Balance … Ready to allocate" was total - settled -
+         * inEscrow: an arithmetic remainder presented as a balance the client
+         * could spend. The Owner's Budget-Does-Not-Equal-Funding rule names
+         * exactly this — a planning number must never be shown as money held.
+         * There is no balance to show, so none is shown.
+         */
         $stats = [
-            'total_earnings'   => $s['total'],     // total project value managed
-            'withdrawn'        => $s['settled'],   // released to vendors
-            'pending_release'  => $s['inEscrow'],
-            'available'        => max(0, round($s['total'] - $s['settled'] - $s['inEscrow'])),
-            'pending_count'    => Booking::where('client_id', $user->id)->where('status', 'confirmed')->count(),
+            'total_agreed'   => $s['total'],
+            'paid'           => $s['settled'],
+            'agreed_unpaid'  => $s['inEscrow'],
+            'awaiting'       => $s['pending'],
+            'pending_count'  => Booking::where('client_id', $user->id)->where('status', 'confirmed')->count(),
         ];
 
         // Revenue-pipeline donut split.

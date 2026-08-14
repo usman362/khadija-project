@@ -174,7 +174,8 @@
                 <a href="{{ route('client.search.index', ['q' => $name]) }}" class="vh-svc">
                     <div class="vh-svc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
                     <div class="vh-svc-name">{{ \Illuminate\Support\Str::limit($name, 18) }}</div>
-                    <div class="vh-svc-cnt">{{ rand(80, 220) }} pros</div>
+                    {{-- A professional count stood here as rand(80, 220), so it
+                         changed on every reload. Nothing counts these yet. --}}
                 </a>
             @endforeach
         </div>
@@ -185,7 +186,10 @@
         <div class="vh-sec-head"><span class="vh-sec-title">Top Matching Professionals</span><a href="{{ route('client.search.index') }}" class="vh-sec-link">View all matches →</a></div>
         <div class="vh-pro-grid">
             @forelse($pros as $i => $pro)
-                @php $rate = $pro->profile?->hourly_rate ?: rand(80, 400); $match = [98, 95, 93, 91][$i] ?? 90; @endphp
+                {{-- The rate was rand(80, 400) when a professional had not
+                     published one: a price invented for a named person, and a
+                     different price each time the page loaded. --}}
+                @php $rate = $pro->profile?->hourly_rate; $match = [98, 95, 93, 91][$i] ?? 90; @endphp
                 <div class="vh-pro">
                     <div class="vh-pro-top">
                         <img src="{{ $pro->avatar_url }}" class="vh-pro-avatar" loading="lazy" alt="">
@@ -218,8 +222,9 @@
                         <tr>
                             <td class="vh-rfp-name">{{ \Illuminate\Support\Str::limit($g->title, 26) }}</td>
                             <td><span class="vh-rfp-type {{ $type[1] }}">{{ $type[0] }}</span></td>
-                            <td>${{ number_format($g->budget ?? rand(3000, 25000), 0) }}</td>
-                            <td>{{ rand(4, 18) }}</td>
+                            <td>{{ $g->budget ? '$' . number_format($g->budget, 0) : '—' }}</td>
+                            {{-- A response count stood here as rand(4, 18). --}}
+                            <td>{{ $g->bids()->count() }}</td>
                             <td><span class="vh-rfp-status">{{ ucfirst($g->status) }}</span></td>
                             <td style="color:var(--text-muted);font-size:11px;">{{ $g->created_at?->humanAgo() }}</td>
                         </tr>

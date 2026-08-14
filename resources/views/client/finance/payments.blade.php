@@ -113,26 +113,38 @@
 <div class="pay-main">
 
     {{-- Top stat cards --}}
+    {{--
+        The Owner's three states, and nothing else.
+
+        These cards used to read "IRS 1099 Liability", "Net Cash Position",
+        "Stripe Outflow" and "Processing Fees" — each one a percentage of a
+        real total (0.27, 0.20, 0.55, 0.029) printed as a dollar figure. A
+        comment at the top of this file called them placeholders pending the
+        Stripe Connect sandbox; the comment was in the file and the numbers
+        were on the screen, and there is no Connect integration to be pending.
+
+        The 1099 line mattered most: a tax figure nobody calculated, shown to
+        someone who might use it at tax time.
+
+        What remains comes from booking rows and separates a price agreed from
+        money actually paid, which is the distinction the Owner asked for.
+    --}}
     <div class="pay-stats">
         <div class="pay-stat">
-            <div class="pay-stat-head"><div class="pay-stat-ico indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><div class="pay-stat-label">Stripe Outflow</div><div class="pay-stat-value">${{ number_format($stats['stripe_outflow'], 0) }}</div></div></div>
-            <div class="pay-stat-foot"><span>Processing Fees</span><span class="red">-${{ number_format($stats['processing_fees'], 2) }}</span></div>
+            <div class="pay-stat-head"><div class="pay-stat-ico amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div><div class="pay-stat-label">Agreed, Not Yet Paid</div><div class="pay-stat-value">${{ number_format($stats['agreed_unpaid'], 0) }}</div></div></div>
+            <div class="pay-stat-foot"><span>A price both sides accepted</span></div>
         </div>
         <div class="pay-stat">
-            <div class="pay-stat-head"><div class="pay-stat-ico amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><div class="pay-stat-label">Locked in Secure Payment</div><div class="pay-stat-value">${{ number_format($stats['escrow_locked'], 0) }}</div></div></div>
-            <div class="pay-stat-foot"><span>Total Locked</span><span>{{ \App\Models\Booking::where('client_id', auth()->id())->where('status','confirmed')->count() }} active</span></div>
+            <div class="pay-stat-head"><div class="pay-stat-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div><div class="pay-stat-label">Paid</div><div class="pay-stat-value">${{ number_format($stats['paid'], 0) }}</div></div></div>
+            <div class="pay-stat-foot"><span>Money that has actually moved</span></div>
         </div>
         <div class="pay-stat">
-            <div class="pay-stat-head"><div class="pay-stat-ico coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="pay-stat-label">IRS 1099 Liability</div><div class="pay-stat-value">${{ number_format($stats['tax_liability'], 0) }}</div></div></div>
-            <div class="pay-stat-foot"><span>YTD to Contractors</span><span class="red">⚠ Est.</span></div>
+            <div class="pay-stat-head"><div class="pay-stat-ico slate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="pay-stat-label">Awaiting Acceptance</div><div class="pay-stat-value">${{ number_format($stats['awaiting'], 0) }}</div></div></div>
+            <div class="pay-stat-foot"><span>Sent, not yet accepted</span></div>
         </div>
         <div class="pay-stat">
-            <div class="pay-stat-head"><div class="pay-stat-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div><div class="pay-stat-label">Net Cash Position</div><div class="pay-stat-value">${{ number_format($stats['net_cash'], 0) }}</div></div></div>
-            <div class="pay-stat-foot"><span>Available Balance</span></div>
-        </div>
-        <div class="pay-stat">
-            <div class="pay-stat-head"><div class="pay-stat-ico slate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div><div class="pay-stat-label">Total Payments</div><div class="pay-stat-value">${{ number_format($stats['total_payments'], 0) }}</div></div></div>
-            <div class="pay-stat-foot"><span>All Time Spend</span></div>
+            <div class="pay-stat-head"><div class="pay-stat-ico indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><div class="pay-stat-label">Total Agreed</div><div class="pay-stat-value">${{ number_format($stats['total_agreed'], 0) }}</div></div></div>
+            <div class="pay-stat-foot"><span>Across every booking</span></div>
         </div>
     </div>
 
@@ -150,9 +162,9 @@
     <div class="pay-card" style="padding:0;overflow:hidden;">
         <div class="pay-ledger-head"><span class="pay-ledger-title">Ledger Stream</span></div>
         <form method="GET" class="pay-filters">
-            <button type="button" class="pay-gw-btn active">All Gateways</button>
-            <button type="button" class="pay-gw-btn">Secure Payment.com</button>
-            <button type="button" class="pay-gw-btn">Stripe</button>
+            {{-- Three gateway buttons stood here. They were type="button" with
+                 no handler, so they filtered nothing even before the gateway
+                 column they referred to turned out to be invented. --}}
             <div class="pay-search">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 <input type="search" name="search" value="{{ request('search') }}" placeholder="Search transactions...">
@@ -160,13 +172,20 @@
         </form>
         <div style="overflow-x:auto;">
             <table class="pay-table">
-                <thead><tr><th style="padding-left:18px;">Vendor</th><th>Gateway</th><th>Status</th><th>Amount</th><th>Date</th><th style="padding-right:18px;">TX ID</th></tr></thead>
+                <thead><tr><th style="padding-left:18px;">Vendor</th><th>Status</th><th>Amount</th><th style="padding-right:18px;">Date</th></tr></thead>
                 <tbody>
                     @forelse($transactions as $t)
                         @php
-                            $amount = $t->total_amount ?? $t->agreed_price ?? 0;
-                            $gw = $t->id % 2 === 0 ? ['Stripe', '#635bff'] : ['Secure Payment.com', '#16a34a'];
-                            $txid = ($gw[0] === 'Stripe' ? 'STR-' : 'ESC-') . str_pad($t->id * 7919 % 999999, 6, '0', STR_PAD_LEFT);
+                            /*
+                             * Gateway and transaction reference removed 2026-08-15.
+                             * The gateway was $t->id % 2 — alternating Stripe and
+                             * "Secure Payment.com" down the page — and the
+                             * reference was id * 7919 % 999999, set in monospace
+                             * so it read exactly like a real payment reference.
+                             * Neither is recorded anywhere, and no payment
+                             * provider is connected to record them.
+                             */
+                            $amount = $t->total_amount ?? $t->agreed_price;
                         @endphp
                         <tr>
                             <td style="padding-left:18px;">
@@ -175,14 +194,15 @@
                                     <div><div class="nm">{{ $t->supplier?->name ?? 'Vendor' }}</div><div class="sub">{{ \Illuminate\Support\Str::limit($t->supplier?->profile?->headline ?? $t->event?->title ?? '', 18) }}</div></div>
                                 </div>
                             </td>
-                            <td><span class="pay-gw"><svg viewBox="0 0 24 24" fill="{{ $gw[1] }}"><circle cx="12" cy="12" r="10"/></svg>{{ $gw[0] }}</span></td>
                             <td><span class="pay-pill {{ $t->status }}">{{ ucfirst($t->status) }}</span></td>
-                            <td><span class="pay-amt">${{ number_format($amount ?: rand(600, 2500), 0) }}</span></td>
-                            <td>{{ $t->created_at?->format('M d, Y') }}<br><span style="font-size:10px;color:var(--text-muted);">{{ $t->created_at?->format('h:i A') }}</span></td>
-                            <td style="padding-right:18px;"><span class="pay-txid">{{ $txid }}</span></td>
+                            {{-- rand(600, 2500) stood where this dash is: a booking
+                                 with no amount was given a random one, so the
+                                 figure changed every time the page was loaded. --}}
+                            <td><span class="pay-amt">{{ $amount ? '$' . number_format($amount, 0) : '—' }}</span></td>
+                            <td style="padding-right:18px;">{{ $t->created_at?->format('M d, Y') }}<br><span style="font-size:10px;color:var(--text-muted);">{{ $t->created_at?->format('h:i A') }}</span></td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No transactions yet.</td></tr>
+                        <tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted);">No transactions yet.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -197,25 +217,23 @@
 
     {{-- Bottom summary --}}
     <div class="pay-bottom">
-        <div class="pay-card">
-            <div class="pay-sum-title">Payment Methods Summary</div>
-            <div class="pay-sum-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="#16a34a" style="width:14px;height:14px;"><circle cx="12" cy="12" r="10"/></svg>Secure Payment.com</span><span class="val">${{ number_format($methods['escrow'], 0) }}<span class="pct">62%</span></span></div>
-            <div class="pay-sum-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="#635bff" style="width:14px;height:14px;"><circle cx="12" cy="12" r="10"/></svg>Stripe</span><span class="val">${{ number_format($methods['stripe'], 0) }}<span class="pct">38%</span></span></div>
-            <div class="pay-sum-row pay-sum-total"><span class="lbl">Total</span><span class="val">${{ number_format($methods['escrow'] + $methods['stripe'], 0) }}</span></div>
-        </div>
-        <div class="pay-card">
-            <div class="pay-sum-title">Fee Breakdown (This Month)</div>
-            <div class="pay-sum-row"><span class="lbl">Platform Fees</span><span class="val pay-neg">-${{ number_format($fees['platform'], 2) }}<span class="pct">2.9%</span></span></div>
-            <div class="pay-sum-row"><span class="lbl">Gateway Fees</span><span class="val pay-neg">-${{ number_format($fees['gateway'], 2) }}<span class="pct">1.6%</span></span></div>
-            <div class="pay-sum-row pay-sum-total"><span class="lbl">Total Fees</span><span class="val pay-neg">-${{ number_format($fees['platform'] + $fees['gateway'], 2) }}</span></div>
-        </div>
-        <div class="pay-card">
-            <div class="pay-sum-title">Cash Flow (This Month)</div>
-            <div class="pay-sum-row"><span class="lbl">Total Outflow</span><span class="val pay-neg">${{ number_format($stats['stripe_outflow'], 0) }}</span></div>
-            <div class="pay-sum-row"><span class="lbl">Milestone Releases</span><span class="val pay-pos">${{ number_format($stats['escrow_locked'], 0) }}</span></div>
-            <div class="pay-sum-row pay-sum-total"><span class="lbl">Net Cash Flow</span><span class="val pay-neg">-${{ number_format($stats['stripe_outflow'] - $stats['escrow_locked'], 0) }}</span></div>
-        </div>
-    </div>
+        {{--
+            Removed 2026-08-15. Three cards, none of them measured:
+
+              Payment Methods Summary — a 62/38 split between "Secure
+                Payment.com" and Stripe, both figures a percentage of the
+                booking total and the second naming a gateway this platform
+                does not use.
+              Fee Breakdown (This Month) — 2.9% and 1.6% of all-time settled
+                bookings, under a heading that says this month.
+              Cash Flow (This Month) — the same two invented numbers again,
+                subtracted from each other to produce a third.
+
+            Nothing here replaced them, because there is nothing real to put in
+            their place yet: fees are not recorded per transaction and no
+            payment provider is connected. An empty space is honest; a card of
+            derived percentages is not.
+        --}}
 </div>{{-- /.pay-main --}}
 
 {{-- Right rail --}}
@@ -225,13 +243,19 @@
         <a href="{{ route('client.search.index') }}" class="pay-qa"><div class="pay-qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div><div class="pay-qa-body"><div class="pay-qa-name">Pay Vendor</div><div class="pay-qa-sub">Send instant payment</div></div></a>
     </div>
 
-    <div class="pay-rail-card">
-        <div class="pay-rail-title">Payment Insights <span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:rgba(99,102,241,0.12);color:var(--accent-text);">BETA</span></div>
-        <div class="pay-insight"><svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><div class="body"><b>All payment checks on track.</b> No delays detected.</div></div>
-        <div class="pay-insight"><svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg><div class="body"><b>1 vendor missing a W-9.</b> Upload to avoid tax hold.</div></div>
-        <div class="pay-insight"><svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><div class="body">Projected 1099-NEC total: <b>${{ number_format($stats['tax_liability'], 0) }}</b></div></div>
-    </div>
+    {{--
+        Removed 2026-08-15. "Payment Insights" made three claims and measured
+        none of them:
 
+          "All payment checks on track. No delays detected." — hardcoded; no
+            check runs.
+          "1 vendor missing a W-9. Upload to avoid tax hold." — a specific
+            count, hardcoded, about a form the platform has no way to collect:
+            W-9 intake was never built (checklist row 219).
+          "Projected 1099-NEC total: $X" — the booking total times 0.27.
+
+        A BETA badge sat above them, which reads as "early", not as "invented".
+    --}}
     <div class="pay-rail-card">
         <div class="pay-rail-title">Recent Activity</div>
         @forelse($transactions->take(4) as $t)

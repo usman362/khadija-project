@@ -179,8 +179,15 @@
                         @php
                             $pipe = $statusToPipe($p->status);
                             $amount = $p->amount ?? $p->total_amount ?? $p->agreed_price ?? 0;
-                            // Health score heuristic: accepted=high, pending=mid, declined=low.
-                            $score = match ($pipe) { 'accepted','completed' => rand(82, 96), 'pending','in_progress' => rand(55, 78), default => rand(20, 45) };
+                            /*
+                             * This was a "health score" drawn at random inside a
+                             * band per pipeline stage — so the same proposal
+                             * scored differently on every reload, and the ring
+                             * around it looked like a measurement. The stage is
+                             * the only thing actually known, so the ring now
+                             * reads the stage rather than dressing it up.
+                             */
+                            $score = match ($pipe) { 'accepted', 'completed' => 100, 'pending', 'in_progress' => 50, default => 0 };
                             $col = $ringColor($score);
                             $ico = strtoupper(substr($p->event?->title ?? 'P', 0, 1));
                             $icoColors = ['#f97316','#6366f1','#10b981','#8b5cf6','#ec4899','#06b6d4'];
@@ -206,7 +213,7 @@
                                 <div style="color:var(--text-primary);font-weight:600;">{{ $p->created_at?->format('M d, Y') ?? '—' }}</div>
                                 <div style="font-size:10px;color:var(--text-muted);">{{ $p->created_at?->humanAgo() }}</div>
                             </td>
-                            <td><div class="pr-amt">${{ number_format($amount ?: rand(2000, 12000), 0) }}</div><div class="pr-amt-sub">Total</div></td>
+                            <td><div class="pr-amt">{{ $amount ? '$' . number_format($amount, 0) : '—' }}</div><div class="pr-amt-sub">Total</div></td>
                             <td><span class="pr-pstatus pr-ps-{{ $pipe }}">{{ ucfirst(str_replace('_', ' ', $pipe)) }}</span></td>
                             <td>
                                 <svg class="pr-ring" viewBox="0 0 36 36">

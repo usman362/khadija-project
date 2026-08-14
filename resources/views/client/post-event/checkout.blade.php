@@ -80,7 +80,7 @@
                         <h3 style="margin-bottom:12px;">Secure Your Date</h3>
                         @foreach([
                             ['⚡','Instant Confirmation','Your date is locked the moment your deposit clears.'],
-                            ['🛡️','Protected Payments','Funds are held in secure securely until services are delivered.'],
+                            ['🛡️','Payment on Agreement','You pay when you and the professional have agreed the price and the work.'],
                             ['🔄','Free Date Changes (1x)','Reschedule your event once at no extra cost.'],
                         ] as $point)
                             <div style="display:flex; gap:10px; padding:9px 0; border-bottom:1px dashed var(--pe-line-2);">

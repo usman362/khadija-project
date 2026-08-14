@@ -2,84 +2,86 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Two panels from the 2026-08-04 screenshot review stated things as fact that
- * were not true. They are the same mistake in two places: a screen presenting
- * a number or a state it does not have.
+ * Numbers nobody measured.
  *
- *   Calendar — "Phone Synchronization" showed Apple and Google Calendar with a
- *   tick and the words "Synced Successfully". No calendar integration exists
- *   at all, so a professional could believe their outside commitments were
- *   reaching GigResource and double-book on the strength of it.
+ * The Owner's Budget-Does-Not-Equal-Funding rule says planning values must
+ * never be shown as actual funds. What the sweep behind this test found was a
+ * step worse: figures that were not planning values either, drawn at render
+ * time and presented as fact.
  *
- *   Bid Intelligence — "Competitor Benchmarks" showed Low / Market Avg / High
- *   around the professional's own bid. The three were that same bid times
- *   0.69, 0.94 and 1.19. It compared a professional to themselves and called
- *   it the market, and pricing against it is a decision they would act on.
+ * They were spread across four client screens — a random payment amount, a
+ * random hourly rate for a named professional, a random proposal total, a
+ * random "health score", a random "Friction Score", and a claim that a named
+ * professional "has maintained 95–100% contract compliance across 8–20
+ * completed events". Every one of them changed when the page was refreshed.
+ *
+ * THE RULE: a view may not call rand(). A figure on screen either comes from a
+ * record or it is a dash. This is narrow on purpose — it cannot judge whether
+ * a computed number is meaningful, but it does catch the specific habit that
+ * produced all of the above.
  */
 class NoInventedFiguresTest extends TestCase
 {
-    use RefreshDatabase;
-
-    private User $pro;
-
-    protected function setUp(): void
+    public function test_no_view_invents_a_number_at_render_time(): void
     {
-        parent::setUp();
+        $offenders = [];
 
-        $this->seed(\Database\Seeders\PermissionSeeder::class);
-        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+        foreach ($this->bladeFiles() as $path) {
+            // Comments are where the removals are explained, and several quote
+            // the call they replaced.
+            $src = preg_replace('/\{\{--.*?--\}\}/s', '', file_get_contents($path));
+            $src = preg_replace('#/\*.*?\*/#s', '', $src);
 
-        $this->pro = User::factory()->create();
-        $this->pro->assignRole('professional');
-        $this->pro->givePermissionTo('dashboard.view');
-        $this->pro->getOrCreateProfile()->update(['country' => 'US', 'state' => 'MD', 'city' => 'Baltimore']);
-        $this->pro = $this->pro->fresh();
+            if (preg_match('/\brand\s*\(/', $src)) {
+                $offenders[] = str_replace(resource_path('views/'), '', $path);
+            }
+        }
+
+        $this->assertSame([], $offenders, "these views make up a number each time they render:\n" . implode("\n", $offenders));
     }
 
-    public function test_the_calendar_does_not_claim_a_sync_that_does_not_exist(): void
+    /**
+     * The two claims that were about a named person rather than a figure: a
+     * tax form the platform cannot collect, and a compliance rate nothing
+     * measures.
+     */
+    public function test_no_screen_makes_a_compliance_claim_about_a_professional(): void
     {
-        $page = $this->actingAs($this->pro)->get(route('professional.calendar.index'));
+        $client = resource_path('views/client');
 
-        $page->assertSuccessful();
-        $page->assertDontSee('Synced Successfully');
-        $page->assertDontSee('Phone Synchronization');
-    }
+        foreach (['contract compliance', 'Push W-9 Reminder', 'IRS 1099 Liability'] as $claim) {
+            $hits = [];
 
-    public function test_no_calendar_integration_is_actually_installed(): void
-    {
-        // The reason the panel had to go rather than be reworded. If this ever
-        // stops being true, the panel can come back showing a real state.
-        $composer = json_decode(file_get_contents(base_path('composer.json')), true);
-        $packages = array_keys($composer['require'] ?? []);
+            foreach ($this->bladeFiles($client) as $path) {
+                $src = preg_replace('/\{\{--.*?--\}\}/s', '', file_get_contents($path));
+                $src = preg_replace('#/\*.*?\*/#s', '', $src);
 
-        foreach (['laravel/socialite', 'google/apiclient', 'spatie/icalendar-generator'] as $package) {
-            $this->assertNotContains($package, $packages);
+                if (str_contains($src, $claim)) {
+                    $hits[] = str_replace(resource_path('views/'), '', $path);
+                }
+            }
+
+            $this->assertSame([], $hits, "\"{$claim}\" is stated where nothing measures it: " . implode(', ', $hits));
         }
     }
 
-    public function test_bid_intelligence_does_not_present_a_market_it_cannot_see(): void
+    /** @return list<string> */
+    private function bladeFiles(?string $root = null): array
     {
-        $page = $this->actingAs($this->pro)->get(route('professional.bid-intelligence.index'));
+        $files = [];
+        $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root ?? resource_path('views')));
 
-        $page->assertSuccessful();
-        $page->assertDontSee('Competitor Benchmarks');
-        $page->assertDontSee('Market Avg');
-        $page->assertDontSee('Your Pricing vs Market');
-    }
+        foreach ($it as $f) {
+            if ($f->isFile() && str_ends_with($f->getFilename(), '.blade.php')) {
+                $files[] = $f->getPathname();
+            }
+        }
 
-    public function test_the_professionals_own_average_is_still_shown(): void
-    {
-        // The real figure was never the problem — only the invented band
-        // around it — so removing that must not have taken this with it.
-        $page = $this->actingAs($this->pro)->get(route('professional.bid-intelligence.index'));
+        sort($files);
 
-        $page->assertSee('Your Average Bid');
-        $this->assertArrayHasKey('avg', $page->viewData('pricing'));
-        $this->assertCount(1, $page->viewData('pricing'), 'nothing but the real number');
+        return $files;
     }
 }

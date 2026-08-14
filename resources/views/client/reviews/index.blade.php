@@ -178,8 +178,14 @@
                 $fullStars = str_repeat('★', $rating) . str_repeat('☆', 5 - $rating);
                 $pro = $r->reviewee;
                 $eventTitle = $r->booking?->event?->title ?? 'Hired Service';
-                $gateway = $r->id % 2 === 0 ? ['Stripe', '#635bff'] : ['Secure Payment.com', '#16a34a'];
-                $metricVal = fn() => rand(4, 5);
+                /*
+                 * $gateway was $r->id % 2 — a payment provider assigned by row
+                 * parity — and $metricVal returned rand(4, 5), so each
+                 * sub-rating on a real person's review was drawn fresh every
+                 * time the page rendered. The review's own rating is the only
+                 * score anyone actually gave.
+                 */
+                $metricVal = fn () => $r->rating;
             @endphp
             <div class="rv-rc">
                 <div class="rv-rc-head">
@@ -188,7 +194,12 @@
                         <div class="rv-rc-stars">
                             <span class="stars">{{ $fullStars }}</span>
                             <span class="score">{{ number_format($rating, 1) }}</span>
-                            <span class="rv-rc-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified {{ $gateway[0] === 'Stripe' ? 'Stripe' : 'Secure Payment' }} Review</span>
+                            {{-- Read "Verified Stripe Review" or "Verified Secure
+                                 Payment Review" depending on whether the review's
+                                 id was even. A review is verified because it came
+                                 from a completed booking, not by a payment
+                                 provider, and neither provider is connected. --}}
+                            <span class="rv-rc-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified Review</span>
                         </div>
                         <div class="rv-rc-title">{{ $eventTitle }}</div>
                         <div class="rv-rc-meta">
@@ -196,7 +207,6 @@
                             <span>Date: {{ $r->created_at?->format('M d, Y') }}</span>
                         </div>
                     </div>
-                    <span class="rv-rc-gateway"><svg viewBox="0 0 24 24" fill="{{ $gateway[1] }}"><circle cx="12" cy="12" r="10"/></svg>{{ $gateway[0] }}</span>
                     <span class="rv-rc-payout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified Payout</span>
                     <button class="rv-rc-kebab">⋮</button>
                 </div>
@@ -233,10 +243,13 @@
                         <div class="rv-pro-box">
                             <div class="rv-pro-name">Professional: {{ \Illuminate\Support\Str::limit($pro?->name ?? 'Pro', 14) }}</div>
                             <div class="rv-pro-role">{{ $pro?->profile?->headline ?? 'Event Professional' }}</div>
+                            {{-- Three scores stood here — "Friction Score",
+                                 "Events Done", "Repeat Hire" — all rand(), all
+                                 about a named professional, all different on
+                                 every reload. Only one of the three is
+                                 countable today, so only that one is shown. --}}
                             <div class="rv-pro-scores">
-                                <div><div class="num" style="color:var(--ok-text);">{{ rand(88, 99) }}%</div><div class="lbl">Friction Score</div></div>
-                                <div><div class="num">{{ rand(8, 20) }}</div><div class="lbl">Events Done</div></div>
-                                <div><div class="num" style="color:var(--brand-text);">{{ rand(70, 90) }}%</div><div class="lbl">Repeat Hire</div></div>
+                                <div><div class="num">{{ \App\Models\Booking::where('supplier_id', $pro?->id)->where('status', 'completed')->count() }}</div><div class="lbl">Events Completed</div></div>
                             </div>
                         </div>
                     </div>
@@ -247,16 +260,18 @@
                         <div class="rv-feedback-text"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>{{ \Illuminate\Support\Str::limit($r->comment, 120) }} </div>
                         <div class="rv-helpful">
                             <span>Was this helpful?</span>
-                            <button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/></svg>{{ rand(0, 5) }}</button>
+                            {{-- The helpful count was rand(0, 5); nobody records these votes. --}}
+                            <button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/></svg>0</button>
                             <button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3z"/></svg>0</button>
                         </div>
                     </div>
                 @endif
 
-                <div class="rv-ai-insight">
-                    <div class="rv-ai-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>
-                    <div class="rv-ai-body"><b>Reputation Insight</b> — This professional has maintained {{ rand(95, 100) }}% contract compliance across {{ rand(8, 20) }} completed events.</div>
-                </div>
+                {{-- "Reputation Insight — This professional has maintained
+                     95–100% contract compliance across 8–20 completed events"
+                     was removed on 2026-08-15. Both figures were rand(), so the
+                     same professional's compliance changed every time a client
+                     refreshed the page. Nothing measures contract compliance. --}}
             </div>
         @empty
             <div class="rv-card" style="text-align:center;padding:50px;">

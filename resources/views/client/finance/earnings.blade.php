@@ -124,10 +124,13 @@
 
     {{-- Stat cards --}}
     <div class="ea-stats">
-        <div class="ea-stat"><div class="ea-stat-ico indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><div class="ea-stat-label">Total Project Funds</div><div class="ea-stat-value">${{ number_format($stats['total_earnings'], 0) }}</div><div class="ea-stat-sub up">↑ Managed value</div></div></div>
-        <div class="ea-stat"><div class="ea-stat-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div><div><div class="ea-stat-label">Released to Vendors</div><div class="ea-stat-value">${{ number_format($stats['withdrawn'], 0) }}</div><div class="ea-stat-sub">Paid out</div></div></div>
-        <div class="ea-stat"><div class="ea-stat-ico amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="ea-stat-label">Pending Release</div><div class="ea-stat-value">${{ number_format($stats['pending_release'], 0) }}</div><div class="ea-stat-sub amber">{{ $stats['pending_count'] }} payments</div></div></div>
-        <div class="ea-stat"><div class="ea-stat-ico coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div><div class="ea-stat-label">Available Balance</div><div class="ea-stat-value">${{ number_format($stats['available'], 0) }}</div><div class="ea-stat-sub">Ready to allocate</div></div></div>
+        <div class="ea-stat"><div class="ea-stat-ico indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><div class="ea-stat-label">Total Agreed</div><div class="ea-stat-value">${{ number_format($stats['total_agreed'], 0) }}</div><div class="ea-stat-sub up">Across every booking</div></div></div>
+        <div class="ea-stat"><div class="ea-stat-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div><div><div class="ea-stat-label">Paid</div><div class="ea-stat-value">${{ number_format($stats['paid'], 0) }}</div><div class="ea-stat-sub">Money that has actually moved</div></div></div>
+        <div class="ea-stat"><div class="ea-stat-ico amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="ea-stat-label">Agreed, Not Yet Paid</div><div class="ea-stat-value">${{ number_format($stats['agreed_unpaid'], 0) }}</div><div class="ea-stat-sub amber">{{ $stats['pending_count'] }} payments</div></div></div>
+        {{-- "Available Balance — Ready to allocate" stood here, over
+             total - settled - inEscrow: a remainder shown as a spendable
+             balance. Replaced with the one state that was missing. --}}
+        <div class="ea-stat"><div class="ea-stat-ico coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="ea-stat-label">Awaiting Acceptance</div><div class="ea-stat-value">${{ number_format($stats['awaiting'], 0) }}</div><div class="ea-stat-sub">Sent, not yet accepted</div></div></div>
     </div>
 
     {{-- Toolbar --}}
@@ -141,15 +144,16 @@
     <div class="ea-gw-row">
         <div class="ea-gw">
             <div class="ea-gw-head"><span class="ea-gw-name">Stripe Outflow</span><span class="ea-gw-tag">STRIPE</span></div>
-            <div class="ea-gw-big">${{ number_format($stats['withdrawn'], 0) }}</div>
+            <div class="ea-gw-big">${{ number_format($stats['paid'], 0) }}</div>
             <div class="ea-gw-foot">Deposits / Fees</div>
-            <div class="ea-gw-foot red">${{ number_format($stats['withdrawn'] * 0.029, 0) }} processing fees incurred</div>
+            {{-- A 2.9% processing fee was printed here. No fee is recorded
+                 per transaction and no provider is connected to charge one. --}}
         </div>
         <div class="ea-gw">
             <div class="ea-gw-head"><span class="ea-gw-name">Secure Payment Vault</span><span class="ea-gw-tag">SECURED</span></div>
             <div class="ea-gw-split">
-                <div><b style="color:var(--ok-text);">${{ number_format($stats['pending_release'], 0) }}</b><span style="color:var(--text-muted);">Funded</span></div>
-                <div><b>${{ number_format($stats['available'], 0) }}</b><span style="color:var(--text-muted);">Released</span></div>
+                <div><b style="color:var(--ok-text);">${{ number_format($stats['agreed_unpaid'], 0) }}</b><span style="color:var(--text-muted);">Agreed</span></div>
+                <div><b>${{ number_format($stats['paid'], 0) }}</b><span style="color:var(--text-muted);">Paid</span></div>
             </div>
             <div class="ea-gw-foot">$0.00 currently in dispute</div>
         </div>
@@ -166,25 +170,39 @@
         <div class="ea-matrix-title">Itemized Vendor Expense &amp; Gateway Matrix</div>
         <div style="overflow-x:auto;">
             <table class="ea-table">
-                <thead><tr><th style="padding-left:18px;">Professional</th><th>Service</th><th>Gateway</th><th>Transfer Status</th><th>Tax (W-9)</th><th style="padding-right:18px;">Action</th></tr></thead>
+                <thead><tr><th style="padding-left:18px;">Professional</th><th>Service</th><th>Status</th><th style="padding-right:18px;">Action</th></tr></thead>
                 <tbody>
                     @forelse($vendors as $i => $v)
                         @php
-                            $gw = $i % 2 === 0 ? ['Secure Payment.com', '#16a34a'] : ['Stripe.com', '#635bff'];
-                            $statuses = [['In Inspection','blue'],['Deposit Paid','green'],['Milestone Funded','green'],['Charge Settled','green'],['Pending Milestone','amber']];
-                            $st = $statuses[$i % count($statuses)];
-                            $hasW9 = $i !== 1; // one vendor missing W-9
+                            /*
+                             * Every column in this row used to be manufactured
+                             * from the row's own index:
+                             *
+                             *   gateway  = $i % 2 — "Secure Payment.com" or
+                             *              "Stripe.com", alternating down the page
+                             *   status   = a five-item list cycled by $i, printing
+                             *              "Milestone Funded" and "Charge Settled"
+                             *              over bookings that were neither
+                             *   W-9      = $i !== 1, so the SECOND professional in
+                             *              every client's table was always shown as
+                             *              missing a tax form, with a button to
+                             *              chase them for it
+                             *
+                             * That last one is a false statement about a named
+                             * person, shown to the client who hired them, about a
+                             * form the platform cannot collect — W-9 intake was
+                             * never built. The status now comes from the booking.
+                             */
+                            [$stLabel, $stTone] = \App\Support\GigStatus::for($v);
                         @endphp
                         <tr>
                             <td style="padding-left:18px;"><div class="ea-vendor"><img src="{{ $v->supplier?->avatar_url ?? \App\Models\User::placeholderAvatarUri() }}" loading="lazy" alt=""><span class="nm">{{ $v->supplier?->name ?? 'Vendor' }}</span></div></td>
                             <td>{{ \Illuminate\Support\Str::limit($v->supplier?->profile?->headline ?? $v->event?->title ?? 'Service', 16) }}</td>
-                            <td><span style="display:inline-flex;align-items:center;gap:5px;"><svg viewBox="0 0 24 24" fill="{{ $gw[1] }}" style="width:12px;height:12px;"><circle cx="12" cy="12" r="10"/></svg>{{ $gw[0] }}</span></td>
-                            <td><span class="ea-pill {{ $st[1] }}">{{ $st[0] }} ↗</span></td>
-                            <td>@if($hasW9)<span class="ea-tax-ok">Verified ✓</span>@else<span class="ea-tax-miss">Missing ⚠</span>@endif</td>
-                            <td style="padding-right:18px;">@if(!$hasW9)<button class="ea-action-btn coral">Push W-9 Reminder</button>@else<button class="ea-action-btn ghost">View Details</button>@endif</td>
+                            <td><span class="ea-pill {{ $stTone }}">{{ $stLabel }}</span></td>
+                            <td style="padding-right:18px;"><a class="ea-action-btn ghost" href="{{ route('client.bookings.index') }}">View in Bookings</a></td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No vendor expenses yet.</td></tr>
+                        <tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted);">No vendor expenses yet.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -219,7 +237,7 @@
             <div class="ea-donut-c"><span class="num">${{ number_format($pipeline['total'], 0) }}</span><span class="lbl">Total Pipeline</span></div>
         </div>
         <div class="ea-legend">
-            <div class="row"><span class="dot" style="background:#f59e0b;"></span><span class="lbl">Pending Release</span><span class="val">${{ number_format($pipeline['pending'], 0) }}</span></div>
+            <div class="row"><span class="dot" style="background:#f59e0b;"></span><span class="lbl">Agreed, Not Yet Paid</span><span class="val">${{ number_format($pipeline['pending'], 0) }}</span></div>
             <div class="row"><span class="dot" style="background:#10b981;"></span><span class="lbl">Accepted / Won</span><span class="val">${{ number_format($pipeline['accepted'], 0) }}</span></div>
             <div class="row"><span class="dot" style="background:#6366f1;"></span><span class="lbl">Paid / Withdrawn</span><span class="val">${{ number_format($pipeline['paid'], 0) }}</span></div>
         </div>
@@ -228,7 +246,7 @@
     {{-- Earnings trend (sparkline) --}}
     <div class="ea-rail-card">
         <div class="ea-rail-head"><div class="ea-rail-title">Spending Trend</div><span class="ea-rail-sel">This Month</span></div>
-        <div class="ea-trend-big">${{ number_format($stats['total_earnings'], 0) }}</div>
+        <div class="ea-trend-big">${{ number_format($stats['total_agreed'], 0) }}</div>
         <div class="ea-trend-up">↑ Project total</div>
         @php
             $max = max(1, collect($trend)->max('value'));
