@@ -18,7 +18,7 @@
 
     /* Hero */
     .et-hero { text-align: center; padding: 46px 22px 34px; }
-    .et-hero h1 { font-size: clamp(1.9rem, 4vw, 2.7rem); font-weight: 700; color: var(--ink); letter-spacing: -.02em; margin: 0 0 8px; }
+    .et-hero h1 { font-size: clamp(1.9rem, 4vw, 2.7rem); font-weight: 800; color: var(--ink); letter-spacing: -.02em; margin: 0 0 8px; }
     .et-hero h1 span { color: var(--et); }
     .et-hero p { color: var(--muted); font-size: 1.02rem; max-width: 560px; margin: 0 auto 22px; }
     .et-search { max-width: 560px; margin: 0 auto; display: flex; gap: 10px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 8px; box-shadow: 0 12px 30px -20px rgba(15,27,53,.4); }

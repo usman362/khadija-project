@@ -23,7 +23,7 @@
 
     /* Hero */
     .pk-hero { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 22px 0 20px; }
-    .pk-hero h1 { font-size: clamp(1.7rem, 3.4vw, 2.5rem); font-weight: 700; color: var(--ink); letter-spacing: -.02em; margin: 0 0 6px; }
+    .pk-hero h1 { font-size: clamp(1.7rem, 3.4vw, 2.5rem); font-weight: 800; color: var(--ink); letter-spacing: -.02em; margin: 0 0 6px; }
     .pk-hero h1 span { color: var(--pk); }
     .pk-hero p { color: var(--muted); font-size: 15px; max-width: 420px; margin: 0; }
     .pk-props { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 12px; }
