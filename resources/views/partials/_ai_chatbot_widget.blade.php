@@ -447,6 +447,10 @@
         display: flex; flex-wrap: wrap; gap: 8px;
         padding: 0 0 10px;
     }
+    /* The hidden attribute is only display:none from the browser's own
+       stylesheet, so the rule above beat it and this stayed on screen —
+       full width, over everything, swallowing every click. */
+    .aic-attachments[hidden] { display: none !important; }
     .aic-attachment {
         position: relative;
         display: inline-flex; align-items: center; gap: 8px;

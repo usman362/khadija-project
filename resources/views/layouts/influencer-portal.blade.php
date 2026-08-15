@@ -191,6 +191,10 @@
 
         /* overlay for mobile */
         .ipx-overlay { display: none; position: fixed; inset: 0; background: rgba(15,27,53,.4); z-index: 45; }
+    /* The hidden attribute is only display:none from the browser's own
+       stylesheet, so the rule above beat it and this stayed on screen —
+       full width, over everything, swallowing every click. */
+    .ipx-overlay[hidden] { display: none !important; }
 
         @media (max-width: 1000px) {
             .ipx-sb { transform: translateX(-100%); }

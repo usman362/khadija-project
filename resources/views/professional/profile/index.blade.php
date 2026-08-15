@@ -716,6 +716,10 @@
             </div>
             <style>
                 .pf-crop-modal { position: fixed; inset: 0; z-index: 9999; background: rgba(6,10,20,.72); display: flex; align-items: center; justify-content: center; padding: 20px; }
+                /* The hidden attribute is only display:none from the browser's own
+                   stylesheet, so the rule above beat it and this stayed on screen —
+                   full width, over everything, swallowing every click. */
+                .pf-crop-modal[hidden] { display: none !important; }
                 .pf-crop-box { background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e5e9f0); border-radius: 16px; padding: 20px; width: min(560px, 100%); box-shadow: 0 30px 60px -20px rgba(0,0,0,.5); }
                 .pf-crop-head { display: flex; justify-content: space-between; align-items: center; font-size: 16px; }
                 .pf-crop-x { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-muted, #64748b); }
