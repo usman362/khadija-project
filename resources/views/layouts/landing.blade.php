@@ -31,14 +31,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://images.unsplash.com">
     <link rel="dns-prefetch" href="https://images.unsplash.com">
-    {{-- Manrope on the headings, Inter on everything else.
-     Plus Jakarta Sans was doing this job and reads as a slightly rounder
-     Inter, so the two together looked like one font used inconsistently
-     rather than a pairing. Manrope is far enough from Inter to be a real
-     contrast — tighter, more geometric, a little more expensive-looking —
-     while staying a sans, which a marketplace wants. Inter keeps the
-     interface: at 12px in a table nothing beats it. --}}
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    {{-- Outfit on the headings, Inter on everything else.
+     Outfit is geometric — circular o/e/a, a single-storey g — so it reads
+     as clearly a different face from Inter rather than a slightly-off
+     version of it, which is what Plus Jakarta Sans and Manrope both did.
+     Inter keeps the interface: at 12px in a table nothing beats it. --}}
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         /* ── Light public theme (self-contained — does not touch the dark
@@ -80,7 +78,7 @@
             --shadow: 0 14px 40px rgba(15, 27, 53, 0.08);
             --shadow-lg: 0 24px 60px rgba(15, 27, 53, 0.12);
             --ff: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            --ff-head: 'Manrope', 'Inter', system-ui, sans-serif;
+            --ff-head: 'Outfit', 'Inter', system-ui, sans-serif;
         }
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; }

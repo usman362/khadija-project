@@ -255,7 +255,9 @@ class SameStateMatchingTest extends TestCase
         $availability = $this->actingAs($client)->get(route('public.packages'))
             ->assertSuccessful()->viewData('availability');
 
-        $this->assertSame(['Baltimore'], array_keys($availability->all()));
+        // Named with the state since 2026-08-16 — "Washington" alone is three
+        // different places inside the launch area.
+        $this->assertSame(['Baltimore, MD'], array_keys($availability->all()));
         $this->assertSame(1, $availability->sum(), 'the cities add up to the packages on the page');
     }
 

@@ -304,6 +304,19 @@ class User extends Authenticatable
             ->withPivot('note')->withTimestamps();
     }
 
+    /** Packages this client hearted on the Package Service Search. */
+    public function savedPackages(): BelongsToMany
+    {
+        return $this->belongsToMany(Package::class, 'saved_packages', 'client_id', 'package_id')
+            ->withTimestamps();
+    }
+
+    /** Filter sets this user asked us to keep (see SavedSearch). */
+    public function savedSearches(): HasMany
+    {
+        return $this->hasMany(SavedSearch::class);
+    }
+
     /** Opportunities this professional bookmarked on the Bidding Board. */
     public function savedEvents(): BelongsToMany
     {

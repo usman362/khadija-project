@@ -175,9 +175,24 @@ Route::get('/event-types', [\App\Http\Controllers\Public\EventTypeController::cl
 Route::get('/packages', [\App\Http\Controllers\Public\PackageController::class, 'index'])
     ->name('public.packages');
 
+// Side-by-side comparison of up to three packages (the rail's compare tray).
+// Above the {package:slug} route on purpose — it is not a slug.
+Route::get('/packages/compare', [\App\Http\Controllers\Public\PackageController::class, 'compare'])
+    ->name('public.packages.compare');
+
 // Public package detail — the browsable, shareable page for a pro's package.
 Route::get('/package/{package:slug}', [\App\Http\Controllers\Public\PackageController::class, 'show'])
     ->name('public.package');
+
+// Saving a search, and hearting a package, both belong to a signed-in client.
+Route::middleware('auth')->group(function () {
+    Route::post('/packages/saved-searches', [\App\Http\Controllers\Public\PackageController::class, 'saveSearch'])
+        ->name('public.packages.save-search');
+    Route::delete('/packages/saved-searches/{savedSearch}', [\App\Http\Controllers\Public\PackageController::class, 'deleteSearch'])
+        ->name('public.packages.delete-search');
+    Route::post('/package/{package}/save', [\App\Http\Controllers\Public\PackageController::class, 'toggleSaved'])
+        ->name('public.package.save');
+});
 
 // XML sitemap — generated on the fly so newly-added pros / blog posts show
 // up the next time a crawler hits /sitemap.xml. Cached for an hour to keep

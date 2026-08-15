@@ -34,12 +34,52 @@ final class ResponseStats
      */
     public static function for(User $user): array
     {
+        return self::forMany([$user->id])[$user->id];
+    }
+
+    /**
+     * The same reading, for a page full of people, in one query.
+     *
+     * A card list calling for() twelve times is twelve full message scans. The
+     * arithmetic below is identical — a user's own messages are pulled out of
+     * the shared set and walked exactly as for() walks them — so the two
+     * methods cannot drift apart and report different figures for one person.
+     *
+     * @param  array<int, int>  $userIds
+     * @return array<int, array{rate: ?int, hours: ?float, answered: int, prompts: int}> keyed by user id
+     */
+    public static function forMany(array $userIds): array
+    {
+        $userIds = array_values(array_unique(array_map('intval', $userIds)));
+
+        if ($userIds === []) {
+            return [];
+        }
+
         $messages = Message::query()
-            ->where(fn ($q) => $q->where('recipient_id', $user->id)->orWhere('sender_id', $user->id))
+            ->where(fn ($q) => $q->whereIn('recipient_id', $userIds)->orWhereIn('sender_id', $userIds))
             ->orderBy('conversation_id')
             ->orderBy('created_at')
             ->get(['conversation_id', 'sender_id', 'recipient_id', 'created_at']);
 
+        $out = [];
+
+        foreach ($userIds as $id) {
+            $out[$id] = self::walk(
+                $messages->filter(fn ($m) => (int) $m->sender_id === $id || (int) $m->recipient_id === $id),
+                $id
+            );
+        }
+
+        return $out;
+    }
+
+    /**
+     * @param  \Illuminate\Support\Collection  $messages  this user's messages, conversation-then-time ordered
+     * @return array{rate: ?int, hours: ?float, answered: int, prompts: int}
+     */
+    private static function walk($messages, int $userId): array
+    {
         $prompts = 0;
         $answered = 0;
         $totalHours = 0.0;
@@ -48,7 +88,7 @@ final class ResponseStats
             $awaiting = null;   // the inbound message still waiting on a reply
 
             foreach ($thread as $message) {
-                $fromThem = (int) $message->sender_id !== $user->id;
+                $fromThem = (int) $message->sender_id !== $userId;
 
                 if ($fromThem) {
                     // Only the first of a consecutive run counts as a prompt.
@@ -73,6 +113,31 @@ final class ResponseStats
             'rate'     => $prompts > 0 ? (int) round($answered / $prompts * 100) : null,
             'hours'    => $answered > 0 ? round($totalHours / $answered, 1) : null,
         ];
+    }
+
+    /**
+     * The card-sized version — "Responds in ~2 hrs" — or null.
+     *
+     * Null rather than a dash, because a card line reading "Responds —" is
+     * worse than no line at all.
+     */
+    public static function brief(?float $hours): ?string
+    {
+        if ($hours === null) {
+            return null;
+        }
+
+        if ($hours < 1) {
+            return 'Responds in ~' . max(1, (int) round($hours * 60)) . ' min';
+        }
+
+        if ($hours < 48) {
+            return 'Responds in ~' . (int) round($hours) . ' hr' . (round($hours) == 1 ? '' : 's');
+        }
+
+        $days = (int) round($hours / 24);
+
+        return 'Responds in ~' . $days . ' day' . ($days === 1 ? '' : 's');
     }
 
     /** "1.5 hours" / "2 days" / "—" when there is nothing to go on. */

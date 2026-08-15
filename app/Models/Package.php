@@ -11,7 +11,7 @@ class Package extends Model
     protected $fillable = [
         'user_id', 'category_id', 'services', 'event_types',
         'title', 'slug', 'type', 'description', 'price', 'price_unit', 'duration',
-        'coverage', 'team', 'guests', 'serves_regions', 'availability', 'savings_pct',
+        'coverage', 'team', 'guests', 'guests_max', 'serves_regions', 'availability', 'savings_pct',
         'includes', 'images', 'is_active', 'status', 'sort_order',
         // Rule R38, Option B — a package is bookable only in its owner's own
         // state. Stamped from the professional's account on create.
@@ -28,6 +28,29 @@ class Package extends Model
                 $package->state = \App\Support\StateMatching::stateOf(User::find($package->user_id));
             }
         });
+
+        // The guest-count filter compares numbers; `guests` is prose. Kept in
+        // step here so no form has to remember to do it.
+        static::saving(function (self $package) {
+            if ($package->isDirty('guests')) {
+                $package->guests_max = self::parseGuests($package->guests);
+            }
+        });
+    }
+
+    /**
+     * The capacity inside "Up to 150", "150 guests", "80–200 seated".
+     *
+     * The LARGEST number wins, because the column answers "how many people can
+     * this package serve" — on a range, that is the top of the range.
+     */
+    public static function parseGuests(?string $text): ?int
+    {
+        if (! preg_match_all('/\d+/', (string) $text, $m) || $m[0] === []) {
+            return null;
+        }
+
+        return max(array_map('intval', $m[0])) ?: null;
     }
 
     protected $casts = [
@@ -38,6 +61,7 @@ class Package extends Model
         'images'     => 'array',
         'is_active'  => 'boolean',
         'price'      => 'integer',
+        'guests_max' => 'integer',
         'savings_pct' => 'integer',
         'sort_order' => 'integer',
     ];
