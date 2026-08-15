@@ -19,8 +19,8 @@
         position: relative;
         padding: 56px 24px 64px;
         overflow: hidden;
-        background: linear-gradient(135deg, var(--bg-soft) 0%, var(--bg-soft-2) 100%);
-        border-bottom: 1px solid var(--line);
+        background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+        border-bottom: 1px solid #fed7aa;
     }
     @if($category->cover_image)
     .cl-hero::before {
@@ -46,16 +46,16 @@
     .cl-eyebrow {
         display: inline-flex; align-items: center; gap: 8px;
         padding: 6px 14px;
-        background: rgba(37, 99, 235, 0.08);
-        border: 1px solid rgba(37, 99, 235, 0.20);
+        background: #ffedd5;
+        border: 1px solid #fdba74;
         border-radius: 999px;
-        font-size: 12px; font-weight: 700;
-        letter-spacing: 1px; text-transform: uppercase;
-        color: var(--blue-dark);
+        font-size: 11.5px; font-weight: 800;
+        letter-spacing: .8px; text-transform: uppercase;
+        color: #9a3412;
     }
     .cl-eyebrow .dot {
         width: 6px; height: 6px; border-radius: 50%;
-        background: linear-gradient(135deg, var(--blue), var(--orange));
+        background: #ea580c;
     }
     .cl-hero h1 {
         font-size: 3rem; font-weight: 900;
@@ -63,43 +63,47 @@
         color: var(--ink);
         line-height: 1.05; letter-spacing: -0.02em;
     }
-    .cl-hero h1 .grad {
-        background: linear-gradient(135deg, var(--blue), var(--orange));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
+    /* Was a blue-to-orange gradient across the words, so a long category name
+       came out blue at one end, purple in the middle and orange at the other —
+       three brands in one line. One brand colour. */
+    .cl-hero h1 .grad { color: #ea580c; }
     .cl-hero p.lede {
         font-size: 1.05rem;
         color: var(--muted);
         max-width: 680px;
         line-height: 1.65;
     }
+    /* Two bare numbers sat under a rule with nothing holding them, which is
+       what made the page read as unfinished. */
     .cl-stats {
-        display: flex; flex-wrap: wrap; gap: 28px;
-        margin-top: 26px; padding-top: 22px;
-        border-top: 1px solid var(--line);
-        font-size: 14px; color: var(--muted);
+        display: flex; flex-wrap: wrap; gap: 12px;
+        margin-top: 26px;
+        font-size: 13px; color: var(--muted);
+    }
+    .cl-stats > div {
+        background: #fff; border: 1.5px solid #fed7aa;
+        border-radius: 13px; padding: 12px 20px; min-width: 132px;
     }
     .cl-stats b {
         display: block;
-        font-size: 1.6rem; font-weight: 900;
-        color: var(--ink);
-        margin-bottom: 2px;
+        font-size: 1.5rem; font-weight: 900;
+        color: #9a3412;
+        margin-bottom: 1px;
     }
     .cl-cta {
         display: inline-flex; align-items: center; gap: 8px;
         margin-top: 28px;
         padding: 13px 26px;
-        background: linear-gradient(135deg, var(--blue), var(--blue-dark));
-        color: #fff; font-weight: 700;
+        background: #ea580c;
+        color: #fff; font-weight: 800;
         border-radius: 12px;
         text-decoration: none;
-        box-shadow: 0 10px 30px rgba(37,99,235,0.22);
+        box-shadow: 0 10px 26px rgba(234,88,12,0.26);
         transition: transform 0.15s, box-shadow 0.15s;
     }
     .cl-cta:hover {
         transform: translateY(-2px);
-        box-shadow: 0 14px 36px rgba(37,99,235,0.30);
+        box-shadow: 0 14px 32px rgba(234,88,12,0.34);
         color: #fff;
     }
 
@@ -130,7 +134,7 @@
         transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
     }
     .cl-card:hover {
-        border-color: rgba(37,99,235,0.40);
+        border-color: #fdba74;
         transform: translateY(-3px);
         box-shadow: var(--shadow);
     }
@@ -149,9 +153,9 @@
     .cl-card-tag {
         font-size: 11px; font-weight: 600;
         padding: 3px 9px; border-radius: 999px;
-        background: rgba(37,99,235,0.08);
-        color: var(--blue-dark);
-        border: 1px solid rgba(37,99,235,0.18);
+        background: #fff7ed;
+        color: #9a3412;
+        border: 1px solid #fed7aa;
         text-transform: capitalize;
     }
 
@@ -170,8 +174,8 @@
         transition: all 0.15s;
     }
     .cl-sibling:hover {
-        border-color: rgba(37,99,235,0.40);
-        color: var(--blue-dark);
+        border-color: #fdba74;
+        color: #9a3412;
         background: var(--bg-soft);
     }
 
@@ -192,7 +196,7 @@
     .cl-empty p { margin: 0 0 18px; font-size: 0.95rem; }
     .cl-empty a {
         display: inline-block;
-        background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+        background: #ea580c;
         color: #fff !important;
         padding: 11px 24px;
         border-radius: 10px;
@@ -210,7 +214,7 @@
         color: var(--muted);
         text-decoration: none;
     }
-    .cl-breadcrumb a:hover { color: var(--blue-dark); }
+    .cl-breadcrumb a:hover { color: #ea580c; }
     .cl-breadcrumb .current { color: var(--ink); font-weight: 600; }
 
     @media (max-width: 640px) {
