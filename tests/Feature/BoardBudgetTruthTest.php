@@ -58,6 +58,10 @@ class BoardBudgetTruthTest extends TestCase
             'status' => 'published', 'starts_at' => now()->addMonth(),
             'state' => 'MD', 'source' => $source,
             'proposal_deadline' => now()->addWeek(),
+            // Multi-service requests are held back from non-Elite tiers for
+            // their first hour. Backdated so this suite tests the budget
+            // label rather than the early-access gate.
+            'published_at' => now()->subDay(),
         ], $money));
 
         $e->categories()->attach(Category::firstOrCreate(
@@ -66,6 +70,14 @@ class BoardBudgetTruthTest extends TestCase
         )->id);
 
         return $e;
+    }
+
+    private function addService(Event $e, string $name): void
+    {
+        $e->categories()->attach(Category::firstOrCreate(
+            ['slug' => \Illuminate\Support\Str::slug($name)],
+            ['name' => $name, 'kind' => Category::SERVICE, 'is_active' => true],
+        )->id);
     }
 
     private function labelSeenBy(User $pro): string
@@ -111,5 +123,49 @@ class BoardBudgetTruthTest extends TestCase
         $this->request(['budget' => null, 'budget_min' => null, 'budget_max' => null]);
 
         $this->assertSame('Open budget', $this->labelSeenBy($this->pro()));
+    }
+
+    /* ── Rule 4 and Rule 5: only your own service's money ───── */
+
+    /**
+     * The sum of three services is not the DJ's budget.
+     *
+     * One budget covers every service on a multi-service request, and it was
+     * printed under the plain word "Budget". A DJ on a DJ + Photographer +
+     * Band request read the total as theirs and priced against it. The
+     * controller set a `budget_is_whole_request` flag for exactly this, and no
+     * view ever read it — the qualifier it promised never reached a screen.
+     */
+    public function test_a_multi_service_request_does_not_show_its_combined_budget(): void
+    {
+        $e = $this->request(['budget' => 6000, 'budget_min' => 6000, 'budget_max' => 8000]);
+        $this->addService($e, 'Photography');
+        $this->addService($e, 'Live Music');
+
+        $seen = $this->labelSeenBy($this->pro());
+
+        $this->assertStringNotContainsString('6,000', $seen);
+        $this->assertStringNotContainsString('8,000', $seen);
+        $this->assertSame('Set per service', $seen);
+    }
+
+    /**
+     * And it does not claim the client set none — that figure exists, it is
+     * simply not this professional's to see.
+     */
+    public function test_it_does_not_pretend_the_client_gave_no_budget(): void
+    {
+        $e = $this->request(['budget' => 6000, 'budget_min' => 6000, 'budget_max' => 8000]);
+        $this->addService($e, 'Photography');
+
+        $this->assertNotSame('Open budget', $this->labelSeenBy($this->pro()));
+    }
+
+    /** A single-service request is unaffected: that budget IS theirs. */
+    public function test_a_single_service_request_still_shows_its_range(): void
+    {
+        $this->request(['budget' => 2000, 'budget_min' => 2000, 'budget_max' => 3000]);
+
+        $this->assertSame('$2,000 – $3,000', $this->labelSeenBy($this->pro()));
     }
 }

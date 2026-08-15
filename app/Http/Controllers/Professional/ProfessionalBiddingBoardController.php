@@ -601,6 +601,26 @@ class ProfessionalBiddingBoardController extends Controller
      */
     private function budgetLabel(Event $e, string $type): string
     {
+        /*
+         * Framework Rule 4 and Rule 5 — a professional sees only the money
+         * that belongs to their own service.
+         *
+         * On a request carrying several independently awarded services, the
+         * one budget on the record covers all of them. It was printed under
+         * the plain word "Budget", so a DJ on a DJ + Photographer + Band
+         * request read the sum of three as theirs and priced against it. The
+         * controller did set a `budget_is_whole_request` flag, but no view
+         * ever read it, so the qualifier it promised never reached a screen.
+         *
+         * There is no per-service figure to show instead — the client was
+         * never asked for one, which is the gap the review documents. So this
+         * says that, rather than showing a number that is not this
+         * professional's or claiming the client set none.
+         */
+        if ($this->scopeOf($e) === 'multi') {
+            return 'Set per service';
+        }
+
         $min = $e->budget_min !== null ? (float) $e->budget_min : null;
         $max = $e->budget_max !== null ? (float) $e->budget_max : null;
         $one = $e->budget !== null ? (float) $e->budget : null;
@@ -679,7 +699,9 @@ class ProfessionalBiddingBoardController extends Controller
              * whole request — see the note above the per-service split.
              */
             'budget' => $this->budgetLabel($e, $type),
-            'budget_is_whole_request' => $service !== null,
+            // `budget_is_whole_request` stood here and no view ever read it.
+            // The whole-request figure is no longer shown at all, so there is
+            // nothing left to qualify.
             /*
              * Rows 106, 139, 141 and 151 — one countdown, one format, and
              * computed from THIS listing's own deadline.

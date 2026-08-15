@@ -210,17 +210,29 @@ class BiddingBoardScopeTest extends TestCase
     }
 
     /**
-     * The budget is NOT split. A request carries one budget covering every
-     * service; there is no per-service budget anywhere in the data, so
-     * dividing it would invent a figure per line the client never gave.
+     * The budget is neither split nor shown.
+     *
+     * This test used to assert the opposite half: that every service line
+     * carried the same whole-request figure, flagged `budget_is_whole_request`
+     * so the view could qualify it. Splitting it was right to refuse — there
+     * is no per-service budget in the data and dividing one would invent a
+     * figure the client never gave.
+     *
+     * What was wrong is that no view ever read that flag, so the qualifier
+     * never rendered: a DJ on a DJ + Photographer + Band request saw the sum
+     * of three under the plain word "Budget" and priced against it. The
+     * Multi-Service Budget Framework's Rules 4 and 5 settle it — a
+     * professional sees only money belonging to their own service — so the
+     * combined figure is now withheld rather than qualified.
      */
-    public function test_the_budget_is_not_divided_between_services(): void
+    public function test_the_combined_budget_is_not_shown_on_a_service_line(): void
     {
         $event = $this->event(2);
 
         $cards = collect($this->gigs())->where('event_id', $event->id);
 
-        $this->assertCount(1, $cards->pluck('budget')->unique(), 'each line shows the request budget');
-        $this->assertTrue($cards->first()['budget_is_whole_request']);
+        $this->assertCount(1, $cards->pluck('budget')->unique(), 'every line says the same thing');
+        $this->assertSame('Set per service', $cards->first()['budget']);
+        $this->assertArrayNotHasKey('budget_is_whole_request', $cards->first());
     }
 }
