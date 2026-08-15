@@ -159,4 +159,70 @@ class ServiceRelevanceTest extends TestCase
     {
         return preg_replace('/\{\{--.*?--\}\}/s', '', file_get_contents($path));
     }
+
+    /**
+     * One page, one name.
+     *
+     * Every link to the event-type wall now says the same thing. Before this it
+     * was reached through three different words in four places — "Browse
+     * Categories" in the client sidebar, "Categories" in the public mobile menu
+     * and footer, and "Events" in two older partials — for one destination.
+     */
+    public function test_every_link_to_the_event_type_wall_uses_one_name(): void
+    {
+        $labels = [];
+
+        foreach ([resource_path('views/layouts'), resource_path('views/partials')] as $dir) {
+            foreach ($this->bladeFilesIn($dir) as $path) {
+                $src = preg_replace('/\{\{--.*?--\}\}/s', '', file_get_contents($path));
+
+                // Anchor by anchor: a pattern spanning the whole file walks past
+                // the closing tag and captures whatever link comes next.
+                preg_match_all('/<a\\b[^>]*>.*?<\\/a>/s', $src, $anchors);
+
+                foreach ($anchors[0] as $anchor) {
+                    if (! str_contains($anchor, "route('events-categories')")) {
+                        continue;
+                    }
+
+                    $text = trim(preg_replace('/\\s+/', ' ', strip_tags($anchor)));
+
+                    if ($text !== '') {
+                        $labels[$text] = true;
+                    }
+                }
+            }
+        }
+
+        /*
+         * The rule is not that every label is byte-identical — the public
+         * dropdown carries a description under its title, and the client
+         * sidebar says "Explore Event Types" because that is the wording the
+         * Owner asked for. The rule is that none of them uses the two words
+         * that made this page unreadable: "Categories", which on this site also
+         * means one of the 27 service categories, and "Events", which means a
+         * client's own booked event.
+         */
+        foreach (array_keys($labels) as $label) {
+            $this->assertStringContainsStringIgnoringCase(
+                'event type', $label, "\"{$label}\" does not name the event-type wall",
+            );
+        }
+
+        $this->assertNotEmpty($labels, 'the links themselves should still exist');
+    }
+
+    /** @return list<string> */
+    private function bladeFilesIn(string $dir): array
+    {
+        $files = [];
+
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir)) as $f) {
+            if ($f->isFile() && str_ends_with($f->getFilename(), '.blade.php')) {
+                $files[] = $f->getPathname();
+            }
+        }
+
+        return $files;
+    }
 }

@@ -281,7 +281,7 @@
     <div id="lpnMobile" style="display:none;background:#fff;border-top:1px solid var(--line);padding:12px 24px 18px;">
         <a href="{{ $__fgHref }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">{{ $__fgLabel }}</a>
         <a href="{{ route('public.browse') }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">Find Professionals</a>
-        <a href="{{ route('events-categories') }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">Categories</a>
+        <a href="{{ route('events-categories') }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">Event Types</a>
         <a href="{{ route('blog.index') }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">Resources</a>
         <a href="{{ route('landing') }}#pricing" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);">Pricing</a>
     </div>
@@ -311,7 +311,7 @@
                 <ul>
                     <li><a href="{{ $__fgHref }}">{{ $__fgLabel }}</a></li>
                     <li><a href="{{ route('public.browse') }}">Find Professionals</a></li>
-                    <li><a href="{{ route('events-categories') }}">Categories</a></li>
+                    <li><a href="{{ route('events-categories') }}">Event Types</a></li>
                     <li><a href="{{ url('/dashboard') }}">Tools <span class="lpf-new-badge">NEW</span></a></li>
                     <li><a href="{{ route('landing') }}#pricing">Pricing</a></li>
                 </ul>

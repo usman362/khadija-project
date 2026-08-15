@@ -1286,7 +1286,10 @@
                 <li class="cl-nav-item">
                     <a href="{{ route('events-categories') }}" class="cl-nav-link {{ request()->routeIs('events-categories') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                        Browse Categories
+                        {{-- Was "Browse Categories". It opens the event-type wall,
+                             and "Categories" on this site also means one of the 27
+                             service categories, so it named the wrong tier. --}}
+                        Explore Event Types
                     </a>
                 </li>
 
