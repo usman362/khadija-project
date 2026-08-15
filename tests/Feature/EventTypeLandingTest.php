@@ -219,4 +219,66 @@ class EventTypeLandingTest extends TestCase
 
         $this->assertCount(0, $chips);
     }
+
+    /* ── The browse page shows the real catalogue ───────────── */
+
+    /**
+     * /event-types offered a hand-written list of 13 occasions with stock
+     * photographs while 106 event types sat in the database. The Owner's
+     * mockup asks for "Showing 1 to 12 of N event types", which is a request
+     * for the actual list rather than a selection of it.
+     */
+    public function test_the_browse_page_lists_every_event_type(): void
+    {
+        foreach (range(1, 14) as $i) {
+            $this->category("Occasion {$i}", Category::EVENT_TYPE);
+        }
+
+        $all = $this->get(route('public.event-types'))->assertOk()->viewData('all');
+
+        $this->assertSame(14, $all->total(), 'every event type, not a chosen few');
+        $this->assertSame(12, $all->count(), 'twelve to a page');
+        $this->assertSame(2, $all->lastPage());
+    }
+
+    /**
+     * The number on a card counts the service categories the masterlist ranks
+     * for that occasion.
+     *
+     * Not the services beneath them — a wedding touches 171 of the 241, which
+     * says "nearly everything" and helps nobody choose. And not all 27
+     * categories, because the event-type page shows all 27 to everyone, so
+     * that number would be identical on every card.
+     */
+    public function test_the_card_counts_what_the_masterlist_recommends(): void
+    {
+        $this->wedding();   // ranks 2 categories for this archetype
+
+        $card = collect($this->get(route('public.event-types'))->assertOk()->viewData('all')->items())
+            ->firstWhere('name', 'Wedding');
+
+        $this->assertSame(2, $card['recommended']);
+    }
+
+    /** An occasion the matrix does not rank says nothing rather than guessing. */
+    public function test_an_unranked_event_type_recommends_nothing(): void
+    {
+        $this->category('Unmapped Gathering', Category::EVENT_TYPE);
+
+        $card = collect($this->get(route('public.event-types'))->assertOk()->viewData('all')->items())
+            ->firstWhere('name', 'Unmapped Gathering');
+
+        $this->assertSame(0, $card['recommended']);
+    }
+
+    /** No artwork exists for any event type, so none is claimed. */
+    public function test_a_card_without_artwork_does_not_point_at_a_missing_image(): void
+    {
+        $this->category('Plain Occasion', Category::EVENT_TYPE);
+
+        $card = collect($this->get(route('public.event-types'))->assertOk()->viewData('all')->items())
+            ->firstWhere('name', 'Plain Occasion');
+
+        $this->assertNull($card['image'], 'a broken <img> is worse than a tinted tile');
+    }
 }

@@ -43,7 +43,44 @@ class EventTypeController extends Controller
                 : 0;
         }
 
+        /*
+         * The real catalogue, paginated.
+         *
+         * Everything above this is a hand-written list of 13 occasions with
+         * stock photographs, while 106 event types sit in the database. The
+         * Owner's mockup asks for "Showing 1 to 12 of N event types", which is
+         * a request for the actual list — so this is it, and the curated
+         * sections above stay for now as the editorial top of the page.
+         *
+         * The number on each card counts what the Category Masterlist says
+         * MATTERS for that occasion — the service categories its archetype
+         * ranks Essential, Common or Occasional.
+         *
+         * Not the services beneath them: a wedding touches 171 of the 241, so
+         * that figure says "nearly everything" and helps nobody choose. And
+         * not all 27 categories either, because the event-type page shows all
+         * 27 to everyone, so that number would be the same on every card.
+         *
+         * The mockup's "26 services available" is illustrative — no count in
+         * this taxonomy produces it — so the card says what it is measuring
+         * rather than borrowing a word that would be wrong.
+         */
+        $tiers = \App\Domain\Taxonomy\ServiceRelevance::tiersByArchetype();
+
+        $all = \App\Models\Category::active()
+            ->where('kind', \App\Models\Category::EVENT_TYPE)
+            ->orderBy('name')
+            ->paginate(12)
+            ->withQueryString()
+            ->through(fn ($c) => [
+                'name'     => $c->name,
+                'slug'     => $c->slug,
+                'image'    => $c->thumbnail ? asset('storage/' . $c->thumbnail) : null,
+                'recommended' => count($tiers[$c->archetype] ?? []),
+            ]);
+
         return view('public.event-types', [
+            'all'        => $all,
             'occasions'  => $occasions,
             'featured'   => $featured,
             'popular'    => $popular,

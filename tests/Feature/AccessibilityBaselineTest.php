@@ -118,7 +118,12 @@ class AccessibilityBaselineTest extends TestCase
         $offenders = [];
 
         foreach ($this->views() as $path) {
-            $src = file_get_contents($path);
+            // Blade comments are stripped first. Notes explaining a removal
+            // often quote the markup they replaced — a comment reading "an
+            // <img> pointing at nothing reads as broken" was reported here as
+            // an image with no alt text. The same trap the dead-controls and
+            // invented-figures guards already avoid.
+            $src = preg_replace('/\{\{--.*?--\}\}/s', '', file_get_contents($path));
 
             foreach ($this->tags($src, 'img') as [$a, $b]) {
                 if (! preg_match('/\balt\s*=/', substr($src, $a, $b - $a))) {
