@@ -31,7 +31,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://images.unsplash.com">
     <link rel="dns-prefetch" href="https://images.unsplash.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    {{-- Fraunces carries the headings, Inter everything else.
+     Plus Jakarta Sans was doing the headings and reads as a slightly rounder
+     Inter — two sans faces that close together look like one font used
+     inconsistently rather than a pairing. This is an events marketplace, so the
+     display face is warm: a wedding, a birthday and a company party are not
+     dashboard rows. Inter keeps the interface, because at 12px in a table
+     nothing beats it. --}}
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         /* ── Light public theme (self-contained — does not touch the dark
@@ -73,7 +80,7 @@
             --shadow: 0 14px 40px rgba(15, 27, 53, 0.08);
             --shadow-lg: 0 24px 60px rgba(15, 27, 53, 0.12);
             --ff: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            --ff-head: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            --ff-head: 'Fraunces', Georgia, 'Times New Roman', serif;
         }
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
@@ -87,7 +94,14 @@
         }
         a { text-decoration: none; color: inherit; }
         img { max-width: 100%; display: block; }
-        h1, h2, h3, h4 { font-family: var(--ff-head); color: var(--ink); margin: 0; line-height: 1.15; }
+        h1, h2, h3, h4 {
+            font-family: var(--ff-head); color: var(--ink); margin: 0;
+            line-height: 1.1; letter-spacing: -0.015em;
+            /* Fraunces reads heavy at the same numeric weight as a sans, so the
+               headings step down rather than up. */
+            font-weight: 600;
+        }
+        h1 { font-weight: 700; }
         .lp-container { max-width: 1320px; margin: 0 auto; padding: 0 24px; }
         .skip-to-content { position: absolute; left: -9999px; top: 0; background: var(--blue); color: #fff; padding: 10px 16px; border-radius: 0 0 8px 0; z-index: 2000; }
         .skip-to-content:focus { left: 0; }

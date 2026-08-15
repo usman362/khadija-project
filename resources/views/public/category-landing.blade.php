@@ -58,7 +58,7 @@
         background: #ea580c;
     }
     .cl-hero h1 {
-        font-size: 3rem; font-weight: 900;
+        font-size: 3rem; font-weight: 700;
         margin: 18px 0 14px;
         color: var(--ink);
         line-height: 1.05; letter-spacing: -0.02em;
@@ -86,7 +86,7 @@
     }
     .cl-stats b {
         display: block;
-        font-size: 1.5rem; font-weight: 900;
+        font-size: 1.5rem; font-family: var(--ff); font-weight: 800;
         color: #9a3412;
         margin-bottom: 1px;
     }

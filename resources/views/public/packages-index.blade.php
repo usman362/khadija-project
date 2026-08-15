@@ -23,7 +23,7 @@
 
     /* Hero */
     .pk-hero { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 22px 0 20px; }
-    .pk-hero h1 { font-size: clamp(1.7rem, 3.4vw, 2.5rem); font-weight: 900; color: var(--ink); letter-spacing: -.02em; margin: 0 0 6px; }
+    .pk-hero h1 { font-size: clamp(1.7rem, 3.4vw, 2.5rem); font-weight: 700; color: var(--ink); letter-spacing: -.02em; margin: 0 0 6px; }
     .pk-hero h1 span { color: var(--pk); }
     .pk-hero p { color: var(--muted); font-size: 15px; max-width: 420px; margin: 0; }
     .pk-props { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 12px; }
@@ -110,13 +110,13 @@
     .pk-cardfoot .star { color: #f59e0b; font-weight: 800; }
     .pk-pricebox { border-left: 1px solid var(--line); padding: 18px 16px; display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: center; }
     .pk-pricebox .lbl { font-size: 11px; color: var(--muted); font-weight: 700; }
-    .pk-pricebox .amt { font-size: 24px; font-weight: 900; color: var(--ink); line-height: 1.1; margin: 2px 0; }
+    .pk-pricebox .amt { font-size: 24px; font-family: var(--ff); font-weight: 800; color: var(--ink); line-height: 1.1; margin: 2px 0; }
     .pk-pricebox .tp { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
     .pk-btn { display: block; width: 100%; text-align: center; border-radius: 10px; padding: 10px; font-size: 13.5px; font-weight: 800; text-decoration: none; cursor: pointer; }
     .pk-btn-primary { background: var(--pk); color: #fff; border: none; }
     .pk-btn-primary:hover { background: var(--pk-dark); }
     .pk-btn-ghost { background: #fff; color: var(--pk); border: 1px solid var(--pk); margin-top: 8px; }
-    .pk-save { font-size: 11.5px; font-weight: 700; color: #16a34a; margin-top: 12px; line-height: 1.4; }
+    .pk-save { font-size: 11.5px; font-family: var(--ff); font-weight: 800; color: #16a34a; margin-top: 12px; line-height: 1.4; }
 
     /* Grid view */
     .pk-cards.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 18px; }

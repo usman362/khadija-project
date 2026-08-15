@@ -18,7 +18,7 @@
 
     /* Hero */
     .et-hero { text-align: center; padding: 46px 22px 34px; }
-    .et-hero h1 { font-size: clamp(1.9rem, 4vw, 2.7rem); font-weight: 900; color: var(--ink); letter-spacing: -.02em; margin: 0 0 8px; }
+    .et-hero h1 { font-size: clamp(1.9rem, 4vw, 2.7rem); font-weight: 700; color: var(--ink); letter-spacing: -.02em; margin: 0 0 8px; }
     .et-hero h1 span { color: var(--et); }
     .et-hero p { color: var(--muted); font-size: 1.02rem; max-width: 560px; margin: 0 auto 22px; }
     .et-search { max-width: 560px; margin: 0 auto; display: flex; gap: 10px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 8px; box-shadow: 0 12px 30px -20px rgba(15,27,53,.4); }
@@ -70,7 +70,7 @@
 
     @media (max-width: 1080px) { .et-browse { grid-template-columns: 1fr; } .et-rail-card { position: static; } .et-all { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     @media (max-width: 820px)  { .et-all { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    .et-sec-h { margin: 8px 0 4px; font-size: 1.4rem; font-weight: 900; color: var(--ink); }
+    .et-sec-h { margin: 8px 0 4px; font-size: 1.4rem; font-weight: 700; color: var(--ink); }
     .et-sec-h span { color: var(--et); }
     .et-sec-p { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
 
@@ -93,7 +93,7 @@
     .et-hero-card .ov { position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,15,30,.82), rgba(10,15,30,.15) 60%); }
     .et-hero-card .txt { position: absolute; left: 20px; bottom: 20px; right: 20px; color: #fff; }
     .et-badge-feat { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .4px; background: var(--et); color: #fff; padding: 4px 10px; border-radius: 6px; margin-bottom: 10px; }
-    .et-hero-card h3 { font-size: 1.7rem; font-weight: 900; color: #fff; margin: 0 0 4px; }
+    .et-hero-card h3 { font-size: 1.7rem; font-weight: 700; color: #fff; margin: 0 0 4px; }
     .et-hero-card p { font-size: 13.5px; color: #e2e8f0; margin: 0 0 14px; }
     .et-hero-card .go { display: inline-flex; align-items: center; gap: 7px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.5); color: #fff; border-radius: 10px; padding: 10px 16px; font-size: 13.5px; font-weight: 800; }
 
@@ -148,7 +148,7 @@
 
     /* CTA */
     .et-cta { display: flex; align-items: center; justify-content: space-between; gap: 20px; background: var(--et-soft); border: 1px solid #bfdbfe; border-radius: 18px; padding: 24px 28px; }
-    .et-cta h3 { font-size: 1.2rem; font-weight: 900; color: var(--ink); margin: 0 0 4px; }
+    .et-cta h3 { font-size: 1.2rem; font-weight: 700; color: var(--ink); margin: 0 0 4px; }
     .et-cta p { color: var(--muted); font-size: 13.5px; margin: 0; }
     .et-cta .btns { display: flex; gap: 10px; flex-shrink: 0; }
     .et-cta .b1 { background: var(--et); color: #fff; border-radius: 11px; padding: 11px 20px; font-weight: 800; text-decoration: none; font-size: 14px; }

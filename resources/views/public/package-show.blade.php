@@ -23,7 +23,7 @@
     .pk-hero-cat { position: absolute; top: 14px; left: 14px; background: rgba(255,255,255,.94); color: #0f1b35; font-size: 12px; font-weight: 800; padding: 6px 13px; border-radius: 999px; }
     .pk-grid { display: grid; grid-template-columns: 1fr 340px; gap: 28px; align-items: start; }
     .pk-eyebrow { font-size: 12px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; color: var(--blue); }
-    .pk-title { font-size: 2rem; font-weight: 900; color: var(--ink); line-height: 1.12; margin: 8px 0 14px; letter-spacing: -.02em; }
+    .pk-title { font-size: 2rem; font-weight: 700; color: var(--ink); line-height: 1.12; margin: 8px 0 14px; letter-spacing: -.02em; }
     .pk-pro { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-bottom: 20px; }
     .pk-pro img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; }
     .pk-pro-name { font-weight: 800; color: var(--ink); }
@@ -34,7 +34,7 @@
     .pk-inc li { display: flex; gap: 10px; align-items: flex-start; color: var(--ink-2); font-size: 14.5px; }
     .pk-inc svg { width: 18px; height: 18px; color: #16a34a; flex-shrink: 0; margin-top: 1px; }
     .pk-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 22px; box-shadow: 0 12px 30px -18px rgba(15,27,53,.4); position: sticky; top: 90px; }
-    .pk-price { font-size: 2rem; font-weight: 900; color: var(--ink); }
+    .pk-price { font-size: 2rem; font-family: var(--ff); font-weight: 800; color: var(--ink); }
     .pk-price small { font-size: 13px; font-weight: 600; color: var(--muted); display: block; margin-top: 2px; }
     .pk-cta { display: block; text-align: center; margin-top: 16px; padding: 13px; border-radius: 12px; font-weight: 800; text-decoration: none; font-size: 15px; }
     .pk-cta-primary { background: linear-gradient(135deg, var(--blue), #6366f1); color: #fff; box-shadow: 0 12px 26px -12px rgba(99,102,241,.5); }
