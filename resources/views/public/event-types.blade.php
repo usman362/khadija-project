@@ -32,6 +32,44 @@
     .et-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 8px 15px; font-size: 13px; font-weight: 700; color: var(--ink-2); cursor: pointer; }
     .et-chip.on { background: var(--et); border-color: var(--et); color: #fff; }
 
+    /* ── Mockup layout: chip row, rail, four-across wall ───── */
+    .et-groupbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+    .et-gchip { display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line, #e5e7eb);
+        background: #fff; color: #374151; border-radius: 999px; padding: 8px 16px; font-size: 12.5px;
+        font-weight: 700; text-decoration: none; cursor: pointer; font-family: inherit; }
+    .et-gchip b { font-weight: 800; font-size: 11px; color: #9a3412; background: #ffedd5; border-radius: 999px; padding: 1px 7px; }
+    .et-gchip:hover { border-color: #fdba74; }
+    .et-gchip.is-on { background: #ea580c; border-color: #ea580c; color: #fff; }
+    .et-gchip.is-on b { background: rgba(255,255,255,.22); color: #fff; }
+    .et-gextra { display: none; }
+
+    .et-browse { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 24px; align-items: start; margin-bottom: 46px; }
+    .et-rail-card { border: 1.5px solid var(--line, #e5e7eb); border-radius: 16px; padding: 16px; background: #fff; position: sticky; top: 88px; }
+    .et-rail-card h4 { margin: 0 0 2px; font-size: 14px; font-weight: 800; color: #111827; }
+    .et-rail-note { margin: 0 0 10px; font-size: 11.5px; color: #6b7280; line-height: 1.4; }
+    .et-rail-row { display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        padding: 9px 2px; border-bottom: 1px solid #f3f4f6; font-size: 13px; color: #374151; text-decoration: none; }
+    .et-rail-row:hover { color: #ea580c; }
+    .et-rail-row b { font-size: 11px; font-weight: 800; color: #9a3412; background: #ffedd5; border-radius: 999px; padding: 1px 8px; }
+    .et-rail-all { display: inline-block; margin-top: 12px; font-size: 12.5px; font-weight: 800; color: #ea580c; text-decoration: none; }
+
+    .et-all { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .et-all-card { position: relative; border: 1.5px solid var(--line, #e5e7eb); border-radius: 14px;
+        overflow: hidden; background: #fff; text-decoration: none; display: block; }
+    .et-all-card:hover { border-color: #fdba74; }
+    .et-all-img { height: 118px; background: linear-gradient(135deg, #fed7aa, #fdba74); position: relative; }
+    .et-all-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .et-all-init { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+        font-size: 30px; font-weight: 800; color: #9a3412; opacity: .55; }
+    .et-all-body { padding: 11px 30px 13px 13px; }
+    .et-all-name { font-size: 13.5px; font-weight: 800; color: #111827; margin-bottom: 2px; }
+    .et-all-sub { font-size: 11.5px; color: #ea580c; font-weight: 700; }
+    .et-all-arw { position: absolute; right: 12px; bottom: 12px; color: #9ca3af; font-size: 17px; line-height: 1; }
+    .et-all-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        flex-wrap: wrap; font-size: 13px; color: #6b7280; }
+
+    @media (max-width: 1080px) { .et-browse { grid-template-columns: 1fr; } .et-rail-card { position: static; } .et-all { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (max-width: 820px)  { .et-all { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     .et-sec-h { margin: 8px 0 4px; font-size: 1.4rem; font-weight: 900; color: var(--ink); }
     .et-sec-h span { color: var(--et); }
     .et-sec-p { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
@@ -125,160 +163,88 @@
 @section('content')
 <div class="et et-wrap">
     <div class="et-hero">
-        <h1>Explore by <span>Event Type</span> ✨</h1>
-        <p>Search by occasion — find the perfect professionals, services, and packages for every kind of event.</p>
+        <h1>Explore <span>Event Types</span></h1>
+        <p>Find the type of event you're planning and discover the services and professionals you need to bring it together.</p>
         <form class="et-search" method="GET" action="{{ route('public.browse') }}">
-            <input type="text" name="q" placeholder="Search event types or occasions…">
+            <input type="text" name="q" placeholder="Search event types…">
             <button type="submit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</button>
         </form>
     </div>
 
-    <div class="et-shell">
-        <div class="et-filters">
-            <span class="et-drop">All event types ▾</span>
-            <span class="et-drop">All subtypes ▾</span>
-            <div class="et-chips">
-                <button type="button" class="et-chip on">🔥 Popular</button>
-                <button type="button" class="et-chip">📈 Trending</button>
-                <button type="button" class="et-chip">💲 Budget-Friendly</button>
-                <button type="button" class="et-chip">🆕 Newly Added</button>
-                <button type="button" class="et-chip">📍 Near Me</button>
-            </div>
-        </div>
+    {{-- The chips are the Category Masterlist's own 13 archetypes, which is how
+         the 106 occasions are actually grouped. A hand-written set of themes
+         would need somebody to keep it in step with the taxonomy; these cannot
+         drift, because they come from it. --}}
+    <div class="et-groupbar">
+        <a class="et-gchip {{ $group === '' ? 'is-on' : '' }}" href="{{ route('public.event-types') }}">All Event Types</a>
+        @foreach($chips as $name => $count)
+            <a class="et-gchip {{ $group === $name ? 'is-on' : '' }} {{ $loop->index >= 5 ? 'et-gextra' : '' }}"
+               href="{{ route('public.event-types', ['group' => $name]) }}">{{ $name }} <b>{{ $count }}</b></a>
+        @endforeach
+        @if($chips->count() > 5)
+            <button type="button" class="et-gchip" data-et-more>More ({{ $chips->count() - 5 }}) ▾</button>
+        @endif
+    </div>
 
-        {{-- Browse by Event Type --}}
-        <h2 class="et-sec-h">Browse by Event Type</h2>
-        <p class="et-sec-p">Find professionals and packages for every kind of occasion.</p>
-        <div class="et-browse">
-            <nav class="et-rail">
-                <a href="{{ route('public.event-types') }}" class="on"><span class="e">🗂️</span> All Occasions</a>
-                @foreach($occasions as $o)
-                    <a href="{{ $link($o['name']) }}"><span class="e">{{ $o['icon'] }}</span> {{ $o['name'] }}{!! $countOf($o['name']) ? '<span class="et-rc">' . $countOf($o['name']) . '</span>' : '' !!}</a>
-                @endforeach
-            </nav>
+    <div class="et-browse">
+        <aside class="et-rail-card">
+            <h4>All Event Types</h4>
+            <p class="et-rail-note">The occasions with the most to plan for.</p>
+            @foreach($rail as $r)
+                <a class="et-rail-row" href="{{ route('public.category', $r['slug']) }}">
+                    <span>{{ $r['name'] }}</span><b>{{ $r['recommended'] }}</b>
+                </a>
+            @endforeach
+            <a class="et-rail-all" href="{{ route('public.event-types') }}">View all event types →</a>
+        </aside>
 
-            <div>
-                <div class="et-tabs">
-                    @foreach($groups as $i => $g)
-                        <button type="button" class="et-tab {{ $i === 0 ? 'on' : '' }}">{{ $g }}</button>
-                    @endforeach
-                </div>
+        <div>
+            <h2 class="et-sec-h">Browse <span>Event Types</span></h2>
+            <p class="et-sec-p">Choose an event type to start planning.</p>
 
-                <div class="et-fgrid">
-                    <a href="{{ $link($featured['hero']['name']) }}" class="et-card et-hero-card">
-                        <img src="{{ $featured['hero']['img'] }}" alt="{{ $featured['hero']['name'] }}" loading="lazy">
-                        <div class="ov"></div>
-                        <div class="txt">
-                            <span class="et-badge-feat">FEATURED</span>
-                            <h3>{{ $featured['hero']['name'] }}</h3>
-                            <p>{{ $featured['hero']['blurb'] }}</p>
-                            <span class="go">Explore {{ $featured['hero']['name'] }}{!! $countOf($featured['hero']['name']) ? ' · ' . $countOf($featured['hero']['name']) . ' packages' : '' !!} →</span>
+            <div class="et-all">
+                @forelse($wall as $et)
+                    <a class="et-all-card" href="{{ route('public.category', $et['slug']) }}">
+                        <div class="et-all-img">
+                            @if($et['image'])
+                                <img src="{{ $et['image'] }}" alt="{{ $et['name'] }}" loading="lazy">
+                            @else
+                                {{-- No artwork exists for any event type yet. A tinted
+                                     tile with the initial reads as deliberate; an image
+                                     tag pointing at nothing reads as broken. It fills in
+                                     on its own once the pictures are uploaded. --}}
+                                <span class="et-all-init">{{ mb_substr($et['name'], 0, 1) }}</span>
+                            @endif
                         </div>
+                        <div class="et-all-body">
+                            <div class="et-all-name">{{ $et['name'] }}</div>
+                            <div class="et-all-sub">
+                                {{ $et['recommended'] }} {{ \Illuminate\Support\Str::plural('service', $et['recommended']) }} available
+                            </div>
+                        </div>
+                        <span class="et-all-arw">›</span>
                     </a>
-                    @foreach(array_slice($featured['tiles'], 0, 2) as $t)
-                        <a href="{{ $link($t['name']) }}" class="et-card et-tile">
-                            <img src="{{ $t['img'] }}" alt="{{ $t['name'] }}" loading="lazy">
-                            <div class="ov"></div>
-                            <div class="txt"><h4>{{ $t['name'] }}</h4><p>{{ $t['blurb'] }}</p></div>
-                            <span class="arw">→</span>
-                        </a>
-                    @endforeach
-                </div>
-
-                <div class="et-subgrid">
-                    @foreach(array_slice($featured['tiles'], 2) as $t)
-                        <a href="{{ $link($t['name']) }}" class="et-card et-tile">
-                            <img src="{{ $t['img'] }}" alt="{{ $t['name'] }}" loading="lazy">
-                            <div class="ov"></div>
-                            <div class="txt"><h4>{{ $t['name'] }}</h4><p>{{ $t['blurb'] }}</p></div>
-                            <span class="arw">→</span>
-                        </a>
-                    @endforeach
-                </div>
+                @empty
+                    <p class="et-sec-p">No event types in this group.</p>
+                @endforelse
             </div>
-        </div>
 
-        {{-- Popular Event Types --}}
-        <h2 class="et-sec-h">Popular <span>Event Types</span></h2>
-        <p class="et-sec-p">Browse the most in-demand occasions and celebrations.</p>
-        <div class="et-pop">
-            @foreach($popular as $pop)
-                <a href="{{ $link($pop['name']) }}" class="et-pcard">
-                    <div class="et-pmedia">
-                        <img src="{{ $pop['img'] }}" alt="{{ $pop['name'] }}" loading="lazy">
-                        <span class="et-pbadge" style="background: {{ $badgeColor[$pop['badge']] ?? '#2563eb' }};">{{ $pop['badge'] }}</span>
-                    </div>
-                    <div class="et-pbody">
-                        <b>{{ $pop['name'] }}</b>
-                        <span>{{ $pop['blurb'] }}</span>
-                        <span class="et-pfrom">from ${{ number_format($pop['from']) }}{!! $countOf($pop['name']) ? '<span class="et-pcount">' . $countOf($pop['name']) . ' packages</span>' : '' !!}</span>
-                    </div>
-                </a>
-            @endforeach
-        </div>
-
-        {{-- More Occasions --}}
-        <h2 class="et-sec-h">More Occasions to Explore</h2>
-        <p class="et-sec-p">Discover professionals for every kind of event.</p>
-        <div class="et-more">
-            @foreach($more as $m)
-                <a href="{{ $link($m['name']) }}" class="et-mcard">
-                    <img src="{{ $m['img'] }}" alt="{{ $m['name'] }}" loading="lazy">
-                    <div class="ov"></div>
-                    <div class="txt"><h5>{{ $m['name'] }}</h5><p>{{ $m['blurb'] }}</p></div>
-                    <span class="arw">→</span>
-                </a>
-            @endforeach
-        </div>
-
-        {{-- CTA --}}
-                {{-- The real catalogue.
-             Everything above this section is a hand-picked list of 13
-             occasions with stock photography; there are 106 event types in the
-             database. The Owner's mockup asks for "Showing 1 to 12 of N",
-             which is a request for the actual list rather than a selection. --}}
-        <h2 class="et-sec-h">Browse <span>Event Types</span></h2>
-        <p class="et-sec-p">Every occasion we cover. Choose one to start planning.</p>
-
-        <div class="et-all">
-            @foreach($all as $et)
-                <a class="et-all-card" href="{{ route('public.category', $et['slug']) }}">
-                    <div class="et-all-img">
-                        @if($et['image'])
-                            <img src="{{ $et['image'] }}" alt="{{ $et['name'] }}" loading="lazy">
-                        @else
-                            {{-- No artwork exists for any event type yet. A tinted
-                                 tile with the initial reads as deliberate; an
-                                 <img> pointing at nothing reads as broken. It
-                                 fills in on its own once the images are uploaded. --}}
-                            <span class="et-all-init">{{ mb_substr($et['name'], 0, 1) }}</span>
-                        @endif
-                    </div>
-                    <div class="et-all-body">
-                        <div class="et-all-name">{{ $et['name'] }}</div>
-                        <div class="et-all-sub">
-                            {{ $et['recommended'] }} recommended {{ \Illuminate\Support\Str::plural('service', $et['recommended']) }}
-                        </div>
-                    </div>
-                </a>
-            @endforeach
-        </div>
-
-        <div class="et-all-foot">
-            <span>Showing {{ $all->firstItem() }} to {{ $all->lastItem() }} of {{ $all->total() }} event types</span>
-            {{ $all->onEachSide(1)->links() }}
-        </div>
-
-        <div class="et-cta">
-            <div>
-                <h3>Can't find your event type?</h3>
-                <p>Post your event and let verified professionals come to you. Describe your needs and receive proposals.</p>
-            </div>
-            <div class="btns">
-                <a class="b1" href="{{ route('register', ['role' => 'client']) }}">Post an Event</a>
-                <a class="b2" href="{{ route('public.browse') }}">Find a Professional</a>
+            <div class="et-all-foot">
+                <span>Showing {{ $wall->firstItem() ?? 0 }} to {{ $wall->lastItem() ?? 0 }} of {{ $wall->total() }} event types</span>
+                {{ $wall->onEachSide(1)->links() }}
             </div>
         </div>
     </div>
 </div>
+
+<script>
+(function () {
+    var more = document.querySelector('[data-et-more]');
+    if (!more) return;
+    more.addEventListener('click', function () {
+        document.querySelectorAll('.et-gextra').forEach(function (c) { c.style.display = 'inline-flex'; });
+        more.remove();
+    });
+})();
+</script>
 @endsection

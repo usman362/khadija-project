@@ -19,74 +19,76 @@ class EventTypeController extends Controller
 
     public function index(): View
     {
-        $occasions = $this->occasions();
-        $featured  = $this->featured();
-        $popular   = $this->popular();
-        $more      = $this->more();
-
-        // Real package counts per occasion label (matched by title/category/services).
-        $names = collect($occasions)->pluck('name')
-            ->merge([$featured['hero']['name']])
-            ->merge(collect($featured['tiles'])->pluck('name'))
-            ->merge(collect($popular)->pluck('name'))
-            ->merge(collect($more)->pluck('name'))
-            ->unique();
-
-        $counts = [];
-        foreach ($names as $name) {
-            // Scoped to the viewer: the tile's number is a promise about what
-            // the packages page will show, and that page is R38-scoped.
-            $counts[$name] = \App\Support\Occasions::known($name)
-                ? \App\Models\Package::active()
-                    ->tap(fn ($qr) => \App\Support\StateMatching::scopeForViewer($qr, auth()->user()))
-                    ->forOccasion($name)->count()
-                : 0;
-        }
+        /*
+         * The hand-picked lists this page used to render — 13 occasions with
+         * stock photographs, 6 featured, 8 popular, 5 more — are gone. The
+         * page now shows the 106 event types that actually exist. Their
+         * builder methods are kept below for the moment because the Owner may
+         * want an editorial strip back on top of the catalogue; nothing calls
+         * them today.
+         */
 
         /*
-         * The real catalogue, paginated.
+         * The catalogue, as the Owner's mockup draws it: a chip row, a rail of
+         * event types with counts, and a paginated wall four across.
          *
-         * Everything above this is a hand-written list of 13 occasions with
-         * stock photographs, while 106 event types sit in the database. The
-         * Owner's mockup asks for "Showing 1 to 12 of N event types", which is
-         * a request for the actual list — so this is it, and the curated
-         * sections above stay for now as the editorial top of the page.
+         * The chips are the Category Masterlist's 13 archetypes, which is how
+         * the 106 occasions are actually grouped. A hand-written set of themes
+         * would have to be kept in step with the taxonomy by somebody
+         * remembering to; these cannot drift because they come from it.
          *
-         * The number on each card counts what the Category Masterlist says
-         * MATTERS for that occasion — the service categories its archetype
-         * ranks Essential, Common or Occasional.
-         *
-         * Not the services beneath them: a wedding touches 171 of the 241, so
-         * that figure says "nearly everything" and helps nobody choose. And
-         * not all 27 categories either, because the event-type page shows all
-         * 27 to everyone, so that number would be the same on every card.
-         *
-         * The mockup's "26 services available" is illustrative — no count in
-         * this taxonomy produces it — so the card says what it is measuring
-         * rather than borrowing a word that would be wrong.
+         * The number beside each is what the masterlist RECOMMENDS for that
+         * occasion — the service categories its archetype ranks. Not the
+         * services beneath them (a wedding touches 171 of 241, which says
+         * "nearly everything"), and not all 27 (identical on every card,
+         * because the event-type page shows all 27 to everyone).
          */
         $tiers = \App\Domain\Taxonomy\ServiceRelevance::tiersByArchetype();
 
-        $all = \App\Models\Category::active()
+        $chips = \App\Models\Category::active()
             ->where('kind', \App\Models\Category::EVENT_TYPE)
+            ->whereNotNull('archetype')
+            ->selectRaw('archetype, COUNT(*) as c')
+            ->groupBy('archetype')
+            ->orderByDesc('c')
+            ->pluck('c', 'archetype');
+
+        $group = (string) request()->query('group', '');
+        $group = $chips->has($group) ? $group : '';
+
+        $card = fn ($c) => [
+            'name'        => $c->name,
+            'slug'        => $c->slug,
+            'image'       => $c->thumbnail ? asset('storage/' . $c->thumbnail) : null,
+            'recommended' => count($tiers[$c->archetype] ?? []),
+        ];
+
+        $wall = \App\Models\Category::active()
+            ->where('kind', \App\Models\Category::EVENT_TYPE)
+            ->when($group !== '', fn ($q) => $q->where('archetype', $group))
             ->orderBy('name')
             ->paginate(12)
             ->withQueryString()
-            ->through(fn ($c) => [
-                'name'     => $c->name,
-                'slug'     => $c->slug,
-                'image'    => $c->thumbnail ? asset('storage/' . $c->thumbnail) : null,
-                'recommended' => count($tiers[$c->archetype] ?? []),
-            ]);
+            ->through($card);
+
+        // The rail lists the occasions with the most to plan for, which is the
+        // most useful ten to put in front of someone rather than the first ten
+        // alphabetically.
+        $rail = \App\Models\Category::active()
+            ->where('kind', \App\Models\Category::EVENT_TYPE)
+            ->get()
+            ->map($card)
+            ->sortByDesc('recommended')
+            ->take(10)
+            ->values();
 
         return view('public.event-types', [
-            'all'        => $all,
-            'occasions'  => $occasions,
-            'featured'   => $featured,
-            'popular'    => $popular,
-            'more'       => $more,
-            'counts'     => $counts,
-            'groups'     => ['All', 'Celebrations', 'Corporate', 'Personal', 'Seasonal', 'Cultural'],
+            'wall'       => $wall,
+            'chips'      => $chips,
+            'group'      => $group,
+            'rail'       => $rail,
+            // 'groups' was a hand-written list of six themes. The chips above
+            // are the taxonomy's own 13 archetypes, so it is no longer read.
         ]);
     }
 

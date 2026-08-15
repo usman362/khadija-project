@@ -234,7 +234,7 @@ class EventTypeLandingTest extends TestCase
             $this->category("Occasion {$i}", Category::EVENT_TYPE);
         }
 
-        $all = $this->get(route('public.event-types'))->assertOk()->viewData('all');
+        $all = $this->get(route('public.event-types'))->assertOk()->viewData('wall');
 
         $this->assertSame(14, $all->total(), 'every event type, not a chosen few');
         $this->assertSame(12, $all->count(), 'twelve to a page');
@@ -254,7 +254,7 @@ class EventTypeLandingTest extends TestCase
     {
         $this->wedding();   // ranks 2 categories for this archetype
 
-        $card = collect($this->get(route('public.event-types'))->assertOk()->viewData('all')->items())
+        $card = collect($this->get(route('public.event-types'))->assertOk()->viewData('wall')->items())
             ->firstWhere('name', 'Wedding');
 
         $this->assertSame(2, $card['recommended']);
@@ -265,7 +265,7 @@ class EventTypeLandingTest extends TestCase
     {
         $this->category('Unmapped Gathering', Category::EVENT_TYPE);
 
-        $card = collect($this->get(route('public.event-types'))->assertOk()->viewData('all')->items())
+        $card = collect($this->get(route('public.event-types'))->assertOk()->viewData('wall')->items())
             ->firstWhere('name', 'Unmapped Gathering');
 
         $this->assertSame(0, $card['recommended']);
@@ -276,7 +276,7 @@ class EventTypeLandingTest extends TestCase
     {
         $this->category('Plain Occasion', Category::EVENT_TYPE);
 
-        $card = collect($this->get(route('public.event-types'))->assertOk()->viewData('all')->items())
+        $card = collect($this->get(route('public.event-types'))->assertOk()->viewData('wall')->items())
             ->firstWhere('name', 'Plain Occasion');
 
         $this->assertNull($card['image'], 'a broken <img> is worse than a tinted tile');
