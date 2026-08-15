@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Public;
 
 use App\Domain\Auth\Enums\RoleName;
 use App\Http\Controllers\Controller;
+use App\Domain\Taxonomy\ServiceRelevance;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,6 +23,19 @@ class CategoryLandingController extends Controller
     public function show(string $slug): View
     {
         $category = Category::active()->where('slug', $slug)->firstOrFail();
+
+        /*
+         * An event type is not something you hire.
+         *
+         * Every row on this site came through one page, so all 106 event types
+         * rendered as "Hire Charity Event" over a count of professionals — the
+         * same confusion between the three tiers that the Owner has been
+         * pointing at, in its plainest form. You do not hire a Year-End Party;
+         * you plan one, and then hire the people for it.
+         */
+        if ($category->kind === Category::EVENT_TYPE) {
+            return $this->eventType($category);
+        }
 
         // Pros who list this category — or anything beneath it, so a visitor
         // landing on a group page still sees the specialists inside it. This
@@ -87,6 +101,56 @@ class CategoryLandingController extends Controller
             'subcategoryCount' => $category->children()->where('is_active', true)->count(),
             'siblings'         => $siblings,
         ]);
+    }
+
+    /**
+     * The event-type page: plan first, hire second.
+     *
+     * The services offered are the ones the Category Masterlist says matter
+     * for this occasion — its archetype's service categories, Essential first.
+     * That matrix has been in the database since 5 August; this is the second
+     * place to read it.
+     *
+     * Nothing is invented for an occasion the matrix does not rank: the page
+     * falls back to every service category rather than guessing an order.
+     */
+    private function eventType(Category $category): View
+    {
+        $tiers = ServiceRelevance::tiersByArchetype()[$category->archetype] ?? [];
+
+        $services = Category::active()
+            ->ofKind(Category::SERVICE_CATEGORY)
+            ->orderBy('name')
+            ->get(['id', 'name', 'slug', 'thumbnail', 'short_description'])
+            ->map(fn ($c) => [
+                'id'    => $c->id,
+                'name'  => $c->name,
+                'slug'  => $c->slug,
+                'blurb' => $c->short_description,
+                'tier'  => $tiers[$c->id] ?? null,
+            ])
+            ->sortBy([
+                fn ($a, $b) => ServiceRelevance::rank($a['tier']) <=> ServiceRelevance::rank($b['tier']),
+                fn ($a, $b) => $a['name'] <=> $b['name'],
+            ])
+            ->values();
+
+        // Rule R38 — the same scope the rest of the site uses. A featured
+        // professional a visitor cannot hire is not a feature.
+        $inState = fn ($q) => \App\Support\StateMatching::scopeUsersForViewer($q, auth()->user());
+
+        $featured = User::query()
+            ->whereHas('roles', fn ($r) => $r->where('name', RoleName::PROFESSIONAL->value))
+            ->excludingSelf()
+            ->tap($inState)
+            ->with('profile')
+            ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')
+            ->withCount(['reviewsReceived as reviews_count' => fn ($r) => $r->where('is_hidden', false)])
+            ->orderByRaw('reviews_avg IS NULL, reviews_avg DESC')
+            ->limit(6)
+            ->get();
+
+        return view('public.event-type-landing', compact('category', 'services', 'featured'));
     }
 
     /**

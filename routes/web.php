@@ -678,6 +678,8 @@ Route::middleware('auth')->group(function () {
         // Row 226 Phase 1 — a tool result becomes the start of a bidding request.
         Route::post('/bsr-from-tool', [\App\Http\Controllers\Client\ClientBsrController::class, 'fromTool'])
             ->middleware('permission:events.create')->name('client.bsr.from-tool');
+        Route::post('/bsr-from-event-type', [\App\Http\Controllers\Client\ClientBsrController::class, 'fromEventType'])
+            ->middleware('permission:events.create')->name('client.bsr.from-event-type');
         Route::get('/events/{event}/compare-proposals', [\App\Http\Controllers\Client\ClientProposalController::class, 'compare'])
             ->name('client.proposals.compare');
 

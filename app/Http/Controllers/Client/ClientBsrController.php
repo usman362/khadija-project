@@ -329,6 +329,46 @@ class ClientBsrController extends Controller
             ->with('status', 'Saved as a draft from ' . $toolName . '. Nothing has been posted — it is in My Events until you publish it.');
     }
 
+    /**
+     * From an event-type page into the request wizard.
+     *
+     * The page offers SERVICE CATEGORIES, because that is the tier the Category
+     * Masterlist ranks per occasion. The wizard needs specific services, so the
+     * chosen categories arrive as a focus rather than as the answer — the
+     * picker there is already ordered by the same matrix, and the client ticks
+     * the actual services.
+     *
+     * Nothing is chosen on their behalf. Turning "Catering" into every catering
+     * service under it would put a dozen requests in front of professionals
+     * that the client never asked for.
+     */
+    public function fromEventType(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'event_type'   => ['required', 'string', 'max:120'],
+            'categories'   => ['required', 'array', 'min:1', 'max:27'],
+            'categories.*' => ['integer', 'exists:categories,id'],
+        ]);
+
+        // Only an event type we actually have, for the same reason the tool
+        // handoff checks it: free text must not become a public listing title.
+        $eventType = Category::active()->eventTypes()
+            ->whereRaw('LOWER(name) = ?', [mb_strtolower(trim($data['event_type']))])
+            ->value('name');
+
+        Session::put(self::KEY, array_filter([
+            'event_type'    => $eventType,
+            'title'         => $this->titleFrom($eventType, null),
+            'focus_categories' => array_values(array_map('intval', $data['categories'])),
+        ], fn ($v) => $v !== null && $v !== []));
+
+        return redirect()
+            ->route('client.bsr.step', 'service')
+            ->with('status', $eventType
+                ? "Planning your {$eventType}. Choose the services you need — the ones that matter most for this kind of event are first."
+                : 'Choose the services you need to get started.');
+    }
+
     /** A working title, so the client edits one rather than writes one. */
     private function titleFrom(?string $eventType, ?string $date): ?string
     {
