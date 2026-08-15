@@ -16,7 +16,15 @@
     // asset live on a category: a square photo thumbnail and a wide promo
     // banner with the name baked in. Cards always take the thumbnail — a
     // banner shrunk into a card reads as a shouty graphic.
-    $fallbackImg = 'https://images.unsplash.com/photo-1519741497674-611481863552?w=900&q=80&auto=format&fit=crop';
+    /*
+     * No category in the taxonomy has a thumbnail yet — not one of the 374.
+     * This used to fall back to a single stock wedding photograph, so every
+     * card on the page showed the same picture: a Trade Show, a Funeral
+     * Service and a Wine Tasting all illustrated with the same bouquet.
+     * Null means the card draws its tinted initial instead, the same as the
+     * event-types page, and fills itself the moment artwork is uploaded.
+     */
+    $fallbackImg = null;
     $thumbUrl = function ($c) use ($fallbackImg) {
         $f = $c->thumbnail ?? null;
         return $f ? asset('storage/' . $f) : $fallbackImg;
@@ -188,6 +196,9 @@
        category name that the legacy art bakes into the image. */
     .ec-card-img { position: relative; aspect-ratio: 6 / 5; overflow: hidden; background: var(--bg-soft-2, #eef2f8); }
     .ec-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s; }
+    .ec-card-init { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+        font-size: 42px; font-weight: 800; color: var(--brand-text, #9a3412);
+        background: linear-gradient(135deg, #fed7aa, #fdba74); opacity: .9; }
     /* Wide promo banner in a 6:5 box. Cropping to fill would slice 25% off each
        side, straight through the lettering the artwork is built around, so the
        banner stays whole and a blurred, scaled copy of itself fills the space
@@ -326,8 +337,12 @@
                  at once — the occasion, the kind of service, and the service
                  itself. The default view is the event-type wall, so that is what
                  it is called. --}}
-            <h1 class="ec-h1">Explore by <span class="b">Event Type</span> <span class="o">✨</span></h1>
-            <p class="ec-hero-sub">Every kind of event, every kind of professional — browse the event types we cover and find the right people for your occasion.</p>
+            {{-- This page is the whole tree — event types, service categories
+                 AND services. The one that browses occasions is /event-types,
+                 and titling both of them "Event Type" is what made them look
+                 like the same page twice. --}}
+            <h1 class="ec-h1">Everything <span class="b">We Cover</span></h1>
+            <p class="ec-hero-sub">Every event type, every service category and every service on GigResource. Looking for occasions only? <a href="{{ route('public.event-types') }}" style="color:var(--brand-text);font-weight:700;">Browse event types</a>.</p>
 
             {{-- Searches the category browser below. It used to post to /browse,
                  which sits behind auth — a guest typing here just landed on the
@@ -474,7 +489,15 @@
                                 <a class="ec-card" href="{{ route('public.category', $cat->slug) }}">
                                     <div class="ec-card-img {{ $isBanner ? 'is-banner' : '' }}"
                                          @if($isBanner) style="--ec-bg: url('{{ $cardImg }}')" @endif>
-                                        <img loading="lazy" src="{{ $cardImg }}" alt="{{ $cat->name }}">
+                                        @if($cardImg)
+                                            <img loading="lazy" src="{{ $cardImg }}" alt="{{ $cat->name }}">
+                                        @else
+                                            {{-- No artwork: a tinted tile with the initial, which
+                                                 reads as deliberate. An <img> with no source reads
+                                                 as broken, and one stock photo on every card reads
+                                                 as wrong. --}}
+                                            <span class="ec-card-init">{{ mb_substr($cat->name, 0, 1) }}</span>
+                                        @endif
                                         @php $kidCount = $descCounts[$cat->id] ?? 0; @endphp
                                         @if($kidCount > 0)
                                             <span class="ec-card-count">{{ $kidCount }} {{ Str::plural('subcategory', $kidCount) }}</span>
@@ -510,7 +533,12 @@
         </div>
     </section>
 
-    {{-- ══════════════ TOP SERVICES ══════════════ --}}
+    {{-- ══════════════ TOP SERVICES ══════════════
+         Withheld when there is nothing in it. The query wants services that
+         carry a thumbnail and not one of the 374 categories has one, so this
+         rendered a heading, a paragraph and four filter tabs over an empty
+         space. A section with nothing under it reads as a broken page. --}}
+    @if($topServices->isNotEmpty())
     <section class="ec-section">
         <div class="lp-container">
             <div class="ec-shead">
@@ -543,6 +571,7 @@
             </div>
         </div>
     </section>
+    @endif
 
     {{-- ══════════════ CTA ══════════════ --}}
     <section class="ec-section" style="padding-bottom: 60px;">

@@ -142,9 +142,24 @@ class ServiceRelevanceTest extends TestCase
     {
         $markup = $this->stripComments(resource_path('views/events-categories.blade.php'));
 
-        $this->assertStringContainsString('Explore by <span class="b">Event Type</span>', $markup);
+        /*
+         * This page is the whole tree — event types, service categories AND
+         * services — so it is named for that. Titling it "Explore by Event
+         * Type" was the earlier fix, and it turned out to be wrong for a
+         * different reason: /event-types already browses occasions, and two
+         * pages under the same title is how four rounds of screenshots got
+         * pointed at the page nobody had rebuilt.
+         */
+        $this->assertStringContainsString('Everything <span class="b">We Cover</span>', $markup);
         $this->assertStringNotContainsString('Explore by <span class="b">Category</span>', $markup);
+        $this->assertStringNotContainsString('Explore by <span class="b">Event Type</span>', $markup);
         $this->assertStringNotContainsString('Search categories or services', $markup);
+
+        // And the page that DOES browse occasions still says so.
+        $this->assertStringContainsString(
+            'Explore <span>Event Types</span>',
+            file_get_contents(resource_path('views/public/event-types.blade.php')),
+        );
     }
 
     /** Shop Packages had its own place in the bar and a second one in a menu. */
