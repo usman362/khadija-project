@@ -164,4 +164,59 @@ class EventTypeLandingTest extends TestCase
             ->post(route('client.bsr.from-event-type'), ['event_type' => 'Wedding', 'categories' => []])
             ->assertSessionHasErrors('categories');
     }
+
+    /* ── Icons and chips ────────────────────────────────────── */
+
+    /**
+     * Every one of the 27 service categories has an icon, because none of them
+     * has artwork. A photograph would have to come from somewhere, and a stock
+     * picture of someone else's wedding is a claim this page cannot make.
+     */
+    public function test_every_service_category_has_an_icon(): void
+    {
+        $mapped = \App\Domain\Taxonomy\ServiceIcon::mappedSlugs();
+
+        $this->assertCount(27, $mapped, 'one per service category in the masterlist');
+        $this->assertNotEmpty(\App\Domain\Taxonomy\ServiceIcon::pathFor('something-unmapped'),
+            'an unmapped category should look plain, never broken');
+    }
+
+    public function test_the_cards_carry_their_icon(): void
+    {
+        $shown = collect($this->get(route('public.category', $this->wedding()->slug))
+            ->assertOk()->viewData('services'));
+
+        foreach ($shown as $svc) {
+            $this->assertNotEmpty($svc['icon'], "{$svc['name']} has no icon");
+        }
+    }
+
+    /**
+     * The chips are the trades the professionals on the page actually work in.
+     * A fixed list would offer "DJs" where none of them is a DJ, and filter to
+     * an empty row.
+     */
+    public function test_the_filter_chips_come_from_the_professionals_shown(): void
+    {
+        $this->wedding();
+
+        $catering = Category::where('name', 'Catering')->firstOrFail();
+
+        $pro = User::factory()->create(['primary_role' => 'professional']);
+        $pro->assignRole('professional');
+        $pro->getOrCreateProfile()->update(['country' => 'US', 'state' => 'MD', 'city' => 'Baltimore']);
+        $pro->serviceCategories()->attach($catering->id);
+
+        $chips = $this->get(route('public.category', 'wedding'))->assertOk()->viewData('chips');
+
+        $this->assertSame(['Catering'], $chips->all(), 'only trades somebody here actually offers');
+    }
+
+    /** With nobody to show, there is nothing to filter and no chip row. */
+    public function test_no_chips_when_there_is_nobody_to_filter(): void
+    {
+        $chips = $this->get(route('public.category', $this->wedding()->slug))->assertOk()->viewData('chips');
+
+        $this->assertCount(0, $chips);
+    }
 }

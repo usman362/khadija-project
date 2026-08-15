@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Public;
 
 use App\Domain\Auth\Enums\RoleName;
 use App\Http\Controllers\Controller;
+use App\Domain\Taxonomy\ServiceIcon;
 use App\Domain\Taxonomy\ServiceRelevance;
 use App\Models\Category;
 use App\Models\User;
@@ -128,6 +129,7 @@ class CategoryLandingController extends Controller
                 'slug'  => $c->slug,
                 'blurb' => $c->short_description,
                 'tier'  => $tiers[$c->id] ?? null,
+                'icon'  => ServiceIcon::pathFor($c->slug),
             ])
             ->sortBy([
                 fn ($a, $b) => ServiceRelevance::rank($a['tier']) <=> ServiceRelevance::rank($b['tier']),
@@ -143,14 +145,28 @@ class CategoryLandingController extends Controller
             ->whereHas('roles', fn ($r) => $r->where('name', RoleName::PROFESSIONAL->value))
             ->excludingSelf()
             ->tap($inState)
-            ->with('profile')
+            ->with(['profile', 'serviceCategories:id,name'])
             ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')
             ->withCount(['reviewsReceived as reviews_count' => fn ($r) => $r->where('is_hidden', false)])
             ->orderByRaw('reviews_avg IS NULL, reviews_avg DESC')
-            ->limit(6)
+            ->limit(12)
             ->get();
 
-        return view('public.event-type-landing', compact('category', 'services', 'featured'));
+        /*
+         * The filter chips are the categories these professionals actually
+         * work in, not a fixed list. A chip for a trade nobody here offers
+         * filters to an empty row, and one that says "DJs" when none of the
+         * twelve is a DJ is the same broken promise as a count that overstates
+         * itself.
+         */
+        $chips = $featured
+            ->flatMap(fn ($p) => $p->serviceCategories->pluck('name'))
+            ->countBy()
+            ->sortDesc()
+            ->keys()
+            ->values();
+
+        return view('public.event-type-landing', compact('category', 'services', 'featured', 'chips'));
     }
 
     /**
