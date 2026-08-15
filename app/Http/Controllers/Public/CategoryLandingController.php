@@ -95,12 +95,62 @@ class CategoryLandingController extends Controller
             ->limit(8)
             ->get(['id', 'name', 'slug', 'icon']);
 
+        /*
+         * What this category actually holds. The page said "10 Services
+         * covered" and then never listed them — the ten sat at the bottom as
+         * unlabelled pills under a heading that called them "Related
+         * categories", which they are not. They are the content of the page.
+         */
+        $services = Category::active()
+            ->where('parent_id', $category->id)
+            ->orderBy('sort_order')->orderBy('name')
+            ->get(['id', 'name', 'slug', 'short_description']);
+
+        // Real words from real clients about people in this category. Nothing
+        // is shown when there are none, rather than a placeholder testimonial.
+        $proIds = User::query()
+            ->whereHas('serviceCategories', fn (Builder $c) => $c->whereIn('categories.id', $branchIds))
+            ->pluck('id');
+
+        $reviews = \App\Models\Review::query()
+            ->whereIn('reviewee_id', $proIds)
+            ->where('is_hidden', false)
+            ->whereNotNull('comment')
+            ->with(['reviewer:id,name', 'reviewee:id,name'])
+            ->latest()
+            ->limit(3)
+            ->get();
+
+        /*
+         * Which occasions this category matters for, straight from the
+         * Category Masterlist rather than a guess. It answers the question a
+         * visitor actually has — "is this for something like my event?" — and
+         * every one of them is a page they can go to.
+         */
+        $forEvents = collect();
+
+        if ($category->kind === Category::SERVICE_CATEGORY) {
+            $archetypes = \App\Models\CategoryRelevance::where('category_id', $category->id)
+                ->where('tier', 'Essential')
+                ->pluck('archetype');
+
+            $forEvents = Category::active()
+                ->where('kind', Category::EVENT_TYPE)
+                ->whereIn('archetype', $archetypes)
+                ->orderBy('name')
+                ->limit(12)
+                ->get(['name', 'slug']);
+        }
+
         return view('public.category-landing', [
             'category'         => $category,
             'featured'         => $featured,
             'totalCount'       => $totalCount,
             'subcategoryCount' => $category->children()->where('is_active', true)->count(),
             'siblings'         => $siblings,
+            'services'         => $services,
+            'reviews'          => $reviews,
+            'forEvents'        => $forEvents,
         ]);
     }
 

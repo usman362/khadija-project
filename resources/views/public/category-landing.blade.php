@@ -90,9 +90,17 @@
         color: #9a3412;
         margin-bottom: 1px;
     }
+    .cl-cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 28px; }
+    .cl-cta-alt {
+        display: inline-flex; align-items: center;
+        padding: 13px 22px;
+        background: #fff; border: 1.5px solid #fed7aa;
+        color: #9a3412; font-weight: 800;
+        border-radius: 12px; text-decoration: none;
+    }
+    .cl-cta-alt:hover { border-color: #fdba74; background: #fff7ed; color: #9a3412; }
     .cl-cta {
         display: inline-flex; align-items: center; gap: 8px;
-        margin-top: 28px;
         padding: 13px 26px;
         background: #ea580c;
         color: #fff; font-weight: 800;
@@ -161,6 +169,22 @@
 
     /* ─── Sibling pills ───────────────────────────────────── */
     .cl-siblings { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    /* What's included */
+    .cl-svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 12px; }
+    .cl-svc { display: block; padding: 15px 16px; border: 1.5px solid var(--line); border-radius: 13px;
+        background: var(--bg); text-decoration: none; transition: border-color .15s, transform .15s; }
+    .cl-svc:hover { border-color: #fdba74; transform: translateY(-2px); }
+    .cl-svc-name { display: block; font-weight: 800; font-size: 14px; color: var(--ink); margin-bottom: 3px; }
+    .cl-svc-desc { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+
+    /* What clients said */
+    .cl-rev-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+    .cl-rev { margin: 0; padding: 18px; border: 1.5px solid var(--line); border-radius: 15px; background: var(--bg); }
+    .cl-rev-stars { color: #f59e0b; font-size: 14px; letter-spacing: 1px; margin-bottom: 9px; }
+    .cl-rev-stars span { color: var(--line); }
+    .cl-rev blockquote { margin: 0 0 11px; font-size: 14px; line-height: 1.6; color: var(--ink); }
+    .cl-rev figcaption { font-size: 12px; color: var(--muted); }
     .cl-sibling {
         display: inline-flex; align-items: center; gap: 8px;
         background: var(--bg);
@@ -271,12 +295,42 @@
                 <div><b>{{ number_format($subcategoryCount) }}</b>{{ Str::plural('Service', $subcategoryCount) }} covered</div>
             </div>
         @endif
-        <a href="{{ $browseUrl }}" class="cl-cta">
-            Browse all {{ $category->name }}
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </a>
+        {{-- Two ways to act, because the page had only one. Browsing suits a
+             visitor who wants to look; posting suits one who already knows what
+             they need and would rather be come to. --}}
+        <div class="cl-cta-row">
+            <a href="{{ $browseUrl }}" class="cl-cta">
+                Browse all {{ $category->name }}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a href="{{ route('client.bsr.step', 'service') }}" class="cl-cta-alt">
+                Post a request instead
+            </a>
+        </div>
     </div>
 </section>
+
+{{-- What this category holds. The hero says "N Services covered" and this
+     is that N — it used to be nowhere on the page except as unlabelled pills
+     at the bottom under a heading calling them related categories. --}}
+@if($services->isNotEmpty())
+<section class="cl-section" style="padding-bottom:0;">
+    <div class="cl-section-head">
+        <h2>What's included</h2>
+        <p>The {{ $services->count() }} {{ Str::plural('service', $services->count()) }} you can book under {{ $category->name }}.</p>
+    </div>
+    <div class="cl-svc-grid">
+        @foreach($services as $svc)
+            <a class="cl-svc" href="{{ route('public.browse', ['category' => $svc->slug]) }}">
+                <span class="cl-svc-name">{{ $svc->name }}</span>
+                @if($svc->short_description)
+                    <span class="cl-svc-desc">{{ Str::limit(strip_tags((string) $svc->short_description), 62) }}</span>
+                @endif
+            </a>
+        @endforeach
+    </div>
+</section>
+@endif
 
 <section class="cl-section">
     <div class="cl-section-head">
@@ -328,6 +382,44 @@
         </div>
     @endif
 </section>
+
+{{-- Real words from real clients about people in this category. Nothing at
+     all when there are none — a placeholder testimonial on a marketplace is
+     the one thing a visitor will never forgive. --}}
+@if($reviews->isNotEmpty())
+<section class="cl-section" style="padding-top:0;">
+    <div class="cl-section-head">
+        <h2>What clients said</h2>
+        <p>Reviews left for professionals in this category.</p>
+    </div>
+    <div class="cl-rev-grid">
+        @foreach($reviews as $rev)
+            <figure class="cl-rev">
+                <div class="cl-rev-stars">{{ str_repeat('★', (int) $rev->rating) }}<span>{{ str_repeat('★', 5 - (int) $rev->rating) }}</span></div>
+                <blockquote>{{ Str::limit(strip_tags((string) $rev->comment), 150) }}</blockquote>
+                <figcaption>{{ $rev->reviewer?->name ?? 'A client' }} · on {{ $rev->reviewee?->name }}</figcaption>
+            </figure>
+        @endforeach
+    </div>
+</section>
+@endif
+
+{{-- Answers the question a visitor actually arrives with: is this for
+     something like my event? Straight from the Category Masterlist, which
+     marks this category Essential for these occasions. --}}
+@if($forEvents->isNotEmpty())
+<section class="cl-section" style="padding-top:0;">
+    <div class="cl-section-head">
+        <h2>Essential for these events</h2>
+        <p>Occasions where {{ $category->name }} is usually one of the first things booked.</p>
+    </div>
+    <div class="cl-siblings">
+        @foreach($forEvents as $ev)
+            <a href="{{ route('public.category', $ev->slug) }}" class="cl-sibling">{{ $ev->name }}</a>
+        @endforeach
+    </div>
+</section>
+@endif
 
 @if($siblings->isNotEmpty())
 <section class="cl-section" style="padding-top:0;">
