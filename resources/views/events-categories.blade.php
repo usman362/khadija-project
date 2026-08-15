@@ -25,6 +25,9 @@
      * event-types page, and fills itself the moment artwork is uploaded.
      */
     $fallbackImg = null;
+
+    // Read once: the masterlist's archetype -> service-category ranking.
+    $relevanceTiers = \App\Domain\Taxonomy\ServiceRelevance::tiersByArchetype();
     $thumbUrl = function ($c) use ($fallbackImg) {
         $f = $c->thumbnail ?? null;
         return $f ? asset('storage/' . $f) : $fallbackImg;
@@ -186,7 +189,7 @@
     .ec-fchip-clear { font-size: 12.5px; font-weight: 700; color: var(--blue); text-decoration: none; }
     .ec-fchip-clear:hover { text-decoration: underline; }
 
-    .ec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .ec-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
     .ec-card { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line);
         border-radius: 16px; overflow: hidden; text-decoration: none;
         box-shadow: 0 10px 24px -20px rgba(15,27,53,.5); transition: transform .15s, box-shadow .15s; }
@@ -194,6 +197,9 @@
     /* 6:5 matches the service artwork exactly and trims only 8% off a square
        occasion photo — enough to fill the box, never enough to slice the
        category name that the legacy art bakes into the image. */
+    .ec-card { position: relative; }
+    .ec-card-svc { display: block; font-size: 12px; font-weight: 700; color: var(--brand-text, #ea580c); }
+    .ec-card-arw { position: absolute; right: 13px; bottom: 12px; color: var(--text-muted, #9ca3af); font-size: 18px; line-height: 1; }
     .ec-card-img { position: relative; aspect-ratio: 6 / 5; overflow: hidden; background: var(--bg-soft-2, #eef2f8); }
     .ec-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s; }
     .ec-card-init { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
@@ -303,7 +309,7 @@
 
     @media (max-width: 1080px) {
         .ec-shop { grid-template-columns: 268px 1fr; }
-        .ec-grid { grid-template-columns: repeat(2, 1fr); }
+        .ec-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
         .ec-ts-grid { grid-template-columns: repeat(3, 1fr); }
     }
     @media (max-width: 900px) {
@@ -316,7 +322,7 @@
     }
     @media (max-width: 720px) {
         .ec-h1 { font-size: 30px; }
-        .ec-grid { grid-template-columns: 1fr; }
+        .ec-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .ec-ts-grid { grid-template-columns: repeat(2, 1fr); }
         .ec-search { border-radius: 18px; }
         /* Too narrow for a toolbar — stack the count over the pages rather
@@ -499,21 +505,50 @@
                                             <span class="ec-card-init">{{ mb_substr($cat->name, 0, 1) }}</span>
                                         @endif
                                         @php $kidCount = $descCounts[$cat->id] ?? 0; @endphp
-                                        @if($kidCount > 0)
-                                            <span class="ec-card-count">{{ $kidCount }} {{ Str::plural('subcategory', $kidCount) }}</span>
-                                        @endif
                                     </div>
+                                    {{-- The mockup's card: the name, and how many services
+                                         sit under it. The kicker, the description and the
+                                         "View professionals" line are gone — four of those
+                                         across a row is a wall of text, and the count is the
+                                         thing that helps someone choose. --}}
                                     <div class="ec-card-body">
+                                        {{-- The kicker stays. This grid mixes all three tiers when
+                                             you search, so "Event Type" or "Service Category" is
+                                             the only thing telling you which one you are looking
+                                             at. The description and the "View professionals" line
+                                             are what went — four of those across a row is a wall
+                                             of text. --}}
                                         <span class="ec-card-parent">{{ $kicker }}</span>
                                         <h3>{{ Str::title($cat->name) }}</h3>
-                                        @if($cat->short_description)
-                                            <p>{{ Str::limit(strip_tags((string) $cat->short_description), 80) }}</p>
+                                        @php
+                                            /*
+                                             * The count means a different thing per tier, and using
+                                             * one for all three printed "0 services available" on
+                                             * every event type — they have no children; services
+                                             * hang under service categories, not under occasions.
+                                             *
+                                             * Event type      -> what the Category Masterlist
+                                             *                    recommends for that occasion, which
+                                             *                    is exactly what its own page then
+                                             *                    offers, so the two agree.
+                                             * Service category -> the services it holds.
+                                             * A service        -> nothing; it is the leaf.
+                                             */
+                                            $svcCount = match ($cat->kind) {
+                                                \App\Models\Category::EVENT_TYPE
+                                                    => count($relevanceTiers[$cat->archetype] ?? []),
+                                                \App\Models\Category::SERVICE_CATEGORY
+                                                    => $kidCount,
+                                                default => null,
+                                            };
+                                        @endphp
+                                        @if($svcCount !== null)
+                                            <span class="ec-card-svc">
+                                                {{ $svcCount }} {{ Str::plural('service', $svcCount) }} available
+                                            </span>
                                         @endif
-                                        <span class="ec-card-go">
-                                            View professionals
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                                        </span>
                                     </div>
+                                    <span class="ec-card-arw">›</span>
                                 </a>
                             @endforeach
                         </div>
