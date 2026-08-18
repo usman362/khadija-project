@@ -49,7 +49,7 @@ class PrototypeToolToRequestController extends Controller
             'icon'   => '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
         ],
         'dsr' => [
-            'label'  => 'Send Direct Offer',
+            'label'  => 'Send Direct Request',
             'blurb'  => 'Skip the board — take the plan straight to a professional you already want.',
             'status' => 'proposed',
             'icon'   => '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',

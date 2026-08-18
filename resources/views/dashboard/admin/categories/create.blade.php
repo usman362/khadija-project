@@ -38,6 +38,7 @@
                             <label class="form-label fw-bold">Cover Image</label>
                             <input type="file" name="cover_image" class="form-control @error('cover_image') is-invalid @enderror"
                                    accept="image/*" onchange="previewImage(this, 'coverPreview')">
+                            <small class="text-secondary">No names, prices or logos in the picture. The category title is shown as text on the site. Prefer a consistent illustration.</small>
                             @error('cover_image')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -48,6 +49,7 @@
                             <label class="form-label fw-bold">Thumbnail Image</label>
                             <input type="file" name="thumbnail" class="form-control @error('thumbnail') is-invalid @enderror"
                                    accept="image/*" onchange="previewImage(this, 'thumbPreview')">
+                            <small class="text-secondary">Same rule: no words baked into the image.</small>
                             @error('thumbnail')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -115,6 +117,37 @@
                             @error('long_description')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                        </div>
+
+                        {{-- Insurance matrix (draft — not a live gate) --}}
+                        <div class="mb-3 p-3 rounded" style="background:#f8fafc;border:1px solid #e2e8f0;">
+                            <label class="form-label fw-bold mb-1">Insurance (draft)</label>
+                            <p class="text-secondary small mb-3">For the broker conversation. A “Required” cell here does not lock anyone until broker and attorney sign off.</p>
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <label class="form-label small">Requirement</label>
+                                    <select name="insurance_requirement" class="form-select">
+                                        <option value="">— Not set —</option>
+                                        <option value="required" @selected(old('insurance_requirement') === 'required')>Required</option>
+                                        <option value="conditional" @selected(old('insurance_requirement') === 'conditional')>Conditional</option>
+                                        <option value="not_required" @selected(old('insurance_requirement') === 'not_required')>Not Required</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">Insurance type</label>
+                                    <input type="text" name="insurance_type" class="form-control" maxlength="80"
+                                           value="{{ old('insurance_type') }}" placeholder="e.g. General Liability">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small">Tier</label>
+                                    <select name="insurance_tier" class="form-select">
+                                        <option value="">— Not set —</option>
+                                        @foreach(['A','B','C'] as $tier)
+                                            <option value="{{ $tier }}" @selected(old('insurance_tier') === $tier)>Tier {{ $tier }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
                         {{-- Sort Order & Active --}}

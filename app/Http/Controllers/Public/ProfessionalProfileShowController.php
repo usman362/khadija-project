@@ -194,7 +194,7 @@ class ProfessionalProfileShowController extends Controller
     private function acceptedOn(): array
     {
         return [
-            ['Direct offers',      'Yes',      'A client can hire them directly, without posting to the board.'],
+            ['Direct requests',    'Yes',      'A client can hire them directly, without posting to the board.'],
             ['Emergency requests', 'Yes',      'They can be reached for short-notice work.'],
             ['Payment protection', 'Included', 'Money is held by the payment processor until the work is confirmed.'],
         ];

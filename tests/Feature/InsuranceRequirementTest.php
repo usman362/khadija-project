@@ -195,6 +195,54 @@ class InsuranceRequirementTest extends TestCase
     }
 
     /**
+     * 2026-08-19 — the broker matrix is storage, not a gate. A cell marked
+     * Required on a category that is not on the live named list must not
+     * suddenly demand a certificate.
+     */
+    public function test_a_draft_required_cell_does_not_gate_until_signed_off(): void
+    {
+        $pro = $this->pro();
+        $cat = $this->category('Balloon Decor');
+        $cat->update([
+            'insurance_requirement' => 'required',
+            'insurance_type'        => 'General Liability',
+            'insurance_tier'        => 'A',
+        ]);
+        $pro->serviceCategories()->attach($cat);
+
+        $this->assertFalse((bool) config('compliance.insurance_matrix_signed_off'));
+        $this->assertFalse(InsuranceRequirement::appliesTo($pro->fresh()));
+    }
+
+    /** Admin can fill the draft cells. Filling them still does not enforce. */
+    public function test_admin_can_record_the_draft_matrix_without_enforcing_it(): void
+    {
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+
+        $this->actingAs($admin)->post(route('app.admin.categories.store'), [
+            'name'                   => 'Fireworks Display',
+            'insurance_requirement'  => 'required',
+            'insurance_type'         => 'Pyrotechnics',
+            'insurance_tier'         => 'C',
+            'is_active'              => 1,
+        ])->assertRedirect(route('app.admin.categories.index'));
+
+        $cat = Category::where('name', 'Fireworks Display')->first();
+        $this->assertNotNull($cat);
+        $this->assertSame('required', $cat->insurance_requirement);
+        $this->assertSame('C', $cat->insurance_tier);
+
+        $pro = $this->pro();
+        $pro->serviceCategories()->attach($cat);
+
+        $this->assertFalse(InsuranceRequirement::appliesTo($pro->fresh()));
+    }
+
+    /**
      * A PDF whose first bytes actually say PDF.
      *
      * R54's pipeline reads the file header, so `fake()->create('x.pdf')` — all

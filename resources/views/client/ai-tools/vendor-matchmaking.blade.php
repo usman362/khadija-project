@@ -361,7 +361,7 @@
                 // Mirrors the Blade partial: a direct offer only for a real
                 // professional. Without this the control would disappear the
                 // moment a filter re-rendered the list.
-                + (m.id ? '<a class="vm-offer" href="' + offerUrl.replace('__PRO__', m.id) + '">Send ' + esc(m.name) + ' a direct offer →</a>' : '')
+                + (m.id ? '<a class="vm-offer" href="' + offerUrl.replace('__PRO__', m.id) + '">Send ' + esc(m.name) + ' a Direct Request →</a>' : '')
                 + '</div>';
         }).join('');
     }

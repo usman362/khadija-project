@@ -11,14 +11,14 @@ use Tests\TestCase;
 /**
  * Checklist row 226 — turning a tool result into a request.
  *
- * R40's vision is five outcomes (BR, ER, Direct Offer, Save Draft, Attach to
+ * R40's vision is five outcomes (BR, ER, Direct Request, Save Draft, Attach to
  * Existing Event) across twelve tools. Phase 1 proved ONE outcome from THREE
  * tools; Phase 2 is three outcomes across seven.
  *
  * Neither number is a shortfall. Four of the twelve describe something that is
  * not an event to be requested — a review, a signed contract, a message, a
  * phrase — and the two remaining legs already have homes: "attach to an
- * existing event" lives on the event page, and a Direct Offer needs a
+ * existing event" lives on the event page, and a Direct Request needs a
  * professional, which only Best Match names.
  *
  * The judgement worth recording is what crosses over. A request carries what

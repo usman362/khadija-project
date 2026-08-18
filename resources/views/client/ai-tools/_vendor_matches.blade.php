@@ -38,7 +38,7 @@
              addressed to nobody. The id is what tells them apart. --}}
         @if(!empty($m['id']))
             <a class="vm-offer" href="{{ route('client.direct-offers.create', ['pro' => $m['id']]) }}">
-                Send {{ $m['name'] }} a direct offer →
+                Send {{ $m['name'] }} a Direct Request →
             </a>
         @endif
     </div>

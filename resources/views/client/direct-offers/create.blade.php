@@ -262,8 +262,8 @@
     {{-- Contextual rail — fills large screens, stacks under the form on tablet/mobile --}}
     <aside class="do-rail">
         <div class="do-rcard">
-            <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>How direct offers work</h4>
-            <div class="do-step"><span class="do-step-n">1</span><span class="do-step-b"><b>Pick your pro &amp; services</b>Choose who you're offering to and exactly what you need.</span></div>
+            <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>How Direct Requests work</h4>
+            <div class="do-step"><span class="do-step-n">1</span><span class="do-step-b"><b>Pick your pro &amp; services</b>Choose who you're sending this to and exactly what you need.</span></div>
             <div class="do-step"><span class="do-step-n">2</span><span class="do-step-b"><b>Send the request</b>We draft a clear brief from your inputs and delivers it to the pro.</span></div>
             <div class="do-step"><span class="do-step-n">3</span><span class="do-step-b"><b>They respond</b>The pro can accept, counter, or ask questions — replies land on your Proposals page.</span></div>
         </div>

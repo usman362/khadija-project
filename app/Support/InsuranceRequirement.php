@@ -11,6 +11,11 @@ use Illuminate\Support\Carbon;
  *
  * Khadijah, 2026-08-04: required for Alcohol service, Catering, Security and
  * Pyrotechnics/Fireworks. The category names sit in config/compliance.php.
+ *
+ * 2026-08-19: categories.insurance_requirement / insurance_type / insurance_tier
+ * are the broker's draft matrix. They are NOT read here. Flip
+ * compliance.insurance_matrix_signed_off only after broker and attorney
+ * sign off — until then a "Required" cell is a note, not a gate.
  */
 class InsuranceRequirement
 {

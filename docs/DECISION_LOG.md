@@ -128,6 +128,21 @@ meantime.
 
 ---
 
+## 4c. Decided 2026-08-19
+
+Taken from the 9-item open-items QA (PM comments). Built the three that were
+signed off to build; left the rest.
+
+| Item | Decision | Who |
+|---|---|---|
+| **R46 labels** | User-facing names are **BR / ER / DR** everywhere a person reads them. Routes, class names, config keys and stored `source` values stay. SSR / MSR stay as the *scope* inside a request (one service vs several), not as types. | Signed off, built |
+| **R44 category images** | No names, prices or logos inside the picture. The category title is page text. Art style stays **illustrations** (already locked 13 Aug). Admin upload now carries that instruction. | Signed off, built |
+| **Insurance matrix** | Schema only: Required / Conditional / Not Required + insurance type + Tier A/B/C. **Do not enforce Required from those cells** until broker and attorney sign off. Live gate remains the named list in compliance config. | Signed off, schema only |
+| **Tax / SSN fields** | Do not build. Payment provider collects; GigResource stores a status later. | Do not build |
+| **Dispute legal wording, ID consent copy, admin bidding-window UI** | Do not build in this pass. | Do not build |
+
+---
+
 ## 5. Locked rules — do not re-open without Sir Peter
 
 From `GIGRESOURCE_RULES_MASTER.docx` (36 rules). These are settled; changing one
@@ -151,3 +166,4 @@ is a decision, not a preference.
 |---|---|
 | 2026-07-31 | Created and seeded from the code (Ali). Handed to Khadijah to own. |
 | 2026-08-13 | Added §4b for the decisions taken in Chat on 13 August. B5 resolved and struck. A7 moved to built (Phase 1). Recorded the payouts finding behind the tax/identity plan. |
+| 2026-08-19 | Added §4c for the 9-item QA sign-off. Remaining user-facing copy swept to BR / ER / DR. Category image upload now tells admin not to bake names into the picture. Insurance matrix columns added as draft storage only — live Required list unchanged. |

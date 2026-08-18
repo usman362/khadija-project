@@ -107,7 +107,7 @@ class ClientDirectOfferController extends Controller
         // the request and an offer to yourself would create a booking where one
         // account is both parties — a contract with itself, and commission
         // taken on money that never moved.
-        abort_if($pro->id === $user->id, 422, 'You cannot send a direct offer to yourself.');
+        abort_if($pro->id === $user->id, 422, 'You cannot send a Direct Request to yourself.');
 
         /*
          * Row 193's actual bug, guarded at the point it matters.
@@ -141,7 +141,7 @@ class ClientDirectOfferController extends Controller
         );
 
         $event = Event::create([
-            'title'        => $data['event_name'] ?: ('Direct Offer to ' . $pro->name),
+            'title'        => $data['event_name'] ?: ('Direct Request to ' . $pro->name),
             'status'       => 'pending',
             'is_published' => false,               // targeted — never hits the open board
             'starts_at'    => $data['event_date'] ?? null,
@@ -176,7 +176,7 @@ class ClientDirectOfferController extends Controller
         // Land on the offer itself, same as the other post flows.
         return redirect()
             ->route('client.events.show', $event)
-            ->with('status', 'Direct offer sent to ' . $pro->name
+            ->with('status', 'Direct Request sent to ' . $pro->name
                 . '. Once they accept, the confirmed booking appears under Bookings.');
     }
 }

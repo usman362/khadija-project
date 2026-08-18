@@ -407,7 +407,7 @@ class ProfessionalProfileSectionsTest extends TestCase
     {
         $page = $this->page();
 
-        $page->assertSee('Direct offers', false);
+        $page->assertSee('Direct requests', false);
         $page->assertSee('Emergency requests', false);
         $page->assertSee('Payment protection', false);
     }

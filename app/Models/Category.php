@@ -23,6 +23,9 @@ class Category extends Model
         'archetype',
         'popularity_tier',
         'cross_fit_alt',
+        'insurance_requirement',
+        'insurance_type',
+        'insurance_tier',
         'is_active',
         'sort_order',
     ];

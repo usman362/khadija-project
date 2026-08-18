@@ -23,6 +23,11 @@ return [
     | than a pyrotechnician. Flagged for Khadijah — the fourth regulated
     | category has nowhere to attach until the taxonomy adds one.
     |
+    | The 241-row Required / Conditional / Not Required matrix lives on
+    | categories.insurance_* columns as a DRAFT for the broker conversation.
+    | Those columns do not gate anything until insurance_matrix_signed_off
+    | is true (broker + attorney). Do not flip that from a filled spreadsheet.
+    |
     */
 
     'insurance_required_categories' => [
@@ -70,5 +75,13 @@ return [
     */
 
     'insurance_expiry_warning_days' => 30,
+
+    /*
+    | Broker + attorney have not signed the matrix. Leave false.
+    */
+    'insurance_matrix_signed_off' => false,
+
+    'insurance_requirement_values' => ['required', 'conditional', 'not_required'],
+    'insurance_tiers' => ['A', 'B', 'C'],
 
 ];

@@ -485,8 +485,7 @@
             <thead><tr><th>Opportunity</th><th>Starter</th><th>Professional</th><th>Elite</th></tr></thead>
             <tbody>
                 <tr><td>Standard opportunities</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-                <tr><td>Early access — new SSRs</td><td class="no">—</td><td class="partial">After 60 min</td><td class="imm">Immediate</td></tr>
-                <tr><td>Early access — new MSRs</td><td class="no">—</td><td class="partial">After 60 min</td><td class="imm">Immediate</td></tr>
+                <tr><td>Early access — new BRs (multi-service)</td><td class="no">—</td><td class="partial">After 60 min</td><td class="imm">Immediate</td></tr>
                 <tr><td>Early access — new ERs</td><td class="no">—</td><td class="partial">After 60 min</td><td class="imm">Immediate</td></tr>
                 <tr><td>Featured &amp; premium opportunities</td><td class="no">—</td><td class="partial">Limited</td><td class="yes">Full</td></tr>
             </tbody>

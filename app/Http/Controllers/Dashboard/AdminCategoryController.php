@@ -96,6 +96,9 @@ class AdminCategoryController extends Controller
             'parent_id' => ['nullable', 'exists:categories,id'],
             'is_active' => ['nullable', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
+            'insurance_requirement' => ['nullable', 'in:required,conditional,not_required'],
+            'insurance_type' => ['nullable', 'string', 'max:80'],
+            'insurance_tier' => ['nullable', 'in:A,B,C'],
         ]);
 
         $data = [
@@ -107,6 +110,9 @@ class AdminCategoryController extends Controller
             'parent_id' => $validated['parent_id'] ?? null,
             'is_active' => $request->boolean('is_active'),
             'sort_order' => $validated['sort_order'] ?? 0,
+            'insurance_requirement' => $validated['insurance_requirement'] ?? null,
+            'insurance_type' => $validated['insurance_type'] ?? null,
+            'insurance_tier' => $validated['insurance_tier'] ?? null,
         ];
 
         if ($request->hasFile('cover_image')) {
@@ -142,6 +148,9 @@ class AdminCategoryController extends Controller
             'parent_id' => ['nullable', 'exists:categories,id'],
             'is_active' => ['nullable', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
+            'insurance_requirement' => ['nullable', 'in:required,conditional,not_required'],
+            'insurance_type' => ['nullable', 'string', 'max:80'],
+            'insurance_tier' => ['nullable', 'in:A,B,C'],
         ]);
 
         $data = [
@@ -153,6 +162,9 @@ class AdminCategoryController extends Controller
             'parent_id' => $validated['parent_id'] ?? null,
             'is_active' => $request->boolean('is_active'),
             'sort_order' => $validated['sort_order'] ?? 0,
+            'insurance_requirement' => $validated['insurance_requirement'] ?? null,
+            'insurance_type' => $validated['insurance_type'] ?? null,
+            'insurance_tier' => $validated['insurance_tier'] ?? null,
         ];
 
         if ($request->hasFile('cover_image')) {

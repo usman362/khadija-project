@@ -60,7 +60,7 @@ class ProfessionalDirectOfferController extends Controller
                 'currency'   => 'USD',
                 'booked_at'  => now(),
                 'source'     => 'direct_offer',
-                'notes'      => 'Accepted direct offer (event #' . $event->id . ')',
+                'notes'      => 'Accepted Direct Request (event #' . $event->id . ')',
             ]
         );
 
@@ -75,7 +75,7 @@ class ProfessionalDirectOfferController extends Controller
 
         $event->update(['status' => 'cancelled']);
 
-        return back()->with('status', 'Direct offer declined.');
+        return back()->with('status', 'Direct Request declined.');
     }
 
     /** Build the view payload from a real Direct Offer event. */
