@@ -1,0 +1,1939 @@
+{
+  "source": "GigResource_Insurance_Review_RECONCILED_20260813.xlsx",
+  "status": "proposed",
+  "note": "Draft only. Do not treat Required cells as a live gate until broker and attorney sign off (compliance.insurance_matrix_signed_off).",
+  "categories": [
+    {
+      "name": "Catering & Food Services",
+      "requirement": "required",
+      "services": 16,
+      "required": 16,
+      "conditional": 0,
+      "not_required": 0,
+      "variation": "Uniform -- all services in this category land on the same tier."
+    },
+    {
+      "name": "Bakery, Desserts & Cake Design",
+      "requirement": "required",
+      "services": 12,
+      "required": 2,
+      "conditional": 10,
+      "not_required": 0,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 12 services."
+    },
+    {
+      "name": "Bar, Beverage & Mixology Services",
+      "requirement": "required",
+      "services": 11,
+      "required": 8,
+      "conditional": 3,
+      "not_required": 0,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 11 services."
+    },
+    {
+      "name": "DJs, Live Bands & Musicians",
+      "requirement": "conditional",
+      "services": 10,
+      "required": 0,
+      "conditional": 10,
+      "not_required": 0,
+      "variation": "Uniform -- all services in this category land on the same tier."
+    },
+    {
+      "name": "Entertainment, Performers & Activities",
+      "requirement": "required",
+      "services": 15,
+      "required": 3,
+      "conditional": 12,
+      "not_required": 0,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 15 services."
+    },
+    {
+      "name": "Photography & Videography",
+      "requirement": "required",
+      "services": 10,
+      "required": 1,
+      "conditional": 9,
+      "not_required": 0,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 10 services."
+    },
+    {
+      "name": "Event Planning & Day-Of Coordination",
+      "requirement": "conditional",
+      "services": 10,
+      "required": 0,
+      "conditional": 9,
+      "not_required": 1,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 10 services."
+    },
+    {
+      "name": "Decor, Floral & Balloon Design",
+      "requirement": "required",
+      "services": 14,
+      "required": 2,
+      "conditional": 12,
+      "not_required": 0,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 14 services."
+    },
+    {
+      "name": "Event Rentals & Furnishings",
+      "requirement": "required",
+      "services": 12,
+      "required": 3,
+      "conditional": 9,
+      "not_required": 0,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 12 services."
+    },
+    {
+      "name": "Venues & Event Spaces",
+      "requirement": "required",
+      "services": 10,
+      "required": 10,
+      "conditional": 0,
+      "not_required": 0,
+      "variation": "Uniform -- all services in this category land on the same tier."
+    },
+    {
+      "name": "Audio, Visual, Lighting & Staging",
+      "requirement": "required",
+      "services": 10,
+      "required": 4,
+      "conditional": 6,
+      "not_required": 0,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 10 services."
+    },
+    {
+      "name": "Officiants, Hosts & Ceremonial Leaders",
+      "requirement": "conditional",
+      "services": 8,
+      "required": 0,
+      "conditional": 6,
+      "not_required": 2,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 8 services."
+    },
+    {
+      "name": "Hair, Makeup & Wardrobe Styling",
+      "requirement": "conditional",
+      "services": 8,
+      "required": 0,
+      "conditional": 8,
+      "not_required": 0,
+      "variation": "Uniform -- all services in this category land on the same tier."
+    },
+    {
+      "name": "Transportation & Valet Services",
+      "requirement": "required",
+      "services": 8,
+      "required": 7,
+      "conditional": 1,
+      "not_required": 0,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 8 services."
+    },
+    {
+      "name": "Security & Crowd Management",
+      "requirement": "required",
+      "services": 6,
+      "required": 5,
+      "conditional": 1,
+      "not_required": 0,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 6 services."
+    },
+    {
+      "name": "Event Staffing & Guest Services",
+      "requirement": "required",
+      "services": 10,
+      "required": 1,
+      "conditional": 9,
+      "not_required": 0,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 10 services."
+    },
+    {
+      "name": "Photo Booths & Interactive Experiences",
+      "requirement": "conditional",
+      "services": 8,
+      "required": 0,
+      "conditional": 8,
+      "not_required": 0,
+      "variation": "Uniform -- all services in this category land on the same tier."
+    },
+    {
+      "name": "Party Rentals & Inflatables",
+      "requirement": "required",
+      "services": 6,
+      "required": 5,
+      "conditional": 1,
+      "not_required": 0,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 6 services."
+    },
+    {
+      "name": "Invitations, Printing & Signage",
+      "requirement": "conditional",
+      "services": 8,
+      "required": 0,
+      "conditional": 1,
+      "not_required": 7,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 8 services."
+    },
+    {
+      "name": "Favors, Gifting & Awards",
+      "requirement": "not_required",
+      "services": 6,
+      "required": 0,
+      "conditional": 0,
+      "not_required": 6,
+      "variation": "Uniform -- all services in this category land on the same tier."
+    },
+    {
+      "name": "Cleaning, Sanitation & Waste Services",
+      "requirement": "conditional",
+      "services": 5,
+      "required": 0,
+      "conditional": 5,
+      "not_required": 0,
+      "variation": "Uniform -- all services in this category land on the same tier."
+    },
+    {
+      "name": "Event Technology & Livestreaming",
+      "requirement": "conditional",
+      "services": 8,
+      "required": 0,
+      "conditional": 5,
+      "not_required": 3,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 8 services."
+    },
+    {
+      "name": "Trade Show & Exhibit Services",
+      "requirement": "required",
+      "services": 6,
+      "required": 2,
+      "conditional": 3,
+      "not_required": 1,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 6 services."
+    },
+    {
+      "name": "Fundraising & Auction Services",
+      "requirement": "conditional",
+      "services": 6,
+      "required": 0,
+      "conditional": 1,
+      "not_required": 5,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 6 services."
+    },
+    {
+      "name": "Funeral & Memorial Services",
+      "requirement": "required",
+      "services": 8,
+      "required": 3,
+      "conditional": 5,
+      "not_required": 0,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 8 services."
+    },
+    {
+      "name": "Pet Services for Events",
+      "requirement": "required",
+      "services": 5,
+      "required": 3,
+      "conditional": 2,
+      "not_required": 0,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 5 services."
+    },
+    {
+      "name": "Property Staging & Real Estate Event Services",
+      "requirement": "conditional",
+      "services": 5,
+      "required": 0,
+      "conditional": 3,
+      "not_required": 2,
+      "variation": "Mixed -- a single category-level rule would over- or under-classify some of the 5 services."
+    }
+  ],
+  "services": [
+    {
+      "category": "Catering & Food Services",
+      "name": "Full-Service Catering",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Catering & Food Services",
+      "name": "Buffet Catering",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Catering & Food Services",
+      "name": "Plated Dinner Service",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Catering & Food Services",
+      "name": "Food Truck Booking",
+      "requirement": "required",
+      "type": "General Liability; Product Liability; Commercial Auto",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Catering & Food Services",
+      "name": "Food Stations & Live Cooking",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Catering & Food Services",
+      "name": "Passed Hors d'Oeuvres",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Catering & Food Services",
+      "name": "Boxed Lunch Catering",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Catering & Food Services",
+      "name": "Vegan & Vegetarian Catering",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Catering & Food Services",
+      "name": "Kosher & Halal Catering",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Catering & Food Services",
+      "name": "Allergen-Friendly Catering",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Catering & Food Services",
+      "name": "BBQ & Grill Catering",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Catering & Food Services",
+      "name": "Brunch Catering",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Catering & Food Services",
+      "name": "Coffee & Espresso Cart",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Catering & Food Services",
+      "name": "Popcorn & Snack Carts",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Catering & Food Services",
+      "name": "Late-Night Snack Service",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Catering & Food Services",
+      "name": "Custom Menu Tasting Sessions",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bakery, Desserts & Cake Design",
+      "name": "Custom Wedding Cakes",
+      "requirement": "conditional",
+      "type": "Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bakery, Desserts & Cake Design",
+      "name": "Birthday & Celebration Cakes",
+      "requirement": "conditional",
+      "type": "Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bakery, Desserts & Cake Design",
+      "name": "Cupcake Towers",
+      "requirement": "conditional",
+      "type": "Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bakery, Desserts & Cake Design",
+      "name": "Dessert Tables & Displays",
+      "requirement": "conditional",
+      "type": "Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bakery, Desserts & Cake Design",
+      "name": "Candy Buffets",
+      "requirement": "conditional",
+      "type": "Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bakery, Desserts & Cake Design",
+      "name": "Donut Walls",
+      "requirement": "conditional",
+      "type": "Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bakery, Desserts & Cake Design",
+      "name": "Macaron Towers",
+      "requirement": "conditional",
+      "type": "Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bakery, Desserts & Cake Design",
+      "name": "Chocolate Fountains",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": true
+    },
+    {
+      "category": "Bakery, Desserts & Cake Design",
+      "name": "Ice Cream Carts",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": true
+    },
+    {
+      "category": "Bakery, Desserts & Cake Design",
+      "name": "Cake Pops & Favors",
+      "requirement": "conditional",
+      "type": "Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bakery, Desserts & Cake Design",
+      "name": "Specialty Diet Desserts (Gluten-Free/Vegan)",
+      "requirement": "conditional",
+      "type": "Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bakery, Desserts & Cake Design",
+      "name": "Groom's Cakes",
+      "requirement": "conditional",
+      "type": "Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bar, Beverage & Mixology Services",
+      "name": "Professional Bartenders",
+      "requirement": "required",
+      "type": "Liquor Liability; General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bar, Beverage & Mixology Services",
+      "name": "Mobile Bar Rentals",
+      "requirement": "required",
+      "type": "Liquor Liability; General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bar, Beverage & Mixology Services",
+      "name": "Signature Cocktail Design",
+      "requirement": "required",
+      "type": "Liquor Liability; General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bar, Beverage & Mixology Services",
+      "name": "Craft Beer & Wine Service",
+      "requirement": "required",
+      "type": "Liquor Liability; General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bar, Beverage & Mixology Services",
+      "name": "Non-Alcoholic & Mocktail Bars",
+      "requirement": "conditional",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bar, Beverage & Mixology Services",
+      "name": "Champagne Towers",
+      "requirement": "required",
+      "type": "Liquor Liability; General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bar, Beverage & Mixology Services",
+      "name": "Coffee & Tea Service",
+      "requirement": "conditional",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bar, Beverage & Mixology Services",
+      "name": "Luxury Glam Bars",
+      "requirement": "required",
+      "type": "Liquor Liability; General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bar, Beverage & Mixology Services",
+      "name": "Beverage Catering Packages",
+      "requirement": "required",
+      "type": "Liquor Liability; General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bar, Beverage & Mixology Services",
+      "name": "Kegerator Rentals",
+      "requirement": "required",
+      "type": "Liquor Liability; General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Bar, Beverage & Mixology Services",
+      "name": "Juice & Smoothie Bars",
+      "requirement": "conditional",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "DJs, Live Bands & Musicians",
+      "name": "Wedding DJs",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "DJs, Live Bands & Musicians",
+      "name": "Party & Club DJs",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "DJs, Live Bands & Musicians",
+      "name": "Live Bands",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "DJs, Live Bands & Musicians",
+      "name": "Solo Musicians & Acoustic Acts",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "DJs, Live Bands & Musicians",
+      "name": "String Quartets & Chamber Ensembles",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "DJs, Live Bands & Musicians",
+      "name": "Cultural & Folk Musicians",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "DJs, Live Bands & Musicians",
+      "name": "Karaoke Hosting",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "DJs, Live Bands & Musicians",
+      "name": "MC & Emcee Services",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "DJs, Live Bands & Musicians",
+      "name": "Silent Disco Setups",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "DJs, Live Bands & Musicians",
+      "name": "Mobile Sound Systems",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Entertainment, Performers & Activities",
+      "name": "Magicians",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Entertainment, Performers & Activities",
+      "name": "Dancers & Dance Troupes",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Entertainment, Performers & Activities",
+      "name": "Caricature Artists",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Entertainment, Performers & Activities",
+      "name": "Comedians",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Entertainment, Performers & Activities",
+      "name": "Circus & Aerial Performers",
+      "requirement": "required",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Entertainment, Performers & Activities",
+      "name": "Costumed Characters",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Entertainment, Performers & Activities",
+      "name": "Face Painters",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Entertainment, Performers & Activities",
+      "name": "Balloon Twisters",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Entertainment, Performers & Activities",
+      "name": "Fire Performers",
+      "requirement": "required",
+      "type": "General Liability; Excess/Umbrella (recommend broker review)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Entertainment, Performers & Activities",
+      "name": "Casino & Game Night Rentals",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Entertainment, Performers & Activities",
+      "name": "Lawn Games & Yard Activities",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Entertainment, Performers & Activities",
+      "name": "Escape Room Experiences",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Entertainment, Performers & Activities",
+      "name": "Trivia Hosts",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Entertainment, Performers & Activities",
+      "name": "Carnival Ride Rentals",
+      "requirement": "required",
+      "type": "General Liability; Amusement/Equipment Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Entertainment, Performers & Activities",
+      "name": "Kids Entertainers & Clowns",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photography & Videography",
+      "name": "Wedding Photography",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photography & Videography",
+      "name": "Event Photography",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photography & Videography",
+      "name": "Videography & Cinematic Films",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photography & Videography",
+      "name": "Drone Photography",
+      "requirement": "required",
+      "type": "General Liability; Aviation/Drone Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photography & Videography",
+      "name": "Live Streaming Services",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photography & Videography",
+      "name": "Photo Editing & Album Design",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photography & Videography",
+      "name": "Same-Day Edit Videography",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photography & Videography",
+      "name": "Portrait & Headshot Stations",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photography & Videography",
+      "name": "360 Video Booths",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photography & Videography",
+      "name": "Engagement & Pre-Event Shoots",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Planning & Day-Of Coordination",
+      "name": "Full-Service Event Planning",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Planning & Day-Of Coordination",
+      "name": "Day-Of Coordination",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Planning & Day-Of Coordination",
+      "name": "Wedding Planning",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Planning & Day-Of Coordination",
+      "name": "Corporate Event Management",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Planning & Day-Of Coordination",
+      "name": "Vendor Sourcing & Management",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Planning & Day-Of Coordination",
+      "name": "Timeline & Logistics Planning",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Planning & Day-Of Coordination",
+      "name": "Budget Planning Consultation",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Planning & Day-Of Coordination",
+      "name": "Destination Event Planning",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Planning & Day-Of Coordination",
+      "name": "Nonprofit & Fundraiser Event Management",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Planning & Day-Of Coordination",
+      "name": "Rehearsal Coordination",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Decor, Floral & Balloon Design",
+      "name": "Bridal & Ceremony Florals",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Decor, Floral & Balloon Design",
+      "name": "Centerpiece Design",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Decor, Floral & Balloon Design",
+      "name": "Balloon Arches & Columns",
+      "requirement": "required",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Decor, Floral & Balloon Design",
+      "name": "Balloon Garlands",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Decor, Floral & Balloon Design",
+      "name": "Balloon Drops",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Decor, Floral & Balloon Design",
+      "name": "Backdrop Design & Rental",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Decor, Floral & Balloon Design",
+      "name": "Draping & Fabric Design",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Decor, Floral & Balloon Design",
+      "name": "Table Linens & Styling",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Decor, Floral & Balloon Design",
+      "name": "Themed Decor Design",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Decor, Floral & Balloon Design",
+      "name": "Seasonal & Holiday Decor",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Decor, Floral & Balloon Design",
+      "name": "Candle & Ambient Lighting Decor",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Decor, Floral & Balloon Design",
+      "name": "Arch & Chuppah Design",
+      "requirement": "required",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Decor, Floral & Balloon Design",
+      "name": "Aisle & Ceremony Decor",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Decor, Floral & Balloon Design",
+      "name": "Neon Sign Rentals",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Rentals & Furnishings",
+      "name": "Tables & Chairs",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Rentals & Furnishings",
+      "name": "Tents & Canopies",
+      "requirement": "required",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Rentals & Furnishings",
+      "name": "Lounge Furniture Rentals",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Rentals & Furnishings",
+      "name": "Linens & Chair Covers",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Rentals & Furnishings",
+      "name": "Dance Floor Rentals",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Rentals & Furnishings",
+      "name": "Staging & Riser Rentals",
+      "requirement": "required",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Rentals & Furnishings",
+      "name": "China, Glassware & Flatware Rentals",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Rentals & Furnishings",
+      "name": "Heaters & Fans",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Rentals & Furnishings",
+      "name": "Portable Restroom Rentals",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Rentals & Furnishings",
+      "name": "Generators & Power Rentals",
+      "requirement": "required",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Rentals & Furnishings",
+      "name": "Tableware & Charger Plates",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Rentals & Furnishings",
+      "name": "Photo Backdrops & Props Rentals",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Venues & Event Spaces",
+      "name": "Banquet Halls",
+      "requirement": "required",
+      "type": "General Liability (Premises)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Venues & Event Spaces",
+      "name": "Outdoor & Garden Venues",
+      "requirement": "required",
+      "type": "General Liability (Premises)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Venues & Event Spaces",
+      "name": "Barn & Rustic Venues",
+      "requirement": "required",
+      "type": "General Liability (Premises)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Venues & Event Spaces",
+      "name": "Rooftop & Skyline Venues",
+      "requirement": "required",
+      "type": "General Liability (Premises)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Venues & Event Spaces",
+      "name": "Hotel Event Spaces",
+      "requirement": "required",
+      "type": "General Liability (Premises)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Venues & Event Spaces",
+      "name": "Warehouse & Industrial Venues",
+      "requirement": "required",
+      "type": "General Liability (Premises)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Venues & Event Spaces",
+      "name": "Country Club Venues",
+      "requirement": "required",
+      "type": "General Liability (Premises)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Venues & Event Spaces",
+      "name": "Waterfront Venues",
+      "requirement": "required",
+      "type": "General Liability (Premises)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Venues & Event Spaces",
+      "name": "Private Estate Rentals",
+      "requirement": "required",
+      "type": "General Liability (Premises)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Venues & Event Spaces",
+      "name": "Conference Centers",
+      "requirement": "required",
+      "type": "General Liability (Premises)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Audio, Visual, Lighting & Staging",
+      "name": "AV Equipment Rental",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Audio, Visual, Lighting & Staging",
+      "name": "Uplighting & Ambient Lighting",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Audio, Visual, Lighting & Staging",
+      "name": "Stage Design & Setup",
+      "requirement": "required",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Audio, Visual, Lighting & Staging",
+      "name": "Projector & Screen Rental",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Audio, Visual, Lighting & Staging",
+      "name": "Sound System Rental & Operation",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Audio, Visual, Lighting & Staging",
+      "name": "Lighting Design (Event-Wide)",
+      "requirement": "required",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Audio, Visual, Lighting & Staging",
+      "name": "LED Wall & Video Display",
+      "requirement": "required",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Audio, Visual, Lighting & Staging",
+      "name": "Microphones & PA Systems",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Audio, Visual, Lighting & Staging",
+      "name": "Special FX Lighting (Lasers, Haze)",
+      "requirement": "required",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Audio, Visual, Lighting & Staging",
+      "name": "Teleprompter Services",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Officiants, Hosts & Ceremonial Leaders",
+      "name": "Wedding Officiants",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": true
+    },
+    {
+      "category": "Officiants, Hosts & Ceremonial Leaders",
+      "name": "Religious Ceremony Leaders",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": true
+    },
+    {
+      "category": "Officiants, Hosts & Ceremonial Leaders",
+      "name": "Funeral Officiants",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": true
+    },
+    {
+      "category": "Officiants, Hosts & Ceremonial Leaders",
+      "name": "Master of Ceremonies (MC)",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Officiants, Hosts & Ceremonial Leaders",
+      "name": "Celebrant Services",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": true
+    },
+    {
+      "category": "Officiants, Hosts & Ceremonial Leaders",
+      "name": "Vow Renewal Officiants",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": true
+    },
+    {
+      "category": "Officiants, Hosts & Ceremonial Leaders",
+      "name": "Cultural Ceremony Leaders",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": true
+    },
+    {
+      "category": "Officiants, Hosts & Ceremonial Leaders",
+      "name": "Keynote & Guest Speakers",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Hair, Makeup & Wardrobe Styling",
+      "name": "Bridal Hair & Makeup",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O); Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Hair, Makeup & Wardrobe Styling",
+      "name": "Event Hairstyling",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O); Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Hair, Makeup & Wardrobe Styling",
+      "name": "Airbrush Makeup",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O); Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Hair, Makeup & Wardrobe Styling",
+      "name": "Groom Grooming Services",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O); Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Hair, Makeup & Wardrobe Styling",
+      "name": "Wardrobe Styling & Fittings",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O); Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Hair, Makeup & Wardrobe Styling",
+      "name": "Spray Tanning",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O); Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Hair, Makeup & Wardrobe Styling",
+      "name": "Mobile Beauty Squads",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O); Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Hair, Makeup & Wardrobe Styling",
+      "name": "Fashion & Costume Design",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O); Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Transportation & Valet Services",
+      "name": "Limousine & Luxury Car Service",
+      "requirement": "required",
+      "type": "Commercial Auto; General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Transportation & Valet Services",
+      "name": "Party Bus Rentals",
+      "requirement": "required",
+      "type": "Commercial Auto; General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Transportation & Valet Services",
+      "name": "Shuttle Services",
+      "requirement": "required",
+      "type": "Commercial Auto; General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Transportation & Valet Services",
+      "name": "Chauffeur Services",
+      "requirement": "required",
+      "type": "Commercial Auto; General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Transportation & Valet Services",
+      "name": "Valet Parking Services",
+      "requirement": "required",
+      "type": "Commercial Auto; General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Transportation & Valet Services",
+      "name": "Classic & Vintage Car Rentals",
+      "requirement": "required",
+      "type": "Commercial Auto; General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Transportation & Valet Services",
+      "name": "Guest Transportation Coordination",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Transportation & Valet Services",
+      "name": "Airport Transfer Services",
+      "requirement": "required",
+      "type": "Commercial Auto; General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Security & Crowd Management",
+      "name": "Event Security Guards",
+      "requirement": "required",
+      "type": "General Liability; Security/Professional Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Security & Crowd Management",
+      "name": "Crowd Control & Barricading",
+      "requirement": "required",
+      "type": "General Liability; Security/Professional Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Security & Crowd Management",
+      "name": "VIP & Executive Protection",
+      "requirement": "required",
+      "type": "General Liability; Security/Professional Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Security & Crowd Management",
+      "name": "Bag Check & Screening Services",
+      "requirement": "required",
+      "type": "General Liability; Security/Professional Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Security & Crowd Management",
+      "name": "Parking Attendants & Traffic Control",
+      "requirement": "required",
+      "type": "General Liability; Security/Professional Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Security & Crowd Management",
+      "name": "ID Verification Services",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Staffing & Guest Services",
+      "name": "Wait Staff & Servers",
+      "requirement": "conditional",
+      "type": "General Liability; Workers' Comp",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Staffing & Guest Services",
+      "name": "Bartenders (Staffing Only)",
+      "requirement": "required",
+      "type": "Liquor Liability; Workers' Comp",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Staffing & Guest Services",
+      "name": "Coat Check Attendants",
+      "requirement": "conditional",
+      "type": "General Liability; Workers' Comp",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Staffing & Guest Services",
+      "name": "Registration & Check-In Staff",
+      "requirement": "conditional",
+      "type": "General Liability; Workers' Comp",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Staffing & Guest Services",
+      "name": "Greeters & Ushers",
+      "requirement": "conditional",
+      "type": "General Liability; Workers' Comp",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Staffing & Guest Services",
+      "name": "Concierge Services",
+      "requirement": "conditional",
+      "type": "General Liability; Workers' Comp",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Staffing & Guest Services",
+      "name": "Event Captains & Supervisors",
+      "requirement": "conditional",
+      "type": "General Liability; Workers' Comp",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Staffing & Guest Services",
+      "name": "Cleanup Crew Staffing",
+      "requirement": "conditional",
+      "type": "General Liability; Workers' Comp",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Staffing & Guest Services",
+      "name": "Brand Ambassadors",
+      "requirement": "conditional",
+      "type": "General Liability; Workers' Comp",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Staffing & Guest Services",
+      "name": "Hospitality Staffing Agencies",
+      "requirement": "conditional",
+      "type": "General Liability; Workers' Comp",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photo Booths & Interactive Experiences",
+      "name": "Classic Photo Booths",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photo Booths & Interactive Experiences",
+      "name": "360 Photo Booths",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photo Booths & Interactive Experiences",
+      "name": "GIF Booths",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photo Booths & Interactive Experiences",
+      "name": "Mirror Photo Booths",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photo Booths & Interactive Experiences",
+      "name": "Green Screen Photo Booths",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photo Booths & Interactive Experiences",
+      "name": "Digital Guestbook Stations",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photo Booths & Interactive Experiences",
+      "name": "Selfie Stations",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Photo Booths & Interactive Experiences",
+      "name": "Roaming Photographers with Instant Prints",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Party Rentals & Inflatables",
+      "name": "Bounce House Rentals",
+      "requirement": "required",
+      "type": "General Liability; Amusement/Equipment Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Party Rentals & Inflatables",
+      "name": "Water Slide Rentals",
+      "requirement": "required",
+      "type": "General Liability; Amusement/Equipment Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Party Rentals & Inflatables",
+      "name": "Obstacle Course Rentals",
+      "requirement": "required",
+      "type": "General Liability; Amusement/Equipment Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Party Rentals & Inflatables",
+      "name": "Carnival Game Rentals",
+      "requirement": "required",
+      "type": "General Liability; Amusement/Equipment Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Party Rentals & Inflatables",
+      "name": "Kids Craft Stations",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Party Rentals & Inflatables",
+      "name": "Petting Zoo & Pony Rides",
+      "requirement": "required",
+      "type": "General Liability; Amusement/Equipment Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Invitations, Printing & Signage",
+      "name": "Custom Invitations & Save-the-Dates",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Invitations, Printing & Signage",
+      "name": "Event Signage & Banners",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Invitations, Printing & Signage",
+      "name": "Name Badge Printing",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Invitations, Printing & Signage",
+      "name": "Seating Chart Design",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Invitations, Printing & Signage",
+      "name": "Menu & Program Printing",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Invitations, Printing & Signage",
+      "name": "Vinyl Banners & Backdrops",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Invitations, Printing & Signage",
+      "name": "Digital Invitations",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Invitations, Printing & Signage",
+      "name": "Table Number & Place Card Design",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Favors, Gifting & Awards",
+      "name": "Wedding & Party Favors",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Favors, Gifting & Awards",
+      "name": "Corporate Gifting",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Favors, Gifting & Awards",
+      "name": "Awards & Trophy Design",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Favors, Gifting & Awards",
+      "name": "Branded Swag & Merchandise",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Favors, Gifting & Awards",
+      "name": "Guest Welcome Bags",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Favors, Gifting & Awards",
+      "name": "Custom Engraving Services",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Cleaning, Sanitation & Waste Services",
+      "name": "Post-Event Cleanup Crews",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": true
+    },
+    {
+      "category": "Cleaning, Sanitation & Waste Services",
+      "name": "Portable Restroom Servicing",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": true
+    },
+    {
+      "category": "Cleaning, Sanitation & Waste Services",
+      "name": "Waste & Recycling Removal",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": true
+    },
+    {
+      "category": "Cleaning, Sanitation & Waste Services",
+      "name": "Venue Sanitation Services",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": true
+    },
+    {
+      "category": "Cleaning, Sanitation & Waste Services",
+      "name": "Deep Cleaning Services",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": true
+    },
+    {
+      "category": "Event Technology & Livestreaming",
+      "name": "Online Ticketing Platforms",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Technology & Livestreaming",
+      "name": "RFID Wristband & Badge Systems",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O); Cyber/Data Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Technology & Livestreaming",
+      "name": "Event Mobile Apps",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Technology & Livestreaming",
+      "name": "Livestream Production",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O); Cyber/Data Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Technology & Livestreaming",
+      "name": "Digital Signage",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O); Cyber/Data Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Technology & Livestreaming",
+      "name": "Virtual & Hybrid Event Platforms",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Technology & Livestreaming",
+      "name": "Point-of-Sale & Cashless Payment Systems",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O); Cyber/Data Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Event Technology & Livestreaming",
+      "name": "VR & AR Experience Stations",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O); Cyber/Data Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Trade Show & Exhibit Services",
+      "name": "Custom Booth Design & Build",
+      "requirement": "required",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Trade Show & Exhibit Services",
+      "name": "Trade Show Booth Rental",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Trade Show & Exhibit Services",
+      "name": "Exhibit Graphics & Displays",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Trade Show & Exhibit Services",
+      "name": "Product Demo Staffing",
+      "requirement": "conditional",
+      "type": "General Liability; Workers' Comp",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Trade Show & Exhibit Services",
+      "name": "Lead Retrieval Technology",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Trade Show & Exhibit Services",
+      "name": "Booth Installation & Dismantle",
+      "requirement": "required",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Fundraising & Auction Services",
+      "name": "Silent Auction Platforms",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Fundraising & Auction Services",
+      "name": "Live Auctioneers",
+      "requirement": "conditional",
+      "type": "General Liability; Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Fundraising & Auction Services",
+      "name": "Donor Management Software",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Fundraising & Auction Services",
+      "name": "Raffle & Ticketed Giveaway Services",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Fundraising & Auction Services",
+      "name": "Sponsorship Package Design",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Fundraising & Auction Services",
+      "name": "Peer-to-Peer Fundraising Tools",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Funeral & Memorial Services",
+      "name": "Funeral Officiants & Ceremony Leaders",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Funeral & Memorial Services",
+      "name": "Casket & Urn Services",
+      "requirement": "required",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Funeral & Memorial Services",
+      "name": "Memorial Displays & Tribute Videos",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Funeral & Memorial Services",
+      "name": "Grief & Bereavement Support",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Funeral & Memorial Services",
+      "name": "Floral Tributes",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Funeral & Memorial Services",
+      "name": "Repast & Reception Catering",
+      "requirement": "required",
+      "type": "General Liability; Product Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Funeral & Memorial Services",
+      "name": "Headstone & Monument Services",
+      "requirement": "required",
+      "type": "General Liability; Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Funeral & Memorial Services",
+      "name": "Livestreaming for Remote Mourners",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Pet Services for Events",
+      "name": "Pet-Friendly Event Coordination",
+      "requirement": "conditional",
+      "type": "Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Pet Services for Events",
+      "name": "Mobile Petting Zoos",
+      "requirement": "required",
+      "type": "General Liability; Animal Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Pet Services for Events",
+      "name": "Pet Costume & Styling",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Pet Services for Events",
+      "name": "Pet Sitting During Events",
+      "requirement": "required",
+      "type": "General Liability; Animal Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Pet Services for Events",
+      "name": "Therapy Animal Appearances",
+      "requirement": "required",
+      "type": "General Liability; Animal Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Property Staging & Real Estate Event Services",
+      "name": "Home Staging",
+      "requirement": "conditional",
+      "type": "General Liability; Property/Equipment",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Property Staging & Real Estate Event Services",
+      "name": "Open House Coordination",
+      "requirement": "conditional",
+      "type": "General Liability; Professional Liability (E&O)",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Property Staging & Real Estate Event Services",
+      "name": "Property Photography",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    },
+    {
+      "category": "Property Staging & Real Estate Event Services",
+      "name": "Curb Appeal Styling",
+      "requirement": "conditional",
+      "type": "General Liability",
+      "broker_tie_break": false
+    },
+    {
+      "category": "Property Staging & Real Estate Event Services",
+      "name": "Real Estate Signage",
+      "requirement": "not_required",
+      "type": null,
+      "broker_tie_break": false
+    }
+  ]
+}

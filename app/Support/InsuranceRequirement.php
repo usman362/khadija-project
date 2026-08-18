@@ -36,12 +36,30 @@ class InsuranceRequirement
             return [];
         }
 
+        $user->loadMissing('serviceCategories.parent');
+
+        // V2 professionals attach the specific service (Full-Service Catering),
+        // not the parent (Catering & Food Services). The live named list is
+        // written at the parent for three of the four, so a name match on the
+        // attached row alone would miss every caterer, bartender and guard.
         return $user->serviceCategories
-            ->filter(fn ($category) => $required->contains(mb_strtolower($category->name)))
+            ->filter(fn ($category) => self::nameOrParentIsRequired($category, $required))
             ->pluck('name')
             ->unique()
             ->values()
             ->all();
+    }
+
+    /** Own name, or a parent's — the live list mixes both grains. */
+    private static function nameOrParentIsRequired($category, $required): bool
+    {
+        for ($node = $category; $node; $node = $node->parent) {
+            if ($required->contains(mb_strtolower($node->name))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

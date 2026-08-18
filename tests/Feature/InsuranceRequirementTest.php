@@ -61,6 +61,33 @@ class InsuranceRequirementTest extends TestCase
         $this->assertFalse(InsuranceRequirement::appliesTo($pro->fresh()));
     }
 
+    /**
+     * The live list names the V2 parent (Catering & Food Services). Pros attach
+     * the service under it. Matching only the attached name would ask nobody.
+     */
+    public function test_a_v2_catering_service_inherits_the_parent_rule(): void
+    {
+        $parent = Category::create([
+            'name'      => 'Catering & Food Services',
+            'slug'      => 'catering-food-services',
+            'kind'      => Category::SERVICE_CATEGORY,
+            'is_active' => true,
+        ]);
+        $service = Category::create([
+            'name'      => 'Full-Service Catering',
+            'slug'      => 'full-service-catering',
+            'kind'      => Category::SERVICE,
+            'parent_id' => $parent->id,
+            'is_active' => true,
+        ]);
+
+        $pro = $this->pro();
+        $pro->serviceCategories()->attach($service);
+
+        $this->assertTrue(InsuranceRequirement::appliesTo($pro->fresh()));
+        $this->assertSame(['Full-Service Catering'], InsuranceRequirement::triggeringCategories($pro->fresh()));
+    }
+
     public function test_a_bar_mitzvah_does_not_count_as_a_bar(): void
     {
         // A keyword list would have matched "bar" here and demanded a

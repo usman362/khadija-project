@@ -55,6 +55,11 @@ class ImportTaxonomyV2 extends Command
         // just replaced — correct data on disk, stale answers on screen.
         \App\Domain\Taxonomy\ServiceRelevance::forget();
 
+        $stats = \Database\Seeders\InsuranceMatrixSeeder::apply();
+        $this->info("Draft insurance matrix: {$stats['updated']} v2 rows filled"
+            . ($stats['missing'] ? ", {$stats['missing']} names not found" : '')
+            . " ({$stats['required']} required / {$stats['conditional']} conditional / {$stats['not_required']} not required). Not a live gate.");
+
         $this->report();
 
         return self::SUCCESS;

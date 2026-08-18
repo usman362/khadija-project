@@ -166,4 +166,4 @@ is a decision, not a preference.
 |---|---|
 | 2026-07-31 | Created and seeded from the code (Ali). Handed to Khadijah to own. |
 | 2026-08-13 | Added §4b for the decisions taken in Chat on 13 August. B5 resolved and struck. A7 moved to built (Phase 1). Recorded the payouts finding behind the tax/identity plan. |
-| 2026-08-19 | Added §4c for the 9-item QA sign-off. Remaining user-facing copy swept to BR / ER / DR. Category image upload now tells admin not to bake names into the picture. Insurance matrix columns added as draft storage only — live Required list unchanged. |
+| 2026-08-19 | Added §4c for the 9-item QA sign-off. Remaining user-facing copy swept to BR / ER / DR. Category image upload now tells admin not to bake names into the picture. Insurance matrix columns added as draft storage only — live Required list unchanged. Reconciled workbook (27 + 241) loaded onto those draft cells; live gate still the named list, now matching a V2 service via its parent. |
