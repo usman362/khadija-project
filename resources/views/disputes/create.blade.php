@@ -81,7 +81,7 @@
                     <select name="taxonomy" id="taxonomy" class="dsp-select" required>
                         <option value="">Choose one…</option>
                         @foreach($taxonomy as $key => $label)
-                            <option value="{{ $key }}" @selected(old('taxonomy') === $key)>{{ $label }}</option>
+                            <option value="{{ $key }}" @selected(old('taxonomy', $chosen ?? null) === $key)>{{ $label }}</option>
                         @endforeach
                     </select>
                     @error('taxonomy') <p class="dsp-err">{{ $message }}</p> @enderror

@@ -45,20 +45,135 @@ class DisputeController extends Controller
         abort_unless($case->isParty($user), 403);
     }
 
+    /** The tabs, and what each one means in terms of the state machine. */
+    public const TABS = [
+        'all'      => 'All Cases',
+        'action'   => 'Needs Your Action',
+        'review'   => 'Under Review',
+        'resolved' => 'Resolved',
+        'closed'   => 'Closed',
+    ];
+
+    /** The date ranges the header offers, in days. Null = no limit. */
+    public const RANGES = [
+        'all'  => ['All Time', null],
+        '30'   => ['Last 30 days', 30],
+        '90'   => ['Last 90 days', 90],
+        '365'  => ['Last 12 months', 365],
+    ];
+
+    /**
+     * The six situations the "Common Issues" row offers, each a real taxonomy
+     * key so the tile lands on the filing form with the classification already
+     * chosen. "Other" opens the form with all twelve to pick from.
+     */
+    public const COMMON_ISSUES = [
+        ['payment_dispute',    'Payment Dispute',    'Issues with payment, refunds, or extra charges.'],
+        ['cancellation',       'Cancellation',       'Cancellation fees or last-minute changes.'],
+        ['no_show',            'No-Show',            'Client or professional did not show up.'],
+        ['incomplete_service', 'Incomplete Service',  'Service did not match the agreed scope.'],
+        ['damage_claim',       'Damaged Property',   'Damage to equipment or venue.'],
+        [null,                 'Other Issue',        'Something else not listed here.'],
+    ];
+
     public function index(Request $request): View
     {
         $user = $request->user();
 
-        $cases = DisputeCase::query()
-            ->where(fn ($q) => $q->where('client_id', $user->id)->orWhere('professional_id', $user->id))
-            ->with(['booking.event', 'client', 'professional'])
-            ->latest('id')
-            ->paginate(15);
+        $tab = array_key_exists((string) $request->query('tab'), self::TABS)
+            ? (string) $request->query('tab') : 'all';
+        $range = array_key_exists((string) $request->query('range'), self::RANGES)
+            ? (string) $request->query('range') : 'all';
+        $taxonomy = array_key_exists((string) $request->query('taxonomy'), DisputeClassification::TAXONOMY)
+            ? (string) $request->query('taxonomy') : '';
+
+        $mine = fn () => DisputeCase::query()
+            ->where(fn ($q) => $q->where('client_id', $user->id)->orWhere('professional_id', $user->id));
+
+        /*
+         * The tiles count states, and one of them — "Waiting on You" — depends
+         * on which side of the case this person is, which is not a column. So
+         * the party's own cases are loaded once and counted in PHP rather than
+         * asked for four times in a way the database cannot answer.
+         *
+         * A person's own disputes are few by construction; this is not a feed.
+         */
+        $all = $mine()->with(['booking.event', 'client', 'professional'])->latest('id')->get();
+
+        $counts = [
+            'open'     => $all->filter->isOpen()->count(),
+            'action'   => $all->filter(fn ($c) => $this->needsActionFrom($c, $user))->count(),
+            'review'   => $all->whereIn('state', [DisputeStates::FORMAL_INVESTIGATION, DisputeStates::OUTSIDE_ESCALATION])->count(),
+            // "Resolved" on the tile is explicitly scoped to the last 30 days,
+            // so it counts that and not every decision ever made.
+            'resolved' => $all->filter(fn ($c) => in_array($c->state, [DisputeStates::DECIDED, DisputeStates::CURE_PERIOD], true)
+                && $c->updated_at?->gte(now()->subDays(30)))->count(),
+        ];
+
+        $shown = match ($tab) {
+            'action'   => $all->filter(fn ($c) => $this->needsActionFrom($c, $user)),
+            'review'   => $all->whereIn('state', [DisputeStates::FORMAL_INVESTIGATION, DisputeStates::OUTSIDE_ESCALATION]),
+            'resolved' => $all->whereIn('state', [DisputeStates::DECIDED, DisputeStates::CURE_PERIOD]),
+            'closed'   => $all->whereIn('state', [DisputeStates::CLOSED, DisputeStates::WITHDRAWN, DisputeStates::EXPIRED]),
+            default    => $all,
+        };
+
+        if ($taxonomy !== '') {
+            $shown = $shown->where('taxonomy', $taxonomy);
+        }
+
+        if (self::RANGES[$range][1] !== null) {
+            $since = now()->subDays(self::RANGES[$range][1]);
+            $shown = $shown->filter(fn ($c) => $c->created_at?->gte($since));
+        }
+
+        $shown = $shown->values();
+
+        $perPage = 15;
+        $page = max(1, (int) $request->query('page', 1));
+        $cases = new \Illuminate\Pagination\LengthAwarePaginator(
+            $shown->forPage($page, $perPage)->values(),
+            $shown->count(),
+            $perPage,
+            $page,
+            ['path' => route('disputes.index'), 'query' => $request->query()],
+        );
 
         return view('disputes.index', [
-            'layout' => $this->layout($user),
-            'cases'  => $cases,
+            'layout'   => $this->layout($user),
+            'cases'    => $cases,
+            'counts'   => $counts,
+            'tabs'     => self::TABS,
+            'ranges'   => self::RANGES,
+            'issues'   => self::COMMON_ISSUES,
+            'taxonomy' => DisputeClassification::TAXONOMY,
+            'filters'  => ['tab' => $tab, 'range' => $range, 'taxonomy' => $taxonomy],
+            'viewer'   => $user->isProfessionalMode() ? 'professional' : 'client',
+            'needsAction' => fn (DisputeCase $c) => $this->needsActionFrom($c, $user),
         ]);
+    }
+
+    /**
+     * Is this case waiting on THIS person?
+     *
+     * Two situations, both of them the state machine saying so rather than a
+     * guess: the case is awaiting a response and they are not the one who filed
+     * it, or a decision put the case into a cure period and they are the
+     * professional who has to do the curing. Everything else is waiting on the
+     * other side or on the platform, and telling someone to act when there is
+     * nothing to act on is worse than saying nothing.
+     */
+    private function needsActionFrom(DisputeCase $case, User $user): bool
+    {
+        if ($case->state === DisputeStates::AWAITING_RESPONSE) {
+            return $case->filed_by !== $user->id;
+        }
+
+        if ($case->state === DisputeStates::CURE_PERIOD) {
+            return $case->professional_id === $user->id;
+        }
+
+        return false;
     }
 
     public function create(Request $request): View
@@ -80,6 +195,11 @@ class DisputeController extends Controller
             'bookings' => $bookings,
             'taxonomy' => DisputeClassification::TAXONOMY,
             'filing'   => $user->isProfessionalMode() ? 'professional' : 'client',
+            // Arrived from a "Common Issues" tile, which already asked what the
+            // problem is — so the form does not ask again.
+            'chosen'   => array_key_exists((string) $request->query('taxonomy'), DisputeClassification::TAXONOMY)
+                ? (string) $request->query('taxonomy')
+                : null,
         ]);
     }
 
