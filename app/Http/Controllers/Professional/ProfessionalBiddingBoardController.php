@@ -134,6 +134,18 @@ class ProfessionalBiddingBoardController extends Controller
             fn ($e) => $e->source === 'direct_offer' || RequestLifecycle::acceptsProposals($e),
         )->values();
 
+        $originIssue = null;
+        if (\App\Support\RadiusMatching::enabled()) {
+            if (! \App\Support\RadiusMatching::originIsMatchable($user)
+                && ($user?->profile?->origin_precision === \App\Domain\Geolocation\LocationPrecision::UNRESOLVED
+                    || filled($user?->profile?->service_origin_zip)
+                    || filled($user?->profile?->service_origin_line))) {
+                $originIssue = 'We could not place your service origin. Distance matching is off until this is fixed.';
+            } elseif (\App\Support\RadiusMatching::originIsMatchable($user)) {
+                $events = \App\Support\RadiusMatching::filterEventsForProfessional($events, $user);
+            }
+        }
+
         /*
          * §2's ranking — Published Today, then Extended, then older active.
          *
@@ -247,6 +259,7 @@ class ProfessionalBiddingBoardController extends Controller
             'isElite'       => $this->isElite($user),
             'myActivity'    => $this->myActivity($user),
             'insights'      => $this->insights(),
+            'originIssue'   => $originIssue,
             // Packages and Invite Only appear as tabs in Peter's mockups but have
             // no model yet — no package_requests, no event_invites table. Left off
             // rather than rendered as tabs that can only ever show nothing.

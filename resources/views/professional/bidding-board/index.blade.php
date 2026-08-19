@@ -331,8 +331,13 @@
             @endforeach
             @if(empty($gigs))
                 <div class="bb-empty">
-                    <h4>Nothing open here right now</h4>
-                    <p>{{ $ff['tab'] === 'saved' ? 'You haven’t saved any opportunities yet — use the ☆ on a request to park it.' : 'Try a different tab, or clear your filters.' }}</p>
+                    @if(!empty($originIssue))
+                        <h4>We could not place your service origin</h4>
+                        <p>{{ $originIssue }} This is not the same as having no open requests.</p>
+                    @else
+                        <h4>Nothing open here right now</h4>
+                        <p>{{ $ff['tab'] === 'saved' ? 'You haven’t saved any opportunities yet — use the ☆ on a request to park it.' : 'Try a different tab, or clear your filters.' }}</p>
+                    @endif
                 </div>
             @endif
 

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>GigResource — Q5 / Q6 / Q7 Developer Response</title>
+<style>
+  @page { margin: 28px 32px; }
+  body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #0f172a; line-height: 1.45; }
+  h1 { font-size: 18px; color: #1e3a8a; margin: 0 0 4px; }
+  h2 { font-size: 14px; color: #1e3a8a; margin: 22px 0 8px; page-break-after: avoid; }
+  h3 { font-size: 12px; color: #1e3a8a; margin: 14px 0 6px; }
+  .sub { color: #c2410c; font-size: 11px; margin-bottom: 12px; }
+  p { margin: 0 0 8px; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; }
+  th { background: #1e3a8a; color: #fff; text-align: left; padding: 6px 7px; font-size: 10px; }
+  td { border: 1px solid #cbd5e1; padding: 6px 7px; vertical-align: top; font-size: 10px; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .yes { background: #dcfce7 !important; }
+  .no { background: #fee2e2 !important; }
+  .ind { background: #fef3c7 !important; }
+  .need { background: #ffedd5 !important; }
+  .rec { background: #dbeafe; padding: 10px 12px; margin: 8px 0 14px; }
+  .stamp { border: 1px dashed #ca8a04; padding: 8px 10px; margin: 8px 0 14px; background: #fefce8; }
+  ul { margin: 0 0 10px 18px; padding: 0; }
+  li { margin-bottom: 4px; }
+  .small { font-size: 10px; color: #475569; }
+</style>
+</head>
+<body>
+<h1>GigResource — Geographic matching developer response</h1>
+<p class="sub">19 August 2026 · UNDER REVIEW · Q5 / Q6 / Q7 / Q9 not locked · not built</p>
+<p>Please stamp each question <strong>APPROVE · MODIFY · REJECT · NEED MORE INFORMATION</strong> before this is treated as a locked rule or an implementation. Nothing below invents a missing number; those items are marked NEED MORE INFORMATION.</p>
+<div class="stamp"><strong>PM stamps:</strong> Q5 ________ &nbsp; Q6 ________ &nbsp; Q7 ________ &nbsp; Q9 ________</div>
+
+<h2>Q5 — Professional Service Origin</h2>
+<p>Preference on the table (not locked): one dedicated Service Origin per Professional account. Travel radius is measured from it. It is not automatically the billing address.</p>
+
+<h3>Location fields that exist today</h3>
+<p>There is <strong>one address block</strong> on the Professional account. There is <strong>no</strong> billing street, <strong>no</strong> map coordinates, <strong>no</strong> travel radius, and <strong>no</strong> Service Origin field.</p>
+<table>
+  <tr><th>Field</th><th>Purpose today</th><th>Feeds search / matching?</th></tr>
+  <tr><td>Street (business address)</td><td>Professional business address. Used for address checks. PO Boxes are rejected. Paid address confirmation is built but switched off until launch.</td><td class="no">No</td></tr>
+  <tr><td>City</td><td>Public profile. Homepage city counts. Browse city filter.</td><td class="yes">Yes — coarsely (name match, not miles)</td></tr>
+  <tr><td>State</td><td>Registered jurisdiction of this account. Locked once set (one account per state). Also decides whether the account may transact in the launch area.</td><td class="yes">Yes — today’s eligibility rule (same state as the event)</td></tr>
+  <tr><td>Country</td><td>With state, decides supported vs coming soon.</td><td class="ind">Indirect (transaction gate)</td></tr>
+  <tr><td>ZIP</td><td>Stored on the profile. At client sign-up, ZIP is mapped to a launch state using the first three digits. That mapping is state only — not a point on a map.</td><td class="ind">Indirect</td></tr>
+  <tr><td>Service-area status</td><td>Derived: operate here vs coming soon. Out-of-area accounts can register and browse; they cannot transact.</td><td class="yes">Transaction gate, not travel origin</td></tr>
+  <tr><td>Address-check status</td><td>Whether the street was checked, flagged as looking like a home, locked, etc.</td><td class="no">No</td></tr>
+  <tr><td>Trade-licence state</td><td>Which launch jurisdiction issued the licence. Must match this account’s state.</td><td class="no">No</td></tr>
+  <tr><td>Billing / card address</td><td>Membership billing is handled by the payment provider. GigResource does not store a separate billing street.</td><td class="no">Does not exist here</td></tr>
+  <tr><td>Map coordinates, travel radius, Service Origin</td><td>Do not exist.</td><td class="no">Do not exist</td></tr>
+</table>
+<p>On the <strong>request</strong> (not the Professional): a free-text location (“city, venue, or address”) plus a two-letter event state. Same-state matching uses the event state. Miles cannot be calculated from free text.</p>
+
+<div class="rec">
+<strong>Recommendation (pending stamp — not a schema lock).</strong>
+Create a dedicated Service Origin. Do not reuse the business street as the travel-radius origin, and do not treat it as billing (billing street is not in this product). Keep state as the same-state gate. Keep city and ZIP for display, directory counts, and ZIP fallback. V1 needs only one active origin: one account is already one state; a second state is a second account; no live workflow needs two dispatch bases on the same account. Exact new field names are not proposed here.
+</div>
+
+<p><strong>NEED MORE INFORMATION (do not assume):</strong> default travel radius in miles and whether the Professional may edit it; whether the origin street is shown publicly or used only for distance math; confirmation that Service Origin may differ from the verified business address (recommended: yes).</p>
+
+<h2>Q6 — Distance calculation for matching</h2>
+<p>Preference on the table (not locked): straight-line / geodesic for marketplace search and matching. Driving distance, travel time, and travel fees can be a later feature.</p>
+<table>
+  <tr><th>Topic</th><th>Developer answer</th></tr>
+  <tr><td>Stack</td><td>The live product is Laravel on PHP, with MySQL in production and SQLite in tests. There is no PostGIS.</td></tr>
+  <tr><td>Method</td><td>Geodesic (great-circle) distance on stored coordinates. Production uses MySQL’s sphere-distance function (or the same Haversine formula in SQL). Tests use the same formula in PHP. This is straight-line, not road miles and not drive time.</td></tr>
+  <tr><td>When coordinates are created</td><td>Once, when the Professional origin or the event location is saved. Search and bidding never call a mapping service.</td></tr>
+  <tr><td>Indexing / speed</td><td>Same-state filter first (already indexed), then a bounding box on coordinates, then the precise circle check on the remaining rows. Launch is seven jurisdictions. With indexes this stays interactive at thousands of Professionals and acceptable into the tens / low hundreds of thousands in one state.</td></tr>
+  <tr><td>Mapping API for matching?</td><td>No.</td></tr>
+  <tr><td>API for saving an address?</td><td>Yes — a geocoder on save only. Primary: U.S. Census Geocoder (no per-request fee). Optional paid Google only if Census fails and a launch key already exists. Never on every browse or bid.</td></tr>
+  <tr><td>Costs</td><td>Search: $0 per query. Census on save: $0 (public; rate-limited on write). Google fallback: only if switched on, billed per save. ZIP centre table: $0, public data for the seven launch states.</td></tr>
+  <tr><td>Trade-offs</td><td>Straight-line is shorter than driving. A Professional 20 road-miles away via a river or beltway may be 12 miles as the crow flies (included) or the reverse (excluded). That is the V1 trade-off requested. This is not travel time and not a travel fee. Same-state still wins: a circle that overlaps a neighbouring state does not match that state’s events.</td></tr>
+  <tr><td>Not recommended for V1 matching</td><td>Driving / directions lookups on each search (cost, delay, third-party dependency).</td></tr>
+</table>
+<p>No extra information is required to approve the <em>method</em>. The default radius in miles is Q5-A, not a Q6 question.</p>
+
+<h2>Q7 — Geocoding failure and ZIP fallback</h2>
+<p>Proposed hierarchy (not locked): precise validated location → validated ZIP fallback → unresolvable. Matching must be checked on <strong>both</strong> sides: Professional origin and event location.</p>
+<p class="small">Fact today: GigResource can map a ZIP prefix to a state, not a ZIP to a point. ZIP fallback requires a ZIP centre table. Until that exists, a ZIP is not a coordinate. The event location is still free text.</p>
+<table>
+  <tr><th>Status</th><th>Meaning</th><th>Eligible to match?</th></tr>
+  <tr><td>Exact</td><td>Street or venue placed on the map.</td><td class="yes">Yes, if same state and within radius</td></tr>
+  <tr><td>ZIP</td><td>Validated ZIP centre stored; ZIP is not too broad.</td><td class="yes">Yes, with an accuracy warning</td></tr>
+  <tr><td>Unresolved</td><td>Neither exact nor an acceptable ZIP.</td><td class="no">No. Fail closed. Never invent a point.</td></tr>
+</table>
+<table>
+  <tr><th>Situation</th><th>What the system does</th><th>What the person sees</th></tr>
+  <tr><td>Full address fails to geocode</td><td>Do not invent a point. If a valid 5-digit ZIP is in a launch state, has a centre, and is not too broad → save as ZIP. Otherwise unresolved. Matching stays off.</td><td>Client: “We could not place this location.” Not an empty professional list. Professional: origin matching is off, or “approximate (ZIP)” if ZIP was saved.</td></tr>
+  <tr><td>Only a valid ZIP</td><td>Map ZIP to launch state (already live). Look up the ZIP centre. Found and not too broad → ZIP status. Missing → unresolved.</td><td>“Location is approximate (ZIP). Nearby professionals are based on the centre of this ZIP, not a street.”</td></tr>
+  <tr><td>Unusually large ZIP</td><td>Proposed test (not locked): land area over 150 square miles, or the ZIP’s span is greater than half the travel radius (event side: greater than 15 miles if no radius applies) → unresolved. Ask for a city, venue, or street. Rural West Virginia and some Eastern Shore ZIPs will hit this on purpose.</td><td>Same as unresolved. Do not silently use the ZIP centre.</td></tr>
+  <tr><td>Neither coordinates nor acceptable ZIP</td><td>Unresolved. No coordinates. Not eligible. Request is not opened as an in-range gig. Do not fall back to “same city name.”</td><td>Client: “We could not place this location. Please enter a street, venue, or a more specific ZIP.” Professional: “Distance matching is off until this is fixed.”</td></tr>
+  <tr><td>Location placed, in-state, zero professionals in range</td><td>A real empty market.</td><td>“No professionals available in this area for this request.” <strong>Only this condition</strong> uses empty-market wording.</td></tr>
+</table>
+<p><strong>Silent eligibility is prevented</strong> by a hard gate: both sides must be exact or acceptable ZIP, both must have coordinates, same event state, and geodesic distance within radius. Unresolved or missing coordinates = not eligible. Tests must prove a failed geocode never appears in an in-range list.</p>
+<p class="need" style="padding:8px 10px;"><strong>NEED MORE INFORMATION (Q7-A):</strong> confirm or change the broad-ZIP cutoff (150 square miles / half of travel radius). Do not invent a different number without a stamp.</p>
+
+<h2>Q9 — Who counts toward the city directory</h2>
+<p>Approved rule: only Active and Eligible Professionals count. There is <strong>no</strong> Active / Suspended / Incomplete / Unapproved status on a Professional account. Influencers have pending / approved / rejected. Professionals do not. Eligibility is a set of flags.</p>
+<table>
+  <tr><th>Actual field</th><th>Counts on homepage today?</th><th>Count under Q9?</th></tr>
+  <tr><td>Professional role</td><td class="yes">Yes — required</td><td class="yes">Yes — required</td></tr>
+  <tr><td>Removed account</td><td class="no">No</td><td class="no">No</td></tr>
+  <tr><td>Locked out of sign-in (too many failed passwords)</td><td class="ind">Yes — gap</td><td class="no">No (closest to Suspended)</td></tr>
+  <tr><td>Account deletion requested</td><td class="ind">Yes — gap</td><td class="no">No</td></tr>
+  <tr><td>Coming soon (outside launch area)</td><td class="ind">Yes — gap</td><td class="no">Only “supported” counts</td></tr>
+  <tr><td>Blank or non-launch state</td><td class="no">Excluded</td><td class="no">Launch state required</td></tr>
+  <tr><td>Blank city</td><td class="no">Excluded from city pages</td><td class="no">Required for a city page</td></tr>
+  <tr><td>Availability = not taking work</td><td class="ind">Yes — gap</td><td class="ind">Recommend exclude</td></tr>
+  <tr><td>Trade licence / insurance not verified</td><td class="yes">Yes — optional badges</td><td class="ind">NEED MORE INFORMATION — do not treat as Unapproved unless product locks that</td></tr>
+  <tr><td>No paid membership</td><td class="yes">Yes</td><td class="ind">NEED MORE INFORMATION (recommend No for V1)</td></tr>
+  <tr><td>Email not verified</td><td class="yes">Yes</td><td class="ind">NEED MORE INFORMATION (recommend No for directory)</td></tr>
+</table>
+<p>Homepage today: Professional role + city + launch state. Threshold <strong>2</strong>, hardcoded. Q8 approved <strong>5</strong> as an admin setting — not built.</p>
+<p><strong>Recommended Q9 filter</strong> (pending stamp on Q9-A–D): Professional role; not removed; not locked out; not leaving; in a supported launch state; city present; not marked “not taking work.” Do not require badges or a paid plan unless stamped.</p>
+
+<h2>How this 13 August review maps to the live product</h2>
+<ul>
+  <li><strong>Approved and live:</strong> Q1 / Q3 / Q4 same-state gate (Professional account state vs <em>event</em> state — two-letter state, not a numeric state_id). Q11 is true by default because radius matching does not exist yet.</li>
+  <li><strong>Approved, not built:</strong> Q2 radius (Option B: full circle, then drop other states). Q8 threshold 5 as an admin setting (live is 2, hardcoded). Q10 Coverage Map + 20-mile directory-only cap (live homepage is still base-city counts).</li>
+  <li><strong>Still need a stamp:</strong> Q5, Q6, Q7 (answered in this pack). Q9 mapping (this section).</li>
+  <li>The review’s closing line that “every open item is resolved” covers Q2 / Q8 / Q10 / Q11. It does not close Q5–Q7.</li>
+  <li>Do not build Q10 until Q5–Q7 are stamped — Coverage Map needs an origin, a radius, and a geocode failure state.</li>
+</ul>
+</body>
+</html>

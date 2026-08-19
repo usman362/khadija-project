@@ -528,6 +528,32 @@
                         <label class="pf-label">ZIP / Postal Code</label>
                         <input type="text" name="zip_code" class="pf-input" value="{{ old('zip_code', $profile->zip_code) }}">
                     </div>
+
+                    <div class="pf-form-full" style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 4px;">
+                        <div class="pf-card-title" style="font-size:15px;">Service origin</div>
+                        <div class="pf-card-desc" style="margin:0;">Travel distance is measured from here — not from your billing or business address unless you enter the same place. Clients see city and state, not the street.</div>
+                    </div>
+                    @if($profile->origin_precision === 'unresolved' && ($profile->service_origin_zip || $profile->service_origin_line || $profile->service_origin_city))
+                        <div class="pf-form-full"><div class="pf-error">We could not place your service origin. Distance matching is off until this is fixed.</div></div>
+                    @elseif($profile->origin_precision === 'zip')
+                        <div class="pf-form-full"><div class="pf-hint">Your service origin is approximate (ZIP). Clients will see you by travel radius from the ZIP centre.</div></div>
+                    @endif
+                    <div class="pf-form-full">
+                        <label class="pf-label">Street or venue (optional)</label>
+                        <input type="text" name="service_origin_line" class="pf-input" value="{{ old('service_origin_line', $profile->service_origin_line) }}">
+                    </div>
+                    <div>
+                        <label class="pf-label">Origin city</label>
+                        <input type="text" name="service_origin_city" class="pf-input" value="{{ old('service_origin_city', $profile->service_origin_city) }}">
+                    </div>
+                    <div>
+                        <label class="pf-label">Origin ZIP</label>
+                        <input type="text" name="service_origin_zip" class="pf-input" value="{{ old('service_origin_zip', $profile->service_origin_zip) }}" placeholder="e.g. 21201">
+                    </div>
+                    <div>
+                        <label class="pf-label">Travel radius (miles)</label>
+                        <input type="number" name="travel_radius_miles" class="pf-input" min="1" max="200" value="{{ old('travel_radius_miles', $profile->travel_radius_miles) }}" placeholder="Required for distance matching">
+                    </div>
                 </div>
                 <div style="margin-top: 20px;">
                     <button type="submit" class="pf-btn">Save Changes</button>

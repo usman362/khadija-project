@@ -1,0 +1,12 @@
+{
+  "_comment": "Launch-state ZIP/ZCTA internal points for ZIP fallback. sq_mi is land area used to reject unusually broad ZIPs. Expand from Census ZCTA gazetteer; this file is enough for tests and the dense launch cities.",
+  "19103": {"lat": 39.9520, "lng": -75.1740, "sq_mi": 1.1, "city": "Philadelphia", "state": "PA"},
+  "19801": {"lat": 39.7390, "lng": -75.5390, "sq_mi": 4.0, "city": "Wilmington", "state": "DE"},
+  "20001": {"lat": 38.9103, "lng": -77.0170, "sq_mi": 2.5, "city": "Washington", "state": "DC"},
+  "21201": {"lat": 39.2904, "lng": -76.6122, "sq_mi": 1.2, "city": "Baltimore", "state": "MD"},
+  "21202": {"lat": 39.2909, "lng": -76.6100, "sq_mi": 0.8, "city": "Baltimore", "state": "MD"},
+  "22201": {"lat": 38.8895, "lng": -77.0920, "sq_mi": 3.0, "city": "Arlington", "state": "VA"},
+  "25301": {"lat": 38.3490, "lng": -81.6330, "sq_mi": 8.0, "city": "Charleston", "state": "WV"},
+  "07302": {"lat": 40.7190, "lng": -74.0430, "sq_mi": 2.0, "city": "Jersey City", "state": "NJ"},
+  "26807": {"lat": 38.8900, "lng": -79.4000, "sq_mi": 420.0, "city": "Franklin", "state": "WV"}
+}

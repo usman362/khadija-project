@@ -15,7 +15,9 @@
     $availF  = !empty($f['available']);
     $rateMaxF = (int) ($f['rate_max'] ?? 0);
     $sortF   = $f['sort'] ?? 'top';
+    $zipF    = $f['zip'] ?? '';
     $total   = method_exists($pros, 'total') ? $pros->total() : $pros->count();
+    $locationIssue = $locationIssue ?? null;
 
 @endphp
 
@@ -369,14 +371,14 @@
                         <a href="{{ route('public.browse') }}" class="br-clear">Clear All</a>
                     </div>
 
-                    {{-- Only filters with data behind them survive here. Distance Radius
-                         (no coordinates are stored anywhere), Response Time (no reply
-                         times are tracked), Available for Travel and Eco-Friendly
-                         Vendors (no such fields), Reviews with Photos (reviews carry no
-                         images) and the availability date picker (no availability
-                         calendar exists) were all inert controls — three of them
-                         literally `disabled` — so they were removed rather than left
-                         looking operable. --}}
+                    {{-- Distance uses a ZIP only when the visitor types one. Same-state
+                         listing is still the default. A ZIP we cannot place is a
+                         location error, not an empty marketplace. --}}
+
+                    <div class="br-fgroup">
+                        <label class="br-flabel">Near ZIP</label>
+                        <input type="text" name="zip" inputmode="numeric" maxlength="10" value="{{ $zipF }}" placeholder="e.g. 21201" class="br-input" style="width:100%;border:1px solid var(--line,#e2e8f0);border-radius:10px;padding:8px 10px;font:inherit;">
+                    </div>
 
                     <div class="br-fgroup">
                         <label class="br-flabel">Hourly Rate <span class="br-frate" id="brRateOut">{{ $rateMaxF ? 'up to $' . number_format($rateMaxF) : 'Any' }}</span></label>
@@ -406,6 +408,12 @@
 
             {{-- ── CENTER: RESULTS ── --}}
             <main class="br-results" id="brResults" aria-busy="false">
+                @if($locationIssue)
+                    <div class="br-card" style="padding:16px 18px;margin-bottom:14px;border-color:#fdba74;background:#fff7ed;">
+                        <h3 style="margin:0 0 6px;font-size:16px;color:#9a3412;">We could not place this location</h3>
+                        <p style="margin:0;font-size:13.5px;color:#7c2d12;">{{ $locationIssue }} This is not the same as having no professionals in range.</p>
+                    </div>
+                @endif
                 <div class="br-results-head">
                     <div class="br-found">Found: <b>{{ $total }} {{ Str::plural('Pro', $total) }}</b>{{ $cityF ? ' near '.$cityF : '' }}{{ $kw ? ' for “'.Str::title($kw).'”' : '' }}</div>
                     <div class="br-results-tools">
@@ -547,8 +555,13 @@
                 @empty
                     <div class="br-card br-empty">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                        <h3>No professionals match your filters yet</h3>
-                        <p>Try widening your search — or post your event and let pros come to you.</p>
+                        @if($locationIssue)
+                            <h3>We could not place this location</h3>
+                            <p>{{ $locationIssue }} Enter a street, venue, or a more specific ZIP — then search again.</p>
+                        @else
+                            <h3>{{ $zipF ? 'No professionals available in this area for this request' : 'No professionals match your filters yet' }}</h3>
+                            <p>Try widening your search — or post your event and let pros come to you.</p>
+                        @endif
                         <a href="{{ route('public.browse') }}" class="br-btn-ghost" style="margin-top:14px;">Reset filters</a>
                     </div>
                 @endforelse

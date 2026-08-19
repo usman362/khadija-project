@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Domain\Geolocation\Geocoder;
+use App\Domain\Geolocation\LocationPrecision;
+use App\Domain\Geolocation\ZipCentroidTable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -42,6 +45,10 @@ class Event extends Model
         // Rule R38 — the state this request belongs to. Stamped from the
         // client's account on create; see booted().
         'state',
+        'location_lat',
+        'location_lng',
+        'location_precision',
+        'location_zip',
         // Rule R60 — may the booked professional see this event's guest list?
         // Per event, the client's choice, private until they say otherwise.
         'share_attendees',
@@ -102,6 +109,13 @@ class Event extends Model
             if ($event->is_published && $event->published_at === null) {
                 $event->published_at = now();
             }
+
+            $textDirty = $event->isDirty(['location', 'venue', 'state']);
+            $pointDirty = $event->isDirty(['location_lat', 'location_lng', 'location_precision']);
+
+            if ($textDirty && ! $pointDirty) {
+                $event->applyLocationGeocode();
+            }
         });
 
         static::updated(function (self $event) {
@@ -141,7 +155,52 @@ class Event extends Model
             'share_attendees' => 'boolean',
             'closed_at' => 'datetime',
             'reopened_at' => 'datetime',
+            'location_lat' => 'float',
+            'location_lng' => 'float',
         ];
+    }
+
+    /**
+     * Place the request. Free-text location plus the structured state.
+     * No coordinates unless precision is exact or zip.
+     */
+    public function applyLocationGeocode(): void
+    {
+        $text = trim(implode(', ', array_filter([
+            trim((string) $this->venue) ?: null,
+            trim((string) $this->location) ?: null,
+        ])));
+
+        if ($text === '' && ! ZipCentroidTable::normalize((string) $this->location_zip)) {
+            $this->location_lat = null;
+            $this->location_lng = null;
+            $this->location_precision = LocationPrecision::UNRESOLVED;
+            $this->location_zip = null;
+
+            return;
+        }
+
+        $placed = app(Geocoder::class)->fromFreeText(
+            $text !== '' ? $text : $this->location_zip,
+            $this->state,
+        );
+
+        $this->location_lat = $placed->lat;
+        $this->location_lng = $placed->lng;
+        $this->location_precision = $placed->precision;
+        $this->location_zip = $placed->zip;
+    }
+
+    public function locationPlacementFailed(): bool
+    {
+        $hasText = trim((string) $this->location) !== '' || trim((string) $this->venue) !== '';
+
+        return $hasText && $this->location_precision === LocationPrecision::UNRESOLVED;
+    }
+
+    public function locationIsApproximate(): bool
+    {
+        return $this->location_precision === LocationPrecision::ZIP;
     }
 
     /* ── Rule R33 ───────────────────────────────────────────── */

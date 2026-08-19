@@ -141,6 +141,18 @@
                 <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>{{ number_format($event->guest_count) }} guests</div>
             @endif
         </div>
+
+        @if($event->locationPlacementFailed())
+            <div style="margin-top:14px;padding:14px 16px;border:1px solid #fdba74;background:#fff7ed;border-radius:12px;">
+                <div style="font-weight:800;color:#9a3412;margin-bottom:4px;">We could not place this location</div>
+                <p style="margin:0;font-size:13.5px;color:#7c2d12;">Professionals cannot be matched by travel distance until you enter a street, venue, or a more specific ZIP. This is not the same as having no professionals available.</p>
+            </div>
+        @elseif($event->locationIsApproximate())
+            <div style="margin-top:14px;padding:14px 16px;border:1px solid #93c5fd;background:#eff6ff;border-radius:12px;">
+                <div style="font-weight:800;color:#1e3a8a;margin-bottom:4px;">Location is approximate (ZIP)</div>
+                <p style="margin:0;font-size:13.5px;color:#1e40af;">Nearby professionals are based on the centre of this ZIP, not a street.</p>
+            </div>
+        @endif
     </div>
 
     {{-- ── Rule R33: an expired request, and what to do with it ──

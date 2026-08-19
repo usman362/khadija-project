@@ -163,6 +163,24 @@ class BrowseProfessionalsController extends Controller
                     ->orderBy('reviews_count', 'desc'),
         };
 
+        $locationIssue = null;
+        $nearZip = \App\Domain\Geolocation\ZipCentroidTable::normalize((string) $request->query('zip', ''));
+        if (\App\Support\RadiusMatching::enabled() && $nearZip !== null) {
+            $placed = app(\App\Domain\Geolocation\Geocoder::class)->fromZip($nearZip);
+            if (! $placed->isMatchable()) {
+                // Q7 — failed place is not an empty marketplace.
+                $locationIssue = $placed->message;
+            } else {
+                $candidateIds = (clone $query)->pluck('users.id');
+                $kept = \App\Support\RadiusMatching::filterUsersNearPoint(
+                    User::with('profile')->whereIn('id', $candidateIds)->get(),
+                    $placed->lat,
+                    $placed->lng,
+                )->pluck('id')->all();
+                $query->whereIn('users.id', $kept ?: [0]);
+            }
+        }
+
         /** @var LengthAwarePaginator $pros */
         $pros = $query->paginate(12)->withQueryString();
 
@@ -311,6 +329,7 @@ class BrowseProfessionalsController extends Controller
                 'rate_max'   => $rateMax,
                 'sort'       => $sort,
                 'category'   => $category?->slug,
+                'zip'        => $nearZip,
             ],
             'activeCategory'  => $category,
             'trending'        => $trending,
@@ -319,6 +338,7 @@ class BrowseProfessionalsController extends Controller
             'locationOther'   => $locationOther,
             'recentPros'      => $recentPros,
             'badges'     => UserProfile::BADGES,
+            'locationIssue' => $locationIssue,
         ]);
     }
 

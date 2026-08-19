@@ -55,9 +55,27 @@
 </style>
 @endpush
 
+@push('styles')
+<style>
+    .pk-previewbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #fff7ed; border: 1.5px solid #fdba74; color: #7c2d12; border-radius: 12px; padding: 12px 16px; margin: 16px 0 4px; font-size: 13px; }
+    .pk-previewbar b { font-weight: 800; }
+    .pk-previewbar a { margin-left: auto; font-weight: 800; color: #9a3412; white-space: nowrap; }
+</style>
+@endpush
+
 @section('content')
 <div class="pk-wrap">
     <div class="pk-container">
+        @if($preview ?? false)
+            {{-- The owner previewing their own unpublished package. Says so
+                 plainly, because the rest of the page is written for a client
+                 and would otherwise read as if this were already live. --}}
+            <div class="pk-previewbar">
+                <b>Preview — this package is not live.</b>
+                <span>This is exactly what a client will see once you publish it. Nobody else can open this page.</span>
+                <a href="{{ route('professional.packages.index') }}">Back to My Packages →</a>
+            </div>
+        @endif
         <nav class="pk-crumb">
             <a href="{{ route('landing') }}">Home</a> ›
             <a href="{{ route('public.packages') }}">Packages</a> ›

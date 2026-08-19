@@ -84,4 +84,21 @@ return [
         'AU' => 'Australia',
         'OTHER' => 'Other',
     ],
+
+    /*
+    | Radius matching (Q2 Option B, Q6 geodesic). A Professional without a
+    | placed Service Origin keeps today's same-state list until they save one.
+    */
+    'radius_matching' => env('GEO_RADIUS_MATCHING', true),
+
+    // census = street geocode on save (free). none = ZIP table only (tests).
+    'geocoder' => env('GEOCODER_DRIVER', 'census'),
+
+    // Q7-A proposed cutoff until the PM stamps a different number.
+    'zip_max_land_sq_mi' => (int) env('GEO_ZIP_MAX_SQ_MI', 150),
+
+    // Q8 approved 5 as an admin setting; the live homepage is 2 (Khadijah
+    // 2026-08-13). Default stays 2 so the page does not jump; admin can
+    // raise it via directory.city_min_professionals without a deploy.
+    'directory_city_min' => (int) env('GEO_DIRECTORY_CITY_MIN', 2),
 ];

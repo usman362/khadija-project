@@ -125,8 +125,8 @@
                             <p class="text-secondary small mb-3">For the broker conversation. A “Required” cell here does not lock anyone until broker and attorney sign off.</p>
                             <div class="row g-2">
                                 <div class="col-md-4">
-                                    <label class="form-label small">Requirement</label>
-                                    <select name="insurance_requirement" class="form-select">
+                                    <label class="form-label small" for="cat-new-insurance-requirement">Requirement</label>
+                                    <select id="cat-new-insurance-requirement" name="insurance_requirement" class="form-select">
                                         <option value="">— Not set —</option>
                                         <option value="required" @selected(old('insurance_requirement') === 'required')>Required</option>
                                         <option value="conditional" @selected(old('insurance_requirement') === 'conditional')>Conditional</option>
@@ -139,8 +139,8 @@
                                            value="{{ old('insurance_type') }}" placeholder="e.g. General Liability">
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label small">Tier</label>
-                                    <select name="insurance_tier" class="form-select">
+                                    <label class="form-label small" for="cat-new-insurance-tier">Tier</label>
+                                    <select id="cat-new-insurance-tier" name="insurance_tier" class="form-select">
                                         <option value="">— Not set —</option>
                                         @foreach(['A','B','C'] as $tier)
                                             <option value="{{ $tier }}" @selected(old('insurance_tier') === $tier)>Tier {{ $tier }}</option>

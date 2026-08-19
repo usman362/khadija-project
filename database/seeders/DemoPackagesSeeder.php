@@ -78,7 +78,17 @@ class DemoPackagesSeeder extends Seeder
                     'savings_pct'    => $data['savings_pct'] ?? null,
                     'includes'       => $data['includes'],
                     'images'         => [],
-                    'is_active'      => true,
+                    /*
+                     * Most demo packages are live. Four are not, on purpose: the
+                     * professional's My Packages shelf sorts its shelf into
+                     * published / draft / ready to publish / unpublished /
+                     * archived, and with everything active four of those five
+                     * tiles read zero and the screen cannot be seen working.
+                     * Only ACTIVE ones reach the public catalogue, so this adds
+                     * nothing a client sees.
+                     */
+                    'status'         => $data['status'] ?? 'active',
+                    'is_active'      => ($data['status'] ?? 'active') === 'active',
                     'sort_order'     => $data['sort'] ?? 0,
                 ],
             );
@@ -201,6 +211,57 @@ class DemoPackagesSeeder extends Seeder
                 'description' => "Themed balloon installations, backdrops and table styling for birthdays and milestone celebrations.",
                 'includes' => ['Themed balloon install', 'Photo backdrop', 'Table styling', 'Setup & teardown'],
                 'sort' => 44,
+            ],
+            /*
+             * Elena's shelf, the one the My Packages screen is demonstrated on.
+             * One of each non-live state, so every tile has something behind it.
+             */
+            [
+                'title' => 'Engagement Mini Session + Styling Bundle', 'owner' => 'elena.demo@example.test', 'category' => 'Photograph', 'type' => 'solo',
+                'status' => 'draft',
+                // Deliberately unfinished: one service and no price, so the
+                // shelf shows it stopped at step 2 with a real reason.
+                'services' => ['Photography'],
+                'price' => 0, 'price_unit' => 'flat', 'duration' => null, 'coverage' => null,
+                'team' => [], 'guests' => 'Up to 40',
+                'availability' => null, 'savings_pct' => null,
+                'description' => "Beautiful mini session plus styling guidance for your engagement.",
+                'includes' => [],
+                'sort' => 10,
+            ],
+            [
+                'title' => 'Anniversary Portrait Session', 'owner' => 'elena.demo@example.test', 'category' => 'Photograph', 'type' => 'solo',
+                // Finished, just not live — this is the "Ready to Publish" state.
+                'status' => 'draft',
+                'services' => ['Photography', 'Videography'],
+                'price' => 1600, 'price_unit' => 'from', 'duration' => 'Up to 4 Hours', 'coverage' => 'Up to 4 Hours',
+                'team' => [], 'guests' => 'Up to 30',
+                'availability' => 'Weekdays & Weekend', 'savings_pct' => null,
+                'description' => "A relaxed portrait session for anniversaries, with a short highlight film.",
+                'includes' => ['2 hours of portraits', 'Edited online gallery', 'Short highlight film'],
+                'sort' => 12,
+            ],
+            [
+                'title' => 'Summer Wedding Add-On: Drone Coverage', 'owner' => 'elena.demo@example.test', 'category' => 'Video', 'type' => 'solo',
+                'status' => 'paused',
+                'services' => ['Videography', 'Photography'],
+                'price' => 650, 'price_unit' => 'from', 'duration' => 'Up to 2 Hours', 'coverage' => 'Up to 2 Hours',
+                'team' => [], 'guests' => 'Up to 150',
+                'availability' => 'Available Weekends', 'savings_pct' => null,
+                'description' => "Cinematic drone footage to capture stunning aerial views of your day.",
+                'includes' => ['Licensed drone pilot', 'Aerial stills', '60-second aerial edit'],
+                'sort' => 8,
+            ],
+            [
+                'title' => 'Winter 2025 Holiday Party Package', 'owner' => 'elena.demo@example.test', 'category' => 'Photograph', 'type' => 'solo',
+                'status' => 'archived',
+                'services' => ['Photography', 'Decor & Design'],
+                'price' => 1900, 'price_unit' => 'from', 'duration' => 'Up to 5 Hours', 'coverage' => 'Up to 5 Hours',
+                'team' => [], 'guests' => 'Up to 80',
+                'availability' => 'Available Weekends', 'savings_pct' => null,
+                'description' => "Last season's holiday party package, kept for reference.",
+                'includes' => ['Party photography', 'Seasonal styling'],
+                'sort' => 4,
             ],
             [
                 'title' => 'Grand Gala Production Package', 'owner' => 'grandaffair.demo@example.test', 'category' => 'Planning', 'type' => 'solo',

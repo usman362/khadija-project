@@ -23,6 +23,21 @@ class UserProfile extends Model
             if ($profile->isDirty(['country', 'state'])) {
                 $profile->service_area_status = ServiceArea::statusFor($profile->country, $profile->state);
             }
+
+            // Service Origin is its own block. Do not copy the business
+            // address, and do not overwrite a point a test or admin already set.
+            $originTextDirty = $profile->isDirty([
+                'service_origin_line',
+                'service_origin_city',
+                'service_origin_state',
+                'service_origin_zip',
+                'travel_radius_miles',
+            ]);
+            $pointDirty = $profile->isDirty(['origin_lat', 'origin_lng', 'origin_precision']);
+
+            if ($originTextDirty && ! $pointDirty) {
+                $profile->applyServiceOriginGeocode();
+            }
         });
     }
 
@@ -36,6 +51,14 @@ class UserProfile extends Model
         'state',
         'country',
         'zip_code',
+        'service_origin_line',
+        'service_origin_city',
+        'service_origin_state',
+        'service_origin_zip',
+        'origin_lat',
+        'origin_lng',
+        'origin_precision',
+        'travel_radius_miles',
         // Without these two here, update() drops them silently and every new
         // account stays on the column default — an in-area registration would
         // still be filed as "coming soon".
@@ -116,7 +139,48 @@ class UserProfile extends Model
             'address_verified_at' => 'datetime',
             'address_locked_at' => 'datetime',
             'address_verification_meta' => 'array',
+            'origin_lat' => 'float',
+            'origin_lng' => 'float',
+            'travel_radius_miles' => 'integer',
         ];
+    }
+
+    /**
+     * Place the Service Origin. Empty origin is unresolved, never a guessed
+     * city centre. Coordinates exist only for exact/zip.
+     */
+    public function applyServiceOriginGeocode(): void
+    {
+        $line = trim((string) $this->service_origin_line);
+        $city = trim((string) $this->service_origin_city);
+        $zip  = trim((string) $this->service_origin_zip);
+        $state = strtoupper(trim((string) ($this->service_origin_state ?: $this->state)));
+
+        if ($line === '' && $city === '' && $zip === '') {
+            $this->origin_lat = null;
+            $this->origin_lng = null;
+            $this->origin_precision = \App\Domain\Geolocation\LocationPrecision::UNRESOLVED;
+
+            return;
+        }
+
+        $placed = app(\App\Domain\Geolocation\Geocoder::class)->place(
+            $line ?: null,
+            $city ?: null,
+            $state ?: null,
+            $zip ?: null,
+            $this->travel_radius_miles !== null ? (float) $this->travel_radius_miles : null,
+        );
+
+        $this->origin_lat = $placed->lat;
+        $this->origin_lng = $placed->lng;
+        $this->origin_precision = $placed->precision;
+        if ($placed->zip) {
+            $this->service_origin_zip = $placed->zip;
+        }
+        if ($state !== '') {
+            $this->service_origin_state = $state;
+        }
     }
 
     public function user(): BelongsTo

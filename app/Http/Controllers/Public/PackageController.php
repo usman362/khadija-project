@@ -500,8 +500,18 @@ class PackageController extends Controller
 
     public function show(Package $package): View
     {
-        // Only an active package is publicly visible — draft/paused/archived 404.
-        abort_unless(($package->status ?? ($package->is_active ? 'active' : 'draft')) === 'active', 404);
+        /*
+         * Only an active package is publicly visible — draft/paused/archived 404.
+         *
+         * With one exception: its own professional. "Preview as Client" on the
+         * My Packages shelf is how they check a package before it goes live, and
+         * a preview that only works once the thing is already published is not a
+         * preview. The page states plainly that it is not visible to anyone else.
+         */
+        $live = ($package->status ?? ($package->is_active ? 'active' : 'draft')) === 'active';
+        $owner = auth()->id() === $package->user_id;
+
+        abort_unless($live || $owner, 404);
 
         $package->load([
             'category:id,name,slug',
@@ -528,11 +538,18 @@ class PackageController extends Controller
             ->limit(3)
             ->get();
 
-        // Track "Recently Viewed" for the Package Service Search rail (newest first, max 8).
-        $recent = collect(session('recent_packages', []))
-            ->prepend($package->id)->unique()->take(8)->values()->all();
-        session(['recent_packages' => $recent]);
+        // Track "Recently Viewed" for the Package Service Search rail (newest
+        // first, max 8). Not while previewing: the rail is a public surface and
+        // would then offer a package nobody but the owner can open.
+        if ($live) {
+            $recent = collect(session('recent_packages', []))
+                ->prepend($package->id)->unique()->take(8)->values()->all();
+            session(['recent_packages' => $recent]);
+        }
 
-        return view('public.package-show', compact('package', 'more'));
+        return view('public.package-show', compact('package', 'more') + [
+            // Drives the preview banner. False for every actual client.
+            'preview' => ! $live,
+        ]);
     }
 }

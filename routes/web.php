@@ -906,6 +906,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/packages/{package}/edit', [ProfessionalPackageController::class, 'edit'])->name('professional.packages.edit');
         Route::patch('/packages/{package}', [ProfessionalPackageController::class, 'update'])->name('professional.packages.update');
         Route::delete('/packages/{package}', [ProfessionalPackageController::class, 'destroy'])->name('professional.packages.destroy');
+        Route::post('/packages/{package}/duplicate', [ProfessionalPackageController::class, 'duplicate'])->name('professional.packages.duplicate');
         Route::patch('/packages/{package}/status', [ProfessionalPackageController::class, 'setStatus'])->name('professional.packages.status');
 
         // NOTE: professionals do NOT create gigs — clients post gigs (events), pros

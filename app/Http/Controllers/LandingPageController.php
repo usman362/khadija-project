@@ -144,7 +144,7 @@ class LandingPageController extends Controller
 
         return \App\Models\UserProfile::query()
             ->when($onlyState, fn ($q) => $q->where('state', $onlyState))
-            ->whereHas('user', fn ($u) => $u->whereHas('roles', fn ($r) => $r->where('name', 'professional')))
+            ->tap(fn ($q) => \App\Support\DirectoryEligibility::scopeProfessionals($q))
             ->whereNotNull('state')->where('state', '!=', '')
             ->whereIn('state', array_keys($names))
             ->selectRaw('state, COUNT(*) as total')
@@ -171,7 +171,7 @@ class LandingPageController extends Controller
     {
         return \App\Models\UserProfile::query()
             ->when($onlyState, fn ($q) => $q->where('state', $onlyState))
-            ->whereHas('user', fn ($u) => $u->whereHas('roles', fn ($r) => $r->where('name', 'professional')))
+            ->tap(fn ($q) => \App\Support\DirectoryEligibility::scopeProfessionals($q))
             ->whereNotNull('city')->where('city', '!=', '')
             ->whereNotNull('state')->where('state', '!=', '')
             // Only where we actually operate. A city we cannot trade in has no
@@ -179,7 +179,7 @@ class LandingPageController extends Controller
             ->whereIn('state', array_keys(config('geo.allowed_states', [])))
             ->selectRaw('city, state, COUNT(*) as total')
             ->groupBy('city', 'state')
-            ->havingRaw('COUNT(*) >= ?', [self::CITY_MIN_PROFESSIONALS])
+            ->havingRaw('COUNT(*) >= ?', [\App\Support\DirectoryEligibility::cityMinimum()])
             ->orderByDesc('total')
             ->orderBy('city')
             ->limit(8)

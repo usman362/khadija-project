@@ -25,11 +25,20 @@ class AccessibilityBaselineTest extends TestCase
     /** @return array<int, string> */
     private function views(): array
     {
-        // The design-spec pages are internal reference documents, not product.
-        return array_values(array_filter(
-            glob(resource_path('views/**/*.blade.php'), GLOB_BRACE) + $this->recursiveViews(),
+        /*
+         * The design-spec pages are internal reference documents, not product.
+         *
+         * array_merge, not `+`. Both halves are integer-keyed lists, so `+` kept
+         * the glob's element at every index the glob already had and silently
+         * dropped that many entries from the recursive walk — which files got
+         * dropped depended on how many files the glob happened to return. Adding
+         * one new view anywhere shuffled the set. Four admin selects with no
+         * accessible name had been sitting outside the scan the whole time.
+         */
+        return array_values(array_unique(array_filter(
+            array_merge(glob(resource_path('views/**/*.blade.php'), GLOB_BRACE), $this->recursiveViews()),
             fn ($path) => ! str_contains($path, '/design-'),
-        ));
+        )));
     }
 
     private function recursiveViews(): array

@@ -97,6 +97,10 @@ class ProfessionalProfileController extends Controller
             'country' => ['nullable', 'string', 'max:100'],
             'zip_code' => ['nullable', 'string', 'max:20'],
             'website' => ['nullable', 'url', 'max:255'],
+            'service_origin_line' => ['nullable', 'string', 'max:255'],
+            'service_origin_city' => ['nullable', 'string', 'max:100'],
+            'service_origin_zip' => ['nullable', 'string', 'max:20'],
+            'travel_radius_miles' => ['nullable', 'integer', 'min:1', 'max:200'],
         ]);
 
         $user->update([
@@ -118,6 +122,11 @@ class ProfessionalProfileController extends Controller
             'country' => $validated['country'] ?? null,
             'zip_code' => $validated['zip_code'] ?? null,
             'website' => $validated['website'] ?? null,
+            'service_origin_line' => $validated['service_origin_line'] ?? null,
+            'service_origin_city' => $validated['service_origin_city'] ?? null,
+            'service_origin_state' => $user->profile?->state ?? $validated['state'] ?? null,
+            'service_origin_zip' => $validated['service_origin_zip'] ?? null,
+            'travel_radius_miles' => $validated['travel_radius_miles'] ?? null,
         ]);
 
         return back()->with('status', 'Profile updated successfully.');
