@@ -8,13 +8,16 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * "What does each toolkit tier unlock?" — the tab table from Rule R31.
+ * "Choose Your Toolkit Power" — the three tiers from Rule R31, what each one
+ * unlocks, and what it costs.
  *
- * Replaces the pair of Semi/Maximum toggle buttons, which said which add-on
- * was active but never what it actually bought you.
+ * Replaces a three-tab table that answered "what is in this tier" one tier at
+ * a time. Choosing between three things means seeing three things, so the
+ * tiers sit side by side and the comparison underneath shows every tool
+ * against every tier at once.
  *
  * The same page serves both sides; the tools and the membership rules differ,
- * the tiers and prices do not.
+ * the tiers and the prices do not.
  */
 class ToolkitTierController extends Controller
 {
@@ -26,17 +29,46 @@ class ToolkitTierController extends Controller
             : ToolkitTiers::CLIENT;
 
         $tiers = config('toolkit-tiers.tiers', []);
-        $tab = $request->query('tier');
-        $tab = array_key_exists($tab, $tiers) ? $tab : 'semi';
+        $total = ToolkitTiers::toolsFor($audience)->count();
+
+        /*
+         * Whether the toolkit is on sale at all.
+         *
+         * AI_FEATURES_FREE_FOR_ALL unlocks every tool for every account during
+         * the launch period, and there is no checkout behind these prices yet.
+         * So the cards state the tiers and the prices — they are decided (R31)
+         * — but the button does what the app can actually do rather than
+         * pretending to take a payment.
+         */
+        $everythingUnlocked = filter_var(env('AI_FEATURES_FREE_FOR_ALL', false), FILTER_VALIDATE_BOOLEAN)
+            || (bool) $user?->isAdmin();
+
+        $cards = collect($tiers)->map(fn ($label, $tier) => [
+            'key'         => $tier,
+            'label'       => $label,
+            'tagline'     => match ($tier) {
+                'manual'  => 'Basic Access',
+                'semi'    => 'Essential Toolkit',
+                default   => 'Complete Toolkit',
+            },
+            'price'       => ToolkitTiers::price($tier),
+            'unlocked'    => ToolkitTiers::countFor($tier, $audience),
+            'total'       => $total,
+            'adds'        => ToolkitTiers::toolsAddedBy($tier, $audience),
+            'purchasable' => in_array($tier, ToolkitTiers::purchasableBy($user), true),
+        ])->values();
 
         return view('client.toolkit.tiers', [
-            'tiers'       => $tiers,
-            'tab'         => $tab,
-            'audience'    => $audience,
-            'rows'        => ToolkitTiers::table($tab, $audience),
-            'counts'      => collect($tiers)->map(fn ($l, $t) => ToolkitTiers::countFor($t, $audience)),
-            'prices'      => collect($tiers)->map(fn ($l, $t) => ToolkitTiers::price($t)),
-            'purchasable' => ToolkitTiers::purchasableBy($user),
+            'tiers'      => $tiers,
+            'audience'   => $audience,
+            'cards'      => $cards,
+            'suites'     => ToolkitTiers::comparison($audience),
+            'total'      => $total,
+            'difference' => ToolkitTiers::upgradeDifference(),
+            'everythingUnlocked' => $everythingUnlocked,
+            // Semi is the one recommended on the mockup, and it is the one a
+            // client starting out needs.
+            'recommended' => 'semi',
         ]);
     }
 }

@@ -217,33 +217,120 @@ class ToolkitTierTableTest extends TestCase
         $this->assertSame(['manual', 'semi', 'maximum'], ToolkitTiers::purchasableBy($this->user()));
     }
 
-    public function test_the_page_opens_on_semi_and_lists_all_three_tiers(): void
+    /**
+     * The three tiers sit side by side now, rather than one tab at a time.
+     * Choosing between three things means seeing three things.
+     */
+    public function test_the_page_shows_all_three_tiers_at_once(): void
     {
         $response = $this->actingAs($this->user())->get(route('client.toolkit.tiers'));
 
         $response->assertSuccessful();
-        $response->assertViewHas('tab', 'semi');
-        $response->assertSee('Manual');
-        $response->assertSee('Semi');
-        $response->assertSee('Maximum');
+        $response->assertSee('MANUAL');
+        $response->assertSee('SEMI');
+        $response->assertSee('MAXIMUM');
         $response->assertSee('$2.99');
+        $response->assertSee('$5.99');
+        $response->assertSee('FREE');
     }
 
-    public function test_the_manual_tab_says_it_has_nothing_rather_than_listing_twelve_refusals(): void
+    public function test_the_manual_card_says_it_has_nothing_rather_than_listing_twelve_refusals(): void
     {
-        $this->actingAs($this->user())
-            ->get(route('client.toolkit.tiers', ['tier' => 'manual']))
-            ->assertSuccessful()
-            ->assertSee('Manual includes no tools')
-            ->assertDontSee('Not included');
+        $html = $this->actingAs($this->user())->get(route('client.toolkit.tiers'))
+            ->assertSuccessful()->getContent();
+
+        $this->assertStringContainsString('Manual includes no tools', $html);
+
+        // Inside the Manual card specifically — the comparison table below it
+        // legitimately marks tools as not included for every tier.
+        $card = substr($html, (int) strpos($html, 'MANUAL'), (int) strpos($html, 'SEMI') - (int) strpos($html, 'MANUAL'));
+        $this->assertStringNotContainsString('Not included', $card);
     }
 
-    public function test_an_unknown_tab_falls_back_rather_than_erroring(): void
+    public function test_a_leftover_tier_parameter_does_not_break_the_page(): void
     {
+        // The old three-tab version took ?tier=. Links to it still exist in
+        // the wild, and they must land on the page rather than an error.
         $this->actingAs($this->user())
             ->get(route('client.toolkit.tiers', ['tier' => 'nonsense']))
             ->assertSuccessful()
-            ->assertViewHas('tab', 'semi');
+            ->assertSee('Choose Your Toolkit Power');
+    }
+
+    /* ── The three cards, and the comparison under them ────────── */
+
+    public function test_each_card_counts_the_tools_that_tier_actually_unlocks(): void
+    {
+        $cards = $this->actingAs($this->user())->get(route('client.toolkit.tiers'))
+            ->assertSuccessful()->viewData('cards');
+
+        foreach ($cards as $card) {
+            $this->assertSame(
+                ToolkitTiers::countFor($card['key'], ToolkitTiers::CLIENT),
+                $card['unlocked'],
+                "the {$card['key']} card counts something other than what it unlocks",
+            );
+        }
+
+        $this->assertSame(0, $cards->firstWhere('key', 'manual')['unlocked']);
+        $this->assertSame(5, $cards->firstWhere('key', 'semi')['unlocked']);
+        $this->assertSame(12, $cards->firstWhere('key', 'maximum')['unlocked']);
+    }
+
+    public function test_the_maximum_card_lists_only_what_it_adds_on_top_of_semi(): void
+    {
+        // Its own heading says "everything in Semi, plus N more", so listing
+        // the Semi five again would make the two cards look like they overlap
+        // by accident.
+        $adds = ToolkitTiers::toolsAddedBy('maximum', ToolkitTiers::CLIENT);
+
+        $this->assertCount(7, $adds);
+
+        foreach ($adds as $tool) {
+            $this->assertFalse(ToolkitTiers::unlocks('semi', $tool['name'], ToolkitTiers::CLIENT),
+                "{$tool['name']} is already in Semi and should not be listed as something Maximum adds");
+        }
+    }
+
+    public function test_the_upgrade_price_is_the_difference_not_the_full_price(): void
+    {
+        // Quoting $5.99 to somebody who already paid $2.99 is quoting them the
+        // wrong number; the config says the Semi payment is credited.
+        $this->assertSame(3.0, ToolkitTiers::upgradeDifference());
+
+        $this->actingAs($this->user())->get(route('client.toolkit.tiers'))
+            ->assertSuccessful()
+            ->assertSee('$3.00 difference');
+    }
+
+    public function test_the_comparison_covers_every_tool_exactly_once(): void
+    {
+        $suites = ToolkitTiers::comparison(ToolkitTiers::CLIENT);
+
+        $names = collect($suites)->flatMap(fn ($s) => collect($s['tools'])->pluck('name'))->all();
+
+        $this->assertCount(12, $names, 'the comparison lists something other than the twelve tools');
+        $this->assertSame(count($names), count(array_unique($names)), 'a tool appears in two suites');
+        $this->assertSame([], array_diff(
+            ToolkitTiers::toolsFor(ToolkitTiers::CLIENT)->pluck('name')->all(), $names,
+        ), 'a tool is in no suite and so appears nowhere in the comparison');
+    }
+
+    public function test_the_comparison_marks_agree_with_the_rule(): void
+    {
+        // The table is the page's answer to "what am I buying", so a tick in it
+        // has to be the same answer ToolkitTiers::unlocks() gives.
+        foreach (ToolkitTiers::comparison(ToolkitTiers::CLIENT) as $suite) {
+            foreach ($suite['tools'] as $tool) {
+                foreach (['manual', 'semi', 'maximum'] as $tier) {
+                    $this->assertSame(
+                        ToolkitTiers::unlocks($tier, $tool['name'], ToolkitTiers::CLIENT),
+                        $tool['tiers'][$tier],
+                        "{$tool['name']} is marked wrongly under {$tier}",
+                    );
+                }
+            }
+        }
     }
     public function test_both_sidebars_link_to_the_page(): void
     {

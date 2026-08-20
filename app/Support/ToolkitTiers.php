@@ -99,4 +99,78 @@ class ToolkitTiers
     {
         return self::table($tier, $audience)->where('included', true)->count();
     }
+
+    /**
+     * The comparison table, grouped by the GigResource IQ suite each tool
+     * belongs to — one row per tool, one column per tier.
+     *
+     * The suites come from AiToolCatalog rather than a second list here. A
+     * tool's suite is a fact about the tool, and two lists of it would drift.
+     *
+     * @return Collection<int, array{key:string, name:string, emoji:string, tagline:string, tools:array}>
+     */
+    public static function comparison(string $audience): Collection
+    {
+        $tiers = array_keys(config('toolkit-tiers.tiers', []));
+
+        $rows = self::toolsFor($audience)->map(fn (array $tool) => [
+            'key'     => $tool['key'] ?? '',
+            'name'    => $name = $tool['name'] ?? '',
+            'purpose' => $tool['purpose'] ?? null,
+            'suite'   => AiToolCatalog::suiteOf($tool['key'] ?? ''),
+            'tiers'   => collect($tiers)->mapWithKeys(
+                fn ($tier) => [$tier => self::unlocks($tier, $name, $audience)]
+            )->all(),
+        ]);
+
+        return collect(AiToolCatalog::suites())
+            ->map(fn (array $meta, string $key) => [
+                'key'     => $key,
+                'name'    => $meta['name'],
+                'emoji'   => $meta['emoji'],
+                'tagline' => $meta['tagline'],
+                'tools'   => $rows->where('suite', $key)->values()->all(),
+            ])
+            // A suite with none of this audience's tools in it is a heading
+            // with nothing under it.
+            ->filter(fn (array $suite) => $suite['tools'] !== [])
+            ->values();
+    }
+
+    /**
+     * The tools a tier adds ON TOP of the one below it — what the card lists.
+     *
+     * Maximum's card says "everything in Semi, plus N more", so it must show
+     * the difference rather than all twelve; listing the Semi five again would
+     * make the two cards look like they overlap by accident.
+     *
+     * @return Collection<int, array>
+     */
+    public static function toolsAddedBy(string $tier, string $audience): Collection
+    {
+        $below = match ($tier) {
+            'maximum' => 'semi',
+            'semi'    => 'manual',
+            default   => null,
+        };
+
+        return self::toolsFor($audience)->filter(function (array $tool) use ($tier, $below, $audience) {
+            $name = $tool['name'] ?? '';
+
+            return self::unlocks($tier, $name, $audience)
+                && ! ($below !== null && self::unlocks($below, $name, $audience));
+        })->values();
+    }
+
+    /**
+     * What upgrading from Semi to Maximum costs.
+     *
+     * The difference, not the full price: config says the Semi payment is
+     * credited, and quoting $5.99 to somebody who has already paid $2.99 would
+     * be quoting them the wrong number.
+     */
+    public static function upgradeDifference(): float
+    {
+        return round(max(0, self::price('maximum') - self::price('semi')), 2);
+    }
 }
