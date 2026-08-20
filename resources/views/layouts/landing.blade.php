@@ -9,13 +9,14 @@
     $__fgHref = match ($__fgActive) {
         'professional' => route('professional.bidding-board.index'),  // the real gig board
         'client'   => route('public.packages'),                   // clients shop packages, not gigs
-        // A guest can't reach the board — it's pro-only and there is no public gig
-        // listing — so fall back to the professional directory rather than a dead
-        // end. Ali's call 07.26.2026: for anyone without gig access, Browse
-        // Professionals is the right landing.
-        default    => route('public.browse'),
+        // A guest can't reach the board — it's pro-only and there is no public
+        // gig listing. It used to fall back to Browse Professionals, but /browse
+        // has since been put behind auth, so the first link in the nav sent
+        // every signed-out visitor to a login wall. Packages is public, it is
+        // the shop window, and it is what Peter's mockup shows here.
+        default    => route('public.packages'),
     };
-    $__fgLabel = $__fgActive === 'client' ? 'Shop Packages' : 'Find Gigs';
+    $__fgLabel = $__fgActive === 'professional' ? 'Find Gigs' : 'Shop Packages';
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
