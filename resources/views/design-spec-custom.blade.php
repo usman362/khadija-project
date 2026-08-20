@@ -237,7 +237,7 @@
                 ['id' => 'D-03', 'title' => 'Professional Profile',     'url' => '/pro/{user}',
                     'purpose' => 'Public profile of a single professional — the booking-decision page.',
                     'elements' => 'Cover banner, avatar overlap, name + verified check + headline, breadcrumb, sticky right sidebar (Top Rated seal · Satisfaction · Verified Credentials), About, Skills, Portfolio gallery, Reviews list, Similar pros row, mobile sticky "Request Quote" bar.'],
-                ['id' => 'D-04', 'title' => 'Events & Categories',      'url' => '/events-categories',
+                ['id' => 'D-04', 'title' => 'Events & Categories (REMOVED 2026-08-20 — Owner)', 'url' => '/event-types',
                     'purpose' => 'Alibaba-style mega category browser with audience toggle and advanced filters.',
                     'elements' => 'Hero + search, advanced filter (5 categories per audience with dropdown popovers), active chips, 9-category left rail with right showcase, sub-tile filter tabs (Popular/Top Rated/Newest/Trending), Top Services 4-col tiles, Event types section, CTA banner.'],
                 ['id' => 'D-05', 'title' => 'How It Works',             'url' => '/how-it-works',

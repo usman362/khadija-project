@@ -10,7 +10,7 @@
 @section('err-helpful')
     <div class="err-helpful-links">
         <a href="{{ route('public.browse') }}">Browse Professionals</a>
-        <a href="{{ route('events-categories') }}">All Categories</a>
+        <a href="{{ route('public.event-types') }}">All Categories</a>
         <a href="{{ route('public.how-it-works') }}">How It Works</a>
         <a href="{{ route('public.faq') }}">FAQ</a>
         <a href="{{ route('blog.index') }}">Blog</a>

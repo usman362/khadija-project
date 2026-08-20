@@ -102,7 +102,7 @@
                     {{-- Primary nav links --}}
                     <div class="mobile-nav-section">
                         <h4>Explore</h4>
-                        <a href="{{ route('events-categories') }}" class="mobile-nav-link">
+                        <a href="{{ route('public.event-types') }}" class="mobile-nav-link">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                             Event Types
                         </a>
@@ -210,7 +210,7 @@
 
             <li><a href="{{ route('public.browse') }}" class="{{ request()->routeIs('public.browse') ? 'is-active' : '' }}">Browse Professionals</a></li>
             <li><a href="{{ route('about-us') }}" class="{{ request()->routeIs('about-us') ? 'is-active' : '' }}">About Us</a></li>
-            <li><a href="{{ route('events-categories') }}" class="{{ request()->routeIs('events-categories') ? 'is-active' : '' }}">Event Types</a></li>
+            <li><a href="{{ route('public.event-types') }}" class="{{ request()->routeIs('public.event-types') ? 'is-active' : '' }}">Event Types</a></li>
             <li><a href="{{ route('blog.index') }}" class="{{ request()->routeIs('blog.*') ? 'is-active' : '' }}">Blog</a></li>
             <li><a href="{{ route('public.how-it-works') }}" class="{{ request()->routeIs('public.how-it-works') ? 'is-active' : '' }}">How It Works</a></li>
             <li><a href="{{ route('landing') }}#pricing">Pricing</a></li>

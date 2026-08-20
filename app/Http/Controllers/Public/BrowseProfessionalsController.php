@@ -18,7 +18,7 @@ use Illuminate\View\View;
 /**
  * Public "/browse" — the searchable, filterable grid of professionals
  * (users with the `supplier` role). This is where the landing page's
- * hero search, A-Z browse chips, and the events-categories mega-panel
+ * hero search, A-Z browse chips, and the Explore Event Types panel
  * all converge. Without this, those entry points dead-end.
  *
  * Filters (all query-string, all optional):

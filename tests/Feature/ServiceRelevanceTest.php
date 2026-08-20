@@ -140,26 +140,23 @@ class ServiceRelevanceTest extends TestCase
      */
     public function test_the_page_names_the_thing_it_is_actually_showing(): void
     {
-        $markup = $this->stripComments(resource_path('views/events-categories.blade.php'));
-
         /*
-         * This page is the whole tree — event types, service categories AND
-         * services — so it is named for that. Titling it "Explore by Event
-         * Type" was the earlier fix, and it turned out to be wrong for a
-         * different reason: /event-types already browses occasions, and two
-         * pages under the same title is how four rounds of screenshots got
-         * pointed at the page nobody had rebuilt.
+         * There used to be two of these. "Everything We Cover"
+         * (/events-categories) showed the whole tree; /event-types browses
+         * occasions. Two pages doing nearly the same job under nearly the same
+         * title is how four rounds of screenshots got pointed at the page
+         * nobody had rebuilt — and it is why the Owner had the first one
+         * removed on 2026-08-20.
+         *
+         * One page, one title. This holds the survivor to its name.
          */
-        $this->assertStringContainsString('Everything <span class="b">We Cover</span>', $markup);
-        $this->assertStringNotContainsString('Explore by <span class="b">Category</span>', $markup);
-        $this->assertStringNotContainsString('Explore by <span class="b">Event Type</span>', $markup);
-        $this->assertStringNotContainsString('Search categories or services', $markup);
-
-        // And the page that DOES browse occasions still says so.
         $this->assertStringContainsString(
             'Explore <span>Event Types</span>',
             file_get_contents(resource_path('views/public/event-types.blade.php')),
         );
+
+        $this->assertFileDoesNotExist(resource_path('views/events-categories.blade.php'),
+            'the second wall is back — see EventsCategoriesRemovedTest');
     }
 
     /** Shop Packages had its own place in the bar and a second one in a menu. */
@@ -182,6 +179,9 @@ class ServiceRelevanceTest extends TestCase
      * was reached through three different words in four places — "Browse
      * Categories" in the client sidebar, "Categories" in the public mobile menu
      * and footer, and "Events" in two older partials — for one destination.
+     *
+     * Scans route('public.event-types'): /events-categories was removed on
+     * 2026-08-20 and every link that used to point there now points here.
      */
     public function test_every_link_to_the_event_type_wall_uses_one_name(): void
     {
@@ -196,7 +196,7 @@ class ServiceRelevanceTest extends TestCase
                 preg_match_all('/<a\\b[^>]*>.*?<\\/a>/s', $src, $anchors);
 
                 foreach ($anchors[0] as $anchor) {
-                    if (! str_contains($anchor, "route('events-categories')")) {
+                    if (! str_contains($anchor, "route('public.event-types')")) {
                         continue;
                     }
 

@@ -195,7 +195,7 @@ class LandingPageController extends Controller
 
     private function showcaseCategories(): array
     {
-        // Deliberately the same query as /events-categories, just capped at
+        // Deliberately the same query as Explore Event Types, just capped at
         // eight instead of paginated, so the carousel is the first page of the
         // browse grid rather than a separate selection of its own. No
         // parent_id filter — that had limited it to top-level event types, so
@@ -220,7 +220,7 @@ class LandingPageController extends Controller
              * no kind filter, and because it sorts by sort_order then id, the
              * event types won every slot — the carousel was eight event types
              * under a heading promising categories, duplicating the page that
-             * already exists for them at /events-categories.
+             * already exists for them at /event-types.
              *
              * A visitor reading "Categories" here expects the things they can
              * hire someone for.
@@ -240,7 +240,7 @@ class LandingPageController extends Controller
                 // that only one category carries. Preferring the cover meant
                 // that single tile rendered as a cropped letterbox while the
                 // other 48 were square — the odd one out in the row. This is
-                // also the order /events-categories already uses.
+                // also the order Explore Event Types already uses.
                 'image' => asset('storage/' . ($c->thumbnail ?: $c->cover_image)),
                 'link'  => route('public.category', $c->slug),
             ])

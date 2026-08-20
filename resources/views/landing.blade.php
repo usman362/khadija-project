@@ -455,7 +455,7 @@
     <div class="lp-container">
         <div class="lp-cats-head">
             <h2 class="lp-h2">{{ $t('categories', 'heading', 'Explore Popular Categories') }}</h2>
-            <a href="{{ route('events-categories') }}" class="lp-viewall">{{ $t('categories', 'body', 'View all categories') }}
+            <a href="{{ route('public.event-types') }}" class="lp-viewall">{{ $t('categories', 'body', 'View all categories') }}
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         </div>
         <div class="lp-cat-wrap">

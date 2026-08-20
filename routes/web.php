@@ -70,7 +70,7 @@ Route::get('/client-portfolio/{user}', [\App\Http\Controllers\Public\ClientPortf
     ->name('public.client.portfolio');
 
 // ── Public Browse (filterable professional directory) ─────────────────
-// Where the landing-page hero search, A-Z chips, and events-categories
+// Where the landing-page hero search, A-Z chips, and Explore Event Types
 // mega-panel all converge. Supports ?q= ?city= ?rating_min= ?verified=
 // ?sort= query params.
 Route::get('/browse', [\App\Http\Controllers\Public\BrowseProfessionalsController::class, 'index'])
@@ -156,11 +156,20 @@ Route::view('/design-breakdown', 'design-breakdown')->name('design-breakdown');
 // Internal — custom-design-only spec (28 pages the designer mocks up).
 Route::view('/design-spec-custom', 'design-spec-custom')->name('design-spec-custom');
 
-// Events & Categories — the public category browser: full tree down the left,
-// a real paginated card grid on the right, every card linking to its
-// /category/{slug} landing page.
-Route::get('/events-categories', \App\Http\Controllers\Public\EventsCategoriesController::class)
-    ->name('events-categories');
+/*
+ * "Everything We Cover" (/events-categories) — REMOVED on the Owner's
+ * instruction, 2026-08-20: "this entire webpage system needs to be removed".
+ *
+ * It was a second way into the same tree that Explore Event Types already
+ * covers, and its cards led to the same /category/{slug} pages. Two doors into
+ * one room is one door too many.
+ *
+ * The URL stays as a redirect rather than a 404: it was in the sitemap, it has
+ * been shared, and Peter's own screenshots point at it. Everything inside the
+ * app now links to event-types directly, so this only catches links from
+ * outside — nothing here should ever route through it.
+ */
+Route::permanentRedirect('/events-categories', '/event-types');
 
 // Per-category landing page — SEO-friendly URL that highlights featured
 // pros and links into /browse for full results.
@@ -204,7 +213,7 @@ Route::get('/sitemap.xml', function () {
         foreach ([
             ['url' => route('landing'),             'priority' => '1.0', 'changefreq' => 'weekly'],
             // /browse is now login-gated — excluded from the public sitemap.
-            ['url' => route('events-categories'),   'priority' => '0.8', 'changefreq' => 'weekly'],
+            ['url' => route('public.event-types'),  'priority' => '0.8', 'changefreq' => 'weekly'],
             ['url' => route('public.how-it-works'), 'priority' => '0.7', 'changefreq' => 'monthly'],
             ['url' => route('public.faq'),          'priority' => '0.6', 'changefreq' => 'monthly'],
             ['url' => route('blog.index'),          'priority' => '0.7', 'changefreq' => 'weekly'],

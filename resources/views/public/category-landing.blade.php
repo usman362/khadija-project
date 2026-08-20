@@ -257,7 +257,7 @@
     "@@type": "BreadcrumbList",
     "itemListElement": [
         {"@@type":"ListItem","position":1,"name":"Home","item":"{{ route('landing') }}"},
-        {"@@type":"ListItem","position":2,"name":"Categories","item":"{{ route('events-categories') }}"},
+        {"@@type":"ListItem","position":2,"name":"Categories","item":"{{ route('public.event-types') }}"},
         {"@@type":"ListItem","position":3,"name":"{{ $category->name }}","item":"{{ url()->current() }}"}
     ]
 }
@@ -268,7 +268,7 @@
         <nav class="cl-breadcrumb" aria-label="Breadcrumb">
             <a href="{{ route('landing') }}">Home</a>
             <span> › </span>
-            <a href="{{ route('events-categories') }}">Categories</a>
+            <a href="{{ route('public.event-types') }}">Categories</a>
             <span> › </span>
             <span class="current">{{ $category->name }}</span>
         </nav>

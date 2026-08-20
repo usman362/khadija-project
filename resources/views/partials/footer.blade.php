@@ -24,7 +24,7 @@
                 <ul>
                     <li><a href="{{ route('public.browse') }}">Browse Professionals</a></li>
                     <li><a href="{{ route('about-us') }}">About Us</a></li>
-                    <li><a href="{{ route('events-categories') }}">Event Types</a></li>
+                    <li><a href="{{ route('public.event-types') }}">Event Types</a></li>
                     <li><a href="{{ route('blog.index') }}">Blog</a></li>
                     <li><a href="{{ route('public.how-it-works') }}">How It Works</a></li>
                     <li><a href="{{ route('landing') }}#pricing">Pricing</a></li>

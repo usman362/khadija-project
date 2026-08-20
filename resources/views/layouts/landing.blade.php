@@ -226,16 +226,11 @@
                 </div>
             </div>
             <div class="lpn-item">
-                {{-- Was "Categories". What a client browses here is the occasion
-                     they are hosting, so it is named for that. --}}
-                <span class="lpn-link">Event Types <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg></span>
-                <div class="lpn-menu">
-                    {{-- "Shop Packages" was here as well as in the bar above it —
-                         the same link twice, two inches apart. It keeps its own
-                         top-level place. --}}
-                    <a href="{{ route('public.event-types') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3h.01"/><path d="M22 8h.01"/><path d="M15 2c0 2 .5 3.5 2 5"/><path d="M11.5 13.5 21 4"/></svg><span style="display:flex;flex-direction:column;gap:1px;"><span style="font-weight:600;">Event Types</span><span style="font-size:11px;color:var(--muted);font-weight:500;">Browse by occasion</span></span></a>
-                    <a href="{{ route('events-categories') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><span style="display:flex;flex-direction:column;gap:1px;"><span style="font-weight:600;">Everything We Cover</span><span style="font-size:11px;color:var(--muted);font-weight:500;">Event types, service categories and services</span></span></a>
-                </div>
+                {{-- Was "Categories", then a dropdown of two. "Everything We
+                     Cover" went with /events-categories on 2026-08-20, and a
+                     dropdown holding one item is a menu that exists to be
+                     opened and then closed — so this is a plain link now. --}}
+                <a href="{{ route('public.event-types') }}" class="lpn-link">Event Types</a>
             </div>
             <div class="lpn-item">
                 <span class="lpn-link">Resources <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg></span>
@@ -291,7 +286,7 @@
     <div id="lpnMobile" style="display:none;background:#fff;border-top:1px solid var(--line);padding:12px 24px 18px;">
         <a href="{{ $__fgHref }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">{{ $__fgLabel }}</a>
         <a href="{{ route('public.browse') }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">Find Professionals</a>
-        <a href="{{ route('events-categories') }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">Event Types</a>
+        <a href="{{ route('public.event-types') }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">Event Types</a>
         <a href="{{ route('blog.index') }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">Resources</a>
         <a href="{{ route('landing') }}#pricing" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);">Pricing</a>
     </div>
@@ -321,7 +316,7 @@
                 <ul>
                     <li><a href="{{ $__fgHref }}">{{ $__fgLabel }}</a></li>
                     <li><a href="{{ route('public.browse') }}">Find Professionals</a></li>
-                    <li><a href="{{ route('events-categories') }}">Event Types</a></li>
+                    <li><a href="{{ route('public.event-types') }}">Event Types</a></li>
                     <li><a href="{{ url('/dashboard') }}">Tools <span class="lpf-new-badge">NEW</span></a></li>
                     <li><a href="{{ route('landing') }}#pricing">Pricing</a></li>
                 </ul>
