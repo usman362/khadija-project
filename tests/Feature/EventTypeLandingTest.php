@@ -272,23 +272,22 @@ class EventTypeLandingTest extends TestCase
     }
 
     /**
-     * The rule was "no artwork exists, so none is claimed" — a tinted tile with
-     * the occasion's initial. The Owner asked for pictures on 2026-08-20, and
-     * the artwork turned out to exist all along on the v1 tree.
+     * A card must never point at nothing.
      *
-     * What survives the change is the reason behind it: a card must never point
-     * at nothing. Every card now carries a real URL, and the card says whether
-     * it is the category's own picture or a stand-in.
+     * 35 of the 106 event types got their own artwork back from the v1 tree on
+     * 2026-08-20. The rest have none, and the card says so rather than pointing
+     * at a file that is not there — the tile it draws instead reads as
+     * deliberate and fills in the moment somebody uploads a picture.
      */
-    public function test_every_card_points_at_a_real_picture(): void
+    public function test_a_card_without_artwork_claims_none(): void
     {
         $this->category('Plain Occasion', Category::EVENT_TYPE);
 
         $card = collect($this->get(route('public.event-types'))->assertOk()->viewData('wall')->items())
             ->firstWhere('name', 'Plain Occasion');
 
-        $this->assertNotNull($card['image'], 'a card with no picture is what the Owner reported');
-        $this->assertStringStartsWith('http', $card['image']);
-        $this->assertFalse($card['own_image'], 'this category has no artwork of its own, and the card should know');
+        $this->assertNull($card['image'], 'a broken <img> is worse than a tinted tile');
+        $this->assertFalse($card['own_image']);
     }
+
 }

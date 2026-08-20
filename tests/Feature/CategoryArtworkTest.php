@@ -7,16 +7,18 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Every event type card carries a picture.
+ * Category artwork.
  *
- * Peter asked for "the events images" on a page showing 106 tinted tiles with
- * a letter in them. The artwork was not missing — 273 pictures came across
- * from the old live site into the v1 taxonomy, and when v2 replaced v1 as the
- * live tree the import did not carry them. A migration matches them by name.
+ * The pictures were not missing — 273 came across from the old live site into
+ * the v1 taxonomy, and when v2 replaced v1 as the live tree the import did not
+ * carry them. A migration matches them by name, which brought 35 of the 106
+ * event types their own artwork back.
  *
- * The 71 occasions the old site never had a page for get a stand-in chosen by
- * what the occasion is. It decorates and nothing else: it makes no claim about
- * a professional, a price or a place, and anything an admin uploads replaces it.
+ * The occasions with none draw a tinted tile with their initial, and keep
+ * doing so until somebody uploads a picture. A stock photograph was here for
+ * an afternoon on 2026-08-20 and came straight back out on the Owner's
+ * instruction: he is uploading the real ones, and a stand-in in the meantime
+ * is a placeholder somebody has to remember to remove.
  */
 class CategoryArtworkTest extends TestCase
 {
@@ -32,47 +34,48 @@ class CategoryArtworkTest extends TestCase
         ], $over));
     }
 
-    public function test_a_category_with_its_own_artwork_uses_it(): void
+    public function test_a_category_with_artwork_uses_it(): void
     {
         $c = $this->eventType('Wedding', ['thumbnail' => 'categories/thumbnails/wedding.png']);
 
         $this->assertTrue($c->hasOwnImage());
         $this->assertStringContainsString('categories/thumbnails/wedding.png', $c->imageUrl());
-        $this->assertStringNotContainsString('unsplash', $c->imageUrl());
     }
 
-    public function test_a_category_without_artwork_still_gets_a_picture(): void
+    public function test_a_cover_image_counts_as_artwork_too(): void
     {
-        // A card with no picture was the complaint.
+        // The controller used to read `thumbnail` inline and miss this column
+        // entirely, so a category with only a cover looked like it had nothing.
+        $c = $this->eventType('Gala', ['cover_image' => 'categories/covers/gala.png']);
+
+        $this->assertTrue($c->hasOwnImage());
+        $this->assertStringContainsString('categories/covers/gala.png', $c->imageUrl());
+    }
+
+    public function test_a_category_without_artwork_claims_none(): void
+    {
         $c = $this->eventType('Bachelorette Party');
 
         $this->assertFalse($c->hasOwnImage());
-        $this->assertStringContainsString('images.unsplash.com', $c->imageUrl());
+        $this->assertNull($c->imageUrl(), 'a card must not point at a picture that does not exist');
     }
 
-    public function test_the_longest_matching_word_wins(): void
+    public function test_no_stock_photography_stands_in_for_a_category(): void
     {
         /*
-         * "Bachelorette Party" contains "bachelor", and "Block Party" contains
-         * "party". A shorter key matching first is how the bachelorette ends up
-         * with the bachelor's photograph.
+         * The Owner is uploading the real pictures. A stock photograph in the
+         * meantime stops looking like a placeholder and starts looking like a
+         * decision — and the ones that got left behind would be the ones nobody
+         * noticed.
          */
-        $this->assertNotSame(
-            Category::stockFor('Bachelor Party'),
-            Category::stockFor('Bachelorette Party'),
-        );
+        $src = file_get_contents(app_path('Models/Category.php'));
+        $src = preg_replace('#/\*.*?\*/#s', '', $src);
 
-        $this->assertSame(Category::stockFor('Block Party'), Category::stockFor('Block Party'));
-        $this->assertNotSame(Category::stockFor('Block Party'), Category::stockFor('Bachelor Party'));
+        $this->assertStringNotContainsString('unsplash', strtolower($src));
+        $this->assertStringNotContainsString('photo-1', $src);
     }
 
-    public function test_an_occasion_nobody_wrote_a_rule_for_still_gets_something(): void
-    {
-        $this->assertStringContainsString('images.unsplash.com', Category::stockFor('Something Nobody Listed'));
-        $this->assertStringContainsString('images.unsplash.com', Category::stockFor(null));
-    }
-
-    public function test_the_wall_draws_a_picture_on_every_card_and_no_letters(): void
+    public function test_the_wall_draws_the_tile_where_there_is_no_picture(): void
     {
         config(['taxonomy.version' => 'v2']);
 
@@ -81,30 +84,27 @@ class CategoryArtworkTest extends TestCase
 
         $html = $this->get('/event-types')->assertOk()->getContent();
 
-        $this->assertStringNotContainsString('et-all-init', $html,
-            'a card fell back to its initial — the wall of letters is back');
-
-        $this->assertSame(2, substr_count($html, 'class="et-all-card"'));
         $this->assertStringContainsString('categories/thumbnails/wedding.png', $html);
+        $this->assertStringContainsString('et-all-init', $html, 'the occasion with no picture should draw its tile');
+        $this->assertSame(2, substr_count($html, 'class="et-all-card"'));
     }
 
     /**
-     * A dead stock id renders a blank card, which is worse than the letter it
-     * replaced. This checks the ids are well-formed and unique per lookup —
-     * it deliberately does NOT call Unsplash, because a test that needs the
-     * network fails on a train.
+     * The page ran the full width of the window while the navbar and footer
+     * above and below it stayed centred, because .et-shell was written into the
+     * stylesheet and never put on any element.
      */
-    public function test_every_stock_id_is_well_formed(): void
+    public function test_the_page_content_sits_inside_the_shell(): void
     {
-        $src = file_get_contents(app_path('Models/Category.php'));
+        config(['taxonomy.version' => 'v2']);
+        $this->eventType('Wedding', ['taxonomy_version' => 'v2']);
 
-        preg_match_all("/'(photo-[0-9a-zA-Z-]+)'/", $src, $m);
+        $html = $this->get('/event-types')->assertOk()->getContent();
 
-        $this->assertGreaterThan(10, count($m[1]), 'the stock map has gone missing');
+        $this->assertStringContainsString('class="et-shell"', $html,
+            'the page is not inside its own container and will stretch edge to edge');
 
-        foreach (array_unique($m[1]) as $id) {
-            $this->assertMatchesRegularExpression('/^photo-\d{10,}-[0-9a-f]{12}$/', $id,
-                "{$id} is not an Unsplash photo id");
-        }
+        // And the container is the same width the chrome uses.
+        $this->assertMatchesRegularExpression('/\.et-shell \{[^}]*max-width: 1320px/', $html);
     }
 }

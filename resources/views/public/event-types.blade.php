@@ -14,7 +14,10 @@
 <style>
     .et { --et: #2563eb; --et-dark: #1d4ed8; --et-soft: #eff6ff; }
     .et-wrap { background: var(--bg-soft); }
-    .et-shell { max-width: 1200px; margin: 0 auto; padding: 0 22px 60px; }
+    /* 1320 is what the navbar and the footer use. This class existed from the
+       start and was never put on the markup, so on a wide screen the page ran
+       edge to edge inside chrome that did not. */
+    .et-shell { max-width: 1320px; margin: 0 auto; padding: 0 24px 60px; }
 
     /* Hero */
     .et-hero { text-align: center; padding: 46px 22px 34px; }
@@ -59,6 +62,8 @@
     .et-all-card:hover { border-color: #fdba74; }
     .et-all-img { height: 118px; background: linear-gradient(135deg, #fed7aa, #fdba74); position: relative; }
     .et-all-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .et-all-init { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+        font-size: 30px; font-weight: 800; color: #9a3412; opacity: .55; }
     .et-all-body { padding: 11px 30px 13px 13px; }
     .et-all-name { font-size: 13.5px; font-weight: 800; color: #111827; margin-bottom: 2px; }
     .et-all-sub { font-size: 11.5px; color: #ea580c; font-weight: 700; }
@@ -126,6 +131,8 @@
     .et-all-card:hover { border-color: #fdba74; }
     .et-all-img { height: 120px; background: linear-gradient(135deg, #fed7aa, #fdba74); position: relative; }
     .et-all-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .et-all-init { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+        font-size: 30px; font-weight: 800; color: #9a3412; opacity: .55; }
     .et-all-body { padding: 12px 13px 14px; }
     .et-all-name { font-size: 14px; font-weight: 800; color: #111827; margin-bottom: 3px; }
     .et-all-sub { font-size: 12px; color: #6b7280; }
@@ -158,6 +165,7 @@
 
 @section('content')
 <div class="et et-wrap">
+  <div class="et-shell">
     <div class="et-hero">
         <h1>Explore <span>Event Types</span></h1>
         <p>Find the type of event you're planning and discover the services and professionals you need to bring it together.</p>
@@ -202,14 +210,17 @@
                 @forelse($wall as $et)
                     <a class="et-all-card" href="{{ route('public.category', $et['slug']) }}">
                         <div class="et-all-img">
-                            {{-- Category::imageUrl() — the category's own picture
-                                 where it has one, a stand-in chosen by what the
-                                 occasion is where it does not. The initial tile
-                                 this used to draw was correct while no artwork
-                                 existed anywhere; 35 of these now have theirs
-                                 back from the old site, and a wall of letters
-                                 was never what the page was for. --}}
-                            <img src="{{ $et['image'] }}" alt="{{ $et['name'] }}" loading="lazy">
+                            @if($et['image'])
+                                <img src="{{ $et['image'] }}" alt="{{ $et['name'] }}" loading="lazy">
+                            @else
+                                {{-- No picture uploaded for this occasion yet. A
+                                     tinted tile with the initial reads as
+                                     deliberate; an <img> pointing at nothing reads
+                                     as broken, and a stock photograph reads as a
+                                     decision nobody made. It fills in on its own
+                                     the moment a picture is uploaded. --}}
+                                <span class="et-all-init">{{ mb_substr($et['name'], 0, 1) }}</span>
+                            @endif
                         </div>
                         <div class="et-all-body">
                             <div class="et-all-name">{{ $et['name'] }}</div>
@@ -230,6 +241,7 @@
             </div>
         </div>
     </div>
+  </div>
 </div>
 
 <script>
