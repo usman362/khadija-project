@@ -393,4 +393,54 @@ class PackageSearchFiltersTest extends TestCase
         $this->assertMatchesRegularExpression('/href="[^"]*packages\?[^"]*guests=100[^"]*"/', $html);
         $this->assertMatchesRegularExpression('/href="[^"]*packages\?[^"]*budget_max=9000[^"]*"/', $html);
     }
+
+    // ── The card itself ──────────────────────────────────────────
+
+    public function test_the_card_states_the_service_area_once(): void
+    {
+        /*
+         * The footer carried "Serves MD" directly under a SERVICE AREA cell
+         * reading "Baltimore, MD". R38 means those two can never disagree — a
+         * package is offered in its professional's own state — so the second
+         * one was the same fact printed twice in a card that had no room for it.
+         */
+        $package = $this->package($this->pro(['city' => 'Baltimore', 'state' => 'MD']));
+
+        $card = $this->cardFor($package->title);
+
+        $this->assertStringContainsString('Baltimore, MD', $card);
+        $this->assertStringNotContainsString('Serves', $card);
+    }
+
+    public function test_every_link_inside_a_card_carries_a_class(): void
+    {
+        /*
+         * The card is an <article>, and the layout styles
+         * `article a:not([class])` for blog prose — so a classless anchor in
+         * here renders indigo and underlined, which is what turned every
+         * package title blue. Naming the links is the fix; fighting it with
+         * specificity would only move the problem.
+         */
+        $this->package($this->pro(), ['title' => 'Classless check']);
+
+        $card = $this->cardFor('Classless check');
+
+        preg_match_all('/<a\s+href=(?![^>]*class=)[^>]*>/', $card, $m);
+
+        $this->assertSame([], $m[0], 'a link inside a card has no class and will be styled as blog prose');
+    }
+
+    /** The markup of one card, so an assertion cannot pass on the rest of the page. */
+    private function cardFor(string $title): string
+    {
+        $html = $this->get('/packages')->assertOk()->getContent();
+        $html = preg_replace('/\{\{--.*?--\}\}/s', '', $html);
+
+        $start = strpos($html, '<article class="pk-card">');
+        $this->assertNotFalse($start, 'no package card rendered');
+
+        $end = strpos($html, '</article>', $start);
+
+        return substr($html, $start, $end - $start);
+    }
 }

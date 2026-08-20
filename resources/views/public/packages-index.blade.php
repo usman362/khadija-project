@@ -50,7 +50,7 @@
 <style>
     .pk { --pk: var(--orange, #f97316); --pk-dark: #ea580c; --pk-soft: #fff4ec; }
     .pk-wrap { background: var(--bg-soft); }
-    .pk-shell { max-width: 1360px; margin: 0 auto; padding: 20px 22px 60px; }
+    .pk-shell { max-width: 1480px; margin: 0 auto; padding: 20px 22px 60px; }
 
     /* Hero */
     .pk-hero { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 22px 0 20px; }
@@ -128,7 +128,7 @@
 
     /* Cards (list) */
     .pk-cards { display: flex; flex-direction: column; gap: 16px; }
-    .pk-card { display: grid; grid-template-columns: 250px minmax(0,1fr) 196px; background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; transition: transform .18s, box-shadow .18s; }
+    .pk-card { display: grid; grid-template-columns: 228px minmax(0,1fr) 178px; background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; transition: transform .18s, box-shadow .18s; }
     .pk-media { position: relative; min-height: 232px; background: linear-gradient(135deg,#e2e8f0,#eef2ff); }
     .pk-slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .4s ease; }
     .pk-slide.active { opacity: 1; }
@@ -148,7 +148,11 @@
 
     .pk-main { padding: 16px 18px; min-width: 0; display: flex; flex-direction: column; }
     .pk-title { font-size: 17px; margin: 0 0 4px; }
-    .pk-title a:hover { color: var(--pk-dark); }
+    /* Named on purpose: the layout styles `article a:not([class])` for blog
+       prose, the card IS an <article>, and a classless anchor in here came out
+       indigo and underlined. */
+    .pk-title-link { color: var(--ink); text-decoration: none; }
+    .pk-title-link:hover { color: var(--pk-dark); }
     .pk-pro { font-size: 13px; color: var(--ink-2); font-weight: 600; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .pk-verif { color: var(--green-onwhite); }
     .pk-meta { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin: 8px 0 0; font-size: 12px; color: var(--muted); font-weight: 600; }
@@ -156,10 +160,11 @@
     .pk-meta .sep { color: #cbd5e1; }
     .pk-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
     .pk-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; color: var(--ink-2); background: var(--bg-soft); border: 1px solid var(--line); border-radius: 7px; padding: 3px 9px; }
-    .pk-facts { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; background: var(--pk-soft); border-radius: 10px; padding: 11px 13px; margin-bottom: 11px; }
-    .pk-fact { display: flex; gap: 8px; min-width: 0; }
-    .pk-fact svg { width: 15px; height: 15px; color: var(--pk-dark); flex-shrink: 0; margin-top: 2px; }
-    .pk-fact span { display: block; font-size: 10px; font-weight: 800; letter-spacing: .3px; text-transform: uppercase; color: var(--pk-dark); margin-bottom: 2px; }
+    .pk-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: 10px 12px; background: var(--pk-soft); border-radius: 10px; padding: 11px 13px; margin-bottom: 11px; }
+    .pk-fact { display: flex; gap: 7px; min-width: 0; }
+    .pk-fact > div { min-width: 0; }
+    .pk-fact svg { width: 14px; height: 14px; color: var(--pk-dark); flex-shrink: 0; margin-top: 2px; }
+    .pk-fact span { display: block; font-size: 9.5px; font-weight: 800; letter-spacing: .2px; text-transform: uppercase; color: var(--pk-dark); margin-bottom: 2px; white-space: nowrap; }
     .pk-fact b { font-size: 12px; font-weight: 700; color: var(--ink); display: block; line-height: 1.35; }
     .pk-cardfoot { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--muted); font-weight: 600; margin-top: auto; }
     .pk-cardfoot .free { color: var(--green-onwhite); font-weight: 700; }
@@ -225,7 +230,7 @@
     .pk-tray a { background: var(--pk); color: #fff; border-radius: 9px; padding: 8px 15px; font-size: 12.5px; font-weight: 800; }
     .pk-tray button { background: none; border: none; color: #cbd5e1; font-size: 12.5px; font-weight: 700; cursor: pointer; font-family: inherit; }
 
-    @media (max-width: 1140px) { .pk-grid { grid-template-columns: 240px minmax(0,1fr); } .pk-side { display: none; } }
+    @media (max-width: 1360px) { .pk-grid { grid-template-columns: 240px minmax(0,1fr); } .pk-side { display: none; } }
     @media (max-width: 820px) {
         .pk-grid { grid-template-columns: 1fr; }
         .pk-card { grid-template-columns: 1fr; }
@@ -480,7 +485,7 @@
                                 </div>
 
                                 <div class="pk-main">
-                                    <h3 class="pk-title"><a href="{{ route('public.package', $pkg->slug) }}">{{ $pkg->title }}</a></h3>
+                                    <h3 class="pk-title"><a class="pk-title-link" href="{{ route('public.package', $pkg->slug) }}">{{ $pkg->title }}</a></h3>
                                     <div class="pk-pro">by {{ $company ?? 'Verified Professional' }} <span class="pk-verif">✔</span></div>
 
                                     {{-- Three facts about the professional, each shown only when
@@ -521,7 +526,11 @@
                                             <span class="free">✓ Available on {{ \Illuminate\Support\Carbon::parse($f['date'])->format('M j, Y') }}</span>
                                         @endif
                                         @if($pkg->availability)<span>🗓 {{ $pkg->availability }}</span>@endif
-                                        @if($pkg->serves_regions)<span>🌐 Serves {{ $pkg->serves_regions }}</span>@endif
+                                        {{-- "Serves MD" used to sit here. It says what the
+                                             SERVICE AREA cell two lines above already says,
+                                             and R38 means it can never say anything else —
+                                             a package is offered in its professional's own
+                                             state. One line, not two. --}}
                                     </div>
                                 </div>
 
