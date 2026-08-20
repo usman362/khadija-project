@@ -176,6 +176,14 @@ Route::permanentRedirect('/events-categories', '/event-types');
 Route::get('/category/{slug}', [\App\Http\Controllers\Public\CategoryLandingController::class, 'show'])
     ->name('public.category');
 
+// Event Hierarchy Review — Peter's four-level cascade (Main Event → Main
+// Service → Sub-Main Service → Specific Component), with the out-of-order
+// guard enforced on the server as well as in the dropdowns.
+Route::get('/event-hierarchy', [\App\Http\Controllers\Public\EventHierarchyController::class, 'index'])
+    ->name('public.event-hierarchy');
+Route::get('/event-hierarchy/options', [\App\Http\Controllers\Public\EventHierarchyController::class, 'options'])
+    ->name('public.event-hierarchy.options');
+
 // Public "Explore by Event Type" — occasion-first discovery (Weddings, Corporate…).
 Route::get('/event-types', [\App\Http\Controllers\Public\EventTypeController::class, 'index'])
     ->name('public.event-types');
