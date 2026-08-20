@@ -242,8 +242,8 @@
                             @if($svcs)
                                 <div class="mp-svcs">{{ implode(' • ', array_slice($svcs, 0, 4)) }}@if(count($svcs) > 4) +{{ count($svcs) - 4 }}@endif</div>
                             @endif
-                            @if($pkg->description)
-                                <p class="mp-desc">{{ \Illuminate\Support\Str::limit($pkg->description, 110) }}</p>
+                            @if($pkg->purpose || $pkg->description)
+                                <p class="mp-desc">{{ \Illuminate\Support\Str::limit($pkg->purpose ?: $pkg->description, 110) }}</p>
                             @endif
                             <div class="mp-chips">
                                 @if($pkg->coverage || $pkg->duration)<span class="mp-chip">🕐 {{ $pkg->coverage ?: $pkg->duration }}</span>@endif

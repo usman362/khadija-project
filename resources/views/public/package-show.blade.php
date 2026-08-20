@@ -23,6 +23,7 @@
     .pk-hero-cat { position: absolute; top: 14px; left: 14px; background: rgba(255,255,255,.94); color: #0f1b35; font-size: 12px; font-weight: 800; padding: 6px 13px; border-radius: 999px; }
     .pk-grid { display: grid; grid-template-columns: 1fr 340px; gap: 28px; align-items: start; }
     .pk-eyebrow { font-size: 12px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; color: var(--blue); }
+    .pk-purpose { font-size: 1.05rem; color: var(--text); line-height: 1.5; margin: -6px 0 14px; font-weight: 600; }
     .pk-title { font-size: 2rem; font-weight: 700; color: var(--ink); line-height: 1.12; margin: 8px 0 14px; letter-spacing: -.02em; }
     .pk-pro { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-bottom: 20px; }
     .pk-pro img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; }
@@ -95,6 +96,12 @@
             <div>
                 <span class="pk-eyebrow">Service Package</span>
                 <h1 class="pk-title">{{ $package->title }}</h1>
+                @if($package->purpose)
+                    {{-- The one-line "what this delivers" the professional wrote
+                         on step 1. Rendered here, or it would be a field that
+                         goes nowhere. --}}
+                    <p class="pk-purpose">{{ $package->purpose }}</p>
+                @endif
 
                 <div class="pk-pro">
                     <img src="{{ $pro?->avatar_url }}" alt="{{ $pro?->name }}">

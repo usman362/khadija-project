@@ -143,7 +143,7 @@ class MyPackagesShelfTest extends TestCase
         $this->actingAs($pro)->get(route('professional.packages.index'))
             ->assertOk()
             // "50% complete" alone tells nobody what to do next.
-            ->assertSee('Step 2 of 4: Services Included')
+            ->assertSee('Step 2 of 4: Services &amp; Deliverables', false)
             ->assertSee('at least two services')
             ->assertSee('Pricing not set');
     }

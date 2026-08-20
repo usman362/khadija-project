@@ -33,19 +33,19 @@ final class PackageProgress
                 'missing' => filled($package->description) ? null : 'a description',
             ],
             [
-                'n' => 2, 'label' => 'Services Included',
+                'n' => 2, 'label' => 'Services & Deliverables',
                 // Two is the floor everywhere else — a package IS a bundle, and
                 // the store validator says min:2.
                 'done' => count($services) >= 2,
                 'missing' => count($services) >= 2 ? null : 'at least two services',
             ],
             [
-                'n' => 3, 'label' => 'Pricing & Options',
+                'n' => 3, 'label' => 'Pricing & Add-Ons',
                 'done' => (int) $package->price > 0,
                 'missing' => (int) $package->price > 0 ? null : 'a price',
             ],
             [
-                'n' => 4, 'label' => 'Availability & Coverage',
+                'n' => 4, 'label' => 'Availability & Terms',
                 'done' => filled($package->coverage) || filled($package->availability),
                 'missing' => filled($package->coverage) || filled($package->availability)
                     ? null

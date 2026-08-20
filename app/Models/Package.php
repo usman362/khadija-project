@@ -10,7 +10,7 @@ class Package extends Model
 {
     protected $fillable = [
         'user_id', 'category_id', 'services', 'event_types',
-        'title', 'slug', 'type', 'description', 'price', 'price_unit', 'duration',
+        'title', 'purpose', 'slug', 'type', 'description', 'price', 'price_unit', 'duration',
         'coverage', 'team', 'guests', 'guests_max', 'serves_regions', 'availability', 'savings_pct',
         'includes', 'images', 'is_active', 'status', 'sort_order',
         // Rule R38, Option B — a package is bookable only in its owner's own

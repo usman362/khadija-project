@@ -123,7 +123,9 @@ class ProfessionalPackageController extends Controller
         abort_unless($package->user_id === $request->user()->id, 403);
 
         $copy = $package->replicate(['slug', 'created_at', 'updated_at']);
-        $copy->title = Str::limit($package->title . ' (Copy)', 160, '');
+        // 60 is the form's own limit, so a copy is never longer than a title
+        // the professional would be allowed to type.
+        $copy->title = Str::limit($package->title . ' (Copy)', 60, '');
         $copy->slug = Str::slug($copy->title) . '-' . Str::lower(Str::random(5));
         $copy->status = 'draft';
         $copy->is_active = false;
@@ -304,9 +306,12 @@ class ProfessionalPackageController extends Controller
         $publishing = $request->boolean('is_active', true);
 
         $rules = [
-            'title'           => ['required', 'string', 'max:160'],
+            'title'           => ['required', 'string', 'max:60'],
+            // One line saying what the package delivers — not the paragraph of
+            // selling copy, which is `description`.
+            'purpose'         => ['nullable', 'string', 'max:160'],
             'category_id'     => ['nullable', 'exists:categories,id'],
-            'description'     => ['nullable', 'string', 'max:2000'],
+            'description'     => ['nullable', 'string', 'max:500'],
             'services'        => ['nullable', 'array'],
             'services.*'      => ['string', 'max:60'],
             'event_types'     => ['nullable', 'array'],
@@ -320,7 +325,7 @@ class ProfessionalPackageController extends Controller
             'availability'    => ['nullable', 'string', 'max:80'],
             'savings_pct'     => ['nullable', 'integer', 'min:0', 'max:90'],
             'is_active'       => ['nullable', 'boolean'],
-            'gallery_images'   => ['nullable', 'array', 'max:8'],
+            'gallery_images'   => ['nullable', 'array', 'max:10'],
             'gallery_images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:6144'],
             'cover'            => ['nullable', 'string', 'max:20'],
             'remove_images'    => ['nullable', 'array'],
