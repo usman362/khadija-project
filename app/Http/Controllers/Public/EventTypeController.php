@@ -59,7 +59,8 @@ class EventTypeController extends Controller
         $card = fn ($c) => [
             'name'        => $c->name,
             'slug'        => $c->slug,
-            'image'       => $c->thumbnail ? asset('storage/' . $c->thumbnail) : null,
+            'image'       => $c->imageUrl(500),
+            'own_image'   => $c->hasOwnImage(),
             'recommended' => count($tiers[$c->archetype] ?? []),
         ];
 

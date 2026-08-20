@@ -204,4 +204,169 @@ class Category extends Model
             }
         }
     }
+
+    /*
+     * ── Category artwork ──────────────────────────────────────────────
+     *
+     * A card picture, in one place, so the event-type wall, the rail and the
+     * landing page cannot disagree about what a category looks like.
+     *
+     * Real artwork first: 273 pictures came across from the old live site and
+     * a migration carried the matching ones onto the v2 tree. Where a category
+     * has none — 71 of the 106 event types are occasions the old site never
+     * had a page for — a stock photograph stands in, chosen by what the
+     * occasion IS.
+     *
+     * The stand-in is decoration and nothing else. It makes no claim about a
+     * professional, a price or a place, which is the line this codebase draws
+     * around stock imagery: it may decorate, it may never stand in for a fact.
+     * Anything an admin uploads replaces it immediately.
+     */
+    private const STOCK = [
+        // Weddings & the run-up
+        'wedding'      => 'photo-1519741497674-611481863552',
+        'vow renewal'  => 'photo-1519225421980-715cb0215aed',
+        'rehearsal'    => 'photo-1464366400600-7168b8af9bc3',
+        'engagement'   => 'photo-1522673607200-164d1b6ce486',
+        'bridal'       => 'photo-1519225421980-715cb0215aed',
+        'bachelorette' => 'photo-1530103862676-de8c9debad1d',
+        'bachelor'     => 'photo-1470229722913-7c0e2dbbafd3',
+
+        // Milestones
+        'birthday'     => 'photo-1530103862676-de8c9debad1d',
+        'sweet 16'     => 'photo-1530103862676-de8c9debad1d',
+        'anniversary'  => 'photo-1464366400600-7168b8af9bc3',
+        'baby shower'  => 'photo-1519689680058-324335c77eba',
+        'graduation'   => 'photo-1541339907198-e08756dedf3f',
+        'prom'         => 'photo-1519225421980-715cb0215aed',
+        'retirement'   => 'photo-1511795409834-ef04bbd61622',
+        'housewarming' => 'photo-1484154218962-a197022b5858',
+        'mitzvah'      => 'photo-1511795409834-ef04bbd61622',
+        'coming out'   => 'photo-1533174072545-7a4b6ad7a6c3',
+        'funeral'      => 'photo-1508672019048-805c876b67e2',
+        'memorial'     => 'photo-1508672019048-805c876b67e2',
+        'religious'    => 'photo-1508672019048-805c876b67e2',
+
+        // Corporate
+        'conference'   => 'photo-1505373877841-8d25f7d46678',
+        'seminar'      => 'photo-1540575467063-178a50c2df87',
+        'workshop'     => 'photo-1540575467063-178a50c2df87',
+        'product launch' => 'photo-1540575467063-178a50c2df87',
+        'corporate'    => 'photo-1505373877841-8d25f7d46678',
+        'business'     => 'photo-1505373877841-8d25f7d46678',
+        'client appreciation'   => 'photo-1511795409834-ef04bbd61622',
+        'customer appreciation' => 'photo-1511795409834-ef04bbd61622',
+        'real estate'  => 'photo-1484154218962-a197022b5858',
+        'inauguration' => 'photo-1540575467063-178a50c2df87',
+        'fraternity'   => 'photo-1541339907198-e08756dedf3f',
+        'university'   => 'photo-1541339907198-e08756dedf3f',
+        'homecoming'   => 'photo-1541339907198-e08756dedf3f',
+        'summer camp'  => 'photo-1476514525535-07fb3b4ae5f1',
+        'nursing home' => 'photo-1511795409834-ef04bbd61622',
+
+        // Food, drink & nightlife
+        'wine'         => 'photo-1510812431401-41d2bd2722f3',
+        'coffee'       => 'photo-1501339847302-ac426a4a7cbb',
+        'paint & sip'  => 'photo-1510812431401-41d2bd2722f3',
+        'karaoke'      => 'photo-1470229722913-7c0e2dbbafd3',
+        'trivia'       => 'photo-1511795409834-ef04bbd61622',
+        'club'         => 'photo-1470229722913-7c0e2dbbafd3',
+        'night'        => 'photo-1470229722913-7c0e2dbbafd3',
+
+        // Outdoors, sport & public
+        'beach'        => 'photo-1476514525535-07fb3b4ae5f1',
+        'tailgate'     => 'photo-1471295253337-3ceaaedca402',
+        'sporting'     => 'photo-1471295253337-3ceaaedca402',
+        'march madness'=> 'photo-1471295253337-3ceaaedca402',
+        'derby'        => 'photo-1471295253337-3ceaaedca402',
+        'block party'  => 'photo-1533174072545-7a4b6ad7a6c3',
+        'fair'         => 'photo-1533174072545-7a4b6ad7a6c3',
+        'festival'     => 'photo-1533174072545-7a4b6ad7a6c3',
+        'parade'       => 'photo-1533174072545-7a4b6ad7a6c3',
+        'earth day'    => 'photo-1476514525535-07fb3b4ae5f1',
+        'resort'       => 'photo-1476514525535-07fb3b4ae5f1',
+        'country club' => 'photo-1471295253337-3ceaaedca402',
+        'farm'         => 'photo-1476514525535-07fb3b4ae5f1',
+
+        // Holidays & cultural
+        'christmas'    => 'photo-1512389142860-9c449e58a543',
+        'hanukkah'     => 'photo-1512389142860-9c449e58a543',
+        'kwanzaa'      => 'photo-1512389142860-9c449e58a543',
+        'diwali'       => 'photo-1512389142860-9c449e58a543',
+        'new year'     => 'photo-1512389142860-9c449e58a543',
+        'year-end'     => 'photo-1512389142860-9c449e58a543',
+        'thanksgiving' => 'photo-1511795409834-ef04bbd61622',
+        'fourth of july' => 'photo-1533174072545-7a4b6ad7a6c3',
+        'juneteenth'   => 'photo-1533174072545-7a4b6ad7a6c3',
+        'mardi gras'   => 'photo-1533174072545-7a4b6ad7a6c3',
+        'cinco de mayo'=> 'photo-1533174072545-7a4b6ad7a6c3',
+        "st. patrick"  => 'photo-1533174072545-7a4b6ad7a6c3',
+        'pride'        => 'photo-1533174072545-7a4b6ad7a6c3',
+        'lgbtq'        => 'photo-1533174072545-7a4b6ad7a6c3',
+        'heritage'     => 'photo-1533174072545-7a4b6ad7a6c3',
+        'veterans'     => 'photo-1508672019048-805c876b67e2',
+        'election'     => 'photo-1540575467063-178a50c2df87',
+        "mother's day" => 'photo-1519225421980-715cb0215aed',
+        "father's day" => 'photo-1511795409834-ef04bbd61622',
+        'spring fling' => 'photo-1519225421980-715cb0215aed',
+
+        // Giving & the rest
+        'fundraiser'   => 'photo-1511795409834-ef04bbd61622',
+        'silent auction' => 'photo-1511795409834-ef04bbd61622',
+        'charity'      => 'photo-1511795409834-ef04bbd61622',
+        'gallery'      => 'photo-1533174072545-7a4b6ad7a6c3',
+        'family'       => 'photo-1511795409834-ef04bbd61622',
+        'welcome'      => 'photo-1511795409834-ef04bbd61622',
+        'divorce'      => 'photo-1530103862676-de8c9debad1d',
+        'private'      => 'photo-1511795409834-ef04bbd61622',
+    ];
+
+    /** The last resort — a gathering, which every one of these is. */
+    private const STOCK_DEFAULT = 'photo-1511795409834-ef04bbd61622';
+
+    /** This category's card picture: its own if it has one, a stand-in if not. */
+    public function imageUrl(int $width = 500): ?string
+    {
+        if ($this->thumbnail) {
+            return asset('storage/' . $this->thumbnail);
+        }
+
+        if ($this->cover_image) {
+            return asset('storage/' . $this->cover_image);
+        }
+
+        return self::stockFor($this->name, $width);
+    }
+
+    /** Does this category have artwork of its own, rather than a stand-in? */
+    public function hasOwnImage(): bool
+    {
+        return (bool) ($this->thumbnail ?: $this->cover_image);
+    }
+
+    /**
+     * The stand-in for a name.
+     *
+     * Longest key first, so "block party" wins over "party" and
+     * "client appreciation" over the word "client" — a shorter key matching
+     * first is how "Bachelorette Party" ends up with the bachelor's photograph.
+     */
+    public static function stockFor(?string $name, int $width = 500): string
+    {
+        $haystack = strtolower((string) $name);
+
+        $keys = array_keys(self::STOCK);
+        usort($keys, fn ($a, $b) => strlen($b) <=> strlen($a));
+
+        $id = self::STOCK_DEFAULT;
+
+        foreach ($keys as $key) {
+            if (str_contains($haystack, $key)) {
+                $id = self::STOCK[$key];
+                break;
+            }
+        }
+
+        return 'https://images.unsplash.com/' . $id . '?w=' . $width . '&q=70&auto=format&fit=crop';
+    }
 }
