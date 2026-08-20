@@ -54,6 +54,10 @@
     .bw-opt span { font-size: 11.5px; color: var(--text-muted); line-height: 1.45; }
     .bw-opt:has(input:checked) { border-color: #f97316; box-shadow: 0 0 0 1px #f97316 inset; background: rgba(249,115,22,.05); }
 
+    .bw-focus { background:#ecfdf5; border:1px solid #a7f3d0; border-radius:11px; padding:11px 14px; margin-bottom:14px; font-size:13px; line-height:1.55; }
+    .bw-focus b { display:block; color:#065f46; font-weight:800; }
+    .bw-focus span { color:#047857; font-size:12.5px; }
+    .bw-focus a { color:#065f46; font-weight:800; text-decoration:underline; }
     .bw-svc { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; max-height: 320px; overflow-y: auto; padding: 4px; border: 1px solid var(--border-color); border-radius: 12px; }
     .bw-svc label { display: flex; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 9px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
     .bw-svc label:has(input:checked) { background: rgba(249,115,22,.09); color: var(--text-primary); font-weight: 700; }
@@ -139,6 +143,22 @@
     @if($step === 'service')
         <h3>What do you need?</h3>
         <p class="lede">Pick one service for a single-service request, or several for a multi-service one — it's the same request either way.</p>
+
+        @if(! empty($focusNames) && ! $showingAll)
+            {{-- They already said which area on the event-type page. This is
+                 the level below it, not the same question again — so the page
+                 says what they chose and shows only what is inside it. --}}
+            <div class="bw-focus">
+                <b>You chose {{ implode(' and ', $focusNames) }}.</b>
+                <span>Pick the specific services you need. Or
+                    <a href="{{ route('client.bsr.step', ['step' => 'service', 'all' => 1]) }}">see every service</a>.</span>
+            </div>
+        @elseif(! empty($focusNames))
+            <div class="bw-focus">
+                <b>Showing every service.</b>
+                <span><a href="{{ route('client.bsr.step', 'service') }}">Back to {{ implode(' and ', $focusNames) }}</a>.</span>
+            </div>
+        @endif
 
         <div class="bw-field">
             <label>Services <span class="req">*</span></label>

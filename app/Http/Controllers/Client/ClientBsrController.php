@@ -57,6 +57,24 @@ class ClientBsrController extends Controller
         }
 
         $data  = $this->state($request);
+
+        /*
+         * The client already answered on the event-type page, and step 1 asked
+         * again — the Owner's words, "the marked in red selection was already
+         * answered".
+         *
+         * It was not quite the same question. They chose a service CATEGORY
+         * there ("Decor, Floral & Balloon Design"); the checkboxes here are the
+         * individual services under it ("Balloon Arches & Columns"). Level 2
+         * and level 3 of the same hierarchy.
+         *
+         * So it is not answered twice — it is narrowed. The page opens on the
+         * services inside what they chose, says so, and offers the full list
+         * for anyone who wants to add something else. What it must not do is
+         * drop them into an alphabetical wall of 241 as if they had said
+         * nothing, which is what it did.
+         */
+
         $index = array_search($step, array_keys(self::STEPS), true);
 
         // Can't jump ahead of what's been filled in — the review step in
@@ -76,8 +94,13 @@ class ClientBsrController extends Controller
             // Row 91 — one shared definition of a bookable service, so this
             // form's catalogue cannot drift from the emergency and direct
             // offer forms the way it had.
-            'categories' => Category::active()->bookableServices()
-                ->orderBy('name')->get(['id', 'name'])->unique('name')->values(),
+            // Ordered so the ones this event type actually needs come first.
+            // The message on arrival says they will be — "the ones that matter
+            // most for this kind of event are first" — and the page was
+            // alphabetical, which made that line untrue.
+            'categories'    => $this->serviceCatalogue($data, $request),
+            'focusNames'    => $this->focusNames($data),
+            'showingAll'    => $this->showingAll($data, $request),
             'eventTypes' => Category::active()->eventTypes()
                 ->orderBy('name')->get(['id', 'name']),
             'characteristics' => self::CHARACTERISTICS,
@@ -85,6 +108,54 @@ class ClientBsrController extends Controller
             'draftId'         => $data['draft_id'] ?? null,
             'defaultWindowDays' => config('bsr.default_proposal_window_days'),
         ]);
+    }
+
+    /**
+     * The services offered at step 1.
+     *
+     * Narrowed to what sits under the areas the client picked on the event-type
+     * page, unless they ask for everything. Row 91's shared definition still
+     * decides what counts as a bookable service, so this form's catalogue
+     * cannot drift from the emergency and direct-offer ones — this only decides
+     * which of them to show.
+     */
+    private function serviceCatalogue(array $data, Request $request)
+    {
+        $all = Category::active()->bookableServices()
+            ->orderBy('name')->get(['id', 'name', 'parent_id'])->unique('name')->values();
+
+        if ($this->showingAll($data, $request)) {
+            return $all;
+        }
+
+        $focus = array_map('intval', (array) ($data['focus_categories'] ?? []));
+
+        if ($focus === []) {
+            return $all;
+        }
+
+        $narrowed = $all->filter(fn ($c) => in_array((int) $c->parent_id, $focus, true)
+            || in_array((int) $c->id, $focus, true))->values();
+
+        // If nothing bookable sits under what they chose, showing them an empty
+        // step is worse than showing them everything.
+        return $narrowed->isEmpty() ? $all : $narrowed;
+    }
+
+    /** Are we showing the whole catalogue rather than the chosen areas? */
+    private function showingAll(array $data, Request $request): bool
+    {
+        return $request->boolean('all') || empty($data['focus_categories']);
+    }
+
+    /** The areas the client picked, by name, so the step can say them back. */
+    private function focusNames(array $data): array
+    {
+        $focus = array_map('intval', (array) ($data['focus_categories'] ?? []));
+
+        return $focus === []
+            ? []
+            : Category::whereIn('id', $focus)->orderBy('name')->pluck('name')->all();
     }
 
     /** Save one step and move on (or back, or straight to a draft). */

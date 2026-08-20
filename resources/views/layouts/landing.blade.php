@@ -222,7 +222,12 @@
                 <span class="lpn-link">Find Professionals <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg></span>
                 <div class="lpn-menu">
                     <a href="{{ route('public.browse') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Browse Professionals</a>
-                    <a href="{{ route('register', ['role' => 'client']) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Post Your Event</a>
+                    {{-- Signed in, this went to /register, and register bounces
+                         anyone already signed in to their dashboard — so the
+                         link named "Post Your Event" landed on the dashboard.
+                         A signed-in client goes to the screen the link names;
+                         a guest still has to make an account first. --}}
+                    <a href="{{ auth()->user()?->hasRole('client') ? route('client.post-event.event-info') : route('register', ['role' => 'client']) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Post Your Event</a>
                 </div>
             </div>
             <div class="lpn-item">
