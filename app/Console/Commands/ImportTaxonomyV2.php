@@ -41,7 +41,12 @@ class ImportTaxonomyV2 extends Command
             $seen[] = $this->importEventTypes($data['event_types']);
             [$categoryIds, $categorySlugs] = $this->importServiceCategories($data['service_categories']);
             $seen[] = $categorySlugs;
-            $seen[] = $this->importServices($data['services'], $categoryIds);
+            [$serviceIds, $serviceSlugs] = $this->importServices($data['services'], $categoryIds);
+            $seen[] = $serviceSlugs;
+
+            // Level 4. Optional in the file: the list is still being drawn up,
+            // and a sheet without it must import cleanly rather than fail.
+            $seen[] = $this->importComponents($data['components'] ?? [], $serviceIds);
 
             $this->importRelevance($data['relevance'], $categoryIds);
 
@@ -131,7 +136,7 @@ class ImportTaxonomyV2 extends Command
             $slugs[] = $slug = Str::slug($service['category'] . '-' . $service['name']);
             $position[$parentId] = ($position[$parentId] ?? 0) + 1;
 
-            $this->upsert($slug, [
+            $ids[$service['category'] . '|' . $service['name']] = $this->upsert($slug, [
                 'name'            => $service['name'],
                 'kind'            => Category::SERVICE,
                 'parent_id'       => $parentId,
@@ -139,6 +144,49 @@ class ImportTaxonomyV2 extends Command
                 'cross_fit_alt'   => $service['cross_fit'] ?? null,
                 'sort_order'      => $position[$parentId],
             ]);
+        }
+
+        return [$ids ?? [], $slugs];
+    }
+
+    /**
+     * Level 4 — the component, the actual thing a client books.
+     *
+     * Keyed on category + service rather than the service name alone: service
+     * names repeat across categories ("Consultation" sits under several), and
+     * matching on the name on its own would file a component under whichever
+     * one happened to import first.
+     *
+     * @return array<int, string> the slugs seen, for --prune
+     */
+    private function importComponents(array $components, array $serviceIds): array
+    {
+        $slugs = [];
+        $position = [];
+
+        foreach ($components as $component) {
+            $key = ($component['category'] ?? '') . '|' . ($component['service'] ?? '');
+            $parentId = $serviceIds[$key] ?? null;
+
+            if ($parentId === null) {
+                $this->warn("Skipped component '{$component['name']}' — unknown service '{$key}'");
+
+                continue;
+            }
+
+            $slugs[] = $slug = Str::slug($component['service'] . '-' . $component['name']);
+            $position[$parentId] = ($position[$parentId] ?? 0) + 1;
+
+            $this->upsert($slug, [
+                'name'      => $component['name'],
+                'kind'      => Category::COMPONENT,
+                'parent_id' => $parentId,
+                'sort_order' => $position[$parentId],
+            ]);
+        }
+
+        if ($slugs !== []) {
+            $this->info('Level 4: ' . count($slugs) . ' component(s) imported.');
         }
 
         return $slugs;
@@ -215,6 +263,7 @@ class ImportTaxonomyV2 extends Command
             ['Event Types',        $count(Category::EVENT_TYPE)],
             ['Service Categories', $count(Category::SERVICE_CATEGORY)],
             ['Services',           $count(Category::SERVICE)],
+            ['Components',         $count(Category::COMPONENT)],
             ['Archetype relevance', CategoryRelevance::count()],
         ]);
 

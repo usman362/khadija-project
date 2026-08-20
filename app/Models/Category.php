@@ -35,10 +35,18 @@ class Category extends Model
         'sort_order' => 'integer',
     ];
 
-    /** The three kinds of row in the v2 tree. */
+    /**
+     * The four kinds of row in the v2 tree.
+     *
+     * Level 1 event type → level 2 service category → level 3 service → level 4
+     * component, which is the actual thing a client books. COMPONENT is
+     * declared but nothing carries it yet: the list is being drawn up (Peter,
+     * 2026-08-20). The importer accepts them the moment the sheet has them.
+     */
     public const EVENT_TYPE = 'event_type';
     public const SERVICE_CATEGORY = 'service_category';
     public const SERVICE = 'service';
+    public const COMPONENT = 'component';
 
     /**
      * Two category trees live in this table at once — the original one and Sir

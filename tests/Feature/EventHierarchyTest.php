@@ -186,4 +186,54 @@ class EventHierarchyTest extends TestCase
         $this->assertCount(2, $options);
         $this->assertNull($options[0]['tier']);
     }
+
+    // ── Level 4, once the list exists ────────────────────────────
+
+    public function test_a_component_fills_level_four_and_the_page_stops_saying_three(): void
+    {
+        /*
+         * Level 4 — the sub-subcategory, the actual service a client books —
+         * is being drawn up (Peter, 2026-08-20). Nothing carries it yet, so
+         * this proves the cascade is waiting on the list and not on code: add
+         * one component and the fourth level fills.
+         */
+        $this->assertSame(3, EventHierarchy::depth());
+
+        Category::create([
+            'name' => 'Three-Tier Buttercream',
+            'slug' => 'three-tier-buttercream-eh',
+            'kind' => Category::COMPONENT,
+            'parent_id' => $this->cakes->id,
+            'taxonomy_version' => 'v2',
+            'is_active' => true,
+        ]);
+
+        $this->assertSame(4, EventHierarchy::depth());
+
+        $options = $this->getJson('/event-hierarchy/options?level=4&parent=' . $this->cakes->id)
+            ->assertOk()->json('options');
+
+        $this->assertSame('Three-Tier Buttercream', $options[0]['name']);
+
+        $this->get('/event-hierarchy')->assertOk()->assertDontSee('Level 4 stays');
+    }
+
+    public function test_the_importer_files_a_component_under_the_right_service(): void
+    {
+        /*
+         * Service names repeat across categories — "Consultation" sits under
+         * several — so a component is matched on category AND service. Matching
+         * on the service name alone would file it under whichever one happened
+         * to import first.
+         */
+        $reflection = new \ReflectionClass(\App\Console\Commands\ImportTaxonomyV2::class);
+
+        $this->assertTrue($reflection->hasMethod('importComponents'),
+            'the importer cannot take the level 4 list when it arrives');
+
+        $source = file_get_contents($reflection->getFileName());
+
+        $this->assertStringContainsString("\$data['components'] ?? []", $source,
+            'a sheet without components must still import cleanly');
+    }
 }
