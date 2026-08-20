@@ -39,8 +39,25 @@ class CategorySeeder extends Seeder
             return;
         }
 
-        // 1) Clear existing categories + references (idempotent reseed).
-        $this->clearExisting();
+        /*
+         * Nothing is cleared.
+         *
+         * This used to delete every category and null out events.category_id
+         * first. On an empty database that reads as "idempotent reseed"; on the
+         * server it would cut every client's event loose from its category and
+         * empty the category_event pivot — and `db:seed` is now run on every
+         * deploy. Rows are matched on their natural key instead.
+         */
+        /*
+         * v1, hardcoded — this file IS the v1 tree.
+         *
+         * legacy_categories.json is the 360-category import from the old live
+         * site. Reading TAXONOMY_VERSION here put all 360 of them into v2
+         * alongside the real 340-row live tree, so the taxonomy had 700 rows
+         * and browse listed both. The version a seeder writes is a fact about
+         * its data, not about which tree happens to be switched on.
+         */
+        $version = 'v1';
 
         // 2) Copy images into the public disk (storage/app/public/categories/...).
         $thumbDir = storage_path('app/public/categories/thumbnails');
@@ -72,20 +89,43 @@ class CategorySeeder extends Seeder
             while (isset($usedSlugs[$slug])) { $slug = $base . '-' . $i++; }
             $usedSlugs[$slug] = true;
 
-            $cat = Category::create([
+            /*
+             * Matched on (taxonomy_version, slug) — the pair the unique index
+             * is on — so a second run updates the row it wrote the first time.
+             *
+             * taxonomy_version is written explicitly rather than left to the
+             * model's creating hook: a seeder must produce the same rows
+             * whether it is run on its own or from DatabaseSeeder, and a hook
+             * is one `WithoutModelEvents` away from not running.
+             *
+             * is_active and parent_id are NOT overwritten on an existing row.
+             * An admin who deactivated a category, or the v2 import that set
+             * the parents, would otherwise have their work undone by a deploy.
+             */
+            $cat = Category::withoutGlobalScopes()->firstOrNew([
+                'taxonomy_version' => $version,
+                'slug'             => $slug,
+            ]);
+
+            $cat->fill([
                 'name'              => $r['name'],
-                'slug'              => $slug,
                 'short_description' => $r['short_description'] ?? null,
                 'long_description'  => $r['long_description'] ?? null,
                 'thumbnail'         => $copyImage($r['image'] ?? null, 'thumbnails', $thumbDir),
                 'cover_image'       => $copyImage($r['cover_image'] ?? null, 'covers', $coverDir),
                 'icon'              => $r['icon'] ?? null,
-                'parent_id'         => null,
+                'sort_order'        => (int) ($r['old_id'] ?? 0),
+            ]);
+
+            if (! $cat->exists) {
                 // Import every category as active — the client wants the full
                 // taxonomy live/visible; individual ones can be toggled off in admin.
-                'is_active'         => true,
-                'sort_order'        => (int)($r['old_id'] ?? 0),
-            ]);
+                $cat->is_active = true;
+                $cat->parent_id = null;
+            }
+
+            $cat->taxonomy_version = $version;
+            $cat->save();
 
             $idMap[$r['old_id']] = $cat->id;
         }
@@ -94,33 +134,14 @@ class CategorySeeder extends Seeder
         foreach ($rows as $r) {
             $oldParent = $r['old_parent_id'] ?? 0;
             if ($oldParent && isset($idMap[$oldParent]) && isset($idMap[$r['old_id']])) {
-                Category::whereKey($idMap[$r['old_id']])
+                Category::withoutGlobalScopes()->whereKey($idMap[$r['old_id']])
                     ->update(['parent_id' => $idMap[$oldParent]]);
             }
         }
 
-        $roots = Category::whereNull('parent_id')->count();
+        $roots = Category::withoutGlobalScopes()
+            ->where('taxonomy_version', $version)->whereNull('parent_id')->count();
         $this->command?->info("Seeded " . count($idMap) . " categories ({$roots} roots) with images.");
     }
 
-    /**
-     * Remove existing categories and anything that references them, without
-     * tripping foreign-key constraints.
-     */
-    private function clearExisting(): void
-    {
-        Schema::disableForeignKeyConstraints();
-
-        if (Schema::hasTable('category_event')) {
-            DB::table('category_event')->truncate();
-        }
-        if (Schema::hasTable('events') && Schema::hasColumn('events', 'category_id')) {
-            DB::table('events')->update(['category_id' => null]);
-        }
-
-        Category::query()->delete();
-        DB::statement('ALTER TABLE categories AUTO_INCREMENT = 1');
-
-        Schema::enableForeignKeyConstraints();
-    }
 }
