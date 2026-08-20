@@ -368,6 +368,84 @@ final class FormRegistry
         );
     }
 
+    /**
+     * The four families the Requests & Submissions screen sorts these into.
+     *
+     * Fifteen tiles in one wall is a list to read rather than a place to start,
+     * so they are grouped by what the person is actually trying to do. Every
+     * form appears in exactly one group — a form in two places is a form
+     * somebody files twice.
+     */
+    public const GROUPS = [
+        'bookings' => [
+            'label' => 'Bookings & Events',
+            'blurb' => 'Changes, corrections, crew and anything about a job you are on.',
+            'keys'  => [
+                'change_order', 'correction_request', 'package_purchase',
+                'shift_request', 'shift_confirmation', 'crew_assignment',
+                'crew_record', 'menu_inventory',
+            ],
+        ],
+        'payments' => [
+            'label' => 'Payments & Billing',
+            'blurb' => 'Payouts, payment details and money questions.',
+            'keys'  => ['payout_details'],
+        ],
+        'account' => [
+            'label' => 'Account & Verification',
+            'blurb' => 'Verification, programme applications and campaign plans.',
+            'keys'  => ['elite_verification', 'influencer_application', 'campaign_plan'],
+        ],
+        'safety' => [
+            'label' => 'Safety & Support',
+            'blurb' => 'Help from our team, reporting content, and telling us how it went.',
+            'keys'  => ['support_request', 'content_report', 'testimonial'],
+        ],
+    ];
+
+    /**
+     * The groups as ONE audience sees them: only the forms that audience may
+     * file, and a count of exactly those.
+     *
+     * The count is taken from the same list the group opens, so a card cannot
+     * promise a professional "4 request types" and then show them one.
+     *
+     * @return array<string, array{label:string, blurb:string, forms:array<string, array>}>
+     */
+    public static function groupsForAudience(string $audience): array
+    {
+        $available = self::forAudience($audience);
+        $out = [];
+
+        foreach (self::GROUPS as $slug => $group) {
+            $forms = [];
+
+            foreach ($group['keys'] as $key) {
+                if (isset($available[$key])) {
+                    $forms[$key] = $available[$key];
+                }
+            }
+
+            if ($forms !== []) {
+                $out[$slug] = ['label' => $group['label'], 'blurb' => $group['blurb'], 'forms' => $forms];
+            }
+        }
+
+        return $out;
+    }
+
+    /** Which group a form key belongs to — null if it has not been filed under one. */
+    public static function groupOf(string $key): ?string
+    {
+        foreach (self::GROUPS as $slug => $group) {
+            if (in_array($key, $group['keys'], true)) {
+                return $slug;
+            }
+        }
+
+        return null;
+    }
+
     /** Every certification across every form — the signatures this app takes. */
     public static function certifications(): array
     {

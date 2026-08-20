@@ -36,17 +36,143 @@ class FormController extends Controller
         return $user->isProfessionalMode() ? 'layouts.professional' : 'layouts.client';
     }
 
+    /** The tabs, and what each means in terms of the two status columns. */
+    public const TABS = [
+        'action'    => 'Needs Your Action',
+        'review'    => 'Under Review',
+        'completed' => 'Completed',
+        'closed'    => 'Closed',
+    ];
+
+    /** Date ranges the header offers, in days. Null = no limit. */
+    public const RANGES = [
+        'all' => ['All Time', null],
+        '30'  => ['Last 30 days', 30],
+        '90'  => ['Last 90 days', 90],
+        '365' => ['Last 12 months', 365],
+    ];
+
     public function index(Request $request): View
     {
         $user = $request->user();
 
+        $tab = array_key_exists((string) $request->query('tab'), self::TABS)
+            ? (string) $request->query('tab') : 'all';
+        $range = array_key_exists((string) $request->query('range'), self::RANGES)
+            ? (string) $request->query('range') : 'all';
+        $group = array_key_exists((string) $request->query('group'), FormRegistry::GROUPS)
+            ? (string) $request->query('group') : '';
+        $q = trim((string) $request->query('q', ''));
+
+        /*
+         * Everything this person is part of — what they sent, and what was sent
+         * to them for a decision. Both belong on one screen: a change order you
+         * proposed and one you have been asked to accept are the same kind of
+         * thing, and splitting them is how "waiting on you" gets missed.
+         *
+         * Loaded once and sorted in PHP, because "needs your action" depends on
+         * which side of the submission this person is — not a column.
+         */
+        $all = FormSubmission::query()
+            ->where(fn ($w) => $w->where('submitted_by', $user->id)->orWhere('counterparty_id', $user->id))
+            ->with(['submitter', 'counterparty', 'subject'])
+            ->latest('id')
+            ->get();
+
+        $counts = [
+            'all'       => $all->count(),
+            'action'    => $all->filter(fn ($s) => $this->stateOf($s, $user) === 'action')->count(),
+            'review'    => $all->filter(fn ($s) => $this->stateOf($s, $user) === 'review')->count(),
+            // Scoped to 30 days because the tile says so.
+            'completed' => $all->filter(fn ($s) => $this->stateOf($s, $user) === 'completed'
+                && $s->updated_at?->gte(now()->subDays(30)))->count(),
+            'closed'    => $all->filter(fn ($s) => $this->stateOf($s, $user) === 'closed')->count(),
+        ];
+
+        $shown = $tab === 'all'
+            ? $all
+            : $all->filter(fn ($s) => $this->stateOf($s, $user) === $tab);
+
+        if ($group !== '') {
+            $shown = $shown->filter(fn ($s) => FormRegistry::groupOf($s->form_key) === $group);
+        }
+
+        if ($q !== '') {
+            $needle = \Illuminate\Support\Str::lower($q);
+            $shown = $shown->filter(fn ($s) => str_contains(\Illuminate\Support\Str::lower($s->title()), $needle)
+                || str_contains(\Illuminate\Support\Str::lower((string) $s->reference), $needle));
+        }
+
+        if (self::RANGES[$range][1] !== null) {
+            $since = now()->subDays(self::RANGES[$range][1]);
+            $shown = $shown->filter(fn ($s) => $s->created_at?->gte($since));
+        }
+
+        $shown = $shown->values();
+
+        $perPage = 15;
+        $page = max(1, (int) $request->query('page', 1));
+        $submissions = new \Illuminate\Pagination\LengthAwarePaginator(
+            $shown->forPage($page, $perPage)->values(),
+            $shown->count(),
+            $perPage,
+            $page,
+            ['path' => route('forms.index'), 'query' => $request->query()],
+        );
+
         return view('forms.index', [
-            'layout'  => $this->layout($user),
-            'forms'   => FormRegistry::forAudience($this->audience($user)),
-            'mine'    => FormSubmission::where('submitted_by', $user->id)->latest('id')->limit(20)->get(),
-            'waiting' => FormSubmission::where('counterparty_id', $user->id)
-                            ->where('approval_status', 'pending')->get(),
+            'layout'      => $this->layout($user),
+            'groups'      => FormRegistry::groupsForAudience($this->audience($user)),
+            'submissions' => $submissions,
+            'counts'      => $counts,
+            'tabs'        => self::TABS,
+            'ranges'      => self::RANGES,
+            'filters'     => ['tab' => $tab, 'range' => $range, 'group' => $group, 'q' => $q],
+            // Passed as closures so the row and the tile read one function.
+            'stateOf'     => fn (FormSubmission $s) => $this->stateOf($s, $user),
+            'nextStep'    => fn (FormSubmission $s) => $this->nextStep($s, $user),
         ]);
+    }
+
+    /**
+     * Which of the four states a submission is in FOR THIS PERSON.
+     *
+     * "Needs your action" is the one worth being careful about: it means a
+     * dual-approval form is waiting on a decision and this person is the one
+     * who has to make it. The person who proposed the change is not waiting on
+     * themselves, and a form with no approval step is not waiting on either
+     * party — it is with our team.
+     */
+    private function stateOf(FormSubmission $submission, User $user): string
+    {
+        if ($submission->status === 'withdrawn' || $submission->approval_status === 'declined') {
+            return 'closed';
+        }
+
+        if ($submission->approval_status === 'accepted' || $submission->status === 'actioned') {
+            return 'completed';
+        }
+
+        if ($submission->needsApproval()
+            && $submission->approval_status === 'pending'
+            && $submission->counterparty_id === $user->id) {
+            return 'action';
+        }
+
+        return 'review';
+    }
+
+    /** What happens next, in the reader's own terms. Never a deadline. */
+    private function nextStep(FormSubmission $submission, User $user): string
+    {
+        return match ($this->stateOf($submission, $user)) {
+            'action'    => 'Open it and accept or decline',
+            'completed' => 'Nothing — this is finished',
+            'closed'    => 'Nothing — this is closed',
+            default     => $submission->needsApproval()
+                ? 'Waiting on ' . ($submission->counterparty?->name ?? 'the other party')
+                : 'With our team — no action needed',
+        };
     }
 
     public function create(Request $request, string $key): View
