@@ -679,6 +679,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/toolkit/tiers', [\App\Http\Controllers\Client\ToolkitTierController::class, 'index'])
             ->name('client.toolkit.tiers');
 
+        // Rule R30 — Plan with Toolkit: put a saved tool result into an open
+        // request or a professional's agreement. The other R30 leg (starting a
+        // brand-new request from a tool) is still the prototype above.
+        Route::prefix('toolkit')->name('client.toolkit.')->group(function () {
+            $b = \App\Http\Controllers\Client\ToolkitBridgeController::class;
+
+            Route::get('/plan', [$b, 'index'])->name('plan');
+            Route::post('/plan', [$b, 'store'])->name('plan.store');
+
+            Route::delete('/placed/{attachment}', [$b, 'destroy'])->name('placed.destroy');
+            Route::post('/placed/{attachment}/apply', [$b, 'apply'])->name('placed.apply');
+            Route::post('/placed/{attachment}/keep', [$b, 'keep'])->name('placed.keep');
+        });
+
         // Was a second professional-search screen. /browse now carries the event
         // context that made this one different, so this only keeps old links
         // working — query string and all.

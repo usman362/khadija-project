@@ -1312,6 +1312,12 @@
                         Toolkit Tiers
                     </a>
                 </li>
+                <li class="cl-nav-item">
+                    <a href="{{ route('client.toolkit.plan') }}" class="cl-nav-link {{ request()->routeIs('client.toolkit.plan') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                        Plan with Toolkit
+                    </a>
+                </li>
 
                 {{-- ── INSIGHTS & FINANCE ─────────────────────────── --}}
                 <li class="cl-nav-label">Insights &amp; Finance</li>
