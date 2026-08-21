@@ -42,6 +42,7 @@ class ClientEsrController extends Controller
             ->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
 
         return view('client.esr.create', [
+            'orgTypes' => \App\Models\Event::ORGANIZATION_TYPES,
             'categories' => $categories,
             'reasons'    => self::REASONS,
             'scope'      => $this->scopeOf($request->query('scope')),
@@ -55,11 +56,42 @@ class ClientEsrController extends Controller
         return $raw === 'multi' ? 'multi' : 'single';
     }
 
+    /**
+     * The request's title, from what they picked rather than what they typed.
+     *
+     * "Urgent: DJ, Live Bands & Musicians" says more to a professional
+     * scanning the board than a sentence would, and it cannot be left blank or
+     * filled with something that contradicts the services attached to it.
+     */
+    private function titleFrom(array $serviceIds, string $reason): string
+    {
+        $names = \App\Models\Category::whereIn('id', $serviceIds)
+            ->orderBy('name')->pluck('name');
+
+        $what = match (true) {
+            $names->isEmpty() => 'Urgent request',
+            $names->count() === 1 => $names->first(),
+            $names->count() === 2 => $names->implode(' and '),
+            default => $names->take(2)->implode(', ') . ' +' . ($names->count() - 2),
+        };
+
+        return \Illuminate\Support\Str::limit('Urgent: ' . $what, 200, '');
+    }
+
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'event_name'   => ['required', 'string', 'max:200'],
+            /*
+             * No free-text "What do you need?" any more.
+             *
+             * It sat above the service picker and asked the same thing in
+             * different words, so the form asked twice — the Owner's point on
+             * 2026-08-20, with BR held up as the one that "is clean with only
+             * asking once". The title is built from the service they pick.
+             */
             'reason'       => ['required', 'in:' . implode(',', array_keys(self::REASONS))],
+            // Asked on every request form now (Peter, 2026-08-20).
+            'organization_type' => ['required', 'in:' . implode(',', array_keys(\App\Models\Event::ORGANIZATION_TYPES))],
             'needed_by'    => ['required', 'date'],
             'location'     => ['nullable', 'string', 'max:200'],
             // R38 / R71 — the state the work happens in. See
@@ -124,7 +156,7 @@ class ClientEsrController extends Controller
         }
 
         $event = Event::create([
-            'title'        => $data['event_name'],
+            'title'        => $this->titleFrom($data['services'], $data['reason']),
             'description'  => $data['description'] ?? null,
             'status'       => 'published',
             'is_published' => true,
@@ -133,6 +165,7 @@ class ClientEsrController extends Controller
             'location'     => $data['location'] ?? null,
             'state'        => \App\Support\StateMatching::requestState($user, $data['event_state'] ?? null),
             'guest_count'  => $data['guest_count'] ?? null,
+            'organization_type' => $data['organization_type'],
             'created_by'   => $user->id,
             'client_id'    => $user->id,
             'source'       => 'esr',   // marks it urgent on the Bidding Board

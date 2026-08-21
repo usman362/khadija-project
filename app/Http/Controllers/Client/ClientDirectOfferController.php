@@ -75,7 +75,10 @@ class ClientDirectOfferController extends Controller
 
         $type = in_array($request->query('type'), ['SSR', 'MSR'], true) ? $request->query('type') : 'SSR';
 
+        $orgTypes = \App\Models\Event::ORGANIZATION_TYPES;
+
         return view('client.direct-offers.create', compact(
+            'orgTypes',
             'pros', 'categories', 'selectedPro', 'type', 'serviceId',
         ));
     }
@@ -90,6 +93,8 @@ class ClientDirectOfferController extends Controller
         $data = $request->validate([
             'professional_id' => ['required', 'exists:users,id'],
             'event_name'      => ['nullable', 'string', 'max:200'],
+            // Asked on every request form now (Peter, 2026-08-20).
+            'organization_type' => ['required', 'in:' . implode(',', array_keys(\App\Models\Event::ORGANIZATION_TYPES))],
             'event_date'      => ['nullable', 'date'],
             'guests'          => ['nullable', 'integer', 'min:1', 'max:1000000'],
             'venue'           => ['nullable', 'string', 'max:200'],
@@ -142,6 +147,7 @@ class ClientDirectOfferController extends Controller
 
         $event = Event::create([
             'title'        => $data['event_name'] ?: ('Direct Request to ' . $pro->name),
+            'organization_type' => $data['organization_type'],
             'status'       => 'pending',
             'is_published' => false,               // targeted — never hits the open board
             'starts_at'    => $data['event_date'] ?? null,

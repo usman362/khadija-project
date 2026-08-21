@@ -37,6 +37,17 @@
                             <input type="text" name="venue" class="pe-input" placeholder="Enter Venue Address" value="{{ $summary['venue'] ?? '' }}">
                         </div>
 
+                        {{-- Asked on every request form now (Peter, 2026-08-20,
+                             "for data collecting purposes"). --}}
+                        <div class="pe-field">
+                            <label class="pe-label" for="peOrgType">This request is for</label>
+                            <select name="organization_type" id="peOrgType" class="pe-select">
+                                @foreach($orgTypes as $key => $label)
+                                    <option value="{{ $key }}" @selected(($summary['organization_type'] ?? 'individual') === $key)>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <div class="pe-row">
                             <div class="pe-field">
                                 <label class="pe-label">Guest Count <span class="pe-req">*</span></label>

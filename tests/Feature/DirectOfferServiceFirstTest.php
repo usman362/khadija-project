@@ -110,6 +110,7 @@ class DirectOfferServiceFirstTest extends TestCase
     public function test_sending_a_service_the_professional_does_not_offer_is_refused(): void
     {
         $this->actingAs($this->client)->post(route('client.direct-offers.store'), [
+                'organization_type' => 'individual',
             'professional_id' => $this->florist->id,
             'services'        => [$this->photography->id],
             'event_name'      => 'Our wedding',
@@ -121,6 +122,7 @@ class DirectOfferServiceFirstTest extends TestCase
     public function test_a_matching_offer_goes_through(): void
     {
         $this->actingAs($this->client)->post(route('client.direct-offers.store'), [
+                'organization_type' => 'individual',
             'professional_id' => $this->photographer->id,
             'services'        => [$this->photography->id],
             'event_name'      => 'Our wedding',
@@ -142,6 +144,7 @@ class DirectOfferServiceFirstTest extends TestCase
         $this->photographer->serviceCategories()->syncWithoutDetaching([$second->id]);
 
         $this->actingAs($this->client)->post(route('client.direct-offers.store'), [
+                'organization_type' => 'individual',
             'professional_id' => $this->photographer->id,
             'services'        => [$this->photography->id, $second->id],
             'event_name'      => 'Our wedding',

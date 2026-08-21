@@ -189,6 +189,14 @@
             <div class="do-sec-hd"><h4>Event Details</h4><span class="do-tag">YOUR INPUT</span></div>
             <div class="do-sec-bd">
                 <div class="do-field"><label>Event Name</label><input class="do-input" name="event_name" placeholder="e.g. Luxury Wedding Reception"></div>
+                <div class="do-field">
+                    <label for="doOrgType">This request is for <span style="color:#dc2626;">*</span></label>
+                    <select class="do-input" name="organization_type" id="doOrgType" required>
+                        @foreach($orgTypes as $key => $label)
+                            <option value="{{ $key }}" @selected(old('organization_type', 'individual') === $key)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
                 <div class="do-row">
                     <div class="do-field"><label>Event Date</label><input type="date" class="do-input" name="event_date"></div>
                     <div class="do-field"><label>Guest Count</label><input type="number" class="do-input" name="guests" placeholder="150"></div>

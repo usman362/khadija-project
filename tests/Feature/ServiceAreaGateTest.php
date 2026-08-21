@@ -81,7 +81,8 @@ class ServiceAreaGateTest extends TestCase
     public function test_coming_soon_client_cannot_post_a_request(): void
     {
         $this->actingAs($this->user(ServiceArea::COMING_SOON))
-            ->post(route('client.esr.store'), [])
+            ->post(route('client.esr.store'), [
+                'organization_type' => 'individual',])
             ->assertRedirect()
             ->assertSessionHas('error');
     }
@@ -137,7 +138,8 @@ class ServiceAreaGateTest extends TestCase
     public function test_admin_is_never_gated_by_where_they_live(): void
     {
         $this->actingAs($this->user(ServiceArea::COMING_SOON, 'admin'))
-            ->post(route('client.esr.store'), [])
+            ->post(route('client.esr.store'), [
+                'organization_type' => 'individual',])
             ->assertSessionMissing('error');
     }
 }

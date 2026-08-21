@@ -116,6 +116,17 @@
                     Edit
                 </button>
                 @if(!$event->is_published)
+                    {{-- The way back into the request wizard.
+                         A bidding request does not sit beside an event, it IS
+                         one — ClientBsrController creates the event. But the
+                         event page had publish, reopen, extend, duplicate and
+                         close, and no way to open the request itself, so the
+                         two halves of one record had no door between them
+                         (Khadijah, 2026-08-20). --}}
+                    <a href="{{ route('client.bsr.resume', $event) }}" class="cl-btn cl-btn-ghost cl-btn-sm">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/></svg>
+                        Continue this request
+                    </a>
                     <form method="POST" action="{{ route('client.events.publish', $event) }}" style="display:inline;">
                         @csrf
                         <button type="submit" class="cl-btn cl-btn-primary cl-btn-sm" style="background:#c2410c;border-color:#c2410c;">

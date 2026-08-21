@@ -84,6 +84,7 @@ class PostEventController extends Controller
     {
         return view('client.post-event.event-info', $this->shell('event-info') + [
             'categories' => Category::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']),
+            'orgTypes'   => \App\Models\Event::ORGANIZATION_TYPES,
         ]);
     }
 
@@ -91,6 +92,8 @@ class PostEventController extends Controller
     {
         $data = $request->validate([
             'event_type'   => ['nullable', 'string', 'max:120'],
+            // Asked on every request form now (Peter, 2026-08-20).
+            'organization_type' => ['nullable', 'in:' . implode(',', array_keys(\App\Models\Event::ORGANIZATION_TYPES))],
             'start_time'   => ['nullable', 'string', 'max:20'],
             'end_time'     => ['nullable', 'string', 'max:20'],
             'venue'        => ['nullable', 'string', 'max:200'],

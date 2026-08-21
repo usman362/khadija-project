@@ -60,6 +60,7 @@ class BiddingWindowTest extends TestCase
         $category = $this->service('Photography', 'photography');
 
         $this->actingAs($this->client)->post(route('client.esr.store'), [
+                'organization_type' => 'individual',
             'event_name'  => 'Replacement DJ needed',
             'reason'      => 'professional_cancelled',
             'description' => 'Our DJ cancelled and we need a replacement for Saturday evening.',
@@ -89,6 +90,7 @@ class BiddingWindowTest extends TestCase
         $neededBy = now()->addHours(6);
 
         $this->actingAs($this->client)->post(route('client.esr.store'), [
+                'organization_type' => 'individual',
             'event_name'  => 'Emergency catering',
             'reason'      => 'no_show',
             'description' => 'Caterer pulled out this morning and we need cover for tonight.',

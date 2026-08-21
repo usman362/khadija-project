@@ -143,6 +143,7 @@ class SameStateMatchingTest extends TestCase
 
         $this->actingAs($client)
             ->post(route('client.direct-offers.store'), [
+                'organization_type' => 'individual',
                 'professional_id' => $pro->id,
                 'event_name'      => 'Garden Party',
             ])

@@ -15,6 +15,21 @@ class Event extends Model
 {
     use HasFactory;
 
+    /**
+     * Who the request is for — asked on every request form.
+     *
+     * Here rather than on one controller because the Owner wants it on all of
+     * them (2026-08-20, "for data collecting purposes") and four copies of the
+     * same four options is four chances for them to drift apart. The column
+     * this fills is `events.organization_type`.
+     */
+    public const ORGANIZATION_TYPES = [
+        'individual' => 'Individual',
+        'business'   => 'Business',
+        'government' => 'Government',
+        'nonprofit'  => 'Nonprofit',
+    ];
+
     protected $fillable = [
         'title',
         'description',

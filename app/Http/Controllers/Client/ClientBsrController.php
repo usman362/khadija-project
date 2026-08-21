@@ -45,8 +45,8 @@ class ClientBsrController extends Controller
         'high_value' => ['High-Value', 'Large budget or complex request.'],
     ];
 
-    public const ORG_TYPES = ['individual' => 'Individual', 'business' => 'Business',
-                              'government' => 'Government', 'nonprofit' => 'Nonprofit'];
+    /** One definition, on the model that owns the column. */
+    public const ORG_TYPES = \App\Models\Event::ORGANIZATION_TYPES;
 
     private const KEY = 'bsr_wizard';
 
@@ -104,6 +104,7 @@ class ClientBsrController extends Controller
             'eventTypes' => Category::active()->eventTypes()
                 ->orderBy('name')->get(['id', 'name']),
             'characteristics' => self::CHARACTERISTICS,
+            'otherEventType'  => self::OTHER_EVENT_TYPE,
             'orgTypes'        => self::ORG_TYPES,
             'draftId'         => $data['draft_id'] ?? null,
             'defaultWindowDays' => config('bsr.default_proposal_window_days'),
@@ -172,6 +173,26 @@ class ClientBsrController extends Controller
         // what single vs multi service means, so it isn't a separate question.
         if ($step === 'service') {
             $validated['scope'] = count($validated['services'] ?? []) >= 2 ? 'multi' : 'single';
+
+            /*
+             * The client's own wording becomes the request's working title, so
+             * they name their event once rather than twice — step 2 asks for a
+             * title, and somebody who has just typed "Maryland's Horse Show
+             * Event" should find it already there.
+             *
+             * Only seeded while step 2 has not been answered; editing the title
+             * later must stick.
+             */
+            if (filled($validated['event_title'] ?? null) && empty($data['title'])) {
+                $validated['title'] = trim($validated['event_title']);
+            }
+
+            // Picked something off the list after picking Other — the private
+            // wording goes with it rather than lingering on a request it no
+            // longer describes.
+            if (($validated['event_type'] ?? null) !== self::OTHER_EVENT_TYPE) {
+                $validated['event_title'] = null;
+            }
         }
 
         $data = array_merge($data, $validated);
@@ -285,6 +306,17 @@ class ClientBsrController extends Controller
 
     /** The outcomes a tool result can become. */
     public const OUTCOMES = ['bidding', 'emergency', 'draft'];
+
+    /**
+     * The list row a client picks when their event is not on the list.
+     *
+     * It is a real event type in the taxonomy, not a magic string, so the
+     * relevance matrix still has something to order services by. Their own
+     * wording goes in `event_title` beside it — free text REPLACING the event
+     * type would leave the matrix nothing to work with (Peter + Khadijah,
+     * 2026-08-20: they may type their own, and our team reviews it).
+     */
+    public const OTHER_EVENT_TYPE = 'Other Event';
 
     public function fromTool(Request $request): RedirectResponse
     {
@@ -473,7 +505,19 @@ class ClientBsrController extends Controller
             'service' => [
                 'services'          => ['required', 'array', 'min:1', 'max:12'],
                 'services.*'        => ['integer', 'exists:categories,id', new \App\Rules\BookableService],
-                'event_type'        => ['nullable', 'string', 'max:80'],
+                /*
+                 * Required, and first on the page.
+                 *
+                 * It was nullable and sat below the services, so a client who
+                 * started from Post Event rather than from an event-type page
+                 * could skip it and the request was saved with no event type —
+                 * two entry paths producing disconnected requests. The event
+                 * type is what the archetype relevance matrix orders the
+                 * services by, so a request without one has nothing to order by.
+                 */
+                'event_type'        => ['required', 'string', 'max:80', new \App\Rules\KnownEventType],
+                // Only asked for, and only kept, when they picked "Other".
+                'event_title'       => ['nullable', 'string', 'max:120', 'required_if:event_type,' . self::OTHER_EVENT_TYPE],
                 'organization_type' => ['required', 'in:' . implode(',', array_keys(self::ORG_TYPES))],
                 'characteristic'    => ['required', 'in:' . implode(',', array_keys(self::CHARACTERISTICS))],
             ],

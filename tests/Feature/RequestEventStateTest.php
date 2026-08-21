@@ -46,6 +46,15 @@ class RequestEventStateTest extends TestCase
     }
 
     /** Bookable under either taxonomy version: v1 wants a parent, v2 wants the kind. */
+    /** Event type is required at step 1 now, and must be one we actually have. */
+    private function eventType(): Category
+    {
+        return Category::firstOrCreate(
+            ['slug' => 'wedding-res'],
+            ['name' => 'Wedding', 'kind' => Category::EVENT_TYPE, 'is_active' => true],
+        );
+    }
+
     private function service(): Category
     {
         $parent = Category::firstOrCreate(
@@ -63,6 +72,7 @@ class RequestEventStateTest extends TestCase
     private function openEventStep(User $client)
     {
         $this->actingAs($client)->post(route('client.bsr.save', 'service'), [
+            'event_type'        => $this->eventType()->name,
             'services'          => [$this->service()->id],
             'organization_type' => array_key_first(\App\Http\Controllers\Client\ClientBsrController::ORG_TYPES),
             'characteristic'    => array_key_first(\App\Http\Controllers\Client\ClientBsrController::CHARACTERISTICS),
@@ -79,7 +89,7 @@ class RequestEventStateTest extends TestCase
         $client = $this->user('client', 'VA');
 
         $this->actingAs($client)->post(route('client.esr.store'), [
-            'event_name'  => 'Server room power failure',
+            'organization_type' => 'business',
             'reason'      => array_key_first(\App\Http\Controllers\Client\ClientEsrController::REASONS),
             'needed_by'   => now()->addHours(30)->format('Y-m-d\TH:i'),
             'scope'       => 'single',
@@ -152,6 +162,7 @@ class RequestEventStateTest extends TestCase
         $pro->serviceCategories()->attach($service->id);
 
         $this->actingAs($client)->post(route('client.direct-offers.store'), [
+            'organization_type' => 'individual',
             'professional_id' => $pro->id,
             'event_name'      => 'Garden Party',
             'services'        => [$service->id],

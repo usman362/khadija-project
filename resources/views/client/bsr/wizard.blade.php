@@ -144,6 +144,36 @@
         <h3>What do you need?</h3>
         <p class="lede">Pick one service for a single-service request, or several for a multi-service one — it's the same request either way.</p>
 
+        {{-- Event type first, and required.
+             It used to sit below the services and validate as nullable, so a
+             client who started from Post Event rather than from an event-type
+             page could skip it and the request was saved with no event type at
+             all — two entry paths producing disconnected requests (Khadijah,
+             2026-08-20: "it should be the first thing not below"). --}}
+        <div class="bw-field">
+            <label for="bwEventType">Event type <span class="req">*</span></label>
+            <select name="event_type" id="bwEventType" required aria-label="Event type">
+                <option value="">— Choose your event —</option>
+                @foreach($eventTypes as $t)
+                    <option value="{{ $t->name }}" @selected(($data['event_type'] ?? '') === $t->name)>{{ $t->name }}</option>
+                @endforeach
+                <option value="{{ $otherEventType }}" @selected(($data['event_type'] ?? '') === $otherEventType)>Other / not on this list</option>
+            </select>
+            <p class="bw-hint">The services below are ordered by what this kind of event usually needs.</p>
+        </div>
+
+        {{-- H — the client's own words, kept beside the list entry rather than
+             replacing it. Free text as the event type would break the
+             archetype relevance matrix, which is what orders the services on
+             every request form. --}}
+        <div class="bw-field" id="bwOwnTitle" @if(($data['event_type'] ?? '') !== $otherEventType) hidden @endif>
+            <label for="bwEventTitle">What do you call your event? <span class="req">*</span></label>
+            <input type="text" name="event_title" id="bwEventTitle" maxlength="120"
+                   value="{{ $data['event_title'] ?? '' }}"
+                   placeholder="e.g. Maryland's Horse Show Event">
+            <p class="bw-hint">We keep your wording. Our team reviews it before it goes out to professionals.</p>
+        </div>
+
         @if(! empty($focusNames) && ! $showingAll)
             {{-- They already said which area on the event-type page. This is
                  the level below it, not the same question again — so the page
@@ -176,24 +206,13 @@
             </div>
         </div>
 
-        <div class="bw-two">
-            <div class="bw-field">
-                <label>Event type</label>
-                <select name="event_type" aria-label="Not sure yet">
-                    <option value="">Not sure yet</option>
-                    @foreach($eventTypes as $t)
-                        <option value="{{ $t->name }}" @selected(($data['event_type'] ?? '') === $t->name)>{{ $t->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="bw-field">
-                <label>This request is for <span class="req">*</span></label>
-                <select name="organization_type" aria-label="Organization type">
-                    @foreach($orgTypes as $k => $l)
-                        <option value="{{ $k }}" @selected(($data['organization_type'] ?? 'individual') === $k)>{{ $l }}</option>
-                    @endforeach
-                </select>
-            </div>
+        <div class="bw-field">
+            <label for="bwOrgType">This request is for <span class="req">*</span></label>
+            <select name="organization_type" id="bwOrgType" aria-label="Organization type">
+                @foreach($orgTypes as $k => $l)
+                    <option value="{{ $k }}" @selected(($data['organization_type'] ?? 'individual') === $k)>{{ $l }}</option>
+                @endforeach
+            </select>
         </div>
 
         <div class="bw-field">
@@ -422,4 +441,28 @@
 })();
 </script>
 @endif
+
+<script>
+(function () {
+    var type = document.getElementById('bwEventType');
+    var own  = document.getElementById('bwOwnTitle');
+    var box  = document.getElementById('bwEventTitle');
+
+    if (!type || !own) return;
+
+    var OTHER = @json($otherEventType ?? 'Other Event');
+
+    function sync() {
+        var isOther = type.value === OTHER;
+        own.hidden = !isOther;
+        // Required only while it is on screen, or the form refuses to submit
+        // over a field nobody can see.
+        if (box) box.required = isOther;
+    }
+
+    type.addEventListener('change', sync);
+    sync();
+})();
+</script>
+
 @endsection

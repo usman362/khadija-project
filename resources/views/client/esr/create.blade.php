@@ -108,8 +108,12 @@
         <div class="esr-card">
             <div class="esr-sec-h"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Emergency &amp; Timing</div>
             <div class="esr-field">
-                <label>What do you need? <span class="esr-req">*</span></label>
-                <input name="event_name" class="esr-input" required maxlength="200" value="{{ old('event_name') }}" placeholder="e.g. Replacement DJ for tonight's reception">
+                <label for="esrOrgType">This request is for <span class="esr-req">*</span></label>
+                <select name="organization_type" id="esrOrgType" class="esr-input" required>
+                    @foreach($orgTypes as $key => $label)
+                        <option value="{{ $key }}" @selected(old('organization_type', 'individual') === $key)>{{ $label }}</option>
+                    @endforeach
+                </select>
             </div>
             <div class="esr-field">
                 <label>Why is this urgent? <span class="esr-req">*</span></label>
