@@ -24,9 +24,22 @@ class ToolkitTierController extends Controller
     public function index(Request $request): View
     {
         $user = $request->user();
-        $audience = $user?->activeRole() === 'professional'
-            ? ToolkitTiers::PROFESSIONAL
-            : ToolkitTiers::CLIENT;
+
+        /*
+         * One decision, not two.
+         *
+         * This page is reachable from both sidebars, and it used to pick the
+         * audience here while the view hardcoded the client chrome. A
+         * professional therefore got their own tools drawn inside the client's
+         * portal — and the client sidebar has no link back to the
+         * professional one, so the only way out was the browser's Back button.
+         *
+         * The audience and the chrome are the same question, so they are
+         * answered once.
+         */
+        $isPro    = (bool) $user?->isProfessionalMode();
+        $audience = $isPro ? ToolkitTiers::PROFESSIONAL : ToolkitTiers::CLIENT;
+        $layout   = $isPro ? 'layouts.professional' : 'layouts.client';
 
         $tiers = config('toolkit-tiers.tiers', []);
         $total = ToolkitTiers::toolsFor($audience)->count();
@@ -61,6 +74,7 @@ class ToolkitTierController extends Controller
         return view('client.toolkit.tiers', [
             'tiers'      => $tiers,
             'audience'   => $audience,
+            'layout'     => $layout,
             'cards'      => $cards,
             'suites'     => ToolkitTiers::comparison($audience),
             'total'      => $total,

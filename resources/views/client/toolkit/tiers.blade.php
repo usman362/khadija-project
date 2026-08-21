@@ -1,4 +1,4 @@
-@extends('layouts.client')
+@extends($layout)
 
 @section('title', 'Toolkit Tiers')
 @section('page-title', 'Toolkit Tiers')

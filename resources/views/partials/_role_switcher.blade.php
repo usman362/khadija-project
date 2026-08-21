@@ -9,6 +9,21 @@
     $__hasSupplier = $__u?->hasRole(\App\Domain\Auth\Enums\RoleName::PROFESSIONAL->value);
     $__isAdmin    = $__u?->isAdmin();
     $__active     = $__u?->activeRole();
+
+    /*
+     * The button names the portal you are NOT looking at — which is not always
+     * the opposite of your active role.
+     *
+     * A shared page can draw the client chrome around a professional. When
+     * that happened, this button read from the role and offered "Switch to
+     * Client", pointing further into the portal the user was trying to leave,
+     * and the professional sidebar was then reachable only with the browser's
+     * Back button. So the chrome decides, and each layout says which one it is.
+     *
+     * For a user whose chrome and role already agree — everyone, normally —
+     * this is the same button it always was.
+     */
+    $__portal = $portal ?? $__active;
 @endphp
 
 @if($__u && !$__isAdmin && ($__hasClient || $__hasSupplier))
@@ -16,7 +31,7 @@
     @if($__hasClient && $__hasSupplier)
         {{-- Both roles: show compact toggle to switch to the OTHER one --}}
         @php
-            $__target    = $__active === 'professional' ? 'client' : 'professional';
+            $__target    = $__portal === 'professional' ? 'client' : 'professional';
             $__targetLbl = $__target === 'professional' ? 'Professional' : 'Client';
         @endphp
         {{-- The current-mode pill is gone: it labelled the portal you were

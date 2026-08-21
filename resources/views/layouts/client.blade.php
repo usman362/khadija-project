@@ -1427,7 +1427,7 @@
 
             <div class="cl-topbar-right">
                 {{-- CLIENT pill + Switch to Professional --}}
-                @include('partials._role_switcher')
+                @include('partials._role_switcher', ['portal' => 'client'])
 
                 {{-- Light / Dark theme toggle --}}
                 <button class="cl-theme-toggle" id="theme-toggle" title="Toggle light / dark theme" aria-label="Toggle theme">
