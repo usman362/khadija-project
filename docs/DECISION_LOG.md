@@ -32,7 +32,7 @@ These are the only things stopping work. Everything else can proceed.
 | B1 | Client request fee — when it is charged | High | $2.99 upfront when the request is posted, or at finalization? Code currently charges at **finalization** (`config/payments.php`). Changing it later means re-doing refund logic. |
 | B2 | Bidding window values (R37) | High | How long does a BSR stay open? How long for an ESR? Nothing is in config, so the Admin page for this cannot be built. |
 | B3 | Live Event Upgrades — money rules | High | Four answers needed: how held funds are recorded, whether an overtime rate is mandatory on every bid, geofence rules for on-site upgrades, and the real fee (the "15% vs your standard 10%" in the spec matches neither the 3/5/1.5% commission nor the $2.99 request fee). |
-| B4 | AI modules — keep or remove | High | R29 forbids any feature that *claims or uses* AI. The naming sweep is done, but three modules still genuinely call OpenAI: **AI Agreement generation**, the **support chatbot**, and the **"AI-assisted marketplace"** line in the registration disclaimer. This is not a rename — it is keep-or-remove. Sir Peter's own FAC-13 lists "D2 remove-AI" as done, so this may simply have been missed. |
+| ~~B4~~ | ~~AI modules — keep or remove~~ | — | **Resolved 2026-08-22 (evidence-based; awaiting Sir Peter's ratification of the rulebook edit).** The premise was wrong in two ways. (1) It is not three modules — **five** services genuinely POST to `api.openai.com`: AI Agreement generation, the support chatbot, Budget Planner, Best Match, and Review Builder (each with a rules-based fallback when no key is set). (2) The registration disclaimer's **"AI-assisted marketplace"** line is not a leak to remove — it is the honest, required disclosure, and matches Sir Peter's own AI-first direction (AI IQ levels, AI Agreement Builder, and the AI email-answering plan of 2026-08-22). Decision: **KEEP** — the platform is AI-assisted and says so. R29's blanket "no AI" reading is retired (see R29 note below). The FAC-13 "D2 remove-AI done" claim was simply false. No feature removed; the code comments that wrongly called the AI tools "calculators" were corrected. |
 | B6 | **A pro awarded two services on one request gets one booking** | High | Not a decision — a defect found while answering A10. `Booking` is keyed on (event, supplier) with no service, so awarding a second service to the same professional on the same request either does nothing (`firstOrCreate` on bid accept) or overwrites the first price (`updateOrCreate` on finalize). Reachable today: multi-service requests already take per-service bids. Needs a decision on whether to fix narrowly now or fold into A10. |
 | ~~B5~~ | ~~Brand button contrast~~ | — | **Resolved 2026-08-13.** Sir Peter approved via Ali. Measured worse than first reported — 2.26:1, not 2.8, once read at the light end of the button's gradient. Fixed sitewide with on-white colour variants; `--orange` and `--blue` themselves are untouched. See `docs/contrast-audit.md`. |
 
@@ -68,7 +68,7 @@ Verified against the code, most recent first. Safe for Sir Peter to screenshot.
 | Multi-Service Requests folded into the Bidding Board | It was the board's `scope=multi` filter as a second page. |
 | Expansion waitlist (admin) | Where out-of-area signups are coming from. |
 | Service-area gate | Out-of-area accounts register and browse but cannot transact. |
-| R29 naming sweep | 51 views. Tools are rules and calculators; only the labels were wrong. |
+| R29 naming sweep | 51 views relabelled to hide the word "AI" — but the tools it renamed genuinely call OpenAI, so the sweep hid a real capability rather than a mislabelled one. Reversed in principle by B4 (2026-08-22): the platform is AI-assisted and says so. |
 | Tool → Request prototype | For design review. Writes nothing, marked as a prototype on every screen. |
 | Find Professionals — one page | Search and Browse were two pages doing one job. |
 | Request types: BSR / ESR / DSR, with SSR/MSR as scope | 5 cards → 4, both sides. |
@@ -89,7 +89,7 @@ Kept as a list because it is the argument for this document existing.
 | What was believed | What was true |
 |---|---|
 | "Co-Op removed platform-wide" (15 Jul) | UI removed; the column and 8 rows naming partners survived to 31 Jul. |
-| "D2 remove-AI — done" (FAC-13) | Three modules still call OpenAI. See B4. |
+| "D2 remove-AI — done" (FAC-13) | False — five services call OpenAI. Resolved by B4 (2026-08-22): AI is KEPT and disclosed, not removed. |
 | Client request fee is live | Displayed in three places, charged nowhere, until 30 Jul. |
 | Demo professionals are in the launch states | All 10 were outside them; a column default had filed every account as out-of-area. |
 | The Tools page cannot group by suite | It could — `AiToolCatalog::suites()` already existed. (My error, corrected.) |
@@ -148,7 +148,10 @@ signed off to build; left the rest.
 From `GIGRESOURCE_RULES_MASTER.docx` (36 rules). These are settled; changing one
 is a decision, not a preference.
 
-- **R29** — No AI anywhere, client-, professional- or influencer-facing. Every "smart", "recommended" or "matched" feature must be fixed, documented, rules-based logic.
+- **R29** — ~~No AI anywhere.~~ **Retired 2026-08-22 (B4).** Never true on the ground: the AI tools always called OpenAI, and the owner has since directed *more* AI, not less. What actually held, and still holds, is two narrower rules that were both filed under R29 and must not be lost with it:
+  - **R29a — a person decides disputes.** No automated ruling, no AI verdict; the dispute engine ranks and guides, a human decides. Enforced in `DecisionGuide`, `DisputeStates`, `RepeatOffenderHistory`. **This survives.**
+  - **R29b — no invented authority.** A tool's output is a suggestion the user can change, never a locked or "official" figure, whether it came from a calculator or an AI-assisted tool. **This survives.**
+  - The dead part was the marketing claim that the product is AI-free / "all rules-based." The disclaimer already discloses "AI-assisted"; that is now the canonical framing.
 - **R8** — Sealed bids. No bid amount or outcome aggregate leaks to competing professionals.
 - **R10** — Fee model. Commission is paid by the professional at payout: Starter 5% / Professional 3% / Elite 1.5%.
 - **A6** — Direct Offer: one professional per service, multiple services allowed.

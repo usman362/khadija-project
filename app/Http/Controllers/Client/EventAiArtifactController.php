@@ -66,9 +66,11 @@ class EventAiArtifactController extends Controller
      *
      * Copied data is a NORMAL field: editable and removable like anything
      * else here. The row is explicit that it is never locked or treated as
-     * authoritative, which matters more than usual given R29 — these are
-     * calculators, and a figure a calculator produced is still the client's
-     * to change.
+     * authoritative: a tool's suggestion is the client's to change, and that
+     * is true whether the figure came from a rules-based calculator or from
+     * one of the AI-assisted tools. (Earlier comments here called every tool
+     * a "calculator" — several of them, Budget Planner and Best Match among
+     * them, genuinely call OpenAI. See docs/DECISION_LOG.md B4.)
      */
     public function copy(Request $request, Event $event, EventAiArtifact $artifact): RedirectResponse
     {

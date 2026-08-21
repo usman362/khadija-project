@@ -318,8 +318,11 @@
             @endphp
             @if($aiArtifacts->isNotEmpty() || ($availableArtifacts ?? collect())->isNotEmpty())
             <div class="cl-card" style="margin-top:20px;">
-                {{-- R29 is platform-wide: no feature may claim or imply AI. The tools are
-                     rules-based calculators and templates, so the heading says that. --}}
+                {{-- Heading is "Toolkit Results" -- neutral, and accurate whether a
+                     result came from a rules-based calculator or an AI-assisted tool.
+                     (It does NOT claim the tools are AI-free: several call OpenAI.
+                     See docs/DECISION_LOG.md B4 -- R29's blanket "no AI" reading is
+                     retired.) --}}
                 <h3 style="font-size:16px;font-weight:600;margin-bottom:14px;">Toolkit Results ({{ $aiArtifacts->count() }})</h3>
                 @if($aiArtifacts->isEmpty())
                     <p style="font-size:13px;color:var(--text-muted);margin:0 0 12px;">
@@ -351,9 +354,9 @@
 
                      What comes across is a COPY and a normal field — editable
                      and removable like any other detail. The row is explicit
-                     that it is never locked or authoritative, which matters
-                     given R29: these are calculators, and a figure a
-                     calculator produced is still the client's to change. --}}
+                     that it is never locked or authoritative: a tool's
+                     suggestion is the client's to change, whether it came
+                     from a calculator or an AI-assisted tool (B4). --}}
                 @if(($availableArtifacts ?? collect())->isNotEmpty())
                     <details style="margin-top:14px;">
                         <summary style="cursor:pointer;font-size:13px;font-weight:700;color:var(--accent-orange,#f97316);">
