@@ -37,7 +37,19 @@ class ToolkitBridgeTest extends TestCase
         $this->client = User::factory()->create();
         $this->client->assignRole('client');
         $this->client->givePermissionTo('dashboard.view');
+        $this->client->givePermissionTo('agreements.view_any');
+        $this->client->givePermissionTo('events.view');
         $this->client = $this->client->fresh();
+    }
+
+    /** A professional who can reach the agreement page at all. */
+    private function professional(): User
+    {
+        $pro = User::factory()->create();
+        $pro->assignRole('professional');
+        $pro->givePermissionTo('agreements.view_any');
+
+        return $pro->fresh();
     }
 
     private function event(string $title = 'Wedding'): Event
@@ -66,7 +78,7 @@ class ToolkitBridgeTest extends TestCase
 
     private function agreement(string $status = 'draft', ?User $pro = null): Agreement
     {
-        $pro ??= User::factory()->create();
+        $pro ??= $this->professional();
 
         $booking = Booking::create([
             'event_id'    => $this->event('Booked event')->id,
@@ -344,6 +356,79 @@ class ToolkitBridgeTest extends TestCase
         $this->assertNotNull(ToolkitBridge::attach($this->client, $artifact, $event));
         $this->assertNull(ToolkitBridge::attach($this->client, $artifact, $event));
         $this->assertSame(1, ToolkitAttachment::count());
+    }
+
+    // ── Placed data has to be visible where it was placed ────────
+
+    /**
+     * The point of putting a budget into a professional's agreement is that
+     * the professional reads it. Data that lands somewhere nothing renders has
+     * not gone anywhere.
+     */
+    public function test_the_professional_sees_what_the_client_attached_to_their_agreement(): void
+    {
+        $pro       = $this->professional();
+        $agreement = $this->agreement('draft', $pro);
+
+        ToolkitBridge::attach($this->client, $this->artifact(), $agreement);
+
+        $this->actingAs($pro)
+            ->get(route('app.agreements.show', $agreement))
+            ->assertOk()
+            ->assertSee('Wedding budget')
+            ->assertSee('From Budget Planner', false);
+    }
+
+    /** And it is not dressed up as something they signed. */
+    public function test_attached_data_is_marked_as_not_part_of_the_agreement(): void
+    {
+        $agreement = $this->agreement('draft');
+        ToolkitBridge::attach($this->client, $this->artifact(), $agreement);
+
+        $this->actingAs($this->client)
+            ->get(route('app.agreements.show', $agreement))
+            ->assertOk()
+            ->assertSee('not part of the agreement text', false);
+    }
+
+    /** The professional may read it. They may not take it off. */
+    public function test_the_professional_cannot_remove_what_the_client_attached(): void
+    {
+        $pro        = $this->professional();
+        $agreement  = $this->agreement('draft', $pro);
+        $attachment = ToolkitBridge::attach($this->client, $this->artifact(), $agreement);
+
+        $this->actingAs($pro)
+            ->delete(route('client.toolkit.placed.destroy', $attachment))
+            ->assertForbidden();
+
+        $this->assertSame(1, ToolkitAttachment::count());
+
+        // And they are not offered the button either. Asserted on the form's
+        // action, not the CSS class -- the stylesheet names the class whether
+        // or not anything is wearing it.
+        $this->actingAs($pro)
+            ->get(route('app.agreements.show', $agreement))
+            ->assertOk()
+            ->assertDontSee(route('client.toolkit.placed.destroy', $attachment), false);
+
+        // The client, on the same page, is.
+        $this->actingAs($this->client)
+            ->get(route('app.agreements.show', $agreement))
+            ->assertOk()
+            ->assertSee(route('client.toolkit.placed.destroy', $attachment), false);
+    }
+
+    public function test_a_request_shows_what_was_attached_to_it(): void
+    {
+        $event = $this->event('Live request');
+        ToolkitBridge::attach($this->client, $this->artifact(), $event);
+
+        $this->actingAs($this->client)
+            ->get(route('client.events.show', $event))
+            ->assertOk()
+            ->assertSee('Attached from your toolkit', false)
+            ->assertSee('Wedding budget');
     }
 
     // ── The screen ───────────────────────────────────────────────

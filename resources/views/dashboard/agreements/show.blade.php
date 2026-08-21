@@ -272,6 +272,13 @@
         {!! $agreement->content !!}
     </div>
 
+    {{-- R30 -- planning data the client attached from their toolkit.
+         Placed AFTER the document on purpose: it is context for the work, not
+         a term either party signed, and putting it among the terms would make
+         a budget figure look binding. Both sides see it; only the client who
+         attached it can take it off. --}}
+    <x-toolkit-placed :destination="$agreement" :can-manage="$isClient" />
+
     {{-- Acceptance Status --}}
     <div class="acceptance-card">
         <h6 class="mb-3">Agreement Acceptance</h6>

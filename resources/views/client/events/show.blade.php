@@ -385,6 +385,14 @@
             </div>
             @endif
 
+            {{-- R30 -- what the toolkit bridge placed on this request.
+                 No "add" button here: this page already offers its own way in,
+                 just above, and two near-identical doors to the same room is
+                 how a screen stops being read. Removal lives here because this
+                 is where the data is shown. --}}
+            <x-toolkit-placed :destination="$event" :can-manage="true" :show-add="false"
+                              heading="Attached from your toolkit" />
+
             {{-- Proposals & Bookings --}}
             @php
                 $proposals = $event->bookings->where('status', 'requested');
