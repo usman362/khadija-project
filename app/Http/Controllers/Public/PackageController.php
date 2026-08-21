@@ -498,7 +498,7 @@ class PackageController extends Controller
         return back()->with('status', 'Saved to your favourites.');
     }
 
-    public function show(Package $package): View
+    public function show(Request $request, Package $package): View
     {
         /*
          * Only an active package is publicly visible — draft/paused/archived 404.
@@ -514,7 +514,9 @@ class PackageController extends Controller
         abort_unless($live || $owner, 404);
 
         $package->load([
-            'category:id,name,slug',
+            // parent too — the breadcrumb climbs the category path.
+            'category:id,name,slug,parent_id',
+            'category.parent:id,name,slug',
             'user' => function ($q) {
                 $q->select('id', 'name')
                   ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')
@@ -547,9 +549,52 @@ class PackageController extends Controller
             session(['recent_packages' => $recent]);
         }
 
+        $pro = $package->user;
+
+        /*
+         * The figures the page states about the professional.
+         *
+         * Every one is null when there is nothing behind it — a new
+         * professional gets no "0 bookings" and no "responds in —". The page
+         * says less about them, which is the truth.
+         *
+         * Deliberately NOT two numbers for one fact: the mockup shows both
+         * "63 Bookings" and "128 Events Completed", and on this platform those
+         * are the same count read twice.
+         */
+        $bookings = $pro ? Booking::where('supplier_id', $pro->id)
+            ->where('status', 'completed')->count() : 0;
+
+        $date = trim((string) $request->query('date', ''));
+        try {
+            $date = $date !== '' && Carbon::parse($date)->startOfDay()->gte(now()->startOfDay())
+                ? Carbon::parse($date)->toDateString()
+                : '';
+        } catch (\Throwable) {
+            $date = '';
+        }
+
         return view('public.package-show', compact('package', 'more') + [
             // Drives the preview banner. False for every actual client.
-            'preview' => ! $live,
+            'preview'  => ! $live,
+            'bookings' => $bookings ?: null,
+            'responds' => $pro ? ResponseStats::brief(ResponseStats::for($pro)['hours']) : null,
+            // The three verifications this platform actually checks. The
+            // mockup names Identity / Business / Insurance; these are the ones
+            // with documents behind them.
+            'badges'   => $pro?->profile
+                ? collect(\App\Models\UserProfile::BADGES)
+                    ->map(fn ($label, $key) => ['label' => $label, 'verified' => $pro->profile->badgeStatus($key) === 'verified'])
+                    ->values()->all()
+                : [],
+            // "Check availability for your event" — read from the same
+            // calendar My Gigs reads, so the page cannot offer a day the
+            // professional's own diary has taken.
+            'checkDate' => $date,
+            'freeOnDate' => $date !== '' && $pro
+                ? ! in_array($date, Availability::busyDates($pro, max(1, (int) now()->startOfDay()->diffInDays(Carbon::parse($date), false) + 1)), true)
+                : null,
+            'saved' => in_array($package->id, $this->savedPackageIds($request), true),
         ]);
     }
 }
