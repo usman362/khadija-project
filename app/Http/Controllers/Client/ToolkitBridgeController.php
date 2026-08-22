@@ -62,10 +62,6 @@ class ToolkitBridgeController extends Controller
 
         return view('client.toolkit.plan', [
             'layout'       => 'layouts.client',
-            // The portal layouts title themselves from _seo_meta, not from
-            // @section('title') -- without this the browser tab reads as the
-            // marketing homepage.
-            'seoTitle'     => 'Plan with Toolkit',
             'tier'         => ToolkitBridge::tierOf($user),
             'launchOpen'   => ToolkitBridge::everythingUnlocked($user),
             'tools'        => $tools,

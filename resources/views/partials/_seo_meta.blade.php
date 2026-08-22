@@ -18,7 +18,12 @@
 @php
     $brand        = 'GigResource';
     $tagline      = 'Hire trusted event professionals. Bookings, contracts, and payouts in one place.';
-    $title        = isset($seoTitle) && $seoTitle ? $seoTitle . ' | ' . $brand : $brand . ' — ' . $tagline;
+    // A page-set title may be bare ("Toolkit Tiers") or already carry the
+    // brand ("Explore by Event Type — GigResource"). Suffix only when the
+    // brand is not already there, so neither convention double-brands.
+    $title        = isset($seoTitle) && $seoTitle
+        ? (\Illuminate\Support\Str::contains($seoTitle, $brand) ? $seoTitle : $seoTitle . ' | ' . $brand)
+        : $brand . ' — ' . $tagline;
     $description  = $seoDescription ?? 'GigResource is the marketplace for event professionals — photographers, caterers, DJs, planners and more. Get quotes, sign contracts, and pay securely.';
     $description  = trim(preg_replace('/\s+/', ' ', $description));
     $description  = mb_substr($description, 0, 160);

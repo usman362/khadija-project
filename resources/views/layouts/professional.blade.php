@@ -8,7 +8,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{ asset('gigresource-logos/gigresource-icon.png') }}">
-    @include('partials._seo_meta', ['seoNoIndex' => $seoNoIndex ?? true])
+    @include('partials._seo_meta', [
+        'seoNoIndex' => $seoNoIndex ?? true,
+        // The layout titles itself from _seo_meta, so a page's
+        // @section('title') was being ignored -- the browser tab read
+        // as the marketing homepage on every portal page. Feed the
+        // section in (a controller-set $seoTitle still wins).
+        // yieldContent hands back ALREADY-escaped html, and _seo_meta's {{ }}
+        // escapes again -- "&" became "&amp;amp;". Decode here so the single
+        // escape in _seo_meta is the only one.
+        'seoTitle' => $seoTitle ?? (html_entity_decode(trim($__env->yieldContent('title'))) ?: null),
+    ])
 
     <link rel="preconnect" href="https://fonts.googleapis.com/">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
