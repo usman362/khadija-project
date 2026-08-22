@@ -81,7 +81,10 @@ final class RequestLifecycle
         }
 
         // §1 — awarded bypasses Expired, independent of the deadline.
-        if ($event->supplier_id !== null) {
+        // supplier_id is the fast path (a request fully awarded to one pro);
+        // isFullyAwarded also catches the multi-service request whose services
+        // went to different pros, which no single supplier_id can name (A10).
+        if ($event->supplier_id !== null || $event->isFullyAwarded()) {
             return self::AWARDED;
         }
 

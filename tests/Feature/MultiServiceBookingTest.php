@@ -198,12 +198,12 @@ class MultiServiceBookingTest extends TestCase
     }
 
     /**
-     * Two pros, two services. Fully awarded, but no single supplier_id can name
-     * both -- it stays null, and the request is closed by its bookings, not by a
-     * stamped supplier. (The board still showing such an event is the logged
-     * A10 remainder; the acute one-award-hides-the-rest bug is fixed.)
+     * Two pros, two services. No single supplier_id can name both, so it stays
+     * null -- but the request is fully awarded and must read as closed by its
+     * bookings, not by a stamped supplier. This is the different-pros remainder,
+     * now closed: off the board (openForBids) and AWARDED.
      */
-    public function test_two_pros_splitting_the_services_is_not_stamped_to_one(): void
+    public function test_two_pros_splitting_the_services_closes_the_request(): void
     {
         $event = $this->requesting($this->event(), $photo = $this->service('Photography'), $cater = $this->service('Catering'));
 
@@ -221,6 +221,36 @@ class MultiServiceBookingTest extends TestCase
         $event->refresh();
         $this->assertTrue($event->isFullyAwarded());
         $this->assertNull($event->supplier_id, 'Two winners cannot be named by one column.');
+
+        // Closed despite the null supplier_id -- the service-aware tests agree.
+        $this->assertSame(RequestLifecycle::AWARDED, RequestLifecycle::statusFor($event));
+        $this->assertFalse(
+            \App\Models\Event::openForBids()->whereKey($event->id)->exists(),
+            'A fully-awarded request must leave the board even with no supplier_id.'
+        );
+    }
+
+    // ── The board query itself is service-aware (A10) ────────────
+
+    public function test_the_board_keeps_a_half_awarded_request_and_drops_a_full_one(): void
+    {
+        $partial = $this->requesting($this->event(), $p1 = $this->service('Photography'), $this->service('Catering'));
+        $this->actingAs($this->client)->post(route('client.proposals.accept', $this->bid($partial, $p1, 2400)));
+
+        $full = $this->requesting($this->event(), $f1 = $this->service('DJ'));
+        $this->actingAs($this->client)->post(route('client.proposals.accept', $this->bid($full, $f1, 800)));
+
+        $onBoard = \App\Models\Event::openForBids()->pluck('id')->all();
+
+        $this->assertContains($partial->id, $onBoard, 'A service is still open — the request stays on the board.');
+        $this->assertNotContains($full->id, $onBoard, 'Every service is taken — the request leaves the board.');
+    }
+
+    public function test_a_brand_new_request_with_no_awards_is_on_the_board(): void
+    {
+        $fresh = $this->requesting($this->event(), $this->service('Photography'));
+
+        $this->assertTrue(\App\Models\Event::openForBids()->whereKey($fresh->id)->exists());
     }
 
     /** A plain single-service award still stamps and closes, exactly as before. */

@@ -299,6 +299,43 @@ class Event extends Model
     }
 
     /**
+     * Events still open to bids (A10) — service-aware, not supplier-aware.
+     *
+     * An event is biddable while a service it asked for has no confirmed
+     * booking. This replaces the old "supplier_id IS NULL" test, which could
+     * not tell a half-awarded request (still open) from one fully awarded to
+     * two different pros (closed, but nameable by no single supplier_id).
+     */
+    public function scopeOpenForBids($query)
+    {
+        return $query->where('is_published', true)->where(function ($e) {
+            // A requested service with no confirmed/completed booking of its own.
+            $e->whereExists(function ($sub) {
+                $sub->selectRaw('1')->from('category_event as ce')
+                    ->whereColumn('ce.event_id', 'events.id')
+                    ->whereNotExists(function ($b) {
+                        $b->selectRaw('1')->from('bookings')
+                          ->whereColumn('bookings.event_id', 'events.id')
+                          ->whereColumn('bookings.category_id', 'ce.category_id')
+                          ->whereIn('bookings.status', ['confirmed', 'completed']);
+                    });
+            })
+            // Or a whole-event request (no named service) with nothing confirmed.
+            ->orWhere(function ($whole) {
+                $whole->whereNotExists(function ($c) {
+                        $c->selectRaw('1')->from('category_event as ce2')
+                          ->whereColumn('ce2.event_id', 'events.id');
+                    })
+                    ->whereNotExists(function ($b) {
+                        $b->selectRaw('1')->from('bookings')
+                          ->whereColumn('bookings.event_id', 'events.id')
+                          ->whereIn('bookings.status', ['confirmed', 'completed']);
+                    });
+            });
+        });
+    }
+
+    /**
      * The services this request asked for. Empty for a whole-event (SSR)
      * request that named no specific service.
      */

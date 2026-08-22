@@ -62,12 +62,11 @@ class ProfessionalBiddingBoardController extends Controller
         $base = Event::query()
             ->whereNotIn('status', ['completed', 'cancelled'])
             ->where(function ($outer) use ($user) {
-                // A broadcast gig leaves the board once it is awarded. Only
-                // `completed` and `cancelled` were excluded before, so an event
-                // that already had a supplier — awarded to someone else — sat
-                // there taking bids nobody could win.
-                $outer->where(fn ($q1) => $q1->where('is_published', true)
-                                              ->whereNull('supplier_id'))
+                // A broadcast gig stays on the board while any service it
+                // asked for is still open (A10) — not until a single supplier_id
+                // is stamped, which a multi-service request awarded to two pros
+                // never gets. openForBids is that service-aware test.
+                $outer->where(fn ($q1) => $q1->openForBids())
                       ->orWhere(fn ($q2) => $q2->where('source', 'direct_offer')
                                                 ->where('supplier_id', $user?->id));
             })
@@ -284,8 +283,7 @@ class ProfessionalBiddingBoardController extends Controller
         $query = Event::query()
             ->whereNotIn('status', ['completed', 'cancelled'])
             ->where(function ($outer) use ($user) {
-                $outer->where(fn ($q1) => $q1->where('is_published', true)
-                                              ->whereNull('supplier_id'))
+                $outer->where(fn ($q1) => $q1->openForBids())
                       ->orWhere(fn ($q2) => $q2->where('source', 'direct_offer')
                                                 ->where('supplier_id', $user?->id));
             })
