@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Event;
 use App\Models\Finalization;
 use App\Models\User;
+use App\Domain\Requests\RequestLifecycle;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -59,6 +60,15 @@ class MultiServiceBookingTest extends TestCase
     private function service(string $name): Category
     {
         return Category::create(['name' => $name, 'slug' => \Illuminate\Support\Str::slug($name), 'is_active' => true]);
+    }
+
+    /** Post a multi-service request: it asks for these services. */
+    private function requesting(Event $e, Category ...$services): Event
+    {
+        $e->categories()->sync(collect($services)->pluck('id')->all());
+        $e->update(['is_published' => true, 'status' => 'published']);
+
+        return $e->fresh();
     }
 
     private function bid(Event $e, Category $svc, float $amount): Bid
@@ -149,5 +159,79 @@ class MultiServiceBookingTest extends TestCase
         $rows = Booking::where('event_id', $event->id)->where('supplier_id', $this->pro->id)->get();
         $this->assertCount(1, $rows);
         $this->assertNull($rows->first()->category_id);
+    }
+
+    // ── Awarding one service must not close the request (B6/A10) ──
+
+    /**
+     * The bug B6 exposed: with per-service awards, stamping the event's single
+     * supplier_id on the FIRST award hid every still-open service. A two-service
+     * request with one service awarded must stay open for the other.
+     */
+    public function test_awarding_one_of_two_services_keeps_the_request_open(): void
+    {
+        $event = $this->requesting($this->event(), $photo = $this->service('Photography'), $cater = $this->service('Catering'));
+        $photoBid = $this->bid($event, $photo, 2400);
+        $this->bid($event, $cater, 900);
+
+        $this->actingAs($this->client)->post(route('client.proposals.accept', $photoBid))->assertRedirect();
+
+        $event->refresh();
+        $this->assertNull($event->supplier_id, 'A half-awarded request must not be stamped to one pro.');
+        $this->assertFalse($event->isFullyAwarded());
+        $this->assertSame(RequestLifecycle::OPEN, RequestLifecycle::statusFor($event),
+            'The catering service is still open for bids.');
+    }
+
+    /** When the last service is taken by the same pro, the request is awarded. */
+    public function test_awarding_both_services_to_one_pro_closes_the_request(): void
+    {
+        $event = $this->requesting($this->event(), $photo = $this->service('Photography'), $cater = $this->service('Catering'));
+
+        $this->actingAs($this->client)->post(route('client.proposals.accept', $this->bid($event, $photo, 2400)));
+        $this->actingAs($this->client)->post(route('client.proposals.accept', $this->bid($event, $cater, 900)));
+
+        $event->refresh();
+        $this->assertTrue($event->isFullyAwarded());
+        $this->assertSame($this->pro->id, $event->supplier_id, 'One pro won everything, so the event names them.');
+        $this->assertSame(RequestLifecycle::AWARDED, RequestLifecycle::statusFor($event));
+    }
+
+    /**
+     * Two pros, two services. Fully awarded, but no single supplier_id can name
+     * both -- it stays null, and the request is closed by its bookings, not by a
+     * stamped supplier. (The board still showing such an event is the logged
+     * A10 remainder; the acute one-award-hides-the-rest bug is fixed.)
+     */
+    public function test_two_pros_splitting_the_services_is_not_stamped_to_one(): void
+    {
+        $event = $this->requesting($this->event(), $photo = $this->service('Photography'), $cater = $this->service('Catering'));
+
+        $other = User::factory()->create();
+        $other->assignRole('professional');
+
+        $catererBid = Bid::create([
+            'event_id' => $event->id, 'supplier_id' => $other->id,
+            'category_id' => $cater->id, 'amount' => 900, 'status' => 'submitted',
+        ]);
+
+        $this->actingAs($this->client)->post(route('client.proposals.accept', $this->bid($event, $photo, 2400)));
+        $this->actingAs($this->client)->post(route('client.proposals.accept', $catererBid));
+
+        $event->refresh();
+        $this->assertTrue($event->isFullyAwarded());
+        $this->assertNull($event->supplier_id, 'Two winners cannot be named by one column.');
+    }
+
+    /** A plain single-service award still stamps and closes, exactly as before. */
+    public function test_a_single_service_award_still_closes_the_request(): void
+    {
+        $event = $this->requesting($this->event(), $photo = $this->service('Photography'));
+
+        $this->actingAs($this->client)->post(route('client.proposals.accept', $this->bid($event, $photo, 2400)));
+
+        $event->refresh();
+        $this->assertSame($this->pro->id, $event->supplier_id);
+        $this->assertSame(RequestLifecycle::AWARDED, RequestLifecycle::statusFor($event));
     }
 }

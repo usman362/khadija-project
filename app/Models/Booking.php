@@ -79,15 +79,34 @@ class Booking extends Model
 
             $event = $booking->event;
 
-            // Never overwrite an event already awarded to someone else — that
-            // would be a second professional silently taking the first one's
-            // job. Two confirmed bookings on one event is its own problem
-            // (R12, one contract per service); it is not this method's to fix.
             if ($event === null || $event->supplier_id !== null) {
                 return;
             }
 
-            $event->forceFill(['supplier_id' => $booking->supplier_id])->saveQuietly();
+            // Stamp the event only once it is FULLY awarded (B6/A10). A
+            // multi-service request keeps every service on the board until the
+            // last one is taken -- stamping on the first award is exactly what
+            // used to hide a still-open service, now that awards are per
+            // service. A whole-event request is full on its first award, so
+            // single-service behaviour is unchanged.
+            if (! $event->isFullyAwarded()) {
+                return;
+            }
+
+            // supplier_id is one column and cannot name two winners. When
+            // different professionals took different services, it stays null --
+            // the event is off the board because it is fully awarded, tracked
+            // by its bookings, not by a single supplier. It is stamped only in
+            // the common case where every service went to the same pro, which
+            // is what My Gigs still counts by.
+            $suppliers = $event->bookings()
+                ->whereIn('status', ['confirmed', 'completed'])
+                ->distinct()
+                ->pluck('supplier_id');
+
+            if ($suppliers->count() === 1) {
+                $event->forceFill(['supplier_id' => $suppliers->first()])->saveQuietly();
+            }
         });
     }
 

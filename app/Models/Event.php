@@ -298,6 +298,48 @@ class Event extends Model
         return $this->hasMany(Bid::class);
     }
 
+    /**
+     * The services this request asked for. Empty for a whole-event (SSR)
+     * request that named no specific service.
+     */
+    public function requestedCategoryIds(): array
+    {
+        return $this->categories->pluck('id')->all()
+            ?: $this->categories()->pluck('categories.id')->all();
+    }
+
+    /** The services already awarded — a confirmed or completed booking names them. */
+    public function awardedCategoryIds(): array
+    {
+        return $this->bookings()
+            ->whereIn('status', ['confirmed', 'completed'])
+            ->whereNotNull('category_id')
+            ->distinct()
+            ->pluck('category_id')
+            ->all();
+    }
+
+    /**
+     * Is every service on this request now awarded? (B6/A10)
+     *
+     * A whole-event request with no named service is fully awarded the moment
+     * it has any confirmed booking. A multi-service request is fully awarded
+     * only when each service it asked for has one -- which is what keeps a
+     * half-awarded request on the bidding board for the services still open.
+     */
+    public function isFullyAwarded(): bool
+    {
+        $requested = $this->requestedCategoryIds();
+
+        if (empty($requested)) {
+            return $this->bookings()
+                ->whereIn('status', ['confirmed', 'completed'])
+                ->exists();
+        }
+
+        return empty(array_diff($requested, $this->awardedCategoryIds()));
+    }
+
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);
