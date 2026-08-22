@@ -382,8 +382,20 @@ class ClientEventController extends Controller
          * events, offered for pulling into this one. Their own only: somebody
          * else's budget is not a library to browse.
          */
+        // Already attached to THIS event, so it is not offered again. Pulling
+        // a result in now records a placement in toolkit_attachments (R30), not
+        // a second library row, so "already here" is checked against the source
+        // artifact of those placements.
+        $attachedSourceIds = \App\Models\ToolkitAttachment::query()
+            ->where('attachable_type', $event::class)
+            ->where('attachable_id', $event->id)
+            ->pluck('source_artifact_id')
+            ->filter()
+            ->all();
+
         $availableArtifacts = \App\Models\EventAiArtifact::where('user_id', $request->user()->id)
             ->where('event_id', '!=', $event->id)
+            ->whereNotIn('id', $attachedSourceIds)
             ->latest('id')
             ->get()
             ->unique(fn ($a) => $a->tool_key . '|' . $a->title)

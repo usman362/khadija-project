@@ -56,21 +56,18 @@ class EventAiArtifactController extends Controller
     /**
      * Checklist row 194 — pull an existing result into this request.
      *
-     * The bridge only ever ran one way: a tool pushed its result onto an
-     * event. A client looking at an open request had no way to reach for
-     * something they had already worked out — they had to go back to the
-     * tool and run it again.
+     * There were two ways to do this and they wrote to two different tables:
+     * this method duplicated a row into event_ai_artifacts, while the R30
+     * bridge (ToolkitBridge) records a placement in toolkit_attachments. Two
+     * tables holding the same idea is one to forget when the rules change, so
+     * placement now has a single home -- toolkit_attachments -- and this method
+     * feeds it rather than making a second library row.
      *
-     * A copy, not a move. The same budget can inform two requests, and taking
-     * it off the first one to answer the second is not what anybody meant.
-     *
-     * Copied data is a NORMAL field: editable and removable like anything
-     * else here. The row is explicit that it is never locked or treated as
-     * authoritative: a tool's suggestion is the client's to change, and that
-     * is true whether the figure came from a rules-based calculator or from
-     * one of the AI-assisted tools. (Earlier comments here called every tool
-     * a "calculator" — several of them, Budget Planner and Best Match among
-     * them, genuinely call OpenAI. See docs/DECISION_LOG.md B4.)
+     * That also draws the line the two event-page sections needed: "Toolkit
+     * Results" is what was SAVED on this event (born here, in
+     * event_ai_artifacts); "Attached from your toolkit" is what was PULLED IN
+     * from elsewhere (toolkit_attachments). A pull is a copy -- the original
+     * stays on its own event -- and removing the placement never touches it.
      */
     public function copy(Request $request, Event $event, EventAiArtifact $artifact): RedirectResponse
     {
@@ -80,26 +77,13 @@ class EventAiArtifactController extends Controller
         // library to browse.
         abort_unless($artifact->user_id === $request->user()->id, 403);
 
-        $already = EventAiArtifact::where('event_id', $event->id)
-            ->where('tool_key', $artifact->tool_key)
-            ->where('title', $artifact->title)
-            ->exists();
+        $placed = \App\Domain\Toolkit\ToolkitBridge::attach($request->user(), $artifact, $event);
 
-        if ($already) {
-            return back()->with('status', 'That result is already on this request.');
+        if (! $placed) {
+            return back()->with('status', 'That result is already attached to this request.');
         }
 
-        EventAiArtifact::create([
-            'event_id'  => $event->id,
-            'user_id'   => $request->user()->id,
-            'tool_key'  => $artifact->tool_key,
-            'tool_name' => $artifact->tool_name,
-            'title'     => $artifact->title,
-            'payload'   => $artifact->payload,
-            'mode'      => 'manual',      // pulled in by hand, never auto
-        ]);
-
-        return back()->with('status', 'Added to this request. You can edit or remove it like any other detail.');
+        return back()->with('status', 'Attached to this request. You can remove it here anytime — your saved result stays put.');
     }
 
     public function destroy(Request $request, EventAiArtifact $artifact): RedirectResponse

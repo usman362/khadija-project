@@ -380,8 +380,8 @@
                             @endforeach
                         </div>
                         <p style="font-size:11.5px;color:var(--text-muted);margin:10px 0 0;">
-                            Adding a result copies it here — your original stays on the other event, and this
-                            copy is yours to edit or remove.
+                            Attaching shows it under “Attached from your toolkit” below — your original stays on
+                            the other event, and removing the attachment never touches it.
                         </p>
                     </details>
                 @endif

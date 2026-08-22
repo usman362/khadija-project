@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Event;
 use App\Models\EventAiArtifact;
+use App\Models\ToolkitAttachment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -15,6 +16,11 @@ use Tests\TestCase;
  * event. A client looking at an open request had no way to reach for
  * something they had already worked out, and had to go back and run the tool
  * again. This is the pull.
+ *
+ * The pull records a PLACEMENT in toolkit_attachments (R30), not a second
+ * library row in event_ai_artifacts -- placement has one home now. These
+ * assert that: the source stays single, the placement is what gets removed,
+ * and the source survives the removal.
  */
 class AddToolDataToRequestTest extends TestCase
 {
@@ -79,7 +85,7 @@ class AddToolDataToRequestTest extends TestCase
     }
 
     /** A copy, not a move — the same budget can inform two requests. */
-    public function test_adding_a_result_copies_it_and_leaves_the_original(): void
+    public function test_adding_a_result_places_it_without_duplicating_the_library(): void
     {
         $other    = $this->event(title: 'Last year');
         $artifact = $this->artifact($other);
@@ -89,9 +95,17 @@ class AddToolDataToRequestTest extends TestCase
             ->post(route('client.ai-artifacts.copy', [$current, $artifact]))
             ->assertRedirect();
 
-        $this->assertDatabaseCount('event_ai_artifacts', 2);
+        // The library is untouched -- still one row, still on its own event.
+        $this->assertDatabaseCount('event_ai_artifacts', 1);
         $this->assertDatabaseHas('event_ai_artifacts', ['event_id' => $other->id, 'id' => $artifact->id]);
-        $this->assertDatabaseHas('event_ai_artifacts', ['event_id' => $current->id, 'title' => 'Wedding budget split']);
+
+        // A placement now points this event at that source.
+        $this->assertDatabaseHas('toolkit_attachments', [
+            'attachable_type'    => Event::class,
+            'attachable_id'      => $current->id,
+            'source_artifact_id' => $artifact->id,
+            'title'              => 'Wedding budget split',
+        ]);
     }
 
     /**
@@ -99,7 +113,7 @@ class AddToolDataToRequestTest extends TestCase
      * is explicit that data added this way is a normal editable field, never
      * locked or authoritative.
      */
-    public function test_a_pulled_result_is_a_normal_editable_field(): void
+    public function test_removing_a_pulled_result_leaves_the_original(): void
     {
         $other    = $this->event(title: 'Last year');
         $artifact = $this->artifact($other);
@@ -107,16 +121,17 @@ class AddToolDataToRequestTest extends TestCase
 
         $this->actingAs($this->client)->post(route('client.ai-artifacts.copy', [$current, $artifact]));
 
-        $copy = EventAiArtifact::where('event_id', $current->id)->firstOrFail();
+        $placement = ToolkitAttachment::where('attachable_id', $current->id)
+            ->where('source_artifact_id', $artifact->id)->firstOrFail();
 
-        $this->assertSame('manual', $copy->mode);
-
-        // And removable like anything else on the request.
+        // Removing the placement is the request-side action, and it never
+        // reaches back to the saved result it came from.
         $this->actingAs($this->client)
-            ->delete(route('client.ai-artifacts.destroy', $copy))
+            ->delete(route('client.toolkit.placed.destroy', $placement))
             ->assertRedirect();
 
-        $this->assertDatabaseMissing('event_ai_artifacts', ['id' => $copy->id]);
+        $this->assertDatabaseMissing('toolkit_attachments', ['id' => $placement->id]);
+        $this->assertDatabaseHas('event_ai_artifacts', ['id' => $artifact->id]);
     }
 
     public function test_the_same_result_is_not_added_twice(): void
@@ -128,7 +143,8 @@ class AddToolDataToRequestTest extends TestCase
         $this->actingAs($this->client)->post(route('client.ai-artifacts.copy', [$current, $artifact]));
         $this->actingAs($this->client)->post(route('client.ai-artifacts.copy', [$current, $artifact]));
 
-        $this->assertSame(1, EventAiArtifact::where('event_id', $current->id)->count());
+        $this->assertSame(1, ToolkitAttachment::where('attachable_id', $current->id)
+            ->where('source_artifact_id', $artifact->id)->count());
     }
 
     /** Somebody else's budget is not a library to browse. */
