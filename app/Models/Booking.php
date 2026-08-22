@@ -14,6 +14,7 @@ class Booking extends Model
 
     protected $fillable = [
         'event_id',
+        'category_id',
         'client_id',
         'supplier_id',
         'created_by',
@@ -140,6 +141,15 @@ class Booking extends Model
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
+    }
+
+    /**
+     * The service this award is for (B6). Null on a whole-event (SSR) award,
+     * which has no single service -- the same convention the bid uses.
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Category::class);
     }
 
     public function client(): BelongsTo

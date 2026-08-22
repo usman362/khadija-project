@@ -181,9 +181,12 @@ class ClientProposalController extends Controller
         $this->authorizeOwner($request, $bid);
         $bid->update(['status' => 'won']);
 
-        // Turn the award into a real booking/contract (idempotent per pro+event).
+        // Turn the award into a real booking/contract. Keyed on the SERVICE
+        // too (B6): a pro who wins two services on one event gets two bookings,
+        // not one that silently swallows the second. category_id is null for a
+        // whole-event (SSR) bid, and firstOrCreate matches that null.
         Booking::firstOrCreate(
-            ['event_id' => $bid->event_id, 'supplier_id' => $bid->supplier_id],
+            ['event_id' => $bid->event_id, 'supplier_id' => $bid->supplier_id, 'category_id' => $bid->category_id],
             [
                 'client_id'  => $bid->event->client_id,
                 'created_by' => $request->user()->id,

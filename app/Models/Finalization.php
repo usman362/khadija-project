@@ -34,6 +34,7 @@ class Finalization extends Model
 
     public function event(): BelongsTo    { return $this->belongsTo(Event::class); }
     public function bid(): BelongsTo      { return $this->belongsTo(Bid::class); }
+    public function category(): BelongsTo { return $this->belongsTo(\App\Models\Category::class); }
     public function client(): BelongsTo   { return $this->belongsTo(User::class, 'client_id'); }
     public function supplier(): BelongsTo { return $this->belongsTo(User::class, 'supplier_id'); }
     public function booking(): BelongsTo  { return $this->belongsTo(Booking::class); }
