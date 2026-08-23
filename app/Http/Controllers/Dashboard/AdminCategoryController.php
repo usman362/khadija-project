@@ -103,7 +103,10 @@ class AdminCategoryController extends Controller
 
         $data = [
             'name' => $validated['name'],
-            'slug' => Str::slug($validated['name']) . '-' . Str::random(4),
+            // Readable and unique, with a counted suffix only on a real
+            // collision. It used to be name . Str::random(4) every time, which
+            // made "Bridal Shower" live at /category/bridal-shower-9mKC.
+            'slug' => Category::makeSlug($validated['name']),
             'short_description' => $validated['short_description'] ?? null,
             'long_description' => $validated['long_description'] ?? null,
             'icon' => $validated['icon'] ?? null,
@@ -155,7 +158,10 @@ class AdminCategoryController extends Controller
 
         $data = [
             'name' => $validated['name'],
-            'slug' => Str::slug($validated['name']) . '-' . Str::random(4),
+            // The slug is NOT rebuilt here. Editing a description must not
+            // change a live URL -- that is what broke every /category/{slug}
+            // link on the site, one admin save at a time. A category keeps the
+            // address it was published at.
             'short_description' => $validated['short_description'] ?? null,
             'long_description' => $validated['long_description'] ?? null,
             'icon' => $validated['icon'] ?? null,

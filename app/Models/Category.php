@@ -61,6 +61,37 @@ class Category extends Model
      * Use Category::anyTaxonomy() to deliberately see across both — the import
      * and switch commands do, nothing else should.
      */
+    /**
+     * A URL-safe slug for a category name, unique within its taxonomy version.
+     *
+     * Deliberately NOT random. The admin screen used to build every slug as
+     * "name-" . Str::random(4) -- on create AND on update -- so a category's
+     * public URL was gibberish from birth and changed again every time anyone
+     * edited it. That silently broke /category/{slug} for every link, bookmark
+     * and search result pointing at it.
+     *
+     * A suffix is added only on a real collision, and then it counts (-2, -3)
+     * so the URL still reads as the thing it names.
+     */
+    public static function makeSlug(string $name, ?int $ignoreId = null, ?string $version = null): string
+    {
+        $version = $version ?: config('taxonomy.version', 'v1');
+        $base    = \Illuminate\Support\Str::slug($name) ?: 'category';
+        $slug    = $base;
+        $n       = 1;
+
+        while (static::withoutGlobalScopes()
+            ->where('taxonomy_version', $version)
+            ->where('slug', $slug)
+            ->when($ignoreId, fn ($q) => $q->whereKeyNot($ignoreId))
+            ->exists()
+        ) {
+            $slug = $base . '-' . (++$n);
+        }
+
+        return $slug;
+    }
+
     protected static function booted(): void
     {
         static::addGlobalScope('taxonomy', function ($query) {
