@@ -107,7 +107,7 @@ class ClientBsrController extends Controller
             'otherEventType'  => self::OTHER_EVENT_TYPE,
             'orgTypes'        => self::ORG_TYPES,
             'draftId'         => $data['draft_id'] ?? null,
-            'defaultWindowDays' => config('bsr.default_proposal_window_days'),
+            'defaultWindowHours' => config('bsr.default_proposal_window_hours'),
         ]);
     }
 
@@ -545,7 +545,7 @@ class ClientBsrController extends Controller
                 // The hard ceiling also applies: a deadline can never fall
                 // after the event itself. Enforced here and in persist().
                 'proposal_deadline' => [
-                    config('bsr.default_proposal_window_days') ? 'nullable' : 'required',
+                    config('bsr.default_proposal_window_hours') ? 'nullable' : 'required',
                     'date', 'after:now',
                 ],
                 'sealed_proposals'  => ['nullable', 'boolean'],
@@ -614,9 +614,9 @@ class ClientBsrController extends Controller
         // R37: no invented fallbacks. A window is used only if one has actually
         // been approved; otherwise the deadline came from the client, and if
         // neither exists the request cannot be published safely.
-        $approvedWindow = config('bsr.default_proposal_window_days');
+        $approvedWindow = config('bsr.default_proposal_window_hours');
         if (! $deadline && $approvedWindow) {
-            $deadline = now()->addDays((int) $approvedWindow);
+            $deadline = now()->addHours((int) $approvedWindow);
         }
 
         if (! $deadline && $publish) {

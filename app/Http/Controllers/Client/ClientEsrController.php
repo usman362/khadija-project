@@ -170,6 +170,10 @@ class ClientEsrController extends Controller
             'client_id'    => $user->id,
             'source'       => 'esr',   // marks it urgent on the Bidding Board
             'proposal_deadline' => $deadline,
+            // Owner 2026-08-22: emergency bids show in real time as they land,
+            // never held to the close. Sealed bids are a standard-request
+            // feature; an emergency cannot afford to wait for the window.
+            'sealed_proposals'  => false,
         ]);
 
         $event->categories()->sync($services->all());

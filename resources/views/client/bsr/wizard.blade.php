@@ -312,11 +312,11 @@
         <div class="bw-field">
             {{-- R37: no window value may be prefilled until GigResource approves
                  one, so with none configured the client sets the deadline. --}}
-            <label>Proposal deadline @unless($defaultWindowDays)<span class="req">*</span>@endunless</label>
+            <label>Proposal deadline @unless($defaultWindowHours)<span class="req">*</span>@endunless</label>
             <input type="datetime-local" name="proposal_deadline" value="{{ $data['proposal_deadline'] ?? '' }}">
             <p class="bw-help">
-                @if($defaultWindowDays)
-                    Leave blank to use the standard {{ $defaultWindowDays }}-day window.
+                @if($defaultWindowHours)
+                    Leave blank to use the standard {{ $defaultWindowHours }}-hour window.
                 @else
                     Choose when proposals close. No standard window has been approved yet, so this can't be set for you.
                 @endif
@@ -374,7 +374,7 @@
                 ${{ number_format((float) ($data['budget_min'] ?? 0)) }} – ${{ number_format((float) ($data['budget_max'] ?? 0)) }}
             @else Not stated @endif
         </b></div>
-        <div class="bw-rev"><span>Proposal deadline</span><b>{{ ! empty($data['proposal_deadline']) ? \Illuminate\Support\Carbon::parse($data['proposal_deadline'])->format('M j, Y · g:i A') : ($defaultWindowDays ? 'Standard ' . $defaultWindowDays . '-day window' : 'Not set') }}</b></div>
+        <div class="bw-rev"><span>Proposal deadline</span><b>{{ ! empty($data['proposal_deadline']) ? \Illuminate\Support\Carbon::parse($data['proposal_deadline'])->format('M j, Y · g:i A') : ($defaultWindowHours ? 'Standard ' . $defaultWindowHours . '-hour window' : 'Not set') }}</b></div>
         <div class="bw-rev"><span>Proposals</span><b>{{ ($data['sealed_proposals'] ?? true) ? 'Sealed' : 'Open' }} · questions {{ ($data['questions_enabled'] ?? true) ? 'allowed' : 'off' }}</b></div>
 
         @if(! empty($data['description']))
