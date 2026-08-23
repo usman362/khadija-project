@@ -14,9 +14,10 @@
         // @section('title') was being ignored -- the browser tab read
         // as the marketing homepage on every portal page. Feed the
         // section in (a controller-set $seoTitle still wins).
-        // yieldContent hands back ALREADY-escaped html, and _seo_meta's {{ }}
-        // escapes again -- "&" became "&amp;amp;". Decode here so the single
-        // escape in _seo_meta is the only one.
+        // yieldContent returns ALREADY-escaped html, and _seo_meta escapes it
+        // again on output -- an ampersand became a double-escaped entity.
+        // Decode here so the escape in _seo_meta is the only one. (Do not write
+        // Blade echo braces in this comment: Blade parses comments too.)
         'seoTitle' => $seoTitle ?? (html_entity_decode(trim($__env->yieldContent('title'))) ?: null),
     ])
 
