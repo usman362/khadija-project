@@ -161,6 +161,37 @@ class MultiServiceBookingTest extends TestCase
         $this->assertNull($rows->first()->category_id);
     }
 
+    /**
+     * Peter's recheck (2026-08-23): does this hold for MORE than two services,
+     * or was it only ever fixed for a pair? Nothing in the key is limited to
+     * two -- (event, supplier, category) is unique per service -- but a claim
+     * about "any number" deserves a test that actually books any number.
+     */
+    public function test_one_pro_awarded_five_services_gets_five_bookings(): void
+    {
+        $event = $this->event();
+
+        $prices = [
+            'Photography' => 2400, 'Catering' => 900, 'DJ' => 800,
+            'Floral' => 650, 'Security' => 1200,
+        ];
+
+        foreach ($prices as $name => $amount) {
+            $bid = $this->bid($event, $this->service($name), $amount);
+            $this->actingAs($this->client)->post(route('client.proposals.accept', $bid))->assertRedirect();
+        }
+
+        $bookings = Booking::where('event_id', $event->id)->where('supplier_id', $this->pro->id)->get();
+
+        $this->assertCount(5, $bookings, 'Every awarded service is its own booking, however many there are.');
+        $this->assertEqualsCanonicalizing(
+            array_map('floatval', array_values($prices)),
+            $bookings->pluck('price')->map(fn ($p) => (float) $p)->all(),
+            'Each service keeps its own price -- none overwrites another.'
+        );
+        $this->assertSame(5, $bookings->pluck('category_id')->unique()->count());
+    }
+
     // ── Awarding one service must not close the request (B6/A10) ──
 
     /**
