@@ -775,7 +775,13 @@ Route::middleware('auth')->group(function () {
         // Finance — Payments ledger + Earnings (project financial dashboard).
         Route::get('/payments', [\App\Http\Controllers\Client\ClientFinanceController::class, 'payments'])
             ->name('client.payments.index');
-        Route::get('/earnings', [\App\Http\Controllers\Client\ClientFinanceController::class, 'earnings'])
+        Route::get('/spending', [\App\Http\Controllers\Client\ClientFinanceController::class, 'spending'])
+            ->name('client.spending.index');
+
+        // The sidebar has said "Spending" all along; only the URL said
+        // "earnings", which is the professional's word — a client spends.
+        // The old address still resolves so nobody's bookmark breaks.
+        Route::get('/earnings', fn () => redirect()->route('client.spending.index'))
             ->name('client.earnings.index');
 
         // Virtual & Hybrid Hub (new feature scaffold).

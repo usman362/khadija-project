@@ -22,7 +22,7 @@ use Illuminate\View\View;
  *
  * Routes:
  *   GET /client/payments  → payments()
- *   GET /client/earnings  → earnings()
+ *   GET /client/spending  → spending()
  */
 class ClientFinanceController extends Controller
 {
@@ -113,7 +113,7 @@ class ClientFinanceController extends Controller
         ));
     }
 
-    public function earnings(Request $request): View
+    public function spending(Request $request): View
     {
         $user = $request->user();
         $s    = $this->spend($user->id);
@@ -170,7 +170,7 @@ class ClientFinanceController extends Controller
             ->whereIn('status', ['pending', 'published', 'confirmed'])
             ->latest('starts_at')->first();
 
-        return view('client.finance.earnings', compact(
+        return view('client.finance.spending', compact(
             'stats', 'vendors', 'pipeline', 'trend', 'activeEvent'
         ));
     }
