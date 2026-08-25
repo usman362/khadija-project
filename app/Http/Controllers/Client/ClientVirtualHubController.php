@@ -61,8 +61,68 @@ class ClientVirtualHubController extends Controller
             ->whereIn('status', ['pending', 'published', 'confirmed'])
             ->latest('starts_at')->first();
 
+        /*
+         * The event workspace from the client's Virtual & Hybrid mockup
+         * (stages 5-7): what stage this event is at, which services are hired,
+         * and what is still open.
+         *
+         * Built from bookings and bids -- the systems the mockup itself says
+         * this workflow should reuse. It replaces the panels that stood here:
+         * a Live Stream Monitor, Stream Alerts, Audience Overview and Active
+         * Integrations, reporting bitrate, dropped frames and CDN health for a
+         * streaming backend that does not exist.
+         */
+        $workspace = null;
+
+        if ($activeEvent) {
+            $activeEvent->loadMissing('categories:id,name');
+
+            $bookings = \App\Models\Booking::where('event_id', $activeEvent->id)
+                ->with(['supplier:id,name'])
+                ->get();
+
+            $waitingByService = \App\Models\Bid::where('event_id', $activeEvent->id)
+                ->whereIn('status', ['submitted', 'pending'])
+                ->get()
+                ->groupBy('category_id');
+
+            // One row per service the event asked for, in whichever of the
+            // three states it is actually in -- booked, proposals in, or still
+            // looking. No fourth state is invented.
+            $rows = $activeEvent->categories->map(function ($cat) use ($bookings, $waitingByService) {
+                $booking = $bookings->firstWhere('category_id', $cat->id);
+                $waiting = $waitingByService->get($cat->id)?->count() ?? 0;
+
+                return [
+                    'service'      => $cat->name,
+                    'professional' => $booking?->supplier?->name,
+                    'state'        => $booking && in_array($booking->status, ['confirmed', 'completed'], true)
+                        ? 'booked'
+                        : ($waiting > 0 ? 'proposals' : 'searching'),
+                    'waiting'      => $waiting,
+                ];
+            })->values();
+
+            $confirmed = $bookings->whereIn('status', ['confirmed', 'completed'])->count();
+            $completed = $bookings->where('status', 'completed')->count();
+
+            $workspace = [
+                'event'    => $activeEvent,
+                'rows'     => $rows,
+                'booked'   => $confirmed,
+                'services' => $rows->count(),
+                'stage'    => match (true) {
+                    $bookings->count() > 0 && $completed === $bookings->count() => 'complete',
+                    (bool) $activeEvent->starts_at?->isPast()                   => 'event_day',
+                    $confirmed > 0                                              => 'preparation',
+                    $rows->contains(fn ($r) => $r['waiting'] > 0)               => 'hiring',
+                    default                                                     => 'planning',
+                },
+            ];
+        }
+
         return view('client.virtual-hub.index', compact(
-            'categories', 'pros', 'gigs', 'activeEvent'
+            'categories', 'pros', 'gigs', 'activeEvent', 'workspace'
         ));
     }
 

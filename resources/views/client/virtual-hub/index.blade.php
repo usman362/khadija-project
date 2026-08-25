@@ -122,27 +122,6 @@
 <div class="vh-layout">
 <div class="vh-main">
 
-    {{-- Command Center --}}
-    <div class="vh-card">
-        <div class="vh-cc-head">
-            <span class="vh-cc-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>Virtual Event Command Center</span>
-            <span class="vh-live"><span class="dot"></span>Live Overview</span>
-        </div>
-        {{-- Placeholder telemetry — needs streaming backend --}}
-        <div class="vh-cc-stats">
-            <div class="vh-cc-stat"><div class="vh-cc-stat-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Live Attendees</div><div class="vh-cc-stat-val">1,248</div><div class="vh-cc-stat-sub">↑ 12% last hr</div></div>
-            <div class="vh-cc-stat"><div class="vh-cc-stat-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Stream Health</div><div class="vh-cc-stat-val">Excellent</div><div class="vh-cc-stat-sub">1080p · 6 Mbps</div></div>
-            <div class="vh-cc-stat"><div class="vh-cc-stat-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/></svg>Active Channels</div><div class="vh-cc-stat-val">3</div><div class="vh-cc-stat-sub">Zoom · YT · Web</div></div>
-            <div class="vh-cc-stat"><div class="vh-cc-stat-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>Stream Alerts</div><div class="vh-cc-stat-val">0</div><div class="vh-cc-stat-sub">All systems normal</div></div>
-        </div>
-        <div class="vh-cc-stats-2">
-            <div class="vh-cc-stat"><div class="vh-cc-stat-head">Languages Active</div><div class="vh-cc-stat-val">3</div><div class="vh-cc-stat-sub" style="color:var(--text-muted);">EN · ES · FR</div></div>
-            <div class="vh-cc-stat"><div class="vh-cc-stat-head">Stream Delay</div><div class="vh-cc-stat-val">1.2 sec</div><div class="vh-cc-stat-sub">Low latency</div></div>
-            <div class="vh-cc-stat"><div class="vh-cc-stat-head">Engagement</div><div class="vh-cc-stat-val">87%</div><div class="vh-cc-stat-sub">Very High</div></div>
-            <div class="vh-cc-stat"><div class="vh-cc-stat-head">Gamification</div><div class="vh-cc-stat-val">72%</div><div class="vh-cc-stat-sub" style="color:var(--text-muted);">Participation</div></div>
-        </div>
-    </div>
-
     {{-- Two paths --}}
     <div class="vh-paths">
         <div class="vh-path active"><div class="vh-path-title">Path 1: Instant Discovery</div><div class="vh-path-desc">Search and connect with verified virtual professionals.</div></div>
@@ -246,45 +225,97 @@
     </div>
 </div>{{-- /.vh-main --}}
 
-{{-- Right rail --}}
-<aside class="vh-rail">
-    {{-- Live Stream Monitor --}}
-    <div class="vh-rail-card">
-        <div class="vh-rail-head"><div class="vh-rail-title">Live Stream Monitor</div><span class="vh-live"><span class="dot"></span>Live</span></div>
-        <div class="vh-monitor"><span class="live-tag">● LIVE</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
-        <div class="vh-mon-row"><span>Bitrate</span><span class="v">6.0 Mbps</span></div>
-        <div class="vh-mon-row"><span>Resolution</span><span class="v">1080p</span></div>
-        <div class="vh-mon-row"><span>Dropped Frames</span><span class="v">0.05%</span></div>
-        <div class="vh-mon-row"><span>Latency</span><span class="ok">1.2 sec</span></div>
-        <div class="vh-mon-row"><span>CDN Status</span><span class="ok">Excellent</span></div>
-    </div>
+{{-- Right rail — the event workspace from the mockup (stages 5-7).
+     What stood here was a Live Stream Monitor, Stream Alerts, an Audience
+     Overview and Active Integrations: bitrate, dropped frames, CDN health and
+     viewer counts for a streaming backend this platform does not have. Every
+     number was a placeholder. This shows the event the client actually has. --}}
+<div class="vh-rail">
+    @if($workspace)
+        @php
+            $stages = ['planning' => 'Planning', 'hiring' => 'Hiring', 'preparation' => 'Preparation', 'event_day' => 'Event day', 'complete' => 'Complete'];
+            $stageKeys = array_keys($stages);
+            $atIndex = array_search($workspace['stage'], $stageKeys, true);
+        @endphp
 
-    {{-- Stream Alerts --}}
-    <div class="vh-rail-card">
-        <div class="vh-rail-head"><div class="vh-rail-title">Stream Alerts</div><span style="font-size:10px;color:var(--ok-text);font-weight:700;">All Clear</span></div>
-        @foreach(['Stream Health', 'Audio Sync', 'Internet Stability', 'Chat Moderation', 'Translation Feeds'] as $a)
-            <div class="vh-alert-row"><span>{{ $a }}</span><span class="ok">Excellent</span></div>
-        @endforeach
-    </div>
+        <div class="vh-panel">
+            <div class="vh-rail-head">
+                <div class="vh-rail-title">Event workspace</div>
+                <a href="{{ route('client.events.show', $workspace['event']) }}" style="font-size:11px;font-weight:700;">Open</a>
+            </div>
 
-    {{-- Audience Overview --}}
-    <div class="vh-rail-card">
-        <div class="vh-rail-head"><div class="vh-rail-title">Audience Overview</div><span class="vh-live"><span class="dot"></span>Live Now</span></div>
-        <div class="vh-aud-big">1,248</div>
-        <div style="font-size:10.5px;color:var(--ok-text);font-weight:700;margin-bottom:8px;">↑ 12% last hour</div>
-        <div class="vh-mon-row"><span>Live Viewers</span><span class="v">892</span></div>
-        <div class="vh-mon-row"><span>On-Demand</span><span class="v">166</span></div>
-        <div class="vh-mon-row"><span>Chat Participants</span><span class="v">642</span></div>
-        <div class="vh-mon-row"><span>Engagement Rate</span><span class="v">87%</span></div>
-    </div>
+            <div style="font-size:14px;font-weight:700;margin:2px 0 3px;">{{ $workspace['event']->title }}</div>
+            <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:12px;">
+                @if($workspace['event']->starts_at)
+                    {{ $workspace['event']->starts_at->format('M j, Y · g:i A') }}
+                    @if($workspace['event']->starts_at->isFuture())
+                        · starts {{ $workspace['event']->starts_at->humanAgo(true) }} from now
+                    @endif
+                @else
+                    No date set yet
+                @endif
+            </div>
 
-    {{-- Active Integrations --}}
-    <div class="vh-rail-card">
-        <div class="vh-rail-title" style="margin-bottom:10px;">Active Integrations</div>
-        @foreach(['Zoom Events', 'YouTube Live', 'RTMP Server', 'Slack Alerts'] as $int)
-            <div class="vh-int-row"><span class="name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;color:var(--ok-text);"><polyline points="20 6 9 17 4 12"/></svg>{{ $int }}</span><span class="conn">Connected</span></div>
-        @endforeach
-    </div>
-</aside>
+            {{-- Progress, read from the bookings rather than a stored step. --}}
+            <div style="display:flex;gap:5px;margin-bottom:7px;">
+                @foreach($stageKeys as $i => $k)
+                    <div style="flex:1;height:4px;border-radius:3px;background:{{ $i <= $atIndex ? 'var(--accent-blue)' : 'var(--border-color)' }};"></div>
+                @endforeach
+            </div>
+            <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:14px;">
+                {{ $stages[$workspace['stage']] }} · {{ $workspace['booked'] }} of {{ $workspace['services'] }} {{ Str::plural('service', $workspace['services']) }} booked
+            </div>
+
+            @if($workspace['rows']->isEmpty())
+                <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 4px;">
+                    No services listed on this event yet.
+                </p>
+            @else
+                @foreach($workspace['rows'] as $row)
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--border-color);">
+                        <div style="min-width:0;">
+                            <div style="font-size:12.5px;font-weight:600;">{{ $row['service'] }}</div>
+                            <div style="font-size:11px;color:var(--text-muted);">
+                                {{ $row['professional'] ?? ($row['waiting'] > 0 ? $row['waiting'] . ' ' . Str::plural('proposal', $row['waiting']) . ' in' : 'No proposals yet') }}
+                            </div>
+                        </div>
+                        @php
+                            $label = ['booked' => 'Booked', 'proposals' => 'Proposals in', 'searching' => 'Still open'][$row['state']];
+                            $tone  = ['booked' => 'rgba(34,197,94,.16);color:#15803d', 'proposals' => 'rgba(59,130,246,.16);color:var(--accent-blue)', 'searching' => 'rgba(120,120,120,.14);color:var(--text-muted)'][$row['state']];
+                        @endphp
+                        <span style="flex:none;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:3px 8px;border-radius:20px;background:{{ $tone }};">{{ $label }}</span>
+                    </div>
+                @endforeach
+            @endif
+        </div>
+
+        {{-- Quick access — the mockup's row, pointing at screens that exist. --}}
+        <div class="vh-panel">
+            <div class="vh-rail-title" style="margin-bottom:10px;">Quick access</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <a href="{{ route('client.events.show', $workspace['event']) }}" class="vh-quick">Event details</a>
+                <a href="{{ route('client.chat.index') }}" class="vh-quick">Messages</a>
+                <a href="{{ route('client.proposals.index') }}" class="vh-quick">Proposals</a>
+                <a href="{{ route('client.bookings.index') }}" class="vh-quick">Bookings</a>
+                <a href="{{ route('client.payments.index') }}" class="vh-quick">Payments</a>
+                <a href="{{ route('client.reviews.index') }}" class="vh-quick">Reviews</a>
+            </div>
+        </div>
+    @else
+        <div class="vh-panel">
+            <div class="vh-rail-title" style="margin-bottom:8px;">Event workspace</div>
+            <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 12px;">
+                Once you have a virtual or hybrid event open, its progress and the professionals on it appear here.
+            </p>
+            <a href="{{ route('client.virtual-hub.brief') }}" class="vh-quick" style="display:inline-block;">Plan an event</a>
+        </div>
+    @endif
+</div>
+
+<style>
+    .vh-quick{display:block;padding:9px 11px;border:1px solid var(--border-color);border-radius:9px;
+        font-size:12px;font-weight:600;text-decoration:none;color:var(--text-primary);text-align:center;}
+    .vh-quick:hover{border-color:var(--accent-blue);}
+</style>
 </div>{{-- /.vh-layout --}}
 @endsection
