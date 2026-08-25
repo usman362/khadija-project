@@ -108,6 +108,14 @@ class ClientVirtualHubController extends Controller
 
             $workspace = [
                 'event'    => $activeEvent,
+                // Stage 6 needs a real countdown and only the joining details
+                // the client actually gave us. There is no Zoom integration, so
+                // there is no connection status -- the mockup's "Connection ·
+                // Ready" would be a green tick for something nobody checked.
+                'starts_in' => $activeEvent->starts_at && $activeEvent->starts_at->isFuture()
+                    ? $activeEvent->starts_at->humanAgo(true)
+                    : null,
+                'is_today'  => (bool) $activeEvent->starts_at?->isToday(),
                 'rows'     => $rows,
                 'booked'   => $confirmed,
                 'services' => $rows->count(),
@@ -121,9 +129,23 @@ class ClientVirtualHubController extends Controller
             ];
         }
 
+        /*
+         * Which of the mockup's seven stages the client is standing in.
+         * Derived from the same workspace stage the panels use, so the strip
+         * cannot say "Event day" for an event nobody has booked.
+         */
+        $stage = match ($workspace['stage'] ?? null) {
+            'complete'    => 7,
+            'event_day'   => 6,
+            'preparation' => 5,
+            'hiring'      => 4,
+            'planning'    => 4,   // posted and waiting — still the hiring stage
+            default       => 1,   // no event yet: they are choosing what to do
+        };
+
         return view('client.virtual-hub.index', compact(
             'categories', 'pros', 'gigs', 'activeEvent', 'workspace'
-        ));
+        ) + ['stage' => $stage]);
     }
 
     /**
@@ -145,7 +167,17 @@ class ClientVirtualHubController extends Controller
             ->whereIn('status', ['pending', 'published', 'confirmed'])
             ->latest('starts_at')->first();
 
-        return view('client.virtual-hub.brief', compact('activeEvent'));
+        // The same bookable-service definition every other request form uses,
+        // so this catalogue cannot drift from the BSR, ER and Direct Request
+        // ones. Grouped by their service category, which is what gives the
+        // mockup its Technical Production / Event Support / Content & Media
+        // headings without inventing a second grouping.
+        $services = Category::active()->bookableServices()
+            ->with('parent:id,name')
+            ->orderBy('name')
+            ->get(['id', 'name', 'parent_id']);
+
+        return view('client.virtual-hub.brief', compact('activeEvent', 'services'));
     }
 
     /**
@@ -154,48 +186,92 @@ class ClientVirtualHubController extends Controller
      *
      * Route: POST /client/virtual-hub/brief
      */
+    /**
+     * Post a virtual or hybrid event (mockup stages 2 and 3).
+     *
+     * Every field this form asks for is now stored. It used to ask for the
+     * platform as a set of radio buttons that carried no value, so the browser
+     * submitted "on" -- and the controller neither validated nor saved it
+     * regardless. The client chose Zoom and the answer went nowhere.
+     *
+     * The event itself is an ordinary Event, published through the same
+     * systems as any other request, which is what the mockup asks for: the
+     * virtual workflow reuses professionals, requests, proposals, messages,
+     * bookings and payments rather than growing a parallel set.
+     */
     public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
         $data = $request->validate([
-            'title'      => ['required', 'string', 'max:200'],
-            'event_type' => ['nullable', 'string', 'max:120'],
-            'event_date' => ['nullable', 'string', 'max:60'],
-            'location'   => ['nullable', 'string', 'max:200'],
-            'budget_min' => ['nullable', 'string', 'max:40'],
-            'budget_max' => ['nullable', 'string', 'max:40'],
+            'title'         => ['required', 'string', 'max:200'],
+            'event_format'  => ['required', 'in:virtual,hybrid'],
+            'event_type'    => ['nullable', 'string', 'max:120'],
+            'starts_at'     => ['required', 'date'],
+            'ends_at'       => ['nullable', 'date', 'after:starts_at'],
+            'guest_count'   => ['nullable', 'integer', 'min:1', 'max:1000000'],
+            // Only a hybrid event has somewhere to be.
+            'location'      => ['nullable', 'required_if:event_format,hybrid', 'string', 'max:200'],
+            'platform'      => ['nullable', 'string', 'max:60'],
+            'meeting_url'   => ['nullable', 'url', 'max:500'],
+            'services'      => ['required', 'array', 'min:1'],
+            'services.*'    => ['integer', 'exists:categories,id'],
+            'description'   => ['nullable', 'string', 'max:5000'],
+            'budget_min'    => ['nullable', 'numeric', 'min:0'],
+            'budget_max'    => ['nullable', 'numeric', 'min:0', 'gte:budget_min'],
+        ], [
+            'location.required_if' => 'A hybrid event needs a venue — tell professionals where the in-person half is.',
+            'services.required'    => 'Pick at least one service you need.',
         ]);
 
-        // "$5,000" → 5000 ; free-text date → Carbon or null.
-        $budget = null;
-        if (! empty($data['budget_min']) && preg_match('/[\d,]+/', $data['budget_min'], $m)) {
-            $budget = (int) str_replace(',', '', $m[0]);
-        }
-        $startsAt = null;
-        if (! empty($data['event_date'])) {
-            try { $startsAt = \Illuminate\Support\Carbon::parse($data['event_date']); } catch (\Throwable $e) { $startsAt = null; }
-        }
-
-        $descParts = array_filter([
-            $data['event_type'] ?? null,
-            ! empty($data['budget_min']) ? ('Budget: ' . $data['budget_min'] . (! empty($data['budget_max']) ? ' – ' . $data['budget_max'] : '')) : null,
-        ]);
+        $starts = \Illuminate\Support\Carbon::parse($data['starts_at']);
 
         $event = Event::create([
-            'title'        => $data['title'],
-            'description'  => 'Virtual / Hybrid event brief. ' . implode(' · ', $descParts),
-            'status'       => 'published',
-            'is_published' => true,
-            'published_at' => now(),
-            'starts_at'    => $startsAt,
-            'budget'       => $budget,
-            'location'     => $data['location'] ?? null,
-            'source'       => 'virtual_hub',
-            'created_by'   => $request->user()->id,
-            'client_id'    => $request->user()->id,
+            'title'             => $data['title'],
+            'description'       => $data['description'] ?? null,
+            'event_type'        => $data['event_type'] ?? null,
+            'event_format'      => $data['event_format'],
+            'platform'          => $data['platform'] ?? null,
+            'meeting_url'       => $data['meeting_url'] ?? null,
+            'status'            => 'published',
+            'is_published'      => true,
+            'published_at'      => now(),
+            'starts_at'         => $starts,
+            'ends_at'           => ! empty($data['ends_at']) ? \Illuminate\Support\Carbon::parse($data['ends_at']) : null,
+            'guest_count'       => $data['guest_count'] ?? null,
+            'budget_min'        => $data['budget_min'] ?? null,
+            'budget_max'        => $data['budget_max'] ?? null,
+            'budget'            => $data['budget_min'] ?? null,
+            // A virtual event has no venue, so it has no state of its own --
+            // it takes the client's, which is what R38 matches professionals
+            // against either way.
+            'location'          => $data['location'] ?? null,
+            'state'             => \App\Support\StateMatching::requestState($request->user(), null),
+            'proposal_deadline' => $this->deadlineFor($starts),
+            'source'            => 'virtual_hub',
+            'created_by'        => $request->user()->id,
+            'client_id'         => $request->user()->id,
         ]);
 
+        $event->categories()->sync(array_map('intval', $data['services']));
+
         return redirect()
-            ->route('client.events.show', $event)
-            ->with('status', 'Your virtual/hybrid gig is posted — professionals can now submit bids.');
+            ->route('client.virtual-hub.index')
+            ->with('status', 'Your ' . $data['event_format'] . ' event is posted — professionals can send proposals now.');
+    }
+
+    /**
+     * The same approved window every other broadcast request uses, pulled back
+     * if the event itself lands inside it. Nothing invented here (R37).
+     */
+    private function deadlineFor(\Illuminate\Support\Carbon $startsAt): ?\Illuminate\Support\Carbon
+    {
+        $hours = (int) config('bsr.default_proposal_window_hours');
+
+        if ($hours <= 0) {
+            return null;
+        }
+
+        $deadline = now()->addHours($hours);
+
+        return $deadline->gt($startsAt) ? $startsAt->copy()->subHour() : $deadline;
     }
 }

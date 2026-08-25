@@ -162,6 +162,15 @@
         ).forEach(function (input) {
             // Pull per-field overrides off data attributes
             var enableTime = input.type === 'datetime-local' || input.hasAttribute('data-flatpickr-time');
+
+            /* altInput copies the source input's placeholder, and none of the
+               27 date fields on this site had one -- so every date on every
+               screen rendered as an empty box with no hint that it opens a
+               picker. Set here rather than on each field: one prompt, and a
+               new date input cannot be added without it. */
+            if (!input.getAttribute('placeholder')) {
+                input.setAttribute('placeholder', enableTime ? 'Pick a date and time' : 'Pick a date');
+            }
             var minDate    = input.getAttribute('data-flatpickr-min') || input.min || null;
             var maxDate    = input.getAttribute('data-flatpickr-max') || input.max || null;
 

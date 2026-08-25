@@ -122,11 +122,64 @@
 <div class="vh-layout">
 <div class="vh-main">
 
-    {{-- Two paths --}}
-    <div class="vh-paths">
-        <div class="vh-path active"><div class="vh-path-title">Path 1: Instant Discovery</div><div class="vh-path-desc">Search and connect with verified virtual professionals.</div></div>
-        <a href="{{ route('client.virtual-hub.brief') }}" style="text-decoration:none;"><div class="vh-path"><div class="vh-path-title">Path 2: Project Gigs / RFP</div><div class="vh-path-desc">Post your event brief and get competitive proposals.</div></div></a>
+    @include('client.virtual-hub._stages', ['current' => $stage])
+
+    {{-- ── Stage 1 · Entry and Stage 4 · Hire ──────────────
+         The mockup opens by asking what the client wants to do, and its Hire
+         stage offers three routes. Both are just doors onto systems that
+         already exist -- which is exactly what the mockup says this workflow
+         should be: "uses GigResource's existing systems for professionals,
+         requests, proposals, messages, bookings, payments". --}}
+    <div class="vh-entry">
+        <a href="{{ route('client.virtual-hub.brief') }}" class="vh-entry-card primary">
+            <div class="vh-entry-title">Plan a new event</div>
+            <div class="vh-entry-sub">Tell us the format, date and services — professionals send proposals.</div>
+        </a>
+        <a href="{{ route('public.browse') }}" class="vh-entry-card">
+            <div class="vh-entry-title">Find a professional</div>
+            <div class="vh-entry-sub">Search profiles and invite someone directly.</div>
+        </a>
+        <a href="{{ route('client.events.index') }}" class="vh-entry-card">
+            <div class="vh-entry-title">Manage my events</div>
+            <div class="vh-entry-sub">Open an event you have already posted.</div>
+        </a>
     </div>
+
+    <div class="vh-hire">
+        <div class="vh-hire-head">Three ways to hire — all the usual rules apply</div>
+        <div class="vh-hire-row">
+            <a href="{{ route('public.browse') }}" class="vh-hire-card">
+                <b>Browse professionals</b>
+                <span>Search and view profiles</span>
+            </a>
+            <a href="{{ route('client.bsr.step', 'service') }}" class="vh-hire-card">
+                <b>Create a request</b>
+                <span>Post it once, compare sealed proposals</span>
+            </a>
+            <a href="{{ route('client.direct-offers.create') }}" class="vh-hire-card">
+                <b>Send a direct request</b>
+                <span>Invite one professional you already want</span>
+            </a>
+        </div>
+    </div>
+
+    <style>
+        .vh-entry{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:16px;}
+        .vh-entry-card{display:block;padding:16px 17px;border:1px solid var(--border-color);border-radius:13px;
+            text-decoration:none;color:var(--text-primary);background:var(--bg-card);}
+        .vh-entry-card.primary{border-color:var(--accent-orange,#f97316);background:rgba(249,115,22,.06);}
+        .vh-entry-card:hover{border-color:var(--accent-blue);}
+        .vh-entry-title{font-size:15px;font-weight:800;margin-bottom:4px;}
+        .vh-entry-sub{font-size:12.5px;color:var(--text-muted);line-height:1.45;}
+        .vh-hire{border:1px solid var(--border-color);border-radius:13px;padding:15px 17px;margin-bottom:18px;background:var(--bg-card);}
+        .vh-hire-head{font-size:13px;font-weight:800;margin-bottom:11px;}
+        .vh-hire-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;}
+        .vh-hire-card{display:block;padding:11px 13px;border:1px solid var(--border-color);border-radius:10px;
+            text-decoration:none;color:var(--text-primary);}
+        .vh-hire-card:hover{border-color:var(--accent-orange,#f97316);}
+        .vh-hire-card b{display:block;font-size:13px;font-weight:700;}
+        .vh-hire-card span{display:block;font-size:11.5px;color:var(--text-muted);margin-top:2px;}
+    </style>
 
     {{-- Filters --}}
     <div class="vh-card">
@@ -288,6 +341,56 @@
                 @endforeach
             @endif
         </div>
+
+        {{-- ── Stage 6 · Event Day ──────────────────────────
+             Countdown, platform and joining link — the three things we
+             actually know. The mockup also shows "Connection · Ready" with a
+             green tick; there is no Zoom integration behind this, so a
+             connection status would be a reassurance nobody checked. --}}
+        @if($workspace['is_today'] || $workspace['stage'] === 'event_day')
+            <div class="vh-panel" style="border-color:var(--accent-orange,#f97316);">
+                <div class="vh-rail-title" style="margin-bottom:8px;">Event day</div>
+
+                @if($workspace['starts_in'])
+                    <div style="font-size:12px;color:var(--text-muted);">Starts in</div>
+                    <div style="font-size:24px;font-weight:800;line-height:1.1;margin-bottom:12px;">{{ $workspace['starts_in'] }}</div>
+                @else
+                    <div style="font-size:13px;font-weight:700;margin-bottom:12px;">Happening now</div>
+                @endif
+
+                @if($workspace['event']->platform)
+                    <div style="font-size:12px;color:var(--text-muted);">Platform</div>
+                    <div style="font-size:13.5px;font-weight:700;margin-bottom:10px;">{{ $workspace['event']->platform }}</div>
+                @endif
+
+                @if($workspace['event']->meeting_url)
+                    <a href="{{ $workspace['event']->meeting_url }}" target="_blank" rel="noopener"
+                       class="vh-quick" style="background:var(--accent-orange,#f97316);color:#fff;border-color:transparent;">Join event</a>
+                @else
+                    <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px;">
+                        No joining link saved. Add one on the event so everyone has it in one place.
+                    </p>
+                @endif
+
+                <a href="{{ route('client.chat.index') }}" class="vh-quick" style="margin-top:8px;">Message your professionals</a>
+            </div>
+        @endif
+
+        {{-- ── Stage 7 · Complete ───────────────────────────
+             Closing the loop. Deliverables are not here: there is no
+             deliverables model, so a button would open nothing. --}}
+        @if($workspace['stage'] === 'complete')
+            <div class="vh-panel">
+                <div class="vh-rail-title" style="margin-bottom:4px;">Event complete</div>
+                <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 12px;">Let's wrap things up.</p>
+                <div style="display:grid;gap:8px;">
+                    <a href="{{ route('client.payments.index') }}" class="vh-quick">Release payment</a>
+                    <a href="{{ route('client.reviews.index') }}" class="vh-quick">Review your professionals</a>
+                    <a href="{{ route('client.virtual-hub.brief') }}" class="vh-quick">Book again</a>
+                    <a href="{{ route('forms.create', 'support_request') }}" class="vh-quick">Get support</a>
+                </div>
+            </div>
+        @endif
 
         {{-- Quick access — the mockup's row, pointing at screens that exist. --}}
         <div class="vh-panel">

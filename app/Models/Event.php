@@ -56,6 +56,9 @@ class Event extends Model
         'budget_max',
         'proposal_deadline',
         'schedule_note',
+        'event_format',
+        'platform',
+        'meeting_url',
         'sealed_proposals',
         'questions_enabled',
         // Rule R38 — the state this request belongs to. Stamped from the

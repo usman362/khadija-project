@@ -140,231 +140,153 @@
 @endpush
 
 @section('content')
-<form method="POST" action="{{ route('client.virtual-hub.store') }}">
+{{-- Stages 2 and 3 of the Virtual & Hybrid workflow: tell us about the event,
+     then pick the services. Every field here is stored. The form this replaces
+     asked for a platform through radio buttons that carried no value, a bidding
+     model, interactive features and a language interpreter -- none of which the
+     controller validated or saved -- and prefilled the date with "Oct 25, 2024",
+     a date in the past that a client could submit without noticing. --}}
+@include('client.virtual-hub._stages', ['current' => 2])
+
+<form method="POST" action="{{ route('client.virtual-hub.store') }}" class="vhb">
     @csrf
+
     @if($errors->any())
-        <div style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:10px;padding:11px 15px;margin-bottom:16px;font-size:13.5px;font-weight:600;">{{ $errors->first() }}</div>
+        <div class="vhb-card" style="border-color:#ef4444;">
+            <b style="display:block;margin-bottom:6px;">Please fix these first</b>
+            <ul style="margin:0;padding-left:18px;font-size:13px;">
+                @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
+            </ul>
+        </div>
     @endif
 
-    {{-- ════════ Step header ════════ --}}
-    <div class="vhb-stepper">
-        <div class="vhb-step is-active">
-            <span class="vhb-step-num">1</span>
-            <span class="vhb-step-label">1. Event Details</span>
-        </div>
-        <span class="vhb-step-line is-active"></span>
-        <div class="vhb-step">
-            <span class="vhb-step-num">2</span>
-            <span class="vhb-step-label">2. Production Reqs</span>
-        </div>
-        <span class="vhb-step-line"></span>
-        <div class="vhb-step">
-            <span class="vhb-step-num">3</span>
-            <span class="vhb-step-label">3. Budget &amp; Bidding</span>
-        </div>
-    </div>
+    {{-- ── Stage 2 · Plan ─────────────────────────────────── --}}
+    <div class="vhb-card">
+        <div class="vhb-card-head"><span class="vhb-step">2</span> Tell us about your event</div>
 
-    {{-- ════════ 4 section cards ════════ --}}
-    <div class="vhb-grid">
+        <label class="vhb-label">Event name *</label>
+        <input type="text" name="title" class="vhb-input" required maxlength="200"
+               value="{{ old('title') }}" placeholder="e.g. Annual Leadership Conference">
 
-        {{-- ─── 1. EVENT DETAILS ─── --}}
-        <div class="vhb-card">
-            <div class="vhb-card-head">
-                <span class="vhb-card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
-                <span class="vhb-card-title">1. Event Details</span>
-            </div>
-            <p class="vhb-card-sub">Tell us about your virtual or hybrid event.</p>
-
-            <div class="vhb-field">
-                <label class="vhb-label">Project Title <span class="req">*</span></label>
-                <input type="text" name="title" class="vhb-input" value="{{ old('title', 'Technical Director for 3-Day Hybrid Crypto Summit') }}" required>
-            </div>
-            <div class="vhb-field">
-                <label class="vhb-label">Event Type <span class="req">*</span></label>
-                <select name="event_type" class="vhb-select" aria-label="Hybrid Event (Physical + Virtual)">
-                    <option>Hybrid Event (Physical + Virtual)</option>
-                    <option>Fully Virtual Event</option>
-                    <option>Livestream / Broadcast</option>
-                    <option>Webinar / Conference</option>
-                </select>
-            </div>
-            <div class="vhb-field">
-                <label class="vhb-label">Event Date <span class="req">*</span></label>
-                <div class="vhb-iwrap has-l has-r">
-                    <svg class="ico-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    <input type="text" name="event_date" class="vhb-input" value="{{ old('event_date', 'Oct 25, 2024') }}">
-                    <svg class="ico-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                </div>
-            </div>
-            <div class="vhb-field">
-                <label class="vhb-label">Start Time <span class="req">*</span></label>
-                <div class="vhb-iwrap has-r">
-                    <input type="text" class="vhb-input" value="09:00 AM">
-                    <svg class="ico-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                </div>
-            </div>
-            <div class="vhb-field">
-                <label class="vhb-label">End Time <span class="req">*</span></label>
-                <div class="vhb-iwrap has-r">
-                    <input type="text" class="vhb-input" value="06:00 PM">
-                    <svg class="ico-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                </div>
-            </div>
-            <div class="vhb-field">
-                <label class="vhb-label">Time Zone <span class="req">*</span></label>
-                <select class="vhb-select" aria-label="Choose an option">
-                    <option selected>(GMT-05:00) Eastern Time (US &amp; Canada)</option>
-                    <option>(GMT-06:00) Central Time (US &amp; Canada)</option>
-                    <option>(GMT-07:00) Mountain Time (US &amp; Canada)</option>
-                    <option>(GMT-08:00) Pacific Time (US &amp; Canada)</option>
-                    <option>(GMT+00:00) UTC</option>
-                </select>
-            </div>
-
-            <div class="vhb-callout">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg>
-                <div class="vhb-callout-body">
-                    <span class="vhb-callout-title">Tip</span>
-                    Accurate date, time, and timezone help vendors plan and monitor your live event successfully.
-                </div>
-            </div>
-        </div>
-
-        {{-- ─── 2. TECHNICAL ENVIRONMENT & SOFTWARE ─── --}}
-        <div class="vhb-card">
-            <div class="vhb-card-head">
-                <span class="vhb-card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
-                <span class="vhb-card-title">2. Technical Environment &amp; Software</span>
-            </div>
-            <p class="vhb-card-sub">Select the platforms and interactive features you need.</p>
-
-            <div class="vhb-subhead">Primary Virtual Platform <span class="req">*</span></div>
-            <div class="vhb-opts">
-                <label class="vhb-opt"><input type="radio" name="platform" checked><span class="vhb-opt-text">Zoom Events / Webinar</span></label>
-                <label class="vhb-opt"><input type="radio" name="platform"><span class="vhb-opt-text">Microsoft Teams / Webex</span></label>
-                <label class="vhb-opt"><input type="radio" name="platform"><span class="vhb-opt-text">Custom 3D Virtual Environment (Web3/Metaverse)</span></label>
-                <label class="vhb-opt"><input type="radio" name="platform"><span class="vhb-opt-text">Hopin / RingCentral Events</span></label>
-                <label class="vhb-opt"><input type="radio" name="platform"><span class="vhb-opt-text">Other (Please specify)</span></label>
-            </div>
-            <div class="vhb-other"><input type="text" class="vhb-input" placeholder=""></div>
-
-            <div class="vhb-divider"></div>
-
-            <div class="vhb-subhead">Interactive Features Needed <span class="hint">(Select all that apply)</span></div>
-            <div class="vhb-opts">
-                <label class="vhb-opt"><input type="checkbox" checked><span class="vhb-opt-text">Live Chat &amp; Q&amp;A Moderation</span></label>
-                <label class="vhb-opt"><input type="checkbox" checked><span class="vhb-opt-text">Networking Roulette / Breakout Rooms</span></label>
-                <label class="vhb-opt"><input type="checkbox" checked><span class="vhb-opt-text">Virtual Expo Booths</span></label>
-                <label class="vhb-opt"><input type="checkbox" checked><span class="vhb-opt-text">Gamification &amp; Live Polling</span></label>
-                <label class="vhb-opt"><input type="checkbox"><span class="vhb-opt-text">Other (Please specify)</span></label>
-            </div>
-            <div class="vhb-other"><input type="text" class="vhb-input" placeholder=""></div>
-        </div>
-
-        {{-- ─── 3. PRODUCTION & STAFFING REQUIREMENTS ─── --}}
-        <div class="vhb-card">
-            <div class="vhb-card-head">
-                <span class="vhb-card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
-                <span class="vhb-card-title">3. Production &amp; Staffing Requirements</span>
-            </div>
-            <p class="vhb-card-sub">Choose the professional services and production support you require.</p>
-
-            <div class="vhb-subhead">Professional Services Needed <span class="req">*</span> <span class="hint">(Select all that apply)</span></div>
-            <div class="vhb-opts">
-                <label class="vhb-opt"><input type="checkbox" checked><span class="vhb-opt-text">Livestream Technical Director</span></label>
-                <label class="vhb-opt"><input type="checkbox" checked><span class="vhb-opt-text">Virtual Stage / 3D Environment Architect</span></label>
-                <label class="vhb-opt"><input type="checkbox" checked><span class="vhb-opt-text">Live Language Interpreter</span></label>
-                <label class="vhb-opt"><input type="checkbox" checked><span class="vhb-opt-text">Hybrid AV Integrator (Physical Venue Setup)</span></label>
-                <label class="vhb-opt"><input type="checkbox" checked><span class="vhb-opt-text">Chat / Engagement Moderator</span></label>
-                <label class="vhb-opt"><input type="checkbox"><span class="vhb-opt-text">Video Editor / Replay Producer</span></label>
-                <label class="vhb-opt"><input type="checkbox"><span class="vhb-opt-text">Other (Please specify)</span></label>
-            </div>
-            <div class="vhb-other"><input type="text" class="vhb-input" placeholder=""></div>
-
-            <div class="vhb-divider"></div>
-
-            <div class="vhb-subhead">Physical Venue Details <span class="hint">(Only for Hybrid Events)</span></div>
-            <div class="vhb-field">
-                <label class="vhb-label">Venue Name &amp; Location</label>
-                <input type="text" name="location" class="vhb-input" value="{{ old('location') }}" placeholder="e.g., TechCenter, Arlington, VA">
-            </div>
-            <div class="vhb-field">
-                <label class="vhb-label">On-Site Internet Speed <span class="hint">(if known)</span></label>
-                <select class="vhb-select" aria-label="Select speed type">
-                    <option selected disabled value="">Select speed type</option>
-                    <option>Standard (up to 100 Mbps)</option>
-                    <option>High-Speed (100–500 Mbps)</option>
-                    <option>Enterprise / Dedicated Fiber (1 Gbps+)</option>
-                </select>
-            </div>
-        </div>
-
-        {{-- ─── 4. BUDGET & BIDDING PREFERENCES ─── --}}
-        <div class="vhb-card">
-            <div class="vhb-card-head">
-                <span class="vhb-card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
-                <span class="vhb-card-title">4. Budget &amp; Bidding Preferences</span>
-            </div>
-            <p class="vhb-card-sub">Set your budget range and bidding preferences.</p>
-
-            <div class="vhb-field">
-                <label class="vhb-label">Estimated Production Budget <span class="req">*</span></label>
-                <div class="vhb-budget-row">
-                    <select class="vhb-select" aria-label="USD $"><option selected>USD $</option><option>EUR €</option><option>GBP £</option></select>
-                    <input type="text" name="budget_min" class="vhb-input" value="{{ old('budget_min', '$5,000') }}">
-                    <span class="to">to</span>
-                    <input type="text" name="budget_max" class="vhb-input" value="{{ old('budget_max', '$15,000') }}">
-                </div>
-                <div class="vhb-range">
-                    <div class="vhb-range-track"></div>
-                    <div class="vhb-range-fill" style="left:0%; right:0%;"></div>
-                    <div class="vhb-range-thumb" style="left:0%;"></div>
-                    <div class="vhb-range-thumb" style="left:100%;"></div>
-                </div>
-                <div class="vhb-range-marks"><span>$5,000</span><span>$10,000</span><span>$15,000</span></div>
-            </div>
-
-            <div class="vhb-divider"></div>
-
-            <div class="vhb-subhead">Bidding Model <span class="req">*</span></div>
-            <div class="vhb-opts">
-                <label class="vhb-opt"><input type="radio" name="bidding" checked><span class="vhb-opt-text"><b>Open Bidding</b><small>All professionals can see competitor bids to encourage competitive rates.</small></span></label>
-                <label class="vhb-opt"><input type="radio" name="bidding"><span class="vhb-opt-text"><b>Blind Bidding</b><small>Vendor bids stay private; only the planner can see them.</small></span></label>
-            </div>
-
-            <div class="vhb-divider"></div>
-
-            <div class="vhb-field">
-                <label class="vhb-label">Gig Expiration Date <span class="req">*</span></label>
-                <div class="vhb-iwrap has-l has-r">
-                    <svg class="ico-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    <input type="text" class="vhb-input" value="Oct 31, 2024">
-                    <svg class="ico-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                </div>
-            </div>
-
-            <div class="vhb-subhead" style="margin-top:6px;">Gig Boost</div>
-            <div class="vhb-callout">
-                <label class="vhb-opt" style="gap:10px; align-items:flex-start;">
-                    <input type="checkbox" checked>
-                    <span class="vhb-callout-body">
-                        <b>Enable Best Match:</b> Instantly notify the top 5 rated virtual professionals matching these requirements to submit a bid.
-                        <span style="display:block; color:var(--text-muted); margin-top:3px;">(Boosts engagement instantly)</span>
-                    </span>
+        <label class="vhb-label">Event format *</label>
+        <div class="vhb-formats">
+            @foreach(['virtual' => 'Fully virtual', 'hybrid' => 'Hybrid — in person and online'] as $val => $text)
+                <label class="vhb-opt">
+                    <input type="radio" name="event_format" value="{{ $val }}"
+                           {{ old('event_format') === $val ? 'checked' : '' }} required
+                           onchange="document.getElementById('vhb-venue').style.display = this.value === 'hybrid' ? 'block' : 'none';">
+                    <span class="vhb-opt-text">{{ $text }}</span>
                 </label>
+            @endforeach
+        </div>
+
+        <div class="vhb-grid-2">
+            <div>
+                <label class="vhb-label">Event type</label>
+                <input type="text" name="event_type" class="vhb-input" maxlength="120"
+                       value="{{ old('event_type') }}" placeholder="e.g. Conference">
+            </div>
+            <div>
+                <label class="vhb-label">Expected attendance</label>
+                <input type="number" name="guest_count" class="vhb-input" min="1"
+                       value="{{ old('guest_count') }}" placeholder="e.g. 150">
             </div>
         </div>
 
+        <div class="vhb-grid-2">
+            <div>
+                <label class="vhb-label">Starts *</label>
+                {{-- No prefilled date. The one that used to sit here was in
+                     the past, and a client could post it unchanged. --}}
+                <input type="datetime-local" name="starts_at" class="vhb-input" required value="{{ old('starts_at') }}">
+            </div>
+            <div>
+                <label class="vhb-label">Ends</label>
+                <input type="datetime-local" name="ends_at" class="vhb-input" value="{{ old('ends_at') }}">
+            </div>
+        </div>
+
+        <div id="vhb-venue" style="display:{{ old('event_format') === 'hybrid' ? 'block' : 'none' }};">
+            <label class="vhb-label">Venue for the in-person half *</label>
+            <input type="text" name="location" class="vhb-input" maxlength="200"
+                   value="{{ old('location') }}" placeholder="e.g. Baltimore, MD">
+        </div>
+
+        <div class="vhb-grid-2">
+            <div>
+                {{-- for/id rather than aria-label: the visible label is the
+                     right name, so tie the two together instead of writing a
+                     second one that can drift from it. --}}
+                <label class="vhb-label" for="vhb-platform">Platform, if you know it</label>
+                <select name="platform" id="vhb-platform" class="vhb-select">
+                    <option value="">Not decided yet</option>
+                    @foreach(['Zoom', 'Microsoft Teams', 'Google Meet', 'Webex', 'Hopin', 'YouTube Live', 'Other'] as $pf)
+                        <option value="{{ $pf }}" @selected(old('platform') === $pf)>{{ $pf }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="vhb-label">Joining link, if you have one</label>
+                <input type="url" name="meeting_url" class="vhb-input" maxlength="500"
+                       value="{{ old('meeting_url') }}" placeholder="https://…">
+                <p class="vhb-hint">We only store what you paste. Nothing here creates a meeting for you.</p>
+            </div>
+        </div>
     </div>
 
-    {{-- ════════ Footer actions ════════ --}}
+    {{-- ── Stage 3 · Services ─────────────────────────────── --}}
+    <div class="vhb-card">
+        <div class="vhb-card-head"><span class="vhb-step">3</span> What services do you need?</div>
+        <p class="vhb-hint" style="margin-top:-4px;">Pick one or more. Professionals bid on what you choose.</p>
+
+        <x-service-picker :categories="$services" name="services" :selected="old('services', [])" />
+    </div>
+
+    {{-- ── Brief ──────────────────────────────────────────── --}}
+    <div class="vhb-card">
+        <div class="vhb-card-head">Anything else they should know?</div>
+        <textarea name="description" class="vhb-input" rows="4" maxlength="5000"
+                  placeholder="Run of show, rehearsal needs, accessibility requirements…">{{ old('description') }}</textarea>
+
+        <div class="vhb-grid-2">
+            <div>
+                <label class="vhb-label">Budget from</label>
+                <input type="number" name="budget_min" class="vhb-input" min="0" step="1" value="{{ old('budget_min') }}">
+            </div>
+            <div>
+                <label class="vhb-label">Budget to</label>
+                <input type="number" name="budget_max" class="vhb-input" min="0" step="1" value="{{ old('budget_max') }}">
+            </div>
+        </div>
+    </div>
+
     <div class="vhb-actions">
-        <a href="{{ route('client.virtual-hub.index') }}" class="vhb-btn ghost">Save Draft</a>
-        <button type="submit" class="vhb-btn primary">
-            Review &amp; Post Gig
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </button>
+        <a href="{{ route('client.virtual-hub.index') }}" class="vhb-btn-ghost">Cancel</a>
+        <button type="submit" class="vhb-btn">Post event &amp; get proposals →</button>
     </div>
-
 </form>
+
+<style>
+    .vhb{max-width:820px;}
+    .vhb-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:14px;padding:20px 22px;margin-bottom:16px;}
+    .vhb-card-head{font-size:15.5px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:9px;}
+    .vhb-step{display:inline-flex;width:23px;height:23px;border-radius:50%;background:var(--accent-orange,#f97316);
+        color:#fff;align-items:center;justify-content:center;font-size:12px;font-weight:800;}
+    .vhb-label{display:block;font-size:12.5px;font-weight:700;margin:14px 0 5px;}
+    .vhb-input,.vhb-select{width:100%;padding:10px 12px;font:inherit;font-size:14px;color:var(--text-primary);
+        background:var(--bg-body);border:1px solid var(--border-color);border-radius:9px;outline:none;}
+    .vhb-input:focus,.vhb-select:focus{border-color:var(--accent-blue);}
+    .vhb-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    @media(max-width:640px){.vhb-grid-2{grid-template-columns:1fr;}}
+    .vhb-formats{display:flex;gap:10px;flex-wrap:wrap;}
+    .vhb-opt{display:flex;align-items:center;gap:8px;border:1px solid var(--border-color);border-radius:10px;
+        padding:10px 14px;cursor:pointer;font-size:13.5px;}
+    .vhb-opt:has(input:checked){border-color:var(--accent-orange,#f97316);background:rgba(249,115,22,.07);font-weight:700;}
+    .vhb-hint{font-size:11.5px;color:var(--text-muted);margin:5px 0 0;}
+    .vhb-actions{display:flex;gap:10px;justify-content:flex-end;align-items:center;}
+    .vhb-btn{border:none;border-radius:10px;padding:11px 20px;background:var(--accent-orange,#f97316);
+        color:#fff;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;}
+    .vhb-btn-ghost{padding:11px 18px;border:1px solid var(--border-color);border-radius:10px;
+        text-decoration:none;color:var(--text-primary);font-size:13.5px;font-weight:600;}
+</style>
 @endsection
