@@ -249,6 +249,48 @@ class VirtualHubBriefTest extends TestCase
             ->assertRedirect(route('client.virtual-hub.brief', 'plan'));
     }
 
+    /**
+     * The workspace must describe the event you just posted.
+     *
+     * It picked the event with the latest start date, so posting a new one and
+     * landing on the hub showed a different event entirely — the flash naming
+     * one, the panel beside it describing another.
+     */
+    public function test_the_workspace_shows_the_event_just_posted(): void
+    {
+        // An older event whose date is further out than the new one's.
+        $far = Event::create([
+            'title' => 'Corporate Gala — Full Production',
+            'client_id' => $this->client->id, 'created_by' => $this->client->id,
+            'status' => 'published', 'is_published' => true,
+            'starts_at' => now()->addYear(),
+        ]);
+
+        $this->postBoth(['starts_at' => now()->addWeek()->format('Y-m-d\TH:i')])
+            ->assertSessionHasNoErrors();
+
+        $html = $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.index', ['stage' => 5]))->assertOk()->getContent();
+
+        $this->assertStringContainsString('Annual Leadership Conference', $html,
+            'The workspace should describe the event that was just posted.');
+        $this->assertStringNotContainsString($far->title, $html,
+            'A later start date must not outrank the event the client just created.');
+    }
+
+    /** A closed request is not the one you are working on. */
+    public function test_a_closed_event_is_not_the_active_one(): void
+    {
+        $this->postBoth()->assertSessionHasNoErrors();
+        $event = Event::where('client_id', $this->client->id)->latest('id')->firstOrFail();
+
+        $event->update(['closed_at' => now()]);
+
+        $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.index'))->assertOk()
+            ->assertViewHas('workspace', null);
+    }
+
     /** No prefilled date, and none in the past. */
     public function test_the_form_offers_no_prefilled_date(): void
     {

@@ -217,15 +217,11 @@
          Hidden once the work is underway: an event on its event day does not
          need a professional grid. --}}
     @if(in_array($stage, [1, 4], true))
-    {{-- Filters --}}
-    <div class="vh-card">
-        <div class="vh-filters">
-            <select class="vh-filter" aria-label="All Platforms"><option>All Platforms</option><option>Zoom</option><option>YouTube</option><option>RTMP</option></select>
-            <select class="vh-filter" aria-label="All Categories"><option>All Categories</option></select>
-            <select class="vh-filter" aria-label="All Languages"><option>All Languages</option></select>
-            <select class="vh-filter" aria-label="Any Budget"><option>Any Budget</option></select>
-        </div>
-    </div>
+    {{-- The four filters that stood here -- All Platforms, All Categories,
+         All Languages, Any Budget -- had no name, no form and no handler, and
+         two of them had no options either. Selecting anything did nothing,
+         which is worse than not offering the choice: it invites the question
+         "what should I pick?" and has no answer. --}}
 
     {{-- Specialized virtual services --}}
     <div class="vh-card">

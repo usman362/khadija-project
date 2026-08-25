@@ -58,9 +58,19 @@ class ClientVirtualHubController extends Controller
             ->take(4)
             ->get(['id', 'title', 'status', 'budget', 'starts_at', 'created_at']);
 
+        /*
+         * The event the client is working on — the one most recently posted,
+         * not the one furthest in the future.
+         *
+         * This ordered by starts_at, so posting a new event and landing here
+         * showed a DIFFERENT event: the flash said "Wesley Calderon is posted"
+         * while the workspace beside it described a gala in October. Whichever
+         * event has the latest date is not the one you just created.
+         */
         $activeEvent = Event::where('client_id', $user->id)
             ->whereIn('status', ['pending', 'published', 'confirmed'])
-            ->latest('starts_at')->first();
+            ->whereNull('closed_at')
+            ->latest('id')->first();
 
         /*
          * The event workspace from the client's Virtual & Hybrid mockup
