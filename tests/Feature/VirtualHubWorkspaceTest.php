@@ -69,6 +69,13 @@ class VirtualHubWorkspaceTest extends TestCase
         return $this->actingAs($this->client)->get(route('client.virtual-hub.index'))->assertOk()->getContent();
     }
 
+    /** Open one stage's tab. The hub always opens on Entry now, by design. */
+    private function stage(int $n): string
+    {
+        return $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.index', ['stage' => $n]))->assertOk()->getContent();
+    }
+
     /** The invented telemetry must never come back. */
     public function test_the_hub_reports_no_streaming_telemetry(): void
     {
@@ -100,7 +107,7 @@ class VirtualHubWorkspaceTest extends TestCase
             'supplier_id' => $this->pro->id, 'amount' => 900, 'status' => 'submitted',
         ]);
 
-        $html = $this->hub();
+        $html = $this->stage(5);
 
         $this->assertStringContainsString('Streaming Technician', $html);
         $this->assertStringContainsString('Jordan Lee Photography', $html);
@@ -118,14 +125,14 @@ class VirtualHubWorkspaceTest extends TestCase
         $event->categories()->sync([$svc->id]);
 
         // Nothing yet — planning.
-        $this->assertStringContainsString('Planning', $this->hub());
+        $this->assertStringContainsString('Planning', $this->stage(5));
 
         // A proposal arrives — hiring.
         Bid::create([
             'event_id' => $event->id, 'category_id' => $svc->id,
             'supplier_id' => $this->pro->id, 'amount' => 900, 'status' => 'submitted',
         ]);
-        $this->assertStringContainsString('Hiring', $this->hub());
+        $this->assertStringContainsString('Hiring', $this->stage(5));
 
         // Someone is booked — preparation.
         Booking::create([
@@ -133,7 +140,7 @@ class VirtualHubWorkspaceTest extends TestCase
             'supplier_id' => $this->pro->id, 'created_by' => $this->client->id,
             'status' => 'confirmed', 'price' => 1500, 'currency' => 'USD',
         ]);
-        $this->assertStringContainsString('Preparation', $this->hub());
+        $this->assertStringContainsString('Preparation', $this->stage(5));
     }
 
     // ── The workflow's seven stages ──────────────────────────────
@@ -203,7 +210,7 @@ class VirtualHubWorkspaceTest extends TestCase
             'status' => 'completed', 'price' => 1500, 'currency' => 'USD',
         ]);
 
-        $html = $this->hub();
+        $html = $this->stage(7);
 
         $this->assertStringContainsString('Event complete', $html);
         $this->assertStringContainsString('Release payment', $html);
@@ -253,8 +260,15 @@ class VirtualHubWorkspaceTest extends TestCase
             ->assertViewHas('stage', 1);
     }
 
-    /** Where the event has got to decides which stage opens first. */
-    public function test_the_opening_stage_follows_the_event(): void
+    /**
+     * The sidebar always lands on Entry.
+     *
+     * It used to open wherever the event had got to, which dropped the client
+     * into step 4 with no explanation — Ali's "sidenav me click karo to direct
+     * step 4". The same click has to reach the same place every time; the event
+     * is offered on the Entry panel instead of being jumped into.
+     */
+    public function test_the_hub_always_opens_on_entry(): void
     {
         $this->actingAs($this->client)
             ->get(route('client.virtual-hub.index'))->assertOk()->assertViewHas('stage', 1);
@@ -262,20 +276,18 @@ class VirtualHubWorkspaceTest extends TestCase
         $event = $this->event();
         $svc   = $this->service('Streaming Technician');
         $event->categories()->sync([$svc->id]);
-
-        // Posted and waiting — opens on Hire.
-        $this->actingAs($this->client)
-            ->get(route('client.virtual-hub.index'))->assertOk()->assertViewHas('stage', 4);
-
         Booking::create([
             'event_id' => $event->id, 'category_id' => $svc->id, 'client_id' => $this->client->id,
             'supplier_id' => $this->pro->id, 'created_by' => $this->client->id,
             'status' => 'confirmed', 'price' => 1500, 'currency' => 'USD',
         ]);
 
-        // Someone booked — opens on the workspace.
+        // Even mid-hire, the door opens on Entry...
         $this->actingAs($this->client)
-            ->get(route('client.virtual-hub.index'))->assertOk()->assertViewHas('stage', 5);
+            ->get(route('client.virtual-hub.index'))->assertOk()->assertViewHas('stage', 1);
+
+        // ...and the event is right there, not hidden.
+        $this->assertStringContainsString($event->title, $this->hub());
     }
 
     /** The four tiles that opened nothing are gone. */
@@ -301,7 +313,7 @@ class VirtualHubWorkspaceTest extends TestCase
     {
         $event = $this->event();
 
-        $html = $this->hub();
+        $html = $this->stage(5);
 
         $this->assertStringContainsString('Close this request', $html);
         $this->assertStringContainsString(route('client.events.close', $event), $html,
@@ -348,10 +360,14 @@ class VirtualHubWorkspaceTest extends TestCase
         $this->assertSame(4, substr_count($html, 'class="vhs-hit"'),
             'Only Entry, Plan, Services and Hire lead anywhere before an event exists.');
 
-        // With an event, the workspace stages point at it.
-        $event = $this->event();
-        $html  = $this->hub();
-        $this->assertStringContainsString(route('client.events.show', $event), $html);
+        // With an event, the workspace stages become tabs on this same page.
+        $this->event();
+        $html = $this->hub();
+        $this->assertStringContainsString(
+            route('client.virtual-hub.index', ['stage' => 5]),
+            $html,
+            'Once an event exists, the workspace stage opens its own tab.',
+        );
     }
 
     /** The strip says what it is, because it looks like something it is not. */

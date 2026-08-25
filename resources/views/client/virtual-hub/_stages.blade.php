@@ -1,5 +1,12 @@
 @props(['current' => 1])
 
+@php
+    /* The brief is stages 2 AND 3 on one screen -- plan the event, then pick the
+       services -- so it marks both. Marking only 2 made submitting it look like
+       a jump from step 2 to step 4 with step 3 skipped. */
+    $currentStages = (array) $current;
+@endphp
+
 {{-- The seven-stage strip from the client's Virtual & Hybrid mockup.
      Wayfinding, not data: it tells the client where they are in a journey that
      runs across several screens. The stage it marks is derived from the event's
@@ -26,8 +33,8 @@
 
     $stages = [
         1 => ['Entry',           'Choose what you want to do.',            $hub(1)],
-        2 => ['Plan',            'Tell us about your event.',              route('client.virtual-hub.brief')],
-        3 => ['Services',        'Select the services you need.',          route('client.virtual-hub.brief')],
+        2 => ['Plan',            'Tell us about your event.',              route('client.virtual-hub.brief', 'plan')],
+        3 => ['Services',        'Select the services you need.',          route('client.virtual-hub.brief', 'services')],
         4 => ['Hire',            'Find and hire the right professionals.', $hub(4)],
         5 => ['Event workspace', 'Manage everything in one place.',        $has ? $hub(5) : null],
         6 => ['Event day',       'Run your event with confidence.',        $has ? $hub(6) : null],
@@ -49,14 +56,14 @@
 
     <ol class="vhs-row">
         @foreach($stages as $n => [$name, $blurb, $url])
-            <li class="vhs-item {{ $n === $current ? 'is-now' : ($n < $current ? 'is-done' : '') }} {{ $url ? 'is-link' : '' }}">
+            <li class="vhs-item {{ in_array($n, $currentStages, true) ? 'is-now' : ($n < min($currentStages) ? 'is-done' : '') }} {{ $url ? 'is-link' : '' }}">
                 @if($url)
                     <a href="{{ $url }}" class="vhs-hit" aria-label="Go to {{ $name }}"></a>
                 @endif
-                <div class="vhs-num">{{ $n < $current ? '✓' : $n }}</div>
+                <div class="vhs-num">{{ $n < min($currentStages) ? '✓' : $n }}</div>
                 <div class="vhs-name">{{ $name }}</div>
                 <div class="vhs-blurb">{{ $blurb }}</div>
-                @if($n === $current)<div class="vhs-here">You are here</div>@endif
+                @if($n === min($currentStages))<div class="vhs-here">You are here</div>@endif
             </li>
         @endforeach
     </ol>

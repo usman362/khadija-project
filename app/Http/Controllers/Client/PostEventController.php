@@ -91,7 +91,7 @@ class PostEventController extends Controller
     public function storeEventInfo(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'event_type'   => ['nullable', 'string', 'max:120'],
+            'event_type'   => ['nullable', 'string', 'max:80'],
             // Asked on every request form now (Peter, 2026-08-20).
             'organization_type' => ['nullable', 'in:' . implode(',', array_keys(\App\Models\Event::ORGANIZATION_TYPES))],
             'start_time'   => ['nullable', 'string', 'max:20'],

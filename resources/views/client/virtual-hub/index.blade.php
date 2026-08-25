@@ -134,6 +134,33 @@
          already exist -- which is exactly what the mockup says this workflow
          should be: "uses GigResource's existing systems for professionals,
          requests, proposals, messages, bookings, payments". --}}
+    {{-- Styles for the stage panels. These lived inside the Hire block, so
+         on the Entry tab they never rendered and its cards came out as bare
+         underlined links -- CSS scoped by accident to one branch. --}}
+    <style>
+        .vh-entry{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:16px;}
+        .vh-entry-card{display:block;padding:16px 17px;border:1px solid var(--border-color);border-radius:13px;
+            text-decoration:none;color:var(--text-primary);background:var(--bg-card);}
+        .vh-entry-card.primary{border-color:var(--accent-orange,#f97316);background:rgba(249,115,22,.06);}
+        .vh-entry-card:hover{border-color:var(--accent-blue);}
+        .vh-entry-title{font-size:15px;font-weight:800;margin-bottom:4px;}
+        .vh-resume{display:flex;align-items:center;justify-content:space-between;gap:14px;
+            border:1px solid var(--accent-blue);background:rgba(59,130,246,.06);border-radius:12px;
+            padding:13px 16px;margin-bottom:16px;text-decoration:none;color:var(--text-primary);}
+        .vh-resume b{display:block;font-size:14px;}
+        .vh-resume span{font-size:12px;color:var(--text-muted);}
+        .vh-resume-go{flex:none;font-size:12.5px;font-weight:700;color:var(--accent-blue);}
+        .vh-entry-sub{font-size:12.5px;color:var(--text-muted);line-height:1.45;}
+        .vh-hire{border:1px solid var(--border-color);border-radius:13px;padding:15px 17px;margin-bottom:18px;background:var(--bg-card);}
+        .vh-hire-head{font-size:13px;font-weight:800;margin-bottom:11px;}
+        .vh-hire-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;}
+        .vh-hire-card{display:block;padding:11px 13px;border:1px solid var(--border-color);border-radius:10px;
+            text-decoration:none;color:var(--text-primary);}
+        .vh-hire-card:hover{border-color:var(--accent-orange,#f97316);}
+        .vh-hire-card b{display:block;font-size:13px;font-weight:700;}
+        .vh-hire-card span{display:block;font-size:11.5px;color:var(--text-muted);margin-top:2px;}
+    </style>
+
     @if($stage === 1)
     <div class="vh-entry">
         <a href="{{ route('client.virtual-hub.brief') }}" class="vh-entry-card primary">
@@ -149,6 +176,18 @@
             <div class="vh-entry-sub">Open an event you have already posted.</div>
         </a>
     </div>
+
+    {{-- The event does not get lost by always opening here: this is the way
+         back into it, named, with where it has got to. --}}
+    @if($workspace)
+        <a href="{{ route('client.virtual-hub.index', ['stage' => 5]) }}" class="vh-resume">
+            <div>
+                <b>{{ $workspace['event']->title }}</b>
+                <span>{{ $workspace['booked'] }} of {{ $workspace['services'] }} {{ Str::plural('service', $workspace['services']) }} booked · continue where you left off</span>
+            </div>
+            <span class="vh-resume-go">Open workspace →</span>
+        </a>
+    @endif
 
     @endif
 
@@ -171,23 +210,6 @@
         </div>
     </div>
 
-    <style>
-        .vh-entry{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:16px;}
-        .vh-entry-card{display:block;padding:16px 17px;border:1px solid var(--border-color);border-radius:13px;
-            text-decoration:none;color:var(--text-primary);background:var(--bg-card);}
-        .vh-entry-card.primary{border-color:var(--accent-orange,#f97316);background:rgba(249,115,22,.06);}
-        .vh-entry-card:hover{border-color:var(--accent-blue);}
-        .vh-entry-title{font-size:15px;font-weight:800;margin-bottom:4px;}
-        .vh-entry-sub{font-size:12.5px;color:var(--text-muted);line-height:1.45;}
-        .vh-hire{border:1px solid var(--border-color);border-radius:13px;padding:15px 17px;margin-bottom:18px;background:var(--bg-card);}
-        .vh-hire-head{font-size:13px;font-weight:800;margin-bottom:11px;}
-        .vh-hire-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;}
-        .vh-hire-card{display:block;padding:11px 13px;border:1px solid var(--border-color);border-radius:10px;
-            text-decoration:none;color:var(--text-primary);}
-        .vh-hire-card:hover{border-color:var(--accent-orange,#f97316);}
-        .vh-hire-card b{display:block;font-size:13px;font-weight:700;}
-        .vh-hire-card span{display:block;font-size:11.5px;color:var(--text-muted);margin-top:2px;}
-    </style>
 
     @endif
 

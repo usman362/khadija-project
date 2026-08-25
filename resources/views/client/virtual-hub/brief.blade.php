@@ -140,134 +140,165 @@
 @endpush
 
 @section('content')
-{{-- Stages 2 and 3 of the Virtual & Hybrid workflow: tell us about the event,
-     then pick the services. Every field here is stored. The form this replaces
-     asked for a platform through radio buttons that carried no value, a bidding
-     model, interactive features and a language interpreter -- none of which the
-     controller validated or saved -- and prefilled the date with "Oct 25, 2024",
-     a date in the past that a client could submit without noticing. --}}
-@include('client.virtual-hub._stages', ['current' => 2, 'event' => null])
+{{-- Two steps, the way the client's workflow draws them: Plan, then Services,
+     with a Continue between. They were one page, so submitting looked like a
+     jump from step 2 straight to step 4 with step 3 never seen. --}}
+@include('client.virtual-hub._stages', ['current' => $step === 'plan' ? 2 : 3, 'event' => null])
 
-<form method="POST" action="{{ route('client.virtual-hub.store') }}" class="vhb">
-    @csrf
-
-    @if($errors->any())
-        <div class="vhb-card" style="border-color:#ef4444;">
-            <b style="display:block;margin-bottom:6px;">Please fix these first</b>
-            <ul style="margin:0;padding-left:18px;font-size:13px;">
-                @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
-            </ul>
-        </div>
-    @endif
-
-    {{-- ── Stage 2 · Plan ─────────────────────────────────── --}}
-    <div class="vhb-card">
-        <div class="vhb-card-head"><span class="vhb-step">2</span> Tell us about your event</div>
-
-        <label class="vhb-label">Event name *</label>
-        <input type="text" name="title" class="vhb-input" required maxlength="200"
-               value="{{ old('title') }}" placeholder="e.g. Annual Leadership Conference">
-
-        <label class="vhb-label">Event format *</label>
-        <div class="vhb-formats">
-            @foreach(['virtual' => 'Fully virtual', 'hybrid' => 'Hybrid — in person and online'] as $val => $text)
-                <label class="vhb-opt">
-                    <input type="radio" name="event_format" value="{{ $val }}"
-                           {{ old('event_format') === $val ? 'checked' : '' }} required
-                           onchange="document.getElementById('vhb-venue').style.display = this.value === 'hybrid' ? 'block' : 'none';">
-                    <span class="vhb-opt-text">{{ $text }}</span>
-                </label>
-            @endforeach
-        </div>
-
-        <div class="vhb-grid-2">
-            <div>
-                <label class="vhb-label">Event type</label>
-                <input type="text" name="event_type" class="vhb-input" maxlength="120"
-                       value="{{ old('event_type') }}" placeholder="e.g. Conference">
-            </div>
-            <div>
-                <label class="vhb-label">Expected attendance</label>
-                <input type="number" name="guest_count" class="vhb-input" min="1"
-                       value="{{ old('guest_count') }}" placeholder="e.g. 150">
-            </div>
-        </div>
-
-        <div class="vhb-grid-2">
-            <div>
-                <label class="vhb-label">Starts *</label>
-                {{-- No prefilled date. The one that used to sit here was in
-                     the past, and a client could post it unchanged. --}}
-                <input type="datetime-local" name="starts_at" class="vhb-input" required value="{{ old('starts_at') }}">
-            </div>
-            <div>
-                <label class="vhb-label">Ends</label>
-                <input type="datetime-local" name="ends_at" class="vhb-input" value="{{ old('ends_at') }}">
-            </div>
-        </div>
-
-        <div id="vhb-venue" style="display:{{ old('event_format') === 'hybrid' ? 'block' : 'none' }};">
-            <label class="vhb-label">Venue for the in-person half *</label>
-            <input type="text" name="location" class="vhb-input" maxlength="200"
-                   value="{{ old('location') }}" placeholder="e.g. Baltimore, MD">
-        </div>
-
-        <div class="vhb-grid-2">
-            <div>
-                {{-- for/id rather than aria-label: the visible label is the
-                     right name, so tie the two together instead of writing a
-                     second one that can drift from it. --}}
-                <label class="vhb-label" for="vhb-platform">Platform, if you know it</label>
-                <select name="platform" id="vhb-platform" class="vhb-select">
-                    <option value="">Not decided yet</option>
-                    @foreach(['Zoom', 'Microsoft Teams', 'Google Meet', 'Webex', 'Hopin', 'YouTube Live', 'Other'] as $pf)
-                        <option value="{{ $pf }}" @selected(old('platform') === $pf)>{{ $pf }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label class="vhb-label">Joining link, if you have one</label>
-                <input type="url" name="meeting_url" class="vhb-input" maxlength="500"
-                       value="{{ old('meeting_url') }}" placeholder="https://…">
-                <p class="vhb-hint">We only store what you paste. Nothing here creates a meeting for you.</p>
-            </div>
-        </div>
+@if($errors->any())
+    <div class="vhb-card" id="vhb-errors" style="border-color:#ef4444;max-width:820px;">
+        <b style="display:block;margin-bottom:6px;">Please fix these first</b>
+        <ul style="margin:0;padding-left:18px;font-size:13px;">
+            @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
+        </ul>
     </div>
+@endif
 
-    {{-- ── Stage 3 · Services ─────────────────────────────── --}}
-    <div class="vhb-card">
-        <div class="vhb-card-head"><span class="vhb-step">3</span> What services do you need?</div>
-        <p class="vhb-hint" style="margin-top:-4px;">Pick one or more. Professionals bid on what you choose.</p>
+@if($step === 'plan')
+    {{-- ── Step 2 · Plan ───────────────────────────────── --}}
+    <form method="POST" action="{{ route('client.virtual-hub.save', 'plan') }}" class="vhb">
+        @csrf
+        <div class="vhb-card">
+            <div class="vhb-card-head"><span class="vhb-step">2</span> Tell us about your event</div>
 
-        <x-service-picker :categories="$services" name="services" :selected="old('services', [])" />
-    </div>
+            <label class="vhb-label" for="vhb-title">Event name *</label>
+            <input type="text" id="vhb-title" name="title" class="vhb-input" required maxlength="200"
+                   value="{{ old('title', $draft['title'] ?? '') }}" placeholder="e.g. Annual Leadership Conference">
+            @error('title')<p class="vhb-err">{{ $message }}</p>@enderror
 
-    {{-- ── Brief ──────────────────────────────────────────── --}}
-    <div class="vhb-card">
-        <div class="vhb-card-head">Anything else they should know?</div>
-        <textarea name="description" class="vhb-input" rows="4" maxlength="5000"
-                  placeholder="Run of show, rehearsal needs, accessibility requirements…">{{ old('description') }}</textarea>
-
-        <div class="vhb-grid-2">
-            <div>
-                <label class="vhb-label">Budget from</label>
-                <input type="number" name="budget_min" class="vhb-input" min="0" step="1" value="{{ old('budget_min') }}">
+            <label class="vhb-label">Event format *</label>
+            <div class="vhb-formats">
+                @foreach(['virtual' => 'Fully virtual', 'hybrid' => 'Hybrid — in person and online'] as $val => $text)
+                    <label class="vhb-opt">
+                        <input type="radio" name="event_format" value="{{ $val }}" required
+                               {{ old('event_format', $draft['event_format'] ?? '') === $val ? 'checked' : '' }}
+                               onchange="document.getElementById('vhb-venue').style.display = this.value === 'hybrid' ? 'block' : 'none';">
+                        <span class="vhb-opt-text">{{ $text }}</span>
+                    </label>
+                @endforeach
             </div>
-            <div>
-                <label class="vhb-label">Budget to</label>
-                <input type="number" name="budget_max" class="vhb-input" min="0" step="1" value="{{ old('budget_max') }}">
+            @error('event_format')<p class="vhb-err">{{ $message }}</p>@enderror
+
+            <div class="vhb-grid-2">
+                <div>
+                    <label class="vhb-label" for="vhb-type">Event type</label>
+                    <input type="text" id="vhb-type" name="event_type" class="vhb-input" maxlength="80"
+                           value="{{ old('event_type', $draft['event_type'] ?? '') }}" placeholder="e.g. Conference">
+                    @error('event_type')<p class="vhb-err">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label class="vhb-label" for="vhb-guests">Expected attendance</label>
+                    <input type="number" id="vhb-guests" name="guest_count" class="vhb-input" min="1"
+                           value="{{ old('guest_count', $draft['guest_count'] ?? '') }}" placeholder="e.g. 150">
+                </div>
+            </div>
+
+            <div class="vhb-grid-2">
+                <div>
+                    <label class="vhb-label" for="vhb-starts">Starts *</label>
+                    <input type="datetime-local" id="vhb-starts" name="starts_at" class="vhb-input" required
+                           value="{{ old('starts_at', $draft['starts_at'] ?? '') }}">
+                    @error('starts_at')<p class="vhb-err">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label class="vhb-label" for="vhb-ends">Ends</label>
+                    <input type="datetime-local" id="vhb-ends" name="ends_at" class="vhb-input"
+                           value="{{ old('ends_at', $draft['ends_at'] ?? '') }}">
+                    @error('ends_at')<p class="vhb-err">{{ $message }}</p>@enderror
+                </div>
+            </div>
+
+            <div id="vhb-venue" style="display:{{ old('event_format', $draft['event_format'] ?? '') === 'hybrid' ? 'block' : 'none' }};">
+                <label class="vhb-label" for="vhb-loc">Venue for the in-person half *</label>
+                <input type="text" id="vhb-loc" name="location" class="vhb-input" maxlength="200"
+                       value="{{ old('location', $draft['location'] ?? '') }}" placeholder="e.g. Baltimore, MD">
+                @error('location')<p class="vhb-err">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="vhb-grid-2">
+                <div>
+                    <label class="vhb-label" for="vhb-platform">Platform, if you know it</label>
+                    <select name="platform" id="vhb-platform" class="vhb-select">
+                        <option value="">Not decided yet</option>
+                        @foreach(['Zoom', 'Microsoft Teams', 'Google Meet', 'Webex', 'Hopin', 'YouTube Live', 'Other'] as $pf)
+                            <option value="{{ $pf }}" @selected(old('platform', $draft['platform'] ?? '') === $pf)>{{ $pf }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="vhb-label" for="vhb-url">Joining link, if you have one</label>
+                    <input type="url" id="vhb-url" name="meeting_url" class="vhb-input" maxlength="500"
+                           value="{{ old('meeting_url', $draft['meeting_url'] ?? '') }}" placeholder="https://…">
+                    @error('meeting_url')<p class="vhb-err">{{ $message }}</p>@enderror
+                    <p class="vhb-hint">We only store what you paste. Nothing here creates a meeting for you.</p>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="vhb-actions">
-        <a href="{{ route('client.virtual-hub.index') }}" class="vhb-btn-ghost">Cancel</a>
-        <button type="submit" class="vhb-btn">Post event &amp; get proposals →</button>
-    </div>
-</form>
+        <div class="vhb-actions">
+            <a href="{{ route('client.virtual-hub.index') }}" class="vhb-btn-ghost">Cancel</a>
+            <button type="submit" class="vhb-btn">Continue to services →</button>
+        </div>
+    </form>
 
+@else
+    {{-- ── Step 3 · Services ───────────────────────────── --}}
+    <form method="POST" action="{{ route('client.virtual-hub.save', 'services') }}" class="vhb">
+        @csrf
+
+        {{-- What they told us a moment ago, so they are not choosing blind. --}}
+        <div class="vhb-recap">
+            <b>{{ $draft['title'] }}</b>
+            <span>
+                {{ ucfirst($draft['event_format']) }}
+                @if(! empty($draft['starts_at'])) · {{ \Illuminate\Support\Carbon::parse($draft['starts_at'])->format('M j, Y · g:i A') }} @endif
+                @if(! empty($draft['guest_count'])) · {{ $draft['guest_count'] }} attending @endif
+            </span>
+            <a href="{{ route('client.virtual-hub.brief', 'plan') }}">Edit</a>
+        </div>
+
+        <div class="vhb-card">
+            <div class="vhb-card-head"><span class="vhb-step">3</span> What services do you need?</div>
+            <p class="vhb-hint" style="margin-top:-4px;">Pick one or more. Professionals bid on what you choose.</p>
+
+            @error('services')<p class="vhb-err" style="margin-bottom:8px;">{{ $message }}</p>@enderror
+            <x-service-picker :categories="$services" name="services" :selected="old('services', [])" />
+        </div>
+
+        <div class="vhb-card">
+            <div class="vhb-card-head">Anything else they should know?</div>
+            <textarea name="description" class="vhb-input" rows="4" maxlength="5000"
+                      placeholder="Run of show, rehearsal needs, accessibility requirements…">{{ old('description') }}</textarea>
+
+            <div class="vhb-grid-2">
+                <div>
+                    <label class="vhb-label" for="vhb-bmin">Budget from</label>
+                    <input type="number" id="vhb-bmin" name="budget_min" class="vhb-input" min="0" step="1" value="{{ old('budget_min') }}">
+                </div>
+                <div>
+                    <label class="vhb-label" for="vhb-bmax">Budget to</label>
+                    <input type="number" id="vhb-bmax" name="budget_max" class="vhb-input" min="0" step="1" value="{{ old('budget_max') }}">
+                    @error('budget_max')<p class="vhb-err">{{ $message }}</p>@enderror
+                </div>
+            </div>
+        </div>
+
+        <div class="vhb-actions">
+            <a href="{{ route('client.virtual-hub.brief', 'plan') }}" class="vhb-btn-ghost">← Back</a>
+            <button type="submit" class="vhb-btn">Post event &amp; get proposals →</button>
+        </div>
+    </form>
+@endif
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var box = document.getElementById('vhb-errors');
+        if (box) { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    });
+</script>
 <style>
     .vhb{max-width:820px;}
+    .vhb-err{font-size:12px;color:#dc2626;margin:5px 0 0;font-weight:600;}
     .vhb-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:14px;padding:20px 22px;margin-bottom:16px;}
     .vhb-card-head{font-size:15.5px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:9px;}
     .vhb-step{display:inline-flex;width:23px;height:23px;border-radius:50%;background:var(--accent-orange,#f97316);
@@ -283,7 +314,12 @@
         padding:10px 14px;cursor:pointer;font-size:13.5px;}
     .vhb-opt:has(input:checked){border-color:var(--accent-orange,#f97316);background:rgba(249,115,22,.07);font-weight:700;}
     .vhb-hint{font-size:11.5px;color:var(--text-muted);margin:5px 0 0;}
-    .vhb-actions{display:flex;gap:10px;justify-content:flex-end;align-items:center;}
+    .vhb-recap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;max-width:820px;
+        border:1px solid var(--border-color);border-radius:12px;padding:12px 16px;margin-bottom:16px;}
+    .vhb-recap b{font-size:14px;}
+    .vhb-recap span{font-size:12.5px;color:var(--text-muted);flex:1;min-width:180px;}
+    .vhb-recap a{font-size:12.5px;font-weight:700;}
+    .vhb-actions{display:flex;gap:10px;justify-content:flex-end;align-items:center;max-width:820px;}
     .vhb-btn{border:none;border-radius:10px;padding:11px 20px;background:var(--accent-orange,#f97316);
         color:#fff;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;}
     .vhb-btn-ghost{padding:11px 18px;border:1px solid var(--border-color);border-radius:10px;

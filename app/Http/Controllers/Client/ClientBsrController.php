@@ -362,7 +362,7 @@ class ClientBsrController extends Controller
             'tool_key'    => ['required', 'string', 'in:' . implode(',', self::FROM_TOOL)],
             'tool_name'   => ['required', 'string', 'max:80'],
             'outcome'     => ['required', 'string', 'in:' . implode(',', self::OUTCOMES)],
-            'event_type'  => ['nullable', 'string', 'max:120'],
+            'event_type'  => ['nullable', 'string', 'max:80'],
             'event_date'  => ['nullable', 'date'],
             'guest_count' => ['nullable', 'integer', 'min:1', 'max:1000000'],
             'budget'      => ['nullable', 'numeric', 'min:0', 'max:99999999'],
@@ -486,7 +486,7 @@ class ClientBsrController extends Controller
     public function fromEventType(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'event_type'   => ['required', 'string', 'max:120'],
+            'event_type'   => ['required', 'string', 'max:80'],
             'categories'   => ['required', 'array', 'min:1', 'max:27'],
             'categories.*' => ['integer', 'exists:categories,id'],
         ]);

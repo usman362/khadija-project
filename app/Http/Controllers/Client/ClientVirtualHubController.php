@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Event;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -143,17 +144,19 @@ class ClientVirtualHubController extends Controller
          * only panel below it. Where the event has got to decides which one
          * opens first; after that the client chooses.
          */
-        $default = match ($workspace['stage'] ?? null) {
-            'complete'    => 7,
-            'event_day'   => 6,
-            'preparation' => 5,
-            'hiring', 'planning' => 4,
-            default       => 1,
-        };
-
-        $stage = (int) $request->integer('stage', $default);
+        /*
+         * Opening on stage 1, always.
+         *
+         * This used to open wherever the event had got to, which was clever
+         * and wrong: clicking "Virtual & Hybrid Hub" in the sidebar dropped
+         * the client into step 4 with no idea why. The same click has to lead
+         * to the same place every time, and the start of a workflow is the
+         * start of it. The event is not hidden by this -- the Entry panel
+         * points straight at it.
+         */
+        $stage = (int) $request->integer('stage', 1);
         if ($stage < 1 || $stage > 7) {
-            $stage = $default;
+            $stage = 1;
         }
 
         // Stages 5-7 describe an event. Without one there is nothing to show,
@@ -178,91 +181,102 @@ class ClientVirtualHubController extends Controller
      *
      * Route: GET /client/virtual-hub/brief
      */
-    public function brief(Request $request): View
+    /** Where the half-finished brief lives between the two steps. */
+    private const DRAFT = 'virtual_hub_brief';
+
+    /**
+     * The brief, in the two steps the client's workflow shows: plan the event,
+     * then choose the services. They used to sit on one page, which made
+     * submitting it look like a jump from step 2 to step 4 with step 3 skipped.
+     */
+    public function brief(Request $request, string $step = 'plan'): View|RedirectResponse
     {
-        $user = $request->user();
+        $draft = (array) session(self::DRAFT, []);
 
-        $activeEvent = Event::where('client_id', $user->id)
-            ->whereIn('status', ['pending', 'published', 'confirmed'])
-            ->latest('starts_at')->first();
+        // The services step needs the plan behind it. Arriving cold sends the
+        // client to the start rather than to a form that cannot be submitted.
+        if ($step === 'services' && empty($draft['title'])) {
+            return redirect()->route('client.virtual-hub.brief', 'plan');
+        }
 
-        // The same bookable-service definition every other request form uses,
-        // so this catalogue cannot drift from the BSR, ER and Direct Request
-        // ones. Grouped by their service category, which is what gives the
-        // mockup its Technical Production / Event Support / Content & Media
-        // headings without inventing a second grouping.
-        $services = Category::active()->bookableServices()
-            ->with('parent:id,name')
-            ->orderBy('name')
-            ->get(['id', 'name', 'parent_id']);
+        $services = $step === 'services'
+            ? Category::active()->bookableServices()
+                ->with('parent:id,name')->orderBy('name')->get(['id', 'name', 'parent_id'])
+            : collect();
 
-        return view('client.virtual-hub.brief', compact('activeEvent', 'services'));
+        return view('client.virtual-hub.brief', [
+            'step'     => $step,
+            'draft'    => $draft,
+            'services' => $services,
+        ]);
     }
 
     /**
-     * Persist a Virtual & Hybrid Event Brief as a real published Event (RFP)
-     * so it flows into the same proposals/bidding pipeline as other gigs.
-     *
-     * Route: POST /client/virtual-hub/brief
+     * Save a step. The plan step is remembered and passes on; the services step
+     * is the one that actually creates the event.
      */
-    /**
-     * Post a virtual or hybrid event (mockup stages 2 and 3).
-     *
-     * Every field this form asks for is now stored. It used to ask for the
-     * platform as a set of radio buttons that carried no value, so the browser
-     * submitted "on" -- and the controller neither validated nor saved it
-     * regardless. The client chose Zoom and the answer went nowhere.
-     *
-     * The event itself is an ordinary Event, published through the same
-     * systems as any other request, which is what the mockup asks for: the
-     * virtual workflow reuses professionals, requests, proposals, messages,
-     * bookings and payments rather than growing a parallel set.
-     */
-    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    public function save(Request $request, string $step): RedirectResponse
+    {
+        return $step === 'plan'
+            ? $this->savePlan($request)
+            : $this->saveServices($request);
+    }
+
+    private function savePlan(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'title'         => ['required', 'string', 'max:200'],
-            'event_format'  => ['required', 'in:virtual,hybrid'],
-            'event_type'    => ['nullable', 'string', 'max:120'],
-            'starts_at'     => ['required', 'date'],
-            'ends_at'       => ['nullable', 'date', 'after:starts_at'],
-            'guest_count'   => ['nullable', 'integer', 'min:1', 'max:1000000'],
-            // Only a hybrid event has somewhere to be.
-            'location'      => ['nullable', 'required_if:event_format,hybrid', 'string', 'max:200'],
-            'platform'      => ['nullable', 'string', 'max:60'],
-            'meeting_url'   => ['nullable', 'url', 'max:500'],
-            'services'      => ['required', 'array', 'min:1'],
-            'services.*'    => ['integer', 'exists:categories,id'],
-            'description'   => ['nullable', 'string', 'max:5000'],
-            'budget_min'    => ['nullable', 'numeric', 'min:0'],
-            'budget_max'    => ['nullable', 'numeric', 'min:0', 'gte:budget_min'],
-        ], [
-            'location.required_if' => 'A hybrid event needs a venue — tell professionals where the in-person half is.',
-            'services.required'    => 'Pick at least one service you need.',
-        ]);
+            'title'        => ['required', 'string', 'max:200'],
+            'event_format' => ['required', 'in:virtual,hybrid'],
+            'event_type'   => ['nullable', 'string', 'max:80'],
+            'starts_at'    => ['required', 'date'],
+            'ends_at'      => ['nullable', 'date', 'after:starts_at'],
+            'guest_count'  => ['nullable', 'integer', 'min:1', 'max:1000000'],
+            'location'     => ['nullable', 'required_if:event_format,hybrid', 'string', 'max:200'],
+            'platform'     => ['nullable', 'string', 'max:60'],
+            'meeting_url'  => ['nullable', 'url', 'max:500'],
+        ], $this->messages());
 
-        $starts = \Illuminate\Support\Carbon::parse($data['starts_at']);
+        session([self::DRAFT => array_merge((array) session(self::DRAFT, []), $data)]);
+
+        return redirect()->route('client.virtual-hub.brief', 'services');
+    }
+
+    private function saveServices(Request $request): RedirectResponse
+    {
+        $draft = (array) session(self::DRAFT, []);
+
+        if (empty($draft['title'])) {
+            return redirect()->route('client.virtual-hub.brief', 'plan')
+                ->with('error', 'Tell us about the event first.');
+        }
+
+        $data = $request->validate([
+            'services'    => ['required', 'array', 'min:1'],
+            'services.*'  => ['integer', 'exists:categories,id'],
+            'description' => ['nullable', 'string', 'max:5000'],
+            'budget_min'  => ['nullable', 'numeric', 'min:0'],
+            'budget_max'  => ['nullable', 'numeric', 'min:0', 'gte:budget_min'],
+        ], $this->messages());
+
+        $starts = \Illuminate\Support\Carbon::parse($draft['starts_at']);
 
         $event = Event::create([
-            'title'             => $data['title'],
+            'title'             => $draft['title'],
             'description'       => $data['description'] ?? null,
-            'event_type'        => $data['event_type'] ?? null,
-            'event_format'      => $data['event_format'],
-            'platform'          => $data['platform'] ?? null,
-            'meeting_url'       => $data['meeting_url'] ?? null,
+            'event_type'        => $draft['event_type'] ?? null,
+            'event_format'      => $draft['event_format'],
+            'platform'          => $draft['platform'] ?? null,
+            'meeting_url'       => $draft['meeting_url'] ?? null,
             'status'            => 'published',
             'is_published'      => true,
             'published_at'      => now(),
             'starts_at'         => $starts,
-            'ends_at'           => ! empty($data['ends_at']) ? \Illuminate\Support\Carbon::parse($data['ends_at']) : null,
-            'guest_count'       => $data['guest_count'] ?? null,
+            'ends_at'           => ! empty($draft['ends_at']) ? \Illuminate\Support\Carbon::parse($draft['ends_at']) : null,
+            'guest_count'       => $draft['guest_count'] ?? null,
             'budget_min'        => $data['budget_min'] ?? null,
             'budget_max'        => $data['budget_max'] ?? null,
             'budget'            => $data['budget_min'] ?? null,
-            // A virtual event has no venue, so it has no state of its own --
-            // it takes the client's, which is what R38 matches professionals
-            // against either way.
-            'location'          => $data['location'] ?? null,
+            'location'          => $draft['location'] ?? null,
             'state'             => \App\Support\StateMatching::requestState($request->user(), null),
             'proposal_deadline' => $this->deadlineFor($starts),
             'source'            => 'virtual_hub',
@@ -272,9 +286,26 @@ class ClientVirtualHubController extends Controller
 
         $event->categories()->sync(array_map('intval', $data['services']));
 
+        session()->forget(self::DRAFT);
+
         return redirect()
-            ->route('client.virtual-hub.index')
-            ->with('status', 'Your ' . $data['event_format'] . ' event is posted — professionals can send proposals now.');
+            ->route('client.virtual-hub.index', ['stage' => 4])
+            ->with('status', '“' . $event->title . '” is posted — professionals can send proposals now.');
+    }
+
+    /** One set of wordings for both steps. */
+    private function messages(): array
+    {
+        return [
+            'title.required'        => 'Give your event a name.',
+            'event_format.required' => 'Choose whether this is fully virtual or hybrid.',
+            'starts_at.required'    => 'Pick the date and time your event starts.',
+            'ends_at.after'         => 'The end time has to be after the start.',
+            'location.required_if'  => 'A hybrid event needs a venue — tell professionals where the in-person half is.',
+            'services.required'     => 'Pick at least one service you need.',
+            'budget_max.gte'        => 'The top of the budget must be at least the bottom.',
+            'meeting_url.url'       => 'A joining link should start with http:// or https://',
+        ];
     }
 
     /**

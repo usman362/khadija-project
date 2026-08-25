@@ -48,7 +48,8 @@ class VirtualHubBriefTest extends TestCase
         ]);
     }
 
-    private function payload(array $overrides = []): array
+    /** Step 2 — the plan. */
+    private function plan(array $overrides = []): array
     {
         return array_merge([
             'title'        => 'Annual Leadership Conference',
@@ -58,17 +59,34 @@ class VirtualHubBriefTest extends TestCase
             'guest_count'  => 150,
             'platform'     => 'Zoom',
             'meeting_url'  => 'https://zoom.us/j/123456789',
-            'services'     => [$this->service->id],
         ], $overrides);
+    }
+
+    /** Step 3 — the services. */
+    private function servicesStep(array $overrides = []): array
+    {
+        return array_merge(['services' => [$this->service->id]], $overrides);
+    }
+
+    /** Walk both steps the way a client does. */
+    private function postBoth(array $plan = [], array $services = []): \Illuminate\Testing\TestResponse
+    {
+        $this->actingAs($this->client)
+            ->post(route('client.virtual-hub.save', 'plan'), $this->plan($plan))
+            ->assertSessionHasNoErrors();
+
+        return $this->actingAs($this->client)
+            ->post(route('client.virtual-hub.save', 'services'), $this->servicesStep($services));
     }
 
     /** The bug that started this: the platform is kept. */
     public function test_everything_the_form_asks_for_is_stored(): void
     {
-        $this->actingAs($this->client)
-            ->post(route('client.virtual-hub.store'), $this->payload())
+        $this->postBoth()
             ->assertSessionHasNoErrors()
-            ->assertRedirect(route('client.virtual-hub.index'));
+            // Lands on Hire — the client just posted, and "what happens now"
+            // is the next question, not "what would you like to do".
+            ->assertRedirect(route('client.virtual-hub.index', ['stage' => 4]));
 
         $event = Event::where('client_id', $this->client->id)->latest('id')->firstOrFail();
 
@@ -86,25 +104,23 @@ class VirtualHubBriefTest extends TestCase
     public function test_a_hybrid_event_must_name_its_venue(): void
     {
         $this->actingAs($this->client)
-            ->post(route('client.virtual-hub.store'), $this->payload(['event_format' => 'hybrid', 'location' => null]))
+            ->post(route('client.virtual-hub.save', 'plan'), $this->plan(['event_format' => 'hybrid', 'location' => null]))
             ->assertSessionHasErrors('location');
 
         $this->actingAs($this->client)
-            ->post(route('client.virtual-hub.store'), $this->payload(['event_format' => 'hybrid', 'location' => 'Baltimore, MD']))
+            ->post(route('client.virtual-hub.save', 'plan'), $this->plan(['event_format' => 'hybrid', 'location' => 'Baltimore, MD']))
             ->assertSessionHasNoErrors();
     }
 
     public function test_a_request_needs_at_least_one_service(): void
     {
-        $this->actingAs($this->client)
-            ->post(route('client.virtual-hub.store'), $this->payload(['services' => []]))
-            ->assertSessionHasErrors('services');
+        $this->postBoth([], ['services' => []])->assertSessionHasErrors('services');
     }
 
     /** It gets the same approved bidding window as every other request (R37). */
     public function test_it_closes_bidding_on_the_approved_window(): void
     {
-        $this->actingAs($this->client)->post(route('client.virtual-hub.store'), $this->payload());
+        $this->postBoth();
 
         $event = Event::where('client_id', $this->client->id)->latest('id')->firstOrFail();
 
@@ -114,6 +130,123 @@ class VirtualHubBriefTest extends TestCase
             now()->diffInHours($event->proposal_deadline),
             1,
         );
+    }
+
+    /**
+     * A rejected submit must say why, where the client is standing.
+     *
+     * Ali hit Post at the foot of a long form, the page reloaded to the top,
+     * and it read as "nothing happened, back to the start" — the error summary
+     * was up there, out of sight. Each field now carries its own reason, in
+     * words rather than "The starts at field is required".
+     */
+    public function test_a_rejected_submit_explains_itself_at_the_field(): void
+    {
+        $this->actingAs($this->client)
+            ->post(route('client.virtual-hub.save', 'plan'), $this->plan(['starts_at' => null, 'event_format' => null]))
+            ->assertSessionHasErrors(['starts_at', 'event_format']);
+
+        $errors = session('errors');
+        $this->assertSame('Pick the date and time your event starts.', $errors->first('starts_at'));
+        $this->assertSame('Choose whether this is fully virtual or hybrid.', $errors->first('event_format'));
+
+        // And on the services step, its own reason.
+        $this->postBoth([], ['services' => []]);
+        $this->assertSame('Pick at least one service you need.', session('errors')->first('services'));
+    }
+
+    /** The form renders those reasons beside the fields, not only in a summary. */
+    public function test_the_form_shows_errors_inline(): void
+    {
+        $this->postBoth([], ['services' => []]);
+
+        $html = $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.brief', 'services'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('vhb-err', $html,
+            'A rejected field must carry its reason next to it.');
+        $this->assertStringContainsString('Pick at least one service you need.', $html);
+    }
+
+    // ── The two steps ────────────────────────────────────────────
+
+    /**
+     * Plan then Services, with a Continue between — the two stages the
+     * client's workflow draws. They were one page, so submitting it looked
+     * like a jump from step 2 to step 4 with step 3 never seen.
+     */
+    public function test_the_plan_step_leads_to_the_services_step(): void
+    {
+        $this->actingAs($this->client)
+            ->post(route('client.virtual-hub.save', 'plan'), $this->plan())
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('client.virtual-hub.brief', 'services'));
+    }
+
+    /** Each step marks its own stage on the strip — never two at once. */
+    public function test_each_step_marks_its_own_stage(): void
+    {
+        $plan = $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.brief', 'plan'))->assertOk()->getContent();
+        $this->assertMatchesRegularExpression('/Plan.*?You are here/s', preg_replace('/<[^>]+>/', ' ', $plan));
+
+        $this->actingAs($this->client)->post(route('client.virtual-hub.save', 'plan'), $this->plan());
+
+        $services = $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.brief', 'services'))->assertOk()->getContent();
+        $this->assertMatchesRegularExpression('/Services.*?You are here/s', preg_replace('/<[^>]+>/', ' ', $services));
+    }
+
+    /** The services step needs the plan behind it. */
+    public function test_the_services_step_cannot_be_reached_cold(): void
+    {
+        $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.brief', 'services'))
+            ->assertRedirect(route('client.virtual-hub.brief', 'plan'));
+    }
+
+    /** Nothing is created by the plan step alone. */
+    public function test_the_plan_step_creates_no_event(): void
+    {
+        $this->actingAs($this->client)->post(route('client.virtual-hub.save', 'plan'), $this->plan());
+
+        $this->assertSame(0, Event::where('client_id', $this->client->id)->count(),
+            'An event must not exist until the services step is submitted.');
+    }
+
+    /** What was entered on step 2 is still there on step 3, and editable. */
+    public function test_the_services_step_shows_the_plan_it_is_choosing_for(): void
+    {
+        $this->actingAs($this->client)->post(route('client.virtual-hub.save', 'plan'), $this->plan());
+
+        $html = $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.brief', 'services'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('Annual Leadership Conference', $html);
+        $this->assertStringContainsString('150 attending', $html);
+        $this->assertStringContainsString(route('client.virtual-hub.brief', 'plan'), $html,
+            'There must be a way back to change it.');
+    }
+
+    /** Going back keeps what was typed. */
+    public function test_going_back_to_plan_keeps_the_answers(): void
+    {
+        $this->actingAs($this->client)->post(route('client.virtual-hub.save', 'plan'), $this->plan());
+
+        $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.brief', 'plan'))->assertOk()
+            ->assertSee('Annual Leadership Conference', false)
+            ->assertSee('Conference', false);
+    }
+
+    /** Once posted, the draft is gone — a second visit starts clean. */
+    public function test_posting_clears_the_draft(): void
+    {
+        $this->postBoth()->assertSessionHasNoErrors();
+
+        $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.brief', 'services'))
+            ->assertRedirect(route('client.virtual-hub.brief', 'plan'));
     }
 
     /** No prefilled date, and none in the past. */
