@@ -63,6 +63,9 @@ Verified against the code, most recent first. Safe for Sir Peter to screenshot.
 
 | Item | Notes |
 |---|---|
+| **Package purchase path (audit row 25)** | 2026-08-25. A package had a price, a page, and a "Request this Package" button that opened the Direct Request form — a different product, in which the package's own price appeared nowhere. Now `/client/packages/{package}/book`: fixed price, date, R38 state gate, own-package and draft blocked, no double-booking on one date. It creates the booking at `requested`, **not** confirmed — an instant-book that commits the professional before they have seen the date would be a screen promising what the other side never agreed to. No tiers, no add-ons, no fee line: none of those has been decided, and a number on a checkout is a number the client will hold us to. No payment is taken; the confirmation says so in as many words. |
+| **Transaction detail (audit row 17)** | 2026-08-25. `/client/payments/{booking}` — what the money is for, its status history, and one plain sentence per state about whether anything has moved. Nothing is derived, split or forecast. |
+| **Payments and Spending were reporting $0 on real money** | 2026-08-25, found while building row 17. `ClientFinanceController::priceColumn()` looked for `bookings.total_amount` then `bookings.agreed_price`; neither column has ever existed. It returned null, every sum was skipped, and both pages showed $0 and dashes while all 62 bookings carried a price in `bookings.price`. Same defect as the Total Spent card: a real number, not read. |
 | Client inbox brought up to the professional one | Filters, details panel, templates, working attachments. |
 | Co-Op / Team removed completely | Decided 15 Jul; the UI went then, the column and 8 stale rows survived until 31 Jul. |
 | Multi-Service Requests folded into the Bidding Board | It was the board's `scope=multi` filter as a second page. |

@@ -311,7 +311,31 @@
                         @endphp
                         <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">{{ $priceNote }}</div>
 
-                        <a class="pk-cta pk-cta-primary" href="{{ auth()->check() ? route('client.direct-offers.create', array_filter(['pro' => $pro?->id, 'date' => $checkDate ?: null])) : route('login') }}">Request this Package</a>
+                        {{-- This button used to open the Direct Request form.
+                             That is a different product — the client writes a
+                             brief and waits for a quote — and the package's own
+                             price appeared nowhere in it. A package is already
+                             priced and already scoped; buying it is its own
+                             path. The owner of the package is sent to their own
+                             shelf instead, because nobody books themselves. --}}
+                        @php
+                            $isOwner = auth()->id() === $package->user_id;
+                            $bookUrl = auth()->check()
+                                ? route('client.packages.book', array_filter([
+                                    'package' => $package->id,
+                                    'date'    => $checkDate ?: null,
+                                  ]))
+                                : route('login');
+                        @endphp
+
+                        @if ($isOwner)
+                            <a class="pk-cta pk-cta-ghost" href="{{ route('professional.packages.index') }}">This is your package · manage it</a>
+                        @else
+                            <a class="pk-cta pk-cta-primary" href="{{ $bookUrl }}">Book this package · ${{ number_format((float) $package->price, 0) }}</a>
+                            <div style="font-size:11.5px;color:var(--muted);margin-top:7px;text-align:center;line-height:1.5;">
+                                You are not charged when you send it — {{ $pro?->name ?? 'the professional' }} confirms the date first.
+                            </div>
+                        @endif
 
                         @auth
                             @if(auth()->user()->hasRole('client'))

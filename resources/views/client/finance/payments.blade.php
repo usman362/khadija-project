@@ -172,7 +172,7 @@
         </form>
         <div style="overflow-x:auto;">
             <table class="pay-table">
-                <thead><tr><th style="padding-left:18px;">Vendor</th><th>Status</th><th>Amount</th><th style="padding-right:18px;">Date</th></tr></thead>
+                <thead><tr><th style="padding-left:18px;">Vendor</th><th>Status</th><th>Amount</th><th>Date</th><th style="padding-right:18px;"></th></tr></thead>
                 <tbody>
                     @forelse($transactions as $t)
                         @php
@@ -185,7 +185,10 @@
                              * Neither is recorded anywhere, and no payment
                              * provider is connected to record them.
                              */
-                            $amount = $t->total_amount ?? $t->agreed_price;
+                            // Was `$t->total_amount ?? $t->agreed_price` — two
+                            // columns that do not exist on bookings, so every
+                            // row printed a dash while carrying a real price.
+                            $amount = $t->price ?? $t->total_amount ?? $t->agreed_price;
                         @endphp
                         <tr>
                             <td style="padding-left:18px;">
@@ -199,10 +202,16 @@
                                  with no amount was given a random one, so the
                                  figure changed every time the page was loaded. --}}
                             <td><span class="pay-amt">{{ $amount ? '$' . number_format($amount, 0) : '—' }}</span></td>
-                            <td style="padding-right:18px;">{{ $t->created_at?->format('M d, Y') }}<br><span style="font-size:10px;color:var(--text-muted);">{{ $t->created_at?->format('h:i A') }}</span></td>
+                            <td>{{ $t->created_at?->format('M d, Y') }}<br><span style="font-size:10px;color:var(--text-muted);">{{ $t->created_at?->format('h:i A') }}</span></td>
+                            {{-- The row could show a figure but never account
+                                 for it. This is where that account lives. --}}
+                            <td style="padding-right:18px;text-align:right;">
+                                <a href="{{ route('client.payments.show', $t) }}"
+                                   style="font-size:12px;font-weight:700;color:var(--brand-text);text-decoration:none;white-space:nowrap;">View</a>
+                            </td>
                         </tr>
                     @empty
-                        <tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted);">No transactions yet.</td></tr>
+                        <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">No transactions yet.</td></tr>
                     @endforelse
                 </tbody>
             </table>

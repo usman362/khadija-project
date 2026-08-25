@@ -26,14 +26,26 @@ use Illuminate\View\View;
  */
 class ClientFinanceController extends Controller
 {
+    /**
+     * The column a booking's money actually lives in.
+     *
+     * This used to look for `total_amount`, then `agreed_price`, then give up.
+     * Neither column has ever existed on `bookings` — the agreed figure is in
+     * `price`. So the lookup returned null every time, every sum was skipped,
+     * and Payments and Spending reported $0 across the board while all 62
+     * bookings in the database carried a price.
+     *
+     * `price` is checked first and is the real answer; the two legacy names
+     * are kept behind it only so an older schema still resolves.
+     */
     private function priceColumn(): ?string
     {
-        if (Schema::hasColumn('bookings', 'total_amount')) {
-            return 'total_amount';
+        foreach (['price', 'total_amount', 'agreed_price'] as $col) {
+            if (Schema::hasColumn('bookings', $col)) {
+                return $col;
+            }
         }
-        if (Schema::hasColumn('bookings', 'agreed_price')) {
-            return 'agreed_price';
-        }
+
         return null;
     }
 
@@ -111,6 +123,79 @@ class ClientFinanceController extends Controller
         return view('client.finance.payments', compact(
             'stats', 'transactions', 'activeEvent'
         ));
+    }
+
+    /**
+     * One transaction, on its own page.
+     *
+     * The ledger row carried an amount and a status. It could not say what the
+     * money was for, whether any of it had actually moved, or what had to
+     * happen next — so the client was looking at a figure with no account of
+     * it, and "Transaction detail" stayed open in the audit.
+     *
+     * Everything here is read from the booking and its own status history.
+     * Nothing is derived, split, or forecast: there is no payment provider
+     * wired to this app, so this page reports what was agreed and what state
+     * it is in, and says plainly when money has not moved.
+     */
+    public function transaction(Request $request, Booking $booking): View
+    {
+        abort_unless($booking->client_id === $request->user()->id, 403);
+
+        $booking->load([
+            'event:id,title,starts_at,location,guest_count',
+            'supplier:id,name,avatar',
+            'supplier.profile:id,user_id,headline,company_name,city,state',
+        ]);
+
+        // The status history IS the money timeline — every transition was
+        // written by whoever made it, so nothing has to be reconstructed.
+        $history = $booking->agreementLogs()
+            ->with('changer:id,name')
+            ->orderBy('id')
+            ->get();
+
+        /*
+         * The one honest statement about money for each state.
+         *
+         * `completed` is the only state in which anything has been paid, and
+         * even there the app did not process it — so it is described as
+         * settled between the two parties, not as a payment this platform took.
+         */
+        $money = match ($booking->status) {
+            'requested' => [
+                'label'  => 'Not agreed yet',
+                'tone'   => 'amber',
+                'line'   => 'A price has been proposed. Nothing is owed until the professional accepts.',
+                'moved'  => false,
+            ],
+            'confirmed' => [
+                'label'  => 'Agreed, not yet paid',
+                'tone'   => 'indigo',
+                'line'   => 'Both sides have agreed this amount. It has not been collected through GigResource.',
+                'moved'  => false,
+            ],
+            'completed' => [
+                'label'  => 'Settled',
+                'tone'   => 'green',
+                'line'   => 'The work is marked delivered and this amount was settled between you and the professional.',
+                'moved'  => true,
+            ],
+            'cancelled' => [
+                'label'  => 'Cancelled',
+                'tone'   => 'slate',
+                'line'   => 'This booking was cancelled. Nothing is owed on it.',
+                'moved'  => false,
+            ],
+            default => [
+                'label'  => ucfirst((string) $booking->status),
+                'tone'   => 'slate',
+                'line'   => 'No amount is due on this booking.',
+                'moved'  => false,
+            ],
+        };
+
+        return view('client.finance.transaction', compact('booking', 'history', 'money'));
     }
 
     public function spending(Request $request): View

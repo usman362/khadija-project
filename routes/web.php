@@ -778,6 +778,22 @@ Route::middleware('auth')->group(function () {
         Route::get('/spending', [\App\Http\Controllers\Client\ClientFinanceController::class, 'spending'])
             ->name('client.spending.index');
 
+        // One transaction, on its own page. The ledger row could show the
+        // amount and the status; it could not show what the money is for,
+        // what has actually moved, or what happens next — so the client had
+        // a number with no account of it.
+        Route::get('/payments/{booking}', [\App\Http\Controllers\Client\ClientFinanceController::class, 'transaction'])
+            ->whereNumber('booking')->name('client.payments.show');
+
+        // Buying a package. Until now a package had a price and a button that
+        // led to a Direct Request — a different product, at no price at all.
+        Route::get('/packages/{package}/book', [\App\Http\Controllers\Client\ClientPackageBookingController::class, 'create'])
+            ->name('client.packages.book');
+        Route::post('/packages/{package}/book', [\App\Http\Controllers\Client\ClientPackageBookingController::class, 'store'])
+            ->name('client.packages.book.store');
+        Route::get('/packages/booked/{booking}', [\App\Http\Controllers\Client\ClientPackageBookingController::class, 'confirmation'])
+            ->name('client.packages.booked');
+
         // The sidebar has said "Spending" all along; only the URL said
         // "earnings", which is the professional's word — a client spends.
         // The old address still resolves so nobody's bookmark breaks.
