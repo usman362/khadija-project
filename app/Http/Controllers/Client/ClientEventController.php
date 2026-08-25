@@ -404,10 +404,23 @@ class ClientEventController extends Controller
             ->take(20)
             ->values();
 
+        /*
+         * Files on the request. `draft_key` is the event's own id here rather
+         * than a wizard token: this page is the event, so anything uploaded
+         * from it belongs to it immediately — there is no draft to adopt from.
+         */
+        $filesKey = 'event-'.$event->id;
+        $files    = \App\Http\Controllers\Client\RequestAttachmentController::forDraft(
+            $request->user()->id,
+            $filesKey,
+            $event->id,
+        );
+
         return view('client.events.show', compact(
             'event', 'categories', 'selectedCategoryIds', 'bids',
             'type', 'scope', 'tab', 'award', 'questions', 'activity',
-            'attendees', 'attendeeSummary', 'availableArtifacts'
+            'attendees', 'attendeeSummary', 'availableArtifacts',
+            'files', 'filesKey'
         ));
     }
 

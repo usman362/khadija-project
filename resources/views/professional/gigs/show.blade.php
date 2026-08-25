@@ -168,6 +168,22 @@
                 </p>
             </div>
 
+            {{-- Client's files.
+                 Read-only: these are the documents the bid is being made
+                 against, and a professional editing the brief they are
+                 quoting on makes no sense. Empty means the client attached
+                 nothing, so the block is simply absent rather than showing an
+                 upload box that belongs to someone else. --}}
+            @if($clientFiles->isNotEmpty())
+                <div class="cl-card">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 6px;">Files from the client</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+                        Briefs, floor plans and reference documents attached to this request.
+                    </p>
+                    <x-request-files :files="$clientFiles" draft-key="" :readonly="true" />
+                </div>
+            @endif
+
             {{-- Bookings (only for own gigs) --}}
             @if($isOwnGig && $event->bookings->count())
                 <div class="cl-card">

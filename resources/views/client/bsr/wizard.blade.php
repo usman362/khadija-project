@@ -339,19 +339,17 @@
             </label>
         </div>
 
-    {{-- ── 6 · Files ───────────────────────────────────────── --}}
+    {{-- ── 6 · Files ─────────────────────────────────────────
+         This step used to say "Attachments aren't available yet" — true then,
+         because there was nowhere to put a file, but a step in an eight-step
+         wizard that does nothing is still a step that does nothing.
+         Files upload as they are picked, so nothing is lost if the client
+         leaves the wizard and comes back. --}}
     @elseif($step === 'files')
         <h3>Files</h3>
-        <p class="lede">Briefs, floor plans and reference documents.</p>
-        {{-- No upload control: requests have no attachment model yet, so a file
-             picker here would take the file and drop it. Said plainly instead. --}}
-        <div style="border:1px dashed var(--border-color);border-radius:12px;padding:36px 20px;text-align:center;">
-            <b style="display:block;font-size:14.5px;color:var(--text-primary);margin-bottom:6px;">Attachments aren't available yet</b>
-            <p style="font-size:13px;color:var(--text-muted);line-height:1.6;max-width:420px;margin:0 auto;">
-                You can publish without them. Once a professional is in touch, share documents in the message thread —
-                everything else about your request works normally.
-            </p>
-        </div>
+        <p class="lede">Briefs, floor plans and reference documents. Optional — you can publish without them.</p>
+
+        <x-request-files :files="$files" :draft-key="$filesKey" />
 
     {{-- ── 7 · Availability Match ───────────────────────────
          The mockup's four buckets (Available / Limited / Not Confirmed /
@@ -448,6 +446,16 @@
         </b></div>
         <div class="bw-rev"><span>Proposal deadline</span><b>{{ ! empty($data['proposal_deadline']) ? \Illuminate\Support\Carbon::parse($data['proposal_deadline'])->format('M j, Y · g:i A') : ($defaultWindowHours ? 'Standard ' . $defaultWindowHours . '-hour window' : 'Not set') }}</b></div>
         <div class="bw-rev"><span>Proposals</span><b>{{ ($data['sealed_proposals'] ?? true) ? 'Sealed' : 'Open' }} · questions {{ ($data['questions_enabled'] ?? true) ? 'allowed' : 'off' }}</b></div>
+        {{-- Named on the review too. A file the client attached three steps
+             back is part of what they are about to publish, and a summary that
+             omits it is a summary they cannot check. --}}
+        <div class="bw-rev"><span>Files</span><b>
+            @if($files->count())
+                {{ $files->count() }} attached · {{ $files->pluck('file_name')->implode(', ') }}
+            @else
+                None
+            @endif
+        </b></div>
 
         @if(! empty($data['description']))
             <div style="margin-top:16px;">

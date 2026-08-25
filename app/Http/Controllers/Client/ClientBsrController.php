@@ -109,6 +109,13 @@ class ClientBsrController extends Controller
             'orgTypes'        => self::ORG_TYPES,
             'draftId'         => $data['draft_id'] ?? null,
             'defaultWindowHours' => config('bsr.default_proposal_window_hours'),
+            // Step 6. Read on every step so the review step can list them too.
+            'filesKey' => $this->filesKey($request),
+            'files'    => RequestAttachmentController::forDraft(
+                $request->user()->id,
+                $this->filesKey($request),
+                $data['draft_id'] ?? null,
+            ),
         ] + $this->availabilityFor($step, $data, $request));
     }
 
@@ -714,6 +721,35 @@ class ClientBsrController extends Controller
 
         $event->categories()->sync($d['services'] ?? []);
 
+        /*
+         * The client attaches a floor plan on step 6, before the Event row
+         * exists — the wizard holds its state in the session so an abandoned
+         * request leaves nothing behind. The files were uploaded against the
+         * wizard's own key; this is where they are handed to the request they
+         * were always for. Idempotent, so saving a draft and then publishing
+         * does not move them twice.
+         */
+        RequestAttachmentController::adopt($user->id, $this->filesKey($request), $event);
+
         return $event;
+    }
+
+    /**
+     * A stable token for the files uploaded during this run of the wizard.
+     *
+     * It lives in the wizard's own session state, so Back and Continue keep
+     * finding the same files, and a second request started later gets its own
+     * key rather than inheriting the first one's attachments.
+     */
+    private function filesKey(Request $request): string
+    {
+        $data = $this->state($request);
+
+        if (empty($data['files_key'])) {
+            $data['files_key'] = (string) \Illuminate\Support\Str::uuid();
+            Session::put(self::KEY, $data);
+        }
+
+        return $data['files_key'];
     }
 }

@@ -772,6 +772,16 @@ Route::middleware('auth')->group(function () {
         Route::delete('/my-professionals/{professional}', [\App\Http\Controllers\Client\ClientSavedProfessionalController::class, 'destroy'])
             ->name('client.saved-professionals.destroy');
 
+        // Files on a request. Private disk, served only through the
+        // controller — a floor plan or a guest list does not go on a
+        // guessable public path.
+        Route::post('/request-files', [\App\Http\Controllers\Client\RequestAttachmentController::class, 'store'])
+            ->name('client.request-files.store');
+        Route::delete('/request-files/{attachment}', [\App\Http\Controllers\Client\RequestAttachmentController::class, 'destroy'])
+            ->name('client.request-files.destroy');
+        Route::get('/request-files/{attachment}', [\App\Http\Controllers\Client\RequestAttachmentController::class, 'show'])
+            ->name('client.request-files.show');
+
         // Finance — Payments ledger + Earnings (project financial dashboard).
         Route::get('/payments', [\App\Http\Controllers\Client\ClientFinanceController::class, 'payments'])
             ->name('client.payments.index');

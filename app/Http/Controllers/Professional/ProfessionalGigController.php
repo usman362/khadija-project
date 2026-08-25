@@ -131,9 +131,19 @@ class ProfessionalGigController extends Controller
             ? $event->attendees()->orderBy('name')->get()
             : null;
 
+        /*
+         * The client's own attachments. Only once the request is published —
+         * before that it is a draft, and a draft's floor plan is not something
+         * anyone outside the client is bidding on.
+         */
+        $clientFiles = $event->is_published
+            ? \App\Models\RequestAttachment::where('event_id', $event->id)->orderBy('id')->get()
+            : collect();
+
         return view('professional.gigs.show', [
-            'event'     => $event,
-            'attendees' => $attendees,
+            'event'       => $event,
+            'attendees'   => $attendees,
+            'clientFiles' => $clientFiles,
         ]);
     }
 }

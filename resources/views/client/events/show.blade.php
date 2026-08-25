@@ -647,13 +647,21 @@
     @if($tab === 'files')
         <div class="cl-card">
             <h3 style="font-size:16px;font-weight:600;margin-bottom:6px;">Files</h3>
-            {{-- There is no attachment model on requests yet, so this states that
-                 plainly instead of rendering an upload box that drops the file. --}}
-            <div class="ev-empty">
-                <b>File attachments aren't available yet</b>
-                <p>Briefs, floor plans and reference documents will attach to a request here once uploads are enabled. For now, share them in the message thread with a professional.</p>
-                <a class="cl-btn cl-btn-ghost cl-btn-sm" href="{{ route('client.chat.index') }}">Open messages</a>
-            </div>
+            <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">
+                Briefs, floor plans and reference documents on this request.
+                @if($event->is_published)
+                    Professionals who can bid on it can open these.
+                @else
+                    Only you can see these until the request is published.
+                @endif
+            </p>
+
+            {{-- A published request is what professionals are bidding against,
+                 so its documents are read-only here — changing one after the
+                 fact would move the goalposts under a bid already sent. --}}
+            <x-request-files :files="$files"
+                             :draft-key="$filesKey"
+                             :readonly="(bool) $event->is_published" />
         </div>
     @endif
 
