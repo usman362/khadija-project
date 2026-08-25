@@ -139,7 +139,9 @@
     <div class="dr-cta">
         {{-- Named first and on the left on purpose: §2 puts direct resolution
              before a formal case, and most problems never need one. --}}
-        <a class="dr-btn" href="{{ route('messages.index') }}">
+        {{-- `messages.index` is the JSON API, not the inbox page — clicking
+             this dropped the client onto a screen of raw JSON. --}}
+        <a class="dr-btn" href="{{ \App\Support\Inbox::urlFor() }}">
             <b>Resolve Without Filing</b><span>Try direct resolution first</span>
         </a>
         <a class="dr-btn primary" href="{{ route('disputes.create') }}">
@@ -221,7 +223,7 @@
                 </div>
             </div>
             <div class="dr-mid">
-                <a class="dr-ghost" href="{{ route('messages.index') }}">Message a {{ $otherSide }}</a>
+                <a class="dr-ghost" href="{{ \App\Support\Inbox::urlFor() }}">Message a {{ $otherSide }}</a>
             </div>
         </div>
 

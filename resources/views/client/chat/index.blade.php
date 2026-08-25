@@ -126,9 +126,30 @@
     .cm-c-icons > button { width: 32px; height: 32px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-card); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
     .cm-c-icons > button:hover { color: var(--cm); border-color: var(--cm); }
     .cm-c-icons svg { width: 15px; height: 15px; }
-    .cm-emoji { position: absolute; bottom: 38px; left: 0; display: flex; flex-wrap: wrap; gap: 2px; width: 176px; padding: 7px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; box-shadow: 0 8px 22px rgba(0,0,0,0.16); z-index: 20; }
-    .cm-emoji button { width: 30px; height: 30px; border: none; background: none; font-size: 17px; cursor: pointer; border-radius: 6px; }
-    .cm-emoji button:hover { background: var(--bg-card-hover); }
+    /* Emoji picker. Was ten buttons in a 176px box. */
+    /* Anchored to its RIGHT edge. The icons sit at the right of the composer,
+       so a 306px panel opening leftwards from them stayed inside the thread;
+       opening rightwards (which `left: 0` did) put 132px of it past the edge
+       and the last two emoji columns were cut off. The old picker was 176px
+       and fitted either way, which is why nobody noticed. */
+    .cm-emoji { position: absolute; bottom: 38px; right: 0; width: 306px; max-width: min(306px, calc(100vw - 32px));
+                padding: 8px; background: var(--bg-card);
+                border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,0.18); z-index: 20; }
+    .cm-emoji-q { width: 100%; padding: 7px 10px; font-size: 12.5px; font-family: inherit; color: var(--text-primary);
+                  background: var(--bg-input, transparent); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 7px; }
+    .cm-emoji-q:focus { outline: none; border-color: var(--brand-text); }
+    .cm-emoji-tabs { display: flex; gap: 2px; margin-bottom: 6px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; }
+    .cm-emoji-tabs button { flex: 1; height: 28px; border: none; background: none; font-size: 15px; cursor: pointer; border-radius: 6px; }
+    .cm-emoji-tabs button:hover { background: var(--bg-card-hover); }
+    .cm-emoji-tabs button.on { background: rgba(234,88,12,0.12); }
+    .cm-emoji-grid { max-height: 216px; overflow-y: auto; }
+    .cm-emoji-h { font-size: 10.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;
+                  letter-spacing: .04em; margin: 6px 0 4px; position: sticky; top: 0; background: var(--bg-card); }
+    .cm-emoji-row { display: grid; grid-template-columns: repeat(8, 1fr); gap: 1px; }
+    .cm-emoji-row button { width: 100%; aspect-ratio: 1; border: none; background: none; font-size: 18px; cursor: pointer;
+                           border-radius: 6px; line-height: 1; padding: 0; }
+    .cm-emoji-row button:hover { background: var(--bg-card-hover); transform: scale(1.15); }
+    .cm-emoji-none { font-size: 12px; color: var(--text-muted); padding: 14px 4px; margin: 0; text-align: center; }
 
     .cm-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; }
     .chat-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; color: var(--text-primary); background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 999px; padding: 4px 6px 4px 10px; }
@@ -332,10 +353,30 @@
                                 <button type="button" id="cm-emoji-btn" title="Emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></button>
                                 <button type="button" id="cm-attach-btn" title="Attach a file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
                                 <input type="file" id="cm-file" multiple hidden>
+                                {{-- Ten emoji, all of them event-planning
+                                     shorthand, was the whole picker. People
+                                     write to each other here; the set is a
+                                     real one now, grouped and searchable. --}}
                                 <div class="cm-emoji" id="cm-emoji" style="display:none;">
-                                    @foreach(['👍','🙏','😊','🎉','✅','❓','⏰','📸','🎵','💐'] as $e)
-                                        <button type="button" data-e="{{ $e }}">{{ $e }}</button>
-                                    @endforeach
+                                    <input type="text" id="cm-emoji-q" class="cm-emoji-q" placeholder="Search emoji…" aria-label="Search emoji">
+                                    <div class="cm-emoji-tabs" id="cm-emoji-tabs">
+                                        @foreach(\App\Support\EmojiCatalog::groups() as $key => $group)
+                                            <button type="button" data-g="{{ $key }}" class="{{ $loop->first ? 'on' : '' }}" title="{{ $group['label'] }}">{{ $group['icon'] }}</button>
+                                        @endforeach
+                                    </div>
+                                    <div class="cm-emoji-grid" id="cm-emoji-grid">
+                                        @foreach(\App\Support\EmojiCatalog::groups() as $key => $group)
+                                            <div class="cm-emoji-sec" data-g="{{ $key }}">
+                                                <p class="cm-emoji-h">{{ $group['label'] }}</p>
+                                                <div class="cm-emoji-row">
+                                                    @foreach($group['emoji'] as $char => $name)
+                                                        <button type="button" data-e="{{ $char }}" data-n="{{ $name }}" title="{{ $name }}">{{ $char }}</button>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                        <p class="cm-emoji-none" id="cm-emoji-none" hidden>No emoji matches that.</p>
+                                    </div>
                                 </div>
                             </div>
                             <button type="submit" class="cm-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Send</button>
@@ -457,15 +498,59 @@
     });
 
     const emoji = $('cm-emoji');
+
+    // Search + category tabs. Filtering is on the emoji's NAME, so "party"
+    // finds 🎉 — searching the character itself would be useless.
+    if (emoji) {
+        const q     = $('cm-emoji-q');
+        const grid  = $('cm-emoji-grid');
+        const none  = $('cm-emoji-none');
+        const tabs  = $('cm-emoji-tabs');
+        const secs  = () => Array.from(grid.querySelectorAll('.cm-emoji-sec'));
+
+        function filter(term) {
+            term = (term || '').trim().toLowerCase();
+            let shown = 0;
+            secs().forEach((sec) => {
+                let any = 0;
+                sec.querySelectorAll('button[data-n]').forEach((b) => {
+                    const hit = !term || b.dataset.n.toLowerCase().includes(term);
+                    b.hidden = !hit;
+                    if (hit) any++;
+                });
+                sec.hidden = !any;
+                shown += any;
+            });
+            if (none) none.hidden = shown > 0;
+        }
+
+        if (q) q.addEventListener('input', function () { filter(this.value); });
+
+        if (tabs) tabs.addEventListener('click', (e) => {
+            const b = e.target.closest('button[data-g]');
+            if (!b) return;
+            tabs.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+            if (q) { q.value = ''; filter(''); }
+            const sec = grid.querySelector('.cm-emoji-sec[data-g="' + b.dataset.g + '"]');
+            if (sec) grid.scrollTop = sec.offsetTop - grid.offsetTop;
+        });
+    }
+
     if ($('cm-emoji-btn') && emoji) {
         $('cm-emoji-btn').addEventListener('click', (e) => {
             e.stopPropagation();
-            emoji.style.display = emoji.style.display === 'none' ? 'flex' : 'none';
+            // 'block', not 'flex'. The old picker was a single flex-wrap row
+            // of ten buttons; this one stacks a search box, a tab strip and a
+            // scrolling grid, and flex would lay those three side by side.
+            emoji.style.display = emoji.style.display === 'none' ? 'block' : 'none';
         });
         emoji.addEventListener('click', (e) => {
             const b = e.target.closest('button[data-e]');
             if (b) { insert(b.dataset.e); emoji.style.display = 'none'; }
         });
+        // Typing in the search box is a click inside the picker — it used to
+        // close it, because the only child was a button that closed it anyway.
+        emoji.addEventListener('click', (e) => e.stopPropagation());
         document.addEventListener('click', () => { emoji.style.display = 'none'; });
     }
 

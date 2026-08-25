@@ -17,16 +17,24 @@
     .bk-rail { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 80px; }
 
     /* ── Stat tiles double as the status filter ──────────────── */
-    .bk-stats { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 10px; margin-bottom: 16px; }
+    /* Seven tiles, seven columns. It said six: "Awaiting Completion" was
+       added as a seventh and the grid was never widened, so Cancelled wrapped
+       onto a line of its own. The tiles are the status filter, and a filter
+       that looks like two rows reads as two groups. */
+    .bk-stats { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 9px; margin-bottom: 16px; }
     .bk-stat {
         display: flex; align-items: center; gap: 11px;
         background: var(--bg-card); border: 1px solid var(--border-color);
-        border-radius: var(--radius); padding: 13px 14px;
+        border-radius: var(--radius); padding: 12px 12px;
         text-decoration: none; transition: border-color .15s, background .15s;
+        min-width: 0;
     }
+    /* The label is the longest part ("Awaiting Completion") and must be
+       allowed to wrap rather than force the column wider. */
+    .bk-stat > span:last-child { min-width: 0; }
     .bk-stat:hover { background: var(--bg-card-hover); }
     .bk-stat.is-active { border-color: #ea580c; background: rgba(234,88,12,0.06); }
-    .bk-stat-ico { width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .bk-stat-ico { width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     .bk-stat-ico svg { width: 16px; height: 16px; }
     .bk-stat-ico.brand  { background: rgba(234,88,12,0.12);  color: var(--brand-text); }
     .bk-stat-ico.indigo { background: rgba(99,102,241,0.12); color: var(--accent-text); }
@@ -35,7 +43,7 @@
     .bk-stat-ico.violet { background: rgba(139,92,246,0.12); color: var(--accent-text); }
     .bk-stat-ico.red    { background: rgba(239,68,68,0.12);  color: var(--bad-text); }
     .bk-stat-n { font-size: 20px; font-weight: 800; color: var(--text-primary); line-height: 1.05; }
-    .bk-stat-l { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+    .bk-stat-l { font-size: 10.5px; color: var(--text-muted); font-weight: 600; line-height: 1.3; }
 
     .bk-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
     .bk-showing { font-size: 12.5px; color: var(--text-muted); }
@@ -177,7 +185,8 @@
     .bk-qa a:hover { background: var(--bg-card-hover); }
     .bk-qa svg { width: 14px; height: 14px; color: var(--text-muted); }
 
-    @media (max-width: 1240px) { .bk-stats { grid-template-columns: repeat(3, minmax(0,1fr)); } }
+    @media (max-width: 1440px) { .bk-stats { grid-template-columns: repeat(4, minmax(0,1fr)); } }
+    @media (max-width: 1100px) { .bk-stats { grid-template-columns: repeat(3, minmax(0,1fr)); } }
     @media (max-width: 1100px) {
         .bk-layout { grid-template-columns: 1fr; }
         .bk-rail { position: static; }

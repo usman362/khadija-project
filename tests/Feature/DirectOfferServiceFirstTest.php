@@ -63,7 +63,10 @@ class DirectOfferServiceFirstTest extends TestCase
         $page->assertOk();
         $page->assertSee('What do you need?', false);
         $page->assertSee('Choose a service', false);
-        $page->assertSee('Choose a service above first', false);
+        // Reworded 2026-08-25: the prompt used to sit under an empty "Send to"
+        // dropdown, so it said "above". The dropdown is gone until there is
+        // somebody to put in it, and the prompt now stands on its own.
+        $page->assertSee('Choose a service first', false);
     }
 
     /** The fix itself: the list can only contain people who do the work. */

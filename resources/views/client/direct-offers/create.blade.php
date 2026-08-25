@@ -56,6 +56,14 @@
     .do-sec.req .do-tag { background: var(--do); }
     .do-sec.ai .do-tag { background: var(--ai); }
     .do-sec-bd { padding: 15px 16px; }
+    /* Empty state for the professional picker. It replaces a select with no
+       options in it — see the note at the control. */
+    .do-empty { border: 1px solid rgba(245,158,11,.35); background: rgba(245,158,11,.06);
+                border-radius: 11px; padding: 14px 16px; }
+    .do-empty b { display: block; font-size: 13.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 5px; }
+    .do-empty p { font-size: 12.5px; color: var(--text-muted); margin: 0; line-height: 1.6; }
+    .do-empty-acts { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
+    .do-empty-acts a { font-size: 12.5px; font-weight: 700; color: var(--brand-text); text-decoration: none; }
 
     .do-field { margin-bottom: 13px; }
     .do-field:last-child { margin-bottom: 0; }
@@ -129,6 +137,11 @@
              people who actually do that work. Arriving from a profile page
              skips this: the professional is already chosen, and the services
              offered are only theirs. --}}
+        {{-- Shown unless the client arrived from a professional's own profile,
+             where the person is already chosen and the services are theirs.
+             It used to disappear the moment ANY professional was set — and
+             one was set automatically — so picking a service was a one-way
+             door with no way back to change it. --}}
         @unless($selectedPro)
             <div class="do-sec req">
                 <div class="do-sec-hd"><h4>What do you need?</h4><span class="do-tag">START HERE</span></div>
@@ -154,16 +167,6 @@
         <div class="do-sec req">
             <div class="do-sec-hd"><h4>Choose Professional</h4><span class="do-tag">YOUR INPUT</span></div>
             <div class="do-sec-bd">
-                @if(! $selectedPro && ($serviceId ?? 0) === 0)
-                    <p style="font-size:13px;color:var(--text-muted);margin:0;">
-                        Choose a service above first.
-                    </p>
-                @elseif($pros->isEmpty())
-                    <p style="font-size:13px;color:var(--text-muted);margin:0;">
-                        No professional in your state offers this yet. Try another service, or post it
-                        to the board so anyone who can do it may reply.
-                    </p>
-                @endif
                 @if($selectedPro)
                     <div class="do-pro" style="margin-bottom:12px;">
                         <img class="do-pro-av" src="{{ $selectedPro->avatar_url }}" alt="">
@@ -173,14 +176,59 @@
                         </div>
                     </div>
                 @endif
-                <div class="do-field">
-                    <label>Send to</label>
-                    <select name="professional_id" class="do-input" aria-label="id }}' > —">
-                        @foreach($pros as $p)
-                            <option value="{{ $p->id }}" @selected($selectedPro && $selectedPro->id === $p->id)>{{ $p->name }} — {{ $p->profile->headline ?? 'Professional' }}</option>
-                        @endforeach
-                    </select>
-                </div>
+
+                {{-- The dropdown appears only when there is somebody in it.
+                     It used to render regardless: with no service chosen, or
+                     with a service nobody in the state offers, the page showed
+                     a focusable "Send to" control containing nothing at all,
+                     directly under a sentence explaining that there was
+                     nobody. An empty select is not an empty state. --}}
+                @php
+                    // Nothing to choose from until the client says what they
+                    // need. Without this the list fell back to every
+                    // professional in the state, under a heading that promises
+                    // "We only show professionals who offer this."
+                    $mustPickService = ! $selectedPro && ($serviceId ?? 0) === 0;
+                @endphp
+
+                @if($mustPickService || $pros->isEmpty())
+                    <div class="do-empty">
+                        @if($mustPickService)
+                            <b>Choose a service first</b>
+                            <p>Pick what you need above and this will list the professionals who offer it in your state.</p>
+                        @else
+                            <b>No professional in your state offers this yet</b>
+                            <p>
+                                GigResource matches within your own state, and nobody here has listed this service.
+                                You can pick a different service, or post it to the board — it stays open, and any
+                                professional who can do it may reply.
+                            </p>
+                            <div class="do-empty-acts">
+                                <a href="{{ route('client.direct-offers.create') }}">Choose another service</a>
+                                <a href="{{ route('client.bsr.step', 'service') }}">Post it to the board instead</a>
+                            </div>
+                        @endif
+                    </div>
+                @else
+                    <div class="do-field">
+                        <label for="doPro">Send to <span style="color:#dc2626;">*</span></label>
+                        <select name="professional_id" id="doPro" class="do-input" required>
+                            {{-- No pre-selection. The form used to address
+                                 itself to whoever came back first, so a client
+                                 who never chose anyone could still send. --}}
+                            <option value="">Choose who this goes to…</option>
+                            @foreach($pros as $p)
+                                <option value="{{ $p->id }}" @selected(old('professional_id') == $p->id || ($selectedPro && $selectedPro->id === $p->id))>{{ $p->name }} — {{ $p->profile->headline ?? 'Professional' }}</option>
+                            @endforeach
+                        </select>
+                        @error('professional_id')
+                            <p style="font-size:12px;color:#dc2626;font-weight:600;margin-top:5px;">{{ $message }}</p>
+                        @enderror
+                        <p style="font-size:11.5px;color:var(--text-muted);margin-top:5px;">
+                            {{ $pros->count() }} {{ \Illuminate\Support\Str::plural('professional', $pros->count()) }} in your state offer{{ $pros->count() === 1 ? 's' : '' }} this.
+                        </p>
+                    </div>
+                @endif
             </div>
         </div>
 

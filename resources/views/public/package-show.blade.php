@@ -350,7 +350,7 @@
 
                         <div class="pk-mini">
                             <a href="{{ route('public.packages.compare', ['ids' => $package->id]) }}">⚖ Compare</a>
-                            <a href="{{ auth()->check() ? route('messages.index') : route('login') }}">✉ Message</a>
+                            <a href="{{ \App\Support\Inbox::urlFor() }}">✉ Message</a>
                         </div>
                     </div>
                 </div>

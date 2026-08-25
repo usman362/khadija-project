@@ -129,7 +129,12 @@
     margin-top: -60px;
     flex-wrap: wrap;
 }
-.pp-hero-meta, .pp-hero-cta { margin-top: 64px; }
+/*
+ * 64px cleared the cover by four pixels. The name and the Request a Quote row
+ * both began almost exactly where the banner ended, so the header read as one
+ * crowded band with no air in it. 84px puts a clear 24px under the banner.
+ */
+.pp-hero-meta, .pp-hero-cta { margin-top: 84px; }
 @media (max-width: 720px) { .pp-hero-meta, .pp-hero-cta { margin-top: 12px; } }
 .pp-hero-avatar {
     width: 128px; height: 128px;
@@ -139,6 +144,19 @@
     box-shadow: 0 10px 28px rgba(0,0,0,0.25);
     object-fit: cover;
     flex-shrink: 0;
+
+    /*
+     * The avatar straddles the banner, and the banner's gallery tiles are
+     * absolutely positioned inside it. A positioned element paints above
+     * static content whatever the source order, so the tiles covered the
+     * 60px of the avatar that overlaps — the profile picture looked sliced
+     * off along the bottom edge of the photos.
+     *
+     * Positioning the avatar puts it back on top. z-index 3 clears the
+     * tiles and the two icon buttons at z-index 2.
+     */
+    position: relative;
+    z-index: 3;
 }
 .pp-hero-meta { flex: 1; min-width: 220px; padding-bottom: 8px; }
 .pp-hero-name {

@@ -61,9 +61,36 @@ class ClientDirectOfferController extends Controller
             ))
             ->limit(20)->get();
 
+        /*
+         * Only a professional the client actually named.
+         *
+         * This used to fall back to `$pros->first()` — pick a service and the
+         * form quietly addressed itself to whoever came back first. Two things
+         * followed from that. The client could send a request to someone they
+         * never chose, and because the Service section is hidden whenever a
+         * professional is set, choosing a service made the service picker
+         * disappear: there was no way back to change it.
+         *
+         * A professional arriving in the URL (from their profile page) is a
+         * real choice and still fixes the form.
+         */
         $selectedPro = $proId > 0
             ? User::with('serviceCategories:id,name')->find($proId)
-            : ($serviceId > 0 ? $pros->first() : null);
+            : null;
+
+        // R38 and the service filter apply to a professional named in the URL
+        // too — a link is not a bypass.
+        if ($selectedPro && ! $pros->contains('id', $selectedPro->id)) {
+            $stillValid = User::query()
+                ->whereKey($selectedPro->id)
+                ->whereHas('roles', fn ($r) => $r->where('name', RoleName::PROFESSIONAL->value))
+                ->tap(fn ($q) => StateMatching::scopeUsersForViewer($q, $user))
+                ->exists();
+
+            if (! $stillValid) {
+                $selectedPro = null;
+            }
+        }
 
         // Arriving from a profile page fixes the professional, so the service
         // list narrows to what that person actually does. Offering them a
@@ -103,6 +130,9 @@ class ClientDirectOfferController extends Controller
             'service_single'  => ['nullable', 'string', 'max:120'],
             'budget_min'      => ['nullable', 'integer', 'min:0'],
             'request_type'    => ['nullable', 'in:SSR,MSR'],
+        ], [
+            'professional_id.required' => 'Choose which professional this request goes to.',
+            'organization_type.required' => 'Tell us who the request is for.',
         ]);
 
         $user = $request->user();

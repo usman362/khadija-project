@@ -49,17 +49,23 @@ class MessageAttachmentController extends Controller
             'private'
         );
 
+        /*
+         * No message yet — the file is picked before the message is sent, and
+         * `attachment_ids` on send is what joins them.
+         *
+         * This used to insert `0` and null it on the next line, a workaround
+         * for a NOT NULL foreign key. MySQL never reached the next line: 0 is
+         * not a message, the constraint rejected the INSERT, and every upload
+         * 500'd. The column is nullable now, so the honest value goes in.
+         */
         $attachment = MessageAttachment::create([
-            'message_id' => 0, // Temporary — will be linked when message is sent
-            'file_path' => $path,
-            'file_name' => $file->getClientOriginalName(),
-            'file_size' => $file->getSize(),
-            'mime_type' => $file->getMimeType(),
+            'message_id'  => null,
+            'uploaded_by' => $request->user()->id,
+            'file_path'   => $path,
+            'file_name'   => $file->getClientOriginalName(),
+            'file_size'   => $file->getSize(),
+            'mime_type'   => $file->getMimeType(),
         ]);
-
-        // Set message_id to null after create (workaround for non-nullable FK)
-        // The attachment will be linked to a message when the message is sent
-        $attachment->update(['message_id' => null]);
 
         return response()->json([
             'id' => $attachment->id,
@@ -75,16 +81,26 @@ class MessageAttachmentController extends Controller
      */
     public function download(Request $request, MessageAttachment $attachment): StreamedResponse
     {
-        $message = $attachment->message;
-
-        if (! $message || ! $message->conversation) {
-            abort(404);
-        }
-
         $user = $request->user();
-        if (! $user->isAdmin() && ! $message->conversation->hasParticipant($user)) {
-            abort(403);
+
+        /*
+         * An attachment with no message is one the uploader has picked but not
+         * sent. It belongs to them and nobody else — this used to 404 on it,
+         * which is every attachment for as long as it sits in the composer.
+         */
+        if (! $attachment->message_id) {
+            abort_unless($attachment->uploaded_by === $user->id || $user->isAdmin(), 403);
+        } else {
+            $message = $attachment->message;
+
+            abort_unless($message && $message->conversation, 404);
+            abort_unless(
+                $user->isAdmin() || $message->conversation->hasParticipant($user),
+                403,
+            );
         }
+
+        abort_unless(Storage::disk('private')->exists($attachment->file_path), 404);
 
         return Storage::disk('private')->download(
             $attachment->file_path,

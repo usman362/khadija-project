@@ -69,7 +69,6 @@
     .pay-txid { font-family: monospace; font-size: 10.5px; color: var(--text-muted); }
 
     /* Bottom summary panels */
-    .pay-bottom { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
     .pay-sum-title { font-size: 11px; font-weight: 800; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 12px; }
     .pay-sum-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; font-size: 12.5px; border-bottom: 1px dashed var(--border-color); }
     .pay-sum-row:last-child { border-bottom: 0; }
@@ -103,7 +102,7 @@
     .pay-act-name { font-size: 12px; color: var(--text-primary); font-weight: 600; }
     .pay-act-time { font-size: 10px; color: var(--text-muted); }
 
-    @media (max-width: 1200px) { .pay-layout { grid-template-columns: 1fr; } .pay-rail { position: static; } .pay-stats { grid-template-columns: repeat(3, 1fr); } .pay-bottom { grid-template-columns: 1fr; } }
+    @media (max-width: 1200px) { .pay-layout { grid-template-columns: 1fr; } .pay-rail { position: static; } .pay-stats { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 700px) { .pay-stats { grid-template-columns: repeat(2, 1fr); } .pay-table { font-size: 11px; } }
 </style>
 @endpush
@@ -224,25 +223,39 @@
         @endif
     </div>
 
-    {{-- Bottom summary --}}
-    <div class="pay-bottom">
-        {{--
-            Removed 2026-08-15. Three cards, none of them measured:
+    {{--
+        No bottom summary.
 
-              Payment Methods Summary — a 62/38 split between "Secure
-                Payment.com" and Stripe, both figures a percentage of the
-                booking total and the second naming a gateway this platform
-                does not use.
-              Fee Breakdown (This Month) — 2.9% and 1.6% of all-time settled
-                bookings, under a heading that says this month.
-              Cash Flow (This Month) — the same two invented numbers again,
-                subtracted from each other to produce a third.
+        A div with class pay-bottom used to open here and hold three cards.
+        They were removed on 2026-08-15 and the closing tag went with them,
+        leaving the wrapper open — so the closing tag below closed pay-bottom
+        instead of pay-main, and the right rail ended up nested INSIDE the main
+        column. pay-layout was left with one child, its 280px second column
+        reserved and permanently empty: that was the dead strip down the right
+        of the page, and why Quick Actions rendered at the bottom instead of
+        beside the ledger.
 
-            Nothing here replaced them, because there is nothing real to put in
-            their place yet: fees are not recorded per transaction and no
-            payment provider is connected. An empty space is honest; a card of
-            derived percentages is not.
-        --}}
+        (Written without the Blade close-comment sequence on purpose. Blade
+        parses its comments, so quoting one inside another ends it early — the
+        rest of the note then renders as page copy, which is what happened
+        when this explanation was first added.)
+
+        What was removed, and why nothing replaced it:
+
+          Payment Methods Summary — a 62/38 split between "Secure
+            Payment.com" and Stripe, both figures a percentage of the
+            booking total and the second naming a gateway this platform
+            does not use.
+          Fee Breakdown (This Month) — 2.9% and 1.6% of all-time settled
+            bookings, under a heading that says this month.
+          Cash Flow (This Month) — the same two invented numbers again,
+            subtracted from each other to produce a third.
+
+        Nothing here replaced them, because there is nothing real to put in
+        their place yet: fees are not recorded per transaction and no
+        payment provider is connected. An empty space is honest; a card of
+        derived percentages is not.
+    --}}
 </div>{{-- /.pay-main --}}
 
 {{-- Right rail --}}
