@@ -84,9 +84,7 @@ class VirtualHubBriefTest extends TestCase
     {
         $this->postBoth()
             ->assertSessionHasNoErrors()
-            // Lands on Hire — the client just posted, and "what happens now"
-            // is the next question, not "what would you like to do".
-            ->assertRedirect(route('client.virtual-hub.index', ['stage' => 4]));
+            ->assertRedirect(route('client.virtual-hub.index'));
 
         $event = Event::where('client_id', $this->client->id)->latest('id')->firstOrFail();
 
@@ -183,18 +181,24 @@ class VirtualHubBriefTest extends TestCase
             ->assertRedirect(route('client.virtual-hub.brief', 'services'));
     }
 
-    /** Each step marks its own stage on the strip — never two at once. */
-    public function test_each_step_marks_its_own_stage(): void
+    /**
+     * Each step says which of the two it is.
+     *
+     * This form briefly sat under a seven-card strip that looked like a
+     * wizard and was not one. The form itself IS a two-step wizard, so it
+     * says so — plainly, and only about itself.
+     */
+    public function test_each_step_says_which_of_two_it_is(): void
     {
         $plan = $this->actingAs($this->client)
             ->get(route('client.virtual-hub.brief', 'plan'))->assertOk()->getContent();
-        $this->assertMatchesRegularExpression('/Plan.*?You are here/s', preg_replace('/<[^>]+>/', ' ', $plan));
+        $this->assertStringContainsString('Step 1 of 2', $plan);
 
         $this->actingAs($this->client)->post(route('client.virtual-hub.save', 'plan'), $this->plan());
 
         $services = $this->actingAs($this->client)
             ->get(route('client.virtual-hub.brief', 'services'))->assertOk()->getContent();
-        $this->assertMatchesRegularExpression('/Services.*?You are here/s', preg_replace('/<[^>]+>/', ' ', $services));
+        $this->assertStringContainsString('Step 2 of 2', $services);
     }
 
     /** The services step needs the plan behind it. */

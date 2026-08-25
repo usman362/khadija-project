@@ -122,12 +122,7 @@
 <div class="vh-layout">
 <div class="vh-main">
 
-    {{-- current => 1 because this page IS Entry. It used to pass the event's
-     stage, which mixed two different questions into one marker: click Entry,
-     land here, and be told "You are here: Hire" because the EVENT was hiring.
-     Where the event is has its own display, in the workspace panel. --}}
-@include('client.virtual-hub._stages', ['current' => $stage, 'event' => $activeEvent])
-
+    
     {{-- ── Stage 1 · Entry and Stage 4 · Hire ──────────────
          The mockup opens by asking what the client wants to do, and its Hire
          stage offers three routes. Both are just doors onto systems that
@@ -152,7 +147,8 @@
         .vh-resume-go{flex:none;font-size:12.5px;font-weight:700;color:var(--accent-blue);}
         .vh-entry-sub{font-size:12.5px;color:var(--text-muted);line-height:1.45;}
         .vh-hire{border:1px solid var(--border-color);border-radius:13px;padding:15px 17px;margin-bottom:18px;background:var(--bg-card);}
-        .vh-hire-head{font-size:13px;font-weight:800;margin-bottom:11px;}
+        .vh-hire-head{font-size:13px;font-weight:800;margin-bottom:4px;}
+        .vh-hire-note{font-size:12.5px;color:var(--text-muted);line-height:1.5;margin:0 0 12px;}
         .vh-hire-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;}
         .vh-hire-card{display:block;padding:11px 13px;border:1px solid var(--border-color);border-radius:10px;
             text-decoration:none;color:var(--text-primary);}
@@ -161,7 +157,6 @@
         .vh-hire-card span{display:block;font-size:11.5px;color:var(--text-muted);margin-top:2px;}
     </style>
 
-    @if($stage === 1)
     <div class="vh-entry">
         <a href="{{ route('client.virtual-hub.brief') }}" class="vh-entry-card primary">
             <div class="vh-entry-title">Plan a new event</div>
@@ -189,11 +184,23 @@
         </a>
     @endif
 
-    @endif
 
-    @if($stage === 4)
     <div class="vh-hire">
-        <div class="vh-hire-head">Three ways to hire — all the usual rules apply</div>
+        <div class="vh-hire-head">Three ways to bring professionals in</div>
+        {{-- Says what the page is for. Every card here leaves for another
+             screen, which made it look purposeless -- "is page ka kya maqsad
+             hai?" -- especially to a client who had just posted and did not
+             need any of them. --}}
+        <p class="vh-hire-note">
+            @if($workspace)
+                You have already posted <b>{{ $workspace['event']->title }}</b>, so you can simply wait — professionals
+                will send proposals. These are only if you would rather not wait.
+                <a href="{{ route('client.virtual-hub.index', ['stage' => 5]) }}">See your event instead →</a>
+            @else
+                Pick whichever suits you. Each one opens the normal GigResource flow — proposals, messaging,
+                bookings and payments all work the same way afterwards.
+            @endif
+        </p>
         <div class="vh-hire-row">
             <a href="{{ route('public.browse') }}" class="vh-hire-card">
                 <b>Browse professionals</b>
@@ -211,12 +218,10 @@
     </div>
 
 
-    @endif
 
     {{-- Discovery — helps when you are deciding (Entry) or hiring (Hire).
          Hidden once the work is underway: an event on its event day does not
          need a professional grid. --}}
-    @if(in_array($stage, [1, 4], true))
     {{-- The four filters that stood here -- All Platforms, All Categories,
          All Languages, Any Budget -- had no name, no form and no handler, and
          two of them had no options either. Selecting anything did nothing,
@@ -305,7 +310,6 @@
          Tools, Stream Assistant, Analytics Dashboard -- had no href at all.
          They were the last of the streaming console: nothing to open, and
          nothing behind them to build an opening onto. --}}
-    @endif
 
 </div>{{-- /.vh-main --}}
 
@@ -322,7 +326,6 @@
             $atIndex = array_search($workspace['stage'], $stageKeys, true);
         @endphp
 
-        @if(in_array($stage, [4, 5], true))
         <div class="vh-panel">
             <div class="vh-rail-head">
                 <div class="vh-rail-title">Event workspace</div>
@@ -389,14 +392,13 @@
             @endif
         </div>
 
-        @endif
 
         {{-- ── Stage 6 · Event Day ──────────────────────────
              Countdown, platform and joining link — the three things we
              actually know. The mockup also shows "Connection · Ready" with a
              green tick; there is no Zoom integration behind this, so a
              connection status would be a reassurance nobody checked. --}}
-        @if($stage === 6)
+        @if($workspace['is_today'] || $workspace['stage'] === 'event_day')
             <div class="vh-panel" style="border-color:var(--accent-orange,#f97316);">
                 <div class="vh-rail-title" style="margin-bottom:8px;">Event day</div>
 
@@ -428,7 +430,7 @@
         {{-- ── Stage 7 · Complete ───────────────────────────
              Closing the loop. Deliverables are not here: there is no
              deliverables model, so a button would open nothing. --}}
-        @if($stage === 7)
+        @if($workspace['stage'] === 'complete')
             <div class="vh-panel">
                 <div class="vh-rail-title" style="margin-bottom:4px;">Event complete</div>
                 <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 12px;">Let's wrap things up.</p>
@@ -441,7 +443,6 @@
             </div>
         @endif
 
-        @if(in_array($stage, [4, 5], true))
         {{-- Quick access — the mockup's row, pointing at screens that exist. --}}
         <div class="vh-panel">
             <div class="vh-rail-title" style="margin-bottom:10px;">Quick access</div>
@@ -454,7 +455,6 @@
                 <a href="{{ route('client.reviews.index') }}" class="vh-quick">Reviews</a>
             </div>
         </div>
-        @endif
     @else
         <div class="vh-panel">
             <div class="vh-rail-title" style="margin-bottom:8px;">Event workspace</div>

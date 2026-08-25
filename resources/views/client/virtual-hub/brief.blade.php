@@ -143,7 +143,20 @@
 {{-- Two steps, the way the client's workflow draws them: Plan, then Services,
      with a Continue between. They were one page, so submitting looked like a
      jump from step 2 straight to step 4 with step 3 never seen. --}}
-@include('client.virtual-hub._stages', ['current' => $step === 'plan' ? 2 : 3, 'event' => null])
+{{-- A real two-step form gets a real two-step indicator. The seven numbered
+     cards that stood here looked like a wizard and were not one: five of the
+     seven were pages or states, there was no Next between them, and no final
+     submit at the end. This is the only part of the flow that IS a wizard. --}}
+<div class="vhw">
+    <div class="vhw-step {{ $step === 'plan' ? 'on' : 'done' }}">
+        <span>{{ $step === 'plan' ? '1' : '✓' }}</span> Your event
+    </div>
+    <div class="vhw-line"></div>
+    <div class="vhw-step {{ $step === 'services' ? 'on' : '' }}">
+        <span>2</span> Services you need
+    </div>
+    <div class="vhw-of">Step {{ $step === 'plan' ? '1' : '2' }} of 2</div>
+</div>
 
 @if($errors->any())
     <div class="vhb-card" id="vhb-errors" style="border-color:#ef4444;max-width:820px;">
@@ -159,7 +172,7 @@
     <form method="POST" action="{{ route('client.virtual-hub.save', 'plan') }}" class="vhb">
         @csrf
         <div class="vhb-card">
-            <div class="vhb-card-head"><span class="vhb-step">2</span> Tell us about your event</div>
+            <div class="vhb-card-head"><span class="vhb-step">1</span> Tell us about your event</div>
 
             <label class="vhb-label" for="vhb-title">Event name *</label>
             <input type="text" id="vhb-title" name="title" class="vhb-input" required maxlength="200"
@@ -258,7 +271,7 @@
         </div>
 
         <div class="vhb-card">
-            <div class="vhb-card-head"><span class="vhb-step">3</span> What services do you need?</div>
+            <div class="vhb-card-head"><span class="vhb-step">2</span> What services do you need?</div>
             <p class="vhb-hint" style="margin-top:-4px;">Pick one or more. Professionals bid on what you choose.</p>
 
             @error('services')<p class="vhb-err" style="margin-bottom:8px;">{{ $message }}</p>@enderror
@@ -297,6 +310,16 @@
     });
 </script>
 <style>
+    .vhw{display:flex;align-items:center;gap:12px;max-width:820px;margin-bottom:16px;
+        border:1px solid var(--border-color);border-radius:12px;padding:12px 16px;background:var(--bg-card);}
+    .vhw-step{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text-muted);}
+    .vhw-step span{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+        font-size:11px;font-weight:800;background:var(--border-color);color:var(--text-primary);}
+    .vhw-step.on{color:var(--text-primary);font-weight:800;}
+    .vhw-step.on span{background:var(--accent-orange,#f97316);color:#fff;}
+    .vhw-step.done span{background:#16a34a;color:#fff;}
+    .vhw-line{flex:1;height:2px;background:var(--border-color);border-radius:2px;min-width:24px;}
+    .vhw-of{font-size:12px;color:var(--text-muted);flex:none;}
     .vhb{max-width:820px;}
     .vhb-err{font-size:12px;color:#dc2626;margin:5px 0 0;font-weight:600;}
     .vhb-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:14px;padding:20px 22px;margin-bottom:16px;}

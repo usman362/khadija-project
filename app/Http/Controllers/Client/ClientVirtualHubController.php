@@ -140,44 +140,9 @@ class ClientVirtualHubController extends Controller
             ];
         }
 
-        /*
-         * One stage at a time.
-         *
-         * The mockup's own closing promise is "contextual tools appear when
-         * needed, not all at once", and this page was the opposite: entry
-         * choices, hiring routes, filters, a service grid, a professional
-         * grid, an RFP table and three event panels, all on screen together.
-         * Ali's words were "jahan click karo kahin na kahin chala jata" -- of
-         * course, because everything was everywhere.
-         *
-         * The strip is now a set of tabs. Whichever stage is open, that is the
-         * only panel below it. Where the event has got to decides which one
-         * opens first; after that the client chooses.
-         */
-        /*
-         * Opening on stage 1, always.
-         *
-         * This used to open wherever the event had got to, which was clever
-         * and wrong: clicking "Virtual & Hybrid Hub" in the sidebar dropped
-         * the client into step 4 with no idea why. The same click has to lead
-         * to the same place every time, and the start of a workflow is the
-         * start of it. The event is not hidden by this -- the Entry panel
-         * points straight at it.
-         */
-        $stage = (int) $request->integer('stage', 1);
-        if ($stage < 1 || $stage > 7) {
-            $stage = 1;
-        }
-
-        // Stages 5-7 describe an event. Without one there is nothing to show,
-        // so the client is put back at the start rather than at an empty panel.
-        if ($stage >= 5 && ! $activeEvent) {
-            $stage = 1;
-        }
-
         return view('client.virtual-hub.index', compact(
             'categories', 'pros', 'gigs', 'activeEvent', 'workspace'
-        ) + ['stage' => $stage]);
+        ));
     }
 
     /**
@@ -299,7 +264,7 @@ class ClientVirtualHubController extends Controller
         session()->forget(self::DRAFT);
 
         return redirect()
-            ->route('client.virtual-hub.index', ['stage' => 4])
+            ->route('client.virtual-hub.index')
             ->with('status', '“' . $event->title . '” is posted — professionals can send proposals now.');
     }
 
