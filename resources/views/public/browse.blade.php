@@ -640,7 +640,18 @@
                     <div class="br-rail-head"><span>Recently Viewed</span></div>
                     <div class="br-recent">
                         @foreach($recentPros->take(3) as $rv)
-                            @php $rvImg = collect(is_array($rv->profile?->portfolio) ? $rv->profile->portfolio : [])->first(); @endphp
+                            {{-- `portfolio` holds two shapes: a structured
+                                 entry from an upload, and a bare URL string on
+                                 older rows. This read the column raw and took
+                                 whatever was first, so a structured entry came
+                                 back as an ARRAY and the <img src> below fell
+                                 over — a 500 on the whole of /browse for any
+                                 visitor whose recently-viewed list happened to
+                                 include such a pro. `portfolioHeroUrls()` is
+                                 the one place that knows both shapes, and it
+                                 is what the search cards on this same page
+                                 already use. --}}
+                            @php $rvImg = $rv->profile?->portfolioHeroUrls(1)[0] ?? null; @endphp
                             <a href="{{ route('public.professional.show', $rv) }}">
                                 <img src="{{ $rvImg ?: $rv->avatar_url }}" alt="{{ $rv->name }}">
                                 <span>{{ $rv->name }}</span>
