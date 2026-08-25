@@ -146,7 +146,7 @@
      model, interactive features and a language interpreter -- none of which the
      controller validated or saved -- and prefilled the date with "Oct 25, 2024",
      a date in the past that a client could submit without noticing. --}}
-@include('client.virtual-hub._stages', ['current' => 2])
+@include('client.virtual-hub._stages', ['current' => 2, 'event' => null])
 
 <form method="POST" action="{{ route('client.virtual-hub.store') }}" class="vhb">
     @csrf

@@ -203,6 +203,80 @@ class VirtualHubWorkspaceTest extends TestCase
         $this->assertStringNotContainsString('Deliverables', $html);
     }
 
+    // ── A way out ────────────────────────────────────────────────
+
+    /**
+     * Reported by Ali: the hub showed his event parked on stage 4 with no way
+     * to cancel it. The stage strip borrows the request wizard's look, which
+     * you click through, so it read as a wizard he was stuck in — and there
+     * genuinely was no exit on this screen.
+     */
+    public function test_the_workspace_offers_a_way_to_close_the_request(): void
+    {
+        $event = $this->event();
+
+        $html = $this->hub();
+
+        $this->assertStringContainsString('Close this request', $html);
+        $this->assertStringContainsString(route('client.events.close', $event), $html,
+            'The close action must use the existing close route, not a second way to end a request.');
+    }
+
+    /** Closing it actually closes it, and the hub stops offering to again. */
+    public function test_closing_the_request_works_from_the_hub(): void
+    {
+        $event = $this->event();
+
+        $this->actingAs($this->client)
+            ->post(route('client.events.close', $event))
+            ->assertRedirect();
+
+        $this->assertNotNull($event->fresh()->closed_at, 'The request should be closed.');
+    }
+
+    /**
+     * Ali, on the brief screen: "Entry wale step me kese jayega?" — there was
+     * no way back. The only route out was a Cancel button at the foot of a long
+     * form, and the strip's Entry card looked clickable but was not.
+     */
+    public function test_the_reachable_stages_are_links(): void
+    {
+        $html = $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.brief'))->assertOk()->getContent();
+
+        // The places you can always go.
+        $this->assertStringContainsString(route('client.virtual-hub.index'), $html,
+            'Entry must lead back to the hub.');
+        $this->assertStringContainsString(route('public.browse'), $html,
+            'Hire must lead to browsing professionals.');
+    }
+
+    /** A stage with nowhere to go is plain text, not a link that does nothing. */
+    public function test_event_stages_only_link_once_an_event_exists(): void
+    {
+        // No event: the last three stages have no destination.
+        $html = $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.brief'))->assertOk()->getContent();
+        $this->assertSame(4, substr_count($html, 'class="vhs-hit"'),
+            'Only Entry, Plan, Services and Hire lead anywhere before an event exists.');
+
+        // With an event, the workspace stages point at it.
+        $event = $this->event();
+        $html  = $this->hub();
+        $this->assertStringContainsString(route('client.events.show', $event), $html);
+    }
+
+    /** The strip says what it is, because it looks like something it is not. */
+    public function test_the_strip_says_it_is_wayfinding(): void
+    {
+        $html = $this->hub();
+
+        $this->assertStringContainsString('Where you are in the workflow', $html);
+
+        // It must not claim to track the event — that was the confusion.
+        $this->assertStringNotContainsString('Where your event is now', $html);
+    }
+
     // ── The seven-stage strip (the mockup's own shape) ───────────
 
     public function test_the_hub_shows_the_seven_stage_journey(): void
@@ -215,29 +289,42 @@ class VirtualHubWorkspaceTest extends TestCase
         $this->assertStringContainsString('You are here', $html);
     }
 
-    /** The marker follows the real work, never a stored step. */
-    public function test_the_current_stage_is_read_from_the_bookings(): void
+    /**
+     * The marker means "this screen", not "this event".
+     *
+     * It used to be derived from the event's bookings, so a client who clicked
+     * Entry landed on the hub and was told "You are here: Hire" — the strip
+     * answering a question they had not asked. Ali hit it immediately. Where
+     * the event is has its own display in the workspace panel; this one is
+     * wayfinding and nothing else.
+     */
+    public function test_the_marker_follows_the_page_not_the_event(): void
     {
-        // No event at all — the client is still choosing what to do.
-        $this->actingAs($this->client)->get(route('client.virtual-hub.index'))
-            ->assertOk()->assertViewHas('stage', 1);
-
         $event = $this->event();
         $svc   = $this->service('Streaming Technician');
         $event->categories()->sync([$svc->id]);
 
-        // Posted and waiting — the hiring stage.
-        $this->actingAs($this->client)->get(route('client.virtual-hub.index'))
-            ->assertOk()->assertViewHas('stage', 4);
-
-        // Somebody booked — the workspace stage.
+        // An event mid-hire must not move the marker off Entry on the hub.
         Booking::create([
             'event_id' => $event->id, 'category_id' => $svc->id, 'client_id' => $this->client->id,
             'supplier_id' => $this->pro->id, 'created_by' => $this->client->id,
             'status' => 'confirmed', 'price' => 1500, 'currency' => 'USD',
         ]);
-        $this->actingAs($this->client)->get(route('client.virtual-hub.index'))
-            ->assertOk()->assertViewHas('stage', 5);
+
+        $hub = $this->hub();
+        $this->assertMatchesRegularExpression(
+            '/Entry.*?You are here/s',
+            preg_replace('/<[^>]+>/', ' ', $hub),
+            'The hub is the Entry screen, whatever stage the event has reached.',
+        );
+
+        // And the brief is always the Plan screen.
+        $brief = $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.brief'))->assertOk()->getContent();
+        $this->assertMatchesRegularExpression(
+            '/Plan.*?You are here/s',
+            preg_replace('/<[^>]+>/', ' ', $brief),
+        );
     }
 
     /** With no event, it says so rather than drawing an empty studio. */

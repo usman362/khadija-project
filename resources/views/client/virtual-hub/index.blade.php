@@ -122,7 +122,11 @@
 <div class="vh-layout">
 <div class="vh-main">
 
-    @include('client.virtual-hub._stages', ['current' => $stage])
+    {{-- current => 1 because this page IS Entry. It used to pass the event's
+     stage, which mixed two different questions into one marker: click Entry,
+     land here, and be told "You are here: Hire" because the EVENT was hiring.
+     Where the event is has its own display, in the workspace panel. --}}
+@include('client.virtual-hub._stages', ['current' => 1, 'event' => $activeEvent])
 
     {{-- ── Stage 1 · Entry and Stage 4 · Hire ──────────────
          The mockup opens by asking what the client wants to do, and its Hire
@@ -318,6 +322,21 @@
             <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:14px;">
                 {{ $stages[$workspace['stage']] }} · {{ $workspace['booked'] }} of {{ $workspace['services'] }} {{ Str::plural('service', $workspace['services']) }} booked
             </div>
+
+            {{-- A way out. The hub used to show this event and its stage with
+                 no means of closing it, so a client who posted something by
+                 mistake had nowhere to go from here. Uses the same close route
+                 as My Events -- not a second way to end a request. --}}
+            @if(! $workspace['event']->closed_at)
+                <form method="POST" action="{{ route('client.events.close', $workspace['event']) }}"
+                      onsubmit="return confirm('Close “{{ $workspace['event']->title }}”? Professionals will stop seeing it and cannot send new proposals.');"
+                      style="margin:0 0 14px;">
+                    @csrf
+                    <button type="submit" class="vh-quick" style="width:100%;cursor:pointer;background:none;font-family:inherit;">
+                        Close this request
+                    </button>
+                </form>
+            @endif
 
             @if($workspace['rows']->isEmpty())
                 <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 4px;">

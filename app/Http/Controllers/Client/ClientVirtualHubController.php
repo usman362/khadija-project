@@ -129,23 +129,9 @@ class ClientVirtualHubController extends Controller
             ];
         }
 
-        /*
-         * Which of the mockup's seven stages the client is standing in.
-         * Derived from the same workspace stage the panels use, so the strip
-         * cannot say "Event day" for an event nobody has booked.
-         */
-        $stage = match ($workspace['stage'] ?? null) {
-            'complete'    => 7,
-            'event_day'   => 6,
-            'preparation' => 5,
-            'hiring'      => 4,
-            'planning'    => 4,   // posted and waiting — still the hiring stage
-            default       => 1,   // no event yet: they are choosing what to do
-        };
-
         return view('client.virtual-hub.index', compact(
             'categories', 'pros', 'gigs', 'activeEvent', 'workspace'
-        ) + ['stage' => $stage]);
+        ));
     }
 
     /**
