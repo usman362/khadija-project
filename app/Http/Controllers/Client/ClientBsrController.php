@@ -214,6 +214,41 @@ class ClientBsrController extends Controller
 
         $validated = $request->validate($rules, $this->messagesFor($step));
 
+        /*
+         * Step 7 asks for the date and the two times separately, because that
+         * is how a person says it. The database keeps two timestamps, so they
+         * are assembled here — and the assembly is the only place that has to
+         * know the three fields exist.
+         */
+        if ($step === 'availability') {
+            $date  = \Illuminate\Support\Carbon::parse($validated['event_date']);
+            $start = $date->copy()->setTimeFromTimeString($validated['event_start_time']);
+
+            $validated['starts_at'] = $start->format('Y-m-d H:i:s');
+
+            if (! empty($validated['event_end_time'])) {
+                $end = $date->copy()->setTimeFromTimeString($validated['event_end_time']);
+
+                // An event that ends before it starts runs past midnight —
+                // the common case for a reception, not a typo. Rolling it to
+                // the next day is what the client meant.
+                if ($end->lessThanOrEqualTo($start)) {
+                    $end->addDay();
+                }
+
+                $validated['ends_at'] = $end->format('Y-m-d H:i:s');
+            } else {
+                $validated['ends_at'] = null;
+            }
+
+            // A proposal deadline can never fall after the event; moving the
+            // event earlier here can break a deadline that was fine on step 5.
+            if (! empty($data['proposal_deadline'])
+                && \Illuminate\Support\Carbon::parse($data['proposal_deadline'])->greaterThan($start)) {
+                $validated['proposal_deadline'] = $start->copy()->subHour()->format('Y-m-d H:i:s');
+            }
+        }
+
         // Scope is derived from how many services were picked — that is literally
         // what single vs multi service means, so it isn't a separate question.
         if ($step === 'service') {
@@ -281,6 +316,8 @@ class ClientBsrController extends Controller
             'characteristic'    => $event->characteristic,
             'title'             => $event->title,
             'starts_at'         => $event->starts_at?->format('Y-m-d\TH:i'),
+            // Resuming a draft has to bring step 7's end time back with it.
+            'ends_at'           => $event->ends_at?->format('Y-m-d\TH:i'),
             'location'          => $event->location,
             'event_state'       => $event->state,
             'venue'             => $event->venue,
@@ -599,8 +636,21 @@ class ClientBsrController extends Controller
             'files'  => [],
             // The client may move the date here after seeing how crowded it
             // is; everything else on this step is a note to the professional.
+            /*
+             * The client is looking at who is free on a date — this is the
+             * moment they would change it, so the date and the times are asked
+             * for here rather than only on step 2.
+             *
+             * They arrive as three fields because that is how a person thinks
+             * about it ("June 28, 6pm to 10pm"); `starts_at` and `ends_at` are
+             * assembled from them in save(). An end BEFORE the start is the
+             * one combination that is nonsense, and it is rejected rather than
+             * quietly stored.
+             */
             'availability' => [
-                'starts_at'          => ['nullable', 'date'],
+                'event_date'         => ['required', 'date', 'after_or_equal:today'],
+                'event_start_time'   => ['required', 'date_format:H:i'],
+                'event_end_time'     => ['nullable', 'date_format:H:i'],
                 'availability_note'  => ['nullable', 'string', 'max:500'],
             ],
             'review' => ['confirm' => ['accepted']],
@@ -620,6 +670,9 @@ class ClientBsrController extends Controller
             'budget_max.gte'             => 'The top of the range must be at least the bottom.',
             'proposal_deadline.after'    => 'The proposal deadline has to be in the future.',
             'proposal_deadline.required' => 'Choose when proposals close. No standard window has been approved yet, so this can’t be set for you.',
+            'event_date.required'        => 'Set the date your event runs.',
+            'event_date.after_or_equal'  => 'Pick a date that has not already passed.',
+            'event_start_time.required'  => 'Set the time your event starts.',
             'confirm.accepted'           => 'Confirm the details before publishing.',
         ];
     }
@@ -630,6 +683,18 @@ class ClientBsrController extends Controller
      */
     private function furthestAllowed(array $d): int
     {
+        /*
+         * One entry per step that can be COMPLETED — seven, for an eight-step
+         * wizard, because the last step is the one being unlocked.
+         *
+         * There were six. Six entries cap `furthest` at 6, which is step 7's
+         * own index, so step 8 was never reachable: Continue on step 7
+         * redirected to Review, and Review's own guard bounced it straight
+         * back to step 7. The wizard said "Step 7 of 8" and had no eighth
+         * step. Publishing still worked, because save() has no such guard —
+         * the only thing missing was the client's chance to read what they
+         * were about to publish.
+         */
         $ok = [
             ! empty($d['services']) && ! empty($d['organization_type']) && ! empty($d['characteristic']),
             ! empty($d['title']),
@@ -637,6 +702,7 @@ class ClientBsrController extends Controller
             true,   // budget is optional
             true,   // proposal settings all have defaults
             true,   // files are optional
+            ! empty($d['starts_at']),   // step 7 sets the date and start time
         ];
 
         $furthest = 0;
@@ -688,6 +754,11 @@ class ClientBsrController extends Controller
             'organization_type' => $d['organization_type'] ?? null,
             'characteristic'    => $d['characteristic'] ?? 'standard',
             'starts_at'         => $startsAt,
+            // Step 7's optional end time. Null stays null — an event with no
+            // stated finish is a real answer, not a missing one.
+            'ends_at'           => ! empty($d['ends_at'])
+                ? \Illuminate\Support\Carbon::parse($d['ends_at'])
+                : null,
             'location'          => $d['location'] ?? null,
             'state'             => \App\Support\StateMatching::requestState($user, $d['event_state'] ?? null),
             'venue'             => $d['venue'] ?? null,

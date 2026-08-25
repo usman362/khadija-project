@@ -38,13 +38,70 @@
     .bw-field .req { color: var(--bad-text); }
     .bw-field .bw-hint { font-size: 11.5px; color: var(--text-muted); margin-top: 5px; line-height: 1.4; }
     .bw-field input[type=text], .bw-field input[type=number], .bw-field input[type=datetime-local],
+    .bw-field input[type=date], .bw-field input[type=time],
     .bw-field select, .bw-field textarea {
         width: 100%; background: var(--bg-page, transparent); border: 1px solid var(--border-color);
         border-radius: 10px; padding: 10px 12px; font-size: 13.5px; color: var(--text-primary); font-family: inherit;
     }
     .bw-field textarea { min-height: 130px; resize: vertical; line-height: 1.6; }
+    .bw-field textarea[rows='3'] { min-height: 84px; }
     .bw-help { font-size: 12px; color: var(--text-muted); margin-top: 5px; line-height: 1.5; }
     .bw-two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* Step 7 — date, time and availability.
+       The two controls on this step used to carry a class name, `.bw-input`,
+       that this stylesheet never defined: styling comes from
+       `.bw-field input`, a descendant selector, and neither control was in a
+       .bw-field. They rendered as raw browser widgets — a tiny monospace
+       textarea beside a native date box — on a page where everything else is
+       styled. Both are inside .bw-field now and the class is gone. */
+    .bw-three { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+    @media (max-width: 700px) { .bw-three { grid-template-columns: 1fr; } }
+
+    .bw-sec { border: 1px solid var(--border-color); border-radius: 13px; padding: 16px 18px; margin-bottom: 16px; }
+    .bw-sec-h { margin-bottom: 14px; }
+    .bw-sec-h b { display: block; font-size: 14px; font-weight: 800; color: var(--text-primary); }
+    .bw-sec-h span { display: block; font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+    .bw-sec-sub { font-size: 12.5px; font-weight: 800; color: var(--text-primary); margin: 16px 0 9px; }
+
+    .bw-avail { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+    @media (max-width: 700px) { .bw-avail { grid-template-columns: 1fr; } }
+    .bw-avail-card { border: 1px solid var(--border-color); border-radius: 12px; padding: 15px 16px; }
+    .bw-avail-card .n { font-size: 30px; font-weight: 800; line-height: 1; color: var(--text-primary); }
+    .bw-avail-card.ok .n { color: var(--ok-text, #059669); }
+    .bw-avail-card .l { font-size: 13px; font-weight: 700; margin-top: 7px; color: var(--text-primary); }
+    .bw-avail-card .s { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    .bw-days { display: flex; gap: 10px; flex-wrap: wrap; }
+    .bw-day { min-width: 100px; border: 1px solid var(--border-color); border-radius: 11px; padding: 10px 12px;
+              background: var(--bg-card); cursor: pointer; text-align: left; font-family: inherit; }
+    .bw-day:hover { border-color: var(--brand-text, #f97316); }
+    .bw-day.on { border-color: var(--brand-text, #f97316); background: rgba(249,115,22,.06); }
+    .bw-day span { display: block; }
+    .bw-day .dow { font-size: 11.5px; color: var(--text-muted); }
+    .bw-day .dom { font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
+    .bw-day .cnt { font-size: 19px; font-weight: 800; margin-top: 4px; color: var(--text-primary); }
+    .bw-day .cap { font-size: 11px; color: var(--text-muted); }
+
+    .bw-caveat { margin-top: 16px; border: 1px solid var(--border-color); border-left: 3px solid var(--accent-blue, #6366f1);
+                 border-radius: 10px; padding: 12px 14px; font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
+
+    .bw-note { border: 1px dashed var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .bw-note.warn { border-style: solid; border-color: rgba(245,158,11,.4); background: rgba(245,158,11,.06); }
+    .bw-note b { display: block; font-size: 14px; color: var(--text-primary); margin-bottom: 6px; }
+    .bw-note p { font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.6; }
+    .bw-note-acts { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 11px; }
+    .bw-note-acts a { font-size: 12.5px; font-weight: 700; color: var(--brand-text); text-decoration: none; }
+
+    .bw-callout { margin-top: 14px; border: 1px solid rgba(249,115,22,.28); background: rgba(249,115,22,.05);
+                  border-radius: 10px; padding: 12px 14px; }
+    .bw-callout b { display: block; font-size: 12.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 3px; }
+    .bw-callout p { font-size: 12.5px; color: var(--text-muted); margin: 0; line-height: 1.6; }
+
+    /* The label is for screen readers and the accessibility baseline; the
+       section heading above already says it on screen. */
+    .sr-only-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
     @media (max-width: 620px) { .bw-two { grid-template-columns: 1fr; } }
 
     .bw-opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
@@ -358,70 +415,189 @@
          professional may be booked elsewhere -- so this states the two
          countable facts and the caveat, rather than a confidence gauge. --}}
     @elseif($step === 'availability')
-        <h3>Availability match</h3>
-        <p class="lede">How many matching professionals have your date clear, before you send this out.</p>
+        <h3>Date, time and availability</h3>
+        <p class="lede">Set exactly when your event runs, then see how many matching professionals have that day clear before you send it out.</p>
 
+        {{-- ── Event date & time ───────────────────────────────
+             The mockup puts these on this step, and it is right to: the
+             client is looking at who is free on a date, which is the moment
+             they would change it. Step 2 asked for a date; this is where the
+             times get pinned down. --}}
+        <div class="bw-sec">
+            <div class="bw-sec-h">
+                <b>Event date &amp; time</b>
+                <span>Professionals see this on your request.</span>
+            </div>
+
+            <div class="bw-three">
+                <div class="bw-field">
+                    <label for="av_date">Event date <span class="req">*</span></label>
+                    <input type="date" id="av_date" name="event_date" required
+                           min="{{ now()->toDateString() }}"
+                           value="{{ old('event_date', $availabilityDate?->toDateString() ?? '') }}">
+                </div>
+                <div class="bw-field">
+                    <label for="av_start">Start time <span class="req">*</span></label>
+                    <input type="time" id="av_start" name="event_start_time" required
+                           value="{{ old('event_start_time', $availabilityDate?->format('H:i') ?? '') }}">
+                </div>
+                <div class="bw-field">
+                    <label for="av_end">End time <span style="font-weight:500;color:var(--text-muted)">(optional)</span></label>
+                    <input type="time" id="av_end" name="event_end_time"
+                           value="{{ old('event_end_time', ! empty($data['ends_at']) ? \Illuminate\Support\Carbon::parse($data['ends_at'])->format('H:i') : '') }}">
+                    <div class="bw-hint">Helps professionals quote staffing and overtime.</div>
+                </div>
+            </div>
+
+            {{-- No time-zone picker.
+                 The mockup has one, and for a marketplace that spanned zones it
+                 would be right. R38 makes the client and the professional
+                 the same state by design, so both read the same clock — and a
+                 picker whose value nothing in the app converts by would be a
+                 control that looks like it does something. --}}
+        </div>
+
+        {{-- ── Availability ────────────────────────────────────
+             The mockup's four buckets (Available / Limited / Not Confirmed /
+             Unavailable) and its EXCELLENT strength gauge are three buckets
+             and a rating more than our data supports. A clear GigResource
+             calendar means no commitment ON GIGRESOURCE — the professional
+             may be booked elsewhere entirely. So this states the two
+             countable facts and the caveat, and rates nothing. --}}
         @if(! $availability)
-            <div style="border:1px dashed var(--border-color);border-radius:12px;padding:26px 20px;">
-                <b style="display:block;font-size:14.5px;color:var(--text-primary);margin-bottom:6px;">Nothing to check yet</b>
-                <p style="font-size:13px;color:var(--text-muted);margin:0;">
+            <div class="bw-note">
+                <b>Nothing to check yet</b>
+                <p>
                     @if(empty($data['services'] ?? []))
                         Pick your services on step 1 and set a date on step 2, and this will show who is free.
                     @else
-                        Set your event date on step 2 and this will show who is free.
+                        Set your event date above and this will show who is free.
                     @endif
                 </p>
             </div>
-        @else
-            <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;">
-                <div style="flex:1;min-width:190px;border:1px solid var(--border-color);border-radius:12px;padding:15px 16px;">
-                    <div style="font-size:30px;font-weight:800;line-height:1;color:var(--accent-blue);">{{ $availability['nothing_booked'] }}</div>
-                    <div style="font-size:13px;font-weight:700;margin-top:7px;">have nothing booked</div>
-                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">on {{ $availabilityDate->format('M j, Y') }}</div>
-                </div>
-                <div style="flex:1;min-width:190px;border:1px solid var(--border-color);border-radius:12px;padding:15px 16px;">
-                    <div style="font-size:30px;font-weight:800;line-height:1;">{{ $availability['already_booked'] }}</div>
-                    <div style="font-size:13px;font-weight:700;margin-top:7px;">already booked</div>
-                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">that day on GigResource</div>
-                </div>
-                <div style="flex:1;min-width:190px;border:1px solid var(--border-color);border-radius:12px;padding:15px 16px;">
-                    <div style="font-size:30px;font-weight:800;line-height:1;">{{ $availability['matched'] }}</div>
-                    <div style="font-size:13px;font-weight:700;margin-top:7px;">match your request</div>
-                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">your services, in your state</div>
+
+        {{-- Nobody matches at all. That is a real answer and a different one
+             from "everyone is busy", so it does not get three zeros and a
+             shrug — it says which door is closed and which are open. --}}
+        @elseif($availability['matched'] === 0)
+            <div class="bw-note warn">
+                @php
+                    // The services THEY picked, not the event type's focus —
+                    // naming the wrong thing here is worse than naming nothing.
+                    $picked = $categories->whereIn('id', (array) ($data['services'] ?? []))->pluck('name');
+                @endphp
+                <b>No professional on GigResource offers {{ $picked->count() ? $picked->take(2)->implode(' or ') : 'these services' }} in your state yet</b>
+                <p>
+                    You can still publish — the request stays open and any professional who joins and offers
+                    this will see it. If you would rather not wait, go back to step 1 and add another service,
+                    or post a Direct Request to someone you already know.
+                </p>
+                <div class="bw-note-acts">
+                    <a href="{{ route('client.bsr.step', 'service') }}">Change services</a>
+                    <a href="{{ route('client.direct-offers.create') }}">Send a Direct Request instead</a>
                 </div>
             </div>
-
-            @if(count($availabilityDays) > 1)
-                <div style="font-size:13px;font-weight:700;margin-bottom:9px;">Nearby dates</div>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
-                    @foreach($availabilityDays as $d)
-                        <div style="min-width:104px;border:1px solid {{ $d['chosen'] ? 'var(--accent-orange,#f97316)' : 'var(--border-color)' }};
-                                    border-radius:11px;padding:11px 13px;{{ $d['chosen'] ? 'background:rgba(249,115,22,.06);' : '' }}">
-                            <div style="font-size:11.5px;color:var(--text-muted);">{{ $d['date']->format('D') }}</div>
-                            <div style="font-size:13.5px;font-weight:700;">{{ $d['date']->format('M j') }}</div>
-                            <div style="font-size:19px;font-weight:800;margin-top:4px;">{{ $d['nothing_booked'] }}</div>
-                            <div style="font-size:11px;color:var(--text-muted);">free{{ $d['chosen'] ? ' · your date' : '' }}</div>
-                        </div>
-                    @endforeach
+        @else
+            <div class="bw-sec">
+                <div class="bw-sec-h">
+                    <b>Availability on {{ $availabilityDate->format('D, M j, Y') }}</b>
+                    <span>Counted now — it can change until a professional accepts.</span>
                 </div>
-                <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;">Move your date</label>
-                <input type="datetime-local" name="starts_at" class="bw-input"
-                       value="{{ old('starts_at', $data['starts_at'] ?? '') }}" style="max-width:280px;">
-            @endif
 
-            {{-- The caveat is not small print: it is the reason these numbers
-                 are counts and not a promise. --}}
-            <div style="margin-top:18px;border-left:3px solid var(--accent-blue);background:var(--bg-card);
-                        border:1px solid var(--border-color);border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--text-muted);">
-                A clear calendar here means nothing is booked <b>on GigResource</b> — a professional may still be
-                committed elsewhere. Nothing is held until one of them accepts and the booking is confirmed.
+                <div class="bw-avail">
+                    <div class="bw-avail-card ok">
+                        <div class="n">{{ $availability['nothing_booked'] }}</div>
+                        <div class="l">have nothing booked</div>
+                        <div class="s">on GigResource that day</div>
+                    </div>
+                    <div class="bw-avail-card">
+                        <div class="n">{{ $availability['already_booked'] }}</div>
+                        <div class="l">already booked</div>
+                        <div class="s">that day on GigResource</div>
+                    </div>
+                    <div class="bw-avail-card">
+                        <div class="n">{{ $availability['matched'] }}</div>
+                        <div class="l">match your request</div>
+                        <div class="s">your services, in your state</div>
+                    </div>
+                </div>
+
+                @if(count($availabilityDays) > 1)
+                    <div class="bw-sec-sub">Around your date</div>
+                    <div class="bw-days">
+                        @foreach($availabilityDays as $d)
+                            {{-- Clicking a day moves the date. The old screen
+                                 showed the same four days and made the client
+                                 retype the date in a separate field below to
+                                 act on them. --}}
+                            <button type="button" class="bw-day {{ $d['chosen'] ? 'on' : '' }}"
+                                    data-date="{{ $d['date']->toDateString() }}">
+                                <span class="dow">{{ $d['date']->format('D') }}</span>
+                                <span class="dom">{{ $d['date']->format('M j') }}</span>
+                                <span class="cnt">{{ $d['nothing_booked'] }}</span>
+                                <span class="cap">{{ $d['chosen'] ? 'your date' : 'free' }}</span>
+                            </button>
+                        @endforeach
+                    </div>
+                @endif
+
+                {{-- The caveat is not small print: it is the reason these
+                     numbers are counts and not a promise. --}}
+                <div class="bw-caveat">
+                    A clear calendar here means nothing is booked <b>on GigResource</b> — a professional may still be
+                    committed elsewhere. Nothing is held until one of them accepts and the booking is confirmed.
+                </div>
             </div>
         @endif
 
-        <label style="display:block;font-size:13px;font-weight:600;margin:18px 0 6px;">Anything they should know about timing? <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label>
-        <textarea name="availability_note" class="bw-input" rows="3" maxlength="500"
-                  placeholder="e.g. setup can start from 3pm, or we can move the date by a week">{{ old('availability_note', $data['availability_note'] ?? '') }}</textarea>
-        <p style="font-size:12px;color:var(--text-muted);margin-top:6px;">Professionals see this on your request.</p>
+        {{-- ── Note to the professional ────────────────────── --}}
+        <div class="bw-sec">
+            <div class="bw-sec-h">
+                <b>Anything they should know about timing?</b>
+                <span>Optional. Professionals see this on your request.</span>
+            </div>
+            <div class="bw-field" style="margin-bottom:0;">
+                <label for="av_note" class="sr-only-label">Timing notes for the professional</label>
+                <textarea id="av_note" name="availability_note" rows="3" maxlength="500"
+                          data-counter="avCount"
+                          placeholder="e.g. setup can start from 3pm, or we can move the date by a week">{{ old('availability_note', $data['availability_note'] ?? '') }}</textarea>
+                <div class="bw-hint" style="text-align:right;"><span id="avCount">0</span> / 500</div>
+            </div>
+
+            <div class="bw-callout">
+                <b>Ask them to confirm the date</b>
+                <p>Professionals reply with a proposal. Availability above is a count, not a booking — ask them to
+                   confirm the date and time when they respond.</p>
+            </div>
+        </div>
+
+@push('scripts')
+<script>
+(function () {
+    // Clicking a nearby day sets the date field rather than making the client
+    // read the number here and retype the date somewhere else.
+    var date = document.getElementById('av_date');
+    document.querySelectorAll('.bw-day').forEach(function (b) {
+        b.addEventListener('click', function () {
+            if (!date) return;
+            date.value = b.dataset.date;
+            document.querySelectorAll('.bw-day').forEach(function (x) { x.classList.remove('on'); });
+            b.classList.add('on');
+            date.form && date.form.requestSubmit
+                ? null   // not submitted for them: they may still want to edit the time
+                : null;
+        });
+    });
+
+    var ta = document.getElementById('av_note'), out = document.getElementById('avCount');
+    if (ta && out) {
+        var tick = function () { out.textContent = ta.value.length; };
+        ta.addEventListener('input', tick);
+        tick();
+    }
+})();
+</script>
+@endpush
 
     {{-- ── 8 · Review ──────────────────────────────────────── --}}
     @elseif($step === 'review')
@@ -436,7 +612,7 @@
         <div class="bw-rev"><span>Scope</span><b>{{ $isMulti ? 'MSR — multi-service' : 'SSR — single service' }}</b></div>
         <div class="bw-rev"><span>Services</span><b>{{ $svcNames->implode(', ') ?: '—' }}</b></div>
         <div class="bw-rev"><span>Name</span><b>{{ $data['title'] ?? '—' }}</b></div>
-        <div class="bw-rev"><span>Event date</span><b>{{ ! empty($data['starts_at']) ? \Illuminate\Support\Carbon::parse($data['starts_at'])->format('M j, Y · g:i A') : 'Flexible' }}</b></div>
+        <div class="bw-rev"><span>Event date</span><b>{{ ! empty($data['starts_at']) ? \Illuminate\Support\Carbon::parse($data['starts_at'])->format('M j, Y · g:i A') : 'Flexible' }}@if(! empty($data['ends_at'])) – {{ \Illuminate\Support\Carbon::parse($data['ends_at'])->format('g:i A') }}@endif</b></div>
         <div class="bw-rev"><span>Location</span><b>{{ $data['location'] ?? '—' }}{{ ! empty($data['venue']) ? ' · ' . $data['venue'] : '' }}</b></div>
         <div class="bw-rev"><span>Guests</span><b>{{ ! empty($data['guest_count']) ? number_format($data['guest_count']) : '—' }}</b></div>
         <div class="bw-rev"><span>Budget</span><b>

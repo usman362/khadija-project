@@ -165,7 +165,12 @@ class RequestAvailabilityStepTest extends TestCase
         $pro = $this->pro();
         $this->walkTo('availability');
 
+        // The step now carries the event date and start time as well — they
+        // are marked required on Sir Peter's mockup, and this is the screen
+        // where a client looking at who is free would change them.
         $this->actingAs($this->client)->post(route('client.bsr.save', 'availability'), [
+            'event_date'        => now()->addDays(30)->toDateString(),
+            'event_start_time'  => '18:00',
             'availability_note' => 'Setup can start from 3pm.',
         ])->assertSessionHasNoErrors();
 
