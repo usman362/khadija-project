@@ -488,13 +488,14 @@
        them up. */
     $user = auth()->user();
 
-    // Total spent — sum of completed bookings' cost when the column exists.
-    $totalSpent = 0;
-    try {
-        $totalSpent = \App\Models\Booking::where('client_id', $user->id)
-            ->where('status', 'completed')
-            ->sum(\Illuminate\Support\Facades\Schema::hasColumn('bookings', 'total_amount') ? 'total_amount' : 'agreed_price');
-    } catch (\Throwable $e) { /* gracefully degrade */ }
+    /* Total spent — money that actually left the client, i.e. completed
+       payments. It used to sum bookings.total_amount / agreed_price, and
+       NEITHER column exists (the amount lives in bookings.price), so the query
+       threw every time and the catch swallowed it: the card read $0.00 for
+       everyone, forever, and looked like a real answer. */
+    $totalSpent = (float) \App\Models\Payment::where('user_id', $user->id)
+        ->where('status', 'completed')
+        ->sum('amount');
 
     // Calendar — render the current month grid, overlay events on their
     // start dates. dayEvents is keyed by day-of-month (1-31).
@@ -508,16 +509,10 @@
         ->get()
         ->groupBy(fn ($e) => $e->starts_at?->format('Y-m-d'));
 
-    /* Demo calendar events (keyed by day-of-month) — shown when the client
-       has no real scheduled events so the calendar isn't blank, matching
-       the mockup. Replaced automatically once real events exist. */
-    $demoCalEvents = $eventsByDate->isEmpty() ? [
-        6  => ['Wedding, Baltimore MD',        'ev-coral'],
-        8  => ['Corporate Event, Arlington VA','ev-purple'],
-        13 => ['Private Party, Philadelphia PA','ev-purple'],
-        21 => ['Brand Launch, Washington DC',  'ev-coral'],
-        26 => ['Memorial Day',               'ev-pink'],
-    ] : [];
+    /* No invented calendar entries. A client with nothing booked used to see
+       five events they had never created -- Wedding, Baltimore MD; Brand
+       Launch, Washington DC -- on their own calendar, "so it isn't blank".
+       An empty calendar is the true answer, and the panel says so below. */
 
     // My Gigs Overview — split bookings by status (matches design columns).
     $gigsRequested = \App\Models\Booking::where('client_id', $user->id)->where('status', 'requested')->count();
@@ -880,24 +875,29 @@
                         $key      = $cursor->format('Y-m-d');
                         $inMonth  = $cursor->month === $now->month;
                         $dayEvs   = $eventsByDate->get($key, collect());
-                        $demoEv   = ($inMonth && isset($demoCalEvents[$cursor->day])) ? $demoCalEvents[$cursor->day] : null;
+
                         $classes  = 'od-cal-day';
                         if (!$inMonth)                      $classes .= ' muted';
                         if ($key === $todayKey)             $classes .= ' today';
-                        if ($dayEvs->count() || $demoEv)    $classes .= ' has-event';
+                        if ($dayEvs->count())               $classes .= ' has-event';
                     @endphp
                     <div class="{{ $classes }}">
                         <div class="od-cal-num">{{ $cursor->day }}</div>
                         @foreach($dayEvs->take(1) as $ev)
                             <div class="od-cal-event ev-coral" title="{{ $ev->title }}">{{ \Illuminate\Support\Str::limit($ev->title, 10) }}</div>
                         @endforeach
-                        @if($demoEv && $dayEvs->isEmpty())
-                            <div class="od-cal-event {{ $demoEv[1] }}" title="{{ $demoEv[0] }}">{{ $demoEv[0] }}</div>
-                        @endif
                     </div>
                     @php $cursor->addDay(); @endphp
                 @endwhile
             </div>
+            @if($eventsByDate->isEmpty())
+                {{-- Says the true thing instead of filling the grid with
+                     events the client never created. --}}
+                <p style="font-size:12.5px;opacity:.7;margin:10px 2px 0;">
+                    Nothing scheduled this month.
+                    <a href="{{ route('client.post-event.choose') }}" style="font-weight:600;">Post an event</a> to see it here.
+                </p>
+            @endif
             <div class="od-cal-legend">
                 <span><span class="od-cal-legend-dot" style="background:#10b981;"></span>Booked</span>
                 <span><span class="od-cal-legend-dot" style="background:#ef4444;"></span>Pending</span>
@@ -914,31 +914,24 @@
         <div class="od-card-head">
             <span class="od-card-title">My To-Do List</span>
         </div>
-        @php
-            /* Event-planning checklist. Static demo content matching the
-               mockup until a real tasks table ships. */
-            $todos = [
-                ['Find and book a photographer',  'May 30, 2026', 'high'],
-                ['Hire a caterer for 100 guests', 'Jun 2, 2026',  'medium'],
-                ['Book a venue',                  'Jun 5, 2026',  'high'],
-                ['Arrange floral decorations',    'Jun 6, 2026',  'low'],
-            ];
-        @endphp
-        <div class="od-tabs">
-            <span class="od-tab is-active">To Do (4)</span>
-            <span class="od-tab">In Progress (2)</span>
-            <span class="od-tab">Completed (3)</span>
-            <span class="od-tab">Cancelled (1)</span>
-        </div>
+        {{-- Real outstanding work, from the controller. The four chores and the
+             tab counts that used to sit here were hardcoded and counted
+             nothing. Every row below links to the screen that clears it. --}}
         <div class="od-todo">
-            @foreach($todos as [$title, $due, $pri])
-                <div class="od-todo-row">
+            @forelse($todos as $todo)
+                <a class="od-todo-row" href="{{ $todo['url'] }}" style="text-decoration:none;color:inherit;">
                     <span class="od-todo-check"></span>
-                    <span class="od-todo-text">{{ $title }}</span>
-                    <span class="od-todo-due">Due {{ $due }}</span>
-                    <span class="od-todo-pri {{ $pri }}">{{ ucfirst($pri) }}</span>
+                    <span class="od-todo-text">
+                        {{ $todo['title'] }}
+                        <small style="display:block;font-size:11.5px;opacity:.65;font-weight:400;">{{ $todo['meta'] }}</small>
+                    </span>
+                    <span class="od-todo-pri {{ $todo['level'] }}">{{ $todo['level'] === 'high' ? 'Needs you' : 'When you can' }}</span>
+                </a>
+            @empty
+                <div class="od-todo-row" style="opacity:.7">
+                    <span class="od-todo-text">Nothing needs you right now.</span>
                 </div>
-            @endforeach
+            @endforelse
         </div>
     </div>
 

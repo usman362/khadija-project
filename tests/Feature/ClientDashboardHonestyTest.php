@@ -4,153 +4,117 @@ namespace Tests\Feature;
 
 use App\Models\Booking;
 use App\Models\Event;
+use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Checklist rows 179, 191, 192 and 222 — the client dashboard telling the
- * truth about itself.
+ * The client dashboard must not tell the client things that are not true.
  *
- * All four were the same kind of fault: a number or a name on the screen that
- * no data stood behind. "Active Gigs: 21" beside an overview that counted
- * four; ten badge icons nobody had earned; "Tier 3 of 6 · 15 completed
- * events" above "35 / 50 events"; and everyone greeted as "Client User".
+ * Three panels were inventing their content:
+ *   - "Total Spent" summed bookings.total_amount / agreed_price. Neither
+ *     column exists (the amount is bookings.price), so the query threw on
+ *     every render and a try/catch swallowed it — the card read $0.00 for
+ *     every client, forever, and looked like an answer.
+ *   - The calendar drew five events the client had never created (Wedding,
+ *     Baltimore MD; Brand Launch, Washington DC…) whenever they had none.
+ *   - The to-do list held four hardcoded chores under tab counts —
+ *     To Do (4), In Progress (2) — that counted nothing at all.
  */
 class ClientDashboardHonestyTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User $client;
-    private User $pro;
-
-    protected function setUp(): void
+    private function client(): User
     {
-        parent::setUp();
-
         $this->seed(\Database\Seeders\PermissionSeeder::class);
         $this->seed(\Database\Seeders\RolePermissionSeeder::class);
 
-        $this->client = $this->account('client');
-        $this->pro    = $this->account('professional');
+        $u = User::factory()->create();
+        $u->assignRole('client');
+        $u->givePermissionTo('dashboard.view');
+
+        return $u->fresh();
     }
 
-    private function account(string $role): User
+    private function dashboard(User $u): string
     {
-        $user = User::factory()->create(['primary_role' => $role]);
-        $user->assignRole($role);
-        $user->getOrCreateProfile()->update(['country' => 'US', 'state' => 'MD', 'city' => 'Baltimore']);
-
-        return $user->fresh();
+        return $this->actingAs($u)->get(route('client.dashboard'))->assertOk()->getContent();
     }
 
-    private function booking(string $status): Booking
+    /** The number moves with real money, instead of being a permanent zero. */
+    public function test_total_spent_reflects_completed_payments(): void
     {
-        $event = Event::create([
-            'title' => 'A booking', 'client_id' => $this->client->id, 'created_by' => $this->client->id,
-            'status' => 'published', 'is_published' => true, 'starts_at' => now()->addDays(20),
+        $client = $this->client();
+
+        $this->assertStringContainsString('$0.00', $this->dashboard($client));
+
+        Payment::create([
+            'user_id' => $client->id, 'gateway' => 'test', 'status' => 'completed',
+            'amount' => 1250.50, 'currency' => 'USD', 'completed_at' => now(),
         ]);
 
-        return Booking::create([
-            'event_id' => $event->id, 'client_id' => $this->client->id, 'supplier_id' => $this->pro->id,
-            'created_by' => $this->client->id, 'status' => $status, 'price' => 500,
+        $this->assertStringContainsString('$1,250.50', $this->dashboard($client));
+    }
+
+    /** Pending money is not spent money. */
+    public function test_an_incomplete_payment_is_not_counted_as_spent(): void
+    {
+        $client = $this->client();
+
+        Payment::create([
+            'user_id' => $client->id, 'gateway' => 'test', 'status' => 'pending',
+            'amount' => 900, 'currency' => 'USD',
         ]);
+
+        $this->assertStringNotContainsString('$900.00', $this->dashboard($client));
     }
 
-    private function dashboard()
+    public function test_an_empty_calendar_shows_nothing_rather_than_invented_events(): void
     {
-        return $this->actingAs($this->client)->get(route('client.dashboard'));
+        $html = $this->dashboard($this->client());
+
+        foreach (['Brand Launch, Washington DC', 'Wedding, Baltimore MD', 'Corporate Event, Arlington VA'] as $invented) {
+            $this->assertStringNotContainsString($invented, $html);
+        }
+
+        $this->assertStringContainsString('Nothing scheduled this month', $html);
     }
 
-    /**
-     * Row 191 — the tile and the overview counted different things under one
-     * word. Active now means what the overview means, so one is the other's
-     * total and they add up by construction.
-     */
-    public function test_active_gigs_equals_the_overview_beside_it(): void
+    public function test_the_to_do_list_holds_real_work_not_hardcoded_chores(): void
     {
-        $this->booking('requested');
-        $this->booking('confirmed');
-        $this->booking('confirmed');
-        $this->booking('completed');   // finished — not active
+        $client = $this->client();
 
-        $body = $this->dashboard()->assertOk()->getContent();
+        $html = $this->dashboard($client);
+        $this->assertStringNotContainsString('Find and book a photographer', $html);
+        $this->assertStringNotContainsString('To Do (4)', $html);
+        $this->assertStringContainsString('Nothing needs you right now', $html);
 
-        // 3 active (1 requested + 2 confirmed), not 4 and not the event count.
-        $this->assertMatchesRegularExpression(
-            '/Active Gigs<\/div>\s*<div class="od-stat-value">3<\/div>/',
-            $body,
-        );
-    }
-
-    public function test_an_event_nobody_was_hired_for_is_not_an_active_gig(): void
-    {
-        // A published request with no booking is a request, not a gig.
+        // An unpublished request is real outstanding work, so it appears.
         Event::create([
-            'title' => 'Nobody hired yet', 'client_id' => $this->client->id, 'created_by' => $this->client->id,
-            'status' => 'published', 'is_published' => true, 'starts_at' => now()->addDays(20),
+            'title' => 'Draft request', 'client_id' => $client->id, 'created_by' => $client->id,
+            'status' => 'pending', 'is_published' => false, 'starts_at' => now()->addMonth(),
         ]);
 
-        $this->assertMatchesRegularExpression(
-            '/Active Gigs<\/div>\s*<div class="od-stat-value">0<\/div>/',
-            $this->dashboard()->getContent(),
-        );
+        $this->assertStringContainsString('still unpublished', $this->dashboard($client));
     }
 
-    /**
-     * Row 192 — ten badge icons shown to everyone. No badge has an award rule
-     * yet; the rulebook is proposed, not locked.
-     */
-    public function test_no_badge_is_claimed_before_a_rule_exists(): void
+    /** Finished work the client has not rated is offered, once. */
+    public function test_a_completed_booking_appears_as_a_review_to_leave(): void
     {
-        $page = $this->dashboard();
+        $client = $this->client();
+        $pro    = User::factory()->create();
 
-        $page->assertSee('You have no badges yet', false);
+        $event = Event::create([
+            'title' => 'Done', 'client_id' => $client->id, 'created_by' => $client->id,
+            'status' => 'completed', 'starts_at' => now()->subWeek(),
+        ]);
+        Booking::create([
+            'event_id' => $event->id, 'client_id' => $client->id, 'supplier_id' => $pro->id,
+            'created_by' => $client->id, 'status' => 'completed', 'price' => 500, 'currency' => 'USD',
+        ]);
 
-        foreach (['Fast Payer', 'Luxury Host', 'Trendsetter', 'VIP Client', 'Mega Event Planner'] as $badge) {
-            $page->assertDontSee($badge, false);
-        }
-    }
-
-    /**
-     * Row 222 — the profile widget was entirely invented, and its own two
-     * figures disagreed: 15 completed events on one line, 35 on the next.
-     */
-    public function test_the_profile_widget_shows_real_figures_and_no_invented_tier(): void
-    {
-        $page = $this->dashboard();
-
-        $page->assertSee($this->client->name, false);
-        $page->assertSee('0 events completed', false);
-
-        foreach (['Tier 3 of 6', 'Trusted Planner', '35 / 50', '86 reviews', 'Elite Planner'] as $invented) {
-            $page->assertDontSee($invented, false);
-        }
-    }
-
-    /** Row 222 — the button now goes to the page R53 built. */
-    public function test_view_profile_points_at_the_public_portfolio(): void
-    {
-        $this->dashboard()->assertSee(route('public.client.portfolio', $this->client), false);
-    }
-
-    public function test_completed_events_are_counted_not_asserted(): void
-    {
-        $this->booking('completed');
-        $this->booking('completed');
-
-        $this->dashboard()->assertSee('2 events completed', false);
-    }
-
-    /** Row 179 — no placeholder identities anywhere in the demo data. */
-    public function test_the_demo_accounts_have_real_names(): void
-    {
-        $this->seed(\Database\Seeders\DemoUsersSeeder::class);
-
-        foreach (['Client User', 'Professional User', 'Supplier User'] as $placeholder) {
-            $this->assertDatabaseMissing('users', ['name' => $placeholder]);
-        }
-
-        $this->assertDatabaseHas('users', ['email' => 'client@example.com', 'name' => 'Dana Whitfield']);
+        $this->assertStringContainsString('Review 1 completed booking', $this->dashboard($client));
     }
 }

@@ -62,6 +62,70 @@ class ClientDashboardController extends Controller
             $summaries->get($event->id, ['total' => 0, 'confirmed' => 0, 'cancelled' => 0, 'no_response' => 0]),
         ));
 
+        /*
+         * The to-do list, built from things that are actually waiting on this
+         * client. It replaces four hardcoded chores ("Find and book a
+         * photographer", "Book a venue"…) under tab counts — To Do (4), In
+         * Progress (2) — that counted nothing at all. There is no tasks table,
+         * so rather than invent one, the list is the work the account really
+         * has outstanding, and every row goes somewhere that can clear it.
+         */
+        $todos = [];
+
+        $draftCount = Event::where('client_id', $user->id)
+            ->where('is_published', false)->whereNull('closed_at')->count();
+        if ($draftCount) {
+            $todos[] = [
+                'title' => $draftCount . ' ' . \Illuminate\Support\Str::plural('request', $draftCount) . ' still unpublished',
+                'meta'  => 'Professionals cannot see these yet',
+                'url'   => route('client.events.index'),
+                'level' => 'high',
+            ];
+        }
+
+        // Proposals sitting on open requests, waiting to be compared.
+        $awaitingProposals = \App\Models\Event::where('client_id', $user->id)
+            ->whereNull('closed_at')
+            ->whereHas('bids', fn ($b) => $b->whereIn('status', ['submitted', 'pending']))
+            ->count();
+        if ($awaitingProposals) {
+            $todos[] = [
+                'title' => 'Proposals waiting on ' . $awaitingProposals . ' ' . \Illuminate\Support\Str::plural('request', $awaitingProposals),
+                'meta'  => 'Compare and choose a professional',
+                'url'   => route('client.proposals.index'),
+                'level' => 'high',
+            ];
+        }
+
+        // Agreements the professional has signed and the client has not.
+        $toSign = \App\Models\Agreement::whereHas('booking', fn ($q) => $q->where('client_id', $user->id))
+            ->whereNull('client_accepted_at')
+            ->whereIn('status', ['pending_review', 'supplier_accepted'])
+            ->count();
+        if ($toSign) {
+            $todos[] = [
+                'title' => $toSign . ' ' . \Illuminate\Support\Str::plural('agreement', $toSign) . ' awaiting your signature',
+                'meta'  => 'The professional has already signed',
+                'url'   => route('client.bookings.index'),
+                'level' => 'high',
+            ];
+        }
+
+        // Finished work this client has not reviewed.
+        $reviewed = \App\Models\Review::where('reviewer_id', $user->id)->pluck('booking_id');
+        $toReview = Booking::where('client_id', $user->id)
+            ->where('status', 'completed')
+            ->whereNotIn('id', $reviewed)
+            ->count();
+        if ($toReview) {
+            $todos[] = [
+                'title' => 'Review ' . $toReview . ' completed ' . \Illuminate\Support\Str::plural('booking', $toReview),
+                'meta'  => 'Your rating builds their reputation',
+                'url'   => route('client.reviews.index'),
+                'level' => 'low',
+            ];
+        }
+
         // Active subscription
         $subscription = UserSubscription::where('user_id', $user->id)
             ->where('status', 'active')
@@ -69,7 +133,7 @@ class ClientDashboardController extends Controller
             ->first();
 
         return view('client.dashboard', compact(
-            'stats', 'recentEvents', 'recentBookings', 'subscription', 'attendeeSummaries'
+            'stats', 'recentEvents', 'recentBookings', 'subscription', 'attendeeSummaries', 'todos'
         ));
     }
 }
