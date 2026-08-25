@@ -141,12 +141,20 @@ class VirtualHubWorkspaceTest extends TestCase
     /** Stage 1 (entry) and stage 4 (hire) are doors onto systems that exist. */
     public function test_the_hub_offers_the_entry_and_hire_routes(): void
     {
-        $html = $this->hub();
-
-        foreach (['Plan a new event', 'Find a professional', 'Manage my events',
-                  'Browse professionals', 'Create a request', 'Send a direct request'] as $route) {
-            $this->assertStringContainsString($route, $html);
+        // Entry's three choices live on stage 1...
+        $entry = $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.index', ['stage' => 1]))->assertOk()->getContent();
+        foreach (['Plan a new event', 'Find a professional', 'Manage my events'] as $choice) {
+            $this->assertStringContainsString($choice, $entry);
         }
+
+        // ...and Hire's three routes on stage 4, not both at once.
+        $hire = $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.index', ['stage' => 4]))->assertOk()->getContent();
+        foreach (['Three ways to hire', 'Create a request', 'Send a direct request'] as $route) {
+            $this->assertStringContainsString($route, $hire);
+        }
+        $this->assertStringNotContainsString('Plan a new event', $hire);
     }
 
     /** Stage 6 appears on the day, with only what the client actually gave us. */
@@ -159,7 +167,8 @@ class VirtualHubWorkspaceTest extends TestCase
             'meeting_url' => 'https://zoom.us/j/123456789',
         ]);
 
-        $html = $this->hub();
+        $html = $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.index', ['stage' => 6]))->assertOk()->getContent();
 
         $this->assertStringContainsString('Event day', $html);
         $this->assertStringContainsString('Zoom', $html);
@@ -174,7 +183,8 @@ class VirtualHubWorkspaceTest extends TestCase
     {
         $this->event()->update(['starts_at' => now()->addHour()]);
 
-        $html = $this->hub();
+        $html = $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.index', ['stage' => 6]))->assertOk()->getContent();
 
         $this->assertStringContainsString('No joining link saved', $html);
         $this->assertStringNotContainsString('Join event', $html);
@@ -201,6 +211,82 @@ class VirtualHubWorkspaceTest extends TestCase
 
         // There is no deliverables model, so no button pretends there is.
         $this->assertStringNotContainsString('Deliverables', $html);
+    }
+
+    // ── One stage at a time ──────────────────────────────────────
+
+    /**
+     * The mockup's own closing promise: "contextual tools appear when needed,
+     * not all at once." The hub was the opposite — entry choices, hiring
+     * routes, filters, a service grid, a professional grid, an RFP table and
+     * three event panels on screen together. Ali: "jahan click karo kahin na
+     * kahin chala jata."
+     */
+    public function test_each_stage_shows_only_its_own_panel(): void
+    {
+        $event = $this->event();
+        $svc   = $this->service('Streaming Technician');
+        $event->categories()->sync([$svc->id]);
+
+        $open = fn (int $n) => $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.index', ['stage' => $n]))->assertOk()->getContent();
+
+        $entry = $open(1);
+        $this->assertStringContainsString('Plan a new event', $entry);
+        $this->assertStringNotContainsString('Three ways to hire', $entry);
+
+        $hire = $open(4);
+        $this->assertStringContainsString('Three ways to hire', $hire);
+        $this->assertStringNotContainsString('Plan a new event', $hire);
+
+        $day = $open(6);
+        $this->assertStringNotContainsString('Three ways to hire', $day);
+        $this->assertStringNotContainsString('Plan a new event', $day);
+    }
+
+    /** A stage that describes an event is not offered without one. */
+    public function test_event_stages_fall_back_when_there_is_no_event(): void
+    {
+        $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.index', ['stage' => 6]))
+            ->assertOk()
+            ->assertViewHas('stage', 1);
+    }
+
+    /** Where the event has got to decides which stage opens first. */
+    public function test_the_opening_stage_follows_the_event(): void
+    {
+        $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.index'))->assertOk()->assertViewHas('stage', 1);
+
+        $event = $this->event();
+        $svc   = $this->service('Streaming Technician');
+        $event->categories()->sync([$svc->id]);
+
+        // Posted and waiting — opens on Hire.
+        $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.index'))->assertOk()->assertViewHas('stage', 4);
+
+        Booking::create([
+            'event_id' => $event->id, 'category_id' => $svc->id, 'client_id' => $this->client->id,
+            'supplier_id' => $this->pro->id, 'created_by' => $this->client->id,
+            'status' => 'confirmed', 'price' => 1500, 'currency' => 'USD',
+        ]);
+
+        // Someone booked — opens on the workspace.
+        $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.index'))->assertOk()->assertViewHas('stage', 5);
+    }
+
+    /** The four tiles that opened nothing are gone. */
+    public function test_the_dead_feature_tiles_are_gone(): void
+    {
+        $html = $this->hub();
+
+        foreach (['Virtual Venue Builder', 'Stream Assistant', 'Analytics Dashboard', 'Engagement Tools'] as $tile) {
+            $this->assertStringNotContainsString($tile, $html,
+                "'{$tile}' had no href — it opened nothing.");
+        }
     }
 
     // ── A way out ────────────────────────────────────────────────
@@ -241,14 +327,16 @@ class VirtualHubWorkspaceTest extends TestCase
      */
     public function test_the_reachable_stages_are_links(): void
     {
-        $html = $this->actingAs($this->client)
-            ->get(route('client.virtual-hub.brief'))->assertOk()->getContent();
+        // Entry and Hire are separate stages now, each on its own tab.
+        $entry = $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.index', ['stage' => 1]))->assertOk()->getContent();
+        $this->assertStringContainsString('Plan a new event', $entry);
+        $this->assertStringContainsString('Find a professional', $entry);
 
-        // The places you can always go.
-        $this->assertStringContainsString(route('client.virtual-hub.index'), $html,
-            'Entry must lead back to the hub.');
-        $this->assertStringContainsString(route('public.browse'), $html,
-            'Hire must lead to browsing professionals.');
+        $hire = $this->actingAs($this->client)
+            ->get(route('client.virtual-hub.index', ['stage' => 4]))->assertOk()->getContent();
+        $this->assertStringContainsString('Browse professionals', $hire);
+        $this->assertStringContainsString('Send a direct request', $hire);
     }
 
     /** A stage with nowhere to go is plain text, not a link that does nothing. */
@@ -271,7 +359,7 @@ class VirtualHubWorkspaceTest extends TestCase
     {
         $html = $this->hub();
 
-        $this->assertStringContainsString('Where you are in the workflow', $html);
+        $this->assertStringContainsString('Pick a step to see just that part', $html);
 
         // It must not claim to track the event — that was the confusion.
         $this->assertStringNotContainsString('Where your event is now', $html);

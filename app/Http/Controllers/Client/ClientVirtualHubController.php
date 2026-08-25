@@ -129,9 +129,42 @@ class ClientVirtualHubController extends Controller
             ];
         }
 
+        /*
+         * One stage at a time.
+         *
+         * The mockup's own closing promise is "contextual tools appear when
+         * needed, not all at once", and this page was the opposite: entry
+         * choices, hiring routes, filters, a service grid, a professional
+         * grid, an RFP table and three event panels, all on screen together.
+         * Ali's words were "jahan click karo kahin na kahin chala jata" -- of
+         * course, because everything was everywhere.
+         *
+         * The strip is now a set of tabs. Whichever stage is open, that is the
+         * only panel below it. Where the event has got to decides which one
+         * opens first; after that the client chooses.
+         */
+        $default = match ($workspace['stage'] ?? null) {
+            'complete'    => 7,
+            'event_day'   => 6,
+            'preparation' => 5,
+            'hiring', 'planning' => 4,
+            default       => 1,
+        };
+
+        $stage = (int) $request->integer('stage', $default);
+        if ($stage < 1 || $stage > 7) {
+            $stage = $default;
+        }
+
+        // Stages 5-7 describe an event. Without one there is nothing to show,
+        // so the client is put back at the start rather than at an empty panel.
+        if ($stage >= 5 && ! $activeEvent) {
+            $stage = 1;
+        }
+
         return view('client.virtual-hub.index', compact(
             'categories', 'pros', 'gigs', 'activeEvent', 'workspace'
-        ));
+        ) + ['stage' => $stage]);
     }
 
     /**

@@ -15,16 +15,23 @@
      * does nothing, which is what left "how do I get back to Entry?" with no
      * answer on this strip.
      */
-    $eventUrl = ($event ?? null) ? route('client.events.show', $event) : null;
+    /*
+     * Each stage opens its own panel on the hub -- these are tabs, not jumps
+     * to other screens. Only Plan and Services leave, because the brief is a
+     * form of its own. Stages 5-7 describe an event, so without one they are
+     * not offered: a tab that opens an empty panel teaches nothing.
+     */
+    $hub  = fn (int $n) => route('client.virtual-hub.index', ['stage' => $n]);
+    $has  = (bool) ($event ?? null);
 
     $stages = [
-        1 => ['Entry',           'Choose what you want to do.',            route('client.virtual-hub.index')],
+        1 => ['Entry',           'Choose what you want to do.',            $hub(1)],
         2 => ['Plan',            'Tell us about your event.',              route('client.virtual-hub.brief')],
         3 => ['Services',        'Select the services you need.',          route('client.virtual-hub.brief')],
-        4 => ['Hire',            'Find and hire the right professionals.', route('public.browse')],
-        5 => ['Event workspace', 'Manage everything in one place.',        $eventUrl],
-        6 => ['Event day',       'Run your event with confidence.',        $eventUrl],
-        7 => ['Complete',        'Close the loop and wrap up.',            $eventUrl],
+        4 => ['Hire',            'Find and hire the right professionals.', $hub(4)],
+        5 => ['Event workspace', 'Manage everything in one place.',        $has ? $hub(5) : null],
+        6 => ['Event day',       'Run your event with confidence.',        $has ? $hub(6) : null],
+        7 => ['Complete',        'Close the loop and wrap up.',            $has ? $hub(7) : null],
     ];
 @endphp
 
@@ -37,7 +44,7 @@
              here and the strip answered "You are here: Hire" — two different
              questions fighting over one marker. Your event's own progress is
              in the workspace panel, where it belongs. --}}
-        <div class="vhs-note">Where you are in the workflow. Click any step to go there.</div>
+        <div class="vhs-note">Pick a step to see just that part. Nothing else moves.</div>
     </div>
 
     <ol class="vhs-row">

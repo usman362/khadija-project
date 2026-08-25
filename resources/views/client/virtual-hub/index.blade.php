@@ -126,7 +126,7 @@
      stage, which mixed two different questions into one marker: click Entry,
      land here, and be told "You are here: Hire" because the EVENT was hiring.
      Where the event is has its own display, in the workspace panel. --}}
-@include('client.virtual-hub._stages', ['current' => 1, 'event' => $activeEvent])
+@include('client.virtual-hub._stages', ['current' => $stage, 'event' => $activeEvent])
 
     {{-- ── Stage 1 · Entry and Stage 4 · Hire ──────────────
          The mockup opens by asking what the client wants to do, and its Hire
@@ -134,6 +134,7 @@
          already exist -- which is exactly what the mockup says this workflow
          should be: "uses GigResource's existing systems for professionals,
          requests, proposals, messages, bookings, payments". --}}
+    @if($stage === 1)
     <div class="vh-entry">
         <a href="{{ route('client.virtual-hub.brief') }}" class="vh-entry-card primary">
             <div class="vh-entry-title">Plan a new event</div>
@@ -149,6 +150,9 @@
         </a>
     </div>
 
+    @endif
+
+    @if($stage === 4)
     <div class="vh-hire">
         <div class="vh-hire-head">Three ways to hire — all the usual rules apply</div>
         <div class="vh-hire-row">
@@ -185,6 +189,12 @@
         .vh-hire-card span{display:block;font-size:11.5px;color:var(--text-muted);margin-top:2px;}
     </style>
 
+    @endif
+
+    {{-- Discovery — helps when you are deciding (Entry) or hiring (Hire).
+         Hidden once the work is underway: an event on its event day does not
+         need a professional grid. --}}
+    @if(in_array($stage, [1, 4], true))
     {{-- Filters --}}
     <div class="vh-card">
         <div class="vh-filters">
@@ -273,13 +283,12 @@
         <a href="{{ route('client.virtual-hub.brief') }}" class="vh-post-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:15px;height:15px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Post a New Project Gig / RFP</a>
     </div>
 
-    {{-- Feature tiles --}}
-    <div class="vh-feats">
-        <div class="vh-feat"><div class="vh-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><div class="vh-feat-name">Virtual Venue Builder</div></div>
-        <div class="vh-feat"><div class="vh-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="vh-feat-name">Engagement Tools</div></div>
-        <div class="vh-feat"><div class="vh-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div><div class="vh-feat-name">Stream Assistant</div></div>
-        <div class="vh-feat"><div class="vh-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></div><div class="vh-feat-name">Analytics Dashboard</div></div>
-    </div>
+    {{-- The four tiles that stood here -- Virtual Venue Builder, Engagement
+         Tools, Stream Assistant, Analytics Dashboard -- had no href at all.
+         They were the last of the streaming console: nothing to open, and
+         nothing behind them to build an opening onto. --}}
+    @endif
+
 </div>{{-- /.vh-main --}}
 
 {{-- Right rail — the event workspace from the mockup (stages 5-7).
@@ -295,6 +304,7 @@
             $atIndex = array_search($workspace['stage'], $stageKeys, true);
         @endphp
 
+        @if(in_array($stage, [4, 5], true))
         <div class="vh-panel">
             <div class="vh-rail-head">
                 <div class="vh-rail-title">Event workspace</div>
@@ -361,12 +371,14 @@
             @endif
         </div>
 
+        @endif
+
         {{-- ── Stage 6 · Event Day ──────────────────────────
              Countdown, platform and joining link — the three things we
              actually know. The mockup also shows "Connection · Ready" with a
              green tick; there is no Zoom integration behind this, so a
              connection status would be a reassurance nobody checked. --}}
-        @if($workspace['is_today'] || $workspace['stage'] === 'event_day')
+        @if($stage === 6)
             <div class="vh-panel" style="border-color:var(--accent-orange,#f97316);">
                 <div class="vh-rail-title" style="margin-bottom:8px;">Event day</div>
 
@@ -398,7 +410,7 @@
         {{-- ── Stage 7 · Complete ───────────────────────────
              Closing the loop. Deliverables are not here: there is no
              deliverables model, so a button would open nothing. --}}
-        @if($workspace['stage'] === 'complete')
+        @if($stage === 7)
             <div class="vh-panel">
                 <div class="vh-rail-title" style="margin-bottom:4px;">Event complete</div>
                 <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 12px;">Let's wrap things up.</p>
@@ -411,6 +423,7 @@
             </div>
         @endif
 
+        @if(in_array($stage, [4, 5], true))
         {{-- Quick access — the mockup's row, pointing at screens that exist. --}}
         <div class="vh-panel">
             <div class="vh-rail-title" style="margin-bottom:10px;">Quick access</div>
@@ -423,6 +436,7 @@
                 <a href="{{ route('client.reviews.index') }}" class="vh-quick">Reviews</a>
             </div>
         </div>
+        @endif
     @else
         <div class="vh-panel">
             <div class="vh-rail-title" style="margin-bottom:8px;">Event workspace</div>
