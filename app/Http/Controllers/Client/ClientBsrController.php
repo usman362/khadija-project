@@ -33,6 +33,7 @@ class ClientBsrController extends Controller
         'budget'       => 'Budget & Request',
         'proposals'    => 'Proposal Settings',
         'files'        => 'Files',
+        'availability' => 'Availability Match',
         'review'       => 'Review & Submit',
     ];
 
@@ -108,7 +109,44 @@ class ClientBsrController extends Controller
             'orgTypes'        => self::ORG_TYPES,
             'draftId'         => $data['draft_id'] ?? null,
             'defaultWindowHours' => config('bsr.default_proposal_window_hours'),
-        ]);
+        ] + $this->availabilityFor($step, $data, $request));
+    }
+
+    /**
+     * The availability step's numbers.
+     *
+     * Only computed on that step -- it reads every matching professional's
+     * calendar, which is not work to do on six other screens.
+     *
+     * The mockup offers four buckets (Available / Limited / Not Confirmed /
+     * Unavailable). Three of them do not exist in our data, and the one that
+     * does is not called "available": a clear GigResource calendar means no
+     * commitment ON GIGRESOURCE, not that the professional is free. So the
+     * screen states the two things that are true and nothing between them.
+     */
+    private function availabilityFor(string $step, array $data, Request $request): array
+    {
+        if ($step !== 'availability') {
+            return [];
+        }
+
+        $services = array_map('intval', (array) ($data['services'] ?? []));
+        $state    = \App\Support\StateMatching::requestState($request->user(), $data['event_state'] ?? null);
+        $date     = ! empty($data['starts_at'])
+            ? \Illuminate\Support\Carbon::parse($data['starts_at'])
+            : null;
+
+        if ($services === [] || $date === null) {
+            // Nothing to count yet. The view says which answer is missing
+            // rather than showing a confident zero.
+            return ['availability' => null, 'availabilityDays' => [], 'availabilityDate' => $date];
+        }
+
+        return [
+            'availability'     => \App\Support\ServiceAvailability::on($services, $state, $date),
+            'availabilityDays' => \App\Support\ServiceAvailability::around($services, $state, $date),
+            'availabilityDate' => $date,
+        ];
     }
 
     /**
@@ -552,6 +590,12 @@ class ClientBsrController extends Controller
                 'questions_enabled' => ['nullable', 'boolean'],
             ],
             'files'  => [],
+            // The client may move the date here after seeing how crowded it
+            // is; everything else on this step is a note to the professional.
+            'availability' => [
+                'starts_at'          => ['nullable', 'date'],
+                'availability_note'  => ['nullable', 'string', 'max:500'],
+            ],
             'review' => ['confirm' => ['accepted']],
             default  => [],
         };
@@ -647,6 +691,10 @@ class ClientBsrController extends Controller
             // the range so nothing downstream has to know about the new columns.
             'budget'            => $d['budget_min'] ?? null,
             'proposal_deadline' => $deadline,
+            // The availability step's note, shown to professionals on the gig
+            // page. Collected there, stored here, read there -- a field that
+            // is written and never displayed is worse than no field.
+            'schedule_note'     => $d['availability_note'] ?? null,
             'sealed_proposals'  => (bool) ($d['sealed_proposals'] ?? true),
             'questions_enabled' => (bool) ($d['questions_enabled'] ?? true),
             'client_id'         => $user->id,

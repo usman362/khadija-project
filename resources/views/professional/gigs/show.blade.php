@@ -200,6 +200,14 @@
                         <div>
                             <div class="gig-detail-label">Start Date</div>
                             <div class="gig-detail-value">{{ $event->starts_at?->format('M d, Y h:i A') ?? 'Not set' }}</div>
+                            {{-- The client's own scheduling note from the
+                                 availability step. Shown beside the date it is
+                                 about, not buried in the description. --}}
+                            @if(filled($event->schedule_note))
+                                <div class="gig-detail-value" style="font-weight:400;opacity:.8;margin-top:5px;font-size:13px;">
+                                    “{{ $event->schedule_note }}”
+                                </div>
+                            @endif
                         </div>
                     </div>
                     <div class="gig-detail-row">

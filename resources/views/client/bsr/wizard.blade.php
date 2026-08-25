@@ -353,7 +353,79 @@
             </p>
         </div>
 
-    {{-- ── 7 · Review ──────────────────────────────────────── --}}
+    {{-- ── 7 · Availability Match ───────────────────────────
+         The mockup's four buckets (Available / Limited / Not Confirmed /
+         Unavailable) are three more than our data supports. A clear
+         GigResource calendar means no commitment ON GIGRESOURCE -- the
+         professional may be booked elsewhere -- so this states the two
+         countable facts and the caveat, rather than a confidence gauge. --}}
+    @elseif($step === 'availability')
+        <h3>Availability match</h3>
+        <p class="lede">How many matching professionals have your date clear, before you send this out.</p>
+
+        @if(! $availability)
+            <div style="border:1px dashed var(--border-color);border-radius:12px;padding:26px 20px;">
+                <b style="display:block;font-size:14.5px;color:var(--text-primary);margin-bottom:6px;">Nothing to check yet</b>
+                <p style="font-size:13px;color:var(--text-muted);margin:0;">
+                    @if(empty($data['services'] ?? []))
+                        Pick your services on step 1 and set a date on step 2, and this will show who is free.
+                    @else
+                        Set your event date on step 2 and this will show who is free.
+                    @endif
+                </p>
+            </div>
+        @else
+            <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;">
+                <div style="flex:1;min-width:190px;border:1px solid var(--border-color);border-radius:12px;padding:15px 16px;">
+                    <div style="font-size:30px;font-weight:800;line-height:1;color:var(--accent-blue);">{{ $availability['nothing_booked'] }}</div>
+                    <div style="font-size:13px;font-weight:700;margin-top:7px;">have nothing booked</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">on {{ $availabilityDate->format('M j, Y') }}</div>
+                </div>
+                <div style="flex:1;min-width:190px;border:1px solid var(--border-color);border-radius:12px;padding:15px 16px;">
+                    <div style="font-size:30px;font-weight:800;line-height:1;">{{ $availability['already_booked'] }}</div>
+                    <div style="font-size:13px;font-weight:700;margin-top:7px;">already booked</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">that day on GigResource</div>
+                </div>
+                <div style="flex:1;min-width:190px;border:1px solid var(--border-color);border-radius:12px;padding:15px 16px;">
+                    <div style="font-size:30px;font-weight:800;line-height:1;">{{ $availability['matched'] }}</div>
+                    <div style="font-size:13px;font-weight:700;margin-top:7px;">match your request</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">your services, in your state</div>
+                </div>
+            </div>
+
+            @if(count($availabilityDays) > 1)
+                <div style="font-size:13px;font-weight:700;margin-bottom:9px;">Nearby dates</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
+                    @foreach($availabilityDays as $d)
+                        <div style="min-width:104px;border:1px solid {{ $d['chosen'] ? 'var(--accent-orange,#f97316)' : 'var(--border-color)' }};
+                                    border-radius:11px;padding:11px 13px;{{ $d['chosen'] ? 'background:rgba(249,115,22,.06);' : '' }}">
+                            <div style="font-size:11.5px;color:var(--text-muted);">{{ $d['date']->format('D') }}</div>
+                            <div style="font-size:13.5px;font-weight:700;">{{ $d['date']->format('M j') }}</div>
+                            <div style="font-size:19px;font-weight:800;margin-top:4px;">{{ $d['nothing_booked'] }}</div>
+                            <div style="font-size:11px;color:var(--text-muted);">free{{ $d['chosen'] ? ' · your date' : '' }}</div>
+                        </div>
+                    @endforeach
+                </div>
+                <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;">Move your date</label>
+                <input type="datetime-local" name="starts_at" class="bw-input"
+                       value="{{ old('starts_at', $data['starts_at'] ?? '') }}" style="max-width:280px;">
+            @endif
+
+            {{-- The caveat is not small print: it is the reason these numbers
+                 are counts and not a promise. --}}
+            <div style="margin-top:18px;border-left:3px solid var(--accent-blue);background:var(--bg-card);
+                        border:1px solid var(--border-color);border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--text-muted);">
+                A clear calendar here means nothing is booked <b>on GigResource</b> — a professional may still be
+                committed elsewhere. Nothing is held until one of them accepts and the booking is confirmed.
+            </div>
+        @endif
+
+        <label style="display:block;font-size:13px;font-weight:600;margin:18px 0 6px;">Anything they should know about timing? <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label>
+        <textarea name="availability_note" class="bw-input" rows="3" maxlength="500"
+                  placeholder="e.g. setup can start from 3pm, or we can move the date by a week">{{ old('availability_note', $data['availability_note'] ?? '') }}</textarea>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:6px;">Professionals see this on your request.</p>
+
+    {{-- ── 8 · Review ──────────────────────────────────────── --}}
     @elseif($step === 'review')
         @php
             $svcNames = $categories->whereIn('id', (array) ($data['services'] ?? []))->pluck('name');
