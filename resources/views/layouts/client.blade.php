@@ -1390,15 +1390,12 @@
                         Profile &amp; Settings
                     </a>
                 </li>
-                {{-- Rule R53 — the third tier. Dashboard and Profile &
-                     Settings are private; this is the page professionals see,
-                     so the client needs a way to look at it themselves. --}}
-                <li class="cl-nav-item">
-                    <a href="{{ route('public.client.portfolio', auth()->id()) }}" class="cl-nav-link {{ request()->routeIs('public.client.portfolio') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        My Portfolio
-                    </a>
-                </li>
+                {{-- "My Portfolio" was here, built to Rule R53 as the
+                     client's public third tier. Removed 2026-08-25 on Ali's
+                     instruction: a portfolio is a professional's shop window —
+                     work they are selling — and a client is not selling
+                     anything. See the decision log; R53 no longer has a
+                     surface, which is Sir Peter's to confirm. --}}
             </ul>
         </nav>
 

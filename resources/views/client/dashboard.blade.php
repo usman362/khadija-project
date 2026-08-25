@@ -746,7 +746,9 @@
              locked, so a ladder here would invent the rule it is waiting on.
              What was here read "Tier 3 of 6 · 15 completed events" above
              "35 / 50 events" — two different totals for one client. --}}
-        <a href="{{ route('public.client.portfolio', $user) }}" class="od-profile-cta">View my public profile</a>
+        {{-- "View my public profile" led to the client portfolio, removed
+             2026-08-25. A client has no public profile to view. --}}
+        <a href="{{ route('client.profile.index') }}" class="od-profile-cta">Profile &amp; settings</a>
     </div>
 
     {{-- Client Special Badges — checklist row 192.

@@ -61,13 +61,10 @@ Route::get('/pro/{user}', [\App\Http\Controllers\Public\ProfessionalProfileShowC
 // ── Public Client Portfolio (Rule R53) ────────────────────────────────
 // The client's counterpart to /pro/{id} — the third tier the persona was
 // missing, alongside their private Dashboard and Profile & Settings.
-// Login-gated to match /browse: the page exists for professionals to read
-// before they bid, not for the open web to index a client's event history.
-// The path spells the page out rather than using /client/{id}, which the
-// spec warns would be read as the private /client/profile settings page.
-Route::get('/client-portfolio/{user}', [\App\Http\Controllers\Public\ClientPortfolioController::class, 'show'])
-    ->middleware('auth')
-    ->name('public.client.portfolio');
+// The client portfolio lived here until 2026-08-25. Removed on Ali's
+// instruction: a portfolio is a professional's shop window, and a client is
+// not selling anything. It was built to Rule R53 (the client's public third
+// tier), so R53 now has no surface — flagged for Sir Peter.
 
 // ── Public Browse (filterable professional directory) ─────────────────
 // Where the landing-page hero search, A-Z chips, and Explore Event Types

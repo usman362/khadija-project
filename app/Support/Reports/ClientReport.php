@@ -18,10 +18,11 @@ use Illuminate\Support\Collection;
  * work; they are spending money and want to know where it went, who they keep
  * hiring, and whether posting a request actually produces anyone.
  *
- * The figures shared with the public Client Portfolio come from
- * App\Support\ClientStats, so the report, the portfolio and the dashboard
- * cannot disagree about the same account — the requirement R53's spec states
- * outright and the reason ClientStats exists.
+ * The shared figures come from App\Support\ClientStats, so this report and
+ * the dashboard cannot disagree about the same account. That was originally
+ * R53's requirement, stated for the public Client Portfolio — which was
+ * removed on 2026-08-25 — but the rule outlives the page it was written for:
+ * two screens quoting the same account still have to agree.
  */
 final class ClientReport
 {
