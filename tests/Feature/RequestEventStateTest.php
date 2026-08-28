@@ -9,17 +9,31 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * R38's closing amendment and R71 — a request carries the state of the WORK.
+ * Which state a request carries — SUPERSEDED, and rewritten to match.
  *
- * The locked wording compares professional.state to the EVENT's state, and the
- * review that locked it gave the reason: a client registered in Virginia may
- * hold an event at their office in Maryland. Before this, the column was named
- * for the event and filled from the client's account — the substitution the
- * rule exists to forbid — so a Maryland event went out to Virginia
- * professionals and reached nobody who could work it.
+ * This file used to assert R38's closing amendment and R71: that a request
+ * carries the state of the WORK, not the client's account. The review that
+ * locked that wording gave a concrete reason — a client registered in Virginia
+ * may hold an event at their office in Maryland, and a request filled from the
+ * client's account would reach nobody who could work it.
  *
- * The client's own state remains the default, because it is the answer nearly
- * every time.
+ * On 2026-08-26 Sir Peter reversed it, deliberately and in writing, naming two
+ * rules:
+ *
+ *   Event Location Rule   event location when provided, home address as
+ *                         fallback.
+ *   State Boundary Rule   matching is ALWAYS by the client's home state; no
+ *                         cross-state, even if the event is out of state.
+ *
+ * The boundary rule wins, in his words: "each state has its own rules/laws so
+ * until we can figure it all out then we will at least get this problem
+ * resolved." So the Event Location Rule is recorded and NOT in force, and R71's
+ * Virginia/Maryland case is now the ACCEPTED cost rather than the bug: that
+ * client reaches Virginia professionals only.
+ *
+ * The old expectations are kept below as comments beside each test, because
+ * the limit is explicitly temporary — when cross-state opens up, this file is
+ * where the previous behaviour is written down.
  */
 class RequestEventStateTest extends TestCase
 {
@@ -81,10 +95,21 @@ class RequestEventStateTest extends TestCase
         return $this->actingAs($client)->get(route('client.bsr.step', 'event'));
     }
 
-    /* ── The case the rule was written for ──────────────────── */
+    /* ── The case the rule turns on ─────────────────────────── */
 
-    /** A Virginia client holding an event in Maryland gets a Maryland request. */
-    public function test_an_event_takes_the_state_it_happens_in_not_the_clients(): void
+    /**
+     * A Virginia client holding an event at their Maryland office gets a
+     * VIRGINIA request.
+     *
+     * Until 2026-08-26 this asserted the opposite, and R71 was written for
+     * exactly this person. The State Boundary Rule accepts the cost knowingly:
+     * they will not reach a Maryland professional who could work it, and are
+     * matched inside their own state until cross-state opens up.
+     *
+     * `event_state` is still posted here on purpose — a stale form or a typed
+     * request can still send it, and it must change nothing.
+     */
+    public function test_an_out_of_state_event_still_carries_the_clients_own_state(): void
     {
         $client = $this->user('client', 'VA');
 
@@ -95,14 +120,18 @@ class RequestEventStateTest extends TestCase
             'scope'       => 'single',
             'services'    => [$this->service()->id],
             'location'    => 'Baltimore office',
-            'event_state' => 'MD',
+            'event_state' => 'MD',   // ignored — see the class docblock
         ]);
 
-        $this->assertSame('MD', Event::firstOrFail()->state, 'the work is in Maryland');
+        $this->assertSame('VA', Event::firstOrFail()->state);
     }
 
-    /** And the professionals it reaches are the ones who can actually work it. */
-    public function test_the_request_reaches_professionals_where_the_work_is(): void
+    /**
+     * Unchanged, and still the point of the column: whatever state a request
+     * carries, only professionals in that state see it. What changed is which
+     * state gets written there, not what the column does.
+     */
+    public function test_only_professionals_in_the_requests_state_can_see_it(): void
     {
         $client = $this->user('client', 'VA');
         $inMd   = $this->user('professional', 'MD');
@@ -116,8 +145,8 @@ class RequestEventStateTest extends TestCase
 
         $visibleTo = fn (User $pro) => \App\Support\StateMatching::scopeForViewer(Event::query(), $pro)->count();
 
-        $this->assertSame(1, $visibleTo($inMd), 'the Maryland professional can work it');
-        $this->assertSame(0, $visibleTo($inVa), "the client's own state is not what decides this");
+        $this->assertSame(1, $visibleTo($inMd), 'a Maryland request is seen in Maryland');
+        $this->assertSame(0, $visibleTo($inVa), 'and nowhere else');
     }
 
     /* ── The default, which is most of the time ─────────────── */
@@ -130,7 +159,7 @@ class RequestEventStateTest extends TestCase
         $this->assertSame('MD', \App\Support\StateMatching::requestState($client, ''));
     }
 
-    /** A state we do not trade in is not honoured — there is nobody there. */
+    /** Unchanged by the reversal: a state we do not trade in was never honoured. */
     public function test_an_unsupported_state_falls_back_rather_than_being_taken(): void
     {
         $client = $this->user('client', 'MD');
@@ -138,9 +167,17 @@ class RequestEventStateTest extends TestCase
         $this->assertSame('MD', \App\Support\StateMatching::requestState($client, 'CA'));
     }
 
-    public function test_the_choice_is_case_insensitive(): void
+    /**
+     * Whatever arrives in that field, in whatever case, is ignored. It used to
+     * be read case-insensitively — 'md' became MD; now nothing is read.
+     */
+    public function test_a_posted_event_state_is_ignored_whatever_its_case(): void
     {
-        $this->assertSame('MD', \App\Support\StateMatching::requestState($this->user('client', 'VA'), 'md'));
+        $client = $this->user('client', 'VA');
+
+        foreach (['md', 'MD', 'Md', 'CA', ''] as $posted) {
+            $this->assertSame('VA', \App\Support\StateMatching::requestState($client, $posted));
+        }
     }
 
     /* ── Direct Offer takes it from the professional ────────── */
@@ -171,25 +208,33 @@ class RequestEventStateTest extends TestCase
         $this->assertSame('MD', Event::firstOrFail()->state);
     }
 
-    /* ── The form asks ──────────────────────────────────────── */
+    /* ── The form no longer asks ────────────────────────────── */
 
-    public function test_the_wizard_asks_which_state_the_event_is_in(): void
-    {
-        $client = $this->user('client', 'MD');
-
-        $this->openEventStep($client)
-            ->assertOk()
-            ->assertSee('name="event_state"', false)
-            ->assertSee('State the event is in', false);
-    }
-
-    /** With the client's own state already chosen, so the common case is one click. */
-    public function test_the_wizard_preselects_the_clients_own_state(): void
+    /**
+     * It used to offer "State the event is in", defaulted to the client's own.
+     * Under the boundary rule the answer cannot change the outcome, and the
+     * hint under it — "Professionals in this state are the ones who can bid" —
+     * was untrue for any state but their own. A control that changes nothing
+     * is worse than no control.
+     */
+    public function test_the_wizard_does_not_offer_a_state_that_changes_nothing(): void
     {
         $client = $this->user('client', 'DE');
 
-        $html = $this->openEventStep($client)->assertOk()->getContent();
+        $this->openEventStep($client)
+            ->assertOk()
+            ->assertDontSee('name="event_state"', false)
+            ->assertDontSee('State the event is in', false);
+    }
 
-        $this->assertMatchesRegularExpression('/<option value="DE"\s+selected/', $html);
+    /** It says who will actually see the request instead. */
+    public function test_the_wizard_states_which_professionals_will_see_it(): void
+    {
+        $client = $this->user('client', 'DE');
+
+        $this->openEventStep($client)
+            ->assertOk()
+            ->assertSee('Delaware', false)
+            ->assertSee('within one state', false);
     }
 }

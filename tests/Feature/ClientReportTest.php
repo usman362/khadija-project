@@ -198,17 +198,25 @@ class ClientReportTest extends TestCase
         );
     }
 
+    /**
+     * The file used to carry its own header row per section — including
+     * `Professional,Bookings,Spent` — with rows of four different widths in
+     * one sheet. Nothing lined up under anything, which is how the Owner saw
+     * it on 26 Aug. It is one square table now: Section / Item / Value.
+     */
     public function test_the_csv_downloads(): void
     {
-        $this->booking($this->gig(), 'completed', 1000);
+        $pro = $this->booking($this->gig(), 'completed', 1000);
 
         $response = $this->actingAs($this->client)->get(route('client.reports.csv'));
 
         $response->assertSuccessful();
         $csv = $response->streamedContent();
 
+        $this->assertStringContainsString('Section,Item,Value', $csv);
         $this->assertStringContainsString('Spend', $csv);
-        $this->assertStringContainsString('Professional,Bookings,Spent', $csv);
+        $this->assertStringContainsString('Professionals', $csv);
+        $this->assertStringContainsString('bookings', $csv);
     }
 
     public function test_the_sidebar_links_to_it(): void

@@ -8,6 +8,11 @@
     .cmp { --pk: var(--orange, #f97316); --pk-dark: #ea580c; --pk-soft: #fff4ec; background: var(--bg-soft); }
     .cmp-shell { max-width: 1180px; margin: 0 auto; padding: 30px 22px 70px; }
     .cmp-head { margin-bottom: 20px; }
+    .cmp-note { border: 1px solid rgba(245,158,11,.4); background: rgba(245,158,11,.07); border-radius: 11px;
+                padding: 12px 15px; margin-bottom: 18px; }
+    .cmp-note b { display: block; font-size: 13.5px; color: var(--text, #1f2937); margin-bottom: 4px; }
+    .cmp-note span { font-size: 12.5px; color: var(--muted, #6b7280); line-height: 1.6; }
+    .cmp-note a { color: var(--brand-text, #ea580c); font-weight: 700; text-decoration: none; }
     .cmp-head h1 { font-size: clamp(1.5rem, 3vw, 2.1rem); margin: 0 0 6px; }
     .cmp-head p { color: var(--muted); font-size: 14.5px; margin: 0; }
     .cmp-back { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800; color: var(--pk-dark); margin-bottom: 14px; }
@@ -66,6 +71,22 @@
                 <h1>Compare {{ $packages->count() }} Package{{ $packages->count() === 1 ? '' : 's' }}</h1>
                 <p>Side by side — price, what is included, coverage, guests and where the professional works.</p>
             </div>
+
+            {{-- Say where the missing ones went.
+                 A client ticked three and the page said "Compare 1 Package"
+                 with no explanation — the other two were dropped by the
+                 same-state rule. The comparison was working; the page was
+                 keeping a secret, and it read as a broken feature. --}}
+            @if(($missing ?? 0) > 0)
+                <div class="cmp-note">
+                    <b>{{ $missing }} of the {{ $askedFor }} you picked {{ $missing === 1 ? 'is' : 'are' }} not shown here.</b>
+                    <span>
+                        {{ $missing === 1 ? 'It is' : 'They are' }} offered in another state, and GigResource works
+                        within one state for now — so {{ $missing === 1 ? 'it is not' : 'they are not' }} something
+                        you can book. <a href="{{ route('public.packages') }}">Back to packages</a>
+                    </span>
+                </div>
+            @endif
 
             <div class="cmp-scroll">
                 <table class="cmp-table">

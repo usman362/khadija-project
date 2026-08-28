@@ -138,6 +138,16 @@
         .rg-disc a { color:#93b4ff; font-weight:600; }
 
         .rg-agree { display:flex; align-items:flex-start; gap:10px; margin-bottom:18px; font-size:14px; color:var(--text); }
+    /* Location & state disclosure — Sir Peter, 26 Aug 2026. */
+    .rg-loc { border: 1px solid #f2b76a; background: #fffaf3; border-radius: 12px; padding: 15px 17px; margin: 4px 0 16px; }
+    .rg-loc > b { display: block; font-size: 14px; font-weight: 800; color: #1f2937; margin-bottom: 8px; }
+    .rg-loc p { font-size: 12.8px; color: #4b5563; line-height: 1.65; margin: 0 0 9px; }
+    .rg-loc p b { color: #1f2937; font-weight: 700; }
+    .rg-loc-note { font-size: 12px !important; color: #6b7280 !important; }
+    .rg-loc .rg-agree { margin: 9px 0 0; align-items: flex-start; }
+    .rg-loc .rg-agree span { font-size: 12.5px; line-height: 1.55; }
+    /* Disabled until all three are ticked — "do not allow bypass". */
+    .rg-submit[disabled] { opacity: .5; cursor: not-allowed; }
         .rg-agree input { width:17px; height:17px; margin-top:2px; accent-color:var(--brand); flex-shrink:0; }
         .rg-agree a { color:var(--brand); font-weight:600; }
         .rg-agree a:hover { text-decoration:underline; }
@@ -368,6 +378,61 @@
                     @endif
                 @endif
 
+                {{-- ── Location & state disclosure ──────────────────────
+                     Sir Peter's disclosure, 26 Aug 2026. Last thing before the
+                     button, three separate boxes, all required, no bypass —
+                     his instructions. They are separate because they are three
+                     different things to understand; one combined box would let
+                     somebody agree to a limit on who they may hire without
+                     reading it.
+
+                     Hidden for influencers: the rule is about matching clients
+                     to professionals, and an influencer is neither. The server
+                     applies the same test, so hiding it is not the gate. --}}
+                <div class="rg-loc" id="rgLoc">
+                    <b>Where you can work</b>
+
+                    <p>
+                        When you post a job we use the event location you give us. If you do not give one,
+                        we use the home address you signed up with instead.
+                    </p>
+                    <p>
+                        Right now GigResource only connects people in the <b>same state</b>, while we work
+                        through each state's rules. <b>Your home state decides who you can work with — not
+                        where your event is.</b> If you live in Maryland and your event is in Pennsylvania,
+                        you will still only see Maryland professionals.
+                    </p>
+                    <p class="rg-loc-note">
+                        This covers posting a job, hiring someone directly, and bidding. It is temporary —
+                        we will tell you when your state opens up.
+                    </p>
+
+                    <label class="rg-agree">
+                        <input type="checkbox" name="disclosure_event_location" value="1" data-loc-box
+                               {{ old('disclosure_event_location') ? 'checked' : '' }}>
+                        <span>I understand you use my event location when I give one, and my home address when I do not.</span>
+                    </label>
+                    @error('disclosure_event_location') <div class="rg-err">{{ $message }}</div> @enderror
+
+                    <label class="rg-agree">
+                        <input type="checkbox" name="disclosure_state_limit" value="1" data-loc-box
+                               {{ old('disclosure_state_limit') ? 'checked' : '' }}>
+                        <span>I understand I can only work with people in my own state, even if my event is in a different state.</span>
+                    </label>
+                    @error('disclosure_state_limit') <div class="rg-err">{{ $message }}</div> @enderror
+
+                    <label class="rg-agree">
+                        <input type="checkbox" name="disclosure_temporary" value="1" data-loc-box
+                               {{ old('disclosure_temporary') ? 'checked' : '' }}>
+                        <span>I understand this limit is temporary and will change in the future.</span>
+                    </label>
+                    @error('disclosure_temporary') <div class="rg-err">{{ $message }}</div> @enderror
+
+                    <p class="rg-loc-note">
+                        Questions? Email <a href="mailto:support@gigresource.com">support@gigresource.com</a> before you sign up.
+                    </p>
+                </div>
+
                 <button type="submit" class="rg-submit" id="rgSubmit">Create Account
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                 </button>
@@ -405,12 +470,49 @@
                 }
             });
             hidden.value = role;
+            if (window.__rgLocApplies) window.__rgLocApplies(role);
         }
         chips.forEach(function (c) {
             c.addEventListener('click', function () { select(c.getAttribute('data-role')); });
         });
         var proLink = document.getElementById('rgProLink');
         if (proLink) proLink.addEventListener('click', function (e) { e.preventDefault(); select('professional'); window.scrollTo({top:0,behavior:'smooth'}); });
+
+        /* The disclosure applies to clients and professionals, not influencers.
+           Hiding it also clears the boxes, so switching away and back cannot
+           leave a tick behind that the person never read. */
+        var loc = document.getElementById('rgLoc');
+        window.__rgLocApplies = function (role) {
+            if (!loc) return;
+            var applies = role !== 'influencer';
+            loc.hidden = ! applies;
+            if (! applies) {
+                loc.querySelectorAll('[data-loc-box]').forEach(function (b) { b.checked = false; });
+            }
+            if (window.__rgSyncSubmit) window.__rgSyncSubmit();
+        };
+        window.__rgLocApplies(hidden.value);
+    })();
+
+    /* "All three checkboxes must be checked before the Create My Account
+       button becomes active. Do not allow bypass." — the server enforces it
+       too; this is so the reason is obvious before they click. */
+    (function () {
+        var btn = document.getElementById('rgSubmit');
+        var loc = document.getElementById('rgLoc');
+        if (!btn || !loc) return;
+
+        function boxes() { return Array.prototype.slice.call(loc.querySelectorAll('[data-loc-box]')); }
+
+        window.__rgSyncSubmit = function () {
+            var required = ! loc.hidden;
+            var allTicked = boxes().every(function (b) { return b.checked; });
+            btn.disabled = required && ! allTicked;
+            btn.title = btn.disabled ? 'Please confirm all three points above.' : '';
+        };
+
+        boxes().forEach(function (b) { b.addEventListener('change', window.__rgSyncSubmit); });
+        window.__rgSyncSubmit();
     })();
 
     @if($showRecaptcha && $recaptchaSiteKey && $recaptchaVersion === 'v3')

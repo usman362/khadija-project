@@ -81,6 +81,9 @@
     .cg-tf-item .box { width: 17px; height: 17px; border-radius: 5px; border: 2px solid var(--border-color); flex-shrink: 0; }
     /* Semi — editable task input */
     .cg-edit { flex: 1; min-width: 0; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-body, var(--bg-card)); color: var(--text-primary); font-size: 13px; font-family: inherit; }
+    .cg-del { border: none; background: rgba(220,38,38,.1); color: #dc2626; border-radius: 8px;
+              width: 30px; height: 30px; flex: 0 0 auto; cursor: pointer; font-size: 17px; line-height: 1; }
+    .cg-del:hover { background: rgba(220,38,38,.18); }
     .cg-edit:focus { outline: none; border-color: var(--cg); box-shadow: 0 0 0 3px rgba(22,163,74,.14); }
     @media (max-width: 700px) { .cg-form-grid { grid-template-columns: 1fr; } }
 </style>
@@ -288,14 +291,22 @@
         const wrap = document.getElementById('cgGroups');
         wrap.innerHTML = '';
         (res.groups || []).forEach(function (g) {
+            /*
+             * Every generated task is editable and removable.
+             *
+             * The Owner raised this in the 26 Aug walkthrough: the tool
+             * created items and then had no way to change or drop one. Semi
+             * offered an input but no remove; Maximum was flat text with
+             * neither. The hand-built Starter list below has had both all
+             * along — a generated list is not more correct than one a person
+             * typed, so it does not get fewer controls.
+             */
             const items = (g.items || []).map(function (it) {
-                // Semi (semi) → each task is an editable input the client
-                // can reword; Maximum (maximum) → read-only text.
-                if (LEVEL === 'semi') {
-                    return '<div class="cg-tf-item"><span class="box"></span>' +
-                        '<input type="text" class="cg-edit" value="' + esc(it) + '"></div>';
-                }
-                return '<div class="cg-tf-item"><span class="box"></span>' + esc(it) + '</div>';
+                return '<div class="cg-tf-item">' +
+                    '<span class="box"></span>' +
+                    '<input type="text" class="cg-edit" value="' + esc(it) + '" aria-label="Task">' +
+                    '<button type="button" class="cg-del" title="Remove this task" aria-label="Remove task">&times;</button>' +
+                '</div>';
             }).join('');
             const block = document.createElement('div');
             block.className = 'cg-tf';
@@ -303,6 +314,16 @@
                 '<div class="cg-tf-hd"><h4>' + esc(g.timeframe) + '</h4>' +
                 '<span class="due">Target: ' + esc(g.due_date) + '</span></div>' + items;
             wrap.appendChild(block);
+        });
+
+        /* Removing the last task in a group takes the empty group with it —
+           a timeframe heading with nothing under it is not a checklist. */
+        wrap.querySelectorAll('.cg-del').forEach(function (b) {
+            b.addEventListener('click', function () {
+                const group = b.closest('.cg-tf');
+                b.closest('.cg-tf-item').remove();
+                if (group && !group.querySelector('.cg-tf-item')) group.remove();
+            });
         });
         var __n = (res.groups || []).reduce(function (s, g) { return s + (g.items || []).length; }, 0);
         if (window.aiAttachSet) window.aiAttachSet('Checklist · ' + __n + ' tasks', res);

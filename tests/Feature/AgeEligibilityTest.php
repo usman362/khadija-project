@@ -53,6 +53,14 @@ class AgeEligibilityTest extends TestCase
             'country'               => 'US',
             'date_of_birth'         => '1990-04-02',
             'agree'                 => '1',
+
+            // Sir Peter's location/state disclosure (26 Aug 2026) — three
+            // required boxes on every client and professional sign-up. This
+            // file is about age, so it accepts them and gets out of the way;
+            // RegistrationDisclosureTest is where they are the subject.
+            'disclosure_event_location' => '1',
+            'disclosure_state_limit'    => '1',
+            'disclosure_temporary'      => '1',
         ], $overrides));
     }
 

@@ -161,7 +161,18 @@ class ClientChatController extends Controller
             'sender' => $m->sender?->name ?? 'User',
             'body' => $m->body,
             'time' => optional($m->created_at)->format('M d, Y · g:i A'),
-            'attachments' => $m->attachments->map(fn ($a) => ['name' => $a->file_name, 'size' => $this->size($a->file_size)])->all(),
+            /*
+             * A url, because the tile in the thread was a plain <div>: the
+             * reader could see a file had been sent and could not open it.
+             * Reported in the 26 Aug walkthrough as "upload works, viewing
+             * doesn't" — and it was never viewable, only listed.
+             */
+            'attachments' => $m->attachments->map(fn ($a) => [
+                'name'     => $a->file_name,
+                'size'     => $this->size($a->file_size),
+                'url'      => route('attachments.download', $a),
+                'is_image' => $a->isImage(),
+            ])->all(),
         ])->values()->all();
 
         return [

@@ -15,7 +15,18 @@
             Each one covers a single booking.
         </p>
     </div>
-    <a href="{{ route('cancellations.create') }}" class="cl-btn cl-btn-primary">Report something</a>
+    {{-- "Report something" said nothing, to either side. The create page has
+         always known the difference — its own title reads "Cancel a booking"
+         for a client and "Report a no-show or cancellation" for a
+         professional — so the button that opens it says the same.
+
+         NOT "Cancel the event": this cancels ONE booking. A client with three
+         professionals can cancel one and keep the other two, and a button
+         promising to cancel the event would be promising something the page
+         does not do. Raised with Sir Peter. --}}
+    <a href="{{ route('cancellations.create') }}" class="cl-btn cl-btn-primary">
+        {{ ($role ?? 'client') === 'professional' ? 'Report a no-show' : 'Cancel a booking' }}
+    </a>
 </div>
 
 @if(session('status'))

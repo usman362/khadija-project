@@ -265,9 +265,13 @@ class ProfessionalChatController extends Controller
                 'sender' => $m->sender?->name ?? 'User',
                 'body'   => $m->body,
                 'time'   => optional($m->created_at)->format('M d, Y · g:i A'),
+                // Same fix as the client inbox: without a url the tile is
+                // something you can see but cannot open.
                 'attachments' => $m->attachments->map(fn ($a) => [
-                    'name' => $a->file_name,
-                    'size' => $this->size($a->file_size),
+                    'name'     => $a->file_name,
+                    'size'     => $this->size($a->file_size),
+                    'url'      => route('attachments.download', $a),
+                    'is_image' => $a->isImage(),
                 ])->all(),
             ];
         })->values()->all();

@@ -136,14 +136,17 @@
                     @error('needed_by')<p class="esr-err">{{ $message }}</p>@enderror
                 </div>
                 <div class="esr-field"><label>Location</label><input name="location" class="esr-input" value="{{ old('location') }}" placeholder="Venue or city"></div>
-                {{-- R38 / R71 — which state's professionals this reaches. --}}
-                <div class="esr-field"><label for="esrState">State</label>
-                    <select name="event_state" id="esrState" class="esr-input">
-                        @foreach(config('geo.allowed_states', []) as $code => $name)
-                            <option value="{{ $code }}" @selected(old('event_state', auth()->user()?->profile?->state) === $code)>{{ $name }}</option>
-                        @endforeach
-                    </select>
-                </div>
+                {{-- The state selector is gone — see the BR wizard for why.
+                     Every request matches on the client's own home state, so
+                     choosing one here changed nothing. --}}
+                @php $__homeState = config('geo.allowed_states')[auth()->user()?->profile?->state] ?? null; @endphp
+                @if($__homeState)
+                    <div class="esr-field"><label>Who this reaches</label>
+                        <p style="font-size:12px;color:var(--text-muted);margin:6px 0 0;line-height:1.5;">
+                            Professionals in <b>{{ $__homeState }}</b>. GigResource works within one state for now.
+                        </p>
+                    </div>
+                @endif
                 <div class="esr-field"><label>Guest count</label><input type="number" name="guest_count" class="esr-input" value="{{ old('guest_count') }}" placeholder="e.g. 150"></div>
             </div>
         </div>

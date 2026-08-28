@@ -140,34 +140,28 @@
         <button class="ea-tool-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filter</button>
     </div>
 
-    {{-- Gateway mini cards --}}
-    <div class="ea-gw-row">
-        <div class="ea-gw">
-            <div class="ea-gw-head"><span class="ea-gw-name">Stripe Outflow</span><span class="ea-gw-tag">STRIPE</span></div>
-            <div class="ea-gw-big">${{ number_format($stats['paid'], 0) }}</div>
-            <div class="ea-gw-foot">Deposits / Fees</div>
-            {{-- A 2.9% processing fee was printed here. No fee is recorded
-                 per transaction and no provider is connected to charge one. --}}
-        </div>
-        <div class="ea-gw">
-            <div class="ea-gw-head"><span class="ea-gw-name">Secure Payment Vault</span><span class="ea-gw-tag">SECURED</span></div>
-            <div class="ea-gw-split">
-                <div><b style="color:var(--ok-text);">${{ number_format($stats['agreed_unpaid'], 0) }}</b><span style="color:var(--text-muted);">Agreed</span></div>
-                <div><b>${{ number_format($stats['paid'], 0) }}</b><span style="color:var(--text-muted);">Paid</span></div>
-            </div>
-            <div class="ea-gw-foot">$0.00 currently in dispute</div>
-        </div>
-        <div class="ea-gw">
-            <div class="ea-gw-head"><span class="ea-gw-name">1099 Compliance Hub</span><span class="ea-gw-tag">TAX</span></div>
-            <div class="ea-gw-big">{{ $vendors->total() > 0 ? $vendors->total() - 1 : 0 }} / {{ $vendors->total() }}</div>
-            <div class="ea-gw-foot">W-9 Forms Collected</div>
-            <div class="ea-gw-foot red">1 contractor nearing $600 threshold</div>
-        </div>
-    </div>
+    {{--
+        Three "gateway" cards stood here. All three were removed on
+        2026-08-27 — the same three the Payments page shed on 2026-08-15,
+        which had simply been left alive on this one.
+
+          Stripe Outflow — the heading named a payment provider this platform
+            is not connected to, over a figure that was just the paid total
+            relabelled.
+          Secure Payment Vault — another gateway we do not use, and its
+            "$0.00 currently in dispute" was typed, not counted.
+          1099 Compliance Hub — "W-9 Forms Collected" was
+            `$vendors->total() - 1`. An IRS figure produced by subtracting
+            one, shown to a client who might act on it at tax time. No W-9 is
+            collected anywhere in this app.
+
+        The Owner flagged this row in the 26 Aug walkthrough as a column
+        looking blank. The width was the smallest thing wrong with it.
+    --}}
 
     {{-- Vendor expense matrix --}}
     <div class="ea-card" style="padding:0;overflow:hidden;">
-        <div class="ea-matrix-title">Itemized Vendor Expense &amp; Gateway Matrix</div>
+        <div class="ea-matrix-title">What you have spent, by professional</div>
         <div style="overflow-x:auto;">
             <table class="ea-table">
                 <thead><tr><th style="padding-left:18px;">Professional</th><th>Service</th><th>Status</th><th style="padding-right:18px;">Action</th></tr></thead>
@@ -212,19 +206,24 @@
         @endif
     </div>
 
-    {{-- Critical alert --}}
-    <div class="ea-alert">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        <div class="body"><b>Critical Alert:</b> A vendor is nearing the $600 IRS 1099 threshold without a W-9 form. Please request and collect the W-9 before releasing additional funds.</div>
-        <button>Send W-9 Reminder</button>
-    </div>
+    {{--
+        A "Critical Alert" banner stood here: a vendor nearing the $600 IRS
+        1099 threshold without a W-9, with a Send W-9 Reminder button. Every
+        part of it was typed — no vendor was measured against any threshold,
+        no W-9 exists to chase, and the button had no action behind it.
+        Removed with the compliance card it belonged to.
+    --}}
+
 </div>{{-- /.ea-main --}}
 
 {{-- Right rail --}}
 <aside class="ea-rail">
     {{-- Revenue Pipeline donut --}}
     <div class="ea-rail-card">
-        <div class="ea-rail-head"><div class="ea-rail-title">Revenue Pipeline</div><span class="ea-rail-sel">This Month</span></div>
+        {{-- "Revenue Pipeline · This Month" on a CLIENT's page. A client has
+             no revenue — this is their money going out, and the figures are
+             all-time, not this month. Both halves of the label were wrong. --}}
+        <div class="ea-rail-head"><div class="ea-rail-title">Where your money is</div><span class="ea-rail-sel">All time</span></div>
         @php
             $pTotal = max(1, $pipeline['total']);
             $segs = [];
@@ -234,18 +233,18 @@
             $conic = 'conic-gradient(' . implode(', ', $segs) . ')';
         @endphp
         <div class="ea-donut" style="background:{{ $conic }};border-radius:50%;">
-            <div class="ea-donut-c"><span class="num">${{ number_format($pipeline['total'], 0) }}</span><span class="lbl">Total Pipeline</span></div>
+            <div class="ea-donut-c"><span class="num">${{ number_format($pipeline['total'], 0) }}</span><span class="lbl">Total agreed</span></div>
         </div>
         <div class="ea-legend">
             <div class="row"><span class="dot" style="background:#f59e0b;"></span><span class="lbl">Agreed, Not Yet Paid</span><span class="val">${{ number_format($pipeline['pending'], 0) }}</span></div>
-            <div class="row"><span class="dot" style="background:#10b981;"></span><span class="lbl">Accepted / Won</span><span class="val">${{ number_format($pipeline['accepted'], 0) }}</span></div>
-            <div class="row"><span class="dot" style="background:#6366f1;"></span><span class="lbl">Paid / Withdrawn</span><span class="val">${{ number_format($pipeline['paid'], 0) }}</span></div>
+            <div class="row"><span class="dot" style="background:#10b981;"></span><span class="lbl">Paid</span><span class="val">${{ number_format($pipeline['accepted'], 0) }}</span></div>
+            <div class="row"><span class="dot" style="background:#6366f1;"></span><span class="lbl">Remaining</span><span class="val">${{ number_format($pipeline['paid'], 0) }}</span></div>
         </div>
     </div>
 
     {{-- Earnings trend (sparkline) --}}
     <div class="ea-rail-card">
-        <div class="ea-rail-head"><div class="ea-rail-title">Spending Trend</div><span class="ea-rail-sel">This Month</span></div>
+        <div class="ea-rail-head"><div class="ea-rail-title">Spending Trend</div><span class="ea-rail-sel">All time</span></div>
         <div class="ea-trend-big">${{ number_format($stats['total_agreed'], 0) }}</div>
         <div class="ea-trend-up">↑ Project total</div>
         @php

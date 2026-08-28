@@ -52,6 +52,10 @@ class CancellationController extends Controller
         return view('cancellations.index', [
             'layout'   => $this->layout($user),
             'requests' => $requests,
+            // The two sides do different things here — a client cancels their
+            // own booking, a professional reports what the client did — and
+            // the button used to say "Report something" to both.
+            'role'     => $user->isProfessionalMode() ? 'professional' : 'client',
         ]);
     }
 

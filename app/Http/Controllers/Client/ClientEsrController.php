@@ -96,7 +96,7 @@ class ClientEsrController extends Controller
             'location'     => ['nullable', 'string', 'max:200'],
             // R38 / R71 — the state the work happens in. See
             // StateMatching::requestState for why this is asked, not assumed.
-            'event_state'  => ['nullable', 'string', 'in:' . implode(',', array_keys(config('geo.allowed_states', [])))],
+            // Removed from the form on 2026-08-25 — see StateMatching::requestState().
             'guest_count'  => ['nullable', 'integer', 'min:1', 'max:1000000'],
             'description'  => ['nullable', 'string', 'max:2000'],
             'budget_min'   => ['nullable', 'integer', 'min:0'],
@@ -163,7 +163,7 @@ class ClientEsrController extends Controller
             'starts_at'    => $data['needed_by'],
             'budget'       => $data['budget_min'] ?? null,
             'location'     => $data['location'] ?? null,
-            'state'        => \App\Support\StateMatching::requestState($user, $data['event_state'] ?? null),
+            'state'        => \App\Support\StateMatching::requestState($user),
             'guest_count'  => $data['guest_count'] ?? null,
             'organization_type' => $data['organization_type'],
             'created_by'   => $user->id,

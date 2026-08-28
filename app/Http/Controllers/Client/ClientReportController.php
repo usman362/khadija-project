@@ -38,28 +38,55 @@ class ClientReportController extends Controller
 
         $filename = 'my-events-report-' . $from->toDateString() . '-to-' . $to->toDateString() . '.csv';
 
+        /*
+         * One table, three columns, every row the same width.
+         *
+         * It used to write rows of four different widths into one sheet — a
+         * one-cell title, a four-cell date row, two-cell label/value pairs,
+         * then a three-cell table of professionals. A spreadsheet lays them
+         * all on the same grid, so nothing lined up under anything. Reported
+         * in the 26 Aug walkthrough as "columns aren't aligned".
+         *
+         * Section / Item / Value holds all of it and stays square, and the
+         * sections are still readable as sections because the first column
+         * names them.
+         */
         return response()->streamDownload(function () use ($report) {
             $out = fopen('php://output', 'w');
 
-            fputcsv($out, ['Your GigResource report']);
-            fputcsv($out, ['From', $report['from']->toDateString(), 'To', $report['to']->toDateString()]);
-            fputcsv($out, []);
+            /*
+             * A UTF-8 byte-order mark.
+             *
+             * Excel assumes the local codepage without one, so "How
+             * professionals see you — 3" came out as mojibake and an em-dash
+             * broke the cell. Three bytes, and the file opens correctly by
+             * double-click on both Windows and Mac.
+             */
+            fwrite($out, "\xEF\xBB\xBF");
 
-            foreach (['spend' => 'Spend', 'requests' => 'Requests', 'standing' => 'How professionals see you'] as $key => $heading) {
-                fputcsv($out, [$heading]);
+            fputcsv($out, ['Section', 'Item', 'Value']);
+            fputcsv($out, ['Report', 'From', $report['from']->toDateString()]);
+            fputcsv($out, ['Report', 'To', $report['to']->toDateString()]);
+
+            foreach ([
+                'spend'    => 'Spend',
+                'requests' => 'Requests',
+                'standing' => 'How professionals see you',
+            ] as $key => $heading) {
                 foreach ($report[$key] as $label => $value) {
-                    fputcsv($out, [ucwords(str_replace('_', ' ', $label)), $value ?? '—']);
+                    fputcsv($out, [$heading, ucwords(str_replace('_', ' ', $label)), $value ?? '']);
                 }
-                fputcsv($out, []);
             }
 
-            fputcsv($out, ['Professional', 'Bookings', 'Spent']);
             foreach ($report['professionals'] as $row) {
-                fputcsv($out, [$row['name'], $row['bookings'], $row['spent']]);
+                // Two figures per professional, one row each, so the Value
+                // column holds one number and stays sortable.
+                fputcsv($out, ['Professionals', $row['name'].' — bookings', $row['bookings']]);
+                fputcsv($out, ['Professionals', $row['name'].' — spent', $row['spent']]);
             }
 
             fclose($out);
-        }, $filename, ['Content-Type' => 'text/csv']);
+        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
     /** @return array{0: Carbon, 1: Carbon, 2: string} */

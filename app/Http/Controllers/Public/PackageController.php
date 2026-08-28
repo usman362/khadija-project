@@ -403,10 +403,23 @@ class PackageController extends Controller
             ->sortBy(fn ($p) => $ids->search($p->id))
             ->values();
 
+        /*
+         * How many of the ones they ticked did not survive, and why.
+         *
+         * A client picked three packages in the 26 Aug walkthrough and the
+         * page said "Compare 1 Package" — the other two were dropped by the
+         * same-state rule and nothing on the screen said so. It read as a
+         * broken compare. The comparison was working; the page was keeping a
+         * secret.
+         */
+        $missing = $ids->count() - $packages->count();
+
         return view('public.packages-compare', [
             'packages'   => $packages,
             'services'   => self::SERVICES,
             'compareMax' => self::COMPARE_MAX,
+            'askedFor'   => $ids->count(),
+            'missing'    => $missing,
         ]);
     }
 

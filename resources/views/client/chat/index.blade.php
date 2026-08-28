@@ -76,7 +76,10 @@
     .cm-bubble { background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 13px; font-size: 13px; color: var(--text-primary); line-height: 1.5; word-break: break-word; }
     .cm-msg.me .cm-bubble { background: rgba(234,88,12,0.1); border-color: rgba(234,88,12,0.2); }
     .cm-att { display: flex; gap: 9px; margin-top: 8px; flex-wrap: wrap; }
-    .cm-att-item { display: flex; align-items: center; gap: 8px; border: 1px solid var(--border-color); border-radius: 9px; padding: 8px 11px; background: var(--bg-card); }
+    /* Now an anchor, not a div — keep it looking the same and make the
+       pointer say it opens. */
+    .cm-att-item { text-decoration: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 8px; border: 1px solid var(--border-color); border-radius: 9px; padding: 8px 11px; background: var(--bg-card); }
+    .cm-att-item:hover { border-color: var(--brand-text); }
     .cm-att-item svg { width: 16px; height: 16px; color: var(--bad-text); }
     .cm-att-item b { font-size: 12px; color: var(--text-primary); display: block; }
     .cm-att-item span { font-size: 10.5px; color: var(--text-muted); }
@@ -293,7 +296,7 @@
                             <div class="cm-msg-body">
                                 <div class="cm-msg-meta">{{ $m['mine'] ? 'You' : $m['sender'] }} · {{ $m['time'] }}</div>
                                 <div class="cm-bubble">{{ $m['body'] }}</div>
-                                @if(!empty($m['attachments']))<div class="cm-att">@foreach($m['attachments'] as $a)<div class="cm-att-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div><b>{{ $a['name'] }}</b><span>{{ $a['size'] }}</span></div></div>@endforeach</div>@endif
+                                {{-- Each file is a LINK now. It used to be a <div>: you could see something had been sent and had no way to open it. --}}@if(!empty($m['attachments']))<div class="cm-att">@foreach($m['attachments'] as $a)<a class="cm-att-item" href="{{ $a['url'] }}" target="_blank" rel="noopener" title="Open {{ $a['name'] }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div><b>{{ $a['name'] }}</b><span>{{ $a['size'] }}</span></div></a>@endforeach</div>@endif
                             </div>
                         </div>
                     @empty
@@ -596,7 +599,18 @@ window.CHAT_LIVE = {
         const esc = (x) => { const d = document.createElement('div'); d.textContent = x == null ? '' : x; return d.innerHTML; };
         const name = mine ? 'You' : ((m.sender && m.sender.name) || 'User');
         let t = ''; try { t = new Date(m.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }); } catch (e) {}
-        return '<div class="cm-msg ' + (mine ? 'me' : '') + '"><span class="cm-msg-av" style="background:' + (mine ? '#1e293b' : '#ea580c') + ';">' + esc(name.charAt(0).toUpperCase()) + '</span><div class="cm-msg-body"><div class="cm-msg-meta">' + esc(name) + ' · ' + t + '</div><div class="cm-bubble">' + esc(m.body) + '</div></div></div>';
+        /* Attachments on a live-appended bubble.
+           They were dropped entirely: send a file and it vanished from the
+           thread until the page was reloaded. The API returns them on the
+           created message, so they are rendered here too. The filename goes
+           through esc() — it is the sender's own string. */
+        var atts = (m.attachments || []).map(function (a) {
+            return '<a class="cm-att-item" href="' + (a.url || '#') + '" target="_blank" rel="noopener">'
+                + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
+                + '<div><b>' + esc(a.file_name || a.name) + '</b><span>' + esc(a.size || a.size_label || '') + '</span></div></a>';
+        }).join('');
+        var attBlock = atts ? '<div class="cm-att">' + atts + '</div>' : '';
+        return '<div class="cm-msg ' + (mine ? 'me' : '') + '"><span class="cm-msg-av" style="background:' + (mine ? '#1e293b' : '#ea580c') + ';">' + esc(name.charAt(0).toUpperCase()) + '</span><div class="cm-msg-body"><div class="cm-msg-meta">' + esc(name) + ' · ' + t + '</div><div class="cm-bubble">' + esc(m.body) + '</div>' + attBlock + '</div></div>';
     },
 };
 </script>

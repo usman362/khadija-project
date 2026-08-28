@@ -138,7 +138,7 @@ class ClientBsrController extends Controller
         }
 
         $services = array_map('intval', (array) ($data['services'] ?? []));
-        $state    = \App\Support\StateMatching::requestState($request->user(), $data['event_state'] ?? null);
+        $state    = \App\Support\StateMatching::requestState($request->user());
         $date     = ! empty($data['starts_at'])
             ? \Illuminate\Support\Carbon::parse($data['starts_at'])
             : null;
@@ -319,7 +319,6 @@ class ClientBsrController extends Controller
             // Resuming a draft has to bring step 7's end time back with it.
             'ends_at'           => $event->ends_at?->format('Y-m-d\TH:i'),
             'location'          => $event->location,
-            'event_state'       => $event->state,
             'venue'             => $event->venue,
             'guest_count'       => $event->guest_count,
             'description'       => $event->description,
@@ -607,9 +606,10 @@ class ClientBsrController extends Controller
                 'title'       => ['required', 'string', 'max:200'],
                 'starts_at'   => ['nullable', 'date'],
                 'location'    => ['nullable', 'string', 'max:200'],
-                // R38 / R71 — the state the WORK happens in, asked here beside
-                // the address rather than assumed from the account.
-                'event_state' => ['nullable', 'string', 'in:' . implode(',', array_keys(config('geo.allowed_states', [])))],
+                // The event-state field was removed from the form on
+                // 2026-08-25: the State Boundary Rule matches every request by
+                // the client's own home state, so choosing one changed nothing.
+                // Nothing is validated because nothing is submitted.
                 'venue'       => ['nullable', 'string', 'max:200'],
                 'guest_count' => ['nullable', 'integer', 'min:1', 'max:1000000'],
             ],
@@ -760,7 +760,7 @@ class ClientBsrController extends Controller
                 ? \Illuminate\Support\Carbon::parse($d['ends_at'])
                 : null,
             'location'          => $d['location'] ?? null,
-            'state'             => \App\Support\StateMatching::requestState($user, $d['event_state'] ?? null),
+            'state'             => \App\Support\StateMatching::requestState($user),
             'venue'             => $d['venue'] ?? null,
             'guest_count'       => $d['guest_count'] ?? null,
             'budget_min'        => $d['budget_min'] ?? null,

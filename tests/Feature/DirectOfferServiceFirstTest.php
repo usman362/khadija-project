@@ -39,13 +39,26 @@ class DirectOfferServiceFirstTest extends TestCase
         $this->florals     = Category::create(['name' => 'Ceremony Florals DSR', 'slug' => 'florals-dsr', 'kind' => 'service', 'is_active' => true]);
 
         $this->client       = $this->account('client');
-        $this->photographer = $this->account('professional', $this->photography);
-        $this->florist      = $this->account('professional', $this->florals);
+        $this->photographer = $this->account('professional', $this->photography, 'Quillon Photography');
+        $this->florist      = $this->account('professional', $this->florals, 'Zarbek Florals');
     }
 
-    private function account(string $role, ?Category $service = null): User
+    /**
+     * Names are fixed, not faked.
+     *
+     * These tests assert that one professional's name is ABSENT from the page.
+     * With `User::factory()` the name is random, so the assertion passed or
+     * failed on whatever Faker produced — a name that happened to be a
+     * substring of any other word on the page failed the run, and the suite
+     * went red for a reason that had nothing to do with the code. Two names
+     * nothing else on the page contains.
+     */
+    private function account(string $role, ?Category $service = null, ?string $name = null): User
     {
-        $user = User::factory()->create(['primary_role' => $role]);
+        $user = User::factory()->create(array_filter([
+            'primary_role' => $role,
+            'name'         => $name,
+        ]));
         $user->assignRole($role);
         $user->getOrCreateProfile()->update(['country' => 'US', 'state' => 'MD', 'city' => 'Baltimore']);
 

@@ -134,6 +134,8 @@
     .pm-bubble { background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 13px; font-size: 13px; color: var(--text-primary); line-height: 1.5; word-break: break-word; }
     .pm-msg.me .pm-bubble { background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.2); }
     .pm-att { display: flex; gap: 9px; margin-top: 8px; flex-wrap: wrap; }
+    .pm-att-item { text-decoration: none; color: inherit; cursor: pointer; }
+    .pm-att-item:hover { border-color: var(--brand-text); }
     .pm-att-item { display: flex; align-items: center; gap: 8px; border: 1px solid var(--border-color); border-radius: 9px; padding: 8px 11px; background: var(--bg-card); }
     .pm-att-item svg { width: 16px; height: 16px; color: var(--bad-text); }
     .pm-att-item b { font-size: 12px; color: var(--text-primary); display: block; }
@@ -266,7 +268,7 @@
                                 @if(!empty($m['attachments']))
                                     <div class="pm-att">
                                         @foreach($m['attachments'] as $a)
-                                            <div class="pm-att-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div><b>{{ $a['name'] }}</b><span>{{ $a['size'] }}</span></div></div>
+                                            <a class="pm-att-item" href="{{ $a['url'] }}" target="_blank" rel="noopener" title="Open {{ $a['name'] }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div><b>{{ $a['name'] }}</b><span>{{ $a['size'] }}</span></div></a>
                                         @endforeach
                                     </div>
                                 @endif
@@ -468,7 +470,18 @@ window.CHAT_LIVE = {
         const esc = (s) => { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; };
         const name = mine ? 'You' : ((m.sender && m.sender.name) || 'User');
         let t = ''; try { t = new Date(m.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }); } catch (e) {}
-        return '<div class="pm-msg ' + (mine ? 'me' : '') + '"><span class="pm-msg-av" style="background:' + (mine ? '#1e293b' : '#2563eb') + ';">' + esc(name.charAt(0).toUpperCase()) + '</span><div class="pm-msg-body"><div class="pm-msg-meta">' + esc(name) + ' · ' + t + '</div><div class="pm-bubble">' + esc(m.body) + '</div></div></div>';
+        /* Attachments on a live-appended bubble.
+           They were dropped entirely: send a file and it vanished from the
+           thread until the page was reloaded. The API returns them on the
+           created message, so they are rendered here too. The filename goes
+           through esc() — it is the sender's own string. */
+        var atts = (m.attachments || []).map(function (a) {
+            return '<a class="pm-att-item" href="' + (a.url || '#') + '" target="_blank" rel="noopener">'
+                + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
+                + '<div><b>' + esc(a.file_name || a.name) + '</b><span>' + esc(a.size || a.size_label || '') + '</span></div></a>';
+        }).join('');
+        var attBlock = atts ? '<div class="pm-att">' + atts + '</div>' : '';
+        return '<div class="pm-msg ' + (mine ? 'me' : '') + '"><span class="pm-msg-av" style="background:' + (mine ? '#1e293b' : '#2563eb') + ';">' + esc(name.charAt(0).toUpperCase()) + '</span><div class="pm-msg-body"><div class="pm-msg-meta">' + esc(name) + ' · ' + t + '</div><div class="pm-bubble">' + esc(m.body) + '</div>' + attBlock + '</div></div>';
     },
 };
 </script>

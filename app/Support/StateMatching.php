@@ -106,14 +106,35 @@ final class StateMatching
      * An unsupported state is not honoured: the seven jurisdictions are the
      * whole marketplace, so a request outside them has nobody to reach.
      */
-    public static function requestState(?User $client, ?string $chosen): ?string
+    /**
+     * The state a request is matched in.
+     *
+     * Sir Peter named two rules on 2026-08-25, and one overrides the other:
+     *
+     *   Event Location Rule   the event's location when the client gives one,
+     *                         their home address as the fallback.
+     *   State Boundary Rule   matching is ALWAYS by the client's home state.
+     *                         No cross-state work, even when the event itself
+     *                         is out of state.
+     *
+     * The boundary rule wins, in his words: "each state has its own rules/laws
+     * so until we can figure it all out then we will at least get this problem
+     * resolved." So the Event Location Rule is recorded here and is NOT in
+     * force.
+     *
+     * It mattered. This used to return whichever state the client picked for
+     * the event, which meant a Maryland client whose event was in Pennsylvania
+     * had their request routed to Pennsylvania professionals — while a Direct
+     * Request to any of those same professionals was refused, because that
+     * path compares home states. Same client, same event, two opposite
+     * answers. One rule, in one place, now.
+     *
+     * `$chosenEventState` is still accepted because callers know where the
+     * event is and that will matter again: when cross-state opens up, this is
+     * the only function that has to change.
+     */
+    public static function requestState(?User $client, ?string $chosenEventState = null): ?string
     {
-        $chosen = strtoupper(trim((string) $chosen));
-
-        if ($chosen !== '' && array_key_exists($chosen, config('geo.allowed_states', []))) {
-            return $chosen;
-        }
-
         return self::stateOf($client);
     }
 

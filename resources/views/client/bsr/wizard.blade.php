@@ -313,20 +313,23 @@
                 <label>Location</label>
                 <input type="text" name="location" value="{{ $data['location'] ?? '' }}" placeholder="Baltimore, MD">
             </div>
-            <div class="bw-field">
-                {{-- R38 / R71 — the state the event happens in, which decides
-                     which professionals ever see this request. Defaulted to the
-                     client's own state because that is the answer nearly every
-                     time; asked because it is not the answer every time. --}}
-                <label for="bwEventState">State the event is in</label>
-                <select name="event_state" id="bwEventState">
-                    @foreach(config('geo.allowed_states', []) as $code => $name)
-                        <option value="{{ $code }}"
-                            @selected(($data['event_state'] ?? auth()->user()?->profile?->state) === $code)>{{ $name }}</option>
-                    @endforeach
-                </select>
-                <p class="bw-hint">Professionals in this state are the ones who can bid.</p>
-            </div>
+            {{-- The state selector that stood here is gone.
+                 Sir Peter's State Boundary Rule (2026-08-25) matches every
+                 request by the client's own home state, whatever state the
+                 event is in — so picking one changed nothing, and the hint
+                 under it ("Professionals in this state are the ones who can
+                 bid") was untrue for any state but their own. Stated instead
+                 of asked, and it comes back when cross-state opens up. --}}
+            @php $__homeState = config('geo.allowed_states')[auth()->user()?->profile?->state] ?? null; @endphp
+            @if($__homeState)
+                <div class="bw-field">
+                    <label>Who can bid</label>
+                    <p class="bw-hint" style="margin-top:0;">
+                        Professionals in <b>{{ $__homeState }}</b> — GigResource works within one state for now,
+                        so that is who sees this request even if the event itself is elsewhere.
+                    </p>
+                </div>
+            @endif
             <div class="bw-field">
                 <label>Venue</label>
                 <input type="text" name="venue" value="{{ $data['venue'] ?? '' }}" placeholder="Outdoor park (confirmed)">

@@ -259,11 +259,19 @@
 
         <div class="lpn-actions">
             @auth
-                <a href="{{ url('/dashboard') }}" class="lpn-ic" title="Saved">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                    <span>Favorites</span>
-                </a>
-                <a href="{{ url('/dashboard') }}" class="lpn-ic" title="Messages">
+                {{-- Both of these pointed at /dashboard, so neither reached the
+                     page it is named after — reported by Sir Peter from the
+                     Pricing page. Messages goes to the reader's own inbox
+                     (there is one per portal). Favorites is the client's saved
+                     professionals; a professional has no favourites list, so
+                     they are not shown a link to one. --}}
+                @if(! auth()->user()->isProfessionalMode())
+                    <a href="{{ route('client.saved-professionals.index') }}" class="lpn-ic" title="Favorites">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        <span>Favorites</span>
+                    </a>
+                @endif
+                <a href="{{ \App\Support\Inbox::urlFor() }}" class="lpn-ic" title="Messages">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     <span>Messages</span>
                 </a>

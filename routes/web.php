@@ -70,9 +70,22 @@ Route::get('/pro/{user}', [\App\Http\Controllers\Public\ProfessionalProfileShowC
 // Where the landing-page hero search, A-Z chips, and Explore Event Types
 // mega-panel all converge. Supports ?q= ?city= ?rating_min= ?verified=
 // ?sort= query params.
-Route::get('/browse', [\App\Http\Controllers\Public\BrowseProfessionalsController::class, 'index'])
+/*
+ * The page is called Find Professionals everywhere a person can read it —
+ * the sidebar, the header, the breadcrumb — and the address said /browse. The
+ * Owner raised it in the 26 Aug walkthrough.
+ *
+ * The route NAME is unchanged (`public.browse`), so the sixty-odd views that
+ * link to it keep working; only the address people see and share is renamed.
+ * /browse still resolves and redirects, because it is a year of bookmarks and
+ * whatever Google has already indexed.
+ */
+Route::get('/find-professionals', [\App\Http\Controllers\Public\BrowseProfessionalsController::class, 'index'])
     ->middleware('auth')
     ->name('public.browse');
+
+Route::get('/browse', fn (\Illuminate\Http\Request $r) => redirect()->route('public.browse', $r->query()))
+    ->name('public.browse.legacy');
 
 // ── How It Works (standalone explainer page) ──────────────────────────
 // Dual-audience explainer with client/pro flows, comparison table, and

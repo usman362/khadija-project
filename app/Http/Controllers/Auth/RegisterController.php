@@ -63,6 +63,11 @@ class RegisterController extends Controller
             ? ['required', 'date', 'before_or_equal:' . AgeEligibility::latestEligibleBirthdate()->toDateString()]
             : ['nullable', 'date'];
 
+        // Clients and professionals only — see the disclosure rules below.
+        $disclosureRule = in_array($role, ['client', 'professional'], true)
+            ? ['accepted']
+            : ['nullable'];
+
         return Validator::make($data, [
             'date_of_birth' => $dobRule,
             'name' => ['required', 'string', 'max:255'],
@@ -70,6 +75,20 @@ class RegisterController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'phone' => ['nullable', 'string', 'max:30'],
             'agree' => ['accepted'],
+
+            /*
+             * Sir Peter's location/state disclosure, 26 Aug 2026. Three
+             * separate boxes, all required, no bypass — his words. They are
+             * separate because they are three different things to understand,
+             * and one combined box would let someone agree to a limit on who
+             * they may hire without ever reading it.
+             *
+             * Influencers are out of scope: the rule is about matching clients
+             * to professionals, and an influencer is neither.
+             */
+            'disclosure_event_location' => $disclosureRule,
+            'disclosure_state_limit'    => $disclosureRule,
+            'disclosure_temporary'      => $disclosureRule,
             'role' => ['sometimes', 'string', 'in:client,professional,influencer'],
             'state' => $stateRule,
             'country' => ['nullable', 'string', 'in:' . implode(',', array_keys(config('geo.countries', [])))],
@@ -78,6 +97,9 @@ class RegisterController extends Controller
             'g-recaptcha-response' => [new Recaptcha('register')],
         ], [
             'agree.accepted' => 'Please accept the Terms of Service and Privacy Policy to continue.',
+            'disclosure_event_location.accepted' => 'Please confirm you understand which location we use.',
+            'disclosure_state_limit.accepted'    => 'Please confirm you understand the same-state rule.',
+            'disclosure_temporary.accepted'      => 'Please confirm you understand this limit is temporary.',
             'state.required' => 'Please select your state.',
             'date_of_birth.required'        => 'Please enter your date of birth.',
             'date_of_birth.before_or_equal' => 'You must be at least ' . AgeEligibility::MINIMUM_AGE
@@ -155,6 +177,19 @@ class RegisterController extends Controller
 
         if ($state) {
             app(\App\Domain\Geolocation\GeolocationService::class)->rememberState($state);
+        }
+
+        /*
+         * The record of acceptance Sir Peter asked for: who, when (UTC), which
+         * wording, and from where. Written after the account exists because it
+         * points at the user; the validator above is what guarantees they
+         * actually ticked all three.
+         *
+         * Only for the roles the rule governs — an influencer is neither a
+         * client nor a professional and is never matched by state.
+         */
+        if (in_array($role, ['client', 'professional'], true)) {
+            \App\Models\RegistrationDisclosure::record($user, request()->ip());
         }
 
         // Attribute signup to an influencer if a referral cookie is present.

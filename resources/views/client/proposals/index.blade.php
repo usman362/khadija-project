@@ -303,13 +303,23 @@
         <div class="pr-pipe-total"><div class="lbl" style="font-size:10.5px;color:var(--text-muted);">Total Pipeline</div><div class="val" style="font-size:19px;font-weight:800;color:var(--text-primary);">${{ number_format($pipeline['total'], 0) }}</div></div>
     </div>
 
+    {{-- Four labels, at most two destinations.
+         "Send Reminder", "Schedule Call" and "Follow Up" all opened the inbox
+         — three different promises, one page — and "Share Availability" opened
+         professional search, which is not sharing anything. The Owner spotted
+         two of them as duplicates; all four were the same defect.
+         What is left is what the links actually do. --}}
     <div class="pr-rail-card">
         <div class="pr-rail-title">Next Best Actions</div>
         <div class="pr-nba">
-            <a href="{{ route('client.chat.index') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0z"/><polyline points="12 7 12 12 15 15"/></svg>Send Reminder</a>
-            <a href="{{ route('client.chat.index') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/></svg>Schedule Call</a>
-            <a href="{{ route('client.search.index') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Share Availability</a>
-            <a href="{{ route('client.chat.index') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07"/><path d="M4 2h3l2 5-2.5 1.5a11 11 0 0 0 5 5L13 11l5 2v3"/></svg>Follow Up</a>
+            <a href="{{ \App\Support\Inbox::urlFor() }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Message a professional
+            </a>
+            <a href="{{ route('client.search.index') }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                Find more professionals
+            </a>
         </div>
     </div>
 </aside>

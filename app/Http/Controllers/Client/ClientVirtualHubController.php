@@ -287,7 +287,7 @@ class ClientVirtualHubController extends Controller
             'budget_max'        => $data['budget_max'] ?? null,
             'budget'            => $data['budget_min'] ?? null,
             'location'          => $draft['location'] ?? null,
-            'state'             => \App\Support\StateMatching::requestState($request->user(), null),
+            'state'             => \App\Support\StateMatching::requestState($request->user()),
             'proposal_deadline' => $this->deadlineFor($starts),
             'source'            => 'virtual_hub',
             'created_by'        => $request->user()->id,
