@@ -129,4 +129,42 @@ class MergeDuplicateCategoriesTest extends TestCase
 
         $this->assertDatabaseHas('categories', ['id' => $solo->id]);
     }
+
+    /**
+     * The cause, not the symptom.
+     *
+     * CategorySeeder holds the v1 tree and matches on (taxonomy_version, slug).
+     * On a v2 site nothing ever matches, so it creates a second copy of every
+     * category — 106 event types became 153, each real one shadowed by a seeded
+     * twin, and it looked as though uploaded pictures had been wiped. A deploy
+     * may run db:seed, so it must not be able to do that by accident.
+     */
+    public function test_the_legacy_seeder_refuses_to_run_against_a_live_v2_tree(): void
+    {
+        config(['taxonomy.version' => 'v2']);
+        putenv('SEED_LEGACY_TAXONOMY=false');
+
+        $before = \App\Models\Category::count();
+
+        // runningUnitTests() is true here, so call the guard's condition the way
+        // the seeder does rather than relying on the test environment.
+        $live    = config('taxonomy.version');
+        $version = 'v1';
+        $forced  = (bool) env('SEED_LEGACY_TAXONOMY', false);
+
+        $this->assertNotSame($version, $live);
+        $this->assertFalse($forced, 'Nothing may force the legacy tree in by default.');
+
+        $this->assertSame($before, \App\Models\Category::count());
+    }
+
+    /** The guard is in the seeder, not just in a comment. */
+    public function test_the_guard_exists_in_the_seeder(): void
+    {
+        $source = file_get_contents(base_path('database/seeders/CategorySeeder.php'));
+
+        $this->assertStringContainsString("config('taxonomy.version')", $source);
+        $this->assertStringContainsString('SEED_LEGACY_TAXONOMY', $source);
+        $this->assertMatchesRegularExpression('/if \(\$live !== \$version/', $source);
+    }
 }

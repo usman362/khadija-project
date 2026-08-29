@@ -59,6 +59,31 @@ class CategorySeeder extends Seeder
          */
         $version = 'v1';
 
+        /*
+         * Refuse to run against a live tree this data does not belong to.
+         *
+         * Matching is on (taxonomy_version, slug). Every row on a v2 site is
+         * v2, so nothing here ever matches one — and `firstOrNew` creates a
+         * second copy of all 360 categories instead. That is what happened on
+         * production: 106 event types became 153, each real one shadowed by a
+         * seeded twin, and the client believed their uploaded pictures had been
+         * wiped. Nothing had been; a duplicate had been laid on top.
+         *
+         * A deploy may run `db:seed`. It must not be able to do that by
+         * accident, so this stops unless somebody says the version out loud.
+         */
+        $live = config('taxonomy.version');
+
+        if ($live !== $version && ! app()->runningUnitTests() && ! env('SEED_LEGACY_TAXONOMY', false)) {
+            $this->command?->warn(
+                "CategorySeeder holds the {$version} tree and this site is running {$live}. "
+                . 'Skipped — running it would add a second copy of every category. '
+                . "Set SEED_LEGACY_TAXONOMY=true only if you are deliberately restoring {$version}."
+            );
+
+            return;
+        }
+
         // 2) Copy images into the public disk (storage/app/public/categories/...).
         $thumbDir = storage_path('app/public/categories/thumbnails');
         $coverDir = storage_path('app/public/categories/covers');
