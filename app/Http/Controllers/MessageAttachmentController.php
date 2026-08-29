@@ -102,9 +102,27 @@ class MessageAttachmentController extends Controller
 
         abort_unless(Storage::disk('private')->exists($attachment->file_path), 404);
 
-        return Storage::disk('private')->download(
-            $attachment->file_path,
-            $attachment->file_name
-        );
+        /*
+         * An image opens; everything else saves.
+         *
+         * This always sent Content-Disposition: attachment, so clicking a photo
+         * someone sent you started a download instead of showing it — and a
+         * thumbnail in the thread had nothing it could point at. Images and PDFs
+         * are things people want to LOOK at, so they are served inline; ?download=1
+         * still forces the save for when they want the file itself.
+         */
+        $inline = ($attachment->isImage() || $attachment->isPdf())
+            && ! $request->boolean('download');
+
+        return $inline
+            ? Storage::disk('private')->response(
+                $attachment->file_path,
+                $attachment->file_name,
+                ['Content-Type' => $attachment->mime_type ?: 'application/octet-stream'],
+            )
+            : Storage::disk('private')->download(
+                $attachment->file_path,
+                $attachment->file_name
+            );
     }
 }

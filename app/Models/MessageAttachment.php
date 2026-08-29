@@ -32,7 +32,15 @@ class MessageAttachment extends Model
      * inboxes and anything else that serializes one, rather than each caller
      * remembering to build a url.
      */
-    protected $appends = ['url', 'size_label'];
+    /**
+     * `is_image` rides along with the rest.
+     *
+     * The send endpoint returns the raw model, so anything not appended here is
+     * invisible to the JS that draws a freshly sent message — which is why a
+     * photo appeared as a thumbnail after a reload and as a generic file icon
+     * the moment it was sent.
+     */
+    protected $appends = ['url', 'size_label', 'is_image'];
 
     public function getUrlAttribute(): string
     {
@@ -62,6 +70,11 @@ class MessageAttachment extends Model
     public function getUrl(): string
     {
         return route('attachments.download', $this);
+    }
+
+    public function getIsImageAttribute(): bool
+    {
+        return $this->isImage();
     }
 
     public function isImage(): bool

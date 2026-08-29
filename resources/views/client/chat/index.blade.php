@@ -80,6 +80,11 @@
        pointer say it opens. */
     .cm-att-item { text-decoration: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 8px; border: 1px solid var(--border-color); border-radius: 9px; padding: 8px 11px; background: var(--bg-card); }
     .cm-att-item:hover { border-color: var(--brand-text); }
+    /* An image attachment shows itself. */
+    .cm-att-img { display: block; text-decoration: none; color: inherit; border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; max-width: 260px; }
+    .cm-att-img img { display: block; width: 100%; height: auto; max-height: 220px; object-fit: cover; background: var(--bg-soft, #f1f5f9); }
+    .cm-att-img span { display: block; padding: 6px 9px; font-size: 11.5px; color: var(--text-muted); }
+    .cm-att-img:hover { border-color: var(--brand-text); }
     .cm-att-item svg { width: 16px; height: 16px; color: var(--bad-text); }
     .cm-att-item b { font-size: 12px; color: var(--text-primary); display: block; }
     .cm-att-item span { font-size: 10.5px; color: var(--text-muted); }
@@ -157,6 +162,13 @@
     .cm-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; }
     .chat-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; color: var(--text-primary); background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 999px; padding: 4px 6px 4px 10px; }
     .chat-chip button { border: none; background: none; color: var(--text-muted); font-size: 15px; line-height: 1; cursor: pointer; padding: 0 3px; }
+    /* A file that is still going up. It says so, and cannot be removed
+       mid-flight — the remove button only appears once it has landed. */
+    .chat-chip.is-uploading { opacity: .75; }
+    .chat-chip.is-uploading em { font-style: normal; color: var(--text-muted); }
+    .chat-chip-spin { width: 11px; height: 11px; border: 2px solid var(--border-color); border-top-color: var(--brand-text, #ea580c); border-radius: 50%; display: inline-block; animation: chat-chip-spin .7s linear infinite; }
+    @keyframes chat-chip-spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .chat-chip-spin { animation: none; } }
 
     .cm-c-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; font-size: 12px; }
     .cm-c-foot span { color: var(--bad-text); }
@@ -296,7 +308,10 @@
                             <div class="cm-msg-body">
                                 <div class="cm-msg-meta">{{ $m['mine'] ? 'You' : $m['sender'] }} · {{ $m['time'] }}</div>
                                 <div class="cm-bubble">{{ $m['body'] }}</div>
-                                {{-- Each file is a LINK now. It used to be a <div>: you could see something had been sent and had no way to open it. --}}@if(!empty($m['attachments']))<div class="cm-att">@foreach($m['attachments'] as $a)<a class="cm-att-item" href="{{ $a['url'] }}" target="_blank" rel="noopener" title="Open {{ $a['name'] }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div><b>{{ $a['name'] }}</b><span>{{ $a['size'] }}</span></div></a>@endforeach</div>@endif
+                                {{-- Each file is a LINK. An IMAGE is also shown, rather than being listed
+                                     by filename like any other file — you could not tell a photo
+                                     from a spreadsheet without opening it. --}}@if(!empty($m['attachments']))<div class="cm-att">@foreach($m['attachments'] as $a)@if($a['is_image'] ?? false)<a class="cm-att-img" href="{{ $a['url'] }}" target="_blank" rel="noopener" title="Open {{ $a['name'] }}"><img src="{{ $a['url'] }}" alt="{{ $a['name'] }}" loading="lazy"><span>{{ $a['name'] }} · {{ $a['size'] }}</span></a>@endif @if(!($a['is_image'] ?? false))<a class="cm-att-item" href="{{ $a['url'] }}" target="_blank" rel="noopener" title="Open {{ $a['name'] }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div><b>{{ $a['name'] }}</b><span>{{ $a['size'] }}</span></div></a>@endif
+@endforeach</div>@endif
                             </div>
                         </div>
                     @empty
@@ -605,9 +620,20 @@ window.CHAT_LIVE = {
            created message, so they are rendered here too. The filename goes
            through esc() — it is the sender's own string. */
         var atts = (m.attachments || []).map(function (a) {
-            return '<a class="cm-att-item" href="' + (a.url || '#') + '" target="_blank" rel="noopener">'
+            var url  = a.url || '#';
+            var name = esc(a.file_name || a.name);
+            var size = esc(a.size || a.size_label || '');
+
+            // An image shows itself here too, not only after a reload.
+            if (a.is_image) {
+                return '<a class="cm-att-img" href="' + url + '" target="_blank" rel="noopener">'
+                    + '<img src="' + url + '" alt="' + name + '" loading="lazy">'
+                    + '<span>' + name + ' · ' + size + '</span></a>';
+            }
+
+            return '<a class="cm-att-item" href="' + url + '" target="_blank" rel="noopener">'
                 + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
-                + '<div><b>' + esc(a.file_name || a.name) + '</b><span>' + esc(a.size || a.size_label || '') + '</span></div></a>';
+                + '<div><b>' + name + '</b><span>' + size + '</span></div></a>';
         }).join('');
         var attBlock = atts ? '<div class="cm-att">' + atts + '</div>' : '';
         return '<div class="cm-msg ' + (mine ? 'me' : '') + '"><span class="cm-msg-av" style="background:' + (mine ? '#1e293b' : '#ea580c') + ';">' + esc(name.charAt(0).toUpperCase()) + '</span><div class="cm-msg-body"><div class="cm-msg-meta">' + esc(name) + ' · ' + t + '</div><div class="cm-bubble">' + esc(m.body) + '</div>' + attBlock + '</div></div>';
