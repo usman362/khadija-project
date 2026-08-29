@@ -61,9 +61,9 @@ class EventTypesMobileOrderTest extends TestCase
         $this->assertStringNotContainsString('services available', $html,
             'The card still calls a count of service categories a count of services.');
 
-        // Both numbers, so the page it opens is no surprise: the card quotes the
-        // recommended count and that page lists every category.
-        $this->assertMatchesRegularExpression('/\d+ of \d+ categories recommended/', $html);
+        // The card quotes what the page HOLDS, so clicking it is never a
+        // surprise. A recommended subset here opened onto every category.
+        $this->assertMatchesRegularExpression('/\d+ service categor(y|ies)/', $html);
     }
 
     /**
@@ -81,8 +81,8 @@ class EventTypesMobileOrderTest extends TestCase
 
         $html = $this->get(route('public.event-types'))->assertSuccessful()->getContent();
 
-        $this->assertStringContainsString('The number is how many of our', $html);
-        $this->assertStringContainsString('categories recommended for a Bachelor Party', $html);
+        $this->assertStringContainsString('The number is how many service categories you can choose from', $html);
+        $this->assertStringContainsString('service categories to choose from for a Bachelor Party', $html);
 
         // A list of ten must not call itself all of them.
         $this->assertStringNotContainsString('<h4>All Event Types</h4>', $html);
