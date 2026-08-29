@@ -264,8 +264,8 @@ class AiVendorMatchmakingController extends Controller
             'min_match'  => ['nullable', 'integer', 'min:50', 'max:100'],
         ]);
 
-        $theme    = $data['theme'] ?: 'Tropical Beach Party';
-        $category = $data['category'] ?: 'all';
+        $theme    = ($data['theme'] ?? '') ?: 'Tropical Beach Party';
+        $category = ($data['category'] ?? '') ?: 'all';
         $budget   = (int) ($data['max_budget'] ?? 1000);
         $minMatch = (int) ($data['min_match'] ?? 80);
 

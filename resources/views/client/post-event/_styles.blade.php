@@ -4,7 +4,11 @@
     .pe-wrap { --pe-orange:#f97316; --pe-orange-d:#ea580c; --pe-purple:#7c3aed; --pe-purple-l:#ede9fe;
         --pe-green:#16a34a; --pe-green-l:#dcfce7; --pe-ink:#111827; --pe-ink-2:#374151; --pe-muted:#6b7280;
         --pe-line:#e5e7eb; --pe-line-2:#f1f5f9; --pe-bg:#f8fafc; --pe-card:#ffffff;
-        background:var(--pe-bg); min-height:100%; color:var(--pe-ink); }
+        /* No background of its own. It painted #f8fafc, which was invisible
+           while the page shell was also white — since the shell moved off
+           white it showed as a pale block behind the cards. The shell is the
+           layout's job; a page does not paint its own. */
+        min-height:100%; color:var(--pe-ink); }
     .pe-wrap * { box-sizing:border-box; }
     .pe-container { max-width:1280px; margin:0 auto; padding:0 24px; }
 

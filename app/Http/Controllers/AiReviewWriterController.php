@@ -91,12 +91,12 @@ class AiReviewWriterController extends Controller
         ]);
 
         $input = [
-            'provider' => $data['provider'] ?: self::DEFAULTS['provider'],
-            'service'  => $data['service'] ?: '',
-            'event'    => $data['event'] ?: 'event',
+            'provider' => ($data['provider'] ?? '') ?: self::DEFAULTS['provider'],
+            'service'  => ($data['service'] ?? '') ?: '',
+            'event'    => ($data['event'] ?? '') ?: 'event',
             'rating'   => (float) ($data['rating'] ?? 5),
             'tone'     => array_key_exists($data['tone'] ?? '', self::TONES) ? $data['tone'] : 'balanced',
-            'thoughts' => $data['thoughts'] ?: '',
+            'thoughts' => ($data['thoughts'] ?? '') ?: '',
         ];
 
         $this->gate->recordUsage($request->user(), AiFeatureCode::REVIEW_WRITER);

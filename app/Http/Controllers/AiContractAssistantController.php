@@ -71,8 +71,19 @@ class AiContractAssistantController extends Controller
         $total    = round((float) $d['total_price'], 2);
         $mode     = (string) ($d['cancellation'] ?? 'standard');
 
-        $depositPct = $d['deposit_pct'] !== null && $d['deposit_pct'] !== ''
-            ? (float) $d['deposit_pct']
+        /*
+         * `?? null` — the key may not be there at all.
+         *
+         * `nullable` permits the value to BE null; it does not create the key
+         * when the field was never submitted. Leaving the deposit box
+         * untouched sent no key and this threw "Undefined array key", so the
+         * tool 500'd on the most ordinary use of it. Every other optional
+         * field on this form already reads through `??`; this one did not.
+         */
+        $submittedPct = $d['deposit_pct'] ?? null;
+
+        $depositPct = $submittedPct !== null && $submittedPct !== ''
+            ? (float) $submittedPct
             : 30.0;
 
         $deposit = round($total * $depositPct / 100, 2);
