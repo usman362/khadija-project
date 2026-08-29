@@ -82,12 +82,16 @@
         }
 
         [data-theme="light"] {
-            --bg-primary: #ffffff;
+            /* Sir Peter, 27 Aug — same change as the client layout: the page
+               shell steps off white so white cards lift, and the hairline
+               border goes from 8% to a slate 12%. See layouts/client for the
+               reasoning; the two portals have to look like one product. */
+            --bg-primary: #f5f6f8;
             --bg-secondary: #ffffff;
             --bg-card: #ffffff;
             --bg-card-hover: #f1f5f9;
             --bg-sidebar: #ffffff;
-            --border-color: rgba(0, 0, 0, 0.08);
+            --border-color: rgba(15, 23, 42, 0.12);
             --border-glow: rgba(99, 102, 241, 0.2);
             --text-primary: #1e293b;
             --text-secondary: #334155;

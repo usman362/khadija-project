@@ -211,10 +211,19 @@
         font-size: 44px; font-weight: 800; letter-spacing: -1px; }
     .br-rail-btn { display: block; margin: 10px 14px 14px; text-align: center; border-radius: 10px; padding: 9px; font-size: 12.5px; font-weight: 800; text-decoration: none; }
     .br-rail-btn.blue { background: linear-gradient(135deg, var(--blue), var(--blue-dark)); color: #fff; }
-    .br-recent { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 12px 14px; }
-    .br-recent a { display: block; text-decoration: none; }
-    .br-recent img { width: 100%; height: 50px; border-radius: 8px; object-fit: cover; }
-    .br-recent span { display: block; font-size: 10px; color: var(--text); font-weight: 700; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* A list, not a 3-up grid.
+       Three equal columns only look right with exactly three entries — and
+       "recently viewed" usually has one. A lone tile sat in the first third
+       with dead space beside it. Rows work at any count and match the other
+       cards in this rail. */
+    .br-recent { padding: 6px 14px 12px; }
+    .br-recent a { display: flex; align-items: center; gap: 10px; text-decoration: none;
+                   padding: 8px 0; border-top: 1px solid var(--line, #e6eaf1); }
+    .br-recent a:first-child { border-top: 0; }
+    .br-recent img { width: 38px; height: 38px; border-radius: 9px; object-fit: cover; flex-shrink: 0; }
+    .br-recent span { flex: 1; min-width: 0; font-size: 12.5px; color: var(--text); font-weight: 700;
+                      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .br-recent a:hover span { color: var(--brand-text, #ea580c); }
 
     /* CTA + trust strip */
     .br-cta { margin: 8px 0 0; border-radius: 20px; padding: 30px 34px; position: relative; overflow: hidden;

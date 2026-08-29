@@ -441,10 +441,10 @@
    "was": null
   },
   {
-   "name": "Retirement & Going-Away Party",
+   "name": "Going-Away Party",
    "archetype": "Milestone & Personal Celebrations",
    "disposition": "EDIT",
-   "was": "Retirement & Going Away"
+   "was": "Retirement & Going-Away Party"
   },
   {
    "name": "Retirement Party",
@@ -525,10 +525,10 @@
    "was": null
   },
   {
-   "name": "Silent Auction",
+   "name": "Live Auction",
    "archetype": "Fundraising & Charity Events",
-   "disposition": "ADD",
-   "was": null
+   "disposition": "EDIT",
+   "was": "Silent Auction"
   },
   {
    "name": "Spring Fling",

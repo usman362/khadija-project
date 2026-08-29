@@ -74,9 +74,11 @@
                #94a3b8 measured 2.43:1. Anything carrying words has to clear
                4.5 wherever it lands. */
             --faint: #667085;
-            --line: #e6eaf1;
+            /* Sir Peter, 27 Aug — borders and page shell, site-wide. The
+               public pages use their own names for the same two things. */
+            --line: #dfe4ec;
             --line-soft: #eef2f7;
-            --bg: #ffffff;
+            --bg: #f7f8fa;
             --bg-soft: #f7f9fc;
             --bg-soft-2: #eef3fb;
             --radius: 16px;

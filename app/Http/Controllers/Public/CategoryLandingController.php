@@ -9,6 +9,7 @@ use App\Domain\Taxonomy\ServiceRelevance;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 /**
@@ -21,8 +22,24 @@ use Illuminate\View\View;
  */
 class CategoryLandingController extends Controller
 {
-    public function show(string $slug): View
+    /**
+     * Addresses a category used to live at.
+     *
+     * Renaming an event type changes its slug, and any link already shared or
+     * indexed points at the old one. Two entries is not worth a table; when
+     * this list grows past a handful it should become one.
+     */
+    private const MOVED = [
+        'silent-auction'              => 'live-auction',
+        'retirement-going-away-party' => 'going-away-party',
+    ];
+
+    public function show(string $slug): View|RedirectResponse
     {
+        if (isset(self::MOVED[$slug])) {
+            return redirect()->route('public.category', self::MOVED[$slug], 301);
+        }
+
         $category = Category::active()->where('slug', $slug)->firstOrFail();
 
         /*

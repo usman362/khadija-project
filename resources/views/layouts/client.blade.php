@@ -82,13 +82,25 @@
         }
 
         [data-theme="light"] {
-            /* White page shell; cards are lifted by their subtle border + shadow. */
-            --bg-primary: #ffffff;
+            /*
+             * Sir Peter, 27 Aug: "add borderlines, or maybe darken the
+             * background slight" — site-wide.
+             *
+             * The page shell was pure white and cards were white too, held
+             * apart by a 7% black hairline. On a bright screen that hairline
+             * disappears and a page of cards reads as one flat sheet.
+             *
+             * Two small moves, in the tokens so every page gets them at once:
+             * the shell steps off white so white cards lift, and the border
+             * goes from 7% to a slate 12% — visible, still quiet. Card
+             * backgrounds are untouched, so nothing that sits ON a card moves.
+             */
+            --bg-primary: #f5f6f8;
             --bg-secondary: #ffffff;
             --bg-card: #ffffff;
             --bg-card-hover: #f8fafc;
             --bg-sidebar: #ffffff;
-            --border-color: rgba(0, 0, 0, 0.07);
+            --border-color: rgba(15, 23, 42, 0.12);
             --border-glow: rgba(99, 102, 241, 0.2);
             --text-primary: #1e293b;
             --text-secondary: #334155;

@@ -76,7 +76,41 @@ class PostEventController extends Controller
             'steps'   => self::STEPS,
             'current' => 0,
             'summary' => $this->summary(),
+            'postings' => $this->recentPostings(),
         ]);
+    }
+
+    /**
+     * What other clients have posted lately, for the rail beside the routes.
+     *
+     * From Khadijah's design (27 Aug). Real published requests, not a
+     * decoration: the event type, the services asked for, and how long ago.
+     *
+     * Deliberately NOT included: who posted it. A professional sees the client
+     * on the bidding board because they are deciding whether to bid; another
+     * client has no such reason, and this is the same information minus the
+     * name.
+     *
+     * Same state only. Under the State Boundary Rule a request from another
+     * state is not something this client's professionals could take either, so
+     * showing it would only misrepresent how busy their own market is.
+     */
+    private function recentPostings(int $limit = 6): \Illuminate\Support\Collection
+    {
+        return \App\Models\Event::query()
+            ->where('is_published', true)
+            ->whereNotNull('published_at')
+            ->where('client_id', '!=', (int) auth()->id())
+            ->tap(fn ($q) => \App\Support\StateMatching::scopeForViewer($q, auth()->user()))
+            ->with('categories:id,name')
+            ->latest('published_at')
+            ->limit($limit)
+            ->get()
+            ->map(fn ($e) => [
+                'title'    => $e->event_type ?: $e->title,
+                'services' => $e->categories->pluck('name')->take(3)->implode(', '),
+                'when'     => $e->published_at?->humanAgo(),
+            ]);
     }
 
     // ── Step 1 ──────────────────────────────────────────────────────────────

@@ -17,6 +17,14 @@ use Illuminate\Support\Str;
  */
 class ImagePipelineService
 {
+    /**
+     * The one size every category picture is stored at.
+     *
+     * Matches the `square` crop below, and matches the 300x300 the existing
+     * Level 1 pictures already use — so nothing already uploaded has to change.
+     */
+    public const CATEGORY_SIZE = 300;
+
     /** Target sizes [width, height] keyed by role. */
     public const SIZES = [
         'square' => [300, 300],   // avatar / thumbnail
@@ -93,6 +101,45 @@ class ImagePipelineService
                 Storage::disk('public')->delete($item[$k]);
             }
         }
+    }
+
+    /**
+     * One upload, one square file, at exactly CATEGORY_SIZE.
+     *
+     * Sir Peter, 29 Aug — the category pictures should all be one size. They
+     * were not enforced anywhere: any image up to a couple of megabytes went
+     * in at whatever dimensions it happened to have, so the event-type wall
+     * mixed 300x300 with whatever else had been uploaded.
+     *
+     * It crops rather than refuses. Rejecting an upload that is not already
+     * 300x300 would make the Owner resize every photo by hand before he could
+     * use it; centre-cropping gives the same consistency and costs him
+     * nothing. The stored file IS 300x300, so the wall cannot drift again.
+     *
+     * @return string|null the stored path, or null if the file could not be read
+     */
+    public function squareForCategory(UploadedFile $file, string $dir): ?string
+    {
+        $src = $this->load($file->getRealPath(), $file->getClientMimeType());
+
+        if (! $src) {
+            return null;
+        }
+
+        Storage::disk('public')->makeDirectory($dir);
+
+        $path = $this->coverCrop(
+            $src,
+            trim($dir, '/').'/'.Str::uuid()->toString().'.jpg',
+            self::CATEGORY_SIZE,
+            self::CATEGORY_SIZE,
+            0.5,
+            0.5,
+        );
+
+        imagedestroy($src);
+
+        return $path;
     }
 
     private function load(string $path, ?string $mime)

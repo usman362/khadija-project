@@ -84,7 +84,7 @@ class AdminCategoryController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, \App\Services\ImagePipelineService $pipeline): RedirectResponse
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -118,12 +118,29 @@ class AdminCategoryController extends Controller
             'insurance_tier' => $validated['insurance_tier'] ?? null,
         ];
 
-        if ($request->hasFile('cover_image')) {
-            $data['cover_image'] = $request->file('cover_image')->store('categories/covers', 'public');
-        }
+        /*
+         * Every category picture is stored at one size — Sir Peter, 29 Aug.
+         *
+         * These used to be stored exactly as uploaded, at whatever dimensions
+         * the file happened to have, so the event-type wall mixed 300x300
+         * with anything else. Both columns go through the same crop because
+         * `Category::imageUrl()` treats them interchangeably: a 300x300
+         * thumbnail beside a 1600x500 cover would show the drift straight back.
+         *
+         * It crops rather than refuses — see the service for why.
+         */
+        foreach (['cover_image' => 'categories/covers', 'thumbnail' => 'categories/thumbnails'] as $field => $dir) {
+            if (! $request->hasFile($field)) {
+                continue;
+            }
 
-        if ($request->hasFile('thumbnail')) {
-            $data['thumbnail'] = $request->file('thumbnail')->store('categories/thumbnails', 'public');
+            $stored = $pipeline->squareForCategory($request->file($field), $dir);
+
+            // An unreadable image is not a reason to lose the rest of the form;
+            // the old picture stays and nothing is silently replaced.
+            if ($stored) {
+                $data[$field] = $stored;
+            }
         }
 
         Category::create($data);
@@ -139,7 +156,7 @@ class AdminCategoryController extends Controller
         ]);
     }
 
-    public function update(Request $request, Category $category): RedirectResponse
+    public function update(Request $request, Category $category, \App\Services\ImagePipelineService $pipeline): RedirectResponse
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -173,12 +190,29 @@ class AdminCategoryController extends Controller
             'insurance_tier' => $validated['insurance_tier'] ?? null,
         ];
 
-        if ($request->hasFile('cover_image')) {
-            $data['cover_image'] = $request->file('cover_image')->store('categories/covers', 'public');
-        }
+        /*
+         * Every category picture is stored at one size — Sir Peter, 29 Aug.
+         *
+         * These used to be stored exactly as uploaded, at whatever dimensions
+         * the file happened to have, so the event-type wall mixed 300x300
+         * with anything else. Both columns go through the same crop because
+         * `Category::imageUrl()` treats them interchangeably: a 300x300
+         * thumbnail beside a 1600x500 cover would show the drift straight back.
+         *
+         * It crops rather than refuses — see the service for why.
+         */
+        foreach (['cover_image' => 'categories/covers', 'thumbnail' => 'categories/thumbnails'] as $field => $dir) {
+            if (! $request->hasFile($field)) {
+                continue;
+            }
 
-        if ($request->hasFile('thumbnail')) {
-            $data['thumbnail'] = $request->file('thumbnail')->store('categories/thumbnails', 'public');
+            $stored = $pipeline->squareForCategory($request->file($field), $dir);
+
+            // An unreadable image is not a reason to lose the rest of the form;
+            // the old picture stays and nothing is silently replaced.
+            if ($stored) {
+                $data[$field] = $stored;
+            }
         }
 
         $category->update($data);
