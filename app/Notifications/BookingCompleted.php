@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Booking;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /**
@@ -17,9 +18,31 @@ class BookingCompleted extends Notification
 
     public function __construct(public Booking $booking) {}
 
+    /**
+     * In-app always; email only if this account still wants it.
+     * The booking reaching its end is booking news.
+     */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        $channels = ['database'];
+
+        if (method_exists($notifiable, 'acceptsEmail') && $notifiable->acceptsEmail('bookings')) {
+            $channels[] = 'mail';
+        }
+
+        return $channels;
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $data = $this->toArray($notifiable);
+
+        return (new MailMessage())
+            ->subject('Your booking is complete')
+            ->view('emails.lifecycle.booking-completed', [
+                'user' => $notifiable,
+                'data' => $data,
+            ]);
     }
 
     public function toArray(object $notifiable): array

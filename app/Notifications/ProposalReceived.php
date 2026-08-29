@@ -4,11 +4,12 @@ namespace App\Notifications;
 
 use App\Models\Booking;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /**
  * Fired at the client when a professional submits a proposal on their event.
- * Database-only — appears in the client's in-app notification feed.
+ * In-app, plus email when the client's notify_email_events says so.
  */
 class ProposalReceived extends Notification
 {
@@ -16,9 +17,31 @@ class ProposalReceived extends Notification
 
     public function __construct(public Booking $booking) {}
 
+    /**
+     * In-app always; email only if this account still wants it.
+     * A proposal landing on your event is news about that event.
+     */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        $channels = ['database'];
+
+        if (method_exists($notifiable, 'acceptsEmail') && $notifiable->acceptsEmail('events')) {
+            $channels[] = 'mail';
+        }
+
+        return $channels;
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $data = $this->toArray($notifiable);
+
+        return (new MailMessage())
+            ->subject('You have a new proposal')
+            ->view('emails.lifecycle.proposal-received', [
+                'user' => $notifiable,
+                'data' => $data,
+            ]);
     }
 
     public function toArray(object $notifiable): array

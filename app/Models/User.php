@@ -294,6 +294,38 @@ class User extends Authenticatable implements MustVerifyEmail
      * skills that never matched.
      */
     /**
+     * Does this account still want lifecycle email of this kind?
+     *
+     * The four notify_email_* preferences have been editable in profile
+     * settings since the beginning, but nothing has ever read them — because
+     * nothing sent email. Switching email on without consulting them would mail
+     * every person who had already opted out, which is how a sending domain
+     * gets blocked and, more simply, is not what they asked for.
+     *
+     * Anything the account MUST receive — a password reset, a verification
+     * link — does not come through here. Those are not lifecycle mail and are
+     * not optional.
+     *
+     * @param  string  $category  bookings | messages | events | marketing
+     */
+    public function acceptsEmail(string $category): bool
+    {
+        if (! config('emails.lifecycle.enabled')) {
+            return false;
+        }
+
+        $column = 'notify_email_' . $category;
+
+        // Marketing is the one that defaults OFF; nobody is opted in to it by
+        // having simply never visited their settings page.
+        $default = $category !== 'marketing';
+
+        $value = $this->profile?->{$column};
+
+        return $value === null ? $default : (bool) $value;
+    }
+
+    /**
      * Both auth emails go out in the app's own template. Laravel's defaults are
      * unbranded, and an unbranded first email is the one people report as
      * phishing rather than click.

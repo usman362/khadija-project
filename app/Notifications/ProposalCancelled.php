@@ -5,6 +5,7 @@ namespace App\Notifications;
 use App\Models\Booking;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /**
@@ -18,9 +19,31 @@ class ProposalCancelled extends Notification
 
     public function __construct(public Booking $booking, public User $actor) {}
 
+    /**
+     * In-app always; email only if this account still wants it.
+     * A professional stepping away from a booking is booking news.
+     */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        $channels = ['database'];
+
+        if (method_exists($notifiable, 'acceptsEmail') && $notifiable->acceptsEmail('bookings')) {
+            $channels[] = 'mail';
+        }
+
+        return $channels;
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $data = $this->toArray($notifiable);
+
+        return (new MailMessage())
+            ->subject('A professional has withdrawn')
+            ->view('emails.lifecycle.proposal-cancelled', [
+                'user' => $notifiable,
+                'data' => $data,
+            ]);
     }
 
     public function toArray(object $notifiable): array
