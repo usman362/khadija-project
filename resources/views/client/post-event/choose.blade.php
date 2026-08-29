@@ -49,8 +49,13 @@
         .rc-rail-slot { grid-column:1; grid-row:auto; min-height:0; }
         .rc-rail { position:static; }
     }
-    /* The postings scroll; the heading and the footnote stay put. */
-    .rc-rail-list { flex:1; min-height:0; overflow-y:auto; }
+    /* The postings scroll if there are more than fit — but the list does NOT
+       stretch. It used to (flex:1), which pushed the footnote to the bottom
+       of a rail sized by the left column: with six postings that left a large
+       void between the last one and the footnote. Content sits at the top;
+       any spare height is just empty card, which reads as room rather than a
+       gap. */
+    .rc-rail-list { min-height:0; overflow-y:auto; }
     .rc-rail-h { display:flex; align-items:center; gap:8px; font-size:12px; font-weight:800; letter-spacing:.4px;
         text-transform:uppercase; color:var(--pe-purple); margin-bottom:4px; }
     .rc-rail-h svg { width:15px; height:15px; }
