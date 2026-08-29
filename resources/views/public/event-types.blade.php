@@ -71,7 +71,11 @@
     .et-all-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px;
         flex-wrap: wrap; font-size: 13px; color: #6b7280; }
 
-    @media (max-width: 1080px) { .et-browse { grid-template-columns: 1fr; } .et-rail-card { position: static; } .et-all { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    /* Below 1080px the two columns become one, and the rail is first in the
+       markup — so on a phone a plain list of ten shortcuts stood between the
+       reader and the event types themselves, which are the point of the page.
+       The cards come first there and the shortcut list follows them. */
+    @media (max-width: 1080px) { .et-browse { grid-template-columns: 1fr; } .et-rail-card { position: static; order: 2; } .et-browse > div { order: 1; } .et-all { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     @media (max-width: 820px)  { .et-all { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     .et-sec-h { margin: 8px 0 4px; font-size: 1.4rem; font-weight: 700; color: var(--ink); }
     .et-sec-h span { color: var(--et); }
@@ -225,7 +229,13 @@
                         <div class="et-all-body">
                             <div class="et-all-name">{{ $et['name'] }}</div>
                             <div class="et-all-sub">
-                                {{ $et['recommended'] }} {{ \Illuminate\Support\Str::plural('service', $et['recommended']) }} available
+                                {{-- "17 services available" was wrong twice over: the
+                                     number counts service CATEGORIES, not services
+                                     (a wedding touches 171 of the 241 services), and
+                                     the page it opens lists all 27 categories with
+                                     these ones marked. So the card promised 17 and
+                                     delivered 27, and the word was wrong as well. --}}
+                                {{ $et['recommended'] }} recommended {{ \Illuminate\Support\Str::plural('category', $et['recommended']) }}
                             </div>
                         </div>
                         <span class="et-all-arw">›</span>
