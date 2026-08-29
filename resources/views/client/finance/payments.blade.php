@@ -33,6 +33,12 @@
 
     /* Context bar */
     .pay-context { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 12px 18px; margin-bottom: 14px; font-size: 12.5px; }
+    /* The event selector inside the bar. Styled to sit in the row rather than
+       look like a form dropped on top of it. */
+    .pay-context select { border: 0; background: transparent; color: inherit; font-family: inherit; font-size: inherit; font-weight: 700; cursor: pointer; max-width: 320px; }
+    .pay-context select:focus { outline: 2px solid var(--brand, #f97316); outline-offset: 2px; border-radius: 4px; }
+    .pay-context .ev { display: inline-flex; align-items: center; gap: 7px; }
+    .pay-clear { font-size: 12.5px; font-weight: 700; color: var(--brand, #f97316); text-decoration: none; }
     .pay-context .ev { font-weight: 700; color: var(--text-primary); display: inline-flex; align-items: center; gap: 6px; }
     .pay-context .meta { color: var(--text-muted); display: inline-flex; align-items: center; gap: 5px; }
     .pay-context .meta svg { width: 12px; height: 12px; }
@@ -147,14 +153,51 @@
         </div>
     </div>
 
-    {{-- Context bar --}}
-    @if($activeEvent)
-    <div class="pay-context">
-        <span class="ev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>{{ $activeEvent->title }}</span>
-        <span class="meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>Event: {{ $activeEvent->starts_at?->format('M d, Y') ?? '—' }}</span>
-        <span class="meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/></svg>{{ $activeEvent->location ?? 'TBD' }}</span>
-        <span class="spacer"></span>
-    </div>
+    {{-- Event filter.
+
+         This was a caption: it named ONE event above figures that covered
+         EVERY booking, so "$5,080 Total Agreed" read as that event's total
+         while the ledger underneath might not hold a single row belonging to
+         it. It picks the scope now — the cards, the ledger and this bar all
+         answer for the same event.
+
+         The two icons were bare <rect> elements with none of a calendar's
+         inner strokes, which is why they read as empty checkboxes. --}}
+    @if($myEvents->isNotEmpty())
+    <form method="GET" class="pay-context">
+        @if(request('search'))<input type="hidden" name="search" value="{{ request('search') }}">@endif
+        @if(request('status'))<input type="hidden" name="status" value="{{ request('status') }}">@endif
+
+        <label class="ev">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;">
+                <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <select name="event" onchange="this.form.submit()" aria-label="Show one event">
+                <option value="">All events</option>
+                @foreach($myEvents as $ev)
+                    <option value="{{ $ev->id }}" @selected($activeEvent?->id === $ev->id)>{{ $ev->title }}</option>
+                @endforeach
+            </select>
+        </label>
+
+        @if($activeEvent)
+            <span class="meta">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                Event: {{ $activeEvent->starts_at?->format('M d, Y') ?? '—' }}
+            </span>
+            <span class="meta">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ $activeEvent->location ?? 'TBD' }}
+            </span>
+            <span class="spacer"></span>
+            <a class="pay-clear" href="{{ route('client.payments.index') }}">Show all events</a>
+        @else
+            <span class="meta">Every booking on your account</span>
+            <span class="spacer"></span>
+        @endif
+    </form>
     @endif
 
     {{-- Ledger table --}}

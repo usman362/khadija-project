@@ -50,6 +50,30 @@ class ClientFinanceController extends Controller
      *
      * @return array{q: ?string, status: ?string, from: ?string, to: ?string}
      */
+    /**
+     * Which event the money pages are showing, and everything they could show.
+     *
+     * Only the client's own events: passing somebody else's id must select
+     * nothing rather than reveal that it exists.
+     *
+     * @return array{selected: ?\App\Models\Event, events: \Illuminate\Support\Collection}
+     */
+    private function eventScope(Request $request): array
+    {
+        $user = $request->user();
+
+        $events = Event::where('client_id', $user->id)
+            ->orderByRaw('starts_at IS NULL, starts_at DESC')
+            ->get(['id', 'title', 'starts_at', 'location']);
+
+        $chosen = (int) $request->query('event', 0);
+
+        return [
+            'selected' => $chosen ? $events->firstWhere('id', $chosen) : null,
+            'events'   => $events,
+        ];
+    }
+
     private function filters(Request $request): array
     {
         $status = (string) $request->query('status', '');
@@ -80,11 +104,19 @@ class ClientFinanceController extends Controller
         return null;
     }
 
-    /** Money the client owes/has paid across all their bookings. */
-    private function spend(int $userId): array
+    /**
+     * Money the client owes/has paid — across every booking, or within one event.
+     *
+     * The event argument is not decoration. Both money pages carried a bar
+     * naming ONE event above figures that covered EVERY booking, so a client
+     * read "$5,080" as that event's total when the event might not have a
+     * single row in the ledger below it.
+     */
+    private function spend(int $userId, ?int $eventId = null): array
     {
         $col  = $this->priceColumn();
-        $base = Booking::where('client_id', $userId);
+        $base = Booking::where('client_id', $userId)
+            ->when($eventId, fn ($q) => $q->where('event_id', $eventId));
 
         $amount = fn ($status) => $col
             ? (float) (clone $base)->when($status, fn ($q) => $q->where('status', $status))->sum($col)
@@ -101,11 +133,16 @@ class ClientFinanceController extends Controller
     public function payments(Request $request): View
     {
         $user = $request->user();
-        $s    = $this->spend($user->id);
+
+        // The bar above the ledger is a filter now, not a caption.
+        ['selected' => $activeEvent, 'events' => $myEvents] = $this->eventScope($request);
+
+        $s = $this->spend($user->id, $activeEvent?->id);
 
         // Transaction ledger — every booking is one "transaction" row.
         $query = Booking::where('client_id', $user->id)
             ->with(['event:id,title,starts_at,location', 'supplier:id,name,avatar', 'supplier.profile:id,user_id,headline'])
+            ->when($activeEvent, fn ($qr) => $qr->where('event_id', $activeEvent->id))
             ->latest();
 
         if ($request->filled('search')) {
@@ -147,12 +184,8 @@ class ClientFinanceController extends Controller
             'total_agreed'  => $s['total'],
         ];
 
-        $activeEvent = Event::where('client_id', $user->id)
-            ->whereIn('status', ['pending', 'published', 'confirmed'])
-            ->latest('starts_at')->first();
-
         return view('client.finance.payments', compact(
-            'stats', 'transactions', 'activeEvent'
+            'stats', 'transactions', 'activeEvent', 'myEvents'
         ));
     }
 
@@ -232,7 +265,11 @@ class ClientFinanceController extends Controller
     public function spending(Request $request): View
     {
         $user = $request->user();
-        $s    = $this->spend($user->id);
+
+        // Same bar, same fix: it names an event, so it scopes to that event.
+        ['selected' => $activeEvent, 'events' => $myEvents] = $this->eventScope($request);
+
+        $s = $this->spend($user->id, $activeEvent?->id);
 
         /*
          * Itemized vendor expense matrix, filtered.
@@ -246,6 +283,7 @@ class ClientFinanceController extends Controller
         $filters = $this->filters($request);
 
         $query = Booking::where('client_id', $user->id)
+            ->when($activeEvent, fn ($qr) => $qr->where('event_id', $activeEvent->id))
             ->with(['event:id,title', 'supplier:id,name,avatar', 'supplier.profile:id,user_id,headline'])
             ->when($filters['q'], function ($qr) use ($filters) {
                 $term = '%' . $filters['q'] . '%';
@@ -306,12 +344,8 @@ class ClientFinanceController extends Controller
             $trend[] = ['label' => $weekEnd->format('M d'), 'value' => $val];
         }
 
-        $activeEvent = Event::where('client_id', $user->id)
-            ->whereIn('status', ['pending', 'published', 'confirmed'])
-            ->latest('starts_at')->first();
-
         return view('client.finance.spending', compact(
-            'stats', 'vendors', 'pipeline', 'trend', 'activeEvent', 'filters'
+            'stats', 'vendors', 'pipeline', 'trend', 'activeEvent', 'filters', 'myEvents'
         ) + ['statuses' => self::SPEND_STATUSES]);
     }
 }

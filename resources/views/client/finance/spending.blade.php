@@ -16,6 +16,9 @@
     .ea-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 18px; }
 
     .ea-context { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; font-size: 12.5px; color: var(--text-muted); }
+    .ea-context select { border: 0; background: transparent; color: var(--text-primary); font-family: inherit; font-size: inherit; font-weight: 700; cursor: pointer; max-width: 300px; }
+    .ea-context select:focus { outline: 2px solid var(--brand, #f97316); outline-offset: 2px; border-radius: 4px; }
+    .ea-clear { font-size: 12.5px; font-weight: 700; color: var(--brand, #f97316); text-decoration: none; }
     .ea-context b { color: var(--text-primary); }
     .ea-context .spacer { flex: 1; }
     .ea-export { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--brand-text); border: 1px solid rgba(249,115,22,0.3); border-radius: 8px; padding: 6px 12px; text-decoration: none; }
@@ -120,15 +123,40 @@
 <div class="ea-layout">
 <div class="ea-main">
 
-    {{-- Context --}}
-    <div class="ea-context">
+    {{-- Event filter.
+
+         This named ONE event above figures that covered EVERY booking. It picks
+         the scope now, so the cards, the table and this bar all answer for the
+         same event. --}}
+    @if($myEvents->isNotEmpty())
+    <form method="GET" class="ea-context">
+        @if($filters['q'])<input type="hidden" name="q" value="{{ $filters['q'] }}">@endif
+        @if($filters['status'])<input type="hidden" name="status" value="{{ $filters['status'] }}">@endif
+        @if($filters['from'])<input type="hidden" name="from" value="{{ $filters['from'] }}">@endif
+        @if($filters['to'])<input type="hidden" name="to" value="{{ $filters['to'] }}">@endif
+
+        <span>Showing:
+            <select name="event" onchange="this.form.submit()" aria-label="Show one event">
+                <option value="">All events</option>
+                @foreach($myEvents as $ev)
+                    <option value="{{ $ev->id }}" @selected($activeEvent?->id === $ev->id)>{{ $ev->title }}</option>
+                @endforeach
+            </select>
+        </span>
+
         @if($activeEvent)
-            <span>Active Project: <b>{{ $activeEvent->title }}</b></span>
             <span>Dates: <b>{{ $activeEvent->starts_at?->format('M d') ?? '—' }}</b></span>
-            <span>Budget: <b>${{ number_format($activeEvent->budget ?? 0, 0) }}</b></span>
+            @if($activeEvent->budget)
+                <span>Budget: <b>${{ number_format($activeEvent->budget, 0) }}</b></span>
+            @endif
         @endif
+
         <span class="spacer"></span>
-    </div>
+        @if($activeEvent)
+            <a class="ea-clear" href="{{ route('client.spending.index') }}">Show all events</a>
+        @endif
+    </form>
+    @endif
 
     {{-- Stat cards --}}
     <div class="ea-stats">
