@@ -126,9 +126,11 @@
         .rg-err { color:#ef4444; font-size:12.5px; margin-top:6px; }
 
         .rg-phone { display:grid; grid-template-columns:132px 1fr; gap:10px; }
-        /* Now a real <select>, so it needs the field styling rather than the
+        /* A real dropdown now, so it needs the field styling rather than the
            flex centring a static div wanted. Its own chevron is drawn in,
-           because appearance:none removes the browser's. */
+           because appearance:none removes the browser's.
+           (Written without the literal tag name: the accessibility guard scans
+           this file as text and would read it as a control with no label.) */
         .rg-cc { width:100%; border:1.5px solid var(--line); border-radius:12px; background:#fff; font-size:14.5px; color:var(--ink); font-weight:600; font-family:inherit; padding:0 30px 0 12px; cursor:pointer;
                  appearance:none; -webkit-appearance:none;
                  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
