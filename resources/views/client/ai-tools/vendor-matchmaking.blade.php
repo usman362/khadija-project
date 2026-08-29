@@ -15,12 +15,9 @@
     .vm-mb { margin-bottom: 20px; }
 
     /* header */
-    .vm-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
-    .vm-head-l { display: flex; align-items: center; gap: 16px; }
-    .vm-head-ico { width: 58px; height: 58px; flex-shrink: 0; filter: drop-shadow(0 6px 12px rgba(124,58,237,0.35)); }
-    .vm-head-ico svg { width: 100%; height: 100%; }
-    .vm-head-txt h1 { font-size: 28px; font-weight: 800; color: var(--vm-strong); margin: 0; }
-    .vm-head-txt p { font-size: 13.5px; color: var(--text-muted); margin: 3px 0 0; max-width: 560px; }
+    /* Only the back link lives here now, so it keeps its place on the right
+       rather than sliding left the moment it is the only child. */
+    .vm-head { display: flex; align-items: center; justify-content: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
     .vm-back { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border: 1px solid var(--border-color); border-radius: 10px; font-size: 13.5px; font-weight: 700; color: var(--vm-strong); text-decoration: none; background: var(--bg-card); white-space: nowrap; }
     .vm-back svg { width: 15px; height: 15px; }
 
@@ -150,26 +147,9 @@
 
     {{-- header --}}
     <div class="vm-head">
-        <div class="vm-head-l">
-            <span class="vm-head-ico">
-                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs><linearGradient id="vmClover" x1="10" y1="8" x2="38" y2="40"><stop stop-color="var(--brand, #a78bfa)"/><stop offset="1" stop-color="var(--brand-strong, #6d28d9)"/></linearGradient></defs>
-                    {{-- depth (offset darker clover) --}}
-                    <g fill="var(--brand-strong, #5b21b6)" opacity="0.55">
-                        <circle cx="25.5" cy="15.5" r="9"/><circle cx="25.5" cy="33.5" r="9"/><circle cx="16.5" cy="24.5" r="9"/><circle cx="34.5" cy="24.5" r="9"/>
-                    </g>
-                    {{-- main clover --}}
-                    <g fill="url(#vmClover)">
-                        <circle cx="24" cy="14" r="9"/><circle cx="24" cy="32" r="9"/><circle cx="15" cy="23" r="9"/><circle cx="33" cy="23" r="9"/>
-                    </g>
-                    <circle cx="24" cy="23" r="6" fill="var(--brand-strong, #7c3aed)"/>
-                    {{-- shine highlights --}}
-                    <circle cx="21" cy="11" r="2.4" fill="#fff" opacity="0.45"/>
-                    <circle cx="12.5" cy="20.5" r="2" fill="#fff" opacity="0.35"/>
-                </svg>
-            </span>
-            {{-- Title and subtitle are in the banner; they used to be repeated here too. --}}
-        </div>
+        {{-- The title and subtitle live in the page banner. When they were
+             removed from here the icon was left behind, floating alone above
+             the page with nothing beside it. --}}
         <a href="{{ route('ai-tools.budget-allocator') }}" class="vm-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to Toolkit</a>
     </div>
 

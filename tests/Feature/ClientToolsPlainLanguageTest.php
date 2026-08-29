@@ -73,4 +73,48 @@ class ClientToolsPlainLanguageTest extends TestCase
             }
         }
     }
+
+    /**
+     * Nothing should be left stranded when a heading is removed.
+     *
+     * The page header on Best Match was an icon beside a title. The heading
+     * sweep moved title and subtitle into the page banner and took them out of
+     * here — but left the icon, so the page opened with a purple blob floating
+     * alone above it, next to nothing.
+     *
+     * A decorative icon container that renders with no text beside it is the
+     * shape of that mistake, so this looks for one.
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('clientTools')]
+    public function test_no_icon_is_left_stranded_without_its_heading(string $route): void
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+
+        $html = $this->actingAs($admin->fresh())
+            ->get(route($route, ['preview' => 'maximum']))
+            ->assertSuccessful()
+            ->getContent();
+
+        // Regex cannot see nesting, so this walks the real DOM: find the icon
+        // wrapper, step up to its container, and read the text in it.
+        $dom = new \DOMDocument();
+        libxml_use_internal_errors(true);
+        $dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+        libxml_clear_errors();
+
+        $xpath = new \DOMXPath($dom);
+        $icons = $xpath->query("//*[contains(@class, 'head-ico')]");
+
+        foreach ($icons as $icon) {
+            $container = $icon->parentNode;
+            $text = trim(preg_replace('/\s+/', ' ', $container->textContent ?? ''));
+
+            $this->assertNotSame(
+                '',
+                $text,
+                "{$route} renders a header icon with no heading beside it — the text was removed and the icon was left behind."
+            );
+        }
+    }
 }
