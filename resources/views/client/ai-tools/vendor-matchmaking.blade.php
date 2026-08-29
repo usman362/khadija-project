@@ -211,10 +211,10 @@
                             <span class="vm-avatar" style="background:linear-gradient(135deg, {{ $v['grad'] }});">{{ $v['initials'] }}</span>
                             <div class="vm-match-main">
                                 <div class="vm-match-name">{{ $v['name'] }}</div>
-                                <div class="vm-stars" style="font-size:12.5px;color:var(--text-muted);">★ {{ number_format($v['rating'], 1) }} <span class="vm-reviews">({{ $v['reviews'] }} reviews)</span></div>
+                                <div class="vm-stars" style="font-size:12.5px;color:var(--text-muted);">@if($v['rating'])★ {{ number_format($v['rating'], 1) }} <span class="vm-reviews">({{ $v['reviews'] }} {{ Str::plural('review', $v['reviews']) }})</span>@else<span class="vm-reviews">No reviews yet</span>@endif</div>
                                 <div class="vm-tags">@foreach($v['tags'] as $t)<span class="vm-tag">{{ $t }}</span>@endforeach</div>
                             </div>
-                            <div class="vm-match-right"><span class="vm-match-price" style="margin-top:0;">${{ number_format($v['price']) }}</span></div>
+                            <div class="vm-match-right"><span class="vm-match-price" style="margin-top:0;">@if($v['price'])${{ number_format($v['price']) }}@else<span style="font-weight:600;color:var(--text-muted);">Rate on request</span>@endif</span></div>
                         </div>
                     </div>
                     @endforeach
@@ -239,9 +239,9 @@
             @unless($isManual)
             <div class="vm-card">
                 <div class="vm-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><b>Match Insights</b></div>
-                <div class="vm-ins"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><div><b>We analyzed <span id="vm-ins-analyzed">{{ $analyzed }}</span>+ vendors</b><p>To find the best matches for your event.</p></div></div>
-                <div class="vm-ins"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><b>Availability Confirmed</b><p>All matched vendors are available on {{ $event['date'] }}.</p></div></div>
-                <div class="vm-ins"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span><div><b>Budget Friendly</b><p>All matches fit within your ${{ number_format($event['budget']) }} budget.</p></div></div>
+                <div class="vm-ins"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><div><b>We looked at <span id="vm-ins-analyzed">{{ $analyzed }}</span> {{ Str::plural('professional', $analyzed) }}</b><p>Everyone in your state who can take this on.</p></div></div>
+                <div class="vm-ins"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><b>Availability not checked</b><p>@if($event['date'])Confirm {{ $event['date'] }} with each professional before you book.@else Confirm your date with each professional before you book.@endif</p></div></div>
+                <div class="vm-ins"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span><div><b>Budget</b><p>@if($event['budget'])Ranked against your ${{ number_format($event['budget']) }} budget. Anyone who hasn't published a rate is still shown.@else Set a budget on your event to rank by price.@endif</p></div></div>
             </div>
             @endunless
 
@@ -354,9 +354,9 @@
             return '<div class="vm-match"><div class="vm-match-top">'
                 + '<span class="vm-avatar" style="background:linear-gradient(135deg, ' + m.grad + ');">' + esc(m.initials) + '</span>'
                 + '<div class="vm-match-main"><div class="vm-match-name">' + esc(m.name) + '</div>'
-                + '<div class="vm-stars">' + stars(m.rating) + '<span class="vm-reviews">(' + m.reviews + ')</span></div>'
+                + '<div class="vm-stars">' + (m.rating ? stars(m.rating) + '<span class="vm-reviews">(' + m.reviews + ')</span>' : '<span class="vm-reviews">No reviews yet</span>') + '</div>'
                 + '<div class="vm-tags">' + tags + '</div></div>'
-                + '<div class="vm-match-right"><span class="vm-match-pct">' + m.match + '% Match</span><span class="vm-match-price">' + money(m.price) + '</span></div>'
+                + '<div class="vm-match-right"><span class="vm-match-pct">' + m.match + '% Match</span><span class="vm-match-price">' + (m.price ? money(m.price) : 'Rate on request') + '</span></div>'
                 + '</div><div class="vm-why"><b>Why matched?</b> ' + esc(m.why) + '</div>'
                 // Mirrors the Blade partial: a direct offer only for a real
                 // professional. Without this the control would disappear the
@@ -400,7 +400,9 @@
         let shown = 0;
         document.querySelectorAll('.vm-dir-row').forEach((row) => {
             const okCat = cat === 'all' || row.dataset.cat === cat;
-            const okBudget = maxB === 0 || parseInt(row.dataset.price, 10) <= maxB;
+            // A pro with no published rate is not filtered out by a budget.
+            const rowPrice = parseInt(row.dataset.price, 10);
+            const okBudget = maxB === 0 || !rowPrice || rowPrice <= maxB;
             const show = okCat && okBudget;
             row.style.display = show ? '' : 'none';
             if (show) shown++;

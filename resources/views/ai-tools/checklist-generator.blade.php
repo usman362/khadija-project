@@ -4,8 +4,9 @@
 @section('page-title', 'Smart Checklist')
 @section('page-subtitle', 'Your prioritised plan, budget and vendor status in one place')
 
-{{-- Smart Checklist (client). Planning command-center: priorities,
-     budget summary, vendor status, AI recommendations. Representative data. --}}
+{{-- Smart Checklist (client). Shows the client's own event, budget and booked
+     professionals, read from their records; the generator below builds a
+     checklist from what they enter. --}}
 
 @push('styles')
 <style>
@@ -119,7 +120,7 @@
         <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">Want this checklist built for you automatically? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:#15803d;font-weight:700;text-decoration:none;">Upgrade →</a></div>
     </div>
     @else
-    @php $pct = round($budget['spent'] / $budget['total'] * 100); @endphp
+    @php $pct = $snap->spentPercent(); @endphp
     {{-- Generator (Semi / Maximum) --}}
     <div class="cg-gen">
         <h3>🧩 Generate Your Checklist</h3>
@@ -168,6 +169,18 @@
         {{-- Row 226 — post it as a request: bidding, urgent, or a draft. --}}
         <x-post-as-request tool-key="checklist-generator" tool-name="Smart Checklist" form-id="cgForm" />
     </div>
+    {{-- The client's own planning, read from their own records. Anything with
+         no source in the data is not shown at all rather than invented. --}}
+    @if (! $snap->hasEvent())
+        <div class="cg-card" style="margin-top:18px; text-align:center; padding:28px 20px;">
+            <div style="font-size:30px; line-height:1;">🗓️</div>
+            <h4 style="margin:10px 0 6px; font-size:16px;">Nothing to show here yet</h4>
+            <p style="margin:0 0 14px; color:var(--muted,#64748b); font-size:14px;">
+                Once you post an event, your budget and the professionals you book appear here.
+            </p>
+            <a href="{{ route('client.post-event.choose') }}" class="cg-rbtn" style="text-decoration:none;">Post an event</a>
+        </div>
+    @else
     <div class="cg-stats">
         @foreach($stats as [$lbl, $val, $tone])
             <div class="cg-stat {{ $tone }}"><b>{{ $val }}</b><div class="l">{{ $lbl }}</div></div>
@@ -176,59 +189,63 @@
 
     <div class="cg-grid">
         <div>
-            {{-- Priorities --}}
             <div class="cg-card">
-                <div class="cg-card-hd">🎯 Upcoming Priorities</div>
-                @foreach($priorities as [$task, $pri, $due, $status])
-                    <div class="cg-task {{ $status }}">
-                        <span class="cg-check"></span>
-                        <span class="cg-tname">{{ $task }}</span>
-                        <span class="cg-pri {{ $pri }}">{{ $pri }}</span>
-                        <span class="cg-due">{{ $due }}</span>
-                    </div>
-                @endforeach
-            </div>
-
-            {{-- AI recommendations --}}
-            <div class="cg-card">
-                <div class="cg-card-hd">📋 Recommendations</div>
-                @foreach($recommendations as [$title, $desc, $cta])
-                    <div class="cg-rec">
-                        <div class="cg-rec-main"><h5>{{ $title }}</h5><p>{{ $desc }}</p></div>
-                        <button class="cg-rbtn">{{ $cta }}</button>
-                    </div>
-                @endforeach
+                <div class="cg-card-hd">🗓️ Your event</div>
+                <div style="padding:14px 16px;">
+                    <h5 style="margin:0 0 4px; font-size:15px;">{{ $snap->event->title ?: 'Untitled event' }}</h5>
+                    <p style="margin:0; color:var(--muted,#64748b); font-size:14px;">
+                        @if($snap->event->starts_at){{ $snap->event->starts_at->format('M j, Y') }}@endif
+                        @if($snap->event->location) · {{ $snap->event->location }}@endif
+                        @if($snap->event->guest_count) · {{ $snap->event->guest_count }} guests @endif
+                    </p>
+                </div>
             </div>
         </div>
 
-        {{-- Sidebar: budget + vendors --}}
         <aside>
             <div class="cg-card">
                 <div class="cg-card-hd">💰 Budget Summary</div>
                 <div class="cg-bud">
-                    <div class="cg-bud-top"><b>${{ number_format($budget['spent']) }}</b><span>of ${{ number_format($budget['total']) }} ({{ $pct }}%)</span></div>
-                    <div class="cg-bud-bar">
-                        @foreach($budget['lines'] as [$nm, $amt, $color])
-                            <i style="width: {{ round($amt/$budget['total']*100) }}%; background: {{ $color }};"></i>
-                        @endforeach
-                    </div>
-                    @foreach($budget['lines'] as [$nm, $amt, $color])
+                    @if($budget['total'])
+                        <div class="cg-bud-top">
+                            <b>${{ number_format($budget['spent']) }}</b>
+                            <span>of ${{ number_format($budget['total']) }}@if($pct !== null) ({{ $pct }}%)@endif</span>
+                        </div>
+                        <div class="cg-bud-bar">
+                            @foreach($budget['lines'] as [$nm, $amt, $color])
+                                <i style="width: {{ min(100, round($amt / $budget['total'] * 100)) }}%; background: {{ $color }};"></i>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="cg-bud-top"><b>${{ number_format($budget['spent']) }}</b><span>committed so far</span></div>
+                        <p style="margin:8px 0 0; color:var(--muted,#64748b); font-size:13px;">You haven't set a budget for this event, so there's nothing to measure it against.</p>
+                    @endif
+
+                    @forelse($budget['lines'] as [$nm, $amt, $color])
                         <div class="cg-line"><i style="background: {{ $color }};"></i><span class="nm">{{ $nm }}</span><b>${{ number_format($amt) }}</b></div>
-                    @endforeach
+                    @empty
+                        <p style="margin:10px 0 0; color:var(--muted,#64748b); font-size:13px;">Nothing committed yet.</p>
+                    @endforelse
                 </div>
             </div>
 
             <div class="cg-card">
                 <div class="cg-card-hd">🤝 Vendor Status</div>
-                @foreach($vendors as [$name, $cat, $status])
+                @forelse($vendors as $v)
                     <div class="cg-vd">
-                        <div class="cg-vd-main"><h6>{{ $name ?: 'Not booked yet' }}</h6><span>{{ $cat }}</span></div>
-                        <span class="cg-vst {{ $status === 'Confirmed' ? 'Confirmed' : ($status === 'Pending' ? 'Pending' : '') }}">{{ $status }}</span>
+                        <div class="cg-vd-main"><h6>{{ $v['name'] }}</h6><span>{{ $v['service'] }}</span></div>
+                        <span class="cg-vst {{ $v['status'] }}">{{ $v['status'] }}</span>
                     </div>
-                @endforeach
+                @empty
+                    <div style="padding:14px 16px; color:var(--muted,#64748b); font-size:14px;">
+                        No professionals booked yet.
+                        <a href="{{ route('public.browse') }}" style="color:var(--brand,#2563eb);">Browse professionals</a>
+                    </div>
+                @endforelse
             </div>
         </aside>
     </div>
+    @endif
     @endif
 </div>
 @endsection

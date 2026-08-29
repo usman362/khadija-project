@@ -24,28 +24,15 @@ class AiTimelineBuilderController extends Controller
             $level = $request->query('preview');
         }
 
+        // The timeline is built from the submitted event; nothing is pre-filled.
         return view('ai-tools.timeline-builder', [
             'aiLayout' => $aiLayout,
             'level'    => $level,
-            'stats' => [
-                ['Timeline Health', '96%', 'Excellent', 'good'],
-                ['Event Duration', '8h 00m', '5 PM – 1 AM', ''],
-                ['Vendors Scheduled', '12', 'All confirmed', ''],
-                ['Buffer Time Added', '1h 45m', 'of slack', 'good'],
-                ['Conflicts Detected', '2', 'Review needed', 'warn'],
-            ],
-            'hours' => ['5 PM', '6 PM', '7 PM', '8 PM', '9 PM', '10 PM', '11 PM', '12 AM', '1 AM'],
-            'tracks' => [
-                ['Setup', '#64748b', [['Venue Access', 0, 12], ['Vendor Load-in', 9, 16]]],
-                ['Ceremony', '#7c3aed', [['Guest Arrival', 18, 11], ['Ceremony', 28, 16]]],
-                ['Reception', '#f97316', [['Cocktail Hour', 44, 12], ['Dinner Service', 55, 17], ['Dancing', 71, 25]]],
-                ['Vendors', '#16a34a', [['Photographer', 14, 80], ['Catering Crew', 40, 38]]],
-                ['Music / DJ', '#2563eb', [['Sound Check', 38, 7], ['Live Set', 45, 51]]],
-            ],
-            'conflicts' => [
-                'Photographer overlaps DJ sound check at 8:00 PM — stagger by 15 min.',
-                'Catering breakdown runs into dancing — add a 20 min buffer.',
-            ],
+            // The two tabs (rows 197/224/225) are real and render empty until
+            // the client builds a timeline. They used to open onto a finished
+            // 12-vendor run-of-show for an event nobody had entered.
+            'tracks'   => [],
+            'hours'    => [],
         ]);
     }
 

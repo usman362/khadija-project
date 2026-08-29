@@ -38,23 +38,6 @@ class AiVendorMatchmakingController extends Controller
     public function __construct(private AiFeatureGate $gate) {}
 
     /** name, category, tags, price, rating, reviews, themes, base, why, grad. */
-    private const VENDORS = [
-        ['DJ Sunny Beats',          'DJ',          ['DJ', 'Beach Party'],      450, 4.5, 124, ['tropical', 'beach', 'party'],   98, 'Great reviews for beach & tropical vibes. Available on your date and fits your budget.', '#8b5cf6,#6d28d9'],
-        ['Coastal Dreams Decor',    'Decor',       ['Decor', 'Tropical'],      300, 4.5, 89,  ['tropical', 'beach', 'coastal'], 95, 'Specializes in tropical & coastal themes. Perfect for your event style.', '#10b981,#047857'],
-        ['Island Flavor Catering',  'Catering',    ['Catering', 'Seafood'],    550, 4.5, 156, ['tropical', 'beach', 'seafood'], 93, 'Known for fresh seafood & island menus. In budget and available.', '#f59e0b,#b45309'],
-        ['Palm Shore Photography',  'Photography', ['Photography', 'Outdoor'], 600, 4.6, 98,  ['beach', 'tropical', 'outdoor'], 92, 'Stunning outdoor & beach portfolios with top reviews.', '#ec4899,#be185d'],
-        ['Breeze Event Planning',   'Planning',    ['Planner', 'Full-Service'], 950, 4.8, 203, ['wedding', 'beach', 'party'],   91, 'Top-rated full-service planning for stress-free events.', '#8b5cf6,#6d28d9'],
-        ['Tropical Bloom Florist',  'Florist',     ['Florist', 'Decor'],       280, 4.4, 71,  ['tropical', 'beach', 'garden'],  90, 'Lush tropical florals that match your theme beautifully.', '#22c55e,#15803d'],
-        ['Sunset Live Band',        'Live Music',  ['Band', 'Party'],          800, 4.7, 142, ['party', 'beach', 'wedding'],    89, 'High-energy live sets perfect for a beach party.', '#6366f1,#4338ca'],
-        ['Aloha Bartending Co.',    'Bartending',  ['Bar', 'Cocktails'],       350, 4.5, 65,  ['tropical', 'beach', 'party'],   88, 'Tropical cocktails and friendly service within budget.', '#06b6d4,#0e7490'],
-        ['Mai Tai Mixologists',     'Bartending',  ['Bar', 'Tropical'],        420, 4.6, 80,  ['tropical', 'beach', 'cocktails'], 87, 'Signature tropical drinks crafted for your theme.', '#06b6d4,#0e7490'],
-        ['Seaside Cakes & Desserts','Catering',    ['Desserts', 'Cake'],       320, 4.5, 92,  ['beach', 'wedding', 'tropical'], 86, 'Showstopping themed cakes that fit your budget.', '#f59e0b,#b45309'],
-        ['Wave Sound DJs',          'DJ',          ['DJ', 'Wedding'],          520, 4.4, 110, ['wedding', 'party', 'beach'],    85, 'Versatile DJs with a strong wedding & party track record.', '#8b5cf6,#6d28d9'],
-        ['Horizon Videography',     'Videography', ['Video', 'Cinematic'],     700, 4.6, 67,  ['wedding', 'beach', 'tropical'], 84, 'Cinematic films capturing your beach celebration.', '#6366f1,#4338ca'],
-        ['Lagoon Lighting & AV',    'Lighting',    ['Lighting', 'AV'],         500, 4.3, 54,  ['party', 'beach', 'evening'],    83, 'Sets the perfect evening mood for beachfront events.', '#f97316,#c2410c'],
-        ['Cabana Rentals',          'Rentals',     ['Rentals', 'Furniture'],   400, 4.1, 38,  ['beach', 'tropical', 'outdoor'], 82, 'Beach cabanas and lounge furniture for that island feel.', '#14b8a6,#0f766e'],
-        ['Shoreline Photo Booth',   'Photo Booth', ['Photo Booth', 'Fun'],     250, 4.2, 47,  ['party', 'beach', 'fun'],        81, 'A fun, budget-friendly add-on guests will love.', '#ec4899,#be185d'],
-    ];
 
     public const MAX_BUDGET_OPTIONS = [300 => 'Up to $300', 600 => 'Up to $600', 1000 => 'Up to $1,000', 0 => 'Any Budget'];
 
@@ -64,13 +47,13 @@ class AiVendorMatchmakingController extends Controller
         // representative one so the tool still demos when the client has no events.
         [$event, $events, $selectedId] = $this->resolveEvent($request);
 
-        // REAL professionals first (ranked from the DB), topped up with the
-        // representative catalogue only if the live supplier pool is thin.
-        $kw = $this->keywords($event['theme'] . ' ' . ($event['keywords_extra'] ?? ''));
+        // Real professionals only. The list used to be topped up from a
+        // representative catalogue whenever fewer than five real ones matched.
+        // Those filler rows carried a name, a rating and a price and sat in the
+        // same list as real people — the only thing separating them was a
+        // missing button. A short honest list beats a padded one.
+        $kw  = $this->keywords($event['theme'] . ' ' . ($event['keywords_extra'] ?? ''));
         $all = $this->rankReal($kw, 'all', $event['budget'], 80);
-        if (count($all) < 5) {
-            $all = array_merge($all, $this->rank($kw, 'all', $event['budget'], 80));
-        }
 
         // Level drives the experience: Starter (browse the directory and
         // pick), Semi (ranked by the scoring rules, you refine), Maximum (the
@@ -117,7 +100,10 @@ class AiVendorMatchmakingController extends Controller
             ?? $events->first();
 
         if (! $selected) {
-            return [['theme' => 'Tropical Beach Party', 'date' => 'May 24, 2025', 'budget' => 1000], collect(), null];
+            // No event, no assumed one. This used to stand in "Tropical Beach
+            // Party" — invisible in the page, but it fed the keyword scoring and
+            // quietly tilted every match toward beach-themed professionals.
+            return [['theme' => '', 'date' => null, 'budget' => 0], collect(), null];
         }
 
         $theme = $selected->categories->pluck('name')->implode(' ') ?: $selected->title;
@@ -172,19 +158,28 @@ class AiVendorMatchmakingController extends Controller
                 continue;
             }
 
-            // Representative price when a pro hasn't set a rate (stable per pro).
+            // A price only when the pro actually set a rate. This used to
+            // invent one from the user id and print it beside a real person's
+            // name, where a client would read it as that pro's price.
             $price = $s->profile?->hourly_rate
                 ? (int) round($s->profile->hourly_rate * 4 / 50) * 50
-                : 300 + (($s->id * 137) % 8) * 100;
-            if ($maxBudget !== 0 && $price > $maxBudget) {
+                : null;
+
+            // Budget filters what it can price. A pro with no published rate is
+            // not silently dropped for being over a budget nobody knows.
+            if ($maxBudget !== 0 && $price !== null && $price > $maxBudget) {
                 continue;
             }
 
             // Skill/theme overlap drives the score; rating nudges it.
             $skillWords = array_map(fn ($x) => Str::lower((string) $x), $skills);
             $overlap = count(array_intersect($keywords, $skillWords));
-            $rating  = $s->reviews_avg ? round((float) $s->reviews_avg, 1) : round(4.3 + (($s->id % 6) * 0.1), 1);
-            $base    = 78 + min(15, $overlap * 6) + (int) round(($rating - 4.3) * 6);
+            // Null until somebody actually reviews them — never a seeded 4.3.
+            $rating  = $s->reviews_avg ? round((float) $s->reviews_avg, 1) : null;
+            // A professional with no reviews sits at the baseline. Scoring them
+            // BELOW it would drop every new pro under the 80% threshold and hide
+            // them from the client entirely — a silent ban for being new.
+            $base = 80 + min(15, $overlap * 6) + ($rating !== null ? (int) round(($rating - 4.3) * 6) : 0);
             $match   = (int) max(50, min(99, $base));
             if ($match < $minMatch) {
                 continue;
@@ -201,7 +196,9 @@ class AiVendorMatchmakingController extends Controller
                 'tags'      => array_slice($skills, 0, 3) ?: [$cat],
                 'price'     => $price,
                 'rating'    => $rating,
-                'reviews'   => (int) ($s->reviews_count ?: (20 + ($s->id * 7) % 180)),
+                // The real count, including zero. A pro with no reviews used
+                // to be given up to 180 of them.
+                'reviews'   => (int) $s->reviews_count,
                 'match'     => $match,
                 'available' => true,
                 'why'       => $why,
@@ -230,23 +227,25 @@ class AiVendorMatchmakingController extends Controller
      */
     private function directory(): array
     {
-        $rows = [];
-        foreach (self::VENDORS as [$name, $cat, $tags, $price, $rating, $reviews, $themes, $base, $why, $grad]) {
-            $rows[] = [
-                'name'     => $name,
-                'category' => $cat,
-                'tags'     => $tags,
-                'price'    => $price,
-                'rating'   => $rating,
-                'reviews'  => $reviews,
-                'grad'     => preg_match('/^#[0-9a-fA-F]{6},#[0-9a-fA-F]{6}$/', $grad) ? $grad : '#8b5cf6,#6d28d9',
-                'initials' => $this->initials($name),
-            ];
-        }
-
-        usort($rows, fn ($a, $b) => $b['rating'] <=> $a['rating']);
-
-        return $rows;
+        // Starter level: the client browses and picks for themselves. This used
+        // to list a catalogue of invented vendors — names, ratings and prices a
+        // client could compare and choose between, none of whom existed. It now
+        // lists real professionals the client is allowed to work with, and says
+        // plainly when it has nothing to show.
+        return array_map(
+            fn (array $r) => [
+                'name'     => $r['name'],
+                'category' => $r['category'],
+                'tags'     => $r['tags'] ?? '',
+                'price'    => $r['price'],
+                'rating'   => $r['rating'],
+                'reviews'  => $r['reviews'],
+                'grad'     => $r['grad'],
+                'initials' => $r['initials'],
+                'id'       => $r['id'] ?? null,
+            ],
+            $this->rankReal([], 'all', 0, 0)
+        );
     }
 
     public function match(Request $request): JsonResponse
@@ -269,10 +268,8 @@ class AiVendorMatchmakingController extends Controller
         $budget   = (int) ($data['max_budget'] ?? 1000);
         $minMatch = (int) ($data['min_match'] ?? 80);
 
+        // Real professionals only — see show().
         $all = $this->rankReal($this->keywords($theme), $category, $budget, $minMatch);
-        if (count($all) < 5) {
-            $all = array_merge($all, $this->rank($this->keywords($theme), $category, $budget, $minMatch));
-        }
         $matches = array_slice($all, 0, 3);
 
         $this->gate->recordUsage($request->user(), AiFeatureCode::VENDOR_MATCHMAKING);
@@ -287,57 +284,6 @@ class AiVendorMatchmakingController extends Controller
         ]);
     }
 
-    /**
-     * Score (theme-fit base, adjusted by current-theme overlap) + filter
-     * (category, budget, min-match) + rank the catalogue.
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    private function rank(array $keywords, string $category, int $maxBudget, int $minMatch): array
-    {
-        $ranked = [];
-        foreach (self::VENDORS as [$name, $cat, $tags, $price, $rating, $reviews, $themes, $base, $why, $grad]) {
-            if ($category !== 'all' && $cat !== $category) {
-                continue;
-            }
-            // Budget filter: only show vendors that fit (0 = any).
-            if ($maxBudget !== 0 && $price > $maxBudget) {
-                continue;
-            }
-
-            // Theme overlap adjusts the base score (drops vendors that don't
-            // fit a re-themed event).
-            $overlap = count(array_intersect($keywords, $themes));
-            $match   = $base;
-            if (! empty($keywords) && $overlap === 0) {
-                $match = max(55, $base - 24);
-            }
-            $match = (int) max(50, min(99, $match));
-
-            if ($match < $minMatch) {
-                continue;
-            }
-
-            $ranked[] = [
-                'name'      => $name,
-                'category'  => $cat,
-                'tags'      => $tags,
-                'price'     => $price,
-                'rating'    => $rating,
-                'reviews'   => $reviews,
-                'match'     => $match,
-                'available' => true,
-                'why'       => $why,
-                'grad'      => preg_match('/^#[0-9a-fA-F]{6},#[0-9a-fA-F]{6}$/', $grad) ? $grad : '#8b5cf6,#6d28d9',
-                'initials'  => $this->initials($name),
-            ];
-        }
-
-        usort($ranked, fn ($a, $b) => $b['match'] <=> $a['match'] ?: $b['rating'] <=> $a['rating']);
-
-        return $ranked;
-    }
-
     private function keywords(string $theme): array
     {
         $stop  = ['a', 'an', 'the', 'and', 'or', 'of', 'for', 'with', 'my', 'our', 'event'];
@@ -349,9 +295,17 @@ class AiVendorMatchmakingController extends Controller
         return array_values(array_unique($words));
     }
 
-    private function categoryList(): array
+    /**
+     * The filter offers only categories that are actually on the page. It used
+     * to list the invented catalogue's categories, so a client could filter to
+     * one and be told nothing matched.
+     *
+     * @param  array<int, array<string, mixed>>|null  $rows
+     */
+    private function categoryList(?array $rows = null): array
     {
-        $cats = array_values(array_unique(array_column(self::VENDORS, 1)));
+        $rows ??= $this->directory();
+        $cats = array_values(array_unique(array_filter(array_column($rows, 'category'))));
         sort($cats);
 
         return array_merge(['all' => 'All Categories'], array_combine($cats, $cats));

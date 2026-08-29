@@ -1,8 +1,10 @@
 {{-- Vendor match cards (server render; JS renderMatches() mirrors this). --}}
 @forelse($matches as $m)
     @php
-        $full = (int) floor($m['rating']);
-        $half = ($m['rating'] - $full) >= 0.5;
+        // A pro with no reviews has no rating — not a seeded 4.3.
+        $rating = $m['rating'] ?? null;
+        $full = (int) floor($rating ?? 0);
+        $half = $rating !== null && ($rating - $full) >= 0.5;
     @endphp
     <div class="vm-match">
         <div class="vm-match-top">
@@ -10,6 +12,9 @@
             <div class="vm-match-main">
                 <div class="vm-match-name">{{ $m['name'] }}</div>
                 <div class="vm-stars">
+                    @if($rating === null)
+                        <span class="vm-reviews">No reviews yet</span>
+                    @else
                     @for($i = 1; $i <= 5; $i++)
                         @if($i <= $full)
                             <svg viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -20,15 +25,15 @@
                         @endif
                     @endfor
                     <span class="vm-reviews">({{ $m['reviews'] }})</span>
+                    @endif
                 </div>
                 <div class="vm-tags">
                     @foreach($m['tags'] as $t)<span class="vm-tag">{{ $t }}</span>@endforeach
-                    @if($m['available'])<span class="vm-tag vm-tag-avail">Available</span>@endif
                 </div>
             </div>
             <div class="vm-match-right">
                 <span class="vm-match-pct">{{ $m['match'] }}% Match</span>
-                <span class="vm-match-price">${{ number_format($m['price']) }}</span>
+                <span class="vm-match-price">@if($m['price'])${{ number_format($m['price']) }}@else<span style="font-weight:600;color:var(--text-muted);">Rate on request</span>@endif</span>
             </div>
         </div>
         <div class="vm-why"><b>Why matched?</b> {{ $m['why'] }}</div>

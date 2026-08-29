@@ -165,11 +165,10 @@
         </div>
     </div>
 
-    <div class="tb-stats">
-        @foreach($stats as [$lbl, $val, $sub, $tone])
-            <div class="tb-stat {{ $tone }}"><b>{{ $val }}</b><div class="lbl">{{ $lbl }}</div><div class="sub">{{ $sub }}</div></div>
-        @endforeach
-    </div>
+    {{-- The stats strip that used to sit here reported a 96% Timeline Health,
+         12 vendors scheduled and 2 conflicts for an event nobody had entered.
+         Those figures had no source and are gone; the tabs below are real
+         features (rows 197, 224, 225) and stay. --}}
 
     {{-- Checklist rows 197, 224 and 225 — the two timeline views.
 
@@ -265,24 +264,62 @@
         </div>
     </div>
 
-    <div class="tb-card">
-        <h3>⚠️ Conflicts Detected (2)</h3>
-        @foreach($conflicts as $c)
-            <div class="tb-conflict"><span class="w">!</span> {{ $c }}</div>
-        @endforeach
-    </div>
-
+    {{-- A conflicts panel headed "Conflicts Detected (2)" stood here with a
+         hardcoded count, beside four buttons that were spans wired to nothing:
+         Auto-Schedule, What-If Simulator, Export Timeline and Start Live Event
+         Mode. Row 224 asks for Export, so Export is now a real control that
+         downloads the operational schedule; the other three made promises the
+         page could not keep and are gone until they can be. --}}
     <div class="tb-acts">
-        <span class="tb-btn primary">⚡ Auto-Schedule</span>
-        <span class="tb-btn">🔀 What-If Simulator</span>
-        <span class="tb-btn">⬇ Export Timeline</span>
-        <span class="tb-btn">▶ Start Live Event Mode</span>
+        <button type="button" class="tb-btn primary" id="tbDownload" disabled
+                title="Build a timeline first">⬇ Export Timeline</button>
     </div>
 </div>
 @endsection
 
 @push('scripts')
 <script>
+// Row 224 — the download control. It stays disabled until there is a schedule to
+// export, because a button that produces an empty file is worse than a button
+// that tells you it has nothing yet.
+(function () {
+    var btn = document.getElementById('tbDownload');
+    if (!btn) return;
+
+    function rows() {
+        return Array.from(document.querySelectorAll('.tb-sched tbody tr'))
+            .filter(function (tr) { return tr.querySelectorAll('td').length > 1; });
+    }
+
+    function refresh() {
+        var n = rows().length;
+        btn.disabled = n === 0;
+        btn.title = n === 0 ? 'Build a timeline first' : 'Download ' + n + ' rows as CSV';
+    }
+
+    btn.addEventListener('click', function () {
+        var data = rows().map(function (tr) {
+            return Array.from(tr.querySelectorAll('td')).slice(0, 5).map(function (td) {
+                return '"' + td.innerText.replace(/\s+/g, ' ').trim().replace(/"/g, '""') + '"';
+            }).join(',');
+        });
+        if (!data.length) return;
+
+        var csv = '"Time","Activity","Assigned To","Status","Notes"\n' + data.join('\n');
+        var url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'event-timeline.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+
+    refresh();
+    new MutationObserver(refresh).observe(document.body, { childList: true, subtree: true });
+})();
+
 // Rows 197/224/225 — switch the two timeline views. No toolbar on the second
 // tab: Export and Notifications already exist on this page and in the top nav.
 document.querySelectorAll('[data-tb-tab]').forEach(function (tab) {

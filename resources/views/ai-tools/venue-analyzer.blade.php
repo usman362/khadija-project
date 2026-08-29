@@ -209,75 +209,8 @@
         </div>
     </div>
 
-    <div class="va-hero">
-        <div>
-            <h2>🏛 {{ $venue['name'] }}</h2>
-            <div class="a">📍 {{ $venue['address'] }}</div>
-        </div>
-        <div class="va-kpis">
-            <div class="va-kpi"><b>{{ $venue['score'] }}%</b><span>Venue Score</span></div>
-            <div class="va-kpi"><b>{{ $venue['capacity'] }}</b><span>Capacity</span></div>
-            <div class="va-kpi"><b>{{ $venue['compatibility'] }}%</b><span>Compatibility</span></div>
-        </div>
-    </div>
-
-    <div class="va-summary">
-        @foreach($summary as [$lbl, $val, $tone])
-            <div class="va-sum"><b>{{ $val }}</b><div class="l">{{ $lbl }}</div><div class="va-sbar"><i style="width: {{ $val }}"></i></div></div>
-        @endforeach
-    </div>
-
-    <div class="va-grid">
-        <div>
-            {{-- Interactive map --}}
-            <div class="va-card">
-                <div class="va-card-hd">🗺 Interactive Venue Map</div>
-                <div class="va-map">
-                    @foreach($zones as [$label, $x, $y, $color])
-                        <div class="va-zone" style="left: {{ $x }}%; top: {{ $y }}%;"><i style="background: {{ $color }};"></i><span>{{ $label }}</span></div>
-                    @endforeach
-                </div>
-            </div>
-
-            {{-- Gap analysis --}}
-            <div class="va-card">
-                <div class="va-card-hd">🔍 Gap Analysis</div>
-                @foreach($gaps as [$cat, $tone, $detail, $rec])
-                    <div class="va-gap">
-                        <span class="cat"><span class="va-dot {{ $tone }}"></span> {{ $cat }}</span>
-                        <span class="d">{{ $detail }}</span>
-                        <span class="r">✨ {{ $rec }}</span>
-                    </div>
-                @endforeach
-            </div>
-
-            {{-- Required vendors --}}
-            <div class="va-card">
-                <div class="va-card-hd">🧩 Required Vendors & Services</div>
-                <div class="va-vendors">
-                    @foreach($vendors as [$name, $emoji])
-                        <div class="va-vd"><div class="e">{{ $emoji }}</div><span>{{ $name }}</span></div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-
-        {{-- Sidebar --}}
-        <aside class="va-rail">
-            <div class="va-pan va-score-ring">
-                <h4 style="justify-content:center;">Overall Venue Score</h4>
-                <b>{{ $venue['score'] }}</b><span>/ 100 — Excellent</span>
-            </div>
-            <div class="va-pan">
-                <h4>🚨 Alerts</h4>
-                @foreach($alerts as $a)<div class="va-alert">{{ $a }}</div>@endforeach
-            </div>
-            <div class="va-pan">
-                <h4>💸 Hidden Costs to Plan For</h4>
-                @foreach($hidden_costs as [$item, $cost])<div class="va-hc"><span>{{ $item }}</span><b>{{ $cost }}</b></div>@endforeach
-            </div>
-        </aside>
-    </div>
+    {{-- A worked analysis appears above once a venue is submitted. This page used to
+         open onto a finished report for a venue nobody entered. --}}
     @endif
 </div>
 @endsection

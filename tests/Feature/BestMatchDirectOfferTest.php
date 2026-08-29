@@ -86,25 +86,40 @@ class BestMatchDirectOfferTest extends TestCase
      * And the catalogue filler does not, because an offer addressed to
      * "Breeze Event Planning" would reach nobody.
      */
-    public function test_the_representative_catalogue_carries_no_offer_link(): void
+    /**
+     * There is no longer a representative catalogue to guard against.
+     *
+     * The shortlist used to be topped up from an invented vendor list whenever
+     * fewer than five real professionals matched. Those rows carried a name, a
+     * star rating, a review count and a price, and sat in the same list as real
+     * people; the only thing separating them was a missing offer button. This
+     * now asserts the stronger thing: every row is somebody real.
+     */
+    public function test_every_row_on_the_shortlist_is_a_real_professional(): void
     {
         $client = $this->user('client', 'MD');
 
-        $filler = array_filter(
-            $this->actingAs($client)->get(route('ai-tools.vendor-matchmaking'))
-                ->assertOk()->viewData('matches'),
-            fn ($m) => empty($m['id']),
-        );
+        $matches = $this->actingAs($client)->get(route('ai-tools.vendor-matchmaking'))
+            ->assertOk()->viewData('matches');
 
-        $this->assertNotEmpty($filler, 'with no live pros the shortlist should be filler');
+        foreach ($matches as $m) {
+            $this->assertNotEmpty(
+                $m['id'] ?? null,
+                "\"{$m['name']}\" is on the shortlist without being a real professional."
+            );
+            $this->assertDatabaseHas('users', ['id' => $m['id']]);
+        }
+    }
 
-        // Rendered in isolation on purpose: the page also carries the JS that
-        // builds this same anchor at runtime, so a whole-page assertion cannot
-        // tell a rendered link from the template for one.
-        $html = view('client.ai-tools._vendor_matches', ['matches' => array_values($filler)])->render();
+    /** With no professionals in the client's state, the shortlist is empty — not padded. */
+    public function test_an_empty_pool_produces_an_empty_shortlist(): void
+    {
+        $client = $this->user('client', 'MD');
 
-        $this->assertStringNotContainsString('direct-offers/create', $html);
-        $this->assertStringNotContainsString('vm-offer', $html);
+        $matches = $this->actingAs($client)->get(route('ai-tools.vendor-matchmaking'))
+            ->assertOk()->viewData('matches');
+
+        $this->assertSame([], array_values($matches));
     }
 
     /**

@@ -24,39 +24,47 @@ class AiChecklistGeneratorController extends Controller
             $level = $request->query('preview');
         }
 
+        $snap = \App\Support\ClientPlanningSnapshot::for($request->user());
+
+        // Only the figures that have a source. No invented health score, no
+        // invented task count — a number with nothing behind it is a lie the
+        // client cannot check.
+        $stats = [];
+        if (($days = $snap->daysToEvent()) !== null) {
+            $stats[] = ['Days to Event', (string) $days, ''];
+        }
+        if (($left = $snap->budgetRemaining()) !== null) {
+            $stats[] = ['Budget Remaining', '$' . number_format($left), $left >= 0 ? 'good' : 'bad'];
+        }
+        $stats[] = ['Pros Booked', (string) $snap->prosBooked, ''];
+
         return view('ai-tools.checklist-generator', [
             'aiLayout' => $aiLayout,
             'level'    => $level,
-            'stats' => [
-                ['Event Health', '93%', 'good'], ['Days to Event', '184', ''],
-                ['Budget Remaining', '$12,450', 'good'], ['Pros Booked', '6', ''],
-                ['Tasks', '82', ''],
+            'snap'     => $snap,
+            'stats'    => $stats,
+            'budget'   => [
+                'total' => $snap->budgetTotal,
+                'spent' => $snap->spent,
+                'lines' => $this->budgetLines($snap),
             ],
-            'priorities' => [
-                ['Book wedding photographer', 'High', 'May 20', 'todo'],
-                ['Finalize catering menu', 'High', 'May 28', 'todo'],
-                ['Confirm final guest count', 'Medium', 'Jun 5', 'progress'],
-                ['Choose wedding favors', 'Low', 'Jun 20', 'todo'],
-                ['Send invitations', 'Medium', 'Jun 1', 'progress'],
-            ],
-            'budget' => [
-                'total' => 25000, 'spent' => 12550,
-                'lines' => [
-                    ['Venue', 8000, '#7c3aed'], ['Catering', 6500, '#f97316'], ['Photography', 2500, '#16a34a'],
-                    ['Floral & Décor', 3000, '#ec4899'], ['Music / DJ', 1800, '#2563eb'], ['Attire', 2200, '#0ea5e9'], ['Misc', 1000, '#64748b'],
-                ],
-            ],
-            'vendors' => [
-                ['The Garden Estate', 'Venue', 'Confirmed'], ['Gourmet Eats Co.', 'Catering', 'Confirmed'],
-                ['Elite Events', 'Planning', 'Confirmed'], ['Blossom Floral', 'Floral', 'Pending'],
-                ['DJ Soundwave', 'Music', 'Pending'], ['', 'Photography', 'Not booked'],
-            ],
-            'recommendations' => [
-                ['Book photographer now', 'Top pros book out 6 months ahead — secure yours this week.', 'Find Pros'],
-                ['Consider a weekday', 'Shift to a Friday and save ~$1,800 across vendors.', 'Explore'],
-                ['Add live music', 'Couples who add a live set rate their reception 0.6★ higher.', 'Browse'],
-            ],
+            'vendors'  => $snap->vendors,
         ]);
+    }
+
+
+    /** Colours are presentation only; the names and amounts are the client's own. */
+    private function budgetLines(\App\Support\ClientPlanningSnapshot $snap): array
+    {
+        $palette = ['#7c3aed', '#f97316', '#16a34a', '#ec4899', '#2563eb', '#0ea5e9', '#64748b'];
+        $out = [];
+        $i = 0;
+        foreach ($snap->budgetLines as $name => $amount) {
+            $out[] = [$name, $amount, $palette[$i % count($palette)]];
+            $i++;
+        }
+
+        return $out;
     }
 
     /**

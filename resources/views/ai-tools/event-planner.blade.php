@@ -204,66 +204,65 @@
     {{-- Hero --}}
     <div class="ep-hero">
         <div class="ep-hero-top">
+        {{-- The client's own event, read from their records. Nothing here is
+             invented: no borrowed wedding, no vendor the client never chose. --}}
+        @if (! $snap->hasEvent())
+            <div class="ep-card" style="text-align:center; padding:28px 20px;">
+                <div style="font-size:30px; line-height:1;">🗓️</div>
+                <h4 style="margin:10px 0 6px; font-size:16px;">No event to plan yet</h4>
+                <p style="margin:0 0 14px; color:var(--text-muted,#64748b); font-size:14px;">
+                    Post an event and your dates, budget and booked professionals appear here.
+                </p>
+                <a href="{{ route('client.post-event.choose') }}" class="ep-rbtn" style="text-decoration:none;">Post an event</a>
+            </div>
+        @else
+        <div class="ep-head">
             <div>
-                <h2>{{ $event['name'] }}</h2>
-                <div class="meta">📅 {{ $event['date'] }} · 📍 {{ $event['location'] }} · 👥 {{ $event['guests'] }} guests · {{ $event['days_left'] }} days to go</div>
-            </div>
-            <div class="ep-prog"><b>{{ $event['progress'] }}%</b><span>Planned</span></div>
-        </div>
-        <div class="ep-bar"><i style="width: {{ $event['progress'] }}%"></i></div>
-    </div>
-
-    {{-- Phase timeline --}}
-    <div class="ep-phases">
-        @foreach($phases as $i => [$label, $state])
-            <div class="ep-phase {{ $state }}"><span class="ep-pdot">@if($state==='done')✓@else{{ $i+1 }}@endif</span><span>{{ $label }}</span></div>
-            @if(!$loop->last)<span class="ep-pline"></span>@endif
-        @endforeach
-    </div>
-
-    <div class="ep-grid">
-        {{-- Checklist --}}
-        <div class="ep-card">
-            <div class="ep-card-hd">✅ Smart Checklist · 6-Month Phase</div>
-            @foreach($tasks as [$name, $pri, $due, $status])
-                <div class="ep-task {{ $status }}">
-                    <span class="ep-check">@if($status==='done')✓@endif</span>
-                    <span class="ep-tname">{{ $name }}</span>
-                    <span class="ep-pri {{ $pri }}">{{ $pri }}</span>
-                    <span class="ep-due">{{ $due }}</span>
-                    <span class="ep-status {{ $status }}">{{ ['done'=>'Done','progress'=>'In Progress','todo'=>'To Do'][$status] }}</span>
+                <h2>{{ $snap->event->title ?: 'Untitled event' }}</h2>
+                <div class="meta">
+                    @if($snap->event->starts_at)📅 {{ $snap->event->starts_at->format('M j, Y') }}@endif
+                    @if($snap->event->location) · 📍 {{ $snap->event->location }}@endif
+                    @if($snap->event->guest_count) · 👥 {{ $snap->event->guest_count }} guests @endif
+                    @if($snap->daysToEvent() !== null) · {{ $snap->daysToEvent() }} days to go @endif
                 </div>
-            @endforeach
+            </div>
         </div>
 
-        {{-- Sidebar --}}
-        <aside class="ep-rail">
-            <div class="ep-pan">
-                <h4>📋 Recommendations</h4>
-                @foreach($recommendations as $r)<div class="ep-rec">{{ $r }}</div>@endforeach
-            </div>
-            <div class="ep-pan">
-                <h4>🛍 Marketplace Suggestions</h4>
-                @foreach($marketplace as [$name, $cat, $rating, $price])
-                    <div class="ep-mk">
-                        <span class="ep-mk-av">{{ strtoupper(substr($name,0,1)) }}</span>
-                        <div class="ep-mk-main"><h6>{{ $name }}</h6><span>{{ $cat }} · ★ {{ $rating }}</span></div>
-                        <span class="pr">{{ $price }}</span>
+        <div class="ep-grid">
+            <div class="ep-card">
+                <div class="ep-card-hd">🤝 Professionals you've booked</div>
+                @forelse($snap->vendors as $v)
+                    <div class="ep-vd" style="display:flex; justify-content:space-between; padding:10px 14px; border-bottom:1px solid var(--border,#e2e8f0);">
+                        <div><b>{{ $v['name'] }}</b><div style="font-size:13px; color:var(--text-muted,#64748b);">{{ $v['service'] }}</div></div>
+                        <span>{{ $v['status'] }}</span>
                     </div>
-                @endforeach
+                @empty
+                    <div style="padding:14px; color:var(--text-muted,#64748b); font-size:14px;">
+                        None booked yet.
+                    </div>
+                @endforelse
             </div>
-            <div class="ep-pan">
-                <h4>⏰ Upcoming Deadlines</h4>
-                @foreach($deadlines as [$task, $date, $tone])
-                    <div class="ep-dl"><span>{{ $task }}</span><span class="d {{ $tone }}">{{ $date }}</span></div>
-                @endforeach
-            </div>
-            <div class="ep-pan">
-                <h4>💡 Planning Tips</h4>
-                @foreach($tips as $t)<div class="ep-rec" style="padding-left:22px;">{{ $t }}</div>@endforeach
-            </div>
-        </aside>
-    </div>
+
+            <aside>
+                @if($suggested->isNotEmpty())
+                <div class="ep-card">
+                    <div class="ep-card-hd">✨ Professionals in your state</div>
+                    @foreach($suggested as $pro)
+                        <div style="padding:10px 14px; border-bottom:1px solid var(--border,#e2e8f0);">
+                            <b>{{ $pro->name }}</b>
+                            <div style="font-size:13px; color:var(--text-muted,#64748b);">{{ $pro->serviceCategories->first()?->name ?? 'Professional' }}</div>
+                        </div>
+                    @endforeach
+                </div>
+                @endif
+
+                <div class="ep-card">
+                    <div class="ep-card-hd">💡 Planning tips</div>
+                    @foreach($tips as $t)<div class="ep-rec" style="padding-left:22px;">{{ $t }}</div>@endforeach
+                </div>
+            </aside>
+        </div>
+        @endif
     @endif
 </div>
 @endsection
