@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Domain\Auth\Enums\RoleName;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -13,7 +14,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles, SoftDeletes;
@@ -292,6 +293,21 @@ class User extends Authenticatable
      * pros work in this category", replacing a name LIKE against free-text
      * skills that never matched.
      */
+    /**
+     * Both auth emails go out in the app's own template. Laravel's defaults are
+     * unbranded, and an unbranded first email is the one people report as
+     * phishing rather than click.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new \App\Notifications\Auth\VerifyEmailAddress());
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new \App\Notifications\Auth\ResetPasswordLink($token));
+    }
+
     public function serviceCategories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class)->withTimestamps();

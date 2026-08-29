@@ -348,7 +348,11 @@ Route::get('/faq', function () {
     return view('public.faq', compact('faqs', 'grouped'));
 })->name('public.faq');
 
-Auth::routes();
+// verify: true adds the email-confirmation routes. Whether a client is BLOCKED
+// until they confirm is a separate switch — config('emails.verification.required')
+// — because turning it on locks out every account that signed up before this
+// existed and never had an email_verified_at set.
+Auth::routes(['verify' => true]);
 
 // Post-registration welcome — the only place the service area is mentioned.
 // Registration itself never names the launch states (Peter, 2026-07-30).
