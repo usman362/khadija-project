@@ -107,15 +107,27 @@ class CategorySeeder extends Seeder
                 'slug'             => $slug,
             ]);
 
-            $cat->fill([
+            $attributes = [
                 'name'              => $r['name'],
                 'short_description' => $r['short_description'] ?? null,
                 'long_description'  => $r['long_description'] ?? null,
-                'thumbnail'         => $copyImage($r['image'] ?? null, 'thumbnails', $thumbDir),
-                'cover_image'       => $copyImage($r['cover_image'] ?? null, 'covers', $coverDir),
                 'icon'              => $r['icon'] ?? null,
                 'sort_order'        => (int) ($r['old_id'] ?? 0),
-            ]);
+            ];
+
+            /*
+             * The taxonomy file is reference data, but an existing picture is
+             * editorial content. A deploy may run `db:seed`; it must never
+             * replace a picture that someone uploaded in the admin with the
+             * repository's fallback image. New rows still receive the bundled
+             * artwork, so a clean install looks complete.
+             */
+            if (! $cat->exists) {
+                $attributes['thumbnail'] = $copyImage($r['image'] ?? null, 'thumbnails', $thumbDir);
+                $attributes['cover_image'] = $copyImage($r['cover_image'] ?? null, 'covers', $coverDir);
+            }
+
+            $cat->fill($attributes);
 
             if (! $cat->exists) {
                 // Import every category as active — the client wants the full
