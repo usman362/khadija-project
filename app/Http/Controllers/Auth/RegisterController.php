@@ -74,6 +74,8 @@ class RegisterController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'phone' => ['nullable', 'string', 'max:30'],
+            // The dialling code beside it. Was a fixed +1 nobody could change.
+            'phone_country_code' => ['nullable', 'string', 'in:' . implode(',', array_keys(config('geo.dial_codes', [])))],
             'agree' => ['accepted'],
 
             /*
@@ -155,7 +157,17 @@ class RegisterController extends Controller
 
         // Phone captured at signup (optional) — stored on the user.
         if (! empty($data['phone'])) {
-            $user->update(['phone' => $data['phone']]);
+            // Keep the code with the number. Storing the digits alone loses which
+            // country they belong to, and the form only ever showed +1 before —
+            // so a +44 number was saved looking like a US one.
+            $phone = trim((string) $data['phone']);
+            $code  = $data['phone_country_code'] ?? '+1';
+
+            if (! str_starts_with($phone, '+')) {
+                $phone = $code . ' ' . ltrim($phone, '0');
+            }
+
+            $user->update(['phone' => $phone]);
         }
 
         // Location as given, plus the eligibility answer. Everyone is stored —

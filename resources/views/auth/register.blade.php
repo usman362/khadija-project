@@ -125,8 +125,15 @@
         .rg-hint { font-size:12.5px; color:var(--muted); margin-top:7px; }
         .rg-err { color:#ef4444; font-size:12.5px; margin-top:6px; }
 
-        .rg-phone { display:grid; grid-template-columns:92px 1fr; gap:10px; }
-        .rg-cc { display:flex; align-items:center; justify-content:center; gap:7px; border:1.5px solid var(--line); border-radius:12px; background:#fff; font-size:14.5px; color:var(--ink); font-weight:600; }
+        .rg-phone { display:grid; grid-template-columns:132px 1fr; gap:10px; }
+        /* Now a real <select>, so it needs the field styling rather than the
+           flex centring a static div wanted. Its own chevron is drawn in,
+           because appearance:none removes the browser's. */
+        .rg-cc { width:100%; border:1.5px solid var(--line); border-radius:12px; background:#fff; font-size:14.5px; color:var(--ink); font-weight:600; font-family:inherit; padding:0 30px 0 12px; cursor:pointer;
+                 appearance:none; -webkit-appearance:none;
+                 background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+                 background-repeat:no-repeat; background-position:right 10px center; background-size:14px; }
+        .rg-cc:focus { outline:none; border-color:var(--brand); box-shadow:0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent); }
         .rg-phone .rg-input { padding-left:15px; }
 
         .rg-note { display:flex; align-items:center; gap:9px; margin-top:14px; background:var(--brand-soft); border-radius:11px; padding:12px 14px; font-size:13px; color:var(--brand-dark); grid-column:1 / -1; }
@@ -293,8 +300,18 @@
 
                     <div class="rg-field">
                         <label class="rg-label">Phone Number</label>
+                        {{-- The dialling code was a <div> reading "🇺🇸 +1". It looked
+                             like a dropdown, could not be changed, and we accept
+                             registrations from five countries — so a UK number was
+                             typed beside +1 and stored that way. --}}
                         <div class="rg-phone">
-                            <div class="rg-cc">🇺🇸 +1</div>
+                            <select name="phone_country_code"
+                                    class="rg-cc {{ $errors->has('phone_country_code') ? 'is-invalid' : '' }}"
+                                    aria-label="Country dialling code">
+                                @foreach(config('geo.dial_codes', []) as $code => $label)
+                                    <option value="{{ $code }}" @selected(old('phone_country_code', '+1') === $code)>{{ $label }}</option>
+                                @endforeach
+                            </select>
                             <input type="tel" name="phone" class="rg-input {{ $errors->has('phone') ? 'is-invalid' : '' }}" value="{{ old('phone') }}" placeholder="Enter your phone number">
                         </div>
                         @error('phone') <div class="rg-err">{{ $message }}</div> @enderror
@@ -527,5 +544,11 @@
     });
     @endif
 </script>
+
+{{-- This page extends no layout, so it never received the datepicker partial
+     the rest of the site includes. Date of birth was the browser's own
+     mm/dd/yyyy control, which looks nothing like the picker used everywhere
+     else. The partial upgrades any <input type="date"> on the page. --}}
+@include('partials._datepicker')
 </body>
 </html>

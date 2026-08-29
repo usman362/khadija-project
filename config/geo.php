@@ -86,6 +86,23 @@ return [
     ],
 
     /*
+    | Dialling codes offered beside the phone field at registration.
+    |
+    | The form used to print a fixed "🇺🇸 +1" in a <div> — it looked like a
+    | dropdown but could not be changed, so somebody registering from the UK
+    | typed their number next to the wrong code and it was stored that way.
+    | These cover the countries above; "Other" is why the list ends open.
+    */
+    'dial_codes' => [
+        '+1'  => '🇺🇸🇨🇦 +1',   // Canada shares +1; one flag would be wrong for half of them
+        '+44' => '🇬🇧 +44',
+        '+61' => '🇦🇺 +61',
+        '+92' => '🇵🇰 +92',
+        '+91' => '🇮🇳 +91',
+        '+971' => '🇦🇪 +971',
+    ],
+
+    /*
     | Radius matching (Q2 Option B, Q6 geodesic). A Professional without a
     | placed Service Origin keeps today's same-state list until they save one.
     */
