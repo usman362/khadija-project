@@ -203,54 +203,14 @@
         </div>
     </div>
 
-    {{-- Themes --}}
-    <div class="ta-sec">
-        <h3>✨ Your Theme Concepts</h3>
-        <div class="ta-themes">
-            @foreach($themes as [$name, $match, $desc, $img, $sw, $best])
-                <div class="ta-theme {{ $best ? 'best' : '' }}">
-                    <div class="ta-img">
-                        @if($best)<span class="ta-best">★ Best Match</span>@endif
-                        <span class="ta-match">{{ $match }}% Match</span>
-                        <img src="https://images.unsplash.com/{{ $img }}?w=420&q=70&auto=format&fit=crop" alt="{{ $name }}" loading="lazy">
-                    </div>
-                    <div class="ta-body">
-                        <h4>{{ $name }}</h4>
-                        <p>{{ $desc }}</p>
-                        <div class="ta-sw">@foreach($sw as $c)<i style="background: {{ $c }};"></i>@endforeach</div>
-                        <div class="ta-acts">
-                            <span class="ta-btn">View Details</span>
-                            <span class="ta-btn primary">Select Theme</span>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        </div>
-    </div>
-
-    {{-- Palette --}}
-    <div class="ta-sec">
-        <h3>🎨 Recommended Color Palette</h3>
-        <div class="ta-palette">
-            @foreach($palette as [$role, $hex, $label])
-                <div class="ta-pal">
-                    <div class="ta-pal-sw" style="background: {{ $hex }};"></div>
-                    <div class="ta-pal-info"><div class="role">{{ $role }}</div><h5>{{ $label }}</h5><code>{{ $hex }}</code></div>
-                </div>
-            @endforeach
-        </div>
-    </div>
-
-    {{-- Mood board --}}
-    <div class="ta-sec">
-        <h3>🖼 Mood Board</h3>
-        <div class="ta-cats">
-            @foreach($categories as $i => $c)<span class="ta-cat {{ $i===0 ? 'on' : '' }}">{{ $c }}</span>@endforeach
-        </div>
-        <div class="ta-mood">
-            @foreach($moodboard as $m)<img src="https://images.unsplash.com/{{ $m }}?w=240&q=65&auto=format&fit=crop" alt="" loading="lazy">@endforeach
-        </div>
-    </div>
+    {{-- Three finished theme concepts stood here — "Elegant Garden Romance"
+         at 98% Match, "Modern Luxury" at 95%, "Rustic Chic" at 92% — with a
+         Sage Green / Blush Pink palette and a wedding mood board, all
+         rendered before the client pressed anything. Ali set the primary
+         colour to red and the formality to Casual and still got sage green:
+         the match percentages were attached to nothing, and the palette was
+         not an answer to the question asked. The real one arrives above,
+         in #taOut, built from what the client actually chose. --}}
     @endif
 </div>
 @endsection

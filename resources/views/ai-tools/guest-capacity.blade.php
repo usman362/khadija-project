@@ -174,10 +174,48 @@
     </div>
 
 
-    {{-- A stats strip and a full dashboard stood here: 185 expected guests,
-         a 94% comfort score, a seating heatmap and a table plan, all for a
-         room nobody had entered. Results now appear only once the form is
-         submitted, drawn by the calculator from what the client typed. --}}
+    {{-- Where the result goes.
+
+         These containers used to arrive PRE-FILLED from the controller: 185
+         expected guests, a 94% comfort score, a seating heatmap and a table
+         plan, for a room nobody had entered. The figures are gone; the
+         containers stay, because this is what the calculator writes into.
+
+         Emptying them is not the same as deleting them — deleting them is what
+         broke the tool: the fetch succeeded, render() reached for #gcStats,
+         found nothing, and the client was shown "Network error. Please try
+         again." for a request that had worked. The whole panel is hidden until
+         there is a result to put in it. --}}
+    <div id="gcResult" hidden>
+        <div class="gc-stats" id="gcStats"></div>
+
+        <div class="gc-grid">
+            <div>
+                <div class="gc-card">
+                    <div class="gc-card-hd"><h3>📊 Capacity Insights</h3></div>
+                    <div class="gc-ins" id="gcInsights"></div>
+                </div>
+
+                <div class="gc-card">
+                    <div class="gc-card-hd"><h3>⚖️ Legal vs Comfort Capacity</h3></div>
+                    <div class="gc-bars">
+                        <div class="gc-cap">
+                            <div class="gc-cap-top" id="gcCapTop"></div>
+                            <div class="gc-track" id="gcTrack"></div>
+                        </div>
+                        <p style="font-size:12px;color:var(--text-muted);" id="gcCapNote"></p>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="gc-rail">
+                <div class="gc-pan">
+                    <h4>✨ Tips</h4>
+                    <div id="gcTips"></div>
+                </div>
+            </aside>
+        </div>
+    </div>
 
     <x-add-to-event tool-key="guest-capacity" tool-name="Guest Capacity Calculator" :event-id="request('event_id')" />
     {{-- Row 226 — post it as a request: bidding, urgent, or a draft. --}}
@@ -243,6 +281,7 @@
                 errEl.classList.add('on');
                 return;
             }
+            document.getElementById('gcResult')?.removeAttribute('hidden');
             render(data.result);
             if (window.aiAttachSet) window.aiAttachSet('Guest capacity · ' + ((data.result.capacity && data.result.capacity.comfort) || '') + ' comfortable', data.result);
         } catch (err) {
