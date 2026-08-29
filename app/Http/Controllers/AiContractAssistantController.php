@@ -27,8 +27,9 @@ class AiContractAssistantController extends Controller
             'aiLayout' => $aiLayout,
             'level'    => $level,
             'stats' => [
-                ['Clause Sections', '6', ''], ['Deposit Default', '30%', ''],
-                ['Cancellation Modes', '3', 'good'], ['Built-in', 'No API', 'good'],
+                ['Clause Sections', '6', ''],
+                ['Deposit Default', '30%', ''],
+                ['Cancellation Modes', '3', 'good'],
             ],
         ]);
     }

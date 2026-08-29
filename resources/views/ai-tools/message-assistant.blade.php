@@ -7,7 +7,7 @@
 @push('styles')
 <style>
     .ma { --ma: var(--brand, #0d9488); }
-    .ma-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+    .ma-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 18px; }
     .ma-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 16px; }
     .ma-stat b { display: block; font-size: 21px; font-weight: 800; color: var(--text-primary); line-height: 1; } .ma-stat.good b { color: #0d9488; } .ma-stat .l { font-size: 11.5px; color: var(--text-muted); margin-top: 6px; }
     .ma-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 18px; align-items: start; }

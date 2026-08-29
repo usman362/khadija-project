@@ -27,8 +27,9 @@ class AiMessageAssistantController extends Controller
             'aiLayout' => $aiLayout,
             'level'    => $level,
             'stats' => [
-                ['Message Purposes', '5', ''], ['Tone Options', '3', 'good'],
-                ['Drafts per Run', '2–3', 'good'], ['Built-in', 'No API', 'good'],
+                ['Message Purposes', '5', ''],
+                ['Tone Options', '3', 'good'],
+                ['Drafts each time', '2–3', 'good'],
             ],
         ]);
     }

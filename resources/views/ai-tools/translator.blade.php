@@ -2,12 +2,12 @@
 
 @section('title', 'Language')
 @section('page-title', 'Language')
-@section('page-subtitle', 'A built-in event phrasebook across five languages')
+@section('page-subtitle', 'Common event phrases in five languages')
 
 @push('styles')
 <style>
     .tr { --tr: var(--brand, #7c3aed); }
-    .tr-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+    .tr-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 18px; }
     .tr-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 16px; }
     .tr-stat b { display: block; font-size: 22px; font-weight: 800; color: var(--text-primary); line-height: 1; } .tr-stat.good b { color: #16a34a; } .tr-stat .l { font-size: 11.5px; color: var(--text-muted); margin-top: 6px; }
     .tr-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 18px; align-items: start; }
@@ -75,7 +75,7 @@
     <div class="tr-grid">
         <div class="tr-card">
             <h3>🌐 Phrase to translate</h3>
-            <div class="det">Built-in event phrasebook — try common booking phrases</div>
+            <div class="det">Common booking phrases — close wording still finds a match</div>
             <div class="tr-err" id="trErr"></div>
             <form id="trForm">
                 <textarea class="tr-text" name="text" required placeholder="e.g. Thank you for booking"></textarea>
@@ -94,7 +94,7 @@
             <h3>{{ $isSemi ? '✨ Suggested Translation' : '✨ Translation' }}</h3>
             <div class="det" id="trTargetDet">{{ $isSemi ? 'Edit the suggestion before you use it' : 'Pick a language and translate' }}</div>
             <div id="trOut"><p class="tr-empty">The translation and closest phrasebook matches will appear here.</p></div>
-            <p class="tr-note">Live translation of any free text activates once a translation service is configured. Until then, this built-in phrasebook covers the most common event phrases across five languages.</p>
+            <p class="tr-note">This covers the most common event phrases across five languages. Wording outside those phrases is not translated yet.</p>
         </div>
     </div>
     @endif

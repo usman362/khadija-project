@@ -32,8 +32,12 @@ class AiTranslatorController extends Controller
             'languages'  => self::LANGUAGES,
             'phrasebook' => self::phrasebook(),
             'stats' => [
-                ['Phrasebook', (string) count(self::phrasebook()), 'good'], ['Languages', '5', ''],
-                ['Match', 'Fuzzy', 'good'], ['Built-in', 'No API', 'good'],
+                // Plain English only. These tiles read "Fuzzy / Match" and
+                // "No API / Built-in" — how the tool is built, in developer's
+                // words, on a page a client reads.
+                ['Phrases', (string) count(self::phrasebook()), 'good'],
+                ['Languages', '5', ''],
+                ['Wording', 'Flexible', 'good'],
             ],
         ]);
     }
