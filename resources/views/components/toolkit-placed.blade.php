@@ -54,7 +54,12 @@
                             @foreach(array_slice($item->payload, 0, 6, true) as $k => $v)
                                 <div>
                                     <dt>{{ ucfirst(str_replace('_', ' ', (string) $k)) }}</dt>
-                                    <dd>{{ is_array($v) ? implode(', ', array_map('strval', $v)) : (string) $v }}</dd>
+                                    {{-- Was implode(', ', array_map('strval', $v)), which
+                                         assumes every element is a scalar. A tool that
+                                         saves a list of ROWS — a checklist, a timeline —
+                                         hands it an array of arrays, and strval() on an
+                                         array is fatal. It took a whole event page down. --}}
+                                    <dd>{{ \App\Support\PayloadPreview::line($v) }}</dd>
                                 </div>
                             @endforeach
                         </dl>
