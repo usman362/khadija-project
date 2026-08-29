@@ -64,6 +64,26 @@ class ClientReviewController extends Controller
                 ->orWhereHas('reviewee', fn ($rq) => $rq->where('name', 'like', "%{$s}%")));
         }
 
+        /*
+         * Date range. Three <button> elements sat above the search box with no
+         * form and no handler between them — the search worked, so the three
+         * beside it doing nothing read as the whole toolbar being broken.
+         */
+        $from = (string) $request->query('from', '');
+        $to   = (string) $request->query('to', '');
+
+        // Entered backwards is a typo, not an empty page.
+        if ($from !== '' && $to !== '' && $from > $to) {
+            [$from, $to] = [$to, $from];
+        }
+
+        if ($from !== '') {
+            $query->whereDate('created_at', '>=', $from);
+        }
+        if ($to !== '') {
+            $query->whereDate('created_at', '<=', $to);
+        }
+
         $reviews = $query->paginate(8)->withQueryString();
 
         // Bookings completed but not yet reviewed → "Pending Review Requests".
@@ -81,7 +101,7 @@ class ClientReviewController extends Controller
         $trust      = \App\Domain\Reviews\ReviewInsights::trust($user->id);
         $highlights = \App\Domain\Reviews\ReviewInsights::highlights($user->id);
 
-        return view('client.reviews.index', compact('stats', 'reviews', 'star', 'pendingReviews', 'trust', 'highlights'));
+        return view('client.reviews.index', compact('stats', 'reviews', 'star', 'pendingReviews', 'trust', 'highlights', 'from', 'to'));
     }
 
     /**

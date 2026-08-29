@@ -42,6 +42,14 @@
     .ea-search input { width: 100%; height: 40px; padding: 0 14px 0 38px; border-radius: 9px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 12.5px; outline: none; }
     .ea-search svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-muted); }
     .ea-tool-btn { height: 40px; padding: 0 14px; border-radius: 9px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+    /* The date pair and the status select. Same height and radius as the
+       search box beside them, so the toolbar reads as one row. */
+    .ea-tool-field { display: flex; align-items: center; gap: 7px; height: 40px; padding: 0 12px; border-radius: 9px; border: 1px solid var(--border-color); background: var(--bg-card); }
+    .ea-tool-field span { font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .3px; }
+    .ea-tool-field input { border: 0; background: transparent; color: var(--text-primary); font-family: inherit; font-size: 12.5px; outline: none; }
+    .ea-tool-select { height: 40px; padding: 0 12px; border-radius: 9px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-family: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+    .ea-tool-btn.solid { background: var(--brand, #f97316); border-color: transparent; color: #fff; cursor: pointer; }
+    .ea-tool-btn { display: inline-flex; align-items: center; text-decoration: none; cursor: pointer; }
     .ea-tool-btn svg { width: 13px; height: 13px; }
 
     /* Gateway mini cards */
@@ -133,12 +141,40 @@
         <div class="ea-stat"><div class="ea-stat-ico coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="ea-stat-label">Awaiting Acceptance</div><div class="ea-stat-value">${{ number_format($stats['awaiting'], 0) }}</div><div class="ea-stat-sub">Sent, not yet accepted</div></div></div>
     </div>
 
-    {{-- Toolbar --}}
-    <div class="ea-toolbar">
-        <div class="ea-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input placeholder="Search transactions, vendors, or invoices..."></div>
-        <button class="ea-tool-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>Date Range</button>
-        <button class="ea-tool-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filter</button>
-    </div>
+    {{-- Toolbar.
+
+         This was a search box that did nothing when you typed in it and two
+         buttons — "Date Range" and "Filter" — that were <button> elements with
+         no form and no handler. It is a real GET form now; the server reads
+         every one of these. --}}
+    <form method="GET" action="{{ route('client.spending.index') }}" class="ea-toolbar">
+        <div class="ea-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input name="q" value="{{ $filters['q'] }}" placeholder="Search a professional, event or note...">
+        </div>
+
+        <label class="ea-tool-field">
+            <span>From</span>
+            <input type="date" name="from" value="{{ $filters['from'] }}" aria-label="From date">
+        </label>
+        <label class="ea-tool-field">
+            <span>To</span>
+            <input type="date" name="to" value="{{ $filters['to'] }}" aria-label="To date">
+        </label>
+
+        <select name="status" class="ea-tool-select" aria-label="Filter by status">
+            <option value="">Any status</option>
+            @foreach($statuses as $s)
+                <option value="{{ $s }}" @selected($filters['status'] === $s)>{{ ucfirst(str_replace('_', ' ', $s)) }}</option>
+            @endforeach
+        </select>
+
+        <button type="submit" class="ea-tool-btn solid">Apply</button>
+
+        @if($filters['q'] || $filters['status'] || $filters['from'] || $filters['to'])
+            <a href="{{ route('client.spending.index') }}" class="ea-tool-btn">Clear</a>
+        @endif
+    </form>
 
     {{--
         Three "gateway" cards stood here. All three were removed on
@@ -262,13 +298,6 @@
         </div>
     </div>
 
-    {{-- Quick Actions --}}
-    <div class="ea-rail-card">
-        <div class="ea-rail-title" style="margin-bottom:10px;">Quick Actions</div>
-        <div class="ea-qa-grid">
-            <a href="{{ route('client.search.index') }}" class="ea-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Vendor</a>
-        </div>
-    </div>
 </aside>
 </div>{{-- /.ea-layout --}}
 @endsection

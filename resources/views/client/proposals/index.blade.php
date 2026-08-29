@@ -39,6 +39,14 @@
     .pr-search input { width: 100%; height: 40px; padding: 0 14px 0 38px; border-radius: 9px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 13px; outline: none; font-family: inherit; }
     .pr-search svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--text-muted); pointer-events: none; }
     .pr-tool-btn { height: 40px; padding: 0 14px; border-radius: 9px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+    /* The date pair that replaced the two dead buttons. Same height as the
+       search beside it so the toolbar stays one row. */
+    .pr-daterange { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .pr-daterange label { display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 11px; border-radius: 9px; border: 1px solid var(--border-color); background: var(--bg-card); }
+    .pr-daterange label span { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .3px; }
+    .pr-daterange input { border: 0; background: transparent; color: var(--text-primary); font-family: inherit; font-size: 12.5px; outline: none; }
+    .pr-tool-btn.solid { background: var(--brand, #f97316); border-color: transparent; color: #fff; }
+    a.pr-tool-btn { display: inline-flex; align-items: center; text-decoration: none; }
     .pr-tool-btn svg { width: 14px; height: 14px; }
 
     .pr-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
@@ -155,8 +163,18 @@
             <input type="search" name="search" value="{{ request('search') }}" placeholder="Search proposals by event title, client, or keywords...">
             <input type="hidden" name="tab" value="{{ $tab }}">
         </form>
-        <button class="pr-tool-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filters</button>
-        <button class="pr-tool-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>Date Range</button>
+        {{-- "Filters" and "Date Range" were <button> elements with no form and
+             no handler, sitting beside a search box that worked. --}}
+        <form method="GET" class="pr-daterange">
+            <input type="hidden" name="tab" value="{{ $tab }}">
+            @if(request('search'))<input type="hidden" name="search" value="{{ request('search') }}">@endif
+            <label><span>From</span><input type="date" name="from" value="{{ $from }}" aria-label="Proposals from date"></label>
+            <label><span>To</span><input type="date" name="to" value="{{ $to }}" aria-label="Proposals to date"></label>
+            <button type="submit" class="pr-tool-btn solid">Apply</button>
+            @if($from || $to)
+                <a class="pr-tool-btn" href="{{ route('client.proposals.index', ['tab' => $tab]) }}">Clear</a>
+            @endif
+        </form>
     </div>
 
     {{-- Proposals table --}}

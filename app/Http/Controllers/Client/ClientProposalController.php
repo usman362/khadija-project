@@ -62,6 +62,27 @@ class ClientProposalController extends Controller
             default       => null,
         };
 
+        /*
+         * Date range. "Filters" and "Date Range" sat beside the search box as
+         * <button> elements with no form and no handler — the search worked and
+         * the two next to it did nothing, which reads as the whole toolbar
+         * being broken.
+         */
+        $from = (string) $request->query('from', '');
+        $to   = (string) $request->query('to', '');
+
+        // Entered backwards is a typo, not an empty page.
+        if ($from !== '' && $to !== '' && $from > $to) {
+            [$from, $to] = [$to, $from];
+        }
+
+        if ($from !== '') {
+            $query->whereDate('submitted_at', '>=', $from);
+        }
+        if ($to !== '') {
+            $query->whereDate('submitted_at', '<=', $to);
+        }
+
         if ($request->filled('search')) {
             $s = $request->string('search')->toString();
             $query->where(fn ($q) => $q
@@ -83,7 +104,7 @@ class ClientProposalController extends Controller
             'total'          => $pendingValue + $acceptedValue,
         ];
 
-        return view('client.proposals.index', compact('stats', 'proposals', 'tab', 'pipeline'));
+        return view('client.proposals.index', compact('stats', 'proposals', 'tab', 'pipeline', 'from', 'to'));
     }
 
     /**

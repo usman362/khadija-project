@@ -26,6 +26,9 @@ use Illuminate\View\View;
  */
 class ClientFinanceController extends Controller
 {
+    /** Statuses a booking can actually hold — anything else is ignored, not queried. */
+    private const SPEND_STATUSES = ['requested', 'pending', 'confirmed', 'accepted', 'in_progress', 'completed', 'cancelled', 'declined'];
+
     /**
      * The column a booking's money actually lives in.
      *
@@ -38,6 +41,34 @@ class ClientFinanceController extends Controller
      * `price` is checked first and is the real answer; the two legacy names
      * are kept behind it only so an older schema still resolves.
      */
+    /**
+     * What the client asked for, cleaned up.
+     *
+     * Every value is echoed back into the form, so a filter that found nothing
+     * still shows what was searched for — a page that silently forgets the
+     * search is how you conclude the filter is broken.
+     *
+     * @return array{q: ?string, status: ?string, from: ?string, to: ?string}
+     */
+    private function filters(Request $request): array
+    {
+        $status = (string) $request->query('status', '');
+        $from   = (string) $request->query('from', '');
+        $to     = (string) $request->query('to', '');
+
+        // A range entered backwards is a typo, not an empty result set.
+        if ($from !== '' && $to !== '' && $from > $to) {
+            [$from, $to] = [$to, $from];
+        }
+
+        return [
+            'q'      => trim((string) $request->query('q', '')) ?: null,
+            'status' => in_array($status, self::SPEND_STATUSES, true) ? $status : null,
+            'from'   => $from !== '' ? $from : null,
+            'to'     => $to !== '' ? $to : null,
+        ];
+    }
+
     private function priceColumn(): ?string
     {
         foreach (['price', 'total_amount', 'agreed_price'] as $col) {
@@ -203,9 +234,33 @@ class ClientFinanceController extends Controller
         $user = $request->user();
         $s    = $this->spend($user->id);
 
-        // Itemized vendor expense matrix.
+        /*
+         * Itemized vendor expense matrix, filtered.
+         *
+         * The toolbar above it — a search box and two buttons — was decoration:
+         * neither button had a form or a handler, and nothing on this page ever
+         * read a query parameter. A client with forty bookings could see them
+         * only eight at a time, in one order, with a search box that did
+         * nothing when they typed in it.
+         */
+        $filters = $this->filters($request);
+
         $query = Booking::where('client_id', $user->id)
             ->with(['event:id,title', 'supplier:id,name,avatar', 'supplier.profile:id,user_id,headline'])
+            ->when($filters['q'], function ($qr) use ($filters) {
+                $term = '%' . $filters['q'] . '%';
+
+                // Whatever the row shows, they can search: the professional,
+                // the service, or the event it belongs to.
+                $qr->where(function ($w) use ($term) {
+                    $w->whereHas('supplier', fn ($u) => $u->where('name', 'like', $term))
+                      ->orWhereHas('event', fn ($e) => $e->where('title', 'like', $term))
+                      ->orWhere('notes', 'like', $term);
+                });
+            })
+            ->when($filters['status'], fn ($qr) => $qr->where('status', $filters['status']))
+            ->when($filters['from'], fn ($qr) => $qr->whereDate('created_at', '>=', $filters['from']))
+            ->when($filters['to'], fn ($qr) => $qr->whereDate('created_at', '<=', $filters['to']))
             ->latest();
 
         $vendors = $query->paginate(8)->withQueryString();
@@ -256,7 +311,7 @@ class ClientFinanceController extends Controller
             ->latest('starts_at')->first();
 
         return view('client.finance.spending', compact(
-            'stats', 'vendors', 'pipeline', 'trend', 'activeEvent'
-        ));
+            'stats', 'vendors', 'pipeline', 'trend', 'activeEvent', 'filters'
+        ) + ['statuses' => self::SPEND_STATUSES]);
     }
 }

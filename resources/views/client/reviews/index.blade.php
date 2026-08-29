@@ -41,6 +41,13 @@
     /* Toolbar */
     .rv-toolbar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
     .rv-tool-btn { height: 38px; padding: 0 13px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+    /* The date pair that replaced the three dead buttons. */
+    .rv-daterange { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .rv-daterange label { display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 11px; border-radius: 9px; border: 1px solid var(--border-color); background: var(--bg-card); }
+    .rv-daterange label span { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .3px; }
+    .rv-daterange input { border: 0; background: transparent; color: var(--text-primary); font-family: inherit; font-size: 12.5px; outline: none; }
+    .rv-tool-btn.solid { background: var(--brand, #f97316); border-color: transparent; color: #fff; }
+    a.rv-tool-btn { display: inline-flex; align-items: center; text-decoration: none; }
     .rv-tool-btn svg { width: 13px; height: 13px; }
     .rv-search { position: relative; flex: 1; min-width: 200px; }
     .rv-search input { width: 100%; height: 38px; padding: 0 14px 0 36px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 12.5px; outline: none; font-family: inherit; }
@@ -160,9 +167,18 @@
 
     {{-- Toolbar --}}
     <div class="rv-toolbar">
-        <button class="rv-tool-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/></svg>All Event Types</button>
-        <button class="rv-tool-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/></svg>All Categories</button>
-        <button class="rv-tool-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filters</button>
+        {{-- Three <button> elements stood here with no form and no handler
+             between them, beside a search box that worked. --}}
+        <form method="GET" class="rv-daterange">
+            @if(request('search'))<input type="hidden" name="search" value="{{ request('search') }}">@endif
+            @if($star)<input type="hidden" name="star" value="{{ $star }}">@endif
+            <label><span>From</span><input type="date" name="from" value="{{ $from }}" aria-label="Reviews from date"></label>
+            <label><span>To</span><input type="date" name="to" value="{{ $to }}" aria-label="Reviews to date"></label>
+            <button type="submit" class="rv-tool-btn solid">Apply</button>
+            @if($from || $to)
+                <a class="rv-tool-btn" href="{{ route('client.reviews.index') }}">Clear</a>
+            @endif
+        </form>
         <form method="GET" class="rv-search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input type="search" name="search" value="{{ request('search') }}" placeholder="Search reviews...">
