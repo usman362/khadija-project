@@ -235,7 +235,7 @@
                                      the page it opens lists all 27 categories with
                                      these ones marked. So the card promised 17 and
                                      delivered 27, and the word was wrong as well. --}}
-                                {{ $et['recommended'] }} recommended {{ \Illuminate\Support\Str::plural('category', $et['recommended']) }}
+                                {{ $et['recommended'] }} of {{ $et['of_total'] }} categories recommended
                             </div>
                         </div>
                         <span class="et-all-arw">›</span>

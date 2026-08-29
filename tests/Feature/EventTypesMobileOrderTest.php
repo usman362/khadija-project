@@ -60,6 +60,9 @@ class EventTypesMobileOrderTest extends TestCase
 
         $this->assertStringNotContainsString('services available', $html,
             'The card still calls a count of service categories a count of services.');
-        $this->assertStringContainsString('recommended categor', $html);
+
+        // Both numbers, so the page it opens is no surprise: the card quotes the
+        // recommended count and that page lists every category.
+        $this->assertMatchesRegularExpression('/\d+ of \d+ categories recommended/', $html);
     }
 }

@@ -105,7 +105,16 @@
                      archetype ranks each service category Essential, Common or
                      Occasional. Everything stays on the page — a tier is a
                      ranking, not a permission. --}}
-                <p class="etl-sec-p">Most relevant first, based on what this kind of event usually needs.</p>
+                @php $recommended = collect($services)->whereNotNull('tier')->count(); @endphp
+                {{-- Says the same two numbers the card said. The card quoted the
+                     recommended count and this page listed every category, so
+                     "17" opened onto 27 tiles and the visitor was left asking
+                     why. Both numbers, in one sentence, on the page itself. --}}
+                <p class="etl-sec-p">
+                    All {{ count($services) }} categories are here.
+                    <strong>{{ $recommended }}</strong> are recommended for a {{ $category->name }} and are listed first —
+                    the rest are still available if you need them.
+                </p>
 
                 <div class="etl-grid">
                     @foreach($services as $svc)

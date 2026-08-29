@@ -56,12 +56,24 @@ class EventTypeController extends Controller
         $group = (string) request()->query('group', '');
         $group = $chips->has($group) ? $group : '';
 
+        /*
+         * How many service categories exist at all. The card quotes the
+         * recommended count, and the page it opens lists EVERY category with the
+         * recommended ones tagged — so a card saying "17" opened onto 27 tiles
+         * and the two numbers looked unrelated. Quoting both explains the page
+         * before the visitor gets there.
+         */
+        $totalCategories = \App\Models\Category::active()
+            ->where('kind', \App\Models\Category::SERVICE_CATEGORY)
+            ->count();
+
         $card = fn ($c) => [
             'name'        => $c->name,
             'slug'        => $c->slug,
             'image'       => $c->imageUrl(),
             'own_image'   => $c->hasOwnImage(),
             'recommended' => count($tiers[$c->archetype] ?? []),
+            'of_total'    => $totalCategories,
         ];
 
         $wall = \App\Models\Category::active()
