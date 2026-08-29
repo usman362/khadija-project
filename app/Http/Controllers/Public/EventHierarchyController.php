@@ -86,7 +86,7 @@ class EventHierarchyController extends Controller
     private static function emptyReason(int $level): string
     {
         return $level === 4
-            ? 'No specific components are listed for this service in the source.'
+            ? 'No service specialties are listed for this service in the source.'
             : 'Nothing is listed under this selection in the source.';
     }
 }

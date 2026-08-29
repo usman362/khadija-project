@@ -160,7 +160,7 @@ class EventHierarchyTest extends TestCase
             ->assertOk();
 
         $this->assertSame([], $response->json('options'));
-        $this->assertStringContainsString('No specific components', $response->json('empty_reason'));
+        $this->assertStringContainsString('No service specialties', $response->json('empty_reason'));
     }
 
     public function test_the_page_states_how_deep_the_live_tree_actually_goes(): void
@@ -189,20 +189,20 @@ class EventHierarchyTest extends TestCase
 
     // ── Level 4, once the list exists ────────────────────────────
 
-    public function test_a_component_fills_level_four_and_the_page_stops_saying_three(): void
+    public function test_a_specialty_fills_level_four_and_the_page_stops_saying_three(): void
     {
         /*
-         * Level 4 — the sub-subcategory, the actual service a client books —
-         * is being drawn up (Peter, 2026-08-20). Nothing carries it yet, so
-         * this proves the cascade is waiting on the list and not on code: add
-         * one component and the fourth level fills.
+         * Level 4 — the Service Specialty, a narrower way of doing the level 3
+         * service (Peter, 2026-08-29). Level 3 is being finalised first, so
+         * nothing carries it yet. This proves the cascade is waiting on the
+         * list and not on code: add one specialty and the fourth level fills.
          */
         $this->assertSame(3, EventHierarchy::depth());
 
         Category::create([
             'name' => 'Three-Tier Buttercream',
             'slug' => 'three-tier-buttercream-eh',
-            'kind' => Category::COMPONENT,
+            'kind' => Category::SERVICE_SPECIALTY,
             'parent_id' => $this->cakes->id,
             'taxonomy_version' => 'v2',
             'is_active' => true,
@@ -218,22 +218,23 @@ class EventHierarchyTest extends TestCase
         $this->get('/event-hierarchy')->assertOk()->assertDontSee('Level 4 stays');
     }
 
-    public function test_the_importer_files_a_component_under_the_right_service(): void
+    public function test_the_importer_files_a_specialty_under_the_right_service(): void
     {
         /*
          * Service names repeat across categories — "Consultation" sits under
-         * several — so a component is matched on category AND service. Matching
+         * several — so a specialty is matched on category AND service. Matching
          * on the service name alone would file it under whichever one happened
          * to import first.
          */
         $reflection = new \ReflectionClass(\App\Console\Commands\ImportTaxonomyV2::class);
 
-        $this->assertTrue($reflection->hasMethod('importComponents'),
+        $this->assertTrue($reflection->hasMethod('importSpecialties'),
             'the importer cannot take the level 4 list when it arrives');
 
         $source = file_get_contents($reflection->getFileName());
 
-        $this->assertStringContainsString("\$data['components'] ?? []", $source,
-            'a sheet without components must still import cleanly');
+        // The sheet may say either; a sheet with neither must still import.
+        $this->assertStringContainsString("\$data['specialties'] ?? \$data['components'] ?? []", $source,
+            'a sheet without specialties must still import cleanly');
     }
 }

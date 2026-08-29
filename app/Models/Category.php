@@ -39,14 +39,29 @@ class Category extends Model
      * The four kinds of row in the v2 tree.
      *
      * Level 1 event type → level 2 service category → level 3 service → level 4
-     * component, which is the actual thing a client books. COMPONENT is
-     * declared but nothing carries it yet: the list is being drawn up (Peter,
-     * 2026-08-20). The importer accepts them the moment the sheet has them.
+     * SERVICE SPECIALTY. A specialty is a narrower way of doing the level 3
+     * service — level 3 "DJ" carries "Wedding DJ", "Party DJ", "Corporate DJ",
+     * "Karaoke DJ". Only where the specialization is meaningful: a level 3
+     * service is not required to have any (Peter, 2026-08-29).
+     *
+     * These were briefly called "components", and before that "keywords". The
+     * keyword name is the one that caused trouble, because it read as the paid
+     * Search Visibility feature and invited a second list of the same terms.
+     * There is ONE list. A specialty is stored here once; paid Search
+     * Visibility REFERENCES eligible specialties, it does not copy them.
+     *
+     *   Level 4 Service Specialty  = taxonomy and matching
+     *   Search Visibility Keywords = the paid ranking feature, which points at
+     *                                eligible specialty rows
+     *
+     * Nothing carries SERVICE_SPECIALTY yet: level 3 is being finalised first,
+     * then the specialties are built underneath it. The importer accepts them
+     * the moment the sheet has them.
      */
     public const EVENT_TYPE = 'event_type';
     public const SERVICE_CATEGORY = 'service_category';
     public const SERVICE = 'service';
-    public const COMPONENT = 'component';
+    public const SERVICE_SPECIALTY = 'service_specialty';
 
     /**
      * Two category trees live in this table at once — the original one and Sir
