@@ -172,6 +172,8 @@ class ClientChatController extends Controller
                 'size'     => $this->size($a->file_size),
                 'url'      => route('attachments.download', $a),
                 'is_image' => $a->isImage(),
+                'kind'     => $a->kind,
+                'mime'     => $a->mime_type,
             ])->all(),
         ])->values()->all();
 

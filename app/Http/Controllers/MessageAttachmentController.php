@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class MessageAttachmentController extends Controller
@@ -18,8 +19,15 @@ class MessageAttachmentController extends Controller
         'application/pdf',
         'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'video/mp4', 'video/webm',
+        'video/mp4', 'video/webm', 'video/quicktime',
+        // Audio was refused outright. A voice note is the most natural thing to
+        // send a professional about a venue, and it was the one thing that could
+        // not be sent at all. m4a is what an iPhone records.
+        'audio/mpeg', 'audio/mp4', 'audio/x-m4a', 'audio/aac', 'audio/wav', 'audio/x-wav', 'audio/webm', 'audio/ogg',
     ];
+
+    /** For the file picker, so nothing is chosen that will only be refused later. */
+    public const ACCEPT_ATTRIBUTE = 'image/*,audio/*,video/mp4,video/webm,video/quicktime,application/pdf,.doc,.docx,.xls,.xlsx';
 
     /**
      * Upload a file attachment (not yet linked to a message).
@@ -35,7 +43,8 @@ class MessageAttachmentController extends Controller
 
         if (! in_array($file->getMimeType(), self::ALLOWED_MIMES)) {
             return response()->json([
-                'message' => 'File type not allowed.',
+                // "File type not allowed" left the person guessing. Say what is.
+                'message' => 'That file type is not supported. You can send images, audio, video (MP4, WebM, MOV), PDFs, Word and Excel files.',
                 'allowed' => self::ALLOWED_MIMES,
             ], 422);
         }
@@ -79,7 +88,7 @@ class MessageAttachmentController extends Controller
     /**
      * Download an attachment with authorization check.
      */
-    public function download(Request $request, MessageAttachment $attachment): StreamedResponse
+    public function download(Request $request, MessageAttachment $attachment): StreamedResponse|BinaryFileResponse
     {
         $user = $request->user();
 
@@ -103,26 +112,37 @@ class MessageAttachmentController extends Controller
         abort_unless(Storage::disk('private')->exists($attachment->file_path), 404);
 
         /*
-         * An image opens; everything else saves.
+         * Anything you look at or listen to opens; everything else saves.
          *
          * This always sent Content-Disposition: attachment, so clicking a photo
          * someone sent you started a download instead of showing it — and a
-         * thumbnail in the thread had nothing it could point at. Images and PDFs
-         * are things people want to LOOK at, so they are served inline; ?download=1
-         * still forces the save for when they want the file itself.
+         * thumbnail in the thread had nothing it could point at — and a <video>
+         * or <audio> element cannot play a response that says "save me". Images,
+         * audio, video and PDFs are served inline; ?download=1 still forces the
+         * save for when they want the file itself.
          */
-        $inline = ($attachment->isImage() || $attachment->isPdf())
-            && ! $request->boolean('download');
+        $inline = $attachment->isPlayable() && ! $request->boolean('download');
 
-        return $inline
-            ? Storage::disk('private')->response(
-                $attachment->file_path,
-                $attachment->file_name,
-                ['Content-Type' => $attachment->mime_type ?: 'application/octet-stream'],
-            )
-            : Storage::disk('private')->download(
+        if (! $inline) {
+            return Storage::disk('private')->download(
                 $attachment->file_path,
                 $attachment->file_name
             );
+        }
+
+        /*
+         * Served as a FILE, not a stream, so the browser can ask for a byte
+         * range. A streamed response ignores Range, which means a video cannot
+         * be scrubbed and Safari will not begin playing one at all — it asks for
+         * a range first and gives up when the whole file arrives instead.
+         */
+        return response()->file(
+            Storage::disk('private')->path($attachment->file_path),
+            [
+                'Content-Type'        => $attachment->mime_type ?: 'application/octet-stream',
+                'Content-Disposition' => 'inline; filename="' . addslashes($attachment->file_name) . '"',
+                'Accept-Ranges'       => 'bytes',
+            ],
+        );
     }
 }

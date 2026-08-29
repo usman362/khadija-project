@@ -85,6 +85,11 @@
     .cm-att-img img { display: block; width: 100%; height: auto; max-height: 220px; object-fit: cover; background: var(--bg-soft, #f1f5f9); }
     .cm-att-img span { display: block; padding: 6px 9px; font-size: 11.5px; color: var(--text-muted); }
     .cm-att-img:hover { border-color: var(--brand-text); }
+    /* Video and audio play in the thread rather than being listed by name. */
+    .cm-att-media { border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; max-width: 320px; background: var(--bg-soft, #f1f5f9); }
+    .cm-att-media video { display: block; width: 100%; max-height: 240px; background: #000; }
+    .cm-att-media audio { display: block; width: 100%; }
+    .cm-att-media span { display: block; padding: 6px 9px; font-size: 11.5px; color: var(--text-muted); }
     .cm-att-item svg { width: 16px; height: 16px; color: var(--bad-text); }
     .cm-att-item b { font-size: 12px; color: var(--text-primary); display: block; }
     .cm-att-item span { font-size: 10.5px; color: var(--text-muted); }
@@ -310,8 +315,18 @@
                                 <div class="cm-bubble">{{ $m['body'] }}</div>
                                 {{-- Each file is a LINK. An IMAGE is also shown, rather than being listed
                                      by filename like any other file — you could not tell a photo
-                                     from a spreadsheet without opening it. --}}@if(!empty($m['attachments']))<div class="cm-att">@foreach($m['attachments'] as $a)@if($a['is_image'] ?? false)<a class="cm-att-img" href="{{ $a['url'] }}" target="_blank" rel="noopener" title="Open {{ $a['name'] }}"><img src="{{ $a['url'] }}" alt="{{ $a['name'] }}" loading="lazy"><span>{{ $a['name'] }} · {{ $a['size'] }}</span></a>@endif @if(!($a['is_image'] ?? false))<a class="cm-att-item" href="{{ $a['url'] }}" target="_blank" rel="noopener" title="Open {{ $a['name'] }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div><b>{{ $a['name'] }}</b><span>{{ $a['size'] }}</span></div></a>@endif
-@endforeach</div>@endif
+                                     from a spreadsheet without opening it. --}}@if(!empty($m['attachments']))<div class="cm-att">@foreach($m['attachments'] as $a)@php $kind = $a['kind'] ?? (($a['is_image'] ?? false) ? 'image' : 'file'); @endphp
+                                    @if($kind === 'image')
+                                        <a class="cm-att-img" href="{{ $a['url'] }}" target="_blank" rel="noopener" title="Open {{ $a['name'] }}"><img src="{{ $a['url'] }}" alt="{{ $a['name'] }}" loading="lazy"><span>{{ $a['name'] }} · {{ $a['size'] }}</span></a>
+                                    @elseif($kind === 'video')
+                                        {{-- Plays here. It was listed by filename beside a spreadsheet. --}}
+                                        <div class="cm-att-media"><video src="{{ $a['url'] }}" controls preload="metadata"></video><span>{{ $a['name'] }} · {{ $a['size'] }}</span></div>
+                                    @elseif($kind === 'audio')
+                                        <div class="cm-att-media"><audio src="{{ $a['url'] }}" controls preload="metadata"></audio><span>{{ $a['name'] }} · {{ $a['size'] }}</span></div>
+                                    @else
+                                    <a class="cm-att-item" href="{{ $a['url'] }}" target="_blank" rel="noopener" title="Open {{ $a['name'] }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div><b>{{ $a['name'] }}</b><span>{{ $a['size'] }}</span></div></a>
+                                    @endif
+                                @endforeach</div>@endif
                             </div>
                         </div>
                     @empty
@@ -370,7 +385,7 @@
                             <div class="cm-c-icons">
                                 <button type="button" id="cm-emoji-btn" title="Emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></button>
                                 <button type="button" id="cm-attach-btn" title="Attach a file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
-                                <input type="file" id="cm-file" multiple hidden>
+                                <input type="file" id="cm-file" multiple hidden accept="{{ \App\Http\Controllers\MessageAttachmentController::ACCEPT_ATTRIBUTE }}">
                                 {{-- Ten emoji, all of them event-planning
                                      shorthand, was the whole picker. People
                                      write to each other here; the set is a
@@ -624,11 +639,21 @@ window.CHAT_LIVE = {
             var name = esc(a.file_name || a.name);
             var size = esc(a.size || a.size_label || '');
 
-            // An image shows itself here too, not only after a reload.
-            if (a.is_image) {
+            // Media plays here too, not only after a reload.
+            var kind = a.kind || (a.is_image ? 'image' : 'file');
+
+            if (kind === 'image') {
                 return '<a class="cm-att-img" href="' + url + '" target="_blank" rel="noopener">'
                     + '<img src="' + url + '" alt="' + name + '" loading="lazy">'
                     + '<span>' + name + ' · ' + size + '</span></a>';
+            }
+            if (kind === 'video') {
+                return '<div class="cm-att-media"><video src="' + url + '" controls preload="metadata"></video>'
+                    + '<span>' + name + ' · ' + size + '</span></div>';
+            }
+            if (kind === 'audio') {
+                return '<div class="cm-att-media"><audio src="' + url + '" controls preload="metadata"></audio>'
+                    + '<span>' + name + ' · ' + size + '</span></div>';
             }
 
             return '<a class="cm-att-item" href="' + url + '" target="_blank" rel="noopener">'

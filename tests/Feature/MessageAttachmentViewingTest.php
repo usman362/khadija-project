@@ -110,4 +110,61 @@ class MessageAttachmentViewingTest extends TestCase
             ->get(route('attachments.download', $att))
             ->assertForbidden();
     }
+
+    /** A voice note was the one thing that could not be sent at all. */
+    public function test_audio_can_be_uploaded(): void
+    {
+        $client = $this->client();
+        $conversation = \App\Models\Conversation::create(['subject' => 'About the venue', 'created_by' => $client->id]);
+        $conversation->participants()->sync([$client->id]);
+
+        $this->actingAs($client)->post(route('attachments.store'), [
+            'file' => UploadedFile::fake()->create('voice-note.mp3', 40, 'audio/mpeg'),
+            'conversation_id' => $conversation->id,
+        ])->assertSuccessful();
+
+        $this->assertDatabaseHas('message_attachments', ['file_name' => 'voice-note.mp3']);
+    }
+
+    /** @return array<string, array{0: string, 1: string, 2: string}> */
+    public static function playableTypes(): array
+    {
+        return [
+            'image' => ['photo.jpg', 'image/jpeg', 'image'],
+            'video' => ['walkthrough.mp4', 'video/mp4', 'video'],
+            'audio' => ['voice-note.mp3', 'audio/mpeg', 'audio'],
+            'pdf'   => ['quote.pdf', 'application/pdf', 'pdf'],
+        ];
+    }
+
+    /**
+     * Everything you look at or listen to must arrive as something the browser
+     * will play, with byte ranges — a streamed response ignores Range, so a
+     * video cannot be scrubbed and Safari refuses to start it at all.
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('playableTypes')]
+    public function test_media_is_served_to_be_played(string $name, string $mime, string $kind): void
+    {
+        $client = $this->client();
+        $att = $this->upload($client, UploadedFile::fake()->create($name, 20, $mime));
+
+        $response = $this->actingAs($client)->get(route('attachments.download', $att));
+
+        $response->assertSuccessful();
+        $this->assertStringContainsString('inline', (string) $response->headers->get('content-disposition'));
+        $this->assertSame('bytes', $response->headers->get('accept-ranges'));
+        $this->assertSame($kind, $att->fresh()->kind);
+    }
+
+    /** The one word the thread and the live JS both draw from. */
+    public function test_an_attachment_reports_its_kind(): void
+    {
+        $client = $this->client();
+
+        $doc = $this->upload($client, UploadedFile::fake()->create('notes.docx', 5,
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'))->fresh();
+
+        $this->assertSame('file', $doc->kind);
+        $this->assertArrayHasKey('kind', $doc->toArray());
+    }
 }

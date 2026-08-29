@@ -40,7 +40,7 @@ class MessageAttachment extends Model
      * photo appeared as a thumbnail after a reload and as a generic file icon
      * the moment it was sent.
      */
-    protected $appends = ['url', 'size_label', 'is_image'];
+    protected $appends = ['url', 'size_label', 'is_image', 'kind'];
 
     public function getUrlAttribute(): string
     {
@@ -75,6 +75,35 @@ class MessageAttachment extends Model
     public function getIsImageAttribute(): bool
     {
         return $this->isImage();
+    }
+
+    /**
+     * What this is, in one word, for whoever has to draw it.
+     *
+     * Both threads and the live-append JS were each deciding it from the mime
+     * string; a video was being listed by filename beside a spreadsheet because
+     * only images were ever asked about.
+     */
+    public function getKindAttribute(): string
+    {
+        return match (true) {
+            $this->isImage() => 'image',
+            $this->isVideo() => 'video',
+            $this->isAudio() => 'audio',
+            $this->isPdf()   => 'pdf',
+            default          => 'file',
+        };
+    }
+
+    public function isAudio(): bool
+    {
+        return str_starts_with((string) $this->mime_type, 'audio/');
+    }
+
+    /** Things a person opens and looks at or listens to, rather than saves. */
+    public function isPlayable(): bool
+    {
+        return $this->isImage() || $this->isVideo() || $this->isAudio() || $this->isPdf();
     }
 
     public function isImage(): bool
