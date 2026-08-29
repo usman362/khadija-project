@@ -85,11 +85,15 @@ class MergeDuplicateCategories extends Command
                 }
 
                 $refs = $this->countReferences($loser->id);
+                // Show the actual filenames, not just "has picture". When BOTH
+                // copies have one, the only way to be sure the right photo is
+                // being kept is to look at which file each row points to.
                 $rows[] = [
-                    $group->kind,
                     $group->name,
-                    $keeper->id . ($keeper->thumbnail ? ' (has picture)' : ' (no picture)'),
-                    $loser->id . ($loser->thumbnail ? ' (has picture)' : ' (no picture)'),
+                    $keeper->id,
+                    $this->picture($keeper),
+                    $loser->id,
+                    $this->picture($loser),
                     $refs,
                 ];
 
@@ -108,7 +112,10 @@ class MergeDuplicateCategories extends Command
             }
         }
 
-        $this->table(['Kind', 'Name', 'Keeping', 'Removing', 'Things pointing at it'], array_slice($rows, 0, 25));
+        $this->table(
+            ['Name', 'Keep #', 'Keeping this picture', 'Drop #', 'Dropping this picture', 'Refs'],
+            array_slice($rows, 0, 25)
+        );
         if (count($rows) > 25) {
             $this->line('… and ' . (count($rows) - 25) . ' more.');
         }
@@ -138,6 +145,16 @@ class MergeDuplicateCategories extends Command
             fn ($a, $b) => $this->countReferences($b->id) <=> $this->countReferences($a->id),
             fn ($a, $b) => $a->id <=> $b->id,
         ])->first();
+    }
+
+    /** The file itself, short enough to read in a table. */
+    private function picture(Category $cat): string
+    {
+        if (! $cat->thumbnail) {
+            return '—  none';
+        }
+
+        return basename($cat->thumbnail);
     }
 
     private function countReferences(int $id): int
