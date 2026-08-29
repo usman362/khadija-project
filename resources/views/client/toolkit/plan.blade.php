@@ -74,7 +74,7 @@
 @section('content')
 <div class="pw">
     <div class="pw-head">
-        <h1>Plan with Toolkit</h1>
+        {{-- The title is in the banner at the top of the page; it used to be repeated here too. One page header, one size, everywhere. --}}
         <p>Take something a tool already worked out and add it to an open request, or to one professional's agreement.</p>
     </div>
 

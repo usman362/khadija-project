@@ -1203,9 +1203,17 @@
             </button>
 
             <div class="pro-banner">
+                {{-- The page's own title, with the welcome as the fallback —
+                     the same slot the client layout has used all along.
+
+                     It was hardcoded to the welcome, so a professional opening
+                     Disputes or Forms saw "Welcome back, …" and nowhere on the
+                     screen was the page named. Those pages are shared between
+                     both portals; the client saw a title and the professional
+                     did not. --}}
                 <div class="pro-banner-text">
-                    <h1>Welcome back, {{ auth()->user()?->name ?? 'there' }}! 👋</h1>
-                    <p>Your business at a glance, {{ now()->format('M d') }}.</p>
+                    <h1>@yield('page-title', 'Welcome back, ' . (auth()->user()?->name ?? 'there') . '! 👋')</h1>
+                    <p>@yield('page-subtitle', 'Your business at a glance, ' . now()->format('M d') . '.')</p>
                 </div>
                 <div class="pro-banner-search">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>

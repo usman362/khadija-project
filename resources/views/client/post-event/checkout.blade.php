@@ -1,5 +1,7 @@
 @extends('layouts.client')
 @section('title', 'Post an Event — Checkout & Payment')
+@section('page-title', '🔒 Checkout & Secure Your Package')
+@section('page-subtitle', 'Review your selections, sign the contract, and pay your deposit to secure your date.')
 @include('client.post-event._styles')
 
 @section('content')
@@ -7,8 +9,7 @@
     @include('client.post-event._wizard')
 
     <div class="pe-container pe-main">
-        <h1 class="pe-h1">🔒 Checkout &amp; Secure Your Package</h1>
-        <p class="pe-sub">Review your selections, sign the contract, and pay your deposit to secure your date.</p>
+        {{-- Title and subtitle are in the banner at the top of every client page. --}}
         <div class="pe-check" style="color:var(--pe-green); font-weight:700; margin:-12px 0 22px;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
             Your payment is secure and protected.

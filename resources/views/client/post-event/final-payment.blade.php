@@ -1,5 +1,7 @@
 @extends('layouts.client')
 @section('title', 'Post an Event — Final Payment')
+@section('page-title', '🔒 Final Payment')
+@section('page-subtitle', 'Your event is complete! Review your final invoice and make the remaining payment to release funds to your professional.')
 @include('client.post-event._styles')
 
 @section('content')
@@ -7,9 +9,7 @@
     @include('client.post-event._wizard')
 
     <div class="pe-container pe-main">
-        <h1 class="pe-h1">🔒 Final Payment</h1>
-        <p class="pe-sub">Your event is complete! Review your final invoice and make the remaining payment to release funds to your professional.</p>
-
+        {{-- Title and subtitle are in the banner at the top of every client page. --}}
         @if(request()->boolean('paid'))
             {{-- Payment complete success state (final step done) --}}
             <div class="pe-card" style="text-align:center; padding:44px 24px;">

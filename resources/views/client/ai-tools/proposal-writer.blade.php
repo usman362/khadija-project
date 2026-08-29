@@ -158,7 +158,7 @@
                     </g>
                 </svg>
             </span>
-            <div class="pw-head-txt"><h1>Proposal Builder</h1><p>Build a winning proposal in minutes, from your own templates.</p></div>
+            {{-- Title and subtitle are in the banner; they used to be repeated here too. --}}
         </div>
         <a href="{{ route('ai-tools.budget-allocator') }}" class="pw-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to Toolkit</a>
     </div>

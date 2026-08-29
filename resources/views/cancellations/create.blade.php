@@ -1,6 +1,9 @@
 @extends($layout)
 
 @section('title', $role === 'client' ? 'Cancel a booking' : 'Report a no-show or cancellation')
+{{-- $role comes from the controller; $isClient is derived further down in
+     this file, so it does not exist yet at this point. --}}
+@section('page-title', ($role ?? '') === 'client' ? 'Cancel a booking' : 'Report a no-show or cancellation')
 
 @php
     /*
@@ -32,7 +35,7 @@
 @section('content')
 <div class="dsp-head">
     <div>
-        <h1 class="dsp-h1">{{ $isClient ? 'Cancel a booking' : 'Report a no-show or cancellation' }}</h1>
+        {{-- Title is in the banner; it says which side is reading. --}}
         <p class="dsp-sub">
             @if($isClient)
                 One booking at a time. Cancelling one professional does not affect anyone else

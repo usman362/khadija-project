@@ -155,6 +155,11 @@ class ClientEsrController extends Controller
             ]);
         }
 
+        // Ten posted requests a day — Khadijah's sheet, 29 Aug. An emergency
+        // is still a posting; the cap is high enough that a real emergency is
+        // never the eleventh.
+        \App\Support\UserLimit::hit('client-postings', $user, null, 'services');
+
         $event = Event::create([
             'title'        => $this->titleFrom($data['services'], $data['reason']),
             'description'  => $data['description'] ?? null,

@@ -159,7 +159,7 @@
     {{-- A) Page header --}}
     <div class="gb-head">
         <div>
-            <h1>Create a New Gig</h1>
+            {{-- The title is in the banner at the top of the page; it used to be repeated here too. One page header, one size, everywhere. --}}
             <p>Fill in the details below and we will help you find the right professionals.</p>
         </div>
         <button type="button" class="gb-btn ghost" onclick="document.getElementById('gbForm').submit();">

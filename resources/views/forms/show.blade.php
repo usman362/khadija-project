@@ -1,6 +1,7 @@
 @extends($layout)
 
 @section('title', $submission->reference)
+@section('page-title', $submission->reference)
 
 @push('styles')
     @include('disputes._styles')
@@ -9,13 +10,14 @@
 @section('content')
 <div class="dsp-head">
     <div>
-        <h1 class="dsp-h1">
-            <span class="dsp-ref">{{ $submission->reference }}</span>
+        {{-- The reference is the page title and sits in the banner; the
+             status badge stays here, because a badge is not a title. --}}
+        <div class="dsp-badges">
             <span class="dsp-badge {{ $submission->status === 'withdrawn' ? 'dsp-shut' : ($submission->isAccepted() ? 'dsp-done' : 'dsp-open') }}"
                   style="margin-left:8px;vertical-align:middle;">
                 {{ $submission->needsApproval() ? ucfirst($submission->approval_status ?? 'pending') : ucfirst($submission->status) }}
             </span>
-        </h1>
+        </div>
         <p class="dsp-sub">{{ $submission->title() }}</p>
     </div>
     <a href="{{ route('forms.index') }}" class="cl-btn">All forms</a>

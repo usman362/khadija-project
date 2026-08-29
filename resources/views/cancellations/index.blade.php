@@ -1,6 +1,8 @@
 @extends($layout)
 
 @section('title', 'Cancellations')
+@section('page-title', 'Cancellations & no-shows')
+@section('page-subtitle', 'Cancellations you have made, and anything reported on a booking you are part of. Each one covers a single booking.')
 
 @push('styles')
     @include('disputes._styles')
@@ -9,11 +11,7 @@
 @section('content')
 <div class="dsp-head">
     <div>
-        <h1 class="dsp-h1">Cancellations &amp; no-shows</h1>
-        <p class="dsp-sub">
-            Cancellations you have made, and anything reported on a booking you are part of.
-            Each one covers a single booking.
-        </p>
+        {{-- Title and subtitle are in the banner at the top of the page, in both portals. --}}
     </div>
     {{-- "Report something" said nothing, to either side. The create page has
          always known the difference — its own title reads "Cancel a booking"

@@ -1,6 +1,7 @@
 @extends($layout)
 
 @section('title', 'Case ' . $case->reference)
+@section('page-title', $case->reference)
 
 @php
     use App\Domain\Disputes\DecisionGuide;
@@ -36,10 +37,11 @@
 @section('content')
 <div class="dsp-head">
     <div>
-        <h1 class="dsp-h1">
-            <span class="dsp-ref">{{ $case->reference }}</span>
+        {{-- The reference is the page title and sits in the banner; the
+             status badge stays here, because a badge is not a title. --}}
+        <div class="dsp-badges">
             <span class="dsp-badge {{ $badge }}" style="margin-left:8px;vertical-align:middle;">{{ $case->stateLabel() }}</span>
-        </h1>
+        </div>
         <p class="dsp-sub">
             {{ $case->taxonomyLabel() }} · {{ $case->booking?->event?->title ?? 'Booking #' . $case->booking_id }}
             · with {{ $other?->name ?? 'the other party' }}

@@ -1,5 +1,7 @@
 @extends('layouts.client')
 @section('title', 'Post an Event — Package Combinations')
+@section('page-title', 'Package Combinations')
+@section('page-subtitle', 'Fulfil all your requested services by combining these packages.')
 @include('client.post-event._styles')
 
 @section('content')
@@ -7,9 +9,7 @@
     @include('client.post-event._wizard')
 
     <div class="pe-container pe-main">
-        <h1 class="pe-h1">Package Combinations</h1>
-        <p class="pe-sub">Fulfil all your requested services by combining these packages.</p>
-
+        {{-- Title and subtitle are in the banner at the top of every client page. --}}
         {{-- Tip --}}
         <div class="pe-aitip" style="margin-bottom:22px;">
             <span class="ic">✨</span>

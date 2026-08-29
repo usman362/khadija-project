@@ -1,5 +1,7 @@
 @extends('layouts.client')
 @section('title', 'Post an Event — Service Details')
+@section('page-title', 'Service Details')
+@section('page-subtitle', 'Tell us about each service so we can find the best packages.')
 @include('client.post-event._styles')
 
 @section('content')
@@ -7,9 +9,7 @@
     @include('client.post-event._wizard')
 
     <div class="pe-container pe-main">
-        <h1 class="pe-h1">Service Details</h1>
-        <p class="pe-sub">Tell us about each service so we can find the best packages.</p>
-
+        {{-- Title and subtitle are in the banner at the top of every client page. --}}
         <div class="pe-grid">
             {{-- Main --}}
             <div>

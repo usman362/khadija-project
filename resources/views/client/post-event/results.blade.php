@@ -1,5 +1,7 @@
 @extends('layouts.client')
 @section('title', 'Post an Event — Results')
+@section('page-title', 'Packages for Your Event')
+@section('page-subtitle', 'We found these package matches for your requested services.')
 @include('client.post-event._styles')
 
 @section('content')
@@ -9,8 +11,7 @@
     <div class="pe-container pe-main">
         <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap;">
             <div>
-                <h1 class="pe-h1">Packages for Your Event</h1>
-                <p class="pe-sub">We found these package matches for your requested services.</p>
+                {{-- Title and subtitle are in the banner at the top of every client page. --}}
             </div>
             <div style="display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--pe-muted); font-weight:700;">
                 View as:

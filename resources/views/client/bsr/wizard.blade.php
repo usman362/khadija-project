@@ -1,7 +1,8 @@
 @extends('layouts.client')
 
 @section('title', 'Create a Bidding Request')
-@section('page-title', 'Create a Request')
+@section('page-title', 'Create a Bidding Request')
+@section('page-subtitle', 'Tell professionals what you need, when and where — they review it and send you sealed proposals to compare.')
 
 {{-- Screen 1 of the client BR set — the 7-step create wizard.
 
@@ -169,11 +170,13 @@
     $pct  = (int) round(($stepIndex / (count($steps) - 1)) * 100);
 @endphp
 
+{{-- The title and subtitle live in the banner at the top of the page, like
+     every other client screen. They used to be repeated here as well, at a
+     third font size — which is what Sir Peter picked up on 29 Aug: some pages
+     had a heading here, some had none, and no two were the same size. The
+     banner is the page header; nothing restates it. --}}
 <div class="bw-top">
-    <div>
-        <div class="bw-h">Create a Bidding Request</div>
-        <p class="bw-sub">Tell professionals what you need, when and where — they review it and send you sealed proposals to compare.</p>
-    </div>
+    <div></div>
     <div class="bw-acts">
         @if($draftId)<span style="font-size:12px;color:var(--ok-text);font-weight:700;">✓ Draft saved</span>@endif
         <a class="bw-btn" href="{{ route('client.events.index') }}">Exit</a>

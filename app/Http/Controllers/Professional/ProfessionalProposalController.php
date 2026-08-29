@@ -102,6 +102,12 @@ class ProfessionalProposalController extends Controller
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
+        // Thirty responses a day — Khadijah's sheet, 29 Aug. A proposal is a
+        // response to a client's request, so it counts against the same
+        // allowance as a bid. The duplicate check above already stops a second
+        // proposal on one event, so this only ever sees new ones.
+        \App\Support\UserLimit::hit('pro-responses', $user, null, 'notes');
+
         // Create a booking (proposal) from professional side
         $booking = Booking::create([
             'event_id' => $event->id,

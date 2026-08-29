@@ -118,7 +118,7 @@
 
     {{-- header --}}
     <div class="cw-head">
-        <h1>Integrated Cancellation &amp; Rejection Wizard</h1>
+        {{-- The title is in the banner at the top of the page; it used to be repeated here too. One page header, one size, everywhere. --}}
         <span class="cw-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Rejection Workflow Active</span>
         <span class="cw-agreement">{{ $agreementNo }}</span>
         <a href="{{ route('client.dashboard') }}" class="cw-close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></a>

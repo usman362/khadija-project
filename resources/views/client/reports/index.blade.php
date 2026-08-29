@@ -1,6 +1,8 @@
 @extends('layouts.client')
 
 @section('title', 'Reports')
+@section('page-title', 'Reports')
+@section('page-subtitle', 'Your spending, your requests, and how professionals see you.')
 
 @php
     /*
@@ -41,8 +43,12 @@
 @section('content')
 <div class="cr-head">
     <div>
-        <h1 style="font-size:22px;font-weight:800;margin:0;">Reports</h1>
-        <p style="font-size:13px;color:var(--text-muted);margin:4px 0 0;">
+        {{-- No page heading here: the banner at the top of every client screen
+             is the page header. This used to render its own <h1> at 22px with
+             the size typed inline, which is one of the three different
+             headings Sir Peter found on 29 Aug. What is left is the date
+             range, which is a fact about this report, not a title. --}}
+        <p style="font-size:13px;color:var(--text-muted);margin:0;">
             {{ $report['from']->format('M j, Y') }} – {{ $report['to']->format('M j, Y') }}.
             Counted from your real events, bookings and reviews.
         </p>

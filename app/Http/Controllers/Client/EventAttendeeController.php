@@ -27,6 +27,8 @@ class EventAttendeeController extends Controller
     {
         $this->authorize('update', $event);
 
+        $this->guardGuestCount($event, 1);
+
         $event->attendees()->create($this->validated($request));
 
         return back()->with('status', 'Guest added.');
@@ -72,9 +74,16 @@ class EventAttendeeController extends Controller
             'list' => ['required', 'string', 'max:20000'],
         ]);
 
+        $lines = preg_split('/\r\n|\r|\n/', $data['list']);
+
+        // Counted against the whole paste before any of it is saved, so an
+        // import either fits or is refused — a paste of 50 must not silently
+        // become 30 with 20 dropped on the floor.
+        $this->guardGuestCount($event, count(array_filter($lines, fn ($l) => trim(explode(',', $l)[0] ?? '') !== '')));
+
         $added = 0;
 
-        foreach (preg_split('/\r\n|\r|\n/', $data['list']) as $line) {
+        foreach ($lines as $line) {
             [$name, $email, $phone] = array_pad(array_map('trim', explode(',', $line, 3)), 3, null);
 
             if (($name ?? '') === '') {
@@ -134,6 +143,37 @@ class EventAttendeeController extends Controller
             'rsvp_status'   => ['sometimes', Rule::in(array_keys(EventAttendee::STATUSES))],
             'dietary'       => ['nullable', 'string', 'max:255'],
             'accessibility' => ['nullable', 'string', 'max:255'],
+        ]);
+    }
+
+    /**
+     * Thirty guests per event — Khadijah's sheet, 29 Aug.
+     *
+     * A total for the event, not a rate: it does not reset tomorrow, so this
+     * is a plain count rather than one of the windowed rules. Her note says a
+     * large event may need more, which is why the number sits in
+     * config/limits.php and not here.
+     */
+    private function guardGuestCount(Event $event, int $adding): void
+    {
+        $max = (int) config('limits.rules.client-invitations.max', 0);
+
+        if (! config('limits.enabled', true) || $max <= 0 || auth()->user()?->isAdmin()) {
+            return;
+        }
+
+        $already = $event->attendees()->count();
+
+        if ($already + $adding <= $max) {
+            return;
+        }
+
+        $room = max(0, $max - $already);
+
+        throw \Illuminate\Validation\ValidationException::withMessages([
+            'list' => $room === 0
+                ? "This event already has the maximum of {$max} guests."
+                : "That would take this event past {$max} guests. There is room for {$room} more.",
         ]);
     }
 }

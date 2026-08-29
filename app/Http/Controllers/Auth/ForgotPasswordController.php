@@ -19,4 +19,26 @@ class ForgotPasswordController extends Controller
     */
 
     use SendsPasswordResetEmails;
+
+    /**
+     * Three a day — Khadijah's sheet, 29 Aug.
+     *
+     * Keyed on the EMAIL, not the account. Nobody is signed in here, and the
+     * address is the only stable thing about the request: keying on the IP
+     * would let one person work through a list of addresses, and would lock a
+     * shared office out over one person's forgetfulness.
+     */
+    public function sendResetLinkEmail(\Illuminate\Http\Request $request)
+    {
+        $this->validateEmail($request);
+
+        \App\Support\UserLimit::hit(
+            'password-reset',
+            null,
+            'e:'.sha1(strtolower(trim((string) $request->input('email')))),
+            'email',
+        );
+
+        return parent::sendResetLinkEmail($request);
+    }
 }

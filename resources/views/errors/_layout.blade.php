@@ -12,7 +12,11 @@
     stays a 15-line file rather than a 300-line copy-paste.
 --}}
 
-@section('title', '@yield(\'err-code\') · ' . config('app.name'))
+{{-- `@yield` inside a PHP string is not Blade, it is nine characters of
+     text — so every error page's browser tab read
+     "@yield('err-code') · GigResource" instead of "404 · GigResource".
+     yieldContent() is the same thing as an expression. --}}
+@section('title', $__env->yieldContent('err-code') . ' · ' . config('app.name'))
 
 @push('meta')
     <meta name="robots" content="noindex, nofollow">

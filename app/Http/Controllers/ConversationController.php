@@ -154,6 +154,14 @@ class ConversationController extends Controller
 
         $user = $request->user();
 
+        /*
+         * Two windows, both from Khadijah's sheet: 10 an hour stops a burst,
+         * 25 a day stops a slow drip. Counted here — after validation — so a
+         * message rejected for being empty has not cost anybody one of theirs.
+         */
+        \App\Support\UserLimit::hit('messages-hour', $user, null, 'body');
+        \App\Support\UserLimit::hit('messages-day', $user, null, 'body');
+
         // Determine recipient (the other participant in direct chat)
         $recipientId = null;
         if ($conversation->type === 'direct') {

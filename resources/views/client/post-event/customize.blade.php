@@ -1,5 +1,7 @@
 @extends('layouts.client')
 @section('title', 'Post an Event — Customize Package')
+@section('page-title', 'Customize Your Package')
+@section('page-subtitle', 'Fine-tune your package — add extras or adjust what is included.')
 @include('client.post-event._styles')
 
 @push('styles')
@@ -47,9 +49,7 @@
     @include('client.post-event._wizard')
 
     <div class="pe-container pe-main">
-        <h1 class="pe-h1">Customize Your Package</h1>
-        <p class="pe-sub">Fine-tune your package — add extras or adjust what is included.</p>
-
+        {{-- Title and subtitle are in the banner at the top of every client page. --}}
         <div class="pe-grid">
             {{-- Main --}}
             <div>

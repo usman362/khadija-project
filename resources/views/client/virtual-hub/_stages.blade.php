@@ -44,8 +44,16 @@
 
 <div class="vhs">
     <div class="vhs-head">
-        <div class="vhs-title">Virtual &amp; Hybrid events</div>
-        <div class="vhs-flow">Plan → Hire → Prepare → Run event → Complete</div>
+        {{-- Neither a title nor a flow line here — Sir Peter struck both out
+             on 29 Aug as duplicate data, and he was right about both.
+
+             The title read "Virtual & Hybrid events" directly under a banner
+             already saying "Virtual & Hybrid Hub": the same page named twice,
+             at two sizes.
+
+             The flow line read "Plan → Hire → Prepare → Run event →
+             Complete" — which is the seven numbered cards immediately below
+             it, written out again in prose. --}}
         {{-- This marks the SCREEN you are on, not the state of your event.
              It used to mark the event's stage, so clicking Entry landed you
              here and the strip answered "You are here: Hire" — two different
@@ -72,8 +80,6 @@
 <style>
     .vhs{border:1px solid var(--border-color);border-radius:14px;padding:15px 17px 6px;margin-bottom:16px;background:var(--bg-card);}
     .vhs-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
-    .vhs-title{font-size:14.5px;font-weight:800;}
-    .vhs-flow{font-size:12px;color:var(--text-muted);}
     .vhs-note{flex-basis:100%;font-size:11.5px;color:var(--text-muted);margin-top:2px;}
     .vhs-row{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;list-style:none;margin:0;padding:0;}
     @media(max-width:1100px){.vhs-row{grid-template-columns:repeat(4,1fr);}}

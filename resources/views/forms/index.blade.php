@@ -1,6 +1,8 @@
 @extends($layout)
 
 @section('title', 'Requests & Submissions')
+@section('page-title', 'Requests & Submissions')
+@section('page-subtitle', 'Send us anything you need, and track everything you have already sent.')
 
 @php
     $f = $filters;
@@ -94,8 +96,7 @@
 @section('content')
 <div class="rq-head">
     <div>
-        <h1>Requests &amp; Submissions</h1>
-        <p>Send us anything you need, and track everything you have already sent.</p>
+        {{-- Title and subtitle are in the banner at the top of the page, in both portals. --}}
     </div>
     <form class="rq-search" method="GET" action="{{ route('forms.index') }}">
         @foreach(\Illuminate\Support\Arr::except($carry, ['q']) as $k => $v)

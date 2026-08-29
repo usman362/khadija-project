@@ -1,5 +1,7 @@
 @extends('layouts.client')
 @section('title', 'Post an Event — Build Your Event')
+@section('page-title', 'What does your event need?')
+@section('page-subtitle', 'Select the services you need and we will find the best packages.')
 @include('client.post-event._styles')
 
 @section('content')
@@ -7,9 +9,7 @@
     @include('client.post-event._wizard')
 
     <div class="pe-container pe-main">
-        <h1 class="pe-h1">What does your event need?</h1>
-        <p class="pe-sub">Select the services you need and we will find the best packages.</p>
-
+        {{-- Title and subtitle are in the banner at the top of every client page. --}}
         <div class="pe-grid">
             {{-- Main --}}
             <div>

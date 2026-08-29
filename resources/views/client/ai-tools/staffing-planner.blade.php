@@ -166,7 +166,7 @@
                 <path d="M11 41a13 12 0 0 1 26 0z" fill="#1e40af" opacity="0.12"/>
             </svg>
         </span>
-        <div class="sp-head-txt"><h1>Staffing Planner</h1><p>Plan the perfect team. At the right time. Every time.</p></div>
+        {{-- Title and subtitle are in the banner; they used to be repeated here too. --}}
     </div>
 
     {{-- event bar --}}

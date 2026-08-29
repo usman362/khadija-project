@@ -175,6 +175,11 @@ class ClientDirectOfferController extends Controller
             'That professional works in a different state.'
         );
 
+        // Ten requests a day — Khadijah's sheet, 29 Aug. A Direct Request
+        // reaches one professional rather than the board, but it is still a
+        // request being sent, and the sheet counts postings not broadcasts.
+        \App\Support\UserLimit::hit('client-postings', $user, null, 'professional_id');
+
         $event = Event::create([
             'title'        => $data['event_name'] ?: ('Direct Request to ' . $pro->name),
             'organization_type' => $data['organization_type'],

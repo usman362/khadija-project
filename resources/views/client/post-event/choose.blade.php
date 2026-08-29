@@ -1,5 +1,7 @@
 @extends('layouts.client')
 @section('title', 'Post an Event — Choose How to Request')
+@section('page-title', 'How do you want to request?')
+@section('page-subtitle', 'Pick the path that fits your event. You can always start another request later.')
 @include('client.post-event._styles')
 
 {{-- Step 0 — Choose Route. Packages are ONE route of five, not the whole
@@ -102,8 +104,9 @@
 @section('content')
 <div class="pe-wrap">
     <div class="pe-container pe-main" style="padding-top:26px; padding-bottom:40px;">
-        <h1 class="pe-h1">How do you want to request?</h1>
-        <p class="pe-sub">Pick the path that fits your event. You can always start another request later.</p>
+        {{-- Title and subtitle are in the banner, like every other client
+             screen — they used to be repeated here too, at a different size.
+             See the note in the BR wizard. --}}
 
         @php
             $routes = [

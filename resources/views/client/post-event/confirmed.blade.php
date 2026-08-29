@@ -1,5 +1,7 @@
 @extends('layouts.client')
 @section('title', 'Post an Event — Order Confirmed')
+@section('page-title', 'Your Order is Confirmed!')
+@section('page-subtitle', 'Thank you! Your package combination has been booked and your date is secured.')
 @include('client.post-event._styles')
 
 @section('content')
@@ -14,8 +16,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:28px; height:28px;"><polyline points="20 6 9 17 4 12"/></svg>
                 </span>
                 <div>
-                    <h1 class="pe-h1" style="margin-bottom:2px;">Your Order is Confirmed!</h1>
-                    <p class="pe-sub" style="margin:0 0 8px;">Thank you! Your package combination has been booked and your date is secured.</p>
+                    {{-- Title and subtitle are in the banner at the top of every client page. --}}
                     <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; font-size:13px;">
                         <span style="font-weight:800; color:var(--pe-ink);">Order Number {{ $order['number'] }}</span>
                         <span class="pe-muted">Placed on {{ $order['placed'] }}</span>

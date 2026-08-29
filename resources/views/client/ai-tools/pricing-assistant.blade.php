@@ -196,7 +196,7 @@
                     <rect x="26.4" y="32.2" width="4.6" height="4" rx="1.2" fill="#ea580c"/>
                 </svg>
             </span>
-            <div class="apa-head-txt"><h1>Pricing Calculator</h1><p>Get the right price. Win more gigs. Maximize your value.</p></div>
+            {{-- Title and subtitle are in the banner; they used to be repeated here as well. --}}
         </div>
         <a href="{{ route('ai-tools.budget-allocator') }}" class="apa-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to Toolkit</a>
     </div>

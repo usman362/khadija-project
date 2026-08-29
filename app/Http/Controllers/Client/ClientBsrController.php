@@ -288,6 +288,14 @@ class ClientBsrController extends Controller
         }
 
         if ($step === 'review') {
+        /*
+         * Ten posted requests a day — Khadijah's sheet, 29 Aug. Counted only
+         * when a request actually goes PUBLIC: saving a draft, or a form that
+         * fails validation, costs nothing. A client planning a wedding can
+         * open and abandon as many drafts as they like.
+         */
+        \App\Support\UserLimit::hit('client-postings', $request->user(), null, 'confirm');
+
             $event = $this->persist($request, $data, publish: true);
             Session::forget(self::KEY);
 

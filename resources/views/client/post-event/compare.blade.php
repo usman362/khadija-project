@@ -1,5 +1,7 @@
 @extends('layouts.client')
 @section('title', 'Post an Event — Compare Packages')
+@section('page-title', 'Compare Packages Side by Side')
+@section('page-subtitle', 'Compare the top matches and choose the best package for your event.')
 @include('client.post-event._styles')
 
 @push('styles')
@@ -34,9 +36,7 @@
     @include('client.post-event._wizard')
 
     <div class="pe-container pe-main">
-        <h1 class="pe-h1">Compare Packages Side by Side</h1>
-        <p class="pe-sub">Compare the top matches and choose the best package for your event.</p>
-
+        {{-- Title and subtitle are in the banner at the top of every client page. --}}
         <div class="pe-toggle-row">
             <button type="button" class="pe-toggle" onclick="this.classList.toggle('on'); this.setAttribute('aria-pressed', this.classList.contains('on'));" aria-pressed="false"><span class="sw"></span> Show Differences Only</button>
             <button type="button" class="pe-toggle on" onclick="this.classList.toggle('on'); this.setAttribute('aria-pressed', this.classList.contains('on'));" aria-pressed="true"><span class="sw"></span> Expert Comparison</button>

@@ -428,6 +428,24 @@ class ProfessionalBiddingBoardController extends Controller
             return back()->withErrors(['category_id' => 'That service is not part of this event.']);
         }
 
+        /*
+         * Thirty responses a day — Khadijah's sheet, 29 Aug, raised from the
+         * original proposal because a busy professional in season is not a
+         * spammer.
+         *
+         * Only counted on a NEW bid. `updateOrCreate` also covers a
+         * professional correcting their own figure, and revising one bid five
+         * times is not five responses.
+         */
+        $isNewBid = ! Bid::where('event_id', $event->id)
+            ->where('supplier_id', $request->user()->id)
+            ->where('category_id', $categoryId)
+            ->exists();
+
+        if ($isNewBid) {
+            \App\Support\UserLimit::hit('pro-responses', $request->user(), null, 'amount');
+        }
+
         Bid::updateOrCreate(
             ['event_id' => $event->id, 'supplier_id' => $request->user()->id, 'category_id' => $categoryId],
             [

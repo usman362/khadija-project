@@ -1,5 +1,7 @@
 @extends('layouts.client')
 @section('title', 'Post an Event — Event Information')
+@section('page-title', 'Your Event')
+@section('page-subtitle', 'Tell us about your event so we understand exactly what you need.')
 @include('client.post-event._styles')
 
 @section('content')
@@ -7,9 +9,7 @@
     @include('client.post-event._wizard')
 
     <div class="pe-container pe-main">
-        <h1 class="pe-h1">Your Event</h1>
-        <p class="pe-sub">Tell us about your event so we understand exactly what you need.</p>
-
+        {{-- Title and subtitle are in the banner at the top of every client page. --}}
         <form method="POST" action="{{ route('client.post-event.store-info') }}">
             @csrf
             <div class="pe-grid">

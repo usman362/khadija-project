@@ -1,5 +1,7 @@
 @extends('layouts.client')
 @section('title', 'Post an Event — Review & Search')
+@section('page-title', 'Review & Search Preferences')
+@section('page-subtitle', 'Review your details and set your search preferences before we find the best packages.')
 @include('client.post-event._styles')
 
 @section('content')
@@ -7,9 +9,7 @@
     @include('client.post-event._wizard')
 
     <div class="pe-container pe-main">
-        <h1 class="pe-h1">Review &amp; Search Preferences</h1>
-        <p class="pe-sub">Review your details and set your search preferences before we find the best packages.</p>
-
+        {{-- Title and subtitle are in the banner at the top of every client page. --}}
         <div class="pe-grid">
             {{-- Main --}}
             <div>

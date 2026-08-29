@@ -1,6 +1,8 @@
 @extends($layout)
 
 @section('title', 'Disputes & Resolution')
+@section('page-title', 'Disputes & Resolution')
+@section('page-subtitle', 'Resolve booking issues, track cases, review evidence, and see decisions.')
 
 @php
     use App\Domain\Disputes\DisputeStates;
@@ -133,8 +135,7 @@
 @section('content')
 <div class="dr-head">
     <div>
-        <h1>Disputes &amp; Resolution</h1>
-        <p>Resolve booking issues, track cases, review evidence, and see decisions.</p>
+        {{-- Title and subtitle are in the banner at the top of the page, in both portals. --}}
     </div>
     <div class="dr-cta">
         {{-- Named first and on the left on purpose: §2 puts direct resolution

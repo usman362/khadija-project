@@ -224,6 +224,11 @@ class ProfessionalProfileController extends Controller
             return back()->withErrors(['portfolio_image' => 'You can upload up to 12 portfolio images.']);
         }
 
+        // Fifty images a day — Khadijah's sheet, 29 Aug. Counted after the
+        // 12-per-portfolio check above, which is a different rule about how
+        // much work one profile shows; this one is about volume per day.
+        \App\Support\UserLimit::hit('pro-images', $user, null, 'portfolio_image');
+
         $sizes = $pipeline->process(
             $request->file('portfolio_image'),
             'portfolio/' . $user->id,

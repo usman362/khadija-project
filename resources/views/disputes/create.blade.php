@@ -1,6 +1,8 @@
 @extends($layout)
 
 @section('title', 'File a dispute')
+@section('page-title', 'File a dispute')
+@section('page-subtitle', 'One booking per case. Tell us what happened — our team compares what was delivered against what was agreed in the contract.')
 
 @php
     /*
@@ -32,11 +34,7 @@
 @section('content')
 <div class="dsp-head">
     <div>
-        <h1 class="dsp-h1">File a dispute</h1>
-        <p class="dsp-sub">
-            One booking per case. Tell us what happened — our team compares what was
-            delivered against what was agreed in the contract.
-        </p>
+        {{-- Title and subtitle are in the banner at the top of the page, in both portals. --}}
     </div>
     <a href="{{ route('disputes.index') }}" class="cl-btn">Back</a>
 </div>

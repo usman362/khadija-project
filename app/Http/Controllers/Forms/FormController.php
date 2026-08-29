@@ -257,6 +257,16 @@ class FormController extends Controller
             $counterparty = $user->id === $subject->client_id ? $subject->supplier_id : $subject->client_id;
         }
 
+        /*
+         * Five reports a day — Khadijah's sheet, 29 Aug. Only the report form:
+         * a support request or a change order is not a report and is not
+         * capped by this. Counted here, after the form has passed validation
+         * and the subject has been checked, so a rejected form costs nothing.
+         */
+        if ($key === 'content_report') {
+            \App\Support\UserLimit::hit('reports', $user, null, 'detail');
+        }
+
         $certification = collect($definition['fields'])
             ->firstWhere('type', 'certification')['text'] ?? null;
 

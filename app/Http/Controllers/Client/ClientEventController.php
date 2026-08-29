@@ -255,8 +255,36 @@ class ClientEventController extends Controller
             return $record->status === \App\Models\UploadedFile::REJECTED ? null : (string) $record->id;
         };
 
+        /*
+         * Twenty-five images a day — Khadijah's sheet, 29 Aug. Her note is the
+         * reason the number is high: it must not block a legitimate event
+         * gallery.
+         *
+         * The whole batch is checked BEFORE any of it is counted. Hitting the
+         * limiter once per photo would charge a client for the first two of
+         * eight and then refuse the upload — they would lose two from their
+         * allowance for something that never happened.
+         */
+        $photos = (array) $request->file('inspiration_photos', []);
+
+        if ($photos !== []) {
+            $left = \App\Support\UserLimit::remaining('client-images', $request->user());
+
+            if ($left !== null && count($photos) > $left) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'inspiration_photos' => $left === 0
+                        ? 'You have uploaded 25 images today. Please try again tomorrow.'
+                        : "That is more images than you have left today. You can upload {$left} more.",
+                ]);
+            }
+
+            foreach ($photos as $photo) {
+                \App\Support\UserLimit::hit('client-images', $request->user(), null, 'inspiration_photos');
+            }
+        }
+
         $media = ['photos' => [], 'video' => null, 'documents' => []];
-        foreach ((array) $request->file('inspiration_photos', []) as $photo) {
+        foreach ($photos as $photo) {
             $media['photos'][] = $store($photo);
         }
         if ($request->hasFile('video')) {

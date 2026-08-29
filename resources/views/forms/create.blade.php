@@ -1,6 +1,8 @@
 @extends($layout)
 
 @section('title', $definition['title'])
+@section('page-title', $definition['title'])
+@section('page-subtitle', $definition['purpose'])
 
 @push('styles')
     @include('disputes._styles')
@@ -9,8 +11,7 @@
 @section('content')
 <div class="dsp-head">
     <div>
-        <h1 class="dsp-h1">{{ $definition['title'] }}</h1>
-        <p class="dsp-sub">{{ $definition['purpose'] }}</p>
+        {{-- Title and purpose are in the banner at the top of the page. --}}
     </div>
     <a href="{{ route('forms.index') }}" class="cl-btn">Back</a>
 </div>

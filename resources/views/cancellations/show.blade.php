@@ -1,6 +1,7 @@
 @extends($layout)
 
 @section('title', $request->reference)
+@section('page-title', $request->reference)
 
 @push('styles')
     @include('disputes._styles')
@@ -9,11 +10,12 @@
 @section('content')
 <div class="dsp-head">
     <div>
-        <h1 class="dsp-h1">
-            <span class="dsp-ref">{{ $request->reference }}</span>
+        {{-- The reference is the page title and sits in the banner; the
+             status badge stays here, because a badge is not a title. --}}
+        <div class="dsp-badges">
             <span class="dsp-badge {{ $request->status === 'withdrawn' ? 'dsp-shut' : 'dsp-open' }}"
                   style="margin-left:8px;vertical-align:middle;">{{ ucfirst($request->status) }}</span>
-        </h1>
+        </div>
         <p class="dsp-sub">
             {{ $request->kindLabel() }} · {{ $request->booking?->event?->title ?? 'Booking #' . $request->booking_id }}
         </p>
