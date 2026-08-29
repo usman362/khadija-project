@@ -245,7 +245,12 @@
     }
     .od-cal {
         display: grid;
-        grid-template-columns: repeat(7, 1fr);
+        /* minmax(0, 1fr), not 1fr.
+           A grid column's default minimum is its content, so the day cells
+           refused to shrink past about 56px — at that point the seven columns
+           no longer fitted the card and Saturday was cut off at the right edge.
+           Anyone on a narrow screen, or zoomed in, lost a day of the week. */
+        grid-template-columns: repeat(7, minmax(0, 1fr));
         gap: 4px;
         font-size: 12px;
     }
@@ -257,6 +262,7 @@
     }
     .od-cal-day {
         aspect-ratio: 1;
+        min-width: 0;   /* same reason: let the column decide the width */
         border-radius: 8px;
         background: var(--bg-card-hover);
         border: 1px solid transparent;
@@ -280,6 +286,7 @@
         /* allow wrap to 2 lines like the reference */
         white-space: normal;
         word-break: break-word;
+        min-width: 0;
         overflow: hidden;
         display: -webkit-box;
         -webkit-line-clamp: 2;
