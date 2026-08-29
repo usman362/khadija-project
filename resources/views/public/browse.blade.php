@@ -37,7 +37,10 @@
         background-image: url('https://images.unsplash.com/photo-1519741497674-611481863552?w=1600&q=70&auto=format&fit=crop');
         background-size: cover; background-position: center; opacity: .12; z-index: 0; }
     .br-hero > .lp-container { position: relative; z-index: 1; }
-    .br-forevent { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #fff; border: 1px solid var(--line, #e7ebf2); border-radius: 12px; padding: 11px 16px; margin-bottom: 16px; }
+    /* Sits directly under the hero, so it needs the same 18px the content
+       below uses (.br-main's top padding) — it had none and read as stuck
+       to the hero. No bottom margin: .br-main's padding is the gap. */
+    .br-forevent { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #fff; border: 1px solid var(--line, #e7ebf2); border-radius: 12px; padding: 11px 16px; margin: 18px 0 0; }
     .br-forevent .lbl { font-size: 13.5px; color: var(--muted, #64748b); }
     .br-forevent .lbl b { color: var(--ink, #0f1b35); }
     .br-forevent select { margin-left: auto; border: 1px solid var(--line, #e7ebf2); border-radius: 9px; padding: 7px 11px; font-size: 13px; font-family: inherit; background: #fff; cursor: pointer; max-width: 320px; }
