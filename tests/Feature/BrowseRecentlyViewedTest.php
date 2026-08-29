@@ -42,9 +42,23 @@ class BrowseRecentlyViewedTest extends TestCase
         return $user->fresh();
     }
 
+    /**
+     * Names are pinned, not Faker's.
+     *
+     * These assertions use assertSee($name, false) — escaping off — and Faker
+     * hands out names like "Dorothea D'Amore" perhaps one run in six. Blade
+     * renders that apostrophe as &#039;, so the raw name is not in the HTML and
+     * the test fails for a reason that has nothing to do with browse.
+     */
+    private int $proCount = 0;
+
     private function pro(array $portfolio): User
     {
-        $user = User::factory()->create();
+        $names = ['Halloway Sound', 'Vestry Floral', 'Quillon Lighting', 'Marbeck Catering'];
+
+        $user = User::factory()->create([
+            'name' => $names[$this->proCount++ % count($names)],
+        ]);
         $user->assignRole('professional');
         $user->getOrCreateProfile()->update([
             'country' => 'US', 'state' => 'MD', 'city' => 'Baltimore',
