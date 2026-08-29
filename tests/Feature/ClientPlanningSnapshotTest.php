@@ -218,4 +218,76 @@ class ClientPlanningSnapshotTest extends TestCase
         $response->assertSee('Rate on request');
         $response->assertSee('No reviews yet');
     }
+
+    /**
+     * Stripping the fabricated dashboard out of Guest Capacity took the form
+     * with it: the marker matched inside the Starter branch, so the @else that
+     * carried the calculator for every other level was removed too. A Semi
+     * client opened the page and got a heading and nothing else.
+     */
+    public function test_the_guest_capacity_calculator_still_has_its_form(): void
+    {
+        $response = $this->actingAs($this->client())->get(route('ai-tools.guest-capacity'));
+
+        $response->assertSuccessful();
+        $response->assertSee('id="gcForm"', false);
+        $response->assertSee('name="room_sqft"', false);
+        $response->assertSee('name="guest_count"', false);
+    }
+
+    /**
+     * Each tool, and the control that proves its working surface survived — one
+     * for the Starter branch, one for the branch every other level renders.
+     *
+     * An earlier version of this guard just looked for any <form>, <input> or
+     * <a> anywhere on the page. It PASSED against the broken Guest Capacity
+     * file, because the sidebar links and the header search box are links and
+     * inputs too. A test that passes on known-broken code is worse than no
+     * test, so each row now names controls that belong to that tool.
+     */
+    public static function clientToolPages(): array
+    {
+        return [
+            //                  route                          starter branch      built branch
+            'checklist'      => ['ai-tools.checklist-generator', 'id="cgmRows"',    'id="cgForm"'],
+            'event planner'  => ['ai-tools.event-planner',       'id="epmRows"',    'id="epForm"'],
+            'venue analyzer' => ['ai-tools.venue-analyzer',      'id="vamName"',    'id="vaForm"'],
+            'guest capacity' => ['ai-tools.guest-capacity',      'id="gcmSqft"',    'id="gcForm"'],
+            'timeline'       => ['ai-tools.timeline-builder',    'id="tbmRows"',    'id="tbForm"'],
+            'best match'     => ['ai-tools.vendor-matchmaking',  'id="vm-directory"', 'id="vm-matches"'],
+        ];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('clientToolPages')]
+    public function test_a_tool_page_keeps_its_own_control(string $route, string $starter, string $built): void
+    {
+        $this->actingAs($this->client())
+            ->get(route($route))
+            ->assertSuccessful()
+            ->assertSee($built, false);
+    }
+
+    /**
+     * Each level renders a different branch of these pages, and the Starter
+     * branch is the one the Guest Capacity mistake hid in — the tests only ever
+     * exercised the level a normal client gets, so a wrecked @else went unseen.
+     * An admin can preview any level, which is how both branches get rendered.
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('clientToolPages')]
+    public function test_every_level_of_a_tool_page_keeps_its_control(string $route, string $starter, string $built): void
+    {
+        // Each level renders a different branch, and the Starter branch is where
+        // the Guest Capacity mistake hid: the tests only ever exercised the level
+        // a normal client gets, so a wrecked @else went unseen for a whole
+        // commit. An admin can preview any level, which renders both branches.
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+
+        foreach (['manual' => $starter, 'semi' => $built, 'maximum' => $built] as $level => $control) {
+            $this->actingAs($admin->fresh())
+                ->get(route($route, ['preview' => $level]))
+                ->assertSuccessful()
+                ->assertSee($control, false);
+        }
+    }
 }

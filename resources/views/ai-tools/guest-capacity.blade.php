@@ -126,11 +126,63 @@
             </div>
         </div>
         <div class="gc-mano">
-    {{-- Results appear above once the room and guest count are submitted. --}}
+            <div class="gc-stats" id="gcmStats"></div>
+            <div class="gc-card">
+                <div class="gc-card-hd"><h3>⚖️ Legal vs Comfort Capacity</h3></div>
+                <div class="gc-bars">
+                    <div class="gc-cap">
+                        <div class="gc-cap-top" id="gcmCapTop"></div>
+                        <div class="gc-track" id="gcmTrack"></div>
+                    </div>
+                    <p class="gc-note" id="gcmNote"></p>
+                </div>
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);">Want us to estimate flow, insights and tips automatically? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:#0284c7;font-weight:700;text-decoration:none;">Upgrade →</a></div>
+        </div>
+    </div>
+    @else
+    {{-- AI planner (Semi / Maximum) --}}
+    <div class="gc-gen">
+        <h3>📐 Estimate Your Capacity</h3>
+        <div class="sub">{{ $isSemi ? 'We estimate comfort and legal capacity — you can adjust the figures and the score recalculates.' : 'Enter your space and guest details and we estimate comfort, legal capacity and flow insights.' }}</div>
+        <form id="gcForm">
+            <div class="gc-form-grid">
+                <div class="gc-field">
+                    <label>Room Size (sq ft)</label>
+                    <input type="number" name="room_sqft" min="20" step="1" required placeholder="e.g. 2400">
+                </div>
+                <div class="gc-field">
+                    <label>Seating Style</label>
+                    <select name="seating_style" required aria-label="Banquet (seated dining)">
+                        <option value="banquet">Banquet (seated dining)</option>
+                        <option value="theater">Theater (rows of chairs)</option>
+                        <option value="cocktail">Cocktail (standing / mingling)</option>
+                        <option value="mixed">Mixed</option>
+                    </select>
+                </div>
+                <div class="gc-field">
+                    <label>Expected Guests</label>
+                    <input type="number" name="guest_count" min="1" max="100000" required placeholder="e.g. 185">
+                </div>
+            </div>
+            <button type="submit" class="gc-gen-btn" id="gcSubmit">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h4"/><path d="M22 12a10 10 0 1 0-8.5 9.87"/><path d="M12 6v6l4 2"/></svg>
+                {{ $isSemi ? 'Suggest Capacity Plan' : 'Build My Capacity Plan' }}
+            </button>
+            <div class="gc-err" id="gcErr"></div>
+        </form>
+    </div>
+
+
+    {{-- A stats strip and a full dashboard stood here: 185 expected guests,
+         a 94% comfort score, a seating heatmap and a table plan, all for a
+         room nobody had entered. Results now appear only once the form is
+         submitted, drawn by the calculator from what the client typed. --}}
 
     <x-add-to-event tool-key="guest-capacity" tool-name="Guest Capacity Calculator" :event-id="request('event_id')" />
     {{-- Row 226 — post it as a request: bidding, urgent, or a draft. --}}
     <x-post-as-request tool-key="guest-capacity" tool-name="Guest Capacity Calculator" form-id="gcForm" />
+
     @endif
 </div>
 @endsection
