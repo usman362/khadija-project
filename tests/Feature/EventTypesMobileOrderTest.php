@@ -65,4 +65,26 @@ class EventTypesMobileOrderTest extends TestCase
         // recommended count and that page lists every category.
         $this->assertMatchesRegularExpression('/\d+ of \d+ categories recommended/', $html);
     }
+
+    /**
+     * The rail badge was a bare number. "Bachelor Party  17" tells a visitor
+     * nothing, and the list was headed "All Event Types" above ten of the 106,
+     * with a "View all event types" link directly underneath contradicting it.
+     */
+    public function test_the_rail_explains_its_number_and_does_not_claim_to_be_everything(): void
+    {
+        \App\Models\Category::create([
+            'name' => 'Bachelor Party', 'slug' => 'bachelor-party',
+            'kind' => \App\Models\Category::EVENT_TYPE,
+            'archetype' => 'Wedding & Related Ceremonies', 'is_active' => true,
+        ]);
+
+        $html = $this->get(route('public.event-types'))->assertSuccessful()->getContent();
+
+        $this->assertStringContainsString('The number is how many of our', $html);
+        $this->assertStringContainsString('categories recommended for a Bachelor Party', $html);
+
+        // A list of ten must not call itself all of them.
+        $this->assertStringNotContainsString('<h4>All Event Types</h4>', $html);
+    }
 }

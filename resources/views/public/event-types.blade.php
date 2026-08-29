@@ -196,10 +196,16 @@
 
     <div class="et-browse">
         <aside class="et-rail-card">
-            <h4>All Event Types</h4>
-            <p class="et-rail-note">The occasions with the most to plan for.</p>
+            {{-- Was headed "All Event Types" above a list of ten, with a "View
+                 all event types" link directly underneath contradicting it. --}}
+            <h4>Most to plan for</h4>
+            <p class="et-rail-note">
+                The number is how many of our {{ $rail->first()['of_total'] ?? 0 }} service
+                categories are recommended for each.
+            </p>
             @foreach($rail as $r)
-                <a class="et-rail-row" href="{{ route('public.category', $r['slug']) }}">
+                <a class="et-rail-row" href="{{ route('public.category', $r['slug']) }}"
+                   title="{{ $r['recommended'] }} of {{ $r['of_total'] }} categories recommended for a {{ $r['name'] }}">
                     <span>{{ $r['name'] }}</span><b>{{ $r['recommended'] }}</b>
                 </a>
             @endforeach
