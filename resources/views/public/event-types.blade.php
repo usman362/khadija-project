@@ -60,8 +60,23 @@
     .et-all-card { position: relative; border: 1.5px solid var(--line, #e5e7eb); border-radius: 14px;
         overflow: hidden; background: #fff; text-decoration: none; display: block; }
     .et-all-card:hover { border-color: #fdba74; }
-    .et-all-img { height: 118px; background: linear-gradient(135deg, #fed7aa, #fdba74); position: relative; }
-    .et-all-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* 144px, not 120.
+
+       The card box was 1.94:1 while the pictures are 1.50:1 (some 1.78, some
+       1.33) — the box is WIDER than what goes in it, so `cover` had to cut the
+       top and the bottom off nearly every image. Signs and decorations sit at
+       the top of these photos, which is what was being lost.
+
+       Measured on the live page: 120px showed 81% of each picture, 144px shows
+       93%, and at 156px the box matches the pictures and nothing is cropped at
+       all. 144 is the smallest increase that fixes most of it without making
+       the directory unnecessarily tall — Peter's own instruction.
+
+       The remaining crop is pushed downward by object-position: what is left to
+       lose comes off the bottom rather than off the sign. Same height on every
+       card, no stretching, no per-card sizing. */
+    .et-all-img { height: 144px; background: linear-gradient(135deg, #fed7aa, #fdba74); position: relative; }
+    .et-all-img img { width: 100%; height: 100%; object-fit: cover; object-position: center 35%; display: block; }
     .et-all-init { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
         font-size: 30px; font-weight: 800; color: #9a3412; opacity: .55; }
     .et-all-body { padding: 11px 30px 13px 13px; }
@@ -133,8 +148,11 @@
     .et-all-card { border: 1.5px solid var(--line, #e5e7eb); border-radius: 14px; overflow: hidden;
         background: #fff; text-decoration: none; display: block; }
     .et-all-card:hover { border-color: #fdba74; }
-    .et-all-img { height: 120px; background: linear-gradient(135deg, #fed7aa, #fdba74); position: relative; }
-    .et-all-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* The same rule appears twice in this file, and this later one is what
+       the browser actually used. Both are set to the same values so they
+       cannot drift apart again. See the note above. */
+    .et-all-img { height: 144px; background: linear-gradient(135deg, #fed7aa, #fdba74); position: relative; }
+    .et-all-img img { width: 100%; height: 100%; object-fit: cover; object-position: center 35%; display: block; }
     .et-all-init { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
         font-size: 30px; font-weight: 800; color: #9a3412; opacity: .55; }
     .et-all-body { padding: 12px 13px 14px; }

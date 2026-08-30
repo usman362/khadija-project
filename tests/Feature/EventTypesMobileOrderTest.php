@@ -87,4 +87,43 @@ class EventTypesMobileOrderTest extends TestCase
         // A list of ten must not call itself all of them.
         $this->assertStringNotContainsString('<h4>All Event Types</h4>', $html);
     }
+
+    /**
+     * Event images were cut off at the top — signs and decorations lost.
+     *
+     * The card box was 1.94:1 while the pictures are 1.50:1, so `cover` had to
+     * take a slice off the top and the bottom of nearly every one. Measured on
+     * the live page: 120px showed 81% of each picture, 144px shows 93%, and the
+     * remaining crop is pushed off the bottom instead of off the sign.
+     *
+     * Peter's rules for the fix, all held here: one height for every card, no
+     * stretching, cover kept.
+     */
+    public function test_the_card_image_area_shows_more_of_the_picture(): void
+    {
+        $html = $this->get(route('public.event-types'))->assertSuccessful()->getContent();
+
+        $this->assertStringNotContainsString('.et-all-img { height: 120px', $html);
+        $this->assertStringNotContainsString('.et-all-img { height: 118px', $html);
+        $this->assertStringContainsString('.et-all-img { height: 144px', $html);
+
+        // What is left to crop comes off the bottom, not off the top.
+        $this->assertStringContainsString('object-position: center 35%', $html);
+
+        // Still cover — never contain, which would leave bands, and never a
+        // stretch, which would distort.
+        $this->assertStringContainsString('object-fit: cover', $html);
+    }
+
+    /** Every card, the same height. A ragged grid was explicitly ruled out. */
+    public function test_every_card_uses_the_same_image_height(): void
+    {
+        $html = $this->get(route('public.event-types'))->assertSuccessful()->getContent();
+
+        preg_match_all('/\.et-all-img\s*\{[^}]*height:\s*(\d+)px/', $html, $m);
+
+        $this->assertNotEmpty($m[1]);
+        $this->assertCount(1, array_unique($m[1]),
+            'The rule appears more than once with different heights, so the cards will not line up.');
+    }
 }
