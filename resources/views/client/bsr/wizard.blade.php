@@ -47,6 +47,14 @@
     .bw-field textarea { min-height: 130px; resize: vertical; line-height: 1.6; }
     .bw-field textarea[rows='3'] { min-height: 84px; }
     .bw-help { font-size: 12px; color: var(--text-muted); margin-top: 5px; line-height: 1.5; }
+    /* The two ways of answering "where is it". */
+    .bw-locpick { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px; margin-bottom: 10px; }
+    .bw-locopt { display: flex; align-items: flex-start; gap: 9px; padding: 10px 12px; border: 1.5px solid var(--border-color); border-radius: 10px; cursor: pointer; background: var(--bg-card); }
+    .bw-locopt:has(input:checked) { border-color: var(--brand, #f97316); background: color-mix(in srgb, var(--brand, #f97316) 6%, transparent); }
+    .bw-locopt input { margin-top: 3px; }
+    .bw-locopt b { display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .bw-locopt small { display: block; font-size: 11.5px; color: var(--text-muted); line-height: 1.35; margin-top: 1px; }
+    .bw-locmine { border: 0; background: none; padding: 0; font: inherit; font-weight: 700; color: var(--brand, #f97316); cursor: pointer; text-decoration: underline; }
     .bw-two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
     /* Step 7 — date, time and availability.
@@ -312,9 +320,52 @@
             </div>
         </div>
         <div class="bw-two">
-            <div class="bw-field">
-                <label>Location</label>
-                <input type="text" name="location" value="{{ $data['location'] ?? '' }}" placeholder="Baltimore, MD">
+            {{-- Two ways to answer, because both are real.
+
+                 The field was a single free-text box with "Baltimore, MD" in it,
+                 so every request stored a city and nothing else — and
+                 location_precision, which the database has carried all along,
+                 stayed 'unresolved'. Distance from a professional cannot be
+                 worked out from a city name, so it could never be worked out at
+                 all.
+
+                 A venue hunt genuinely has no address yet; everything else
+                 usually does. Asking which one they have beats guessing. --}}
+            @php
+                $__loc  = $data['location'] ?? '';
+                $__prof = auth()->user()?->profile;
+                $__home = trim(implode(', ', array_filter([
+                    $__prof?->address, $__prof?->city, $__prof?->state, $__prof?->zip_code,
+                ])));
+                $__kind = $data['location_kind'] ?? ($__loc === '' ? 'exact' : 'area');
+            @endphp
+
+            <div class="bw-field bw-locfield">
+                <label>Where is the event?</label>
+
+                <div class="bw-locpick">
+                    <label class="bw-locopt">
+                        <input type="radio" name="location_kind" value="exact" @checked($__kind === 'exact')>
+                        <span><b>I know the address</b><small>Lets us judge how far professionals are from it</small></span>
+                    </label>
+                    <label class="bw-locopt">
+                        <input type="radio" name="location_kind" value="area" @checked($__kind === 'area')>
+                        <span><b>Only the area so far</b><small>Fine if you are still looking for a venue</small></span>
+                    </label>
+                </div>
+
+                <input type="text" name="location" value="{{ $__loc }}"
+                       placeholder="{{ $__kind === 'exact' ? '1234 Garden Way, Baltimore, MD 21201' : 'Baltimore, MD' }}"
+                       data-bw-location>
+
+                @if($__home !== '')
+                    <p class="bw-help">
+                        {{-- Peter: ask whether it differs from their own address,
+                             rather than making them type it out again. --}}
+                        Is it at your own address?
+                        <button type="button" class="bw-locmine" data-bw-usemine="{{ $__home }}">Use {{ $__home }}</button>
+                    </p>
+                @endif
             </div>
             {{-- The state selector that stood here is gone.
                  Sir Peter's State Boundary Rule (2026-08-25) matches every
@@ -578,6 +629,35 @@
         </div>
 
 @push('scripts')
+<script>
+// The placeholder should show the shape of answer being asked for, and "use my
+// address" should fill it rather than making them type it again.
+(function () {
+    const field = document.querySelector('[data-bw-location]');
+    if (!field) return;
+
+    const hints = {
+        exact: '1234 Garden Way, Baltimore, MD 21201',
+        area:  'Baltimore, MD',
+    };
+
+    document.querySelectorAll('input[name="location_kind"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            field.placeholder = hints[radio.value] || hints.area;
+        });
+    });
+
+    const mine = document.querySelector('[data-bw-usemine]');
+    if (mine) {
+        mine.addEventListener('click', function () {
+            field.value = mine.dataset.bwUsemine;
+            const exact = document.querySelector('input[name="location_kind"][value="exact"]');
+            if (exact) { exact.checked = true; field.placeholder = hints.exact; }
+            field.focus();
+        });
+    }
+})();
+</script>
 <script>
 (function () {
     // Clicking a nearby day sets the date field rather than making the client

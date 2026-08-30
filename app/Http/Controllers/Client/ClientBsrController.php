@@ -215,6 +215,26 @@ class ClientBsrController extends Controller
         $validated = $request->validate($rules, $this->messagesFor($step));
 
         /*
+         * If they said they know the address, hold them to it.
+         *
+         * A street address has a number in it and a city name does not. Without
+         * this the client picks "I know the address", types "Baltimore, MD",
+         * and the request is stored as an exact location that the geocoder
+         * cannot place — which is the silent version of the bug this whole
+         * field was added to fix.
+         */
+        if (($validated['location_kind'] ?? null) === 'exact') {
+            $typed = trim((string) ($validated['location'] ?? ''));
+
+            if ($typed !== '' && ! preg_match('/\d/', $typed)) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'location' => 'That looks like an area rather than an address. '
+                        . 'Add the street and number, or choose "Only the area so far".',
+                ]);
+            }
+        }
+
+        /*
          * Step 7 asks for the date and the two times separately, because that
          * is how a person says it. The database keeps two timestamps, so they
          * are assembled here — and the assembly is the only place that has to
@@ -614,6 +634,15 @@ class ClientBsrController extends Controller
                 'title'       => ['required', 'string', 'max:200'],
                 'starts_at'   => ['nullable', 'date'],
                 'location'    => ['nullable', 'string', 'max:200'],
+                /*
+                 * Which KIND of answer they gave. The field was one free-text
+                 * box, so a city and a full address arrived looking identical
+                 * and every request placed as 'unresolved' — a distance from a
+                 * professional cannot be worked out from a city name. Knowing
+                 * which was intended lets the geocoder be told, and lets the
+                 * page say plainly when a location is only approximate.
+                 */
+                'location_kind' => ['nullable', 'in:exact,area'],
                 // The event-state field was removed from the form on
                 // 2026-08-25: the State Boundary Rule matches every request by
                 // the client's own home state, so choosing one changed nothing.
