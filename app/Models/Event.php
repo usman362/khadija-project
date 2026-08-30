@@ -381,6 +381,25 @@ class Event extends Model
         return empty(array_diff($requested, $this->awardedCategoryIds()));
     }
 
+    /**
+     * The per-service split of this event's budget.
+     *
+     * Only multi-service requests carry these. A single-service request has one
+     * budget and nothing to divide, so it has no rows here.
+     */
+    public function serviceBudgets(): HasMany
+    {
+        return $this->hasMany(EventServiceBudget::class);
+    }
+
+    /** What the client set aside for one service, if they broke it down. */
+    public function budgetForService(int $categoryId): ?float
+    {
+        $row = $this->serviceBudgets->firstWhere('category_id', $categoryId);
+
+        return $row ? (float) $row->amount : null;
+    }
+
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);

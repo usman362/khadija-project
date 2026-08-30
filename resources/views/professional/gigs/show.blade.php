@@ -246,7 +246,37 @@
                         </div>
                     </div>
                     @endif
-                    @if($event->budget)
+                    {{-- What THIS professional should price against.
+
+                         A bid names one service, but the budget was one figure
+                         for the whole request — so on a five-service request for
+                         $10,000, all five professionals saw $10,000 and a DJ
+                         priced against a number that included the catering.
+
+                         Where the client broke it down, the line for the work
+                         this professional actually does is shown first. Where
+                         they did not, nothing is invented. --}}
+                    @if(($myServiceBudgets ?? collect())->isNotEmpty())
+                    <div class="gig-detail-row">
+                        <div class="gig-detail-icon" style="background: var(--accent-green-soft); color: var(--accent-green);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </div>
+                        <div>
+                            <div class="gig-detail-label">Budget for your part</div>
+                            @foreach($myServiceBudgets as $line)
+                                <div class="gig-detail-value">
+                                    ${{ number_format($line['amount'], 2) }}
+                                    <span style="font-weight:500;opacity:.75;">· {{ $line['name'] }}</span>
+                                </div>
+                            @endforeach
+                            @if($event->budget)
+                                <div style="font-size:12px;opacity:.7;margin-top:3px;">
+                                    ${{ number_format($event->budget, 2) }} across the whole request
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    @elseif($event->budget)
                     <div class="gig-detail-row">
                         <div class="gig-detail-icon" style="background: var(--accent-green-soft); color: var(--accent-green);">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>

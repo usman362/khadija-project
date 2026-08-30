@@ -656,6 +656,13 @@ class ClientBsrController extends Controller
             'budget' => [
                 'budget_min' => ['nullable', 'numeric', 'min:0', 'max:9999999'],
                 'budget_max' => ['nullable', 'numeric', 'min:0', 'max:9999999', 'gte:budget_min'],
+                /*
+                 * The per-service split. Keyed by category id, and every key has
+                 * to be a service this request actually asked for — otherwise a
+                 * budget could be attached to a service nobody is bidding on.
+                 */
+                'service_budgets'   => ['nullable', 'array'],
+                'service_budgets.*' => ['nullable', 'numeric', 'min:0', 'max:9999999'],
             ],
             'proposals' => [
                 // R37 forbids inventing a window. Until GigResource approves a
@@ -830,6 +837,16 @@ class ClientBsrController extends Controller
         $event->categories()->sync($d['services'] ?? []);
 
         /*
+         * The per-service budget, written only for the services this request
+         * actually asked for.
+         *
+         * Rewritten from scratch each save rather than merged: a client who
+         * goes back and drops a service must not leave its budget behind on the
+         * request, waiting to be shown to somebody bidding on something else.
+         */
+        $this->saveServiceBudgets($event, $d);
+
+        /*
          * The client attaches a floor plan on step 6, before the Event row
          * exists — the wizard holds its state in the session so an abandoned
          * request leaves nothing behind. The files were uploaded against the
@@ -840,6 +857,46 @@ class ClientBsrController extends Controller
         RequestAttachmentController::adopt($user->id, $this->filesKey($request), $event);
 
         return $event;
+    }
+
+    /**
+     * Store what the client set aside for each service.
+     *
+     * Bids are per service and the budget was one figure for the whole request,
+     * so five professionals bidding on five different services were all shown
+     * the same total. Only a multi-service request has anything to divide.
+     *
+     * @param  array<string, mixed>  $d  the wizard's saved state
+     */
+    private function saveServiceBudgets(Event $event, array $d): void
+    {
+        $services = array_values(array_filter(array_map('intval', (array) ($d['services'] ?? []))));
+        $split    = (array) ($d['service_budgets'] ?? []);
+
+        $event->serviceBudgets()->delete();
+
+        // Nothing to divide on a single-service request.
+        if (count($services) < 2 || $split === []) {
+            return;
+        }
+
+        foreach ($split as $categoryId => $amount) {
+            $categoryId = (int) $categoryId;
+
+            // A figure may only attach to a service actually being requested.
+            if (! in_array($categoryId, $services, true)) {
+                continue;
+            }
+
+            if ($amount === null || $amount === '' || ! is_numeric($amount)) {
+                continue;
+            }
+
+            $event->serviceBudgets()->create([
+                'category_id' => $categoryId,
+                'amount'      => (float) $amount,
+            ]);
+        }
     }
 
     /**

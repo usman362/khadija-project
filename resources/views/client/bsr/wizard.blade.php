@@ -55,6 +55,15 @@
     .bw-locopt b { display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); }
     .bw-locopt small { display: block; font-size: 11.5px; color: var(--text-muted); line-height: 1.35; margin-top: 1px; }
     .bw-locmine { border: 0; background: none; padding: 0; font: inherit; font-weight: 700; color: var(--brand, #f97316); cursor: pointer; text-decoration: underline; }
+    /* The per-service budget breakdown. */
+    .bw-split { border: 1.5px solid var(--border-color); border-radius: 12px; padding: 14px 16px; margin-top: 16px; background: var(--bg-card); }
+    .bw-split h4 { margin: 0 0 2px; font-size: 14px; font-weight: 800; color: var(--text-primary); }
+    .bw-split-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border-color); }
+    .bw-split-row:last-of-type { border-bottom: 0; }
+    .bw-split-row label { flex: 1; font-size: 13.5px; color: var(--text-primary); }
+    .bw-split-row input { width: 130px; }
+    .bw-split-total { margin-top: 10px; padding-top: 10px; border-top: 1.5px solid var(--border-color); font-size: 13px; color: var(--text-muted); }
+    .bw-split-total b { color: var(--text-primary); }
     .bw-two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
     /* Step 7 — date, time and availability.
@@ -414,6 +423,48 @@
                 <input type="number" name="budget_max" min="0" step="1" value="{{ $data['budget_max'] ?? '' }}" placeholder="1200">
             </div>
         </div>
+        {{-- The per-service split.
+
+             Bids have always been per service — a professional bids on ONE of
+             them — while the budget was a single figure for the whole request.
+             So on five services with a $10,000 budget, five different
+             professionals were each shown $10,000 and priced against a number
+             that was never meant for them. Khadijah, 2026-08-30.
+
+             Only shown when there IS something to split. A single-service
+             request has one budget and no breakdown to make. --}}
+        @php
+            $__svcIds = array_values(array_filter(array_map('intval', (array) ($data['services'] ?? []))));
+            $__svcs   = count($__svcIds) > 1
+                ? \App\Models\Category::whereIn('id', $__svcIds)->orderBy('name')->get(['id', 'name'])
+                : collect();
+            $__split  = (array) ($data['service_budgets'] ?? []);
+        @endphp
+
+        @if($__svcs->isNotEmpty())
+            <div class="bw-split">
+                <h4>What is each service worth to you?</h4>
+                <p class="bw-help" style="margin-top:0;">
+                    Professionals bid on one service each, so this is the figure the
+                    right one sees. Leave any of them blank if you would rather not say.
+                </p>
+
+                @foreach($__svcs as $svc)
+                    <div class="bw-split-row">
+                        <label for="sb-{{ $svc->id }}">{{ $svc->name }}</label>
+                        <input type="number" id="sb-{{ $svc->id }}" min="0" step="1"
+                               name="service_budgets[{{ $svc->id }}]"
+                               value="{{ $__split[$svc->id] ?? '' }}"
+                               data-bw-split placeholder="—">
+                    </div>
+                @endforeach
+
+                <div class="bw-split-total">
+                    Breakdown adds up to <b data-bw-splittotal>—</b>
+                </div>
+            </div>
+        @endif
+
         <div class="bw-scope">
             💡 <span>Posting is free. A <b>$2.99</b> service fee applies only when you finalize with a professional — and nothing at all if you don't book.</span>
         </div>
@@ -630,6 +681,28 @@
 
 @push('scripts')
 <script>
+// The breakdown adds up as it is typed. The client is comparing it against
+// their own range, so the sum has to be in front of them while they type —
+// not discovered on the next screen.
+(function () {
+    const fields = document.querySelectorAll('[data-bw-split]');
+    const out = document.querySelector('[data-bw-splittotal]');
+    if (!fields.length || !out) return;
+
+    function retotal() {
+        let sum = 0;
+        let any = false;
+        fields.forEach(function (f) {
+            const n = parseFloat(f.value);
+            if (!isNaN(n) && n >= 0) { sum += n; any = true; }
+        });
+        out.textContent = any ? '$' + sum.toLocaleString('en-US') : '—';
+    }
+
+    fields.forEach(function (f) { f.addEventListener('input', retotal); });
+    retotal();
+})();
+
 // The placeholder should show the shape of answer being asked for, and "use my
 // address" should fill it rather than making them type it again.
 (function () {

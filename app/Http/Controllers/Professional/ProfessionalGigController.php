@@ -115,6 +115,9 @@ class ProfessionalGigController extends Controller
 
         $event->load([
             'categories:id,name',
+            // The per-service budget, so the professional sees the line meant
+            // for what they do rather than the whole request's total.
+            'serviceBudgets',
             'client:id,name,email',
             'supplier:id,name,email',
             'bookings.supplier:id,name',
@@ -140,7 +143,31 @@ class ProfessionalGigController extends Controller
             ? \App\Models\RequestAttachment::where('event_id', $event->id)->orderBy('id')->get()
             : collect();
 
+        /*
+         * What THIS professional should be pricing against.
+         *
+         * A bid names one service (bids.category_id), but the budget was a
+         * single figure for the whole request — so on a five-service request
+         * for $10,000, every one of the five professionals saw $10,000. A DJ
+         * priced against a number that included the catering.
+         *
+         * Where the client broke the budget down, each professional is shown
+         * the line for the services they actually offer. Where they did not,
+         * nothing is invented and the overall figure stands as before.
+         */
+        $mine = $request->user()?->serviceCategories->pluck('id')->all() ?? [];
+
+        $myServiceBudgets = $event->serviceBudgets
+            ->whereIn('category_id', $mine)
+            ->map(fn ($b) => [
+                'name'   => $event->categories->firstWhere('id', $b->category_id)?->name,
+                'amount' => (float) $b->amount,
+            ])
+            ->filter(fn ($row) => $row['name'] !== null)
+            ->values();
+
         return view('professional.gigs.show', [
+            'myServiceBudgets' => $myServiceBudgets,
             'event'       => $event,
             'attendees'   => $attendees,
             'clientFiles' => $clientFiles,
