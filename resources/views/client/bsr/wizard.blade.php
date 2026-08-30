@@ -64,6 +64,9 @@
     .bw-split-row input { width: 130px; }
     .bw-split-total { margin-top: 10px; padding-top: 10px; border-top: 1.5px solid var(--border-color); font-size: 13px; color: var(--text-muted); }
     .bw-split-total b { color: var(--text-primary); }
+    .bw-suggest { margin-left: 10px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 8px; padding: 4px 11px; font: inherit; font-size: 12.5px; font-weight: 700; color: var(--brand, #f97316); cursor: pointer; }
+    .bw-suggest:disabled { opacity: .6; cursor: default; }
+    .bw-suggest-note { display: block; margin-top: 6px; font-size: 12px; color: var(--text-muted); }
     .bw-two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
     /* Step 7 — date, time and availability.
@@ -461,6 +464,13 @@
 
                 <div class="bw-split-total">
                     Breakdown adds up to <b data-bw-splittotal>—</b>
+                    {{-- Offered, never applied on its own. It divides the
+                         client's own total using the Masterlist's Essential /
+                         Common / Occasional ranking for this occasion — it does
+                         not estimate what anything costs, and every box stays
+                         editable afterwards. --}}
+                    <button type="button" class="bw-suggest" data-bw-suggest>Suggest a split</button>
+                    <span class="bw-suggest-note" data-bw-suggestnote></span>
                 </div>
             </div>
         @endif
@@ -684,6 +694,59 @@
 // The breakdown adds up as it is typed. The client is comparing it against
 // their own range, so the sum has to be in front of them while they type —
 // not discovered on the next screen.
+// "Suggest a split" — fills the boxes from the client's own total, weighted by
+// how central each service is to this kind of event. They then change whatever
+// they disagree with; nothing is saved by pressing it.
+(function () {
+    const btn  = document.querySelector('[data-bw-suggest]');
+    const note = document.querySelector('[data-bw-suggestnote]');
+    if (!btn) return;
+
+    btn.addEventListener('click', async function () {
+        btn.disabled = true;
+        const was = btn.textContent;
+        btn.textContent = 'Working…';
+        if (note) note.textContent = '';
+
+        const totalField = document.querySelector('input[name="budget_max"]')
+            || document.querySelector('input[name="budget_min"]');
+
+        try {
+            const res = await fetch('{{ route('client.bsr.suggest-split') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ total: totalField ? totalField.value : null }),
+            });
+            const data = await res.json();
+
+            if (!data.ok) {
+                if (note) note.textContent = data.message || 'Could not suggest a split.';
+                return;
+            }
+
+            Object.entries(data.split).forEach(function ([id, amount]) {
+                const field = document.querySelector('input[name="service_budgets[' + id + ']"]');
+                if (field) field.value = amount;
+            });
+
+            document.querySelectorAll('[data-bw-split]').forEach(function (f) {
+                f.dispatchEvent(new Event('input'));
+            });
+
+            if (note) note.textContent = 'A starting point — change anything you disagree with.';
+        } catch (err) {
+            if (note) note.textContent = 'Could not suggest a split just now.';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = was;
+        }
+    });
+})();
+
 (function () {
     const fields = document.querySelectorAll('[data-bw-split]');
     const out = document.querySelector('[data-bw-splittotal]');

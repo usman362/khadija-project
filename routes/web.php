@@ -731,6 +731,8 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:events.create')->name('client.bsr.step');
         Route::post('/bsr/{step}', [\App\Http\Controllers\Client\ClientBsrController::class, 'save'])
             ->middleware('permission:events.create')->name('client.bsr.save');
+        Route::post('/bsr-suggest-split', [\App\Http\Controllers\Client\ClientBsrController::class, 'suggestBudgetSplit'])
+            ->middleware('permission:events.create')->name('client.bsr.suggest-split');
         Route::get('/bsr-resume/{event}', [\App\Http\Controllers\Client\ClientBsrController::class, 'resume'])
             ->middleware('permission:events.create')->name('client.bsr.resume');
         Route::post('/bsr-discard', [\App\Http\Controllers\Client\ClientBsrController::class, 'discard'])

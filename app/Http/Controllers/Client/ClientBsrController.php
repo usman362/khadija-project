@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Event;
 use Illuminate\Http\RedirectResponse;
+use App\Domain\Budget\ServiceBudgetSuggester;
+use App\Domain\Taxonomy\ServiceRelevance;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
@@ -857,6 +860,46 @@ class ClientBsrController extends Controller
         RequestAttachmentController::adopt($user->id, $this->filesKey($request), $event);
 
         return $event;
+    }
+
+    /**
+     * Suggest a split of the client's budget across the services they chose.
+     *
+     * Offered, never applied: the response fills the boxes and the client
+     * changes whatever they disagree with. It divides THEIR total using the
+     * Masterlist's own Essential / Common / Occasional ranking for the
+     * occasion — it does not estimate what anything costs.
+     */
+    public function suggestBudgetSplit(Request $request, ServiceBudgetSuggester $suggester): JsonResponse
+    {
+        $d = $this->state($request);
+
+        $total = (float) ($request->input('total')
+            ?? $d['budget_max']
+            ?? $d['budget_min']
+            ?? 0);
+
+        $archetype = ServiceRelevance::archetypeByEventType()[
+            mb_strtolower(trim((string) ($d['event_type'] ?? '')))
+        ] ?? null;
+
+        $split = $suggester->suggest(
+            array_map('intval', (array) ($d['services'] ?? [])),
+            $total,
+            $archetype,
+        );
+
+        if ($split === []) {
+            return response()->json([
+                'ok'      => false,
+                // Say which of the two is missing rather than "cannot suggest".
+                'message' => $total <= 0
+                    ? 'Add a budget above first, then we can suggest a split.'
+                    : 'A split needs at least two services.',
+            ]);
+        }
+
+        return response()->json(['ok' => true, 'split' => $split]);
     }
 
     /**
