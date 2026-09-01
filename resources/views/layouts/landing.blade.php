@@ -234,8 +234,16 @@
                          anyone already signed in to their dashboard — so the
                          link named "Post Your Event" landed on the dashboard.
                          A signed-in client goes to the screen the link names;
-                         a guest still has to make an account first. --}}
-                    <a href="{{ auth()->user()?->hasRole('client') ? route('client.post-event.event-info') : route('register', ['role' => 'client']) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Post Your Event</a>
+                         a guest still has to make an account first.
+
+                         It points at the CHOOSER, not straight into the package
+                         flow. Sir Peter, 2026-08-31: this link went to
+                         /client/post-event while the sidebar and the dashboard
+                         went to /client/post-event/choose — the same words
+                         landing a client in two different flows, one of which
+                         skipped the question of what kind of request they were
+                         making at all. --}}
+                    <a href="{{ auth()->user()?->hasRole('client') ? route('client.post-event.choose') : route('register', ['role' => 'client']) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Post Your Event</a>
                 </div>
             </div>
             <div class="lpn-item">
