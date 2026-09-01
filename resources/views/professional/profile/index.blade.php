@@ -541,7 +541,7 @@
                     </div>
 
                     <div class="pf-form-full" style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 4px;">
-                        <div class="pf-card-title" style="font-size:15px;">Service origin</div>
+                        <div class="pf-card-title" style="font-size:15px;" id="service-origin">Service origin</div>
                         <div class="pf-card-desc" style="margin:0;">Travel distance is measured from here — not from your billing or business address unless you enter the same place. Clients see city and state, not the street.</div>
                     </div>
                     @if($profile->origin_precision === 'unresolved' && ($profile->service_origin_zip || $profile->service_origin_line || $profile->service_origin_city))

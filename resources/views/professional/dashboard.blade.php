@@ -19,6 +19,20 @@
     .pd { --pd-blue: var(--info-text); }
 
     /* ── Stats strip (8 cards) ── */
+    /* Asks for the service origin. Sits above everything because it is about
+       whether this professional can be matched at all. */
+    .so-prompt { display: flex; align-items: flex-start; gap: 14px; padding: 15px 18px; margin-bottom: 18px;
+                 border: 1.5px solid var(--border-color); border-left: 4px solid #f97316; border-radius: 12px;
+                 background: var(--bg-card); flex-wrap: wrap; }
+    .so-prompt-ico { flex-shrink: 0; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 9px;
+                     background: rgba(249,115,22,.12); color: #ea580c; }
+    .so-prompt-ico svg { width: 18px; height: 18px; }
+    .so-prompt-body { flex: 1; min-width: 240px; }
+    .so-prompt-body b { display: block; font-size: 14px; color: var(--text-primary); margin-bottom: 3px; }
+    .so-prompt-body p { margin: 0; font-size: 13px; color: var(--text-muted); line-height: 1.5; max-width: 640px; }
+    .so-prompt-btn { flex-shrink: 0; align-self: center; padding: 9px 16px; border-radius: 9px; background: #ea580c;
+                     color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+
     .pd-stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin-bottom: 16px; }
     .pd-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 13px 13px 11px; min-width: 0; }
     .pd-stat-top { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 9px; min-height: 38px; }
@@ -181,6 +195,7 @@
 @endpush
 
 @section('content')
+@include('partials._service_origin_prompt')
 <div class="pd">
 
     {{-- ════════ 8 stat cards ════════ --}}
