@@ -1067,6 +1067,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('/profile/general', [ProfessionalProfileController::class, 'updateGeneral'])->name('professional.profile.update.general');
         Route::patch('/profile/professional', [ProfessionalProfileController::class, 'updateProfessional'])->name('professional.profile.update.professional');
         Route::patch('/profile/services', [ProfessionalProfileController::class, 'updateServices'])->name('professional.profile.update.services');
+        Route::patch('/profile/specialties', [ProfessionalProfileController::class, 'updateSpecialties'])->name('professional.profile.update.specialties');
         Route::patch('/profile/portfolio', [ProfessionalProfileController::class, 'updatePortfolio'])->name('professional.profile.update.portfolio');
         Route::post('/profile/portfolio/image', [ProfessionalProfileController::class, 'uploadPortfolioImage'])->name('professional.profile.portfolio.image');
         Route::delete('/profile/portfolio/image', [ProfessionalProfileController::class, 'deletePortfolioImage'])->name('professional.profile.portfolio.image.delete');

@@ -33,9 +33,34 @@ class ProfessionalProfileController extends Controller
             ? $user->serviceCategories()->pluck('categories.id')->all()
             : [];
 
+        /*
+         * Level 4 specialties, grouped under the services this professional
+         * actually offers.
+         *
+         * Only those services: a DJ has no business being offered "Buffet
+         * Catering" specialties. And only services that HAVE specialties — not
+         * every level 3 does, which is deliberate (Sir Peter, 2026-08-29), so
+         * an empty group would be reporting a gap that is not one.
+         */
+        $specialtyGroups = collect();
+        $selectedSpecialties = [];
+
+        if ($tab === 'professional' && $selectedServices !== []) {
+            $specialtyGroups = \App\Models\Category::query()
+                ->where('kind', \App\Models\Category::SERVICE_SPECIALTY)
+                ->whereIn('parent_id', $selectedServices)
+                ->where('is_active', true)
+                ->with('parent:id,name')
+                ->orderBy('name')
+                ->get(['id', 'name', 'parent_id'])
+                ->groupBy(fn ($s) => $s->parent?->name ?? 'Other')
+                ->sortKeys();
+
+            $selectedSpecialties = $user->specialties()->pluck('categories.id')->all();
+        }
+
         return view('professional.profile.index', compact(
-            'user', 'profile', 'tab', 'categories', 'selectedServices'
-        ));
+            'user', 'profile', 'tab', 'categories', 'selectedServices', 'specialtyGroups', 'selectedSpecialties'));
     }
 
     /**
@@ -44,6 +69,41 @@ class ProfessionalProfileController extends Controller
      * since "Fine-Art Wedding Photographer" does not contain the category name
      * "Photography Services".
      */
+    /**
+     * Save the level-4 specialties this professional offers.
+     *
+     * Separate from the services form on purpose: they share one pivot table,
+     * and saving one must not disturb the other. syncSpecialties() is what
+     * makes that true — a plain sync() would wipe every service on its way
+     * past, because sync's delete ignores the relation's kind filter.
+     *
+     * Only specialties beneath a service they actually offer are accepted, so a
+     * stale form or a hand-edited request cannot attach "Wedding DJ" to a
+     * caterer.
+     */
+    public function updateSpecialties(Request $request)
+    {
+        $data = $request->validate([
+            'specialties'   => ['nullable', 'array'],
+            'specialties.*' => ['integer', 'exists:categories,id'],
+        ]);
+
+        $user = $request->user();
+        $services = $user->serviceCategories()->pluck('categories.id')->all();
+
+        $allowed = \App\Models\Category::whereIn('id', $data['specialties'] ?? [])
+            ->where('kind', \App\Models\Category::SERVICE_SPECIALTY)
+            ->whereIn('parent_id', $services)
+            ->pluck('id')
+            ->all();
+
+        $user->syncSpecialties($allowed);
+
+        return back()->with('status', $allowed === []
+            ? 'Specialties cleared.'
+            : count($allowed) . ' specialt' . (count($allowed) === 1 ? 'y' : 'ies') . ' saved.');
+    }
+
     public function updateServices(Request $request): RedirectResponse
     {
         $data = $request->validate([
@@ -61,7 +121,10 @@ class ProfessionalProfileController extends Controller
         $names = \App\Models\Category::whereIn('id', $picked)->pluck('name');
         $ids   = \App\Models\Category::whereIn('name', $names)->pluck('id')->all();
 
-        $request->user()->serviceCategories()->sync($ids);
+        // NOT serviceCategories()->sync(): both relations share one pivot and
+        // sync's delete ignores the kind filter, so that call wiped every
+        // level-4 specialty on its way past.
+        $request->user()->syncServices($ids);
 
         $shown = $names->count();
 

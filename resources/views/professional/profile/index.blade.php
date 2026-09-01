@@ -217,6 +217,17 @@
     }
     .pf-textarea { resize: vertical; min-height: 100px; }
     .pf-select { appearance: auto; }
+    /* Level 4 specialties, grouped under the service they belong to. */
+    .pf-card-note { font-size: 13px; color: var(--text-muted); margin: 0 0 16px; line-height: 1.5; }
+    .pf-empty { font-size: 13.5px; color: var(--text-muted); margin: 0; }
+    .pf-spec-group { padding: 14px 0; border-bottom: 1px solid var(--border-color); }
+    .pf-spec-group:last-of-type { border-bottom: 0; }
+    .pf-spec-group h4 { margin: 0 0 9px; font-size: 13.5px; font-weight: 800; color: var(--text-primary); }
+    .pf-spec-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+    .pf-spec { display: flex; align-items: center; gap: 8px; padding: 8px 11px; border: 1px solid var(--border-color); border-radius: 9px; cursor: pointer; background: var(--bg-card); font-size: 13px; }
+    .pf-spec:has(input:checked) { border-color: #2563eb; background: rgba(37,99,235,.06); }
+    .pf-spec input { margin: 0; }
+
     .pf-btn {
         display: inline-flex; align-items: center; gap: 8px;
         padding: 10px 24px;
@@ -673,6 +684,53 @@
                     <button type="submit" class="pf-btn">Save Services</button>
                 </div>
             </form>
+        </div>
+
+        {{-- Level 4 — Service Specialties.
+
+             The narrower ways a professional does the services above: "Wedding
+             DJ" and "Karaoke DJ" beneath "DJ". Paid Search Visibility will
+             reference these rows rather than keeping a duplicate list of the
+             same terms (Sir Peter, 2026-08-29).
+
+             Its own form. Services and specialties share one pivot table, so
+             saving one must not disturb the other — see User::syncSpecialties. --}}
+        <div class="pf-card" style="margin-top: 22px;">
+            <div class="pf-card-h">Service Specialties</div>
+            <div class="pf-card-note">
+                Narrower ways you work, under the services you offer. Optional —
+                not every service has them, and leaving them blank changes nothing
+                about where you appear today.
+            </div>
+
+            @if($selectedServices === [])
+                <p class="pf-empty">Choose your services above and save first — specialties sit underneath them.</p>
+            @elseif($specialtyGroups->isEmpty())
+                <p class="pf-empty">None of the services you offer have specialties listed yet.</p>
+            @else
+                <form action="{{ route('professional.profile.update.specialties') }}" method="POST">
+                    @csrf @method('PATCH')
+
+                    @foreach($specialtyGroups as $serviceName => $specialties)
+                        <div class="pf-spec-group">
+                            <h4>{{ $serviceName }}</h4>
+                            <div class="pf-spec-list">
+                                @foreach($specialties as $spec)
+                                    <label class="pf-spec">
+                                        <input type="checkbox" name="specialties[]" value="{{ $spec->id }}"
+                                               @checked(in_array($spec->id, old('specialties', $selectedSpecialties)))>
+                                        <span>{{ $spec->name }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+
+                    <div style="margin-top: 20px;">
+                        <button type="submit" class="pf-btn">Save Specialties</button>
+                    </div>
+                </form>
+            @endif
         </div>
         @endif
 

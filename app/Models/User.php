@@ -340,9 +340,96 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->notify(new \App\Notifications\Auth\ResetPasswordLink($token));
     }
 
+    /**
+     * The services this professional offers — level 3.
+     *
+     * Named "categories" but it has always held level-3 SERVICES: all 31 links
+     * on record are kind=service. Level 4 specialties share this pivot, so this
+     * excludes them explicitly — otherwise every one of the 29 places that read
+     * this relation would silently start listing "Wedding DJ" beside
+     * "DJs, Live Bands & Musicians" as though they were the same kind of thing.
+     */
     public function serviceCategories(): BelongsToMany
     {
+        return $this->belongsToMany(Category::class)
+            /*
+             * NULL is not a specialty, and SQL will not say so on its own:
+             * `kind != 'service_specialty'` evaluates to NULL for a row with no
+             * kind, which excludes it. A category saved without a kind would
+             * have vanished from every professional's services — silently, and
+             * only for them.
+             */
+            ->where(fn ($q) => $q
+                ->whereNull('categories.kind')
+                ->orWhere('categories.kind', '!=', Category::SERVICE_SPECIALTY))
+            ->withTimestamps();
+    }
+
+    /**
+     * Replace the services WITHOUT touching the specialties, and vice versa.
+     *
+     * Do not call sync() on either relation. Both live in the same pivot and
+     * the `where kind` constraint applies to reading it, not to the delete
+     * sync() performs first — so `serviceCategories()->sync()` wipes every
+     * specialty on the way past, and `specialties()->sync()` wipes every
+     * service. Verified: syncing two services then two specialties left the
+     * professional with two specialties and no services at all.
+     *
+     * @param  array<int, int>  $ids
+     */
+    public function syncServices(array $ids): void
+    {
+        $this->syncWithinKind($ids, [Category::SERVICE, Category::SERVICE_CATEGORY, Category::EVENT_TYPE]);
+    }
+
+    /** @param  array<int, int>  $ids */
+    public function syncSpecialties(array $ids): void
+    {
+        $this->syncWithinKind($ids, [Category::SERVICE_SPECIALTY]);
+    }
+
+    /**
+     * Detach only what belongs to these kinds, then attach the new set.
+     *
+     * @param  array<int, int>     $ids
+     * @param  array<int, string>  $kinds
+     */
+    private function syncWithinKind(array $ids, array $kinds): void
+    {
+        $existing = $this->belongsToMany(Category::class)
+            ->whereIn('categories.kind', $kinds)
+            ->pluck('categories.id')
+            ->all();
+
+        // Only ids of the right kind may be attached here, so a caller cannot
+        // put a specialty into the services list by passing the wrong array.
+        $wanted = Category::whereIn('id', array_map('intval', $ids))
+            ->whereIn('kind', $kinds)
+            ->pluck('id')
+            ->all();
+
+        $this->categoriesPivot()->detach(array_diff($existing, $wanted));
+        $this->categoriesPivot()->syncWithoutDetaching($wanted);
+    }
+
+    /** The raw pivot, unfiltered — used only by syncWithinKind(). */
+    private function categoriesPivot(): BelongsToMany
+    {
         return $this->belongsToMany(Category::class)->withTimestamps();
+    }
+
+    /**
+     * Level 4 — the narrower ways this professional does those services.
+     *
+     * "Wedding DJ" and "Karaoke DJ" beneath "DJ". Same pivot as the services
+     * above, separated by kind. Paid Search Visibility will reference these
+     * rows rather than keeping a list of its own (Sir Peter, 2026-08-29).
+     */
+    public function specialties(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class)
+            ->where('categories.kind', Category::SERVICE_SPECIALTY)
+            ->withTimestamps();
     }
 
     /** Professionals this client has explicitly saved (My Professionals). */
