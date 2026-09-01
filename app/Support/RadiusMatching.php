@@ -56,7 +56,19 @@ final class RadiusMatching
             return false;
         }
 
-        if (! StateMatching::matches($pro->profile?->state, $event->state)) {
+        /*
+         * State is no longer a gate.
+         *
+         * This ran BEFORE the distance was worked out, so a New Jersey
+         * photographer was refused a Philadelphia wedding forty minutes away
+         * while the radius that would have allowed it was never even measured.
+         * Sir Peter, 2026-08-31: distance from the event is the filter.
+         *
+         * It is still honoured when the switch is on — config('geo.state_matching')
+         * — because that is what turning it back on has to mean.
+         */
+        if (StateMatching::appliesTo($pro)
+            && ! StateMatching::matches($pro->profile?->state, $event->state)) {
             return false;
         }
 

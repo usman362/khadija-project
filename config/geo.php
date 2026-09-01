@@ -108,6 +108,35 @@ return [
     */
     'radius_matching' => env('GEO_RADIUS_MATCHING', true),
 
+    /*
+    | Home-state matching. OFF since 2026-08-31.
+    |
+    | Sir Peter: "what matters is whether a professional can get to the venue —
+    | not which state their business address is in. A photographer based in New
+    | Jersey shooting a wedding in Philadelphia is standard practice. Home-state
+    | matching would arbitrarily block that."
+    |
+    | Distance from the event decides — ONCE THERE IS A DISTANCE TO MEASURE.
+    |
+    | It is still ON, and that is deliberate. Checked on 2026-08-31: of 17
+    | professionals, ZERO have placed a service origin or set a travel radius,
+    | and no client has coordinates. With nothing to measure:
+    |
+    |   - turning this off removes the only filter there is, and a Maryland
+    |     client browses professionals across the country who cannot reach them
+    |   - turning radius matching on in its place matches NOBODY, because
+    |     RadiusMatching refuses a professional whose origin is not placed
+    |
+    | Neither is what was asked for. The order has to be: professionals set a
+    | service origin and a travel radius, that is backfilled, and then this
+    | becomes GEO_STATE_MATCHING=false — one environment variable, no rewrite.
+    |
+    | The rule also stays as a switch rather than being deleted because a
+    | service category that one day needs in-state licensing is a compliance
+    | flag on THAT category, not a reason to rebuild this.
+    */
+    'state_matching' => env('GEO_STATE_MATCHING', true),
+
     // census = street geocode on save (free). none = ZIP table only (tests).
     'geocoder' => env('GEOCODER_DRIVER', 'census'),
 

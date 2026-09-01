@@ -37,6 +37,7 @@
     .bw-field { margin-bottom: 16px; }
     .bw-field label { display: block; font-size: 12.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
     .bw-field .req { color: var(--bad-text); }
+    .bw-optional { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .3px; margin-left: 4px; }
     .bw-field .bw-hint { font-size: 11.5px; color: var(--text-muted); margin-top: 5px; line-height: 1.4; }
     .bw-field input[type=text], .bw-field input[type=number], .bw-field input[type=datetime-local],
     .bw-field input[type=date], .bw-field input[type=time],
@@ -296,7 +297,11 @@
         </div>
 
         <div class="bw-field">
-            <label>Request characteristic <span class="req">*</span></label>
+            {{-- No longer required. Sir Peter, 2026-08-31: nothing reads this
+                 after it is saved — it reaches no professional and changes no
+                 matching, deadline or fee — so it cannot be allowed to block a
+                 client from posting. It stays while its purpose is decided. --}}
+            <label>Request characteristic <span class="bw-optional">optional</span></label>
             <div class="bw-opts">
                 @foreach($characteristics as $k => [$label, $desc])
                     <label class="bw-opt">

@@ -38,10 +38,29 @@ final class StateMatching
         return is_string($state) && $state !== '' ? strtoupper($state) : null;
     }
 
-    /** Does R38 govern this account at all? Influencers and admins do not transact. */
+    /**
+     * Does home-state matching govern this account at all?
+     *
+     * OFF by default since 2026-08-31. Sir Peter: "what matters is whether a
+     * professional can get to the venue — not which state their business
+     * address is in. A photographer based in New Jersey shooting a wedding in
+     * Philadelphia is standard practice." Distance from the event is the filter
+     * now; see App\Support\RadiusMatching.
+     *
+     * The rule is kept behind a switch rather than deleted, because it is the
+     * fallback for a professional who has not placed a service origin yet, and
+     * because a service category that ever needs in-state licensing would be a
+     * compliance flag on that category — not this global rule brought back.
+     *
+     * Influencers and admins never transacted, so they were never governed.
+     */
     public static function appliesTo(?User $user): bool
     {
         if ($user === null) {
+            return false;
+        }
+
+        if (! config('geo.state_matching', false)) {
             return false;
         }
 

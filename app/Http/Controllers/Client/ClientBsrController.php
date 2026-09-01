@@ -631,7 +631,16 @@ class ClientBsrController extends Controller
                 // Only asked for, and only kept, when they picked "Other".
                 'event_title'       => ['nullable', 'string', 'max:120', 'required_if:event_type,' . self::OTHER_EVENT_TYPE],
                 'organization_type' => ['required', 'in:' . implode(',', array_keys(self::ORG_TYPES))],
-                'characteristic'    => ['required', 'in:' . implode(',', array_keys(self::CHARACTERISTICS))],
+                /*
+                 * Not required. Sir Peter, 2026-08-31: "a required field that
+                 * does nothing is a broken form."
+                 *
+                 * Nothing reads this after it is saved — it does not reach a
+                 * professional, and it changes no matching, deadline or fee. It
+                 * stays on the form while its purpose is decided, but it can no
+                 * longer stop a client from posting a request.
+                 */
+                'characteristic'    => ['nullable', 'in:' . implode(',', array_keys(self::CHARACTERISTICS))],
             ],
             'event' => [
                 'title'       => ['required', 'string', 'max:200'],
@@ -709,7 +718,6 @@ class ClientBsrController extends Controller
     {
         return [
             'services.required'          => 'Pick at least one service you need.',
-            'characteristic.required'    => 'Choose how urgent or complex this request is.',
             'organization_type.required' => 'Tell us who the request is for.',
             'title.required'             => 'Give your request a name.',
             'description.required'       => 'Describe what you need — professionals bid on this.',
@@ -743,7 +751,8 @@ class ClientBsrController extends Controller
          * were about to publish.
          */
         $ok = [
-            ! empty($d['services']) && ! empty($d['organization_type']) && ! empty($d['characteristic']),
+            // characteristic deliberately absent: it is optional now.
+            ! empty($d['services']) && ! empty($d['organization_type']),
             ! empty($d['title']),
             ! empty($d['description']),
             true,   // budget is optional
