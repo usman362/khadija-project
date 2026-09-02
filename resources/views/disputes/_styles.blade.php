@@ -57,7 +57,6 @@
     .dsp-flash  { padding:11px 14px; border-radius:10px; background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.3);
                   color:#047857; font-size:13px; margin-bottom:14px; }
     .dsp-strike { text-decoration:line-through; opacity:.55; }
-</style>
 
     /* Khadijah's Platform Resolution wording. Quiet, but never hidden — it is
        the paragraph that keeps the page from reading as a binding judgment. */
@@ -65,3 +64,4 @@
                   border-radius: 10px; padding: 12px 14px; margin-top: 14px; background: var(--bg-soft, rgba(0,0,0,.02)); }
     .dr-platres b { display: block; font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
     .dr-platres p { margin: 0; font-size: 12.5px; line-height: 1.65; color: var(--text-muted); }
+</style>

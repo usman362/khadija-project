@@ -200,4 +200,44 @@ class ClientSideSmokeTest extends TestCase
             "a stranger got {$status} on another client's event",
         );
     }
+
+    /**
+     * A page can answer 200 and still be visibly broken. This one was: a CSS
+     * block added just after its own </style> rendered as a paragraph of
+     * stylesheet across the top of Requests & Submissions, and every check
+     * here passed it, because "did not throw" is a low bar and I had treated
+     * it as the whole test.
+     *
+     * So: strip the real style and script blocks, then look at what a reader
+     * would see. Declarations and comment terminators have no business there.
+     */
+    public function test_no_page_shows_its_stylesheet_as_text(): void
+    {
+        $client = $this->client();
+        $leaking = [];
+
+        // Not just /client/*. The page this was written for lives at /forms,
+        // and sweeping only the client prefix is why the first version of this
+        // test passed on the broken page it was written to catch.
+        $paths = array_merge(
+            $this->parameterlessGetRoutes('client/'),
+            $this->parameterlessGetRoutes('forms'),
+            $this->parameterlessGetRoutes('disputes'),
+            $this->parameterlessGetRoutes('cancellations'),
+        );
+
+        foreach ($paths as $path) {
+            $html = $this->actingAs($client)->get($path)->getContent();
+
+            $visible = preg_replace('#<(style|script)\b[^>]*>.*?</\1>#is', '', $html);
+            $visible = strip_tags((string) $visible);
+
+            // The end of a CSS comment, or a declaration block, in plain text.
+            if (preg_match('#\*/#', $visible) || preg_match('#\{[^{}]*:[^{}]*;[^{}]*\}#', $visible)) {
+                $leaking[] = $path;
+            }
+        }
+
+        $this->assertSame([], $leaking, "pages showing stylesheet as text:\n".implode("\n", $leaking));
+    }
 }

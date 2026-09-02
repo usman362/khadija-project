@@ -668,8 +668,24 @@ Route::middleware('auth')->group(function () {
         Route::post('/{cancellation}/withdraw', [$c, 'withdraw'])->name('withdraw');
     });
 
-    // ── The forms audit's ten forms (rows 183–246) ────────────────
-    Route::prefix('forms')->name('forms.')->group(function () {
+    /*
+     * The address says what the page is called.
+     *
+     * The page has been headed "Requests & Submissions" since it was built;
+     * only the URL still said /forms, which is the developer's word for it,
+     * not the client's. Route NAMES stay `forms.*` — they are internal, and
+     * form_submissions.form_key stores the old keys — so this is a change of
+     * address, not of wiring.
+     *
+     * /forms keeps answering, permanently redirected. Unlike a withdrawn page,
+     * this one has somewhere to send you: the same page under its own name.
+     */
+    Route::redirect('/forms', '/requests-submissions', 301);
+    Route::get('/forms/{rest}', function (string $rest) {
+        return redirect('/requests-submissions/'.$rest, 301);
+    })->where('rest', '.*');
+
+    Route::prefix('requests-submissions')->name('forms.')->group(function () {
         $f = \App\Http\Controllers\Forms\FormController::class;
 
         Route::get('/', [$f, 'index'])->name('index');

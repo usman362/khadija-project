@@ -54,7 +54,7 @@ class FormUrlNamesTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('renamedForms')]
     public function test_the_address_reads_as_the_form_name(string $key, string $slug): void
     {
-        $this->assertStringEndsWith("/forms/new/{$slug}", FormRegistry::url($key));
+        $this->assertStringEndsWith("/requests-submissions/new/{$slug}", FormRegistry::url($key));
     }
 
     /** Every form, not just the four above. */
@@ -100,5 +100,42 @@ class FormUrlNamesTest extends TestCase
             $this->assertNotNull(FormRegistry::get($key),
                 "The key {$key} disappeared — submissions filed under it would be orphaned.");
         }
+    }
+
+    /**
+     * The old address still answers. A renamed page is only safely renamed if
+     * the link somebody already sent, bookmarked, or pasted into a message
+     * still arrives — unlike the withdrawn Hub, this page has somewhere to
+     * send them: itself, under its own name.
+     */
+    public function test_the_old_forms_address_redirects_rather_than_breaks(): void
+    {
+        // Signed in: the redirect sits inside the authenticated group, so a
+        // guest is sent to the login screen and would prove nothing here.
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
+        $user = \App\Models\User::factory()->create(['primary_role' => 'client']);
+        $user->assignRole('client');
+
+        $this->actingAs($user)->get('/forms')
+            ->assertRedirect('/requests-submissions');
+
+        $this->actingAs($user)->get('/forms/new/contact-support')
+            ->assertRedirect('/requests-submissions/new/contact-support');
+    }
+
+    /** And the page says the name the address now says. */
+    public function test_the_page_is_headed_requests_and_submissions(): void
+    {
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
+        $user = \App\Models\User::factory()->create(['primary_role' => 'client']);
+        $user->assignRole('client');
+
+        $this->actingAs($user)->get('/requests-submissions')
+            ->assertOk()
+            ->assertSee('Requests &amp; Submissions', false);
     }
 }
