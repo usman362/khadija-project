@@ -167,6 +167,12 @@
             <div class="esr-grid2">
                 <div class="esr-field"><label>Budget (visible to responders only)</label><input type="number" name="budget_min" class="esr-input" value="{{ old('budget_min') }}" placeholder="e.g. 2000"></div>
             </div>
+            @include('client.partials._service_budget_split', [
+                'pickerName' => 'services',
+                'split'      => old('service_budgets', []),
+                'suggestUrl' => route('client.bsr.suggest-split'),
+            ])
+
             <div class="esr-field"><label>Anything else the pro should know?</label><textarea name="description" class="esr-textarea" maxlength="2000" placeholder="Scope, access, equipment, timing…">{{ old('description') }}</textarea></div>
         </div>
 

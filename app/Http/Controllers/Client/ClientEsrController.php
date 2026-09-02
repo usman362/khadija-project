@@ -8,6 +8,7 @@ use App\Models\Event;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Domain\Budget\ServiceBudgetWriter;
 
 /**
  * Emergency Request (ER) — a standalone "Post a Rush Request" flow
@@ -182,6 +183,15 @@ class ClientEsrController extends Controller
         ]);
 
         $event->categories()->sync($services->all());
+
+        // Sir Peter, 2026-09-02: an ER naming several services says what each
+        // one is worth, the same as a BR. Responders answer on one service, so
+        // without this each of them prices against the whole request's total.
+        ServiceBudgetWriter::save(
+            $event,
+            (array) $request->input('service_budgets', []),
+            $services->all(),
+        );
 
         // Land on the request itself; responses show up under Proposals.
         return redirect()

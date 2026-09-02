@@ -11,6 +11,7 @@ use App\Support\StateMatching;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Domain\Budget\ServiceBudgetWriter;
 
 /**
  * Client → Professional Direct Offer / Request builder.
@@ -213,6 +214,15 @@ class ClientDirectOfferController extends Controller
         if ($categoryIds->isNotEmpty()) {
             $event->categories()->sync($categoryIds->all());
         }
+
+        // Sir Peter, 2026-09-02: a DR naming several services says what each
+        // one is worth, the same as a BR. The professional prices one service,
+        // not the request, so a single total is the wrong figure to show them.
+        ServiceBudgetWriter::save(
+            $event,
+            (array) $request->input('service_budgets', []),
+            $categoryIds->all(),
+        );
 
         // Land on the offer itself, same as the other post flows.
         return redirect()

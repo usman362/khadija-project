@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Event;
 use Illuminate\Http\RedirectResponse;
 use App\Domain\Budget\ServiceBudgetSuggester;
+use App\Domain\Budget\ServiceBudgetWriter;
 use App\Domain\Taxonomy\ServiceRelevance;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -922,33 +923,13 @@ class ClientBsrController extends Controller
      */
     private function saveServiceBudgets(Event $event, array $d): void
     {
-        $services = array_values(array_filter(array_map('intval', (array) ($d['services'] ?? []))));
-        $split    = (array) ($d['service_budgets'] ?? []);
-
-        $event->serviceBudgets()->delete();
-
-        // Nothing to divide on a single-service request.
-        if (count($services) < 2 || $split === []) {
-            return;
-        }
-
-        foreach ($split as $categoryId => $amount) {
-            $categoryId = (int) $categoryId;
-
-            // A figure may only attach to a service actually being requested.
-            if (! in_array($categoryId, $services, true)) {
-                continue;
-            }
-
-            if ($amount === null || $amount === '' || ! is_numeric($amount)) {
-                continue;
-            }
-
-            $event->serviceBudgets()->create([
-                'category_id' => $categoryId,
-                'amount'      => (float) $amount,
-            ]);
-        }
+        // The rule itself lives in ServiceBudgetWriter now, so Direct Request
+        // and Emergency Request save the split exactly as this does.
+        ServiceBudgetWriter::save(
+            $event,
+            (array) ($d['service_budgets'] ?? []),
+            (array) ($d['services'] ?? []),
+        );
     }
 
     /**

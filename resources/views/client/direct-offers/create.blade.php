@@ -290,6 +290,12 @@
                     <div class="do-field"><label>Budget Range (min)</label><input type="number" class="do-input" name="budget_min" placeholder="7000"></div>
                     <div class="do-field"><label>Budget Range (max)</label><input type="number" class="do-input" name="budget_max" placeholder="8500"></div>
                 </div>
+                    @include('client.partials._service_budget_split', [
+                        'pickerName' => 'services',
+                        'split'      => old('service_budgets', []),
+                        'suggestUrl' => route('client.bsr.suggest-split'),
+                    ])
+
                 <div class="do-field"><label>Preferred Payment</label>
                     <select class="do-input" name="payment" aria-label="Deposit + balance before event"><option>Deposit + balance before event</option><option>Milestone payments</option><option>Full on completion</option></select>
                 </div>
