@@ -176,7 +176,7 @@
                          button that goes nowhere, this asks the team to set it
                          up — which is a thing that actually happens. --}}
                     <a class="tk-cta {{ $isRec || $isTop ? 'solid' : '' }}"
-                       href="{{ route('forms.create', 'support_request') }}">{{ $isTop ? 'Unlock Maximum' : 'Choose ' . $card['label'] }}</a>
+                       href="{{ \App\Domain\Forms\FormRegistry::url('support_request') }}">{{ $isTop ? 'Unlock Maximum' : 'Choose ' . $card['label'] }}</a>
                     <div class="tk-foot">One-time payment · No monthly fees</div>
                 @endif
             </div>
@@ -256,7 +256,7 @@
                 <b>Not sure which level is right for you?</b>
                 <span>Start with Semi for the essentials. Upgrade to Maximum anytime for the full set.</span>
             </span>
-            <a href="{{ route('forms.create', 'support_request') }}">Need help deciding?</a>
+            <a href="{{ \App\Domain\Forms\FormRegistry::url('support_request') }}">Need help deciding?</a>
         </div>
 
         <p class="tk-small">

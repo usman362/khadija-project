@@ -174,7 +174,7 @@
             <div class="rq-groupsec-h">{{ $groupIcon[$slug] ?? '📄' }} {{ $group['label'] }}</div>
             <div class="rq-forms">
                 @foreach($group['forms'] as $key => $form)
-                    <a class="rq-form" href="{{ route('forms.create', $key) }}">
+                    <a class="rq-form" href="{{ \App\Domain\Forms\FormRegistry::url($key) }}">
                         <b>{{ $form['title'] }}</b>
                         <span>{{ $form['purpose'] }}</span>
                     </a>

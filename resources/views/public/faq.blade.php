@@ -243,7 +243,7 @@
                 <h3>Still Need Help?</h3>
                 <p>Can't find the answer you're looking for? Our support team is ready to assist you.</p>
                 {{-- Row 122 — pointed at the About page, which is not support. --}}
-                <a href="{{ route('forms.create', 'support_request') }}" class="lp-btn lp-btn-blue">Contact Support
+                <a href="{{ \App\Domain\Forms\FormRegistry::url('support_request') }}" class="lp-btn lp-btn-blue">Contact Support
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
             </div>
             <svg class="fq-help-env" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">

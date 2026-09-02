@@ -436,7 +436,7 @@
                     <a href="{{ route('client.payments.index') }}" class="vh-quick">Release payment</a>
                     <a href="{{ route('client.reviews.index') }}" class="vh-quick">Review your professionals</a>
                     <a href="{{ route('client.virtual-hub.brief') }}" class="vh-quick">Book again</a>
-                    <a href="{{ route('forms.create', 'support_request') }}" class="vh-quick">Get support</a>
+                    <a href="{{ \App\Domain\Forms\FormRegistry::url('support_request') }}" class="vh-quick">Get support</a>
                 </div>
             </div>
         @endif

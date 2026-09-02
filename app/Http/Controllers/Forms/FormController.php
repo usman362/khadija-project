@@ -178,6 +178,12 @@ class FormController extends Controller
     public function create(Request $request, string $key): View
     {
         $user       = $request->user();
+        /*
+         * The URL carries the form's NAME now ("share-your-story"), not its
+         * internal key. keyFor() accepts either, so links already sent to
+         * somebody keep working.
+         */
+        $key        = FormRegistry::keyFor($key) ?? $key;
         $definition = FormRegistry::get($key);
 
         abort_if($definition === null, 404);
@@ -201,6 +207,12 @@ class FormController extends Controller
     public function store(Request $request, string $key): RedirectResponse
     {
         $user       = $request->user();
+        /*
+         * The URL carries the form's NAME now ("share-your-story"), not its
+         * internal key. keyFor() accepts either, so links already sent to
+         * somebody keep working.
+         */
+        $key        = FormRegistry::keyFor($key) ?? $key;
         $definition = FormRegistry::get($key);
 
         abort_if($definition === null, 404);

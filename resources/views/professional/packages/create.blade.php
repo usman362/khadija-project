@@ -610,7 +610,7 @@
                 <p>Our support team is here to help you create the perfect package.</p>
                 {{-- Row 122 — pointed at client↔professional messaging, which
                      reaches another user rather than the platform. --}}
-                <a href="{{ route('forms.create', 'support_request') }}">Contact Support →</a>
+                <a href="{{ \App\Domain\Forms\FormRegistry::url('support_request') }}">Contact Support →</a>
             </div>
         </aside>
     </div>
@@ -624,7 +624,7 @@
             <div>
                 <b>Need Assistance?</b>
                 <span>Our support team is here to help you build the package.</span>
-                <a href="{{ route('forms.create', 'support_request') }}">Contact Support →</a>
+                <a href="{{ \App\Domain\Forms\FormRegistry::url('support_request') }}">Contact Support →</a>
             </div>
         </div>
         <div class="pc-tcard">

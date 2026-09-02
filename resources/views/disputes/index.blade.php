@@ -384,7 +384,7 @@
             <h4>🎧 Need Help?</h4>
             <p>Read the answers to common questions, or ask our support team.</p>
             <a class="dr-railbtn" href="{{ route('public.faq') }}">Visit the FAQ</a>
-            <a class="dr-raillink" href="{{ route('forms.create', 'support_request') }}">Contact Support →</a>
+            <a class="dr-raillink" href="{{ \App\Domain\Forms\FormRegistry::url('support_request') }}">Contact Support →</a>
         </div>
     </aside>
 </div>

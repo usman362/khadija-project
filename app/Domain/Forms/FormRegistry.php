@@ -359,6 +359,56 @@ final class FormRegistry
         return self::all()[$key] ?? null;
     }
 
+    /**
+     * The web address for a form, built from its NAME rather than its key.
+     *
+     * Khadijah, 2026-08-30: the URLs and form names should use the real names.
+     * They did not — "Share Your Story" lived at /forms/new/testimonial, and
+     * "Report Content" at /forms/new/content_report. A person reading the
+     * address bar saw an internal identifier.
+     *
+     * The key itself is untouched on purpose: form_submissions.form_key stores
+     * it, and renaming it would orphan every submission already filed. So the
+     * slug is what appears in the address, and the key stays what the database
+     * knows.
+     */
+    public static function slugFor(string $key): string
+    {
+        $definition = self::get($key);
+
+        return $definition
+            ? \Illuminate\Support\Str::slug($definition['title'])
+            : \Illuminate\Support\Str::slug($key);
+    }
+
+    /** The link to open a form, addressed by its name. */
+    public static function url(string $key): string
+    {
+        return route('forms.create', self::slugFor($key));
+    }
+
+    /**
+     * Turn whatever came out of a URL back into a key.
+     *
+     * Accepts the slug OR the old key, so links already sent to somebody —
+     * in an email, a message, a bookmark — keep working. Returns null for
+     * anything that names no form, which the controller turns into a 404.
+     */
+    public static function keyFor(string $slugOrKey): ?string
+    {
+        if (self::get($slugOrKey) !== null) {
+            return $slugOrKey;
+        }
+
+        foreach (array_keys(self::all()) as $key) {
+            if (self::slugFor($key) === $slugOrKey) {
+                return $key;
+            }
+        }
+
+        return null;
+    }
+
     /** Forms this person may file. */
     public static function forAudience(string $audience): array
     {

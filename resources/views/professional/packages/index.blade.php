@@ -470,7 +470,7 @@
         <div class="mp-card">
             <h4>🎧 Need Help?</h4>
             <p class="mp-help">We're here to help you create, publish and manage your packages.</p>
-            <a class="mp-help-link" href="{{ route('forms.create', 'support_request') }}">Contact Support →</a>
+            <a class="mp-help-link" href="{{ \App\Domain\Forms\FormRegistry::url('support_request') }}">Contact Support →</a>
         </div>
     </aside>
 </div>
