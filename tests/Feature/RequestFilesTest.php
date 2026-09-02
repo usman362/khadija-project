@@ -348,7 +348,6 @@ class RequestFilesTest extends TestCase
             'services'          => [$service->id],
             'event_type'        => $type->name,
             'organization_type' => 'individual',
-            'characteristic'    => 'standard',
         ]);
         $this->actingAs($client)->post(route('client.bsr.save', 'event'), [
             'title'       => 'Charity gala',

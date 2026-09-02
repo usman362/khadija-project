@@ -89,7 +89,6 @@ class RequestEventStateTest extends TestCase
             'event_type'        => $this->eventType()->name,
             'services'          => [$this->service()->id],
             'organization_type' => array_key_first(\App\Http\Controllers\Client\ClientBsrController::ORG_TYPES),
-            'characteristic'    => array_key_first(\App\Http\Controllers\Client\ClientBsrController::CHARACTERISTICS),
         ]);
 
         return $this->actingAs($client)->get(route('client.bsr.step', 'event'));

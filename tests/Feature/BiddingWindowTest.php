@@ -132,7 +132,6 @@ class BiddingWindowTest extends TestCase
         $save('service', [
             'services' => [$service->id], 'event_type' => 'Wedding',
             'organization_type' => array_key_first(\App\Http\Controllers\Client\ClientBsrController::ORG_TYPES),
-            'characteristic' => array_key_first(\App\Http\Controllers\Client\ClientBsrController::CHARACTERISTICS),
         ]);
         $save('event', [
             'title' => 'Spring Wedding', 'starts_at' => now()->addMonths(3)->format('Y-m-d\TH:i'),

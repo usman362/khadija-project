@@ -51,7 +51,6 @@ class Event extends Model
         // BR wizard fields
         'event_type',
         'organization_type',
-        'characteristic',
         'budget_min',
         'budget_max',
         'proposal_deadline',

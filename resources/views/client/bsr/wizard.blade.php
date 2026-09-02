@@ -295,23 +295,11 @@
         </div>
 
         <div class="bw-field">
-            {{-- No longer required. Sir Peter, 2026-08-31: nothing reads this
-                 after it is saved — it reaches no professional and changes no
-                 matching, deadline or fee — so it cannot be allowed to block a
-                 client from posting. It stays while its purpose is decided. --}}
-            <label>Request characteristic <span class="bw-optional">optional</span></label>
-            <div class="bw-opts">
-                @foreach($characteristics as $k => [$label, $desc])
-                    <label class="bw-opt">
-                        <input type="radio" name="characteristic" value="{{ $k }}"
-                               @checked(($data['characteristic'] ?? 'standard') === $k)>
-                        <b>{{ $label }}</b><span>{{ $desc }}</span>
-                    </label>
-                @endforeach
-            </div>
-            {{-- No "Emergency" option: emergency is its own request type (ER),
-                 which broadcasts on a rush timeline, not a flavour of a BR. --}}
-            <p class="bw-help">Need it urgently because something fell through? <a href="{{ route('client.esr.create') }}" style="color:var(--brand-text);font-weight:700;">Post an emergency request</a> instead.</p>
+            {{-- Emergency is its own request type (ER), which broadcasts on a
+                 rush timeline — not a flavour of a BR. The pointer stays; the
+                 "Request characteristic" picker that used to sit above it is
+                 gone, because nothing ever read what it collected. --}}
+            <p class="bw-help">Need it urgently because something fell through? <a href="{{ route('client.esr.create') }}" style="color:var(--accent,#ea580c);font-weight:700;">Post an emergency request</a> instead.</p>
         </div>
 
     {{-- ── 2 · Event details ───────────────────────────────── --}}

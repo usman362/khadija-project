@@ -59,7 +59,6 @@ class BsrEventLocationTest extends TestCase
             'services'          => [$service->id],
             'event_type'        => $eventType->name,
             'organization_type' => array_key_first(\App\Http\Controllers\Client\ClientBsrController::ORG_TYPES),
-            'characteristic'    => array_key_first(\App\Http\Controllers\Client\ClientBsrController::CHARACTERISTICS),
         ]);
     }
 

@@ -41,15 +41,6 @@ class ClientBsrController extends Controller
         'review'       => 'Review & Submit',
     ];
 
-    /** Request characteristics. "Emergency" is absent on purpose — that is the
-     *  ER request type, not a characteristic of a BR. */
-    public const CHARACTERISTICS = [
-        'standard'   => ['Standard', 'Typical timeline and scope.'],
-        'urgent'     => ['Urgent', 'Shorter timeline than standard.'],
-        'recurring'  => ['Recurring', 'Occurs on a regular schedule.'],
-        'high_value' => ['High-Value', 'Large budget or complex request.'],
-    ];
-
     /** One definition, on the model that owns the column. */
     public const ORG_TYPES = \App\Models\Event::ORGANIZATION_TYPES;
 
@@ -108,7 +99,6 @@ class ClientBsrController extends Controller
             'showingAll'    => $this->showingAll($data, $request),
             'eventTypes' => Category::active()->eventTypes()
                 ->orderBy('name')->get(['id', 'name']),
-            'characteristics' => self::CHARACTERISTICS,
             'otherEventType'  => self::OTHER_EVENT_TYPE,
             'orgTypes'        => self::ORG_TYPES,
             'draftId'         => $data['draft_id'] ?? null,
@@ -345,7 +335,6 @@ class ClientBsrController extends Controller
             'scope'             => $event->categories->count() >= 2 ? 'multi' : 'single',
             'event_type'        => $event->event_type,
             'organization_type' => $event->organization_type,
-            'characteristic'    => $event->characteristic,
             'title'             => $event->title,
             'starts_at'         => $event->starts_at?->format('Y-m-d\TH:i'),
             // Resuming a draft has to bring step 7's end time back with it.
@@ -484,9 +473,9 @@ class ClientBsrController extends Controller
     }
 
     /**
-     * Straight to the first step regardless: services, organisation type and
-     * characteristic are things no tool asked for, and they are what the
-     * wizard needs before anything else.
+     * Straight to the first step regardless: services and organisation type
+     * are things no tool asked for, and they are what the wizard needs before
+     * anything else.
      */
     private function toBidding(array $carried, string $toolName): RedirectResponse
     {
@@ -632,16 +621,6 @@ class ClientBsrController extends Controller
                 // Only asked for, and only kept, when they picked "Other".
                 'event_title'       => ['nullable', 'string', 'max:120', 'required_if:event_type,' . self::OTHER_EVENT_TYPE],
                 'organization_type' => ['required', 'in:' . implode(',', array_keys(self::ORG_TYPES))],
-                /*
-                 * Not required. Sir Peter, 2026-08-31: "a required field that
-                 * does nothing is a broken form."
-                 *
-                 * Nothing reads this after it is saved — it does not reach a
-                 * professional, and it changes no matching, deadline or fee. It
-                 * stays on the form while its purpose is decided, but it can no
-                 * longer stop a client from posting a request.
-                 */
-                'characteristic'    => ['nullable', 'in:' . implode(',', array_keys(self::CHARACTERISTICS))],
             ],
             'event' => [
                 'title'       => ['required', 'string', 'max:200'],
@@ -752,7 +731,6 @@ class ClientBsrController extends Controller
          * were about to publish.
          */
         $ok = [
-            // characteristic deliberately absent: it is optional now.
             ! empty($d['services']) && ! empty($d['organization_type']),
             ! empty($d['title']),
             ! empty($d['description']),
@@ -809,7 +787,6 @@ class ClientBsrController extends Controller
             'description'       => $d['description'] ?? null,
             'event_type'        => $d['event_type'] ?? null,
             'organization_type' => $d['organization_type'] ?? null,
-            'characteristic'    => $d['characteristic'] ?? 'standard',
             'starts_at'         => $startsAt,
             // Step 7's optional end time. Null stays null — an event with no
             // stated finish is a real answer, not a missing one.

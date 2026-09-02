@@ -83,7 +83,6 @@ class RequestFormsConsistencyTest extends TestCase
             'services'          => [$this->service->id],
             'event_type'        => $this->wedding->name,
             'organization_type' => 'individual',
-            'characteristic'    => array_key_first(\App\Http\Controllers\Client\ClientBsrController::CHARACTERISTICS),
         ], $over));
     }
 
@@ -226,7 +225,6 @@ class RequestFormsConsistencyTest extends TestCase
         $this->actingAs($this->client)->post(route('client.bsr.save', 'service'), [
             'services' => [$this->service->id], 'event_type' => $this->wedding->name,
             'organization_type' => 'individual',
-            'characteristic' => array_key_first(\App\Http\Controllers\Client\ClientBsrController::CHARACTERISTICS),
             'action' => 'draft',
         ]);
 
@@ -245,7 +243,6 @@ class RequestFormsConsistencyTest extends TestCase
         $this->actingAs($this->client)->post(route('client.bsr.save', 'service'), [
             'services' => [$this->service->id], 'event_type' => $this->wedding->name,
             'organization_type' => 'individual',
-            'characteristic' => array_key_first(\App\Http\Controllers\Client\ClientBsrController::CHARACTERISTICS),
             'action' => 'draft',
         ]);
 
