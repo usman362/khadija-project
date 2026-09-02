@@ -159,11 +159,24 @@ class ClientDirectOfferController extends Controller
             $offered = $pro->serviceCategories()->pluck('categories.id');
             $unknown = $asked->diff($offered);
 
-            abort_unless(
-                $unknown->isEmpty(),
-                422,
-                'That professional does not offer one of the services you selected.',
-            );
+            /*
+             * A validation error, not abort(422).
+             *
+             * abort() throws an HttpException, which renders the framework's
+             * error page — a client filling in a form was shown a stack trace
+             * for making an ordinary mistake, and lost everything they had
+             * typed. The rule is unchanged; only how it is reported.
+             */
+            if ($unknown->isNotEmpty()) {
+                $names = \App\Models\Category::whereIn('id', $unknown)->pluck('name');
+
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'services' => $names->isNotEmpty()
+                        ? 'This professional does not offer: '.$names->join(', ')
+                            .'. Remove it, or choose a different professional.'
+                        : 'This professional does not offer one of the services you selected.',
+                ]);
+            }
         }
 
         // Rule R38 — same-state only, re-checked here because the id arrives

@@ -130,7 +130,11 @@ class DirectOfferServiceFirstTest extends TestCase
             'professional_id' => $this->florist->id,
             'services'        => [$this->photography->id],
             'event_name'      => 'Our wedding',
-        ])->assertStatus(422);
+        ])
+            // Refused as a validation error, not abort(422): the client is sent
+            // back to the form with what they typed, rather than shown a stack
+            // trace for an ordinary mistake. Seen live on 2026-09-03.
+            ->assertSessionHasErrors('services');
 
         $this->assertDatabaseCount('events', 0);
     }
