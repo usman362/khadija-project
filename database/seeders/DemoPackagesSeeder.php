@@ -8,6 +8,7 @@ use App\Models\Package;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Database\Seeders\Concerns\OnlyOutsideProduction;
 
 /**
  * Demo professional packages for the public "Shop Packages" catalogue
@@ -24,8 +25,14 @@ use Illuminate\Support\Str;
  */
 class DemoPackagesSeeder extends Seeder
 {
+    use OnlyOutsideProduction;
+
     public function run(): void
     {
+        if ($this->refusedOnProduction()) {
+            return;
+        }
+
         $suppliers = User::whereHas('roles', fn ($r) => $r->where('name', RoleName::PROFESSIONAL->value))
             ->orderBy('id')->get();
 

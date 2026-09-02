@@ -8,6 +8,7 @@ use App\Domain\Influencer\Enums\ReferralType;
 use App\Models\Influencer;
 use App\Models\InfluencerReferral;
 use Illuminate\Database\Seeder;
+use Database\Seeders\Concerns\OnlyOutsideProduction;
 
 /**
  * Seeds realistic referral rows for demo influencers so the Referral Center,
@@ -16,8 +17,14 @@ use Illuminate\Database\Seeder;
  */
 class InfluencerReferralSeeder extends Seeder
 {
+    use OnlyOutsideProduction;
+
     public function run(): void
     {
+        if ($this->refusedOnProduction()) {
+            return;
+        }
+
         // [influencer_id => how many referrals] — gives the leaderboard a clear ranking.
         $plan = [1 => 30, 2 => 14];
 

@@ -5,11 +5,18 @@ namespace Database\Seeders;
 use App\Domain\Auth\Enums\RoleName;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Database\Seeders\Concerns\OnlyOutsideProduction;
 
 class DemoUsersSeeder extends Seeder
 {
+    use OnlyOutsideProduction;
+
     public function run(): void
     {
+        if ($this->refusedOnProduction()) {
+            return;
+        }
+
         /*
          * Checklist row 179 — no placeholder identities anywhere.
          *

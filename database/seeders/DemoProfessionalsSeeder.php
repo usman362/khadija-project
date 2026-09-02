@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\UserProfile;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Database\Seeders\Concerns\OnlyOutsideProduction;
 
 /**
  * Demo professionals for the public "/browse" grid (and category / search
@@ -26,8 +27,14 @@ use Illuminate\Support\Carbon;
  */
 class DemoProfessionalsSeeder extends Seeder
 {
+    use OnlyOutsideProduction;
+
     public function run(): void
     {
+        if ($this->refusedOnProduction()) {
+            return;
+        }
+
         $reviewers = $this->reviewerPool();
 
         foreach ($this->professionals() as $data) {

@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Database\Seeders\Concerns\OnlyOutsideProduction;
 
 /**
  * Demo OPEN gigs — real Event records (not hardcoded) so the Bidding Board,
@@ -15,8 +16,14 @@ use Illuminate\Support\Str;
  */
 class DemoGigsSeeder extends Seeder
 {
+    use OnlyOutsideProduction;
+
     public function run(): void
     {
+        if ($this->refusedOnProduction()) {
+            return;
+        }
+
         /*
          * Real V2 services, not invented ones.
          *
@@ -55,10 +62,28 @@ class DemoGigsSeeder extends Seeder
             'event-planning', 'venue', 'videography', 'lighting',
         ])->whereNull('parent_id')->whereNull('kind')->delete();
 
-        // A client to own the gigs (fall back to any client).
-        $client = User::where('email', 'client@example.com')->first()
-            ?? User::role('client')->first();
+        /*
+         * The demo client, and ONLY the demo client.
+         *
+         * This used to fall back to `User::role('client')->first()`. On a
+         * database where the demo account had never been created — production —
+         * that fallback handed six sample gigs to the first real client on the
+         * platform, who then found "Corporate Gala — Full Production" sitting
+         * among their own events. Demo data owned by a real person is the exact
+         * thing PM-2 forbids, and it survives any cleanup that works by
+         * deleting demo accounts.
+         *
+         * With no demo client there is nothing to own demo gigs, so there are
+         * no demo gigs.
+         */
+        $client = User::where('email', 'client@example.com')->first();
+
         if (! $client) {
+            $this->command?->warn(
+                'DemoGigsSeeder skipped: client@example.com does not exist. '
+                .'Demo gigs are never attached to a real account.'
+            );
+
             return;
         }
 
@@ -89,7 +114,13 @@ class DemoGigsSeeder extends Seeder
         ];
 
         foreach ($gigs as [$title, $desc, $loc, $ownerEmail, $budget, $daysOut, $catList]) {
-            $owner = $ownerEmail ? (User::where('email', $ownerEmail)->first() ?? $client) : $client;
+            // Same rule per gig: a named demo owner or the demo client, never
+            // whoever happens to be first in the users table.
+            $owner = $ownerEmail ? User::where('email', $ownerEmail)->first() : $client;
+
+            if (! $owner) {
+                continue;
+            }
 
             $event = Event::updateOrCreate(
                 ['title' => $title, 'client_id' => $owner->id],

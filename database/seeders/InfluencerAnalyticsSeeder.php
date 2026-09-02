@@ -7,6 +7,7 @@ use App\Models\InfluencerCampaign;
 use App\Models\InfluencerContent;
 use App\Models\InfluencerDailyStat;
 use Illuminate\Database\Seeder;
+use Database\Seeders\Concerns\OnlyOutsideProduction;
 
 /**
  * Seeds demo analytics data for the influencer portal's Analytics section.
@@ -15,8 +16,14 @@ use Illuminate\Database\Seeder;
  */
 class InfluencerAnalyticsSeeder extends Seeder
 {
+    use OnlyOutsideProduction;
+
     public function run(): void
     {
+        if ($this->refusedOnProduction()) {
+            return;
+        }
+
         Influencer::all()->each(fn (Influencer $inf) => $this->seedFor($inf));
     }
 

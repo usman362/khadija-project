@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\FormSubmission;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Database\Seeders\Concerns\OnlyOutsideProduction;
 
 /**
  * A few requests on one demo professional's Requests & Submissions screen.
@@ -20,8 +21,14 @@ use Illuminate\Database\Seeder;
  */
 class DemoFormSubmissionsSeeder extends Seeder
 {
+    use OnlyOutsideProduction;
+
     public function run(): void
     {
+        if ($this->refusedOnProduction()) {
+            return;
+        }
+
         $pro = User::where('email', 'elena.demo@example.test')->first();
 
         if (! $pro) {
