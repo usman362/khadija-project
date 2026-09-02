@@ -361,6 +361,8 @@
                 <li><span><b>Decision Pending</b><span>A decision is prepared based on that review.</span></span></li>
                 <li><span><b>Resolved</b><span>The decision is issued and the case is closed.</span></span></li>
             </ol>
+
+            @include('disputes._platform_resolution')
         </div>
 
         {{-- The mockup's "Booking Protection" card claims cancellation

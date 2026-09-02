@@ -78,6 +78,8 @@
                     </dl>
                 @endif
 
+                @include('disputes._platform_resolution')
+
                 @if($decision->isRevision())
                     {{-- §5 — a revision never replaces the original silently.
                          Being told the decision changed is the whole point. --}}

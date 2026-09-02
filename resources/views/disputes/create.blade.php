@@ -161,18 +161,43 @@
                         agreed contract terms.</li>
                     <li><strong style="color:var(--text-primary);">Decision.</strong>
                         You both get a written decision with the reasoning behind it.</li>
+                    {{-- Was "If the Terms of Service allow it, the one step
+                         after that". Rights under law are not granted by our
+                         terms, and writing it that way reads as though ours
+                         decide whether somebody may use them. Khadijah,
+                         2026-08-30: outside legal and consumer remedies must
+                         not be improperly restricted by the page wording. --}}
                     <li><strong style="color:var(--text-primary);">Outside escalation.</strong>
-                        If the Terms of Service allow it, the one step after that.</li>
+                        Our decision is not the end of the road — you keep whatever rights and
+                        remedies the law gives you.</li>
                 </ol>
+
+                @include('disputes._platform_resolution')
             </div>
 
             <div class="dsp-card">
                 <p class="dsp-sec">About the money</p>
+                {{-- Khadijah, 2026-08-30: say WHY the deposit is not refundable,
+                     and make it plain that only the balance above it is in
+                     question. Her other rule applies here too — the money
+                     language has to match what the code does, so this describes
+                     CancellationPolicy: the deposit comes from the signed terms
+                     (zero when there are none, never an assumed 30%), and the
+                     refund share is worked out on the balance alone. --}}
                 <p style="font-size:13px;line-height:1.65;margin:0;color:var(--text-muted);">
                     Filing pauses the pending release for <em>this booking only</em>. Other
                     professionals on the same event are not affected, and money already paid out
-                    is not touched. The deposit is non-refundable, as it is in every other
-                    situation — only the balance beyond it is ever in question.
+                    is not touched.
+                </p>
+                <p style="font-size:13px;line-height:1.65;margin:10px 0 0;color:var(--text-muted);">
+                    <strong style="color:var(--text-primary);">The deposit.</strong>
+                    The deposit is not refundable. It covers the administrative and reservation
+                    costs of holding the date for you — work that has already been done by the
+                    time a dispute is raised. It is the amount set in the terms you both signed,
+                    so it is only ever a figure you agreed to.
+                    <strong style="color:var(--text-primary);">Only the balance above the deposit
+                    is in question during a dispute</strong> — that is the part any decision can
+                    return, hold or release.
                 </p>
             </div>
         </div>
