@@ -327,12 +327,29 @@ class HomepageMobileAndSupportTest extends TestCase
     /** And both portals that had no support link at all now have one. */
     public function test_the_client_and_professional_sidebars_can_reach_support(): void
     {
-        foreach (['views/layouts/client.blade.php', 'views/layouts/professional.blade.php'] as $path) {
-            $this->assertStringContainsString(
-                "route('forms.create', 'support_request')",
-                file_get_contents(resource_path($path)),
-                "{$path} has no way to reach the platform",
-            );
+        // The address is built by the registry now, so ask the registry where
+        // support lives and then open the real dashboards and look for it.
+        $support = \App\Domain\Forms\FormRegistry::url('support_request');
+
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
+        $pages = [
+            'client' => '/client/dashboard',
+            'professional' => '/professional/dashboard',
+        ];
+
+        foreach ($pages as $role => $path) {
+            $user = User::factory()->create(['primary_role' => $role]);
+            $user->assignRole($role);
+            $user->getOrCreateProfile()->update([
+                'country' => 'US', 'state' => 'MD', 'city' => 'Baltimore',
+                'service_area_status' => 'supported',
+            ]);
+
+            $this->actingAs($user)->get($path)
+                ->assertOk()
+                ->assertSee($support, false);
         }
     }
 }
