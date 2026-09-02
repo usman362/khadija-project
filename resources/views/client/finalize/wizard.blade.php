@@ -298,6 +298,16 @@ PAYMENT TERMS
             {{-- The mode is stated up front. A test-mode run must never be
                  mistaken for a real payment, so it says so before the click and
                  again on the record afterwards. --}}
+            {{-- With Stripe configured the card is entered on Stripe's page,
+                 not here, so the button leaves the site. Saying so beforehand
+                 means the redirect is expected rather than alarming. --}}
+            @if(\App\Domain\Payments\DepositCheckout::isConfigured())
+                <div class="fz-note info" style="margin-top:16px;">
+                    💳 <span>You'll enter your card on <b>Stripe's secure page</b>, then come
+                    straight back here. Your card details never touch GigResource.</span>
+                </div>
+            @endif
+
             @if($payMode === 'test')
                 <div class="fz-note warn" style="margin-top:16px;">
                     🧪 <span><b>Test mode.</b> Payments are running against test credentials, so no real money will move. The booking will be created and marked as a test-mode deposit. Switch Payment Settings to Live (after go-live) to take real deposits.</span>
@@ -325,7 +335,7 @@ PAYMENT TERMS
                 @if($prev)<a class="fz-btn" href="{{ route('client.finalize.step', [$fin, $prev]) }}">Back</a>@endif
             </div>
             <button type="submit" class="fz-btn {{ $step === 'payment' ? 'pay' : 'go' }}">
-                @if($step === 'payment') Secure deposit &amp; book
+                @if($step === 'payment') {{ \App\Domain\Payments\DepositCheckout::isConfigured() ? 'Continue to payment' : 'Secure deposit & book' }}
                 @elseif($step === 'contract') {{ $fin->client_signed_at ? 'Continue' : 'Sign agreement' }}
                 @elseif($step === 'bid') Looks right — continue
                 @else Confirm &amp; continue @endif

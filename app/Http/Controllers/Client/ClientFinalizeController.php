@@ -16,6 +16,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use App\Domain\Payments\DepositCheckout;
 
 /**
  * Client — Finalize With Professional.
@@ -103,7 +104,10 @@ class ClientFinalizeController extends Controller
         abort_unless(array_key_exists($step, Finalization::STEPS), 404);
         abort_if($finalization->status === 'cancelled', 410, 'This finalization was cancelled.');
 
-        match ($step) {
+        // The payment step is the one that can hand back a destination of its
+        // own: with Stripe keys configured, the deposit is paid on Stripe's
+        // page rather than simulated here.
+        $handoff = match ($step) {
             'bid'      => $this->saveBid($finalization),
             'scope'    => $this->saveScope($request, $finalization),
             'price'    => $this->savePrice($request, $finalization),
@@ -113,6 +117,10 @@ class ClientFinalizeController extends Controller
             'payment'  => $this->takePayment($request, $finalization),
             default    => null,
         };
+
+        if ($handoff instanceof RedirectResponse) {
+            return $handoff;
+        }
 
         if ($step === 'payment') {
             return redirect()->route('client.finalize.step', [$finalization, 'payment']);
@@ -231,12 +239,26 @@ class ClientFinalizeController extends Controller
      * mode is recorded on the row, so a test booking can never later be read
      * as a paid one.
      */
-    private function takePayment(Request $request, Finalization $f): void
+    private function takePayment(Request $request, Finalization $f): ?RedirectResponse
     {
         $request->validate(['confirm_payment' => ['accepted']],
             ['confirm_payment.accepted' => 'Confirm the deposit to secure the booking.']);
 
         $mode = $this->paymentMode();
+
+        /*
+         * With Stripe keys present the client pays on Stripe's own page, where
+         * the card fields belong. Without them nothing changes: the deposit is
+         * recorded as a test payment exactly as before, so a site with no keys
+         * configured — which is every copy of this today — behaves as it did.
+         */
+        if (DepositCheckout::isConfigured()) {
+            return redirect()->away(DepositCheckout::begin(
+                $f,
+                route('client.finalize.paid', $f).'?session_id={CHECKOUT_SESSION_ID}',
+                route('client.finalize.step', [$f, 'payment']),
+            ));
+        }
 
         try {
             PaymentGuard::assertLiveChargeAllowed(
@@ -249,10 +271,54 @@ class ClientFinalizeController extends Controller
             ]);
         }
 
-        DB::transaction(function () use ($f, $mode) {
+        $this->recordPayments($f, $mode);
+
+        return null;
+    }
+
+    /**
+     * The return leg from Stripe.
+     *
+     * The address alone proves nothing — a client could simply open it — so
+     * the session is checked with Stripe before a single row is written.
+     */
+    public function paid(Request $request, Finalization $finalization): RedirectResponse
+    {
+        // Named $finalization, not $f. Route model binding matches on the
+        // PARAMETER NAME, not the type hint, so a shorter name here quietly
+        // injects an empty Finalization — whose client_id is null, which fails
+        // the ownership check and reads as "this is not your booking".
+        $this->authorizeClient($request, $finalization);
+
+        $sessionId = (string) $request->query('session_id', '');
+
+        if ($sessionId === '' || ! DepositCheckout::confirm($finalization, $sessionId)) {
+            return redirect()
+                ->route('client.finalize.step', [$finalization, 'payment'])
+                ->withErrors(['confirm_payment' => 'That payment did not complete. Nothing was charged.']);
+        }
+
+        // Paid on Stripe, so the rows say stripe — and still test mode, which
+        // the row records, so a test booking can never read as a paid one.
+        $this->recordPayments($finalization, $this->paymentMode(), 'stripe');
+
+        return redirect()->route('client.finalize.step', [$finalization, 'payment']);
+    }
+
+    /**
+     * Write the deposit and the request fee.
+     *
+     * Shared by both routes in, so a Stripe payment and a test-mode one leave
+     * the same shape of record behind — the Bookings page reads these to work
+     * out what a client still owes, and two spellings of the same event would
+     * show up there as a wrong balance.
+     */
+    private function recordPayments(Finalization $f, string $mode, ?string $gateway = null): void
+    {
+        DB::transaction(function () use ($f, $mode, $gateway) {
             $payment = Payment::create([
                 'user_id'        => $f->client_id,
-                'gateway'        => $mode === 'live' ? 'stripe' : 'test',
+                'gateway'        => $gateway ?? ($mode === 'live' ? 'stripe' : 'test'),
                 'status'         => 'completed',
                 'amount'         => $f->deposit_amount,
                 'currency'       => 'USD',
@@ -290,7 +356,7 @@ class ClientFinalizeController extends Controller
             if ($fee > 0 && ! $alreadyCharged) {
                 Payment::create([
                     'user_id'        => $f->client_id,
-                    'gateway'        => $mode === 'live' ? 'stripe' : 'test',
+                    'gateway'        => $gateway ?? ($mode === 'live' ? 'stripe' : 'test'),
                     'status'         => 'completed',
                     'amount'         => $fee,
                     'currency'       => 'USD',

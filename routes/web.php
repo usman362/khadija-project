@@ -768,6 +768,12 @@ Route::middleware('auth')->group(function () {
             ->name('client.finalize.step');
         Route::post('/finalize/{finalization}/{step}', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'save'])
             ->name('client.finalize.save');
+        // The return leg from Stripe Checkout. GET, because Stripe sends the
+        // client's browser here; nothing is trusted from it until the session
+        // has been checked with Stripe.
+        Route::get('/finalize/{finalization}/paid/return', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'paid'])
+            ->name('client.finalize.paid');
+
         Route::post('/finalize/{finalization}-cancel', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'cancel'])
             ->name('client.finalize.cancel');
         Route::post('/proposals/{bid}/accept', [\App\Http\Controllers\Client\ClientProposalController::class, 'accept'])
