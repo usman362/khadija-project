@@ -826,18 +826,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/earnings', fn () => redirect()->route('client.spending.index'))
             ->name('client.earnings.index');
 
-        // Virtual & Hybrid Hub (new feature scaffold).
-        Route::get('/virtual-hub', [\App\Http\Controllers\Client\ClientVirtualHubController::class, 'index'])
-            ->name('client.virtual-hub.index');
-        // Virtual & Hybrid Event Brief — dedicated posting form.
-        // Two steps, because the client's workflow shows Plan and Services as
-        // two stages with a Continue between them — not one long page.
-        Route::get('/virtual-hub/brief/{step?}', [\App\Http\Controllers\Client\ClientVirtualHubController::class, 'brief'])
-            ->whereIn('step', ['plan', 'services'])
-            ->name('client.virtual-hub.brief');
-        Route::post('/virtual-hub/brief/{step}', [\App\Http\Controllers\Client\ClientVirtualHubController::class, 'save'])
-            ->whereIn('step', ['plan', 'services'])
-            ->name('client.virtual-hub.save');
+        /*
+         * Virtual & Hybrid Hub — routes removed 2026-08-31.
+         *
+         * Khadijah: take the page down for now so it is not reachable on the
+         * site; it will be rebuilt properly with someone who knows the domain.
+         *
+         * Unrouted rather than deleted. Five events already carry event_format,
+         * platform and meeting_url, and the screens are the only thing that can
+         * read them — throwing those away would strand a client's own data with
+         * nothing able to show it. The controller and views stay where they are
+         * until the rebuild; nothing points at them.
+         */
 
         Route::get('/events', [ClientEventController::class, 'index'])->middleware('permission:events.view_any')->name('client.events.index');
         // "Create a Gig" (bidding builder) retired in favour of the "Post an Event" flow — redirect any old links.

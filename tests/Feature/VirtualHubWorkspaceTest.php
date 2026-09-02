@@ -26,23 +26,25 @@ class VirtualHubWorkspaceTest extends TestCase
 {
     use RefreshDatabase;
 
-    private User $client;
-    private User $pro;
-
+    /**
+     * The Virtual & Hybrid Hub was taken off the site on 2026-08-31 — Khadijah
+     * asked for it to be unreachable until it is rebuilt properly with someone
+     * who knows the domain. Its routes are gone, so these cannot run.
+     *
+     * Skipped rather than deleted: the screens, the controller and these tests
+     * are what the rebuild starts from, and five events already carry the data
+     * they describe.
+     */
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\PermissionSeeder::class);
-        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
 
-        $this->client = User::factory()->create();
-        $this->client->assignRole('client');
-        $this->client->givePermissionTo('dashboard.view');
-        $this->client = $this->client->fresh();
-
-        $this->pro = User::factory()->create(['name' => 'Jordan Lee Photography']);
-        $this->pro->assignRole('professional');
+        $this->markTestSkipped('Virtual & Hybrid Hub is withdrawn pending a rebuild (Khadijah, 2026-08-31).');
     }
+
+    private User $client;
+    private User $pro;
+
 
     private function service(string $name): Category
     {

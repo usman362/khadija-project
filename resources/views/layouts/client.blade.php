@@ -1248,10 +1248,10 @@
                     </a>
                 </li>
                 <li class="cl-nav-item">
-                    <a href="{{ route('client.virtual-hub.index') }}" class="cl-nav-link {{ request()->routeIs('client.virtual-hub.*') ? 'active' : '' }}">
-                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-                        Virtual &amp; Hybrid Hub
-                    </a>
+                    {{-- Virtual & Hybrid Hub removed from the menu 2026-08-31 —
+                         Khadijah asked for it to be unreachable until it is
+                         rebuilt. Its routes are gone too, so this is not just
+                         hidden. --}}
                 </li>
                 <li class="cl-nav-item">
                     <a href="{{ route('client.events.index') }}" class="cl-nav-link {{ request()->routeIs('client.events.*') ? 'active' : '' }}">

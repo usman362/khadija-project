@@ -205,8 +205,14 @@ class ServicePickerCatalogTest extends TestCase
 
     /* ── Row 124: the hub, and the breadcrumb ───────────────── */
 
+    /**
+     * Withdrawn with the page. The Virtual & Hybrid Hub came off the site on
+     * 2026-08-31 (Khadijah) and has no routes; this comes back with it.
+     */
     public function test_the_virtual_hub_lists_services_not_occasions(): void
     {
+        $this->markTestSkipped('Virtual & Hybrid Hub is withdrawn pending a rebuild.');
+
         $this->babyShower();
         $this->staffing();
 
@@ -222,11 +228,20 @@ class ServicePickerCatalogTest extends TestCase
      * and {{ }} escaped it again — the breadcrumb read "Virtual &amp; Hybrid
      * Hub" while the page heading beside it, printed once, read correctly.
      */
+    /**
+     * An ampersand in a page title must be escaped once, not twice.
+     *
+     * Blade applies e() to the inline content of @section, so a title that
+     * arrives pre-escaped comes out as "&amp;amp;" on the page. This was found
+     * on the Virtual Hub; that page came off the site on 2026-08-31, so the
+     * guard moved to another title carrying an ampersand rather than leaving
+     * with it — the bug belongs to @section, not to that page.
+     */
     public function test_an_ampersand_in_a_page_title_renders_once(): void
     {
-        $page = $this->actingAs($this->client)->get(route('client.virtual-hub.index'))->assertOk();
+        $page = $this->actingAs($this->client)->get(route('cancellation-wizard.show'))->assertOk();
 
         $page->assertDontSee('&amp;amp;', false);
-        $page->assertSee('Virtual &amp; Hybrid Hub', false);
+        $page->assertSee('Cancellation &amp; Rejection Wizard', false);
     }
 }

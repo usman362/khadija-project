@@ -157,14 +157,17 @@
                     'cta'   => 'Post a Rush Request',
                     'icon'  => '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
                 ],
-                [
-                    'href'  => route('client.virtual-hub.brief'),
-                    'tag'   => ['Online', ''],
-                    'title' => 'Virtual & Hybrid Hub',
-                    'desc'  => 'Search and connect with verified virtual professionals.',
-                    'cta'   => 'Start a request',
-                    'icon'  => '<path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/>',
-                ],
+                /*
+                 * Virtual & Hybrid Hub removed from the chooser 2026-08-31.
+                 * Khadijah: take the page down for now so it is not reachable;
+                 * it will be rebuilt properly with someone who knows the
+                 * domain. The screens and the client data behind them are
+                 * untouched — five events already carry a format, a platform
+                 * and a meeting link.
+                 *
+                 * A PHP comment, not a Blade one: this sits inside an array
+                 * literal, where {{-- --}} compiles to output and breaks it.
+                 */
                 [
                     'href'  => route('client.toolkit.plan'),
                     'tag'   => ['', ''],

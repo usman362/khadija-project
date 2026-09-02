@@ -76,14 +76,14 @@ class EventTypeLengthTest extends TestCase
             'kind' => Category::SERVICE, 'parent_id' => $parent->id, 'is_active' => true,
         ]);
 
-        // event_type is asked for on the plan step, so that is where the
-        // over-long value has to be turned away.
+        // Was posted at the Virtual Hub's plan step, which no longer exists —
+        // the hub came off the site on 2026-08-31. The rule it checks is the
+        // request wizard's, and that is where it is checked now.
         $this->actingAs($client->fresh())
-            ->post(route('client.virtual-hub.save', 'plan'), [
-                'title'        => 'Autofilled event',
-                'event_format' => 'virtual',
-                'event_type'   => str_repeat('a', 120),
-                'starts_at'    => now()->addMonth()->format('Y-m-d\TH:i'),
+            ->post(route('client.bsr.save', 'service'), [
+                'services'          => [\App\Models\Category::where('kind', \App\Models\Category::SERVICE)->value('id')],
+                'organization_type' => array_key_first(\App\Http\Controllers\Client\ClientBsrController::ORG_TYPES),
+                'event_type'        => str_repeat('a', 120),
             ])
             ->assertSessionHasErrors('event_type');
     }

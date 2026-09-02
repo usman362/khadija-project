@@ -49,7 +49,12 @@ class PostEventChooseLayoutTest extends TestCase
     }
 
     /** Six routes, so the grid is two full rows rather than four and a stray. */
-    public function test_all_six_routes_are_offered(): void
+    /**
+     * Five, not six. The Virtual & Hybrid Hub came off the chooser on
+     * 2026-08-31 — Khadijah asked for the page to be unreachable until it is
+     * rebuilt properly.
+     */
+    public function test_every_route_is_offered(): void
     {
         $response = $this->actingAs($this->client())->get(route('client.post-event.choose'));
 
@@ -60,7 +65,6 @@ class PostEventChooseLayoutTest extends TestCase
             'Bidding Request (BR)',
             'Direct Request (DR)',
             'Emergency Request (ER)',
-            'Virtual &amp; Hybrid Hub',
             'Plan with Toolkit',
         ] as $route) {
             $response->assertSee($route, false);
@@ -140,5 +144,14 @@ class PostEventChooseLayoutTest extends TestCase
         $this->actingAs($me)->get(route('client.post-event.choose'))
             ->assertDontSee('real-time', false)
             ->assertSee('As of now');
+    }
+
+    /** And the withdrawn one is genuinely not offered. */
+    public function test_the_virtual_hub_is_not_offered(): void
+    {
+        $this->actingAs($this->client())
+            ->get(route('client.post-event.choose'))
+            ->assertSuccessful()
+            ->assertDontSee('Virtual &amp; Hybrid Hub', false);
     }
 }
