@@ -82,9 +82,30 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Influencer::class, 'referred_by_influencer_id');
     }
 
+    /**
+     * The profile row, made if it is missing.
+     *
+     * `$this->profile` is a cached relation, and reading it before the row
+     * exists caches null. Any later call on that same instance then believed
+     * there was no profile and inserted a second one, which the unique key on
+     * user_id rejects — a 500 on a page that was only asking for the user's
+     * own settings. Rare in a request, where the user is resolved fresh, and
+     * not rare at all anywhere the same instance is held across two steps.
+     *
+     * firstOrCreate asks the database rather than the cache, and the relation
+     * is then dropped so the next read reflects what was actually written.
+     */
     public function getOrCreateProfile(): UserProfile
     {
-        return $this->profile ?? $this->profile()->create(['user_id' => $this->id]);
+        if ($this->relationLoaded('profile') && $this->profile) {
+            return $this->profile;
+        }
+
+        $profile = UserProfile::firstOrCreate(['user_id' => $this->id]);
+
+        $this->setRelation('profile', $profile);
+
+        return $profile;
     }
 
     public function getAvatarUrlAttribute(): string
