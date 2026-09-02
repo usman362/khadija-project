@@ -68,12 +68,9 @@
 
 @section('content')
 <div class="esr" data-scope="{{ $scope }}">
-    @if($errors->any())
-        {{-- The page is orange like the rest of the client area; this one box stays
-             red because it is a validation failure, not decoration — in orange it
-             would read as part of the theme and be missed. --}}
-        <div style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:10px;padding:11px 15px;margin-bottom:16px;font-size:13.5px;font-weight:600;">{{ $errors->first() }}</div>
-    @endif
+    {{-- Validation errors are rendered once, by layouts.client, for every
+         page. This screen used to print its own copy as well, so a failed
+         submit showed the same sentence twice. --}}
 
     <div class="esr-alert">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>

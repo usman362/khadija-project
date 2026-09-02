@@ -124,9 +124,9 @@
     <div class="do-layout">
     <form method="POST" action="{{ route('client.direct-offers.store') }}">
         @csrf
-        @if($errors->any())
-            <div style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;">{{ $errors->first() }}</div>
-        @endif
+        {{-- Validation errors are rendered once, by layouts.client, for every
+             page. This screen used to print its own copy as well, so a failed
+             submit showed the same sentence twice. --}}
         <input type="hidden" name="request_type" id="doType" value="{{ $type }}">
 
         {{-- Checklist row 193 — service first, then the professional.

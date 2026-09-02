@@ -210,9 +210,9 @@
         @if(session('status'))
             <div style="background:rgba(16,185,129,0.10);border:1px solid rgba(16,185,129,0.30);color:var(--ok-text);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;font-weight:600;">{{ session('status') }}</div>
         @endif
-        @if($errors->any())
-            <div style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;font-weight:600;">{{ $errors->first() }}</div>
-        @endif
+        {{-- Validation errors are rendered once, by layouts.client, for every
+             page. This screen used to print its own copy as well, so a failed
+             submit showed the same sentence twice. --}}
 
         {{-- The tiles are the status filter. They used to sit above a row of tabs
              carrying the same six numbers; one control now does both jobs. --}}

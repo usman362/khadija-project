@@ -4,11 +4,9 @@
 @section('page-title', 'Event Details')
 
 @section('content')
-    @if ($errors->any())
-        <div class="cl-card" style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:12px 16px;margin-bottom:18px;font-size:13.5px;">
-            @foreach ($errors->all() as $error)<div>{{ $error }}</div>@endforeach
-        </div>
-    @endif
+    {{-- Validation errors are rendered once, by layouts.client, for every
+         page. This screen used to print its own copy as well, so a failed
+         submit showed the same sentence twice. --}}
 
     {{-- ── Header ───────────────────────────────────────────── --}}
     @php
