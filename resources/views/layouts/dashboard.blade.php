@@ -429,6 +429,19 @@
                         </li>
                     @endrole
 
+                    {{-- Sir Peter, 2026-09-03: signed in, there was no way back
+                         to the public site — the logo goes to the dashboard,
+                         which is right for a workspace and left the homepage
+                         unreachable. Last in the list, because leaving the
+                         workspace is not one of the things you came here to
+                         do. --}}
+                    <li class="nav-item">
+                        <a href="{{ route('landing') }}" class="nav-link">
+                            <i class="link-icon" data-lucide="home"></i>
+                            <span class="link-title">Home</span>
+                        </a>
+                    </li>
+
                 </ul>
             </div>
         </nav>

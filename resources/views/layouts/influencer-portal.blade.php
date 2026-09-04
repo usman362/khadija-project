@@ -246,6 +246,17 @@
                 </div>
             @endif
         @endforeach
+
+        {{-- Sir Peter, 2026-09-03: signed in, there was no way back to the
+             public site. The logo goes to this portal's own dashboard, which
+             is right for a workspace and left the homepage unreachable.
+
+             Last in the list, below the working sections: leaving the
+             workspace is not one of the things you came here to do. --}}
+        <a href="{{ route('landing') }}" class="{{ '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>
+            <span>Home</span>
+        </a>
     </nav>
 
     <div class="ipx-help">

@@ -1415,6 +1415,20 @@
         {{-- Row 122 — the client portal had no way to reach the platform at
              all. Every other portal's "Contact Support" either went nowhere or
              went to the wrong place; this side simply had nothing. --}}
+        {{-- Sir Peter, 2026-09-03: signed in, there was no way back to the
+             public site at all. Not even the logo — that goes to the client
+             dashboard, which is right for a workspace but means the homepage
+             was unreachable once you had an account.
+
+             It sits down here with Contact Support rather than at the top,
+             because it is a "leave the workspace" link, not somewhere you
+             work. Put above Dashboard it would read as a second front door
+             and compete with the one people actually need every day. --}}
+        <a href="{{ route('landing') }}" class="cl-nav-link" style="margin:0 12px 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>
+            <span>Home</span>
+        </a>
+
         <a href="{{ \App\Domain\Forms\FormRegistry::url('support_request') }}" class="cl-nav-link" style="margin:0 12px 8px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.7 8a7 7 0 0 0-13.4 0"/><path d="M3 14v-2a2 2 0 0 1 2-2h1v6H5a2 2 0 0 1-2-2z"/><path d="M21 14v-2a2 2 0 0 0-2-2h-1v6h1a2 2 0 0 0 2-2z"/><path d="M18 16v1a3 3 0 0 1-3 3h-3"/></svg>
             <span>Contact Support</span>
