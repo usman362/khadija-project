@@ -83,11 +83,11 @@ class CategoryLandingController extends Controller
             ->whereHas('serviceCategories', fn (Builder $c) => $c->whereIn('categories.id', $branchIds))
             ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')
             ->withCount(['reviewsReceived as reviews_count' => fn ($r) => $r->where('is_hidden', false)])
-            ->orderByRaw('(SELECT CASE WHEN trade_license_verified_at IS NOT NULL
+            ->orderByRaw('(SELECT CASE WHEN trade_license_doc IS NOT NULL AND trade_license_verified_at IS NOT NULL
                                         AND liability_insurance_verified_at IS NOT NULL
                                         AND (liability_insurance_expires_on IS NULL
                                              OR liability_insurance_expires_on >= CURRENT_DATE)
-                                        AND workers_comp_verified_at IS NOT NULL
+                                        AND workers_comp_doc IS NOT NULL AND workers_comp_verified_at IS NOT NULL
                                    THEN 1 ELSE 0 END
                           FROM user_profiles WHERE user_profiles.user_id = users.id) DESC')
             ->orderByRaw('reviews_avg IS NULL, reviews_avg DESC')

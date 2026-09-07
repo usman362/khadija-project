@@ -154,7 +154,9 @@ class ClientProposalController extends Controller
                 'reviews'    => $st ? (int) $st->total : 0,
                 'years'      => $p?->experience_years,
                 'insured'    => \App\Support\InsuranceRequirement::isCovered($p),
-                'verified'   => (bool) ($p?->trade_license_verified_at && $p?->workers_comp_verified_at)
+                // Same three-part rule as the browse card, through one place.
+                'verified'   => \App\Support\VerifiedBadge::licenceVerified($p)
+                    && \App\Support\VerifiedBadge::holds($p, 'workers_comp')
                     && \App\Support\InsuranceRequirement::isCovered($p),
                 'city'       => $p?->city,
                 'overBudget' => $event->budget && $b->amount > $event->budget,

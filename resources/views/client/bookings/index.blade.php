@@ -294,7 +294,7 @@
                             <div class="bk-title">{{ $event?->title ?: 'Booking #' . $booking->id }}</div>
                             <div class="bk-sub">
                                 <b>{{ $pro?->name ?? 'Professional removed' }}</b>
-                                @if($profile?->trade_license_verified_at)
+                                @if(\App\Support\VerifiedBadge::licenceVerified($profile))
                                     <span class="bk-verified">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified
                                     </span>

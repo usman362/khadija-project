@@ -452,7 +452,11 @@
                         $p = $pro->profile;
                         $avg = round((float) ($pro->reviews_avg ?? 0), 1);
                         $cnt = (int) ($pro->reviews_count ?? 0);
-                        $isVerified = $p && $p->trade_license_verified_at && $p->workers_comp_verified_at
+                        // ISSUE-1: the approval alone was what showed. Every badge on
+                        // the site belonged to a demo account with no document behind
+                        // it, stamped by a seeder. The document is now required too.
+                        $isVerified = \App\Support\VerifiedBadge::licenceVerified($p)
+                            && \App\Support\VerifiedBadge::holds($p, 'workers_comp')
                             && \App\Support\InsuranceRequirement::isCovered($p);
                         $isTop = $avg >= 4.5 && $cnt > 0;
                         $gallery = collect($p ? $p->portfolioHeroUrls(4) : []);

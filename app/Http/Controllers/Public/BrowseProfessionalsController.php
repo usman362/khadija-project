@@ -128,8 +128,11 @@ class BrowseProfessionalsController extends Controller
         // `isTopRated()` policy on the User model.
         if ($verified) {
             $query->whereHas('profile', function (Builder $p) {
-                $p->whereNotNull('trade_license_verified_at')
-                  ->whereNotNull('workers_comp_verified_at')
+                // ISSUE-1: the document is required as well as the approval.
+                // Filtering on the approval alone returned demo profiles that
+                // had never uploaded anything.
+                $p->whereRaw(\App\Support\VerifiedBadge::scopeSql('trade_license'))
+                  ->whereRaw(\App\Support\VerifiedBadge::scopeSql('workers_comp'))
                   ->insuranceCurrent();
             });
         }
@@ -152,11 +155,11 @@ class BrowseProfessionalsController extends Controller
             'newest' => $query->latest('users.created_at'),
             default  => // 'top' — verified first, then rating, then review volume
                 $query
-                    ->orderByRaw('(SELECT CASE WHEN trade_license_verified_at IS NOT NULL
+                    ->orderByRaw('(SELECT CASE WHEN trade_license_doc IS NOT NULL AND trade_license_verified_at IS NOT NULL
                                                 AND liability_insurance_verified_at IS NOT NULL
                                                 AND (liability_insurance_expires_on IS NULL
                                                      OR liability_insurance_expires_on >= CURRENT_DATE)
-                                                AND workers_comp_verified_at IS NOT NULL
+                                                AND workers_comp_doc IS NOT NULL AND workers_comp_verified_at IS NOT NULL
                                            THEN 1 ELSE 0 END
                                   FROM user_profiles WHERE user_profiles.user_id = users.id) DESC')
                     ->orderByRaw('reviews_avg IS NULL, reviews_avg DESC')
