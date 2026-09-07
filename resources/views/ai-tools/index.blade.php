@@ -79,6 +79,11 @@
 
     @media (max-width: 1100px) { .akt-grid { grid-template-columns: repeat(2, 1fr); } .akt-nav { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 560px) { .akt-grid, .akt-nav { grid-template-columns: 1fr; } }
+
+    /* OA-142 — the tier that unlocks a tool, told apart from your own level. */
+    .akt-tier { font-size: 10px; font-weight: 800; padding: 2px 9px; border-radius: 999px;
+                text-transform: uppercase; letter-spacing: .04em;
+                background: rgba(100,116,139,.14); color: #475569; }
 </style>
 @endpush
 
@@ -128,8 +133,25 @@
                         {{-- Audience tag (Client/Professional/Both) intentionally not shown here —
                              the hub is already filtered to each user's own tools, so it's redundant
                              for them. It's admin-facing info only. --}}
+                        {{-- OA-142: this badge alone read "Semi" or "Maximum" —
+                             the same two words the Toolkit Tiers table uses for
+                             a different question. This one is YOUR level on the
+                             tool; that one is the tier that unlocks it. A client
+                             comparing the two pages saw Contract Assistant as
+                             Semi here and Maximum-only there and was right to
+                             call it a contradiction.
+
+                             Both are worth showing. They are now labelled for
+                             what they each answer, and the tier comes from the
+                             one record — R31 in config/toolkit-tiers.php. --}}
+                        @php($tier = \App\Domain\AiFeatures\ToolkitTiers::label(
+                            \App\Domain\AiFeatures\ToolkitTiers::tierFor($t, $isPro ? 'professional' : 'client')
+                        ))
                         <div class="akt-badges">
-                            <span class="akt-lvl lvl-{{ $lvl }}" title="Your plan level">{{ AiAccess::label($lvl) }}</span>
+                            <span class="akt-lvl lvl-{{ $lvl }}" title="The level you can use on this tool">Your level: {{ AiAccess::label($lvl) }}</span>
+                            @if($tier)
+                                <span class="akt-tier" title="The toolkit tier that unlocks this tool">{{ $tier }} toolkit</span>
+                            @endif
                         </div>
                         <p class="akt-purpose">{{ $t['purpose'] }}</p>
                         <ul class="akt-feats">
