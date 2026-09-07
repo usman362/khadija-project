@@ -100,7 +100,9 @@ class ClientBookingController extends Controller
             ->filter(fn ($p) => ($p->metadata['kind'] ?? null) === 'booking_deposit')
             ->keyBy(fn ($p) => ($p->metadata['event_id'] ?? '') . ':' . ($p->metadata['supplier_id'] ?? ''));
 
-        $agreedTotal = (float) $this->base($user)->whereNotIn('status', ['cancelled'])->sum('price');
+        // OA-146: the same calculation Spending and Payments use, so the four
+        // finance pages cannot report two different totals again.
+        $agreedTotal = \App\Domain\Finance\ClientTotals::agreed($user);
         $depositsPaid = (float) $deposits->sum('amount');
 
         $financial = [

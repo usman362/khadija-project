@@ -177,11 +177,24 @@ class ClientFinanceController extends Controller
          * paid, and still awaiting the professional's confirmation. A budget
          * is a plan; only these are money.
          */
+        /*
+         * OA-146: total_agreed was $s['total'], which sums EVERY booking —
+         * cancelled ones included. Bookings and Reports excluded them, so the
+         * same account read $80 on two pages and $5,080 on these two, and the
+         * cancelled $5,000 was shown as money still to spend.
+         *
+         * One calculation now, shared with Bookings. Cancelled money keeps its
+         * own figure so a page can show it on purpose.
+         */
+        // Scoped to the chosen event, the same as everything else on the page.
+        $scope = $activeEvent?->id;
+
         $stats = [
             'agreed_unpaid' => $s['inEscrow'],   // confirmed — a price both sides accepted
             'paid'          => $s['settled'],    // completed — money that actually moved
             'awaiting'      => $s['pending'],    // requested — not yet accepted
-            'total_agreed'  => $s['total'],
+            'total_agreed'  => \App\Domain\Finance\ClientTotals::agreed($user, $scope),
+            'cancelled'     => \App\Domain\Finance\ClientTotals::cancelled($user, $scope),
         ];
 
         return view('client.finance.payments', compact(
@@ -315,19 +328,35 @@ class ClientFinanceController extends Controller
          * There is no balance to show, so none is shown.
          */
         $stats = [
-            'total_agreed'   => $s['total'],
+            // OA-146: one calculation, shared with Bookings and Payments.
+            'total_agreed'   => \App\Domain\Finance\ClientTotals::agreed($user, $activeEvent?->id),
+            'cancelled'      => \App\Domain\Finance\ClientTotals::cancelled($user, $activeEvent?->id),
             'paid'           => $s['settled'],
             'agreed_unpaid'  => $s['inEscrow'],
             'awaiting'       => $s['pending'],
             'pending_count'  => Booking::where('client_id', $user->id)->where('status', 'confirmed')->count(),
         ];
 
-        // Revenue-pipeline donut split.
+        /*
+         * The donut.
+         *
+         * Its keys used to be 'pending', 'accepted' and 'paid' while the legend
+         * beside it read "Agreed, Not Yet Paid", "Paid" and "Remaining" — three
+         * labels, three different words, nothing lining up. They are named for
+         * what the client is shown now.
+         *
+         * "Remaining" is what stands minus what is settled or committed. It was
+         * computed from a total that included cancelled bookings, so a
+         * cancelled $5,000 appeared as money still to be spent.
+         */
+        $agreedTotal = \App\Domain\Finance\ClientTotals::agreed($user, $activeEvent?->id);
+
         $pipeline = [
-            'pending'  => $s['inEscrow'],
-            'accepted' => $s['settled'],
-            'paid'     => max(0, round($s['total'] - $s['settled'] - $s['inEscrow'])),
-            'total'    => $s['total'],
+            'agreed_unpaid' => $s['inEscrow'],
+            'paid'          => $s['settled'],
+            'remaining'     => max(0, round($agreedTotal - $s['settled'] - $s['inEscrow'])),
+            'total'         => $agreedTotal,
+            'cancelled'     => \App\Domain\Finance\ClientTotals::cancelled($user, $activeEvent?->id),
         ];
 
         // Earnings trend — last 8 weeks of cumulative completed-booking value.

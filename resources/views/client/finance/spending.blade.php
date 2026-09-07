@@ -292,7 +292,10 @@
             $pTotal = max(1, $pipeline['total']);
             $segs = [];
             $cur = 0;
-            $parts = [['pending', '#f59e0b'], ['accepted', '#10b981'], ['paid', '#6366f1']];
+            // Keys named for the labels beside them. They used to be
+            // 'pending', 'accepted' and 'paid' against a legend reading
+            // "Agreed, Not Yet Paid", "Paid" and "Remaining".
+            $parts = [['agreed_unpaid', '#f59e0b'], ['paid', '#10b981'], ['remaining', '#6366f1']];
             foreach ($parts as [$k, $c]) { $deg = ($pipeline[$k] / $pTotal) * 360; $segs[] = "$c {$cur}deg ".($cur+$deg)."deg"; $cur += $deg; }
             $conic = 'conic-gradient(' . implode(', ', $segs) . ')';
         @endphp
@@ -300,9 +303,16 @@
             <div class="ea-donut-c"><span class="num">${{ number_format($pipeline['total'], 0) }}</span><span class="lbl">Total agreed</span></div>
         </div>
         <div class="ea-legend">
-            <div class="row"><span class="dot" style="background:#f59e0b;"></span><span class="lbl">Agreed, Not Yet Paid</span><span class="val">${{ number_format($pipeline['pending'], 0) }}</span></div>
-            <div class="row"><span class="dot" style="background:#10b981;"></span><span class="lbl">Paid</span><span class="val">${{ number_format($pipeline['accepted'], 0) }}</span></div>
-            <div class="row"><span class="dot" style="background:#6366f1;"></span><span class="lbl">Remaining</span><span class="val">${{ number_format($pipeline['paid'], 0) }}</span></div>
+            <div class="row"><span class="dot" style="background:#f59e0b;"></span><span class="lbl">Agreed, Not Yet Paid</span><span class="val">${{ number_format($pipeline['agreed_unpaid'], 0) }}</span></div>
+            <div class="row"><span class="dot" style="background:#10b981;"></span><span class="lbl">Paid</span><span class="val">${{ number_format($pipeline['paid'], 0) }}</span></div>
+            <div class="row"><span class="dot" style="background:#6366f1;"></span><span class="lbl">Remaining</span><span class="val">${{ number_format($pipeline['remaining'], 0) }}</span></div>
+            {{-- OA-146: cancelled money on its own line. It used to be folded
+                 into the total, which put it under "Remaining" — a cancelled
+                 booking presented as money the client still had to spend.
+                 Shown only when there is some, so a clean account is clean. --}}
+            @if(($pipeline['cancelled'] ?? 0) > 0)
+                <div class="row"><span class="dot" style="background:#9ca3af;"></span><span class="lbl">Cancelled</span><span class="val">${{ number_format($pipeline['cancelled'], 2) }}</span></div>
+            @endif
         </div>
     </div>
 
