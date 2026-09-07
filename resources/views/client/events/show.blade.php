@@ -113,7 +113,10 @@
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     Edit
                 </button>
-                @if(!$event->is_published)
+                {{-- OA-115: the same two-column disagreement as OA-140. This
+                     offered the wizard and a Publish button on events that were
+                     already Confirmed. It asks the stage now. --}}
+                @if($event->isDraft())
                     {{-- The way back into the request wizard.
                          A bidding request does not sit beside an event, it IS
                          one — ClientBsrController creates the event. But the
@@ -467,7 +470,7 @@
                     </table>
                 @else
                     <div style="text-align:center;padding:24px 16px;color:var(--text-muted);font-size:13.5px;">
-                        No sealed bids yet. {{ $event->is_published ? 'Professionals can bid on this event from their bidding board.' : 'Publish your event so professionals can place sealed bids.' }}
+                        No sealed bids yet. {{ ! $event->isDraft() ? 'Professionals can bid on this event from their bidding board.' : 'Publish your event so professionals can place sealed bids.' }}
                     </div>
                 @endif
             </div>
@@ -647,11 +650,11 @@
             <h3 style="font-size:16px;font-weight:600;margin-bottom:6px;">Files</h3>
             <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">
                 Briefs, floor plans and reference documents on this request.
-                @if($event->is_published)
+                @unless($event->isDraft())
                     Professionals who can bid on it can open these.
                 @else
                     Only you can see these until the request is published.
-                @endif
+                @endunless
             </p>
 
             {{-- A published request is what professionals are bidding against,

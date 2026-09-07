@@ -387,6 +387,54 @@ class Event extends Model
      * budget and nothing to divide, so it has no rows here.
      */
     /**
+     * What stage this request is at — one answer, for every screen.
+     *
+     * OA-114 / OA-115 / OA-140: an event could be Confirmed in My Events and
+     * Cancelled in Bookings, and a Published or Confirmed event still showed
+     * "Continue Draft" and "Publish". The cause is two columns answering the
+     * same question: `status`, and the `is_published` flag the row actions
+     * branched on. They can disagree, and on this database they already do.
+     *
+     * Status wins. A request that has been published, confirmed, completed or
+     * cancelled is not a draft, whatever the flag says — you cannot go back
+     * and finish writing something professionals have already answered.
+     *
+     * The flag still decides one thing it is good for: whether a request that
+     * has NOT moved on yet was ever sent.
+     */
+    public function stage(): string
+    {
+        return match ($this->status) {
+            'cancelled' => 'cancelled',
+            'completed' => 'completed',
+            'confirmed' => 'confirmed',
+            'published' => 'open',
+            default => $this->is_published ? 'open' : 'draft',
+        };
+    }
+
+    /** Only a genuine draft may be finished and published. */
+    public function isDraft(): bool
+    {
+        return $this->stage() === 'draft';
+    }
+
+    /**
+     * Where the two columns disagree.
+     *
+     * Kept as a query so the disagreement can be counted and reconciled rather
+     * than argued about — a row that says published and not-published is a
+     * fault, not a state.
+     */
+    public function scopeStatusContradictsFlag($query)
+    {
+        return $query->where(function ($q) {
+            $q->where(fn ($w) => $w->whereIn('status', ['published', 'confirmed', 'completed'])
+                ->where('is_published', false));
+        });
+    }
+
+    /**
      * Still open to work on — and not already over.
      *
      * OA-127 and OA-143: "open" was decided by status alone, so an event whose

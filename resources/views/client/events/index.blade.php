@@ -818,7 +818,13 @@
                             $negotiating   = \App\Domain\Requests\RequestLifecycle::inExclusiveNegotiation($event);
                         @endphp
                         <div class="cl-event-actions">
-                            @if(! $event->is_published)
+                            {{-- OA-140: this branched on the is_published flag, not the
+                                 status. A Confirmed event with the flag unset offered
+                                 "Continue Draft" and "Publish" — you cannot go back and
+                                 finish writing something professionals have already
+                                 answered. It asks the event's own stage now, which
+                                 resolves the two columns into one answer. --}}
+                            @if($event->isDraft())
                                 {{-- A draft's one job is to be finished. --}}
                                 <a href="{{ route('client.events.show', $event) }}" class="cl-btn cl-btn-primary cl-btn-sm"
                                    style="background:#c2410c;border-color:#c2410c;">Continue Draft</a>
