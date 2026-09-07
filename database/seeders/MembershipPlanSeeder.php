@@ -75,7 +75,13 @@ class MembershipPlanSeeder extends Seeder
                     'Up to 20 service categories',
                     'High marketplace visibility · priority search placement',
                     'Access to client phone numbers',
-                    'Sealed gigs · Verified Professional badge',
+                    // OA-136 / DIR-13: the Verified Professional badge is tied
+                    // to submitting a licence and having it approved — never to
+                    // a paid plan. Selling it here contradicted the badge rule
+                    // and, since ISSUE-1, contradicts the badge itself: it now
+                    // requires a document and an approval, neither of which a
+                    // payment provides.
+                    'Sealed gigs',
                     'Full chat with file attachments',
                     'Email & SMS notifications',
                     'Analytics dashboard · export reports',
@@ -112,7 +118,13 @@ class MembershipPlanSeeder extends Seeder
                     'Unlimited events, bookings & categories',
                     'Highest marketplace visibility · premium search placement',
                     'High-value event access & bidding',
-                    'Sealed gigs · Verified Professional badge',
+                    // OA-136 / DIR-13: the Verified Professional badge is tied
+                    // to submitting a licence and having it approved — never to
+                    // a paid plan. Selling it here contradicted the badge rule
+                    // and, since ISSUE-1, contradicts the badge itself: it now
+                    // requires a document and an approval, neither of which a
+                    // payment provides.
+                    'Sealed gigs',
                     'Immediate early access to new Bidding and Emergency Requests',
                     'Advanced analytics · booking conversion reports',
                     'Invoice & payment tracking · client engagement analytics',

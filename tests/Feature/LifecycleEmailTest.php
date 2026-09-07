@@ -35,7 +35,11 @@ class LifecycleEmailTest extends TestCase
 
     private function client(array $prefs = []): User
     {
-        $user = User::factory()->create();
+        // Name pinned, and pinned to one WITH an apostrophe on purpose. Faker
+        // produces them occasionally, which made this test fail about one run
+        // in twenty; a tidy name would have hidden the escaping question
+        // instead of settling it.
+        $user = User::factory()->create(['name' => "Roderick O'Keefe"]);
         $user->assignRole('client');
         $user->getOrCreateProfile()->update($prefs);
 
@@ -135,7 +139,11 @@ class LifecycleEmailTest extends TestCase
         foreach ($cases as $notification) {
             $html = $notification->toMail($client)->render();
 
-            $this->assertStringContainsString($client->name, $html);
+            // Escaped, because that is how Blade prints it. Faker hands out
+            // names like "Mr. Roderick O'Keefe DDS" perhaps one run in twenty,
+            // and the raw apostrophe never appears in the rendered mail — the
+            // test failed on the name, not on the email.
+            $this->assertStringContainsString(e($client->name), $html);
             $this->assertStringContainsString('Rooftop Anniversary', $html);
         }
     }
