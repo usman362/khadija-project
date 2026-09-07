@@ -2,7 +2,7 @@
 
 @section('title', 'Guided Event Planner')
 @section('page-title', 'Guided Event Planner')
-@section('page-subtitle', 'Your event, organised end-to-end')
+@section('page-subtitle', 'Your event, organized end-to-end')
 
 {{-- Guided Event Planner (client). Milestone checklist + progress + AI
      recommendations + marketplace suggestions + deadlines. Representative. --}}

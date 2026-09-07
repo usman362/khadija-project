@@ -11,8 +11,8 @@ class FaqSeeder extends Seeder
     {
         $faqs = [
             [
-                'question' => 'How does GIGS work?',
-                'answer' => 'GIGS connects event organizers (clients) with verified service professionals (suppliers). Simply create an account, browse available professionals by category, send booking requests, discuss details through our built-in chat, and confirm your booking. Payments are processed securely through Stripe or PayPal.',
+                'question' => 'How does GigResource work?',
+                'answer' => 'GigResource connects event organizers (clients) with event service professionals (photographers, caterers, DJs, planners and more). Create an account, browse professionals by service, send a request, agree the details through the built-in messaging, and book. You can post one request and let professionals respond, or send a request straight to a professional you have chosen.',
                 'category' => 'General',
                 'sort_order' => 1,
             ],
@@ -24,7 +24,7 @@ class FaqSeeder extends Seeder
             ],
             [
                 'question' => 'What payment methods are accepted?',
-                'answer' => 'We accept all major credit and debit cards through Stripe, as well as PayPal. All transactions are encrypted and processed through PCI-compliant payment gateways to ensure your financial data is secure.',
+                'answer' => 'Major credit and debit cards. Card details are entered on our payment provider\'s own secure page and are never stored on GigResource.',
                 'category' => 'Billing',
                 'sort_order' => 3,
             ],

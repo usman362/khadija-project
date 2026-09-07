@@ -151,7 +151,7 @@
     $lvlMeta = [
         'manual'  => ['Starter', '#64748b', 'Work out your own price — a manual rate worksheet, no suggestions.'],
         'semi'    => ['Semi', '#2563eb', 'We suggest a competitive price and market context — you set the final number.'],
-        'maximum' => ['Maximum', '#16a34a', 'the tool analyses the market and sets your optimal price automatically.'],
+        'maximum' => ['Maximum', '#16a34a', 'the tool analyzes the market and sets your optimal price automatically.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp

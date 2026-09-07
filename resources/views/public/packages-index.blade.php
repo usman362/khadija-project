@@ -280,7 +280,7 @@
                          drawer with no handle on the outside. --}}
                     <a class="pk-favlink {{ ! empty($f['saved']) ? 'on' : '' }}"
                        href="{{ ! empty($f['saved']) ? $link(['saved' => null]) : $link(['saved' => 1]) }}">
-                        ♥ {{ ! empty($f['saved']) ? 'Showing favourites — show all' : 'My favourites (' . count($savedIds) . ')' }}
+                        ♥ {{ ! empty($f['saved']) ? 'Showing favorites — show all' : 'My favorites (' . count($savedIds) . ')' }}
                     </a>
                 @endif
             @endauth
@@ -469,7 +469,7 @@
                                             <form method="POST" action="{{ route('public.package.save', $pkg) }}">
                                                 @csrf
                                                 <button class="pk-heart {{ $isSaved ? 'on' : '' }}" type="submit"
-                                                        aria-label="{{ $isSaved ? 'Remove from favourites' : 'Save to favourites' }}">
+                                                        aria-label="{{ $isSaved ? 'Remove from favorites' : 'Save to favorites' }}">
                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
                                                 </button>
                                             </form>

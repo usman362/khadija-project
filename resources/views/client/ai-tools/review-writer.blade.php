@@ -230,7 +230,7 @@
                 </g>
             </svg>
         </span>
-        <div class="rw-hero-txt"><b>Review Builder</b><p>The tool analyses your experience and helps you write clear, honest, and impactful reviews.</p></div>
+        <div class="rw-hero-txt"><b>Review Builder</b><p>The tool analyzes your experience and helps you write clear, honest, and impactful reviews.</p></div>
     </div>
 
     {{-- rating cards --}}

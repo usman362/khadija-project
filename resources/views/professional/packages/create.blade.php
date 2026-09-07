@@ -676,7 +676,7 @@
      * The Package Summary strip, the readiness ring and the review step all
      * read the form as it stands right now. One function, so the three of them
      * cannot describe three different packages — which is what happens when a
-     * summary is typed separately from the fields it summarises.
+     * summary is typed separately from the fields it summarizes.
      *
      * The four rules below are PackageProgress::steps() in JavaScript. They
      * have to stay in step with it: this is what the professional sees while

@@ -118,8 +118,8 @@
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
         'manual'  => ['Starter', '#64748b', 'Score the venue factors yourself — we average them into an overall verdict, no suggestions.'],
-        'semi'    => ['Semi', '#2563eb', 'the tool analyses the space — adjust the figures, verdict and notes and utilization recalculates live.'],
-        'maximum' => ['Maximum', '#16a34a', 'Enter your space and the tool analyses capacity, fit and gaps for you.'],
+        'semi'    => ['Semi', '#2563eb', 'the tool analyzes the space — adjust the figures, verdict and notes and utilization recalculates live.'],
+        'maximum' => ['Maximum', '#16a34a', 'Enter your space and the tool analyzes capacity, fit and gaps for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -148,7 +148,7 @@
             <div><div class="big" id="vamScore">0</div><div style="font-size:11px;color:var(--text-muted);">Overall Score / 100</div></div>
             <div class="va-mverdict" id="vamVerdict"></div>
         </div>
-        <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">Want us to analyse the space, gaps and hidden costs for you? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:#15803d;font-weight:700;text-decoration:none;">Upgrade →</a></div>
+        <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">Want us to analyze the space, gaps and hidden costs for you? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:#15803d;font-weight:700;text-decoration:none;">Upgrade →</a></div>
     </div>
     @else
     {{-- Interactive analyzer (Semi / Maximum) --}}

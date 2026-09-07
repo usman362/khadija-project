@@ -148,7 +148,11 @@
 
 <div class="dsp-card">
     <div style="font-size:14.5px;font-weight:800;color:var(--text-primary);">Start a new request</div>
-    <p class="dsp-sub" style="margin:3px 0 14px;">Pick the area it belongs to. Fifteen forms in one wall is a list to read, not a place to start.</p>
+    {{-- OA-130: this read "Fifteen forms in one wall is a list to read, not a
+         place to start" — the reason the page is grouped, written for whoever
+         built it, left where the client reads it. The grouping still stands;
+         the sentence now tells them what to do with it. --}}
+    <p class="dsp-sub" style="margin:3px 0 14px;">Choose the area your request is about. Each one opens the forms that belong to it.</p>
 
     <div class="rq-groups">
         @foreach($groups as $slug => $group)

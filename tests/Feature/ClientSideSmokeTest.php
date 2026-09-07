@@ -240,4 +240,55 @@ class ClientSideSmokeTest extends TestCase
 
         $this->assertSame([], $leaking, "pages showing stylesheet as text:\n".implode("\n", $leaking));
     }
+
+    /**
+     * OA-130 — no design rationale where the client reads instructions.
+     *
+     * "Fifteen forms in one wall is a list to read, not a place to start" was
+     * on Requests & Submissions. True, and the reason the page is grouped, but
+     * written for whoever built it and shipped where a client reads it. This
+     * is the second time internal writing reached production, after the sample
+     * data, which is why it is worth a check rather than a fix.
+     *
+     * The words below are the tells: a sentence about the design of a page, or
+     * about work still to do, addressed to nobody who uses it.
+     */
+    public function test_no_page_talks_to_the_developer(): void
+    {
+        $client = $this->client();
+
+        // Phrases that only a developer writes. "for now" was in this list
+        // and flagged "GigResource works within one state for now" — which is
+        // correct, useful, honest copy. A guard that fails good writing gets
+        // ignored, or gets the writing changed to satisfy it.
+        $tells = [
+            'TODO', 'FIXME', 'lorem ipsum', 'placeholder text',
+            'not a place to start', 'temporary until', 'to be replaced',
+            'hardcoded', 'hard-coded', 'dummy data',
+        ];
+
+        $found = [];
+
+        $paths = array_merge(
+            $this->parameterlessGetRoutes('client/'),
+            $this->parameterlessGetRoutes('forms'),
+            $this->parameterlessGetRoutes('requests-submissions'),
+        );
+
+        foreach ($paths as $path) {
+            $html = $this->actingAs($client)->get($path)->getContent();
+
+            // What a reader sees: comments and scripts are not the problem.
+            $visible = preg_replace('#<(style|script)\\b[^>]*>.*?</\\1>#is', '', $html);
+            $visible = strip_tags((string) $visible);
+
+            foreach ($tells as $tell) {
+                if (stripos($visible, $tell) !== false) {
+                    $found[] = "{$path} — \"{$tell}\"";
+                }
+            }
+        }
+
+        $this->assertSame([], $found, "developer writing on a client page:\n".implode("\n", $found));
+    }
 }

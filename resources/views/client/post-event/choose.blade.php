@@ -133,7 +133,7 @@
                     'href'  => route('client.bsr.step', 'service'),
                     'tag'   => ['Get bids', 'hot'],
                     'title' => 'Bidding Request (BR)',
-                    'desc'  => 'Post one service or several — professionals bid on what they provide. Free to post; you only pay when you finalise.',
+                    'desc'  => 'Post one service or several — professionals bid on what they provide. Free to post; you only pay when you finalize.',
                     'cta'   => 'Start a request',
                     'icon'  => '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
                 ],

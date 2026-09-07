@@ -9,7 +9,7 @@
     /* Same shape as before — stat tiles, a detailed card body, a progress
        strip, a sticky rail — but every value is read from the database.
        The columns that had nothing behind them (tax status, document lists,
-       a summariser, invented milestone dates) are gone; what replaced them
+       a summarizer, invented milestone dates) are gone; what replaced them
        is the booking's own agreement-log history. */
 
     .bk-layout { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 18px; align-items: start; }

@@ -187,9 +187,9 @@
          * Event type → what matters for it, from the Category Masterlist.
          *
          * Everything stays on the page. A tier is a ranking, not a permission:
-         * the old keyword version HID every service it did not recognise, which
+         * the old keyword version HID every service it did not recognize, which
          * both lost the Essential/Common/Occasional distinction the file exists
-         * to make and — because it recognised only 22 of 106 event types — did
+         * to make and — because it recognized only 22 of 106 event types — did
          * nothing at all most of the time. Ordering keeps the client's choice
          * intact and still puts the right things first.
          *
