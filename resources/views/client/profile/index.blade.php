@@ -198,6 +198,23 @@
     }
     .pf-switch input:checked + .pf-switch-slider { background: #f97316; }
     .pf-switch input:checked + .pf-switch-slider::before { transform: translateX(20px); }
+
+    /* BUG-9 — the way out of the profile. Quiet enough not to compete with the
+       tabs beneath it, and it sits above them because it answers a different
+       question: not "change my details" but "where is my activity". */
+    .pf-activity { border: 1px solid var(--border-color, #e5e7eb); border-radius: 12px;
+                   overflow: hidden; margin-bottom: 14px; }
+    .pf-activity-h { padding: 10px 14px; font-size: 11.5px; font-weight: 800;
+                     letter-spacing: .04em; text-transform: uppercase;
+                     color: var(--text-muted, #6b7280);
+                     border-bottom: 1px solid var(--border-color, #e5e7eb); }
+    .pf-activity-row { display: flex; align-items: center; justify-content: space-between;
+                       gap: 10px; padding: 10px 14px; font-size: 13.5px;
+                       color: var(--text-primary, #111827); text-decoration: none;
+                       border-bottom: 1px solid var(--border-color, #e5e7eb); }
+    .pf-activity-row:last-child { border-bottom: 0; }
+    .pf-activity-row:hover { background: var(--bg-soft, rgba(0,0,0,.03)); }
+    .pf-activity-row b { font-variant-numeric: tabular-nums; }
 </style>
 @endpush
 
@@ -228,6 +245,23 @@
                     </form>
                 </div>
             @endif
+        </div>
+
+        {{-- BUG-9 (Khadijah): the profile linked only to itself — its own tabs
+             and its own forms. A client arriving from the navigation had no way
+             on to their events, bookings or payments without going back.
+
+             Counts are real, read from this client's own rows. A zero is shown
+             rather than hidden: "no bookings yet" is an answer, and a number
+             that was not counted would be worse than no number. --}}
+        <div class="pf-activity">
+            <div class="pf-activity-h">Your account</div>
+            @foreach($activity as $row)
+                <a href="{{ $row['url'] }}" class="pf-activity-row">
+                    <span>{{ $row['label'] }}</span>
+                    <b>{{ number_format($row['count']) }}</b>
+                </a>
+            @endforeach
         </div>
 
         {{-- Tab Nav --}}

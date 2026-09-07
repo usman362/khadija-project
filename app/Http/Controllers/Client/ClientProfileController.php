@@ -20,7 +20,41 @@ class ClientProfileController extends Controller
         $profile = $user->getOrCreateProfile();
         $tab = $request->string('tab')->toString() ?: 'general';
 
-        return view('client.profile.index', compact('user', 'profile', 'tab'));
+        return view('client.profile.index', compact('user', 'profile', 'tab') + [
+            'activity' => $this->activityFor($user),
+        ]);
+    }
+
+    /**
+     * BUG-9: the profile was "a room with no doors".
+     *
+     * Every link on the page pointed back at the page — its own tabs and its
+     * own forms. A client who opened it from the navigation could reach their
+     * events, bookings or payments only by going back the way they came.
+     *
+     * Real counts, always. A row saying "Bookings" is a link; a row saying
+     * "Bookings 3" tells the client something before they click, and a made-up
+     * number would be worse than no number at all. A count of zero is shown
+     * as such rather than hidden — "no bookings yet" is an answer.
+     *
+     * @return array<int, array{label: string, count: int, url: string}>
+     */
+    private function activityFor(\App\Models\User $user): array
+    {
+        $rows = [
+            ['label' => 'My Events', 'count' => $user->clientEvents()->count(), 'route' => 'client.events.index'],
+            ['label' => 'Bookings', 'count' => $user->bookings()->count(), 'route' => 'client.bookings.index'],
+            ['label' => 'Proposals', 'count' => \App\Models\Bid::whereIn(
+                'event_id', $user->clientEvents()->select('id')
+            )->count(), 'route' => 'client.proposals.index'],
+            ['label' => 'Payments', 'count' => \App\Models\Payment::where('user_id', $user->id)
+                ->where('status', 'completed')->count(), 'route' => 'client.payments.index'],
+        ];
+
+        return array_values(array_map(
+            fn ($r) => ['label' => $r['label'], 'count' => $r['count'], 'url' => route($r['route'])],
+            array_filter($rows, fn ($r) => \Illuminate\Support\Facades\Route::has($r['route'])),
+        ));
     }
 
     public function updateGeneral(Request $request): RedirectResponse
