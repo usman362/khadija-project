@@ -191,7 +191,6 @@ class BrowseProfessionalsController extends Controller
         // of distinct cities so we can power a city picker without a
         // separate autocomplete endpoint.
         $categories = Category::active()
-            ->orderBy('sort_order')
             ->orderBy('name')
             ->get(['id', 'name', 'slug', 'icon']);
 

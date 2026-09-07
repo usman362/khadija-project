@@ -78,7 +78,22 @@ class ServiceSpecialtyNamingTest extends TestCase
         }
 
         $this->assertCount(4, $dj->refresh()->children);
-        $this->assertSame('Wedding DJ', $dj->children->first()->name);
-        $this->assertSame(Category::SERVICE, $dj->children->first()->parent->kind);
+
+        // Every one of them hangs off the service — that is what this test is
+        // about. It used to assert children->first() was 'Wedding DJ', which
+        // was only true while the relation ordered by sort_order, and so it
+        // failed when DIR-1 made every category list read A to Z. The
+        // relationship is the claim; the order belongs to its own test.
+        foreach ($dj->children as $specialty) {
+            $this->assertSame(Category::SERVICE_SPECIALTY, $specialty->kind);
+            $this->assertSame(Category::SERVICE, $specialty->parent->kind);
+            $this->assertSame($dj->id, $specialty->parent_id);
+        }
+
+        // And, per DIR-1, they come back alphabetically.
+        $this->assertSame(
+            ['Corporate DJ', 'Karaoke DJ', 'Party DJ', 'Wedding DJ'],
+            $dj->children->pluck('name')->all(),
+        );
     }
 }

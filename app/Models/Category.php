@@ -176,7 +176,10 @@ class Category extends Model
     // Subcategories
     public function children(): HasMany
     {
-        return $this->hasMany(Category::class, 'parent_id')->orderBy('sort_order');
+        // DIR-1: A to Z. sort_order was arbitrary here, so the same set of
+        // subcategories came back in a different order on every screen that
+        // read this relation.
+        return $this->hasMany(Category::class, 'parent_id')->orderBy('name');
     }
 
     // Professional packages filed under this category
@@ -232,7 +235,7 @@ class Category extends Model
     {
         $roots = self::whereNull('parent_id')
             ->with('allChildren')
-            ->orderBy('sort_order')->orderBy('name')
+            ->orderBy('name')
             ->get();
 
         $result = [];

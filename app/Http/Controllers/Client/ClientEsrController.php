@@ -40,7 +40,7 @@ class ClientEsrController extends Controller
         // Row 91 — this list had no filter at all, so Baby Shower and
         // Birthday Party sat among the services a client could request.
         $categories = Category::active()->bookableServices()
-            ->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
+            ->orderBy('name')->get(['id', 'name']);
 
         return view('client.esr.create', [
             'orgTypes' => \App\Models\Event::ORGANIZATION_TYPES,

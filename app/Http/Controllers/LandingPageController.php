@@ -24,7 +24,6 @@ class LandingPageController extends Controller
 
         // Top-level categories (kept for any downstream use / browse links).
         $categories = Category::active()
-            ->orderBy('sort_order')
             ->orderBy('name')
             ->get(['id', 'name', 'slug', 'icon']);
 

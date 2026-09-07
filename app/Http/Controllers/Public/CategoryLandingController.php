@@ -107,7 +107,6 @@ class CategoryLandingController extends Controller
         $siblings = Category::active()
             ->when($category->parent_id, fn ($q) => $q->where('parent_id', $category->parent_id)->where('id', '!=', $category->id))
             ->when(!$category->parent_id, fn ($q) => $q->where('parent_id', $category->id))
-            ->orderBy('sort_order')
             ->orderBy('name')
             ->limit(8)
             ->get(['id', 'name', 'slug', 'icon']);
@@ -120,7 +119,7 @@ class CategoryLandingController extends Controller
          */
         $services = Category::active()
             ->where('parent_id', $category->id)
-            ->orderBy('sort_order')->orderBy('name')
+            ->orderBy('name')
             ->get(['id', 'name', 'slug', 'short_description']);
 
         // Real words from real clients about people in this category. Nothing

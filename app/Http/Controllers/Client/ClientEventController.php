@@ -130,7 +130,7 @@ class ClientEventController extends Controller
             ->whereYear('starts_at', $year)
             ->get(['id', 'title', 'starts_at', 'ends_at', 'status']);
 
-        $categories = Category::active()->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
+        $categories = Category::active()->orderBy('name')->get(['id', 'name']);
 
         /*
          * Checklist row 84 — "Recent Professional Activity".
@@ -184,7 +184,7 @@ class ClientEventController extends Controller
     {
         $this->authorize('create', Event::class);
 
-        $categories = Category::active()->orderBy('sort_order')->orderBy('name')->get(['id', 'name', 'icon']);
+        $categories = Category::active()->orderBy('name')->get(['id', 'name', 'icon']);
 
         return view('client.events.create', compact('categories'));
     }
@@ -338,7 +338,7 @@ class ClientEventController extends Controller
         ]);
 
         // Categories for the edit form + ids of the ones already attached.
-        $categories = Category::active()->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
+        $categories = Category::active()->orderBy('name')->get(['id', 'name']);
         $selectedCategoryIds = $event->categories->pluck('id')->all();
 
         // Sealed bids received on this event. The client is the event owner, so

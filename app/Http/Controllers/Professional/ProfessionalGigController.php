@@ -88,7 +88,7 @@ class ProfessionalGigController extends Controller
             ->get(['id', 'title', 'starts_at', 'ends_at', 'status']);
 
         $categories = Category::active()->bookableServices()
-            ->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
+            ->orderBy('name')->get(['id', 'name']);
 
         return compact(
             'myGigs', 'stats', 'browseEvents', 'browseStats',

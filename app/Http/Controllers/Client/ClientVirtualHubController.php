@@ -37,7 +37,7 @@ class ClientVirtualHubController extends Controller
         // virtual SERVICE beside Event Staffing and Beverage Catering. An
         // occasion is not something a professional can be booked to perform.
         $categories = Category::active()->bookableServices()
-            ->orderBy('sort_order')->orderBy('name')
+            ->orderBy('name')
             ->take(6)
             ->get(['id', 'name', 'icon']);
 

@@ -99,7 +99,7 @@ class ClientDirectOfferController extends Controller
         $categories = $selectedPro
             ? $selectedPro->serviceCategories()->select('categories.id', 'categories.name')->get()
             : Category::active()->bookableServices()
-                ->orderBy('sort_order')->orderBy('name')->get(['id', 'name']);
+                ->orderBy('name')->get(['id', 'name']);
 
         $type = in_array($request->query('type'), ['SSR', 'MSR'], true) ? $request->query('type') : 'SSR';
 

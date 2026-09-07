@@ -90,7 +90,7 @@ class AppServiceProvider extends ServiceProvider
                     ->whereNull('parent_id')
                     ->whereHas('children')
                     ->with(['children' => fn ($q) => $q->where('is_active', true)->orderBy('name')])
-                    ->orderBy('sort_order')->orderBy('name')
+                    ->orderBy('name')
                     ->limit(9)
                     ->get()
             );
