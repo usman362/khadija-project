@@ -61,12 +61,31 @@ final class ClientReport
     /** Did posting a request actually produce anyone? */
     public function requests(): array
     {
+        /*
+         * OA-147: "Requests posted 12" counted drafts. A draft is a request
+         * the client started and never sent — no professional ever saw it, so
+         * counting it in "did posting a request produce anyone?" makes the
+         * answer look worse than the platform performed, on the client's own
+         * report about the platform.
+         */
         $posted = Event::where('client_id', $this->client->id)
+            ->where('is_published', true)
             ->whereBetween('created_at', [$this->from, $this->to]);
 
         $postedCount = (clone $posted)->count();
         $withBid     = (clone $posted)->whereHas('bids')->count();
-        $hired       = (clone $posted)->whereNotNull('supplier_id')->count();
+
+        /*
+         * And "Professionals hired" counted EVENTS with a supplier, not
+         * professionals — three events with the same photographer read as
+         * three. It also counted the client's own account, which appears as a
+         * supplier on a self-referential booking in the sample data.
+         */
+        $hired = (clone $posted)
+            ->whereNotNull('supplier_id')
+            ->where('supplier_id', '!=', $this->client->id)
+            ->distinct()
+            ->count('supplier_id');
 
         $bids = Bid::whereIn('event_id', (clone $posted)->pluck('id'))->count();
 
@@ -101,9 +120,23 @@ final class ClientReport
     /** Which professionals this client keeps going back to. */
     public function professionals(): Collection
     {
+        /*
+         * OA-147: this said "Priya — 2 bookings" while the Bookings page
+         * showed three with her, because it counted only confirmed and
+         * completed while Bookings counts everything that stands.
+         *
+         * The rule now matches Bookings and the finance totals: a booking
+         * counts unless it was cancelled or declined. Stated here rather than
+         * implied by a list of the statuses that happened to be wanted.
+         *
+         * A client's own account is excluded — it appears as a supplier on a
+         * self-referential booking in the sample data, and "you hired
+         * yourself" is not a fact about anybody's hiring.
+         */
         return Booking::where('client_id', $this->client->id)
-            ->whereIn('status', ['confirmed', 'completed'])
+            ->whereNotIn('status', \App\Domain\Finance\ClientTotals::VOID_STATUSES)
             ->whereNotNull('supplier_id')
+            ->where('supplier_id', '!=', $this->client->id)
             ->with('supplier:id,name')
             ->get(['supplier_id', 'price', 'status'])
             ->groupBy('supplier_id')
