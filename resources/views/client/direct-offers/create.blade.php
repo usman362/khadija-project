@@ -104,6 +104,13 @@
     @media (max-width: 1024px) { .do-layout { grid-template-columns: 1fr; } .do-rail { position: static; flex-direction: row; flex-wrap: wrap; } .do-rcard { flex:1; min-width: 240px; } }
     @media (max-width: 760px) { .do-types { grid-template-columns: 1fr; } }
     @media (max-width: 640px) { .do-rail { flex-direction: column; } }
+
+    /* OA-144 — the service already chosen, shown rather than asked again. */
+    .do-chosen { display:flex; align-items:baseline; gap:8px; padding:10px 12px;
+                 border:1px solid var(--border-color,#e5e7eb); border-radius:9px;
+                 background:var(--bg-soft,rgba(0,0,0,.02)); }
+    .do-chosen b { font-size:13.5px; }
+    .do-chosen span { font-size:11.5px; color:var(--text-muted,#6b7280); }
 </style>
 @endpush
 
@@ -262,13 +269,44 @@
                 <span class="do-tag">YOUR INPUT</span>
             </div>
             <div class="do-sec-bd">
-                {{-- SSR: single service --}}
-                <div class="do-svc-single">
+                {{-- SSR: single service.
+
+                     OA-144: this asked the same question twice. The client
+                     chooses a service at the top of the page to find
+                     professionals who offer it, and was then asked again down
+                     here which service they wanted — with no indication the
+                     two were related, and free to disagree.
+
+                     When the choice was already made above, it is shown as
+                     settled and carried in a hidden field. The dropdown is
+                     still there for the other way in: arriving from a
+                     professional's own profile, where no service was picked. --}}
+                @php
+                    $__chosen = ($serviceId ?? 0) ? $categories->firstWhere('id', $serviceId) : null;
+                    // Nothing chosen and nobody chosen: the question is already
+                    // being asked at the top of the page, where it also does
+                    // something — it finds the professionals. Asking again here
+                    // is the duplicate, and it cannot be acted on yet anyway.
+                    $__askAtTop = ! $selectedPro && ! $__chosen;
+                @endphp
+
+                <div class="do-svc-single" @if($__askAtTop) hidden @endif>
                     <div class="do-field">
                         <label>Service requested</label>
-                        <select class="do-input" name="service_single" aria-label="Service single">
-                            @foreach($categories as $cat)<option>{{ $cat->name }}</option>@endforeach
-                        </select>
+
+                        @if($__chosen)
+                            <div class="do-chosen">
+                                <b>{{ $__chosen->name }}</b>
+                                <span>chosen above</span>
+                            </div>
+                            <input type="hidden" name="service_single" value="{{ $__chosen->name }}">
+                        @elseif(! $__askAtTop)
+                            <select class="do-input" name="service_single" aria-label="Service single">
+                                @foreach($categories as $cat)
+                                    <option value="{{ $cat->name }}">{{ $cat->name }}</option>
+                                @endforeach
+                            </select>
+                        @endif
                     </div>
                     <div class="do-hint">SSR — a single, specific service from this professional.</div>
                 </div>
