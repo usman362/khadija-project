@@ -137,6 +137,10 @@ class ToolkitBridge
             ->where(fn ($q) => $q->where('client_id', $user->id)->orWhere('created_by', $user->id))
             ->whereNull('closed_at')
             ->where('status', '!=', 'completed')
+            // OA-127: and not already over. Toolkit output was being offered a
+            // home in requests whose event date had passed — nothing placed
+            // there could reach a professional in time to matter.
+            ->notYetPast()
             ->latest()
             ->get()
             ->map(fn (Event $e) => [

@@ -70,7 +70,15 @@ class ClientEventController extends Controller
 
             // Live and taking proposals — the two statuses that mean "still
             // looking", counted the same way the list's own filter counts them.
-            'open'      => (int) (($eventStats['pending'] ?? 0) + ($eventStats['published'] ?? 0)),
+            //
+            // OA-143: and not already over. Status alone counted a party that
+            // happened last week as still open for proposals. Counted from the
+            // rows rather than the status tally, because the tally has no date
+            // in it.
+            'open'      => (clone $baseEvents)
+                ->whereIn('status', ['pending', 'published'])
+                ->notYetPast()
+                ->count(),
 
             'confirmed' => (int) ($eventStats['confirmed'] ?? 0),
             'completed' => (int) ($eventStats['completed'] ?? 0),

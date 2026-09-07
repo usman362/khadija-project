@@ -386,6 +386,33 @@ class Event extends Model
      * Only multi-service requests carry these. A single-service request has one
      * budget and nothing to divide, so it has no rows here.
      */
+    /**
+     * Still open to work on — and not already over.
+     *
+     * OA-127 and OA-143: "open" was decided by status alone, so an event whose
+     * date had passed was still counted as open on My Events and still offered
+     * as somewhere to place toolkit output. A client cannot take proposals for
+     * a party that happened last week.
+     *
+     * An event with NO date stays open. "Leave blank if the date is still
+     * flexible" is something the wizard invites, and treating an unset date as
+     * a passed one would close every request from a client who has not chosen
+     * their day yet.
+     */
+    public function scopeNotYetPast($query)
+    {
+        return $query->where(fn ($q) => $q
+            ->whereNull('starts_at')
+            ->orWhere('starts_at', '>=', now()->startOfDay()));
+    }
+
+    /** The inverse, for counting what has already happened. */
+    public function scopeAlreadyPast($query)
+    {
+        return $query->whereNotNull('starts_at')
+            ->where('starts_at', '<', now()->startOfDay());
+    }
+
     public function serviceBudgets(): HasMany
     {
         return $this->hasMany(EventServiceBudget::class);

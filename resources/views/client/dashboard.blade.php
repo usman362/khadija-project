@@ -975,15 +975,15 @@
         @endforelse
     </div>
 
-    {{-- Your Achievements --}}
-    <div class="od-card" style="text-align:center;">
-        <div class="od-card-head" style="justify-content:center;">
-            <span class="od-card-title">Your Achievements</span>
-        </div>
-        <div class="od-ach-circle">15</div>
-        <div class="od-ach-label">Badges Earned</div>
-        <div class="od-ach-encouragement">Keep going! You're doing great.</div>
-    </div>
+    {{-- OA-134: "Your Achievements — 15 Badges Earned. Keep going! You're
+         doing great." The 15 was a literal in this template. It counted
+         nothing, and it sat on the same dashboard as the Client Badges card
+         above, which correctly says the client has none — the page told them
+         both at once.
+
+         Removed rather than made to count something. No badge has an award
+         rule yet; the rulebook is PM-14 and is still being written. When it
+         exists, the honest card above is where the count belongs. --}}
 
     <div class="od-card">
         <div class="od-card-head">
