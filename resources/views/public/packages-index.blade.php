@@ -57,17 +57,18 @@
     .pk-hero h1 { font-size: clamp(1.7rem, 3.4vw, 2.5rem); margin: 0 0 6px; }
     .pk-hero h1 span { color: var(--pk); }
     .pk-hero p { color: var(--muted); font-size: 15px; max-width: 430px; margin: 0; }
-    /* Three short claims beside the heading.
-       As one wrapping sentence it broke mid-phrase — "Better value through
-       bundle / pricing". A dot separator did not fix it either: once each
-       claim takes its own line, the separator leads the line instead of
-       joining two things. So they stack, one per line, and nothing can
-       break inside a claim. */
-    .pk-props { margin: 0; display: flex; flex-direction: column; gap: 4px;
-                align-items: flex-end; text-align: right;
-                font-size: 13.5px; line-height: 1.5; color: var(--muted, #6b7280); }
-    .pk-props span { white-space: nowrap; }
-    @media (max-width: 760px) { .pk-props { align-items: flex-start; text-align: left; } }
+    /* Three short claims, under the subtitle they belong to.
+       They are one line where there is room and wrap between claims where
+       there is not — never inside one, which is what turned an earlier
+       version into "Better value through bundle / pricing". */
+    .pk-hero p.pk-props { margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 4px 12px;
+                font-size: 13px; line-height: 1.5; color: var(--muted, #6b7280);
+                /* .pk-hero p caps the subtitle at 430px, which is right for a
+                   sentence and wrong for this — it forced three lines out of
+                   one. */
+                max-width: none; }
+    .pk-hero p.pk-props span { white-space: nowrap; }
+    .pk-hero p.pk-props span + span::before { content: '·'; margin-right: 12px; opacity: .5; }
 
     /* Toolbar */
     .pk-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; margin-bottom: 18px; }
@@ -243,6 +244,12 @@
         .pk-media { min-height: 190px; }
         .pk-pricebox { border-left: none; border-top: 1px solid var(--line); }
         .pk-facts { grid-template-columns: 1fr; }
+
+        /* Narrow enough that the three claims can't share a line. Stacked,
+           the separator would lead lines two and three and read as a bullet
+           somebody forgot to style, so it goes. */
+        .pk-hero p.pk-props { flex-direction: column; gap: 2px; }
+        .pk-hero p.pk-props span + span::before { content: none; }
     }
 </style>
 @endpush
@@ -255,22 +262,21 @@
             <div>
                 <h1>Find the Perfect <span>Package</span></h1>
                 <p>Search ready-made service bundles from professionals who can handle multiple parts of your event.</p>
+
+                {{-- Under the subtitle, not opposite it. Sitting in the hero's
+                     right-hand slot these three lines floated alone against a
+                     wide empty gap and read as a stray column; here they finish
+                     the sentence the subtitle starts.
+
+                     "One Contract — one point of contact" is not among them: the
+                     same page says it lower down in "Why Package Bundles?", and
+                     saying it twice in different words is padding. --}}
+                <p class="pk-props">
+                    <span>Professionally coordinated</span>
+                    <span>Better value through bundle pricing</span>
+                    <span>Customizable to your needs</span>
+                </p>
             </div>
-            {{-- One Contract came out: it is the first of four claims here and
-                 the third of four in "Why Package Bundles?" further down the
-                 same page, which said the same thing twice with different
-                 words. The three that remain read as a sentence rather than as
-                 boxes — four bordered tiles for four short phrases was more
-                 furniture than the phrases needed. --}}
-            <p class="pk-props">
-                {{-- Each claim in its own span so a line break falls BETWEEN
-                     claims, never inside one. Unwrapped, this read "Better
-                     value through bundle / pricing" — a phrase split down the
-                     middle, which is harder to read than four tiles were. --}}
-                <span>Professionally coordinated</span>
-                <span>Better value through bundle pricing</span>
-                <span>Customizable to your needs</span>
-            </p>
         </div>
 
         @if(session('status'))<div class="pk-flash ok">{{ session('status') }}</div>@endif
