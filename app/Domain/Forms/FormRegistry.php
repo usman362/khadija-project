@@ -477,9 +477,22 @@ final class FormRegistry
             }
 
             if ($forms !== []) {
+                /*
+                 * DIR-1 (Khadijah): these read A to Z.
+                 *
+                 * Sorted here rather than written in order, so a form added to
+                 * a group later cannot land in the wrong place — which is how
+                 * the hand-written order drifted in the first place. Every
+                 * screen that reads the registry gets the same order.
+                 */
+                uasort($forms, fn ($a, $b) => strcmp($a['title'] ?? '', $b['title'] ?? ''));
+
                 $out[$slug] = ['label' => $group['label'], 'blurb' => $group['blurb'], 'forms' => $forms];
             }
         }
+
+        // The groups themselves too, for the same reason.
+        uasort($out, fn ($a, $b) => strcmp($a['label'], $b['label']));
 
         return $out;
     }

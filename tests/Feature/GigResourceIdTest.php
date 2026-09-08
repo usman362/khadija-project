@@ -115,7 +115,13 @@ class GigResourceIdTest extends TestCase
     {
         $user = User::factory()->create(['primary_role' => 'client']);
 
-        $this->assertStringNotContainsString('-'.$user->id, $user->fresh()->public_id);
+        // The whole number, not a substring: a random six-digit reference
+        // legitimately starts with the digits of a low row id — CL-119512 for
+        // user 1 — and failing on that made the test fail about one run in ten.
+        [, $digits] = explode('-', (string) $user->fresh()->public_id, 2);
+
+        $this->assertNotSame((string) $user->id, $digits);
+        $this->assertNotSame((string) $user->id, ltrim($digits, '0'));
     }
 
     /* ── Where the client can see it ────────────────────────── */
