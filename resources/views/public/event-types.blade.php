@@ -191,8 +191,12 @@
     <div class="et-hero">
         <h1>Explore <span>Event Types</span></h1>
         <p>Find the type of event you're planning and discover the services and professionals you need to bring it together.</p>
-        <form class="et-search" method="GET" action="{{ route('public.browse') }}">
-            <input type="text" name="q" placeholder="Search event types…">
+        {{-- Searches this page. It used to submit to Find Professionals, so
+             "wedding" left here and asked which PROFESSIONALS have wedding in
+             their name — a different question, usually answered with nothing. --}}
+        <form class="et-search" method="GET" action="{{ route('public.event-types') }}">
+            @if($group !== '')<input type="hidden" name="group" value="{{ $group }}">@endif
+            <input type="text" name="q" value="{{ $q }}" placeholder="Search event types…">
             <button type="submit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</button>
         </form>
     </div>
@@ -202,10 +206,11 @@
          would need somebody to keep it in step with the taxonomy; these cannot
          drift, because they come from it. --}}
     <div class="et-groupbar">
-        <a class="et-gchip {{ $group === '' ? 'is-on' : '' }}" href="{{ route('public.event-types') }}">All Event Types</a>
+        {{-- A chip narrows the search rather than throwing it away. --}}
+        <a class="et-gchip {{ $group === '' ? 'is-on' : '' }}" href="{{ route('public.event-types', array_filter(['q' => $q])) }}">All Event Types</a>
         @foreach($chips as $name => $count)
             <a class="et-gchip {{ $group === $name ? 'is-on' : '' }} {{ $loop->index >= 5 ? 'et-gextra' : '' }}"
-               href="{{ route('public.event-types', ['group' => $name]) }}">{{ $name }} <b>{{ $count }}</b></a>
+               href="{{ route('public.event-types', array_filter(['group' => $name, 'q' => $q])) }}">{{ $name }} <b>{{ $count }}</b></a>
         @endforeach
         @if($chips->count() > 5)
             <button type="button" class="et-gchip" data-et-more>More ({{ $chips->count() - 5 }}) ▾</button>
@@ -234,7 +239,15 @@
 
         <div>
             <h2 class="et-sec-h">Browse <span>Event Types</span></h2>
-            <p class="et-sec-p">Choose an event type to start planning.</p>
+            <p class="et-sec-p">
+                @if($q !== '')
+                    {{ $wall->total() }} {{ \Illuminate\Support\Str::plural('event type', $wall->total()) }}
+                    matching “{{ $q }}”{{ $group !== '' ? ' in '.$group : '' }} ·
+                    <a href="{{ route('public.event-types', array_filter(['group' => $group])) }}">Clear search</a>
+                @else
+                    Choose an event type to start planning.
+                @endif
+            </p>
 
             <div class="et-all">
                 @forelse($wall as $et)
@@ -267,7 +280,15 @@
                         <span class="et-all-arw">›</span>
                     </a>
                 @empty
-                    <p class="et-sec-p">No event types in this group.</p>
+                    {{-- Say which search found nothing, and offer the way back. --}}
+                    <p class="et-sec-p">
+                        @if($q !== '')
+                            No event type matches “{{ $q }}”{{ $group !== '' ? ' in '.$group : '' }}.
+                            <a href="{{ route('public.event-types', array_filter(['group' => $group])) }}">Clear search</a>
+                        @else
+                            No event types in this group.
+                        @endif
+                    </p>
                 @endforelse
             </div>
 

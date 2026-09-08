@@ -57,6 +57,16 @@ class EventTypeController extends Controller
         $group = $chips->has($group) ? $group : '';
 
         /*
+         * The page's own search box.
+         *
+         * It submitted to Find Professionals, so searching "wedding" here left
+         * the page and asked a different question — which professionals have
+         * "wedding" in their name or headline. On a page headed "Search event
+         * types" that reads as a search box that does nothing.
+         */
+        $q = trim((string) request()->query('q', ''));
+
+        /*
          * How many service categories exist at all. The card quotes the
          * recommended count, and the page it opens lists EVERY category with the
          * recommended ones tagged — so a card saying "17" opened onto 27 tiles
@@ -78,7 +88,12 @@ class EventTypeController extends Controller
 
         $wall = \App\Models\Category::active()
             ->where('kind', \App\Models\Category::EVENT_TYPE)
-            ->when($group !== '', fn ($q) => $q->where('archetype', $group))
+            ->when($group !== '', fn ($b) => $b->where('archetype', $group))
+            ->when($q !== '', fn ($b) => $b->where(
+                'name',
+                'like',
+                '%'.str_replace(['%', '_'], ['\\%', '\\_'], $q).'%',
+            ))
             ->orderBy('name')
             ->paginate(12)
             ->withQueryString()
@@ -99,6 +114,7 @@ class EventTypeController extends Controller
             'wall'       => $wall,
             'chips'      => $chips,
             'group'      => $group,
+            'q'          => $q,
             'rail'       => $rail,
             // 'groups' was a hand-written list of six themes. The chips above
             // are the taxonomy's own 13 archetypes, so it is no longer read.
