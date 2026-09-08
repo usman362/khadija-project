@@ -57,11 +57,7 @@
     .pk-hero h1 { font-size: clamp(1.7rem, 3.4vw, 2.5rem); margin: 0 0 6px; }
     .pk-hero h1 span { color: var(--pk); }
     .pk-hero p { color: var(--muted); font-size: 15px; max-width: 430px; margin: 0; }
-    .pk-props { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 12px; }
-    .pk-prop { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
-    .pk-prop svg { width: 22px; height: 22px; color: var(--pk); flex-shrink: 0; }
-    .pk-prop b { display: block; font-size: 13px; font-weight: 800; color: var(--ink); line-height: 1.2; }
-    .pk-prop span { font-size: 11.5px; color: var(--muted); }
+    .pk-props { margin: 0; font-size: 13.5px; line-height: 1.7; color: var(--muted, #6b7280); }
 
     /* Toolbar */
     .pk-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; margin-bottom: 18px; }
@@ -236,7 +232,6 @@
         .pk-card { grid-template-columns: 1fr; }
         .pk-media { min-height: 190px; }
         .pk-pricebox { border-left: none; border-top: 1px solid var(--line); }
-        .pk-props { grid-template-columns: repeat(2,1fr); }
         .pk-facts { grid-template-columns: 1fr; }
     }
 </style>
@@ -251,12 +246,15 @@
                 <h1>Find the Perfect <span>Package</span></h1>
                 <p>Search ready-made service bundles from professionals who can handle multiple parts of your event.</p>
             </div>
-            <div class="pk-props">
-                <div class="pk-prop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8V5a2 2 0 0 1 2-2h1M12 8V5a2 2 0 0 0-2-2H9"/><line x1="12" y1="8" x2="12" y2="21"/></svg><div><b>One Contract</b><span>One point of contact</span></div></div>
-                <div class="pk-prop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12l2.5 2.5L16 9"/></svg><div><b>Professionally</b><span>Coordinated</span></div></div>
-                <div class="pk-prop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><div><b>Better Value</b><span>Bundle pricing</span></div></div>
-                <div class="pk-prop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg><div><b>Customizable</b><span>To your needs</span></div></div>
-            </div>
+            {{-- One Contract came out: it is the first of four claims here and
+                 the third of four in "Why Package Bundles?" further down the
+                 same page, which said the same thing twice with different
+                 words. The three that remain read as a sentence rather than as
+                 boxes — four bordered tiles for four short phrases was more
+                 furniture than the phrases needed. --}}
+            <p class="pk-props">
+                Professionally coordinated · Better value through bundle pricing · Customizable to your needs
+            </p>
         </div>
 
         @if(session('status'))<div class="pk-flash ok">{{ session('status') }}</div>@endif

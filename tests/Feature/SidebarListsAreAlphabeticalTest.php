@@ -157,4 +157,68 @@ class SidebarListsAreAlphabeticalTest extends TestCase
 
         $this->assertSame([], $offenders, "still ordering categories by sort_order:\n".implode("\n", $offenders));
     }
+
+    /* ── Request types, not just services ───────────────────── */
+
+    /**
+     * The five paths on "How do you want to request?" read A to Z.
+     *
+     * They were in the order they were built — Shop Packages first, because it
+     * was added first — which is an order only somebody who worked on the page
+     * can scan.
+     *
+     * The measurement is the delicate part, and it caught me twice. Searching
+     * the whole document finds the sidebar, which carries the same names and
+     * comes first. Searching from "rc-grid" finds the CSS rule of that name,
+     * which is also before the sidebar. Both made a correctly sorted page read
+     * as unsorted, and one of them would have had me "fix" something that was
+     * already right.
+     */
+    public function test_the_request_paths_read_a_to_z(): void
+    {
+        $html = $this->actingAs($this->client())
+            ->get('/client/post-event/choose')->assertOk()->getContent();
+
+        $from = strpos($html, '<div class="rc-grid">');
+        $this->assertNotFalse($from, 'the cards are not on the page');
+
+        $to = strpos($html, 'Not sure which to pick', $from);
+        $cards = substr($html, $from, $to - $from);
+
+        $expected = [
+            'Bidding Request (BR)',
+            'Direct Request (DR)',
+            'Emergency Request (ER)',
+            'Plan with Toolkit',
+            'Shop Packages',
+        ];
+
+        $found = [];
+
+        foreach ($expected as $label) {
+            $at = strpos($cards, $label);
+
+            if ($at !== false) {
+                $found[$label] = $at;
+            }
+        }
+
+        $this->assertCount(count($expected), $found, 'a card is missing, so the order proves nothing');
+
+        asort($found);
+
+        $this->assertSame($expected, array_keys($found), 'the cards are not A to Z');
+    }
+
+    /**
+     * And they are sorted rather than written in order, so a sixth path cannot
+     * land in the wrong place.
+     */
+    public function test_the_chooser_sorts_its_cards(): void
+    {
+        $this->assertStringContainsString(
+            'usort($routes',
+            file_get_contents(resource_path('views/client/post-event/choose.blade.php')),
+        );
+    }
 }
