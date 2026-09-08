@@ -16,7 +16,11 @@
     .pay-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 18px; }
 
     /* Top stat cards (5) */
-    .pay-stats { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 12px; margin-bottom: 16px; }
+    /* auto-fit, not a hand-written count: the row said five and four cards are
+       rendered, so a fifth column of nothing sat on the right and every card
+       was a fifth narrower than it should be. Counted by the browser now, so
+       adding or removing a card cannot leave a hole behind. */
+    .pay-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 16px; }
     .pay-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 16px; }
     .pay-stat-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .pay-stat-ico { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -108,8 +112,8 @@
     .pay-act-name { font-size: 12px; color: var(--text-primary); font-weight: 600; }
     .pay-act-time { font-size: 10px; color: var(--text-muted); }
 
-    @media (max-width: 1200px) { .pay-layout { grid-template-columns: 1fr; } .pay-rail { position: static; } .pay-stats { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 700px) { .pay-stats { grid-template-columns: repeat(2, 1fr); } .pay-table { font-size: 11px; } }
+    @media (max-width: 1200px) { .pay-layout { grid-template-columns: 1fr; } .pay-rail { position: static; } }
+    @media (max-width: 700px) { .pay-table { font-size: 11px; } }
 </style>
 @endpush
 
