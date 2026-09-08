@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use App\Rules\NotTheHintText;
 
 class ClientProfileController extends Controller
 {
@@ -73,7 +74,7 @@ class ClientProfileController extends Controller
             'state' => ['nullable', 'string', 'max:100'],
             'country' => ['nullable', 'string', 'max:100'],
             'zip_code' => ['nullable', 'string', 'max:20'],
-            'website' => ['nullable', 'url', 'max:255'],
+            'website' => ['nullable', 'url', 'max:255', new NotTheHintText(['https://yourwebsite.com'])],
         ]);
 
         $user->update([
@@ -99,10 +100,14 @@ class ClientProfileController extends Controller
 
     public function updateCompany(Request $request): RedirectResponse
     {
+        // OA-131: the hints on this form were saved as answers — "Your
+        // Company LLC", "e.g. Technology, Healthcare", a mistyped
+        // "https://iyourcompany.com". A placeholder is an example; it is
+        // nobody's real company. Refused where it would be stored.
         $validated = $request->validate([
-            'company_name' => ['nullable', 'string', 'max:255'],
-            'company_website' => ['nullable', 'url', 'max:255'],
-            'industry' => ['nullable', 'string', 'max:100'],
+            'company_name' => ['nullable', 'string', 'max:255', new NotTheHintText(['Your Company LLC'])],
+            'company_website' => ['nullable', 'url', 'max:255', new NotTheHintText(['https://yourcompany.com'])],
+            'industry' => ['nullable', 'string', 'max:100', new NotTheHintText(['e.g. Technology, Healthcare'])],
         ]);
 
         $request->user()->getOrCreateProfile()->update($validated);
@@ -113,10 +118,10 @@ class ClientProfileController extends Controller
     public function updateSocial(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'linkedin' => ['nullable', 'url', 'max:255'],
-            'twitter' => ['nullable', 'url', 'max:255'],
-            'facebook' => ['nullable', 'url', 'max:255'],
-            'instagram' => ['nullable', 'url', 'max:255'],
+            'linkedin' => ['nullable', 'url', 'max:255', new NotTheHintText(['https://linkedin.com/in/yourname'])],
+            'twitter' => ['nullable', 'url', 'max:255', new NotTheHintText(['https://twitter.com/yourhandle'])],
+            'facebook' => ['nullable', 'url', 'max:255', new NotTheHintText(['https://facebook.com/yourpage'])],
+            'instagram' => ['nullable', 'url', 'max:255', new NotTheHintText(['https://instagram.com/yourhandle'])],
         ]);
 
         $request->user()->getOrCreateProfile()->update([
