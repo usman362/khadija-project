@@ -89,14 +89,40 @@
     .cm-att-img span { display: block; padding: 6px 9px; font-size: 11.5px; color: var(--text-muted); }
     .cm-att-img:hover { border-color: var(--brand-text); }
     /* Video and audio play in the thread rather than being listed by name. */
-    /* A width, not a max-width: a player sized by its own controls came out a
-       different width in every message. */
-    .cm-att-media { width: 300px; max-width: 100%; border: 1px solid var(--border-color);
-                    border-radius: 10px; overflow: hidden; background: var(--bg-soft, #f1f5f9); }
-    .cm-att-media video { display: block; width: 100%; max-height: 240px; background: #000; }
-    .cm-att-media.is-audio { padding: 10px 10px 0; }
-    .cm-att-media audio { display: block; width: 100%; height: 36px; }
-    .cm-att-media span { display: block; padding: 6px 9px; font-size: 11.5px; color: var(--text-muted); }
+    /* Media plays in the thread's own player.
+       The browser's default controls are built for a page's video, not for a
+       320px card in a chat bubble: a grey bar with a three-dot menu and a
+       download button, in a different visual language from everything around
+       it, and a different size in every message. These are the controls the
+       rest of the page would draw. */
+    .cm-media { width: 320px; max-width: 100%; border: 1px solid var(--border-color);
+                border-radius: 12px; overflow: hidden; background: var(--bg-card); }
+    .cm-media-stage { position: relative; background: #0b1220; line-height: 0; }
+    .cm-media-stage video { display: block; width: 100%; max-height: 200px; object-fit: contain; }
+    .cm-media-big { position: absolute; inset: 0; margin: auto; width: 54px; height: 54px;
+                    border: none; border-radius: 50%; background: rgba(255,255,255,.94);
+                    color: #0f172a; display: flex; align-items: center; justify-content: center;
+                    cursor: pointer; box-shadow: 0 8px 22px rgba(0,0,0,.4); transition: opacity .18s; }
+    .cm-media-big svg { width: 22px; height: 22px; }
+    /* Out of the way while it plays, back the moment the pointer returns. */
+    .cm-media.is-playing .cm-media-big { opacity: 0; }
+    .cm-media-stage:hover .cm-media-big { opacity: 1; }
+
+    .cm-media-ctl { display: flex; align-items: center; gap: 10px; padding: 10px 11px 8px; }
+    .cm-media-play { flex: none; width: 32px; height: 32px; border: none; border-radius: 50%;
+                     background: var(--brand, #f97316); color: #fff; cursor: pointer;
+                     display: flex; align-items: center; justify-content: center; }
+    .cm-media-play svg { width: 14px; height: 14px; }
+    .cm-media-track { flex: 1; height: 5px; border-radius: 999px; background: var(--border-color);
+                      position: relative; cursor: pointer; }
+    .cm-media-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0;
+                     border-radius: 999px; background: var(--brand, #f97316); }
+    .cm-media-time { flex: none; font-size: 11px; color: var(--text-muted);
+                     font-variant-numeric: tabular-nums; }
+    .cm-media-foot { display: flex; gap: 8px; justify-content: space-between; align-items: baseline;
+                     padding: 0 11px 9px; font-size: 11px; color: var(--text-muted); }
+    .cm-media-foot b { font-weight: 600; color: var(--text-muted); overflow: hidden;
+                       text-overflow: ellipsis; white-space: nowrap; }
     .cm-att-item svg { width: 16px; height: 16px; color: var(--bad-text); }
     .cm-att-item b { font-size: 12px; color: var(--text-primary); display: block; }
     .cm-att-item span { font-size: 10.5px; color: var(--text-muted); }
@@ -337,9 +363,28 @@
                                         <a class="cm-att-img" href="{{ $a['url'] }}" target="_blank" rel="noopener" title="Open {{ $a['name'] }}"><img src="{{ $a['url'] }}" alt="{{ $a['name'] }}" loading="lazy"><span>{{ $a['name'] }} · {{ $a['size'] }}</span></a>
                                     @elseif($kind === 'video')
                                         {{-- Plays here. It was listed by filename beside a spreadsheet. --}}
-                                        <div class="cm-att-media"><video src="{{ $a['url'] }}" controls preload="metadata"></video><span>{{ $a['name'] }} · {{ $a['size'] }}</span></div>
+                                        <div class="cm-media" data-media>
+                                            <div class="cm-media-stage">
+                                                <video src="{{ $a['url'] }}" preload="metadata" playsinline data-media-el></video>
+                                                <button type="button" class="cm-media-big" data-media-toggle aria-label="Play"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></button>
+                                            </div>
+                                            <div class="cm-media-ctl">
+                                                <button type="button" class="cm-media-play" data-media-toggle aria-label="Play"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></button>
+                                                <div class="cm-media-track" data-media-track><div class="cm-media-fill" data-media-fill></div></div>
+                                                <span class="cm-media-time" data-media-time>0:00</span>
+                                            </div>
+                                            <div class="cm-media-foot"><b title="{{ $a['name'] }}">{{ $a['name'] }}</b><span>{{ $a['size'] }}</span></div>
+                                        </div>
                                     @elseif($kind === 'audio')
-                                        <div class="cm-att-media is-audio"><audio src="{{ $a['url'] }}" controls preload="metadata"></audio><span>{{ $a['name'] }} · {{ $a['size'] }}</span></div>
+                                        <div class="cm-media" data-media>
+                                            <audio src="{{ $a['url'] }}" preload="metadata" data-media-el></audio>
+                                            <div class="cm-media-ctl">
+                                                <button type="button" class="cm-media-play" data-media-toggle aria-label="Play"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></button>
+                                                <div class="cm-media-track" data-media-track><div class="cm-media-fill" data-media-fill></div></div>
+                                                <span class="cm-media-time" data-media-time>0:00</span>
+                                            </div>
+                                            <div class="cm-media-foot"><b title="{{ $a['name'] }}">{{ $a['name'] }}</b><span>{{ $a['size'] }}</span></div>
+                                        </div>
                                     @else
                                     <a class="cm-att-item" href="{{ $a['url'] }}" target="_blank" rel="noopener" title="Open {{ $a['name'] }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div><b>{{ $a['name'] }}</b><span>{{ $a['size'] }}</span></div></a>
                                     @endif
@@ -635,6 +680,97 @@
 
 @if($thread)
 <script>
+/* The thread's own media player.
+   One controller for every attachment, bound to the message list rather than
+   to each element, so a video that arrives while the page is open behaves
+   exactly like one that was there on load. */
+var PLAY_ICON  = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>';
+var PAUSE_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/></svg>';
+
+function mediaControls(name, size) {
+    return '<div class="cm-media-ctl">'
+        + '<button type="button" class="cm-media-play" data-media-toggle aria-label="Play">' + PLAY_ICON + '</button>'
+        + '<div class="cm-media-track" data-media-track><div class="cm-media-fill" data-media-fill></div></div>'
+        + '<span class="cm-media-time" data-media-time>0:00</span></div>'
+        + '<div class="cm-media-foot"><b title="' + name + '">' + name + '</b><span>' + size + '</span></div>';
+}
+
+(function () {
+    function clock(sec) {
+        if (!isFinite(sec) || sec < 0) sec = 0;
+        var m = Math.floor(sec / 60), s = Math.floor(sec % 60);
+        return m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    function paint(card) {
+        var el   = card.querySelector('[data-media-el]');
+        var fill = card.querySelector('[data-media-fill]');
+        var time = card.querySelector('[data-media-time]');
+        if (!el) return;
+
+        var dur = el.duration;
+        // Before metadata arrives there is no duration to count down from, so
+        // the elapsed time is shown rather than a "0:00 / NaN".
+        if (time) time.textContent = isFinite(dur) && dur > 0
+            ? clock(el.currentTime) + ' / ' + clock(dur)
+            : clock(el.currentTime);
+
+        if (fill) fill.style.width = (isFinite(dur) && dur > 0 ? (el.currentTime / dur) * 100 : 0) + '%';
+    }
+
+    function setIcon(card, playing) {
+        card.classList.toggle('is-playing', playing);
+        card.querySelectorAll('[data-media-toggle]').forEach(function (b) {
+            b.innerHTML = playing ? PAUSE_ICON : PLAY_ICON;
+            b.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+        });
+    }
+
+    document.addEventListener('click', function (e) {
+        var card = e.target.closest ? e.target.closest('[data-media]') : null;
+        if (!card) return;
+
+        var el = card.querySelector('[data-media-el]');
+        if (!el) return;
+
+        if (e.target.closest('[data-media-toggle]')) {
+            if (el.paused) {
+                // Two things playing at once in one thread is never what was
+                // meant, so starting one stops the rest.
+                document.querySelectorAll('[data-media-el]').forEach(function (other) {
+                    if (other !== el) other.pause();
+                });
+                el.play();
+            } else {
+                el.pause();
+            }
+            return;
+        }
+
+        var track = e.target.closest('[data-media-track]');
+        if (track && isFinite(el.duration) && el.duration > 0) {
+            var box = track.getBoundingClientRect();
+            el.currentTime = Math.min(Math.max((e.clientX - box.left) / box.width, 0), 1) * el.duration;
+            paint(card);
+        }
+    });
+
+    // Capture, because timeupdate/play/pause do not bubble.
+    ['timeupdate', 'loadedmetadata', 'durationchange', 'ended'].forEach(function (ev) {
+        document.addEventListener(ev, function (e) {
+            var card = e.target.closest ? e.target.closest('[data-media]') : null;
+            if (card) paint(card);
+        }, true);
+    });
+
+    ['play', 'pause', 'ended'].forEach(function (ev) {
+        document.addEventListener(ev, function (e) {
+            var card = e.target.closest ? e.target.closest('[data-media]') : null;
+            if (card) setIcon(card, ev === 'play');
+        }, true);
+    });
+})();
+
 window.CHAT_LIVE = {
     box: '#cm-msgs', form: '#cm-form', input: '#cm-input',
     sendUrl: @json($thread['sendUrl']), showUrl: @json($thread['showUrl']), readUrl: @json($thread['readUrl']),
@@ -665,12 +801,15 @@ window.CHAT_LIVE = {
                     + '<span>' + name + ' · ' + size + '</span></a>';
             }
             if (kind === 'video') {
-                return '<div class="cm-att-media"><video src="' + url + '" controls preload="metadata"></video>'
-                    + '<span>' + name + ' · ' + size + '</span></div>';
+                return '<div class="cm-media" data-media><div class="cm-media-stage">'
+                    + '<video src="' + url + '" preload="metadata" playsinline data-media-el></video>'
+                    + '<button type="button" class="cm-media-big" data-media-toggle aria-label="Play">' + PLAY_ICON + '</button></div>'
+                    + mediaControls(name, size) + '</div>';
             }
             if (kind === 'audio') {
-                return '<div class="cm-att-media is-audio"><audio src="' + url + '" controls preload="metadata"></audio>'
-                    + '<span>' + name + ' · ' + size + '</span></div>';
+                return '<div class="cm-media" data-media>'
+                    + '<audio src="' + url + '" preload="metadata" data-media-el></audio>'
+                    + mediaControls(name, size) + '</div>';
             }
 
             return '<a class="cm-att-item" href="' + url + '" target="_blank" rel="noopener">'
