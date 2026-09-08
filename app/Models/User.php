@@ -95,6 +95,26 @@ class User extends Authenticatable implements MustVerifyEmail
      * firstOrCreate asks the database rather than the cache, and the relation
      * is then dropped so the next read reflects what was actually written.
      */
+    /**
+     * Every account gets its public reference the moment it exists.
+     *
+     * On the `created` event rather than in the registration controller, so it
+     * holds however an account is made — the sign-up form, an admin creating
+     * one, a seeder, a factory in a test. A rule that lives in one controller
+     * is a rule with as many holes as there are other ways in.
+     *
+     * `public_id` is absent from $fillable on purpose: it must not be settable
+     * from a form, and mass assignment is how that would happen by accident.
+     */
+    protected static function booted(): void
+    {
+        static::created(function (self $user) {
+            if (blank($user->public_id)) {
+                \App\Support\GigResourceId::assign($user);
+            }
+        });
+    }
+
     public function getOrCreateProfile(): UserProfile
     {
         if ($this->relationLoaded('profile') && $this->profile) {

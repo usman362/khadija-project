@@ -215,6 +215,12 @@
     .pf-activity-row:last-child { border-bottom: 0; }
     .pf-activity-row:hover { background: var(--bg-soft, rgba(0,0,0,.03)); }
     .pf-activity-row b { font-variant-numeric: tabular-nums; }
+
+    /* Idea 1 — the account reference under the avatar. */
+    .pf-grid { margin-top: 10px; font-size: 12px; color: var(--text-muted, #6b7280); }
+    .pf-grid b { display: block; margin-top: 2px; font-size: 13.5px;
+                 font-weight: 800; letter-spacing: .02em;
+                 color: var(--text-primary, #111827); user-select: all; }
 </style>
 @endpush
 
@@ -237,6 +243,18 @@
             <div class="pf-avatar-name">{{ $user->name }}</div>
             <div class="pf-avatar-email">{{ $user->email }}</div>
             <span class="pf-avatar-role">Client</span>
+
+            {{-- Idea 1 (Sir Peter): the permanent account reference. Shown
+                 where a client would look for it when support asks, and
+                 selectable so it can be copied rather than transcribed —
+                 a misread digit in a support thread costs more than the
+                 space this takes. --}}
+            @if($user->public_id)
+                <div class="pf-grid">
+                    <span>GigResource ID</span>
+                    <b>{{ $user->public_id }}</b>
+                </div>
+            @endif
             @if($user->avatar)
                 <div class="pf-avatar-actions">
                     <form action="{{ route('client.profile.avatar.remove') }}" method="POST">
