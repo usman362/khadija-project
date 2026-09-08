@@ -39,11 +39,26 @@
     .bw-field .req { color: var(--bad-text); }
     .bw-optional { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .3px; margin-left: 4px; }
     .bw-field .bw-hint { font-size: 11.5px; color: var(--text-muted); margin-top: 5px; line-height: 1.4; }
-    .bw-field input[type=text], .bw-field input[type=number], .bw-field input[type=datetime-local],
-    .bw-field input[type=date], .bw-field input[type=time],
-    .bw-field select, .bw-field textarea {
+    /* Scoped to the card, not to .bw-field.
+       Styling used to hang off `.bw-field input`, so any control that was not
+       inside a .bw-field — the per-service budget boxes, and before them the
+       date and availability controls — rendered as a raw browser widget on a
+       page where everything else is styled. A control cannot be missed now by
+       being put in the wrong wrapper. */
+    .bw-card input[type=text], .bw-card input[type=number], .bw-card input[type=datetime-local],
+    .bw-card input[type=date], .bw-card input[type=time], .bw-card input[type=email],
+    .bw-card input[type=tel], .bw-card input[type=url],
+    .bw-card select, .bw-card textarea {
         width: 100%; background: var(--bg-page, transparent); border: 1px solid var(--border-color);
         border-radius: 10px; padding: 10px 12px; font-size: 13.5px; color: var(--text-primary); font-family: inherit;
+    }
+    .bw-card input:focus, .bw-card select:focus, .bw-card textarea:focus {
+        outline: none; border-color: var(--brand, #f97316);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand, #f97316) 14%, transparent);
+    }
+    /* Checkboxes and radios are not text boxes and must not take the box. */
+    .bw-card input[type=checkbox], .bw-card input[type=radio] {
+        width: auto; padding: 0; border-radius: 0; box-shadow: none;
     }
     .bw-field textarea { min-height: 130px; resize: vertical; line-height: 1.6; }
     .bw-field textarea[rows='3'] { min-height: 84px; }
@@ -63,7 +78,12 @@
     .bw-split-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border-color); }
     .bw-split-row:last-of-type { border-bottom: 0; }
     .bw-split-row label { flex: 1; font-size: 13.5px; color: var(--text-primary); }
-    .bw-split-row input { width: 130px; }
+    /* An amount reads as an amount: the currency is shown rather than typed,
+       and the figures line up down the right so two of them can be compared. */
+    .bw-split-row .bw-amount { position: relative; flex: none; width: 150px; }
+    .bw-split-row .bw-amount::before { content: '$'; position: absolute; left: 11px; top: 50%;
+        transform: translateY(-50%); font-size: 13px; color: var(--text-muted); pointer-events: none; }
+    .bw-split-row input { padding-left: 22px; text-align: right; }
     .bw-split-total { margin-top: 10px; padding-top: 10px; border-top: 1.5px solid var(--border-color); font-size: 13px; color: var(--text-muted); }
     .bw-split-total b { color: var(--text-primary); }
     .bw-suggest { margin-left: 10px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 8px; padding: 4px 11px; font: inherit; font-size: 12.5px; font-weight: 700; color: var(--brand, #f97316); cursor: pointer; }
@@ -520,10 +540,12 @@
                 @foreach($__svcs as $svc)
                     <div class="bw-split-row">
                         <label for="sb-{{ $svc->id }}">{{ $svc->name }}</label>
-                        <input type="number" id="sb-{{ $svc->id }}" min="0" step="1"
-                               name="service_budgets[{{ $svc->id }}]"
-                               value="{{ $__split[$svc->id] ?? '' }}"
-                               data-bw-split placeholder="—">
+                        <span class="bw-amount">
+                            <input type="number" id="sb-{{ $svc->id }}" min="0" step="1"
+                                   name="service_budgets[{{ $svc->id }}]"
+                                   value="{{ $__split[$svc->id] ?? '' }}"
+                                   data-bw-split placeholder="0">
+                        </span>
                     </div>
                 @endforeach
 
