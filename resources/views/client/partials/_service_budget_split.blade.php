@@ -54,10 +54,22 @@
     .sbs { border:1px solid var(--border-color,#e5e7eb); border-radius:12px; padding:14px 16px; margin-top:14px; }
     .sbs h4 { margin:0 0 4px; font-size:14px; font-weight:800; }
     .sbs-help { margin:0 0 12px; font-size:12.5px; line-height:1.6; color:var(--text-muted,#6b7280); }
-    .sbs-row { display:flex; align-items:center; gap:12px; padding:7px 0; }
+    .sbs-row { display:flex; align-items:center; gap:12px; padding:7px 0;
+               border-bottom:1px solid var(--border-color,#e5e7eb); }
+    .sbs-row:last-child { border-bottom:0; }
     .sbs-row label { flex:1; font-size:13.5px; }
-    .sbs-row input { width:130px; padding:8px 10px; border:1px solid var(--border-color,#e5e7eb);
-                     border-radius:8px; font:inherit; }
+    /* An amount reads as an amount: the currency is shown rather than typed,
+       and the figures line up down the right so two can be compared. The box
+       matches the budget field above it — these were the browser's own. */
+    .sbs-amount { position:relative; flex:none; width:150px; }
+    .sbs-amount::before { content:'$'; position:absolute; left:11px; top:50%; transform:translateY(-50%);
+                          font-size:13px; color:var(--text-muted,#6b7280); pointer-events:none; }
+    .sbs-row input { width:100%; padding:10px 12px 10px 22px; text-align:right;
+                     border:1px solid var(--border-color,#e5e7eb); border-radius:10px;
+                     font:inherit; font-size:13.5px; color:var(--text-primary,#111827);
+                     background:var(--bg-page,transparent); }
+    .sbs-row input:focus { outline:none; border-color:var(--brand,#f97316);
+                           box-shadow:0 0 0 3px color-mix(in srgb, var(--brand,#f97316) 14%, transparent); }
     .sbs-total { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px;
                  padding-top:10px; border-top:1px solid var(--border-color,#e5e7eb);
                  font-size:13px; color:var(--text-muted,#6b7280); }
@@ -127,12 +139,18 @@
             input.step = '1';
             input.id = 'sbs-' + b.value;
             input.name = 'service_budgets[' + b.value + ']';
-            input.placeholder = '—';
+            input.placeholder = '0';
             input.dataset.cat = b.value;
             input.value = remembered[b.value] ?? '';
             input.addEventListener('input', retotal);
 
-            row.append(label, input);
+            // The currency sits on the wrapper, so it cannot be typed into or
+            // submitted as part of the figure.
+            const amount = document.createElement('span');
+            amount.className = 'sbs-amount';
+            amount.append(input);
+
+            row.append(label, amount);
             rows.append(row);
         });
 
