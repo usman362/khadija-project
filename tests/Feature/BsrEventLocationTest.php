@@ -183,4 +183,34 @@ class BsrEventLocationTest extends TestCase
         $this->assertStringContainsString("querySelectorAll('input[name=\"location_kind\"]')", $html,
             'The radios have no listener on the step that shows them.');
     }
+
+    /**
+     * The budget step's own script reaches the budget step.
+     *
+     * The running total and "Suggest a split" were pushed from inside the
+     * Availability branch too, so on step 4 neither existed: the breakdown
+     * never added up and the button did nothing.
+     */
+    public function test_the_budget_script_reaches_the_budget_step(): void
+    {
+        $this->startWizard();
+
+        $this->actingAs($this->client)->post(route('client.bsr.save', 'event'), [
+            'title' => 'Test Request', 'location_kind' => 'area', 'location' => 'Baltimore, MD',
+        ])->assertSessionHasNoErrors();
+
+        $this->actingAs($this->client)->post(route('client.bsr.save', 'requirements'), [
+            'description' => 'We need photography and video coverage for a company picnic in Baltimore.',
+        ])->assertSessionHasNoErrors();
+
+        $html = $this->actingAs($this->client)
+            ->get(route('client.bsr.step', 'budget'))
+            ->assertSuccessful()
+            ->getContent();
+
+        $this->assertStringContainsString("querySelector('[data-bw-suggest]')", $html,
+            'Suggest a split has no listener on the step that shows the button.');
+        $this->assertStringContainsString('function retotal', $html,
+            'The breakdown cannot add up: the code that adds it up is not on this step.');
+    }
 }

@@ -545,6 +545,86 @@
         </div>
 
     {{-- ── 5 · Proposal settings ───────────────────────────── --}}
+@push('scripts')
+<script>
+// The breakdown adds up as it is typed. The client is comparing it against
+// their own range, so the sum has to be in front of them while they type —
+// not discovered on the next screen.
+// "Suggest a split" — fills the boxes from the client's own total, weighted by
+// how central each service is to this kind of event. They then change whatever
+// they disagree with; nothing is saved by pressing it.
+(function () {
+    const btn  = document.querySelector('[data-bw-suggest]');
+    const note = document.querySelector('[data-bw-suggestnote]');
+    if (!btn) return;
+
+    btn.addEventListener('click', async function () {
+        btn.disabled = true;
+        const was = btn.textContent;
+        btn.textContent = 'Working…';
+        if (note) note.textContent = '';
+
+        const totalField = document.querySelector('input[name="budget_max"]')
+            || document.querySelector('input[name="budget_min"]');
+
+        try {
+            const res = await fetch('{{ route('client.bsr.suggest-split') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ total: totalField ? totalField.value : null }),
+            });
+            const data = await res.json();
+
+            if (!data.ok) {
+                if (note) note.textContent = data.message || 'Could not suggest a split.';
+                return;
+            }
+
+            Object.entries(data.split).forEach(function ([id, amount]) {
+                const field = document.querySelector('input[name="service_budgets[' + id + ']"]');
+                if (field) field.value = amount;
+            });
+
+            document.querySelectorAll('[data-bw-split]').forEach(function (f) {
+                f.dispatchEvent(new Event('input'));
+            });
+
+            if (note) note.textContent = 'A starting point — change anything you disagree with.';
+        } catch (err) {
+            if (note) note.textContent = 'Could not suggest a split just now.';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = was;
+        }
+    });
+})();
+
+(function () {
+    const fields = document.querySelectorAll('[data-bw-split]');
+    const out = document.querySelector('[data-bw-splittotal]');
+    if (!fields.length || !out) return;
+
+    function retotal() {
+        let sum = 0;
+        let any = false;
+        fields.forEach(function (f) {
+            const n = parseFloat(f.value);
+            if (!isNaN(n) && n >= 0) { sum += n; any = true; }
+        });
+        out.textContent = any ? '$' + sum.toLocaleString('en-US') : '—';
+    }
+
+    fields.forEach(function (f) { f.addEventListener('input', retotal); });
+    retotal();
+})();
+
+</script>
+@endpush
+
     @elseif($step === 'proposals')
         <h3>How proposals work</h3>
         <p class="lede">When bidding closes, and what professionals can do while it's open.</p>
@@ -755,83 +835,6 @@
         </div>
 
 @push('scripts')
-<script>
-// The breakdown adds up as it is typed. The client is comparing it against
-// their own range, so the sum has to be in front of them while they type —
-// not discovered on the next screen.
-// "Suggest a split" — fills the boxes from the client's own total, weighted by
-// how central each service is to this kind of event. They then change whatever
-// they disagree with; nothing is saved by pressing it.
-(function () {
-    const btn  = document.querySelector('[data-bw-suggest]');
-    const note = document.querySelector('[data-bw-suggestnote]');
-    if (!btn) return;
-
-    btn.addEventListener('click', async function () {
-        btn.disabled = true;
-        const was = btn.textContent;
-        btn.textContent = 'Working…';
-        if (note) note.textContent = '';
-
-        const totalField = document.querySelector('input[name="budget_max"]')
-            || document.querySelector('input[name="budget_min"]');
-
-        try {
-            const res = await fetch('{{ route('client.bsr.suggest-split') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({ total: totalField ? totalField.value : null }),
-            });
-            const data = await res.json();
-
-            if (!data.ok) {
-                if (note) note.textContent = data.message || 'Could not suggest a split.';
-                return;
-            }
-
-            Object.entries(data.split).forEach(function ([id, amount]) {
-                const field = document.querySelector('input[name="service_budgets[' + id + ']"]');
-                if (field) field.value = amount;
-            });
-
-            document.querySelectorAll('[data-bw-split]').forEach(function (f) {
-                f.dispatchEvent(new Event('input'));
-            });
-
-            if (note) note.textContent = 'A starting point — change anything you disagree with.';
-        } catch (err) {
-            if (note) note.textContent = 'Could not suggest a split just now.';
-        } finally {
-            btn.disabled = false;
-            btn.textContent = was;
-        }
-    });
-})();
-
-(function () {
-    const fields = document.querySelectorAll('[data-bw-split]');
-    const out = document.querySelector('[data-bw-splittotal]');
-    if (!fields.length || !out) return;
-
-    function retotal() {
-        let sum = 0;
-        let any = false;
-        fields.forEach(function (f) {
-            const n = parseFloat(f.value);
-            if (!isNaN(n) && n >= 0) { sum += n; any = true; }
-        });
-        out.textContent = any ? '$' + sum.toLocaleString('en-US') : '—';
-    }
-
-    fields.forEach(function (f) { f.addEventListener('input', retotal); });
-    retotal();
-})();
-
-</script>
 <script>
 (function () {
     // Clicking a nearby day sets the date field rather than making the client
