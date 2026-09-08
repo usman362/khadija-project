@@ -75,7 +75,10 @@
     .cm-msg.me .cm-msg-meta { text-align: right; }
     .cm-bubble { background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 13px; font-size: 13px; color: var(--text-primary); line-height: 1.5; word-break: break-word; }
     .cm-msg.me .cm-bubble { background: rgba(234,88,12,0.1); border-color: rgba(234,88,12,0.2); }
-    .cm-att { display: flex; gap: 9px; margin-top: 8px; flex-wrap: wrap; }
+    /* align-items, because the default stretches every attachment to the
+       height of the tallest one — an audio player beside a photo grew into a
+       tall empty grey panel with the controls floating in the middle of it. */
+    .cm-att { display: flex; align-items: flex-start; gap: 9px; margin-top: 8px; flex-wrap: wrap; }
     /* Now an anchor, not a div — keep it looking the same and make the
        pointer say it opens. */
     .cm-att-item { text-decoration: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 8px; border: 1px solid var(--border-color); border-radius: 9px; padding: 8px 11px; background: var(--bg-card); }
@@ -86,9 +89,13 @@
     .cm-att-img span { display: block; padding: 6px 9px; font-size: 11.5px; color: var(--text-muted); }
     .cm-att-img:hover { border-color: var(--brand-text); }
     /* Video and audio play in the thread rather than being listed by name. */
-    .cm-att-media { border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; max-width: 320px; background: var(--bg-soft, #f1f5f9); }
+    /* A width, not a max-width: a player sized by its own controls came out a
+       different width in every message. */
+    .cm-att-media { width: 300px; max-width: 100%; border: 1px solid var(--border-color);
+                    border-radius: 10px; overflow: hidden; background: var(--bg-soft, #f1f5f9); }
     .cm-att-media video { display: block; width: 100%; max-height: 240px; background: #000; }
-    .cm-att-media audio { display: block; width: 100%; }
+    .cm-att-media.is-audio { padding: 10px 10px 0; }
+    .cm-att-media audio { display: block; width: 100%; height: 36px; }
     .cm-att-media span { display: block; padding: 6px 9px; font-size: 11.5px; color: var(--text-muted); }
     .cm-att-item svg { width: 16px; height: 16px; color: var(--bad-text); }
     .cm-att-item b { font-size: 12px; color: var(--text-primary); display: block; }
@@ -317,7 +324,12 @@
                             <span class="cm-msg-av" style="background:{{ $m['mine'] ? '#1e293b' : '#ea580c' }};">{{ strtoupper(substr($m['sender'], 0, 1)) }}</span>
                             <div class="cm-msg-body">
                                 <div class="cm-msg-meta">{{ $m['mine'] ? 'You' : $m['sender'] }} · {{ $m['time'] }}</div>
-                                <div class="cm-bubble">{{ $m['body'] }}</div>
+                                {{-- A message can be a file and nothing else. The bubble was
+                                     printed regardless, so those arrived as an empty box
+                                     sitting above the attachment. --}}
+                                @if(trim((string) $m['body']) !== '')
+                                    <div class="cm-bubble">{{ $m['body'] }}</div>
+                                @endif
                                 {{-- Each file is a LINK. An IMAGE is also shown, rather than being listed
                                      by filename like any other file — you could not tell a photo
                                      from a spreadsheet without opening it. --}}@if(!empty($m['attachments']))<div class="cm-att">@foreach($m['attachments'] as $a)@php $kind = $a['kind'] ?? (($a['is_image'] ?? false) ? 'image' : 'file'); @endphp
@@ -327,7 +339,7 @@
                                         {{-- Plays here. It was listed by filename beside a spreadsheet. --}}
                                         <div class="cm-att-media"><video src="{{ $a['url'] }}" controls preload="metadata"></video><span>{{ $a['name'] }} · {{ $a['size'] }}</span></div>
                                     @elseif($kind === 'audio')
-                                        <div class="cm-att-media"><audio src="{{ $a['url'] }}" controls preload="metadata"></audio><span>{{ $a['name'] }} · {{ $a['size'] }}</span></div>
+                                        <div class="cm-att-media is-audio"><audio src="{{ $a['url'] }}" controls preload="metadata"></audio><span>{{ $a['name'] }} · {{ $a['size'] }}</span></div>
                                     @else
                                     <a class="cm-att-item" href="{{ $a['url'] }}" target="_blank" rel="noopener" title="Open {{ $a['name'] }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div><b>{{ $a['name'] }}</b><span>{{ $a['size'] }}</span></div></a>
                                     @endif
@@ -657,7 +669,7 @@ window.CHAT_LIVE = {
                     + '<span>' + name + ' · ' + size + '</span></div>';
             }
             if (kind === 'audio') {
-                return '<div class="cm-att-media"><audio src="' + url + '" controls preload="metadata"></audio>'
+                return '<div class="cm-att-media is-audio"><audio src="' + url + '" controls preload="metadata"></audio>'
                     + '<span>' + name + ' · ' + size + '</span></div>';
             }
 
@@ -666,7 +678,12 @@ window.CHAT_LIVE = {
                 + '<div><b>' + name + '</b><span>' + size + '</span></div></a>';
         }).join('');
         var attBlock = atts ? '<div class="cm-att">' + atts + '</div>' : '';
-        return '<div class="cm-msg ' + (mine ? 'me' : '') + '"><span class="cm-msg-av" style="background:' + (mine ? '#1e293b' : '#ea580c') + ';">' + esc(name.charAt(0).toUpperCase()) + '</span><div class="cm-msg-body"><div class="cm-msg-meta">' + esc(name) + ' · ' + t + '</div><div class="cm-bubble">' + esc(m.body) + '</div>' + attBlock + '</div></div>';
+
+        // A file with no words is a whole message. An empty bubble above it is not.
+        var body = (m.body || '').trim();
+        var bubble = body ? '<div class="cm-bubble">' + esc(body) + '</div>' : '';
+
+        return '<div class="cm-msg ' + (mine ? 'me' : '') + '"><span class="cm-msg-av" style="background:' + (mine ? '#1e293b' : '#ea580c') + ';">' + esc(name.charAt(0).toUpperCase()) + '</span><div class="cm-msg-body"><div class="cm-msg-meta">' + esc(name) + ' · ' + t + '</div>' + bubble + attBlock + '</div></div>';
     },
 };
 </script>
