@@ -57,7 +57,17 @@
     .pk-hero h1 { font-size: clamp(1.7rem, 3.4vw, 2.5rem); margin: 0 0 6px; }
     .pk-hero h1 span { color: var(--pk); }
     .pk-hero p { color: var(--muted); font-size: 15px; max-width: 430px; margin: 0; }
-    .pk-props { margin: 0; font-size: 13.5px; line-height: 1.7; color: var(--muted, #6b7280); }
+    /* Three short claims beside the heading.
+       As one wrapping sentence it broke mid-phrase — "Better value through
+       bundle / pricing". A dot separator did not fix it either: once each
+       claim takes its own line, the separator leads the line instead of
+       joining two things. So they stack, one per line, and nothing can
+       break inside a claim. */
+    .pk-props { margin: 0; display: flex; flex-direction: column; gap: 4px;
+                align-items: flex-end; text-align: right;
+                font-size: 13.5px; line-height: 1.5; color: var(--muted, #6b7280); }
+    .pk-props span { white-space: nowrap; }
+    @media (max-width: 760px) { .pk-props { align-items: flex-start; text-align: left; } }
 
     /* Toolbar */
     .pk-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; margin-bottom: 18px; }
@@ -253,7 +263,13 @@
                  boxes — four bordered tiles for four short phrases was more
                  furniture than the phrases needed. --}}
             <p class="pk-props">
-                Professionally coordinated · Better value through bundle pricing · Customizable to your needs
+                {{-- Each claim in its own span so a line break falls BETWEEN
+                     claims, never inside one. Unwrapped, this read "Better
+                     value through bundle / pricing" — a phrase split down the
+                     middle, which is harder to read than four tiles were. --}}
+                <span>Professionally coordinated</span>
+                <span>Better value through bundle pricing</span>
+                <span>Customizable to your needs</span>
             </p>
         </div>
 

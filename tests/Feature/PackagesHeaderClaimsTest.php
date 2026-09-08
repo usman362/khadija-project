@@ -40,6 +40,20 @@ class PackagesHeaderClaimsTest extends TestCase
         }
     }
 
+    /**
+     * Each claim is its own element, which is what stops a line break falling
+     * inside one.
+     *
+     * As a single sentence it wrapped to "Better value through bundle /
+     * pricing" — a phrase split down the middle, which is harder to read than
+     * the four tiles it replaced. Measured in the browser at 1440 and at
+     * 375: three lines, right edges level, nothing broken mid-phrase.
+     */
+    public function test_each_claim_is_its_own_element(): void
+    {
+        $this->assertSame(3, substr_count($this->topBand(), '<span>'));
+    }
+
     /** And the one that was duplicated is not. */
     public function test_one_contract_is_not_claimed_twice_on_the_page(): void
     {
