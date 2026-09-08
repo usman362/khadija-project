@@ -22,6 +22,25 @@ use Tests\TestCase;
  */
 class PackageSearchFiltersTest extends TestCase
 {
+    /**
+     * A real locked Level 2 category. OA-135 bound the packages Services
+     * filter to the taxonomy, so 'Photography' — which only ever existed in a
+     * hand-written list in the controller — is now correctly rejected.
+     */
+    private const LOCKED_SERVICE = 'Photography & Videography';
+
+    private function lockedService(): string
+    {
+        \App\Models\Category::firstOrCreate(
+            ['slug' => 'photography-videography'],
+            ['name' => self::LOCKED_SERVICE, 'kind' => \App\Models\Category::SERVICE_CATEGORY, 'is_active' => true],
+        );
+
+        \Illuminate\Support\Facades\Cache::forget('packages.service-filter.level2');
+
+        return self::LOCKED_SERVICE;
+    }
+
     use RefreshDatabase;
 
     protected function setUp(): void
@@ -231,15 +250,15 @@ class PackageSearchFiltersTest extends TestCase
         $client = $this->client();
 
         $this->actingAs($client)
-            ->post('/packages/saved-searches', ['services' => ['Photography'], 'budget_max' => 5000])
+            ->post('/packages/saved-searches', ['services' => [$this->lockedService()], 'budget_max' => 5000])
             ->assertRedirect();
 
         $saved = SavedSearch::where('user_id', $client->id)->firstOrFail();
 
         $this->assertSame('packages', $saved->surface);
-        $this->assertSame(['Photography'], $saved->params['services']);
+        $this->assertSame([self::LOCKED_SERVICE], $saved->params['services']);
         $this->assertSame(5000, $saved->params['budget_max']);
-        $this->assertStringContainsString('Photography', $saved->label);
+        $this->assertStringContainsString(self::LOCKED_SERVICE, $saved->label);
     }
 
     public function test_a_saved_search_never_stores_the_event_date(): void
@@ -249,7 +268,7 @@ class PackageSearchFiltersTest extends TestCase
         $client = $this->client();
 
         $this->actingAs($client)->post('/packages/saved-searches', [
-            'services' => ['Photography'],
+            'services' => [$this->lockedService()],
             'date'     => now()->addDays(10)->toDateString(),
         ]);
 

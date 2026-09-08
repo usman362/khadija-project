@@ -25,6 +25,9 @@ use Tests\TestCase;
  */
 class SameStateMatchingTest extends TestCase
 {
+    /** One of the 27 locked Level 2 categories, by its real name. */
+    private const LOCKED_SERVICE = 'Photography & Videography';
+
     use RefreshDatabase;
 
     protected function setUp(): void
@@ -216,8 +219,23 @@ class SameStateMatchingTest extends TestCase
 
     /* ── The packages page: the numbers around a scoped list ── */
 
-    private function package(User $pro, string $service = 'Photography', string $occasion = 'Wedding'): \App\Models\Package
+    /**
+     * OA-135 moved the packages Services filter onto the locked taxonomy, so a
+     * package has to be filed under a real Level 2 category. This used to say
+     * 'Photography', which only ever existed in a hand-written list in the
+     * controller — not one of the 27 the Owner locked.
+     */
+    private function package(User $pro, ?string $service = null, string $occasion = 'Wedding'): \App\Models\Package
     {
+        $service ??= self::LOCKED_SERVICE;
+
+        \App\Models\Category::firstOrCreate(
+            ['slug' => \Illuminate\Support\Str::slug($service)],
+            ['name' => $service, 'kind' => \App\Models\Category::SERVICE_CATEGORY, 'is_active' => true],
+        );
+
+        \Illuminate\Support\Facades\Cache::forget('packages.service-filter.level2');
+
         return \App\Models\Package::create([
             'user_id' => $pro->id, 'title' => 'Package ' . uniqid(), 'slug' => 'pkg-' . uniqid(),
             'type' => 'solo', 'price' => 1000, 'services' => [$service],
@@ -239,7 +257,7 @@ class SameStateMatchingTest extends TestCase
 
         $page = $this->actingAs($client)->get(route('public.packages'))->assertSuccessful();
 
-        $this->assertSame(1, $page->viewData('serviceCounts')['Photography']);
+        $this->assertSame(1, $page->viewData('serviceCounts')[self::LOCKED_SERVICE]);
         $this->assertCount(1, $page->viewData('packages'), 'the count and the list are one number');
     }
 
@@ -283,7 +301,7 @@ class SameStateMatchingTest extends TestCase
 
         $page = $this->get(route('public.packages'))->assertSuccessful();
 
-        $this->assertSame(2, $page->viewData('serviceCounts')['Photography']);
+        $this->assertSame(2, $page->viewData('serviceCounts')[self::LOCKED_SERVICE]);
     }
 
     /* ── Category landing pages ─────────────────────────────── */

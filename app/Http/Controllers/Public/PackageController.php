@@ -22,12 +22,36 @@ class PackageController extends Controller
      * bundles two or more of these; the matcher AND-matches on the selected set.
      * Order mirrors Peter's mockup.
      */
-    public const SERVICES = [
-        'Photography', 'Videography', 'Floral Design', 'Catering / Food',
-        'Decor & Design', 'Lighting & Tech', 'DJ / Entertainment',
-        'Planning / Coordination', 'Rentals', 'Transportation',
-        'Beauty & Hair', 'Invitations / Stationery',
-    ];
+    /**
+     * The service names a package may be filed under.
+     *
+     * OA-135: this was a hand-written list of twelve — Photography,
+     * Videography, Floral Design, Catering / Food, Decor & Design, Lighting &
+     * Tech and so on. Not one of them is a locked Level 2 category. Locked
+     * Owner Rule #2 fixes 27 categories that may not be added, removed or
+     * renamed without Owner sign-off, and this list quietly did all three:
+     * it split Photography & Videography into two, renamed Decor, Floral &
+     * Balloon Design twice over, and invented Rentals and Transportation.
+     *
+     * Read from the taxonomy now, so the filter cannot drift from the rule
+     * again — and so a category the Owner adds appears here without anybody
+     * remembering to edit a constant.
+     *
+     * @return array<int, string>
+     */
+    public static function services(): array
+    {
+        return \Illuminate\Support\Facades\Cache::remember(
+            'packages.service-filter.level2',
+            now()->addHour(),
+            fn () => \App\Models\Category::query()
+                ->where('kind', \App\Models\Category::SERVICE_CATEGORY)
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->pluck('name')
+                ->all(),
+        );
+    }
 
     /** Budget-slider ends. The top one is open — "$20,000+" means no ceiling. */
     public const BUDGET_FLOOR = 1000;
@@ -83,7 +107,7 @@ class PackageController extends Controller
 
         $serviceCounts = [];
         $counted = $countBase()->get(['packages.id', 'packages.services']);
-        foreach (self::SERVICES as $svc) {
+        foreach (self::services() as $svc) {
             $serviceCounts[$svc] = $counted
                 ->filter(fn ($p) => in_array($svc, $p->services ?? [], true))
                 ->count();
@@ -123,7 +147,7 @@ class PackageController extends Controller
         return view('public.packages-index', [
             'packages'       => $packages,
             'total'          => $packages->total(),
-            'services'       => self::SERVICES,
+            'services'       => self::services(),
             'serviceCounts'  => $serviceCounts,
             'occasions'      => Occasions::labels(),
             'states'         => config('geo.allowed_states', []),
@@ -153,7 +177,7 @@ class PackageController extends Controller
     {
         $selected = collect((array) $request->input('services', []))
             ->map(fn ($s) => trim((string) $s))
-            ->filter(fn ($s) => in_array($s, self::SERVICES, true))
+            ->filter(fn ($s) => in_array($s, self::services(), true))
             ->values();
 
         $occasion = trim((string) $request->input('event_type', ''));
@@ -416,7 +440,7 @@ class PackageController extends Controller
 
         return view('public.packages-compare', [
             'packages'   => $packages,
-            'services'   => self::SERVICES,
+            'services'   => self::services(),
             'compareMax' => self::COMPARE_MAX,
             'askedFor'   => $ids->count(),
             'missing'    => $missing,

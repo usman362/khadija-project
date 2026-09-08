@@ -146,7 +146,7 @@ class ProfessionalPackageController extends Controller
     {
         return [
             'categories'  => Category::getNestedDropdownList(),
-            'serviceList' => PackageController::SERVICES,
+            'serviceList' => PackageController::services(),
             'eventTypes'  => self::EVENT_TYPES,
         ];
     }
@@ -395,7 +395,7 @@ class ProfessionalPackageController extends Controller
         // Solo packages have no partner; only keep valid palette services.
         $services = collect((array) $request->input('services'))
             ->map(fn ($s) => trim((string) $s))->filter()
-            ->intersect(PackageController::SERVICES)->values()->all();
+            ->intersect(PackageController::services())->values()->all();
 
         $eventTypes = collect((array) $request->input('event_types'))
             ->map(fn ($s) => trim((string) $s))->filter()
