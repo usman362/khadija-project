@@ -119,7 +119,17 @@
     <div class="cr-card">
         <div class="cr-k">Cancellation rate</div>
         <div class="cr-v">{{ $p($me['cancellation_rate']) }}</div>
-        <div class="cr-note">Of the bookings that reached an outcome</div>
+        {{-- OA-129: with one cancelled booking and nothing completed this card
+             read "100%" on a page headed how professionals see you. A dash
+             with no explanation is only slightly better, so it says which it
+             is. --}}
+        <div class="cr-note">
+            @if($me['cancellation_rate'] === null)
+                Shown once you have {{ \App\Support\ClientStats::MIN_DECIDED_FOR_RATE }} completed or cancelled bookings
+            @else
+                Of the bookings that reached an outcome
+            @endif
+        </div>
     </div>
     <div class="cr-card">
         <div class="cr-k">Booked more than once</div>

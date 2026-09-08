@@ -159,6 +159,21 @@
                             <span>Refund to you</span><b>${{ number_format($quote['refund'], 2) }}</b>
                         </div>
                         <p class="dsp-hint">{{ $quote['tier'] }}.</p>
+
+                        {{-- OA-149: the notice ladder describes time BEFORE an
+                             event. A booking cancelled months after its date was
+                             told "Less than 14 days before the event", which is
+                             not short notice — it is no notice, about a date that
+                             has gone. The figure is unchanged; what it says about
+                             itself is not. --}}
+                        @if($quote['after_event'] ?? false)
+                            <p class="dsp-hint">
+                                This event has already taken place, so the notice
+                                bands below do not apply. Someone from GigResource
+                                will review this one before anything is refunded.
+                            </p>
+                        @endif
+
                         @unless($quote['has_terms'])
                             <p class="dsp-hint">
                                 This booking has no signed terms yet, so there is no agreed deposit —

@@ -31,6 +31,20 @@ final class ClientStats
     private const COMPLETED = ['completed'];
 
     /**
+     * How many decided bookings before a rate means anything.
+     *
+     * OA-129: a client with one cancelled booking and nothing completed was
+     * shown "Cancellation Rate: 100%" on a page about how professionals see
+     * them. That is not a rate, it is one event — and a professional reading
+     * 100% would decline the work.
+     *
+     * Five is a judgement, and a conservative one. It is small enough that a
+     * genuinely unreliable client is not hidden for long, and large enough
+     * that a single cancellation cannot brand somebody.
+     */
+    public const MIN_DECIDED_FOR_RATE = 5;
+
+    /**
      * @return array{
      *   completed_events:int, total_events:int, cancelled:int,
      *   cancellation_rate:?int, repeat_professionals:int,
@@ -57,7 +71,16 @@ final class ClientStats
             // Of the bookings that reached an outcome. Counting live bookings
             // in the denominator would make a busy client look more reliable
             // just for having work in flight.
-            'cancellation_rate' => $decided > 0 ? (int) round($cancelled / $decided * 100) : null,
+            //
+            // OA-129: and null below a handful of them. A percentage computed
+            // from one booking is arithmetic, not a reputation.
+            'cancellation_rate' => $decided >= self::MIN_DECIDED_FOR_RATE
+                ? (int) round($cancelled / $decided * 100)
+                : null,
+
+            // Carried so a page can say WHY there is no rate rather than
+            // printing a dash and leaving the client to wonder.
+            'decided_bookings' => $decided,
 
             'repeat_professionals' => self::repeatProfessionals($client),
 

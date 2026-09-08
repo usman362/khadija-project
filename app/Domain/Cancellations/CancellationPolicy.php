@@ -43,6 +43,25 @@ final class CancellationPolicy
     ];
 
     /**
+     * A cancellation raised after the event has already happened.
+     *
+     * OA-149: booking #58 was dated 28 March and cancelled on 25 August, and
+     * the panel read "Refund $0.00 — Less than 14 days before the event." The
+     * figure may well be right; the sentence is not, and it is the sentence a
+     * client reads and quotes back.
+     *
+     * The share stays 0.00, deliberately. There is no post-event cancellation
+     * policy yet — it is the PM's to write — and inventing a refund rule here
+     * would be worse than the wrong label. What changes is that the platform
+     * stops claiming a notice period it did not have.
+     */
+    public const TIER_AFTER_EVENT = [
+        'share' => 0.00,
+        'label' => 'Event date has passed',
+        'needs_policy' => true,
+    ];
+
+    /**
      * What this cancellation would return, right now.
      *
      * @return array{
@@ -80,6 +99,8 @@ final class CancellationPolicy
             'tier'        => $tier['label'],
             'days_before' => $daysBefore,
             'has_terms'   => $terms !== null,
+            // True when the ladder does not apply because the date has gone.
+            'after_event' => (bool) ($tier['needs_policy'] ?? false),
         ];
     }
 
@@ -132,6 +153,13 @@ final class CancellationPolicy
     {
         if ($daysBefore === null) {
             return self::TIERS[2];
+        }
+
+        // OA-149: the ladder describes notice given BEFORE an event. A
+        // negative number is not short notice, it is no notice at all —
+        // the event already happened.
+        if ($daysBefore < 0) {
+            return self::TIER_AFTER_EVENT;
         }
 
         return match (true) {
