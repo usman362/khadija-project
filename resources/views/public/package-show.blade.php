@@ -94,7 +94,8 @@
     .pk-cta-primary:hover { background: var(--orange-dark); }
     .pk-cta-ghost { border: 1px solid var(--line); color: var(--ink); background: #fff; margin-top: 9px; }
     .pk-mini { display: flex; gap: 8px; margin-top: 10px; }
-    .pk-mini > * { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--line); border-radius: 10px; padding: 8px; font-size: 12.5px; font-weight: 700; color: var(--ink-2); background: #fff; cursor: pointer; font-family: inherit; }
+    .pk-mini > * { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 10px; font-size: 13.5px; font-weight: 700; color: var(--ink-2); background: #fff; cursor: pointer; font-family: inherit; }
+    .pk-mini svg { width: 17px; height: 17px; flex: none; }
     .pk-mini .on { border-color: #dc2626; color: #dc2626; }
 
     .pk-snap dt { font-size: 12.5px; color: var(--muted); }
@@ -348,9 +349,22 @@
                             @endif
                         @endauth
 
+                        {{-- Compare needs two packages to mean anything, and from
+                             one package's own page there is nothing to compare it
+                             with — the shortcut belonged on the list, not here. --}}
                         <div class="pk-mini">
-                            <a href="{{ route('public.packages.compare', ['ids' => $package->id]) }}">⚖ Compare</a>
-                            <a href="{{ \App\Support\Inbox::urlFor() }}">✉ Message</a>
+                            <a href="{{ \App\Support\Inbox::urlFor() }}">
+                                {{-- Drawn, not typed: the ✉ character renders at
+                                     whatever size the font decides, which is why
+                                     it came out tiny beside the label. --}}
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                                     aria-hidden="true">
+                                    <rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/>
+                                    <path d="m3 6.5 9 6 9-6"/>
+                                </svg>
+                                Message
+                            </a>
                         </div>
                     </div>
                 </div>
