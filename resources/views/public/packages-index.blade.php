@@ -67,9 +67,9 @@
        sentence and wrong for this, so the cap is lifted — and lifted on a
        selector that outranks it rather than one that merely follows it. */
     .pk-hero p.pk-props { margin: 0; max-width: none; display: flex;
-                flex-direction: column; align-items: flex-end; gap: 4px;
-                font-size: 12.5px; line-height: 1.45; text-align: right;
+                flex-wrap: nowrap; gap: 18px; font-size: 12.5px;
                 color: var(--muted, #6b7280); }
+    .pk-hero p.pk-props span { white-space: nowrap; }
     .pk-hero p.pk-props span { white-space: nowrap; }
 
     /* Toolbar */
@@ -249,7 +249,7 @@
 
         /* Wrapped under the heading rather than beside it, the left rule is
            pointing at nothing, so it goes. */
-        .pk-hero p.pk-props { align-items: flex-start; text-align: left; gap: 2px; }
+        .pk-hero p.pk-props { flex-wrap: wrap; gap: 2px 14px; }
     }
 </style>
 @endpush
