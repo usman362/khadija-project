@@ -81,17 +81,28 @@ class AiReviewWriterController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
         }
 
+        /*
+         * The provider is required.
+         *
+         * It used to fall back to the worked example on the page, so clearing
+         * the field and pressing generate returned a finished review naming
+         * "Sarah Bennett Photography" — a business that does not exist — in the
+         * first person, ready to paste. A review is a statement about somebody;
+         * the one thing it cannot invent is who it is about.
+         */
         $data = $request->validate([
-            'provider' => ['nullable', 'string', 'max:160'],
+            'provider' => ['required', 'string', 'max:160'],
             'service'  => ['nullable', 'string', 'max:160'],
             'event'    => ['nullable', 'string', 'max:160'],
             'rating'   => ['nullable', 'numeric', 'min:1', 'max:5'],
             'tone'     => ['nullable', 'string'],
             'thoughts' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'provider.required' => 'Who is this review about? Name the professional or business.',
         ]);
 
         $input = [
-            'provider' => ($data['provider'] ?? '') ?: self::DEFAULTS['provider'],
+            'provider' => trim($data['provider']),
             'service'  => ($data['service'] ?? '') ?: '',
             'event'    => ($data['event'] ?? '') ?: 'event',
             'rating'   => (float) ($data['rating'] ?? 5),

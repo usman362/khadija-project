@@ -80,10 +80,27 @@ class AiToolsOptionalFieldsTest extends TestCase
         $this->assertSame($explicit['result'] ?? null, $omitted['result'] ?? null);
     }
 
-    public function test_the_review_writer_survives_an_empty_form(): void
+    /**
+     * This used to assert the opposite — that an empty form still returned a
+     * review. It did, by falling back to the worked example on the page, so a
+     * blank submission came back naming "Sarah Bennett Photography", a
+     * business that does not exist, in a first-person review ready to paste.
+     * Surviving an empty form is right for a tool that fills in defaults; it
+     * is wrong for the one field that says who the review is about.
+     */
+    public function test_the_review_writer_will_not_name_a_professional_for_you(): void
     {
         $this->actingAs($this->client())
             ->postJson(route('ai-tools.review-writer.compose'), [])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('provider');
+    }
+
+    /** Everything else on it is still optional. */
+    public function test_the_review_writer_needs_nothing_but_the_name(): void
+    {
+        $this->actingAs($this->client())
+            ->postJson(route('ai-tools.review-writer.compose'), ['provider' => 'Rossi Studio'])
             ->assertSuccessful()
             ->assertJsonPath('success', true);
     }

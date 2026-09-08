@@ -112,7 +112,9 @@ class AiVendorMatchmakingController extends Controller
             [
                 'theme'  => $selected->title ?: $theme,
                 'date'   => $selected->starts_at?->format('M j, Y') ?: 'Flexible',
-                'budget' => (int) ($selected->budget ?: 1000),
+                // Same rule: an event with no budget on it has no ceiling,
+                // not a $1,000 one.
+                'budget' => (int) ($selected->budget ?: 0),
                 'keywords_extra' => Str::lower($theme),
             ],
             $events->map(fn ($e) => ['id' => $e->id, 'title' => $e->title])->all(),
@@ -265,7 +267,14 @@ class AiVendorMatchmakingController extends Controller
 
         $theme    = ($data['theme'] ?? '') ?: 'Tropical Beach Party';
         $category = ($data['category'] ?? '') ?: 'all';
-        $budget   = (int) ($data['max_budget'] ?? 1000);
+        /*
+         * No ceiling when none was given.
+         *
+         * 0 is what rankReal() reads as "no budget filter"; defaulting to 1000
+         * applied a $1,000 ceiling nobody set and quietly hid every
+         * professional who publishes a rate above it.
+         */
+        $budget   = (int) ($data['max_budget'] ?? 0);
         $minMatch = (int) ($data['min_match'] ?? 80);
 
         // Real professionals only — see show().
