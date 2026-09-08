@@ -290,6 +290,11 @@
                             </div>
                         </div>
                         <div class="cm-info-rows">
+                            {{-- First in the list: it is the thing support and
+                                 disputes ask for, and the one field that never
+                                 changes. Selectable so it is copied, not
+                                 transcribed. --}}
+                            @if($info['public_id'] ?? null)<div><span>GigResource ID</span><b style="user-select:all;">{{ $info['public_id'] }}</b></div>@endif
                             @if($info['email'])<div><span>Email</span><b>{{ $info['email'] }}</b></div>@endif
                             @if($info['phone'])<div><span>Phone</span><b>{{ $info['phone'] }}</b></div>@endif
                             @if($info['member_since'])<div><span>On GigResource since</span><b>{{ $info['member_since'] }}</b></div>@endif

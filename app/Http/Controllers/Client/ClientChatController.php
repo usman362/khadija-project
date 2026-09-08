@@ -38,7 +38,7 @@ class ClientChatController extends Controller
         $conversations = Conversation::query()
             ->whereHas('participants', fn ($q) => $q->where('users.id', $user->id))
             ->with([
-                'participants:id,name,email',
+                'participants:id,name,email,public_id',
                 'booking:id,event_id,status,price',
                 'booking.event:id,title,starts_at',
                 'event:id,title,starts_at',
@@ -54,7 +54,7 @@ class ClientChatController extends Controller
         $activeConv = $activeId ? $conversations->firstWhere('id', $activeId) : $conversations->first();
         $thread = null;
         if ($activeConv) {
-            $activeConv->load(['messages.sender:id,name', 'messages.attachments', 'participants:id,name,email']);
+            $activeConv->load(['messages.sender:id,name', 'messages.attachments', 'participants:id,name,email,public_id']);
             $thread = $this->thread($activeConv, $user);
         }
 
@@ -96,6 +96,11 @@ class ClientChatController extends Controller
 
         return [
             'name'         => $pro?->name ?? 'Professional',
+            // Idea 1: the permanent reference. Two professionals with the same
+            // name are told apart here, in the conversation, rather than on a
+            // profile page the client would have to go and find — and it is
+            // what support asks for first when this thread becomes a dispute.
+            'public_id'    => $pro?->public_id,
             'initials'     => $this->initials($pro?->name ?? 'P'),
             'email'        => $pro?->email,
             'phone'        => $pro?->phone ?? optional($pro?->profile)->phone,
@@ -136,6 +141,11 @@ class ClientChatController extends Controller
         return [
             'id' => $c->id,
             'name' => $other?->name ?? 'Conversation',
+            // Idea 1 (Sir Peter): the other party's permanent reference, in the
+            // one place a client is most likely to need it — two professionals
+            // with the same name are told apart here, not on a profile page
+            // they would have to go and find.
+            'public_id' => $other?->public_id,
             'role' => Str::headline($c->type ?? 'direct'),
             'subject' => $event?->title ?? ($c->type === 'booking' ? 'Booking discussion' : 'Direct message'),
             'preview' => $last ? Str::limit($last->body, 38) : 'No messages yet',
