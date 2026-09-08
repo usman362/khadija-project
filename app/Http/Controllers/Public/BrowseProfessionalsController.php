@@ -145,14 +145,34 @@ class BrowseProfessionalsController extends Controller
               ->withCount(['reviewsReceived as reviews_count' => fn ($r) => $r->where('is_hidden', false)]);
 
         if ($ratingMin > 0) {
-            $query->having('reviews_avg', '>=', $ratingMin);
+            /*
+             * A subquery, not HAVING.
+             *
+             * reviews_avg comes from withAvg, which is a scalar sub-select on
+             * each row — not a grouped aggregate. HAVING without a GROUP BY is
+             * rejected outright ("HAVING clause on a non-aggregate query"), so
+             * picking any rating in the sidebar returned a 500 rather than a
+             * narrower list. The same average, compared where it can be.
+             *
+             * A professional with no reviews has no average and is excluded,
+             * which is what asking for 4.5 and up means.
+             */
+            $query->whereRaw(
+                '(SELECT AVG(rating) FROM reviews
+                   WHERE reviews.reviewee_id = users.id
+                     AND reviews.is_hidden = 0) >= CAST(? AS DECIMAL(10,2))',
+                [$ratingMin],
+            );
         }
 
         // ── Sort ────────────────────────────────────────────────────
         match ($sort) {
             'rating' => $query->orderByRaw('reviews_avg IS NULL, reviews_avg DESC')
                               ->orderBy('reviews_count', 'desc'),
-            'newest' => $query->latest('users.created_at'),
+            // id as the tiebreaker: several accounts created in the same second
+            // otherwise came back in whatever order the database chose, which
+            // put the newest last as often as first.
+            'newest' => $query->latest('users.created_at')->orderByDesc('users.id'),
             default  => // 'top' — verified first, then rating, then review volume
                 $query
                     ->orderByRaw('(SELECT CASE WHEN trade_license_doc IS NOT NULL AND trade_license_verified_at IS NOT NULL
@@ -175,11 +195,31 @@ class BrowseProfessionalsController extends Controller
                 $locationIssue = $placed->message;
             } else {
                 $candidateIds = (clone $query)->pluck('users.id');
-                $kept = \App\Support\RadiusMatching::filterUsersNearPoint(
-                    User::with('profile')->whereIn('id', $candidateIds)->get(),
+                $candidates = User::with('profile')->whereIn('id', $candidateIds)->get();
+
+                $near = \App\Support\RadiusMatching::filterUsersNearPoint(
+                    $candidates,
                     $placed->lat,
                     $placed->lng,
                 )->pluck('id')->all();
+
+                /*
+                 * A professional with no coordinates on file is kept.
+                 *
+                 * Distance cannot be worked out for them, and dropping them
+                 * emptied the page: typing a real ZIP returned nothing at all
+                 * while a ZIP we could not place returned everybody — the exact
+                 * opposite of what each one means. This is the same rule the
+                 * rate ceiling above already follows: an optional field left
+                 * blank does not hide a real professional.
+                 */
+                $unplaceable = $candidates
+                    ->reject(fn (User $u) => \App\Support\RadiusMatching::originIsMatchable($u))
+                    ->pluck('id')
+                    ->all();
+
+                $kept = array_values(array_unique(array_merge($near, $unplaceable)));
+
                 $query->whereIn('users.id', $kept ?: [0]);
             }
         }
