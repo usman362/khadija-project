@@ -43,6 +43,20 @@
                 Sent by {{ $submission->submitted_by === auth()->id() ? 'you' : ($submission->submitter?->name ?? 'someone') }}
                 on {{ $submission->created_at?->format('M j, Y') }}.
             </p>
+
+            {{-- Idea 1 (Sir Peter): the submitter's permanent account
+                 reference, on the record support will be reading. The form
+                 already has its own reference; this one identifies the person,
+                 which is the half staff have to go and look up otherwise.
+
+                 Shown as the reader's own when it is their submission — "your
+                 GigResource ID" is what they would be asked to quote. --}}
+            @if($submission->submitter?->public_id)
+                <p class="dsp-hint" style="margin-top:4px;">
+                    {{ $submission->submitted_by === auth()->id() ? 'Your' : "Their" }}
+                    GigResource ID: <b style="user-select:all;">{{ $submission->submitter->public_id }}</b>
+                </p>
+            @endif
         </div>
 
         @if($submission->approval_note)

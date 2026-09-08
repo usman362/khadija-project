@@ -10,7 +10,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Idea 1, continued — the reference where a client actually needs it.
+ * Idea 1, continued — the reference in the four places it is needed.
+ *
+ * Sir Peter listed the messaging panel, transactions and support requests
+ * alongside the profile. Each is a place where a name is not enough: two
+ * professionals share one, a payment has to be matched to a person, and a
+ * support thread is answered by somebody who was not in it.
  *
  * Sir Peter listed the messaging information panel among the places the
  * GigResource ID should appear, and it is the strongest of them: two
@@ -21,7 +26,7 @@ use Tests\TestCase;
  * Placed above the email because it is the one field on that panel that never
  * changes.
  */
-class ChatShowsGigResourceIdTest extends TestCase
+class GigResourceIdIsShownWhereNeededTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -113,5 +118,85 @@ class ChatShowsGigResourceIdTest extends TestCase
 
         $this->assertSame($pro->public_id, $info['public_id']);
         $this->assertNotSame($client->public_id, $info['public_id']);
+    }
+
+    /* ── The other two places Sir Peter named ───────────────── */
+
+    /**
+     * A transaction record. A payment query is the case where a name is least
+     * use — this is the field support and accounting match a payment to a
+     * person with.
+     */
+    public function test_the_transaction_page_shows_the_professionals_reference(): void
+    {
+        $client = $this->client();
+
+        $pro = User::factory()->create(['primary_role' => 'professional']);
+        $pro->assignRole('professional');
+        $pro = $pro->fresh();
+
+        $event = Event::create([
+            'title' => 'An event', 'client_id' => $client->id,
+            'created_by' => $client->id, 'status' => 'open',
+        ]);
+
+        $booking = Booking::create([
+            'event_id' => $event->id, 'client_id' => $client->id,
+            'created_by' => $client->id, 'supplier_id' => $pro->id,
+            'status' => 'confirmed', 'price' => 100, 'currency' => 'USD',
+        ]);
+
+        $this->actingAs($client)
+            ->get("/client/payments/{$booking->id}")
+            ->assertOk()
+            ->assertSee('GigResource ID')
+            ->assertSee($pro->public_id);
+    }
+
+    /**
+     * A support request. The form already carries its own reference; this one
+     * identifies the person, which is the half staff otherwise look up.
+     */
+    public function test_a_support_request_shows_the_senders_reference(): void
+    {
+        $client = $this->client();
+
+        $submission = \App\Models\FormSubmission::create([
+            'form_key' => 'support_request',
+            'submitted_by' => $client->id,
+            'payload' => ['subject' => 'A question', 'message' => 'Hello'],
+            'status' => 'open',
+        ]);
+
+        $this->actingAs($client)
+            ->get("/requests-submissions/{$submission->id}")
+            ->assertOk()
+            ->assertSee('GigResource ID')
+            ->assertSee($client->public_id);
+    }
+
+    /**
+     * The trap that cost the chat panel its first run, kept as its own test:
+     * a narrowed eager load drops public_id and the field renders blank,
+     * which reads as "not built" rather than as a bug.
+     */
+    public function test_a_narrowed_eager_load_still_carries_the_reference(): void
+    {
+        $pro = User::factory()->create(['primary_role' => 'professional'])->fresh();
+
+        $event = Event::create([
+            'title' => 'An event', 'client_id' => $this->client()->id,
+            'created_by' => $pro->id, 'status' => 'open',
+        ]);
+
+        $booking = Booking::create([
+            'event_id' => $event->id, 'client_id' => $event->client_id,
+            'created_by' => $event->client_id, 'supplier_id' => $pro->id,
+            'status' => 'confirmed', 'price' => 100, 'currency' => 'USD',
+        ]);
+
+        $loaded = Booking::with('supplier:id,name,avatar,public_id')->find($booking->id);
+
+        $this->assertSame($pro->public_id, $loaded->supplier->public_id);
     }
 }

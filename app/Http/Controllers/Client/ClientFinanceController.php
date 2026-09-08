@@ -221,7 +221,10 @@ class ClientFinanceController extends Controller
 
         $booking->load([
             'event:id,title,starts_at,location,guest_count',
-            'supplier:id,name,avatar',
+            // public_id is listed because a narrowed eager load silently
+            // omits it — the chat panel rendered a blank reference for exactly
+            // this reason, and a blank field reads as "not built".
+            'supplier:id,name,avatar,public_id',
             'supplier.profile:id,user_id,headline,company_name,city,state',
         ]);
 

@@ -90,6 +90,16 @@
             @if ($booking->supplier?->profile?->company_name)
                 <div class="tx-line"><span class="l">Business</span><span class="v">{{ $booking->supplier->profile->company_name }}</span></div>
             @endif
+            {{-- Idea 1 (Sir Peter): the professional's permanent reference on
+                 the transaction record. A payment query is the case where a
+                 name is least use — it is the field support and accounting
+                 need to match a payment to a person. --}}
+            @if ($booking->supplier?->public_id)
+                <div class="tx-line">
+                    <span class="l">GigResource ID</span>
+                    <span class="v" style="user-select:all;">{{ $booking->supplier->public_id }}</span>
+                </div>
+            @endif
             <div class="tx-line">
                 <span class="l">Came from</span>
                 <span class="v">{{ \Illuminate\Support\Str::headline((string) ($booking->source ?: 'Booking')) }}</span>
