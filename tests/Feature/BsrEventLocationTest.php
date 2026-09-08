@@ -162,4 +162,25 @@ class BsrEventLocationTest extends TestCase
             'The choice they made was reset, so picking it again looks like it does nothing.',
         );
     }
+
+    /**
+     * The script that drives this field is on the step that has the field.
+     *
+     * It was pushed from inside the Availability branch, so it was only ever
+     * output on step 7 — on Event Details the radios changed nothing, which is
+     * how it was reported: "I know the address" does not work.
+     */
+    public function test_the_location_script_reaches_the_event_step(): void
+    {
+        $this->startWizard();
+
+        $html = $this->actingAs($this->client)
+            ->get(route('client.bsr.step', 'event'))
+            ->assertSuccessful()
+            ->getContent();
+
+        $this->assertStringContainsString('data-bw-loclabel', $html);
+        $this->assertStringContainsString("querySelectorAll('input[name=\"location_kind\"]')", $html,
+            'The radios have no listener on the step that shows them.');
+    }
 }

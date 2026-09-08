@@ -55,6 +55,7 @@
     .bw-locopt input { margin-top: 3px; }
     .bw-locopt b { display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); }
     .bw-locopt small { display: block; font-size: 11.5px; color: var(--text-muted); line-height: 1.35; margin-top: 1px; }
+    .bw-loclabel { display: block; font-size: 12px; font-weight: 700; color: var(--text-primary); margin: 12px 0 5px; }
     .bw-locmine { border: 0; background: none; padding: 0; font: inherit; font-weight: 700; color: var(--brand, #f97316); cursor: pointer; text-decoration: underline; }
     /* The per-service budget breakdown. */
     .bw-split { border: 1.5px solid var(--border-color); border-radius: 12px; padding: 14px 16px; margin-top: 16px; background: var(--bg-card); }
@@ -363,14 +364,26 @@
                     </label>
                 </div>
 
-                <input type="text" name="location" value="{{ $__loc }}"
+                {{-- The box belongs to the option above it. Unlabelled and
+                     sitting under both, it read as a third thing on the page
+                     and never changed when the choice did. --}}
+                <label class="bw-loclabel" for="bw_location" data-bw-loclabel>{{
+                    $__kind === 'exact' ? 'Street address' : 'City and state'
+                }}</label>
+
+                <input type="text" name="location" id="bw_location" value="{{ $__loc }}"
                        placeholder="{{ $__kind === 'exact' ? '1234 Garden Way, Baltimore, MD 21201' : 'Baltimore, MD' }}"
                        data-bw-location>
 
                 @if($__home !== '')
-                    <p class="bw-help">
-                        {{-- Peter: ask whether it differs from their own address,
-                             rather than making them type it out again. --}}
+                    {{-- Peter: ask whether it differs from their own address,
+                         rather than making them type it out again.
+
+                         Only offered against "I know the address": their own
+                         address is a street address, so filling it in under
+                         "only the area so far" would answer a question they
+                         did not ask. --}}
+                    <p class="bw-help" data-bw-mineblock @if($__kind !== 'exact') hidden @endif>
                         Is it at your own address?
                         <button type="button" class="bw-locmine" data-bw-usemine="{{ $__home }}">Use {{ $__home }}</button>
                     </p>
@@ -400,6 +413,61 @@
         </div>
 
     {{-- ── 3 · Requirements ────────────────────────────────── --}}
+@push('scripts')
+<script>
+// The placeholder should show the shape of answer being asked for, and "use my
+// address" should fill it rather than making them type it again.
+(function () {
+    const field = document.querySelector('[data-bw-location]');
+    if (!field) return;
+
+    const hints = {
+        exact: { label: 'Street address', ph: '1234 Garden Way, Baltimore, MD 21201' },
+        area:  { label: 'City and state',  ph: 'Baltimore, MD' },
+    };
+
+    const label = document.querySelector('[data-bw-loclabel]');
+    const mineBlock = document.querySelector('[data-bw-mineblock]');
+
+    // One place decides what the box is asking for, so the label, the
+    // placeholder and the "use my address" offer can never disagree with the
+    // option that is actually selected.
+    function follow(kind) {
+        const h = hints[kind] || hints.area;
+
+        field.placeholder = h.ph;
+        if (label) { label.textContent = h.label; }
+        // Their own address is a street address; offering it under "only the
+        // area so far" answers a question they did not ask.
+        if (mineBlock) { mineBlock.hidden = kind !== 'exact'; }
+    }
+
+    document.querySelectorAll('input[name="location_kind"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            if (radio.checked) { follow(radio.value); }
+        });
+    });
+
+    const mine = document.querySelector('[data-bw-usemine]');
+    if (mine) {
+        mine.addEventListener('click', function () {
+            field.value = mine.dataset.bwUsemine;
+            const exact = document.querySelector('input[name="location_kind"][value="exact"]');
+            if (exact) { exact.checked = true; }
+            follow('exact');
+            field.focus();
+        });
+    }
+
+    // The page can load with either option already chosen — after a rejected
+    // step, or on a returning draft — so the box is brought into line with
+    // whatever is checked rather than with whichever one is first.
+    const checked = document.querySelector('input[name="location_kind"]:checked');
+    if (checked) { follow(checked.value); }
+})();
+</script>
+@endpush
+
     @elseif($step === 'requirements')
         <h3>What should professionals know?</h3>
         <p class="lede">This is what they read before deciding whether to bid, and what they price against. The more specific, the more accurate the proposals.</p>
@@ -763,33 +831,6 @@
     retotal();
 })();
 
-// The placeholder should show the shape of answer being asked for, and "use my
-// address" should fill it rather than making them type it again.
-(function () {
-    const field = document.querySelector('[data-bw-location]');
-    if (!field) return;
-
-    const hints = {
-        exact: '1234 Garden Way, Baltimore, MD 21201',
-        area:  'Baltimore, MD',
-    };
-
-    document.querySelectorAll('input[name="location_kind"]').forEach(function (radio) {
-        radio.addEventListener('change', function () {
-            field.placeholder = hints[radio.value] || hints.area;
-        });
-    });
-
-    const mine = document.querySelector('[data-bw-usemine]');
-    if (mine) {
-        mine.addEventListener('click', function () {
-            field.value = mine.dataset.bwUsemine;
-            const exact = document.querySelector('input[name="location_kind"][value="exact"]');
-            if (exact) { exact.checked = true; field.placeholder = hints.exact; }
-            field.focus();
-        });
-    }
-})();
 </script>
 <script>
 (function () {
