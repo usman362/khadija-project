@@ -335,12 +335,18 @@
                  A venue hunt genuinely has no address yet; everything else
                  usually does. Asking which one they have beats guessing. --}}
             @php
-                $__loc  = $data['location'] ?? '';
+                // old() first, and it has to be: the "that looks like an area"
+                // check rejects the step, so the client lands back here with
+                // nothing saved. Reading the saved state alone blanked the box
+                // they had just typed into and reset the choice they had just
+                // made, which is why picking "I know the address" looked like
+                // it did nothing at all.
+                $__loc  = old('location', $data['location'] ?? '');
                 $__prof = auth()->user()?->profile;
                 $__home = trim(implode(', ', array_filter([
                     $__prof?->address, $__prof?->city, $__prof?->state, $__prof?->zip_code,
                 ])));
-                $__kind = $data['location_kind'] ?? ($__loc === '' ? 'exact' : 'area');
+                $__kind = old('location_kind', $data['location_kind'] ?? ($__loc === '' ? 'exact' : 'area'));
             @endphp
 
             <div class="bw-field bw-locfield">

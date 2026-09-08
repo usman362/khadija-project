@@ -125,4 +125,41 @@ class BsrEventLocationTest extends TestCase
         $this->step(['title' => 'Harbour Gala', 'location_kind' => 'exact', 'location' => ''])
             ->assertSessionHasNoErrors();
     }
+
+    /**
+     * A rejected step comes back with what they typed still in the box.
+     *
+     * The "that looks like an area" check refuses the step, so nothing is
+     * saved — and the form read only the saved state. The client picked
+     * "I know the address", typed a city, got the error, and found the box
+     * empty and the choice reset to whatever the empty box implied. Nothing
+     * they did appeared to have any effect, which is exactly how it was
+     * reported: clicking "I know the address" does nothing.
+     */
+    public function test_a_rejected_address_is_still_in_the_box(): void
+    {
+        $this->startWizard();
+
+        $html = $this->actingAs($this->client)
+            ->from(route('client.bsr.step', 'event'))
+            ->post(route('client.bsr.save', 'event'), [
+                'title' => 'Annual Company Picnic',
+                'location_kind' => 'exact',
+                'location' => 'Baltimore, MD',
+            ])
+            ->assertSessionHasErrors('location')
+            ->assertRedirect(route('client.bsr.step', 'event'))
+            ->getTargetUrl();
+
+        $back = $this->actingAs($this->client)->get($html)->getContent();
+
+        $this->assertStringContainsString('value="Baltimore, MD"', $back,
+            'The rejected address was dropped, so the client cannot see what to correct.');
+
+        $this->assertMatchesRegularExpression(
+            '/value="exact"[^>]*checked/',
+            $back,
+            'The choice they made was reset, so picking it again looks like it does nothing.',
+        );
+    }
 }
