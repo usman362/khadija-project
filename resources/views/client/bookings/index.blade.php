@@ -591,10 +591,6 @@
         <div class="bk-rc">
             <h4>Quick actions</h4>
             <div class="bk-qa">
-                <a href="{{ route('client.post-event.choose') }}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    Post an event
-                </a>
                 <a href="{{ route('client.payments.index') }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                     Payments
