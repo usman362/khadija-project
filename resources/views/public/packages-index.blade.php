@@ -67,9 +67,14 @@
        sentence and wrong for this, so the cap is lifted — and lifted on a
        selector that outranks it rather than one that merely follows it. */
     .pk-hero p.pk-props { margin: 0; max-width: none; display: flex;
-                flex-wrap: nowrap; gap: 18px; font-size: 12.5px;
-                color: var(--muted, #6b7280); }
-    .pk-hero p.pk-props span { white-space: nowrap; }
+                flex-wrap: nowrap; gap: 8px; }
+    .pk-hero p.pk-props span { white-space: nowrap; display: inline-flex;
+                align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600;
+                color: #475467; background: #fff; border: 1px solid var(--line, #e5e7eb);
+                border-radius: 999px; padding: 6px 12px 6px 10px;
+                box-shadow: 0 1px 2px rgba(16,24,40,.04); }
+    .pk-hero p.pk-props span::before { content: '¹3'; color: var(--pk);
+                font-weight: 800; font-size: 11px; }
     .pk-hero p.pk-props span { white-space: nowrap; }
 
     /* Toolbar */
