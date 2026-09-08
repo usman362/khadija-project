@@ -202,7 +202,22 @@
 
             const data = await res.json();
 
-            Object.entries(data.split ?? {}).forEach(([id, amount]) => {
+            // The endpoint answers ok:false with a reason — no budget yet, or
+            // only one service. Reporting "Suggested" over that left the boxes
+            // empty and the client with nothing to act on.
+            if (data.ok === false) {
+                note.textContent = data.message || 'Could not suggest a split just now.';
+                return;
+            }
+
+            const split = data.split ?? {};
+
+            if (Object.keys(split).length === 0) {
+                note.textContent = 'Could not suggest a split just now.';
+                return;
+            }
+
+            Object.entries(split).forEach(([id, amount]) => {
                 const input = rows.querySelector('input[data-cat="' + id + '"]');
                 if (input) input.value = amount;
             });

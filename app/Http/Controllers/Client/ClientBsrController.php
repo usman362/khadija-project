@@ -859,6 +859,16 @@ class ClientBsrController extends Controller
      */
     public function suggestBudgetSplit(Request $request, ServiceBudgetSuggester $suggester): JsonResponse
     {
+        /*
+         * Emergency Request and Direct Request post here too, and neither has
+         * a BSR wizard behind it. Reading the services out of the wizard's
+         * session meant the endpoint saw none from those two pages and always
+         * answered "a split needs at least two services" — with the page
+         * showing two.
+         *
+         * What the caller sent is the answer when it sent one; the wizard's
+         * saved state is the fallback for the wizard, which posts neither.
+         */
         $d = $this->state($request);
 
         $total = (float) ($request->input('total')
@@ -866,15 +876,13 @@ class ClientBsrController extends Controller
             ?? $d['budget_min']
             ?? 0);
 
+        $services = array_map('intval', (array) ($request->input('services') ?: ($d['services'] ?? [])));
+
         $archetype = ServiceRelevance::archetypeByEventType()[
-            mb_strtolower(trim((string) ($d['event_type'] ?? '')))
+            mb_strtolower(trim((string) ($request->input('event_type') ?? $d['event_type'] ?? '')))
         ] ?? null;
 
-        $split = $suggester->suggest(
-            array_map('intval', (array) ($d['services'] ?? [])),
-            $total,
-            $archetype,
-        );
+        $split = $suggester->suggest($services, $total, $archetype);
 
         if ($split === []) {
             return response()->json([
