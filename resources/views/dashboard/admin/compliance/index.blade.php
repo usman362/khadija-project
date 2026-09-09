@@ -12,6 +12,26 @@
         </p>
     </div>
 
+    {{-- Several of these rows are satisfied by a job that runs on a timer, and
+         a timer that is not running fails silently: the code is right and the
+         emails simply never go. So the page says whether the scheduler is
+         alive rather than assuming it. --}}
+    @php $__beat = \App\Console\Commands\SchedulerHeartbeat::lastRun(); @endphp
+    <div class="cmp-beat {{ $__beat && $__beat->gt(now()->subMinutes(10)) ? 'is-ok' : 'is-bad' }}">
+        @if(! $__beat)
+            <b>The scheduler has never run.</b>
+            <span>Nothing time-based is happening — no renewal notices, no account purges.
+                  The host needs a cron entry calling <code>schedule:run</code> every minute.</span>
+        @elseif($__beat->gt(now()->subMinutes(10)))
+            <b>Scheduler running.</b>
+            <span>Last heartbeat {{ $__beat->humanAgo() }}.</span>
+        @else
+            <b>The scheduler has stopped.</b>
+            <span>Last heartbeat {{ $__beat->humanAgo() }} ({{ $__beat->format('M j, Y H:i') }}).
+                  Anything on a timer has not run since.</span>
+        @endif
+    </div>
+
     <div class="cmp-tally">
         @foreach($tally as $status => $count)
             <span class="cmp-pill is-{{ $status }}">{{ \Illuminate\Support\Str::headline($status) }} <b>{{ $count }}</b></span>
@@ -65,6 +85,12 @@
     .cmp { max-width: 900px; }
     .cmp-head h1 { font-size: 22px; font-weight: 800; margin: 0 0 4px; }
     .cmp-head p { font-size: 13px; color: var(--text-muted); margin: 0 0 16px; max-width: 620px; line-height: 1.6; }
+    .cmp-beat { border-radius: 12px; padding: 12px 15px; margin-bottom: 16px; font-size: 13px; line-height: 1.6; }
+    .cmp-beat b { display: block; }
+    .cmp-beat span { color: var(--text-secondary); }
+    .cmp-beat code { font-size: 12px; }
+    .cmp-beat.is-ok { background: rgba(16,185,129,.10); border: 1px solid rgba(16,185,129,.3); }
+    .cmp-beat.is-bad { background: rgba(239,68,68,.09); border: 1px solid rgba(239,68,68,.32); }
     .cmp-tally { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 18px; }
     .cmp-pill { font-size: 11.5px; font-weight: 800; border-radius: 999px; padding: 5px 11px;
         background: var(--bg-card-hover); color: var(--text-muted); }

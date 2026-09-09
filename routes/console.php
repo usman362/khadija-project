@@ -33,3 +33,13 @@ Schedule::command('subscriptions:renewal-notices')
     ->dailyAt('06:00')
     ->withoutOverlapping()
     ->onOneServer();
+
+/*
+ * The scheduler saying it is alive.
+ *
+ * Every minute, because that is how often the host is meant to call it. Anything
+ * else here runs only if this is running — so when a renewal notice does not
+ * arrive, this is what says whether the job is broken or the cron entry is
+ * simply missing.
+ */
+Schedule::command('scheduler:heartbeat')->everyMinute();

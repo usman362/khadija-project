@@ -170,4 +170,32 @@ class RenewalNoticesTest extends TestCase
         $this->assertStringContainsString('cancel', strtolower($body));
         $this->assertStringNotContainsString('unsubscribe', strtolower($body));
     }
+
+    /**
+     * And the scheduler says whether it is alive.
+     *
+     * A timer that is not running fails silently: the code is right and the
+     * emails simply never go. The heartbeat is the difference between knowing
+     * the notices are being sent and assuming it.
+     */
+    public function test_the_scheduler_records_that_it_ran(): void
+    {
+        \Illuminate\Support\Facades\Cache::forget(\App\Console\Commands\SchedulerHeartbeat::KEY);
+
+        $this->assertNull(\App\Console\Commands\SchedulerHeartbeat::lastRun(),
+            'It claims to have run before it ever did.');
+
+        $this->artisan('scheduler:heartbeat')->assertSuccessful();
+
+        $this->assertNotNull(\App\Console\Commands\SchedulerHeartbeat::lastRun());
+        $this->assertTrue(\App\Console\Commands\SchedulerHeartbeat::lastRun()->gt(now()->subMinute()));
+    }
+
+    public function test_the_heartbeat_is_scheduled_every_minute(): void
+    {
+        $this->assertStringContainsString(
+            "Schedule::command('scheduler:heartbeat')->everyMinute()",
+            file_get_contents(base_path('routes/console.php')),
+        );
+    }
 }
