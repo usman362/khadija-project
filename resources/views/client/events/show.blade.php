@@ -597,6 +597,11 @@
                 <div class="ev-req-row"><span>Event date</span><b>{{ $event->starts_at?->format('M j, Y · g:i A') ?? 'Flexible' }}</b></div>
                 <div class="ev-req-row"><span>Location</span><b>{{ $event->location ?: '—' }}</b></div>
                 <div class="ev-req-row"><span>Guest count</span><b>{{ $event->guest_count ? number_format($event->guest_count) : '—' }}</b></div>
+                {{-- Catering requests only. Absent on every other request,
+                     rather than shown as a dash nobody can fill in. --}}
+                @if($event->delivery_mode)
+                    <div class="ev-req-row"><span>Food delivery</span><b>{{ \App\Domain\Requests\FoodDelivery::label($event->delivery_mode) }}</b></div>
+                @endif
                 <div class="ev-req-row"><span>Budget</span><b>{{ $event->budget ? '$' . number_format($event->budget) : 'Not stated' }}</b></div>
             </div>
             @if($event->description)

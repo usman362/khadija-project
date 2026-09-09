@@ -315,6 +315,15 @@
                     <div class="do-field">
                         <label>Services requested (pick all that apply)</label>
                         <x-service-picker :categories="$categories" name="services" :selected="old('services', [])" />
+
+                        {{-- Appears the moment a catering or bar service is ticked. --}}
+                        @include('partials._food_delivery', [
+                            'mode'  => old('delivery_mode'),
+                            'live'  => true,
+                            'shown' => \App\Domain\Requests\FoodDelivery::appliesTo(
+                                array_map('intval', (array) old('services', []))
+                            ),
+                        ])
                     </div>
                 </div>
             </div>

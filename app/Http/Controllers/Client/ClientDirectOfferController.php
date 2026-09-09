@@ -144,6 +144,14 @@ class ClientDirectOfferController extends Controller
             'service_single'  => ['required_without:services', 'nullable', 'string', 'max:120'],
             'budget_min'      => ['nullable', 'integer', 'min:0'],
             'request_type'    => ['nullable', 'in:SSR,MSR'],
+            // Catering only. Required or nullable depending on what was
+            // ticked, so the question is only mandatory where it was asked.
+            'delivery_mode'   => [
+                \App\Domain\Requests\FoodDelivery::appliesTo(
+                    array_map('intval', (array) $request->input('services', []))
+                ) ? 'required' : 'nullable',
+                'in:' . implode(',', array_keys(\App\Domain\Requests\FoodDelivery::CHOICES)),
+            ],
 
             /*
              * Sir Peter, 2026-09-08: the client must actively agree to the
@@ -159,6 +167,7 @@ class ClientDirectOfferController extends Controller
             'services.required_without' => 'Choose at least one service you need.',
             'service_single.required_without' => 'Choose the service you need.',
             'fee_agreed.accepted' => 'Please confirm you understand the $2.99 fee applies when you finalize with a professional.',
+            'delivery_mode.required' => 'Say how the food should get there.',
         ]);
 
         $user = $request->user();
@@ -228,6 +237,10 @@ class ClientDirectOfferController extends Controller
             'budget'       => $data['budget_min'] ?? null,
             'location'     => $data['venue'] ?? null,
             'guest_count'  => $data['guests'] ?? null,
+            'delivery_mode' => \App\Domain\Requests\FoodDelivery::answerFor(
+                array_map('intval', (array) ($data['services'] ?? [])),
+                $data['delivery_mode'] ?? null,
+            ),
             'created_by'   => $user->id,
             'client_id'    => $user->id,
             'supplier_id'  => $pro->id,            // the invited professional

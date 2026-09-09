@@ -561,6 +561,13 @@
             <p class="bw-help">At least a couple of sentences. Include anything that affects scope — access, timings, equipment, dietary needs.</p>
         </div>
 
+        {{-- Only when the services picked at step 1 include catering or bar.
+             The services cannot change on this step, so the question is
+             decided on the server and never toggles. --}}
+        @if($asksFoodDelivery)
+            @include('partials._food_delivery', ['mode' => $data['delivery_mode'] ?? null])
+        @endif
+
     {{-- ── 4 · Budget ──────────────────────────────────────── --}}
     @elseif($step === 'budget')
         <h3>Budget</h3>
@@ -964,6 +971,9 @@
         <div class="bw-rev"><span>Event date</span><b>{{ ! empty($data['starts_at']) ? \Illuminate\Support\Carbon::parse($data['starts_at'])->format('M j, Y · g:i A') : 'Flexible' }}@if(! empty($data['ends_at'])) – {{ \Illuminate\Support\Carbon::parse($data['ends_at'])->format('g:i A') }}@endif</b></div>
         <div class="bw-rev"><span>Location</span><b>{{ $data['location'] ?? '—' }}{{ ! empty($data['venue']) ? ' · ' . $data['venue'] : '' }}</b></div>
         <div class="bw-rev"><span>Guests</span><b>{{ ! empty($data['guest_count']) ? number_format($data['guest_count']) : '—' }}</b></div>
+        @if($asksFoodDelivery)
+            <div class="bw-rev"><span>Food delivery</span><b>{{ \App\Domain\Requests\FoodDelivery::label($data['delivery_mode'] ?? null) ?: '—' }}</b></div>
+        @endif
         <div class="bw-rev"><span>Budget</span><b>
             @if(! empty($data['budget_min']) || ! empty($data['budget_max']))
                 ${{ number_format((float) ($data['budget_min'] ?? 0)) }} – ${{ number_format((float) ($data['budget_max'] ?? 0)) }}

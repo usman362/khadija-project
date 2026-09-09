@@ -171,6 +171,15 @@
             ])
 
             <div class="esr-field"><label>Anything else the pro should know?</label><textarea name="description" class="esr-textarea" maxlength="2000" placeholder="Scope, access, equipment, timing…">{{ old('description') }}</textarea></div>
+
+            {{-- Appears the moment a catering or bar service is ticked above. --}}
+            @include('partials._food_delivery', [
+                'mode'  => old('delivery_mode'),
+                'live'  => true,
+                'shown' => \App\Domain\Requests\FoodDelivery::appliesTo(
+                    array_map('intval', (array) old('services', []))
+                ),
+            ])
         </div>
 
         {{-- Publish --}}

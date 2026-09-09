@@ -356,6 +356,9 @@ class RequestFilesTest extends TestCase
         ]);
         $this->actingAs($client)->post(route('client.bsr.save', 'requirements'), [
             'description' => 'Catering for one hundred guests with vegetarian options and staff for four hours.',
+            // A catering request is asked how the food gets there before it
+            // can move past this step.
+            'delivery_mode' => \App\Domain\Requests\FoodDelivery::PROFESSIONAL_DELIVERS,
         ]);
         $this->actingAs($client)->post(route('client.bsr.save', 'budget'), [
             'budget_min' => 3000,

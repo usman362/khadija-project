@@ -37,6 +37,8 @@ class Event extends Model
         'location',
         'venue',
         'guest_count',
+        // Catering only — see App\Domain\Requests\FoodDelivery.
+        'delivery_mode',
         'media',
         'status',
         'is_published',

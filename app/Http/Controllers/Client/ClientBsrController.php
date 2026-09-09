@@ -114,6 +114,15 @@ class ClientBsrController extends Controller
                 ? \App\Domain\Taxonomy\ServiceRelevance::forBrowser()
                 : [],
             'showingAll'    => $this->showingAll($data, $request),
+            /*
+             * Catering requests get one extra question — how the food arrives.
+             * Asked on the requirements step because the services are settled
+             * by then, and answered by the server rather than by JavaScript so
+             * a photographer's request cannot be made to show it.
+             */
+            'asksFoodDelivery' => \App\Domain\Requests\FoodDelivery::appliesTo(
+                array_map('intval', (array) ($data['services'] ?? []))
+            ),
             'eventTypes' => Category::active()->eventTypes()
                 ->orderBy('name')->get(['id', 'name']),
             'otherEventType'  => self::OTHER_EVENT_TYPE,
@@ -734,6 +743,17 @@ class ClientBsrController extends Controller
             ],
             'requirements' => [
                 'description' => ['required', 'string', 'min:20', 'max:4000'],
+                /*
+                 * Required only where it was asked. A request with no food
+                 * service never saw the question, so requiring it there would
+                 * block a form on a field that is not on the screen.
+                 */
+                'delivery_mode' => [
+                    \App\Domain\Requests\FoodDelivery::appliesTo(
+                        array_map('intval', (array) ($this->state($request)['services'] ?? []))
+                    ) ? 'required' : 'nullable',
+                    'in:' . implode(',', array_keys(\App\Domain\Requests\FoodDelivery::CHOICES)),
+                ],
             ],
             'budget' => [
                 'budget_min' => ['nullable', 'numeric', 'min:0', 'max:9999999'],
@@ -799,6 +819,7 @@ class ClientBsrController extends Controller
             'event_date.after_or_equal'  => 'Pick a date that has not already passed.',
             'event_start_time.required'  => 'Set the time your event starts.',
             'confirm.accepted'           => 'Confirm the details before publishing.',
+            'delivery_mode.required'     => 'Say how the food should get there.',
         ];
     }
 
@@ -887,6 +908,13 @@ class ClientBsrController extends Controller
             'state'             => \App\Support\StateMatching::requestState($user),
             'venue'             => $d['venue'] ?? null,
             'guest_count'       => $d['guest_count'] ?? null,
+            // Only carried when a food service is in the request. Blanked
+            // otherwise, so a client who picks catering, answers, then swaps
+            // the service out does not file a delivery preference for a
+            // photographer.
+            'delivery_mode'     => \App\Domain\Requests\FoodDelivery::appliesTo(
+                array_map('intval', (array) ($d['services'] ?? []))
+            ) ? ($d['delivery_mode'] ?? null) : null,
             'budget_min'        => $d['budget_min'] ?? null,
             'budget_max'        => $d['budget_max'] ?? null,
             // `budget` is what the rest of the app reads; keep it as the floor of

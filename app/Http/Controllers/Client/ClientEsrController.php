@@ -112,11 +112,16 @@ class ClientEsrController extends Controller
             'fee_agreed'   => ['accepted'],
             'services'     => ['required', 'array', 'min:1'],
             'services.*'   => ['integer', 'exists:categories,id', new \App\Rules\BookableService],
-        ], [
+            // Catering only — the rule is required or nullable depending on
+            // what was ticked, which is why it is built rather than written.
+        ] + \App\Domain\Requests\FoodDelivery::rules(
+            array_map('intval', (array) $request->input('services', []))
+        ), [
             'services.required' => 'Select at least one service you need.',
             'fee_agreed.accepted' => 'Please confirm you understand the $2.99 fee applies when you finalize with a professional.',
             'reason.required'   => 'Tell us why this is urgent.',
             'needed_by.required' => 'When do you need this by?',
+            'delivery_mode.required' => 'Say how the food should get there.',
         ]);
 
         $user     = $request->user();
@@ -180,6 +185,10 @@ class ClientEsrController extends Controller
             'location'     => $data['location'] ?? null,
             'state'        => \App\Support\StateMatching::requestState($user),
             'guest_count'  => $data['guest_count'] ?? null,
+            'delivery_mode' => \App\Domain\Requests\FoodDelivery::answerFor(
+                $services->map(fn ($id) => (int) $id)->all(),
+                $data['delivery_mode'] ?? null,
+            ),
             'organization_type' => $data['organization_type'],
             'created_by'   => $user->id,
             'client_id'    => $user->id,
