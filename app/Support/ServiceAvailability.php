@@ -99,6 +99,45 @@ final class ServiceAvailability
      *
      * @param  array<int>  $serviceIds
      */
+    /**
+     * How many professionals offer each of these services, in a state the
+     * client can hire from.
+     *
+     * The availability step told a client at step 7 that nobody in their state
+     * offers what they picked — five steps after the moment they picked it.
+     * The same fact belongs beside each service while they are choosing, so
+     * this answers for a whole list in one query rather than one at a time.
+     *
+     * @param  array<int>  $serviceIds
+     * @return array<int, int>  category id => professionals
+     */
+    public static function countsByService(array $serviceIds, ?string $state): array
+    {
+        if ($serviceIds === []) {
+            return [];
+        }
+
+        return \Illuminate\Support\Facades\DB::table('category_user')
+            ->join('users', 'users.id', '=', 'category_user.user_id')
+            ->join('model_has_roles', function ($j) {
+                $j->on('model_has_roles.model_id', '=', 'users.id')
+                    ->where('model_has_roles.model_type', User::class);
+            })
+            ->join('roles', function ($j) {
+                $j->on('roles.id', '=', 'model_has_roles.role_id')
+                    ->where('roles.name', RoleName::PROFESSIONAL->value);
+            })
+            ->when($state, fn ($q) => $q->join('user_profiles', 'user_profiles.user_id', '=', 'users.id')
+                ->whereRaw('UPPER(user_profiles.state) = ?', [strtoupper($state)]))
+            ->whereIn('category_user.category_id', $serviceIds)
+            ->whereNull('users.deleted_at')
+            ->groupBy('category_user.category_id')
+            ->selectRaw('category_user.category_id, COUNT(DISTINCT users.id) as pros')
+            ->pluck('pros', 'category_user.category_id')
+            ->map(fn ($n) => (int) $n)
+            ->all();
+    }
+
     private static function matching(array $serviceIds, ?string $state)
     {
         if ($serviceIds === []) {

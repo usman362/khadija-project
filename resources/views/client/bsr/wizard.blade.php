@@ -70,6 +70,12 @@
     .bw-locopt input { margin-top: 3px; }
     .bw-locopt b { display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); }
     .bw-locopt small { display: block; font-size: 11.5px; color: var(--text-muted); line-height: 1.35; margin-top: 1px; }
+    /* The count of professionals beside each service. */
+    .bw-svc-name { flex: 1; min-width: 0; }
+    .bw-svc-pros { flex: none; min-width: 20px; text-align: center; font-size: 10.5px; font-weight: 800;
+        color: var(--text-muted); background: var(--bg-page, #f1f5f9); border-radius: 999px;
+        padding: 1px 6px; }
+    .bw-svc-pros.is-none { color: #b45309; background: rgba(245,158,11,.16); }
     .bw-loclabel { display: block; font-size: 12px; font-weight: 700; color: var(--text-primary); margin: 12px 0 5px; }
     .bw-locmine { border: 0; background: none; padding: 0; font: inherit; font-weight: 700; color: var(--brand, #f97316); cursor: pointer; text-decoration: underline; }
     /* The per-service budget breakdown. */
@@ -235,6 +241,12 @@
 </div>
 
 <form method="POST" action="{{ route('client.bsr.save', $step) }}">
+    @php $__return = request()->query('return'); @endphp
+    @if($__return && array_key_exists($__return, \App\Http\Controllers\Client\ClientBsrController::STEPS))
+        {{-- Where to go once this step is saved — set by the link that sent
+             them here, so a trip back to fix one thing is a round trip. --}}
+        <input type="hidden" name="return" value="{{ $__return }}">
+    @endif
 @csrf
 <div class="bw-grid">
     <div class="bw-card">
@@ -290,17 +302,52 @@
             </div>
         @endif
 
+        @if(request()->query('return') === 'availability')
+            {{-- They came from step 7 to fix this one thing. Saying so, and
+                 saying where Continue goes, is the difference between a
+                 detour and being dumped at the start. --}}
+            <div class="bw-focus">
+                <b>Changing your services.</b>
+                <span>Continue takes you straight back to Availability Match.</span>
+            </div>
+        @endif
+
         <div class="bw-field">
             <label>Services <span class="req">*</span></label>
+            {{-- Each service says how many professionals in this state offer
+                 it. The availability step used to break this news at step 7,
+                 five steps after the choice was made and with the whole form
+                 already filled in. --}}
             <div class="bw-svc" id="bwSvc">
                 @foreach($categories as $c)
-                    <label>
+                    @php $pros = $proCounts[$c->id] ?? 0; @endphp
+                    <label data-pros="{{ $pros }}" data-name="{{ $c->name }}">
                         <input type="checkbox" name="services[]" value="{{ $c->id }}"
                                @checked(in_array($c->id, (array) ($data['services'] ?? [])))>
-                        {{ $c->name }}
+                        <span class="bw-svc-name">{{ $c->name }}</span>
+                        @if($pros > 0)
+                            <span class="bw-svc-pros" title="{{ $pros }} {{ \Illuminate\Support\Str::plural('professional', $pros) }} in your state offer this">{{ $pros }}</span>
+                        @else
+                            <span class="bw-svc-pros is-none" title="Nobody in your state offers this yet — you can still ask">0</span>
+                        @endif
                     </label>
                 @endforeach
             </div>
+
+            {{-- Filled in by the script below as they tick, so the warning
+                 arrives with the choice rather than after it. --}}
+            <div class="bw-note warn" id="bwNoPros" hidden>
+                <b id="bwNoProsHead"></b>
+                <p>
+                    You can still ask for it — the request stays open and any professional who joins
+                    and offers this will see it. If you would rather not wait, pick something else
+                    here, or send a Direct Request to someone you already know.
+                </p>
+                <div class="bw-note-acts">
+                    <a href="{{ route('client.direct-offers.create') }}">Send a Direct Request instead</a>
+                </div>
+            </div>
+
             <div class="bw-scope">
                 <span id="bwScope">Pick your services — the scope follows automatically.</span>
             </div>
@@ -781,7 +828,7 @@
                     or post a Direct Request to someone you already know.
                 </p>
                 <div class="bw-note-acts">
-                    <a href="{{ route('client.bsr.step', 'service') }}">Change services</a>
+                    <a href="{{ route('client.bsr.step', ['step' => 'service', 'return' => 'availability']) }}">Change services</a>
                     <a href="{{ route('client.direct-offers.create') }}">Send a Direct Request instead</a>
                 </div>
             </div>
@@ -985,8 +1032,33 @@
                 ? 'One service — this will post as an <b>SSR</b> (single service request).'
                 : n + ' services — this will post as an <b>MSR</b> (multi-service request). Professionals bid per service.');
     }
-    box.addEventListener('change', sync);
+    /* And say straight away when a ticked service has nobody behind it.
+       This was step 7's news; a client had filled in six more screens by the
+       time they heard it, and the only way back was to start the step again. */
+    var warn = document.getElementById('bwNoPros');
+    var head = document.getElementById('bwNoProsHead');
+
+    function coverage() {
+        if (!warn) return;
+
+        var empty = [];
+        box.querySelectorAll('input:checked').forEach(function (input) {
+            var row = input.closest('label');
+            if (row && Number(row.dataset.pros) === 0) empty.push(row.dataset.name);
+        });
+
+        warn.hidden = empty.length === 0;
+        if (empty.length === 0) return;
+
+        head.textContent = empty.length === 1
+            ? 'No professional in your state offers ' + empty[0] + ' yet'
+            : 'No professional in your state offers ' + empty.slice(0, 2).join(' or ')
+              + (empty.length > 2 ? ' and ' + (empty.length - 2) + ' more' : '') + ' yet';
+    }
+
+    box.addEventListener('change', function () { sync(); coverage(); });
     sync();
+    coverage();
 })();
 </script>
 @endif

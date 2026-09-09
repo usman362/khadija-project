@@ -96,6 +96,15 @@ class ClientBsrController extends Controller
             // alphabetical, which made that line untrue.
             'categories'    => $this->serviceCatalogue($data, $request),
             'focusNames'    => $this->focusNames($data),
+            /*
+             * How many professionals offer each service, in the client's own
+             * state — shown beside the service while they are picking.
+             *
+             * The availability step told them at step 7 that nobody offers
+             * what they chose, five steps after they chose it. The fact is
+             * knowable at step 1, so it is said at step 1.
+             */
+            'proCounts'     => $this->proCountsFor($step, $data, $request),
             'showingAll'    => $this->showingAll($data, $request),
             'eventTypes' => Category::active()->eventTypes()
                 ->orderBy('name')->get(['id', 'name']),
@@ -125,6 +134,22 @@ class ClientBsrController extends Controller
      * commitment ON GIGRESOURCE, not that the professional is free. So the
      * screen states the two things that are true and nothing between them.
      */
+    /**
+     * @return array<int, int>  category id => professionals in the client's state
+     */
+    private function proCountsFor(string $step, array $data, Request $request): array
+    {
+        // Only the step that shows the list needs them.
+        if ($step !== 'service') {
+            return [];
+        }
+
+        return \App\Support\ServiceAvailability::countsByService(
+            $this->serviceCatalogue($data, $request)->pluck('id')->all(),
+            \App\Support\StateMatching::requestState($request->user()),
+        );
+    }
+
     private function availabilityFor(string $step, array $data, Request $request): array
     {
         if ($step !== 'availability') {
@@ -319,6 +344,20 @@ class ClientBsrController extends Controller
 
         $keys = array_keys(self::STEPS);
         $next = $keys[min(array_search($step, $keys, true) + 1, count($keys) - 1)];
+
+        /*
+         * Sent back to a step to fix one thing, returned to where you were.
+         *
+         * The availability step's "Change services" dropped the client at step
+         * 1 with no way back except pressing Continue through every screen they
+         * had already filled in. It now carries where they came from, and this
+         * puts them back there once the step it sent them to is saved.
+         */
+        $back = (string) $request->input('return', '');
+
+        if ($back !== '' && array_key_exists($back, self::STEPS) && $back !== $step) {
+            $next = $back;
+        }
 
         return redirect()->route('client.bsr.step', $next);
     }
