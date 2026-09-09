@@ -1207,6 +1207,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/cancellations/{cancellation}/decline', [\App\Http\Controllers\Dashboard\AdminCancellationController::class, 'decline'])
             ->name('app.admin.cancellations.decline');
 
+        /*
+         * Compliance checklist — which state, which law, what we did, when.
+         * Sir Peter, 2026-09-09: kept somewhere we can look back at, rather
+         * than in a chat thread nobody can search a year from now.
+         */
+        Route::get('/compliance', [\App\Http\Controllers\Dashboard\AdminComplianceController::class, 'index'])
+            ->name('app.admin.compliance.index');
+
         // Expansion waitlist — where out-of-area signups are coming from.
         Route::get('/waitlist', [\App\Http\Controllers\Dashboard\AdminWaitlistController::class, 'index'])
             ->name('app.admin.waitlist.index');
