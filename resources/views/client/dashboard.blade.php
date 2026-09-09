@@ -69,11 +69,7 @@
     .od-stat-delta.is-down { color: var(--bad-text, #dc2626); }
 
     /* Client badges */
-    .od-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-    .od-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;
-        color: var(--text-primary); background: rgba(249,115,22,.10); border: 1px solid rgba(249,115,22,.28);
-        border-radius: 999px; padding: 5px 11px; }
-    .od-badge i { font-style: normal; font-size: 13px; }
+    .od-badges { display: flex; flex-wrap: wrap; gap: 14px 12px; margin-bottom: 14px; }
     .od-badge-next b { display: block; font-size: 12.5px; color: var(--text-primary); }
     .od-badge-next span { display: block; font-size: 12px; color: var(--text-muted); line-height: 1.5; margin: 2px 0 7px; }
     .od-badge-bar { height: 5px; border-radius: 999px; background: var(--border-color); overflow: hidden; }
@@ -1092,15 +1088,22 @@
              outlive the thing that earned it. --}}
         @php $__badges = \App\Domain\Badges\ClientBadges::progressFor($user); @endphp
 
-        @if($__badges->where('earned', true)->isNotEmpty())
-            <div class="od-badges">
-                @foreach($__badges->where('earned', true) as $b)
-                    <span class="od-badge" title="{{ $b['blurb'] }}">
-                        <i>{{ $b['icon'] }}</i>{{ $b['name'] }}
-                    </span>
-                @endforeach
-            </div>
-        @endif
+        {{-- Hexagons, and only hexagons (Sir Peter, 2026-09-09). The shape is
+             the component's; the colour and the icon come from config, which
+             is Khadijah's to set. Locked ones are shown greyed rather than
+             hidden — a client who can see what there is to win has a reason to
+             go and win it. --}}
+        <div class="od-badges">
+            @foreach($__badges as $b)
+                <x-hex-badge
+                    :icon="$b['icon']"
+                    :label="$b['name']"
+                    :colour="$b['colour'] ?? '#f97316'"
+                    :earned="$b['earned']"
+                    :title="$b['earned'] ? $b['blurb'] : $b['blurb'] . ' — ' . $b['progress'] . ' of ' . $b['need']"
+                />
+            @endforeach
+        </div>
 
         @php $__next = $__badges->where('earned', false)->first(); @endphp
 

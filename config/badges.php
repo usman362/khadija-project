@@ -15,6 +15,10 @@
  *
  * 'rule' is the measurement; 'need' is how much of it earns the badge.
  *
+ * The SHAPE is settled — every badge on the site is a hexagon (Sir Peter,
+ * 2026-09-09). The colour and the icon inside each one are Khadijah's, and
+ * they are here so she can change them without a code change.
+ *
  *   events_completed     bookings of this client that reached completed
  *   paid_on_time         agreements funded on or before the balance was due
  *   repeat_professional  professionals this client has booked more than once
@@ -27,6 +31,7 @@ return [
             'name'  => 'First Event',
             'blurb' => 'Completed your first event on GigResource.',
             'icon'  => '🎉',
+            'colour' => '#f59e0b',
             'rule'  => 'events_completed',
             'need'  => 1,
         ],
@@ -35,6 +40,7 @@ return [
             'name'  => 'Seasoned Host',
             'blurb' => 'Completed five events.',
             'icon'  => '🏆',
+            'colour' => '#f97316',
             'rule'  => 'events_completed',
             'need'  => 5,
         ],
@@ -43,6 +49,7 @@ return [
             'name'  => 'Pays On Time',
             'blurb' => 'Settled three agreements on or before the balance was due.',
             'icon'  => '⏱',
+            'colour' => '#10b981',
             'rule'  => 'paid_on_time',
             'need'  => 3,
         ],
@@ -51,6 +58,7 @@ return [
             'name'  => 'Worth Coming Back To',
             'blurb' => 'Booked the same professional more than once.',
             'icon'  => '🤝',
+            'colour' => '#6366f1',
             'rule'  => 'repeat_professional',
             'need'  => 1,
         ],

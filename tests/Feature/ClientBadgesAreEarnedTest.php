@@ -223,4 +223,64 @@ class ClientBadgesAreEarnedTest extends TestCase
         $this->assertStringContainsString('Completed your first event', $html);
         $this->assertStringContainsString('0 of 1', $html);
     }
+
+    /* ── The shape is settled; the colours are not ours ────── */
+
+    /**
+     * Every badge is a hexagon.
+     *
+     * Sir Peter, 2026-09-09: "we are now and only using the hexagon style
+     * badges across the users". One component owns the shape, so a second
+     * badge style cannot turn up somewhere later — and it is the same polygon
+     * the client tier crest already used, rather than a second opinion about
+     * what a hexagon is on this site.
+     */
+    public function test_badges_are_drawn_as_hexagons(): void
+    {
+        $this->booking($this->pro());
+
+        $html = $this->actingAs($this->client->fresh())
+            ->get(route('client.dashboard'))
+            ->assertSuccessful()
+            ->getContent();
+
+        $this->assertStringContainsString('hexb-crest', $html);
+        $this->assertStringContainsString('polygon(50% 0%, 100% 14%, 100% 62%, 50% 100%, 0 62%, 0 14%)', $html);
+
+        // And the old pill has gone, rather than sitting alongside.
+        $this->assertStringNotContainsString('class="od-badge"', $html);
+    }
+
+    /**
+     * The colour and the icon inside each one are Khadijah's decision, so they
+     * are settings rather than markup.
+     */
+    public function test_the_colour_and_icon_come_from_config(): void
+    {
+        config(['badges.client' => [[
+            'key' => 'first-event', 'name' => 'First Event', 'blurb' => 'x',
+            'icon' => '✿', 'colour' => '#123456',
+            'rule' => 'events_completed', 'need' => 1,
+        ]]]);
+
+        $this->booking($this->pro());
+
+        $html = $this->actingAs($this->client->fresh())
+            ->get(route('client.dashboard'))
+            ->getContent();
+
+        $this->assertStringContainsString('#123456', $html);
+        $this->assertStringContainsString('✿', $html);
+    }
+
+    /** What is not won yet is shown, drained — not hidden. */
+    public function test_a_badge_not_yet_won_is_still_on_the_page(): void
+    {
+        $html = $this->actingAs($this->client)
+            ->get(route('client.dashboard'))
+            ->getContent();
+
+        $this->assertStringContainsString('is-locked', $html);
+        $this->assertStringContainsString('Seasoned Host', $html);
+    }
 }
