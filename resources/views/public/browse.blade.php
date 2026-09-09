@@ -566,8 +566,20 @@
                             </div>
 
                             <div class="br-chips">
-                                @if($isVerified)<span class="br-chip verif">VERIFIED PRO</span>@endif
-                                @if($isTop)<span class="br-chip top">TOP RATED</span>@endif
+                                {{-- Hexagons here too (Sir Peter, 2026-09-09), in the
+                                     inline shape so a card row does not grow a head
+                                     taller. The shape is the component's; the colour
+                                     is a setting, not a decision made here. --}}
+                                @if($isVerified)
+                                    <x-hex-badge inline size="22" icon="✓" label="Verified Pro"
+                                                 :colour="config('badges.verified_colour', '#2563eb')"
+                                                 title="Licence, insurance and workers' comp all on file and approved" />
+                                @endif
+                                @if($isTop)
+                                    <x-hex-badge inline size="22" icon="★" label="Top Rated"
+                                                 :colour="config('badges.top_rated_colour', '#f59e0b')"
+                                                 title="Rated highly by the clients who booked them" />
+                                @endif
                                 {{-- A "QUICK RESPONDER" chip sat here on every
                                      card unconditionally, including on
                                      professionals nobody had ever messaged.

@@ -25,6 +25,13 @@
  */
 return [
 
+    /*
+     * The two badges that are not earned by activity but by verification and
+     * by reviews. Same hexagon, same rule about who picks the colour.
+     */
+    'verified_colour'  => '#2563eb',
+    'top_rated_colour' => '#f59e0b',
+
     'client' => [
         [
             'key'   => 'first-event',

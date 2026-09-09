@@ -822,11 +822,18 @@
                     @if($profile->experience_years)
                         <span class="pp-tag">{{ $profile->experience_years }}+ yrs experience</span>
                     @endif
+                    {{-- The two that are badges are hexagons; the rest of this row
+                         is facts about the professional, not badges, so they stay
+                         as they are. --}}
                     @if($topRated)
-                        <span class="pp-tag top">★ Top Rated Pro</span>
+                        <x-hex-badge inline size="22" icon="★" label="Top Rated Pro"
+                                     :colour="config('badges.top_rated_colour', '#f59e0b')"
+                                     title="Rated highly by the clients who booked them" />
                     @endif
                     @if($isVerified)
-                        <span class="pp-tag verified">✓ Verified</span>
+                        <x-hex-badge inline size="22" icon="✓" label="Verified"
+                                     :colour="config('badges.verified_colour', '#2563eb')"
+                                     title="Licence, insurance and workers' comp all on file and approved" />
                     @endif
                     @if($isNew)
                         <span class="pp-tag new-vendor">✨ New Vendor</span>
