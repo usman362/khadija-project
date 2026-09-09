@@ -12,6 +12,8 @@
 --}}
 @php
     $fd    = \App\Domain\Requests\FoodDelivery::class;
+    // Two choices only. Sir Peter, 2026-09-10: no third-party option, "so that
+    // we are no longer an option". The wording is his, from his own document.
     $live  = $live ?? false;
     $mode  = $mode ?? null;
     $shown = $shown ?? true;
@@ -35,19 +37,14 @@
 @endonce
 
 <div class="fd-block" data-food-delivery @if(! $shown) hidden @endif>
-    <h4>How should the food get there?</h4>
-    <p class="fd-lede">Professionals price delivery differently from collection, so saying now keeps the quotes comparable.</p>
+    <h4>How will this order be delivered?</h4>
+    <p class="fd-lede">Your preference — you and the professional agree the final arrangement between you. Delivery is priced differently from collection, so saying now keeps the quotes comparable.</p>
 
     <div class="fd-opts">
         @foreach($fd::CHOICES as $value => $label)
             <label class="fd-opt {{ $mode === $value ? 'sel' : '' }}">
                 <input type="radio" name="delivery_mode" value="{{ $value }}" @checked($mode === $value)>
-                <span>
-                    {{ $label }}
-                    @if($value === $fd::COURIER_WANTED)
-                        <span class="fd-note">We do not offer this yet. Choosing it tells us you want it.</span>
-                    @endif
-                </span>
+                <span>{{ $label }}</span>
             </label>
         @endforeach
     </div>

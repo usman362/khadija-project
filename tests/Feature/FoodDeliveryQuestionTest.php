@@ -96,8 +96,32 @@ class FoodDeliveryQuestionTest extends TestCase
         $html = $this->requirementsHtml();
 
         $this->assertStringContainsString('name="delivery_mode"', $html);
-        $this->assertStringContainsString('How should the food get there?', $html);
-        $this->assertStringContainsString(FoodDelivery::COURIER_WANTED, $html);
+        $this->assertStringContainsString('How will this order be delivered?', $html);
+        $this->assertStringContainsString(FoodDelivery::PROFESSIONAL_DELIVERS, $html);
+        $this->assertStringContainsString(FoodDelivery::CLIENT_COLLECTS, $html);
+    }
+
+    /**
+     * Sir Peter, 2026-09-10: "i rather now just have the client pick it up
+     * themselves or set it up by the professionals do it, so that we are no
+     * longer an option."
+     *
+     * So there are two choices, and a courier cannot be asked for -- not by
+     * the form, and not by posting the old value at it either.
+     */
+    public function test_there_is_no_third_party_option(): void
+    {
+        $this->pick($this->catering);
+
+        $this->assertCount(2, FoodDelivery::CHOICES);
+        $this->assertStringNotContainsString('courier', $this->requirementsHtml());
+
+        $this->actingAs($this->client)
+            ->post(route('client.bsr.save', 'requirements'), [
+                'description'   => 'A sit-down dinner for eighty people, two courses.',
+                'delivery_mode' => 'courier_wanted',
+            ])
+            ->assertSessionHasErrors('delivery_mode');
     }
 
     /** The point of asking only where it means something. */
@@ -137,19 +161,19 @@ class FoodDeliveryQuestionTest extends TestCase
         $this->actingAs($this->client)
             ->post(route('client.bsr.save', 'requirements'), [
                 'description'   => 'A sit-down dinner for eighty people, two courses.',
-                'delivery_mode' => FoodDelivery::COURIER_WANTED,
+                'delivery_mode' => FoodDelivery::CLIENT_COLLECTS,
             ])
             ->assertSessionHasNoErrors();
 
         // Kept in the draft…
         $this->assertSame(
-            FoodDelivery::COURIER_WANTED,
+            FoodDelivery::CLIENT_COLLECTS,
             session('bsr_wizard.delivery_mode'),
         );
 
         // …and the radio comes back ticked, not blank, when they step back.
         $this->assertMatchesRegularExpression(
-            '/value="' . FoodDelivery::COURIER_WANTED . '"[^>]*checked/',
+            '/value="' . FoodDelivery::CLIENT_COLLECTS . '"[^>]*checked/',
             $this->requirementsHtml(),
         );
     }
@@ -174,12 +198,12 @@ class FoodDeliveryQuestionTest extends TestCase
     public function test_an_answer_is_dropped_when_the_food_service_is(): void
     {
         $this->assertNull(
-            FoodDelivery::answerFor([$this->photography->id], FoodDelivery::COURIER_WANTED),
+            FoodDelivery::answerFor([$this->photography->id], FoodDelivery::CLIENT_COLLECTS),
         );
 
         $this->assertSame(
-            FoodDelivery::COURIER_WANTED,
-            FoodDelivery::answerFor([$this->catering->id], FoodDelivery::COURIER_WANTED),
+            FoodDelivery::CLIENT_COLLECTS,
+            FoodDelivery::answerFor([$this->catering->id], FoodDelivery::CLIENT_COLLECTS),
         );
     }
 }

@@ -20,12 +20,28 @@ final class FoodDelivery
 {
     public const CLIENT_COLLECTS       = 'client_collects';
     public const PROFESSIONAL_DELIVERS = 'professional_delivers';
-    public const COURIER_WANTED        = 'courier_wanted';
 
+    /*
+     * Two, and only two.
+     *
+     * A third choice was here for a day -- "we would rather a delivery service
+     * brought it" -- to find out whether anyone wanted a courier before
+     * approaching one. Sir Peter, 2026-09-10, closed the question himself:
+     * "i rather now just have the client pick it up themselves or set it up by
+     * the professionals do it, so that we are no longer an option."
+     *
+     * His own research document reached the same place from the other side --
+     * "Do not assume GigResource will earn a commission" -- which removed the
+     * reason the idea started. So the option is gone rather than hidden: a
+     * courier arriving at a professional's kitchen unannounced is a liability
+     * nobody here is carrying, and there is no revenue on the other side of it.
+     *
+     * Sir Peter's own labels, from that document, so the wording on the screen
+     * and the wording in his notes are the same wording.
+     */
     public const CHOICES = [
-        self::PROFESSIONAL_DELIVERS => 'The professional delivers it',
-        self::CLIENT_COLLECTS       => 'We will collect it ourselves',
-        self::COURIER_WANTED        => 'We would rather a delivery service brought it',
+        self::PROFESSIONAL_DELIVERS => 'Professional Delivery — they bring it to the event',
+        self::CLIENT_COLLECTS       => 'Client Pickup — we collect it from them',
     ];
 
     /** The service categories whose services are food. */

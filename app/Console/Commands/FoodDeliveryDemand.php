@@ -7,19 +7,19 @@ use App\Models\Event;
 use Illuminate\Console\Command;
 
 /**
- * How many clients want somebody else to bring the food.
+ * Pickup or delivery — which one clients actually ask for.
  *
- * Sir Peter, 2026-09-09, on affiliating with UberEats or DoorDash: the deal is
- * only worth chasing if clients want a third option. This is that count, taken
- * from what clients actually answered rather than from what we expect.
- *
- * A commission deal negotiated on a guess is negotiated from the weaker side.
+ * This began as a way to size a courier deal. Sir Peter dropped that on
+ * 2026-09-10, so what is left is the plainer question: how often a catering
+ * client wants the food brought to them rather than collecting it. Useful to
+ * whoever writes the catering guidance, and to any professional deciding
+ * whether to offer delivery at all.
  */
 class FoodDeliveryDemand extends Command
 {
     protected $signature = 'food:delivery-demand {--days=30 : Only requests raised in the last N days}';
 
-    protected $description = 'The split of how clients want catering delivered';
+    protected $description = 'The split between client pickup and professional delivery on catering requests';
 
     public function handle(): int
     {
@@ -62,12 +62,6 @@ class FoodDeliveryDemand extends Command
         }
 
         $this->table(['Choice', 'Requests', 'Share of answers'], $rows);
-
-        $courier = (int) ($counts[FoodDelivery::COURIER_WANTED] ?? 0);
-        $this->newLine();
-        $this->line($courier > 0
-            ? "{$courier} client(s) asked for a delivery service we do not offer."
-            : 'No client has asked for a delivery service yet.');
 
         return self::SUCCESS;
     }
