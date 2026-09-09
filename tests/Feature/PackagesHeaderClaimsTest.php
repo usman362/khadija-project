@@ -80,4 +80,46 @@ class PackagesHeaderClaimsTest extends TestCase
     {
         $this->get('/packages')->assertOk()->assertSee('One Contract');
     }
+
+    /**
+     * The hero is one centred column: heading, subtitle, then the claims.
+     *
+     * They used to sit opposite the heading in the hero's right-hand slot,
+     * where a short column stranded against a wide gap read as a stray
+     * element. Nothing is opposite anything now, so nothing can be stranded.
+     */
+    public function test_the_hero_is_one_centred_column(): void
+    {
+        $html = $this->get(route('public.packages'))->assertSuccessful()->getContent();
+
+        $this->assertMatchesRegularExpression(
+            '/\.pk-hero \{[^}]*flex-direction:\s*column/',
+            $html,
+            'The hero still puts the claims opposite the heading.',
+        );
+
+        $this->assertMatchesRegularExpression('/\.pk-hero \{[^}]*text-align:\s*center/', $html);
+
+        // The subtitle is capped for readability, so it needs telling to sit
+        // in the middle — a capped block does not centre itself.
+        $this->assertMatchesRegularExpression('/\.pk-hero p \{[^}]*margin:\s*0 auto/', $html);
+    }
+
+    /** And the three claims run along one line, centred under it. */
+    public function test_the_claims_read_as_one_centred_line(): void
+    {
+        $html = $this->get(route('public.packages'))->getContent();
+
+        $this->assertMatchesRegularExpression(
+            '/\.pk-hero p\.pk-props \{[^}]*justify-content:\s*center/',
+            $html,
+        );
+
+        // Each claim whole — an earlier version broke one into
+        // "Better value through bundle / pricing".
+        $this->assertMatchesRegularExpression(
+            '/\.pk-hero p\.pk-props span \{[^}]*white-space:\s*nowrap/',
+            $html,
+        );
+    }
 }

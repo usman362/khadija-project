@@ -53,24 +53,27 @@
     .pk-shell { max-width: 1480px; margin: 0 auto; padding: 20px 22px 60px; }
 
     /* Hero */
-    .pk-hero { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 22px 0 20px; }
+    /* One centred column: heading, subtitle, then the three claims under
+       them. Nothing sits opposite anything, so nothing can be left stranded
+       against a gap. */
+    .pk-hero { display: flex; flex-direction: column; align-items: center; text-align: center;
+               gap: 0; padding: 26px 0 22px; }
     .pk-hero h1 { font-size: clamp(1.7rem, 3.4vw, 2.5rem); margin: 0 0 6px; }
     .pk-hero h1 span { color: var(--pk); }
-    .pk-hero p { color: var(--muted); font-size: 15px; max-width: 430px; margin: 0; }
-    /* The three claims, in the hero's right-hand slot.
-       Stacked rather than strung along one line: opposite a two-line subtitle
-       a single row would sit alone against the gap, and each claim wrapping
-       mid-phrase — "Better value through bundle / pricing" — is what an
-       earlier one-line version did. nowrap keeps each claim whole.
+    /* Centred by its own margins — the cap is what keeps a sentence readable,
+       and a capped block still needs telling to sit in the middle. */
+    .pk-hero p { color: var(--muted); font-size: 15px; max-width: 430px; margin: 0 auto; }
 
-       .pk-hero p caps every paragraph here at 430px, which is right for a
-       sentence and wrong for this, so the cap is lifted — and lifted on a
-       selector that outranks it rather than one that merely follows it. */
-    .pk-hero p.pk-props { margin: 0; max-width: none; display: flex;
-                flex-direction: column; gap: 6px; font-size: 13.5px;
-                line-height: 1.5; color: var(--muted, #6b7280);
-                padding-left: 18px; border-left: 2px solid var(--line, #e5e7eb); }
+    /* The three claims, one line, under the subtitle.
+       The cap above is right for a sentence and wrong for a row of three, so
+       it is lifted here — on a selector that outranks it rather than one that
+       merely follows it. nowrap keeps each claim whole: an earlier version
+       broke one into "Better value through bundle / pricing". */
+    .pk-hero p.pk-props { margin: 12px auto 0; max-width: none; display: flex;
+                flex-wrap: wrap; justify-content: center; gap: 4px 14px;
+                font-size: 13px; line-height: 1.5; color: var(--muted, #6b7280); }
     .pk-hero p.pk-props span { white-space: nowrap; }
+    .pk-hero p.pk-props span + span::before { content: '·'; margin-right: 14px; opacity: .55; }
 
     /* Toolbar */
     .pk-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; margin-bottom: 18px; }
@@ -249,7 +252,10 @@
 
         /* Wrapped under the heading rather than beside it, the left rule is
            pointing at nothing, so it goes. */
-        .pk-hero p.pk-props { padding-left: 0; border-left: none; gap: 2px; }
+        /* Too narrow for three on a line. Stacked, the separator would lead
+           lines two and three like a bullet nobody styled, so it goes. */
+        .pk-hero p.pk-props { flex-direction: column; gap: 3px; }
+        .pk-hero p.pk-props span + span::before { content: none; }
     }
 </style>
 @endpush
@@ -264,10 +270,8 @@
                 <p>Search ready-made service bundles from professionals who can handle multiple parts of your event.</p>
             </div>
 
-            {{-- The hero's right-hand slot. Three claims, plain text, one under
-                 the next — the rule on the left ties them to the heading block
-                 so they read as part of the hero rather than as a stray column
-                 stranded across the gap.
+            {{-- Under the heading and the subtitle, centred with them, on one
+                 line. Nothing is opposite anything here.
 
                  "One Contract — one point of contact" is not among them: the
                  same page says it lower down in "Why Package Bundles?", and
