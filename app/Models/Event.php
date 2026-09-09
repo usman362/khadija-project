@@ -461,6 +461,12 @@ class Event extends Model
             ->where('starts_at', '<', now()->startOfDay());
     }
 
+    /** Cancellations asked for against this event, approved or not. */
+    public function cancellationRequests(): HasMany
+    {
+        return $this->hasMany(CancellationRequest::class);
+    }
+
     public function serviceBudgets(): HasMany
     {
         return $this->hasMany(EventServiceBudget::class);

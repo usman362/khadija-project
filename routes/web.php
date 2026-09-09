@@ -1192,6 +1192,21 @@ Route::middleware('auth')->group(function () {
         Route::post('/disputes/{case}/note', [\App\Http\Controllers\Dashboard\AdminDisputeController::class, 'note'])
             ->name('app.admin.disputes.note');
 
+        /*
+         * Cancellations — the approval queue.
+         *
+         * Requests were being raised and told "our team will follow up" with
+         * no screen for the team to follow up on. Cancelling an EVENT goes
+         * through here (Sir Peter / Ali, 2026-09-09), and booking
+         * cancellations, which were landing in the same silence, land here too.
+         */
+        Route::get('/cancellations', [\App\Http\Controllers\Dashboard\AdminCancellationController::class, 'index'])
+            ->name('app.admin.cancellations.index');
+        Route::post('/cancellations/{cancellation}/approve', [\App\Http\Controllers\Dashboard\AdminCancellationController::class, 'approve'])
+            ->name('app.admin.cancellations.approve');
+        Route::post('/cancellations/{cancellation}/decline', [\App\Http\Controllers\Dashboard\AdminCancellationController::class, 'decline'])
+            ->name('app.admin.cancellations.decline');
+
         // Expansion waitlist — where out-of-area signups are coming from.
         Route::get('/waitlist', [\App\Http\Controllers\Dashboard\AdminWaitlistController::class, 'index'])
             ->name('app.admin.waitlist.index');

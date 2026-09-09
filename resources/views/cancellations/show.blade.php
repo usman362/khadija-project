@@ -13,11 +13,11 @@
         {{-- The reference is the page title and sits in the banner; the
              status badge stays here, because a badge is not a title. --}}
         <div class="dsp-badges">
-            <span class="dsp-badge {{ $request->status === 'withdrawn' ? 'dsp-shut' : 'dsp-open' }}"
-                  style="margin-left:8px;vertical-align:middle;">{{ ucfirst($request->status) }}</span>
+            <span class="dsp-badge {{ in_array($request->status, ['withdrawn', 'declined'], true) ? 'dsp-shut' : 'dsp-open' }}"
+                  style="margin-left:8px;vertical-align:middle;">{{ $request->statusLabel() }}</span>
         </div>
         <p class="dsp-sub">
-            {{ $request->kindLabel() }} · {{ $request->booking?->event?->title ?? 'Booking #' . $request->booking_id }}
+            {{ $request->kindLabel() }} · {{ $request->event?->title ?? $request->booking?->event?->title ?? 'Booking #' . $request->booking_id }}
         </p>
     </div>
     <a href="{{ route('cancellations.index') }}" class="cl-btn">All cancellations</a>
@@ -89,9 +89,26 @@
             <p class="dsp-sec">This report</p>
             <dl style="margin:0;">
                 <div class="dsp-row"><dt>Reference</dt><dd class="dsp-ref">{{ $request->reference }}</dd></div>
-                <div class="dsp-row"><dt>Booking</dt><dd>#{{ $request->booking_id }}</dd></div>
-                <div class="dsp-row"><dt>Status</dt><dd>{{ ucfirst($request->status) }}</dd></div>
+                {{-- An event cancellation has no booking to number. --}}
+                @if($request->booking_id)
+                    <div class="dsp-row"><dt>Booking</dt><dd>#{{ $request->booking_id }}</dd></div>
+                @elseif($request->event)
+                    <div class="dsp-row"><dt>Event</dt><dd>{{ $request->event->title }}</dd></div>
+                @endif
+                <div class="dsp-row"><dt>Status</dt><dd>{{ $request->statusLabel() }}</dd></div>
+                @if($request->actioned_at)
+                    <div class="dsp-row"><dt>Decided</dt><dd>{{ $request->actioned_at->format('M j, Y') }}</dd></div>
+                @endif
             </dl>
+
+            {{-- What the administrator said. It was written to the row and shown
+                 nowhere, so a client could be declined and never learn why. --}}
+            @if($request->resolution_note)
+                <div class="dsp-note" style="margin-top:12px;padding:11px 13px;border:1px solid var(--border-color);border-radius:10px;">
+                    <b style="display:block;font-size:12.5px;margin-bottom:4px;">From the GigResource team</b>
+                    <span style="font-size:13px;line-height:1.6;">{{ $request->resolution_note }}</span>
+                </div>
+            @endif
 
             @if($request->certification_text)
                 <p class="dsp-hint" style="margin-top:10px;">

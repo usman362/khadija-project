@@ -17,6 +17,7 @@ class CancellationRequest extends Model
 {
     /* What is being reported. One vocabulary for both directions. */
     public const CLIENT_CANCELS       = 'client_cancels';
+    public const CLIENT_CANCELS_EVENT = 'client_cancels_event';
     public const CLIENT_NO_SHOW       = 'client_no_show';
     public const CLIENT_CANCELLED_ON_DAY = 'client_cancelled_on_day';
     public const CLIENT_REFUSED_ACCESS   = 'client_refused_access';
@@ -24,14 +25,30 @@ class CancellationRequest extends Model
 
     public const KINDS = [
         self::CLIENT_CANCELS           => 'I need to cancel this booking',
+        self::CLIENT_CANCELS_EVENT     => 'I need to cancel this event',
         self::CLIENT_NO_SHOW           => 'The client did not turn up',
         self::CLIENT_CANCELLED_ON_DAY  => 'The client cancelled on the day',
         self::CLIENT_REFUSED_ACCESS    => 'I could not get access to the venue',
         self::SCOPE_CHANGED_ON_ARRIVAL => 'The job was not what was agreed when I arrived',
     ];
 
-    /** Only the client raises this one; the rest are the professional's. */
-    public const CLIENT_KINDS = [self::CLIENT_CANCELS];
+    /** Only the client raises these; the rest are the professional's. */
+    public const CLIENT_KINDS = [self::CLIENT_CANCELS, self::CLIENT_CANCELS_EVENT];
+
+    /* Where a request is up to. It only ever had two of these in code —
+       submitted and withdrawn — while the page told the client "our team will
+       follow up" and no screen existed for the team to follow up on. */
+    public const SUBMITTED = 'submitted';
+    public const APPROVED  = 'approved';
+    public const DECLINED  = 'declined';
+    public const WITHDRAWN = 'withdrawn';
+
+    public const STATUS_LABELS = [
+        self::SUBMITTED => 'Waiting for approval',
+        self::APPROVED  => 'Approved',
+        self::DECLINED  => 'Declined',
+        self::WITHDRAWN => 'Withdrawn',
+    ];
 
     protected $fillable = [
         'booking_id', 'event_id', 'raised_by', 'raised_role', 'kind', 'reason', 'detail',
@@ -61,6 +78,7 @@ class CancellationRequest extends Model
         static::creating(function (self $request) {
             $request->reference ??= self::nextReference();
             $request->event_id  ??= $request->booking?->event_id;
+            $request->status    ??= self::SUBMITTED;
         });
     }
 
@@ -75,6 +93,28 @@ class CancellationRequest extends Model
     public function kindLabel(): string
     {
         return self::KINDS[$this->kind] ?? $this->kind;
+    }
+
+    public function statusLabel(): string
+    {
+        return self::STATUS_LABELS[$this->status] ?? $this->status;
+    }
+
+    /** About a posted request rather than a booking that exists. */
+    public function isEventCancellation(): bool
+    {
+        return $this->kind === self::CLIENT_CANCELS_EVENT;
+    }
+
+    /** Waiting on an administrator, so it can still be withdrawn or actioned. */
+    public function isPending(): bool
+    {
+        return $this->status === self::SUBMITTED;
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', self::SUBMITTED);
     }
 
     /**

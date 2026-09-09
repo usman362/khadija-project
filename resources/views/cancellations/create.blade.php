@@ -49,9 +49,16 @@
     <a href="{{ route('cancellations.index') }}" class="cl-btn">Back</a>
 </div>
 
-@if($bookings->isEmpty())
+{{-- Empty only when there is nothing at all to cancel. A client with an
+     event and no bookings could not reach this form, which is precisely the
+     case event cancellation exists for. --}}
+@if($bookings->isEmpty() && $events->isEmpty())
     <div class="dsp-card">
-        <div class="dsp-empty">You have no active bookings to report on.</div>
+        <div class="dsp-empty">
+            {{ $isClient
+                ? 'You have no open events or bookings to cancel.'
+                : 'You have no active bookings to report on.' }}
+        </div>
     </div>
 @else
 <form method="POST" action="{{ route('cancellations.store') }}">
@@ -62,9 +69,46 @@
             <div class="dsp-card">
                 <p class="dsp-sec">The booking</p>
 
-                <div class="dsp-field">
+                {{-- Which of the two forms this is.
+                     A booking cancellation and an event cancellation ask for
+                     different things — one has a professional and a refund
+                     behind it, the other has neither — so the page shows the
+                     one being filled in rather than both at once. --}}
+                @if($isClient && $events->isNotEmpty())
+                    <div class="dsp-field">
+                        <label class="dsp-label">What are you cancelling</label>
+                        <div class="cx-what">
+                            @if($bookings->isNotEmpty())
+                                <label><input type="radio" name="kind" value="{{ \App\Models\CancellationRequest::CLIENT_CANCELS }}"
+                                              @checked(old('kind', \App\Models\CancellationRequest::CLIENT_CANCELS) === \App\Models\CancellationRequest::CLIENT_CANCELS)>
+                                    <span><b>A booking</b><small>A professional is already engaged for this.</small></span></label>
+                            @endif
+                            <label><input type="radio" name="kind" value="{{ \App\Models\CancellationRequest::CLIENT_CANCELS_EVENT }}"
+                                          @checked(old('kind', $bookings->isEmpty() ? \App\Models\CancellationRequest::CLIENT_CANCELS_EVENT : null) === \App\Models\CancellationRequest::CLIENT_CANCELS_EVENT)>
+                                <span><b>A whole event</b><small>Takes the request down. An administrator approves it first.</small></span></label>
+                        </div>
+                    </div>
+
+                    <div class="dsp-field" data-cx-for="{{ \App\Models\CancellationRequest::CLIENT_CANCELS_EVENT }}">
+                        <label class="dsp-label" for="event_id">Which event</label>
+                        <select name="event_id" id="event_id" class="dsp-select">
+                            <option value="">Choose an event…</option>
+                            @foreach($events as $ev)
+                                <option value="{{ $ev->id }}" @selected(old('event_id') == $ev->id)>
+                                    {{ $ev->title }}
+                                    @if($ev->starts_at) ({{ $ev->starts_at->format('M j, Y') }}) @endif
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('event_id') <p class="dsp-err">{{ $message }}</p> @enderror
+                        <p class="dsp-hint">Your event stays live, and professionals can still reply, until an administrator approves this.</p>
+                    </div>
+                @endif
+
+                @if($bookings->isNotEmpty())
+                <div class="dsp-field" data-cx-for="{{ \App\Models\CancellationRequest::CLIENT_CANCELS }}">
                     <label class="dsp-label" for="booking_id">Which booking</label>
-                    <select name="booking_id" id="booking_id" class="dsp-select" required
+                    <select name="booking_id" id="booking_id" class="dsp-select"
                             onchange="document.querySelectorAll('.cx-quote').forEach(q => q.classList.toggle('is-shown', q.dataset.booking === this.value))">
                         <option value="">Choose a booking…</option>
                         @foreach($bookings as $booking)
@@ -78,16 +122,26 @@
                     </select>
                     @error('booking_id') <p class="dsp-err">{{ $message }}</p> @enderror
                 </div>
+                @endif
 
-                <div class="dsp-field">
-                    <label class="dsp-label" for="kind">What happened</label>
-                    <select name="kind" id="kind" class="dsp-select" required>
-                        @foreach($kinds as $key => $label)
-                            <option value="{{ $key }}" @selected(old('kind') === $key)>{{ $label }}</option>
-                        @endforeach
-                    </select>
-                    @error('kind') <p class="dsp-err">{{ $message }}</p> @enderror
-                </div>
+                {{-- The professional picks from a list of things that happened.
+                     For the client the radio above already IS the kind, and two
+                     controls posting the same field name would send whichever
+                     came last. --}}
+                @if(! $isClient || $events->isEmpty())
+                    <div class="dsp-field">
+                        <label class="dsp-label" for="kind">What happened</label>
+                        <select name="kind" id="kind" class="dsp-select" required>
+                            @foreach($kinds as $key => $label)
+                                @if($isClient && $key === \App\Models\CancellationRequest::CLIENT_CANCELS_EVENT)
+                                    @continue   {{-- nothing to cancel: they have no open events --}}
+                                @endif
+                                <option value="{{ $key }}" @selected(old('kind') === $key)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        @error('kind') <p class="dsp-err">{{ $message }}</p> @enderror
+                    </div>
+                @endif
             </div>
 
             <div class="dsp-card">
@@ -220,4 +274,49 @@
     </div>
 </form>
 @endif
+
+@push('styles')
+<style>
+    .cx-what { display: grid; gap: 8px; }
+    .cx-what label { display: flex; gap: 9px; align-items: flex-start; border: 1.5px solid var(--border-color);
+        border-radius: 10px; padding: 10px 12px; cursor: pointer; }
+    .cx-what label:has(input:checked) { border-color: var(--brand, #f97316); background: rgba(249,115,22,.06); }
+    .cx-what input { margin-top: 3px; }
+    .cx-what b { display: block; font-size: 13px; color: var(--text-primary); }
+    .cx-what small { display: block; font-size: 11.5px; color: var(--text-muted); line-height: 1.4; margin-top: 1px; }
+</style>
+@endpush
+
+@push('scripts')
+<script>
+/* Show the half of the form that belongs to what they are cancelling.
+   Both halves are in the page so neither needs fetching, and the one that is
+   hidden is disabled as well — a hidden field still posts. */
+(function () {
+    var picks = document.querySelectorAll('input[name="kind"][type="radio"]');
+    if (! picks.length) return;
+
+    function sync() {
+        var chosen = document.querySelector('input[name="kind"]:checked');
+        if (! chosen) return;
+
+        document.querySelectorAll('[data-cx-for]').forEach(function (block) {
+            var mine = block.dataset.cxFor === chosen.value;
+
+            block.hidden = ! mine;
+            block.querySelectorAll('select, input').forEach(function (field) {
+                field.disabled = ! mine;
+                // Required only while it is the question being asked.
+                if (mine) { field.setAttribute('required', 'required'); }
+                else { field.removeAttribute('required'); }
+            });
+        });
+    }
+
+    picks.forEach(function (p) { p.addEventListener('change', sync); });
+    sync();
+})();
+</script>
+@endpush
+
 @endsection

@@ -41,11 +41,23 @@ class CancellationController extends Controller
     {
         $user = $request->user();
 
+        /*
+         * Mine is: one against a booking I am a party to, one against my own
+         * event, or one I raised.
+         *
+         * This asked only the first question, so an event cancellation — which
+         * has no booking by definition — never appeared in the list of the
+         * person who asked for it.
+         */
         $requests = CancellationRequest::query()
-            ->whereHas('booking', fn ($q) => $q
-                ->where('client_id', $user->id)
-                ->orWhere('supplier_id', $user->id))
-            ->with(['booking.event', 'raiser'])
+            ->where(function ($q) use ($user) {
+                $q->whereHas('booking', fn ($b) => $b
+                        ->where('client_id', $user->id)
+                        ->orWhere('supplier_id', $user->id))
+                    ->orWhereHas('event', fn ($e) => $e->where('client_id', $user->id))
+                    ->orWhere('raised_by', $user->id);
+            })
+            ->with(['booking.event', 'event', 'raiser'])
             ->latest('id')
             ->paginate(15);
 
@@ -77,10 +89,27 @@ class CancellationController extends Controller
             ? $bookings->mapWithKeys(fn ($b) => [$b->id => CancellationPolicy::quote($b)])
             : collect();
 
+        /*
+         * Events the client can ask to cancel.
+         *
+         * A request posted to the board and not yet taken up has no booking to
+         * point at, so it could not be cancelled at all — the only way out was
+         * to leave it open. Only the client's own, and only ones that have not
+         * already finished or been cancelled.
+         */
+        $events = $role === 'client'
+            ? \App\Models\Event::where('client_id', $user->id)
+                ->whereNotIn('status', ['cancelled', 'completed'])
+                ->whereDoesntHave('cancellationRequests', fn ($q) => $q->pending())
+                ->orderByDesc('id')
+                ->get(['id', 'title', 'starts_at', 'status'])
+            : collect();
+
         return view('cancellations.create', [
             'layout'   => $this->layout($user),
             'role'     => $role,
             'bookings' => $bookings,
+            'events'   => $events,
             'quotes'   => $quotes,
             'kinds'    => $role === 'client'
                             ? array_intersect_key(CancellationRequest::KINDS, array_flip(CancellationRequest::CLIENT_KINDS))
@@ -92,6 +121,17 @@ class CancellationController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $user = $request->user();
+
+        /*
+         * Cancelling an EVENT is its own path: there is no booking, no
+         * professional on the other side and no money quote — there is a
+         * posted request the client wants taken down, and an administrator
+         * who decides. Handled first so the booking rules below can go on
+         * assuming a booking.
+         */
+        if ($request->input('kind') === CancellationRequest::CLIENT_CANCELS_EVENT) {
+            return $this->storeEventCancellation($request);
+        }
 
         $data = $request->validate([
             'booking_id'     => ['required', 'integer', 'exists:bookings,id'],
@@ -161,12 +201,85 @@ class CancellationController extends Controller
             ->with('status', "Recorded as {$cancellation->reference}. Our team will follow up.");
     }
 
+    /**
+     * "I need to cancel this event" — recorded, and waiting on an approval.
+     *
+     * Nothing is cancelled here. The event stays exactly as it is until an
+     * administrator approves, because a request that took itself down the
+     * moment it was asked for would not be an approval at all.
+     */
+    private function storeEventCancellation(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        $data = $request->validate([
+            'event_id'  => ['required', 'integer', 'exists:events,id'],
+            'kind'      => ['required', 'in:' . CancellationRequest::CLIENT_CANCELS_EVENT],
+            'reason'    => ['required', 'string', 'min:15', 'max:3000'],
+            'detail'    => ['nullable', 'string', 'max:5000'],
+            'certified' => ['accepted'],
+        ], [
+            'event_id.required' => 'Choose which event you want to cancel.',
+            'reason.min'        => 'Tell us why in a sentence or two — an administrator reads this.',
+        ]);
+
+        $event = \App\Models\Event::findOrFail($data['event_id']);
+
+        // Their own event, and only the client cancels one.
+        abort_unless($event->client_id === $user->id, 403);
+        abort_if($user->isProfessionalMode(), 403);
+
+        abort_if(
+            in_array($event->status, ['cancelled', 'completed'], true),
+            403,
+            'This event has already finished or been cancelled.',
+        );
+
+        // One open request at a time, so an administrator is never looking at
+        // two asks for the same event.
+        abort_if(
+            $event->cancellationRequests()->pending()->exists(),
+            403,
+            'A cancellation for this event is already waiting for approval.',
+        );
+
+        $cancellation = CancellationRequest::create([
+            'booking_id'         => null,
+            'event_id'           => $event->id,
+            'raised_by'          => $user->id,
+            'raised_role'        => 'client',
+            'kind'               => CancellationRequest::CLIENT_CANCELS_EVENT,
+            'reason'             => $data['reason'],
+            'detail'             => $data['detail'] ?? null,
+            'certified'          => true,
+            'certification_text' => 'I understand this event stays live until an administrator approves the cancellation, and that any professional already working on it will be told.',
+        ]);
+
+        return redirect()
+            ->route('cancellations.show', $cancellation)
+            ->with('status', "Recorded as {$cancellation->reference}. Your event stays live until an administrator approves this.");
+    }
+
     public function show(Request $request, CancellationRequest $cancellation): View
     {
         $user = $request->user();
-        $this->authorizeParty($user, $cancellation->booking);
 
-        $cancellation->load(['booking.event', 'booking.client', 'booking.supplier', 'raiser']);
+        /*
+         * An event cancellation has no booking, and this asked the booking who
+         * the parties were — so opening the one you had just raised was a 500.
+         * Whoever raised it, and whoever owns the event, can see it.
+         */
+        if ($cancellation->booking) {
+            $this->authorizeParty($user, $cancellation->booking);
+        } else {
+            abort_unless(
+                $cancellation->raised_by === $user->id
+                    || $cancellation->event?->client_id === $user->id,
+                403,
+            );
+        }
+
+        $cancellation->load(['booking.event', 'booking.client', 'booking.supplier', 'event', 'raiser']);
 
         return view('cancellations.show', [
             'layout'  => $this->layout($user),
@@ -178,9 +291,9 @@ class CancellationController extends Controller
     public function withdraw(Request $request, CancellationRequest $cancellation): RedirectResponse
     {
         abort_unless($cancellation->raised_by === $request->user()->id, 403);
-        abort_unless($cancellation->status === 'submitted', 403);
+        abort_unless($cancellation->isPending(), 403);
 
-        $cancellation->update(['status' => 'withdrawn']);
+        $cancellation->update(['status' => CancellationRequest::WITHDRAWN]);
 
         return back()->with('status', 'Withdrawn.');
     }

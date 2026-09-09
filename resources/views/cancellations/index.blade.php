@@ -50,10 +50,13 @@
                 @foreach($requests as $item)
                     <tr>
                         <td><a href="{{ route('cancellations.show', $item) }}" class="dsp-ref">{{ $item->reference }}</a></td>
-                        <td>{{ $item->booking?->event?->title ?? 'Booking #' . $item->booking_id }}</td>
+                        {{-- An event cancellation has no booking to name. --}}
+                        <td>{{ $item->event?->title ?? $item->booking?->event?->title ?? 'Booking #' . $item->booking_id }}</td>
                         <td>{{ $item->kindLabel() }}</td>
                         <td>{{ $item->raised_by === auth()->id() ? 'You' : ($item->raiser?->name ?? '—') }}</td>
-                        <td><span class="dsp-badge {{ $item->status === 'withdrawn' ? 'dsp-shut' : 'dsp-open' }}">{{ ucfirst($item->status) }}</span></td>
+                        {{-- The status in the client's words. "Submitted" did not
+                             say what it was waiting for. --}}
+                        <td><span class="dsp-badge {{ in_array($item->status, ['withdrawn', 'declined'], true) ? 'dsp-shut' : 'dsp-open' }}">{{ $item->statusLabel() }}</span></td>
                         <td class="dsp-when">{{ $item->created_at?->format('M j, Y') }}</td>
                     </tr>
                 @endforeach
