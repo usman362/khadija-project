@@ -1189,6 +1189,12 @@
         /* ═══════════════════════ LOGOUT BUTTON ═══════════════════════ */
     </style>
     @include('partials._a11y')
+    {{-- Long dropdowns become searchable. On the layout rather than page by
+         page, so a select added later is searchable without anybody having to
+         remember — and included ahead of the styles stack, because a @push
+         after its @stack has already rendered goes nowhere. --}}
+    @include('partials._searchable_select')
+
     @stack('styles')
 </head>
 
