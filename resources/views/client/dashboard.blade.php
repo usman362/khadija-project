@@ -56,6 +56,7 @@
     .od-stat-delta.flat { color: var(--text-muted); }
     .od-stat-sub { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; }
     .od-stat-spark { flex-shrink: 0; opacity: 0.9; }
+    .od-stat-delta.is-down { color: var(--bad-text, #dc2626); }
 
     /* Main grid: Emergency · Client Profile · Special Badges · Calendar */
     /* Top zone: left column = Emergency/Profile/Badges (row A) + Gigs/Bookings
@@ -219,7 +220,7 @@
     }
     .od-cal-month { font-size: 14px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 10px; }
     .od-cal-nav { display: flex; gap: 4px; }
-    .od-cal-nav button {
+    .od-cal-nav button, .od-cal-nav-btn {
         width: 26px; height: 26px;
         border-radius: 6px;
         border: 1px solid var(--border-color);
@@ -228,9 +229,11 @@
         cursor: pointer;
         display: flex; align-items: center; justify-content: center;
     }
-    .od-cal-nav button:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+    .od-cal-nav button:hover, .od-cal-nav-btn:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+    .od-cal-nav-btn { text-decoration: none; font-size: 15px; line-height: 1; }
     .od-cal-tabs { display: flex; gap: 4px; }
     .od-cal-tab {
+        text-decoration: none;
         padding: 4px 10px;
         font-size: 11.5px; font-weight: 600;
         border-radius: 6px;
@@ -275,9 +278,11 @@
     .od-cal-day:hover { border-color: rgba(249, 115, 22, 0.40); }
     .od-cal-day.muted { opacity: 0.4; }
     .od-cal-day.has-event { background: rgba(249, 115, 22, 0.05); }
+    .od-cal-more { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
     .od-cal-num { font-weight: 600; color: var(--text-primary); font-size: 11.5px; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; }
     /* Today — number sits in a solid orange circle (matches reference). */
     .od-cal-day.today .od-cal-num { background: #c2410c; color: #fff;  /* 2.80 -> 5.18 */ border-radius: 50%; font-weight: 800; }
+    a.od-cal-event { text-decoration: none; }
     .od-cal-event {
         font-size: 8.5px; line-height: 1.15;
         padding: 2px 4px;
@@ -504,17 +509,153 @@
         ->where('status', 'completed')
         ->sum('amount');
 
-    // Calendar — render the current month grid, overlay events on their
-    // start dates. dayEvents is keyed by day-of-month (1-31).
-    $now            = \Carbon\Carbon::now();
-    $monthStart     = $now->copy()->startOfMonth();
-    $monthEnd       = $now->copy()->endOfMonth();
-    $firstCalDate   = $monthStart->copy()->startOfWeek(\Carbon\Carbon::SUNDAY);
-    $lastCalDate    = $monthEnd->copy()->endOfWeek(\Carbon\Carbon::SATURDAY);
-    $eventsByDate   = \App\Models\Event::where('client_id', $user->id)
-        ->whereBetween('starts_at', [$firstCalDate, $lastCalDate])
+    /*
+     * The four cards' trend lines.
+     *
+     * Each card carried a hand-drawn rising sparkline and "▲ 0%" — the same
+     * seven points and the same zero for every client, so a card reading
+     * $0.00 sat under a line climbing to the right. A picture of a trend
+     * nobody has is worse than no picture: it is read as one.
+     *
+     * Six months of the client's own history, counted from the timestamps
+     * that already exist. Where there is nothing to compare against, the card
+     * says so rather than drawing a flat claim.
+     */
+    $trendMonths = collect(range(5, 0))->map(fn ($back) => \Carbon\Carbon::now()->startOfMonth()->subMonths($back));
+
+    $seriesFor = function (callable $countFor) use ($trendMonths) {
+        return $trendMonths->map(fn ($m) => (float) $countFor($m->copy(), $m->copy()->endOfMonth()))->all();
+    };
+
+    $spentSeries = $seriesFor(fn ($from, $to) => \App\Models\Payment::where('user_id', $user->id)
+        ->where('status', 'completed')
+        ->whereBetween('created_at', [$from, $to])
+        ->sum('amount'));
+
+    $completedSeries = $seriesFor(fn ($from, $to) => \App\Models\Booking::where('client_id', $user->id)
+        ->where('status', 'completed')
+        ->whereBetween('updated_at', [$from, $to])
+        ->count());
+
+    $savedSeries = $seriesFor(fn ($from, $to) => \Illuminate\Support\Facades\DB::table('saved_professionals')
+        ->where('client_id', $user->id)
+        ->whereBetween('created_at', [$from, $to])
+        ->count());
+
+    // Gigs opened per month — the card's own number is a point-in-time count,
+    // so the line is what was started, which is the thing that has a history.
+    $gigsSeries = $seriesFor(fn ($from, $to) => \App\Models\Event::where('client_id', $user->id)
+        ->whereBetween('created_at', [$from, $to])
+        ->count());
+
+    $savedPros = $user->savedProfessionals()->count();
+
+    /* This month against last, or nothing at all. A percentage needs a figure
+       to be a percentage OF; last month at zero has none. */
+    $trendDelta = function (array $series): ?array {
+        $now  = (float) ($series[count($series) - 1] ?? 0);
+        $prev = (float) ($series[count($series) - 2] ?? 0);
+
+        if ($prev <= 0.0) {
+            return null;
+        }
+
+        $pct = (int) round((($now - $prev) / $prev) * 100);
+
+        return ['pct' => abs($pct), 'up' => $pct >= 0];
+    };
+
+    /* A polyline through the client's own months, scaled to its own peak. */
+    $sparkPoints = function (array $series): ?string {
+        $max = max($series);
+
+        if ($max <= 0.0) {
+            return null;   // nothing happened; draw nothing
+        }
+
+        $step = count($series) > 1 ? 60 / (count($series) - 1) : 60;
+
+        return collect($series)
+            ->map(fn ($v, $i) => round($i * $step, 1) . ',' . round(20 - ($v / $max) * 16, 1))
+            ->implode(' ');
+    };
+
+    /*
+     * Calendar.
+     *
+     * It rendered the current month and nothing else: the ‹ › buttons had no
+     * handler, Today/Month/Week were <span>s that did nothing, and every entry
+     * was painted the same colour beneath a legend naming four statuses the
+     * grid never used. So the panel claimed a colour code it did not have, and
+     * three of its five controls were decoration.
+     *
+     * The month or week being looked at is now part of the address, which is
+     * what makes ‹ › work at all — and makes a particular month something the
+     * client can bookmark or send to us.
+     */
+    $now = \Carbon\Carbon::now();
+
+    $calView = request()->query('calview') === 'week' ? 'week' : 'month';
+
+    // A bad date in the address is not a broken page; it is this month.
+    try {
+        $calAnchor = request()->filled('cal')
+            ? \Carbon\Carbon::createFromFormat('Y-m-d', (string) request()->query('cal'))->startOfDay()
+            : $now->copy();
+    } catch (\Throwable) {
+        $calAnchor = $now->copy();
+    }
+
+    if ($calView === 'week') {
+        $firstCalDate = $calAnchor->copy()->startOfWeek(\Carbon\Carbon::SUNDAY);
+        $lastCalDate  = $calAnchor->copy()->endOfWeek(\Carbon\Carbon::SATURDAY);
+        $calTitle     = $firstCalDate->format('M j') . ' – ' . $lastCalDate->format('M j, Y');
+        $calPrev      = $calAnchor->copy()->subWeek();
+        $calNext      = $calAnchor->copy()->addWeek();
+    } else {
+        $monthStart   = $calAnchor->copy()->startOfMonth();
+        $monthEnd     = $calAnchor->copy()->endOfMonth();
+        $firstCalDate = $monthStart->copy()->startOfWeek(\Carbon\Carbon::SUNDAY);
+        $lastCalDate  = $monthEnd->copy()->endOfWeek(\Carbon\Carbon::SATURDAY);
+        $calTitle     = $calAnchor->format('F Y');
+        $calPrev      = $monthStart->copy()->subMonth();
+        $calNext      = $monthStart->copy()->addMonth();
+    }
+
+    // Keeps whatever else is in the address — the date-range picker above sets
+    // its own parameters and must survive a month change.
+    $calLink = fn (array $over) => route('client.dashboard', array_merge(
+        request()->query(), $over
+    )) . '#calendar';
+
+    $eventsByDate = \App\Models\Event::where('client_id', $user->id)
+        ->whereBetween('starts_at', [$firstCalDate->copy()->startOfDay(), $lastCalDate->copy()->endOfDay()])
+        ->orderBy('starts_at')
         ->get()
         ->groupBy(fn ($e) => $e->starts_at?->format('Y-m-d'));
+
+    /*
+     * The colour says the stage, and the legend lists exactly these.
+     *
+     * Event::stage() is already the one place that decides what an event's
+     * state is — status against is_published, with status winning. Reading it
+     * here means the calendar cannot disagree with the rest of the portal.
+     */
+    $calStages = [
+        'confirmed' => ['Booked', '#10b981'],
+        'open'      => ['Open for proposals', '#f59e0b'],
+        'draft'     => ['Draft — not sent yet', '#9ca3af'],
+        'completed' => ['Completed', '#6366f1'],
+        'cancelled' => ['Cancelled', '#ef4444'],
+    ];
+
+    // Only the stages actually on screen. A legend listing states this month
+    // does not contain is a legend explaining someone else's calendar.
+    $calStagesShown = $eventsByDate->flatten()
+        ->map(fn ($e) => $e->stage())
+        ->unique()
+        ->filter(fn ($st) => isset($calStages[$st]))
+        ->values();
 
     /* No invented calendar entries. A client with nothing booked used to see
        five events they had never created -- Wedding, Baltimore MD; Brand
@@ -629,11 +770,19 @@
             </div>
         </div>
         <div class="od-stat-foot">
-            <div class="od-stat-meta">
-                <span class="od-stat-delta"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>0%</span>
+            <div>
+                @if($__d = $trendDelta($spentSeries))
+                    <span class="od-stat-delta {{ $__d['up'] ? '' : 'is-down' }}">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="{{ $__d['up'] ? '18 15 12 9 6 15' : '18 9 12 15 6 9' }}"/>
+                        </svg>{{ $__d['pct'] }}%
+                    </span>
+                @endif
                 <span class="od-stat-sub">All time</span>
             </div>
-            <svg class="od-stat-spark" width="58" height="22" viewBox="0 0 60 22" fill="none"><polyline points="0,18 10,13 20,15 30,8 40,11 50,4 60,6" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            @if($__pts = $sparkPoints($spentSeries))
+                <svg class="od-stat-spark" width="58" height="22" viewBox="0 0 60 22" fill="none" aria-hidden="true"><polyline points="{{ $__pts }}" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            @endif
         </div>
     </div>
 
@@ -648,11 +797,19 @@
             </div>
         </div>
         <div class="od-stat-foot">
-            <div class="od-stat-meta">
-                <span class="od-stat-delta"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>0%</span>
+            <div>
+                @if($__d = $trendDelta($gigsSeries))
+                    <span class="od-stat-delta {{ $__d['up'] ? '' : 'is-down' }}">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="{{ $__d['up'] ? '18 15 12 9 6 15' : '18 9 12 15 6 9' }}"/>
+                        </svg>{{ $__d['pct'] }}%
+                    </span>
+                @endif
                 <span class="od-stat-sub">In progress</span>
             </div>
-            <svg class="od-stat-spark" width="58" height="22" viewBox="0 0 60 22" fill="none"><polyline points="0,14 10,16 20,11 30,13 40,8 50,11 60,6" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            @if($__pts = $sparkPoints($gigsSeries))
+                <svg class="od-stat-spark" width="58" height="22" viewBox="0 0 60 22" fill="none" aria-hidden="true"><polyline points="{{ $__pts }}" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            @endif
         </div>
     </div>
 
@@ -667,11 +824,19 @@
             </div>
         </div>
         <div class="od-stat-foot">
-            <div class="od-stat-meta">
-                <span class="od-stat-delta"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>0%</span>
+            <div>
+                @if($__d = $trendDelta($completedSeries))
+                    <span class="od-stat-delta {{ $__d['up'] ? '' : 'is-down' }}">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="{{ $__d['up'] ? '18 15 12 9 6 15' : '18 9 12 15 6 9' }}"/>
+                        </svg>{{ $__d['pct'] }}%
+                    </span>
+                @endif
                 <span class="od-stat-sub">All time</span>
             </div>
-            <svg class="od-stat-spark" width="58" height="22" viewBox="0 0 60 22" fill="none"><polyline points="0,16 10,13 20,11 30,9 40,9 50,6 60,4" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            @if($__pts = $sparkPoints($completedSeries))
+                <svg class="od-stat-spark" width="58" height="22" viewBox="0 0 60 22" fill="none" aria-hidden="true"><polyline points="{{ $__pts }}" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            @endif
         </div>
     </div>
 
@@ -682,15 +847,24 @@
             </div>
             <div>
                 <div class="od-stat-label">Saved Professionals</div>
-                <div class="od-stat-value">0</div>
+                {{-- Was the literal 0, whatever the client had saved. --}}
+                <div class="od-stat-value">{{ number_format($savedPros) }}</div>
             </div>
         </div>
         <div class="od-stat-foot">
-            <div class="od-stat-meta">
-                <span class="od-stat-delta"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>0%</span>
+            <div>
+                @if($__d = $trendDelta($savedSeries))
+                    <span class="od-stat-delta {{ $__d['up'] ? '' : 'is-down' }}">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="{{ $__d['up'] ? '18 15 12 9 6 15' : '18 9 12 15 6 9' }}"/>
+                        </svg>{{ $__d['pct'] }}%
+                    </span>
+                @endif
                 <span class="od-stat-sub">Favorites</span>
             </div>
-            <svg class="od-stat-spark" width="58" height="22" viewBox="0 0 60 22" fill="none"><polyline points="0,12 10,9 20,13 30,7 40,9 50,5 60,3" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            @if($__pts = $sparkPoints($savedSeries))
+                <svg class="od-stat-spark" width="58" height="22" viewBox="0 0 60 22" fill="none" aria-hidden="true"><polyline points="{{ $__pts }}" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            @endif
         </div>
     </div>
 </div>
@@ -859,16 +1033,23 @@
             <div class="od-card-head">
                 <span class="od-card-title">My Calendar &amp; Availability</span>
             </div>
-            <div class="od-cal-head">
+            {{-- Links, not buttons with nothing behind them: the month being
+                 looked at is in the address, so ‹ › work without script and
+                 the view survives a reload or a shared link. --}}
+            <div class="od-cal-head" id="calendar">
                 <div class="od-cal-month">
-                    <button class="od-cal-nav-btn" aria-label="Previous month" type="button" style="background:none;border:1px solid var(--border-color);width:24px;height:24px;border-radius:6px;color:var(--text-muted);cursor:pointer;">‹</button>
-                    <button class="od-cal-nav-btn" aria-label="Next month" type="button" style="background:none;border:1px solid var(--border-color);width:24px;height:24px;border-radius:6px;color:var(--text-muted);cursor:pointer;">›</button>
-                    {{ $now->format('F Y') }}
+                    <a class="od-cal-nav-btn" href="{{ $calLink(['cal' => $calPrev->format('Y-m-d')]) }}"
+                       aria-label="{{ $calView === 'week' ? 'Previous week' : 'Previous month' }}">‹</a>
+                    <a class="od-cal-nav-btn" href="{{ $calLink(['cal' => $calNext->format('Y-m-d')]) }}"
+                       aria-label="{{ $calView === 'week' ? 'Next week' : 'Next month' }}">›</a>
+                    {{ $calTitle }}
                 </div>
                 <div class="od-cal-tabs">
-                    <span class="od-cal-tab">Today</span>
-                    <span class="od-cal-tab is-active">Month</span>
-                    <span class="od-cal-tab">Week</span>
+                    <a class="od-cal-tab" href="{{ $calLink(['cal' => $now->format('Y-m-d')]) }}">Today</a>
+                    <a class="od-cal-tab {{ $calView === 'month' ? 'is-active' : '' }}"
+                       href="{{ $calLink(['calview' => 'month', 'cal' => $calAnchor->format('Y-m-d')]) }}">Month</a>
+                    <a class="od-cal-tab {{ $calView === 'week' ? 'is-active' : '' }}"
+                       href="{{ $calLink(['calview' => 'week', 'cal' => $calAnchor->format('Y-m-d')]) }}">Week</a>
                 </div>
             </div>
             <div class="od-cal">
@@ -882,7 +1063,8 @@
                 @while($cursor <= $lastCalDate)
                     @php
                         $key      = $cursor->format('Y-m-d');
-                        $inMonth  = $cursor->month === $now->month;
+                        // In the week view every day on screen belongs to it.
+                        $inMonth  = $calView === 'week' || $cursor->month === $calAnchor->month;
                         $dayEvs   = $eventsByDate->get($key, collect());
 
                         $classes  = 'od-cal-day';
@@ -892,9 +1074,20 @@
                     @endphp
                     <div class="{{ $classes }}">
                         <div class="od-cal-num">{{ $cursor->day }}</div>
-                        @foreach($dayEvs->take(1) as $ev)
-                            <div class="od-cal-event ev-coral" title="{{ $ev->title }}">{{ \Illuminate\Support\Str::limit($ev->title, 10) }}</div>
+                        @foreach($dayEvs->take(2) as $ev)
+                            @php
+                                $stage = $ev->stage();
+                                [$stageLabel, $stageColour] = $calStages[$stage] ?? ['Event', '#f97316'];
+                            @endphp
+                            {{-- The entry opens the event, and its colour is the
+                                 stage the rest of the portal reports for it. --}}
+                            <a class="od-cal-event" href="{{ route('client.events.show', $ev) }}"
+                               style="background:{{ $stageColour }}1f;color:{{ $stageColour }};"
+                               title="{{ $ev->title }} — {{ $stageLabel }}">{{ \Illuminate\Support\Str::limit($ev->title, 10) }}</a>
                         @endforeach
+                        @if($dayEvs->count() > 2)
+                            <div class="od-cal-more">+{{ $dayEvs->count() - 2 }} more</div>
+                        @endif
                     </div>
                     @php $cursor->addDay(); @endphp
                 @endwhile
@@ -903,16 +1096,21 @@
                 {{-- Says the true thing instead of filling the grid with
                      events the client never created. --}}
                 <p style="font-size:12.5px;opacity:.7;margin:10px 2px 0;">
-                    Nothing scheduled this month.
+                    Nothing scheduled {{ $calView === 'week' ? 'this week' : 'this month' }}.
                     <a href="{{ route('client.post-event.choose') }}" style="font-weight:600;">Post an event</a> to see it here.
                 </p>
             @endif
-            <div class="od-cal-legend">
-                <span><span class="od-cal-legend-dot" style="background:#10b981;"></span>Booked</span>
-                <span><span class="od-cal-legend-dot" style="background:#ef4444;"></span>Pending</span>
-                <span><span class="od-cal-legend-dot" style="background:#f59e0b;"></span>On Hold</span>
-                <span><span class="od-cal-legend-dot" style="background:#9ca3af;"></span>Unavailable</span>
-            </div>
+
+            {{-- Only what is on screen. The legend used to name Booked, Pending,
+                 On Hold and Unavailable — four states this calendar never drew,
+                 under entries that were all one colour. --}}
+            @if($calStagesShown->isNotEmpty())
+                <div class="od-cal-legend">
+                    @foreach($calStagesShown as $stage)
+                        <span><span class="od-cal-legend-dot" style="background:{{ $calStages[$stage][1] }};"></span>{{ $calStages[$stage][0] }}</span>
+                    @endforeach
+                </div>
+            @endif
         </div>
     </div>
 </div>
