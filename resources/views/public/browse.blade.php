@@ -112,13 +112,26 @@
     .br-results-tools { display: flex; align-items: center; gap: 8px; }
     .br-sort { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; font-size: 13px; font-weight: 600; color: var(--ink-2); background: #fff; font-family: inherit; cursor: pointer; }
     .br-viewtoggle { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-    .br-viewtoggle button { border: none; background: #fff; padding: 8px 11px; font-size: 12.5px; font-weight: 700; color: var(--muted); display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
-    .br-viewtoggle button.on { background: var(--bg-soft-2); color: var(--blue); }
+    .br-viewtoggle a { border: none; background: #fff; padding: 8px 11px; font-size: 12.5px; font-weight: 700; color: var(--muted); display: inline-flex; align-items: center; gap: 5px; cursor: pointer; text-decoration: none; }
+    .br-viewtoggle a.on { background: var(--bg-soft-2); color: var(--blue); }
     .br-viewtoggle svg { width: 14px; height: 14px; }
 
     /* provider card */
     .br-pro { display: grid; grid-template-columns: 280px minmax(0,1fr); gap: 0; overflow: hidden; margin-bottom: 16px; }
     .br-pro-media { position: relative; height: 230px; background: linear-gradient(135deg,#e2e8f0,#eef2ff); overflow: hidden; }
+
+    /* List view — the same card, scanned rather than browsed: a narrow strip
+       of picture and a shorter row, so more of them fit on a screen. One card,
+       two shapes; a second markup for the same professional is a second place
+       to forget a change. */
+    .br-pro.is-list { grid-template-columns: 132px minmax(0,1fr); margin-bottom: 10px; }
+    .br-pro.is-list .br-pro-media { height: 118px; }
+    .br-pro.is-list .br-pro-body { padding: 12px 14px; }
+    .br-pro.is-list .br-pro-dots, .br-pro.is-list .br-pro-tag { display: none; }
+    @media (max-width: 640px) {
+        .br-pro.is-list { grid-template-columns: 96px minmax(0,1fr); }
+        .br-pro.is-list .br-pro-media { height: 104px; }
+    }
     .br-pro-hero { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: opacity .55s ease; }
     .br-pro-hero.on { opacity: 1; }
     .br-pro-tag { position: absolute; left: 10px; top: 10px; z-index: 2; background: rgba(255,255,255,.94); color: #0f1b35; font-size: 11px; font-weight: 800; padding: 5px 11px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(15,27,53,.18); text-transform: capitalize; }
@@ -135,6 +148,9 @@
     .br-pro-loc svg { width: 13px; height: 13px; color: var(--orange); }
     .br-fav { border: 1px solid var(--line); background: #fff; width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
     .br-fav svg { width: 16px; height: 16px; color: var(--muted); }
+    .br-fav.is-on { border-color: #fecaca; background: #fff1f2; }
+    .br-fav.is-on svg { color: #e11d48; }
+    .br-fav-form { display: inline-flex; }
     .br-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
     .br-chip { font-size: 10.5px; font-weight: 800; padding: 4px 9px; border-radius: 6px; letter-spacing: .2px; }
     .br-chip.verif { background: #fef3e8; color: #c2590a; }
@@ -407,9 +423,13 @@
                                 <option value="newest" @selected($sortF==='newest')>Sort by: Newest</option>
                             </select>
                         </form>
+                        {{-- Links, so they carry the filters already applied and
+                             the live-filter script picks them up like every other
+                             control here. They were buttons with no handler. --}}
+                        @php $viewLink = fn (string $v) => route('public.browse', array_merge(request()->except('page'), ['view' => $v])); @endphp
                         <div class="br-viewtoggle">
-                            <button type="button" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> Grid</button>
-                            <button type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> List</button>
+                            <a href="{{ $viewLink('grid') }}" class="{{ $view === 'grid' ? 'on' : '' }}" aria-pressed="{{ $view === 'grid' ? 'true' : 'false' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> Grid</a>
+                            <a href="{{ $viewLink('list') }}" class="{{ $view === 'list' ? 'on' : '' }}" aria-pressed="{{ $view === 'list' ? 'true' : 'false' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> List</a>
                         </div>
                     </div>
                 </div>
@@ -444,7 +464,7 @@
                         // Prefer a real service the pro signed up for over free-text skills.
                         $catB = $pro->serviceCategories->first()?->name ?: ($skillsB[0] ?? ($p?->industry ?: 'Event Pro'));
                     @endphp
-                    <article class="br-card br-pro">
+                    <article class="br-card br-pro {{ $view === 'list' ? 'is-list' : '' }}">
                         <div class="br-pro-media">
                             @forelse($bg as $gi => $img)
                                 <img class="br-pro-hero {{ $gi === 0 ? 'on' : '' }}" src="{{ $img }}" alt="{{ $pro->name }}" loading="lazy">
@@ -483,7 +503,28 @@
                                         {{ $p?->city ?? 'Location on request' }}
                                     </div>
                                 </div>
-                                <button type="button" class="br-fav" aria-label="Save to favorites"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></button>
+                                {{-- The heart had no handler at all: a control on
+                                     every card, with routes behind it that nothing
+                                     ever called, so "Saved Professionals" could only
+                                     ever read zero. It posts now. --}}
+                                @auth
+                                    @php $isSaved = in_array($pro->id, $savedIds, true); @endphp
+                                    <form method="POST" class="br-fav-form"
+                                          action="{{ $isSaved
+                                              ? route('client.saved-professionals.destroy', $pro)
+                                              : route('client.saved-professionals.store') }}">
+                                        @csrf
+                                        @if($isSaved)
+                                            @method('DELETE')
+                                        @else
+                                            <input type="hidden" name="professional_id" value="{{ $pro->id }}">
+                                        @endif
+                                        <button type="submit" class="br-fav {{ $isSaved ? 'is-on' : '' }}"
+                                                aria-pressed="{{ $isSaved ? 'true' : 'false' }}"
+                                                aria-label="{{ $isSaved ? 'Remove ' . $pro->name . ' from My Professionals' : 'Save ' . $pro->name . ' to My Professionals' }}"
+                                                title="{{ $isSaved ? 'Saved — press to remove' : 'Save to My Professionals' }}"><svg viewBox="0 0 24 24" fill="{{ $isSaved ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></button>
+                                    </form>
+                                @endauth
                             </div>
 
                             <div class="br-chips">
@@ -794,8 +835,20 @@
 
     // Merge every filter form into one query string — the hero and the sidebar
     // each hold half of the state, and submitting one must not drop the other.
+    /* Settings that are not in any form, and so are not rebuilt from one.
+       Grid/list is a link, not a field; without this, ticking any filter
+       rebuilt the query from the forms alone and quietly put the results back
+       into grid. */
+    var CARRIED = ['view'];
+
     function currentUrl(changed) {
         var params = new URLSearchParams();
+        var here = new URL(location.href).searchParams;
+
+        CARRIED.forEach(function (k) {
+            if (here.has(k)) params.set(k, here.get(k));
+        });
+
         document.querySelectorAll('form.br-search, form.br-card, #brSortForm').forEach(function (f) {
             collect(f).forEach(function (v, k) { params.set(k, v); });
         });
@@ -836,12 +889,23 @@
     }
 
 
-    // Pager, city rail, trending row and the "clear" links are plain anchors.
+    /* Pager, city rail, trending row, the view toggle and the "clear" links
+       are plain anchors — they work with the script off, and with it on they
+       swap the results instead of reloading.
+
+       The path is read from the route rather than written here: this page
+       moved from /browse to /find-professionals, and the hard-coded "/browse"
+       stopped matching, so every one of these quietly went back to a full page
+       load. */
+    var PAGE_PATH = @json(parse_url(route('public.browse'), PHP_URL_PATH));
+
     document.addEventListener('click', function (e) {
-        var a = e.target.closest('#brResults a[href*="/browse"], .br-loc-row, .br-loc-clear, .br-vibe, .br-fclear');
-        if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
+        var a = e.target.closest('#brResults a, .br-loc-row, .br-loc-clear, .br-vibe, .br-fclear');
+        if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+
         var href = a.getAttribute('href') || '';
-        if (href.indexOf('/browse') === -1) return;
+        if (href.indexOf(PAGE_PATH) === -1) return;
+
         e.preventDefault();
         load(a.href);
     });

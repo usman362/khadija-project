@@ -46,6 +46,16 @@ class BrowseProfessionalsController extends Controller
         $rateMax   = (int) $request->query('rate_max', 0);
         $sort      = (string) $request->query('sort', 'top');
 
+        /*
+         * Grid or list.
+         *
+         * The two buttons above the results were <button type="button"> with
+         * no handler and "Grid" hard-coded as the selected one — three of this
+         * page's controls were live and this pair was a picture of a control.
+         * The choice is in the address now, like every other filter here.
+         */
+        $view = $request->query('view') === 'list' ? 'list' : 'grid';
+
         // Base query: only suppliers, with their profile for card details.
         // We eager-load the profile so the card can render city / headline /
         // hourly rate / verification badges without N+1 queries.
@@ -338,6 +348,12 @@ class BrowseProfessionalsController extends Controller
          * page load to fill a control nothing else on this page read.
          */
         return view('public.browse', [
+            'view'       => $view,
+            // Which of these are already saved, so the heart shows its state
+            // rather than looking the same whatever you have done.
+            'savedIds'   => $request->user()
+                ? $request->user()->savedProfessionals()->pluck('users.id')->all()
+                : [],
             'pros'       => $pros,
             'categories' => $categories,
             'cities'     => $cities,
@@ -353,6 +369,16 @@ class BrowseProfessionalsController extends Controller
                 'sort'       => $sort,
                 'category'   => $category?->slug,
                 'zip'        => $nearZip,
+                /*
+                 * Grid or list travels with every link built from $filters —
+                 * the city rail, the trending row, the pager. Without it,
+                 * clicking a city while reading a list put the results back
+                 * into grid, which reads as the toggle undoing itself.
+                 *
+                 * 'grid' is the default, so it is left out of the address
+                 * rather than written into every link.
+                 */
+                'view'       => $view === 'list' ? 'list' : null,
             ],
             'activeCategory'  => $category,
             'trending'        => $trending,
