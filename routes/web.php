@@ -1357,7 +1357,19 @@ Route::middleware('auth')->group(function () {
 Route::post('/webhooks/stripe', [PaymentWebhookController::class, 'stripe'])->name('webhooks.stripe');
 Route::post('/webhooks/paypal', [PaymentWebhookController::class, 'paypal'])->name('webhooks.paypal');
 
-// ── Deploy Helper Routes (public, no auth) ──────────────────────────────
+/*
+ * ── Deploy helpers ──────────────────────────────────────────────────────
+ *
+ * Behind a shared key now. These were public: anybody who guessed the path
+ * could pull code onto production, run migrations, or run a seeder — and
+ * running the category seeder on this site once created a second copy of every
+ * category, which the client read as their pictures having been deleted.
+ *
+ * Called as https://…/deploy/migrate?key=THE_KEY, or with an X-Deploy-Key
+ * header. No key configured means the endpoints are closed.
+ */
+Route::middleware(\App\Http\Middleware\DeployKey::class)->group(function () {
+
 Route::get('/deploy/git-pull', function () {
     $output = [];
     exec('cd ' . base_path() . ' && git pull 2>&1', $output, $returnCode);
@@ -1412,4 +1424,6 @@ Route::get('/deploy/cache-clear', function () {
         'success' => true,
         'output' => 'All caches cleared.',
     ]);
+});
+
 });
