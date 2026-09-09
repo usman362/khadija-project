@@ -144,4 +144,30 @@ class ServiceCoverageIsShownWhenPickingTest extends TestCase
             ])
             ->assertRedirect(route('client.bsr.step', 'event'));
     }
+
+    /**
+     * A row is box · name · count, lined up on the name's first line.
+     *
+     * The row was a centred flex line, so a two-line service name pushed the
+     * checkbox halfway down it and left the count floating beside the middle
+     * of the words. Three columns, aligned to the top, keeps the boxes in one
+     * line down the page and the numbers in another.
+     */
+    public function test_the_service_rows_line_up(): void
+    {
+        $html = $this->actingAs($this->client)
+            ->get(route('client.bsr.step', 'service'))
+            ->getContent();
+
+        $this->assertMatchesRegularExpression(
+            '/\.bw-svc label \{[^}]*display:\s*grid/',
+            $html,
+            'The row is still a centred flex line, so a two-line name knocks it out of alignment.',
+        );
+
+        $this->assertMatchesRegularExpression(
+            '/\.bw-svc label \{[^}]*align-items:\s*start/',
+            $html,
+        );
+    }
 }

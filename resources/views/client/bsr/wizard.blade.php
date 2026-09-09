@@ -71,10 +71,9 @@
     .bw-locopt b { display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); }
     .bw-locopt small { display: block; font-size: 11.5px; color: var(--text-muted); line-height: 1.35; margin-top: 1px; }
     /* The count of professionals beside each service. */
-    .bw-svc-name { flex: 1; min-width: 0; }
-    .bw-svc-pros { flex: none; min-width: 20px; text-align: center; font-size: 10.5px; font-weight: 800;
+    .bw-svc-pros { min-width: 22px; text-align: center; font-size: 10.5px; font-weight: 800;
         color: var(--text-muted); background: var(--bg-page, #f1f5f9); border-radius: 999px;
-        padding: 1px 6px; }
+        padding: 2px 6px; line-height: 1.3; }
     .bw-svc-pros.is-none { color: #b45309; background: rgba(245,158,11,.16); }
     .bw-loclabel { display: block; font-size: 12px; font-weight: 700; color: var(--text-primary); margin: 12px 0 5px; }
     .bw-locmine { border: 0; background: none; padding: 0; font: inherit; font-weight: 700; color: var(--brand, #f97316); cursor: pointer; text-decoration: underline; }
@@ -165,8 +164,19 @@
     .bw-focus span { color:#047857; font-size:12.5px; }
     .bw-focus a { color:#065f46; font-weight:800; text-decoration:underline; }
     .bw-svc { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; max-height: 320px; overflow-y: auto; padding: 4px; border: 1px solid var(--border-color); border-radius: 12px; }
-    .bw-svc label { display: flex; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 9px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+    /* A row is: box · name · count.
+       align-items was center, which put the checkbox halfway down a two-line
+       name and left the count floating in the middle of nowhere beside it.
+       Everything lines up with the FIRST line of the name, and the count sits
+       in a column of its own so the numbers read down the page. */
+    .bw-svc label { display: grid; grid-template-columns: 15px minmax(0, 1fr) 26px;
+        gap: 9px; align-items: start; padding: 8px 10px; border-radius: 9px;
+        font-size: 13px; line-height: 1.35; color: var(--text-secondary); cursor: pointer; }
     .bw-svc label:has(input:checked) { background: rgba(249,115,22,.09); color: var(--text-primary); font-weight: 700; }
+    /* Nudged onto the first line's baseline rather than the box's own top. */
+    .bw-svc label input { margin: 1px 0 0; }
+    .bw-svc-name { min-width: 0; }
+    .bw-svc-pros { justify-self: end; margin-top: 1px; }
 
     .bw-scope { display: flex; gap: 8px; align-items: center; background: rgba(37,99,235,.07); border: 1px solid rgba(37,99,235,.2); border-radius: 11px; padding: 10px 14px; font-size: 12.5px; color: var(--text-secondary); margin-top: 12px; }
     .bw-scope b { color: var(--text-primary); }
