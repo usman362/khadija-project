@@ -51,10 +51,10 @@ return [
             'citation'     => null,
             'effective'    => '2018-01',
             'requires'     => 'Notify the member before the first renewal and before every renewal after it.',
-            'status'       => 'todo',
-            'implemented'  => null,
-            'done_on'      => null,
-            'note'         => 'No renewal notice of any kind exists today. Needs a scheduled job — and a scheduler switched on at the host, because nothing runs on a schedule on this site yet.',
+            'status'       => 'done',
+            'implemented'  => 'subscriptions:renewal-notices runs daily at 06:00 and emails every member 30 days and 7 days before their membership renews. Each notice is recorded in subscription_renewal_notices before it is sent, so the same one cannot go twice and we can show what was sent, to whom and when.',
+            'done_on'      => '2026-09',
+            'note'         => 'Sent to every member rather than by state — where somebody lives is not reliably known. Lead times are in config/subscriptions.php, so a state that names a specific window is a settings change. DEPENDS ON the host running Laravel\'s scheduler; two other jobs already rely on it, so if those run, this runs.',
         ],
 
         [

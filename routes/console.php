@@ -20,3 +20,16 @@ Schedule::command('agreements:purge-old-pdfs')
     ->dailyAt('03:20')
     ->withoutOverlapping()
     ->onOneServer();
+
+/*
+ * Renewal notices — Washington DC, Automatic Renewal Protections Act of 2018.
+ *
+ * Early, because a member who reads it over breakfast still has the whole day
+ * to cancel before the charge. Each notice is recorded before it is sent and
+ * the record is unique per renewal, so a second run in the same day sends
+ * nothing twice.
+ */
+Schedule::command('subscriptions:renewal-notices')
+    ->dailyAt('06:00')
+    ->withoutOverlapping()
+    ->onOneServer();
