@@ -134,7 +134,11 @@
     .bw-caveat { margin-top: 16px; border: 1px solid var(--border-color); border-left: 3px solid var(--accent-blue, #6366f1);
                  border-radius: 10px; padding: 12px 14px; font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
 
-    .bw-note { border: 1px dashed var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    /* Room above as well as below. It only ever followed something with its
+       own bottom margin, so the missing top margin never showed — until one
+       sat directly under the service grid and touched it. Adjacent margins
+       collapse, so the notes that were already spaced are unchanged. */
+    .bw-note { border: 1px dashed var(--border-color); border-radius: 12px; padding: 20px; margin: 16px 0; }
     .bw-note.warn { border-style: solid; border-color: rgba(245,158,11,.4); background: rgba(245,158,11,.06); }
     .bw-note b { display: block; font-size: 14px; color: var(--text-primary); margin-bottom: 6px; }
     .bw-note p { font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.6; }
