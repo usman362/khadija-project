@@ -211,4 +211,33 @@ class BrowseControlsAreLiveTest extends TestCase
         $this->assertStringContainsString('category='.$second->slug, $two);
         $this->assertStringNotContainsString('category='.$first->slug, $two);
     }
+
+    /**
+     * The search fields do not offer the browser's saved entries.
+     *
+     * "off" alone is not enough on a field called city or zip: those names are
+     * address tokens, and a browser fills them from the saved address book
+     * whatever the page asks — which is why old searches kept reappearing. An
+     * unrecognised token is read as "no autofill".
+     */
+    public function test_the_search_fields_do_not_autofill(): void
+    {
+        $html = $this->page();
+
+        // Every form, and every text field on them.
+        $this->assertSame(3, substr_count($html, 'method="GET" autocomplete="off"'));
+
+        $this->assertMatchesRegularExpression('/name="city"[^>]*autocomplete="not-an-address"/s', $html);
+        $this->assertMatchesRegularExpression('/name="zip"[^>]*autocomplete="not-a-postcode"/s', $html);
+        $this->assertMatchesRegularExpression('/name="q"[^>]*autocomplete="off"/s', $html);
+    }
+
+    /** The icons say what the control is. */
+    public function test_the_service_picker_is_not_a_musical_note(): void
+    {
+        $html = $this->page();
+
+        // The note's own path, which sat beside a list of catering and venues.
+        $this->assertStringNotContainsString('M9 18V5l12-2v13', $html);
+    }
 }

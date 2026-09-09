@@ -297,9 +297,12 @@
             <h1 class="br-h1">Find Your <span class="b">Vibe</span>. Book the <span class="o">Pro</span>. ✨</h1>
             <p class="br-hero-sub">Every verified event professional, right at your fingertips.</p>
 
-            <form action="{{ route('public.browse') }}" method="GET" class="br-search">
+            <form action="{{ route('public.browse') }}" method="GET" autocomplete="off" class="br-search">
                 <div class="br-sfield">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                    {{-- Four tiles, not a musical note. This field picks a service
+                         category — catering, venues, staffing — and a music icon
+                         said the list was about music. --}}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
                     {{-- Scopes by the real relation, same as the trending row and the
                          category landing pages — it used to post the category NAME as a
                          keyword, which only matched pros whose free text happened to
@@ -313,7 +316,17 @@
                 </div>
                 <div class="br-sfield">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    <input type="text" name="city" value="{{ $cityF }}" placeholder="City or location" list="br-cities" autocomplete="off">
+                    {{-- "off" is not enough on a field called city or zip.
+                         Those names are address tokens, and a browser fills
+                         them from the saved address book whatever the page
+                         asks — which is why old entries kept appearing here.
+                         An unrecognised token is read as "no autofill", and
+                         the two data- attributes are the password managers'
+                         own opt-outs. The city list we offer is the datalist
+                         below, which is ours and current. --}}
+                    <input type="text" name="city" value="{{ $cityF }}" placeholder="City or location"
+                           list="br-cities" autocomplete="not-an-address" autocapitalize="off"
+                           spellcheck="false" data-lpignore="true" data-form-type="other">
                     <datalist id="br-cities">@foreach($cities as $c)<option value="{{ $c }}">@endforeach</datalist>
                 </div>
                 {{-- "Any date" and "Within 25 miles" used to sit here. Neither was
@@ -322,7 +335,9 @@
                      away. Replaced by a keyword box, which the search does use. --}}
                 <div class="br-sfield">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="text" name="q" value="{{ $kw }}" placeholder="Name, skill or keyword" autocomplete="off">
+                    <input type="text" name="q" value="{{ $kw }}" placeholder="Name, skill or keyword"
+                           autocomplete="off" autocapitalize="off" spellcheck="false"
+                           data-lpignore="true" data-form-type="other">
                 </div>
                 <button type="submit" class="br-find">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -335,7 +350,9 @@
                 <span class="br-tb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> License-Verified Pros</span>
                 <span class="br-tb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Secure Booking</span>
                 <span class="br-tb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Quick Reply Times</span>
-                <span class="br-tb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg> Dedicated Support</span>
+                {{-- A headset with a mic. Plain headphones are for listening; this line is
+                     about somebody answering. --}}
+                <span class="br-tb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16v-4a8 8 0 0 1 16 0v4"/><path d="M20 17a2 2 0 0 1-2 2h-1a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h3zM4 17a2 2 0 0 0 2 2h1a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1H4z"/><path d="M20 19v1a3 3 0 0 1-3 3h-3"/><circle cx="13" cy="23" r="1"/></svg> Dedicated Support</span>
             </div>
         </div>
     </section>
@@ -374,7 +391,7 @@
 
             {{-- ── LEFT: POWER FILTERS ── --}}
             <aside class="br-filters">
-                <form action="{{ route('public.browse') }}" method="GET" class="br-card">
+                <form action="{{ route('public.browse') }}" method="GET" autocomplete="off" class="br-card">
                     {{-- Carry the hero's scope so applying a sidebar filter doesn't
                          silently widen the search back out. --}}
                     @if($kw)<input type="hidden" name="q" value="{{ $kw }}">@endif
@@ -391,7 +408,9 @@
 
                     <div class="br-fgroup">
                         <label class="br-flabel">Near ZIP</label>
-                        <input type="text" name="zip" inputmode="numeric" maxlength="10" value="{{ $zipF }}" placeholder="e.g. 21201" class="br-input" style="width:100%;border:1px solid var(--line,#e2e8f0);border-radius:10px;padding:8px 10px;font:inherit;">
+                        <input type="text" name="zip" inputmode="numeric" maxlength="10" value="{{ $zipF }}"
+                               placeholder="e.g. 21201" autocomplete="not-a-postcode" spellcheck="false"
+                               data-lpignore="true" data-form-type="other" class="br-input" style="width:100%;border:1px solid var(--line,#e2e8f0);border-radius:10px;padding:8px 10px;font:inherit;">
                     </div>
 
                     <div class="br-fgroup">
@@ -431,7 +450,7 @@
                 <div class="br-results-head">
                     <div class="br-found">Found: <b>{{ $total }} {{ Str::plural('Pro', $total) }}</b>{{ $cityF ? ' near '.$cityF : '' }}{{ $kw ? ' for “'.Str::title($kw).'”' : '' }}</div>
                     <div class="br-results-tools">
-                        <form action="{{ route('public.browse') }}" method="GET" id="brSortForm">
+                        <form action="{{ route('public.browse') }}" method="GET" autocomplete="off" id="brSortForm">
                             @if($kw)<input type="hidden" name="q" value="{{ $kw }}">@endif
                             @if($cityF)<input type="hidden" name="city" value="{{ $cityF }}">@endif
                             @if($ratingF)<input type="hidden" name="rating_min" value="{{ $ratingF }}">@endif
