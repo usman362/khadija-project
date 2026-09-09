@@ -305,6 +305,38 @@
         overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .od-agenda-body small { font-size: 11.5px; font-weight: 600; }
     .od-agenda-empty { font-size: 12.5px; opacity: .75; margin: 14px 2px; }
+
+    /* ── While a panel is being fetched ──────────────────────────
+       The click is answered at once — the control that was pressed takes its
+       selected state immediately and the panel it changes goes quiet — so the
+       wait reads as "working", not as "nothing happened". */
+    .od-live { position: relative; transition: opacity .12s ease; }
+    .od-live.is-busy { opacity: .45; pointer-events: none; }
+
+    /* A thin indeterminate bar along the top of whatever is being replaced. */
+    .od-live.is-busy::after {
+        content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px;
+        border-radius: 2px; overflow: hidden;
+        background: linear-gradient(90deg,
+            transparent 0%, var(--brand, #f97316) 35%, var(--brand, #f97316) 65%, transparent 100%);
+        background-size: 42% 100%; background-repeat: no-repeat;
+        animation: odSweep .9s linear infinite;
+    }
+    @keyframes odSweep {
+        from { background-position: -45% 0; }
+        to   { background-position: 145% 0; }
+    }
+
+    /* The control that was just pressed, before the answer arrives. */
+    .od-cal-tab.is-pending, .od-daterange-opt.is-pending {
+        background: rgba(249, 115, 22, 0.10); color: var(--brand-text);
+        border-color: rgba(249, 115, 22, 0.30);
+    }
+    .od-cal-nav-btn.is-pending { background: var(--bg-card-hover); color: var(--text-primary); }
+
+    @media (prefers-reduced-motion: reduce) {
+        .od-live.is-busy::after { animation: none; background: var(--brand, #f97316); }
+    }
     .od-cal-num { font-weight: 600; color: var(--text-primary); font-size: 11.5px; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; }
     /* Today — number sits in a solid orange circle (matches reference). */
     .od-cal-day.today .od-cal-num { background: #c2410c; color: #fff;  /* 2.80 -> 5.18 */ border-radius: 50%; font-weight: 800; }
@@ -835,7 +867,7 @@
 {{-- ── Date range selector (top-right) ──────────────────────── --}}
 {{-- A real period, not a label. This printed the current month and did
      nothing, above four cards that all said "All time". --}}
-<div class="od-daterange-row" id="odPeriod">
+<div class="od-daterange-row od-live" id="odPeriod">
     <details class="od-daterange-wrap">
         <summary class="od-daterange">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -852,7 +884,7 @@
 </div>
 
 {{-- ── Stats row (4 cards) ────────────────────────────────────── --}}
-<div class="od-stats" id="odStats">
+<div class="od-stats od-live" id="odStats">
     <div class="od-stat">
         <div class="od-stat-head">
             <div class="od-stat-ico coral">
@@ -1123,7 +1155,7 @@
 
     {{-- Calendar — its own tall card on the right column --}}
     <div class="od-top-right">
-        <div class="od-card" id="odCalCard">
+        <div class="od-card od-live" id="odCalCard">
             <div class="od-card-head">
                 <span class="od-card-title">My Calendar &amp; Availability</span>
             </div>
@@ -1360,10 +1392,42 @@
         if (here && fresh) here.replaceWith(fresh);
     }
 
+    function each(fn) {
+        PANELS.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) fn(el);
+        });
+    }
+
+    /* Held back by a beat.
+       The answer usually arrives in well under a tenth of a second, and a
+       loading state that appears and disappears inside that reads as a flicker
+       — worse than no loading state at all. It is shown only once the wait is
+       long enough to be noticed. */
+    var BUSY_AFTER_MS = 140;
+    var busyTimer = null;
+
+    function busyOn() {
+        clearTimeout(busyTimer);
+        busyTimer = setTimeout(function () {
+            each(function (el) {
+                el.classList.add('od-live', 'is-busy');
+                el.setAttribute('aria-busy', 'true');
+            });
+        }, BUSY_AFTER_MS);
+    }
+
+    function busyOff() {
+        clearTimeout(busyTimer);
+        each(function (el) {
+            el.classList.remove('is-busy');
+            el.setAttribute('aria-busy', 'false');
+        });
+    }
+
     function go(url, push) {
         var mine = ++busy;
-        var card = document.getElementById('odCalCard');
-        if (card) card.setAttribute('aria-busy', 'true');
+        busyOn();
 
         fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
             .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
@@ -1378,10 +1442,7 @@
             })
             // Whatever went wrong, the link still works the ordinary way.
             .catch(function () { window.location.href = url; })
-            .then(function () {
-                var c = document.getElementById('odCalCard');
-                if (c && mine === busy) c.setAttribute('aria-busy', 'false');
-            });
+            .then(function () { if (mine === busy) busyOff(); });
     }
 
     // Delegated: both panels are replaced wholesale, so a listener bound to
@@ -1395,6 +1456,18 @@
         // Close the period menu behind the click.
         var open = a.closest('details');
         if (open) open.open = false;
+
+        /* Answer the press before the server does.
+           The control that was clicked takes the selected look straight away,
+           so the wait reads as "working" rather than as a dead button — the
+           swap replaces these nodes a moment later anyway. */
+        var group = a.closest('.od-cal-tabs, .od-daterange-menu');
+        if (group) {
+            group.querySelectorAll('.is-active, .is-pending').forEach(function (el) {
+                el.classList.remove('is-active', 'is-pending');
+            });
+        }
+        a.classList.add('is-pending');
 
         go(a.href);
     });

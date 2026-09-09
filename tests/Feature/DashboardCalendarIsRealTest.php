@@ -332,4 +332,26 @@ class DashboardCalendarIsRealTest extends TestCase
         $next = $this->calendar(['calview' => 'day', 'cal' => now()->addDay()->format('Y-m-d')]);
         $this->assertStringContainsString('Tomorrow Job', $next);
     }
+
+    /**
+     * The wait is answered on screen.
+     *
+     * On a slow connection a press sat for a second or two with nothing to
+     * show for it, which reads as a dead button. The panels being fetched take
+     * a quiet state with a moving bar — but only after a beat, because a
+     * loading state that appears and disappears inside a tenth of a second is
+     * a flicker, and worse than none.
+     */
+    public function test_the_page_has_something_to_show_while_it_waits(): void
+    {
+        $html = $this->dashboard();
+
+        foreach (['od-live', 'is-busy', 'is-pending', 'odSweep', 'BUSY_AFTER_MS'] as $piece) {
+            $this->assertStringContainsString($piece, $html,
+                "The loading state is missing its {$piece}.");
+        }
+
+        // And it is not left on: something has to take it off again.
+        $this->assertStringContainsString('busyOff', $html);
+    }
 }
