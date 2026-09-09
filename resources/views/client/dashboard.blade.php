@@ -68,6 +68,18 @@
     .od-stat-spark { flex-shrink: 0; opacity: 0.9; }
     .od-stat-delta.is-down { color: var(--bad-text, #dc2626); }
 
+    /* Client badges */
+    .od-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .od-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;
+        color: var(--text-primary); background: rgba(249,115,22,.10); border: 1px solid rgba(249,115,22,.28);
+        border-radius: 999px; padding: 5px 11px; }
+    .od-badge i { font-style: normal; font-size: 13px; }
+    .od-badge-next b { display: block; font-size: 12.5px; color: var(--text-primary); }
+    .od-badge-next span { display: block; font-size: 12px; color: var(--text-muted); line-height: 1.5; margin: 2px 0 7px; }
+    .od-badge-bar { height: 5px; border-radius: 999px; background: var(--border-color); overflow: hidden; }
+    .od-badge-bar i { display: block; height: 100%; background: var(--brand, #f97316); border-radius: 999px; }
+    .od-badge-next small { display: block; margin-top: 5px; font-size: 11px; color: var(--text-muted); }
+
     /* Main grid: Emergency · Client Profile · Special Badges · Calendar */
     /* Top zone: left column = Emergency/Profile/Badges (row A) + Gigs/Bookings
        (row B) stacked; right column = Calendar as its own tall card. The two
@@ -1072,11 +1084,40 @@
         <div class="od-card-head">
             <span class="od-card-title">Client Badges</span>
         </div>
-        <p style="font-size:12.5px;color:var(--text-muted);line-height:1.6;margin:0;">
-            You have no badges yet. Badges are awarded from what you actually do on
-            GigResource — events completed, paying on time, and coming back to the
-            same professionals.
-        </p>
+
+        {{-- The card said what earns a badge and then never awarded one. These
+             are those same three sentences, measured: events completed, paid on
+             or before the balance was due, and professionals booked more than
+             once. Counted from the record on every load, so a badge cannot
+             outlive the thing that earned it. --}}
+        @php $__badges = \App\Domain\Badges\ClientBadges::progressFor($user); @endphp
+
+        @if($__badges->where('earned', true)->isNotEmpty())
+            <div class="od-badges">
+                @foreach($__badges->where('earned', true) as $b)
+                    <span class="od-badge" title="{{ $b['blurb'] }}">
+                        <i>{{ $b['icon'] }}</i>{{ $b['name'] }}
+                    </span>
+                @endforeach
+            </div>
+        @endif
+
+        @php $__next = $__badges->where('earned', false)->first(); @endphp
+
+        @if($__next)
+            {{-- What is left to do, rather than an empty panel that reads as
+                 "you have nothing". --}}
+            <div class="od-badge-next">
+                <b>{{ $__next['icon'] }} {{ $__next['name'] }}</b>
+                <span>{{ $__next['blurb'] }}</span>
+                <div class="od-badge-bar"><i style="width: {{ $__next['need'] > 0 ? round(($__next['progress'] / $__next['need']) * 100) : 0 }}%;"></i></div>
+                <small>{{ $__next['progress'] }} of {{ $__next['need'] }}</small>
+            </div>
+        @elseif($__badges->isNotEmpty())
+            <p style="font-size:12.5px;color:var(--text-muted);line-height:1.6;margin:10px 0 0;">
+                That is every badge — all of them earned.
+            </p>
+        @endif
     </div>
 
 
