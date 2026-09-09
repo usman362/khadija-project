@@ -93,4 +93,43 @@ class LongDropdownsAreSearchableTest extends TestCase
         $this->assertStringContainsString('name="event_type"', $html);
         $this->assertStringContainsString('ss-host', $html);
     }
+
+    /**
+     * The panel escapes the card it lives in.
+     *
+     * The request forms and the wizard steps put these controls inside cards
+     * that clip their overflow, so an absolutely positioned panel was cut off
+     * at the card's edge — on the Direct Request page the search box appeared
+     * and the list under it could not be seen at all. Fixed positioning takes
+     * it out of every clipping context.
+     */
+    public function test_the_panel_is_not_clipped_by_the_card_it_sits_in(): void
+    {
+        $html = $this->actingAs($this->client)
+            ->get(route('client.direct-offers.create'))
+            ->assertSuccessful()
+            ->getContent();
+
+        $this->assertMatchesRegularExpression(
+            '/\.ss-panel\s*\{[^}]*position:\s*fixed/',
+            $html,
+            'The panel is positioned inside its card, so a card that clips will cut it off.',
+        );
+
+        // Fixed means nothing moves it on its own; it is placed from the
+        // control's own rectangle, and kept there while it is open.
+        $this->assertStringContainsString('getBoundingClientRect()', $html);
+        $this->assertStringContainsString('requestAnimationFrame', $html);
+    }
+
+    /** It opens upwards when there is no room below. */
+    public function test_it_opens_upwards_when_it_has_to(): void
+    {
+        $html = $this->actingAs($this->client)
+            ->get(route('client.direct-offers.create'))
+            ->getContent();
+
+        $this->assertStringContainsString('panel.style.bottom', $html);
+        $this->assertStringContainsString('maxHeight', $html);
+    }
 }

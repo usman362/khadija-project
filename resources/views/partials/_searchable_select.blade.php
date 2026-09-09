@@ -34,17 +34,22 @@
     .ss-btn.is-placeholder .ss-label { color: var(--text-muted, #6b7280); }
     .ss-btn svg { width: 14px; height: 14px; flex: none; color: var(--text-muted, #6b7280); }
 
-    .ss-panel { position: absolute; z-index: 60; left: 0; right: 0; top: calc(100% + 5px);
+    /* Fixed, not absolute.
+       These sit inside cards that clip their overflow — the request forms and
+       the wizard steps all do — so an absolutely positioned panel was cut off
+       at the card's edge and the list under the search box could not be seen
+       at all. Fixed takes it out of every clipping context; the position is
+       set from the control's own rectangle when it opens. */
+    .ss-panel { position: fixed; z-index: 1000; display: none;
         background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e5e7eb);
         border-radius: 12px; box-shadow: 0 18px 40px -18px rgba(15,27,53,.45);
-        padding: 8px; display: none; }
+        padding: 8px; }
     .ss-host.is-open .ss-panel { display: block; }
-    .ss-host.is-up .ss-panel { top: auto; bottom: calc(100% + 5px); }
 
     .ss-search { width: 100%; font: inherit; font-size: 13px; padding: 8px 10px;
         border: 1px solid var(--border-color, #e5e7eb); border-radius: 8px;
         background: var(--bg-page, #fff); color: var(--text-primary, #111827); }
-    .ss-list { max-height: 260px; overflow-y: auto; margin-top: 7px; }
+    .ss-list { max-height: 260px; overflow-y: auto; margin-top: 7px; overscroll-behavior: contain; }
     .ss-opt { display: block; width: 100%; text-align: left; font: inherit; font-size: 13.5px;
         padding: 8px 10px; border: 0; background: none; border-radius: 8px; cursor: pointer;
         color: var(--text-primary, #111827); }
@@ -187,22 +192,76 @@
             btn.focus();
         }
 
+        /* Where the panel goes, in viewport coordinates.
+           Re-run while it is open, because a page that scrolls under a fixed
+           panel would otherwise leave it hanging beside nothing. */
+        var lastRect = '';
+
+        function place() {
+            var box = btn.getBoundingClientRect();
+
+            // Nothing moved; nothing to do. This runs every frame while the
+            // panel is open, so it has to be cheap when the answer is "same".
+            var key = box.top + ':' + box.left + ':' + box.width + ':' + window.innerHeight;
+            if (key === lastRect) return;
+            lastRect = key;
+
+            var below = window.innerHeight - box.bottom;
+            var wanted = Math.min(340, Math.max(200, window.innerHeight * 0.5));
+            var up = below < wanted && box.top > below;
+
+            panel.style.left = box.left + 'px';
+            panel.style.width = box.width + 'px';
+
+            if (up) {
+                panel.style.top = 'auto';
+                panel.style.bottom = (window.innerHeight - box.top + 5) + 'px';
+                panel.style.maxHeight = (box.top - 14) + 'px';
+            } else {
+                panel.style.bottom = 'auto';
+                panel.style.top = (box.bottom + 5) + 'px';
+                panel.style.maxHeight = (below - 14) + 'px';
+            }
+
+            // The list scrolls inside whatever room the panel actually has.
+            list.style.maxHeight = Math.max(120, parseFloat(panel.style.maxHeight) - 62) + 'px';
+        }
+
         function open() {
             host.classList.add('is-open');
             btn.setAttribute('aria-expanded', 'true');
 
-            // Upwards when there is more room above than below.
-            var box = host.getBoundingClientRect();
-            host.classList.toggle('is-up', window.innerHeight - box.bottom < 300 && box.top > 300);
-
             search.value = '';
             render();
+            lastRect = '';
+            place();
             search.focus();
+
+            /* Tracked frame by frame rather than on scroll events.
+               These forms scroll inside their own containers, and a scroll
+               event on a nested element is easy to miss; asking where the
+               control is each frame cannot be. It stops when the panel does. */
+            track();
+        }
+
+        var tracking = null;
+
+        function track() {
+            cancelAnimationFrame(tracking);
+
+            var tick = function () {
+                if (!host.classList.contains('is-open')) return;
+                place();
+                tracking = requestAnimationFrame(tick);
+            };
+
+            tracking = requestAnimationFrame(tick);
         }
 
         function close() {
-            host.classList.remove('is-open', 'is-up');
+            host.classList.remove('is-open');
             btn.setAttribute('aria-expanded', 'false');
+            cancelAnimationFrame(tracking);
         }
 
         btn.addEventListener('click', function () {
