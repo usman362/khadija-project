@@ -77,6 +77,36 @@ class BrowseControlsAreLiveTest extends TestCase
         $this->assertStringContainsString('br-pro is-list', $list, 'List looks exactly like grid.');
     }
 
+    /**
+     * And it is a different shape, not the same card with a smaller picture.
+     *
+     * The first attempt only shrank the image: the row stayed as tall, so the
+     * two views were hard to tell apart. In list the body reads across — who
+     * they are, then the price and the buttons — instead of stacking down.
+     */
+    public function test_list_is_a_row_not_a_smaller_card(): void
+    {
+        $html = $this->page(['view' => 'list']);
+
+        $this->assertMatchesRegularExpression(
+            '/\.br-pro\.is-list \.br-pro-body \{[^}]*flex-direction:\s*row/',
+            $html,
+            'The list body still stacks like the card, so the two views look the same.',
+        );
+
+        // The rule under the footer belongs to a card, not to a row.
+        $this->assertMatchesRegularExpression(
+            '/\.br-pro\.is-list \.br-pro-foot \{[^}]*border-top:\s*0/',
+            $html,
+        );
+
+        // The picture fills the row instead of leaving white space beneath it.
+        $this->assertMatchesRegularExpression(
+            '/\.br-pro\.is-list \.br-pro-media \{[^}]*min-height:\s*100%/',
+            $html,
+        );
+    }
+
     /** The choice travels with every link built on the page. */
     public function test_the_view_survives_a_filter(): void
     {
@@ -139,5 +169,46 @@ class BrowseControlsAreLiveTest extends TestCase
 
         $this->assertStringContainsString('PAGE_PATH', $html);
         $this->assertStringContainsString('/find-professionals', $html);
+    }
+
+    /**
+     * A filter can be changed twice.
+     *
+     * The sidebar carries hidden copies of q, city and category so its own
+     * submit does not drop them, and it comes after the hero in the document.
+     * Collected blind, the stale hidden copy overwrote the value just chosen —
+     * so picking a second category left the first one in the address and the
+     * filter looked stuck on whatever was set first.
+     *
+     * A hidden stand-in never speaks over the control itself now.
+     */
+    public function test_a_hidden_copy_cannot_overwrite_the_control_itself(): void
+    {
+        $html = $this->page();
+
+        $this->assertStringContainsString('function visibleNames', $html,
+            'Nothing works out which control owns a name, so the stale hidden copy wins again.');
+
+        $this->assertStringContainsString("el.type === 'hidden' && owned", $html);
+    }
+
+    /** The server takes the second value, whatever the page sent first. */
+    public function test_the_second_choice_is_the_one_that_applies(): void
+    {
+        $first = Category::create([
+            'name' => 'First Pick', 'slug' => 'first-pick',
+            'kind' => Category::SERVICE_CATEGORY, 'is_active' => true,
+        ]);
+        $second = Category::create([
+            'name' => 'Second Pick', 'slug' => 'second-pick',
+            'kind' => Category::SERVICE_CATEGORY, 'is_active' => true,
+        ]);
+
+        $one = $this->page(['category' => $first->slug]);
+        $two = $this->page(['category' => $second->slug]);
+
+        $this->assertStringContainsString('category='.$first->slug, $one);
+        $this->assertStringContainsString('category='.$second->slug, $two);
+        $this->assertStringNotContainsString('category='.$first->slug, $two);
     }
 }

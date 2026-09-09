@@ -120,17 +120,36 @@
     .br-pro { display: grid; grid-template-columns: 280px minmax(0,1fr); gap: 0; overflow: hidden; margin-bottom: 16px; }
     .br-pro-media { position: relative; height: 230px; background: linear-gradient(135deg,#e2e8f0,#eef2ff); overflow: hidden; }
 
-    /* List view — the same card, scanned rather than browsed: a narrow strip
-       of picture and a shorter row, so more of them fit on a screen. One card,
-       two shapes; a second markup for the same professional is a second place
-       to forget a change. */
-    .br-pro.is-list { grid-template-columns: 132px minmax(0,1fr); margin-bottom: 10px; }
-    .br-pro.is-list .br-pro-media { height: 118px; }
-    .br-pro.is-list .br-pro-body { padding: 12px 14px; }
+    /* List view — one row per professional, read across instead of down.
+       Same markup as the card; a second set of markup for the same person is
+       a second place to forget a change. What changes is the shape: the body
+       stops being a column of stacked blocks and becomes a single line —
+       who they are, then what they cost and what you can do about it. */
+    .br-pro.is-list { grid-template-columns: 110px minmax(0,1fr); margin-bottom: 8px; align-items: stretch; }
+    /* Fills the row rather than sitting in it: a fixed height left white
+       space under the picture whenever the row was taller. */
+    .br-pro.is-list .br-pro-media { height: auto; min-height: 100%; }
     .br-pro.is-list .br-pro-dots, .br-pro.is-list .br-pro-tag { display: none; }
-    @media (max-width: 640px) {
+
+    .br-pro.is-list .br-pro-body { padding: 10px 14px; display: flex; flex-direction: row;
+        align-items: center; gap: 16px; flex-wrap: wrap; }
+    .br-pro.is-list .br-pro-top { flex: 1 1 260px; align-items: center; }
+    .br-pro.is-list .br-pro-av { width: 34px; height: 34px; font-size: 13px; }
+    .br-pro.is-list .br-pro-role { display: none; }   /* the headline is the card's job */
+    .br-pro.is-list .br-chips { margin: 0; flex: none; }
+    .br-pro.is-list .br-pro-meta { margin: 0; flex: none; gap: 10px; }
+    /* No rule above it and no push to the bottom: it is beside the name now,
+       not underneath it. */
+    .br-pro.is-list .br-pro-foot { margin: 0; padding: 0; border-top: 0; flex: none; gap: 10px; }
+    .br-pro.is-list .br-price { font-size: 13px; }
+    .br-pro.is-list .br-fav { width: 30px; height: 30px; }
+
+    @media (max-width: 900px) {
+        /* Too narrow to read across. It becomes the card again rather than a
+           row squeezed until the words break. */
         .br-pro.is-list { grid-template-columns: 96px minmax(0,1fr); }
-        .br-pro.is-list .br-pro-media { height: 104px; }
+        .br-pro.is-list .br-pro-body { flex-direction: column; align-items: stretch; gap: 8px; }
+        .br-pro.is-list .br-pro-role { display: block; }
     }
     .br-pro-hero { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: opacity .55s ease; }
     .br-pro-hero.on { opacity: 1; }
@@ -757,14 +776,48 @@
 
     var token = 0;
 
-    function collect(form) {
-        var params = new URLSearchParams(new FormData(form));
+    /* The forms that between them hold the query. Declared here because
+       visibleNames() below reads it. */
+    var FORMS = 'form.br-search, form.br-card, #brSortForm';
+
+    /* Names that a control someone can actually SEE is responsible for.
+       The sidebar carries hidden copies of q, city and category so its own
+       submit does not drop them — but those copies hold whatever the last
+       load put there, and the sidebar comes after the hero in the document.
+       Collected blind, the stale hidden copy overwrote the value just chosen,
+       so picking a second category left the first one in the address and the
+       filter appeared stuck on whatever was set first. */
+    function visibleNames() {
+        var owned = new Set();
+
+        document.querySelectorAll(FORMS).forEach(function (f) {
+            f.querySelectorAll('[name]').forEach(function (el) {
+                if (el.type !== 'hidden') owned.add(el.name);
+            });
+        });
+
+        return owned;
+    }
+
+    function collect(form, owned) {
+        var params = new URLSearchParams();
+
+        form.querySelectorAll('[name]').forEach(function (el) {
+            // A hidden stand-in never speaks over the control itself.
+            if (el.type === 'hidden' && owned && owned.has(el.name)) return;
+            if (el.disabled) return;
+            if ((el.type === 'checkbox' || el.type === 'radio') && !el.checked) return;
+
+            params.set(el.name, el.value);
+        });
+
         // Drop empties and the "no filter" sentinels so the URL stays readable
         // and a cleared control doesn't leave ?rate_max=0 behind.
         [...params.keys()].forEach(function (k) {
             var v = params.get(k);
             if (!v || ((k === 'rate_max' || k === 'rating_min') && Number(v) === 0)) params.delete(k);
         });
+
         return params;
     }
 
@@ -849,8 +902,10 @@
             if (here.has(k)) params.set(k, here.get(k));
         });
 
-        document.querySelectorAll('form.br-search, form.br-card, #brSortForm').forEach(function (f) {
-            collect(f).forEach(function (v, k) { params.set(k, v); });
+        var owned = visibleNames();
+
+        document.querySelectorAll(FORMS).forEach(function (f) {
+            collect(f, owned).forEach(function (v, k) { params.set(k, v); });
         });
         if (changed) changed.forEach(function (v, k) { v === null ? params.delete(k) : params.set(k, v); });
         params.delete('page');   // any filter change returns to page one
@@ -863,8 +918,6 @@
     // filter change and the next sort submitted natively — rebuilding the query
     // from that form's own hidden fields and dropping every filter it doesn't
     // mirror.
-    var FORMS = 'form.br-search, form.br-card, #brSortForm';
-
     document.addEventListener('submit', function (e) {
         if (!e.target.closest(FORMS)) return;
         e.preventDefault();
