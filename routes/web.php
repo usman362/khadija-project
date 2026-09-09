@@ -689,6 +689,15 @@ Route::middleware('auth')->group(function () {
         $f = \App\Http\Controllers\Forms\FormController::class;
 
         Route::get('/', [$f, 'index'])->name('index');
+
+        /*
+         * "Book a Package" used to be a form here and booked nothing — see
+         * FormRegistry. The address is kept and sent to the packages page,
+         * because the client following it wants to book a package, and a 404
+         * would answer them with nothing at all.
+         */
+        Route::get('/new/book-a-package', fn () => redirect()->route('public.packages', [], 301));
+
         Route::get('/new/{key}', [$f, 'create'])->name('create');
         Route::post('/new/{key}', [$f, 'store'])->name('store');
         Route::get('/{submission}', [$f, 'show'])->name('show');

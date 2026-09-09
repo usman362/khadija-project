@@ -66,7 +66,9 @@ class FormsAuditTest extends TestCase
     {
         $expected = [
             'change_order', 'content_report', 'correction_request', 'payout_details',
-            'elite_verification', 'influencer_application', 'package_purchase',
+            // package_purchase is deliberately absent: it booked nothing, and
+            // /packages does the job properly. See FormRegistry.
+            'elite_verification', 'influencer_application',
             'crew_record', 'shift_request', 'shift_confirmation', 'crew_assignment', 'menu_inventory',
             'campaign_plan', 'testimonial',
         ];

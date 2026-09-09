@@ -238,21 +238,22 @@ final class FormRegistry
             ],
 
             /* ── Row 239 — Package Purchase ───────────────────── */
-            'package_purchase' => [
-                'title'    => 'Book a Package',
-                'row'      => 239,
-                'audience' => self::CLIENT,
-                'purpose'  => 'Book a professional’s ready-made package for your event.',
-                'fields'   => [
-                    ['name' => 'package_id', 'label' => 'Which package', 'type' => 'text', 'required' => true],
-                    ['name' => 'event_date', 'label' => 'Your event date', 'type' => 'date', 'required' => true],
-                    ['name' => 'location', 'label' => 'Where', 'type' => 'text', 'required' => true],
-                    ['name' => 'guests', 'label' => 'How many guests', 'type' => 'number', 'required' => false],
-                    ['name' => 'notes', 'label' => 'Anything the professional should know', 'type' => 'textarea', 'required' => false],
-                    ['name' => 'certify', 'type' => 'certification', 'required' => true,
-                     'text' => 'I understand a deposit is taken on booking and is not refundable.'],
-                ],
-            ],
+            /*
+             * Row 239 — "Book a Package" is NOT a form.
+             *
+             * It was one, and it booked nothing. "Which package" was a text
+             * box, so the client typed a name from memory that pointed at no
+             * package; submitting filed a message; no booking was created and
+             * no professional was told. It also asked them to certify that "a
+             * deposit is taken on booking and is not refundable" when no
+             * deposit is taken anywhere.
+             *
+             * The real path already existed and works: browse /packages, open
+             * one, and book it — against that package, with its price and its
+             * professional. Sir Peter found the form and asked what it was
+             * for; the honest answer was nothing, so it is gone and the old
+             * address redirects to the packages page.
+             */
 
             /* ── Row 243 — Crew & Staffing, the five forms ────── */
             'crew_record' => [
@@ -431,7 +432,7 @@ final class FormRegistry
             'label' => 'Bookings & Events',
             'blurb' => 'Changes, corrections, crew and anything about a job you are on.',
             'keys'  => [
-                'change_order', 'correction_request', 'package_purchase',
+                'change_order', 'correction_request',
                 'shift_request', 'shift_confirmation', 'crew_assignment',
                 'crew_record', 'menu_inventory',
             ],
