@@ -1195,6 +1195,10 @@
          after its @stack has already rendered goes nowhere. --}}
     @include('partials._searchable_select')
 
+    {{-- The pop-up messenger (Ideas 2 and 3). It decides for itself whether
+         this account gets it, so the layout does not need to know the rule. --}}
+    @include('partials._message_dock')
+
     @stack('styles')
 </head>
 

@@ -145,6 +145,8 @@
     .cm-info-rows > div { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; font-size: 12.5px; }
     .cm-info-rows span { color: var(--text-muted); }
     .cm-info-rows b { color: var(--text-primary); font-weight: 600; text-align: right; word-break: break-word; }
+    .cm-info-act { display: inline-block; margin-bottom: 10px; font-size: 12.5px; font-weight: 700;
+        color: var(--brand-text, #c2410c); text-decoration: none; }
     .cm-info-order { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color); font-size: 12.5px; }
     .cm-info-order .ref { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .3px; color: var(--cm); background: rgba(234,88,12,0.12); padding: 2px 7px; border-radius: 5px; margin-bottom: 5px; }
     .cm-info-order b { display: block; color: var(--text-primary); font-size: 13.5px; }
@@ -314,14 +316,27 @@
                 </div>
 
                 @if($info)
-                    <div class="cm-info" id="cm-info" style="display:none;">
+                    {{-- Idea 4 — the conversation's details panel.
+                         Open by default and remembered per browser: a panel
+                         that starts hidden behind an unlabelled icon is a panel
+                         nobody finds. Whether this account gets it at all is
+                         MessengerAccess's decision, so the tier can be changed
+                         in config without touching this page. --}}
+                    @if(\App\Support\MessengerAccess::panel(auth()->user()))
+                    <div class="cm-info" id="cm-info">
                         <div class="cm-info-who">
                             <span class="cm-info-av">{{ $info['initials'] }}</span>
                             <div>
                                 <b>{{ $info['name'] }}</b>
-                                @if($info['location'])<span>{{ $info['location'] }}</span>@endif
+                                {{-- Which side of the conversation they are on: the
+                                     opposite of whichever side is reading it. --}}
+                                <span>{{ auth()->user()?->activeRole() === 'professional' ? 'Client' : 'Professional' }}@if($info['location']) · {{ $info['location'] }}@endif</span>
                             </div>
                         </div>
+
+                        @if($info['profileUrl'] ?? null)
+                            <a class="cm-info-act" href="{{ $info['profileUrl'] }}">View full profile →</a>
+                        @endif
                         <div class="cm-info-rows">
                             {{-- First in the list: it is the thing support and
                                  disputes ask for, and the one field that never
@@ -343,6 +358,7 @@
                             </div>
                         @endif
                     </div>
+                    @endif
                 @endif
                 <div class="cm-msgs" id="cm-msgs">
                     @forelse($thread['messages'] as $m)
@@ -562,9 +578,27 @@
     }));
 
     // ── Thread controls ────────────────────────────────────────────────────
+    /* The details panel remembers whether it was hidden.
+       Hiding it and finding it back on the next conversation is the same as
+       it not being collapsible at all. Per browser, and wrapped because a
+       browser set to block site data throws on the read itself. */
     const infoPanel = $('cm-info');
+    const INFO_KEY = 'gr.chat.info';
+
+    function infoShow(open) {
+        if (! infoPanel) return;
+        infoPanel.style.display = open ? '' : 'none';
+        try { localStorage.setItem(INFO_KEY, open ? '1' : '0'); } catch (e) {}
+    }
+
+    if (infoPanel) {
+        let open = true;
+        try { open = localStorage.getItem(INFO_KEY) !== '0'; } catch (e) {}
+        infoShow(open);
+    }
+
     if ($('cm-info-toggle') && infoPanel) $('cm-info-toggle').addEventListener('click', () => {
-        infoPanel.style.display = infoPanel.style.display === 'none' ? '' : 'none';
+        infoShow(infoPanel.style.display === 'none');
     });
 
     function insert(text) {

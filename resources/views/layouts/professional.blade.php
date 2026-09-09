@@ -982,6 +982,12 @@
         /* ═══════════════════════ LOGOUT BUTTON ═══════════════════════ */
     </style>
     @include('partials._a11y')
+    {{-- Idea 3: whether a professional gets the pop-up messenger is decided by
+         their membership, in MessengerAccess — not by which layout they are on.
+         Included ahead of the styles stack, because a @push after its @stack
+         has already rendered goes nowhere. --}}
+    @include('partials._message_dock')
+
     @stack('styles')
 </head>
 
