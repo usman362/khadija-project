@@ -52,6 +52,14 @@
         .ev-req-row:last-child { border-bottom: 0; }
         .ev-req-row span { color: var(--text-muted); font-weight: 600; }
         .ev-req-row b { color: var(--text-primary); font-weight: 700; text-align: right; }
+        .ev-svc { margin-top: 8px; border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; }
+        .ev-svc-row { display: flex; justify-content: space-between; gap: 16px; padding: 8px 11px; font-size: 13px; border-bottom: 1px solid var(--border-color); }
+        .ev-svc-row:last-child { border-bottom: 0; }
+        .ev-svc-row span { color: var(--text-secondary); font-weight: 600; }
+        .ev-svc-row b { color: var(--text-primary); font-weight: 700; white-space: nowrap; }
+        .ev-svc-row.is-total { background: var(--bg-soft, #f8fafc); }
+        .ev-svc-row.is-total span { color: var(--text-muted); }
+        .ev-svc-note { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; margin: 7px 0 0; }
         .ev-hint { display: block; margin-top: 9px; font-size: 12px; color: var(--warn-text); }
 
         /* Proposals */
@@ -549,7 +557,43 @@
             <div class="ev-req">
                 <div class="ev-req-row"><span>Request type</span><b>{{ $type }} — {{ $type === 'BR' ? 'open to bidding' : ($type === 'ER' ? 'emergency, open to bidding' : 'direct to one professional') }}</b></div>
                 <div class="ev-req-row"><span>Scope</span><b>{{ $scope }} — {{ $scope === 'MSR' ? 'multi-service' : 'single service' }}</b></div>
-                <div class="ev-req-row"><span>Services requested</span><b>{{ $event->categories->pluck('name')->implode(', ') ?: '—' }}</b></div>
+                {{-- Sir Peter, 2026-09-08: a page an MSR touched has to show the
+                     client the MSR's own data, not a summary of it. The client
+                     breaks the budget down service by service on the request
+                     form and that breakdown is shown to the professional — this
+                     page listed the services as one comma-separated line under
+                     a single total, so the client could enter the split and
+                     then never see it again anywhere in their own portal.
+
+                     Each service is bid on and agreed separately, so each one
+                     is a row, with what was set aside for it. --}}
+                @php $__split = $event->serviceBudgets->keyBy('category_id'); @endphp
+
+                @if($event->categories->isEmpty())
+                    <div class="ev-req-row"><span>Services requested</span><b>—</b></div>
+                @elseif($__split->isEmpty())
+                    <div class="ev-req-row"><span>Services requested</span><b>{{ $event->categories->pluck('name')->implode(', ') }}</b></div>
+                @else
+                    <div class="ev-req-row" style="display:block;">
+                        <span>Services requested</span>
+                        <div class="ev-svc">
+                            @foreach($event->categories as $cat)
+                                <div class="ev-svc-row">
+                                    <span>{{ $cat->name }}</span>
+                                    <b>{{ isset($__split[$cat->id]) ? '$' . number_format($__split[$cat->id]->amount) : 'Not stated' }}</b>
+                                </div>
+                            @endforeach
+                            <div class="ev-svc-row is-total">
+                                <span>Breakdown total</span>
+                                <b>${{ number_format($__split->sum('amount')) }}</b>
+                            </div>
+                        </div>
+                        <p class="ev-svc-note">
+                            Each service is quoted and agreed separately, so each professional
+                            sees only the figure for the service they are bidding on.
+                        </p>
+                    </div>
+                @endif
                 <div class="ev-req-row"><span>Event date</span><b>{{ $event->starts_at?->format('M j, Y · g:i A') ?? 'Flexible' }}</b></div>
                 <div class="ev-req-row"><span>Location</span><b>{{ $event->location ?: '—' }}</b></div>
                 <div class="ev-req-row"><span>Guest count</span><b>{{ $event->guest_count ? number_format($event->guest_count) : '—' }}</b></div>
