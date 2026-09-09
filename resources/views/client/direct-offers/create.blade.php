@@ -243,7 +243,7 @@
         <div class="do-sec req">
             <div class="do-sec-hd"><h4>Event Details</h4><span class="do-tag">YOUR INPUT</span></div>
             <div class="do-sec-bd">
-                <div class="do-field"><label>Event Name</label><input class="do-input" name="event_name" placeholder="e.g. Luxury Wedding Reception"></div>
+                <div class="do-field"><label>Event Name <span style="color:#dc2626;">*</span></label><input class="do-input" name="event_name" value="{{ old('event_name') }}" placeholder="e.g. Luxury Wedding Reception" required></div>
                 <div class="do-field">
                     <label for="doOrgType">This request is for <span style="color:#dc2626;">*</span></label>
                     <select class="do-input" name="organization_type" id="doOrgType" required>
@@ -344,14 +344,22 @@
         <div class="do-sec ai">
             <div class="do-sec-hd"><h4>Request Summary</h4><span class="do-tag">AUTO-DRAFTED</span></div>
             <div class="do-sec-bd">
-                <div class="do-ai-row"><span class="ck">✓</span> We draft a clear, structured request from your inputs so the pro understands scope instantly.</div>
-                <div class="do-ai-row"><span class="ck">✓</span> Suggests a fair budget band based on your services, location and guest count.</div>
-                <div class="do-ai-row" data-types="MSR"><span class="ck">✓</span> For an <b id="doTypeLbl">{{ $type }}</b>, each requested service is sent as its own separate agreement.</div>
+                <div class="do-ai-row"><span class="ck">✓</span><span>We draft a clear, structured request from your inputs so the pro understands scope instantly.</span></div>
+                <div class="do-ai-row"><span class="ck">✓</span><span>Suggests a fair budget band based on your services, location and guest count.</span></div>
+                {{-- The sentence is ONE span.
+                     .do-ai-row is a flex container, so an inline <b> in loose
+                     text becomes its own flex item — which put a 9px gap
+                     either side of "MSR" and let the line break there. Sir
+                     Peter read it as the acronym being oddly placed; it was
+                     the layout, not the wording. --}}
+                <div class="do-ai-row" data-types="MSR"><span class="ck">✓</span><span>For an <b id="doTypeLbl">{{ $type }}</b>, each requested service is sent as its own separate agreement.</span></div>
             </div>
         </div>
 
         <div class="do-foot">
-            <p>The professional will receive this as a <b id="doTypeLbl2">{{ $type }}</b> and can accept, counter, or ask questions.</p>
+            <p><span>The professional will receive this as a <b id="doTypeLbl2">{{ $type }}</b> and can accept, counter, or ask questions.</span></p>
+
+            @include('client.partials._request_fee_terms', ['action' => 'sending this request'])
             <button type="submit" class="do-btn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
                 Send Direct Request

@@ -113,6 +113,7 @@ class RequestEventStateTest extends TestCase
         $client = $this->user('client', 'VA');
 
         $this->actingAs($client)->post(route('client.esr.store'), [
+            'fee_agreed' => 1,
             'organization_type' => 'business',
             'reason'      => array_key_first(\App\Http\Controllers\Client\ClientEsrController::REASONS),
             'needed_by'   => now()->addHours(30)->format('Y-m-d\TH:i'),
@@ -198,6 +199,7 @@ class RequestEventStateTest extends TestCase
         $pro->serviceCategories()->attach($service->id);
 
         $this->actingAs($client)->post(route('client.direct-offers.store'), [
+            'fee_agreed' => 1,
             'organization_type' => 'individual',
             'professional_id' => $pro->id,
             'event_name'      => 'Garden Party',

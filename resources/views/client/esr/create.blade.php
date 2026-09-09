@@ -175,10 +175,9 @@
 
         {{-- Publish --}}
         <div class="esr-card esr-foot">
-            <div class="esr-fees">
-                <div><b>$0</b> to post — you only pay a single <b>$2.99</b> when you finalize with a professional.</div>
-                <div style="margin-top:2px;">Nothing is charged to post, and nothing if the request goes unfilled.</div>
-            </div>
+            {{-- Was this page's own wording, and the only page that carried it.
+                 Shared now, with the agreement Sir Peter asked for. --}}
+            @include('client.partials._request_fee_terms', ['action' => 'posting this rush request'])
             <button type="submit" class="esr-btn">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                 Publish Rush Request

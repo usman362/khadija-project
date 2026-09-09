@@ -120,20 +120,45 @@ class ClientDirectOfferController extends Controller
     {
         $data = $request->validate([
             'professional_id' => ['required', 'exists:users,id'],
-            'event_name'      => ['nullable', 'string', 'max:200'],
+            /*
+             * Sir Peter, 2026-09-08: the BR, ER and DR should collect the same
+             * mandatory facts. The BR has always required a title; this one
+             * accepted a request with no name, which then appeared on the
+             * professional's board as an untitled job.
+             */
+            'event_name'      => ['required', 'string', 'max:200'],
             // Asked on every request form now (Peter, 2026-08-20).
             'organization_type' => ['required', 'in:' . implode(',', array_keys(\App\Models\Event::ORGANIZATION_TYPES))],
             'event_date'      => ['nullable', 'date'],
             'guests'          => ['nullable', 'integer', 'min:1', 'max:1000000'],
             'venue'           => ['nullable', 'string', 'max:200'],
-            'services'        => ['nullable', 'array'],
+            /*
+             * One of the two, always.
+             *
+             * An MSR posts `services[]` and an SSR posts `service_single`, and
+             * both were optional — so a Direct Request could be sent asking a
+             * professional for nothing at all, which the BR and ER both refuse.
+             */
+            'services'        => ['required_without:service_single', 'array'],
             'services.*'      => ['integer', 'exists:categories,id', new \App\Rules\BookableService],
-            'service_single'  => ['nullable', 'string', 'max:120'],
+            'service_single'  => ['required_without:services', 'nullable', 'string', 'max:120'],
             'budget_min'      => ['nullable', 'integer', 'min:0'],
             'request_type'    => ['nullable', 'in:SSR,MSR'],
+
+            /*
+             * Sir Peter, 2026-09-08: the client must actively agree to the
+             * $2.99 finalisation fee before the request goes anywhere. Checked
+             * here and not only in the browser — a form that is required only
+             * in the markup can be posted around.
+             */
+            'fee_agreed'      => ['accepted'],
         ], [
             'professional_id.required' => 'Choose which professional this request goes to.',
             'organization_type.required' => 'Tell us who the request is for.',
+            'event_name.required' => 'Give the event a name so the professional knows what this is.',
+            'services.required_without' => 'Choose at least one service you need.',
+            'service_single.required_without' => 'Choose the service you need.',
+            'fee_agreed.accepted' => 'Please confirm you understand the $2.99 fee applies when you finalize with a professional.',
         ]);
 
         $user = $request->user();

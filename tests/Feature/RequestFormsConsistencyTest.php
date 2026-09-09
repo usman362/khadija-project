@@ -165,6 +165,7 @@ class RequestFormsConsistencyTest extends TestCase
     public function test_the_emergency_request_titles_itself_from_the_service(): void
     {
         $this->actingAs($this->client)->post(route('client.esr.store'), [
+            'fee_agreed' => 1,
             'organization_type' => 'individual',
             'reason'      => array_key_first(\App\Http\Controllers\Client\ClientEsrController::REASONS),
             'needed_by'   => now()->addHours(30)->format('Y-m-d\TH:i'),
@@ -192,6 +193,7 @@ class RequestFormsConsistencyTest extends TestCase
     public function test_the_emergency_request_stores_who_it_is_for(): void
     {
         $this->actingAs($this->client)->post(route('client.esr.store'), [
+            'fee_agreed' => 1,
             'organization_type' => 'nonprofit',
             'reason'      => array_key_first(\App\Http\Controllers\Client\ClientEsrController::REASONS),
             'needed_by'   => now()->addHours(30)->format('Y-m-d\TH:i'),

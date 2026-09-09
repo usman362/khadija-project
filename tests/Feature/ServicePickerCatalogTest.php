@@ -163,6 +163,7 @@ class ServicePickerCatalogTest extends TestCase
         $babyShower = $this->babyShower();
 
         $this->actingAs($this->client)->post(route('client.esr.store'), [
+            'fee_agreed' => 1,
                 'organization_type' => 'individual',
             'event_name' => 'Emergency help',
             'reason'     => 'last_minute',
@@ -179,6 +180,7 @@ class ServicePickerCatalogTest extends TestCase
         $babyShower = $this->babyShower();
 
         $errors = $this->actingAs($this->client)->post(route('client.esr.store'), [
+            'fee_agreed' => 1,
                 'organization_type' => 'individual',
             'event_name' => 'Emergency help',
             'reason'     => 'last_minute',
@@ -193,6 +195,7 @@ class ServicePickerCatalogTest extends TestCase
     public function test_a_real_service_is_still_accepted(): void
     {
         $this->actingAs($this->client)->post(route('client.esr.store'), [
+            'fee_agreed' => 1,
                 'organization_type' => 'individual',
             'event_name' => 'Emergency help',
             'reason'     => 'last_minute',

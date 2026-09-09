@@ -146,9 +146,13 @@ class SameStateMatchingTest extends TestCase
 
         $this->actingAs($client)
             ->post(route('client.direct-offers.store'), [
+                'fee_agreed' => 1,
                 'organization_type' => 'individual',
                 'professional_id' => $pro->id,
                 'event_name'      => 'Garden Party',
+                // A named service, so the refusal under test is the state rule
+                // rather than the form's own "choose a service".
+                'service_single'  => 'Anything',
             ])
             ->assertStatus(422);
 

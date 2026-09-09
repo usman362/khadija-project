@@ -82,6 +82,7 @@ class ServiceAreaGateTest extends TestCase
     {
         $this->actingAs($this->user(ServiceArea::COMING_SOON))
             ->post(route('client.esr.store'), [
+            'fee_agreed' => 1,
                 'organization_type' => 'individual',])
             ->assertRedirect()
             ->assertSessionHas('error');
@@ -139,6 +140,7 @@ class ServiceAreaGateTest extends TestCase
     {
         $this->actingAs($this->user(ServiceArea::COMING_SOON, 'admin'))
             ->post(route('client.esr.store'), [
+            'fee_agreed' => 1,
                 'organization_type' => 'individual',])
             ->assertSessionMissing('error');
     }

@@ -102,10 +102,19 @@ class ClientEsrController extends Controller
             'description'  => ['nullable', 'string', 'max:2000'],
             'budget_min'   => ['nullable', 'integer', 'min:0'],
             'scope'        => ['nullable', 'in:single,multi'],
+
+            /*
+             * Sir Peter, 2026-09-08: the client must actively agree to the
+             * $2.99 finalisation fee before the request is published. Checked
+             * here and not only in the browser — a form that is required only
+             * in the markup can be posted around.
+             */
+            'fee_agreed'   => ['accepted'],
             'services'     => ['required', 'array', 'min:1'],
             'services.*'   => ['integer', 'exists:categories,id', new \App\Rules\BookableService],
         ], [
             'services.required' => 'Select at least one service you need.',
+            'fee_agreed.accepted' => 'Please confirm you understand the $2.99 fee applies when you finalize with a professional.',
             'reason.required'   => 'Tell us why this is urgent.',
             'needed_by.required' => 'When do you need this by?',
         ]);

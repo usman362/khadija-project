@@ -80,9 +80,13 @@ class NoSelfHireTest extends TestCase
         // The list no longer offers it, but the id still arrives in the request.
         $this->actingAs($this->both)
             ->post(route('client.direct-offers.store'), [
+                'fee_agreed' => 1,
                 'organization_type' => 'individual',
                 'professional_id' => $this->both->id,
                 'event_name'      => 'Self dealing',
+                // A named service, so the refusal under test is the self-hire
+                // rule rather than the form's own "choose a service".
+                'service_single'  => 'Anything',
             ])
             ->assertStatus(422);
     }

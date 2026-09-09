@@ -56,6 +56,7 @@ class EmergencyRequestRulesTest extends TestCase
     private function raiseEsr(string $neededBy, array $overrides = [])
     {
         return $this->actingAs($this->client)->post(route('client.esr.store'), array_merge([
+            'fee_agreed' => 1,
             // The free-text "What do you need?" was removed on 2026-08-20 —
             // the ESR asks the service question once, like BR, and builds the
             // title from the service. organization_type is asked on every

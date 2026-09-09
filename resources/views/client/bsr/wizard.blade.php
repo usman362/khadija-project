@@ -925,10 +925,15 @@
             </div>
         @endif
 
-        <label class="bw-confirm">
-            <input type="checkbox" name="confirm" value="1" style="margin-top:2px;">
-            <span>I've checked these details. Publishing notifies eligible professionals and opens the request for proposals — it's free, and the $2.99 fee applies only if I finalize with someone.</span>
-        </label>
+        {{-- Was this page's own wording of the fee. Shared with the ER and DR
+             now, so the three cannot quote different terms. --}}
+        <p class="bw-help" style="margin-top:16px;">
+            Publishing notifies eligible professionals and opens the request for proposals.
+        </p>
+        @include('client.partials._request_fee_terms', [
+            'action' => 'publishing this request',
+            'field'  => 'confirm',
+        ])
     @endif
 
         <div class="bw-nav">
