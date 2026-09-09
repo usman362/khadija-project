@@ -699,7 +699,7 @@ class ClientBsrController extends Controller
         return [
             'services.required'          => 'Pick at least one service you need.',
             'organization_type.required' => 'Tell us who the request is for.',
-            'title.required'             => 'Give your request a name.',
+            'title.required'             => 'Give your event a name.',
             'description.required'       => 'Describe what you need — professionals bid on this.',
             'description.min'            => 'A little more detail helps professionals bid accurately.',
             'budget_max.gte'             => 'The top of the range must be at least the bottom.',

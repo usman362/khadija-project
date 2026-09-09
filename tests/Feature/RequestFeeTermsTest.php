@@ -209,4 +209,42 @@ class RequestFeeTermsTest extends TestCase
             'event_start_time' => '17:00',
         ]);
     }
+
+    /**
+     * The three forms call the same field the same thing.
+     *
+     * The BR's step 2 asked for a "Request name" while the DR asked for an
+     * "Event name" and every screen that shows it afterwards calls it the
+     * event's name. One field, three names, is how a client comes to think
+     * they are two different things.
+     */
+    public function test_the_name_field_is_called_the_same_thing_everywhere(): void
+    {
+        $this->startBidding();
+
+        $bidding = $this->actingAs($this->client)
+            ->get(route('client.bsr.step', 'event'))
+            ->assertSuccessful()
+            ->getContent();
+
+        $this->assertStringContainsString('Event name', $bidding);
+        $this->assertStringNotContainsString('Request name', $bidding);
+
+        $direct = $this->actingAs($this->client)
+            ->get(route('client.direct-offers.create'))
+            ->assertSuccessful()
+            ->getContent();
+
+        $this->assertStringContainsString('Event Name', $direct);
+    }
+
+    /** And the message when it is missing says the same. */
+    public function test_the_message_says_event_too(): void
+    {
+        $this->startBidding();
+
+        $this->actingAs($this->client)
+            ->post(route('client.bsr.save', 'event'), ['location_kind' => 'area'])
+            ->assertSessionHasErrors(['title' => 'Give your event a name.']);
+    }
 }

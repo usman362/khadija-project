@@ -329,7 +329,10 @@
         <p class="lede">The basics professionals need to know before they can price anything.</p>
 
         <div class="bw-field">
-            <label>Request name <span class="req">*</span></label>
+            {{-- "Event name", the same words the DR and the review screens use.
+                 The field is the event's name; calling it a request name on
+                 one step of one form was the odd one out. --}}
+            <label>Event name <span class="req">*</span></label>
             <input type="text" name="title" value="{{ $data['title'] ?? '' }}" placeholder="e.g. Annual Company Picnic">
         </div>
         <div class="bw-two">
