@@ -52,6 +52,24 @@ class DashboardCalendarIsRealTest extends TestCase
         ]);
     }
 
+
+    /**
+     * created_at is not fillable on Payment, so passing it to create() is
+     * quietly ignored and every seeded payment lands in the current month —
+     * which would make a period test pass or fail for the wrong reason.
+     */
+    private function paymentOn(\Carbon\Carbon $when, float $amount): void
+    {
+        $payment = Payment::create([
+            'user_id' => $this->client->id, 'status' => 'completed',
+            'amount' => $amount, 'gateway' => 'manual', 'currency' => 'USD',
+        ]);
+
+        Payment::where('id', $payment->id)->update([
+            'created_at' => $when, 'updated_at' => $when,
+        ]);
+    }
+
     private function dashboard(array $query = []): string
     {
         return $this->actingAs($this->client)
@@ -157,12 +175,7 @@ class DashboardCalendarIsRealTest extends TestCase
     public function test_a_card_with_history_draws_its_own_line(): void
     {
         foreach ([2, 1, 0] as $i => $back) {
-            Payment::create([
-                'user_id' => $this->client->id, 'status' => 'completed',
-                'amount' => 100 * ($i + 1), 'gateway' => 'manual', 'currency' => 'USD',
-                'created_at' => now()->subMonths($back)->startOfMonth()->addDay(),
-                'updated_at' => now()->subMonths($back)->startOfMonth()->addDay(),
-            ]);
+            $this->paymentOn(now()->subMonths($back)->startOfMonth()->addDay(), 100 * ($i + 1));
         }
 
         $html = $this->dashboard();
@@ -185,5 +198,138 @@ class DashboardCalendarIsRealTest extends TestCase
             $html,
             'The card is still the literal 0.',
         );
+    }
+
+    /* ── The period selector above the cards ─────────────────── */
+
+    /**
+     * It was a <button> printing the current month with nothing behind it,
+     * above four cards that all said "All time" — a filter that did not exist.
+     */
+    public function test_the_period_control_offers_periods(): void
+    {
+        $html = $this->dashboard();
+
+        foreach (['All time', 'This month', 'Last month', 'Last 3 months', 'This year'] as $label) {
+            $this->assertStringContainsString($label, $html);
+        }
+    }
+
+    public function test_the_period_narrows_what_the_cards_answer(): void
+    {
+        // Paid last month, not this one.
+        $this->paymentOn(now()->startOfMonth()->subMonth()->addDay(), 250);
+
+        $this->assertStringContainsString('$250.00', $this->dashboard(['period' => 'all']));
+        $this->assertStringContainsString('$250.00', $this->dashboard(['period' => 'last']));
+
+        // This month has none of it.
+        $this->assertStringContainsString('$0.00', $this->dashboard(['period' => 'month']));
+    }
+
+    /** The label says which period is being answered for. */
+    public function test_the_cards_say_which_period_they_answer_for(): void
+    {
+        $html = $this->dashboard(['period' => 'last']);
+
+        $this->assertStringContainsString('>Last month<', $html);
+    }
+
+    /** A period that is not one of ours is All time, not a broken page. */
+    public function test_a_nonsense_period_falls_back(): void
+    {
+        $this->actingAs($this->client)
+            ->get(route('client.dashboard', ['period' => 'whenever']))
+            ->assertSuccessful()
+            ->assertSee('All time');
+    }
+
+    /**
+     * Every control that changes what is on screen is marked for the live
+     * swap, so using one does not take the whole page with it.
+     */
+    public function test_the_controls_change_the_page_without_reloading_it(): void
+    {
+        $this->event('Booked Gala', 'confirmed', true, now()->startOfMonth()->addDays(4));
+
+        $html = $this->dashboard();
+
+        // ‹ › Today Month Week, and the five period options.
+        $this->assertGreaterThanOrEqual(
+            10,
+            substr_count($html, 'data-live'),
+            'A control was left as a plain link, so pressing it reloads the page.',
+        );
+
+        // And the regions those clicks replace.
+        foreach (['id="odPeriod"', 'id="odStats"', 'id="odCalCard"'] as $panel) {
+            $this->assertStringContainsString($panel, $html);
+        }
+    }
+
+    /* ── Today ───────────────────────────────────────────────── */
+
+    /**
+     * "Today" is a day, listed.
+     *
+     * It used to jump the month grid to today's month — so pressing it while
+     * looking at that month changed nothing at all, and it never showed the
+     * day on its own.
+     */
+    public function test_today_shows_only_today_as_a_list(): void
+    {
+        $this->event('Morning Walkthrough', 'published', true, now()->setTime(11, 0));
+        $this->event('Afternoon Tasting', 'confirmed', true, now()->setTime(15, 30));
+        $this->event('Some Other Day', 'confirmed', true, now()->addDays(3)->setTime(12, 0));
+
+        $cal = $this->calendar(['calview' => 'day', 'cal' => now()->format('Y-m-d')]);
+
+        $this->assertStringContainsString('Morning Walkthrough', $cal);
+        $this->assertStringContainsString('Afternoon Tasting', $cal);
+        $this->assertStringNotContainsString('Some Other Day', $cal);
+
+        // A list, not a seven-column grid holding one column.
+        $this->assertStringContainsString('od-agenda-row', $cal);
+        $this->assertStringNotContainsString('od-cal-dow', $cal);
+
+        // Each line carries the time and the stage.
+        $this->assertStringContainsString('11:00 AM', $cal);
+        $this->assertStringContainsString('3:30 PM', $cal);
+    }
+
+    /** In time order, so the day reads top to bottom. */
+    public function test_the_day_reads_in_time_order(): void
+    {
+        $this->event('Later', 'confirmed', true, now()->setTime(16, 0));
+        $this->event('Earlier', 'confirmed', true, now()->setTime(9, 0));
+
+        $cal = $this->calendar(['calview' => 'day', 'cal' => now()->format('Y-m-d')]);
+
+        $this->assertLessThan(
+            strpos($cal, 'Later'),
+            strpos($cal, 'Earlier'),
+            'The day is not in time order.',
+        );
+    }
+
+    /** An empty day says so, and offers the month. */
+    public function test_an_empty_day_says_so(): void
+    {
+        $cal = $this->calendar(['calview' => 'day', 'cal' => now()->format('Y-m-d')]);
+
+        $this->assertStringContainsString('Nothing on today', $cal);
+        $this->assertStringContainsString('See the month', $cal);
+    }
+
+    /** The arrows step a day at a time while a day is being shown. */
+    public function test_the_arrows_step_one_day(): void
+    {
+        $this->event('Tomorrow Job', 'confirmed', true, now()->addDay()->setTime(10, 0));
+
+        $today = $this->calendar(['calview' => 'day', 'cal' => now()->format('Y-m-d')]);
+        $this->assertStringNotContainsString('Tomorrow Job', $today);
+
+        $next = $this->calendar(['calview' => 'day', 'cal' => now()->addDay()->format('Y-m-d')]);
+        $this->assertStringContainsString('Tomorrow Job', $next);
     }
 }

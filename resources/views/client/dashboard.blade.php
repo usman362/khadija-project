@@ -23,6 +23,16 @@
         cursor: pointer;
     }
     .od-daterange svg { width: 14px; height: 14px; color: var(--text-muted); }
+    .od-daterange-wrap { position: relative; }
+    .od-daterange-wrap > summary { list-style: none; cursor: pointer; }
+    .od-daterange-wrap > summary::-webkit-details-marker { display: none; }
+    .od-daterange-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 30;
+        min-width: 180px; background: var(--bg-card); border: 1px solid var(--border-color);
+        border-radius: 10px; padding: 5px; box-shadow: 0 12px 28px -14px rgba(15,27,53,.45); }
+    .od-daterange-opt { display: block; padding: 8px 10px; border-radius: 7px; font-size: 13px;
+        color: var(--text-primary); text-decoration: none; }
+    .od-daterange-opt:hover { background: var(--bg-card-hover); }
+    .od-daterange-opt.is-on { background: rgba(249,115,22,.10); color: var(--brand-text); font-weight: 700; }
     .od-daterange .chev { width: 13px; height: 13px; }
 
     /* Stats row — 4 cards with mini sparkline */
@@ -279,6 +289,22 @@
     .od-cal-day.muted { opacity: 0.4; }
     .od-cal-day.has-event { background: rgba(249, 115, 22, 0.05); }
     .od-cal-more { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+    /* Day view — an agenda, one line per booking, the way a calendar's day
+       reads everywhere else. */
+    .od-cal-agenda { display: flex; flex-direction: column; }
+    .od-agenda-row { display: flex; align-items: center; gap: 10px; padding: 11px 4px;
+        border-bottom: 1px solid var(--border-color); text-decoration: none; color: inherit; }
+    .od-agenda-row:last-child { border-bottom: 0; }
+    .od-agenda-row:hover { background: var(--bg-card-hover); }
+    .od-agenda-time { flex: none; width: 68px; font-size: 12px; font-weight: 700;
+        color: var(--text-muted); font-variant-numeric: tabular-nums; }
+    .od-agenda-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; }
+    .od-agenda-body { min-width: 0; }
+    .od-agenda-body b { display: block; font-size: 13.5px; color: var(--text-primary);
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .od-agenda-body small { font-size: 11.5px; font-weight: 600; }
+    .od-agenda-empty { font-size: 12.5px; opacity: .75; margin: 14px 2px; }
     .od-cal-num { font-weight: 600; color: var(--text-primary); font-size: 11.5px; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; }
     /* Today — number sits in a solid orange circle (matches reference). */
     .od-cal-day.today .od-cal-num { background: #c2410c; color: #fff;  /* 2.80 -> 5.18 */ border-radius: 50%; font-weight: 800; }
@@ -505,9 +531,47 @@
        NEITHER column exists (the amount lives in bookings.price), so the query
        threw every time and the catch swallowed it: the card read $0.00 for
        everyone, forever, and looked like a real answer. */
-    $totalSpent = (float) \App\Models\Payment::where('user_id', $user->id)
-        ->where('status', 'completed')
-        ->sum('amount');
+    /*
+     * The period the two money/history cards answer for.
+     *
+     * The control above the cards was a <button> that printed the current
+     * month and did nothing — and nothing on the page was filtered by a date
+     * range at all, so it implied a filter that did not exist while every card
+     * beneath it said "All time".
+     *
+     * Only the two cards that HAVE a period take one. Active Gigs and Saved
+     * Professionals are counts of what is true right now, not of what happened
+     * in a window, so they say so instead of pretending to narrow.
+     */
+    $periods = [
+        'all'    => ['All time', null],
+        'month'  => ['This month', \Carbon\Carbon::now()->startOfMonth()],
+        'last'   => ['Last month', \Carbon\Carbon::now()->startOfMonth()->subMonth()],
+        'q'      => ['Last 3 months', \Carbon\Carbon::now()->startOfMonth()->subMonths(2)],
+        'year'   => ['This year', \Carbon\Carbon::now()->startOfYear()],
+    ];
+
+    $periodKey   = array_key_exists((string) request()->query('period'), $periods)
+        ? (string) request()->query('period')
+        : 'all';
+    $periodLabel = $periods[$periodKey][0];
+    $periodFrom  = $periods[$periodKey][1];
+    $periodTo    = $periodKey === 'last'
+        ? \Carbon\Carbon::now()->startOfMonth()->subMonth()->endOfMonth()
+        : \Carbon\Carbon::now()->endOfDay();
+
+    $inPeriod = fn ($query, string $column) => $periodFrom
+        ? $query->whereBetween($column, [$periodFrom, $periodTo])
+        : $query;
+
+    $periodLink = fn (string $key) => route('client.dashboard', array_merge(
+        request()->query(), ['period' => $key]
+    ));
+
+    $totalSpent = (float) $inPeriod(
+        \App\Models\Payment::where('user_id', $user->id)->where('status', 'completed'),
+        'created_at'
+    )->sum('amount');
 
     /*
      * The four cards' trend lines.
@@ -595,7 +659,9 @@
      */
     $now = \Carbon\Carbon::now();
 
-    $calView = request()->query('calview') === 'week' ? 'week' : 'month';
+    $calView = in_array(request()->query('calview'), ['day', 'week'], true)
+        ? request()->query('calview')
+        : 'month';
 
     // A bad date in the address is not a broken page; it is this month.
     try {
@@ -606,7 +672,18 @@
         $calAnchor = $now->copy();
     }
 
-    if ($calView === 'week') {
+    if ($calView === 'day') {
+        // One day, read as a list — which is what "Today" means. It used to
+        // jump the month grid to today's month, so pressing it on the month
+        // you were already looking at changed nothing at all.
+        $firstCalDate = $calAnchor->copy()->startOfDay();
+        $lastCalDate  = $calAnchor->copy()->endOfDay();
+        $calTitle     = $calAnchor->isToday()
+            ? 'Today · ' . $calAnchor->format('D j M')
+            : $calAnchor->format('D j M Y');
+        $calPrev      = $calAnchor->copy()->subDay();
+        $calNext      = $calAnchor->copy()->addDay();
+    } elseif ($calView === 'week') {
         $firstCalDate = $calAnchor->copy()->startOfWeek(\Carbon\Carbon::SUNDAY);
         $lastCalDate  = $calAnchor->copy()->endOfWeek(\Carbon\Carbon::SATURDAY);
         $calTitle     = $firstCalDate->format('M j') . ' – ' . $lastCalDate->format('M j, Y');
@@ -731,7 +808,14 @@
 
     // Planner tier — derived from completed events count. Brand wants this
     // wired to a config table eventually; static thresholds for now.
+    // Lifetime — the badge tiers below are an achievement, not a window.
     $completedEvents = $stats['completed_bookings'] ?? 0;
+
+    // What the card answers for, which does take the period.
+    $completedInPeriod = $periodFrom
+        ? \App\Models\Booking::where('client_id', $user->id)->where('status', 'completed')
+            ->whereBetween('updated_at', [$periodFrom, $periodTo])->count()
+        : $completedEvents;
     $tiers = [
         ['name' => 'New Planner',     'min' => 0,   'max' => 5],
         ['name' => 'Rising Planner',  'min' => 5,   'max' => 15],
@@ -749,16 +833,26 @@
 @endphp
 
 {{-- ── Date range selector (top-right) ──────────────────────── --}}
-<div class="od-daterange-row">
-    <button type="button" class="od-daterange">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        {{ $now->copy()->startOfMonth()->format('M d') }} – {{ $now->copy()->endOfMonth()->addDays(0)->format('M d, Y') }}
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-    </button>
+{{-- A real period, not a label. This printed the current month and did
+     nothing, above four cards that all said "All time". --}}
+<div class="od-daterange-row" id="odPeriod">
+    <details class="od-daterange-wrap">
+        <summary class="od-daterange">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            {{ $periodLabel }}
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="od-daterange-menu">
+            @foreach($periods as $key => [$label, $from])
+                <a class="od-daterange-opt {{ $key === $periodKey ? 'is-on' : '' }}"
+                   data-live href="{{ $periodLink($key) }}">{{ $label }}</a>
+            @endforeach
+        </div>
+    </details>
 </div>
 
 {{-- ── Stats row (4 cards) ────────────────────────────────────── --}}
-<div class="od-stats">
+<div class="od-stats" id="odStats">
     <div class="od-stat">
         <div class="od-stat-head">
             <div class="od-stat-ico coral">
@@ -778,7 +872,7 @@
                         </svg>{{ $__d['pct'] }}%
                     </span>
                 @endif
-                <span class="od-stat-sub">All time</span>
+                <span class="od-stat-sub">{{ $periodLabel }}</span>
             </div>
             @if($__pts = $sparkPoints($spentSeries))
                 <svg class="od-stat-spark" width="58" height="22" viewBox="0 0 60 22" fill="none" aria-hidden="true"><polyline points="{{ $__pts }}" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -820,7 +914,7 @@
             </div>
             <div>
                 <div class="od-stat-label">Completed Events</div>
-                <div class="od-stat-value">{{ $stats['completed_bookings'] ?? 0 }}</div>
+                <div class="od-stat-value">{{ number_format($completedInPeriod) }}</div>
             </div>
         </div>
         <div class="od-stat-foot">
@@ -832,7 +926,7 @@
                         </svg>{{ $__d['pct'] }}%
                     </span>
                 @endif
-                <span class="od-stat-sub">All time</span>
+                <span class="od-stat-sub">{{ $periodLabel }}</span>
             </div>
             @if($__pts = $sparkPoints($completedSeries))
                 <svg class="od-stat-spark" width="58" height="22" viewBox="0 0 60 22" fill="none" aria-hidden="true"><polyline points="{{ $__pts }}" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1029,7 +1123,7 @@
 
     {{-- Calendar — its own tall card on the right column --}}
     <div class="od-top-right">
-        <div class="od-card">
+        <div class="od-card" id="odCalCard">
             <div class="od-card-head">
                 <span class="od-card-title">My Calendar &amp; Availability</span>
             </div>
@@ -1038,20 +1132,47 @@
                  the view survives a reload or a shared link. --}}
             <div class="od-cal-head" id="calendar">
                 <div class="od-cal-month">
-                    <a class="od-cal-nav-btn" href="{{ $calLink(['cal' => $calPrev->format('Y-m-d')]) }}"
+                    <a class="od-cal-nav-btn" data-live href="{{ $calLink(['cal' => $calPrev->format('Y-m-d')]) }}"
                        aria-label="{{ $calView === 'week' ? 'Previous week' : 'Previous month' }}">‹</a>
-                    <a class="od-cal-nav-btn" href="{{ $calLink(['cal' => $calNext->format('Y-m-d')]) }}"
+                    <a class="od-cal-nav-btn" data-live href="{{ $calLink(['cal' => $calNext->format('Y-m-d')]) }}"
                        aria-label="{{ $calView === 'week' ? 'Next week' : 'Next month' }}">›</a>
                     {{ $calTitle }}
                 </div>
                 <div class="od-cal-tabs">
-                    <a class="od-cal-tab" href="{{ $calLink(['cal' => $now->format('Y-m-d')]) }}">Today</a>
-                    <a class="od-cal-tab {{ $calView === 'month' ? 'is-active' : '' }}"
+                    <a class="od-cal-tab {{ $calView === 'day' ? 'is-active' : '' }}" data-live
+                       href="{{ $calLink(['calview' => 'day', 'cal' => $now->format('Y-m-d')]) }}">Today</a>
+                    <a class="od-cal-tab {{ $calView === 'month' ? 'is-active' : '' }}" data-live
                        href="{{ $calLink(['calview' => 'month', 'cal' => $calAnchor->format('Y-m-d')]) }}">Month</a>
-                    <a class="od-cal-tab {{ $calView === 'week' ? 'is-active' : '' }}"
+                    <a class="od-cal-tab {{ $calView === 'week' ? 'is-active' : '' }}" data-live
                        href="{{ $calLink(['calview' => 'week', 'cal' => $calAnchor->format('Y-m-d')]) }}">Week</a>
                 </div>
             </div>
+            @if($calView === 'day')
+                {{-- One day, listed. A seven-column grid holding a single
+                     column of one is not a day view. --}}
+                @php $dayList = $eventsByDate->get($calAnchor->format('Y-m-d'), collect()); @endphp
+                <div class="od-cal-agenda">
+                    @forelse($dayList as $ev)
+                        @php
+                            $stage = $ev->stage();
+                            [$stageLabel, $stageColour] = $calStages[$stage] ?? ['Event', '#f97316'];
+                        @endphp
+                        <a class="od-agenda-row" href="{{ route('client.events.show', $ev) }}">
+                            <span class="od-agenda-time">{{ $ev->starts_at?->format('g:i A') ?? 'All day' }}</span>
+                            <span class="od-agenda-dot" style="background:{{ $stageColour }};"></span>
+                            <span class="od-agenda-body">
+                                <b>{{ $ev->title }}</b>
+                                <small style="color:{{ $stageColour }};">{{ $stageLabel }}</small>
+                            </span>
+                        </a>
+                    @empty
+                        <p class="od-agenda-empty">
+                            Nothing on {{ $calAnchor->isToday() ? 'today' : $calAnchor->format('D j M') }}.
+                            <a href="{{ $calLink(['calview' => 'month', 'cal' => $calAnchor->format('Y-m-d')]) }}" data-live style="font-weight:600;">See the month</a>
+                        </p>
+                    @endforelse
+                </div>
+            @else
             <div class="od-cal">
                 @foreach(['SUN','MON','TUE','WED','THU','FRI','SAT'] as $dow)
                     <div class="od-cal-dow">{{ $dow }}</div>
@@ -1092,7 +1213,8 @@
                     @php $cursor->addDay(); @endphp
                 @endwhile
             </div>
-            @if($eventsByDate->isEmpty())
+            @endif
+            @if($eventsByDate->isEmpty() && $calView !== 'day')
                 {{-- Says the true thing instead of filling the grid with
                      events the client never created. --}}
                 <p style="font-size:12.5px;opacity:.7;margin:10px 2px 0;">
@@ -1214,4 +1336,74 @@
         @endif
     </div>
 </div>
+
+@push('scripts')
+<script>
+/*
+ * The calendar and the period selector change what is on screen without
+ * taking the whole page with them.
+ *
+ * Both are plain links, and they stay plain links — the month is in the
+ * address so it survives a reload, a bookmark and a shared URL, and the page
+ * still works with this script switched off. What this adds is that a click
+ * fetches the same address and swaps only the two panels that changed, which
+ * is what makes it feel immediate instead of a full reload.
+ */
+(function () {
+    // The period control is swapped too: it names the period being shown, so
+    // leaving it behind would let the button and the cards disagree.
+    var PANELS = ['odPeriod', 'odStats', 'odCalCard'];
+    var busy = 0;
+
+    function swap(doc, id) {
+        var here = document.getElementById(id), fresh = doc.getElementById(id);
+        if (here && fresh) here.replaceWith(fresh);
+    }
+
+    function go(url, push) {
+        var mine = ++busy;
+        var card = document.getElementById('odCalCard');
+        if (card) card.setAttribute('aria-busy', 'true');
+
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+            .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+            .then(function (html) {
+                // A newer click already won; this answer is out of date.
+                if (mine !== busy) return;
+
+                var doc = new DOMParser().parseFromString(html, 'text/html');
+                PANELS.forEach(function (id) { swap(doc, id); });
+
+                if (push !== false) history.pushState({ odUrl: url }, '', url);
+            })
+            // Whatever went wrong, the link still works the ordinary way.
+            .catch(function () { window.location.href = url; })
+            .then(function () {
+                var c = document.getElementById('odCalCard');
+                if (c && mine === busy) c.setAttribute('aria-busy', 'false');
+            });
+    }
+
+    // Delegated: both panels are replaced wholesale, so a listener bound to
+    // the links themselves would die on the first click.
+    document.addEventListener('click', function (e) {
+        var a = e.target.closest ? e.target.closest('a[data-live]') : null;
+        if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+
+        e.preventDefault();
+
+        // Close the period menu behind the click.
+        var open = a.closest('details');
+        if (open) open.open = false;
+
+        go(a.href);
+    });
+
+    window.addEventListener('popstate', function (e) {
+        if (e.state && e.state.odUrl) go(e.state.odUrl, false);
+    });
+})();
+</script>
+@endpush
+
 @endsection
