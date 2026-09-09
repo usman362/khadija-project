@@ -105,6 +105,14 @@ class ClientBsrController extends Controller
              * knowable at step 1, so it is said at step 1.
              */
             'proCounts'     => $this->proCountsFor($step, $data, $request),
+            /*
+             * The relevance maps, so the list can reorder the moment the event
+             * type changes rather than only after the step is saved — which is
+             * what Sir Peter was asking about.
+             */
+            'relevance'     => $step === 'service'
+                ? \App\Domain\Taxonomy\ServiceRelevance::forBrowser()
+                : [],
             'showingAll'    => $this->showingAll($data, $request),
             'eventTypes' => Category::active()->eventTypes()
                 ->orderBy('name')->get(['id', 'name']),
@@ -189,6 +197,10 @@ class ClientBsrController extends Controller
         $all = Category::active()->bookableServices()
             ->orderBy('name')->get(['id', 'name', 'parent_id'])->unique('name')->values();
 
+        // The page says "the services below are ordered by what this kind of
+        // event usually needs". It was alphabetical, so the line was untrue.
+        $all = $this->orderedForEventType($all, $data);
+
         if ($this->showingAll($data, $request)) {
             return $all;
         }
@@ -205,6 +217,45 @@ class ClientBsrController extends Controller
         // If nothing bookable sits under what they chose, showing them an empty
         // step is worse than showing them everything.
         return $narrowed->isEmpty() ? $all : $narrowed;
+    }
+
+    /**
+     * The ones this kind of event usually needs, first.
+     *
+     * Sir Peter asked whether the list changes when the event type does. It
+     * said it did — that sentence has been under the dropdown all along — and
+     * it did not: the catalogue came back alphabetical whatever was chosen.
+     *
+     * The ranking is the Masterlist's own: each service sits under a service
+     * category, and the relevance matrix says whether that category is
+     * Essential, Common or Occasional for this kind of event. Nothing is
+     * hidden — a wedding can still want something the matrix calls occasional,
+     * and the matrix says occasional, not forbidden. Alphabetical within a
+     * tier, so the order is stable rather than arbitrary.
+     */
+    private function orderedForEventType($services, array $data)
+    {
+        $eventType = mb_strtolower(trim((string) ($data['event_type'] ?? '')));
+
+        if ($eventType === '') {
+            return $services;
+        }
+
+        $archetype = \App\Domain\Taxonomy\ServiceRelevance::archetypeByEventType()[$eventType] ?? null;
+        $tiers     = $archetype
+            ? (\App\Domain\Taxonomy\ServiceRelevance::tiersByArchetype()[$archetype] ?? [])
+            : [];
+
+        if ($tiers === []) {
+            return $services;
+        }
+
+        return $services
+            ->sortBy(fn ($c) => [
+                \App\Domain\Taxonomy\ServiceRelevance::rank($tiers[(int) $c->parent_id] ?? null),
+                $c->name,
+            ])
+            ->values();
     }
 
     /** Are we showing the whole catalogue rather than the chosen areas? */

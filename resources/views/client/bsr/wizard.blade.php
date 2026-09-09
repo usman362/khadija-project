@@ -335,7 +335,7 @@
             <div class="bw-svc" id="bwSvc">
                 @foreach($categories as $c)
                     @php $pros = $proCounts[$c->id] ?? 0; @endphp
-                    <label data-pros="{{ $pros }}" data-name="{{ $c->name }}">
+                    <label data-pros="{{ $pros }}" data-name="{{ $c->name }}" data-parent="{{ $c->parent_id }}">
                         <input type="checkbox" name="services[]" value="{{ $c->id }}"
                                @checked(in_array($c->id, (array) ($data['services'] ?? [])))>
                         <span class="bw-svc-name">{{ $c->name }}</span>
@@ -1073,6 +1073,44 @@
     box.addEventListener('change', function () { sync(); coverage(); });
     sync();
     coverage();
+
+    /* The list follows the event type.
+       The line under that dropdown has always said the services are ordered by
+       what this kind of event usually needs. On the server they now are — and
+       here they follow along the moment the dropdown changes, instead of only
+       after the step is saved.
+
+       Nothing is hidden. A wedding can still want something the matrix calls
+       occasional; occasional is not forbidden. */
+    var RELEVANCE = @json($relevance ?? []);
+    var typeEl = document.getElementById('bwEventType');
+    var natural = Array.prototype.slice.call(box.querySelectorAll('label'));
+
+    function reorder() {
+        if (! typeEl || ! RELEVANCE.tiers) return;
+
+        var arche = RELEVANCE.archetypeOf[String(typeEl.value || '').toLowerCase()];
+        var tiers = arche ? RELEVANCE.tiers[arche] : null;
+
+        var list = natural.slice();
+
+        if (tiers) {
+            list.sort(function (a, b) {
+                var ra = RELEVANCE.order.indexOf(tiers[a.dataset.parent] || null);
+                var rb = RELEVANCE.order.indexOf(tiers[b.dataset.parent] || null);
+                if (ra === -1) ra = RELEVANCE.order.length;
+                if (rb === -1) rb = RELEVANCE.order.length;
+                // Alphabetical inside a tier, which is the order the server
+                // sent — so the same event type always gives the same list.
+                return ra - rb || natural.indexOf(a) - natural.indexOf(b);
+            });
+        }
+
+        list.forEach(function (row) { box.appendChild(row); });
+    }
+
+    if (typeEl) typeEl.addEventListener('change', reorder);
+    reorder();
 })();
 </script>
 @endif
