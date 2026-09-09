@@ -245,7 +245,11 @@ class ClientBadgesAreEarnedTest extends TestCase
             ->getContent();
 
         $this->assertStringContainsString('hexb-crest', $html);
-        $this->assertStringContainsString('polygon(50% 0%, 100% 14%, 100% 62%, 50% 100%, 0 62%, 0 14%)', $html);
+        // A real hexagon, waist centred at 25/75. It was 14/62 -- a shield --
+        // until Sir Peter saw it on 2026-09-10. EveryBadgeIsAHexagonTest holds
+        // the shape itself; this only checks the page actually gets the rule.
+        $this->assertStringContainsString('polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)', $html);
+        $this->assertStringContainsString('hex-shape', $html);
 
         // And the old pill has gone, rather than sitting alongside.
         $this->assertStringNotContainsString('class="od-badge"', $html);

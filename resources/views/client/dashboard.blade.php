@@ -145,13 +145,13 @@
        green ribbon, matching the reference mockup. */
     .od-profile-badge {
         position: relative;
-        width: 78px; height: 96px;
+        /* 2/sqrt(3) of the width -- see the hexagon note in components/hex-badge. */
+        width: 78px; height: 90px;
         flex-shrink: 0;
         display: flex; flex-direction: column;
         align-items: center; justify-content: center;
         gap: 3px;
         background: linear-gradient(160deg, #2b3344 0%, #161c28 100%);
-        clip-path: polygon(50% 0%, 100% 14%, 100% 62%, 50% 100%, 0 62%, 0 14%);
         box-shadow: inset 0 0 0 2px rgba(245,158,11,0.55), 0 6px 16px rgba(0,0,0,0.25);
     }
     .od-profile-badge .crown { width: 30px; height: 30px; color: var(--warn-text); }
@@ -1028,7 +1028,8 @@
             <span class="od-card-title">Your Client Profile</span>
         </div>
         <div class="od-profile-row">
-            <div class="od-profile-badge">
+            @include('partials._hex_shape')
+            <div class="od-profile-badge hex-shape">
                 <svg class="crown" viewBox="0 0 24 24" fill="currentColor"><path d="M2 6l4 4 6-7 6 7 4-4v12H2z"/><circle cx="2" cy="5" r="1.4"/><circle cx="22" cy="5" r="1.4"/><circle cx="12" cy="2.5" r="1.4"/></svg>
                 @if($clientFigures['rating'])
                     <span class="stars">{{ str_repeat('★', (int) round($clientFigures['rating'])) }}</span>

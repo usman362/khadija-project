@@ -55,12 +55,72 @@ class EveryBadgeIsAHexagonTest extends TestCase
      */
     public function test_the_shape_is_defined_in_one_place(): void
     {
-        $component = file_get_contents(resource_path('views/components/hex-badge.blade.php'));
+        $others = [];
 
-        $this->assertStringContainsString(
-            'polygon(50% 0%, 100% 14%, 100% 62%, 50% 100%, 0 62%, 0 14%)',
-            $component,
+        foreach ($this->bladeFiles() as $file) {
+            if (str_ends_with($file, 'partials/_hex_shape.blade.php')) {
+                continue;
+            }
+
+            if (str_contains(file_get_contents($file), 'polygon(50% 0%')) {
+                $others[] = $file;
+            }
+        }
+
+        $this->assertSame([], $others, 'The hexagon is drawn outside partials/_hex_shape: ' . implode(', ', $others));
+    }
+
+    /**
+     * It has to be an actual hexagon, not a crest.
+     *
+     * The component shipped with 14%/62%, which pulls the bottom vertex into a
+     * long spike -- a shield. Sir Peter saw it beside the hexagons he wanted on
+     * 2026-09-10: "and not these style". Asserting the literal polygon string
+     * would have passed the whole time, because the string was the bug.
+     *
+     * A hexagon's two waist vertices sit the same distance from the top and the
+     * bottom, so their percentages add up to 100. A shield's do not.
+     */
+    public function test_the_polygon_is_a_hexagon_and_not_a_shield(): void
+    {
+        $component = file_get_contents(resource_path('views/partials/_hex_shape.blade.php'));
+
+        $this->assertTrue(
+            (bool) preg_match('/clip-path:\s*polygon\(([^)]+)\)/', $component, $m),
+            'The hexagon partial draws no polygon at all.',
         );
+
+        preg_match_all('/(\d+(?:\.\d+)?)%?\s+(\d+(?:\.\d+)?)%/', $m[1], $points, PREG_SET_ORDER);
+
+        $this->assertCount(6, $points, 'A hexagon has six corners.');
+
+        $ys = array_map(fn ($p) => (float) $p[2], $points);
+        sort($ys);
+
+        // Top point at 0, bottom point at 100, and the four waist corners in
+        // two mirrored pairs.
+        $this->assertSame(0.0, $ys[0], 'The top point is not at the top.');
+        $this->assertSame(100.0, $ys[5], 'The bottom point is not at the bottom.');
+        $this->assertSame(100.0, $ys[1] + $ys[4], 'The waist is not centred -- this is a crest, not a hexagon.');
+        $this->assertSame(100.0, $ys[2] + $ys[3], 'The waist is not centred -- this is a crest, not a hexagon.');
+    }
+
+    /** @return array<int, string> */
+    private function bladeFiles(): array
+    {
+        $files = [];
+
+        $it = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(resource_path('views'))
+        );
+
+        foreach ($it as $file) {
+            if ($file->isFile() && str_ends_with($file->getFilename(), '.blade.php')) {
+                $files[] = $file->getPathname();
+            }
+        }
+
+        return $files;
     }
 
     /** Colours are settings, because they are not ours to choose. */

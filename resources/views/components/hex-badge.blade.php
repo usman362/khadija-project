@@ -31,15 +31,17 @@
     'inline' => false,
 ])
 
+@include('partials._hex_shape')
+
 @once
 @push('styles')
 <style>
     .hexb { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; width: max-content; }
     .hexb-crest {
         display: flex; align-items: center; justify-content: center;
-        /* The same polygon the client tier crest already uses, so the two do
-           not disagree about what a hexagon is on this site. */
-        clip-path: polygon(50% 0%, 100% 14%, 100% 62%, 50% 100%, 0 62%, 0 14%);
+        /* The shape itself is in partials/_hex_shape -- the profile crest on
+           the dashboard needs it too, and one copy each is how both of them
+           came to be a shield. */
         line-height: 1;
     }
     .hexb-crest span { font-style: normal; }
@@ -60,8 +62,8 @@
 @endonce
 
 <span class="hexb {{ $earned ? '' : 'is-locked' }} {{ $inline ? 'is-inline' : '' }}" @if($title) title="{{ $title }}" @endif>
-    <span class="hexb-crest"
-          style="width: {{ $size }}px; height: {{ round($size * 1.14) }}px;
+    <span class="hexb-crest hex-shape"
+          style="width: {{ $size }}px; height: {{ round($size * 1.1547) }}px;
                  font-size: {{ round($size * 0.42) }}px;
                  background: linear-gradient(160deg, {{ $colour }} 0%, color-mix(in srgb, {{ $colour }} 62%, #0f172a) 100%);
                  box-shadow: inset 0 0 0 2px color-mix(in srgb, #fff 42%, {{ $colour }});">
