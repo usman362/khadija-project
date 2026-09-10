@@ -55,6 +55,9 @@
     .cm-side-role { margin: 10px 16px 0; font-size: 12.5px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 4px 10px; }
     .cm-side-role a { color: var(--cm); font-weight: 700; text-decoration: none; }
     .cm-side-job { margin: 14px 16px 0; padding-bottom: 14px; border-bottom: 1px solid var(--border-color); }
+    .cm-side-job-cap { display: block; font-size: 11px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase;
+        color: var(--text-muted); margin-bottom: 4px; }
+    .cm-side-more { display: inline-block; margin-top: 8px; font-size: 12.5px; font-weight: 700; color: var(--cm); text-decoration: none; }
     .cm-side-job-title { display: block; font-size: 14.5px; font-weight: 800; color: var(--text-primary); text-decoration: none; line-height: 1.35; }
     .cm-side-job-title:hover { color: var(--cm); }
     .cm-side-job-when { display: block; font-size: 12.5px; color: var(--text-muted); margin: 3px 0 12px; }
@@ -567,6 +570,9 @@
 
                 @if($info['job'])
                     <div class="cm-side-job">
+                        {{-- Said when the chat itself names no event and this was
+                             found from their proposal, so it is clear why it is here. --}}
+                        @if($info['job']['source'] === 'proposal')<span class="cm-side-job-cap">Their proposal on your event</span>@endif
                         <a class="cm-side-job-title" href="{{ $info['job']['url'] }}">{{ $info['job']['title'] }}</a>
                         <span class="cm-side-job-when">{{ $info['job']['posted'] ? 'Posted ' . $info['job']['posted'] : 'Not posted yet' }}</span>
 
@@ -590,6 +596,9 @@
                             <small class="cm-side-note">They withdrew their proposal for this event.</small>
                         @elseif($aw)
                             <small class="cm-side-note">{{ $info['name'] }} has not sent a proposal for this event yet.</small>
+                        @endif
+                        @if(($info['job']['more'] ?? 0) > 0)
+                            <a class="cm-side-more" href="{{ route('client.proposals.index') }}">{{ $info['job']['more'] }} more {{ \Illuminate\Support\Str::plural('proposal', $info['job']['more']) }} from them</a>
                         @endif
                     </div>
                 @endif

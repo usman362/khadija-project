@@ -98,6 +98,38 @@ class ClientChatController extends Controller
         $booking = $c->booking;
         $event   = $c->event ?? $booking?->event;
 
+        /*
+         * The job this chat is about, when the chat does not say.
+         *
+         * Sending a proposal does not open a conversation, so a client and a
+         * professional who bid almost always talk in a plain direct chat with
+         * no event on it. Reading the job only from the conversation meant the
+         * job card, and the Award button with it, never appeared at all (Ali,
+         * 2026-09-11: "chat me kahin show nhi horaha hai award karne ka").
+         *
+         * So it falls back to their proposals on this client's own events: the
+         * newest one still open, or failing that the newest of any status, so
+         * an award already made still reads as Awarded. Never another client's
+         * event. The card says it came from their proposal.
+         */
+        $jobSource = $event ? 'chat' : null;
+        $moreOpen  = 0;
+        if (! $event && $pro) {
+            $bids = \App\Models\Bid::where('supplier_id', $pro->id)
+                ->whereHas('event', fn ($q) => $q->where('client_id', $user->id))
+                ->with('event')
+                ->latest('id')
+                ->get();
+
+            $open  = $bids->where('status', 'submitted');
+            $pick  = $open->first() ?? $bids->first();
+            $event = $pick?->event;
+            if ($event) {
+                $jobSource = 'proposal';
+                $moreOpen  = $open->pluck('event_id')->unique()->reject(fn ($id) => $id === $event->id)->count();
+            }
+        }
+
         $withThisPro = $pro
             ? Booking::where('client_id', $user->id)->where('supplier_id', $pro->id)
             : null;
@@ -127,6 +159,11 @@ class ClientChatController extends Controller
                 'title'  => $event->title,
                 'posted' => $event->postedAt()?->humanAgo(),
                 'url'    => route('client.events.show', $event),
+                // 'chat' when the conversation names the event, 'proposal'
+                // when it was found from their proposals.
+                'source' => $jobSource,
+                // Their other open proposals on this client's events.
+                'more'   => $moreOpen,
             ] : null,
             'award'        => $this->award($event, $pro, $user),
             'archived'     => (bool) optional($c->participants->firstWhere('id', $user->id))->pivot?->archived_at,
