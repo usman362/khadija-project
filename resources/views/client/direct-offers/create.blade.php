@@ -6,7 +6,7 @@
      Request can ask one professional for a single service (SSR) or several
      (MSR); "services" read as the second only. Phrased like the Bidding
      Request card, "one service or several". --}}
-@section('page-subtitle', 'Request one service or several from a single professional.')
+@section('page-subtitle', 'Request Single service or Multiple services from a single professional.')
 
 {{-- Client → Professional Direct Request builder. The request type (SSR / MSR)
      reshapes the form: SSR = one service; MSR = multiple services, each handled

@@ -60,7 +60,7 @@ class RequestTypeLabelsTest extends TestCase
         $this->actingAs($this->client())
             ->get(route('client.direct-offers.create'))
             ->assertOk()
-            ->assertSee('Request one service or several from a single professional.', false)
+            ->assertSee('Request Single service or Multiple services from a single professional.', false)
             ->assertDontSee('Request services from one professional.', false);
     }
 
