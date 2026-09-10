@@ -12,7 +12,11 @@
     ending anything. Neither touches the thread.
 --}}
 @auth
-@if(\App\Support\MessengerAccess::dock(auth()->user()))
+{{-- Not on the messages page itself: it is a shortcut to the page you are
+     already on, and its button sat over the details column's Chat options
+     and figures (Ali, 2026-09-11). --}}
+@if(\App\Support\MessengerAccess::dock(auth()->user())
+    && ! request()->routeIs('client.chat.*', 'professional.chat.*', 'app.chat.*'))
 @once
 @push('styles')
 <style>

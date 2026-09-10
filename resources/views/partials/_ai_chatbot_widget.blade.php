@@ -146,6 +146,21 @@
 
 <style>
     /* ── Bubble ── */
+    /*
+     * Room at the foot of the page for the floating buttons.
+     *
+     * The assistant's bubble, and the messages button stacked above it, are
+     * fixed to the bottom-right corner, so whatever sits there at the end of
+     * a page was under them with no way to scroll it out: on Messages, the
+     * details column's Archive button and its figures (Ali, 2026-09-11). The
+     * page now ends that much lower, so the last row can always be brought
+     * above them. Numbers from the buttons themselves:
+     *   bubble only:      24 bottom + 58 bubble + 28 gap = 110
+     *   with the button:  96 bottom + 52 button + 28 gap = 176
+     */
+    body:has(.aic-bubble) .cl-content { padding-bottom: 110px; }
+    body:has(.aic-bubble):has(#msgDock) .cl-content { padding-bottom: 176px; }
+
     .aic-bubble {
         position: fixed;
         bottom: 24px;

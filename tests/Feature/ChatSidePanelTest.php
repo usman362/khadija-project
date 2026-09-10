@@ -149,6 +149,21 @@ class ChatSidePanelTest extends TestCase
         $this->assertStringContainsString('class="cm-main has-side"', $html);
     }
 
+    /**
+     * Ali, 2026-09-11: Archive was out of sight. The panel scrolls inside its
+     * card and the options were its last row, wrapped onto two lines. They
+     * are pinned to the panel's foot on one line now.
+     */
+    public function test_chat_options_stay_pinned_and_on_one_line(): void
+    {
+        $src = file_get_contents(resource_path('views/client/chat/index.blade.php'));
+
+        $this->assertMatchesRegularExpression('/\.cm-side-options \{ position: sticky; bottom: 0;/', $src);
+        $this->assertStringContainsString('.cm-side-opt-btns { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));', $src);
+        // And the columns end above the assistant's bubble on a normal screen.
+        $this->assertStringContainsString('body:has(.aic-bubble) .cm-main .cm-card { height: clamp(460px, calc(100vh - 360px), 600px); }', $src);
+    }
+
     /** Part 2 added Mute and Block beside Archive (ChatMuteBlockTest). */
     public function test_chat_options_offer_mute_block_and_archive(): void
     {

@@ -77,8 +77,21 @@
         border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary); font-size: 12.5px; font-weight: 700; cursor: pointer; }
     .cm-side-options button:hover { color: var(--cm); border-color: var(--cm); }
     .cm-side-options svg { width: 16px; height: 16px; }
-    .cm-side-opt-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
-    .cm-side-options { flex-wrap: wrap; }
+    /*
+     * Chat options stay in view.
+     *
+     * The details column scrolls inside its card, and the options were the
+     * last thing in it, so Mute, Block and Archive sat below the fold until
+     * you scrolled the panel itself, which nothing suggested. Three buttons
+     * also did not fit one line, so Archive wrapped onto a second row further
+     * down (Ali, 2026-09-11). The row is pinned to the foot of the panel now,
+     * the details scroll behind it, and the buttons share one line.
+     */
+    .cm-side-options { position: sticky; bottom: 0; z-index: 1; background: var(--bg-card); flex-wrap: wrap; row-gap: 8px; }
+    .cm-side-options > span { flex-basis: 100%; }
+    .cm-side-opt-btns { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; width: 100%; }
+    .cm-side-opt-btns form { margin: 0; }
+    .cm-side-opt-btns button { width: 100%; justify-content: center; padding: 7px 6px; font-size: 12px; }
     .cm-side-options button.is-on { color: #b91c1c; border-color: rgba(185,28,28,.4); background: rgba(185,28,28,.06); }
     .cm-side-name em { display: block; font-style: normal; font-size: 11.5px; opacity: .8; margin-top: 2px; }
     .cm-blocked-note { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 18px 14px;
@@ -93,6 +106,15 @@
        to its own content, so the list ran on past the bottom of the thread
        and left a block of empty card under the compose box. */
     .cm-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; display: flex; flex-direction: column; height: 600px; }
+    /*
+     * With the assistant's bubble in the corner, the three columns end above
+     * it on a normal screen, so the pinned chat options are clear of it the
+     * moment the page opens, not only after scrolling. The cards start about
+     * 265px down; ending 12px above the bubble (82px from the bottom) leaves
+     * 100vh - 360px. Never shorter than 460px: below that the page scrolls,
+     * and the room left at its foot (partials/_ai_chatbot_widget) takes over.
+     */
+    body:has(.aic-bubble) .cm-main .cm-card { height: clamp(460px, calc(100vh - 360px), 600px); }
     .cm-tabs { display: flex; gap: 4px; padding: 12px 14px 0; border-bottom: 1px solid var(--border-color); }
     .cm-tab { display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; font-size: 12.5px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
     .cm-tab.on { color: var(--cm); border-bottom-color: var(--cm); }
