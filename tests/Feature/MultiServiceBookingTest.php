@@ -23,6 +23,11 @@ use Tests\TestCase;
  * (updateOrCreate). Reachable today: multi-service requests take per-service
  * bids. These guard the service dimension at both award paths, and guard the
  * whole-event (null) case against regressing into duplicates.
+ *
+ * 2026-09-10: every award goes through finalization now (App\Domain\Requests
+ * \Award). These drove the Proposals list's direct accept, which booked on the
+ * spot; they now open the agreement and finish it, which is the only way a
+ * booking is made, and hold exactly the same rules.
  */
 class MultiServiceBookingTest extends TestCase
 {
@@ -71,6 +76,12 @@ class MultiServiceBookingTest extends TestCase
         return $e->fresh();
     }
 
+    /** Award a proposal the way the product does: open the agreement, finish it. */
+    private function award(Bid $bid): void
+    {
+        \App\Domain\Requests\Award::book(\App\Domain\Requests\Award::openFinalization($bid), 'Test award of bid #' . $bid->id);
+    }
+
     private function bid(Event $e, Category $svc, float $amount): Bid
     {
         return Bid::create([
@@ -89,8 +100,8 @@ class MultiServiceBookingTest extends TestCase
         $photo = $this->bid($event, $this->service('Photography'), 2400);
         $cater = $this->bid($event, $this->service('Catering'), 900);
 
-        $this->actingAs($this->client)->post(route('client.proposals.accept', $photo))->assertRedirect();
-        $this->actingAs($this->client)->post(route('client.proposals.accept', $cater))->assertRedirect();
+        $this->award($photo);
+        $this->award($cater);
 
         $bookings = Booking::where('event_id', $event->id)->where('supplier_id', $this->pro->id)->get();
 
@@ -131,8 +142,8 @@ class MultiServiceBookingTest extends TestCase
         $event = $this->event();
         $bid   = $this->bid($event, $this->service('Photography'), 2400);
 
-        $this->actingAs($this->client)->post(route('client.proposals.accept', $bid))->assertRedirect();
-        $this->actingAs($this->client)->post(route('client.proposals.accept', $bid))->assertRedirect();
+        $this->award($bid);
+        $this->award($bid);
 
         $this->assertSame(1, Booking::where('event_id', $event->id)->where('supplier_id', $this->pro->id)->count());
     }
@@ -153,8 +164,8 @@ class MultiServiceBookingTest extends TestCase
             'status'      => 'submitted',
         ]);
 
-        $this->actingAs($this->client)->post(route('client.proposals.accept', $bid))->assertRedirect();
-        $this->actingAs($this->client)->post(route('client.proposals.accept', $bid))->assertRedirect();
+        $this->award($bid);
+        $this->award($bid);
 
         $rows = Booking::where('event_id', $event->id)->where('supplier_id', $this->pro->id)->get();
         $this->assertCount(1, $rows);
@@ -178,7 +189,7 @@ class MultiServiceBookingTest extends TestCase
 
         foreach ($prices as $name => $amount) {
             $bid = $this->bid($event, $this->service($name), $amount);
-            $this->actingAs($this->client)->post(route('client.proposals.accept', $bid))->assertRedirect();
+            $this->award($bid);
         }
 
         $bookings = Booking::where('event_id', $event->id)->where('supplier_id', $this->pro->id)->get();
@@ -205,7 +216,7 @@ class MultiServiceBookingTest extends TestCase
         $photoBid = $this->bid($event, $photo, 2400);
         $this->bid($event, $cater, 900);
 
-        $this->actingAs($this->client)->post(route('client.proposals.accept', $photoBid))->assertRedirect();
+        $this->award($photoBid);
 
         $event->refresh();
         $this->assertNull($event->supplier_id, 'A half-awarded request must not be stamped to one pro.');
@@ -219,8 +230,8 @@ class MultiServiceBookingTest extends TestCase
     {
         $event = $this->requesting($this->event(), $photo = $this->service('Photography'), $cater = $this->service('Catering'));
 
-        $this->actingAs($this->client)->post(route('client.proposals.accept', $this->bid($event, $photo, 2400)));
-        $this->actingAs($this->client)->post(route('client.proposals.accept', $this->bid($event, $cater, 900)));
+        $this->award($this->bid($event, $photo, 2400));
+        $this->award($this->bid($event, $cater, 900));
 
         $event->refresh();
         $this->assertTrue($event->isFullyAwarded());
@@ -246,8 +257,8 @@ class MultiServiceBookingTest extends TestCase
             'category_id' => $cater->id, 'amount' => 900, 'status' => 'submitted',
         ]);
 
-        $this->actingAs($this->client)->post(route('client.proposals.accept', $this->bid($event, $photo, 2400)));
-        $this->actingAs($this->client)->post(route('client.proposals.accept', $catererBid));
+        $this->award($this->bid($event, $photo, 2400));
+        $this->award($catererBid);
 
         $event->refresh();
         $this->assertTrue($event->isFullyAwarded());
@@ -266,10 +277,10 @@ class MultiServiceBookingTest extends TestCase
     public function test_the_board_keeps_a_half_awarded_request_and_drops_a_full_one(): void
     {
         $partial = $this->requesting($this->event(), $p1 = $this->service('Photography'), $this->service('Catering'));
-        $this->actingAs($this->client)->post(route('client.proposals.accept', $this->bid($partial, $p1, 2400)));
+        $this->award($this->bid($partial, $p1, 2400));
 
         $full = $this->requesting($this->event(), $f1 = $this->service('DJ'));
-        $this->actingAs($this->client)->post(route('client.proposals.accept', $this->bid($full, $f1, 800)));
+        $this->award($this->bid($full, $f1, 800));
 
         $onBoard = \App\Models\Event::openForBids()->pluck('id')->all();
 
@@ -289,7 +300,7 @@ class MultiServiceBookingTest extends TestCase
     {
         $event = $this->requesting($this->event(), $photo = $this->service('Photography'));
 
-        $this->actingAs($this->client)->post(route('client.proposals.accept', $this->bid($event, $photo, 2400)));
+        $this->award($this->bid($event, $photo, 2400));
 
         $event->refresh();
         $this->assertSame($this->pro->id, $event->supplier_id);

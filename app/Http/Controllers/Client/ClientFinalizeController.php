@@ -41,19 +41,8 @@ class ClientFinalizeController extends Controller
         $event = $bid->event;
         abort_unless((int) $event->client_id === (int) $request->user()->id, 403);
 
-        // Keyed on the SERVICE too (B6). Finalizing photography must not reuse
-        // the finalization the client already started for catering with the
-        // same professional -- price, scope and schedule are per service.
-        $fin = Finalization::firstOrCreate(
-            ['event_id' => $event->id, 'supplier_id' => $bid->supplier_id, 'category_id' => $bid->category_id],
-            [
-                'bid_id'       => $bid->id,
-                'client_id'    => $event->client_id,
-                'agreed_price' => $bid->amount,
-                'scope'        => $bid->plan,
-                'payment_terms' => $bid->terms,
-            ]
-        );
+        // Keyed on the SERVICE too (B6): see App\Domain\Requests\Award.
+        $fin = \App\Domain\Requests\Award::openFinalization($bid);
 
         return redirect()->route('client.finalize.step', [$fin, 'bid']);
     }
@@ -375,24 +364,10 @@ class ClientFinalizeController extends Controller
                 ]);
             }
 
-            // Only now is it a booking. Everything before this was an agreement
-            // in progress that either side could walk away from.
-            // Keyed on the SERVICE too (B6): finalizing the second service to
-            // the same pro must not overwrite the first booking's price.
-            $booking = Booking::updateOrCreate(
-                ['event_id' => $f->event_id, 'supplier_id' => $f->supplier_id, 'category_id' => $f->category_id],
-                [
-                    'client_id'  => $f->client_id,
-                    'created_by' => $f->client_id,
-                    'status'     => 'confirmed',
-                    'price'      => $f->agreed_price,
-                    'currency'   => 'USD',
-                    'booked_at'  => now(),
-                    'source'     => 'finalization',
-                    'notes'      => 'Finalized agreement #' . $f->id
-                        . ($mode === 'test' ? ' (test-mode deposit)' : ''),
-                ]
-            );
+            // Only now is it a booking, and the proposal is won. The one
+            // place that happens: App\Domain\Requests\Award.
+            $booking = \App\Domain\Requests\Award::book($f, 'Finalized agreement #' . $f->id
+                . ($mode === 'test' ? ' (test-mode deposit)' : ''));
 
             $f->update([
                 'payment_id'   => $payment->id,
@@ -401,8 +376,6 @@ class ClientFinalizeController extends Controller
                 'booking_id'   => $booking->id,
                 'status'       => 'booked',
             ]);
-
-            $f->bid?->update(['status' => 'won']);
         });
     }
 

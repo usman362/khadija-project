@@ -199,32 +199,26 @@ class ClientProposalController extends Controller
         ]);
     }
 
+    /**
+     * Accept a proposal: open its agreement, never book it outright.
+     *
+     * This used to mark the bid won and create a confirmed booking on the
+     * spot, skipping scope, price, schedule, contract and the $2.99 fee. The
+     * Compare page and the chat already went through finalization; Ali,
+     * 2026-09-10, put this one on it too. The route stays, so an old link or a
+     * form still open in someone's browser lands in the agreement rather than
+     * failing, but it can no longer book around it.
+     */
     public function accept(Request $request, Bid $bid): RedirectResponse
     {
         $this->authorizeOwner($request, $bid);
-        $bid->update(['status' => 'won']);
 
-        // Turn the award into a real booking/contract. Keyed on the SERVICE
-        // too (B6): a pro who wins two services on one event gets two bookings,
-        // not one that silently swallows the second. category_id is null for a
-        // whole-event (SSR) bid, and firstOrCreate matches that null.
-        Booking::firstOrCreate(
-            ['event_id' => $bid->event_id, 'supplier_id' => $bid->supplier_id, 'category_id' => $bid->category_id],
-            [
-                'client_id'  => $bid->event->client_id,
-                'created_by' => $request->user()->id,
-                'status'     => 'confirmed',
-                'price'      => $bid->amount,
-                'currency'   => 'USD',
-                'booked_at'  => now(),
-                'source'     => 'bid',
-                'notes'      => 'Awarded from bid #' . $bid->id,
-            ]
-        );
+        $fin = \App\Domain\Requests\Award::openFinalization($bid);
 
-        return back()->with('status', 'Bid accepted. '
-            . ($bid->supplier?->name ?? 'The professional')
-            . ' is awarded: a confirmed booking has been created under Bookings.');
+        return redirect()->route('client.finalize.step', [$fin, 'bid'])
+            ->with('status', 'Review the agreement with '
+                . ($bid->supplier?->name ?? 'the professional')
+                . '. Nothing is booked until you confirm it.');
     }
 
     /** Decline a bid. Only the event's owner may act. */
