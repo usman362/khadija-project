@@ -6,7 +6,11 @@
 
 @push('styles')
 <style>
-    .pw { max-width: 1180px; }
+    .pw { max-width: 1180px; min-width: 0; }
+    /* The page was one column, so it was the only request flow with nothing
+       beside it explaining itself. */
+    .pw-layout { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 20px; align-items: start; }
+    @media (max-width: 1024px) { .pw-layout { grid-template-columns: minmax(0,1fr); } }
     .pw-head { margin-bottom: 18px; }
     .pw-head h1 { font-size: 23px; font-weight: 800; margin: 0 0 4px; color: var(--text-primary); }
     .pw-head p  { font-size: 13px; color: var(--text-muted); margin: 0; }
@@ -72,6 +76,7 @@
 @endpush
 
 @section('content')
+<div class="pw-layout">
 <div class="pw">
     <div class="pw-head">
         {{-- The title is in the banner at the top of the page; it used to be repeated here too. One page header, one size, everywhere. --}}
@@ -273,5 +278,10 @@
             @endif
         </div>
     @endif
+</div>
+
+<aside class="hr-rail">
+    @include('partials._help_rail', ['flow' => 'toolkit'])
+</aside>
 </div>
 @endsection

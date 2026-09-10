@@ -377,27 +377,10 @@
     </form>
 
     {{-- Contextual rail — fills large screens, stacks under the form on tablet/mobile --}}
-    <aside class="do-rail">
-        <div class="do-rcard">
-            <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>How Direct Requests work</h4>
-            <div class="do-step"><span class="do-step-n">1</span><span class="do-step-b"><b>Pick your pro &amp; services</b>Choose who you're sending this to and exactly what you need.</span></div>
-            <div class="do-step"><span class="do-step-n">2</span><span class="do-step-b"><b>Send the request</b>We draft a clear brief from your inputs and delivers it to the pro.</span></div>
-            <div class="do-step"><span class="do-step-n">3</span><span class="do-step-b"><b>They respond</b>The pro can accept, counter, or ask questions — replies land on your Proposals page.</span></div>
-        </div>
-        <div class="do-rcard">
-            <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>SSR vs MSR</h4>
-            <ul class="do-rlist">
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span><b>SSR</b> — one service, handled as a single agreement.</span></li>
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span><b>MSR</b> — multiple services; each is sent as its own separate agreement.</span></li>
-            </ul>
-        </div>
-        <div class="do-rcard">
-            <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>Good to know</h4>
-            <ul class="do-rlist">
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span>Your budget range is only visible to the pro you send to.</span></li>
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span>You can counter or negotiate before anything is confirmed.</span></li>
-            </ul>
-        </div>
+    {{-- Shared with the bidding and emergency pages -- see config/request-help.
+         It had no "what it'll cost" panel at all, while both of the others did. --}}
+    <aside class="hr-rail">
+        @include('partials._help_rail', ['flow' => 'dr'])
     </aside>
     </div>
 </div>

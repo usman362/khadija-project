@@ -195,36 +195,10 @@
     </form>
 
     {{-- Contextual rail — fills large screens, stacks under the form on tablet/mobile --}}
-    <aside class="esr-rail">
-        <div class="esr-rcard">
-            <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>How rush requests work</h4>
-            <div class="esr-step"><span class="esr-step-n">1</span><span class="esr-step-b"><b>Publish your request</b>Tell us what you need and by when — it's free to post.</span></div>
-            <div class="esr-step"><span class="esr-step-n">2</span><span class="esr-step-b"><b>Verified pros are notified</b>Available professionals nearby get a priority alert instantly.</span></div>
-            <div class="esr-step"><span class="esr-step-n">3</span><span class="esr-step-b"><b>Respond &amp; finalize</b>Replies appear on your Proposals page — pick one and confirm.</span></div>
-        </div>
-        <div class="esr-rcard">
-            <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Single or multi?</h4>
-            <ul class="esr-rlist">
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span><b>Single service</b> — one urgent gap, one agreement.</span></li>
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span><b>Multi-service</b> — several gaps; each is bid on and agreed separately.</span></li>
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span>Either way this goes out to <b>every available professional</b> — it isn't sent to one pro like a Direct Request.</span></li>
-            </ul>
-        </div>
-        <div class="esr-rcard">
-            <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>What you'll pay</h4>
-            <ul class="esr-rlist">
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span><b>$0</b> to post — nothing charged upfront.</span></li>
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span>A single <b>$2.99</b> only when you finalize with a pro.</span></li>
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span>Nothing if the request goes unfilled.</span></li>
-            </ul>
-        </div>
-        <div class="esr-rcard">
-            <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>Faster responses</h4>
-            <ul class="esr-rlist">
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span>Add a clear "needed by" time and location.</span></li>
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span>Share a budget range so pros can commit quickly.</span></li>
-            </ul>
-        </div>
+    {{-- Was four hand-written cards saying what the bidding and direct pages
+         also said, in different words. Shared now -- see config/request-help. --}}
+    <aside class="hr-rail">
+        @include('partials._help_rail', ['flow' => 'er'])
     </aside>
     </div>
 </div>

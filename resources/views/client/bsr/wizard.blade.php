@@ -1022,20 +1022,17 @@
     </div>
 
     {{-- ── Right rail ──────────────────────────────────────── --}}
-    <aside>
-        <div class="bw-rail-card">
+    <aside class="hr-rail">
+        <div class="hr-card">
             <h4>Step {{ $stepIndex + 1 }} of {{ count($steps) }}</h4>
             <div class="bw-bar"><i style="width: {{ $pct }}%;"></i></div>
             <p style="font-size:11.5px;color:var(--text-muted);">{{ $pct }}% complete</p>
         </div>
 
-        <div class="bw-rail-card">
-            <h4>How this works</h4>
-            <div class="bw-rule"><i>🔒</i><div><b>Sealed proposals</b><span>Amounts are visible only to you and the professional who sent them.</span></div></div>
-            <div class="bw-rule"><i>💸</i><div><b>Free to post</b><span>$2.99 applies only when you finalize with a professional. Nothing books, nothing charged.</span></div></div>
-            <div class="bw-rule"><i>✏️</i><div><b>Editable until you choose</b><span>Change details or back out any time before you select someone.</span></div></div>
-            <div class="bw-rule"><i>⏱️</i><div><b>Deadline before the event</b><span>Proposals always close before the event date.</span></div></div>
-        </div>
+        {{-- The four hand-written rules that were here said the same things as
+             the emergency and direct pages did, in different words. They are
+             in config/request-help.php now, shared with both. --}}
+        @include('partials._help_rail', ['flow' => 'br'])
     </aside>
 </div>
 </form>
