@@ -150,7 +150,7 @@ class ChatStatsCardsTest extends TestCase
         Booking::create(['event_id' => $this->event()->id, 'client_id' => $this->client->id, 'supplier_id' => $p->id,
             'created_by' => $this->client->id, 'status' => 'confirmed', 'price' => 400]);
 
-        $card = $this->card('Agreed, unpaid', $this->cards());
+        $card = $this->card('Due', $this->cards());
 
         $this->assertStringContainsString('$400', $card);
         $this->assertStringContainsString('Across 1 booking<', $card);

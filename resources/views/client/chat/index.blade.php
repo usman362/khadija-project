@@ -332,7 +332,8 @@
                 <div class="s">Your average time to answer</div>
             </div>
             <a class="cm-stat is-link" href="{{ route('client.bookings.index') }}">
-                <div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(234,88,12,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Agreed, unpaid</div>
+                <div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(234,88,12,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>{{-- One word (Ali, 2026-09-11). Not "Paid": this is money agreed and
+                     not yet paid, and "Paid" would say the opposite. --}}Due</div>
                 <div class="v">{{ $money($stats['unpaid']) }}</div>
                 <div class="s">Across {{ $stats['unpaid_bookings'] }} {{ \Illuminate\Support\Str::plural('booking', $stats['unpaid_bookings']) }}</div>
             </a>
