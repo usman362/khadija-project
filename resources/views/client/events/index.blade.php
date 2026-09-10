@@ -66,13 +66,6 @@
     .mg-filter-btn.coral { background: #c2410c; color: #fff; border-color: #c2410c; }  /* 2.80 -> 5.18 */
 
     /* Sub-tabs */
-    .mg-subtabs { display: flex; gap: 22px; border-bottom: 1px solid var(--border-color); margin-bottom: 4px; }
-    .mg-subtab {
-        padding: 10px 2px; font-size: 13px; font-weight: 600;
-        color: var(--text-muted); cursor: pointer;
-        border-bottom: 2px solid transparent; margin-bottom: -1px;
-    }
-    .mg-subtab.active { color: var(--brand-text); border-bottom-color: #f97316; }
 
     /* Master-list table */
     .mg-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
@@ -408,8 +401,6 @@
     .cl-multiselect-option.hidden {
         display: none;
     }
-    /* The sub-tabs are buttons now, not decorative spans. */
-    button.mg-subtab { background: none; border: 0; font: inherit; cursor: pointer; }
     .mg-filter-panel { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px;
         padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-card); }
     .mg-filter-panel[hidden] { display: none !important; }
@@ -522,15 +513,9 @@
     {{-- ════════════ EVENTS LIST (default) ════════════ --}}
     <div class="cl-tab-content active" id="tab-list">
         <div class="mg-card" style="padding:0;overflow:hidden;">
-            {{-- These were three spans marked "(visual)" — two of them did
-                 nothing when clicked. They are three real views now: the
-                 events, who is booked for when, and what each booking costs. --}}
-            <div class="mg-subtabs" style="padding:0 18px;" role="tablist">
-                <button type="button" class="mg-subtab active" data-subtab="events" role="tab" aria-selected="true">Events List</button>
-                <button type="button" class="mg-subtab" data-subtab="schedule" role="tab" aria-selected="false">Professional Schedule</button>
-                <button type="button" class="mg-subtab" data-subtab="payments" role="tab" aria-selected="false">Payment Tracker</button>
-            </div>
-            <div data-subpane="events">
+            {{-- The Events List / Professional Schedule / Payment Tracker tab
+                 strip was removed on Ali's call, 2026-09-10. --}}
+            <div data-events-list>
             <div style="overflow-x:auto;">
                 <table class="mg-table">
                     <thead>
@@ -602,60 +587,7 @@
                     {{ $events->onEachSide(1)->links() }}
                 </div>
             @endif
-            </div>{{-- /events subpane --}}
-
-            {{-- Who is booked, for which event, when. --}}
-            <div data-subpane="schedule" hidden>
-                <div style="overflow-x:auto;">
-                    <table class="mg-table">
-                        <thead><tr><th style="padding-left:18px;">Professional</th><th>Event</th><th>Service</th><th>Date</th><th>Time</th><th style="padding-right:18px;">Status</th></tr></thead>
-                        <tbody>
-                            @forelse($bookings->whereNotIn('status', \App\Domain\Finance\ClientTotals::VOID_STATUSES) as $b)
-                                <tr>
-                                    <td style="padding-left:18px;"><div class="ev-name">{{ $b->supplier?->name ?? 'Professional' }}</div></td>
-                                    <td>@if($b->event)<a href="{{ route('client.events.show', $b->event_id) }}">{{ $b->event->title }}</a>@else — @endif</td>
-                                    <td>{{ $b->category?->name ?? '—' }}</td>
-                                    <td>{{ $b->event?->starts_at?->format('M d, Y') ?? 'Not scheduled' }}</td>
-                                    <td>{{ $b->event?->starts_at?->format('g:i A') ?? '—' }}@if($b->event?->ends_at) – {{ $b->event->ends_at->format('g:i A') }}@endif</td>
-                                    <td style="padding-right:18px;"><span class="mg-status-pill mg-status-{{ $b->status }}">{{ $b->status === 'requested' ? 'Awaiting reply' : ucfirst($b->status) }}</span></td>
-                                </tr>
-                            @empty
-                                <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No professionals booked yet.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {{-- What each booking costs and where the money stands. --}}
-            <div data-subpane="payments" hidden>
-                <div style="overflow-x:auto;">
-                    <table class="mg-table">
-                        <thead><tr><th style="padding-left:18px;">Professional</th><th>Event</th><th>Amount</th><th style="padding-right:18px;">Payment</th></tr></thead>
-                        <tbody>
-                            @forelse($bookings as $b)
-                                @php
-                                    $pay = match (true) {
-                                        $b->status === 'completed' => ['Paid', 'completed'],
-                                        in_array($b->status, \App\Domain\Finance\ClientTotals::VOID_STATUSES, true) => ['Cancelled — nothing owed', 'cancelled'],
-                                        $b->event?->starts_at && $b->event->starts_at->isPast() => ['Overdue', 'cancelled'],
-                                        $b->status === 'confirmed' => ['Agreed, not yet paid', 'pending'],
-                                        default => ['Awaiting professional', 'pending'],
-                                    };
-                                @endphp
-                                <tr>
-                                    <td style="padding-left:18px;"><div class="ev-name">{{ $b->supplier?->name ?? 'Professional' }}</div></td>
-                                    <td>{{ $b->event?->title ?? '—' }}</td>
-                                    <td style="font-weight:600;color:var(--text-primary);">{{ $b->price !== null ? '$' . number_format((float) $b->price, 0) : '—' }}</td>
-                                    <td style="padding-right:18px;"><span class="mg-status-pill mg-status-{{ $pay[1] }}">{{ $pay[0] }}</span></td>
-                                </tr>
-                            @empty
-                                <tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted);">Nothing to pay yet.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            </div>{{-- /events list --}}
         </div>
 
         {{-- Professional Status Overview bar --}}
@@ -1087,19 +1019,6 @@
         var tab = want && document.querySelector('#viewTabs [data-tab="' + want + '"]');
         if (tab) tab.click();
     })();
-
-    // Events List / Professional Schedule / Payment Tracker.
-    document.querySelectorAll('[data-subtab]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            document.querySelectorAll('[data-subtab]').forEach(function (b) {
-                b.classList.toggle('active', b === btn);
-                b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
-            });
-            document.querySelectorAll('[data-subpane]').forEach(function (pane) {
-                pane.hidden = pane.dataset.subpane !== btn.dataset.subtab;
-            });
-        });
-    });
 
     // Filters opens the service / when panel.
     (function () {

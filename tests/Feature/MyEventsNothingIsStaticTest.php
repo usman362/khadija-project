@@ -167,20 +167,14 @@ class MyEventsNothingIsStaticTest extends TestCase
         $this->assertStringNotContainsString('Someone Else Entirely', $csv);
     }
 
-    public function test_the_schedule_and_payment_tabs_show_real_bookings(): void
+    /** Ali, 2026-09-10: the sub-tab strip is gone. */
+    public function test_there_is_no_sub_tab_strip(): void
     {
-        $event = $this->event(['title' => 'Charity Gala']);
-        $this->book($event, 'confirmed', 2200);
-
         $html = $this->page();
 
-        $schedule = $this->between($html, 'data-subpane="schedule"', 'data-subpane="payments"');
-        $this->assertStringContainsString('Priya Raghavan', $schedule);
-        $this->assertStringContainsString('Charity Gala', $schedule);
-
-        $payments = $this->between($html, 'data-subpane="payments"', '</table>');
-        $this->assertStringContainsString('$2,200', $payments);
-        $this->assertStringContainsString('Agreed, not yet paid', $payments);
+        $this->assertStringNotContainsString('Professional Schedule', $html);
+        $this->assertStringNotContainsString('Payment Tracker</button>', $html);
+        $this->assertStringNotContainsString('data-subtab', $html);
     }
 
     /** The period dropdown changes the rail, and only the rail. */
@@ -237,7 +231,9 @@ class MyEventsNothingIsStaticTest extends TestCase
     /** The Events List pane only — the rows the filters act on. */
     private function listOf(string $html): string
     {
-        return $this->between($html, 'data-subpane="events"', 'data-subpane="schedule"');
+        // Ends at the status bar that follows the card — a Blade comment
+        // would not be in the rendered page to stop at.
+        return $this->between($html, 'data-events-list', 'class="mg-pso"');
     }
 
     private function between(string $html, string $from, string $to): string
