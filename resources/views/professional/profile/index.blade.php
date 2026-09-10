@@ -521,7 +521,7 @@
                                     <option value="{{ $code }}" @selected(old('state', $profile->state) === $code)>{{ $label }}</option>
                                 @endforeach
                             </select>
-                            <div class="pf-hint">You can only set this once — see below.</div>
+                            <div class="pf-hint">You can only set this once. See below.</div>
                         @else
                             <input type="text" class="pf-input" value="{{ $profile->state }}" disabled>
                             <div class="pf-hint">
@@ -542,7 +542,7 @@
 
                     <div class="pf-form-full" style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 4px;">
                         <div class="pf-card-title" style="font-size:15px;" id="service-origin">Service origin</div>
-                        <div class="pf-card-desc" style="margin:0;">Travel distance is measured from here — not from your billing or business address unless you enter the same place. Clients see city and state, not the street.</div>
+                        <div class="pf-card-desc" style="margin:0;">Travel distance is measured from here, not from your billing or business address unless you enter the same place. Clients see city and state, not the street.</div>
                     </div>
                     @if($profile->origin_precision === 'unresolved' && ($profile->service_origin_zip || $profile->service_origin_line || $profile->service_origin_city))
                         <div class="pf-form-full"><div class="pf-error">We could not place your service origin. Distance matching is off until this is fixed.</div></div>
@@ -588,7 +588,7 @@
         @endphp
         <div class="pf-card">
             <div class="pf-card-title">Business Address Verification</div>
-            <div class="pf-card-desc">We verify your business address before you go live — this builds client trust. PO Boxes aren't accepted; home-based businesses are reviewed individually.</div>
+            <div class="pf-card-desc">We verify your business address before you go live. This builds client trust. PO Boxes aren't accepted; home-based businesses are reviewed individually.</div>
 
             <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:14px 0;">
                 <div>
@@ -597,10 +597,10 @@
                         {{ $avLabel }}
                     </span>
                     @if($profile->address_flagged_home)
-                        <div style="font-size:12px; color:var(--text-muted); margin-top:8px;">Flagged as a possible home address — a business license or state registration may be requested.</div>
+                        <div style="font-size:12px; color:var(--text-muted); margin-top:8px;">Flagged as a possible home address: a business license or state registration may be requested.</div>
                     @endif
                     @if($profile->address_locked_at)
-                        <div style="font-size:12px; color:var(--bad-text); margin-top:8px;">Attempt limit reached — please open a support ticket with proof (utility bill or business license).</div>
+                        <div style="font-size:12px; color:var(--bad-text); margin-top:8px;">Attempt limit reached, please open a support ticket with proof (utility bill or business license).</div>
                     @endif
                 </div>
                 <form action="{{ route('professional.profile.verify-address') }}" method="POST" style="margin:0;">
@@ -668,7 +668,7 @@
         <div class="pf-card" id="services">
             <div class="pf-card-title">Services You Offer</div>
             <div class="pf-card-desc">
-                Pick every service you take bookings for. Clients browsing those categories will see your profile —
+                Pick every service you take bookings for. Clients browsing those categories will see your profile,
                 without at least one, you will not appear on any category page.
             </div>
 
@@ -698,13 +698,13 @@
         <div class="pf-card" style="margin-top: 22px;">
             <div class="pf-card-h">Service Specialties</div>
             <div class="pf-card-note">
-                Narrower ways you work, under the services you offer. Optional —
+                Narrower ways you work, under the services you offer. Optional,
                 not every service has them, and leaving them blank changes nothing
                 about where you appear today.
             </div>
 
             @if($selectedServices === [])
-                <p class="pf-empty">Choose your services above and save first — specialties sit underneath them.</p>
+                <p class="pf-empty">Choose your services above and save first, specialties sit underneath them.</p>
             @elseif($specialtyGroups->isEmpty())
                 <p class="pf-empty">None of the services you offer have specialties listed yet.</p>
             @else
@@ -786,7 +786,7 @@
             <div id="pfCropModal" class="pf-crop-modal" hidden>
                 <div class="pf-crop-box">
                     <div class="pf-crop-head"><b>Adjust cover crop</b><button type="button" class="pf-crop-x" onclick="pfCloseCrop()">✕</button></div>
-                    <p class="pf-crop-hint">Drag the dot to the part of the photo that should always stay in frame — your camera, the cake, the couple.</p>
+                    <p class="pf-crop-hint">Drag the dot to the part of the photo that should always stay in frame: your camera, the cake, the couple.</p>
                     <div class="pf-crop-stage" id="pfCropStage"><img id="pfCropImg" src="" alt=""><span class="pf-crop-dot" id="pfCropDot"></span></div>
                     <form action="{{ route('professional.profile.portfolio.crop') }}" method="POST" class="pf-crop-actions">
                         @csrf
@@ -951,7 +951,7 @@
         <div class="pf-card">
             <div class="pf-card-title">Trust & Verification Badges</div>
             <div class="pf-card-desc">
-                Upload proof of your credentials. Verified badges appear on your public profile and in search results, helping clients trust you faster — inspired by platforms like BestPickPro.
+                Upload proof of your credentials. Verified badges appear on your public profile and in search results, helping clients trust you faster, inspired by platforms like BestPickPro.
             </div>
 
             @php
@@ -1022,12 +1022,12 @@
                         <div style="background:rgba(239,68,68,0.08); border-left:3px solid #ef4444; padding:10px 14px; border-radius:6px; margin-top:10px; font-size:13px;">
                             <b>This policy has expired.</b>
                             It ran out on {{ $profile->liability_insurance_expires_on->format('M d, Y') }}.
-                            Clients no longer see you as insured — upload the renewed certificate below.
+                            Clients no longer see you as insured. Upload the renewed certificate below.
                         </div>
                     @elseif($key === 'liability_insurance' && $insuranceExpiringSoon)
                         <div style="background:rgba(245,158,11,0.08); border-left:3px solid #f59e0b; padding:10px 14px; border-radius:6px; margin-top:10px; font-size:13px;">
                             <b>Expires in {{ $insuranceDaysLeft }} {{ $insuranceDaysLeft === 1 ? 'day' : 'days' }}</b>
-                            — on {{ $profile->liability_insurance_expires_on->format('M d, Y') }}.
+                            on {{ $profile->liability_insurance_expires_on->format('M d, Y') }}.
                             Upload the renewal before then so your cover does not lapse mid-booking.
                         </div>
                     @endif
@@ -1043,7 +1043,7 @@
                         </div>
                     @elseif($status === 'pending')
                         <div style="background:rgba(245,158,11,0.08); border-left:3px solid #f59e0b; padding:10px 14px; border-radius:6px; margin-top:10px; font-size:13px;">
-                            Submitted — admin review in progress.
+                            Submitted, admin review in progress.
                             @if($number) · <span style="color:var(--text-muted);">#{{ $number }}</span> @endif
                             · <a href="{{ asset('storage/' . $doc) }}" target="_blank" style="color:var(--warn-text);">View submitted document</a>
                         </div>
@@ -1199,7 +1199,7 @@
         <div class="pf-card">
             <div class="pf-card-title">Account Modes</div>
             <div class="pf-card-desc">
-                Enable dual-mode on your account — act as a Client to post events, or as a Professional to offer your services.
+                Enable dual-mode on your account, act as a Client to post events, or as a Professional to offer your services.
                 You can switch between modes anytime from the top navigation bar.
             </div>
 
@@ -1286,7 +1286,7 @@
                 <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.6;">
                     <strong style="color:var(--text-primary);">💡 How it works:</strong>
                     Once you enable both modes, a quick-switch button appears in your top navigation bar.
-                    Your data, messages, and bookings stay separate between modes — just like Freelancer or Upwork.
+                    Your data, messages, and bookings stay separate between modes, just like Freelancer or Upwork.
                 </div>
             </div>
         </div>
@@ -1305,7 +1305,7 @@
             <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px; padding: 16px 20px; margin-bottom: 24px;">
                 <div style="font-size:13px; font-weight:600; color:var(--bad-text); margin-bottom:8px;">What happens next?</div>
                 <ul style="font-size:12.5px; color:var(--text-secondary); line-height:1.8; padding-left:18px; margin:0;">
-                    <li>Your account is immediately locked — no further gigs, bookings, or messages.</li>
+                    <li>Your account is immediately locked: no further gigs, bookings, or messages.</li>
                     <li>You will be signed out on your next request.</li>
                     <li>You have 60 days to restore the account by simply logging in.</li>
                     <li>After 60 days, your personal data and portfolio are permanently anonymized.</li>
@@ -1322,7 +1322,7 @@
                 <div class="pf-form-grid">
                     <div class="pf-form-full">
                         <label class="pf-label">Reason for leaving (optional)</label>
-                        <textarea name="reason" class="pf-textarea" placeholder="Help us improve — why are you deleting your account?" maxlength="1000">{{ old('reason') }}</textarea>
+                        <textarea name="reason" class="pf-textarea" placeholder="Help us improve: why are you deleting your account?" maxlength="1000">{{ old('reason') }}</textarea>
                     </div>
                     <div class="pf-form-full">
                         <label class="pf-label">Current Password *</label>

@@ -186,7 +186,7 @@
                     <form method="POST" action="{{ route('professional.team.shifts.fill', $sh) }}">@csrf<button class="pt-fill" type="submit">Fill Shift</button></form>
                 </div>
             @empty
-                <div class="pt-empty">No open shifts — your crew is fully booked. Create a shift below to staff up.</div>
+                <div class="pt-empty">No open shifts. Your crew is fully booked. Create a shift below to staff up.</div>
             @endforelse
         </div>
     </div>

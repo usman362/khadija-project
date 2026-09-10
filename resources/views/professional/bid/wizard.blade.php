@@ -222,17 +222,17 @@
     {{-- ── 3 · Service plan ────────────────────────────────── --}}
     @elseif($step === 'plan')
         <h3>How will you deliver it?</h3>
-        <p class="lede">This is the part that wins work. The client is told to compare scope and qualifications, not only price — give them something to compare.</p>
+        <p class="lede">This is the part that wins work. The client is told to compare scope and qualifications, not only price. Give them something to compare.</p>
         <div class="bd-f">
             <label>Service plan <span class="req">*</span></label>
             <textarea name="plan" placeholder="What you'll provide, how many people, what equipment, how the day runs…">{{ $data['plan'] ?? '' }}</textarea>
-            <p class="bd-help">Include what's covered and what isn't — unstated exclusions are where disputes start.</p>
+            <p class="bd-help">Include what's covered and what isn't, unstated exclusions are where disputes start.</p>
         </div>
 
     {{-- ── 4 · Terms ───────────────────────────────────────── --}}
     @elseif($step === 'terms')
         <h3>Timeline &amp; terms</h3>
-        <p class="lede">Deliverables, milestones, deposit expectations, cancellation — anything you'd want agreed before you start.</p>
+        <p class="lede">Deliverables, milestones, deposit expectations, cancellation. Anything you'd want agreed before you start.</p>
         <div class="bd-f">
             <label>Terms <span style="font-weight:600;color:var(--text-muted);">(optional but recommended)</span></label>
             <textarea name="terms" placeholder="e.g. 30% deposit to hold the date, balance due 7 days before. Setup from 2pm. Cancellation inside 14 days forfeits the deposit.">{{ $data['terms'] ?? '' }}</textarea>
@@ -295,7 +295,7 @@
 
         <label class="bd-check" style="border-color:rgba(37,99,235,.35);background:rgba(37,99,235,.07);">
             <input type="checkbox" name="confirm" value="1">
-            <span>I've checked my proposal. Submitting sends it to the client — it stays sealed from other professionals, and I can edit it until the deadline.</span>
+            <span>I've checked my proposal. Submitting sends it to the client. It stays sealed from other professionals, and I can edit it until the deadline.</span>
         </label>
     @endif
 
@@ -322,7 +322,7 @@
         <div class="bd-rail">
             <h4>Your bid status</h4>
             <div class="bd-el"><span>State</span><b style="color:{{ $existing && $existing->submitted_at ? '#4ade80' : '#f59e0b' }};">
-                {{ $existing && $existing->submitted_at ? 'Submitted' : 'Draft — not sent' }}
+                {{ $existing && $existing->submitted_at ? 'Submitted' : 'Draft, not sent' }}
             </b></div>
             @if($event->proposal_deadline)
                 <div class="bd-el"><span>Deadline</span><b>{{ $event->proposal_deadline->format('M j, g:i A') }}</b></div>
@@ -332,7 +332,7 @@
 
         <div class="bd-rail">
             <h4>Reminders</h4>
-            <div class="bd-rem">🔒 Bids are sealed — competitors can't see your amount, terms or files.</div>
+            <div class="bd-rem">🔒 Bids are sealed, competitors can't see your amount, terms or files.</div>
             <div class="bd-rem">🧾 One active bid per request. Saving again updates the same one.</div>
             <div class="bd-rem">✏️ Editable until the deadline, or until exclusive negotiation begins.</div>
             <div class="bd-rem">💸 Free to submit and negotiate. Commission is deducted at payout.</div>

@@ -9,12 +9,12 @@
     {{-- Row 114 — "Tier" alone reads as a membership plan, which is a different
          thing a user pays for. Named here and on every pill below. --}}
     <h1>Influencer Tiers</h1>
-    <p>Your influencer tier is earned by referring members — it is not a membership plan, and there is nothing to buy.</p>
+    <p>Your influencer tier is earned by referring members. It is not a membership plan, and there is nothing to buy.</p>
 </div>
 
 <div class="bt-info">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-    Your tier reflects your activity. The more members you refer, the higher you climb — and the more you earn.
+    Your tier reflects your activity. The more members you refer, the higher you climb, and the more you earn.
 </div>
 
 {{-- Row 144 — a percentage nobody can read without knowing what it is a

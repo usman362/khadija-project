@@ -32,7 +32,7 @@ class DemoFormSubmissionsSeeder extends Seeder
         $pro = User::where('email', 'elena.demo@example.test')->first();
 
         if (! $pro) {
-            $this->command?->warn('DemoFormSubmissionsSeeder: elena.demo@example.test not found — skipped.');
+            $this->command?->warn('DemoFormSubmissionsSeeder: elena.demo@example.test not found, skipped.');
 
             return;
         }
@@ -87,7 +87,7 @@ class DemoFormSubmissionsSeeder extends Seeder
                 'status'         => 'withdrawn',
                 'payload'        => [
                     'what'    => 'message',
-                    'details' => 'Reported in error — the message was from a colleague, not a stranger.',
+                    'details' => 'Reported in error: the message was from a colleague, not a stranger.',
                 ],
             ],
         ];

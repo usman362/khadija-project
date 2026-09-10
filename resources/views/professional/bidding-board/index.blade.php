@@ -190,9 +190,9 @@
                  filter below, because both BR and DR carry either. --}}
             @foreach([
                 ['all', 'All Requests', ''],
-                ['BR', 'BR', 'Bidding — open to all professionals'],
-                ['ER', '🔥 ER', 'Emergency — open to everyone'],
-                ['DR', 'DR', 'Direct — sent to you'],
+                ['BR', 'BR', 'Bidding. Open to all professionals'],
+                ['ER', '🔥 ER', 'Emergency. Open to everyone'],
+                ['DR', 'DR', 'Direct, sent to you'],
                 ['saved', '★ Saved', ''],
             ] as [$key, $label, $sub])
                 <a class="bb-tab {{ $ff['tab'] === $key ? 'on' : '' }}"
@@ -219,8 +219,8 @@
         <input type="text" name="city" value="{{ $ff['city'] }}" placeholder="City">
         <select name="scope" aria-label="Service scope">
             <option value="">Single &amp; multi-service</option>
-            <option value="single" @selected($ff['scope'] === 'single')>SSR — single service</option>
-            <option value="multi" @selected($ff['scope'] === 'multi')>MSR — multi-service</option>
+            <option value="single" @selected($ff['scope'] === 'single')>SSR, single service</option>
+            <option value="multi" @selected($ff['scope'] === 'multi')>MSR, multi-service</option>
         </select>
         <select name="closing" aria-label="Any deadline">
             <option value="">Any deadline</option>
@@ -336,7 +336,7 @@
                         <p>{{ $originIssue }} This is not the same as having no open requests.</p>
                     @else
                         <h4>Nothing open here right now</h4>
-                        <p>{{ $ff['tab'] === 'saved' ? 'You haven’t saved any opportunities yet — use the ☆ on a request to park it.' : 'Try a different tab, or clear your filters.' }}</p>
+                        <p>{{ $ff['tab'] === 'saved' ? 'You haven’t saved any opportunities yet. Use the ☆ on a request to park it.' : 'Try a different tab, or clear your filters.' }}</p>
                     @endif
                 </div>
             @endif
@@ -385,7 +385,7 @@
 
             <div class="bb-rail-card bb-sealed">
                 <h4>🔒 Sealed Bidding is On</h4>
-                <p>Every bid you place is hidden from other pros by default — only you and the client see the amount. You can opt to make a bid public anytime from <a href="{{ route('professional.bidding-board.my-bids') }}" style="font-weight:800; text-decoration:underline;">My Bids</a>.</p>
+                <p>Every bid you place is hidden from other pros by default, only you and the client see the amount. You can opt to make a bid public anytime from <a href="{{ route('professional.bidding-board.my-bids') }}" style="font-weight:800; text-decoration:underline;">My Bids</a>.</p>
             </div>
         </aside>
     </div>
@@ -403,7 +403,7 @@
                 <label for="bbCategory">Which service are you bidding on?</label>
                 <select name="category_id" id="bbCategory" style="width:100%;padding:10px 12px;border:1px solid var(--border-color);border-radius:10px;background:var(--bg-card);color:var(--text-primary);font-size:14px;">
                 </select>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:5px;">Each service is its own gig — bid on one at a time.</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:5px;">Each service is its own gig, bid on one at a time.</div>
             </div>
             <div class="bb-field">
                 <label for="bbAmount">Your bid amount</label>
@@ -416,7 +416,7 @@
                     Platform commission ({{ rtrim(rtrim(number_format($commissionPct ?? 5, 2), '0'), '.') }}%):
                     <b id="bbFee" style="color:var(--text-primary);">$0</b>
                     · You net <b id="bbNetAmt" style="color:var(--ok-text);">$0</b>
-                    <span style="display:block;margin-top:2px;">Deducted only on a finalized contract — never on bids that don't win.</span>
+                    <span style="display:block;margin-top:2px;">Deducted only on a finalized contract, never on bids that don't win.</span>
                 </div>
             </div>
             <div class="bb-field">
@@ -425,7 +425,7 @@
             </div>
             <label class="bb-seal">
                 <input type="checkbox" name="is_public" value="1" id="bbPublic">
-                <span><b>Keep my bid sealed (recommended).</b> Leave this unchecked and other professionals can't see your amount — only you and the client can. Check it to make your bid public.</span>
+                <span><b>Keep my bid sealed (recommended).</b> Leave this unchecked and other professionals can't see your amount, only you and the client can. Check it to make your bid public.</span>
             </label>
             <div class="bb-dialog-actions">
                 <button type="button" class="bb-cancel" data-bid-close>Cancel</button>

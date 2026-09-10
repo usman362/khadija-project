@@ -85,7 +85,8 @@ class BudgetAllocatorService
         $data   = $response->json();
         $parsed = $this->parseResponse($data['choices'][0]['message']['content'] ?? null);
 
-        return [$parsed, (int) ($data['usage']['total_tokens'] ?? 0)];
+        // Every string in the answer, corrected; the numbers are left as they are.
+        return [\App\Support\PlainPunctuation::modelDeep($parsed), (int) ($data['usage']['total_tokens'] ?? 0)];
     }
 
     /**
@@ -227,7 +228,7 @@ Rules:
 - Be realistic: adjust allocations based on event type and guest count
 - Provide actionable tips specific to their budget size
 - Round amounts to whole numbers (no decimals)
-PROMPT;
+PROMPT . "\n- " . \App\Support\PlainPunctuation::PROMPT_RULE;
     }
 
     private function buildPrompt(array $input): string

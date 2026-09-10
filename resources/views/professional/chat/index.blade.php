@@ -1,6 +1,6 @@
 @extends('layouts.professional')
 
-@section('title', 'Messages — Inbox')
+@section('title', 'Messages: Inbox')
 
 {{-- Professional Messages — Inbox. Server-rendered: real conversations +
      thread + derived stats; compose posts to conversations.messages.store.
@@ -178,7 +178,7 @@
 <div class="pm" data-csrf="{{ csrf_token() }}">
 
     <div class="pm-head">
-        <h1>Messages — Inbox <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></h1>
+        <h1>Messages: Inbox <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></h1>
         <p>All your conversations, event updates, documents, and payments—organized in one place.</p>
     </div>
 
@@ -275,7 +275,7 @@
                             </div>
                         </div>
                     @empty
-                        <div style="text-align:center;color:var(--text-muted);font-size:13px;margin:auto;">No messages yet — start the conversation below.</div>
+                        <div style="text-align:center;color:var(--text-muted);font-size:13px;margin:auto;">No messages yet. Start the conversation below.</div>
                     @endforelse
                 </div>
 
@@ -292,7 +292,7 @@
                     @php
                         // The professional's half of the conversation.
                         $quickReplies = [
-                            "Thanks — I've got that, I'll confirm shortly.",
+                            "Thanks: I've got that, I'll confirm shortly.",
                             'Yes, that date is available.',
                             'I can hold the date for 48 hours while you decide.',
                             "I'll send a written quote today.",
@@ -302,7 +302,7 @@
                             'Confirm availability' => "Hi {name}, thanks for getting in touch. I'm available on that date. Shall I put together a quote for what you need?",
                             'Send what is included' => "Hi {name}, here's exactly what's included at this price, and anything charged on top is listed separately so there are no surprises.",
                             'Ask for event details' => "Hi {name}, to quote this properly could you confirm the venue, guest count, and the start and finish times?",
-                            'Confirm setup times' => "Hi {name}, confirming the plan for the day — I'd arrive to set up ahead of the start time, and pack down afterwards.",
+                            'Confirm setup times' => "Hi {name}, confirming the plan for the day: I'd arrive to set up ahead of the start time, and pack down afterwards.",
                         ];
                     @endphp
                     <div class="pm-c-pane" data-pane="quick" style="display:none;">
@@ -451,7 +451,7 @@
     // Compose → drop a polished draft into the active thread.
     if ($('pm-ai-compose')) $('pm-ai-compose').addEventListener('click', () => {
         const i = $('pm-input');
-        if (i) { i.value = "Hi! Thanks for reaching out. I'd love to help with your event — could you share the date, venue, and guest count so I can confirm availability and put together the right package for you?"; i.focus(); }
+        if (i) { i.value = "Hi! Thanks for reaching out. I'd love to help with your event, could you share the date, venue, and guest count so I can confirm availability and put together the right package for you?"; i.focus(); }
         else if (modal) modal.style.display = 'flex';
     });
 })();

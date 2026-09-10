@@ -51,7 +51,7 @@ class DemoGigsSeeder extends Seeder
             ->get()->keyBy('name');
 
         if ($cats->isEmpty()) {
-            $this->command?->warn('  V2 taxonomy not seeded — run the category seeder first.');
+            $this->command?->warn('  V2 taxonomy not seeded, run the category seeder first.');
 
             return;
         }
@@ -105,12 +105,12 @@ class DemoGigsSeeder extends Seeder
          * the two fields straight back out of step.
          */
         $gigs = [
-            ['Luxury Garden Wedding Photography', 'Seeking a photographer for a 150-guest garden wedding — ceremony, reception, family portraits and candids.', 'Philadelphia, PA', 'marcus.demo@example.test', 2500, 40, ['Wedding Photography']],
-            ['Corporate Gala — Full Production', 'Annual corporate gala needs catering, AV, lighting and a planner. Black-tie, 300 guests.', 'Baltimore, MD', null, 18000, 55, ['Full-Service Catering', 'Full-Service Event Planning', 'Uplighting & Ambient Lighting', 'Videography & Cinematic Films']],
-            ['Waterfront Wedding — Photo + Video + DJ', 'Sunset waterfront wedding wants a photographer, videographer and DJ. Relaxed, boho vibe.', 'Wilmington, DE', 'sofia.demo@example.test', 6500, 70, ['Wedding Photography', 'Videography & Cinematic Films', 'Wedding DJs']],
+            ['Luxury Garden Wedding Photography', 'Seeking a photographer for a 150-guest garden wedding, ceremony, reception, family portraits and candids.', 'Philadelphia, PA', 'marcus.demo@example.test', 2500, 40, ['Wedding Photography']],
+            ['Corporate Gala: Full Production', 'Annual corporate gala needs catering, AV, lighting and a planner. Black-tie, 300 guests.', 'Baltimore, MD', null, 18000, 55, ['Full-Service Catering', 'Full-Service Event Planning', 'Uplighting & Ambient Lighting', 'Videography & Cinematic Films']],
+            ['Waterfront Wedding: Photo + Video + DJ', 'Sunset waterfront wedding wants a photographer, videographer and DJ. Relaxed, boho vibe.', 'Wilmington, DE', 'sofia.demo@example.test', 6500, 70, ['Wedding Photography', 'Videography & Cinematic Films', 'Wedding DJs']],
             ['Birthday Party Décor & Balloons', 'Black, gold & white décor for a 30th birthday, 80 guests. Setup and teardown included.', 'Philadelphia, PA', 'marcus.demo@example.test', 600, 12, ['Balloon Arches & Columns']],
-            ['Wedding Planner — Full Service', 'Engaged couple needs a full-service planner to manage vendors, timeline and day-of coordination.', 'Richmond, VA', 'priya.demo@example.test', 4000, 90, ['Wedding Planning']],
-            ['Conference Catering — 200 Guests', 'Two-day tech conference needs breakfast + lunch catering for 200. Dietary options required.', 'Washington, DC', 'james.demo@example.test', 5200, 21, ['Buffet Catering']],
+            ['Wedding Planner: Full Service', 'Engaged couple needs a full-service planner to manage vendors, timeline and day-of coordination.', 'Richmond, VA', 'priya.demo@example.test', 4000, 90, ['Wedding Planning']],
+            ['Conference Catering, 200 Guests', 'Two-day tech conference needs breakfast + lunch catering for 200. Dietary options required.', 'Washington, DC', 'james.demo@example.test', 5200, 21, ['Buffet Catering']],
         ];
 
         foreach ($gigs as [$title, $desc, $loc, $ownerEmail, $budget, $daysOut, $catList]) {

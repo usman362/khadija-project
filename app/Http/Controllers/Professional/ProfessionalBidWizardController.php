@@ -103,10 +103,10 @@ class ProfessionalBidWizardController extends Controller
 
         $validated = $request->validate($this->rulesFor($step, $request, $event, $data), [
             'amount.required'   => 'Enter your bid amount.',
-            'above_budget_reason.required' => 'Your bid is above the client’s range — explain the added value or cost.',
+            'above_budget_reason.required' => 'Your bid is above the client’s range, explain the added value or cost.',
             'available_confirmed.accepted' => 'Confirm you are available on the event date.',
             'plan.required'     => 'Describe how you will deliver this.',
-            'plan.min'          => 'A little more detail — this is what the client compares against price.',
+            'plan.min'          => 'A little more detail. This is what the client compares against price.',
             'sealed_ack.accepted' => 'Acknowledge that your bid is sealed before continuing.',
             'confirm.accepted'  => 'Confirm your proposal before submitting.',
         ]);
@@ -142,7 +142,7 @@ class ProfessionalBidWizardController extends Controller
             Session::forget($this->key($event));
 
             return redirect()->route('professional.bidding-board.my-bids')->with('status',
-                'Proposal submitted for "' . $event->title . '". It is sealed — only the client can see it.');
+                'Proposal submitted for "' . $event->title . '". It is sealed, only the client can see it.');
         }
 
         $keys = array_keys(self::STEPS);

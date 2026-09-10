@@ -96,7 +96,7 @@ class AdminCancellationController extends Controller
             // told why is the thing that becomes a support ticket.
             'resolution_note' => ['required', 'string', 'min:10', 'max:2000'],
         ], [
-            'resolution_note.required' => 'Say why this is being declined — the client sees it.',
+            'resolution_note.required' => 'Say why this is being declined: the client sees it.',
         ]);
 
         abort_unless($cancellation->isPending(), 403, 'This one has already been actioned.');

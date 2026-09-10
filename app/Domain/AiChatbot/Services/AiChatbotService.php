@@ -138,7 +138,9 @@ class AiChatbotService
         $context .= "Roles: " . $user->roles->pluck('name')->implode(', ') . "\n";
         $context .= "Current Date: " . now()->format('F j, Y') . "\n";
 
-        return $basePrompt . $context;
+        // The admin's own prompt comes first; the punctuation rule is ours and
+        // is added whatever it says. See App\Support\PlainPunctuation.
+        return $basePrompt . $context . "\n" . \App\Support\PlainPunctuation::PROMPT_RULE;
     }
 
     private function callOpenAI(array $messages, array $config): array
@@ -172,7 +174,8 @@ class AiChatbotService
                 throw new RuntimeException('Empty response from AI. Please try again.');
             }
 
-            return ['content' => trim($content), 'tokens' => $tokens];
+            // Corrected as well as asked: a model does not always follow the rule.
+            return ['content' => \App\Support\PlainPunctuation::model(trim($content)), 'tokens' => $tokens];
         } catch (RuntimeException $e) {
             throw $e;
         } catch (\Throwable $e) {

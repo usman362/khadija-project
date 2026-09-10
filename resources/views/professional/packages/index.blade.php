@@ -284,7 +284,7 @@
                                      tells nobody what to do next. --}}
                                 <div class="mp-prog">
                                     <div class="mp-prog-lbl">
-                                        Step {{ $next['n'] }} of 4: {{ $next['label'] }} — needs {{ $next['missing'] }}
+                                        Step {{ $next['n'] }} of 4: {{ $next['label'] }}, needs {{ $next['missing'] }}
                                     </div>
                                     <div class="mp-prog-track">
                                         <div class="mp-prog-fill" style="width: {{ PackageProgress::percent($pkg) }}%;"></div>
@@ -395,7 +395,7 @@
                     <p>No package matches that. <a href="{{ route('professional.packages.index') }}" style="color:var(--accent-blue);font-weight:800;">Show all packages</a></p>
                 @else
                     <h3>No packages yet</h3>
-                    <p>Create a package to let clients book your services directly — no back-and-forth.</p>
+                    <p>Create a package to let clients book your services directly: no back-and-forth.</p>
                     <a href="{{ route('professional.packages.create') }}" class="mp-new" style="margin-top:14px;">＋ Create your first package</a>
                 @endif
             </div>
@@ -449,7 +449,7 @@
             <h4>How Publishing Works</h4>
             <ol class="mp-steps">
                 <li>Complete all 4 Create a Package steps.</li>
-                <li>Save as Draft at any point — a draft stays private.</li>
+                <li>Save as Draft at any point: a draft stays private.</li>
                 <li>Preview as Client, then Publish.</li>
                 <li>Published packages appear in Package Search.</li>
                 <li>Unpublish anytime, or Archive when no longer in use.</li>

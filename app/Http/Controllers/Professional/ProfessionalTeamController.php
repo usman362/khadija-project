@@ -140,7 +140,7 @@ class ProfessionalTeamController extends Controller
         }
 
         if (! $staff) {
-            return back()->with('status', 'No available crew member to fill this shift — add more staff first.');
+            return back()->with('status', 'No available crew member to fill this shift. Add more staff first.');
         }
 
         $shift->update(['staff_id' => $staff->id, 'status' => 'on_shift']);

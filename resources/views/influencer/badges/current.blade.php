@@ -35,7 +35,7 @@
         {{-- progress --}}
         <div class="bt-panel">
             <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
-                <div><h3>Your Progress</h3><div class="sub">@if($nextTier) Refer {{ $referralsToNext }} more to reach <b>{{ $nextTier['label'] }}</b>. @else You've reached the highest tier — amazing work! @endif</div></div>
+                <div><h3>Your Progress</h3><div class="sub">@if($nextTier) Refer {{ $referralsToNext }} more to reach <b>{{ $nextTier['label'] }}</b>. @else You've reached the highest tier, amazing work! @endif</div></div>
                 <div style="font-family:var(--ff); font-weight:800; color:var(--ink);">
                     {{ $influencer->total_referrals }} @if($nextTier) / {{ $nextTier['min_referrals'] }} @endif referrals
                 </div>
@@ -61,7 +61,7 @@
                             <div style="color:#16a34a;font-family:var(--ff);font-weight:700;font-size:13px;">+${{ number_format($r->commission_amount, 2) }}</div>
                         </div>
                     @empty
-                        <div style="text-align:center;color:var(--muted);font-size:13px;padding:18px;">No activity yet — start referring to see it here.</div>
+                        <div style="text-align:center;color:var(--muted);font-size:13px;padding:18px;">No activity yet. Start referring to see it here.</div>
                     @endforelse
                 </div>
             </div>

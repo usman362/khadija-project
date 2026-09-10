@@ -138,7 +138,7 @@
             </div>
             <h1>Gig Operations Hub</h1>
             <div class="tag">Manage all your gigs in one place.</div>
-            <p>Your centralized control center to track jobs, monitor earnings, manage staffing, and organize communications — all in one powerful dashboard.</p>
+            <p>Your centralized control center to track jobs, monitor earnings, manage staffing, and organize communications, all in one powerful dashboard.</p>
             <div class="pg-feat x1"><span class="pg-feat-ico" style="background:rgba(139,92,246,0.14);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19.5 12.5l-7 7a2 2 0 0 1-2.8 0l-7-7a2 2 0 0 1 0-2.8l7-7a2 2 0 0 1 2.8 0l7 7a2 2 0 0 1 0 2.8z"/></svg></span><div><b>Stops Confusion</b><p>Gathers scattered details into one view.</p></div></div>
             <div class="pg-feat x2"><span class="pg-feat-ico" style="background:rgba(16,185,129,0.14);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9.5a2.5 2.5 0 0 1 5 0M9 14.5a2.5 2.5 0 0 0 5 0"/></svg></span><div><b>Tracks Money</b><p>Shows exactly how much each job pays.</p></div></div>
             <div class="pg-feat x3"><span class="pg-feat-ico" style="background:rgba(249,115,22,0.14);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span><div><b>Manages Teams</b><p>Helps verify that enough workers are assigned to every event.</p></div></div>
@@ -199,8 +199,8 @@
                     <div class="pg-mini"><div class="k">Work in Progress</div><div class="v">{{ $stats['in_progress'] }}</div></div>
                     <div class="pg-mini"><div class="k">Completed</div><div class="v">{{ $stats['completed'] }}</div></div>
                 </div>
-                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><p><b>Active Gigs:</b> everything still live — proposals awaiting the client, plus accepted jobs not yet delivered.</p></div>
-                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/></svg><p><b>Work in Progress:</b> accepted jobs whose event is running right now — the same set the badge of that name marks.</p></div>
+                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><p><b>Active Gigs:</b> everything still live, proposals awaiting the client, plus accepted jobs not yet delivered.</p></div>
+                <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/></svg><p><b>Work in Progress:</b> accepted jobs whose event is running right now: the same set the badge of that name marks.</p></div>
                 <div class="pg-bd-row"><svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg><p><b>Completed:</b> finished jobs ready for final billing or archiving.</p></div>
             </div>
             <div>

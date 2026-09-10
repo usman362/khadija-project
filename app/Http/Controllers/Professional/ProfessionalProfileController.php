@@ -129,7 +129,7 @@ class ProfessionalProfileController extends Controller
         $shown = $names->count();
 
         return back()->with('status', $shown === 0
-            ? 'Services cleared — your profile will not appear on any category page until you pick at least one.'
+            ? 'Services cleared. Your profile will not appear on any category page until you pick at least one.'
             : $shown . ' ' . \Illuminate\Support\Str::plural('service', $shown) . ' saved. Clients browsing those categories can now find you.');
     }
 
@@ -443,7 +443,7 @@ class ProfessionalProfileController extends Controller
         ]);
 
         $message = 'Address status: ' . $result['label']
-            . ($result['reason'] ? ' — ' . $result['reason'] : '');
+            . ($result['reason'] ? ': ' . $result['reason'] : '');
 
         return back(303)->with('status', $message);
     }

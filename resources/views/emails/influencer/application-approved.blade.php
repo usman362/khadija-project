@@ -10,7 +10,7 @@
 <h1>Welcome aboard, {{ $influencer->full_name ?? 'there' }}! 🎉</h1>
 
 <p>
-    Great news — your application to the {{ config('app.name') }} affiliate program has been
+    Great news. Your application to the {{ config('app.name') }} affiliate program has been
     <strong>approved</strong>. You can now log in and start earning.
 </p>
 

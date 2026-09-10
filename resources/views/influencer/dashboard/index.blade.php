@@ -157,7 +157,7 @@
                 @endforeach
             </svg>
             @if($series->sum() == 0)
-                <div class="dx-empty">Share your referral link to start earning — your monthly earnings will chart here.</div>
+                <div class="dx-empty">Share your referral link to start earning. Your monthly earnings will chart here.</div>
             @endif
         </div>
 

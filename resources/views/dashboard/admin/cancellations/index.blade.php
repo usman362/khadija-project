@@ -58,7 +58,7 @@
                     </form>
                     <form method="POST" action="{{ route('app.admin.cancellations.decline', $item) }}">
                         @csrf
-                        <input type="text" name="resolution_note" placeholder="Why it is declined — the client sees this" maxlength="2000" required>
+                        <input type="text" name="resolution_note" placeholder="Why it is declined: the client sees this" maxlength="2000" required>
                         <button type="submit" class="ac-btn ac-btn-no">Decline</button>
                     </form>
                 </div>

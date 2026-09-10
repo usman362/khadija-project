@@ -105,6 +105,6 @@ class AdminVerificationController extends Controller
             "{$badge}_verified_at" => null,
         ]);
 
-        return back()->with('status', ucfirst(str_replace('_', ' ', $badge)) . ' rejected — document removed.');
+        return back()->with('status', ucfirst(str_replace('_', ' ', $badge)) . ' rejected, document removed.');
     }
 }

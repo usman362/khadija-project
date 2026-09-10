@@ -38,7 +38,7 @@
 
 <div class="iv-panel" style="text-align:center;">
     <h3>Ready to earn?</h3>
-    <div class="sub" style="max-width:46ch; margin:6px auto 14px;">Grab your link and start sharing — your first commission could be a referral away.</div>
+    <div class="sub" style="max-width:46ch; margin:6px auto 14px;">Grab your link and start sharing. Your first commission could be a referral away.</div>
     <a href="{{ route('influencer.invite.tools') }}" style="display:inline-block; background:var(--orange); color:#fff; padding:11px 22px; border-radius:11px; font-family:var(--ff); font-weight:700; font-size:13.5px;">Go to Invite Tools</a>
 </div>
 @endsection

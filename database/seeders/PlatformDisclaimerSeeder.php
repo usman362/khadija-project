@@ -35,7 +35,7 @@ between clients and professionals.</p>
 <h2>2. No Expert Advice, Recommendations, or Negotiation Management</h2>
 <p>{$app} <strong>does not provide expert advice or recommendations</strong>, and
 <strong>does not manage negotiations</strong> on behalf of any user. Our level of
-assistance is focused on involving AI more helpfully at each step — for example, surfacing
+assistance is focused on involving AI more helpfully at each step, for example, surfacing
 information, drafting suggestions, and organising details. Any decision about who to hire,
 what to pay, or what terms to accept is yours alone. You are responsible for your own due
 diligence before entering into any agreement.</p>
@@ -60,7 +60,7 @@ Please review the privacy practices of any third party before sharing informatio
 our <a href="/privacy-policy">Privacy Policy</a> for how {$app} itself handles your data.</p>
 
 <h2>6. No Guaranteed Outcomes</h2>
-<p>{$app} makes <strong>no guarantees to any user regarding membership outcomes</strong> —
+<p>{$app} makes <strong>no guarantees to any user regarding membership outcomes</strong>,
 including, but not limited to, the number or quality of leads, bookings, proposals, hires,
 earnings, or results of any kind. Membership gives you access to platform features; it does
 not promise any particular commercial result.</p>

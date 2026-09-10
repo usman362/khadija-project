@@ -25,7 +25,7 @@
         </div>
         <div class="bt-progress"><span style="width:{{ $progressPct }}%"></span></div>
     @else
-        <div style="margin-top:16px; text-align:center; color:#16a34a; font-family:var(--ff); font-weight:700;">🎉 You've reached the highest tier — incredible work!</div>
+        <div style="margin-top:16px; text-align:center; color:#16a34a; font-family:var(--ff); font-weight:700;">🎉 You've reached the highest tier, incredible work!</div>
     @endif
 </div>
 

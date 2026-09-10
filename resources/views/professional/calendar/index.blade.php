@@ -229,7 +229,7 @@
                     <div class="mc-bd-row"><span class="ic" style="background:{{ $it['color'] }}1f;color:{{ $it['color'] }};"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div><b>{{ \Illuminate\Support\Str::limit($it['title'], 24) }}</b><div class="tm" style="color:{{ $it['color'] }};">{{ $it['all_day'] ? $it['start']->format('M d') . ' • All Day' : $it['start']->format('g:i A') }}</div><p>{{ $it['all_day'] ? 'All-day event or date reminder.' : ($idx === 0 ? 'Your first scheduled event.' : 'Your next scheduled event.') }}</p></div></div>
                 @endforeach
                 @if($agenda->isEmpty())
-                    <div class="mc-empty">Your agenda is clear — no scheduled items yet.</div>
+                    <div class="mc-empty">Your agenda is clear: no scheduled items yet.</div>
                 @endif
             </div>
             {{-- 3. Navigation Gate --}}

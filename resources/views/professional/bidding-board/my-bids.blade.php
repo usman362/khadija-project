@@ -142,8 +142,8 @@
         <input class="mb-search" type="search" name="q" value="{{ $f['q'] }}" placeholder="Search event, client or service…">
         <select name="scope" aria-label="Single &amp; multi-service">
             <option value="">Single &amp; multi-service</option>
-            <option value="single" @selected($f['scope'] === 'single')>SSR — single service</option>
-            <option value="multi" @selected($f['scope'] === 'multi')>MSR — multi-service</option>
+            <option value="single" @selected($f['scope'] === 'single')>SSR, single service</option>
+            <option value="multi" @selected($f['scope'] === 'multi')>MSR, multi-service</option>
         </select>
         <button type="submit" class="go">Apply</button>
         @if($f['q'] || $f['scope'])
@@ -204,7 +204,7 @@
                     <div style="font-size:36px;">🔒</div>
                     <h4>No bids here yet</h4>
                     <p>{{ $f['state'] === 'all' && $f['type'] === '' && ! $f['q'] && ! $f['scope']
-                        ? 'Head to the Bidding Board and place your first bid — submitting is free.'
+                        ? 'Head to the Bidding Board and place your first bid, submitting is free.'
                         : 'Nothing matches this filter. Try another tab, or clear your search.' }}</p>
                     <a href="{{ route('professional.bidding-board.index') }}">Browse open requests →</a>
                 </div>

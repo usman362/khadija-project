@@ -1,9 +1,9 @@
 @extends('layouts.influencer-portal')
-@section('title', 'Analytics — Getting Started')
+@section('title', 'Analytics: Getting Started')
 @push('styles') @include('influencer.analytics._styles') @endpush
 
 @section('content')
-<div class="an-head"><div><h1>Analytics — Getting Started</h1><p>A quick tour of everything you can track in your influencer analytics.</p></div></div>
+<div class="an-head"><div><h1>Analytics: Getting Started</h1><p>A quick tour of everything you can track in your influencer analytics.</p></div></div>
 
 <div class="an-grid-2" style="margin-top:18px;">
     <div class="an-panel">

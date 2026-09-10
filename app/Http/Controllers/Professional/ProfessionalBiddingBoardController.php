@@ -612,7 +612,7 @@ class ProfessionalBiddingBoardController extends Controller
         $awarded = \App\Models\Booking::where('event_id', $bid->event_id)
             ->whereNotIn('status', ['cancelled'])->exists();
         if ($awarded) {
-            return back()->withErrors(['bid' => 'This request has already been awarded — the bid can no longer be withdrawn.']);
+            return back()->withErrors(['bid' => 'This request has already been awarded: the bid can no longer be withdrawn.']);
         }
 
         $bid->update(['status' => 'withdrawn']);
@@ -694,10 +694,10 @@ class ProfessionalBiddingBoardController extends Controller
             // date further out quietly drop the flag that's the whole point.
             'urgent' => ! $expired && ($type === 'ER' || ($days !== null && $days >= 0 && $days <= 3)),
             'expired' => $expired,
-            'title'  => $service ? $service->name . ' — ' . $e->title : $e->title,
+            'title'  => $service ? $service->name . ': ' . $e->title : $e->title,
             'service_id'   => $service?->id,
             'service_name' => $service?->name,
-            'desc'   => Str::limit($e->description ?: 'Open gig — full details available on request.', 140),
+            'desc'   => Str::limit($e->description ?: 'Open gig, full details available on request.', 140),
             'loc'    => $e->location ?: 'Location flexible',
             'date'   => $e->starts_at ? $e->starts_at->format('M j, Y') : 'Flexible',
             /*

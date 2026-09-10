@@ -88,10 +88,13 @@ class InventoryDemoData extends Command
      * client is perfectly entitled to raise an event called "Corporate Gala".
      */
     /*
-     * These keep their dashes on purpose. They are matched exactly against
-     * titles DemoGigsSeeder already wrote into the database; the site-wide
-     * dash removal of 2026-09-10 changed them and every stray demo event on a
-     * real account stopped being found. They are lookup keys, not copy.
+     * Lookup keys, not copy: matched exactly against titles in the database.
+     *
+     * Both spellings are listed. The demo seeders wrote these with a spaced
+     * dash; the 2026-09-10 migration renames those rows and the seeder now
+     * writes the new form. A database on either side of that migration must
+     * still have its stray demo events found, and changing the list alone
+     * broke exactly that (DemoDataCleanupTest).
      */
     public const DEMO_GIG_TITLES = [
         'Luxury Garden Wedding Photography',
@@ -100,6 +103,11 @@ class InventoryDemoData extends Command
         'Birthday Party Décor & Balloons',
         'Wedding Planner — Full Service',
         'Conference Catering — 200 Guests',
+        // As written after 2026-09-10:
+        'Corporate Gala: Full Production',
+        'Waterfront Wedding: Photo + Video + DJ',
+        'Wedding Planner: Full Service',
+        'Conference Catering, 200 Guests',
     ];
 
     public function handle(): int

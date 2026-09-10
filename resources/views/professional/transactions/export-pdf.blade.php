@@ -11,7 +11,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Transactions — {{ $generatedAt->format('Y-m-d H:i') }}</title>
+    <title>Transactions: {{ $generatedAt->format('Y-m-d H:i') }}</title>
     <style>
         * { box-sizing: border-box; }
         body {

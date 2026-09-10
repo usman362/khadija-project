@@ -347,7 +347,7 @@
         {{-- Direct Message Center --}}
         <div class="pl-cc-card">
             <div class="pl-cc-h"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><b>Direct Message Center</b></div>
-            <p>Every conversation with this lead, in one place — on-platform messaging.</p>
+            <p>Every conversation with this lead, in one place, on-platform messaging.</p>
             <div class="pl-cc-prev">
                 <div class="pl-chat-hd"><span class="pl-chat-av" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);">{{ $leads->first()['name'] ?? false ? strtoupper(substr($leads->first()['name'],0,1)) : 'L' }}</span><div><b>{{ \Illuminate\Support\Str::limit($leads->first()['name'] ?? 'New Lead', 16) }}</b><p>{{ \Illuminate\Support\Str::limit($leads->first()['location'] ?? 'Location', 14) }}</p></div></div>
                 <div class="pl-bub them">Hi! I'd like to learn more about your services.<span class="t">11:30 AM</span></div>
@@ -387,7 +387,7 @@
              the pro sends every message." --}}
         <div class="pl-cc-card">
             <div class="pl-cc-h"><span class="ic" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span><b>Follow-Up Reminders</b></div>
-            <p>Set a reminder to follow up — you send it.</p>
+            <p>Set a reminder to follow up. You send it.</p>
             <div class="pl-cc-prev">
                 <div class="pl-flow-step"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></span><span>Lead receives proposal</span></div>
                 <div class="pl-flow-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div>

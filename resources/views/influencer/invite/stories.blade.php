@@ -11,7 +11,7 @@
         ['Tripled my side income in three months. The dashboard makes it easy to see exactly what\'s working.', 'Maya R.', 'Wedding Content Creator', '#16a34a'],
         ['My event-planning audience loved the referrals. Climbing tiers genuinely bumped my rate.', 'Daniel K.', 'Event Blogger', '#2563eb'],
         ['Payouts are reliable and the marketing assets saved me hours. Highly recommend.', 'Sofia L.', 'Lifestyle Influencer', '#7c3aed'],
-        ['Started with zero followers in events — the academy resources got me earning fast.', 'Andre P.', 'Micro-Creator', '#16a34a'],
+        ['Started with zero followers in events: the academy resources got me earning fast.', 'Andre P.', 'Micro-Creator', '#16a34a'],
         ['Best affiliate program I\'ve joined for the events niche. Transparent and supportive.', 'Priya S.', 'Community Manager', '#db2777'],
         ['I share one link in my bio and it keeps earning. Set-and-forget income.', 'Liam T.', 'Podcast Host', '#15803d'],
     ] as [$quote,$name,$role,$c])

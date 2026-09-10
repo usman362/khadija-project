@@ -95,7 +95,7 @@
                     {{ $decision ? 'Revise the decision' : 'Record a decision' }}
                 </h6>
                 <p class="text-secondary small mb-3">
-                    Platform conformance review — was the work as agreed in the contract, not was
+                    Platform conformance review, was the work as agreed in the contract, not was
                     the client satisfied.
                 </p>
 
@@ -114,7 +114,7 @@
                         <div class="col-md-6">
                             <label class="form-label small fw-bold" for="financial_outcome">Financial outcome</label>
                             <select name="financial_outcome" id="financial_outcome" class="form-select form-select-sm">
-                                <option value="">None — housekeeping closure</option>
+                                <option value="">None, housekeeping closure</option>
                                 @foreach($outcomes as $key => $label)
                                     <option value="{{ $key }}" @selected(old('financial_outcome') === $key)>{{ $label }}</option>
                                 @endforeach
@@ -181,7 +181,7 @@
             <div class="card mb-3"><div class="card-body">
                 <h6 class="text-secondary text-uppercase small mb-2">Decision</h6>
                 <p class="mb-1"><strong>{{ $decision->resolutionTypeLabel() }}</strong>
-                    @if($decision->financialOutcomeLabel()) — {{ $decision->financialOutcomeLabel() }} @endif
+                    @if($decision->financialOutcomeLabel()): {{ $decision->financialOutcomeLabel() }} @endif
                 </p>
                 <p class="small mb-2" style="white-space:pre-line;">{{ $decision->reasoning }}</p>
                 <p class="text-secondary small mb-0">
@@ -196,7 +196,7 @@
             <h6 class="text-secondary text-uppercase small mb-1">Consistency guide</h6>
             <p class="text-secondary small mb-3">
                 What comparable findings have usually led to, and why. A reference for the person
-                deciding — it fills nothing in and decides nothing.
+                deciding. It fills nothing in and decides nothing.
             </p>
             <div class="table-responsive">
                 <table class="table table-sm mb-0">
@@ -223,7 +223,7 @@
                         <span>
                             <strong>{{ ucfirst(str_replace('_', ' ', $entry->action)) }}</strong>
                             @if($entry->old_value || $entry->new_value)
-                                — {{ $entry->old_value ?: '(none)' }} → {{ $entry->new_value ?: '(none)' }}
+                                {{ $entry->old_value ?: '(none)' }} → {{ $entry->new_value ?: '(none)' }}
                             @endif
                             @if($staffOnly($entry))
                                 <span class="badge bg-secondary-subtle text-secondary-emphasis ms-1">Internal</span>
@@ -256,7 +256,7 @@
                     <label class="form-label small fw-bold" for="severity">Severity</label>
                     <select name="severity" id="severity" class="form-select form-select-sm">
                         @foreach($severities as $level => $label)
-                            <option value="{{ $level }}" @selected($case->severity === $level)>{{ $level }} — {{ $label }}</option>
+                            <option value="{{ $level }}" @selected($case->severity === $level)>{{ $level }}: {{ $label }}</option>
                         @endforeach
                     </select>
                     <div class="form-text" style="font-size:11.5px;">
@@ -304,7 +304,7 @@
                         <option value="">Choose a staff member…</option>
                         @foreach($assignable as $person)
                             <option value="{{ $person->id }}" @selected($case->assigned_to === $person->id)>
-                                {{ $person->name }} — {{ $person->email }}
+                                {{ $person->name }}: {{ $person->email }}
                             </option>
                         @endforeach
                     </select>
@@ -356,7 +356,7 @@
             @endforeach
             <p class="text-secondary mt-2 mb-0" style="font-size:11.5px;">
                 Only confirmed outcomes count here. Filing a case, or having one filed against you,
-                counts for nothing until it is decided. The ladder is a recommendation — nothing is
+                counts for nothing until it is decided. The ladder is a recommendation. Nothing is
                 applied automatically.
             </p>
         </div></div>
@@ -368,7 +368,7 @@
                 @foreach($related as $sibling)
                     <div class="border-top py-2 small">
                         <a href="{{ route('app.admin.disputes.show', $sibling) }}" class="font-monospace">{{ $sibling->reference }}</a>
-                        — {{ $sibling->professional?->name }} · {{ $sibling->stateLabel() }}
+                        {{ $sibling->professional?->name }} · {{ $sibling->stateLabel() }}
                     </div>
                 @endforeach
                 <p class="text-secondary mt-2 mb-0" style="font-size:11.5px;">
@@ -399,7 +399,7 @@
                     <button type="submit" class="btn btn-sm btn-outline-danger">Close</button>
                 </form>
                 <p class="text-secondary mt-2 mb-0" style="font-size:11.5px;">
-                    A closed case is never reopened — a new case is opened instead. Closing also
+                    A closed case is never reopened: a new case is opened instead. Closing also
                     ends the hold on this booking's balance.
                 </p>
             </div></div>

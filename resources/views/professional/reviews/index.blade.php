@@ -306,7 +306,7 @@
         [2,   'There were some challenges to note.'],
         [3.5, 'A solid working experience.'],
         [4.2, 'Great experience! Thanks for booking.'],
-        [5,   'Outstanding — a pleasure to work with!'],
+        [5,   'Outstanding: a pleasure to work with!'],
     ];
     function vals() {
         return groups.map(g => {

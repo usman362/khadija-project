@@ -11,9 +11,9 @@
         @foreach([
             ['How do I earn commissions?', 'You earn a commission whenever someone signs up and books through your referral link. Your rate depends on your current tier (5% to 12.5%).'],
             ['When and how do I get paid?', 'Once your available balance reaches the minimum payout of $'.number_format(config('influencer.min_payout_threshold',50),0).', you can request a payout from the Payouts page. Payouts are sent via bank transfer or PayPal.'],
-            ['How do tiers work?', 'Your tier is based on your total successful referrals. The more you refer, the higher your tier — and the higher your commission rate and perks. See Badges & Tiers for details.'],
+            ['How do tiers work?', 'Your tier is based on your total successful referrals. The more you refer, the higher your tier, and the higher your commission rate and perks. See Badges & Tiers for details.'],
             ['Where can I find my referral link?', 'Your unique referral link and code are always available on the Invite Tools page, ready to copy and share anywhere.'],
-            ['Is there a cost to join?', 'No. Joining the influencer program is completely free — apply, get approved, and start sharing.'],
+            ['Is there a cost to join?', 'No. Joining the influencer program is completely free, apply, get approved, and start sharing.'],
             ['How are referrals tracked?', 'When someone clicks your link, a cookie attributes them to you for '.config('influencer.cookie_days',30).' days. Signups and bookings in that window count as your referrals.'],
         ] as [$q,$a])
             <details class="iv-faq">

@@ -26,6 +26,6 @@
 </div>
 
 @if($articles->isEmpty())
-    <div class="rs-panel" style="text-align:center; color:var(--muted);">No articles yet — check back soon.</div>
+    <div class="rs-panel" style="text-align:center; color:var(--muted);">No articles yet. Check back soon.</div>
 @endif
 @endsection

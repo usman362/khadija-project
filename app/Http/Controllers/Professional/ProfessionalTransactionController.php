@@ -101,7 +101,7 @@ class ProfessionalTransactionController extends Controller
             'requested_at' => now(),
         ]);
 
-        return back()->with('status', 'Payout of $' . number_format($data['amount']) . ' requested — you\'ll be notified once it\'s processed.');
+        return back()->with('status', 'Payout of $' . number_format($data['amount']) . ' requested, you\'ll be notified once it\'s processed.');
     }
 
     /**
@@ -220,7 +220,7 @@ class ProfessionalTransactionController extends Controller
             ->get()
             ->map(fn (Booking $b) => [
                 'title' => 'Booking ' . strtolower((string) $b->status)
-                    . ($b->event?->title ? ' — ' . $b->event->title : ''),
+                    . ($b->event?->title ? ': ' . $b->event->title : ''),
                 'meta'  => trim(($b->client?->name ? $b->client->name . ' · ' : '')
                     . (($b->booked_at ?? $b->created_at)?->diffForHumans() ?? '')),
             ])

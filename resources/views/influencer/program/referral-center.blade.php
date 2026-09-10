@@ -19,7 +19,7 @@
 
 <div class="pg-panel" style="margin-bottom:18px;">
     <h3>Your Referral Link</h3>
-    <p class="sub">Share this link anywhere — every signup is tracked to your account automatically.</p>
+    <p class="sub">Share this link anywhere. Every signup is tracked to your account automatically.</p>
     <div class="pg-linkbox">
         <code id="refUrl">{{ $referralUrl }}</code>
         <button class="pg-copy" data-copy="#refUrl">Copy Link</button>
@@ -35,7 +35,7 @@
         <h3>Recent Referrals</h3>
         <p class="sub">Your latest tracked referrals and their status.</p>
         @if($recent->isEmpty())
-            <div style="text-align:center; color:var(--muted); padding:24px;">No referrals yet — share your link to get started.</div>
+            <div style="text-align:center; color:var(--muted); padding:24px;">No referrals yet. Share your link to get started.</div>
         @else
             <table class="pg-table">
                 <thead><tr><th>Type</th><th>Source</th><th>Commission</th><th>Status</th><th>Date</th></tr></thead>

@@ -97,7 +97,7 @@
     @endforeach
 </div>
 <p class="text-secondary small mb-4" style="margin-top:-8px;">
-    “Active” means someone did something — placed a bid, posted a gig. There is no last-seen record,
+    “Active” means someone did something, placed a bid, posted a gig. There is no last-seen record,
     and counting accounts that merely exist is how a marketplace convinces itself it is busy.
 </p>
 
@@ -105,7 +105,7 @@
 <h6 class="text-secondary text-uppercase small mb-2">Needs attention</h6>
 <div class="card mb-4"><div class="card-body">
     <p class="text-secondary small mb-3">
-        Not limited to the dates above — a document waiting since June is exactly what you need to see today.
+        Not limited to the dates above: a document waiting since June is exactly what you need to see today.
     </p>
     <div class="row g-3">
         @foreach([
@@ -132,7 +132,7 @@
 <h6 class="text-secondary text-uppercase small mb-2">By state</h6>
 <div class="card"><div class="card-body">
     <p class="text-secondary small mb-3">
-        Since R38, this is seven separate same-state marketplaces rather than one pooled market —
+        Since R38, this is seven separate same-state marketplaces rather than one pooled market,
         so a total that hides which state produced it is not much use for deciding where to put effort.
     </p>
     <div class="table-responsive">

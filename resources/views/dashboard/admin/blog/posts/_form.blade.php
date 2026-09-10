@@ -150,8 +150,8 @@
         <div class="card mb-3">
             <div class="card-header"><h6 class="mb-0">Category</h6></div>
             <div class="card-body">
-                <select name="blog_category_id" class="form-select" aria-label="— Uncategorized —">
-                    <option value="">— Uncategorized —</option>
+                <select name="blog_category_id" class="form-select" aria-label="Uncategorized">
+                    <option value="">Uncategorized</option>
                     @foreach($categories as $cat)
                         <option value="{{ $cat->id }}" @selected((int)old('blog_category_id', $post->blog_category_id ?? 0) === $cat->id)>
                             {{ $cat->name }}

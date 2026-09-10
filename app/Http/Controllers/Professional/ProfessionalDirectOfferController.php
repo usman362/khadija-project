@@ -64,7 +64,7 @@ class ProfessionalDirectOfferController extends Controller
             ]
         );
 
-        return back()->with('status', 'Offer accepted — a confirmed booking has been created under Bookings.');
+        return back()->with('status', 'Offer accepted: a confirmed booking has been created under Bookings.');
     }
 
     /** Decline a direct offer → cancelled. */

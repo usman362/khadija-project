@@ -25,6 +25,6 @@
 </div>
 
 @if($videos->isEmpty())
-    <div class="rs-panel" style="text-align:center; color:var(--muted);">No tutorials yet — check back soon.</div>
+    <div class="rs-panel" style="text-align:center; color:var(--muted);">No tutorials yet. Check back soon.</div>
 @endif
 @endsection

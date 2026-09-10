@@ -12,19 +12,17 @@ use Tests\TestCase;
  * client portal, the public site, the shared pages, the emails and the copy in
  * config — each by what the sentence needed: a comma, a full stop, a colon.
  *
- * Code comments keep theirs; nobody reads them on screen. The professional,
- * admin and influencer areas are left until Ali says so (client-side-only
- * rule), and so is one lookup list that must match rows already in the
- * database. Everything else is checked here so the dash cannot creep back.
+ * Code comments keep theirs; nobody reads them on screen. Ali extended it to
+ * the whole project the same day, professional, admin and influencer areas
+ * and the seeders included. One lookup list is exempt: it must match rows
+ * already in the database. Text a language model writes at runtime is put
+ * through App\Support\PlainPunctuation before anyone sees it.
  */
 class NoSpacedDashInCopyTest extends TestCase
 {
     private const HELD = [
-        '#^resources/views/professional/#', '#^resources/views/layouts/professional#',
-        '#^resources/views/influencer/#',   '#^resources/views/layouts/influencer#', '#^resources/views/emails/influencer/#',
-        '#^resources/views/dashboard/admin/#',
-        '#^app/Http/Controllers/Professional/#', '#^app/Http/Controllers/Influencer/#',
-        '#^app/Http/Controllers/Dashboard/Admin#', '#^app/Http/Controllers/Admin/#',
+        // The rules that find the dash have to contain it.
+        '#^app/Support/PlainPunctuation\.php$#',
         // Matched exactly against titles the demo seeders wrote. Lookup keys, not copy.
         '#^app/Console/Commands/InventoryDemoData\.php$#',
     ];
@@ -49,7 +47,13 @@ class NoSpacedDashInCopyTest extends TestCase
     {
         // Everything between comments. Blade, HTML, CSS and JS comments are
         // for developers and keep whatever punctuation they like.
-        $comments = '/(\{\{--.*?--\}\}|<!--.*?-->|\/\*.*?\*\/|(?m:^[ \t]*\/\/[^\n]*$)|(?<=[;{}),])[ \t]*\/\/[^\n]*)/s';
+        //
+        // A "/*" counts as a comment only when no word, quote, = or / sits
+        // right before it. accept="image/*" on a file input was read as the
+        // start of a CSS comment, and everything up to the next "*/" — real
+        // copy on the professional profile page — was skipped, by the fixer
+        // and by this test alike.
+        $comments = '/(\{\{--.*?--\}\}|<!--.*?-->|(?<![\w"\'=\/])\/\*.*?\*\/|(?m:^[ \t]*\/\/[^\n]*$)|(?<=[;{}),])[ \t]*\/\/[^\n]*)/s';
         $found = [];
 
         $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(resource_path('views')));
@@ -81,7 +85,9 @@ class NoSpacedDashInCopyTest extends TestCase
         $found = [];
         $files = array_merge(
             iterator_to_array(new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(app_path()))),
-            array_map(fn ($p) => new \SplFileInfo($p), glob(config_path('*.php')))
+            array_map(fn ($p) => new \SplFileInfo($p), glob(config_path('*.php'))),
+            // What the seeders write ends up on screen too.
+            iterator_to_array(new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(database_path('seeders'))))
         );
 
         foreach ($files as $file) {

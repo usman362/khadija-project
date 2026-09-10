@@ -34,12 +34,12 @@
                 </div>
             </div>
         @empty
-            <div style="font-size:12px;opacity:.6;margin-bottom:8px;">No messages yet — start the conversation below.</div>
+            <div style="font-size:12px;opacity:.6;margin-bottom:8px;">No messages yet. Start the conversation below.</div>
         @endforelse
 
         @unless($closed)
             @if($awarded)
-                <div style="font-size:12px;color:var(--ok-text);font-weight:700;margin-bottom:6px;">✓ Awarded — use this thread to sort out the details.</div>
+                <div style="font-size:12px;color:var(--ok-text);font-weight:700;margin-bottom:6px;">✓ Awarded. Use this thread to sort out the details.</div>
             @endif
             <form method="POST" action="{{ route($replyRoute, $bid->id) }}" style="display:flex;flex-direction:column;gap:6px;">
                 @csrf
@@ -57,7 +57,7 @@
                 </div>
             </form>
         @else
-            <div style="font-size:12px;opacity:.6;">This bid is {{ $bid->status }} — the conversation is closed.</div>
+            <div style="font-size:12px;opacity:.6;">This bid is {{ $bid->status }}: the conversation is closed.</div>
         @endunless
     </div>
 </div>

@@ -7,7 +7,7 @@
 
 <div class="iv-hero">
     <h2>The GigResource Influencer Program 🚀</h2>
-    <p>Monetize your influence, promote amazing events, and earn commissions for every successful referral — doing what you love.</p>
+    <p>Monetize your influence, promote amazing events, and earn commissions for every successful referral, doing what you love.</p>
     <a href="{{ route('influencer.invite.tools') }}">Get Your Referral Link</a>
 </div>
 

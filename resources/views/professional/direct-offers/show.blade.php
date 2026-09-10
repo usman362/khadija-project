@@ -237,7 +237,7 @@
                 @if(($offer['is_open'] ?? false) && ($offer['event_id'] ?? null))
                     <div class="do-action">
                         <div class="do-action-h"><span class="do-num">1</span>Accept the Offer</div>
-                        <p>Take the job at the client's terms — a confirmed booking is created.</p>
+                        <p>Take the job at the client's terms: a confirmed booking is created.</p>
                         <form method="POST" action="{{ route('professional.direct-offers.accept', $offer['event_id']) }}">@csrf<button type="submit" class="do-action-btn solid">Accept Offer</button></form>
                     </div>
                     <div class="do-action">

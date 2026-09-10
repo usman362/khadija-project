@@ -133,7 +133,7 @@ class ProfessionalPackageController extends Controller
 
         return redirect()
             ->route('professional.packages.edit', $copy)
-            ->with('status', 'Copied. This is a draft — nothing is live until you publish it.');
+            ->with('status', 'Copied. This is a draft. Nothing is live until you publish it.');
     }
 
     public function create(): View

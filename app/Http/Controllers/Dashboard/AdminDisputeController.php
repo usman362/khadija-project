@@ -228,7 +228,7 @@ class AdminDisputeController extends Controller
                 'reason' => $data['conflict_detail'] ?: 'Personal connection disclosed.', 'visible' => false,
             ]);
 
-            return back()->with('status', 'A connection was disclosed — this case needs a different owner.');
+            return back()->with('status', 'A connection was disclosed. This case needs a different owner.');
         }
 
         // §6 — exactly one role owns a case at a time. The previous owner is

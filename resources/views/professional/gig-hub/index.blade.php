@@ -13,7 +13,7 @@
 
 @php
     $tabs = [
-        'overview'  => ['Overview',  'The gig itself — crew, kit, directions, signing.'],
+        'overview'  => ['Overview',  'The gig itself, crew, kit, directions, signing.'],
         'gigs'      => ['My Gigs',   'Every gig, with the calendar and filters.'],
         'contracts' => ['Contracts', 'Paperwork, status and history.'],
     ];

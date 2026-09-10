@@ -195,7 +195,7 @@ class DemoProfessionalsSeeder extends Seeder
         $ids = $ids->unique()->values();
 
         if ($ids->isEmpty()) {
-            $this->command?->warn("  No services matched for {$user->name} — skipped.");
+            $this->command?->warn("  No services matched for {$user->name} skipped.");
 
             return;
         }
@@ -287,7 +287,7 @@ class DemoProfessionalsSeeder extends Seeder
 
         $count    = rand(4, 9);
         $comments = [
-            'Absolutely incredible — exceeded every expectation. Highly recommend!',
+            'Absolutely incredible, exceeded every expectation. Highly recommend!',
             'Professional, punctual, and so easy to work with. Will book again.',
             'Made our event unforgettable. The quality of work speaks for itself.',
             'Great communication from start to finish. Worth every penny.',
@@ -422,7 +422,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'skills' => ['Full Planning', 'Day-of Coordination', 'Vendor Sourcing', 'Budgeting'],
                 'services' => ['Full-Service Event Planning', 'Day-Of Coordination', 'Corporate Event Management'],
                 'languages' => ['English', 'Spanish', 'Portuguese'],
-                'bio' => 'From concept to last dance — we plan luxury weddings and corporate events end to end.',
+                'bio' => 'From concept to last dance. We plan luxury weddings and corporate events end to end.',
                 'eventTitle' => 'Luxury Wedding',
             ],
             [
@@ -444,7 +444,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'skills' => ['Uplighting', 'Stage Design', 'Gobo / Monogram', 'Pin Spotting'],
                 'services' => ['Uplighting & Ambient Lighting', 'Stage Design & Setup', 'AV Equipment Rental'],
                 'languages' => ['English'],
-                'bio' => 'We sculpt rooms with light — from intimate receptions to large-scale productions.',
+                'bio' => 'We sculpt rooms with light, from intimate receptions to large-scale productions.',
                 'eventTitle' => 'Event Lighting',
             ],
             [
@@ -467,7 +467,7 @@ class DemoProfessionalsSeeder extends Seeder
                 'skills' => ['Bridal Makeup', 'Hair Styling', 'Airbrush', 'On-Location Glam'],
                 'services' => ['Wait Staff & Servers', 'Registration & Check-In Staff'],
                 'languages' => ['English'],
-                'bio' => 'On-location glam for brides and bridal parties — flawless, photo-ready looks.',
+                'bio' => 'On-location glam for brides and bridal parties, flawless, photo-ready looks.',
                 'eventTitle' => 'Bridal Glam',
             ],
         ];

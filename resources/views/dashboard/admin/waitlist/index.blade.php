@@ -7,8 +7,8 @@
     <div>
         <h4 class="mb-1"><i data-lucide="map-pin" class="me-2" style="width:24px;height:24px;"></i> Expansion Waitlist</h4>
         <p class="text-secondary mb-0">
-            People who signed up from somewhere we don't operate yet. Everyone here has a working account —
-            they just can't book or bid until we open their state.
+            People who signed up from somewhere we don't operate yet. Everyone here has a working account.
+            They just can't book or bid until we open their state.
         </p>
     </div>
 </div>
@@ -40,7 +40,7 @@
         <div class="card h-100">
             <div class="card-body">
                 <h6 class="mb-1">Where they are</h6>
-                <p class="text-secondary small mb-3">Largest first — this is the "where do we open next" list.</p>
+                <p class="text-secondary small mb-3">Largest first. This is the "where do we open next" list.</p>
 
                 @if($byState->isEmpty())
                     <p class="text-secondary mb-0">Nobody is waiting. Every registration so far is inside the launch area.</p>

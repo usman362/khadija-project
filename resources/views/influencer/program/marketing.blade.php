@@ -10,7 +10,7 @@
     ];
     $swipes = [
         ['Instagram / Facebook', "Planning an event? I use GigResource to find trusted event professionals in one place. Check it out and book with confidence 👉 {$referralUrl}"],
-        ['Short & Punchy', "Find your perfect event pro on GigResource — quick, simple, reliable. Start here: {$referralUrl}"],
+        ['Short & Punchy', "Find your perfect event pro on GigResource, quick, simple, reliable. Start here: {$referralUrl}"],
         ['Email / Newsletter', "Hi! If you're organising an event, I'd recommend GigResource for discovering and booking event professionals. You can explore it using my link: {$referralUrl}"],
     ];
 @endphp
@@ -50,7 +50,7 @@
 <div class="pg-grid two">
     <div class="pg-panel">
         <h3>Swipe Copy</h3>
-        <p class="sub">Pre-written posts with your link already added — copy and share.</p>
+        <p class="sub">Pre-written posts with your link already added, copy and share.</p>
         @foreach($swipes as $i => [$label, $text])
             <div class="pg-swipe">
                 <div class="cap"><b>{{ $label }}</b><button class="pg-copy" style="padding:6px 12px; font-size:11.5px;" data-copy="#swipe{{ $i }}">Copy</button></div>
@@ -72,7 +72,7 @@
 
         <div class="pg-note">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            <span>Keep your promotion honest — describe GigResource as a marketplace to discover and book event professionals. Avoid guarantees or specific outcome claims.</span>
+            <span>Keep your promotion honest, describe GigResource as a marketplace to discover and book event professionals. Avoid guarantees or specific outcome claims.</span>
         </div>
     </div>
 </div>

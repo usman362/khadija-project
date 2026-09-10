@@ -34,7 +34,7 @@ class DemoDisputesSeeder extends Seeder
         $pro = User::where('email', 'elena.demo@example.test')->first();
 
         if (! $pro) {
-            $this->command?->warn('DemoDisputesSeeder: elena.demo@example.test not found — skipped.');
+            $this->command?->warn('DemoDisputesSeeder: elena.demo@example.test not found, skipped.');
 
             return;
         }
@@ -47,7 +47,7 @@ class DemoDisputesSeeder extends Seeder
             ->get();
 
         if ($bookings->isEmpty()) {
-            $this->command?->warn('DemoDisputesSeeder: no bookings for the demo professional — skipped.');
+            $this->command?->warn('DemoDisputesSeeder: no bookings for the demo professional, skipped.');
 
             return;
         }

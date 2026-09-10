@@ -122,7 +122,7 @@
                     <td style="color:var(--muted);">{{ $p->created_at->format('M d, Y') }}</td>
                 </tr>
             @empty
-                <tr><td colspan="4" class="po-empty">No payout requests yet — request your first withdrawal on the left.</td></tr>
+                <tr><td colspan="4" class="po-empty">No payout requests yet. Request your first withdrawal on the left.</td></tr>
             @endforelse
             </tbody>
         </table>

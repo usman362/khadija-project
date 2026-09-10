@@ -265,7 +265,7 @@
                                  stand-in hero image and the "more like this"
                                  row on the public page. --}}
                             <select name="category_id" id="pcCat" class="pc-select">
-                                <option value="">— Choose a category —</option>
+                                <option value="">Choose a category</option>
                                 {{-- getNestedDropdownList() returns rows, not an
                                      id => name map: each one carries the tree
                                      depth as a prefix on `name`. --}}
@@ -322,7 +322,7 @@
 
                     <div class="pc-block">Package Media</div>
                     <div class="hint" style="margin-bottom:12px;">
-                        Add up to 10 photos and pick one as the <b>cover</b> — it becomes the hero image and
+                        Add up to 10 photos and pick one as the <b>cover</b>. It becomes the hero image and
                         drives the card's hover carousel. JPG/PNG/WebP, up to 6&nbsp;MB each.
                     </div>
 
@@ -777,7 +777,7 @@
             list.innerHTML = '';
             missing.forEach(function (x) {
                 var li = document.createElement('li');
-                li.textContent = 'Step ' + x.n + ', ' + x.label + ' — needs ' + x.missing;
+                li.textContent = 'Step ' + x.n + ', ' + x.label + ', needs ' + x.missing;
                 list.appendChild(li);
             });
         }

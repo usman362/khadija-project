@@ -127,7 +127,7 @@
                                 <div class="col-md-4">
                                     <label class="form-label small" for="cat-new-insurance-requirement">Requirement</label>
                                     <select id="cat-new-insurance-requirement" name="insurance_requirement" class="form-select">
-                                        <option value="">— Not set —</option>
+                                        <option value="">Not set</option>
                                         <option value="required" @selected(old('insurance_requirement') === 'required')>Required</option>
                                         <option value="conditional" @selected(old('insurance_requirement') === 'conditional')>Conditional</option>
                                         <option value="not_required" @selected(old('insurance_requirement') === 'not_required')>Not Required</option>
@@ -141,7 +141,7 @@
                                 <div class="col-md-4">
                                     <label class="form-label small" for="cat-new-insurance-tier">Tier</label>
                                     <select id="cat-new-insurance-tier" name="insurance_tier" class="form-select">
-                                        <option value="">— Not set —</option>
+                                        <option value="">Not set</option>
                                         @foreach(['A','B','C'] as $tier)
                                             <option value="{{ $tier }}" @selected(old('insurance_tier') === $tier)>Tier {{ $tier }}</option>
                                         @endforeach

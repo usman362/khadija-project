@@ -37,7 +37,7 @@ class DemoPackagesSeeder extends Seeder
             ->orderBy('id')->get();
 
         if ($suppliers->isEmpty()) {
-            $this->command?->warn('No suppliers found — run DemoProfessionalsSeeder first.');
+            $this->command?->warn('No suppliers found, run DemoProfessionalsSeeder first.');
             return;
         }
 
@@ -135,7 +135,7 @@ class DemoPackagesSeeder extends Seeder
                 'price' => 3250, 'price_unit' => 'from', 'duration' => 'Up to 10 Hours', 'coverage' => 'Up to 10 Hours',
                 'team' => ['1 Lead Photographer', '1 Videographer', '1 Floral Designer'], 'guests' => 'Up to 150',
                 'availability' => 'Available Weekends', 'savings_pct' => 15,
-                'description' => "Complete visual storytelling with premium photography, cinematic video, and custom floral design — all coordinated on one timeline.",
+                'description' => "Complete visual storytelling with premium photography, cinematic video, and custom floral design, all coordinated on one timeline.",
                 'includes' => ['Full-day photo coverage', 'Cinematic highlight film', 'Custom floral design', 'Timeline planning', 'Edited online gallery'],
                 'sort' => 96,
             ],
@@ -160,7 +160,7 @@ class DemoPackagesSeeder extends Seeder
                 'sort' => 92,
             ],
             [
-                'title' => 'Complete Celebration — Photo, DJ & Décor', 'owner' => 'mixmasters.demo@example.test', 'category' => 'DJ', 'type' => 'solo',
+                'title' => 'Complete Celebration: Photo, DJ & Décor', 'owner' => 'mixmasters.demo@example.test', 'category' => 'DJ', 'type' => 'solo',
                 'services' => ['Photography', 'DJ / Entertainment', 'Decor & Design', 'Lighting & Tech'],
                 'price' => 5600, 'price_unit' => 'from', 'duration' => 'Up to 8 Hours', 'coverage' => 'Up to 8 Hours',
                 'team' => ['1 Photographer', '1 DJ + MC', '1 Décor Lead', '1 Lighting Tech'], 'guests' => 'Up to 250',
@@ -170,7 +170,7 @@ class DemoPackagesSeeder extends Seeder
                 'sort' => 90,
             ],
             [
-                'title' => 'Corporate Conference — Catering & AV', 'owner' => 'saffron.demo@example.test', 'category' => 'Cater', 'type' => 'solo',
+                'title' => 'Corporate Conference: Catering & AV', 'owner' => 'saffron.demo@example.test', 'category' => 'Cater', 'type' => 'solo',
                 'services' => ['Catering / Food', 'Lighting & Tech', 'Planning / Coordination'],
                 'price' => 8400, 'price_unit' => 'from', 'duration' => 'Multi-day', 'coverage' => 'Up to 3 Days',
                 'team' => ['Catering crew (6)', '2 AV Technicians', '1 Event Coordinator'], 'guests' => 'Up to 400',
@@ -185,7 +185,7 @@ class DemoPackagesSeeder extends Seeder
                 'price' => 4200, 'price_unit' => 'from', 'duration' => '3–6 months lead', 'coverage' => 'Planning + Event Day',
                 'team' => ['1 Lead Planner', '1 Day-of Coordinator', '1 Assistant'], 'guests' => 'Up to 200',
                 'availability' => 'Available Weekends', 'savings_pct' => 14,
-                'description' => "End-to-end planning from concept to day-of execution — vendor sourcing, budget, timeline and on-site coordination.",
+                'description' => "End-to-end planning from concept to day-of execution, vendor sourcing, budget, timeline and on-site coordination.",
                 'includes' => ['Vendor sourcing & vetting', 'Budget & timeline management', 'Design concept & mood board', 'Day-of coordination team', 'Unlimited planning calls'],
                 'sort' => 88,
             ],
@@ -200,12 +200,12 @@ class DemoPackagesSeeder extends Seeder
                 'sort' => 74,
             ],
             [
-                'title' => 'DJ & Live Sound — Reception Party', 'owner' => 'horizon.demo@example.test', 'category' => 'DJ', 'type' => 'solo',
+                'title' => 'DJ & Live Sound: Reception Party', 'owner' => 'horizon.demo@example.test', 'category' => 'DJ', 'type' => 'solo',
                 'services' => ['DJ / Entertainment', 'Lighting & Tech'],
                 'price' => 1200, 'price_unit' => 'from', 'duration' => '5 hours', 'coverage' => 'Up to 5 Hours',
                 'team' => ['1 DJ + MC', '1 Sound Tech'], 'guests' => 'Up to 150',
                 'availability' => 'Available Weekends', 'savings_pct' => 10,
-                'description' => "Professional DJ and MC with a full sound system and dance-floor lighting — playlist built with you.",
+                'description' => "Professional DJ and MC with a full sound system and dance-floor lighting, playlist built with you.",
                 'includes' => ['Pro DJ + MC', 'Full PA sound system', 'Dance-floor lighting', 'Custom playlist planning', 'Wireless mics for toasts'],
                 'sort' => 66,
             ],
@@ -276,7 +276,7 @@ class DemoPackagesSeeder extends Seeder
                 'price' => 15000, 'price_unit' => 'from', 'duration' => 'Per event', 'coverage' => 'Full Production',
                 'team' => ['1 Production Lead', 'Catering crew (8)', '2 AV Techs', '1 DJ', 'Event staff (6)'], 'guests' => 'Up to 500',
                 'availability' => 'By Arrangement', 'savings_pct' => 16,
-                'description' => "Full production for large galas and fundraisers — catering, AV, staging, lighting and event staffing under one managed package.",
+                'description' => "Full production for large galas and fundraisers, catering, AV, staging, lighting and event staffing under one managed package.",
                 'includes' => ['Dedicated production lead', 'Catering & bar service', 'Stage, AV & lighting', 'Event staffing', 'Run-of-show management'],
                 'sort' => 86,
             ],

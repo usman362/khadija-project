@@ -29,13 +29,13 @@ class CategorySeeder extends Seeder
         $assetDir  = database_path('seeders/assets/categories');
 
         if (!File::exists($jsonPath)) {
-            $this->command?->error("Missing {$jsonPath} — cannot seed categories.");
+            $this->command?->error("Missing {$jsonPath} cannot seed categories.");
             return;
         }
 
         $rows = json_decode(File::get($jsonPath), true) ?? [];
         if (!$rows) {
-            $this->command?->warn('legacy_categories.json is empty — nothing to seed.');
+            $this->command?->warn('legacy_categories.json is empty. Nothing to seed.');
             return;
         }
 
@@ -77,7 +77,7 @@ class CategorySeeder extends Seeder
         if ($live !== $version && ! app()->runningUnitTests() && ! env('SEED_LEGACY_TAXONOMY', false)) {
             $this->command?->warn(
                 "CategorySeeder holds the {$version} tree and this site is running {$live}. "
-                . 'Skipped — running it would add a second copy of every category. '
+                . 'Skipped, running it would add a second copy of every category. '
                 . "Set SEED_LEGACY_TAXONOMY=true only if you are deliberately restoring {$version}."
             );
 

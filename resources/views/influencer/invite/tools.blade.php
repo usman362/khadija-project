@@ -12,7 +12,7 @@
         {{-- link generator --}}
         <div class="iv-panel">
             <h3>Your Referral Link</h3>
-            <div class="sub">Share this link — you earn a commission every time someone signs up and books through it.</div>
+            <div class="sub">Share this link. You earn a commission every time someone signs up and books through it.</div>
             <div class="iv-linkbox">
                 <div class="url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg><span id="refUrl">{{ $referralUrl }}</span></div>
                 <button type="button" class="iv-copy" id="copyBtn" data-url="{{ $referralUrl }}">

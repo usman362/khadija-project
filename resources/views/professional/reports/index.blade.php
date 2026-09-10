@@ -136,7 +136,7 @@
     @if(collect($report['over_time'])->sum('earned') > 0)
         <div class="rp-bars">
             @foreach($report['over_time'] as $row)
-                <div class="rp-bar" title="{{ $row['month'] }} — ${{ number_format($row['earned'], 2) }} from {{ $row['bookings'] }} {{ Str::plural('booking', $row['bookings']) }}">
+                <div class="rp-bar" title="{{ $row['month'] }}: ${{ number_format($row['earned'], 2) }} from {{ $row['bookings'] }} {{ Str::plural('booking', $row['bookings']) }}">
                     <div class="rp-bar-fill" style="height: {{ max(2, (int) round($row['earned'] / $peak * 100)) }}%;"></div>
                     <span class="rp-bar-label">{{ Str::before($row['month'], ' ') }}</span>
                 </div>

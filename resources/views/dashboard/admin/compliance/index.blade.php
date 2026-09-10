@@ -7,7 +7,7 @@
     <div class="cmp-head">
         <h1>Compliance</h1>
         <p>
-            One row per requirement, not per law — a single act can ask for three
+            One row per requirement, not per law: a single act can ask for three
             different things, and three things is what somebody has to build.
         </p>
     </div>
@@ -20,7 +20,7 @@
     <div class="cmp-beat {{ $__beat && $__beat->gt(now()->subMinutes(10)) ? 'is-ok' : 'is-bad' }}">
         @if(! $__beat)
             <b>The scheduler has never run.</b>
-            <span>Nothing time-based is happening — no renewal notices, no account purges.
+            <span>Nothing time-based is happening: no renewal notices, no account purges.
                   The host needs a cron entry calling <code>schedule:run</code> every minute.</span>
         @elseif($__beat->gt(now()->subMinutes(10)))
             <b>Scheduler running.</b>
@@ -45,7 +45,7 @@
             <b>{{ $problems->count() }} {{ \Illuminate\Support\Str::plural('gap', $problems->count()) }} in the register itself</b>
             <ul>
                 @foreach($problems as $p)
-                    <li><code>{{ $p['key'] }}</code> — {{ $p['problem'] }}</li>
+                    <li><code>{{ $p['key'] }}</code>: {{ $p['problem'] }}</li>
                 @endforeach
             </ul>
         </div>
@@ -64,7 +64,7 @@
                 <p class="cmp-requires">{{ $r['requires'] }}</p>
 
                 <dl class="cmp-facts">
-                    <div><dt>Citation</dt><dd>{{ $r['citation'] ?? '— not on file —' }}</dd></div>
+                    <div><dt>Citation</dt><dd>{{ $r['citation'] ?? 'not on file' }}</dd></div>
                     <div><dt>In force from</dt><dd>{{ $r['effective'] ?? '—' }}</dd></div>
                     <div><dt>Done</dt><dd>{{ $r['done_on'] ?? '—' }}</dd></div>
                 </dl>

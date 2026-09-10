@@ -85,7 +85,9 @@ class ReviewWriterService
         }
 
         return [
-            ['review' => trim($parsed['review']), 'short' => trim($parsed['short'] ?? '')],
+            // A model does not always follow the punctuation rule it is given.
+            ['review' => \App\Support\PlainPunctuation::model(trim($parsed['review'])),
+             'short'  => \App\Support\PlainPunctuation::model(trim($parsed['short'] ?? ''))],
             (int) ($data['usage']['total_tokens'] ?? 0),
         ];
     }
@@ -175,7 +177,7 @@ Rules:
 - Use first person ("I", "we")
 - Be honest, specific, and helpful, avoid generic platitudes
 - Never mention "AI" or "artificial intelligence" in the review
-PROMPT;
+PROMPT . "\n- " . \App\Support\PlainPunctuation::PROMPT_RULE;
     }
 
     private function buildPrompt(array $input): string

@@ -238,7 +238,7 @@
                      (No-AI). Framed as bid activity a pro can act on. --}}
                 <div class="bi-ai-box" style="background:rgba(37,99,235,0.07);">
                     <div class="k" style="color:var(--info-text);">Insight</div>
-                    <p>You have <b>{{ \App\Models\Bid::where('supplier_id', auth()->id())->where('status','submitted')->count() }}</b> active bids. Bids viewed by clients convert far more often than un-opened ones — follow up on the ones going quiet.</p>
+                    <p>You have <b>{{ \App\Models\Bid::where('supplier_id', auth()->id())->where('status','submitted')->count() }}</b> active bids. Bids viewed by clients convert far more often than un-opened ones. Follow up on the ones going quiet.</p>
                 </div>
                 <div class="bi-ai-box" style="background:rgba(16,185,129,0.07);">
                     <div class="k" style="color:var(--ok-text);">Recommendation</div>

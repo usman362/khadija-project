@@ -263,8 +263,9 @@ class VendorMatchmakingService
         }
 
         return [
-            'matches' => $parsed['matches'],
-            'summary' => $parsed['summary'] ?? null,
+            // Reasons and the summary are read by the client; corrected as well as asked.
+            'matches' => \App\Support\PlainPunctuation::modelDeep($parsed['matches']),
+            'summary' => isset($parsed['summary']) ? \App\Support\PlainPunctuation::model((string) $parsed['summary']) : null,
             'tokens'  => $tokens,
         ];
     }
@@ -327,6 +328,6 @@ Rules:
 - The reasoning must be CONCRETE, cite specific skills, experience, or rate that match the requirement
 - If fewer than 5 are good fits, return fewer matches (quality over quantity)
 - Never invent supplier details, only use what's provided
-PROMPT;
+PROMPT . "\n" . \App\Support\PlainPunctuation::PROMPT_RULE;
     }
 }

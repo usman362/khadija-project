@@ -221,6 +221,6 @@ class ProfessionalProposalController extends Controller
 
         return redirect()
             ->route('professional.chat.show', $conversation)
-            ->with('status', 'You can negotiate this proposal here — the client is in the thread.');
+            ->with('status', 'You can negotiate this proposal here: the client is in the thread.');
     }
 }

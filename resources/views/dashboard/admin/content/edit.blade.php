@@ -93,7 +93,7 @@
             <div class="card mb-3">
                 <div class="card-body">
                     <h6 class="mb-1">{{ $spec['label'] }}</h6>
-                    <p class="text-secondary small">{{ $spec['min'] === $spec['max'] ? 'The design has ' . $spec['min'] . ' of these — you can change the wording, not how many.' : '' }}</p>
+                    <p class="text-secondary small">{{ $spec['min'] === $spec['max'] ? 'The design has ' . $spec['min'] . ' of these. You can change the wording, not how many.' : '' }}</p>
 
                     <div class="row g-3">
                         @foreach($rows as $i => $row)

@@ -146,7 +146,7 @@ class AgreementGeneratorService
             'messages' => [
                 [
                     'role' => 'system',
-                    'content' => 'You are a professional legal document assistant that generates service agreements for event bookings. Generate clear, professional agreements in HTML format. Extract specific terms mentioned in the conversation (dates, prices, deliverables, cancellation terms, etc.) into a structured JSON object alongside the agreement.',
+                    'content' => 'You are a professional legal document assistant that generates service agreements for event bookings. Generate clear, professional agreements in HTML format. Extract specific terms mentioned in the conversation (dates, prices, deliverables, cancellation terms, etc.) into a structured JSON object alongside the agreement. ' . \App\Support\PlainPunctuation::PROMPT_RULE,
                 ],
                 [
                     'role' => 'user',
@@ -166,8 +166,13 @@ class AgreementGeneratorService
         $parsed = json_decode($data['choices'][0]['message']['content'] ?? '{}', true);
 
         return [
-            'content' => $parsed['agreement_html'] ?? $this->generateFallbackContent($context),
-            'terms' => $parsed['extracted_terms'] ?? $this->extractTermsFromChat($context),
+            // The HTML's text is corrected; its tags and attributes are not touched.
+            'content' => isset($parsed['agreement_html'])
+                ? \App\Support\PlainPunctuation::modelHtml($parsed['agreement_html'])
+                : $this->generateFallbackContent($context),
+            'terms' => isset($parsed['extracted_terms'])
+                ? \App\Support\PlainPunctuation::modelDeep($parsed['extracted_terms'])
+                : $this->extractTermsFromChat($context),
             'model' => $data['model'] ?? 'gpt-4o-mini',
             'prompt_summary' => 'Prompt size: ' . strlen($prompt) . ' chars',
         ];

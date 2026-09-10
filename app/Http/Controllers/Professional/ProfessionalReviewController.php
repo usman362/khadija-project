@@ -105,6 +105,6 @@ class ProfessionalReviewController extends Controller
             'comment'     => $comment,
         ]);
 
-        return back()->with('status', 'Feedback posted — thanks for helping build a trusted community!');
+        return back()->with('status', 'Feedback posted, thanks for helping build a trusted community!');
     }
 }
