@@ -216,6 +216,18 @@ class ClientEventController extends Controller
             ->take(4)
             ->get(['id', 'title', 'starts_at']);
 
+        /*
+         * The two sub-tabs beside the list — "Professional Schedule" and
+         * "Payment Tracker" — were plain text that did nothing when clicked.
+         * They are the same bookings seen two ways: who is booked for when,
+         * and what each one costs and whether it is paid.
+         */
+        $bookings = (clone $bookingBase)
+            ->with(['supplier:id,name', 'event:id,title,starts_at,ends_at', 'category:id,name'])
+            ->get()
+            ->sortBy(fn ($b) => $b->event?->starts_at?->timestamp ?? PHP_INT_MAX)
+            ->values();
+
         // Calendar data: events for the chosen month
         $month = $request->integer('month', (int) now()->format('m'));
         $year = $request->integer('year', (int) now()->format('Y'));
@@ -271,7 +283,7 @@ class ClientEventController extends Controller
         return view('client.events.index', compact(
             'events', 'stats', 'calendarEvents', 'categories', 'month', 'year',
             'totalSpent', 'proStatus', 'payment', 'deadlines', 'activity',
-            'overview', 'period'
+            'overview', 'bookings', 'period'
         ) + [
             'statuses' => self::FILTER_STATUSES,
             'periods'  => self::PERIODS,
