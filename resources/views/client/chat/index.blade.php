@@ -17,6 +17,10 @@
     .cm { --cm: #ea580c; padding-top: 6px; }
     .cm-top { display: grid; grid-template-columns: minmax(0,1fr) 210px; gap: 16px; align-items: start; margin-bottom: 18px; }
     .cm-stats { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 12px; }
+    button.cm-stat, a.cm-stat { font: inherit; color: inherit; text-align: left; text-decoration: none; width: 100%; }
+    .cm-stat.is-link { cursor: pointer; transition: border-color .12s ease, box-shadow .12s ease; }
+    .cm-stat.is-link:hover { border-color: var(--cm); }
+    .cm-stat.is-active { border-color: var(--cm); box-shadow: 0 0 0 3px rgba(234,88,12,.14); }
     .cm-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; }
     .cm-stat-h { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 700; color: var(--text-muted); }
     .cm-stat-ico { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -304,11 +308,34 @@
     {{-- stats + actions --}}
     <div class="cm-top">
         <div class="cm-stats">
-            <div class="cm-stat"><div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(234,88,12,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Unread</div><div class="v">{{ $stats['unread'] }}</div><div class="s">of {{ max($stats['total'], $stats['unread']) }}</div></div>
-            <div class="cm-stat"><div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(217,119,6,0.12);color:var(--warn-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>Priority</div><div class="v">{{ $stats['priority'] }}</div><div class="s">Needs attention</div></div>
-            <div class="cm-stat"><div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></span>Response Time</div><div class="v">{{ $stats['response'] }}</div><div class="s" style="color:var(--ok-text);">↓ 9% vs last 30 days</div></div>
-            <div class="cm-stat"><div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(220,38,38,0.12);color:var(--bad-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>Compliance</div><div class="v">{{ $stats['compliance'] }}</div><div class="s">Action required</div></div>
-            <div class="cm-stat"><div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(234,88,12,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>Payment Secured</div><div class="v">{{ $money($stats['escrow']) }}</div><div class="s">Across {{ $stats['escrow_convos'] }} conversations</div></div>
+            {{-- Every figure counts one kind of thing and says which. Unread and
+                 Awaiting narrow the list when pressed; the other two open the
+                 page they are about. Priority and Compliance were removed. --}}
+            <button type="button" class="cm-stat is-link" data-card-filter="unread" aria-pressed="false" title="Show only these">
+                <div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(234,88,12,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Unread</div>
+                <div class="v">{{ $stats['unread'] }}</div>
+                <div class="s">{{ \Illuminate\Support\Str::plural('conversation', $stats['unread']) }} of {{ $stats['inbox'] }} in your inbox</div>
+            </button>
+            <button type="button" class="cm-stat is-link" data-card-filter="awaiting" aria-pressed="false" title="Show only these">
+                <div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(217,119,6,0.12);color:var(--warn-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg></span>Awaiting your reply</div>
+                <div class="v">{{ $stats['awaiting'] }}</div>
+                <div class="s">Their message is the last one</div>
+            </button>
+            <a class="cm-stat is-link" href="{{ route('client.proposals.index') }}">
+                <div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(37,99,235,0.12);color:#1d4ed8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/></svg></span>Open proposals</div>
+                <div class="v">{{ $stats['proposals'] }}</div>
+                <div class="s">From people you are chatting with</div>
+            </a>
+            <div class="cm-stat">
+                <div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Your reply time</div>
+                <div class="v">{{ $stats['reply'] }}</div>
+                <div class="s">Your average time to answer</div>
+            </div>
+            <a class="cm-stat is-link" href="{{ route('client.bookings.index') }}">
+                <div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(234,88,12,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Agreed, unpaid</div>
+                <div class="v">{{ $money($stats['unpaid']) }}</div>
+                <div class="s">Across {{ $stats['unpaid_bookings'] }} {{ \Illuminate\Support\Str::plural('booking', $stats['unpaid_bookings']) }}</div>
+            </a>
         </div>
         <div class="cm-actions">
             <button type="button" class="cm-btn-primary" id="cm-create"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Message</button>
@@ -346,7 +373,7 @@
             </div>
             <div class="cm-list" id="cm-list">
                 @forelse($conversations as $c)
-                    <a href="{{ route('client.chat.show', $c['id']) }}" class="cm-conv {{ ($thread && $thread['id'] === $c['id']) ? 'active' : '' }}" data-archived="{{ $c['archived'] ? '1' : '0' }}" data-name="{{ \Illuminate\Support\Str::lower($c['name'].' '.$c['subject']) }}" data-lastfrom="{{ $c['lastFromMe'] ? 'me' : 'them' }}" data-event="{{ $c['event']['id'] ?? '' }}" data-unread="{{ $c['unread'] }}" data-at="{{ $c['sortAt'] }}" data-sortname="{{ \Illuminate\Support\Str::lower($c['name']) }}">
+                    <a href="{{ route('client.chat.show', $c['id']) }}" class="cm-conv {{ ($thread && $thread['id'] === $c['id']) ? 'active' : '' }}" data-archived="{{ $c['archived'] ? '1' : '0' }}" data-awaiting="{{ $c['awaiting'] ? '1' : '0' }}" data-muted="{{ $c['muted'] ? '1' : '0' }}" data-name="{{ \Illuminate\Support\Str::lower($c['name'].' '.$c['subject']) }}" data-lastfrom="{{ $c['lastFromMe'] ? 'me' : 'them' }}" data-event="{{ $c['event']['id'] ?? '' }}" data-unread="{{ $c['unread'] }}" data-at="{{ $c['sortAt'] }}" data-sortname="{{ \Illuminate\Support\Str::lower($c['name']) }}">
                         <span class="cm-conv-av">{{ $c['initials'] }}</span>
                         <div class="cm-conv-mid">
                             <div class="cm-conv-name">{{ $c['name'] }} <span>({{ $c['role'] }})</span></div>
@@ -697,6 +724,9 @@
     const evSel = $('cm-event');
     const sortSel = $('cm-sort');
 
+    // Set by the Unread and Awaiting cards: narrows the inbox to those rows.
+    let cardFilter = null;
+
     function applyFilters() {
         const q = (s ? s.value : '').toLowerCase();
         const ev = evSel ? evSel.value : '';
@@ -707,6 +737,8 @@
             // The Archived tab used to hide every row. It shows what this person
             // archived now, and the other tabs leave those out.
             const archived = el.dataset.archived === '1';
+            if (cardFilter === 'unread') ok = ok && (+el.dataset.unread > 0) && el.dataset.muted !== '1';
+            if (cardFilter === 'awaiting') ok = ok && el.dataset.awaiting === '1';
             if (activeTab === 'archived') ok = ok && archived;
             else {
                 ok = ok && ! archived;
@@ -718,7 +750,7 @@
         });
         const empty = $('cm-list-empty');
         if (empty) {
-            if (shown === 0) { empty.style.display = ''; empty.textContent = activeTab === 'drafts' ? 'No drafts.' : (activeTab === 'archived' ? 'No archived conversations.' : 'No matching conversations.'); }
+            if (shown === 0) { empty.style.display = ''; empty.textContent = cardFilter === 'awaiting' ? 'Nothing is waiting on your reply.' : (cardFilter === 'unread' ? 'No unread conversations.' : (activeTab === 'drafts' ? 'No drafts.' : (activeTab === 'archived' ? 'No archived conversations.' : 'No matching conversations.'))); }
             else empty.style.display = 'none';
         }
     }
@@ -752,6 +784,20 @@
     }));
     // So the inbox opens without the archived rows in it.
     applyFilters();
+
+    // Unread and Awaiting narrow the list; pressing the same card again clears it.
+    document.querySelectorAll('[data-card-filter]').forEach((card) => card.addEventListener('click', function () {
+        cardFilter = cardFilter === this.dataset.cardFilter ? null : this.dataset.cardFilter;
+        document.querySelectorAll('[data-card-filter]').forEach((c) => {
+            const on = c.dataset.cardFilter === cardFilter;
+            c.classList.toggle('is-active', on);
+            c.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        // The cards count the inbox, so the list shows the inbox.
+        document.querySelectorAll('.cm-tab').forEach((x) => x.classList.toggle('on', x.dataset.tab === 'inbox'));
+        activeTab = 'inbox';
+        applyFilters();
+    }));
 
     // ── Thread controls ────────────────────────────────────────────────────
     /* The details panel remembers whether it was hidden.

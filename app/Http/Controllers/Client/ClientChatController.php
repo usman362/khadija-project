@@ -46,7 +46,10 @@ class ClientChatController extends Controller
                 // loaded, every chat showed "Not posted yet" and no Award.
                 'booking.event:id,title,starts_at,client_id,is_published,published_at,created_at,status',
                 'event:id,title,starts_at,client_id,is_published,published_at,created_at,status',
-                'messages' => fn ($q) => $q->latest()->limit(1),
+                // Newest first, and by id when two share a second: which message
+                // is "last" decides Awaiting your reply, and a tie on created_at
+                // alone picked either one.
+                'messages' => fn ($q) => $q->latest()->latest('id')->limit(1),
                 'messages.sender:id,name',
             ])
             ->get()
@@ -67,7 +70,7 @@ class ClientChatController extends Controller
             'conversations' => $list,
             'thread' => $thread,
             'info' => $activeConv ? $this->info($activeConv, $user) : null,
-            'stats' => $this->stats($conversations, $user),
+            'stats' => $this->stats($conversations, $user, $list),
             // Counted without what this person has archived: an archived
             // conversation is out of the inbox, and so out of its numbers.
             'tabCounts' => [
@@ -261,6 +264,8 @@ class ClientChatController extends Controller
             'tags' => $tags,
             'initials' => $this->initials($other?->name ?? 'C'),
             'lastFromMe' => $last && $last->sender_id === $user->id,
+            // Their message is the last word: the conversation is waiting on you.
+            'awaiting' => $last !== null && $last->sender_id !== $user->id,
             'archived' => (bool) optional($c->participants->firstWhere('id', $user->id))->pivot?->archived_at,
             'muted' => (bool) optional($c->participants->firstWhere('id', $user->id))->pivot?->muted_at,
             'event' => $event ? ['id' => $event->id, 'title' => $event->title] : null,
@@ -273,7 +278,7 @@ class ClientChatController extends Controller
         $other = $c->participants->firstWhere('id', '!=', $user->id) ?? $c->participants->first();
         $event = $c->event ?? $c->booking?->event;
 
-        $messages = $c->messages->sortBy('created_at')->map(fn ($m) => [
+        $messages = $c->messages->sortBy([['created_at', 'asc'], ['id', 'asc']])->map(fn ($m) => [
             'id' => $m->id,
             'mine' => $m->sender_id === $user->id,
             'sender' => $m->sender?->name ?? 'User',
@@ -310,20 +315,47 @@ class ClientChatController extends Controller
         ];
     }
 
-    private function stats($conversations, $user): array
+    /**
+     * The cards above the inbox. Ali, 2026-09-11: drop Priority and
+     * Compliance, make the rest real, add what is worth knowing here.
+     *
+     * What was wrong with the old ones: Unread counted MESSAGES and put
+     * "of N" CONVERSATIONS under it, muted and archived included. Response
+     * Time carried "9% vs last 30 days", which was typed into the page, not
+     * worked out. Payment Secured added up confirmed bookings, where no money
+     * is held, and called the booking count "conversations".
+     *
+     * Every figure here counts one kind of thing and says which.
+     */
+    private function stats($conversations, $user, array $list): array
     {
-        $unread = $conversations->sum(fn ($c) => $c->messages()->where('sender_id', '!=', $user->id)
-            ->whereDoesntHave('reads', fn ($q) => $q->where('user_id', $user->id))->count());
-        $escrow = (float) Booking::where('client_id', $user->id)->where('status', 'confirmed')->sum('price');
+        $inbox = collect($list)->where('archived', false);
+
+        // The people this client is talking to, in conversations still in the inbox.
+        $partners = $conversations
+            ->filter(fn ($c) => ! optional($c->participants->firstWhere('id', $user->id))->pivot?->archived_at)
+            ->map(fn ($c) => $c->participants->firstWhere('id', '!=', $user->id)?->id)
+            ->filter()->unique()->values();
 
         return [
-            'unread' => $unread,
-            'total' => $conversations->count(),
-            'priority' => $conversations->filter(fn ($c) => $c->booking?->status === 'requested')->count(),
-            'response' => $this->avgResponseTime($conversations, $user),
-            'compliance' => Booking::where('client_id', $user->id)->where('status', 'confirmed')->whereDoesntHave('agreements')->count(),
-            'escrow' => $escrow,
-            'escrow_convos' => Booking::where('client_id', $user->id)->where('status', 'confirmed')->count(),
+            // Conversations, not messages; muted and archived ones left out,
+            // the same as the Inbox tab's own count.
+            'unread'    => $inbox->where('muted', false)->where('unread', '>', 0)->count(),
+            'inbox'     => $inbox->count(),
+            // Every conversation, archived included: the list's own footer
+            // ("Showing N of M") reads it.
+            'total'     => $conversations->count(),
+            'awaiting'  => $inbox->where('awaiting', true)->count(),
+            // Open proposals on this client's events, from people they are
+            // already talking to: the ones the chat's Award button acts on.
+            'proposals' => $partners->isEmpty() ? 0 : \App\Models\Bid::whereIn('supplier_id', $partners)
+                ->where('status', 'submitted')
+                ->whereHas('event', fn ($q) => $q->where('client_id', $user->id))
+                ->count(),
+            'reply'     => $this->avgResponseTime($conversations, $user),
+            // Agreed and not yet paid. Not "secured": nothing is held.
+            'unpaid'          => \App\Domain\Finance\ClientTotals::agreedUnpaid($user),
+            'unpaid_bookings' => Booking::where('client_id', $user->id)->where('status', 'confirmed')->count(),
         ];
     }
 
@@ -355,6 +387,15 @@ class ClientChatController extends Controller
             return '—';
         }
         $avg = (int) round(array_sum($gaps) / count($gaps));
+        // Short enough for the card: "Under a minute" broke onto two lines.
+        if ($avg < 1) {
+            return '< 1 min';
+        }
+        // 926.3h read as a typo; past two days it is said in days.
+        if ($avg >= 2880) {
+            return round($avg / 1440, 1) . ' days';
+        }
+
         return $avg >= 60 ? round($avg / 60, 1) . 'h' : $avg . 'm';
     }
 
