@@ -19,6 +19,31 @@
     .md { position: fixed; right: 18px; bottom: 18px; z-index: 900; display: flex;
           align-items: flex-end; gap: 12px; font-family: inherit; }
 
+    /*
+     * Two floating buttons, one corner.
+     *
+     * The AI assistant's bubble (partials/_ai_chatbot_widget) sits in the
+     * corner: 24px in, 58px round. This launcher sat at 18px, right behind it,
+     * so on every page with both a client saw one button and a sliver of
+     * orange. It stacks above the bubble instead, centred on it with a 14px
+     * gap. Only where the bubble is actually on the page: with the assistant
+     * off, the launcher keeps the corner. MessageDockClearsTheChatbotTest
+     * holds these numbers to the bubble's.
+     */
+    body:has(.aic-bubble) .md { right: 27px; bottom: 96px; }   /* 24 + (58-52)/2 · 24 + 58 + 14 */
+
+    /*
+     * A phone has no room beside the launcher. The window opened to its left
+     * and ran 55px off a 375px screen, cutting "Messages" to "ges". Below
+     * 520px it opens above the launcher instead, as wide as the screen allows
+     * with the same margin on both sides.
+     */
+    @media (max-width: 520px) {
+        .md { flex-direction: column; align-items: flex-end; }
+        .md-win { width: calc(100vw - 36px); }                              /* right: 18px, both sides */
+        body:has(.aic-bubble) .md-win { width: calc(100vw - 54px); }        /* right: 27px, both sides */
+    }
+
     .md-launch { width: 52px; height: 52px; border-radius: 50%; border: 0; cursor: pointer;
         background: var(--brand, #f97316); color: #fff; box-shadow: 0 10px 26px -8px rgba(15,27,53,.5);
         display: flex; align-items: center; justify-content: center; position: relative; }
