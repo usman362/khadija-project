@@ -126,10 +126,13 @@ class ClientDirectOfferController extends Controller
              * accepted a request with no name, which then appeared on the
              * professional's board as an untitled job.
              */
-            'event_name'      => ['required', 'string', 'max:200'],
             // Asked on every request form now (Peter, 2026-08-20).
             'organization_type' => ['required', 'in:' . implode(',', array_keys(\App\Models\Event::ORGANIZATION_TYPES))],
-            'event_date'      => ['nullable', 'date'],
+            /*
+             * Name, description and date -- the three facts that go into the
+             * agreement, asked the same way on all three forms. This one took
+             * no date at all, and had nowhere to say what was actually wanted.
+             */
             'guests'          => ['nullable', 'integer', 'min:1', 'max:1000000'],
             'venue'           => ['nullable', 'string', 'max:200'],
             /*
@@ -144,6 +147,7 @@ class ClientDirectOfferController extends Controller
             'service_single'  => ['required_without:services', 'nullable', 'string', 'max:120'],
             'budget_min'      => ['nullable', 'integer', 'min:0'],
             'request_type'    => ['nullable', 'in:SSR,MSR'],
+        ] + \App\Domain\Requests\CoreFacts::rules('event_name', 'description', 'event_date') + [
             // Catering only. Required or nullable depending on what was
             // ticked, so the question is only mandatory where it was asked.
             'delivery_mode'   => [
@@ -163,12 +167,11 @@ class ClientDirectOfferController extends Controller
         ], [
             'professional_id.required' => 'Choose which professional this request goes to.',
             'organization_type.required' => 'Tell us who the request is for.',
-            'event_name.required' => 'Give the event a name so the professional knows what this is.',
             'services.required_without' => 'Choose at least one service you need.',
             'service_single.required_without' => 'Choose the service you need.',
             'fee_agreed.accepted' => 'Please confirm you understand the $2.99 fee applies when you finalize with a professional.',
             'delivery_mode.required' => 'Say how the food should get there.',
-        ]);
+        ] + \App\Domain\Requests\CoreFacts::messages('event_name', 'description', 'event_date'));
 
         $user = $request->user();
         $pro  = User::findOrFail($data['professional_id']);
@@ -229,7 +232,8 @@ class ClientDirectOfferController extends Controller
         \App\Support\UserLimit::hit('client-postings', $user, null, 'professional_id');
 
         $event = Event::create([
-            'title'        => $data['event_name'] ?: ('Direct Request to ' . $pro->name),
+            'title'        => $data['event_name'],
+            'description'  => $data['description'],
             'organization_type' => $data['organization_type'],
             'status'       => 'pending',
             'is_published' => false,               // targeted — never hits the open board

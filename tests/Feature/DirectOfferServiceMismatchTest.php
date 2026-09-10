@@ -57,6 +57,8 @@ class DirectOfferServiceMismatchTest extends TestCase
                 'services' => [$offers->id, $doesNot->id],
                 'title' => 'A party',
                 'event_name' => 'A party',
+                'description' => 'A two-hour party with music and photography for about forty guests.',
+                'event_date' => now()->addDays(30)->format('Y-m-d'),
                 'organization_type' => 'individual',
             ]);
 

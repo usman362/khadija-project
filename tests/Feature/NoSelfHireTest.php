@@ -80,6 +80,8 @@ class NoSelfHireTest extends TestCase
         // The list no longer offers it, but the id still arrives in the request.
         $this->actingAs($this->both)
             ->post(route('client.direct-offers.store'), [
+            'description' => 'Enough detail here for the professional to price the work properly.',
+            'event_date'  => now()->addDays(30)->format('Y-m-d'),
                 'fee_agreed' => 1,
                 'organization_type' => 'individual',
                 'professional_id' => $this->both->id,

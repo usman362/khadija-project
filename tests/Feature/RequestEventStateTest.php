@@ -113,6 +113,8 @@ class RequestEventStateTest extends TestCase
         $client = $this->user('client', 'VA');
 
         $this->actingAs($client)->post(route('client.esr.store'), [
+            'event_name'  => 'Test event',
+            'description' => 'Enough detail here for the professional to price the work properly.',
             'fee_agreed' => 1,
             'organization_type' => 'business',
             'reason'      => array_key_first(\App\Http\Controllers\Client\ClientEsrController::REASONS),
@@ -199,6 +201,8 @@ class RequestEventStateTest extends TestCase
         $pro->serviceCategories()->attach($service->id);
 
         $this->actingAs($client)->post(route('client.direct-offers.store'), [
+            'description' => 'Enough detail here for the professional to price the work properly.',
+            'event_date'  => now()->addDays(30)->format('Y-m-d'),
             'fee_agreed' => 1,
             'organization_type' => 'individual',
             'professional_id' => $pro->id,

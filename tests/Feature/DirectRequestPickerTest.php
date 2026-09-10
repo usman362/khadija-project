@@ -164,6 +164,8 @@ class DirectRequestPickerTest extends TestCase
     public function test_sending_without_choosing_a_professional_is_rejected(): void
     {
         $response = $this->actingAs($this->client())->post(route('client.direct-offers.store'), [
+            'description' => 'Enough detail here for the professional to price the work properly.',
+            'event_date'  => now()->addDays(30)->format('Y-m-d'),
             'fee_agreed' => 1,
             'organization_type' => 'individual',
             'event_name'        => 'Rooftop reception',

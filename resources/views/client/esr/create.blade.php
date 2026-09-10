@@ -120,6 +120,17 @@
                     @endforeach
                 </div>
             </div>
+            {{-- The name of the event. It used to be built from the services
+                 picked -- "Urgent: Buffet Catering" -- so the professional saw
+                 a label nobody wrote and the client could not correct it. The
+                 bidding and direct forms both ask; this one now does too. --}}
+            <div class="esr-field">
+                <label>Event Name <span class="esr-req">*</span></label>
+                <input name="event_name" class="esr-input" value="{{ old('event_name') }}"
+                       maxlength="200" placeholder="e.g. Corporate Lunch — Friday" required>
+                @error('event_name')<p class="esr-err">{{ $message }}</p>@enderror
+            </div>
+
             <div class="esr-grid3">
                 @php $esrBuffer = (int) config('bsr.esr.closes_hours_before_start'); @endphp
                 <div class="esr-field">
@@ -170,7 +181,16 @@
                 'suggestUrl' => route('client.bsr.suggest-split'),
             ])
 
-            <div class="esr-field"><label>Anything else the pro should know?</label><textarea name="description" class="esr-textarea" maxlength="2000" placeholder="Scope, access, equipment, timing…">{{ old('description') }}</textarea></div>
+            {{-- Required now. It is what a professional reads before deciding
+                 whether to answer, and it goes into the agreement -- the same
+                 reason the bidding form has always required it. --}}
+            <div class="esr-field">
+                <label>What should professionals know? <span class="esr-req">*</span></label>
+                <textarea name="description" class="esr-textarea" maxlength="4000" required
+                          placeholder="Scope, access, equipment, timing — anything that changes the price.">{{ old('description') }}</textarea>
+                <p class="esr-hint">At least a sentence or two.</p>
+                @error('description')<p class="esr-err">{{ $message }}</p>@enderror
+            </div>
 
             {{-- Appears the moment a catering or bar service is ticked above. --}}
             @include('partials._food_delivery', [

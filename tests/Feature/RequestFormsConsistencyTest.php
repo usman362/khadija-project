@@ -153,16 +153,35 @@ class RequestFormsConsistencyTest extends TestCase
 
     // ── C: ER asks once, like BR ─────────────────────────────────
 
-    public function test_the_emergency_form_no_longer_asks_what_you_need_twice(): void
+    /**
+     * The Owner's 2026-08-20 complaint was a free-text "What do you need?" box
+     * sitting above the service picker, asking in words what the checkboxes
+     * below asked in checkboxes. He held the bidding form up as the clean one
+     * -- and the bidding form has always had a name field. So the rule is not
+     * "no text box"; it is "do not ask for the services twice".
+     *
+     * This test asserted no event_name field at all, which on 2026-09-10 put it
+     * in the way of his newer instruction that all three forms carry the same
+     * agreement-driving facts. Rewritten to guard what he actually objected to.
+     */
+    public function test_the_emergency_form_does_not_ask_for_the_services_twice(): void
     {
         $html = $this->actingAs($this->client)->get(route('client.esr.create'))
             ->assertOk()->getContent();
 
-        $this->assertStringNotContainsString('name="event_name"', $html,
-            'the free-text question is back beside the service picker');
+        $this->assertStringContainsString('name="services[]"', $html);
+        $this->assertStringContainsString('Event Name', $html);
+        $this->assertStringContainsString('What should professionals know?', $html);
+        $this->assertStringNotContainsString('What do you need?', $html);
     }
 
-    public function test_the_emergency_request_titles_itself_from_the_service(): void
+    /**
+     * It used to build its own title -- "Urgent: Event Photography" -- because
+     * the form did not ask for one. Sir Peter, 2026-09-09: the core
+     * agreement-driving information has to be consistent across the flows, and
+     * a name nobody wrote is not the same fact as a name the client chose.
+     */
+    public function test_the_emergency_request_keeps_the_clients_own_name(): void
     {
         $this->actingAs($this->client)->post(route('client.esr.store'), [
             'fee_agreed' => 1,
@@ -170,9 +189,11 @@ class RequestFormsConsistencyTest extends TestCase
             'reason'      => array_key_first(\App\Http\Controllers\Client\ClientEsrController::REASONS),
             'needed_by'   => now()->addHours(30)->format('Y-m-d\TH:i'),
             'services'    => [$this->service->id],
+            'event_name'  => 'Office move — photographer needed',
+            'description' => 'Our photographer pulled out this morning and we need three hours of cover.',
         ])->assertSessionHasNoErrors();
 
-        $this->assertSame('Urgent: Event Photography', Event::firstOrFail()->title);
+        $this->assertSame('Office move — photographer needed', Event::firstOrFail()->title);
     }
 
     // ── E: "This request is for", on all of them ─────────────────
@@ -193,6 +214,8 @@ class RequestFormsConsistencyTest extends TestCase
     public function test_the_emergency_request_stores_who_it_is_for(): void
     {
         $this->actingAs($this->client)->post(route('client.esr.store'), [
+            'event_name'  => 'Test event',
+            'description' => 'Enough detail here for the professional to price the work properly.',
             'fee_agreed' => 1,
             'organization_type' => 'nonprofit',
             'reason'      => array_key_first(\App\Http\Controllers\Client\ClientEsrController::REASONS),

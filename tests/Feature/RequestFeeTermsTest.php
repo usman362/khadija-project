@@ -167,6 +167,9 @@ class RequestFeeTermsTest extends TestCase
             'organization_type' => 'individual',
             'needed_by' => now()->addDays(2)->toDateTimeString(),
             'services' => [$this->service->id],
+            // The three facts every request carries now — see CoreFacts.
+            'event_name' => 'Garden Reception',
+            'description' => 'Cover for a two-hour reception, including setup and one group photo.',
         ], $over);
     }
 
@@ -179,6 +182,8 @@ class RequestFeeTermsTest extends TestCase
             'organization_type' => 'individual',
             'request_type' => 'MSR',
             'services' => [$this->service->id],
+            'description' => 'Cover for a two-hour reception, including setup and one group photo.',
+            'event_date' => now()->addDays(30)->format('Y-m-d'),
         ], $over);
     }
 

@@ -93,13 +93,17 @@ class ClientEsrController extends Controller
             'reason'       => ['required', 'in:' . implode(',', array_keys(self::REASONS))],
             // Asked on every request form now (Peter, 2026-08-20).
             'organization_type' => ['required', 'in:' . implode(',', array_keys(\App\Models\Event::ORGANIZATION_TYPES))],
-            'needed_by'    => ['required', 'date'],
             'location'     => ['nullable', 'string', 'max:200'],
             // R38 / R71 — the state the work happens in. See
             // StateMatching::requestState for why this is asked, not assumed.
             // Removed from the form on 2026-08-25 — see StateMatching::requestState().
             'guest_count'  => ['nullable', 'integer', 'min:1', 'max:1000000'],
-            'description'  => ['nullable', 'string', 'max:2000'],
+            /*
+             * Name, description and date are the three facts every request
+             * carries into its agreement, so all three flows ask for them in
+             * the same words. This one used to invent its own title from the
+             * services picked and take no description at all.
+             */
             'budget_min'   => ['nullable', 'integer', 'min:0'],
             'scope'        => ['nullable', 'in:single,multi'],
 
@@ -112,15 +116,20 @@ class ClientEsrController extends Controller
             'fee_agreed'   => ['accepted'],
             'services'     => ['required', 'array', 'min:1'],
             'services.*'   => ['integer', 'exists:categories,id', new \App\Rules\BookableService],
+        ] + \App\Domain\Requests\CoreFacts::rules('event_name', 'description', 'needed_by') + [
             // Catering only — the rule is required or nullable depending on
             // what was ticked, which is why it is built rather than written.
         ] + \App\Domain\Requests\FoodDelivery::rules(
             array_map('intval', (array) $request->input('services', []))
         ), [
+            // A rush request asks when it is NEEDED BY rather than when it
+            // runs. Same fact, and this page's wording wins over the shared
+            // one because "+" keeps the left-hand keys.
+            'needed_by.required' => 'When do you need this by?',
             'services.required' => 'Select at least one service you need.',
             'fee_agreed.accepted' => 'Please confirm you understand the $2.99 fee applies when you finalize with a professional.',
             'reason.required'   => 'Tell us why this is urgent.',
-            'needed_by.required' => 'When do you need this by?',
+        ] + \App\Domain\Requests\CoreFacts::messages('event_name', 'description', 'needed_by') + [
             'delivery_mode.required' => 'Say how the food should get there.',
         ]);
 
@@ -176,7 +185,7 @@ class ClientEsrController extends Controller
         \App\Support\UserLimit::hit('client-postings', $user, null, 'services');
 
         $event = Event::create([
-            'title'        => $this->titleFrom($data['services'], $data['reason']),
+            'title'        => $data['event_name'],
             'description'  => $data['description'] ?? null,
             'status'       => 'published',
             'is_published' => true,

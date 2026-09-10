@@ -82,6 +82,8 @@ class ServiceAreaGateTest extends TestCase
     {
         $this->actingAs($this->user(ServiceArea::COMING_SOON))
             ->post(route('client.esr.store'), [
+            'event_name'  => 'Test event',
+            'description' => 'Enough detail here for the professional to price the work properly.',
             'fee_agreed' => 1,
                 'organization_type' => 'individual',])
             ->assertRedirect()
@@ -140,6 +142,8 @@ class ServiceAreaGateTest extends TestCase
     {
         $this->actingAs($this->user(ServiceArea::COMING_SOON, 'admin'))
             ->post(route('client.esr.store'), [
+            'event_name'  => 'Test event',
+            'description' => 'Enough detail here for the professional to price the work properly.',
             'fee_agreed' => 1,
                 'organization_type' => 'individual',])
             ->assertSessionMissing('error');

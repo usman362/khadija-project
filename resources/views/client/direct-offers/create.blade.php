@@ -243,7 +243,7 @@
         <div class="do-sec req">
             <div class="do-sec-hd"><h4>Event Details</h4><span class="do-tag">YOUR INPUT</span></div>
             <div class="do-sec-bd">
-                <div class="do-field"><label>Event Name <span style="color:#dc2626;">*</span></label><input class="do-input" name="event_name" value="{{ old('event_name') }}" placeholder="e.g. Luxury Wedding Reception" required></div>
+                <div class="do-field"><label>Event Name <span style="color:#dc2626;">*</span></label><input class="do-input" name="event_name" value="{{ old('event_name') }}" placeholder="e.g. Luxury Wedding Reception" required>@error('event_name')<p style="color:#dc2626;font-size:12px;margin-top:5px;">{{ $message }}</p>@enderror</div>
                 <div class="do-field">
                     <label for="doOrgType">This request is for <span style="color:#dc2626;">*</span></label>
                     <select class="do-input" name="organization_type" id="doOrgType" required>
@@ -253,12 +253,27 @@
                     </select>
                 </div>
                 <div class="do-row">
-                    <div class="do-field"><label>Event Date</label><input type="date" class="do-input" name="event_date"></div>
+                    <div class="do-field">
+                        <label>Event Date <span style="color:#dc2626;">*</span></label>
+                        <input type="date" class="do-input" name="event_date" value="{{ old('event_date') }}" required>
+                        @error('event_date')<p style="color:#dc2626;font-size:12px;margin-top:5px;">{{ $message }}</p>@enderror
+                    </div>
                     <div class="do-field"><label>Guest Count</label><input type="number" class="do-input" name="guests" placeholder="150"></div>
                 </div>
                 <div class="do-field"><label>Venue / Location</label><input class="do-input" name="venue" {{-- Placeholder text is still copy: this one named Chicago on a
                      seven-jurisdiction marketplace (R9). --}}
                     placeholder="The Grand Ballroom, Baltimore, MD"></div>
+
+                {{-- The form had nowhere to say what was actually wanted. The
+                     professional was sent a name, a date and a service list,
+                     and had to guess the rest -- while the bidding form has
+                     always required this. --}}
+                <div class="do-field">
+                    <label>What should the professional know? <span style="color:#dc2626;">*</span></label>
+                    <textarea class="do-input" name="description" maxlength="4000" required
+                              placeholder="What the event is, what you need delivered, anything that would change the price…">{{ old('description') }}</textarea>
+                    @error('description')<p style="color:#dc2626;font-size:12px;margin-top:5px;">{{ $message }}</p>@enderror
+                </div>
             </div>
         </div>
 

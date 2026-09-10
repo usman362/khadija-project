@@ -721,8 +721,14 @@ class ClientBsrController extends Controller
                 'event_title'       => ['nullable', 'string', 'max:120', 'required_if:event_type,' . self::OTHER_EVENT_TYPE],
                 'organization_type' => ['required', 'in:' . implode(',', array_keys(self::ORG_TYPES))],
             ],
+            /*
+             * The wizard asks the three core facts across three steps -- the
+             * name here, the description on step 3, the date on step 7 -- but
+             * they are the same three rules the emergency and direct forms
+             * use, from App\Domain\Requests\CoreFacts. See that class for why.
+             */
             'event' => [
-                'title'       => ['required', 'string', 'max:200'],
+                'title'       => \App\Domain\Requests\CoreFacts::nameRule(),
                 'starts_at'   => ['nullable', 'date'],
                 'location'    => ['nullable', 'string', 'max:200'],
                 /*
@@ -742,7 +748,7 @@ class ClientBsrController extends Controller
                 'guest_count' => ['nullable', 'integer', 'min:1', 'max:1000000'],
             ],
             'requirements' => [
-                'description' => ['required', 'string', 'min:20', 'max:4000'],
+                'description' => \App\Domain\Requests\CoreFacts::descriptionRule(),
                 /*
                  * Required only where it was asked. A request with no food
                  * service never saw the question, so requiring it there would
@@ -794,7 +800,9 @@ class ClientBsrController extends Controller
              * quietly stored.
              */
             'availability' => [
-                'event_date'         => ['required', 'date', 'after_or_equal:today'],
+                // Shared with the other two forms, plus this one's own rule
+                // that a bidding request cannot be dated in the past.
+                'event_date'         => [...\App\Domain\Requests\CoreFacts::dateRule(), 'after_or_equal:today'],
                 'event_start_time'   => ['required', 'date_format:H:i'],
                 'event_end_time'     => ['nullable', 'date_format:H:i'],
                 'availability_note'  => ['nullable', 'string', 'max:500'],
