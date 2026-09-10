@@ -40,8 +40,12 @@ class ClientChatController extends Controller
             ->with([
                 'participants:id,name,email,public_id',
                 'booking:id,event_id,status,price',
-                'booking.event:id,title,starts_at',
-                'event:id,title,starts_at',
+                // Owner and publication too: the details panel's Award needs to
+                // know the event is this client's, and "Posted 1 day ago" is
+                // read from when it was published. With only id, title and date
+                // loaded, every chat showed "Not posted yet" and no Award.
+                'booking.event:id,title,starts_at,client_id,is_published,published_at,created_at,status',
+                'event:id,title,starts_at,client_id,is_published,published_at,created_at,status',
                 'messages' => fn ($q) => $q->latest()->limit(1),
                 'messages.sender:id,name',
             ])
@@ -64,11 +68,14 @@ class ClientChatController extends Controller
             'thread' => $thread,
             'info' => $activeConv ? $this->info($activeConv, $user) : null,
             'stats' => $this->stats($conversations, $user),
+            // Counted without what this person has archived: an archived
+            // conversation is out of the inbox, and so out of its numbers.
             'tabCounts' => [
-                'inbox' => count($list),
-                'unread' => collect($list)->where('unread', '>', 0)->count(),
-                'sent' => collect($list)->where('lastFromMe', true)->count(),
+                'inbox' => collect($list)->where('archived', false)->count(),
+                'unread' => collect($list)->where('archived', false)->where('unread', '>', 0)->count(),
+                'sent' => collect($list)->where('archived', false)->where('lastFromMe', true)->count(),
                 'drafts' => 0,
+                'archived' => collect($list)->where('archived', true)->count(),
             ],
             // Drives the event filter above the list. Only events that actually
             // have a conversation appear, so the dropdown can never offer a
@@ -111,6 +118,18 @@ class ClientChatController extends Controller
                 ? (float) (clone $withThisPro)->whereIn('status', ['confirmed', 'completed'])->sum('price')
                 : 0.0,
             'profileUrl'   => $pro ? route('public.professional.show', $pro->id) : null,
+            // Their photo, or the initials image every avatar falls back to.
+            'avatar'       => $pro?->avatar_url,
+            // Sir Peter, 2026-09-10: the job the conversation is about, with an
+            // Award button, as in the Freelancer chat he sent.
+            'job'          => $event ? [
+                'title'  => $event->title,
+                'posted' => $event->postedAt()?->humanAgo(),
+                'url'    => route('client.events.show', $event),
+            ] : null,
+            'award'        => $this->award($event, $pro, $user),
+            'archived'     => (bool) optional($c->participants->firstWhere('id', $user->id))->pivot?->archived_at,
+            'archiveUrl'   => route('conversations.archive', $c),
             'booking'      => $booking ? [
                 'title'  => $event?->title ?? 'Booking',
                 'ref'    => 'BK-' . str_pad((string) $booking->id, 4, '0', STR_PAD_LEFT),
@@ -119,6 +138,48 @@ class ClientChatController extends Controller
                 'date'   => optional($booking->created_at)->format('M d, Y'),
                 'url'    => route('client.bookings.index'),
             ] : null,
+        ];
+    }
+
+    /**
+     * Where awarding this professional stands, for the event this chat is about.
+     *
+     * Award goes through finalization, the same way the Compare page does:
+     * scope, price, schedule, contract and the $2.99 fee, before anything is
+     * booked. The Proposals list's direct accept skips all of that, which is
+     * why it is not used here. Starting again is safe; finalize.start picks up
+     * the one already open.
+     *
+     * No proposal from them, no button: an Award with nothing to award is a
+     * button that cannot do what it says.
+     */
+    private function award($event, $pro, $user): ?array
+    {
+        if (! $event || ! $pro || (int) $event->client_id !== (int) $user->id) {
+            return null;
+        }
+
+        $bid = \App\Models\Bid::where('event_id', $event->id)->where('supplier_id', $pro->id)->latest('id')->first();
+
+        $booked = \App\Models\Booking::where('event_id', $event->id)->where('supplier_id', $pro->id)
+            ->whereNotIn('status', \App\Domain\Finance\ClientTotals::VOID_STATUSES)->exists();
+
+        $started = $bid && \App\Models\Finalization::where('event_id', $event->id)
+            ->where('supplier_id', $pro->id)->where('category_id', $bid->category_id)->exists();
+
+        $state = match (true) {
+            $booked || $bid?->status === 'won' => 'awarded',
+            $bid?->status === 'declined'        => 'declined',
+            $bid?->status === 'withdrawn'       => 'withdrawn',
+            $bid !== null && $started           => 'in_progress',
+            $bid !== null                       => 'open',
+            default                             => 'none',
+        };
+
+        return [
+            'state'  => $state,
+            'url'    => in_array($state, ['open', 'in_progress'], true) ? route('client.finalize.start', $bid) : null,
+            'amount' => $bid?->amount,
         ];
     }
 
@@ -155,6 +216,7 @@ class ClientChatController extends Controller
             'tags' => $tags,
             'initials' => $this->initials($other?->name ?? 'C'),
             'lastFromMe' => $last && $last->sender_id === $user->id,
+            'archived' => (bool) optional($c->participants->firstWhere('id', $user->id))->pivot?->archived_at,
             'event' => $event ? ['id' => $event->id, 'title' => $event->title] : null,
             'sortAt' => optional($last?->created_at)->timestamp ?? optional($c->updated_at)->timestamp ?? 0,
         ];

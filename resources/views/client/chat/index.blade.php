@@ -30,6 +30,53 @@
     .cm-btn-ghost svg { width: 14px; height: 14px; color: var(--brand-text); }
 
     .cm-main { display: grid; grid-template-columns: minmax(0,340px) minmax(0,1fr); gap: 16px; }
+    /* A third column for the details panel; a thin rail when it is collapsed. */
+    .cm-main.has-side { grid-template-columns: minmax(0,320px) minmax(0,1fr) 300px; }
+    .cm-main.has-side.panel-closed { grid-template-columns: minmax(0,320px) minmax(0,1fr) 48px; }
+    @media (max-width: 1320px) { .cm-main.has-side { grid-template-columns: minmax(0,270px) minmax(0,1fr) 270px; } }
+
+    .cm-side { overflow: hidden; }
+    .cm-side-body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; }
+    .cm-side-rail { display: none; flex: 1; align-items: flex-start; justify-content: center; padding-top: 12px;
+        border: 0; background: none; color: var(--text-muted); cursor: pointer; }
+    .cm-side-rail svg, .cm-side-collapse svg { width: 20px; height: 20px; }
+    .cm-main.panel-closed .cm-side-body { display: none; }
+    .cm-main.panel-closed .cm-side-rail { display: flex; }
+    .cm-side-rail:hover, .cm-side-collapse:hover { color: var(--cm); }
+    .cm-side-top { position: absolute; z-index: 2; padding: 10px; }
+    .cm-side-collapse { width: 34px; height: 34px; border-radius: 9px; border: 0; background: rgba(255,255,255,.92);
+        color: #334155; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(15,23,42,.18); }
+    .cm-side-photo { position: relative; aspect-ratio: 1 / 1; flex-shrink: 0; background: var(--bg-card-hover); border-radius: 16px 16px 0 0; overflow: hidden; }
+    .cm-side-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cm-side-name { position: absolute; left: 0; right: 0; bottom: 0; padding: 38px 16px 14px; color: #fff;
+        background: linear-gradient(to top, rgba(2,6,23,.82), rgba(2,6,23,0)); }
+    .cm-side-name b { display: block; font-size: 17px; font-weight: 800; }
+    .cm-side-name span { font-size: 12.5px; font-weight: 600; opacity: .88; }
+    .cm-side-role { margin: 10px 16px 0; font-size: 12.5px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 4px 10px; }
+    .cm-side-role a { color: var(--cm); font-weight: 700; text-decoration: none; }
+    .cm-side-job { margin: 14px 16px 0; padding-bottom: 14px; border-bottom: 1px solid var(--border-color); }
+    .cm-side-job-title { display: block; font-size: 14.5px; font-weight: 800; color: var(--text-primary); text-decoration: none; line-height: 1.35; }
+    .cm-side-job-title:hover { color: var(--cm); }
+    .cm-side-job-when { display: block; font-size: 12.5px; color: var(--text-muted); margin: 3px 0 12px; }
+    .cm-award { width: 100%; padding: 11px 14px; border: 0; border-radius: 10px; background: #15803d; color: #fff;
+        font-size: 14px; font-weight: 800; cursor: pointer; }
+    .cm-award:hover { background: #166534; }
+    .cm-awarded { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 10px 14px; border-radius: 10px;
+        background: rgba(21,128,61,.1); color: #15803d; font-size: 14px; font-weight: 800; }
+    .cm-awarded svg { width: 16px; height: 16px; }
+    .cm-side-note { display: block; margin-top: 8px; font-size: 11.5px; color: var(--text-muted); line-height: 1.45; }
+    .cm-side .cm-info-rows { margin: 12px 16px 0; }
+    .cm-side .cm-info-order { margin: 12px 16px 0; }
+    .cm-side-options { margin-top: auto; padding: 12px 16px; border-top: 1px solid var(--border-color);
+        display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .cm-side-options > span { font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
+    .cm-side-options button { display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; border-radius: 9px;
+        border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary); font-size: 12.5px; font-weight: 700; cursor: pointer; }
+    .cm-side-options button:hover { color: var(--cm); border-color: var(--cm); }
+    .cm-side-options svg { width: 16px; height: 16px; }
+    .cm-thumbs { width: 42px; height: 42px; border: 0; background: none; font-size: 26px; line-height: 1; cursor: pointer;
+        border-radius: 10px; transition: transform .12s ease; }
+    .cm-thumbs:hover { transform: scale(1.12); background: var(--bg-card-hover); }
     /* Both columns are one height. `align-items: start` used to size each
        to its own content, so the list ran on past the bottom of the thread
        and left a block of empty card under the compose box. */
@@ -244,14 +291,14 @@
         </div>
     </div>
 
-    <div class="cm-main">
+    <div class="cm-main {{ ($info && \App\Support\MessengerAccess::panel(auth()->user())) ? 'has-side' : '' }}">
         {{-- list --}}
         <div class="cm-card">
             <div class="cm-tabs">
                 <span class="cm-tab on" data-tab="inbox">Inbox <span class="ct">{{ $tabCounts['unread'] }}</span></span>
                 <span class="cm-tab" data-tab="sent">Sent @if($tabCounts['sent'])<span class="ct">{{ $tabCounts['sent'] }}</span>@endif</span>
                 <span class="cm-tab" data-tab="drafts">Drafts</span>
-                <span class="cm-tab" data-tab="archived">Archived</span>
+                <span class="cm-tab" data-tab="archived">Archived @if($tabCounts['archived'])<span class="ct">{{ $tabCounts['archived'] }}</span>@endif</span>
             </div>
             <div class="cm-search"><div class="cm-search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="cm-search" placeholder="Search messages..."></div></div>
 
@@ -274,7 +321,7 @@
             </div>
             <div class="cm-list" id="cm-list">
                 @forelse($conversations as $c)
-                    <a href="{{ route('client.chat.show', $c['id']) }}" class="cm-conv {{ ($thread && $thread['id'] === $c['id']) ? 'active' : '' }}" data-name="{{ \Illuminate\Support\Str::lower($c['name'].' '.$c['subject']) }}" data-lastfrom="{{ $c['lastFromMe'] ? 'me' : 'them' }}" data-event="{{ $c['event']['id'] ?? '' }}" data-unread="{{ $c['unread'] }}" data-at="{{ $c['sortAt'] }}" data-sortname="{{ \Illuminate\Support\Str::lower($c['name']) }}">
+                    <a href="{{ route('client.chat.show', $c['id']) }}" class="cm-conv {{ ($thread && $thread['id'] === $c['id']) ? 'active' : '' }}" data-archived="{{ $c['archived'] ? '1' : '0' }}" data-name="{{ \Illuminate\Support\Str::lower($c['name'].' '.$c['subject']) }}" data-lastfrom="{{ $c['lastFromMe'] ? 'me' : 'them' }}" data-event="{{ $c['event']['id'] ?? '' }}" data-unread="{{ $c['unread'] }}" data-at="{{ $c['sortAt'] }}" data-sortname="{{ \Illuminate\Support\Str::lower($c['name']) }}">
                         <span class="cm-conv-av">{{ $c['initials'] }}</span>
                         <div class="cm-conv-mid">
                             <div class="cm-conv-name">{{ $c['name'] }} <span>({{ $c['role'] }})</span></div>
@@ -315,51 +362,6 @@
                     </div>
                 </div>
 
-                @if($info)
-                    {{-- Idea 4 — the conversation's details panel.
-                         Open by default and remembered per browser: a panel
-                         that starts hidden behind an unlabelled icon is a panel
-                         nobody finds. Whether this account gets it at all is
-                         MessengerAccess's decision, so the tier can be changed
-                         in config without touching this page. --}}
-                    @if(\App\Support\MessengerAccess::panel(auth()->user()))
-                    <div class="cm-info" id="cm-info">
-                        <div class="cm-info-who">
-                            <span class="cm-info-av">{{ $info['initials'] }}</span>
-                            <div>
-                                <b>{{ $info['name'] }}</b>
-                                {{-- Which side of the conversation they are on: the
-                                     opposite of whichever side is reading it. --}}
-                                <span>{{ auth()->user()?->activeRole() === 'professional' ? 'Client' : 'Professional' }}@if($info['location']) · {{ $info['location'] }}@endif</span>
-                            </div>
-                        </div>
-
-                        @if($info['profileUrl'] ?? null)
-                            <a class="cm-info-act" href="{{ $info['profileUrl'] }}">View full profile →</a>
-                        @endif
-                        <div class="cm-info-rows">
-                            {{-- First in the list: it is the thing support and
-                                 disputes ask for, and the one field that never
-                                 changes. Selectable so it is copied, not
-                                 transcribed. --}}
-                            @if($info['public_id'] ?? null)<div><span>GigResource ID</span><b style="user-select:all;">{{ $info['public_id'] }}</b></div>@endif
-                            @if($info['email'])<div><span>Email</span><b>{{ $info['email'] }}</b></div>@endif
-                            @if($info['phone'])<div><span>Phone</span><b>{{ $info['phone'] }}</b></div>@endif
-                            @if($info['member_since'])<div><span>On GigResource since</span><b>{{ $info['member_since'] }}</b></div>@endif
-                            <div><span>Your bookings with them</span><b>{{ $info['bookings'] }}</b></div>
-                            @if($info['spent'] > 0)<div><span>Total agreed</span><b>${{ number_format($info['spent'], 2) }}</b></div>@endif
-                        </div>
-                        @if($info['booking'])
-                            <div class="cm-info-order">
-                                <span class="ref">{{ $info['booking']['ref'] }}</span>
-                                <b>{{ $info['booking']['title'] }}</b>
-                                <div><span>${{ number_format($info['booking']['price'], 2) }}</span> · <span>{{ \Illuminate\Support\Str::headline($info['booking']['status']) }}</span> · <span>{{ $info['booking']['date'] }}</span></div>
-                                <a href="{{ $info['booking']['url'] }}">Open in Bookings →</a>
-                            </div>
-                        @endif
-                    </div>
-                    @endif
-                @endif
                 <div class="cm-msgs" id="cm-msgs">
                     @forelse($thread['messages'] as $m)
                         <div class="cm-msg {{ $m['mine'] ? 'me' : '' }}">
@@ -490,6 +492,10 @@
                                     </div>
                                 </div>
                             </div>
+                            {{-- Sir Peter's example has a large thumbs-up in the composer.
+                                 An empty box sends it; with a draft in the box it is added
+                                 to the draft instead, so nothing typed is ever lost. --}}
+                            <button type="button" class="cm-thumbs" id="cm-thumbs" title="Send a thumbs up" aria-label="Send a thumbs up">👍</button>
                             <button type="submit" class="cm-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Send</button>
                         </div>
                         <div class="cm-c-foot">
@@ -502,6 +508,100 @@
                 <div class="cm-empty">Select a conversation to view the thread.</div>
             @endif
         </div>
+
+        {{-- The details column. Sir Peter, 2026-09-10, from a Freelancer chat:
+             photo, name, the job the chat is about with an Award button, and
+             chat options, in a panel that collapses to a thin rail.
+             "Active now" is left out on purpose: nothing records whether
+             someone is online, and a green dot we cannot back is a claim.
+             Whether an account gets the panel is MessengerAccess's call. --}}
+        @if($info && \App\Support\MessengerAccess::panel(auth()->user()))
+        <aside class="cm-card cm-side" id="cm-info" aria-label="Conversation details">
+            <button type="button" class="cm-side-rail" data-side-toggle title="Show details" aria-label="Show conversation details">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="15" y1="3" x2="15" y2="21"/><polyline points="10 9 7 12 10 15"/></svg>
+            </button>
+            <div class="cm-side-body">
+                <div class="cm-side-top">
+                    <button type="button" class="cm-side-collapse" data-side-toggle title="Hide details" aria-label="Hide conversation details">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="15" y1="3" x2="15" y2="21"/><polyline points="8 9 11 12 8 15"/></svg>
+                    </button>
+                </div>
+
+                <div class="cm-side-photo">
+                    <img src="{{ $info['avatar'] }}" alt="" loading="lazy">
+                    <div class="cm-side-name">
+                        <b>{{ $info['name'] }}</b>
+                        @if($info['public_id'])<span style="user-select:all;">{{ $info['public_id'] }}</span>@endif
+                    </div>
+                </div>
+                <p class="cm-side-role">
+                    {{ auth()->user()?->activeRole() === 'professional' ? 'Client' : 'Professional' }}@if($info['location']) · {{ $info['location'] }}@endif
+                    @if($info['profileUrl'] ?? null)<a href="{{ $info['profileUrl'] }}">View full profile</a>@endif
+                </p>
+
+                @if($info['job'])
+                    <div class="cm-side-job">
+                        <a class="cm-side-job-title" href="{{ $info['job']['url'] }}">{{ $info['job']['title'] }}</a>
+                        <span class="cm-side-job-when">{{ $info['job']['posted'] ? 'Posted ' . $info['job']['posted'] : 'Not posted yet' }}</span>
+
+                        @php $aw = $info['award']; @endphp
+                        @if($aw && in_array($aw['state'], ['open', 'in_progress'], true))
+                            {{-- Through finalization, like the Compare page: scope,
+                                 price, schedule, contract and the fee come first. --}}
+                            <form method="POST" action="{{ $aw['url'] }}">
+                                @csrf
+                                <button type="submit" class="cm-award">{{ $aw['state'] === 'in_progress' ? 'Continue award' : 'Award' }}</button>
+                            </form>
+                            <small class="cm-side-note">
+                                @if($aw['amount'] !== null)Their proposal: ${{ number_format((float) $aw['amount'], 2) }}. @endif
+                                You confirm scope, price and schedule before anything is booked.
+                            </small>
+                        @elseif($aw && $aw['state'] === 'awarded')
+                            <div class="cm-awarded"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Awarded</div>
+                        @elseif($aw && $aw['state'] === 'declined')
+                            <small class="cm-side-note">You declined their proposal for this event.</small>
+                        @elseif($aw && $aw['state'] === 'withdrawn')
+                            <small class="cm-side-note">They withdrew their proposal for this event.</small>
+                        @elseif($aw)
+                            <small class="cm-side-note">{{ $info['name'] }} has not sent a proposal for this event yet.</small>
+                        @endif
+                    </div>
+                @endif
+
+                <div class="cm-info-rows">
+                    {{-- First in the list: support and disputes ask for it, and it
+                         never changes. Selectable, so it is copied, not retyped. --}}
+                    @if($info['public_id'] ?? null)<div><span>GigResource ID</span><b style="user-select:all;">{{ $info['public_id'] }}</b></div>@endif
+                    @if($info['email'])<div><span>Email</span><b>{{ $info['email'] }}</b></div>@endif
+                    @if($info['phone'])<div><span>Phone</span><b>{{ $info['phone'] }}</b></div>@endif
+                    @if($info['member_since'])<div><span>On GigResource since</span><b>{{ $info['member_since'] }}</b></div>@endif
+                    <div><span>Your bookings with them</span><b>{{ $info['bookings'] }}</b></div>
+                    @if($info['spent'] > 0)<div><span>Total agreed</span><b>${{ number_format($info['spent'], 2) }}</b></div>@endif
+                </div>
+                @if($info['booking'])
+                    <div class="cm-info-order">
+                        <span class="ref">{{ $info['booking']['ref'] }}</span>
+                        <b>{{ $info['booking']['title'] }}</b>
+                        <div><span>${{ number_format($info['booking']['price'], 2) }}</span> · <span>{{ \Illuminate\Support\Str::headline($info['booking']['status']) }}</span> · <span>{{ $info['booking']['date'] }}</span></div>
+                        <a href="{{ $info['booking']['url'] }}">Open in Bookings</a>
+                    </div>
+                @endif
+
+                {{-- Only the options that work. Mute and block need their own
+                     records and are not built yet, so they are not shown. --}}
+                <div class="cm-side-options">
+                    <span>Chat options</span>
+                    <form method="POST" action="{{ $info['archiveUrl'] }}">
+                        @csrf
+                        <button type="submit" title="{{ $info['archived'] ? 'Move back to inbox' : 'Archive conversation' }}" aria-label="{{ $info['archived'] ? 'Move back to inbox' : 'Archive conversation' }}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/>@if($info['archived'])<polyline points="9 15 12 12 15 15"/><line x1="12" y1="12" x2="12" y2="18"/>@else<polyline points="9 13 12 16 15 13"/><line x1="12" y1="10" x2="12" y2="16"/>@endif</svg>
+                            {{ $info['archived'] ? 'Unarchive' : 'Archive' }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+        @endif
     </div>
 </div>
 
@@ -537,8 +637,15 @@
         document.querySelectorAll('#cm-list .cm-conv').forEach((el) => {
             let ok = (el.dataset.name || '').includes(q);
             if (ev) ok = ok && el.dataset.event === ev;
-            if (activeTab === 'sent') ok = ok && el.dataset.lastfrom === 'me';
-            else if (activeTab === 'drafts' || activeTab === 'archived') ok = false;
+            // The Archived tab used to hide every row. It shows what this person
+            // archived now, and the other tabs leave those out.
+            const archived = el.dataset.archived === '1';
+            if (activeTab === 'archived') ok = ok && archived;
+            else {
+                ok = ok && ! archived;
+                if (activeTab === 'sent') ok = ok && el.dataset.lastfrom === 'me';
+                else if (activeTab === 'drafts') ok = false;
+            }
             el.style.display = ok ? '' : 'none';
             if (ok) shown++;
         });
@@ -576,6 +683,8 @@
         document.querySelectorAll('.cm-tab').forEach((x) => x.classList.remove('on')); this.classList.add('on');
         activeTab = this.dataset.tab || 'inbox'; applyFilters();
     }));
+    // So the inbox opens without the archived rows in it.
+    applyFilters();
 
     // ── Thread controls ────────────────────────────────────────────────────
     /* The details panel remembers whether it was hidden.
@@ -583,11 +692,14 @@
        it not being collapsible at all. Per browser, and wrapped because a
        browser set to block site data throws on the read itself. */
     const infoPanel = $('cm-info');
-    const INFO_KEY = 'gr.chat.info';
+    const mainGrid  = document.querySelector('.cm-main');
+    const INFO_KEY  = 'gr.chat.info';
 
+    // Collapsed, the panel is a thin rail with a button to bring it back,
+    // rather than gone; the header's details button does the same.
     function infoShow(open) {
-        if (! infoPanel) return;
-        infoPanel.style.display = open ? '' : 'none';
+        if (! infoPanel || ! mainGrid) return;
+        mainGrid.classList.toggle('panel-closed', ! open);
         try { localStorage.setItem(INFO_KEY, open ? '1' : '0'); } catch (e) {}
     }
 
@@ -597,9 +709,27 @@
         infoShow(open);
     }
 
-    if ($('cm-info-toggle') && infoPanel) $('cm-info-toggle').addEventListener('click', () => {
-        infoShow(infoPanel.style.display === 'none');
+    document.addEventListener('click', (e) => {
+        if (! e.target.closest || ! e.target.closest('[data-side-toggle], #cm-info-toggle')) return;
+        infoShow(mainGrid.classList.contains('panel-closed'));
     });
+
+    // 👍: sends on its own from an empty box; joins a draft otherwise.
+    (function () {
+        const thumbs = $('cm-thumbs'), box = $('cm-input'), form = $('cm-form');
+        if (! thumbs || ! box || ! form) return;
+        thumbs.addEventListener('click', () => {
+            if (box.value.trim() === '') {
+                box.value = '👍';
+                form.requestSubmit();
+                return;
+            }
+            const at = box.selectionStart ?? box.value.length;
+            box.value = box.value.slice(0, at) + '👍' + box.value.slice(at);
+            box.focus();
+            box.setSelectionRange(at + 2, at + 2);
+        });
+    })();
 
     function insert(text) {
         const i = $('cm-input');

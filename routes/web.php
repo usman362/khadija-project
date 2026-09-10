@@ -1145,6 +1145,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/conversations/{conversation}/messages', [ConversationController::class, 'storeMessage'])->middleware('permission:messages.create')->name('conversations.messages.store');
     Route::post('/conversations/{conversation}/read', [ConversationController::class, 'markAsRead'])->middleware('permission:messages.view')->name('conversations.mark-read');
     Route::post('/conversations/{conversation}/typing', [ConversationController::class, 'typing'])->middleware('permission:messages.view')->name('conversations.typing');
+    // Archive or restore, for the person asking only.
+    Route::post('/conversations/{conversation}/archive', [ConversationController::class, 'archive'])->middleware('permission:messages.view')->name('conversations.archive');
 
     // Attachments
     Route::post('/attachments', [MessageAttachmentController::class, 'store'])->middleware('permission:messages.create')->name('attachments.store');

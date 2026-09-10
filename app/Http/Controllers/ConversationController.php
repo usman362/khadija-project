@@ -228,6 +228,31 @@ class ConversationController extends Controller
     /**
      * Broadcast typing indicator.
      */
+    /**
+     * Archive a conversation, or bring it back, for the person asking.
+     *
+     * The other participant keeps it where it was. Archiving tidies your own
+     * inbox; it does not end the conversation, and nobody is told.
+     */
+    public function archive(Request $request, Conversation $conversation): \Illuminate\Http\RedirectResponse|JsonResponse
+    {
+        $this->authorize('view', $conversation);
+
+        $user = $request->user();
+        $was  = $conversation->participants()->where('users.id', $user->id)->first()?->pivot?->archived_at;
+
+        $conversation->participants()->updateExistingPivot($user->id, ['archived_at' => $was ? null : now()]);
+        $archived = ! $was;
+
+        if ($request->expectsJson()) {
+            return response()->json(['archived' => $archived]);
+        }
+
+        return back()->with('status', $archived
+            ? 'Conversation archived. You will find it under Archived.'
+            : 'Conversation moved back to your inbox.');
+    }
+
     public function typing(Request $request, Conversation $conversation): JsonResponse
     {
         $this->authorize('view', $conversation);
