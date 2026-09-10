@@ -95,7 +95,7 @@ class MyEventsIsLiveTest extends TestCase
 
         $this->assertStringContainsString('In That Week', $cal);
         $this->assertStringNotContainsString('A Week Later', $cal);
-        $this->assertSame(7, substr_count($cal, 'ec-daylink'));
+        $this->assertSame(7, substr_count($cal, 'class="tg-dayhead'));
     }
 
     public function test_the_day_view_lists_that_day(): void
