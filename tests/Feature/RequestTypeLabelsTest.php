@@ -51,6 +51,19 @@ class RequestTypeLabelsTest extends TestCase
             ->assertDontSee('Direct Offer', false);
     }
 
+    /**
+     * Sir Peter, 2026-09-10: the Direct Request subtitle has to cover both
+     * scopes, a single service (SSR) and several (MSR).
+     */
+    public function test_the_direct_request_subtitle_covers_one_service_or_several(): void
+    {
+        $this->actingAs($this->client())
+            ->get(route('client.direct-offers.create'))
+            ->assertOk()
+            ->assertSee('Request one service or several from a single professional.', false)
+            ->assertDontSee('Request services from one professional.', false);
+    }
+
     public function test_the_emergency_form_is_labelled_er(): void
     {
         $this->actingAs($this->client())
