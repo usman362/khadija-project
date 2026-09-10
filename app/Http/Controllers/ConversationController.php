@@ -41,6 +41,13 @@ class ConversationController extends Controller
                 ->latest('created_at')
                 ->limit(1),
             ])
+            // The dock leaves muted conversations out of its unread total.
+            ->addSelect(['muted_at' => \Illuminate\Support\Facades\DB::table('conversation_participants')
+                ->select('muted_at')
+                ->whereColumn('conversation_participants.conversation_id', 'conversations.id')
+                ->where('conversation_participants.user_id', $user->id)
+                ->limit(1),
+            ])
             ->addSelect(['last_message_at' => Message::select('created_at')
                 ->whereColumn('conversation_id', 'conversations.id')
                 ->latest('created_at')
@@ -75,6 +82,13 @@ class ConversationController extends Controller
         ]);
 
         $user = $request->user();
+
+        // A block stops new conversations too, either way round.
+        foreach ($validated['participant_ids'] as $participantId) {
+            if (\App\Domain\Messaging\Blocking::between($user->id, (int) $participantId)) {
+                return response()->json(['message' => \App\Domain\Messaging\Blocking::MESSAGE], 403);
+            }
+        }
 
         // For direct chats, check if conversation already exists between these users
         if ($validated['type'] === 'direct' && count($validated['participant_ids']) === 1) {
@@ -251,6 +265,66 @@ class ConversationController extends Controller
         return back()->with('status', $archived
             ? 'Conversation archived. You will find it under Archived.'
             : 'Conversation moved back to your inbox.');
+    }
+
+    /**
+     * Mute or unmute a conversation, for the person asking.
+     *
+     * Its messages still arrive and still show as unread in the conversation;
+     * they stop adding to the unread counts on the menu and the messages
+     * button. Nobody is told.
+     */
+    public function mute(Request $request, Conversation $conversation): \Illuminate\Http\RedirectResponse|JsonResponse
+    {
+        $this->authorize('view', $conversation);
+
+        $user = $request->user();
+        $was  = $conversation->participants()->where('users.id', $user->id)->first()?->pivot?->muted_at;
+        $conversation->participants()->updateExistingPivot($user->id, ['muted_at' => $was ? null : now()]);
+        $muted = ! $was;
+
+        if ($request->expectsJson()) {
+            return response()->json(['muted' => $muted]);
+        }
+
+        return back()->with('status', $muted
+            ? 'Muted. New messages here will not add to your unread count.'
+            : 'Unmuted.');
+    }
+
+    /**
+     * Block or unblock the other person in this conversation.
+     *
+     * While blocked, neither side can send messages to the other, here or in
+     * any other conversation. Bookings, agreements and payments are not
+     * touched. Only the person who blocked can lift it.
+     */
+    public function block(Request $request, Conversation $conversation): \Illuminate\Http\RedirectResponse|JsonResponse
+    {
+        $this->authorize('view', $conversation);
+
+        $user   = $request->user();
+        $others = $conversation->participants()->where('users.id', '!=', $user->id)->pluck('users.id');
+        abort_if($others->isEmpty(), 422, 'There is nobody else in this conversation.');
+
+        $mine = \App\Models\UserBlock::where('blocker_id', $user->id)->whereIn('blocked_id', $others);
+        $wasBlocked = (clone $mine)->exists();
+
+        if ($wasBlocked) {
+            $mine->delete();
+        } else {
+            foreach ($others as $id) {
+                \App\Models\UserBlock::firstOrCreate(['blocker_id' => $user->id, 'blocked_id' => $id]);
+            }
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['blocked' => ! $wasBlocked]);
+        }
+
+        return back()->with('status', $wasBlocked
+            ? 'Unblocked. You can message each other again.'
+            : 'Blocked. Neither of you can send messages until you unblock. Bookings and payments are not affected.');
     }
 
     public function typing(Request $request, Conversation $conversation): JsonResponse

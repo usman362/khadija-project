@@ -102,6 +102,8 @@ class AppServiceProvider extends ServiceProvider
 
         Event::listen(UserRegistered::class, LogUserRegistered::class);
         Event::listen(MessageInserted::class, LogMessageInserted::class);
+        // A block stops the message row itself, whichever route wrote it.
+        \App\Models\Message::observe(\App\Domain\Messaging\BlockGuard::class);
         Event::subscribe(LogAuthEvents::class);
         Gate::policy(EventModel::class, EventPolicy::class);
         Gate::policy(BookingModel::class, BookingPolicy::class);

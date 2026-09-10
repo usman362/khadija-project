@@ -38,7 +38,7 @@ class ClientChatController extends Controller
         $conversations = Conversation::query()
             ->whereHas('participants', fn ($q) => $q->where('users.id', $user->id))
             ->with([
-                'participants:id,name,email,public_id',
+                'participants:id,name,email,public_id,avatar,last_active_at',
                 'booking:id,event_id,status,price',
                 // Owner and publication too: the details panel's Award needs to
                 // know the event is this client's, and "Posted 1 day ago" is
@@ -58,7 +58,7 @@ class ClientChatController extends Controller
         $activeConv = $activeId ? $conversations->firstWhere('id', $activeId) : $conversations->first();
         $thread = null;
         if ($activeConv) {
-            $activeConv->load(['messages.sender:id,name', 'messages.attachments', 'participants:id,name,email,public_id']);
+            $activeConv->load(['messages.sender:id,name', 'messages.attachments', 'participants:id,name,email,public_id,avatar,last_active_at']);
             $thread = $this->thread($activeConv, $user);
         }
 
@@ -72,7 +72,8 @@ class ClientChatController extends Controller
             // conversation is out of the inbox, and so out of its numbers.
             'tabCounts' => [
                 'inbox' => collect($list)->where('archived', false)->count(),
-                'unread' => collect($list)->where('archived', false)->where('unread', '>', 0)->count(),
+                // Muted conversations keep their unread marks but not the count.
+                'unread' => collect($list)->where('archived', false)->where('muted', false)->where('unread', '>', 0)->count(),
                 'sent' => collect($list)->where('archived', false)->where('lastFromMe', true)->count(),
                 'drafts' => 0,
                 'archived' => collect($list)->where('archived', true)->count(),
@@ -130,6 +131,13 @@ class ClientChatController extends Controller
             'award'        => $this->award($event, $pro, $user),
             'archived'     => (bool) optional($c->participants->firstWhere('id', $user->id))->pivot?->archived_at,
             'archiveUrl'   => route('conversations.archive', $c),
+            'muted'        => (bool) optional($c->participants->firstWhere('id', $user->id))->pivot?->muted_at,
+            'muteUrl'      => route('conversations.mute', $c),
+            'blockUrl'     => route('conversations.block', $c),
+            'blockedByMe'  => $pro ? \App\Domain\Messaging\Blocking::blocked($user->id, $pro->id) : false,
+            'blockedMe'    => $pro ? \App\Domain\Messaging\Blocking::blocked($pro->id, $user->id) : false,
+            // When they were last here, to five minutes. Not "online".
+            'lastActive'   => $pro?->last_active_at ? \Illuminate\Support\Carbon::parse($pro->last_active_at)->humanAgo() : null,
             'booking'      => $booking ? [
                 'title'  => $event?->title ?? 'Booking',
                 'ref'    => 'BK-' . str_pad((string) $booking->id, 4, '0', STR_PAD_LEFT),
@@ -217,6 +225,7 @@ class ClientChatController extends Controller
             'initials' => $this->initials($other?->name ?? 'C'),
             'lastFromMe' => $last && $last->sender_id === $user->id,
             'archived' => (bool) optional($c->participants->firstWhere('id', $user->id))->pivot?->archived_at,
+            'muted' => (bool) optional($c->participants->firstWhere('id', $user->id))->pivot?->muted_at,
             'event' => $event ? ['id' => $event->id, 'title' => $event->title] : null,
             'sortAt' => optional($last?->created_at)->timestamp ?? optional($c->updated_at)->timestamp ?? 0,
         ];

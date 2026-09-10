@@ -26,10 +26,16 @@ class ConversationPolicy
         return $user->can('messages.create');
     }
 
-    public function sendMessage(User $user, Conversation $conversation): bool
+    public function sendMessage(User $user, Conversation $conversation): bool|\Illuminate\Auth\Access\Response
     {
         if (! $user->can('messages.create')) {
             return false;
+        }
+
+        // Refused here, before anything is counted against their message
+        // limit; BlockGuard refuses the row itself as well.
+        if (\App\Domain\Messaging\Blocking::stopsMessaging($user->id, $conversation)) {
+            return \Illuminate\Auth\Access\Response::deny(\App\Domain\Messaging\Blocking::MESSAGE);
         }
 
         return $user->isAdmin() || $conversation->hasParticipant($user);

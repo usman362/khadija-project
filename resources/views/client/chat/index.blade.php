@@ -74,6 +74,15 @@
         border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary); font-size: 12.5px; font-weight: 700; cursor: pointer; }
     .cm-side-options button:hover { color: var(--cm); border-color: var(--cm); }
     .cm-side-options svg { width: 16px; height: 16px; }
+    .cm-side-opt-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .cm-side-options { flex-wrap: wrap; }
+    .cm-side-options button.is-on { color: #b91c1c; border-color: rgba(185,28,28,.4); background: rgba(185,28,28,.06); }
+    .cm-side-name em { display: block; font-style: normal; font-size: 11.5px; opacity: .8; margin-top: 2px; }
+    .cm-blocked-note { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 18px 14px;
+        padding: 12px 14px; border-radius: 10px; background: rgba(100,116,139,.1); color: var(--text-secondary); font-size: 13px; }
+    .cm-blocked-note button { border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 8px; padding: 6px 12px;
+        font-weight: 700; cursor: pointer; color: var(--text-primary); }
+    .cm-compose-off { display: none; }
     .cm-thumbs { width: 42px; height: 42px; border: 0; background: none; font-size: 26px; line-height: 1; cursor: pointer;
         border-radius: 10px; transition: transform .12s ease; }
     .cm-thumbs:hover { transform: scale(1.12); background: var(--bg-card-hover); }
@@ -328,6 +337,7 @@
                             <div class="cm-conv-subj">{{ $c['subject'] }}</div>
                             <div class="cm-conv-prev">{{ $c['preview'] }}</div>
                             <div class="cm-conv-tags">
+                                @if($c['muted'])<span class="cm-tag" style="color:#475569;background:rgba(100,116,139,.14);">Muted</span>@endif
                                 @foreach($c['tags'] as [$tname, $tcol])
                                     <span class="cm-tag" style="color:{{ ($tagColors[$tcol] ?? $tagColors['blue'])[0] }};background:{{ ($tagColors[$tcol] ?? $tagColors['blue'])[1] }};">{{ $tname }}</span>
                                 @endforeach
@@ -419,7 +429,21 @@
                     <button type="button" id="cm-suggest-use">Use</button>
                 </div>
 
-                <div class="cm-compose">
+                @php $blockedHere = $info && ($info['blockedByMe'] || $info['blockedMe']); @endphp
+                @if($blockedHere)
+                    {{-- The blocker is told who and how to undo it; the other
+                         side is only told they cannot send, not that they were
+                         blocked. --}}
+                    <div class="cm-blocked-note">
+                        @if($info['blockedByMe'])
+                            <span>You blocked {{ $info['name'] }}. Unblock them to send messages.</span>
+                            <form method="POST" action="{{ $info['blockUrl'] }}">@csrf<button type="submit">Unblock</button></form>
+                        @else
+                            <span>{{ \App\Domain\Messaging\Blocking::MESSAGE }}</span>
+                        @endif
+                    </div>
+                @endif
+                <div class="cm-compose {{ $blockedHere ? 'cm-compose-off' : '' }}">
                     {{-- Tabs switch what the picker below offers. They are not a
                          highlight that moves — Templates and Quick Replies each
                          insert real text into the box. --}}
@@ -532,6 +556,8 @@
                     <div class="cm-side-name">
                         <b>{{ $info['name'] }}</b>
                         @if($info['public_id'])<span style="user-select:all;">{{ $info['public_id'] }}</span>@endif
+                        {{-- A timestamp, to five minutes. Deliberately not "online". --}}
+                        @if($info['lastActive'])<em>Last active {{ $info['lastActive'] }}</em>@endif
                     </div>
                 </div>
                 <p class="cm-side-role">
@@ -587,10 +613,28 @@
                     </div>
                 @endif
 
-                {{-- Only the options that work. Mute and block need their own
-                     records and are not built yet, so they are not shown. --}}
+                {{-- Mute: your own unread counts stop counting this chat.
+                     Block: neither of you can message the other until you lift
+                     it; bookings and payments carry on. Archive: out of your
+                     inbox. Each is yours alone. --}}
                 <div class="cm-side-options">
                     <span>Chat options</span>
+                    <div class="cm-side-opt-btns">
+                    <form method="POST" action="{{ $info['muteUrl'] }}">
+                        @csrf
+                        <button type="submit" title="{{ $info['muted'] ? 'Unmute' : 'Mute' }}" aria-label="{{ $info['muted'] ? 'Unmute conversation' : 'Mute conversation' }}" class="{{ $info['muted'] ? 'is-on' : '' }}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>@if($info['muted'])<line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>@else<path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>@endif</svg>
+                            {{ $info['muted'] ? 'Unmute' : 'Mute' }}
+                        </button>
+                    </form>
+                    <form method="POST" action="{{ $info['blockUrl'] }}"
+                          @unless($info['blockedByMe']) onsubmit="return confirm('Block {{ addslashes($info['name']) }}? Neither of you will be able to send messages until you unblock. Bookings and payments are not affected.');" @endunless>
+                        @csrf
+                        <button type="submit" title="{{ $info['blockedByMe'] ? 'Unblock' : 'Block' }}" aria-label="{{ $info['blockedByMe'] ? 'Unblock' : 'Block' }} {{ $info['name'] }}" class="{{ $info['blockedByMe'] ? 'is-on' : '' }}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                            {{ $info['blockedByMe'] ? 'Unblock' : 'Block' }}
+                        </button>
+                    </form>
                     <form method="POST" action="{{ $info['archiveUrl'] }}">
                         @csrf
                         <button type="submit" title="{{ $info['archived'] ? 'Move back to inbox' : 'Archive conversation' }}" aria-label="{{ $info['archived'] ? 'Move back to inbox' : 'Archive conversation' }}">
@@ -598,6 +642,7 @@
                             {{ $info['archived'] ? 'Unarchive' : 'Archive' }}
                         </button>
                     </form>
+                    </div>
                 </div>
             </div>
         </aside>

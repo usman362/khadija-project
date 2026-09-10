@@ -1293,6 +1293,11 @@
                             $unread = auth()->check()
                                 ? \App\Models\Message::where('recipient_id', auth()->id())
                                     ->whereDoesntHave('reads', fn ($q) => $q->where('user_id', auth()->id()))
+                                    // Not from conversations this person muted. A message
+                                    // with no conversation still counts.
+                                    ->where(fn ($q) => $q->whereNull('conversation_id')->orWhereNotIn('conversation_id',
+                                        \Illuminate\Support\Facades\DB::table('conversation_participants')
+                                            ->where('user_id', auth()->id())->whereNotNull('muted_at')->pluck('conversation_id')))
                                     ->count()
                                 : 0;
                         @endphp

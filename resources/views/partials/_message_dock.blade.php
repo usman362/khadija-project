@@ -173,7 +173,7 @@
                     + '</button>';
             }).join('');
 
-            badge(rows.reduce(function (n, c) { return n + Number(c.unread_count || 0); }, 0));
+            badge(rows.reduce(function (n, c) { return n + (c.muted_at ? 0 : Number(c.unread_count || 0)); }, 0));
         }).catch(function () {
             body.innerHTML = '<div class="md-note">Could not load your messages.</div>';
         });
@@ -268,7 +268,7 @@
     // The unread count on the launcher, without opening anything.
     get(urls.list).then(function (data) {
         var rows = (data.data || data || []);
-        badge(rows.reduce(function (n, c) { return n + Number(c.unread_count || 0); }, 0));
+        badge(rows.reduce(function (n, c) { return n + (c.muted_at ? 0 : Number(c.unread_count || 0)); }, 0));
     }).catch(function () {});
 })();
 </script>

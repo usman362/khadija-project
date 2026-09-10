@@ -37,6 +37,8 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\CheckAccountDeletionStatus::class,
             \App\Http\Middleware\EnsureServiceArea::class,
             \App\Http\Middleware\SecurityHeaders::class,
+            // "Last active 5 minutes ago" in the chat. Never "online".
+            \App\Http\Middleware\TouchLastActive::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [

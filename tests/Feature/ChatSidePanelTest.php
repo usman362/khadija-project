@@ -149,14 +149,14 @@ class ChatSidePanelTest extends TestCase
         $this->assertStringContainsString('class="cm-main has-side"', $html);
     }
 
-    /** Only options that work are offered. */
-    public function test_chat_options_offer_only_what_is_built(): void
+    /** Part 2 added Mute and Block beside Archive (ChatMuteBlockTest). */
+    public function test_chat_options_offer_mute_block_and_archive(): void
     {
         $side = $this->side($this->page());
 
         $this->assertStringContainsString('Chat options', $side);
-        $this->assertStringContainsString('Archive', $side);
-        $this->assertStringNotContainsString('>Mute', $side);
-        $this->assertStringNotContainsString('>Block', $side);
+        foreach (['Mute', 'Block', 'Archive'] as $option) {
+            $this->assertMatchesRegularExpression('/<\/svg>\s*' . $option . '\s*<\/button>/', $side, "{$option} is missing.");
+        }
     }
 }

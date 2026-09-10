@@ -1147,6 +1147,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/conversations/{conversation}/typing', [ConversationController::class, 'typing'])->middleware('permission:messages.view')->name('conversations.typing');
     // Archive or restore, for the person asking only.
     Route::post('/conversations/{conversation}/archive', [ConversationController::class, 'archive'])->middleware('permission:messages.view')->name('conversations.archive');
+    // Mute is per person and per conversation; block is between the two people.
+    Route::post('/conversations/{conversation}/mute', [ConversationController::class, 'mute'])->middleware('permission:messages.view')->name('conversations.mute');
+    Route::post('/conversations/{conversation}/block', [ConversationController::class, 'block'])->middleware('permission:messages.view')->name('conversations.block');
 
     // Attachments
     Route::post('/attachments', [MessageAttachmentController::class, 'store'])->middleware('permission:messages.create')->name('attachments.store');
