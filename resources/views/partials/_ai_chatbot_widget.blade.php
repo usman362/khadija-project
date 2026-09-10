@@ -5,7 +5,11 @@
     $chatbotKey     = \App\Models\Setting::get('openai.api_key') ?: config('services.openai.key');
 @endphp
 
-@if(auth()->check() && $chatbotEnabled && !empty($chatbotKey))
+{{-- Not on the messages pages. Its bubble sat over the details column's
+     chat options there, and on a smaller laptop no layout could clear it
+     without squeezing the conversation (Ali, 2026-09-11). --}}
+@if(auth()->check() && $chatbotEnabled && !empty($chatbotKey)
+    && ! request()->routeIs('client.chat.*', 'professional.chat.*', 'app.chat.*'))
 <div id="aiChatBubble" class="aic-bubble" role="button" aria-label="Open AI assistant" tabindex="0">
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>

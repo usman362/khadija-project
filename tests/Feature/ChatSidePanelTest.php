@@ -160,8 +160,6 @@ class ChatSidePanelTest extends TestCase
 
         $this->assertMatchesRegularExpression('/\.cm-side-options \{ position: sticky; bottom: 0;/', $src);
         $this->assertStringContainsString('.cm-side-opt-btns { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));', $src);
-        // And the columns end above the assistant's bubble on a normal screen.
-        $this->assertStringContainsString('body:has(.aic-bubble) .cm-main .cm-card { height: clamp(460px, calc(100vh - 360px), 600px); }', $src);
     }
 
     /** Part 2 added Mute and Block beside Archive (ChatMuteBlockTest). */

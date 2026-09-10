@@ -106,15 +106,6 @@
        to its own content, so the list ran on past the bottom of the thread
        and left a block of empty card under the compose box. */
     .cm-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; display: flex; flex-direction: column; height: 600px; }
-    /*
-     * With the assistant's bubble in the corner, the three columns end above
-     * it on a normal screen, so the pinned chat options are clear of it the
-     * moment the page opens, not only after scrolling. The cards start about
-     * 265px down; ending 12px above the bubble (82px from the bottom) leaves
-     * 100vh - 360px. Never shorter than 460px: below that the page scrolls,
-     * and the room left at its foot (partials/_ai_chatbot_widget) takes over.
-     */
-    body:has(.aic-bubble) .cm-main .cm-card { height: clamp(460px, calc(100vh - 360px), 600px); }
     .cm-tabs { display: flex; gap: 4px; padding: 12px 14px 0; border-bottom: 1px solid var(--border-color); }
     .cm-tab { display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; font-size: 12.5px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
     .cm-tab.on { color: var(--cm); border-bottom-color: var(--cm); }

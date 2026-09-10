@@ -40,6 +40,23 @@ class FloatingButtonsLeaveRoomTest extends TestCase
             $this->actingAs($client)->get(route('client.dashboard'))->assertOk()->getContent());
     }
 
+    /**
+     * Nor the assistant's bubble: on a smaller laptop it covered the chat
+     * options however the page was laid out (Ali, 2026-09-11).
+     */
+    public function test_the_assistant_bubble_is_not_on_the_messages_page(): void
+    {
+        // The widget renders only when a key is set; a placeholder, in memory.
+        config(['services.openai.key' => 'test-placeholder']);
+        $client = $this->client();
+
+        $this->assertStringNotContainsString('class="aic-bubble"',
+            $this->actingAs($client)->get(route('client.chat.index'))->assertOk()->getContent());
+
+        $this->assertStringContainsString('class="aic-bubble"',
+            $this->actingAs($client)->get(route('client.dashboard'))->assertOk()->getContent());
+    }
+
     /** The room at the foot of the page is worked out from the buttons' own sizes. */
     public function test_the_page_ends_below_the_buttons(): void
     {
