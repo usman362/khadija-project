@@ -77,12 +77,14 @@ class BsrEventLocationTest extends TestCase
             ->assertSuccessful()
             ->getContent();
 
+        // Sir Peter's three answers, 11 Sep.
         $this->assertStringContainsString('name="location_kind"', $html);
-        $this->assertStringContainsString('I know the address', $html);
-        $this->assertStringContainsString('Only the area so far', $html);
+        $this->assertStringContainsString('Use my address', $html);
+        $this->assertStringContainsString('Enter a different address', $html);
+        $this->assertStringContainsString('know the exact address yet', $html);
     }
 
-    /** Peter: ask whether it is their own address rather than making them retype it. */
+    /** Their own address is offered as a choice, shown in full. */
     public function test_their_own_address_is_offered(): void
     {
         $this->startWizard();
@@ -93,7 +95,149 @@ class BsrEventLocationTest extends TestCase
             ->getContent();
 
         $this->assertStringContainsString('12 Harbour Row', $html);
-        $this->assertStringContainsString('Is it at your own address?', $html);
+        $this->assertMatchesRegularExpression('/value="mine"[^>]*checked/', $html,
+            'Someone with an address on file should start on "Use my address".');
+    }
+
+    /** "Use my address" stores the address on the profile, not what is in the box. */
+    public function test_use_my_address_stores_the_profile_address(): void
+    {
+        $this->startWizard();
+
+        $this->step(['location_kind' => 'mine', 'location' => 'ignored'])->assertSessionHasNoErrors();
+
+        $data = session('bsr_wizard');
+        $this->assertStringContainsString('12 Harbour Row', $data['location']);
+        $this->assertSame('exact', $data['location_kind']);
+    }
+
+    private function wizard(): array
+    {
+        return (array) session('bsr_wizard');
+    }
+
+    /**
+     * Sir Peter, 11 Sep: the name is built, not asked for twice. It grows as
+     * the area and the date become known.
+     */
+    public function test_the_name_is_built_from_the_answers(): void
+    {
+        $this->startWizard();
+        $type = $this->wizard()['event_type'];
+
+        // Before any location is given, the town on their profile stands in.
+        $this->assertSame("{$type} · Baltimore", $this->wizard()['title']);
+
+        $this->step(['location_kind' => 'area', 'location' => 'Annapolis, MD', 'starts_at' => '2027-10-09T18:00'])
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame("{$type} · Annapolis · October 2027", $this->wizard()['title']);
+    }
+
+    /** A street address contributes its town, not its street. */
+    public function test_a_street_address_names_the_town(): void
+    {
+        $this->startWizard();
+
+        $this->step(['location_kind' => 'exact', 'location' => '1234 Garden Way, Towson, MD 21204'])
+            ->assertSessionHasNoErrors();
+
+        $this->assertStringContainsString('· Towson', $this->wizard()['title']);
+    }
+
+    /** Once renamed on the review step, the client's own name sticks. */
+    public function test_a_rename_sticks(): void
+    {
+        $this->startWizard();
+
+        $this->actingAs($this->client)->post(route('client.bsr.save', 'review'), [
+            'title' => 'Harbour Gala', 'confirm' => '1', 'action' => 'draft',
+        ])->assertSessionHasNoErrors();
+
+        $this->assertSame('Harbour Gala', $this->wizard()['title']);
+
+        $this->step(['location_kind' => 'area', 'location' => 'Annapolis, MD'])->assertSessionHasNoErrors();
+
+        $this->assertSame('Harbour Gala', $this->wizard()['title']);
+    }
+
+    /** Two services, so there is a split to make. Returns their ids. */
+    private function startMulti(): array
+    {
+        $a = \App\Models\Category::create(['name' => 'Split DJ', 'slug' => 'split-dj', 'kind' => \App\Models\Category::SERVICE, 'is_active' => true]);
+        $b = \App\Models\Category::create(['name' => 'Split Photo', 'slug' => 'split-photo', 'kind' => \App\Models\Category::SERVICE, 'is_active' => true]);
+        $type = \App\Models\Category::where('kind', \App\Models\Category::EVENT_TYPE)->first()
+            ?? \App\Models\Category::create(['name' => 'Wedding', 'slug' => 'wedding-split', 'kind' => \App\Models\Category::EVENT_TYPE, 'is_active' => true]);
+
+        $this->actingAs($this->client)->post(route('client.bsr.save', 'service'), [
+            'services'          => [$a->id, $b->id],
+            'event_type'        => $type->name,
+            'organization_type' => array_key_first(\App\Http\Controllers\Client\ClientBsrController::ORG_TYPES),
+        ])->assertSessionHasNoErrors();
+
+        return [$a->id, $b->id];
+    }
+
+    private function budget(array $payload)
+    {
+        return $this->actingAs($this->client)->post(route('client.bsr.save', 'budget'), $payload);
+    }
+
+    /** Sir Peter, 11 Sep: the split has to come to the top of the range. */
+    public function test_a_split_that_does_not_add_up_is_refused(): void
+    {
+        [$a, $b] = $this->startMulti();
+
+        $this->budget(['budget_min' => 800, 'budget_max' => 1200, 'service_budgets' => [$a => 700, $b => 700]])
+            ->assertSessionHasErrors(['service_budgets' => 'The split adds up to $1,400 but your budget is $1,200. It is $200 over.']);
+    }
+
+    public function test_a_split_that_adds_up_is_accepted(): void
+    {
+        [$a, $b] = $this->startMulti();
+
+        $this->budget(['budget_min' => 800, 'budget_max' => 1200, 'service_budgets' => [$a => 500, $b => 700]])
+            ->assertSessionHasNoErrors();
+    }
+
+    /** Half a split would read as "nothing" for the blank services. */
+    public function test_a_half_filled_split_is_refused(): void
+    {
+        [$a, $b] = $this->startMulti();
+
+        $this->budget(['budget_max' => 1200, 'service_budgets' => [$a => 1200, $b => '']])
+            ->assertSessionHasErrors('service_budgets');
+    }
+
+    public function test_no_split_at_all_is_fine(): void
+    {
+        [$a, $b] = $this->startMulti();
+
+        $this->budget(['budget_max' => 1200, 'service_budgets' => [$a => '', $b => '']])
+            ->assertSessionHasNoErrors();
+    }
+
+    /** With only one figure given, that figure is what the split must reach. */
+    public function test_a_single_figure_is_the_target(): void
+    {
+        [$a, $b] = $this->startMulti();
+
+        $this->budget(['budget_min' => 1000, 'service_budgets' => [$a => 400, $b => 600]])
+            ->assertSessionHasNoErrors();
+    }
+
+    /** A profile with only a city has no street address to offer. */
+    public function test_no_street_address_means_no_use_my_address(): void
+    {
+        $this->client->profile->update(['address' => null]);
+        $this->startWizard();
+
+        $html = $this->actingAs($this->client)
+            ->get(route('client.bsr.step', 'event'))
+            ->getContent();
+
+        $this->assertStringNotContainsString('value="mine"', $html);
+        $this->step(['location_kind' => 'mine'])->assertSessionHasErrors('location');
     }
 
     /** Claiming an exact address and typing a city is the silent version of the old bug. */

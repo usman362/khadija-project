@@ -216,14 +216,13 @@ class RequestFeeTermsTest extends TestCase
     }
 
     /**
-     * The three forms call the same field the same thing.
+     * The bidding request does not ask for a name twice.
      *
-     * The BR's step 2 asked for a "Request name" while the DR asked for an
-     * "Event name" and every screen that shows it afterwards calls it the
-     * event's name. One field, three names, is how a client comes to think
-     * they are two different things.
+     * Sir Peter, 11 Sep: step 1 asks what the event is, and step 2 then asked
+     * for its name, which is the same question again. The name is now built
+     * for them, and step 2 has no name box and no "Request name" either.
      */
-    public function test_the_name_field_is_called_the_same_thing_everywhere(): void
+    public function test_step_two_no_longer_asks_for_a_name(): void
     {
         $this->startBidding();
 
@@ -232,7 +231,7 @@ class RequestFeeTermsTest extends TestCase
             ->assertSuccessful()
             ->getContent();
 
-        $this->assertStringContainsString('Event name', $bidding);
+        $this->assertStringNotContainsString('name="title"', $bidding);
         $this->assertStringNotContainsString('Request name', $bidding);
 
         $direct = $this->actingAs($this->client)
@@ -243,13 +242,15 @@ class RequestFeeTermsTest extends TestCase
         $this->assertStringContainsString('Event Name', $direct);
     }
 
-    /** And the message when it is missing says the same. */
-    public function test_the_message_says_event_too(): void
+    /** Step 2 goes through without a name, because one is already there. */
+    public function test_step_two_saves_without_a_name(): void
     {
         $this->startBidding();
 
         $this->actingAs($this->client)
             ->post(route('client.bsr.save', 'event'), ['location_kind' => 'area'])
-            ->assertSessionHasErrors(['title' => 'Give your event a name.']);
+            ->assertSessionHasNoErrors();
+
+        $this->assertNotEmpty(session('bsr_wizard')['title'] ?? null);
     }
 }

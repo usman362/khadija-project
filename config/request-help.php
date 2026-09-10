@@ -55,7 +55,8 @@ return [
                 ['b' => 'Direct Request', 't' => 'Goes to one professional you have already chosen, instead of out to the board.'],
             ],
         ],
-        $pay,
+        // No fee panel here: Sir Peter wants the $2.99 shown only on the
+        // last step, as the checkbox the client ticks before publishing.
         [
             'title' => 'Tips for better proposals',
             'icon'  => 'bolt',

@@ -294,23 +294,46 @@ class ClientBsrController extends Controller
         $validated = $request->validate($rules, $this->messagesFor($step));
 
         /*
-         * If they said they know the address, hold them to it.
-         *
-         * A street address has a number in it and a city name does not. Without
-         * this the client picks "I know the address", types "Baltimore, MD",
-         * and the request is stored as an exact location that the geocoder
-         * cannot place — which is the silent version of the bug this whole
-         * field was added to fix.
+         * "Use my address" is answered from the profile, not from the form.
+         * The address box stays empty under that option, so what gets stored
+         * is the address on file, and downstream it is simply an exact one.
          */
-        if (($validated['location_kind'] ?? null) === 'exact') {
-            $typed = trim((string) ($validated['location'] ?? ''));
+        if (($validated['location_kind'] ?? null) === 'mine') {
+            $home = $this->homeAddress($request);
 
-            if ($typed !== '' && ! preg_match('/\d/', $typed)) {
+            if ($home === '') {
                 throw \Illuminate\Validation\ValidationException::withMessages([
-                    'location' => 'That looks like an area rather than an address. '
-                        . 'Add the street and number, or choose "Only the area so far".',
+                    'location' => 'There is no street address on your profile yet. Enter the address instead.',
                 ]);
             }
+
+            $validated['location']      = $home;
+            $validated['location_kind'] = 'exact';
+            $validated['location_mine'] = true;
+        } elseif ($step === 'event') {
+            $validated['location_mine'] = false;
+
+            if (($validated['location_kind'] ?? null) === 'exact') {
+                $typed = trim((string) ($validated['location'] ?? ''));
+
+                if ($typed !== '' && ! preg_match('/\d/', $typed)) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'location' => 'That looks like an area rather than an address. '
+                            . 'Add the street and number, or choose "I don\'t know the exact address yet".',
+                    ]);
+                }
+            }
+        }
+
+        /*
+         * The split has to add up. Sir Peter, 11 Sep: whatever the client
+         * divides between services should come to the top of their range, so
+         * professionals are never shown figures that total more (or less) than
+         * the client actually means to spend. All blank is still fine; half
+         * filled is not, because the blanks would read as "nothing".
+         */
+        if ($step === 'budget') {
+            $this->checkSplit($validated, $data);
         }
 
         /*
@@ -374,7 +397,27 @@ class ClientBsrController extends Controller
             }
         }
 
+        /*
+         * The name is written for them. Sir Peter, 11 Sep: step 1 already
+         * asked what the event is, so asking for a name again on step 2 was
+         * the same question twice. It follows the event type, the area and
+         * the month until the client renames it on the review step; after
+         * that their own name sticks.
+         */
+        if ($step === 'review') {
+            $typed = trim((string) ($validated['title'] ?? ''));
+            $auto  = $this->autoTitle($request, array_merge($data, $validated));
+
+            $validated['title_custom'] = $typed !== '' && $typed !== $auto;
+            $validated['title']        = $typed !== '' ? $typed : $auto;
+        }
+
         $data = array_merge($data, $validated);
+
+        if (empty($data['title_custom'])) {
+            $data['title'] = $this->autoTitle($request, $data) ?? ($data['title'] ?? null);
+        }
+
         Session::put(self::KEY, $data);
 
         if ($request->input('action') === 'draft') {
@@ -435,6 +478,8 @@ class ClientBsrController extends Controller
             'event_type'        => $event->event_type,
             'organization_type' => $event->organization_type,
             'title'             => $event->title,
+            // A saved draft's name is kept as it is, not rebuilt.
+            'title_custom'      => true,
             'starts_at'         => $event->starts_at?->format('Y-m-d\TH:i'),
             // Resuming a draft has to bring step 7's end time back with it.
             'ends_at'           => $event->ends_at?->format('Y-m-d\TH:i'),
@@ -685,6 +730,103 @@ class ClientBsrController extends Controller
         return $when ? "{$eventType} in {$when}" : $eventType;
     }
 
+    /**
+     * The request's name when the client has not chosen one:
+     * "Bachelor Party · Baltimore · October 2026". Each part appears only
+     * once it is known, so a fresh request is just its event type.
+     */
+    private function autoTitle(Request $request, array $d): ?string
+    {
+        $type = ($d['event_type'] ?? null) === self::OTHER_EVENT_TYPE
+            ? trim((string) ($d['event_title'] ?? ''))
+            : trim((string) ($d['event_type'] ?? ''));
+
+        if ($type === '') {
+            return null;
+        }
+
+        // Under "Other" they named the event in their own words; that is the
+        // whole name, not a type to decorate.
+        if (($d['event_type'] ?? null) === self::OTHER_EVENT_TYPE) {
+            return $type;
+        }
+
+        // The town: the second part of a street address, the first part of
+        // "City, ST", or the profile's city when nothing was given yet.
+        $parts = array_values(array_filter(array_map('trim', explode(',', (string) ($d['location'] ?? '')))));
+        $area  = ($d['location_kind'] ?? null) === 'exact' && count($parts) >= 2 ? $parts[1] : ($parts[0] ?? '');
+
+        if ($area === '' || preg_match('/\d/', $area)) {
+            $area = trim((string) $request->user()?->profile?->city);
+        }
+
+        $when = ! empty($d['starts_at'])
+            ? \Illuminate\Support\Carbon::parse($d['starts_at'])->format('F Y')
+            : null;
+
+        return implode(' · ', array_filter([$type, $area, $when]));
+    }
+
+    /** The profile's full street address, or '' when there is no street line. */
+    private function homeAddress(Request $request): string
+    {
+        $p = $request->user()?->profile;
+
+        if (! $p || ! filled($p->address)) {
+            return '';
+        }
+
+        return trim(implode(', ', array_filter([
+            $p->address, $p->city, trim(($p->state ?? '') . ' ' . ($p->zip_code ?? '')),
+        ])));
+    }
+
+    /**
+     * Blank split is fine. Otherwise every service needs a figure and the
+     * figures must add up to the top of the range (or the one figure given).
+     */
+    private function checkSplit(array $validated, array $data): void
+    {
+        $services = array_map('intval', (array) ($data['services'] ?? []));
+
+        if (count($services) < 2) {
+            return;
+        }
+
+        $split  = array_intersect_key((array) ($validated['service_budgets'] ?? []), array_flip($services));
+        $filled = array_filter($split, fn ($v) => $v !== null && $v !== '');
+
+        if ($filled === []) {
+            return;
+        }
+
+        if (count($filled) < count($services)) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'service_budgets' => 'Give every service a figure, or leave them all blank.',
+            ]);
+        }
+
+        $target = $validated['budget_max'] ?? $validated['budget_min'] ?? null;
+
+        if ($target === null || $target === '') {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'service_budgets' => 'Add your budget above first, so the split has something to add up to.',
+            ]);
+        }
+
+        $sum  = array_sum(array_map('floatval', $filled));
+        $diff = round($sum - (float) $target, 2);
+
+        if (abs($diff) >= 0.01) {
+            $fmt = fn ($n) => '$' . number_format($n, fmod($n, 1) ? 2 : 0);
+
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'service_budgets' => 'The split adds up to ' . $fmt($sum) . ' but your budget is '
+                    . $fmt((float) $target) . '. It is ' . $fmt(abs($diff)) . ($diff > 0 ? ' over.' : ' short.'),
+            ]);
+        }
+    }
+
     public function discard(Request $request): RedirectResponse
     {
         Session::forget(self::KEY);
@@ -727,8 +869,9 @@ class ClientBsrController extends Controller
              * they are the same three rules the emergency and direct forms
              * use, from App\Domain\Requests\CoreFacts. See that class for why.
              */
+            // No name on this step any more: it is built from step 1's answers
+            // and can be renamed on the review step. See save().
             'event' => [
-                'title'       => \App\Domain\Requests\CoreFacts::nameRule(),
                 'starts_at'   => ['nullable', 'date'],
                 'location'    => ['nullable', 'string', 'max:200'],
                 /*
@@ -739,7 +882,8 @@ class ClientBsrController extends Controller
                  * which was intended lets the geocoder be told, and lets the
                  * page say plainly when a location is only approximate.
                  */
-                'location_kind' => ['nullable', 'in:exact,area'],
+                // 'mine' = the address on their profile, filled in by save().
+                'location_kind' => ['nullable', 'in:mine,exact,area'],
                 // The event-state field was removed from the form on
                 // 2026-08-25: the State Boundary Rule matches every request by
                 // the client's own home state, so choosing one changed nothing.
@@ -763,7 +907,13 @@ class ClientBsrController extends Controller
             ],
             'budget' => [
                 'budget_min' => ['nullable', 'numeric', 'min:0', 'max:9999999'],
-                'budget_max' => ['nullable', 'numeric', 'min:0', 'max:9999999', 'gte:budget_min'],
+                // Compared with the bottom only when there is one: a client who
+                // gives just a top figure was refused with "must be at least
+                // the bottom" against a bottom they never entered.
+                'budget_max' => array_values(array_filter([
+                    'nullable', 'numeric', 'min:0', 'max:9999999',
+                    $request->filled('budget_min') ? 'gte:budget_min' : null,
+                ])),
                 /*
                  * The per-service split. Keyed by category id, and every key has
                  * to be a service this request actually asked for — otherwise a
@@ -807,7 +957,11 @@ class ClientBsrController extends Controller
                 'event_end_time'     => ['nullable', 'date_format:H:i'],
                 'availability_note'  => ['nullable', 'string', 'max:500'],
             ],
-            'review' => ['confirm' => ['accepted']],
+            'review' => [
+                'confirm' => ['accepted'],
+                // Optional: left blank, the automatic name is kept.
+                'title'   => ['nullable', 'string', 'max:200'],
+            ],
             default  => [],
         };
     }

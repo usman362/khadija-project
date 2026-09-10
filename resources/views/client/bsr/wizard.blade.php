@@ -91,6 +91,15 @@
     .bw-split-row input { padding-left: 22px; text-align: right; }
     .bw-split-total { margin-top: 10px; padding-top: 10px; border-top: 1.5px solid var(--border-color); font-size: 13px; color: var(--text-muted); }
     .bw-split-total b { color: var(--text-primary); }
+    .bw-split-gap { margin-left: 8px; font-weight: 700; }
+    .bw-split-gap.ok { color: #15803d; }
+    .bw-split-gap.off { color: #b91c1c; }
+    .bw-card .bw-err, .bw-err { margin: 6px 0 0; font-size: 12.5px; font-weight: 600; color: #b91c1c !important; }
+    .bw-rev-name { flex-wrap: wrap; align-items: center; }
+    .bw-rev-name b { display: inline-flex; align-items: center; gap: 10px; }
+    .bw-rev-name b[hidden], .bw-rename-input[hidden] { display: none; }
+    .bw-rename { border: 0; background: none; padding: 0; font: inherit; font-size: 12px; font-weight: 700; color: var(--brand, #f97316); cursor: pointer; text-decoration: underline; }
+    .bw-rename-input { flex-basis: 100%; margin-top: 8px; padding: 9px 12px; border: 1.5px solid var(--border-color); border-radius: 10px; font: inherit; font-size: 13.5px; background: var(--bg-card); color: var(--text-primary); }
     .bw-suggest { margin-left: 10px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 8px; padding: 4px 11px; font: inherit; font-size: 12.5px; font-weight: 700; color: var(--brand, #f97316); cursor: pointer; }
     .bw-suggest:disabled { opacity: .6; cursor: default; }
     .bw-suggest-note { display: block; margin-top: 6px; font-size: 12px; color: var(--text-muted); }
@@ -268,7 +277,7 @@
     {{-- ── 1 · Service ─────────────────────────────────────── --}}
     @if($step === 'service')
         <h3>What do you need?</h3>
-        <p class="lede">Pick one service for a single-service request, or several for a multi-service one, it's the same request either way.</p>
+        <p class="lede">Pick one service for a single-service request, or several for a multi-service request. Either way, it's the same request.</p>
 
         {{-- Event type first, and required.
              It used to sit below the services and validate as nullable, so a
@@ -389,13 +398,8 @@
         <h3>About the event</h3>
         <p class="lede">The basics professionals need to know before they can price anything.</p>
 
-        <div class="bw-field">
-            {{-- "Event name", the same words the DR and the review screens use.
-                 The field is the event's name; calling it a request name on
-                 one step of one form was the odd one out. --}}
-            <label>Event name <span class="req">*</span></label>
-            <input type="text" name="title" value="{{ $data['title'] ?? '' }}" placeholder="e.g. Annual Company Picnic">
-        </div>
+        {{-- No "Event name" box: step 1 already asked what the event is, and
+             the name is built from that. It can be renamed on the last step. --}}
         <div class="bw-two">
             <div class="bw-field">
                 <label>Event date &amp; time</label>
@@ -428,50 +432,51 @@
                 // it did nothing at all.
                 $__loc  = old('location', $data['location'] ?? '');
                 $__prof = auth()->user()?->profile;
-                $__home = trim(implode(', ', array_filter([
-                    $__prof?->address, $__prof?->city, $__prof?->state, $__prof?->zip_code,
-                ])));
-                $__kind = old('location_kind', $data['location_kind'] ?? ($__loc === '' ? 'exact' : 'area'));
+                // Only a real street address counts as "my address"; a city
+                // alone would fill a street-address answer with an area.
+                $__home = filled($__prof?->address) ? trim(implode(', ', array_filter([
+                    $__prof?->address, $__prof?->city, trim(($__prof?->state ?? '') . ' ' . ($__prof?->zip_code ?? '')),
+                ]))) : '';
+                $__kind = old('location_kind', ! empty($data['location_mine']) ? 'mine'
+                    : ($data['location_kind'] ?? ($__home !== '' ? 'mine' : ($__loc === '' ? 'exact' : 'area'))));
+                if ($__kind === 'mine' && $__home === '') { $__kind = 'exact'; }
+                // Under "use my address" the box stays empty; the profile is the answer.
+                if ($__kind === 'mine') { $__loc = ''; }
             @endphp
 
             <div class="bw-field bw-locfield">
                 <label>Where is the event?</label>
 
+                {{-- Sir Peter's three answers, 11 Sep. --}}
                 <div class="bw-locpick">
+                    @if($__home !== '')
+                        <label class="bw-locopt">
+                            <input type="radio" name="location_kind" value="mine" @checked($__kind === 'mine')>
+                            <span><b>Use my address</b><small>{{ $__home }}</small></span>
+                        </label>
+                    @endif
                     <label class="bw-locopt">
                         <input type="radio" name="location_kind" value="exact" @checked($__kind === 'exact')>
-                        <span><b>I know the address</b><small>Lets us judge how far professionals are from it</small></span>
+                        <span><b>Enter a different address</b><small>Lets us judge how far professionals are from it</small></span>
                     </label>
                     <label class="bw-locopt">
                         <input type="radio" name="location_kind" value="area" @checked($__kind === 'area')>
-                        <span><b>Only the area so far</b><small>Fine if you are still looking for a venue</small></span>
+                        <span><b>I don't know the exact address yet</b><small>Just the city and state for now</small></span>
                     </label>
                 </div>
 
                 {{-- The box belongs to the option above it. Unlabelled and
                      sitting under both, it read as a third thing on the page
                      and never changed when the choice did. --}}
-                <label class="bw-loclabel" for="bw_location" data-bw-loclabel>{{
-                    $__kind === 'exact' ? 'Street address' : 'City and state'
-                }}</label>
+                <div data-bw-locbox @if($__kind === 'mine') hidden @endif>
+                    <label class="bw-loclabel" for="bw_location" data-bw-loclabel>{{
+                        $__kind === 'area' ? 'City and state' : 'Street address'
+                    }}</label>
 
-                <input type="text" name="location" id="bw_location" value="{{ $__loc }}"
-                       placeholder="{{ $__kind === 'exact' ? '1234 Garden Way, Baltimore, MD 21201' : 'Baltimore, MD' }}"
-                       data-bw-location>
-
-                @if($__home !== '')
-                    {{-- Peter: ask whether it differs from their own address,
-                         rather than making them type it out again.
-
-                         Only offered against "I know the address": their own
-                         address is a street address, so filling it in under
-                         "only the area so far" would answer a question they
-                         did not ask. --}}
-                    <p class="bw-help" data-bw-mineblock @if($__kind !== 'exact') hidden @endif>
-                        Is it at your own address?
-                        <button type="button" class="bw-locmine" data-bw-usemine="{{ $__home }}">Use {{ $__home }}</button>
-                    </p>
-                @endif
+                    <input type="text" name="location" id="bw_location" value="{{ $__loc }}"
+                           placeholder="{{ $__kind === 'area' ? 'e.g. Baltimore, MD' : 'e.g. 1234 Garden Way, Baltimore, MD 21201' }}"
+                           data-bw-location>
+                </div>
             </div>
             {{-- The state selector that stood here is gone.
                  Sir Peter's State Boundary Rule (2026-08-25) matches every
@@ -491,8 +496,9 @@
                 </div>
             @endif
             <div class="bw-field">
-                <label>Venue</label>
-                <input type="text" name="venue" value="{{ $data['venue'] ?? '' }}" placeholder="Outdoor park (confirmed)">
+                <label>Venue <span class="bw-optional">Optional</span></label>
+                <input type="text" name="venue" value="{{ $data['venue'] ?? '' }}" placeholder="e.g. Oregon Ridge Park">
+                <p class="bw-help">Helps professionals understand the setting.</p>
             </div>
         </div>
 
@@ -506,42 +512,33 @@
     if (!field) return;
 
     const hints = {
-        exact: { label: 'Street address', ph: '1234 Garden Way, Baltimore, MD 21201' },
-        area:  { label: 'City and state',  ph: 'Baltimore, MD' },
+        exact: { label: 'Street address', ph: 'e.g. 1234 Garden Way, Baltimore, MD 21201' },
+        area:  { label: 'City and state',  ph: 'e.g. Baltimore, MD' },
     };
 
     const label = document.querySelector('[data-bw-loclabel]');
-    const mineBlock = document.querySelector('[data-bw-mineblock]');
+    const box = document.querySelector('[data-bw-locbox]');
 
-    // One place decides what the box is asking for, so the label, the
-    // placeholder and the "use my address" offer can never disagree with the
-    // option that is actually selected.
+    // One place decides what the box is asking for, so the label and the
+    // placeholder can never disagree with the option that is selected.
+    // "Use my address" needs no box at all: the profile is the answer.
     function follow(kind) {
-        const h = hints[kind] || hints.area;
+        if (box) { box.hidden = kind === 'mine'; }
+        if (kind === 'mine') { return; }
 
+        const h = hints[kind] || hints.area;
         field.placeholder = h.ph;
         if (label) { label.textContent = h.label; }
-        // Their own address is a street address; offering it under "only the
-        // area so far" answers a question they did not ask.
-        if (mineBlock) { mineBlock.hidden = kind !== 'exact'; }
     }
 
     document.querySelectorAll('input[name="location_kind"]').forEach(function (radio) {
         radio.addEventListener('change', function () {
-            if (radio.checked) { follow(radio.value); }
+            if (radio.checked) {
+                follow(radio.value);
+                if (radio.value !== 'mine') { field.focus(); }
+            }
         });
     });
-
-    const mine = document.querySelector('[data-bw-usemine]');
-    if (mine) {
-        mine.addEventListener('click', function () {
-            field.value = mine.dataset.bwUsemine;
-            const exact = document.querySelector('input[name="location_kind"][value="exact"]');
-            if (exact) { exact.checked = true; }
-            follow('exact');
-            field.focus();
-        });
-    }
 
     // The page can load with either option already chosen — after a rejected
     // step, or on a returning draft — so the box is brought into line with
@@ -575,11 +572,11 @@
         <div class="bw-two">
             <div class="bw-field">
                 <label>Budget from</label>
-                <input type="number" name="budget_min" min="0" step="1" value="{{ $data['budget_min'] ?? '' }}" placeholder="800">
+                <input type="number" name="budget_min" min="0" step="1" value="{{ old('budget_min', $data['budget_min'] ?? '') }}" placeholder="e.g. 800">
             </div>
             <div class="bw-field">
                 <label>Budget to</label>
-                <input type="number" name="budget_max" min="0" step="1" value="{{ $data['budget_max'] ?? '' }}" placeholder="1200">
+                <input type="number" name="budget_max" min="0" step="1" value="{{ old('budget_max', $data['budget_max'] ?? '') }}" placeholder="e.g. 1200">
             </div>
         </div>
         {{-- The per-service split.
@@ -605,7 +602,8 @@
                 <h4>What is each service worth to you?</h4>
                 <p class="bw-help" style="margin-top:0;">
                     Professionals bid on one service each, so this is the figure the
-                    right one sees. Leave any of them blank if you would rather not say.
+                    right one sees. Fill in every service so they add up to your
+                    budget, or leave them all blank.
                 </p>
 
                 @foreach($__svcs as $svc)
@@ -614,14 +612,15 @@
                         <span class="bw-amount">
                             <input type="number" id="sb-{{ $svc->id }}" min="0" step="1"
                                    name="service_budgets[{{ $svc->id }}]"
-                                   value="{{ $__split[$svc->id] ?? '' }}"
+                                   value="{{ old('service_budgets.' . $svc->id, $__split[$svc->id] ?? '') }}"
                                    data-bw-split placeholder="0">
                         </span>
                     </div>
                 @endforeach
 
                 <div class="bw-split-total">
-                    Breakdown adds up to <b data-bw-splittotal>—</b>
+                    Breakdown adds up to <b data-bw-splittotal>$0</b>
+                    <span class="bw-split-gap" data-bw-splitgap></span>
                     {{-- Offered, never applied on its own. It divides the
                          client's own total using the Masterlist's Essential /
                          Common / Occasional ranking for this occasion — it does
@@ -633,9 +632,8 @@
             </div>
         @endif
 
-        <div class="bw-scope">
-            💡 <span>Posting is free. A <b>$2.99</b> service fee applies only when you finalize with a professional, and nothing at all if you don't book.</span>
-        </div>
+        {{-- The fee note that stood here is gone: Sir Peter wants the $2.99
+             shown only once, as the checkbox on the review step. --}}
 
     {{-- ── 5 · Proposal settings ───────────────────────────── --}}
 @push('scripts')
@@ -701,6 +699,13 @@
     const out = document.querySelector('[data-bw-splittotal]');
     if (!fields.length || !out) return;
 
+    const gap = document.querySelector('[data-bw-splitgap]');
+    const maxF = document.querySelector('input[name="budget_max"]');
+    const minF = document.querySelector('input[name="budget_min"]');
+    const money = function (n) { return '$' + n.toLocaleString('en-US'); };
+
+    // Checked against the same target the server uses: the top of the
+    // range, or the one figure given.
     function retotal() {
         let sum = 0;
         let any = false;
@@ -708,10 +713,25 @@
             const n = parseFloat(f.value);
             if (!isNaN(n) && n >= 0) { sum += n; any = true; }
         });
-        out.textContent = any ? '$' + sum.toLocaleString('en-US') : '—';
+        out.textContent = money(sum);
+
+        if (!gap) return;
+        const target = parseFloat((maxF && maxF.value) || (minF && minF.value));
+        gap.className = 'bw-split-gap';
+        if (!any || isNaN(target)) { gap.textContent = ''; return; }
+
+        const diff = Math.round((sum - target) * 100) / 100;
+        if (diff === 0) {
+            gap.textContent = 'Matches your budget';
+            gap.classList.add('ok');
+        } else {
+            gap.textContent = money(Math.abs(diff)) + (diff > 0 ? ' over' : ' short of') + ' your ' + money(target) + ' budget';
+            gap.classList.add('off');
+        }
     }
 
     fields.forEach(function (f) { f.addEventListener('input', retotal); });
+    [maxF, minF].forEach(function (f) { if (f) f.addEventListener('input', retotal); });
     retotal();
 })();
 
@@ -967,7 +987,31 @@
         <div class="bw-rev"><span>Request type</span><b>BR. Open to bidding</b></div>
         <div class="bw-rev"><span>Scope</span><b>{{ $isMulti ? 'MSR, multi-service' : 'SSR, single service' }}</b></div>
         <div class="bw-rev"><span>Services</span><b>{{ $svcNames->implode(', ') ?: '—' }}</b></div>
-        <div class="bw-rev"><span>Name</span><b>{{ $data['title'] ?? '—' }}</b></div>
+        {{-- Written for them from the event type, area and month; this is
+             the one place to rename it. Left blank, the automatic name stays. --}}
+        <div class="bw-rev bw-rev-name"><span>Name</span>
+            <b data-bw-name>{{ old('title', $data['title'] ?? '') }}
+                <button type="button" class="bw-rename" data-bw-rename>Rename</button></b>
+            <input type="text" name="title" value="{{ old('title', $data['title'] ?? '') }}" maxlength="200"
+                   class="bw-rename-input" data-bw-nameinput @unless($errors->has('title')) hidden @endunless>
+        </div>
+@push('scripts')
+<script>
+(function () {
+    const btn = document.querySelector('[data-bw-rename]');
+    const input = document.querySelector('[data-bw-nameinput]');
+    const shown = document.querySelector('[data-bw-name]');
+    if (!btn || !input || !shown) return;
+
+    btn.addEventListener('click', function () {
+        shown.hidden = true;
+        input.hidden = false;
+        input.focus();
+        input.select();
+    });
+})();
+</script>
+@endpush
         <div class="bw-rev"><span>Event date</span><b>{{ ! empty($data['starts_at']) ? \Illuminate\Support\Carbon::parse($data['starts_at'])->format('M j, Y · g:i A') : 'Flexible' }}@if(! empty($data['ends_at'])) – {{ \Illuminate\Support\Carbon::parse($data['ends_at'])->format('g:i A') }}@endif</b></div>
         <div class="bw-rev"><span>Location</span><b>{{ $data['location'] ?? '—' }}{{ ! empty($data['venue']) ? ' · ' . $data['venue'] : '' }}</b></div>
         <div class="bw-rev"><span>Guests</span><b>{{ ! empty($data['guest_count']) ? number_format($data['guest_count']) : '—' }}</b></div>

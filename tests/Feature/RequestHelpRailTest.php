@@ -80,7 +80,9 @@ class RequestHelpRailTest extends TestCase
      */
     public function test_the_fee_is_explained_in_the_same_words_everywhere(): void
     {
-        $sending = ['br', 'er', 'dr'];
+        // Not the bidding request: Sir Peter wants its $2.99 shown only as
+        // the checkbox on the last step. See the test below.
+        $sending = ['er', 'dr'];
 
         foreach ($sending as $flow) {
             $rail = $this->railOf($this->flows()[$flow]);
@@ -92,6 +94,15 @@ class RequestHelpRailTest extends TestCase
                 "The {$flow} rail explains the fee in its own words.",
             );
         }
+    }
+
+    /** Sir Peter, 11 Sep: on the bidding request the fee is on the last step only. */
+    public function test_the_bidding_rail_does_not_repeat_the_fee(): void
+    {
+        $rail = $this->railOf($this->flows()['br']);
+
+        $this->assertStringNotContainsString('2.99', $rail);
+        $this->assertStringNotContainsString("What it'll cost", $rail);
     }
 
     /**
