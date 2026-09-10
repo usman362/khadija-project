@@ -25,6 +25,6 @@ class UspsAddressProvider implements AddressProvider
         // TODO(launch): POST to USPS Web Tools "Verify" API, parse <Address>
         // response, set matched/normalized/reason. Until then this is unreachable
         // in production because AddressVerificationGuard blocks the call.
-        throw new LogicException('UspsAddressProvider::verify() not implemented yet — awaiting USPS credentials & go-live.');
+        throw new LogicException('UspsAddressProvider::verify() not implemented yet, awaiting USPS credentials & go-live.');
     }
 }

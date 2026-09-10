@@ -48,8 +48,8 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Starter', '#64748b', 'Assemble your own draft by hand — add, edit and remove your own clauses. No suggestions.'],
-        'semi'    => ['Semi', '#7c3aed', 'instantly drafts the agreement — reword any clause before you use it.'],
+        'manual'  => ['Starter', '#64748b', 'Assemble your own draft by hand. Add, edit and remove your own clauses. No suggestions.'],
+        'semi'    => ['Semi', '#7c3aed', 'instantly drafts the agreement, reword any clause before you use it.'],
         'maximum' => ['Maximum', '#16a34a', 'Enter your details and instantly drafts the full agreement for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -67,12 +67,12 @@
     {{-- Starter — hand-built agreement, no suggestions --}}
     <div class="ca-card ca-mano">
         <h3>📝 Build My Agreement</h3>
-        <div style="font-size:12.5px;color:var(--text-muted);margin:-6px 0 14px;">Assemble your own draft by hand — add, edit and remove clauses. No suggestions.</div>
+        <div style="font-size:12.5px;color:var(--text-muted);margin:-6px 0 14px;">Assemble your own draft by hand. Add, edit and remove clauses. No suggestions.</div>
         <label class="ca-lbl">Agreement Title</label>
-        <input class="ca-in" id="camTitle" placeholder="e.g. Service Agreement — Wedding Floral &amp; Décor">
+        <input class="ca-in" id="camTitle" placeholder="e.g. Service Agreement: Wedding Floral &amp; Décor">
         <div id="camClauses"></div>
         <button type="button" id="camAdd" class="ca-add">+ Add clause</button>
-        <div class="ca-disc" style="display:block;margin-top:14px;">⚠️ This is a draft template for your convenience and is not legal advice — have a professional review it before signing.</div>
+        <div class="ca-disc" style="display:block;margin-top:14px;">⚠️ This is a draft template for your convenience and is not legal advice, have a professional review it before signing.</div>
     </div>
     @else
     <div class="ca-stats">@foreach($stats as [$lbl, $val, $tone])<div class="ca-stat {{ $tone }}"><b>{{ $val }}</b><div class="l">{{ $lbl }}</div></div>@endforeach</div>
@@ -126,7 +126,7 @@
             <x-add-to-event tool-key="contract-assistant" tool-name="Contract Assistant" :event-id="request('event_id')" />
         {{-- Row 226 — post it as a request: bidding, urgent, or a draft. --}}
         <x-post-as-request tool-key="contract-assistant" tool-name="Contract Assistant" form-id="caForm" />
-            <div id="caOut"><p class="ca-empty">Fill in the details and generate a draft agreement — it will appear here.</p></div>
+            <div id="caOut"><p class="ca-empty">Fill in the details and generate a draft agreement. It will appear here.</p></div>
             <div class="ca-disc" id="caDisc" style="display:none;"></div>
         </div>
     </div>

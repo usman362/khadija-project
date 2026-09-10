@@ -103,8 +103,8 @@ class DashboardCalendarIsRealTest extends TestCase
 
         $cal = $this->calendar();
 
-        $this->assertStringContainsString('Booked Gala — Booked', $cal);
-        $this->assertStringContainsString('Open Wedding — Open for proposals', $cal);
+        $this->assertStringContainsString('Booked Gala: Booked', $cal);
+        $this->assertStringContainsString('Open Wedding: Open for proposals', $cal);
 
         // The legend names exactly what is drawn — and not the four states it
         // used to claim.

@@ -137,20 +137,20 @@ class AiContractAssistantController extends Controller
             ],
             [
                 'heading' => '5. Liability & Force Majeure',
-                'body'    => "{$provider}'s total liability under this agreement is limited to the total fee paid, being {$money($total)}. Neither party is liable for failure to perform caused by events beyond their reasonable control — including severe weather, illness, venue closure, government restrictions or other force majeure. In such cases the parties will act in good faith to reschedule or provide a fair, proportionate refund for services not delivered.",
+                'body'    => "{$provider}'s total liability under this agreement is limited to the total fee paid, being {$money($total)}. Neither party is liable for failure to perform caused by events beyond their reasonable control, including severe weather, illness, venue closure, government restrictions or other force majeure. In such cases the parties will act in good faith to reschedule or provide a fair, proportionate refund for services not delivered.",
             ],
             [
                 'heading' => '6. Agreement & Signatures',
-                'body'    => "This agreement represents the understanding between {$client} and {$provider} for the Event on {$eventStr}. By signing below, both parties confirm they have read and accept these terms.\n\nClient: {$client} — Signature: __________________  Date: ____________\n\nProvider: {$provider} — Signature: __________________  Date: ____________",
+                'body'    => "This agreement represents the understanding between {$client} and {$provider} for the Event on {$eventStr}. By signing below, both parties confirm they have read and accept these terms.\n\nClient: {$client}, Signature: __________________  Date: ____________\n\nProvider: {$provider}, Signature: __________________  Date: ____________",
             ],
         ];
 
         $modeLabel = ucfirst($mode);
 
         return [
-            'title'   => "Service Agreement — {$service}",
+            'title'   => "Service Agreement: {$service}",
             'clauses' => $clauses,
-            'disclaimer' => 'This is a draft template for convenience and is not legal advice — have a professional review before signing.',
+            'disclaimer' => 'This is a draft template for convenience and is not legal advice, have a professional review before signing.',
             'summary' => "Draft agreement between {$client} and {$provider} for {$service} on {$eventStr}. Total {$money($total)} with a {$this->pctLabel($depositPct)} deposit of {$money($deposit)} and a {$money($balance)} balance due by {$balanceStr}. {$modeLabel} cancellation terms applied.",
         ];
     }

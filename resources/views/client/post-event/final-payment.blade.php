@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', 'Post an Event — Final Payment')
+@section('title', 'Post an Event: Final Payment')
 @section('page-title', '🔒 Final Payment')
 @section('page-subtitle', 'Your event is complete! Review your final invoice and make the remaining payment to release funds to your professional.')
 @include('client.post-event._styles')
@@ -138,7 +138,7 @@
 
                     <div style="display:flex; gap:10px; align-items:flex-start; background:var(--pe-green-l); border:1px solid #bbf7d0; border-radius:10px; padding:12px 14px; margin-top:14px;">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.2" style="width:18px; height:18px; flex-shrink:0; margin-top:1px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        <div style="font-size:12.5px; color:var(--ok-text); line-height:1.5;"><strong>Secure Payment</strong> — Your payment will be released to the professional once you approve the event completion.</div>
+                        <div style="font-size:12.5px; color:var(--ok-text); line-height:1.5;"><strong>Secure Payment</strong>: Your payment will be released to the professional once you approve the event completion.</div>
                     </div>
                 </div>
             </div>

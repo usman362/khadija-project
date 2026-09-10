@@ -32,7 +32,7 @@
         <h2 class="bk-h">Sent to {{ $booking->supplier?->name }}</h2>
         <p class="bk-sub">
             Nothing has been charged. They have your date and the package you picked, and the request is
-            waiting on them — you will see it move in Bookings.
+            waiting on them. You will see it move in Bookings.
         </p>
 
         <div class="bk-line"><span class="l">Event</span><span class="v">{{ $booking->event?->title }}</span></div>

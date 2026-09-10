@@ -73,7 +73,7 @@ class DiagnoseCategoryImagery extends Command
         if ($dupes->isEmpty()) {
             $this->line('No duplicate category names.');
         } else {
-            $this->warn("Duplicate names ({$dupes->count()}) — this is why a list can look doubled:");
+            $this->warn("Duplicate names ({$dupes->count()}). This is why a list can look doubled:");
             $this->table(['Name', 'Kind', 'Copies'], $dupes->map(fn ($d) => [$d->name, $d->kind, $d->n])->all());
         }
 

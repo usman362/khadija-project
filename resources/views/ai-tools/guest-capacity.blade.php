@@ -82,8 +82,8 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Starter', '#64748b', 'Enter your own room size, guests and space-per-guest — the math runs right here.'],
-        'semi'    => ['Semi', '#0ea5e9', 'We estimate your capacity — adjust the comfort and legal figures and the score updates live.'],
+        'manual'  => ['Starter', '#64748b', 'Enter your own room size, guests and space-per-guest: the math runs right here.'],
+        'semi'    => ['Semi', '#0ea5e9', 'We estimate your capacity, adjust the comfort and legal figures and the score updates live.'],
         'maximum' => ['Maximum', '#16a34a', 'Enter your space and we work out comfort, legal capacity and flow for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -101,7 +101,7 @@
     {{-- Starter — hand-built capacity calculator, no AI, computed client-side --}}
     <div class="gc-gen">
         <h3>📐 Build My Capacity Estimate</h3>
-        <div class="sub">Enter your own numbers and adjust space-per-guest — the math runs right here.</div>
+        <div class="sub">Enter your own numbers and adjust space-per-guest: the math runs right here.</div>
         <div class="gc-form-grid">
             <div class="gc-field">
                 <label>Room Size (sq ft)</label>
@@ -144,7 +144,7 @@
     {{-- AI planner (Semi / Maximum) --}}
     <div class="gc-gen">
         <h3>📐 Estimate Your Capacity</h3>
-        <div class="sub">{{ $isSemi ? 'We estimate comfort and legal capacity — you can adjust the figures and the score recalculates.' : 'Enter your space and guest details and we estimate comfort, legal capacity and flow insights.' }}</div>
+        <div class="sub">{{ $isSemi ? 'We estimate comfort and legal capacity. You can adjust the figures and the score recalculates.' : 'Enter your space and guest details and we estimate comfort, legal capacity and flow insights.' }}</div>
         <form id="gcForm">
             <div class="gc-form-grid">
                 <div class="gc-field">
@@ -316,8 +316,8 @@
             '<span class="gc-marker" style="left:' + comfortPct + '%;" title="Comfort"></span>';
         const room = comfort - expected;
         document.getElementById('gcCapNote').innerHTML = room >= 0
-            ? 'You’re <b style="color:#16a34a;">comfortably under</b> the comfort estimate — room for about ' + room + ' more guests before it feels tight.'
-            : 'You’re about <b style="color:#d97706;">' + Math.abs(room) + ' guests over</b> the comfort estimate — consider a larger space or a different seating style.';
+            ? 'You’re <b style="color:#16a34a;">comfortably under</b> the comfort estimate, room for about ' + room + ' more guests before it feels tight.'
+            : 'You’re about <b style="color:#d97706;">' + Math.abs(room) + ' guests over</b> the comfort estimate, consider a larger space or a different seating style.';
     }
 
     // Semi — recompute the score + bar live when a figure is edited.
@@ -419,7 +419,7 @@
             '<span class="gc-marker" style="left:' + comfortPct + '%;" title="Comfort"></span>';
         noteEl.innerHTML = room >= 0
             ? 'Estimated room for about <b style="color:#16a34a;">' + room + ' more guests</b> before spacing feels tight (comfort estimate ' + comfort + ').'
-            : 'About <b style="color:#d97706;">' + Math.abs(room) + ' over</b> the comfort estimate of ' + comfort + ' — consider more space or a tighter layout.';
+            : 'About <b style="color:#d97706;">' + Math.abs(room) + ' over</b> the comfort estimate of ' + comfort + ', consider more space or a tighter layout.';
     }
 
     // Changing the layout seeds a typical space-per-guest the user can override.

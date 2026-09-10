@@ -140,7 +140,7 @@
         </div>
         <div class="card-body">
             <p class="mb-2"><strong>reCAPTCHA v2 (Checkbox):</strong> Users click "I'm not a robot" before submitting the form. Simple and effective against bots.</p>
-            <p class="mb-2"><strong>reCAPTCHA v3 (Invisible):</strong> Runs in the background without user interaction. Assigns a score (0.0 to 1.0) — scores below 0.5 are blocked as likely bots.</p>
+            <p class="mb-2"><strong>reCAPTCHA v3 (Invisible):</strong> Runs in the background without user interaction. Assigns a score (0.0 to 1.0), scores below 0.5 are blocked as likely bots.</p>
             <p class="mb-0 text-muted">When disabled, forms will work normally without any captcha protection. Keys are stored encrypted in the database.</p>
         </div>
     </div>

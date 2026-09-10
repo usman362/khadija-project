@@ -277,7 +277,7 @@
              read "Showing services that fit …" with a "Show all" button beside
              it, which told the client things were being hidden from them. Now
              nothing is. --}}
-        Sorted for <b data-svc-cascade-type></b> — everything is still here, most relevant first.
+        Sorted for <b data-svc-cascade-type></b>. Everything is still here, most relevant first.
         <button type="button" data-svc-cascade-all>Sort A–Z</button>
     </div>
     <div class="svc-grid">

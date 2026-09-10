@@ -20,7 +20,7 @@ class InfluencerApplicationApproved extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "You're approved! Welcome to the affiliate program — " . config('app.name'),
+            subject: "You're approved! Welcome to the affiliate program: " . config('app.name'),
         );
     }
 

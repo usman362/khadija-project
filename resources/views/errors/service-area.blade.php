@@ -34,14 +34,14 @@
 
         <p>
             Your account is active and stays that way. Booking and bidding are the
-            parts that need us to operate in your state — every one of them ends in
+            parts that need us to operate in your state. Every one of them ends in
             a contract, and we won't put you in one we can't stand behind yet.
         </p>
 
         <div class="sa-can">
             <b>What you can still do</b>
             <ul>
-                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Use every planning tool — budget, timeline, checklists, capacity</li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Use every planning tool, budget, timeline, checklists, capacity</li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Browse professionals and packages</li>
                 <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Build out your profile so you're ready on day one</li>
             </ul>

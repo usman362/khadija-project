@@ -23,6 +23,6 @@ class GoogleAddressProvider implements AddressProvider
 
         // TODO(launch): POST to Address Validation API, read verdict
         // (addressComplete, hasUnconfirmedComponents) → matched/normalized/reason.
-        throw new LogicException('GoogleAddressProvider::verify() not implemented yet — awaiting Google credentials & go-live.');
+        throw new LogicException('GoogleAddressProvider::verify() not implemented yet, awaiting Google credentials & go-live.');
     }
 }

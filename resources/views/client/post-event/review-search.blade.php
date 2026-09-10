@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', 'Post an Event — Review & Search')
+@section('title', 'Post an Event: Review & Search')
 @section('page-title', 'Review & Search Preferences')
 @section('page-subtitle', 'Review your details and set your search preferences before we find the best packages.')
 @include('client.post-event._styles')
@@ -31,7 +31,7 @@
                         <div class="pe-list-row">
                             <div style="flex:1; min-width:0;">
                                 <div style="font-weight:700; font-size:14px;">{{ $line['service'] }}</div>
-                                <div class="pe-muted">{{ $line['coverage'] }} — {{ $line['budget'] }}</div>
+                                <div class="pe-muted">{{ $line['coverage'] }}: {{ $line['budget'] }}</div>
                             </div>
                             <a href="{{ route('client.post-event.service-details') }}" class="pe-muted" style="font-weight:700; text-decoration:none; color:var(--pe-orange);">Edit</a>
                         </div>

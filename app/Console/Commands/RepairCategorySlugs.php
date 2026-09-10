@@ -74,7 +74,7 @@ class RepairCategorySlugs extends Command
         }
 
         $this->info(($dry ? 'Would repair ' : 'Repaired ') . $fixed . ' slug(s).'
-            . ($blocked ? ' ' . count($blocked) . ' skipped — see above.' : ''));
+            . ($blocked ? ' ' . count($blocked) . ' skipped. See above.' : ''));
 
         return self::SUCCESS;
     }

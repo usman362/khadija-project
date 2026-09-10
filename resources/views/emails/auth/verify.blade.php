@@ -12,7 +12,7 @@
 @if($blocking)
     <p>You'll need to confirm before you can post an event or contact a professional.</p>
 @else
-    <p>You can start looking around straight away — confirming just means we can reach you about your events.</p>
+    <p>You can start looking around straight away, confirming just means we can reach you about your events.</p>
 @endif
 
 <p style="font-size: 13px; color: #64748b;">

@@ -50,7 +50,7 @@ class FoodDeliveryDemand extends Command
         $this->newLine();
 
         if ($answered === 0) {
-            $this->warn('Nothing to report yet — no catering request has answered the question.');
+            $this->warn('Nothing to report yet: no catering request has answered the question.');
 
             return self::SUCCESS;
         }

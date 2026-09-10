@@ -76,7 +76,7 @@ final class ProfessionalStateAccount
 
         return $state
             ? "This account works in {$state}. To take work in another state, open a separate "
-              . 'account for it with its own email and that state’s licence — your phone number '
+              . 'account for it with its own email and that state’s licence. Your phone number '
               . 'can stay the same.'
             : 'Add the state this account works in. Each state you work in needs its own account, '
               . 'with its own licence.';

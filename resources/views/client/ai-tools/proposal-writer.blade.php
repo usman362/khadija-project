@@ -117,8 +117,8 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Starter', '#64748b', 'Write your proposal yourself — templates & structure, no suggestions.'],
-        'semi'    => ['Semi', '#2563eb', 'Write a draft, then let the tool improve, rewrite or expand it — you approve.'],
+        'manual'  => ['Starter', '#64748b', 'Write your proposal yourself, templates & structure, no suggestions.'],
+        'semi'    => ['Semi', '#2563eb', 'Write a draft, then let the tool improve, rewrite or expand it. You approve.'],
         'maximum' => ['Maximum', '#16a34a', 'Describe the event and instantly writes the whole proposal for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -182,7 +182,7 @@
             @endif
 
             <div class="pw-gen">
-                <div class="pw-sec-num">{{ $isManual ? 'Write Your Proposal' : ($isSemi ? 'Your Draft — refine it' : '2. Your Auto-generated Proposal') }}</div>
+                <div class="pw-sec-num">{{ $isManual ? 'Write Your Proposal' : ($isSemi ? 'Your Draft, refine it' : '2. Your Auto-generated Proposal') }}</div>
                 @if($isSemi || $isMax)
                 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px;">
                     <button type="button" class="pw-assist" data-assist="improve">✨ Improve</button>
@@ -193,7 +193,7 @@
                     @endif
                 </div>
                 @endif
-                <textarea class="pw-proposal" id="pw-proposal" rows="9" placeholder="{{ $isManual ? 'Write your proposal here…' : 'Your proposal will appear here — edit freely.' }}">{{ $proposal }}</textarea>
+                <textarea class="pw-proposal" id="pw-proposal" rows="9" placeholder="{{ $isManual ? 'Write your proposal here…' : 'Your proposal will appear here, edit freely.' }}">{{ $proposal }}</textarea>
                 <div class="pw-gen-actions">
                     <button type="button" class="pw-btn pw-btn-pink" id="pw-copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy Proposal</button>
                     <button type="button" class="pw-btn" id="pw-download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download</button>

@@ -5,7 +5,7 @@
 @section('err-title')
     The page you're looking for is <span class="grad">missing in action</span>
 @endsection
-@section('err-tagline', 'The link might be broken, or the page may have been moved. Don\'t worry — your event-planning journey can pick up right where you left off.')
+@section('err-tagline', 'The link might be broken, or the page may have been moved. Don\'t worry. Your event-planning journey can pick up right where you left off.')
 
 @section('err-helpful')
     <div class="err-helpful-links">

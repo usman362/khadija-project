@@ -91,7 +91,7 @@
             <div class="esr-scope-o {{ $scope === 'single' ? 'sel' : '' }}" data-scope-pick="single">
                 <span class="esr-scope-code">SINGLE SERVICE</span>
                 <h5>One urgent service</h5>
-                <p>One gap to fill right now — a replacement DJ, a caterer, a van. Handled as a single agreement.</p>
+                <p>One gap to fill right now: a replacement DJ, a caterer, a van. Handled as a single agreement.</p>
             </div>
             <div class="esr-scope-o {{ $scope === 'multi' ? 'sel' : '' }}" data-scope-pick="multi">
                 <span class="esr-scope-code">MULTI-SERVICE</span>
@@ -127,7 +127,7 @@
             <div class="esr-field">
                 <label>Event Name <span class="esr-req">*</span></label>
                 <input name="event_name" class="esr-input" value="{{ old('event_name') }}"
-                       maxlength="200" placeholder="e.g. Corporate Lunch — Friday" required>
+                       maxlength="200" placeholder="e.g. Corporate Lunch: Friday" required>
                 @error('event_name')<p class="esr-err">{{ $message }}</p>@enderror
             </div>
 
@@ -163,7 +163,7 @@
         <div class="esr-card">
             <x-form-section :n="2" required><span data-scope-only="single">The Service You Need</span><span data-scope-only="multi">Services You Need</span></x-form-section>
             <p style="font-size:12.5px;color:var(--text-muted,#6b7280);margin:-6px 0 12px;">
-                <span data-scope-only="single">Pick the one service you need covered — choosing another replaces it.</span>
+                <span data-scope-only="single">Pick the one service you need covered, choosing another replaces it.</span>
                 <span data-scope-only="multi">Pick every service you need covered. Each one is bid on separately.</span>
             </p>
             <x-service-picker :categories="$categories" name="services" :selected="old('services', [])" :single="$scope === 'single'" />
@@ -187,7 +187,7 @@
             <div class="esr-field">
                 <label>What should professionals know? <span class="esr-req">*</span></label>
                 <textarea name="description" class="esr-textarea" maxlength="4000" required
-                          placeholder="Scope, access, equipment, timing — anything that changes the price.">{{ old('description') }}</textarea>
+                          placeholder="Scope, access, equipment, timing. Anything that changes the price.">{{ old('description') }}</textarea>
                 <p class="esr-hint">At least a sentence or two.</p>
                 @error('description')<p class="esr-err">{{ $message }}</p>@enderror
             </div>

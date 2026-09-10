@@ -35,7 +35,7 @@ class EventChanged extends Notification
             'event_id' => $this->event->id,
             'title'    => $this->event->title,
             'changed'  => $this->changed,
-            'message'  => 'This event has changed — review your proposal.',
+            'message'  => 'This event has changed. Review your proposal.',
             'url'      => route('professional.bidding-board.index'),
         ];
     }

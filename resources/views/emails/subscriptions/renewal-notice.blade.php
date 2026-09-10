@@ -39,7 +39,7 @@
 
 <p>
     <strong>If you do not want it to renew,</strong> you can cancel it yourself at any time
-    before that date. It takes one step from your membership page — you do not need to call
+    before that date. It takes one step from your membership page. You do not need to call
     or email anybody.
 </p>
 
@@ -51,7 +51,7 @@
 
 <p style="font-size:12px;color:#6b7280;line-height:1.6;margin-top:26px;">
     You are receiving this because you have an active paid membership. Renewal reminders
-    are a legal requirement and are sent to every member — they are not marketing, and they
+    are a legal requirement and are sent to every member. They are not marketing, and they
     cannot be switched off while a membership is active.
 </p>
 @endsection

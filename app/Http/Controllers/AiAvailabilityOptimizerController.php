@@ -39,14 +39,14 @@ class AiAvailabilityOptimizerController extends Controller
             // [day index, type, time, title]
             'events' => [
                 [0, 'confirmed', '9:00 AM', 'Corporate AV Setup'],
-                [0, 'open', '2:00 PM', 'Open — 2 slots'],
+                [0, 'open', '2:00 PM', 'Open, 2 slots'],
                 [1, 'tight', '11:00 AM', 'Tight turnaround'],
-                [2, 'confirmed', '5:00 PM', 'Wedding — Baltimore'],
+                [2, 'confirmed', '5:00 PM', 'Wedding: Baltimore'],
                 [3, 'open', '10:00 AM', 'Open opportunity'],
                 [4, 'confirmed', '6:00 PM', 'Birthday DJ set'],
                 [5, 'confirmed', '4:00 PM', 'Wedding reception'],
                 [5, 'personal', '12:00 PM', 'Personal time'],
-                [6, 'open', '1:00 PM', 'Open — high demand'],
+                [6, 'open', '1:00 PM', 'Open, high demand'],
             ],
             'legend' => [
                 ['confirmed', 'Confirmed Booking'], ['tight', 'Tight Turnaround'],
@@ -59,10 +59,10 @@ class AiAvailabilityOptimizerController extends Controller
             ],
             'forecast' => ['total' => '$69,800', 'bars' => [40, 62, 55, 78, 70, 92, 85]],
             'suggestions' => [
-                'Fill your Thu 10 AM gap — 3 matching gigs nearby (+$2,400 potential).',
-                'Your Sat is back-to-back — add 30 min buffer to avoid a tight turnaround.',
-                'Sunday afternoon is high-demand — open it up for +$650 average.',
-                'Raise weekend rates 8% — demand is above your booked capacity.',
+                'Fill your Thu 10 AM gap, 3 matching gigs nearby (+$2,400 potential).',
+                'Your Sat is back-to-back. Add 30 min buffer to avoid a tight turnaround.',
+                'Sunday afternoon is high-demand. Open it up for +$650 average.',
+                'Raise weekend rates 8%, demand is above your booked capacity.',
             ],
         ]);
     }
@@ -97,7 +97,7 @@ class AiAvailabilityOptimizerController extends Controller
             $openSlots = $avgGigHours > 0 ? (int) floor($remaining / $avgGigHours) : 0;
 
             if ($utilization < 60) {
-                $status = 'Under-booked — room to grow';
+                $status = 'Under-booked, room to grow';
             } elseif ($utilization < 85) {
                 $status = 'Healthy';
             } else {
@@ -107,21 +107,21 @@ class AiAvailabilityOptimizerController extends Controller
             $suggestions = [];
 
             if ($openSlots > 0) {
-                $suggestions[] = "You have room for about {$openSlots} more gig(s) per week ({$remaining}h open) — consider promoting these open slots.";
+                $suggestions[] = "You have room for about {$openSlots} more gig(s) per week ({$remaining}h open), consider promoting these open slots.";
             }
 
             if ($utilization < 60) {
-                $suggestions[] = 'Utilization is under 60% — batch similar gigs on your peak days to reduce travel/setup time and free up marketing capacity.';
+                $suggestions[] = 'Utilization is under 60%, batch similar gigs on your peak days to reduce travel/setup time and free up marketing capacity.';
                 $suggestions[] = 'Offer a limited-time package or off-peak rate to fill the open ' . $remaining . ' hours this week.';
             } elseif ($utilization < 85) {
-                $suggestions[] = 'Your schedule is healthy — protect a small buffer between gigs to avoid tight turnarounds as you fill the remaining ' . $remaining . ' hours.';
+                $suggestions[] = 'Your schedule is healthy, protect a small buffer between gigs to avoid tight turnarounds as you fill the remaining ' . $remaining . ' hours.';
                 $suggestions[] = 'Group bookings on fewer days where possible so you can keep whole days open for larger, higher-value events.';
             } else {
-                $suggestions[] = 'You are near capacity — this is a strong signal to review and raise your rates, since demand is meeting your available ' . $capacity . ' hours.';
+                $suggestions[] = 'You are near capacity. This is a strong signal to review and raise your rates, since demand is meeting your available ' . $capacity . ' hours.';
                 $suggestions[] = 'Add turnaround buffers between back-to-back gigs to keep quality consistent when you are this booked.';
             }
 
-            $suggestions[] = "At {$avgGigHours}h per gig across {$workingDays} working day(s), each extra booking uses about " . round(($avgGigHours / max($capacity, 0.1)) * 100, 1) . '% of your weekly capacity — price accordingly.';
+            $suggestions[] = "At {$avgGigHours}h per gig across {$workingDays} working day(s), each extra booking uses about " . round(($avgGigHours / max($capacity, 0.1)) * 100, 1) . '% of your weekly capacity, price accordingly.';
 
             $suggestions = array_slice($suggestions, 0, 4);
 

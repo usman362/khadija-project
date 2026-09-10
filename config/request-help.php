@@ -51,7 +51,7 @@ return [
             'icon'  => 'check',
             'items' => [
                 ['b' => 'SSR', 't' => 'One service, one agreement.'],
-                ['b' => 'MSR', 't' => 'Several services — each is bid on and agreed separately. You do not have to choose; picking more than one service makes it an MSR.'],
+                ['b' => 'MSR', 't' => 'Several services. Each is bid on and agreed separately. You do not have to choose; picking more than one service makes it an MSR.'],
                 ['b' => 'Direct Request', 't' => 'Goes to one professional you have already chosen, instead of out to the board.'],
             ],
         ],
@@ -81,9 +81,9 @@ return [
             'title' => 'How rush requests work',
             'icon'  => 'clock',
             'steps' => [
-                ['b' => 'Publish your request',       't' => "Tell us what you need and by when — it's free to post."],
+                ['b' => 'Publish your request',       't' => "Tell us what you need and by when, it's free to post."],
                 ['b' => 'Available pros are notified', 't' => 'It goes out to every professional in your state who offers the service.'],
-                ['b' => 'Respond and finalize',       't' => 'Replies appear on your Proposals page — pick one and confirm.'],
+                ['b' => 'Respond and finalize',       't' => 'Replies appear on your Proposals page. Pick one and confirm.'],
             ],
         ],
         [
@@ -92,7 +92,7 @@ return [
             'items' => [
                 ['b' => 'Single service', 't' => 'One urgent gap, one agreement.'],
                 ['b' => 'Multi-service',  't' => 'Several gaps; each is bid on and agreed separately.'],
-                ['b' => 'Either way',     't' => 'This goes out to the board — it is not sent to one professional the way a Direct Request is.'],
+                ['b' => 'Either way',     't' => 'This goes out to the board. It is not sent to one professional the way a Direct Request is.'],
             ],
         ],
         $pay,
@@ -122,7 +122,7 @@ return [
             'steps' => [
                 ['b' => 'Pick your pro and services', 't' => "Choose who you're sending this to and exactly what you need."],
                 ['b' => 'Send the request',           't' => 'Your answers become a brief and go to that professional.'],
-                ['b' => 'They respond',               't' => 'They can accept, counter, or ask questions — replies land on your Proposals page.'],
+                ['b' => 'They respond',               't' => 'They can accept, counter, or ask questions, replies land on your Proposals page.'],
             ],
         ],
         [
@@ -160,7 +160,7 @@ return [
             'title' => 'How planning works',
             'icon'  => 'clock',
             'steps' => [
-                ['b' => 'Work something out in a tool', 't' => 'A budget, a checklist, a timeline — whatever you saved.'],
+                ['b' => 'Work something out in a tool', 't' => 'A budget, a checklist, a timeline, whatever you saved.'],
                 ['b' => 'Choose where it goes',         't' => 'Onto an open request, or into a professional’s agreement.'],
                 ['b' => 'Choose how it is added',       't' => 'As a copy, or kept linked so it follows your changes.'],
             ],

@@ -49,7 +49,7 @@ final class FormsLibrary
                 'purpose'  => 'Opens a case against one professional on one service line (§6).',
                 'fields'   => [
                     ['name' => 'booking_id', 'label' => 'Which booking', 'type' => 'select', 'required' => true,
-                     'note' => 'One service line only. On a multi-service event the client picks the professional they have a problem with — R12 does not allow a case against the whole event.'],
+                     'note' => 'One service line only. On a multi-service event the client picks the professional they have a problem with: R12 does not allow a case against the whole event.'],
                     ['name' => 'taxonomy', 'label' => 'What went wrong', 'type' => 'select', 'required' => true,
                      'options' => 'DisputeClassification::TAXONOMY'],
                     ['name' => 'secondary_taxonomy', 'label' => 'Anything else that applies', 'type' => 'multiselect', 'required' => false],
@@ -68,7 +68,7 @@ final class FormsLibrary
             'professional_filing' => [
                 'title'    => 'File a Dispute',
                 'audience' => self::PROFESSIONAL,
-                'purpose'  => 'The same case type, filed the other way — non-payment, client no-show, scope changed on the day.',
+                'purpose'  => 'The same case type, filed the other way, non-payment, client no-show, scope changed on the day.',
                 'fields'   => [
                     ['name' => 'booking_id', 'label' => 'Which booking', 'type' => 'select', 'required' => true],
                     ['name' => 'taxonomy', 'label' => 'What went wrong', 'type' => 'select', 'required' => true],
@@ -108,7 +108,7 @@ final class FormsLibrary
                     ['name' => 'description', 'label' => 'What this shows', 'type' => 'textarea', 'required' => true],
                     ['name' => 'file', 'label' => 'File', 'type' => 'file', 'required' => false],
                     ['name' => 'supersedes', 'label' => 'Does this replace something you submitted earlier?', 'type' => 'select', 'required' => false,
-                     'note' => '§4 — no silent edits. Replacing is allowed; overwriting is not.'],
+                     'note' => '§4: no silent edits. Replacing is allowed; overwriting is not.'],
                     ['name' => 'certify_unaltered', 'type' => 'certification', 'required' => true,
                      'text' => 'I certify that this file is the original and that I have not edited or altered it.'],
                 ],
@@ -117,7 +117,7 @@ final class FormsLibrary
             'settlement_agreement' => [
                 'title'    => 'Settlement Agreement',
                 'audience' => self::SHARED,
-                'purpose'  => '§2 Step 1 — the guided format the platform can prompt during Direct Resolution.',
+                'purpose'  => '§2 Step 1: the guided format the platform can prompt during Direct Resolution.',
                 'fields'   => [
                     ['name' => 'terms', 'label' => 'What both of you have agreed', 'type' => 'textarea', 'required' => true],
                     ['name' => 'amount_to_client', 'label' => 'Amount returning to the client', 'type' => 'money', 'required' => false,
@@ -128,7 +128,7 @@ final class FormsLibrary
                     ['name' => 'certify_professional', 'type' => 'certification', 'required' => true, 'signer' => self::PROFESSIONAL,
                      'text' => 'I agree to these terms and understand that this closes the dispute.'],
                 ],
-                'note' => 'Two signatures, captured separately. Closes as Mutual Settlement (§5) — never reaches Formal Investigation.',
+                'note' => 'Two signatures, captured separately. Closes as Mutual Settlement (§5), never reaches Formal Investigation.',
             ],
 
             'withdrawal' => [
@@ -146,13 +146,13 @@ final class FormsLibrary
             'outside_escalation_request' => [
                 'title'    => 'Request Outside Escalation',
                 'audience' => self::SHARED,
-                'purpose'  => '§2 Step 4 — the single post-decision step. There is no internal appeal.',
+                'purpose'  => '§2 Step 4: the single post-decision step. There is no internal appeal.',
                 'fields'   => [
                     ['name' => 'grounds', 'label' => 'Why you are escalating', 'type' => 'textarea', 'required' => true],
                     ['name' => 'acknowledge_no_internal_appeal', 'type' => 'certification', 'required' => true,
                      'text' => 'I understand that GigResource has completed its review and will not review this decision again internally.'],
                 ],
-                'note' => 'Wording of anything binding is §12. Until counsel rules, this form takes the request and records it — it does not describe what the outside step is or what it can do.',
+                'note' => 'Wording of anything binding is §12. Until counsel rules, this form takes the request and records it. It does not describe what the outside step is or what it can do.',
             ],
 
             /* ── Internal ─────────────────────────────────────────── */
@@ -160,7 +160,7 @@ final class FormsLibrary
             'staff_classification' => [
                 'title'    => 'Classify Case',
                 'audience' => self::STAFF,
-                'purpose'  => '§3 — the three independent fields, set at intake.',
+                'purpose'  => '§3: the three independent fields, set at intake.',
                 'fields'   => [
                     ['name' => 'severity', 'label' => 'Severity', 'type' => 'select', 'required' => true,
                      'note' => 'Levels 4–5 move the case straight to Formal Investigation the moment they are set (§2).'],
@@ -169,16 +169,16 @@ final class FormsLibrary
                     ['name' => 'taxonomy', 'label' => 'Primary category', 'type' => 'select', 'required' => true],
                     ['name' => 'internal_tags', 'label' => 'Internal knowledge tags', 'type' => 'multiselect', 'required' => false,
                      'options' => 'Venue issue · Insurance · Repeat pattern · Training opportunity · Policy clarification',
-                     'note' => '§6 — staff-only, never user-visible, internal reporting only.'],
+                     'note' => '§6, staff-only, never user-visible, internal reporting only.'],
                     ['name' => 'duplicate_of', 'label' => 'Duplicate of', 'type' => 'select', 'required' => false,
-                     'note' => '§6 — same event alone is not a duplicate. Same service line + same claim + a prior closed case on that exact line.'],
+                     'note' => '§6, same event alone is not a duplicate. Same service line + same claim + a prior closed case on that exact line.'],
                 ],
             ],
 
             'staff_conflict_disclosure' => [
                 'title'    => 'Conflict of Interest Disclosure',
                 'audience' => self::STAFF,
-                'purpose'  => '§7 — completed at assignment, by the person being assigned.',
+                'purpose'  => '§7, completed at assignment, by the person being assigned.',
                 'fields'   => [
                     ['name' => 'has_connection', 'label' => 'Do you have any personal connection to either party?', 'type' => 'radio', 'required' => true],
                     ['name' => 'detail', 'label' => 'Describe it', 'type' => 'textarea', 'required' => false,
@@ -202,7 +202,7 @@ final class FormsLibrary
             'staff_decision' => [
                 'title'    => 'Record Decision',
                 'audience' => self::STAFF,
-                'purpose'  => '§2 Step 3 — becomes the Resolution/Outcome Notice sent to both parties.',
+                'purpose'  => '§2 Step 3, becomes the Resolution/Outcome Notice sent to both parties.',
                 'fields'   => [
                     ['name' => 'resolution_type', 'label' => 'Resolution type', 'type' => 'select', 'required' => true,
                      'options' => 'DisputeClassification::RESOLUTION_TYPES'],
@@ -216,13 +216,13 @@ final class FormsLibrary
                     ['name' => 'cure_deadline', 'label' => 'Cure deadline', 'type' => 'date', 'required' => false,
                      'note' => 'Only on a cure-redo, and agreed per case. This is the one date in the module a staff member sets, because §5 makes it a case-level agreement rather than a platform policy.'],
                 ],
-                'guide' => 'DecisionGuide — shown beside this form as suggestions with reasoning. It never fills the form in.',
+                'guide' => 'DecisionGuide, shown beside this form as suggestions with reasoning. It never fills the form in.',
             ],
 
             'staff_decision_revision' => [
                 'title'    => 'Revise Decision',
                 'audience' => self::STAFF,
-                'purpose'  => '§5 — a revision keeps the original alongside it.',
+                'purpose'  => '§5: a revision keeps the original alongside it.',
                 'fields'   => [
                     ['name' => 'revision_reason', 'label' => 'Why this is being revised', 'type' => 'textarea', 'required' => true],
                     ['name' => 'resolution_type', 'label' => 'Revised resolution type', 'type' => 'select', 'required' => true],
@@ -235,11 +235,11 @@ final class FormsLibrary
             'staff_closure' => [
                 'title'    => 'Close Case',
                 'audience' => self::STAFF,
-                'purpose'  => 'Terminal. A closed case is never reopened — a new case is opened instead.',
+                'purpose'  => 'Terminal. A closed case is never reopened: a new case is opened instead.',
                 'fields'   => [
                     ['name' => 'closure_note', 'label' => 'Closing note', 'type' => 'textarea', 'required' => true],
                     ['name' => 'confirm_financial_executed', 'label' => 'Financial outcome has been executed', 'type' => 'checkbox', 'required' => false,
-                     'note' => 'Confirmed by Finance, not by the person who decided the case — DisputePermissions::SEPARATION_OF_DUTIES.'],
+                     'note' => 'Confirmed by Finance, not by the person who decided the case: DisputePermissions::SEPARATION_OF_DUTIES.'],
                 ],
             ],
         ];

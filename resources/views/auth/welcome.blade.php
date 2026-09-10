@@ -40,7 +40,7 @@
             </div>
             <h1>Welcome to GigResource, {{ \Illuminate\Support\Str::before($user->name, ' ') }}!</h1>
             <p>Your account has been created and you have <b>full access</b> to the platform.</p>
-            <p>GigResource is available in <span class="wc-where">{{ $where }}</span> — you can start browsing professionals and posting requests right away.</p>
+            <p>GigResource is available in <span class="wc-where">{{ $where }}</span>. You can start browsing professionals and posting requests right away.</p>
 
             <div class="wc-btns">
                 <a href="{{ url('/dashboard') }}" class="wc-btn primary">Go to my dashboard</a>
@@ -51,7 +51,7 @@
             </div>
             <h1>Thank you for registering with GigResource!</h1>
             <p>We're excited to have you join us. Your account has been <b>successfully created and saved</b>.</p>
-            <p>At this time, GigResource is not yet available in your area — <span class="wc-where">{{ $where }}</span>.</p>
+            <p>At this time, GigResource is not yet available in your area, <span class="wc-where">{{ $where }}</span>.</p>
 
             <div class="wc-hr"></div>
 

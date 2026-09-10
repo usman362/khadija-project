@@ -160,7 +160,7 @@
     {{-- ── 2 · Scope ───────────────────────────────────────── --}}
     @elseif($step === 'scope')
         <h3>Confirm the scope</h3>
-        <p class="lede">Prefilled from their service plan. Edit it until it says exactly what's being delivered — this becomes part of the contract.</p>
+        <p class="lede">Prefilled from their service plan. Edit it until it says exactly what's being delivered. This becomes part of the contract.</p>
         <div class="fz-f">
             <label>Final scope &amp; deliverables</label>
             <textarea name="scope" style="min-height:200px;">{{ old('scope', $fin->scope) }}</textarea>
@@ -268,7 +268,7 @@ PAYMENT TERMS
             </div>
             <label class="fz-note info" style="cursor:pointer;">
                 <input type="checkbox" name="agree" value="1" style="margin-top:2px;">
-                <span>I've read the agreement above and accept it on behalf of myself or my organisation. Signing does not charge anything — the deposit is the next step.</span>
+                <span>I've read the agreement above and accept it on behalf of myself or my organisation. Signing does not charge anything: the deposit is the next step.</span>
             </label>
         @endif
 
@@ -287,7 +287,7 @@ PAYMENT TERMS
                 ✅ <span>
                     <b>Booked.</b> The deposit was secured on {{ $fin->funded_at->format('M j, Y · g:i A') }}.
                     @if($fin->payment_mode === 'test')
-                        This ran in <b>test mode</b> — no real money moved.
+                        This ran in <b>test mode</b>: no real money moved.
                     @endif
                 </span>
             </div>
@@ -322,7 +322,7 @@ PAYMENT TERMS
                          is glued to the preceding word, but it still compiles the closing
                          @endif — which silently unbalances the whole template. --}}
                     <span>Secure ${{ number_format((float) $fin->deposit_amount) }} to confirm this booking
-                        @if($payMode === 'test')<b>(test mode — no real charge)</b>@endif.</span>
+                        @if($payMode === 'test')<b>(test mode: no real charge)</b>@endif.</span>
             </label>
         @endif
     @endif
@@ -335,7 +335,7 @@ PAYMENT TERMS
             <button type="submit" class="fz-btn {{ $step === 'payment' ? 'pay' : 'go' }}">
                 @if($step === 'payment') {{ \App\Domain\Payments\DepositCheckout::isConfigured() ? 'Continue to payment' : 'Secure deposit & book' }}
                 @elseif($step === 'contract') {{ $fin->client_signed_at ? 'Continue' : 'Sign agreement' }}
-                @elseif($step === 'bid') Looks right — continue
+                @elseif($step === 'bid') Looks right, continue
                 @else Confirm &amp; continue @endif
             </button>
         </div>

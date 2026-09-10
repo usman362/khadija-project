@@ -14,8 +14,8 @@
     $isMax    = $level === 'maximum';
     $isLocked = $level === 'none';
     $lvlMeta  = [
-        'manual'  => ['Starter', '#64748b', 'You build packages by hand — templates & structure, no suggestions.'],
-        'semi'    => ['Semi', 'var(--brand-strong, #2563eb)', 'We suggest prices, descriptions and add-ons — you review and approve.'],
+        'manual'  => ['Starter', '#64748b', 'You build packages by hand, templates & structure, no suggestions.'],
+        'semi'    => ['Semi', 'var(--brand-strong, #2563eb)', 'We suggest prices, descriptions and add-ons. You review and approve.'],
         'maximum' => ['Maximum', '#16a34a', 'Enter a service and we generate the whole tiered package.'],
         'none'    => ['Locked', '#ef4444', 'This tool is currently unavailable.'],
     ];
@@ -127,10 +127,10 @@
     <div class="pb-tool">
         @if($isMax)
             <h3>🤖 Auto-Generate Full Package</h3>
-            <div class="sub">Enter your service and base price — we build the complete tiered package for you.</div>
+            <div class="sub">Enter your service and base price. We build the complete tiered package for you.</div>
         @else
             <h3>🧰 Build Your Package</h3>
-            <div class="sub">{{ $isSemi ? 'Fill in your package — use the ✨ helpers for suggestions you can edit.' : 'Fill in your package details. (Assistance unlocks on higher membership tiers.)' }}</div>
+            <div class="sub">{{ $isSemi ? 'Fill in your package. Use the ✨ helpers for suggestions you can edit.' : 'Fill in your package details. (Assistance unlocks on higher membership tiers.)' }}</div>
         @endif
 
         <form id="pbForm" class="pb-form" autocomplete="off">
@@ -299,7 +299,7 @@
     if (save) save.addEventListener('click', function () {
         clearMsgs();
         if (!document.getElementById('pbName').value.trim()) { showErr('Enter a package name first.'); return; }
-        note.textContent = '✓ Package saved. (Demo — persistence wires up with the packages backend.)';
+        note.textContent = '✓ Package saved. (Demo, persistence wires up with the packages backend.)';
         note.classList.add('open');
     });
 

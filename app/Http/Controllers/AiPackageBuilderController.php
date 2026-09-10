@@ -41,13 +41,13 @@ class AiPackageBuilderController extends Controller
             'tiers' => [
                 ['Bronze', 1250, '52%', '8 hrs', '#b08d57', false,
                     ['Wedding day photography', '200 edited photos', 'Online gallery', '1 photographer'],
-                    ['+ Extra hour — $150', '+ Prints — $200']],
+                    ['+ Extra hour: $150', '+ Prints: $200']],
                 ['Silver', 1850, '58%', '10 hrs', '#8b95a5', true,
                     ['Everything in Bronze', 'Engagement session', '400 edited photos', '2 photographers', 'Print release'],
-                    ['+ Album — $300', '+ Drone — $250']],
+                    ['+ Album: $300', '+ Drone: $250']],
                 ['Gold', 2550, '61%', '12 hrs', '#c9a227', false,
                     ['Everything in Silver', 'Second shooter', '600 edited photos', 'Premium album', 'Drone coverage'],
-                    ['+ Videography — $800']],
+                    ['+ Videography: $800']],
                 ['Platinum', 3750, '64%', '16 hrs', '#3b3f4a', false,
                     ['Everything in Gold', 'Cinematic videography', 'Unlimited edited photos', 'Luxury album', 'Same-day teaser'],
                     ['Fully bespoke']],
@@ -61,9 +61,9 @@ class AiPackageBuilderController extends Controller
                 ['Videography', ['—', '—', 'Add-on', '✓']],
             ],
             'suggestions' => [
-                'Your Silver tier converts best — feature it as “Most Popular”.',
-                'Add a Same-Day Teaser to Gold (+$400) — high demand, low effort.',
-                'Bronze margin is thin — trim 1 hour or raise to $1,350.',
+                'Your Silver tier converts best, feature it as “Most Popular”.',
+                'Add a Same-Day Teaser to Gold (+$400), high demand, low effort.',
+                'Bronze margin is thin, trim 1 hour or raise to $1,350.',
             ],
         ]);
     }
@@ -121,7 +121,7 @@ class AiPackageBuilderController extends Controller
         $half = (int) ceil(count($addons) / 2);
         $signatureAddons = array_slice($addons, 0, $half);
 
-        $core = [$service . ' — core service', 'Consultation & planning call', 'Online delivery'];
+        $core = [$service . ', core service', 'Consultation & planning call', 'Online delivery'];
         $premiumExtras = ['Priority scheduling', 'Extended delivery & revisions', 'Dedicated point of contact'];
 
         $essentialPrice = round($base, 2);
@@ -135,11 +135,11 @@ class AiPackageBuilderController extends Controller
         ];
 
         $tips = [
-            'Position Signature as your "most popular" option — a strong middle tier makes both the Essential and Premium prices feel more reasonable to clients.',
+            'Position Signature as your "most popular" option: a strong middle tier makes both the Essential and Premium prices feel more reasonable to clients.',
             count($addons) > 0
-                ? 'You spread ' . count($addons) . ' add-on' . (count($addons) === 1 ? '' : 's') . ' across the tiers — consider offering the most-requested one as a standalone upsell too.'
+                ? 'You spread ' . count($addons) . ' add-on' . (count($addons) === 1 ? '' : 's') . ' across the tiers, consider offering the most-requested one as a standalone upsell too.'
                 : 'Add a few comma-separated add-ons (e.g. "Extra hour, Second shooter, Prints") to differentiate the higher tiers more clearly.',
-            'These prices are estimates based on a common 1.6× / 2.3× tier spread — adjust them to reflect your real costs and local market.',
+            'These prices are estimates based on a common 1.6× / 2.3× tier spread, adjust them to reflect your real costs and local market.',
         ];
 
         return [
@@ -190,12 +190,12 @@ class AiPackageBuilderController extends Controller
 
         $improved = $opener
             . 'Every booking includes a planning consultation, clear deliverables and on-time delivery, '
-            . 'so you know exactly what to expect. Choose the tier that fits your event size and budget — '
+            . 'so you know exactly what to expect. Choose the tier that fits your event size and budget: '
             . 'each one is designed to give you standout results without surprises.';
 
         return [
             'description' => $improved,
-            'note'        => 'Rewritten for clarity and appeal — review and edit before saving.',
+            'note'        => 'Rewritten for clarity and appeal. Review and edit before saving.',
         ];
     }
 
@@ -221,7 +221,7 @@ class AiPackageBuilderController extends Controller
         return [
             'addons' => implode(', ', $addons),
             'list'   => $addons,
-            'note'   => 'Common add-ons for "' . trim($validated['service_name']) . '" — keep the ones that fit.',
+            'note'   => 'Common add-ons for "' . trim($validated['service_name']) . '". Keep the ones that fit.',
         ];
     }
 }

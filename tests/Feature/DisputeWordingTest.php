@@ -113,7 +113,7 @@ class DisputeWordingTest extends TestCase
         $words = $this->words($html);
 
         $this->assertStringNotContainsString('If the Terms of Service allow it', $words);
-        $this->assertStringContainsString('you keep whatever rights and remedies the law gives you', $words);
+        $this->assertStringContainsString('You keep whatever rights and remedies the law gives you', $words);
     }
 
     /** Say why the deposit is not refundable, and what is actually in question. */

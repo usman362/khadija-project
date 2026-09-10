@@ -70,7 +70,7 @@ class ReviewController extends Controller
             'comment'     => $data['comment'],
         ]);
 
-        return back()->with('status', 'Review submitted — thanks for your feedback!');
+        return back()->with('status', 'Review submitted, thanks for your feedback!');
     }
 
     /** Delete your own review. Reviewees can't delete reviews about them. */

@@ -358,10 +358,10 @@
     // legal page feels distinct rather than a generic shell.
     $policyMeta = [
         'privacy_policy'      => ['eyebrow' => 'Privacy Policy',     'subtitle' => 'Transparent details on what we collect, how we use it, and the choices you have over your data.'],
-        'ai_usage_agreement'  => ['eyebrow' => 'AI Usage Agreement', 'subtitle' => 'How GigResource uses AI features responsibly — and the rules every user agrees to before using them.'],
+        'ai_usage_agreement'  => ['eyebrow' => 'AI Usage Agreement', 'subtitle' => 'How GigResource uses AI features responsibly, and the rules every user agrees to before using them.'],
         'terms_of_service'    => ['eyebrow' => 'Terms of Service',   'subtitle' => 'The rules of engagement for clients, GigProfessionals, and Influencers using the platform.'],
         'payment_policy'      => ['eyebrow' => 'Payment Policy',     'subtitle' => 'How payments, refunds, and disputes are handled across bookings and memberships.'],
-        'cancellation_policy' => ['eyebrow' => 'Cancellation & Refund', 'subtitle' => 'When and how clients and professionals can cancel — and what happens to the funds securely.'],
+        'cancellation_policy' => ['eyebrow' => 'Cancellation & Refund', 'subtitle' => 'When and how clients and professionals can cancel, and what happens to the funds securely.'],
     ];
     $meta = $policyMeta[$policyType ?? ''] ?? [
         'eyebrow'  => 'Legal Document',
@@ -429,7 +429,7 @@
             <textarea name="statement" placeholder="Additional details (optional)" class="esign-input" rows="2" style="font-family:'Inter',sans-serif;font-size:0.95rem;margin-top:14px;resize:vertical;">{{ old('statement') }}</textarea>
             <label style="display:flex;gap:10px;align-items:flex-start;margin-top:16px;font-size:0.85rem;color:var(--text, #475569);line-height:1.6;cursor:pointer;">
                 <input type="checkbox" name="good_faith" required style="margin-top:3px;flex-shrink:0;">
-                I have a good-faith belief that the use of this material is not authorized by the copyright owner, its agent, or the law — and I declare, under penalty of perjury, that this notice is accurate and that I am (or am authorized to act for) the copyright owner.
+                I have a good-faith belief that the use of this material is not authorized by the copyright owner, its agent, or the law, and I declare, under penalty of perjury, that this notice is accurate and that I am (or am authorized to act for) the copyright owner.
             </label>
             <button type="submit" class="esign-btn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>

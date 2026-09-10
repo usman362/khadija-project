@@ -51,7 +51,7 @@ class StripeGateway implements PaymentGatewayInterface
                         // Show the contract term on the Stripe checkout line so the
                         // client sees "Professional — 12-month contract" rather than
                         // a recurring-looking label.
-                        'name' => $plan->name . ' — ' . $plan->contractTermLabel(),
+                        'name' => $plan->name . ': ' . $plan->contractTermLabel(),
                         'description' => $plan->description ?? "Access to {$plan->name} for {$plan->contractTermLabel()}",
                     ],
                     'unit_amount' => (int) round($plan->price * 100), // Stripe uses cents

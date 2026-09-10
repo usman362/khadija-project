@@ -168,7 +168,7 @@
 
             <label class="vhb-label">Event format *</label>
             <div class="vhb-formats">
-                @foreach(['virtual' => 'Fully virtual', 'hybrid' => 'Hybrid — in person and online'] as $val => $text)
+                @foreach(['virtual' => 'Fully virtual', 'hybrid' => 'Hybrid, in person and online'] as $val => $text)
                     <label class="vhb-opt">
                         <input type="radio" name="event_format" value="{{ $val }}" required
                                {{ old('event_format', $draft['event_format'] ?? '') === $val ? 'checked' : '' }}

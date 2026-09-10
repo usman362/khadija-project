@@ -34,8 +34,8 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Starter', '#64748b', 'Browse the event phrasebook yourself — look up phrases by hand, no auto-translate.'],
-        'semi'    => ['Semi', '#7c3aed', 'We suggest a translation — edit the wording before you use it.'],
+        'manual'  => ['Starter', '#64748b', 'Browse the event phrasebook yourself, look up phrases by hand, no auto-translate.'],
+        'semi'    => ['Semi', '#7c3aed', 'We suggest a translation, edit the wording before you use it.'],
         'maximum' => ['Maximum', '#16a34a', 'Type a phrase and we translate it for you automatically.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -75,7 +75,7 @@
     <div class="tr-grid">
         <div class="tr-card">
             <h3>🌐 Phrase to translate</h3>
-            <div class="det">Common booking phrases — close wording still finds a match</div>
+            <div class="det">Common booking phrases, close wording still finds a match</div>
             <div class="tr-err" id="trErr"></div>
             <form id="trForm">
                 <textarea class="tr-text" name="text" required placeholder="e.g. Thank you for booking"></textarea>
@@ -156,7 +156,7 @@
 
     function render(res) {
         det.textContent = res.target_language + (res.matched ? ' · phrasebook match' : ' · no exact match');
-        let html = '<div class="tr-tag">' + (LEVEL === 'semi' ? 'SUGGESTED — EDIT AS NEEDED' : (res.matched ? 'TRANSLATED' : 'NOTE')) + '</div>';
+        let html = '<div class="tr-tag">' + (LEVEL === 'semi' ? 'SUGGESTED: EDIT AS NEEDED' : (res.matched ? 'TRANSLATED' : 'NOTE')) + '</div>';
         // Semi: the translation is editable; Maximum: read-only.
         if (LEVEL === 'semi') {
             html += '<textarea class="tr-text tr-out" id="trEdit" style="min-height:80px;">' + esc(res.translation) + '</textarea>';

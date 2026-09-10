@@ -300,7 +300,7 @@ class ClientVirtualHubController extends Controller
 
         return redirect()
             ->route('client.virtual-hub.index', ['stage' => 4])
-            ->with('status', '“' . $event->title . '” is posted — professionals can send proposals now.');
+            ->with('status', '“' . $event->title . '” is posted. Professionals can send proposals now.');
     }
 
     /** One set of wordings for both steps. */
@@ -311,7 +311,7 @@ class ClientVirtualHubController extends Controller
             'event_format.required' => 'Choose whether this is fully virtual or hybrid.',
             'starts_at.required'    => 'Pick the date and time your event starts.',
             'ends_at.after'         => 'The end time has to be after the start.',
-            'location.required_if'  => 'A hybrid event needs a venue — tell professionals where the in-person half is.',
+            'location.required_if'  => 'A hybrid event needs a venue. Tell professionals where the in-person half is.',
             'services.required'     => 'Pick at least one service you need.',
             'budget_max.gte'        => 'The top of the budget must be at least the bottom.',
             'meeting_url.url'       => 'A joining link should start with http:// or https://',

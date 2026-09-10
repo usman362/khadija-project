@@ -123,7 +123,7 @@ class MergeDuplicateCategories extends Command
         $this->newLine();
         $this->line($apply
             ? "Merged: <fg=green>{$merged}</>   References moved: <fg=green>{$movedRefs}</>"
-            : "Would merge: <fg=yellow>{$merged}</>  (nothing saved — add --apply)");
+            : "Would merge: <fg=yellow>{$merged}</>  (nothing saved. Add --apply)");
 
         if ($skipped !== []) {
             $this->newLine();

@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', 'Post an Event — Choose How to Request')
+@section('title', 'Post an Event: Choose How to Request')
 @section('page-title', 'How do you want to request?')
 @section('page-subtitle', 'Pick the path that fits your event. You can always start another request later.')
 @include('client.post-event._styles')
@@ -119,7 +119,7 @@
                     'href'  => route('public.packages'),
                     'tag'   => ['Ready-made', 'hot'],
                     'title' => 'Shop Packages',
-                    'desc'  => 'Browse fixed service bundles from professionals and book instantly — one contract, one payment.',
+                    'desc'  => 'Browse fixed service bundles from professionals and book instantly: one contract, one payment.',
                     'cta'   => 'Browse packages',
                     'icon'  => '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
                 ],
@@ -133,7 +133,7 @@
                     'href'  => route('client.bsr.step', 'service'),
                     'tag'   => ['Get bids', 'hot'],
                     'title' => 'Bidding Request (BR)',
-                    'desc'  => 'Post one service or several — professionals bid on what they provide. Free to post; you only pay when you finalize.',
+                    'desc'  => 'Post one service or several. Professionals bid on what they provide. Free to post; you only pay when you finalize.',
                     'cta'   => 'Start a request',
                     'icon'  => '<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
                 ],
@@ -145,7 +145,7 @@
                     // NOT that it is one service. A6 caps it at one professional per
                     // SERVICE at a time; a professional who offers several can be
                     // asked for several. The old wording implied otherwise.
-                    'desc'  => 'Go straight to a professional you already want — one service or several, whatever they offer. They accept, decline, or reply. No open bidding.',
+                    'desc'  => 'Go straight to a professional you already want: one service or several, whatever they offer. They accept, decline, or reply. No open bidding.',
                     'cta'   => 'Send a Direct Request',
                     'icon'  => '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
                 ],
@@ -153,7 +153,7 @@
                     'href'  => route('client.esr.create'),
                     'tag'   => ['Urgent', 'hot'],
                     'title' => 'Emergency Request (ER)',
-                    'desc'  => 'Time-sensitive need within 72 hours — verified professionals are notified with priority so you get fast responses.',
+                    'desc'  => 'Time-sensitive need within 72 hours, verified professionals are notified with priority so you get fast responses.',
                     'cta'   => 'Post a Rush Request',
                     'icon'  => '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
                 ],
@@ -237,8 +237,8 @@
                 </div>
             @empty
                 <p class="rc-rail-empty">
-                    Nothing posted in your state yet. Yours would be the first —
-                    professionals here are notified as soon as it goes up.
+                    Nothing posted in your state yet. Yours would be the first.
+                    Professionals here are notified as soon as it goes up.
                 </p>
             @endforelse
             </div>
@@ -247,7 +247,7 @@
                  page loaded, and saying otherwise would be a claim the page
                  does not keep. --}}
             @if($postings->isNotEmpty())
-                <p class="rc-rail-foot">As of now — reload to see newer ones.</p>
+                <p class="rc-rail-foot">As of now, reload to see newer ones.</p>
             @endif
         </aside>
         </div>{{-- /.rc-rail-slot --}}
@@ -260,7 +260,7 @@
                 <h4>Not sure which to pick?</h4>
                 <p>
                     <b>Shop Packages</b> is the fastest if a pro already offers what you need as a bundle.
-                    Choose <b>Bidding Request</b> when you want professionals to compete on price — tick one
+                    Choose <b>Bidding Request</b> when you want professionals to compete on price, tick one
                     service or several, and it handles both.
                 </p>
             </span>

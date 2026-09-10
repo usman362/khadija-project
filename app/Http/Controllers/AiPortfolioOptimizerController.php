@@ -37,7 +37,7 @@ class AiPortfolioOptimizerController extends Controller
                 ['5+ recent reviews', false], ['Response time set', true],
             ],
             'recommendations' => [
-                ['Update your hero image', 'Your top photo is 2 years old — a fresh hero lifts clicks ~18%.', 'High', '+18% clicks'],
+                ['Update your hero image', 'Your top photo is 2 years old: a fresh hero lifts clicks ~18%.', 'High', '+18% clicks'],
                 ['Add more portfolio photos', 'Add 8 photos to reach the 20-photo sweet spot for conversions.', 'High', '+12% inquiries'],
                 ['Add a highlight video', 'Profiles with a 30-60s reel get 2.3× more saves.', 'High', '+130% saves'],
                 ['Rewrite business description', 'AI can rewrite it keyword-rich for better search ranking.', 'Medium', '+9% visibility'],
@@ -52,7 +52,7 @@ class AiPortfolioOptimizerController extends Controller
                 ['Your Portfolio', 94, true], ['Top 10% in your area', 91, false], ['Category average', 73, false],
             ],
             'metrics' => [
-                ['Media Quality', '72%', 'Good — add hi-res'], ['Profile Views', '+24%', 'vs last month'],
+                ['Media Quality', '72%', 'Good. Add hi-res'], ['Profile Views', '+24%', 'vs last month'],
                 ['Inquiry Rate', '8.4%', 'Above average'], ['Win Rate', '31%', 'Top quartile'],
             ],
         ]);
@@ -165,10 +165,10 @@ class AiPortfolioOptimizerController extends Controller
             // Build prioritised actions only for factors below max, largest gap first.
             $actionMap = [
                 'Portfolio photos'  => 'Add ' . max(0, 15 - $photos) . ' more photos to reach the 15+ range that tends to convert best.',
-                'Highlight video'   => 'Add a short 30–60s highlight video — profiles with a reel are often browsed longer.',
+                'Highlight video'   => 'Add a short 30–60s highlight video, profiles with a reel are often browsed longer.',
                 'Client reviews'    => 'Request ' . max(0, 20 - $reviews) . ' more reviews from past clients to strengthen social proof.',
                 'Average rating'    => 'Follow up on lower-rated jobs and encourage happy clients to leave feedback to lift your average.',
-                'Responsiveness'    => 'Aim to reply within 2 hours — faster responses are commonly associated with more booked inquiries.',
+                'Responsiveness'    => 'Aim to reply within 2 hours, faster responses are commonly associated with more booked inquiries.',
                 'Categories listed' => 'List at least 3 relevant service categories so more searches surface your profile.',
             ];
 
@@ -192,7 +192,7 @@ class AiPortfolioOptimizerController extends Controller
                 'actions' => $actions,
                 'summary' => 'Estimated profile score: ' . $score . '/100 (grade ' . $grade . '). '
                     . (count($actions) > 0
-                        ? 'There are ' . count($actions) . ' area' . (count($actions) === 1 ? '' : 's') . ' with room to improve — see the suggestions below.'
+                        ? 'There are ' . count($actions) . ' area' . (count($actions) === 1 ? '' : 's') . ' with room to improve. See the suggestions below.'
                         : 'Every scored area is already at full points based on the values you entered.')
                     . ' This score is an estimate to help you prioritise, not a guarantee of results.',
             ];

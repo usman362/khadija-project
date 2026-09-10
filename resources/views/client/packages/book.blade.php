@@ -2,7 +2,7 @@
 
 @section('title', 'Book ' . $package->title)
 @section('page-title', 'Book this package')
-@section('page-subtitle', 'Fixed scope, fixed price — confirm the date and send it.')
+@section('page-subtitle', 'Fixed scope, fixed price, confirm the date and send it.')
 
 @push('styles')
 <style>
@@ -87,7 +87,7 @@
             <div class="pb-field" style="margin-bottom:0">
                 <label for="notes">Anything they should know <span style="font-weight:500;color:var(--text-muted)">(optional)</span></label>
                 <textarea id="notes" name="notes" class="pb-input" rows="3"
-                          placeholder="Arrival time, parking, a song you want played — anything that does not change the price.">{{ old('notes') }}</textarea>
+                          placeholder="Arrival time, parking, a song you want played. Anything that does not change the price.">{{ old('notes') }}</textarea>
                 @error('notes')<div class="pb-err">{{ $message }}</div>@enderror
             </div>
         </div>
@@ -100,8 +100,8 @@
             @if ($chosenBusy)
                 <div class="pb-note">
                     <strong>Heads up.</strong> {{ $pro?->name }} already has something booked on GigResource on
-                    {{ \Illuminate\Support\Carbon::parse($chosen)->format('M j, Y') }}. You can still send this —
-                    they will tell you if the date does not work.
+                    {{ \Illuminate\Support\Carbon::parse($chosen)->format('M j, Y') }}. You can still send this.
+                    They will tell you if the date does not work.
                 </div>
             @endif
 
@@ -112,8 +112,8 @@
             @error('agree')<div class="pb-err">{{ $message }}</div>@enderror
 
             <div class="pb-note">
-                Sending this does not charge you. {{ $pro?->name }} has to accept the date first —
-                you will get a message either way, and the amount below is what you will owe once they do.
+                Sending this does not charge you. {{ $pro?->name }} has to accept the date first.
+                You will get a message either way, and the amount below is what you will owe once they do.
             </div>
 
             <button type="submit" class="pb-submit" style="margin-top:14px">

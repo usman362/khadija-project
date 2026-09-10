@@ -1,7 +1,7 @@
 @extends('layouts.landing')
 
-@section('title', 'Explore by Event Type — GigResource')
-@section('meta_description', 'Search by occasion — find the perfect professionals, services and packages for weddings, corporate events, birthdays and every kind of event.')
+@section('title', 'Explore by Event Type | GigResource')
+@section('meta_description', 'Search by occasion. Find the perfect professionals, services and packages for weddings, corporate events, birthdays and every kind of event.')
 
 @php
     // Deep-link helper: occasion → real packages filtered by that event type.

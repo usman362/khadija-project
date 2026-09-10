@@ -6,7 +6,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>{{ $agreement->title ?: 'Service Agreement' }} — {{ config('app.name') }}</title>
+    <title>{{ $agreement->title ?: 'Service Agreement' }}: {{ config('app.name') }}</title>
     <style>
         @page { margin: 22mm 18mm 25mm; }
         body {

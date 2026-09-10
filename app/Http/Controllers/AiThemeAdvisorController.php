@@ -89,7 +89,7 @@ class AiThemeAdvisorController extends Controller
 
             $tips = [
                 "Use {$primaryHex} as your anchor colour and let {$neutralHex} carry the larger surfaces to keep the look balanced.",
-                "Reserve the complementary accent ({$compHex}) for small highlights like signage, florals or linens — a little goes a long way.",
+                "Reserve the complementary accent ({$compHex}) for small highlights like signage, florals or linens: a little goes a long way.",
                 "Match lighting warmth to a {$validated['formality']} " . ($validated['season'] === 'winter' || $validated['season'] === 'fall' ? 'warm' : 'soft') . " feel for a cohesive mood.",
             ];
 

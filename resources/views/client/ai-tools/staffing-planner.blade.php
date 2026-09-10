@@ -131,8 +131,8 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Starter', '#64748b', 'Build your own staff roster by hand — add each role yourself, no suggested plan.'],
-        'semi'    => ['Semi', '#2563eb', 'We suggest a roster — adjust the event and staff counts, then regenerate.'],
+        'manual'  => ['Starter', '#64748b', 'Build your own staff roster by hand. Add each role yourself, no suggested plan.'],
+        'semi'    => ['Semi', '#2563eb', 'We suggest a roster, adjust the event and staff counts, then regenerate.'],
         'maximum' => ['Maximum', '#16a34a', 'Enter your event and we build the whole staffing plan for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];

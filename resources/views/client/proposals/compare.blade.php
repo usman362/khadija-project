@@ -1,6 +1,6 @@
 @extends('layouts.client')
 
-@section('title', 'Compare Proposals — ' . $event->title)
+@section('title', 'Compare Proposals: ' . $event->title)
 @section('page-title', 'Compare Proposals')
 
 {{-- Screen 3 of the client BR set.
@@ -83,7 +83,7 @@
 </div>
 
 <div class="cp-sealed">
-    🔒 <span><b>Sealed proposals.</b> Each amount is visible only to you and the professional who sent it — they cannot see each other's bids, rankings or negotiations. Compare the full scope, terms and qualifications, not only price.</span>
+    🔒 <span><b>Sealed proposals.</b> Each amount is visible only to you and the professional who sent it. They cannot see each other's bids, rankings or negotiations. Compare the full scope, terms and qualifications, not only price.</span>
 </div>
 
 <form method="GET" action="{{ route('client.proposals.compare', $event) }}" class="cp-bar">
@@ -148,7 +148,7 @@
             @if($b->replies->isNotEmpty())
                 @php $last = $b->replies->last(); @endphp
                 <p class="cp-note" style="border-top:1px dashed var(--border-color);padding-top:8px;">
-                    Last message from <b>{{ $last->user?->name ?? 'them' }}</b> {{ $last->created_at->humanAgo() }}@if($last->counter_amount) — countered at <b>${{ number_format($last->counter_amount) }}</b>@endif
+                    Last message from <b>{{ $last->user?->name ?? 'them' }}</b> {{ $last->created_at->humanAgo() }}@if($last->counter_amount), countered at <b>${{ number_format($last->counter_amount) }}</b>@endif
                 </p>
             @endif
         </div>
@@ -188,7 +188,7 @@
 @empty
     <div class="cp-empty">
         <b>No proposals to compare yet</b>
-        <p>{{ $f['q'] || $f['only'] ? 'Nothing matches this filter — try clearing it.' : 'Professionals are being notified. Proposals appear here as they arrive.' }}</p>
+        <p>{{ $f['q'] || $f['only'] ? 'Nothing matches this filter. Try clearing it.' : 'Professionals are being notified. Proposals appear here as they arrive.' }}</p>
     </div>
 @endforelse
 

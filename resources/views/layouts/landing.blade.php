@@ -376,7 +376,7 @@
                     <input type="email" placeholder="Enter your email" aria-label="Email address" required>
                     <button type="submit" aria-label="Subscribe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
                 </form>
-                <p class="lpf-news-ok" id="lpfNewsOk">Thanks — you're on the list! 🎉</p>
+                <p class="lpf-news-ok" id="lpfNewsOk">Thanks, you're on the list! 🎉</p>
             </div>
         </div>
         <div class="lpf-bottom">

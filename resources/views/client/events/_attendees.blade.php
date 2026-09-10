@@ -126,8 +126,8 @@
 <div class="cl-card" style="margin-top:20px;">
     <h3 style="font-size:15px;font-weight:600;margin-bottom:6px;">Sharing with your professional</h3>
     <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:12px;">
-        Your guest list is private. You can let the professional booked on this event see it —
-        for seating, headcount or dietary needs — and turn that off again at any time.
+        Your guest list is private. You can let the professional booked on this event see it,
+        for seating, headcount or dietary needs, and turn that off again at any time.
         They read it here on GigResource; it is never emailed or exported.
     </p>
     <form method="POST" action="{{ route('client.attendees.share', $event) }}">

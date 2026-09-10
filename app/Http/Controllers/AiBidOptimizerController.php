@@ -31,7 +31,7 @@ class AiBidOptimizerController extends Controller
                 ['Competing Bids', '7', ''], ['Market Range', '$1.2k–2k', ''],
             ],
             'gig' => [
-                'title' => 'Wedding Photography — Johnson Reception',
+                'title' => 'Wedding Photography: Johnson Reception',
                 'client_budget' => '$1,500 – $2,000', 'date' => 'Jun 14, 2027',
                 'target_margin' => '40%', 'urgency' => 'Standard',
             ],
@@ -40,7 +40,7 @@ class AiBidOptimizerController extends Controller
                 'low' => ['amount' => 1400, 'margin' => 41, 'label' => 'Too low'],
                 'high' => ['amount' => 2200, 'margin' => 56, 'label' => 'Too high'],
             ],
-            'strategy' => 'Bid within 6 hours and include a short personalised note — early, personal bids in this category win ~40% more often.',
+            'strategy' => 'Bid within 6 hours and include a short personalised note, early, personal bids in this category win ~40% more often.',
         ]);
     }
 
@@ -93,12 +93,12 @@ class AiBidOptimizerController extends Controller
             $positioning = [
                 "Your suggested bid of $" . number_format($suggested, 0) . " sits about " . (int) round((1 - $suggested / $budget) * 100) . "% under the client's budget of $" . number_format($budget, 0) . ", which typically reads as competitive without looking underpriced.",
                 $competitors > 0
-                    ? "With {$competitors} competing bid" . ($competitors === 1 ? '' : 's') . " estimated, the win probability lands near {$winProbability}% — respond early and lead with relevant work to stand out."
+                    ? "With {$competitors} competing bid" . ($competitors === 1 ? '' : 's') . " estimated, the win probability lands near {$winProbability}%, respond early and lead with relevant work to stand out."
                     : "With no competing bids estimated, you have room to hold closer to the top of your range around $" . number_format($high, 0) . ".",
                 "Staying at or above your base price of $" . number_format($base, 0) . " keeps an estimated ~{$margin}% margin on this job.",
             ];
             if ($turnaround === 'rush') {
-                $positioning[] = "This is a rush job — a modest premium is built into the suggestion, but confirm you can realistically meet the tighter timeline before committing.";
+                $positioning[] = "This is a rush job: a modest premium is built into the suggestion, but confirm you can realistically meet the tighter timeline before committing.";
             }
 
             $result = [

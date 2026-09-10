@@ -13,6 +13,6 @@ class PaymentsNotLiveException extends RuntimeException
 {
     public function __construct(string $message = '')
     {
-        parent::__construct($message ?: 'Live payments are not enabled yet. The platform is in test mode until launch — use Test mode and test cards to try the payment flow. No real charges are processed.');
+        parent::__construct($message ?: 'Live payments are not enabled yet. The platform is in test mode until launch. Use Test mode and test cards to try the payment flow. No real charges are processed.');
     }
 }

@@ -128,8 +128,8 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Starter', '#64748b', 'Browse the vendor directory and choose who you want yourself — you choose yourself.'],
-        'semi'    => ['Semi', 'var(--brand, #8b5cf6)', 'Ranks the best-fit vendors — refine the theme, budget and match level to re-rank.'],
+        'manual'  => ['Starter', '#64748b', 'Browse the vendor directory and choose who you want yourself. You choose yourself.'],
+        'semi'    => ['Semi', 'var(--brand, #8b5cf6)', 'Ranks the best-fit vendors, refine the theme, budget and match level to re-rank.'],
         'maximum' => ['Maximum', '#16a34a', 'Auto-selects your best-fit vendor team from your event details.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -261,7 +261,7 @@
             {{-- Maximum — auto-matched, read-only criteria summary --}}
             <div class="vm-card">
                 <div class="vm-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><b>Matched Automatically</b></div>
-                <p style="font-size:12.5px;color:var(--text-muted);line-height:1.55;margin:0 0 12px;">Selected from these criteria — no tuning needed:</p>
+                <p style="font-size:12.5px;color:var(--text-muted);line-height:1.55;margin:0 0 12px;">Selected from these criteria: no tuning needed:</p>
                 <div class="vm-ins" style="padding:6px 0;"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg></span><div><b>Theme fit</b><p>{{ $event['theme'] }}</p></div></div>
                 <div class="vm-ins" style="padding:6px 0;"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span><div><b>Within budget</b><p>Under ${{ number_format($event['budget']) }}</p></div></div>
                 <div class="vm-ins" style="padding:6px 0;"><span class="vm-ins-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><b>Available on date</b><p>{{ $event['date'] }}</p></div></div>
@@ -301,7 +301,7 @@
     {{-- banner --}}
     <div class="vm-banner">
         <span class="vm-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>
-        <div class="vm-banner-txt"><b>Trusted &amp; Reviewed.</b><p>Professionals are reviewed by real customers, and verified pros carry a Verified badge — for a safer booking experience.</p></div>
+        <div class="vm-banner-txt"><b>Trusted &amp; Reviewed.</b><p>Professionals are reviewed by real customers, and verified pros carry a Verified badge, for a safer booking experience.</p></div>
         <a href="{{ route('client.search.index') }}">Learn More About Safety</a>
     </div>
 </div>

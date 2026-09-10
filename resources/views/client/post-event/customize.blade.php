@@ -1,7 +1,7 @@
 @extends('layouts.client')
-@section('title', 'Post an Event — Customize Package')
+@section('title', 'Post an Event: Customize Package')
 @section('page-title', 'Customize Your Package')
-@section('page-subtitle', 'Fine-tune your package — add extras or adjust what is included.')
+@section('page-subtitle', 'Fine-tune your package. Add extras or adjust what is included.')
 @include('client.post-event._styles')
 
 @push('styles')

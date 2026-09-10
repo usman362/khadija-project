@@ -87,7 +87,7 @@ class ClientEventLifecycleController extends Controller
 
         if ($extension === null) {
             return redirect()->route('client.events.show', $event)
-                ->withErrors(['extension' => 'We could not find that payment. Nothing has been charged twice — check your extensions below.']);
+                ->withErrors(['extension' => 'We could not find that payment. Nothing has been charged twice. Check your extensions below.']);
         }
 
         if ($extension->isCompleted()) {
@@ -97,7 +97,7 @@ class ClientEventLifecycleController extends Controller
 
         return redirect()->route('client.events.show', $event)->with(
             'status',
-            'Payment received — we are confirming it with the payment provider. Your request reopens as soon as that clears.',
+            'Payment received. We are confirming it with the payment provider. Your request reopens as soon as that clears.',
         );
     }
 
@@ -117,7 +117,7 @@ class ClientEventLifecycleController extends Controller
         // §2 — a failed or abandoned payment grants nothing. The request is
         // still expired, and the client may try again.
         return redirect()->route('client.events.show', $event)
-            ->with('status', 'No payment was taken. Your request is still expired — you can try again.');
+            ->with('status', 'No payment was taken. Your request is still expired. You can try again.');
     }
 
     public function close(Request $request, Event $event): RedirectResponse

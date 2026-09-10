@@ -5,7 +5,7 @@
 @section('err-title')
     We're getting <span class="grad">a quick tune-up</span>
 @endsection
-@section('err-tagline', 'GigResource is briefly down for maintenance to bring you something even better. We\'ll be back in a few minutes — thanks for your patience.')
+@section('err-tagline', 'GigResource is briefly down for maintenance to bring you something even better. We\'ll be back in a few minutes, thanks for your patience.')
 
 @section('err-actions')
     <a href="javascript:location.reload()" class="err-btn err-btn-primary">

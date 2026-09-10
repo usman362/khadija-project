@@ -161,7 +161,7 @@ class AiEventPlannerController extends Controller
 
             $locationText = !empty($validated['location']) ? ' in ' . $validated['location'] : '';
             $summary = sprintf(
-                'A suggested plan for your %s%s on %s — %s guests, %s total budget (about %s per guest). %s days out, with %d milestones mapped back from the event date.',
+                'A suggested plan for your %s%s on %s: %s guests, %s total budget (about %s per guest). %s days out, with %d milestones mapped back from the event date.',
                 $validated['event_type'],
                 $locationText,
                 $date->format('M j, Y'),
@@ -175,13 +175,13 @@ class AiEventPlannerController extends Controller
             $tips = [];
             $tips[] = 'Estimated per-guest spend is about $' . number_format($perGuest) . '. Confirm caterer and venue minimums early.';
             if ($cateringAmt > 0 && $guests > 0) {
-                $tips[] = 'Catering is your largest food line at $' . number_format($cateringAmt) . ' (roughly $' . number_format($cateringAmt / $guests) . ' per guest) — request quotes before locking the venue.';
+                $tips[] = 'Catering is your largest food line at $' . number_format($cateringAmt) . ' (roughly $' . number_format($cateringAmt / $guests) . ' per guest). Request quotes before locking the venue.';
             }
             $tips[] = 'Book ' . ($vendorCategories[0] ?? 'your venue') . ' and ' . ($vendorCategories[1] ?? 'catering') . ' first; they drive availability and price.';
             if ($daysOut >= 0 && $daysOut < 60) {
                 $tips[] = 'With ' . $daysOut . ' days left, treat every "due soon" milestone as this-week work and confirm headcount promptly.';
             } else {
-                $tips[] = 'Keep your Contingency line untouched until the final weeks — it is your buffer for the surprises every event has.';
+                $tips[] = 'Keep your Contingency line untouched until the final weeks. It is your buffer for the surprises every event has.';
             }
             $tips[] = 'Aim to keep Venue + Catering near half of the total budget; the current split lands them at about '
                 . round((($this->catAmount($budgetSplit, 'Venue') + $cateringAmt) / max(1, $budget)) * 100)

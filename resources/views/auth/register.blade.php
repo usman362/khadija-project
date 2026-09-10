@@ -25,7 +25,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Create Your Account — GigResource</title>
+    <title>Create Your Account | GigResource</title>
     <link rel="icon" type="image/png" href="{{ asset('gigresource-logos/gigresource-icon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -417,13 +417,13 @@
                     </p>
                     <p>
                         Right now GigResource only connects people in the <b>same state</b>, while we work
-                        through each state's rules. <b>Your home state decides who you can work with — not
+                        through each state's rules. <b>Your home state decides who you can work with, not
                         where your event is.</b> If you live in Maryland and your event is in Pennsylvania,
                         you will still only see Maryland professionals.
                     </p>
                     <p class="rg-loc-note">
-                        This covers posting a job, hiring someone directly, and bidding. It is temporary —
-                        we will tell you when your state opens up.
+                        This covers posting a job, hiring someone directly, and bidding. It is temporary.
+                        We will tell you when your state opens up.
                     </p>
 
                     <label class="rg-agree">

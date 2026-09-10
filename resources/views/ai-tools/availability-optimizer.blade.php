@@ -91,8 +91,8 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Starter', '#64748b', 'Work out your own weekly capacity and open slots — just the math, no suggestions.'],
-        'semi'    => ['Semi', '#2563eb', 'Enter your pattern — we estimate utilization and suggest how to optimize it.'],
+        'manual'  => ['Starter', '#64748b', 'Work out your own weekly capacity and open slots, just the math, no suggestions.'],
+        'semi'    => ['Semi', '#2563eb', 'Enter your pattern. We estimate utilization and suggest how to optimize it.'],
         'maximum' => ['Maximum', '#16a34a', 'We read your pattern, optimize availability and fill your calendar plan for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -300,7 +300,7 @@
         const util = cap > 0 ? Math.round(Math.min(100, Math.max(0, booked / cap * 100)) * 10) / 10 : 0;
         const remaining = Math.max(0, cap - booked);
         const slots = gig > 0 ? Math.floor(remaining / gig) : 0;
-        const status = util < 60 ? 'Under-booked — room to grow' : (util < 85 ? 'Healthy' : 'Near capacity');
+        const status = util < 60 ? 'Under-booked, room to grow' : (util < 85 ? 'Healthy' : 'Near capacity');
         return {
             weekly_capacity_hours: cap, booked_hours: booked, utilization_pct: util, open_slots: slots,
             status: status, suggestions: [],

@@ -27,7 +27,7 @@ class SeedPlaceholderSpecialties extends Command
     protected $description = 'Add clearly-marked placeholder Level 4 specialties for building against';
 
     /** Written into short_description so a placeholder can never be mistaken for approved content. */
-    public const MARKER = 'PLACEHOLDER — awaiting approved specialty list';
+    public const MARKER = 'PLACEHOLDER, awaiting approved specialty list';
 
     /** Shapes that read like real specialties without pretending to be the list. */
     private const PATTERNS = ['Wedding', 'Corporate', 'Private Party', 'Non-profit', 'Outdoor', 'Small Venue'];

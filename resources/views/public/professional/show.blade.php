@@ -1,10 +1,10 @@
 @extends('layouts.landing')
 
 @php
-    $seoTitle       = $pro->name . ' — ' . ($profile->headline ?? 'Event Professional');
+    $seoTitle       = $pro->name . ': ' . ($profile->headline ?? 'Event Professional');
     $seoDescription = $profile->bio
         ? \Illuminate\Support\Str::limit(strip_tags($profile->bio), 155)
-        : $pro->name . ' is a verified event professional on GigResource. View reviews, portfolio, and rates — request a quote in minutes.';
+        : $pro->name . ' is a verified event professional on GigResource. View reviews, portfolio, and rates. Request a quote in minutes.';
     $seoImage       = $pro->cover_image_url ?: $pro->avatar_url;
     $seoType        = 'profile';
 @endphp
@@ -1011,7 +1011,7 @@
                 <div class="pp-av-tags">
                     @foreach($availability['windows'] as $window)
                         <span class="pp-av-tag {{ $window['free'] ? 'pp-av-free' : 'pp-av-busy' }}">
-                            {{ $window['label'] }} — {{ $window['free'] ? 'nothing booked' : 'already booked' }}
+                            {{ $window['label'] }}: {{ $window['free'] ? 'nothing booked' : 'already booked' }}
                         </span>
                     @endforeach
                 </div>
@@ -1167,7 +1167,7 @@
                         </div>
                     </div>
                 @empty
-                    <div class="pp-empty-reviews">No reviews yet — be the first to work with {{ $pro->name }}.</div>
+                    <div class="pp-empty-reviews">No reviews yet, be the first to work with {{ $pro->name }}.</div>
                 @endforelse
             </div>
         </div>
@@ -1365,7 +1365,7 @@
 @if(count($galleryPhotos) > 0)
     <div class="pp-lightbox" id="pp-gallery" role="dialog" aria-modal="true" aria-label="Full portfolio gallery">
         <button type="button" class="pp-lightbox-close" data-pp-close-gallery aria-label="Close gallery">&times;</button>
-        <div class="pp-lightbox-title">{{ $displayName }} — {{ number_format($portfolioCount) }} {{ \Illuminate\Support\Str::plural('photo', $portfolioCount) }}</div>
+        <div class="pp-lightbox-title">{{ $displayName }}: {{ number_format($portfolioCount) }} {{ \Illuminate\Support\Str::plural('photo', $portfolioCount) }}</div>
         <div class="pp-lightbox-grid">
             @foreach($galleryPhotos as $photo)
                 <img src="{{ $photo }}" alt="Work by {{ $displayName }}" loading="lazy">

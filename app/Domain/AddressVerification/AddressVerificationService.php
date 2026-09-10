@@ -43,7 +43,7 @@ class AddressVerificationService
         // Already locked out — must go through support / docs.
         if ($attempts >= $max) {
             return $this->persist($profile, AddressStatus::MANUAL_REVIEW_REQUIRED, $attempts, [
-                'reason' => 'Attempt limit reached — manual review required.',
+                'reason' => 'Attempt limit reached, manual review required.',
             ], locked: true);
         }
 

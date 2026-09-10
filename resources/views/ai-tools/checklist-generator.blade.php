@@ -95,8 +95,8 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Starter', '#64748b', 'Build your checklist by hand — add each task yourself, no suggested plan.'],
-        'semi'    => ['Semi', '#2563eb', 'instantly drafts a milestone checklist — reword any task before you use it.'],
+        'manual'  => ['Starter', '#64748b', 'Build your checklist by hand. Add each task yourself, no suggested plan.'],
+        'semi'    => ['Semi', '#2563eb', 'instantly drafts a milestone checklist, reword any task before you use it.'],
         'maximum' => ['Maximum', '#16a34a', 'Enter your event and we build the full milestone checklist for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -114,7 +114,7 @@
     {{-- Starter — hand-built checklist, no suggestions --}}
     <div class="cg-gen">
         <h3>🧩 Build My Checklist</h3>
-        <div class="sub">Add each task yourself — name it, pick a timeframe and a due date. Fully yours.</div>
+        <div class="sub">Add each task yourself, name it, pick a timeframe and a due date. Fully yours.</div>
         <div id="cgmRows" style="display:flex;flex-direction:column;gap:10px;"></div>
         <button type="button" id="cgmAdd" style="margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#15803d;background:rgba(22,163,74,.09);border:1px solid rgba(22,163,74,.28);border-radius:10px;padding:9px 15px;cursor:pointer;font-family:inherit;">+ Add task</button>
         <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">Want this checklist built for you automatically? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:#15803d;font-weight:700;text-decoration:none;">Upgrade →</a></div>

@@ -461,8 +461,8 @@
 
     {{-- ── GigResource IQ™ Suite comparison (by suite, not individual tools) ── --}}
     <div class="mp-compare">
-        <h3>GigResource IQ™ — Tools by Suite</h3>
-        <p class="sub">You receive whole <strong>suites</strong>, not a list of tools — and any future tool added to a suite is included automatically.</p>
+        <h3>GigResource IQ™: Tools by Suite</h3>
+        <p class="sub">You receive whole <strong>suites</strong>, not a list of tools, and any future tool added to a suite is included automatically.</p>
         <table class="mp-ctable">
             <thead><tr><th>Tool Suite</th><th>Starter</th><th>Professional</th><th>Elite</th></tr></thead>
             <tbody>
@@ -480,13 +480,13 @@
     {{-- ── Opportunity early-access (the competitive edge) ── --}}
     <div class="mp-compare">
         <h3>⚡ Opportunity Access</h3>
-        <p class="sub">Higher tiers see new requests first — a head start competitors like Upwork &amp; Fiverr don’t offer.</p>
+        <p class="sub">Higher tiers see new requests first: a head start competitors like Upwork &amp; Fiverr don’t offer.</p>
         <table class="mp-ctable">
             <thead><tr><th>Opportunity</th><th>Starter</th><th>Professional</th><th>Elite</th></tr></thead>
             <tbody>
                 <tr><td>Standard opportunities</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
-                <tr><td>Early access — new BRs (multi-service)</td><td class="no">—</td><td class="partial">After 60 min</td><td class="imm">Immediate</td></tr>
-                <tr><td>Early access — new ERs</td><td class="no">—</td><td class="partial">After 60 min</td><td class="imm">Immediate</td></tr>
+                <tr><td>Early access, new BRs (multi-service)</td><td class="no">—</td><td class="partial">After 60 min</td><td class="imm">Immediate</td></tr>
+                <tr><td>Early access, new ERs</td><td class="no">—</td><td class="partial">After 60 min</td><td class="imm">Immediate</td></tr>
                 <tr><td>Featured &amp; premium opportunities</td><td class="no">—</td><td class="partial">Limited</td><td class="yes">Full</td></tr>
             </tbody>
         </table>
@@ -686,7 +686,7 @@ function mpToggleFeatures(btn) {
             open({
                 title: free ? 'Get Started Free' : 'Switch to ' + name,
                 desc: free
-                    ? 'You are about to activate the ' + name + ' plan. No payment required — get started immediately!'
+                    ? 'You are about to activate the ' + name + ' plan. No payment required. Get started immediately!'
                     : 'You are about to subscribe to the ' + name + ' plan for ' + price + '. You will be redirected to a secure payment page.',
                 confirmLabel: free ? 'Activate Free Plan' : 'Proceed to Payment',
                 iconClass: 'subscribe',

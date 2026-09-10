@@ -76,8 +76,8 @@ class MyEventsIsLiveTest extends TestCase
 
         $cal = $this->calendar(['cal' => now()->format('Y-m-d')]);
 
-        $this->assertStringContainsString('Booked Gala — Booked', $cal);
-        $this->assertStringContainsString('Open Brunch — Open for proposals', $cal);
+        $this->assertStringContainsString('Booked Gala: Booked', $cal);
+        $this->assertStringContainsString('Open Brunch: Open for proposals', $cal);
         $this->assertStringContainsString('#10b981', $cal);
 
         $legend = substr($cal, strpos($cal, 'ec-legend'));

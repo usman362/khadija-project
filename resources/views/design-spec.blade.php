@@ -23,7 +23,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>GigResource — Design Specification</title>
+    <title>GigResource: Design Specification</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         @page { size: A4; margin: 18mm 16mm; }
@@ -282,29 +282,29 @@
                     'elements' => 'Full-bleed wedding hero, search bar with category chips, trust pill, featured pro cards row, A-Z category browser, moments gallery, FAQ accordion, newsletter, dual CTAs (Start Planning · List Your Services).'],
                 ['id' => 'WEB-02', 'title' => 'Browse Professionals',     'url' => '/browse',                 'purpose' => 'Searchable / filterable marketplace grid of all professionals.',
                     'elements' => 'Hero with mega search (keyword + city + button), 8-trigger advanced filter bar with dropdowns, active filter chips, category chip rail, grid/list view toggle, sort dropdown, pro cards (cover · avatar · badges · skills · rating · price · save heart · CTA), pagination.'],
-                ['id' => 'WEB-03', 'title' => 'Professional Detail',      'url' => '/pro/{user}',             'purpose' => 'Public profile of a single professional — the conversion page.',
+                ['id' => 'WEB-03', 'title' => 'Professional Detail',      'url' => '/pro/{user}',             'purpose' => 'Public profile of a single professional: the conversion page.',
                     'elements' => 'Cover banner, avatar overlap, name + verified check + headline, breadcrumb, sticky right sidebar (Top Rated seal · Satisfaction · Verified Credentials), About, Skills, Portfolio gallery, Reviews list, Similar pros row, mobile sticky "Request Quote" bar.'],
-                ['id' => 'WEB-04', 'title' => 'Events & Categories (REMOVED 2026-08-20 — Owner)', 'url' => '/event-types',      'purpose' => 'Removed on the Owner\'s instruction: a second way into the tree that Explore Event Types already covers. The URL redirects there.',
+                ['id' => 'WEB-04', 'title' => 'Events & Categories (REMOVED 2026-08-20: Owner)', 'url' => '/event-types',      'purpose' => 'Removed on the Owner\'s instruction: a second way into the tree that Explore Event Types already covers. The URL redirects there.',
                     'elements' => 'Hero + search, advanced filter (5 categories per audience with dropdown popovers), active chips, 9-category left rail with right showcase, sub-tile filter tabs (Popular/Top Rated/Newest/Trending), Top Services 4-col tiles, Event types section, CTA banner.'],
                 ['id' => 'WEB-05', 'title' => 'How It Works',             'url' => '/how-it-works',           'purpose' => 'Step-by-step walkthrough of platform for all 3 audiences.',
                     'elements' => 'Hero, sticky 8-step pill navigator, 8 numbered step panels (audience-color-coded), each with detail cards, stat tiles for commission section, final summary CTA.'],
                 ['id' => 'WEB-06', 'title' => 'About Us',                 'url' => '/about-us',               'purpose' => 'Brand story, stats, team.',
                     'elements' => 'Wedding hero with stats bar overlay, mission story, values grid, team cards, journey timeline, big-number stat band, contact CTA.'],
-                ['id' => 'WEB-07', 'title' => 'Blog — List',              'url' => '/blog',                   'purpose' => 'Article index with search + category filter + featured strip + grid.',
+                ['id' => 'WEB-07', 'title' => 'Blog: List',              'url' => '/blog',                   'purpose' => 'Article index with search + category filter + featured strip + grid.',
                     'elements' => 'Wedding decor hero with eyebrow + search bar, category pills, featured 3-col strip, blog grid (image · category · title · excerpt · meta · read more), pagination.'],
-                ['id' => 'WEB-08', 'title' => 'Blog — Post Detail',       'url' => '/blog/{slug}',            'purpose' => 'Single article reading view.',
+                ['id' => 'WEB-08', 'title' => 'Blog: Post Detail',       'url' => '/blog/{slug}',            'purpose' => 'Single article reading view.',
                     'elements' => 'Magazine hero with featured image as banner, category pill, title + meta (author · date · read time · views), full article body styled, share bar, related posts row.'],
                 ['id' => 'WEB-09', 'title' => 'FAQ',                      'url' => '/faq',                    'purpose' => 'Searchable, category-filtered FAQ list.',
                     'elements' => 'Wedding reception hero, eyebrow + heading + search input, category pill filter, accordion FAQ items grouped by category, "Still have questions?" CTA card.'],
                 ['id' => 'WEB-10', 'title' => 'Join as Influencer',       'url' => '/join-as-influencer',     'purpose' => 'Recruit influencers for the referral program.',
                     'elements' => 'Couple-at-sunset hero with avatars cluster + trust stat, 4-step "How it works" cards, commission tier table, payout policy, sign-up CTA.'],
-                ['id' => 'WEB-11', 'title' => 'Privacy Policy',           'url' => '/privacy-policy',         'purpose' => 'Legal — privacy.',
+                ['id' => 'WEB-11', 'title' => 'Privacy Policy',           'url' => '/privacy-policy',         'purpose' => 'Legal, privacy.',
                     'elements' => 'Bridal-bouquet hero with eyebrow + icon + last-updated pill, long-form rich text content, optional auth-only e-signature box at bottom.'],
-                ['id' => 'WEB-12', 'title' => 'AI Usage Agreement',       'url' => '/ai-agreement',           'purpose' => 'Legal — AI features.',
+                ['id' => 'WEB-12', 'title' => 'AI Usage Agreement',       'url' => '/ai-agreement',           'purpose' => 'Legal: AI features.',
                     'elements' => 'Same hero shell as Privacy, content varies, e-signature box.'],
-                ['id' => 'WEB-13', 'title' => 'Payment Policy',           'url' => '/payment-policy',         'purpose' => 'Legal — payments.',
+                ['id' => 'WEB-13', 'title' => 'Payment Policy',           'url' => '/payment-policy',         'purpose' => 'Legal, payments.',
                     'elements' => 'Same hero shell, content varies.'],
-                ['id' => 'WEB-14', 'title' => 'Cancellation & Refund',    'url' => '/cancellation-policy',    'purpose' => 'Legal — cancellation rules.',
+                ['id' => 'WEB-14', 'title' => 'Cancellation & Refund',    'url' => '/cancellation-policy',    'purpose' => 'Legal, cancellation rules.',
                     'elements' => 'Same hero shell, content varies. References $4.99 cancellation fee.'],
                 ['id' => 'WEB-15', 'title' => 'Influencer Referral Land', 'url' => '/ref/{code}',             'purpose' => 'Landing page hit when someone clicks an influencer referral link.',
                     'elements' => 'Captures cookie + shows welcome + redirects to sign-up funnel.'],
@@ -319,11 +319,11 @@
             'pages' => [
                 ['id' => 'AUTH-01', 'title' => 'Login',                   'url' => '/login',                  'purpose' => 'Email + password sign-in. Split layout with testimonial carousel side.',
                     'elements' => 'Left form column (logo · welcome · email · password · show/hide toggle · remember-me · forgot · login button · reCAPTCHA · social proof footer), right testimonial carousel side with trust stats.'],
-                ['id' => 'AUTH-02', 'title' => 'Register — Role Picker',  'url' => '/register',               'purpose' => 'Choose role tab (Client or Professional) before filling form.',
+                ['id' => 'AUTH-02', 'title' => 'Register: Role Picker',  'url' => '/register',               'purpose' => 'Choose role tab (Client or Professional) before filling form.',
                     'elements' => 'Step indicator (Choose role → Create account → Get started), trust strip pill, role tabs, info card per role, form (name · email · password · confirm), reCAPTCHA, sign-up button, switch-to-login link.'],
-                ['id' => 'AUTH-03', 'title' => 'Register — Client',       'url' => '/register?role=client',   'purpose' => 'Same as above but client role pre-selected.',
+                ['id' => 'AUTH-03', 'title' => 'Register: Client',       'url' => '/register?role=client',   'purpose' => 'Same as above but client role pre-selected.',
                     'elements' => 'Identical to AUTH-02 with client tab active.'],
-                ['id' => 'AUTH-04', 'title' => 'Register — Professional', 'url' => '/register?role=supplier', 'purpose' => 'Same with supplier role pre-selected.',
+                ['id' => 'AUTH-04', 'title' => 'Register: Professional', 'url' => '/register?role=supplier', 'purpose' => 'Same with supplier role pre-selected.',
                     'elements' => 'Identical to AUTH-02 with professional tab active.'],
                 ['id' => 'AUTH-05', 'title' => 'Forgot Password',         'url' => '/password/reset',         'purpose' => 'Email input → send reset link.',
                     'elements' => 'Centered card with email input + send button + back-to-login link.'],
@@ -348,13 +348,13 @@
             'pages' => [
                 ['id' => 'CLI-01', 'title' => 'Dashboard Home',           'url' => '/client/dashboard',       'purpose' => 'Overview of upcoming events, recent bookings, messages, suggested pros.',
                     'elements' => 'Top navbar (logo · search · notifications · theme toggle · role switcher · avatar), left sidebar with role-coloured icons, welcome banner, 4 stat cards, upcoming events list, recent bookings, recommended pros carousel, AI tools quick-access cards.'],
-                ['id' => 'CLI-02', 'title' => 'My Events — List',         'url' => '/client/events',          'purpose' => 'List of all events created by this client.',
+                ['id' => 'CLI-02', 'title' => 'My Events: List',         'url' => '/client/events',          'purpose' => 'List of all events created by this client.',
                     'elements' => 'Page header, "Create Event" button, status filter pills, event cards (title · date · category · status · actions menu), empty state.'],
                 ['id' => 'CLI-03', 'title' => 'Event Detail',             'url' => '/client/events/{id}',     'purpose' => 'Single event with bookings + messages tab.',
                     'elements' => 'Breadcrumb, event header (title · date · location · budget · status pill), tab strip (Overview · Bookings · Quotes · Documents), tab content panels.'],
                 ['id' => 'CLI-04', 'title' => 'My Bookings',              'url' => '/client/bookings',        'purpose' => 'All confirmed bookings list.',
                     'elements' => 'Filter strip (status · date range), booking cards with pro avatar + service + date + amount + actions, review-leaving modal trigger.'],
-                ['id' => 'CLI-05', 'title' => 'Messages — Inbox',         'url' => '/client/messages',        'purpose' => 'Conversation list with pros.',
+                ['id' => 'CLI-05', 'title' => 'Messages: Inbox',         'url' => '/client/messages',        'purpose' => 'Conversation list with pros.',
                     'elements' => 'Two-pane: conversation list left + thread right, unread badges, attachment chips, send composer with emoji + file upload.'],
                 ['id' => 'CLI-06', 'title' => 'Message Thread',           'url' => '/client/messages/{id}',   'purpose' => 'Single conversation view.',
                     'elements' => 'Same as inbox but thread-focused, with pro card sidebar.'],
@@ -395,17 +395,17 @@
                     'elements' => 'Gig header (client · event type · location · date · budget · guest count), full description, requirements list, proposal form (price · message · timeline), existing proposals count.'],
                 ['id' => 'PRO-04', 'title' => 'My Proposals',             'url' => '/professional/proposals', 'purpose' => 'All proposals submitted by this pro with status.',
                     'elements' => 'Status tab strip (Pending · Accepted · Declined · Expired), proposal cards with gig info + submitted price + status badge + actions, "follow up" button.'],
-                ['id' => 'PRO-05', 'title' => 'Messages — Inbox',         'url' => '/professional/messages',  'purpose' => 'Conversations with clients.',
+                ['id' => 'PRO-05', 'title' => 'Messages: Inbox',         'url' => '/professional/messages',  'purpose' => 'Conversations with clients.',
                     'elements' => 'Same two-pane chat UI as client side.'],
                 ['id' => 'PRO-06', 'title' => 'Message Thread',           'url' => '/professional/messages/{id}', 'purpose' => 'Single conversation.',
                     'elements' => 'Same as client side, with client info sidebar.'],
                 ['id' => 'PRO-07', 'title' => 'Reviews',                  'url' => '/professional/reviews',   'purpose' => 'All received reviews with response option (Elite flag).',
-                    'elements' => 'Average rating + breakdown chart, filter pills, review cards (client avatar · star rating · text · date · respond button · flag for admin button — Elite only).'],
-                ['id' => 'PRO-08', 'title' => 'Earnings Overview',        'url' => '/professional/earnings',  'purpose' => 'Money dashboard — totals + chart + payouts.',
+                    'elements' => 'Average rating + breakdown chart, filter pills, review cards (client avatar · star rating · text · date · respond button · flag for admin button: Elite only).'],
+                ['id' => 'PRO-08', 'title' => 'Earnings Overview',        'url' => '/professional/earnings',  'purpose' => 'Money dashboard, totals + chart + payouts.',
                     'elements' => 'Big revenue number, time-range picker, line chart of earnings, payout schedule, pending balance card, withdrawal CTA.'],
                 ['id' => 'PRO-09', 'title' => 'Transactions',             'url' => '/professional/transactions', 'purpose' => 'Full ledger of bookings/payouts/fees.',
                     'elements' => 'Date-range + type filter, table (date · type · client · amount · platform fee · net · status), export CSV / PDF buttons.'],
-                ['id' => 'PRO-10', 'title' => 'Profile Settings',         'url' => '/professional/profile',   'purpose' => 'Public profile editor — what clients see.',
+                ['id' => 'PRO-10', 'title' => 'Profile Settings',         'url' => '/professional/profile',   'purpose' => 'Public profile editor: what clients see.',
                     'elements' => 'Cover banner upload + avatar (Freelancer.com style), tabs (Basic · Services · Pricing · Portfolio · Certifications · Verification · Notifications · Security · Account), service categories multi-select, hourly rate, video introduction (Pro/Elite tiers).'],
             ],
         ],
@@ -485,15 +485,15 @@
                     'elements' => 'Inline-edit card list (name · slug · post count · active toggle), create-category form.'],
                 ['id' => 'ADM-27', 'title' => 'Admin Profile',            'url' => '/app/admin/profile',      'purpose' => 'Admin user own profile editor.',
                     'elements' => 'Same tabbed profile layout as client/pro, admin-only badge.'],
-                ['id' => 'ADM-28', 'title' => 'Settings — Payments',      'url' => '/app/admin/settings/payments', 'purpose' => 'Stripe / payment gateway config.',
+                ['id' => 'ADM-28', 'title' => 'Settings: Payments',      'url' => '/app/admin/settings/payments', 'purpose' => 'Stripe / payment gateway config.',
                     'elements' => 'Form with Stripe publishable + secret keys, test/live mode toggle, webhook URL display.'],
-                ['id' => 'ADM-29', 'title' => 'Settings — OpenAI',        'url' => '/app/admin/settings/openai', 'purpose' => 'OpenAI API config for AI tools.',
+                ['id' => 'ADM-29', 'title' => 'Settings: OpenAI',        'url' => '/app/admin/settings/openai', 'purpose' => 'OpenAI API config for AI tools.',
                     'elements' => 'API key input (masked), model dropdown, max tokens, temperature, "configured" badge, test connection button.'],
-                ['id' => 'ADM-30', 'title' => 'Settings — reCAPTCHA',     'url' => '/app/admin/settings/recaptcha', 'purpose' => 'reCAPTCHA site / secret keys.',
+                ['id' => 'ADM-30', 'title' => 'Settings, reCAPTCHA',     'url' => '/app/admin/settings/recaptcha', 'purpose' => 'reCAPTCHA site / secret keys.',
                     'elements' => 'Version dropdown (v2 / v3), site key + secret key inputs, enable toggle.'],
-                ['id' => 'ADM-31', 'title' => 'Settings — Chatbot',       'url' => '/app/admin/settings/chatbot', 'purpose' => 'AI chatbot widget toggle + system prompt.',
+                ['id' => 'ADM-31', 'title' => 'Settings: Chatbot',       'url' => '/app/admin/settings/chatbot', 'purpose' => 'AI chatbot widget toggle + system prompt.',
                     'elements' => 'Enable toggle, system prompt textarea, message limit input, allowed roles.'],
-                ['id' => 'ADM-32', 'title' => 'Settings — Account Del',   'url' => '/app/admin/settings/account-deletion', 'purpose' => 'Account-deletion grace period config.',
+                ['id' => 'ADM-32', 'title' => 'Settings: Account Del',   'url' => '/app/admin/settings/account-deletion', 'purpose' => 'Account-deletion grace period config.',
                     'elements' => 'Grace period days input, soft-delete vs hard-delete radio, email template editor.'],
                 ['id' => 'ADM-33', 'title' => 'Conversations (Admin)',    'url' => '/app/chat',               'purpose' => 'View all platform conversations.',
                     'elements' => 'Same two-pane chat UI, with admin overlay actions (warn · suspend · export).'],
@@ -506,19 +506,19 @@
             'title' => 'Error Pages',
             'desc' => 'Custom branded pages shown when something goes wrong. Designer should mock up all variants.',
             'pages' => [
-                ['id' => 'ERR-01', 'title' => '404 — Page Not Found',     'url' => '/(any-bad-url)',          'purpose' => 'Show when URL doesn\'t exist.',
+                ['id' => 'ERR-01', 'title' => '404: Page Not Found',     'url' => '/(any-bad-url)',          'purpose' => 'Show when URL doesn\'t exist.',
                     'elements' => '🧭 emoji, eyebrow pill "404", title "Missing in action", tagline, 6 helpful nav links (Browse · Categories · How It Works · FAQ · Blog · About), main "Back to Home" CTA.'],
-                ['id' => 'ERR-02', 'title' => '500 — Server Error',       'url' => '/(server-error-state)',   'purpose' => 'Generic server failure.',
+                ['id' => 'ERR-02', 'title' => '500: Server Error',       'url' => '/(server-error-state)',   'purpose' => 'Generic server failure.',
                     'elements' => '🛠️ emoji, reassuring message, back-home + browse-pros CTAs.'],
-                ['id' => 'ERR-03', 'title' => '403 — Forbidden',          'url' => '/(forbidden-route)',      'purpose' => 'User authenticated but lacks permission.',
+                ['id' => 'ERR-03', 'title' => '403: Forbidden',          'url' => '/(forbidden-route)',      'purpose' => 'User authenticated but lacks permission.',
                     'elements' => '🔒 emoji, "no access" message, auth-aware CTAs (Dashboard if logged in, Log in otherwise).'],
-                ['id' => 'ERR-04', 'title' => '401 — Unauthorized',       'url' => '/(auth-required)',        'purpose' => 'Requires login to access.',
+                ['id' => 'ERR-04', 'title' => '401: Unauthorized',       'url' => '/(auth-required)',        'purpose' => 'Requires login to access.',
                     'elements' => '🔐 emoji, login + register CTAs.'],
-                ['id' => 'ERR-05', 'title' => '419 — Session Expired',    'url' => '/(csrf-token-expired)',   'purpose' => 'CSRF token aged out (common Laravel state).',
+                ['id' => 'ERR-05', 'title' => '419: Session Expired',    'url' => '/(csrf-token-expired)',   'purpose' => 'CSRF token aged out (common Laravel state).',
                     'elements' => '⏱️ emoji, "session expired" message, refresh + log-in-again CTAs.'],
-                ['id' => 'ERR-06', 'title' => '429 — Too Many Requests',  'url' => '/(rate-limited)',         'purpose' => 'Rate-limit triggered.',
+                ['id' => 'ERR-06', 'title' => '429: Too Many Requests',  'url' => '/(rate-limited)',         'purpose' => 'Rate-limit triggered.',
                     'elements' => '🛑 emoji, "slow down" message, try-again + back-home CTAs.'],
-                ['id' => 'ERR-07', 'title' => '503 — Maintenance',        'url' => '/(maintenance-mode)',     'purpose' => 'Site temporarily down for maintenance.',
+                ['id' => 'ERR-07', 'title' => '503: Maintenance',        'url' => '/(maintenance-mode)',     'purpose' => 'Site temporarily down for maintenance.',
                     'elements' => '🚧 emoji, "we\'re tuning up" message, retry button.'],
             ],
         ],
@@ -532,7 +532,7 @@
         <div class="cover-logo">GIG RESOURCE</div>
         <h1>Complete Page Design Specification</h1>
         <p class="subtitle">
-            A comprehensive inventory of every screen the designer needs to mock up — organized section-wise across the website, authentication, client / professional / influencer / admin dashboards, and error states.
+            A comprehensive inventory of every screen the designer needs to mock up, organized section-wise across the website, authentication, client / professional / influencer / admin dashboards, and error states.
         </p>
         <div class="cover-meta">
             <div><strong>{{ collect($sections)->sum(fn ($s) => count($s['pages'])) }}</strong>Pages total</div>
@@ -552,7 +552,7 @@
                 </li>
             @endforeach
             <li>
-                <span class="toc-title">Appendix — design tokens &amp; brand colours</span>
+                <span class="toc-title">Appendix, design tokens &amp; brand colours</span>
                 <span class="toc-count">reference</span>
             </li>
         </ol>
@@ -586,7 +586,7 @@
     <div class="section">
         <div class="section-head">
             <div class="section-num">{{ count($sections) + 1 }}</div>
-            <div class="section-title">Appendix — Brand & Tokens</div>
+            <div class="section-title">Appendix: Brand & Tokens</div>
         </div>
         <p class="section-desc">Reference values to keep designs aligned with the existing live styling.</p>
 

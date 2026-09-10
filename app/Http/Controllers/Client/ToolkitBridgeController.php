@@ -124,7 +124,7 @@ class ToolkitBridgeController extends Controller
 
         $attachment->delete();
 
-        return back()->with('status', 'Removed. Your saved tool result is untouched — it is still in the toolkit.');
+        return back()->with('status', 'Removed. Your saved tool result is untouched. It is still in the toolkit.');
     }
 
     /** Take the source's newer version into a linked placement. */
@@ -135,7 +135,7 @@ class ToolkitBridgeController extends Controller
         if (! ToolkitBridge::applyUpdate($attachment)) {
             // Signed, closed, or gone. What is placed stays placed.
             return back()->with('error',
-                'This one cannot be updated here — the request or agreement it sits in has since been closed or accepted. '
+                'This one cannot be updated here: the request or agreement it sits in has since been closed or accepted. '
                 . 'Changing it now goes through the agreement change-and-approval process.');
         }
 

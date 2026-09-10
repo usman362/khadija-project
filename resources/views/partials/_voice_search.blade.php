@@ -164,7 +164,7 @@
         rec.onstart = function () {
             listening = true;
             btn.classList.add('is-listening');
-            showToast('Listening — speak now');
+            showToast('Listening, speak now');
         };
         rec.onend = function () {
             listening = false;
@@ -177,16 +177,16 @@
             switch (e.error) {
                 case 'not-allowed':
                 case 'service-not-allowed':
-                    showToast('Mic blocked — check browser & macOS settings');
+                    showToast('Mic blocked. Check browser & macOS settings');
                     break;
                 case 'no-speech':
-                    showToast("Didn't catch that — try again");
+                    showToast("Didn't catch that. Try again");
                     break;
                 case 'audio-capture':
                     showToast('No microphone detected');
                     break;
                 case 'network':
-                    showToast('Network error — voice needs internet');
+                    showToast('Network error, voice needs internet');
                     break;
                 case 'language-not-supported':
                     showToast('Language not supported');

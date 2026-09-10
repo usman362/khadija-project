@@ -134,6 +134,6 @@ class ClientReviewController extends Controller
             ]
         );
 
-        return back()->with('status', 'Thanks — your review has been posted.');
+        return back()->with('status', 'Thanks. Your review has been posted.');
     }
 }

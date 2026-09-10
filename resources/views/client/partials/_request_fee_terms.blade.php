@@ -19,7 +19,7 @@
 @php $rftField = $field ?? 'fee_agreed'; @endphp
 <div class="rft">
     <p class="rft-fee">
-        <b>$0</b> to post — you only pay a single <b>$2.99</b> when you finalize
+        <b>$0</b> to post. You only pay a single <b>$2.99</b> when you finalize
         with a professional.<br>
         Nothing is charged to post, and nothing if the request goes unfilled.
     </p>

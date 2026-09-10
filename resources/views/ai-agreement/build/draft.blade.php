@@ -1,8 +1,8 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'Agreement — Draft & Auto-Fill')
+@section('title', 'Agreement: Draft & Auto-Fill')
 @section('page-title', 'Agreement Builder')
-@section('page-subtitle', 'Draft Generation — auto-filled & required sections')
+@section('page-subtitle', 'Draft Generation, auto-filled & required sections')
 
 {{-- Agreement Builder · Draft. Every section is tagged AI-GENERATED (green —
      the auto-filled it from Phase-1 evidence) or REQUIRED (amber — the user must
@@ -86,7 +86,7 @@
     </div>
 
     <div class="aab-legend">
-        <span class="aab-leg ai"><i></i> Auto-filled — auto-filled, editable</span>
+        <span class="aab-leg ai"><i></i> Auto-filled, auto-filled, editable</span>
         <span class="aab-leg req"><i></i> Requires Your Input</span>
     </div>
 

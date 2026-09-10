@@ -43,9 +43,9 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Enabled</label>
-                    <select name="enabled" class="form-select" aria-label="Yes — show chatbot widget">
-                        <option value="1" @selected($settings['enabled'])>Yes — show chatbot widget</option>
-                        <option value="0" @selected(!$settings['enabled'])>No — hide chatbot</option>
+                    <select name="enabled" class="form-select" aria-label="Yes, show chatbot widget">
+                        <option value="1" @selected($settings['enabled'])>Yes, show chatbot widget</option>
+                        <option value="0" @selected(!$settings['enabled'])>No, hide chatbot</option>
                     </select>
                 </div>
                 <div class="col-md-4">

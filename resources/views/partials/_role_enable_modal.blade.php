@@ -278,7 +278,7 @@
         },
         supplier: {
             title: 'Become a Professional',
-            desc:  "Enable Professional Mode on your account. You'll be able to offer your services, browse events, and submit proposals — all from the same account.",
+            desc:  "Enable Professional Mode on your account. You'll be able to offer your services, browse events, and submit proposals. All from the same account.",
             confirmLabel: 'Yes, Enable Professional Mode',
             iconClass: 'rem-icon-supplier',
             btnClass:  'rem-btn-supplier',

@@ -78,7 +78,7 @@ class SendSubscriptionRenewalNotices extends Command
                 }
 
                 if ($dry) {
-                    $this->line("would send: {$email} — renews {$on} ({$days} days)");
+                    $this->line("would send: {$email}, renews {$on} ({$days} days)");
                     $sent++;
                     continue;
                 }

@@ -39,7 +39,7 @@ final class NotificationMatrix
                 'channels'     => ['in_app', 'email'],
                 'timing'       => 'immediate',
                 'retry'        => 'email: 3 attempts over 1 hour; in-app never retries, it persists',
-                'cancellation' => 'none — the filing happened',
+                'cancellation' => 'none: the filing happened',
                 'note'         => 'The responding party learns of the case from us, not from the other party. §9 forbids off-platform pressure; being told by the person who filed is how that starts.',
             ],
             [
@@ -58,7 +58,7 @@ final class NotificationMatrix
                 'timing'       => 'immediate, with the case-filed notice',
                 'retry'        => 'email: 3 attempts over 1 hour',
                 'cancellation' => 'none',
-                'note'         => '§8 — money stopping is the part a professional notices first. Discovering it without being told is how a support ticket becomes a complaint.',
+                'note'         => '§8, money stopping is the part a professional notices first. Discovering it without being told is how a support ticket becomes a complaint.',
             ],
             [
                 'trigger'      => 'response_awaited',
@@ -73,7 +73,7 @@ final class NotificationMatrix
                 'trigger'      => 'evidence_submitted',
                 'recipients'   => ['other party', 'case owner'],
                 'channels'     => ['in_app'],
-                'timing'       => 'batched — one summary per party per day, not one per file',
+                'timing'       => 'batched: one summary per party per day, not one per file',
                 'retry'        => 'none, in-app persists',
                 'cancellation' => 'suppressed once the case is terminal',
                 'note'         => 'Batched deliberately. A party uploading twelve photographs should not send the other side twelve emails.',
@@ -118,7 +118,7 @@ final class NotificationMatrix
                 'channels'     => ['in_app', 'email'],
                 'timing'       => 'immediate',
                 'retry'        => 'email: 5 attempts over 24 hours',
-                'cancellation' => 'never cancelled — this is the Resolution/Outcome Notice (§2 Step 3)',
+                'cancellation' => 'never cancelled. This is the Resolution/Outcome Notice (§2 Step 3)',
                 'note'         => 'More retries than any other row. This is the record of what was decided; a party who never received it is a party who was not told.',
             ],
             [
@@ -128,7 +128,7 @@ final class NotificationMatrix
                 'timing'       => 'immediate',
                 'retry'        => 'email: 5 attempts over 24 hours',
                 'cancellation' => 'never cancelled',
-                'note'         => '§5 — a revision is announced, not slipped in. Both the original and the revision are shown.',
+                'note'         => '§5: a revision is announced, not slipped in. Both the original and the revision are shown.',
             ],
             [
                 'trigger'      => 'cure_period_opened',
@@ -145,7 +145,7 @@ final class NotificationMatrix
                 'timing'       => self::DEADLINE_DEPENDENT,
                 'retry'        => 'email: 3 attempts over 1 hour',
                 'cancellation' => 'cancelled the moment the cure is recorded, or the case closes',
-                'note'         => 'The cure deadline is agreed per case (§5), so this one becomes schedulable as soon as a case sets its own date — unlike the platform-wide windows in §12.',
+                'note'         => 'The cure deadline is agreed per case (§5), so this one becomes schedulable as soon as a case sets its own date, unlike the platform-wide windows in §12.',
             ],
             [
                 'trigger'      => 'financial_outcome_executed',
@@ -163,7 +163,7 @@ final class NotificationMatrix
                 'timing'       => 'immediate on notice from the provider',
                 'retry'        => 'email: 3 attempts over 1 hour',
                 'cancellation' => 'none',
-                'note'         => '§8 — a chargeback under the provider\'s own rules. Disclosed up front, not discovered after the fact.',
+                'note'         => '§8: a chargeback under the provider\'s own rules. Disclosed up front, not discovered after the fact.',
             ],
             [
                 'trigger'      => 'outside_escalation_requested',
@@ -206,7 +206,7 @@ final class NotificationMatrix
                 'timing'       => 'immediate',
                 'retry'        => 'none',
                 'cancellation' => 'none',
-                'note'         => 'Staff only, and never sent to the account concerned. §7 — a pattern is an input to a review, not a finding, and telling someone they have been flagged makes it one.',
+                'note'         => 'Staff only, and never sent to the account concerned. §7: a pattern is an input to a review, not a finding, and telling someone they have been flagged makes it one.',
             ],
         ];
     }

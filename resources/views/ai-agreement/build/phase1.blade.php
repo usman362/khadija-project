@@ -1,8 +1,8 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'Agreement — Evidence Collection')
+@section('title', 'Agreement: Evidence Collection')
 @section('page-title', 'Agreement Builder')
-@section('page-subtitle', 'Phase 1 — Discovery & Evidence Collection')
+@section('page-subtitle', 'Phase 1: Discovery & Evidence Collection')
 
 {{-- Agreement Builder · Phase 1. The tool scans the existing booking
      conversation, accepted proposal and attachments to assemble the evidence

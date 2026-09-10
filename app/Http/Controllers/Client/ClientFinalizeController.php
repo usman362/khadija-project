@@ -142,7 +142,7 @@ class ClientFinalizeController extends Controller
 
         if ($finalization->isSigned() && $finalization->isFunded()) {
             return back()->withErrors(['cancel' =>
-                'This booking is signed and funded — it can no longer be cancelled from here. Contact support.']);
+                'This booking is signed and funded. It can no longer be cancelled from here. Contact support.']);
         }
 
         $finalization->update(['status' => 'cancelled']);
@@ -331,7 +331,7 @@ class ClientFinalizeController extends Controller
                     'event_id'        => $f->event_id,
                     'supplier_id'     => $f->supplier_id,
                     'note'            => $mode === 'test'
-                        ? 'Test-mode deposit — no real money moved.'
+                        ? 'Test-mode deposit: no real money moved.'
                         : null,
                 ],
             ]);
@@ -369,7 +369,7 @@ class ClientFinalizeController extends Controller
                         'event_id'        => $f->event_id,
                         'supplier_id'     => $f->supplier_id,
                         'note'            => $mode === 'test'
-                            ? 'Test-mode request fee — no real money moved.'
+                            ? 'Test-mode request fee: no real money moved.'
                             : null,
                     ],
                 ]);

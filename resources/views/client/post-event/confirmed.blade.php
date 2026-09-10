@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', 'Post an Event — Order Confirmed')
+@section('title', 'Post an Event: Order Confirmed')
 @section('page-title', 'Your Order is Confirmed!')
 @section('page-subtitle', 'Thank you! Your package combination has been booked and your date is secured.')
 @include('client.post-event._styles')

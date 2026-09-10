@@ -211,7 +211,7 @@
                         @else
                             <div class="pw-row blocked">
                                 {{ $d['label'] }}
-                                <span class="meta">{{ $d['meta'] }} — {{ $d['reason'] }}</span>
+                                <span class="meta">{{ $d['meta'] }}: {{ $d['reason'] }}</span>
                             </div>
                         @endif
                     @endforeach
@@ -231,7 +231,7 @@
                 <label class="pw-mode">
                     <input type="radio" name="link_mode" value="linked">
                     <b>Keep linked</b>
-                    <small>Follows the original — but a change is never applied on its own. You will be asked here first.</small>
+                    <small>Follows the original, but a change is never applied on its own. You will be asked here first.</small>
                 </label>
 
                 <button class="pw-btn" type="submit" @disabled(! $artifact || ! $destination || ! ($destination['eligible'] ?? false))>

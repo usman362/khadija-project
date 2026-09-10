@@ -80,7 +80,7 @@ return [
         'maximum' => 'Maximum',
     ],
     'descriptions' => [
-        'manual'  => 'Templates and frameworks — you fill them in yourself.',
+        'manual'  => 'Templates and frameworks. You fill them in yourself.',
         'semi'    => 'The fields you have already answered are filled in for you; you edit the rest.',
         'maximum' => 'The full draft is prepared from your details, ready for you to review and change.',
     ],

@@ -51,7 +51,7 @@
                             @foreach($bookings as $booking)
                                 @php $other = $booking->client_id === auth()->id() ? $booking->supplier : $booking->client; @endphp
                                 <option value="{{ $booking->id }}" @selected(old($name) == $booking->id)>
-                                    {{ $booking->event?->title ?? 'Booking #' . $booking->id }} — {{ $other?->name ?? 'Unknown' }}
+                                    {{ $booking->event?->title ?? 'Booking #' . $booking->id }}: {{ $other?->name ?? 'Unknown' }}
                                 </option>
                             @endforeach
                         </select>
@@ -113,7 +113,7 @@
 
         @if($definition['dual_approval'] ?? false)
             <p class="dsp-hint">
-                This is a proposal. Nothing changes until the other party accepts it — their
+                This is a proposal. Nothing changes until the other party accepts it. Their
                 existing agreement stands until then.
             </p>
         @endif

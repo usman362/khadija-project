@@ -1,8 +1,8 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'Agreement — Execution')
+@section('title', 'Agreement: Execution')
 @section('page-title', 'Agreement Builder')
-@section('page-subtitle', 'Phase 3 — Execution & Finalization')
+@section('page-subtitle', 'Phase 3: Execution & Finalization')
 
 {{-- Agreement Builder · Phase 3. Finalize, sign and activate. Both parties
      receive a final, legally structured, signed document held in a secure,
@@ -131,7 +131,7 @@
             <div class="aab-card">
                 <div class="aab-sec-head">
                     <h3>Electronic Signatures</h3>
-                    <p>Both parties signed the final document — legally binding and timestamped.</p>
+                    <p>Both parties signed the final document, legally binding and timestamped.</p>
                 </div>
                 <div class="aab-sigs">
                     @foreach($signatures as $sig)

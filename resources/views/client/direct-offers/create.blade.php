@@ -14,8 +14,8 @@
     // ER is its own standalone "Post a Rush Request" workflow — NOT a Direct
     // Offer type (per Peter). Direct Request supports single / multi service only.
     $types = [
-        ['SSR', 'Single Service Request', 'One specific service from this pro — simplest request.'],
-        ['MSR', 'Multi-Service Request', 'Several services — each handled as its own separate agreement.'],
+        ['SSR', 'Single Service Request', 'One specific service from this pro, simplest request.'],
+        ['MSR', 'Multi-Service Request', 'Several services. Each handled as its own separate agreement.'],
     ];
 @endphp
 
@@ -213,7 +213,7 @@
                             <b>No professional in your state offers this yet</b>
                             <p>
                                 GigResource matches within your own state, and nobody here has listed this service.
-                                You can pick a different service, or post it to the board — it stays open, and any
+                                You can pick a different service, or post it to the board. It stays open, and any
                                 professional who can do it may reply.
                             </p>
                             <div class="do-empty-acts">
@@ -231,7 +231,7 @@
                                  who never chose anyone could still send. --}}
                             <option value="">Choose who this goes to…</option>
                             @foreach($pros as $p)
-                                <option value="{{ $p->id }}" @selected(old('professional_id') == $p->id || ($selectedPro && $selectedPro->id === $p->id))>{{ $p->name }} — {{ $p->profile->headline ?? 'Professional' }}</option>
+                                <option value="{{ $p->id }}" @selected(old('professional_id') == $p->id || ($selectedPro && $selectedPro->id === $p->id))>{{ $p->name }}: {{ $p->profile->headline ?? 'Professional' }}</option>
                             @endforeach
                         </select>
                         @error('professional_id')
@@ -326,7 +326,7 @@
                             </select>
                         @endif
                     </div>
-                    <div class="do-hint">SSR — a single, specific service from this professional.</div>
+                    <div class="do-hint">SSR: a single, specific service from this professional.</div>
                 </div>
                 {{-- MSR / ER: multiple services --}}
                 <div class="do-svc-multi">

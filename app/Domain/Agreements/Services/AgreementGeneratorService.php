@@ -43,7 +43,7 @@ class AgreementGeneratorService
             'booking_id' => $booking->id,
             'conversation_id' => $conversation?->id,
             'generated_by' => $requestedBy->id,
-            'title' => 'Service Agreement — ' . $booking->event->title,
+            'title' => 'Service Agreement: ' . $booking->event->title,
             'content' => $aiResult['content'],
             'extracted_terms' => $aiResult['terms'],
             'status' => 'pending_review',
@@ -205,7 +205,7 @@ HEAD;
 
 ## Instructions:
 1. Generate the agreement in HTML format with proper headings, sections, and styling.
-2. Extract any specific terms discussed (prices, dates, deliverables, cancellation policy, etc.) from the conversation above — prefer chat details over generic defaults.
+2. Extract any specific terms discussed (prices, dates, deliverables, cancellation policy, etc.) from the conversation above, prefer chat details over generic defaults.
 3. Include standard clauses: scope of services, payment terms, cancellation policy, liability, and signatures section.
 4. If specific terms aren't discussed in the chat, use reasonable defaults marked with [TO BE CONFIRMED].
 
@@ -214,7 +214,7 @@ CHAT;
             $header .= <<<NOCHAT
 
 ## Instructions:
-1. The client chose NOT to include the chat transcript — generate a clean, standard agreement from the booking details only. Do NOT invent or reference specific conversational terms.
+1. The client chose NOT to include the chat transcript, generate a clean, standard agreement from the booking details only. Do NOT invent or reference specific conversational terms.
 2. Generate the agreement in HTML format with proper headings, sections, and styling.
 3. Include standard clauses: scope of services, payment terms, cancellation policy, liability, and signatures section.
 4. For any specifics not present in the booking details (price, deliverables, payment schedule), use reasonable defaults marked with [TO BE CONFIRMED] so the parties can fill them in.

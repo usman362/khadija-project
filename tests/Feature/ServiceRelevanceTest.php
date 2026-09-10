@@ -114,7 +114,7 @@ class ServiceRelevanceTest extends TestCase
         );
 
         $this->assertStringNotContainsString('Showing services that fit', $markup);
-        $this->assertStringContainsString('everything is still here', $markup);
+        $this->assertStringContainsString('Everything is still here', $markup);
     }
 
     /** Each service carries the category the matrix actually ranks. */

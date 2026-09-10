@@ -38,7 +38,7 @@
 
 <div class="fd-block" data-food-delivery @if(! $shown) hidden @endif>
     <h4>How will this order be delivered?</h4>
-    <p class="fd-lede">Your preference — you and the professional agree the final arrangement between you. Delivery is priced differently from collection, so saying now keeps the quotes comparable.</p>
+    <p class="fd-lede">Your preference. You and the professional agree the final arrangement between you. Delivery is priced differently from collection, so saying now keeps the quotes comparable.</p>
 
     <div class="fd-opts">
         @foreach($fd::CHOICES as $value => $label)

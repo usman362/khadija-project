@@ -20,7 +20,7 @@ class PayoutRejected extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Payout Request Declined — ' . config('app.name'),
+            subject: 'Payout Request Declined: ' . config('app.name'),
         );
     }
 

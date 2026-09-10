@@ -34,7 +34,7 @@
                 <b>Where do you travel from, and how far?</b>
                 <p>
                     We are moving to matching by distance to the event rather than by which state
-                    your business address is in — so a job forty minutes away is not hidden from you
+                    your business address is in, so a job forty minutes away is not hidden from you
                     because it is over a state line. Setting yours is what lets us make that change.
                 </p>
             @endif

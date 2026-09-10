@@ -516,7 +516,7 @@
     <div class="lp-container">
         <div class="lp-head">
             <h2 class="lp-h2">{{ $t('assistance', 'heading', 'Choose Your Level of Assistance') }}</h2>
-            <p class="lp-lead">{{ $t('assistance', 'subheading', "You're in control. Each level unlocks more capability — from fully manual to fully automated.") }}</p>
+            <p class="lp-lead">{{ $t('assistance', 'subheading', "You're in control. Each level unlocks more capability, from fully manual to fully automated.") }}</p>
         </div>
         <div class="lp-assist-grid">
             <div class="lp-acard">

@@ -91,8 +91,8 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Starter', '#64748b', 'Build your run-of-show by hand — add each time slot yourself, no suggestions.'],
-        'semi'    => ['Semi', '#2563eb', 'We suggest a timeline — edit the times and segments before you save.'],
+        'manual'  => ['Starter', '#64748b', 'Build your run-of-show by hand. Add each time slot yourself, no suggestions.'],
+        'semi'    => ['Semi', '#2563eb', 'We suggest a timeline, edit the times and segments before you save.'],
         'maximum' => ['Maximum', '#16a34a', 'Enter your event and we build the entire run-of-show for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -108,7 +108,7 @@
     {{-- Starter — hand-built run-of-show, no suggestions --}}
     <div class="tb-form-card">
         <h3>🛠 Build My Run-of-Show</h3>
-        <div class="sub">Add each slot yourself — set the time and what's happening.</div>
+        <div class="sub">Add each slot yourself. Set the time and what's happening.</div>
         <div id="tbmRows" style="display:flex;flex-direction:column;gap:8px;"></div>
         <button type="button" id="tbmAdd" style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#2563eb;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.25);border-radius:9px;padding:8px 14px;cursor:pointer;font-family:inherit;">+ Add time slot</button>
     </div>
@@ -116,7 +116,7 @@
     {{-- Interactive builder --}}
     <div class="tb-form-card">
         <h3>🛠 Build My Run-of-Show</h3>
-        <div class="sub">{{ $isSemi ? "Enter your event — we suggest a timeline you can edit." : "Enter your event details and we build the run-of-show with real clock times." }}</div>
+        <div class="sub">{{ $isSemi ? "Enter your event. We suggest a timeline you can edit." : "Enter your event details and we build the run-of-show with real clock times." }}</div>
         <form id="tbForm">
             <div class="tb-fgrid">
                 <div>
@@ -385,7 +385,7 @@ document.querySelectorAll('[data-tb-tab]').forEach(function (tab) {
     });
 
     function render(res) {
-        document.getElementById('tbSummary').textContent = (LEVEL === 'semi' ? 'Suggested timeline — edit any time or segment below. ' : '') + (res.summary || '');
+        document.getElementById('tbSummary').textContent = (LEVEL === 'semi' ? 'Suggested timeline, edit any time or segment below. ' : '') + (res.summary || '');
         const sched = document.getElementById('tbSchedule');
         if (LEVEL === 'semi') {
             sched.innerHTML = (res.schedule || []).map(s => `

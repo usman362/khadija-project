@@ -4,7 +4,7 @@
     use Illuminate\Support\Str;
 
     $seoTitle       = 'Browse Event Professionals | GigResource';
-    $seoDescription = 'Find verified event professionals — DJs, photographers, caterers, planners, venues. Filter by category, city, rating and budget. Read real reviews and book with confidence.';
+    $seoDescription = 'Find verified event professionals: DJs, photographers, caterers, planners, venues. Filter by category, city, rating and budget. Read real reviews and book with confidence.';
 
     $f       = $filters ?? [];
     $kw      = $f['q'] ?? '';
@@ -365,7 +365,7 @@
     @if($trending->isNotEmpty())
     <section class="br-vibes">
         <div class="lp-container">
-            <p class="br-vibes-cap">Not sure where to start? Tap a category — these are the ones with the most professionals right now.</p>
+            <p class="br-vibes-cap">Not sure where to start? Tap a category. These are the ones with the most professionals right now.</p>
             <div class="br-vibe-scroll">
                 @foreach($trending as $tc)
                     <a class="br-vibe {{ ($f['category'] ?? null) === $tc->slug ? 'is-active' : '' }}"
@@ -560,7 +560,7 @@
                                         <button type="submit" class="br-fav {{ $isSaved ? 'is-on' : '' }}"
                                                 aria-pressed="{{ $isSaved ? 'true' : 'false' }}"
                                                 aria-label="{{ $isSaved ? 'Remove ' . $pro->name . ' from My Professionals' : 'Save ' . $pro->name . ' to My Professionals' }}"
-                                                title="{{ $isSaved ? 'Saved — press to remove' : 'Save to My Professionals' }}"><svg viewBox="0 0 24 24" fill="{{ $isSaved ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></button>
+                                                title="{{ $isSaved ? 'Saved, press to remove' : 'Save to My Professionals' }}"><svg viewBox="0 0 24 24" fill="{{ $isSaved ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></button>
                                     </form>
                                 @endauth
                             </div>
@@ -631,10 +631,10 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                         @if($locationIssue)
                             <h3>We could not place this location</h3>
-                            <p>{{ $locationIssue }} Enter a street, venue, or a more specific ZIP — then search again.</p>
+                            <p>{{ $locationIssue }} Enter a street, venue, or a more specific ZIP, then search again.</p>
                         @else
                             <h3>{{ $zipF ? 'No professionals available in this area for this request' : 'No professionals match your filters yet' }}</h3>
-                            <p>Try widening your search — or post your event and let pros come to you.</p>
+                            <p>Try widening your search, or post your event and let pros come to you.</p>
                         @endif
                         <a href="{{ route('public.browse') }}" class="br-btn-ghost" style="margin-top:14px;">Reset filters</a>
                     </div>

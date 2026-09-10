@@ -147,19 +147,19 @@ class AiPricingAssistantController extends Controller
         // Verdict badge + explanation relative to market average.
         if ($price < $marketAvg * 0.92) {
             $badge = 'Below Market'; $badgeColor = '#2563eb';
-            $means = 'Your price is below the local average — you have room to charge more for the value you offer.';
+            $means = 'Your price is below the local average. You have room to charge more for the value you offer.';
         } elseif ($price <= $marketAvg * 1.15) {
             $badge = 'Great Price'; $badgeColor = '#16a34a';
             if ($price > $marketAvg * 1.02) {
                 $means = 'Your price is slightly above the average, which is great for the value you offer!';
             } elseif ($price < $marketAvg * 0.98) {
-                $means = 'Your price is slightly below the average — competitive and attractive to clients!';
+                $means = 'Your price is slightly below the average, competitive and attractive to clients!';
             } else {
                 $means = 'Your price is right around the average, which is great for the value you offer!';
             }
         } else {
             $badge = 'Premium Price'; $badgeColor = '#ea580c';
-            $means = 'Your price is above the local average — make sure to highlight what makes your service premium.';
+            $means = 'Your price is above the local average. Make sure to highlight what makes your service premium.';
         }
 
         $city = trim(explode(',', $location)[0]);

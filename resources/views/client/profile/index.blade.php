@@ -515,7 +515,7 @@
         <div class="pf-card">
             <div class="pf-card-title">Account Modes</div>
             <div class="pf-card-desc">
-                Enable dual-mode on your account — act as a Client to post events, or as a Professional to offer your services.
+                Enable dual-mode on your account, act as a Client to post events, or as a Professional to offer your services.
                 You can switch between modes anytime from the top navigation bar.
             </div>
 
@@ -602,7 +602,7 @@
                 <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.6;">
                     <strong style="color:var(--text-primary);">💡 How it works:</strong>
                     Once you enable both modes, a quick-switch button appears in your top navigation bar.
-                    Your data, messages, and bookings stay separate between modes — just like Freelancer or Upwork.
+                    Your data, messages, and bookings stay separate between modes, just like Freelancer or Upwork.
                 </div>
             </div>
         </div>
@@ -621,7 +621,7 @@
             <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px; padding: 16px 20px; margin-bottom: 24px;">
                 <div style="font-size:13px; font-weight:600; color:var(--bad-text); margin-bottom:8px;">What happens next?</div>
                 <ul style="font-size:12.5px; color:var(--text-secondary); line-height:1.8; padding-left:18px; margin:0;">
-                    <li>Your account is immediately locked — no further actions possible.</li>
+                    <li>Your account is immediately locked: no further actions possible.</li>
                     <li>You will be signed out on your next request.</li>
                     <li>You have 60 days to restore the account by simply logging in.</li>
                     <li>After 60 days, your personal data is permanently anonymized.</li>
@@ -638,7 +638,7 @@
                 <div class="pf-form-grid">
                     <div class="pf-form-full">
                         <label class="pf-label">Reason for leaving (optional)</label>
-                        <textarea name="reason" class="pf-textarea" placeholder="Help us improve — why are you deleting your account?" maxlength="1000">{{ old('reason') }}</textarea>
+                        <textarea name="reason" class="pf-textarea" placeholder="Help us improve: why are you deleting your account?" maxlength="1000">{{ old('reason') }}</textarea>
                     </div>
                     <div class="pf-form-full">
                         <label class="pf-label">Current Password *</label>

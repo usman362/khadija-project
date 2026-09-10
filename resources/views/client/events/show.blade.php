@@ -197,7 +197,7 @@
             </div>
             <p style="font-size:13px;color:#78350f;line-height:1.6;margin:0 0 14px;">
                 The proposal deadline passed{{ $event->proposal_deadline ? ' on ' . $event->proposal_deadline->format('M j, g:i A') : '' }}.
-                Nothing has been deleted — your proposals, messages and documents are all still here, and
+                Nothing has been deleted. Your proposals, messages and documents are all still here, and
                 no new proposals can arrive until you reopen it.
             </p>
 
@@ -208,7 +208,7 @@
                     @csrf
                     <div>
                         <label style="display:block;font-size:12px;font-weight:700;color:#92400e;margin-bottom:4px;">
-                            Reopen free — new deadline
+                            Reopen free, new deadline
                         </label>
                         <input type="datetime-local" name="proposal_deadline" required
                                max="{{ $event->starts_at?->format('Y-m-d\TH:i') }}"
@@ -225,7 +225,7 @@
                 {{-- §5 — an emergency request's window is hours. Every paid
                      tier would land past the event, so none is offered. --}}
                 <p style="font-size:12.5px;color:#78350f;line-height:1.6;margin:0 0 12px;">
-                    Emergency requests can't be extended by days — the event is too close. You can close
+                    Emergency requests can't be extended by days: the event is too close. You can close
                     this request, copy it as a new one, or turn it into a standard request if it is no
                     longer urgent.
                 </p>
@@ -241,7 +241,7 @@
                             <input type="hidden" name="gateway" value="stripe">
                             <button type="submit" class="cl-btn cl-btn-ghost cl-btn-sm"
                                     style="border-color:#fcd34d;color:#92400e;">
-                                +{{ $option['days'] }} days — ${{ number_format($option['price'], 2) }}
+                                +{{ $option['days'] }} days: ${{ number_format($option['price'], 2) }}
                                 <span style="display:block;font-size:10.5px;font-weight:600;opacity:.75;">
                                     until {{ $option['new_deadline']->format('M j') }}
                                 </span>
@@ -252,11 +252,11 @@
             @elseif($used >= 3)
                 <p style="font-size:12.5px;color:#78350f;line-height:1.6;margin:0 0 12px;">
                     You've used all three extensions on this request. You can close it, or copy it as a
-                    fresh request — a copy starts over with a new set of extensions.
+                    fresh request: a copy starts over with a new set of extensions.
                 </p>
             @else
                 <p style="font-size:12.5px;color:#78350f;line-height:1.6;margin:0 0 12px;">
-                    There isn't room to extend this one — a new deadline would fall after the event itself.
+                    There isn't room to extend this one: a new deadline would fall after the event itself.
                     Move the event date first, or close and copy it.
                 </p>
             @endif
@@ -389,7 +389,7 @@
                             @endforeach
                         </div>
                         <p style="font-size:11.5px;color:var(--text-muted);margin:10px 0 0;">
-                            Attaching shows it under “Attached from your toolkit” below — your original stays on
+                            Attaching shows it under “Attached from your toolkit” below. Your original stays on
                             the other event, and removing the attachment never touches it.
                         </p>
                     </details>
@@ -439,7 +439,7 @@
                         <div style="width:48px;height:48px;border-radius:12px;background:#fff4ec;color:#f97316;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
                         </div>
-                        <p style="color: var(--text-muted); font-size: 14px; margin-bottom:14px;">No professionals yet. {{ $event->is_published ? 'Find and invite pros to start receiving proposals.' : 'Publish your event so professionals can find it — or search and invite them directly.' }}</p>
+                        <p style="color: var(--text-muted); font-size: 14px; margin-bottom:14px;">No professionals yet. {{ $event->is_published ? 'Find and invite pros to start receiving proposals.' : 'Publish your event so professionals can find it, or search and invite them directly.' }}</p>
                         <a href="{{ route('client.search.index') }}" class="cl-btn cl-btn-primary cl-btn-sm" style="background:#c2410c;border-color:#c2410c;">Find Professionals</a>
                     </div>
                 @endif
@@ -452,7 +452,7 @@
                     <h3 style="font-size:16px;font-weight:600;">🔒 Sealed Bids Received ({{ $bids->count() }})</h3>
                 </div>
                 <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:16px;">
-                    Bid amounts are hidden from other professionals — only you can see them here.
+                    Bid amounts are hidden from other professionals, only you can see them here.
                 </p>
                 @if($bids->count())
                     <table class="cl-table">
@@ -555,8 +555,8 @@
         <div class="cl-card">
             <h3 style="font-size:16px;font-weight:600;margin-bottom:14px;">What you asked for</h3>
             <div class="ev-req">
-                <div class="ev-req-row"><span>Request type</span><b>{{ $type }} — {{ $type === 'BR' ? 'open to bidding' : ($type === 'ER' ? 'emergency, open to bidding' : 'direct to one professional') }}</b></div>
-                <div class="ev-req-row"><span>Scope</span><b>{{ $scope }} — {{ $scope === 'MSR' ? 'multi-service' : 'single service' }}</b></div>
+                <div class="ev-req-row"><span>Request type</span><b>{{ $type }}: {{ $type === 'BR' ? 'open to bidding' : ($type === 'ER' ? 'emergency, open to bidding' : 'direct to one professional') }}</b></div>
+                <div class="ev-req-row"><span>Scope</span><b>{{ $scope }}: {{ $scope === 'MSR' ? 'multi-service' : 'single service' }}</b></div>
                 {{-- Sir Peter, 2026-09-08: a page an MSR touched has to show the
                      client the MSR's own data, not a summary of it. The client
                      breaks the budget down service by service on the request
@@ -613,7 +613,7 @@
                 {{-- Peter's rule: the client may edit freely until a professional
                      is selected; after that the terms are being agreed. --}}
                 @if($award)
-                    <span class="ev-hint">A professional has been selected — major changes may require them to revise.</span>
+                    <span class="ev-hint">A professional has been selected, major changes may require them to revise.</span>
                 @endif
             </div>
         </div>

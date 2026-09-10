@@ -149,8 +149,8 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Starter', '#64748b', 'Work out your own price — a manual rate worksheet, no suggestions.'],
-        'semi'    => ['Semi', '#2563eb', 'We suggest a competitive price and market context — you set the final number.'],
+        'manual'  => ['Starter', '#64748b', 'Work out your own price: a manual rate worksheet, no suggestions.'],
+        'semi'    => ['Semi', '#2563eb', 'We suggest a competitive price and market context. You set the final number.'],
         'maximum' => ['Maximum', '#16a34a', 'the tool analyzes the market and sets your optimal price automatically.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -205,7 +205,7 @@
     {{-- Starter — manual rate worksheet, no suggestions --}}
     <div class="apa-card" style="margin-bottom:20px; max-width:520px;">
         <div class="apa-sec-num">Your Price Worksheet</div>
-        <p class="apa-sec-sub">Work out your own quote — enter your rate, hours and any extras.</p>
+        <p class="apa-sec-sub">Work out your own quote, enter your rate, hours and any extras.</p>
         <div class="apa-field"><label>Your Rate ($ / hour)</label><input type="number" class="apa-input" id="pm-rate" min="0" step="1" placeholder="e.g. 150"></div>
         <div class="apa-field"><label>Hours</label><input type="number" class="apa-input" id="pm-hours" min="0" step="0.5" placeholder="e.g. 4"></div>
         <div class="apa-field"><label>Add-ons / extras ($)</label><input type="number" class="apa-input" id="pm-addons" min="0" step="1" placeholder="e.g. 200"></div>

@@ -20,7 +20,7 @@ class PayoutRequested extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Payout Request Received — ' . config('app.name'),
+            subject: 'Payout Request Received: ' . config('app.name'),
         );
     }
 

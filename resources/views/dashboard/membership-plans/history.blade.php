@@ -48,7 +48,7 @@
                                     <br><small class="text-muted">{{ $sub->cancellation_reason }}</small>
                                 @endif
                             @else
-                                —
+                               ,
                             @endif
                         </td>
                     </tr>

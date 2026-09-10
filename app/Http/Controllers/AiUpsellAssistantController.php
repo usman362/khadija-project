@@ -29,14 +29,14 @@ class AiUpsellAssistantController extends Controller
                 ['Upsell Opportunities', '6', ''], ['Potential Extra', '+$2,150', 'good'],
                 ['Acceptance Rate', '64%', 'good'], ['Avg Order Uplift', '+18%', 'good'],
             ],
-            'booking' => ['client' => 'Sarah Johnson', 'event' => 'Wedding Reception', 'package' => 'Silver — $1,850', 'guests' => '150 guests · 6 hrs'],
+            'booking' => ['client' => 'Sarah Johnson', 'event' => 'Wedding Reception', 'package' => 'Silver: $1,850', 'guests' => '150 guests · 6 hrs'],
             'addons' => [
                 ['Engagement Photo Session', 450, 82, 'High fit'],
                 ['Highlight Film (3–5 min)', 799, 71, 'Trending'],
                 ['Extra Hour of Coverage', 300, 64, 'Common'],
                 ['Premium Album Upgrade', 350, 58, ''],
             ],
-            'moment' => 'Best moment to offer: right after they accept the base proposal — acceptance is 3× higher than offering later.',
+            'moment' => 'Best moment to offer: right after they accept the base proposal, acceptance is 3× higher than offering later.',
         ]);
     }
 
@@ -80,7 +80,7 @@ class AiUpsellAssistantController extends Controller
             ];
 
             $script = "Thanks for booking your {$service} for your {$eventType}! A few clients in your situation loved adding {$namesList}. "
-                . "I can bundle them for \${$bundlePrice} (you'd save \${$saves} vs. booking separately) — want me to add it to your proposal?";
+                . "I can bundle them for \${$bundlePrice} (you'd save \${$saves} vs. booking separately), want me to add it to your proposal?";
 
             $summary = 'Based on a ' . $service . ' booking for a ' . $eventType . ' at $' . (int) round($price) . ', here are '
                 . count($addons) . ' relevant add-on estimates. Bundling the top ' . count($topItems)
@@ -120,13 +120,13 @@ class AiUpsellAssistantController extends Controller
         $catalog = [
             'photo' => [
                 ['Extra Hour of Coverage', 0.16, 150, 'Captures more of the day; easiest yes for most clients.'],
-                ['Second Shooter', 0.30, 250, 'Two angles at key moments — popular for larger events.'],
+                ['Second Shooter', 0.30, 250, 'Two angles at key moments, popular for larger events.'],
                 ['Engagement / Pre-Event Session', 0.24, 200, 'Builds rapport before the day and adds deliverables.'],
                 ['Premium Album', 0.20, 180, 'A tangible keepsake with a strong perceived value.'],
                 ['Drone Coverage', 0.18, 160, 'Aerial establishing shots that stand out.'],
             ],
             'video' => [
-                ['Highlight Film (3–5 min)', 0.32, 300, 'The most-shared deliverable — high emotional value.'],
+                ['Highlight Film (3–5 min)', 0.32, 300, 'The most-shared deliverable, high emotional value.'],
                 ['Extra Hour of Coverage', 0.16, 150, 'More footage means a richer final edit.'],
                 ['Same-Day Edit', 0.28, 260, 'A short reel to play at the event itself.'],
                 ['Raw Footage Delivery', 0.14, 120, 'Low effort for you, valued by keepsake-minded clients.'],
@@ -140,12 +140,12 @@ class AiUpsellAssistantController extends Controller
             ],
             'cater' => [
                 ['Premium Bar Package', 0.28, 300, 'Higher margin and a noticeable guest experience lift.'],
-                ['Late-Night Snacks', 0.18, 180, 'Keeps guests happy late — easy operational add.'],
+                ['Late-Night Snacks', 0.18, 180, 'Keeps guests happy late, easy operational add.'],
                 ['Additional Server', 0.14, 120, 'Faster service for larger guest counts.'],
                 ['Dessert Station', 0.20, 200, 'A visual centerpiece with strong perceived value.'],
             ],
             'plan' => [
-                ['Day-of Coordination', 0.35, 400, 'Removes stress on the event day — high-value peace of mind.'],
+                ['Day-of Coordination', 0.35, 400, 'Removes stress on the event day, high-value peace of mind.'],
                 ['Rehearsal Management', 0.18, 200, 'Ensures a smooth run-through the day before.'],
                 ['RSVP & Guest Handling', 0.15, 150, 'Offloads admin many clients dread.'],
                 ['Vendor Coordination', 0.22, 250, 'Single point of contact across all suppliers.'],
@@ -189,7 +189,7 @@ class AiUpsellAssistantController extends Controller
         } else {
             // Generic event add-ons for unknown services.
             $items = [
-                ['Extended Hours', 0.18, 150, 'More time for your ' . $eventType . ' — a common ask.'],
+                ['Extended Hours', 0.18, 150, 'More time for your ' . $eventType . ': a common ask.'],
                 ['Premium Upgrade', 0.24, 200, 'A higher tier of your core service for discerning clients.'],
                 ['Add-On Consultation / Planning', 0.15, 120, 'Extra guidance clients value ahead of the event.'],
                 ['On-Site Assistant', 0.16, 130, 'Extra hands to keep the ' . $eventType . ' running smoothly.'],

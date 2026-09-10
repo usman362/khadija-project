@@ -1,6 +1,6 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'GigResource IQ™ — Smart Productivity Tools')
+@section('title', 'GigResource IQ™: Smart Productivity Tools')
 @section('page-title', 'GigResource IQ™')
 @section('page-subtitle', 'The intelligence behind every event')
 

@@ -230,7 +230,7 @@
             window.flatpickr(input, {
                 dateFormat: enableTime ? 'Y-m-d H:i' : 'Y-m-d',
                 altInput:   true,
-                altFormat:  enableTime ? 'M j, Y — h:i K' : 'M j, Y',
+                altFormat:  enableTime ? 'M j, Y, h:i K' : 'M j, Y',
                 allowInput: false,
                 enableTime: enableTime,
                 minDate:    minDate,

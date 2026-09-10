@@ -41,7 +41,7 @@
                 One booking at a time. Cancelling one professional does not affect anyone else
                 working on the same event.
             @else
-                Tell us what happened on the day. This goes to our team — it does not close the
+                Tell us what happened on the day. This goes to our team. It does not close the
                 booking or move any money on its own.
             @endif
         </p>
@@ -115,7 +115,7 @@
                             @php $other = $isClient ? $booking->supplier : $booking->client; @endphp
                             <option value="{{ $booking->id }}" @selected(old('booking_id') == $booking->id)>
                                 {{ $booking->event?->title ?? 'Booking #' . $booking->id }}
-                                — {{ $other?->name ?? 'Unknown' }}
+                               : {{ $other?->name ?? 'Unknown' }}
                                 @if($booking->event?->starts_at) ({{ $booking->event->starts_at->format('M j, Y') }}) @endif
                             </option>
                         @endforeach
@@ -230,7 +230,7 @@
 
                         @unless($quote['has_terms'])
                             <p class="dsp-hint">
-                                This booking has no signed terms yet, so there is no agreed deposit —
+                                This booking has no signed terms yet, so there is no agreed deposit:
                                 the figures above use the quoted price.
                             </p>
                         @endunless
@@ -261,7 +261,7 @@
                     <p class="dsp-sec">What happens next</p>
                     <p style="font-size:13px;line-height:1.65;color:var(--text-muted);margin:0;">
                         Our team reads your report and contacts both of you. Sending it does not
-                        cancel the booking, release any money, or hold any money — a report is a
+                        cancel the booking, release any money, or hold any money: a report is a
                         record of what happened, not a decision about it.
                     </p>
                     <p class="dsp-hint" style="margin-top:10px;">

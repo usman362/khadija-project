@@ -57,8 +57,8 @@ class PurgeDemoData extends Command
 
         $this->newLine();
         $this->line($apply
-            ? '<fg=red>APPLYING</> — rows will be deleted.'
-            : '<fg=yellow>DRY RUN</> — nothing will be written. Add --apply to go ahead.');
+            ? '<fg=red>APPLYING</>, rows will be deleted.'
+            : '<fg=yellow>DRY RUN</>. Nothing will be written. Add --apply to go ahead.');
 
         /* ── What real data would be damaged ─────────────────── */
 
@@ -69,7 +69,7 @@ class PurgeDemoData extends Command
             $this->error('Real rows would lose their professional:');
 
             foreach ($orphans as $table => $rows) {
-                $this->line("  {$table}: ".count($rows).' row(s) — ids '.implode(', ', array_slice($rows, 0, 20)));
+                $this->line("  {$table}: ".count($rows).' row(s), ids '.implode(', ', array_slice($rows, 0, 20)));
             }
 
             $this->newLine();
@@ -106,7 +106,7 @@ class PurgeDemoData extends Command
             if ($this->option('stranded')) {
                 $this->info('Demo events on real accounts to remove: '.count($stranded));
             } else {
-                $this->warn('Demo events on real accounts: '.count($stranded).' — LEFT ALONE');
+                $this->warn('Demo events on real accounts: '.count($stranded).': LEFT ALONE');
                 $this->line('  Add --stranded to remove these too.');
             }
 

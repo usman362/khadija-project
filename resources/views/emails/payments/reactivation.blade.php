@@ -35,7 +35,7 @@
 </div>
 
 <p>
-    All your data — profile, bookings, messages, and history — are safe and
+    All your data, profile, bookings, messages, and history, are safe and
     exactly where you left them. Your subscription and account settings remain unchanged.
 </p>
 

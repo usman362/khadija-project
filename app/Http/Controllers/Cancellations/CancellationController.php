@@ -158,7 +158,7 @@ class CancellationController extends Controller
         abort_if(! $isClientKind && $role !== 'professional', 403);
 
         abort_unless(CancellationPolicy::cancellable($booking), 403,
-            'This booking has already finished — open a dispute instead.');
+            'This booking has already finished. Open a dispute instead.');
 
         $certification = $isClientKind
             ? 'I understand the deposit is not refundable and that the refund shown is calculated on the remaining balance only.'
@@ -220,7 +220,7 @@ class CancellationController extends Controller
             'certified' => ['accepted'],
         ], [
             'event_id.required' => 'Choose which event you want to cancel.',
-            'reason.min'        => 'Tell us why in a sentence or two — an administrator reads this.',
+            'reason.min'        => 'Tell us why in a sentence or two: an administrator reads this.',
         ]);
 
         $event = \App\Models\Event::findOrFail($data['event_id']);

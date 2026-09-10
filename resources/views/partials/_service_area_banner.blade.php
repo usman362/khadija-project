@@ -8,7 +8,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         <div class="sab-t">
             <b>We haven't opened in your area yet.</b>
-            <span>Your account, profile and planning tools all work — booking and bidding switch on when we launch where you are.</span>
+            <span>Your account, profile and planning tools all work, booking and bidding switch on when we launch where you are.</span>
         </div>
         <a href="{{ route('register.welcome') }}">Notify me</a>
     </div>

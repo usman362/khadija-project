@@ -224,7 +224,7 @@ class ClientProposalController extends Controller
 
         return back()->with('status', 'Bid accepted. '
             . ($bid->supplier?->name ?? 'The professional')
-            . ' is awarded — a confirmed booking has been created under Bookings.');
+            . ' is awarded: a confirmed booking has been created under Bookings.');
     }
 
     /** Decline a bid. Only the event's owner may act. */

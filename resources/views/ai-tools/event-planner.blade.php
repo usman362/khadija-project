@@ -102,8 +102,8 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Starter', '#64748b', 'Build your own checklist by hand — add each task yourself, no suggested plan.'],
-        'semi'    => ['Semi', '#f97316', 'instantly drafts a milestone plan and budget split — tweak the amounts before you use it.'],
+        'manual'  => ['Starter', '#64748b', 'Build your own checklist by hand. Add each task yourself, no suggested plan.'],
+        'semi'    => ['Semi', '#f97316', 'instantly drafts a milestone plan and budget split, tweak the amounts before you use it.'],
         'maximum' => ['Maximum', '#16a34a', 'Enter your event and we build the full plan, milestones and budget for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -121,7 +121,7 @@
     {{-- Starter — hand-built checklist, no suggestions --}}
     <div class="ep-form-card">
         <h3>🗓 Build My Checklist</h3>
-        <div class="sub">Add each task yourself — set a name, priority and due date. Fully yours.</div>
+        <div class="sub">Add each task yourself. Set a name, priority and due date. Fully yours.</div>
         <div id="epmRows" style="display:flex;flex-direction:column;gap:10px;"></div>
         <button type="button" id="epmAdd" style="margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--ep-strong);background:rgba(249,115,22,.09);border:1px solid rgba(249,115,22,.28);border-radius:10px;padding:9px 15px;cursor:pointer;font-family:inherit;">+ Add task</button>
         <div style="margin-top:16px;font-size:12px;color:var(--text-muted);">Want this plan built for you automatically? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--ep-strong);font-weight:700;text-decoration:none;">Upgrade →</a></div>

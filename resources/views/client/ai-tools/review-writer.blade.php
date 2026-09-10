@@ -33,8 +33,8 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Starter', '#64748b', 'Write your own review by hand — by hand, just your words.'],
-        'semi'    => ['Semi', '#ea580c', 'instantly drafts a review — edit the wording before you post it.'],
+        'manual'  => ['Starter', '#64748b', 'Write your own review by hand, by hand, just your words.'],
+        'semi'    => ['Semi', '#ea580c', 'instantly drafts a review, edit the wording before you post it.'],
         'maximum' => ['Maximum', '#16a34a', 'Enter a few thoughts and instantly writes the full review for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -258,7 +258,7 @@
             {{-- share experience --}}
             <div class="rw-card">
                 <div class="rw-sec-h"><span class="n">1</span><b>Share Your Experience</b></div>
-                <p class="rw-sec-sub">{{ $isManual ? 'Add a few details for context, then write your review below.' : ($isSemi ? 'A few keywords are enough — instantly drafts a review you can edit.' : 'A few keywords are enough — instantly writes a natural, helpful review.') }}</p>
+                <p class="rw-sec-sub">{{ $isManual ? 'Add a few details for context, then write your review below.' : ($isSemi ? 'A few keywords are enough, instantly drafts a review you can edit.' : 'A few keywords are enough, instantly writes a natural, helpful review.') }}</p>
                 <div class="rw-form-grid">
                     <div>
                         <div class="rw-2col">
@@ -277,7 +277,7 @@
                                 <button type="button" class="rw-tone" data-tone="professional"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Professional</button>
                             </div>
                         </div>
-                        <div class="rw-fld"><label>Your Quick Thoughts <span style="color:var(--rw);">*</span> <span class="opt">(bullet points, keywords, or full sentences — anything works)</span></label><textarea class="rw-textarea" id="rw-thoughts" placeholder="e.g. On time, great energy, captured amazing candid shots, professional team, delivered edits in 2 weeks...">{{ $defaults['thoughts'] }}</textarea></div>
+                        <div class="rw-fld"><label>Your Quick Thoughts <span style="color:var(--rw);">*</span> <span class="opt">(bullet points, keywords, or full sentences. Anything works)</span></label><textarea class="rw-textarea" id="rw-thoughts" placeholder="e.g. On time, great energy, captured amazing candid shots, professional team, delivered edits in 2 weeks...">{{ $defaults['thoughts'] }}</textarea></div>
                         @unless($isManual)<button type="button" class="rw-gen-btn" id="rw-generate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>{{ $isSemi ? '✨ Suggest a Review' : '🤖 Write My Review' }}</button>@endunless
                     </div>
                     <div class="rw-tips">

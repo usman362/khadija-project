@@ -33,7 +33,7 @@
 
 <div class="dsp-card">
     @if($requests->isEmpty())
-        <div class="dsp-empty">Nothing here — no cancellations or no-shows on your bookings.</div>
+        <div class="dsp-empty">Nothing here: no cancellations or no-shows on your bookings.</div>
     @else
         <table class="dsp-table">
             <thead>

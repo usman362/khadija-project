@@ -89,7 +89,7 @@ class AiAgreementBuilderController extends Controller
             'evidence' => [
                 [
                     'key' => 'chat', 'title' => 'Chat & Messages', 'meta' => '24 messages analyzed', 'confidence' => 96,
-                    'items' => ['Total price discussed: $7,500', 'Floral, décor & photography requested', 'Blush uplighting — special request', 'Guest count confirmed: 150'],
+                    'items' => ['Total price discussed: $7,500', 'Floral, décor & photography requested', 'Blush uplighting, special request', 'Guest count confirmed: 150'],
                 ],
                 [
                     'key' => 'proposal', 'title' => 'Proposal Details', 'meta' => 'Accepted proposal #PR-1058', 'confidence' => 99,
@@ -109,7 +109,7 @@ class AiAgreementBuilderController extends Controller
                 ],
                 [
                     'key' => 'services', 'title' => 'Services & Deliverables', 'meta' => 'Cross-checked across sources', 'confidence' => 92,
-                    'items' => ['Floral arrangements — 10 tables + arch', 'Reception décor & styling', 'Photography + videography'],
+                    'items' => ['Floral arrangements, 10 tables + arch', 'Reception décor & styling', 'Photography + videography'],
                 ],
             ],
 
@@ -153,7 +153,7 @@ class AiAgreementBuilderController extends Controller
                     ['Setup', '8:00 AM'], ['Event', '5:00 PM – 11:00 PM'], ['Breakdown', 'by 11:30 PM'],
                 ]],
                 ['type' => 'ai', 'title' => 'Services & Deliverables', 'conf' => 96, 'list' => [
-                    'Floral & décor — 10 tables + ceremony arch', 'Reception décor & styling',
+                    'Floral & décor, 10 tables + ceremony arch', 'Reception décor & styling',
                     'Photography + videography', 'Delivery, setup, breakdown & pickup',
                 ]],
                 ['type' => 'ai', 'title' => 'Financial Summary', 'conf' => 99, 'fields' => [
@@ -176,7 +176,7 @@ class AiAgreementBuilderController extends Controller
                     ['Load-in Instructions', 'textarea', ''], ['Parking / Valet', 'text', ''],
                 ]],
                 ['type' => 'required', 'title' => 'Cancellation Policy', 'inputs' => [
-                    ['Choose Policy', 'select', ['Standard — 50% refund 30+ days prior', 'Flexible — full refund 14+ days', 'Strict — deposit non-refundable']],
+                    ['Choose Policy', 'select', ['Standard, 50% refund 30+ days prior', 'Flexible, full refund 14+ days', 'Strict, deposit non-refundable']],
                 ]],
                 ['type' => 'required', 'title' => 'Authorization & Signature', 'inputs' => [
                     ['Type your full name to authorize', 'text', ''],
@@ -211,7 +211,7 @@ class AiAgreementBuilderController extends Controller
                 ['title' => 'Payment Terms', 'status' => 'agreed', 'body' => 'Total $7,500. 30% deposit ($2,250) to secure the date; remaining balance due 7 days before the event.'],
                 ['title' => 'Event Timeline', 'status' => 'edited', 'body' => 'Setup 7:00 AM · Event 5:00 PM – 11:00 PM · Breakdown by 11:30 PM.', 'change' => 'Setup time changed 8:00 AM → 7:00 AM at client request.'],
                 ['title' => 'Cancellation Policy', 'status' => 'ai-suggested', 'body' => 'AI suggests: 50% refund if cancelled 30+ days prior; deposit non-refundable within 30 days. (Flagged as missing in Phase 1.)'],
-                ['title' => 'Liability & Insurance', 'status' => 'disputed', 'body' => 'Vendor carries general liability insurance covering the engagement.', 'change' => 'Client asked to specify coverage amount — awaiting response.'],
+                ['title' => 'Liability & Insurance', 'status' => 'disputed', 'body' => 'Vendor carries general liability insurance covering the engagement.', 'change' => 'Client asked to specify coverage amount, awaiting response.'],
             ],
 
             // Version history with change highlights.
@@ -219,13 +219,13 @@ class AiAgreementBuilderController extends Controller
                 ['v' => 'v1.0', 'by' => 'AI Draft', 'note' => 'Generated from Phase 1 evidence', 'time' => '2 days ago'],
                 ['v' => 'v1.1', 'by' => 'Elite Events Co.', 'note' => 'Refined payment & deposit terms', 'time' => '1 day ago'],
                 ['v' => 'v1.2', 'by' => 'Sarah Johnson', 'note' => 'Requested earlier setup time', 'time' => '5 hrs ago'],
-                ['v' => 'v2.0', 'by' => 'Elite Events Co.', 'note' => 'Updated timeline — under client review', 'time' => 'now', 'current' => true],
+                ['v' => 'v2.0', 'by' => 'Elite Events Co.', 'note' => 'Updated timeline, under client review', 'time' => 'now', 'current' => true],
             ],
 
             // Negotiation comment thread.
             'comments' => [
                 ['who' => 'Sarah Johnson', 'side' => 'client', 'msg' => 'Can we move setup to 7:00 AM? The venue opens early.', 'time' => '5h'],
-                ['who' => 'Elite Events Co.', 'side' => 'pro', 'msg' => 'Agreed — updated the timeline to a 7:00 AM setup.', 'time' => '4h'],
+                ['who' => 'Elite Events Co.', 'side' => 'pro', 'msg' => 'Agreed, updated the timeline to a 7:00 AM setup.', 'time' => '4h'],
                 ['who' => 'Sarah Johnson', 'side' => 'client', 'msg' => 'Great. Could you also specify the liability coverage amount?', 'time' => '2h'],
             ],
 

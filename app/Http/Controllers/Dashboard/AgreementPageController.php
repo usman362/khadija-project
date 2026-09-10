@@ -108,7 +108,7 @@ class AgreementPageController extends Controller
         // Only require a conversation when the client actually wants the AI to
         // reference it — skipping chat means booking-context-only is fine.
         if ($includeChat && (!$booking->conversation || $booking->conversation->messages()->count() === 0)) {
-            return back()->with('error', 'Please start a conversation with the other party before generating a chat-aware agreement — or uncheck "Include pro chat" to generate from booking details only.');
+            return back()->with('error', 'Please start a conversation with the other party before generating a chat-aware agreement, or uncheck "Include pro chat" to generate from booking details only.');
         }
 
         // Check: no fully accepted agreement exists
@@ -128,7 +128,7 @@ class AgreementPageController extends Controller
             'to_status' => 'pending_review',
             'changed_by' => $request->user()->id,
             'notes' => 'AI agreement generated (v' . $agreement->version . ')'
-                . ($includeChat ? ' — chat included' : ' — booking context only'),
+                . ($includeChat ? ', chat included' : ', booking context only'),
         ]);
 
         return redirect()->route('app.agreements.show', $agreement)
@@ -192,7 +192,7 @@ class AgreementPageController extends Controller
         }
 
         return back()->with('status', 'Agreement accepted successfully!' .
-            ($agreement->isFullyAccepted() ? ' Both parties have accepted — the booking is now confirmed.' : ''));
+            ($agreement->isFullyAccepted() ? ' Both parties have accepted: the booking is now confirmed.' : ''));
     }
 
     /**

@@ -118,7 +118,7 @@ class ToolToRequestTest extends TestCase
 
         $this->handOff();
 
-        $this->assertSame('Wedding — ' . now()->addMonths(4)->format('F Y'), $this->wizard()['title']);
+        $this->assertSame('Wedding in ' . now()->addMonths(4)->format('F Y'), $this->wizard()['title']);
     }
 
     /* ── The scope boundary ─────────────────────────────────── */

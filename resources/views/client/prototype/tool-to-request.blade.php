@@ -1,8 +1,8 @@
 @extends('layouts.client')
 
-@section('title', 'Prototype — Tool to Request')
+@section('title', 'Prototype: Tool to Request')
 @section('page-title', 'Tool → Request')
-@section('page-subtitle', 'Prototype — nothing here is saved.')
+@section('page-subtitle', 'Prototype. Nothing here is saved.')
 
 @push('styles')
 <style>
@@ -67,7 +67,7 @@
         <div>
             <b>This is a prototype, for the design review.</b>
             <p>
-                Click through it to see the whole idea. Nothing is saved and nothing is posted —
+                Click through it to see the whole idea. Nothing is saved and nothing is posted:
                 the tool results below are representative examples, not calculations.
                 Each outcome says whether it exists today or is still a proposal.
             </p>
@@ -94,7 +94,7 @@
         </div>
 
     @elseif($step === 'result')
-        <h2 class="pt-h">{{ $tool['name'] }} — result</h2>
+        <h2 class="pt-h">{{ $tool['name'] }}, result</h2>
         <p class="pt-sub">{{ $sample['headline'] ?? '' }} · <em>representative example</em></p>
 
         <div class="pt-panel">
@@ -142,7 +142,7 @@
                     <div class="pt-fill">
                         @if(isset($prefilled[$key]))
                             <span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span>
-                            <b>{{ $label }}</b><span>{{ $prefilled[$key] }} — from the tool</span>
+                            <b>{{ $label }}</b><span>{{ $prefilled[$key] }}, from the tool</span>
                         @else
                             <span class="empty"></span>
                             <b style="color:var(--text-muted);font-weight:600;">{{ $label }}</b><span>you fill this in</span>
@@ -159,7 +159,7 @@
                 <p style="margin:0 0 12px;font-size:13.5px;color:var(--text-secondary);line-height:1.6;">
                     <b style="color:var(--text-primary);">This one is already live.</b>
                     Nine tools carry an “Add to my event” button; the result is stored against
-                    the event and appears on its page. Nothing to build — it only needs to sit
+                    the event and appears on its page. Nothing to build. It only needs to sit
                     alongside the other four so the client sees one consistent set of choices.
                 </p>
                 <a class="pt-btn" href="{{ route('client.events.index') }}">See it on a real event →</a>
@@ -167,7 +167,7 @@
         @else
             <div class="pt-panel">
                 <p style="margin:0;font-size:13.5px;color:var(--text-secondary);line-height:1.6;">
-                    Design only — not built, and not in the first pass. It would work the same
+                    Design only, not built, and not in the first pass. It would work the same
                     way as “Post as BR”: the tool's output opens
                     {{ $outcomeKey === 'esr' ? 'the rush request' : ($outcomeKey === 'dsr' ? 'the Direct Request' : 'a saved draft') }}
                     with the fields it already knows filled in.

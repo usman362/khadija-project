@@ -2,7 +2,7 @@
 
 @section('title', 'File a dispute')
 @section('page-title', 'File a dispute')
-@section('page-subtitle', 'One booking per case. Tell us what happened — our team compares what was delivered against what was agreed in the contract.')
+@section('page-subtitle', 'One booking per case. Tell us what happened. Our team compares what was delivered against what was agreed in the contract.')
 
 @php
     /*
@@ -62,7 +62,7 @@
                             @php $other = $booking->client_id === auth()->id() ? $booking->supplier : $booking->client; @endphp
                             <option value="{{ $booking->id }}" @selected(old('booking_id') == $booking->id)>
                                 {{ $booking->event?->title ?? 'Booking #' . $booking->id }}
-                                — {{ $other?->name ?? 'Unknown' }}
+                               : {{ $other?->name ?? 'Unknown' }}
                                 ({{ $booking->booked_at?->format('M j, Y') ?? $booking->created_at?->format('M j, Y') }})
                             </option>
                         @endforeach
@@ -123,7 +123,7 @@
                         No, not yet
                     </label>
                     <p class="dsp-hint">
-                        Either answer is fine — it does not stop you filing. Most cases start
+                        Either answer is fine. It does not stop you filing. Most cases start
                         with the two of you trying to settle it directly.
                     </p>
                     @error('attempted_direct') <p class="dsp-err">{{ $message }}</p> @enderror
@@ -168,7 +168,7 @@
                          2026-08-30: outside legal and consumer remedies must
                          not be improperly restricted by the page wording. --}}
                     <li><strong style="color:var(--text-primary);">Outside escalation.</strong>
-                        Our decision is not the end of the road — you keep whatever rights and
+                        Our decision is not the end of the road. You keep whatever rights and
                         remedies the law gives you.</li>
                 </ol>
 
@@ -192,11 +192,11 @@
                 <p style="font-size:13px;line-height:1.65;margin:10px 0 0;color:var(--text-muted);">
                     <strong style="color:var(--text-primary);">The deposit.</strong>
                     The deposit is not refundable. It covers the administrative and reservation
-                    costs of holding the date for you — work that has already been done by the
+                    costs of holding the date for you, work that has already been done by the
                     time a dispute is raised. It is the amount set in the terms you both signed,
                     so it is only ever a figure you agreed to.
                     <strong style="color:var(--text-primary);">Only the balance above the deposit
-                    is in question during a dispute</strong> — that is the part any decision can
+                    is in question during a dispute</strong>. That is the part any decision can
                     return, hold or release.
                 </p>
             </div>

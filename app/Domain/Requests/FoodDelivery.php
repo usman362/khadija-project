@@ -40,8 +40,8 @@ final class FoodDelivery
      * and the wording in his notes are the same wording.
      */
     public const CHOICES = [
-        self::PROFESSIONAL_DELIVERS => 'Professional Delivery — they bring it to the event',
-        self::CLIENT_COLLECTS       => 'Client Pickup — we collect it from them',
+        self::PROFESSIONAL_DELIVERS => 'Professional Delivery. They bring it to the event',
+        self::CLIENT_COLLECTS       => 'Client Pickup. We collect it from them',
     ];
 
     /** The service categories whose services are food. */

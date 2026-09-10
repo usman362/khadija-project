@@ -1096,7 +1096,7 @@
                     :label="$b['name']"
                     :colour="$b['colour'] ?? '#f97316'"
                     :earned="$b['earned']"
-                    :title="$b['earned'] ? $b['blurb'] : $b['blurb'] . ' — ' . $b['progress'] . ' of ' . $b['need']"
+                    :title="$b['earned'] ? $b['blurb'] : $b['blurb'] . ': ' . $b['progress'] . ' of ' . $b['need']"
                 />
             @endforeach
         </div>
@@ -1114,7 +1114,7 @@
             </div>
         @elseif($__badges->isNotEmpty())
             <p style="font-size:12.5px;color:var(--text-muted);line-height:1.6;margin:10px 0 0;">
-                That is every badge — all of them earned.
+                That is every badge. All of them earned.
             </p>
         @endif
     </div>
@@ -1276,7 +1276,7 @@
                                  stage the rest of the portal reports for it. --}}
                             <a class="od-cal-event" href="{{ route('client.events.show', $ev) }}"
                                style="background:{{ $stageColour }}1f;color:{{ $stageColour }};"
-                               title="{{ $ev->title }} — {{ $stageLabel }}">{{ \Illuminate\Support\Str::limit($ev->title, 10) }}</a>
+                               title="{{ $ev->title }}: {{ $stageLabel }}">{{ \Illuminate\Support\Str::limit($ev->title, 10) }}</a>
                         @endforeach
                         @if($dayEvs->count() > 2)
                             <div class="od-cal-more">+{{ $dayEvs->count() - 2 }} more</div>
@@ -1362,7 +1362,7 @@
             </a>
         @empty
             <p style="font-size:12.5px;color:var(--text-muted);margin:6px 0 0;">
-                No guest lists yet. Open an event and add guests there — each event keeps its own list.
+                No guest lists yet. Open an event and add guests there. Each event keeps its own list.
             </p>
         @endforelse
     </div>

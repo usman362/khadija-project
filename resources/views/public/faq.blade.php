@@ -1,8 +1,8 @@
 @extends('layouts.landing')
 
 @php
-    $seoTitle       = 'FAQs — Questions? We\'ve Got Answers | GigResource';
-    $seoDescription = 'Find quick answers to the most common questions about using GigResource — getting started, clients, professionals, payments, account security, and support.';
+    $seoTitle       = 'FAQs: Questions? We\'ve Got Answers | GigResource';
+    $seoDescription = 'Find quick answers to the most common questions about using GigResource, getting started, clients, professionals, payments, account security, and support.';
 
     // Topic metadata (description + accent) for the 6 known categories.
     $topicMeta = [

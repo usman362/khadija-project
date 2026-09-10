@@ -20,7 +20,7 @@ class AccountReactivationConfirmation extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Account Reactivated Successfully — ' . config('app.name'),
+            subject: 'Account Reactivated Successfully: ' . config('app.name'),
         );
     }
 

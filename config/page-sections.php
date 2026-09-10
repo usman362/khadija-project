@@ -46,10 +46,10 @@ return [
                 ],
             ],
             'extra' => [
-                'badge_title' => ['type' => 'text', 'label' => 'Photo badge — title'],
-                'badge_text'  => ['type' => 'text', 'label' => 'Photo badge — sub-text'],
+                'badge_title' => ['type' => 'text', 'label' => 'Photo badge, title'],
+                'badge_text'  => ['type' => 'text', 'label' => 'Photo badge, sub-text'],
                 'trust_text'  => ['type' => 'text', 'label' => 'Trust line under the cards'],
-                'trust_sub'   => ['type' => 'text', 'label' => 'Trust line — second row'],
+                'trust_sub'   => ['type' => 'text', 'label' => 'Trust line, second row'],
             ],
         ],
 
@@ -69,7 +69,7 @@ return [
 
         'categories' => [
             'name'   => 'Explore Popular Categories',
-            'note'   => 'The tiles themselves come from your real categories — only the heading is editable here.',
+            'note'   => 'The tiles themselves come from your real categories, only the heading is editable here.',
             'fields' => [
                 'heading' => ['type' => 'text', 'label' => 'Heading'],
                 'body'    => ['type' => 'text', 'label' => '“View all” link label'],
@@ -141,7 +141,7 @@ return [
 
         'testimonials' => [
             'name'   => 'Loved by Our Community',
-            'note'   => 'The quote is your newest 5-star review — only the heading is editable.',
+            'note'   => 'The quote is your newest 5-star review, only the heading is editable.',
             'fields' => [
                 'heading' => ['type' => 'text', 'label' => 'Heading'],
             ],
@@ -163,7 +163,7 @@ return [
 
         'pricing' => [
             'name'   => 'Pricing',
-            'note'   => 'The plans and their prices come from Membership Plans — only the heading is editable here.',
+            'note'   => 'The plans and their prices come from Membership Plans, only the heading is editable here.',
             'fields' => [
                 'heading'    => ['type' => 'text', 'label' => 'Heading'],
                 'subheading' => ['type' => 'text', 'label' => 'Sub-text'],

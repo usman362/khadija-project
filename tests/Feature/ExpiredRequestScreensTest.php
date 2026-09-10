@@ -95,8 +95,8 @@ class ExpiredRequestScreensTest extends TestCase
 
         $page->assertOk();
         $page->assertSee('This request has expired', false);
-        $page->assertSee('+3 days — $1.99', false);
-        $page->assertSee('+30 days — $7.99', false);
+        $page->assertSee('+3 days: $1.99', false);
+        $page->assertSee('+30 days: $7.99', false);
 
         // §1 — nothing has been deleted, and the page says so.
         $page->assertSee('Nothing has been deleted', false);

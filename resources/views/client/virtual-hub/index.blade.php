@@ -165,7 +165,7 @@
     <div class="vh-entry">
         <a href="{{ route('client.virtual-hub.brief') }}" class="vh-entry-card primary">
             <div class="vh-entry-title">Plan a new event</div>
-            <div class="vh-entry-sub">Tell us the format, date and services — professionals send proposals.</div>
+            <div class="vh-entry-sub">Tell us the format, date and services. Professionals send proposals.</div>
         </a>
         <a href="{{ route('public.browse') }}" class="vh-entry-card">
             <div class="vh-entry-title">Find a professional</div>
@@ -193,7 +193,7 @@
 
     @if($stage === 4)
     <div class="vh-hire">
-        <div class="vh-hire-head">Three ways to hire — all the usual rules apply</div>
+        <div class="vh-hire-head">Three ways to hire. All the usual rules apply</div>
         <div class="vh-hire-row">
             <a href="{{ route('public.browse') }}" class="vh-hire-card">
                 <b>Browse professionals</b>

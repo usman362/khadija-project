@@ -274,7 +274,7 @@ class AttendeeManagementTest extends TestCase
     {
         $this->actingAs($this->client)
             ->get(route('client.dashboard'))
-            ->assertSee('each event keeps its own list');
+            ->assertSee('Each event keeps its own list');
     }
 
     public function test_the_event_page_has_an_attendees_tab(): void

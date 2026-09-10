@@ -10,7 +10,7 @@
 
     <p>Two things worth doing first:</p>
     <ul>
-        <li>Fill in your profile and the services you offer — that is what clients search on.</li>
+        <li>Fill in your profile and the services you offer. That is what clients search on.</li>
         <li>Set the areas and dates you work, so you only hear about jobs you can take.</li>
     </ul>
 @else

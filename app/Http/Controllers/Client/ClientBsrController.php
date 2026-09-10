@@ -399,7 +399,7 @@ class ClientBsrController extends Controller
             Session::forget(self::KEY);
 
             return redirect()->route('client.events.show', $event)->with('status',
-                'Your request is live — free to post. Professionals are being notified now, and proposals will appear under Proposals as they arrive.');
+                'Your request is live, free to post. Professionals are being notified now, and proposals will appear under Proposals as they arrive.');
         }
 
         $keys = array_keys(self::STEPS);
@@ -582,7 +582,7 @@ class ClientBsrController extends Controller
 
         return redirect()
             ->route('client.bsr.step', 'service')
-            ->with('status', $toolName . ' details carried over. Choose the services you need — you can change everything else as you go.');
+            ->with('status', $toolName . ' details carried over. Choose the services you need. You can change everything else as you go.');
     }
 
     /**
@@ -630,7 +630,7 @@ class ClientBsrController extends Controller
 
         return redirect()
             ->route('client.bsr.resume', $event)
-            ->with('status', 'Saved as a draft from ' . $toolName . '. Nothing has been posted — it is in My Events until you publish it.');
+            ->with('status', 'Saved as a draft from ' . $toolName . '. Nothing has been posted. It is in My Events until you publish it.');
     }
 
     /**
@@ -669,7 +669,7 @@ class ClientBsrController extends Controller
         return redirect()
             ->route('client.bsr.step', 'service')
             ->with('status', $eventType
-                ? "Planning your {$eventType}. Choose the services you need — the ones that matter most for this kind of event are first."
+                ? "Planning your {$eventType}. Choose the services you need: the ones that matter most for this kind of event are first."
                 : 'Choose the services you need to get started.');
     }
 
@@ -682,7 +682,7 @@ class ClientBsrController extends Controller
 
         $when = $date ? \Illuminate\Support\Carbon::parse($date)->format('F Y') : null;
 
-        return $when ? "{$eventType} — {$when}" : $eventType;
+        return $when ? "{$eventType} in {$when}" : $eventType;
     }
 
     public function discard(Request $request): RedirectResponse
@@ -818,7 +818,7 @@ class ClientBsrController extends Controller
             'services.required'          => 'Pick at least one service you need.',
             'organization_type.required' => 'Tell us who the request is for.',
             'title.required'             => 'Give your event a name.',
-            'description.required'       => 'Describe what you need — professionals bid on this.',
+            'description.required'       => 'Describe what you need. Professionals bid on this.',
             'description.min'            => 'A little more detail helps professionals bid accurately.',
             'budget_max.gte'             => 'The top of the range must be at least the bottom.',
             'proposal_deadline.after'    => 'The proposal deadline has to be in the future.',

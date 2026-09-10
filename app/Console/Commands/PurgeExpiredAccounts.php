@@ -55,7 +55,7 @@ class PurgeExpiredAccounts extends Command
             }
         }
 
-        $this->info(sprintf('Purge complete — %d processed, %d failed.', $purged, $failed));
+        $this->info(sprintf('Purge complete: %d processed, %d failed.', $purged, $failed));
         return $failed > 0 ? self::FAILURE : self::SUCCESS;
     }
 

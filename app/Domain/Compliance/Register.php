@@ -77,7 +77,7 @@ final class Register
             }
 
             if (blank($r['citation'] ?? null)) {
-                $out[] = ['key' => $r['key'], 'problem' => 'No citation on file — we cannot show which law this answers.'];
+                $out[] = ['key' => $r['key'], 'problem' => 'No citation on file. We cannot show which law this answers.'];
             }
 
             return $out;

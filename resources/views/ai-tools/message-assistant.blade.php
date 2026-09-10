@@ -37,8 +37,8 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Starter', '#64748b', 'Write your own message by hand — by hand, just your words.'],
-        'semi'    => ['Semi', '#2563eb', 'instantly drafts message options — edit the wording before you send.'],
+        'manual'  => ['Starter', '#64748b', 'Write your own message by hand, by hand, just your words.'],
+        'semi'    => ['Semi', '#2563eb', 'instantly drafts message options, edit the wording before you send.'],
         'maximum' => ['Maximum', '#16a34a', 'Pick a purpose and tone and instantly writes the whole message for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -96,7 +96,7 @@
             <h3>{{ $isMax ? '📨 Drafted Messages' : '📨 Suggested Messages' }}</h3>
             <x-add-to-event tool-key="message-assistant" tool-name="Message Builder" :event-id="request('event_id')" />
             <div class="ma-summary" id="maSummary" style="display:none;"></div>
-            <div id="maOut"><p class="ma-empty">Choose a purpose and tone, then draft your message — a few options will appear here.</p></div>
+            <div id="maOut"><p class="ma-empty">Choose a purpose and tone, then draft your message: a few options will appear here.</p></div>
         </div>
         @endif
     </div>

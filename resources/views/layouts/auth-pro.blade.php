@@ -48,7 +48,7 @@
             'pageBg' => 'linear-gradient(180deg,#fdf6f0 0%,#fbf0e7 100%)',
             'panelBg' => '#fdeee2',
             'label'  => 'Welcome Back',
-            'tagline'=> 'Sign in to manage your events, bookings, and connections — all in one place.',
+            'tagline'=> 'Sign in to manage your events, bookings, and connections. All in one place.',
             'benefits' => [
                 ['cal',   'Pick Up Where You Left Off', 'Jump straight back into your events, bookings and messages.'],
                 ['star',  'Trusted Marketplace',        'Thousands of verified clients and professionals in one place.'],
@@ -80,7 +80,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'GigResource') — GigResource</title>
+    <title>@yield('title', 'GigResource') | GigResource</title>
     <link rel="icon" type="image/png" href="{{ asset('gigresource-logos/gigresource-icon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

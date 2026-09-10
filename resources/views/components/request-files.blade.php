@@ -57,7 +57,7 @@
         <div class="rf-drop" id="rfDrop">
             <b>Drag files here, or choose them</b>
             <p>
-                Images, PDF, Word, Excel, CSV or plain text — up to 10 MB each, {{ \App\Http\Controllers\Client\RequestAttachmentController::MAX_FILES }} files.
+                Images, PDF, Word, Excel, CSV or plain text, up to 10 MB each, {{ \App\Http\Controllers\Client\RequestAttachmentController::MAX_FILES }} files.
                 Professionals can open these once your request is published.
             </p>
             <label class="rf-pick">
@@ -103,7 +103,7 @@
     @unless ($readonly)
         <p class="rf-note">
             Files are stored privately and are not on a public link. Only you can see them until you
-            publish — after that, professionals who can bid on this request can open them too.
+            publish, after that, professionals who can bid on this request can open them too.
         </p>
     @endunless
 </div>
@@ -177,7 +177,7 @@
                     var m = res.body.message
                         || (res.body.errors && Object.values(res.body.errors)[0][0])
                         || 'That file could not be attached.';
-                    say(err, file.name + ' — ' + m);
+                    say(err, file.name + ': ' + m);
                 } else {
                     if (empty) empty.hidden = true;
                     list.appendChild(tile(res.body.file));
@@ -186,7 +186,7 @@
                 next();
             })
             .catch(function () {
-                say(err, file.name + ' — the upload did not go through. Check your connection and try again.');
+                say(err, file.name + ': the upload did not go through. Check your connection and try again.');
                 next();
             });
         }

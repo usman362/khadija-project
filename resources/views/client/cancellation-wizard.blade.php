@@ -198,7 +198,7 @@
                 <div class="cw-log-meta" id="cw-log-meta"></div>
             </div>
             <div class="cw-log-list" id="cw-log-list"></div>
-            <a href="{{ route('client.dashboard') }}" class="cw-log-done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Done — Back to Dashboard</a>
+            <a href="{{ route('client.dashboard') }}" class="cw-log-done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Done: Back to Dashboard</a>
         </div>
     </div>
 </div>

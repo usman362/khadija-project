@@ -10,7 +10,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>GigResource — Design Scope Breakdown</title>
+    <title>GigResource: Design Scope Breakdown</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         @page { size: A4; margin: 16mm 14mm; }
@@ -328,7 +328,7 @@
     $customGroups = [
         [
             'title' => 'Public Website',
-            'note'  => 'Top conversion surface — every visitor sees these first',
+            'note'  => 'Top conversion surface. Every visitor sees these first',
             'pages' => [
                 ['Landing / Home', 'Hero + value props + CTAs'],
                 ['Browse Professionals', 'Marketplace grid + filters + cards'],
@@ -336,11 +336,11 @@
                 ['Events & Categories', 'Mega-panel + advanced filter system'],
                 ['How It Works', '8-step audience-coded journey'],
                 ['About Us', 'Brand story + team + stats'],
-                ['Blog Index', 'Content discovery — featured + grid'],
+                ['Blog Index', 'Content discovery, featured + grid'],
                 ['Blog Post Detail', 'Editorial reading view'],
                 ['FAQ', 'Search + category accordion'],
                 ['Join as Influencer', 'Recruitment CTA flow'],
-                ['Policy Page (1 design — 4 uses)', 'Privacy / AI / Payment / Cancellation'],
+                ['Policy Page (1 design, 4 uses)', 'Privacy / AI / Payment / Cancellation'],
                 ['Pricing / Membership Plans', '3-tier comparison + contract picker'],
             ],
         ],
@@ -355,7 +355,7 @@
         ],
         [
             'title' => 'Dashboard Home Pages',
-            'note'  => 'Welcome layouts — one per role',
+            'note'  => 'Welcome layouts: one per role',
             'pages' => [
                 ['Client Dashboard Home', 'KPIs + upcoming events + recs'],
                 ['Professional Dashboard Home', 'Earnings + leads + reviews'],
@@ -365,16 +365,16 @@
         ],
         [
             'title' => 'Reusable Design Systems',
-            'note'  => 'One design — used across many pages',
+            'note'  => 'One design, used across many pages',
             'pages' => [
-                ['Profile Editor (1 design — multi-role)', 'Sidebar-tabs layout'],
-                ['Messages / Chat (1 design — multi-role)', 'Two-pane chat shell'],
-                ['AI Tools Shell (1 design — 3 tools)', 'Form + result panel'],
+                ['Profile Editor (1 design, multi-role)', 'Sidebar-tabs layout'],
+                ['Messages / Chat (1 design, multi-role)', 'Two-pane chat shell'],
+                ['AI Tools Shell (1 design, 3 tools)', 'Form + result panel'],
                 ['Professional Card (component)', 'Tile pattern reused everywhere'],
                 ['Booking Card (component)', 'Reused across dashboards'],
                 ['Membership Tier Card', 'Pricing-page tile'],
-                ['Empty State (1 design — reused)', 'Friendly no-results pattern'],
-                ['Error Page Shell (already built)', 'Just polish — 7 variants'],
+                ['Empty State (1 design, reused)', 'Friendly no-results pattern'],
+                ['Error Page Shell (already built)', 'Just polish, 7 variants'],
                 ['Email Templates (1 master)', 'Transactional emails'],
             ],
         ],
@@ -383,7 +383,7 @@
     $devGroups = [
         [
             'title' => 'Admin CRUD',
-            'note'  => 'Standard NobleUI Bootstrap shell — tables, forms, modals',
+            'note'  => 'Standard NobleUI Bootstrap shell, tables, forms, modals',
             'pages' => [
                 'Events list / detail', 'Bookings list', 'Categories list / create / edit',
                 'Membership Plans admin', 'FAQ Management', 'Policy editor',
@@ -417,7 +417,7 @@
         ],
         [
             'title' => 'Utility Pages',
-            'note'  => 'Minimal design — small functional confirmations',
+            'note'  => 'Minimal design, small functional confirmations',
             'pages' => [
                 'Forgot / Reset confirm screens', 'Account restore',
                 'Reactivation success / cancel', 'Referral landing',
@@ -483,7 +483,7 @@
                 <li><strong>Conversion focus.</strong> ~80% of user traffic lands on the 28 custom-designed pages (landing → browse → profile → register → dashboard home). This is where bespoke design directly impacts sign-ups and bookings.</li>
                 <li><strong>Component reuse.</strong> One profile-editor design covers 3 role profile pages. One chat design covers 2 role inboxes. One AI-tool shell covers 3 tools. That collapses 11 pages into 3 design deliverables.</li>
                 <li><strong>Admin doesn't need brand polish.</strong> Admins are internal users; standard tables and form layouts (NobleUI template already in place) handle the look-and-feel out of the box.</li>
-                <li><strong>Error / utility pages already styled.</strong> All 7 error variants (404 / 500 / 403 / 419 / 429 / 401 / 503) are already custom-coded with the brand palette — designer only needs to polish if desired.</li>
+                <li><strong>Error / utility pages already styled.</strong> All 7 error variants (404 / 500 / 403 / 419 / 429 / 401 / 503) are already custom-coded with the brand palette, designer only needs to polish if desired.</li>
                 <li><strong>Faster delivery.</strong> Designer focuses on 28 high-impact pages instead of 108. Dev team unblocks 80 pages immediately using the design system.</li>
             </ol>
         </div>

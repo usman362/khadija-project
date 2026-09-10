@@ -2,7 +2,7 @@
 
 @section('title', 'Create a Bidding Request')
 @section('page-title', 'Create a Bidding Request')
-@section('page-subtitle', 'Tell professionals what you need, when and where — they review it and send you sealed proposals to compare.')
+@section('page-subtitle', 'Tell professionals what you need, when and where. They review it and send you sealed proposals to compare.')
 
 {{-- Screen 1 of the client BR set — the 7-step create wizard.
 
@@ -216,7 +216,7 @@
 @if(!empty($data['from_tool_name']))
     <div class="cl-card" style="background:rgba(37,99,235,.06);border:1px solid rgba(37,99,235,.28);padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--text-secondary);">
         <b style="color:var(--text-primary);">Started from {{ $data['from_tool_name'] }}.</b>
-        What you entered there has been filled in below — every field is still yours to change, and
+        What you entered there has been filled in below. Every field is still yours to change, and
         nothing goes out to professionals until you publish.
     </div>
 @endif
@@ -268,7 +268,7 @@
     {{-- ── 1 · Service ─────────────────────────────────────── --}}
     @if($step === 'service')
         <h3>What do you need?</h3>
-        <p class="lede">Pick one service for a single-service request, or several for a multi-service one — it's the same request either way.</p>
+        <p class="lede">Pick one service for a single-service request, or several for a multi-service one, it's the same request either way.</p>
 
         {{-- Event type first, and required.
              It used to sit below the services and validate as nullable, so a
@@ -279,7 +279,7 @@
         <div class="bw-field">
             <label for="bwEventType">Event type <span class="req">*</span></label>
             <select name="event_type" id="bwEventType" required aria-label="Event type">
-                <option value="">— Choose your event —</option>
+                <option value="">Choose your event</option>
                 @foreach($eventTypes as $t)
                     <option value="{{ $t->name }}" @selected(($data['event_type'] ?? '') === $t->name)>{{ $t->name }}</option>
                 @endforeach
@@ -342,7 +342,7 @@
                         @if($pros > 0)
                             <span class="bw-svc-pros" title="{{ $pros }} {{ \Illuminate\Support\Str::plural('professional', $pros) }} in your state offer this">{{ $pros }}</span>
                         @else
-                            <span class="bw-svc-pros is-none" title="Nobody in your state offers this yet — you can still ask">0</span>
+                            <span class="bw-svc-pros is-none" title="Nobody in your state offers this yet. You can still ask">0</span>
                         @endif
                     </label>
                 @endforeach
@@ -353,7 +353,7 @@
             <div class="bw-note warn" id="bwNoPros" hidden>
                 <b id="bwNoProsHead"></b>
                 <p>
-                    You can still ask for it — the request stays open and any professional who joins
+                    You can still ask for it: the request stays open and any professional who joins
                     and offers this will see it. If you would rather not wait, pick something else
                     here, or send a Direct Request to someone you already know.
                 </p>
@@ -363,7 +363,7 @@
             </div>
 
             <div class="bw-scope">
-                <span id="bwScope">Pick your services — the scope follows automatically.</span>
+                <span id="bwScope">Pick your services: the scope follows automatically.</span>
             </div>
         </div>
 
@@ -485,7 +485,7 @@
                 <div class="bw-field">
                     <label>Who can bid</label>
                     <p class="bw-hint" style="margin-top:0;">
-                        Professionals in <b>{{ $__homeState }}</b> — GigResource works within one state for now,
+                        Professionals in <b>{{ $__homeState }}</b> | GigResource works within one state for now,
                         so that is who sees this request even if the event itself is elsewhere.
                     </p>
                 </div>
@@ -558,7 +558,7 @@
         <div class="bw-field">
             <label>Description <span class="req">*</span></label>
             <textarea name="description" placeholder="What the event is, what you need delivered, anything that would change the price…">{{ $data['description'] ?? '' }}</textarea>
-            <p class="bw-help">At least a couple of sentences. Include anything that affects scope — access, timings, equipment, dietary needs.</p>
+            <p class="bw-help">At least a couple of sentences. Include anything that affects scope, access, timings, equipment, dietary needs.</p>
         </div>
 
         {{-- Only when the services picked at step 1 include catering or bar.
@@ -634,7 +634,7 @@
         @endif
 
         <div class="bw-scope">
-            💡 <span>Posting is free. A <b>$2.99</b> service fee applies only when you finalize with a professional — and nothing at all if you don't book.</span>
+            💡 <span>Posting is free. A <b>$2.99</b> service fee applies only when you finalize with a professional, and nothing at all if you don't book.</span>
         </div>
 
     {{-- ── 5 · Proposal settings ───────────────────────────── --}}
@@ -686,7 +686,7 @@
                 f.dispatchEvent(new Event('input'));
             });
 
-            if (note) note.textContent = 'A starting point — change anything you disagree with.';
+            if (note) note.textContent = 'A starting point, change anything you disagree with.';
         } catch (err) {
             if (note) note.textContent = 'Could not suggest a split just now.';
         } finally {
@@ -733,7 +733,7 @@
                 @else
                     Choose when proposals close. No standard window has been approved yet, so this can't be set for you.
                 @endif
-                A deadline can never fall after the event date — if it would, it's pulled back automatically.
+                A deadline can never fall after the event date, if it would, it's pulled back automatically.
             </p>
         </div>
 
@@ -760,7 +760,7 @@
          leaves the wizard and comes back. --}}
     @elseif($step === 'files')
         <h3>Files</h3>
-        <p class="lede">Briefs, floor plans and reference documents. Optional — you can publish without them.</p>
+        <p class="lede">Briefs, floor plans and reference documents. Optional. You can publish without them.</p>
 
         <x-request-files :files="$files" :draft-key="$filesKey" />
 
@@ -844,7 +844,7 @@
                 @endphp
                 <b>No professional on GigResource offers {{ $picked->count() ? $picked->take(2)->implode(' or ') : 'these services' }} in your state yet</b>
                 <p>
-                    You can still publish — the request stays open and any professional who joins and offers
+                    You can still publish: the request stays open and any professional who joins and offers
                     this will see it. If you would rather not wait, go back to step 1 and add another service,
                     or post a Direct Request to someone you already know.
                 </p>
@@ -857,7 +857,7 @@
             <div class="bw-sec">
                 <div class="bw-sec-h">
                     <b>Availability on {{ $availabilityDate->format('D, M j, Y') }}</b>
-                    <span>Counted now — it can change until a professional accepts.</span>
+                    <span>Counted now. It can change until a professional accepts.</span>
                 </div>
 
                 <div class="bw-avail">
@@ -900,7 +900,7 @@
                 {{-- The caveat is not small print: it is the reason these
                      numbers are counts and not a promise. --}}
                 <div class="bw-caveat">
-                    A clear calendar here means nothing is booked <b>on GigResource</b> — a professional may still be
+                    A clear calendar here means nothing is booked <b>on GigResource</b>: a professional may still be
                     committed elsewhere. Nothing is held until one of them accepts and the booking is confirmed.
                 </div>
             </div>
@@ -922,7 +922,7 @@
 
             <div class="bw-callout">
                 <b>Ask them to confirm the date</b>
-                <p>Professionals reply with a proposal. Availability above is a count, not a booking — ask them to
+                <p>Professionals reply with a proposal. Availability above is a count, not a booking. Ask them to
                    confirm the date and time when they respond.</p>
             </div>
         </div>
@@ -964,8 +964,8 @@
         <h3>Review &amp; publish</h3>
         <p class="lede">This is what professionals will see. You can edit any of it after publishing, right up until you choose someone.</p>
 
-        <div class="bw-rev"><span>Request type</span><b>BR — open to bidding</b></div>
-        <div class="bw-rev"><span>Scope</span><b>{{ $isMulti ? 'MSR — multi-service' : 'SSR — single service' }}</b></div>
+        <div class="bw-rev"><span>Request type</span><b>BR. Open to bidding</b></div>
+        <div class="bw-rev"><span>Scope</span><b>{{ $isMulti ? 'MSR, multi-service' : 'SSR, single service' }}</b></div>
         <div class="bw-rev"><span>Services</span><b>{{ $svcNames->implode(', ') ?: '—' }}</b></div>
         <div class="bw-rev"><span>Name</span><b>{{ $data['title'] ?? '—' }}</b></div>
         <div class="bw-rev"><span>Event date</span><b>{{ ! empty($data['starts_at']) ? \Illuminate\Support\Carbon::parse($data['starts_at'])->format('M j, Y · g:i A') : 'Flexible' }}@if(! empty($data['ends_at'])) – {{ \Illuminate\Support\Carbon::parse($data['ends_at'])->format('g:i A') }}@endif</b></div>
@@ -1048,10 +1048,10 @@
     function sync() {
         var n = box.querySelectorAll('input:checked').length;
         out.innerHTML = n === 0
-            ? 'Pick your services — the scope follows automatically.'
+            ? 'Pick your services: the scope follows automatically.'
             : (n === 1
-                ? 'One service — this will post as an <b>SSR</b> (single service request).'
-                : n + ' services — this will post as an <b>MSR</b> (multi-service request). Professionals bid per service.');
+                ? 'One service. This will post as an <b>SSR</b> (single service request).'
+                : n + ' services. This will post as an <b>MSR</b> (multi-service request). Professionals bid per service.');
     }
     /* And say straight away when a ticked service has nobody behind it.
        This was step 7's news; a client had filled in six more screens by the

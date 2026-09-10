@@ -77,8 +77,8 @@ class RequestTypeLabelsTest extends TestCase
         $this->actingAs($this->client())
             ->get(route('membership.plans'))
             ->assertOk()
-            ->assertSee('Early access — new BRs (multi-service)', false)
-            ->assertSee('Early access — new ERs', false)
+            ->assertSee('Early access, new BRs (multi-service)', false)
+            ->assertSee('Early access, new ERs', false)
             ->assertDontSee('new SSRs', false)
             ->assertDontSee('new ESRs', false)
             ->assertDontSee('Direct Offer', false);

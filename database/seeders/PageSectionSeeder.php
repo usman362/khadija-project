@@ -82,7 +82,7 @@ class PageSectionSeeder extends Seeder
             [
                 'key'        => 'assistance',
                 'heading'    => 'Choose Your Level of Assistance',
-                'subheading' => "You're in control. Each level unlocks more capability — from fully manual to fully automated.",
+                'subheading' => "You're in control. Each level unlocks more capability, from fully manual to fully automated.",
                 'payload'    => ['cards' => [
                     [
                         'title' => 'Manual', 'text' => 'You handle everything.',

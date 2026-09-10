@@ -276,7 +276,7 @@ final class UploadPipeline
             // Not a 422 — a purpose that is not in the config is a developer
             // adding an upload path without going through R54, which is the
             // one thing the rule forbids outright.
-            throw new RuntimeException("Unknown upload purpose [{$purpose}]. Add it to config/uploads.php — R54 allows no separate upload paths.");
+            throw new RuntimeException("Unknown upload purpose [{$purpose}]. Add it to config/uploads.php: R54 allows no separate upload paths.");
         }
 
         return $rules;

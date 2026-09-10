@@ -68,7 +68,7 @@ class ReclassifyCategoryImagery extends Command
         );
 
         if ($dry) {
-            $this->info('Dry run — nothing was written.');
+            $this->info('Dry run. Nothing was written.');
         }
 
         return self::SUCCESS;

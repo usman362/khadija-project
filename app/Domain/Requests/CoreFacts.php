@@ -70,7 +70,7 @@ final class CoreFacts
     {
         return [
             $name . '.required' => 'Give your event a name.',
-            $desc . '.required' => 'Describe what you need — this is what the professional reads before answering.',
+            $desc . '.required' => 'Describe what you need. This is what the professional reads before answering.',
             $desc . '.min'      => 'A little more detail helps professionals answer accurately.',
             $date . '.required' => 'Set the date your event runs.',
         ];

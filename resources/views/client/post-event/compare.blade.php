@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', 'Post an Event — Compare Packages')
+@section('title', 'Post an Event: Compare Packages')
 @section('page-title', 'Compare Packages Side by Side')
 @section('page-subtitle', 'Compare the top matches and choose the best package for your event.')
 @include('client.post-event._styles')

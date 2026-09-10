@@ -118,7 +118,7 @@ class ReviewWriterService
             $t = rtrim($thoughts, '.');
             $middle = match (true) {
                 $rating >= 4  => " What stood out most: {$t}. From start to finish the{$servicePhrase} was handled professionally and with real care.",
-                $rating === 3 => " A few things went well — {$t} — though there was room to improve on communication and consistency.",
+                $rating === 3 => " A few things went well ({$t}), though there was room to improve on communication and consistency.",
                 default       => " In particular, {$t}. We had hoped for a smoother experience given the booking.",
             };
         } else {
@@ -142,10 +142,10 @@ class ReviewWriterService
         }
 
         $short = match (true) {
-            $rating >= 5  => ($service ?: 'Excellent service') . " — highly recommend {$name}!",
-            $rating === 4 => "Great experience with {$name} — would recommend.",
+            $rating >= 5  => ($service ?: 'Excellent service') . ". Highly recommend {$name}!",
+            $rating === 4 => "Great experience with {$name}. Would recommend.",
             $rating === 3 => "Decent experience with {$name}, a few things to improve.",
-            default       => "Mixed experience with {$name} — see the full review.",
+            default       => "Mixed experience with {$name}. See the full review.",
         };
 
         return [
@@ -173,7 +173,7 @@ Rules:
 - Weave the user's specific thoughts/keywords naturally into the review
 - Never fabricate specifics not mentioned by the user
 - Use first person ("I", "we")
-- Be honest, specific, and helpful — avoid generic platitudes
+- Be honest, specific, and helpful, avoid generic platitudes
 - Never mention "AI" or "artificial intelligence" in the review
 PROMPT;
     }

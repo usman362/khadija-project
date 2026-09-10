@@ -81,8 +81,8 @@ class ClientReportController extends Controller
             foreach ($report['professionals'] as $row) {
                 // Two figures per professional, one row each, so the Value
                 // column holds one number and stays sortable.
-                fputcsv($out, ['Professionals', $row['name'].' — bookings', $row['bookings']]);
-                fputcsv($out, ['Professionals', $row['name'].' — spent', $row['spent']]);
+                fputcsv($out, ['Professionals', $row['name'].', bookings', $row['bookings']]);
+                fputcsv($out, ['Professionals', $row['name'].', spent', $row['spent']]);
             }
 
             fclose($out);

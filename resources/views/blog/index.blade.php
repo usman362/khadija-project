@@ -1,7 +1,7 @@
 @extends('layouts.landing')
 
 @php
-    $seoTitle       = 'Blog & Insights — GigResource';
+    $seoTitle       = 'Blog & Insights | GigResource';
     $seoDescription = 'Expert tips, industry trends, and in-depth guides to help event professionals plan, manage, and deliver unforgettable experiences.';
     $showFeatured   = $featured && $posts->onFirstPage() && !$activeCategory && $search === '';
     $blItems        = $posts->getCollection();
@@ -300,7 +300,7 @@
             <div class="bl-news-txt">
                 <h2>Stay Updated</h2>
                 <p>Subscribe to our newsletter and never miss the latest tips, trends, and updates.</p>
-                <p class="bl-news-ok" id="blNewsOk">Thanks — you're subscribed! 🎉</p>
+                <p class="bl-news-ok" id="blNewsOk">Thanks, you're subscribed! 🎉</p>
             </div>
             <form class="bl-news-form" id="blNews" onsubmit="return false;">
                 <input type="email" placeholder="Enter your email address" aria-label="Email address" required>

@@ -38,7 +38,7 @@
         <i data-lucide="info" style="width:18px;height:18px;" class="me-2 mt-1 flex-shrink-0"></i>
         <div class="small">
             When a user submits an account deletion request, they enter a <strong>60-day grace period</strong> before their data is permanently removed.
-            During this period, they can <strong>reactivate their account</strong> — optionally by paying a fee configured below.
+            During this period, they can <strong>reactivate their account</strong>, optionally by paying a fee configured below.
             Payment gateway credentials are inherited from <a href="{{ route('app.admin.settings.payments') }}">Payment Settings</a>.
         </div>
     </div>
@@ -60,9 +60,9 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Charge a Fee?</label>
-                    <select name="enabled" class="form-select" aria-label="Yes — require payment">
-                        <option value="1" @selected($settings['enabled'])>Yes — require payment</option>
-                        <option value="0" @selected(!$settings['enabled'])>No — free restoration</option>
+                    <select name="enabled" class="form-select" aria-label="Yes, require payment">
+                        <option value="1" @selected($settings['enabled'])>Yes, require payment</option>
+                        <option value="0" @selected(!$settings['enabled'])>No, free restoration</option>
                     </select>
                     @error('enabled') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                 </div>

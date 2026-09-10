@@ -1,7 +1,7 @@
 @extends('layouts.landing')
 
-@section('title', 'Find the Perfect Package — GigResource')
-@section('meta_description', 'Search ready-made service bundles from event professionals who handle multiple parts of your event — one contract, one payment, better value.')
+@section('title', 'Find the Perfect Package | GigResource')
+@section('meta_description', 'Search ready-made service bundles from event professionals who handle multiple parts of your event: one contract, one payment, better value.')
 
 @php
     use App\Support\ResponseStats;
@@ -294,7 +294,7 @@
             @forelse($f['selected'] as $svc)
                 <span class="pk-chip">{{ $svc }} <a href="{{ $withoutService($svc) }}" aria-label="Remove {{ $svc }}">✕</a></span>
             @empty
-                <span style="font-size:12.5px;color:var(--muted);">None — pick services in the matcher →</span>
+                <span style="font-size:12.5px;color:var(--muted);">None. Pick services in the matcher →</span>
             @endforelse
             <button type="button" class="pk-addsvc" onclick="document.getElementById('pkSvcSearch')?.focus()">+ Add Another Service</button>
 
@@ -304,7 +304,7 @@
                          drawer with no handle on the outside. --}}
                     <a class="pk-favlink {{ ! empty($f['saved']) ? 'on' : '' }}"
                        href="{{ ! empty($f['saved']) ? $link(['saved' => null]) : $link(['saved' => 1]) }}">
-                        ♥ {{ ! empty($f['saved']) ? 'Showing favorites — show all' : 'My favorites (' . count($savedIds) . ')' }}
+                        ♥ {{ ! empty($f['saved']) ? 'Showing favorites, show all' : 'My favorites (' . count($savedIds) . ')' }}
                     </a>
                 @endif
             @endauth
@@ -596,7 +596,7 @@
                     <div class="pk-empty">
                         <div style="font-size:40px;">🎁</div>
                         <h3>No packages match these filters</h3>
-                        <p>Try removing a service — a package has to include every one you tick — or widen the budget.</p>
+                        <p>Try removing a service, a package has to include every one you tick, or widen the budget.</p>
                         <a href="{{ route('public.packages') }}">Clear filters</a>
                     </div>
                 @endif

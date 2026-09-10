@@ -122,7 +122,7 @@
                     <p style="margin:5px 0 0;white-space:pre-line;">{{ $item->description }}</p>
 
                     @if($item->isWithdrawn())
-                        <p class="dsp-hint">Withdrawn — {{ $item->withdrawn_reason }}</p>
+                        <p class="dsp-hint">Withdrawn: {{ $item->withdrawn_reason }}</p>
                     @elseif($item->isSuperseded())
                         <p class="dsp-hint">Replaced by a later submission. Kept for the record.</p>
                     @endif
@@ -165,7 +165,7 @@
                             </select>
                             <p class="dsp-hint">
                                 The original stays on the case. Nothing submitted here is ever
-                                edited or deleted — that is what makes it evidence.
+                                edited or deleted. That is what makes it evidence.
                             </p>
                         </div>
                     @endif
@@ -216,7 +216,7 @@
                         <div>
                             {{ ucfirst(str_replace('_', ' ', $entry->action)) }}
                             @if($entry->old_value && $entry->new_value)
-                                — {{ $entry->old_value }} → {{ $entry->new_value }}
+                               : {{ $entry->old_value }} → {{ $entry->new_value }}
                             @endif
                         </div>
                         @if($entry->reason)

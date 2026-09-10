@@ -1,6 +1,6 @@
 @extends('layouts.landing')
 
-@section('title', 'Plan your ' . $category->name . ' — GigResource')
+@section('title', 'Plan your ' . $category->name . ' | GigResource')
 
 @push('styles')
 <style>
@@ -112,7 +112,7 @@
                      why. Both numbers, in one sentence, on the page itself. --}}
                 <p class="etl-sec-p">
                     All {{ count($services) }} categories are here.
-                    <strong>{{ $recommended }}</strong> are recommended for a {{ $category->name }} and are listed first —
+                    <strong>{{ $recommended }}</strong> are recommended for a {{ $category->name }} and are listed first:
                     the rest are still available if you need them.
                 </p>
 
@@ -199,8 +199,8 @@
             {{-- Says why, rather than looking broken. Under Rule R38 a signed-in
                  client only ever sees professionals in their own state. --}}
             <div class="etl-empty">
-                No professionals to show here yet. You can still choose your services and post the request —
-                professionals are notified when it goes out.
+                No professionals to show here yet. You can still choose your services and post the request.
+                Professionals are notified when it goes out.
             </div>
         @endif
     </section>
@@ -231,8 +231,8 @@
 
         hint.hidden = false;
         hint.innerHTML = picked === 1
-            ? 'One service — this posts as a <b>single-service request</b>.'
-            : picked + ' services — this posts as a <b>multi-service request</b>. Professionals bid per service.';
+            ? 'One service. This posts as a <b>single-service request</b>.'
+            : picked + ' services. This posts as a <b>multi-service request</b>. Professionals bid per service.';
     }
 
     form.querySelectorAll('[data-etl-card] input').forEach(function (cb) {

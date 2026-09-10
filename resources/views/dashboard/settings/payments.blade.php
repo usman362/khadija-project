@@ -34,7 +34,7 @@
                 <div class="alert alert-warning d-flex align-items-start gap-2" role="alert" style="border-left:4px solid #f59e0b;">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     <div>
-                        <strong>Pre-launch lock is ON — no real money can be charged.</strong><br>
+                        <strong>Pre-launch lock is ON: no real money can be charged.</strong><br>
                         <span class="small">Testing works fully in <strong>Test</strong> mode with test cards. Real (Live) charges are blocked until launch. To go live: set <code>PAYMENTS_GO_LIVE=true</code> in <code>.env</code> <em>and</em> switch Mode to Live with live keys.</span>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
             @if(($settings['mode'] ?? 'test') === 'live')
                 <div class="alert alert-warning mt-3 mb-0">
                     <i data-lucide="alert-triangle" style="width:16px;height:16px" class="me-1"></i>
-                    <strong>Live Mode Active</strong> — Real payments will be processed. Make sure your keys are correct.
+                    <strong>Live Mode Active</strong>: Real payments will be processed. Make sure your keys are correct.
                 </div>
             @endif
         </div>

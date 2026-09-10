@@ -128,7 +128,7 @@ class ImportTaxonomyV2 extends Command
             $parentId = $categoryIds[$service['category']] ?? null;
 
             if ($parentId === null) {
-                $this->warn("Skipped '{$service['name']}' — unknown category '{$service['category']}'");
+                $this->warn("Skipped '{$service['name']}', unknown category '{$service['category']}'");
 
                 continue;
             }
@@ -170,7 +170,7 @@ class ImportTaxonomyV2 extends Command
             $parentId = $serviceIds[$key] ?? null;
 
             if ($parentId === null) {
-                $this->warn("Skipped specialty '{$specialty['name']}' — unknown service '{$key}'");
+                $this->warn("Skipped specialty '{$specialty['name']}', unknown service '{$key}'");
 
                 continue;
             }
@@ -271,6 +271,6 @@ class ImportTaxonomyV2 extends Command
         $live = config('taxonomy.version');
         $this->info($live === 'v2'
             ? 'v2 is live.'
-            : "Imported, but not live — the site is still reading {$live}. Run `php artisan taxonomy:switch` when ready.");
+            : "Imported, but not live: the site is still reading {$live}. Run `php artisan taxonomy:switch` when ready.");
     }
 }

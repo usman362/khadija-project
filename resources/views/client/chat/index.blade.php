@@ -1,7 +1,7 @@
 @extends('layouts.client')
 
-@section('title', 'Messages — Inbox')
-@section('page-title', 'Messages — Inbox')
+@section('title', 'Messages: Inbox')
+@section('page-title', 'Messages: Inbox')
 @section('page-subtitle', 'Every conversation in one place.')
 
 {{-- Client Messages — Inbox. Server-rendered, orange client theme. Live send +
@@ -408,7 +408,7 @@
                             </div>
                         </div>
                     @empty
-                        <div style="text-align:center;color:var(--text-muted);font-size:13px;margin:auto;">No messages yet — start the conversation below.</div>
+                        <div style="text-align:center;color:var(--text-muted);font-size:13px;margin:auto;">No messages yet. Start the conversation below.</div>
                     @endforelse
                 </div>
                 <div class="cm-suggest">
@@ -431,14 +431,14 @@
                         // Written for the client's half of the conversation: the
                         // things a client actually needs to say to a professional.
                         $quickReplies = [
-                            'Thanks — that works for me.',
+                            'Thanks. That works for me.',
                             'Could you send a written quote for this?',
                             'What time would you arrive to set up?',
                             "I'd like to move ahead. What do you need from me?",
                             'Can we go over this on a call this week?',
                         ];
                         $templates = [
-                            'Ask what is included' => "Hi {name}, before we confirm — could you list exactly what's included at this price, and anything that would be charged on top?",
+                            'Ask what is included' => "Hi {name}, before we confirm, could you list exactly what's included at this price, and anything that would be charged on top?",
                             'Confirm date and times' => "Hi {name}, just confirming the date and the timings. What time do you plan to arrive, and when would you finish?",
                             'Request a written quote' => "Hi {name}, could you send a written quote covering the services we discussed? I'd like it in writing before we go ahead.",
                             'Ask about changes' => "Hi {name}, we may need to change some details. How late can we make changes, and does anything cost extra?",
@@ -706,7 +706,7 @@
     // Compose → drop a polished draft into the active thread.
     if ($('cm-ai')) $('cm-ai').addEventListener('click', () => {
         const i = $('cm-input');
-        if (i) { i.value = "Hi! Following up on our event — could you please confirm the final details and timeline? Happy to share anything you need from my side. Thank you!"; i.focus(); }
+        if (i) { i.value = "Hi! Following up on our event, could you please confirm the final details and timeline? Happy to share anything you need from my side. Thank you!"; i.focus(); }
         else if (modal) modal.style.display = 'flex';
     });
 })();

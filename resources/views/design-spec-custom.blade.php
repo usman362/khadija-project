@@ -10,7 +10,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>GigResource — Custom Design Pages</title>
+    <title>GigResource: Custom Design Pages</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         @page { size: A4; margin: 18mm 16mm; }
@@ -226,7 +226,7 @@
         [
             'key' => 'public',
             'title' => 'Public Website',
-            'desc' => 'Conversion-critical pages — every visitor sees these first.',
+            'desc' => 'Conversion-critical pages. Every visitor sees these first.',
             'pages' => [
                 ['id' => 'D-01', 'title' => 'Landing / Home',           'url' => '/',
                     'purpose' => 'Main marketing page. Hero + value props + featured categories + how it works + testimonials + CTA.',
@@ -235,9 +235,9 @@
                     'purpose' => 'Searchable / filterable marketplace grid of all professionals.',
                     'elements' => 'Hero with mega search (keyword + city + button), advanced filter bar with dropdowns, active filter chips, category chip rail, grid/list view toggle, sort dropdown, pro cards (cover · avatar · badges · skills · rating · price · save heart · CTA), pagination.'],
                 ['id' => 'D-03', 'title' => 'Professional Profile',     'url' => '/pro/{user}',
-                    'purpose' => 'Public profile of a single professional — the booking-decision page.',
+                    'purpose' => 'Public profile of a single professional: the booking-decision page.',
                     'elements' => 'Cover banner, avatar overlap, name + verified check + headline, breadcrumb, sticky right sidebar (Top Rated seal · Satisfaction · Verified Credentials), About, Skills, Portfolio gallery, Reviews list, Similar pros row, mobile sticky "Request Quote" bar.'],
-                ['id' => 'D-04', 'title' => 'Events & Categories (REMOVED 2026-08-20 — Owner)', 'url' => '/event-types',
+                ['id' => 'D-04', 'title' => 'Events & Categories (REMOVED 2026-08-20: Owner)', 'url' => '/event-types',
                     'purpose' => 'Alibaba-style mega category browser with audience toggle and advanced filters.',
                     'elements' => 'Hero + search, advanced filter (5 categories per audience with dropdown popovers), active chips, 9-category left rail with right showcase, sub-tile filter tabs (Popular/Top Rated/Newest/Trending), Top Services 4-col tiles, Event types section, CTA banner.'],
                 ['id' => 'D-05', 'title' => 'How It Works',             'url' => '/how-it-works',
@@ -246,10 +246,10 @@
                 ['id' => 'D-06', 'title' => 'About Us',                 'url' => '/about-us',
                     'purpose' => 'Brand story, stats, team.',
                     'elements' => 'Wedding hero with stats bar overlay, mission story, values grid, team cards, journey timeline, big-number stat band, contact CTA.'],
-                ['id' => 'D-07', 'title' => 'Blog — List',              'url' => '/blog',
+                ['id' => 'D-07', 'title' => 'Blog: List',              'url' => '/blog',
                     'purpose' => 'Article index with search + category filter + featured strip + grid.',
                     'elements' => 'Wedding decor hero with eyebrow + search bar, category pills, featured 3-col strip, blog grid (image · category · title · excerpt · meta · read more), pagination.'],
-                ['id' => 'D-08', 'title' => 'Blog — Post Detail',       'url' => '/blog/{slug}',
+                ['id' => 'D-08', 'title' => 'Blog: Post Detail',       'url' => '/blog/{slug}',
                     'purpose' => 'Single article reading view.',
                     'elements' => 'Magazine hero with featured image as banner, category pill, title + meta (author · date · read time · views), full article body styled, share bar, related posts row.'],
                 ['id' => 'D-09', 'title' => 'FAQ',                      'url' => '/faq',
@@ -258,8 +258,8 @@
                 ['id' => 'D-10', 'title' => 'Join as Influencer',       'url' => '/join-as-influencer',
                     'purpose' => 'Recruit influencers for the referral program.',
                     'elements' => 'Couple-at-sunset hero with avatars cluster + trust stat, 4-step "How it works" cards, commission tier table, payout policy, sign-up CTA.'],
-                ['id' => 'D-11', 'title' => 'Policy Page (1 design — 4 uses)', 'url' => '/privacy-policy · /ai-agreement · /payment-policy · /cancellation-policy',
-                    'purpose' => 'Legal pages — single design template, content varies per policy.',
+                ['id' => 'D-11', 'title' => 'Policy Page (1 design, 4 uses)', 'url' => '/privacy-policy · /ai-agreement · /payment-policy · /cancellation-policy',
+                    'purpose' => 'Legal pages, single design template, content varies per policy.',
                     'elements' => 'Bridal-bouquet hero with eyebrow + icon + last-updated pill, long-form rich text body, optional auth-only e-signature box at bottom.'],
                 ['id' => 'D-12', 'title' => 'Pricing / Membership Plans', 'url' => '/app/membership-plans',
                     'purpose' => 'Conversion-critical: 3-tier comparison + contract length picker.',
@@ -279,7 +279,7 @@
                     'purpose' => 'Choose role tab (Client or Professional) then fill onboarding form.',
                     'elements' => 'Step indicator (Choose role → Create account → Get started), trust strip pill, role tabs, info card per role, form (name · email · password · confirm), reCAPTCHA, sign-up button, switch-to-login link.'],
                 ['id' => 'D-15', 'title' => 'Forgot / Reset Password (1 design)', 'url' => '/password/reset',
-                    'purpose' => 'Email-input or new-password reset flow — same shell reused.',
+                    'purpose' => 'Email-input or new-password reset flow, same shell reused.',
                     'elements' => 'Centered card with input + primary button + back-to-login link. Two states: request reset / set new password (token-protected).'],
             ],
         ],
@@ -287,7 +287,7 @@
         [
             'key' => 'dash',
             'title' => 'Dashboard Home Pages',
-            'desc' => 'Welcome layout — one design per role.',
+            'desc' => 'Welcome layout: one design per role.',
             'pages' => [
                 ['id' => 'D-16', 'title' => 'Client Dashboard Home',    'url' => '/client/dashboard',
                     'purpose' => 'Overview of upcoming events, recent bookings, messages, suggested pros.',
@@ -307,15 +307,15 @@
         [
             'key' => 'reuse',
             'title' => 'Reusable Design Systems',
-            'desc' => 'One design serves many pages — high leverage deliverables.',
+            'desc' => 'One design serves many pages, high leverage deliverables.',
             'pages' => [
-                ['id' => 'D-20', 'title' => 'Profile Editor (1 design — 3 roles)', 'url' => '/client/profile · /professional/profile · /app/admin/profile',
+                ['id' => 'D-20', 'title' => 'Profile Editor (1 design, 3 roles)', 'url' => '/client/profile · /professional/profile · /app/admin/profile',
                     'purpose' => 'Personal info, password, notifications. Reused by client / professional / admin.',
                     'elements' => 'Sidebar tab nav (Basic · Address · Company · Social · Notifications · Security · Account), avatar card with upload, form grid per tab, danger zone (account deletion), cover banner for pro variant.'],
-                ['id' => 'D-21', 'title' => 'Messages / Chat (1 design — 2 roles)', 'url' => '/client/messages · /professional/messages',
+                ['id' => 'D-21', 'title' => 'Messages / Chat (1 design, 2 roles)', 'url' => '/client/messages · /professional/messages',
                     'purpose' => 'Conversation list + thread view. Same UI for client and professional inbox.',
                     'elements' => 'Two-pane: conversation list left + thread right, unread badges, attachment chips, send composer with emoji + file upload, online status dots, search inbox.'],
-                ['id' => 'D-22', 'title' => 'AI Tools Shell (1 design — 3 tools)', 'url' => '/ai-tools/budget-allocator · /ai-tools/vendor-matchmaking · /ai-tools/review-writer',
+                ['id' => 'D-22', 'title' => 'AI Tools Shell (1 design, 3 tools)', 'url' => '/ai-tools/budget-allocator · /ai-tools/vendor-matchmaking · /ai-tools/review-writer',
                     'purpose' => 'Form + AI-result panel pattern reused across Budget Allocator, Vendor Matchmaking, and Review Writer.',
                     'elements' => 'Hero banner card, quota badge, form grid (event details / requirements), generate button, loading state, result panel with summary + breakdown, edit/copy/export actions, upgrade prompt if quota exhausted.'],
                 ['id' => 'D-23', 'title' => 'Professional Card (component)', 'url' => 'used in /browse · home · search results',
@@ -327,11 +327,11 @@
                 ['id' => 'D-25', 'title' => 'Membership Tier Card',     'url' => 'used in /app/membership-plans · landing pricing section',
                     'purpose' => 'Pricing-page tile for the 3-tier comparison.',
                     'elements' => 'Tier name + tagline, big monthly-equivalent price, contract toggle, feature checklist with check icons, "Most Popular" badge for middle tier, "Choose Plan" CTA, Elite-tier gold accent.'],
-                ['id' => 'D-26', 'title' => 'Empty State (1 design — reused)', 'url' => 'used in browse · bookings · messages · etc.',
+                ['id' => 'D-26', 'title' => 'Empty State (1 design, reused)', 'url' => 'used in browse · bookings · messages · etc.',
                     'purpose' => 'Friendly no-results pattern for empty lists.',
                     'elements' => 'Centered icon in gradient pill, "Nothing here yet" headline, helpful body copy, 1-2 action CTAs (reset filters · explore categories).'],
                 ['id' => 'D-27', 'title' => 'Error Page Shell',         'url' => '/(404 · 500 · 403 · 419 · 429 · 401 · 503)',
-                    'purpose' => 'Already built — just polish if desired. 7 variants share one shell.',
+                    'purpose' => 'Already built, just polish if desired. 7 variants share one shell.',
                     'elements' => 'Big emoji, eyebrow pill with error code, gradient title, tagline, primary + secondary CTAs (Back to Home · Browse). Per-code emoji + messaging variations.'],
                 ['id' => 'D-28', 'title' => 'Email Templates (1 master)', 'url' => 'transactional emails',
                     'purpose' => 'Master email shell for all transactional notifications.',

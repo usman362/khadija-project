@@ -12,6 +12,6 @@
 <p>This link expires in {{ $minutes }} minutes.</p>
 
 <p style="font-size: 13px; color: #64748b;">
-    If you didn't ask for this, you can ignore this email — your password stays as it is.
+    If you didn't ask for this, you can ignore this email. Your password stays as it is.
 </p>
 @endsection

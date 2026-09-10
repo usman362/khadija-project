@@ -20,7 +20,7 @@ class PayoutPaid extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your Payout Has Been Processed — ' . config('app.name'),
+            subject: 'Your Payout Has Been Processed: ' . config('app.name'),
         );
     }
 

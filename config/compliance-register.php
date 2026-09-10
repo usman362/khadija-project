@@ -37,7 +37,7 @@ return [
             'law'          => 'Subscription cancellation requirements (2025)',
             'citation'     => null,
             'effective'    => '2025-01',
-            'requires'     => 'A simple, timely, self-service way to cancel a subscription — not "call us to cancel".',
+            'requires'     => 'A simple, timely, self-service way to cancel a subscription, not "call us to cancel".',
             'status'       => 'done',
             'implemented'  => 'A member cancels their own subscription from the membership page in one step; no contact with support is required.',
             'done_on'      => '2026-09',
@@ -54,7 +54,7 @@ return [
             'status'       => 'done',
             'implemented'  => 'subscriptions:renewal-notices runs daily at 06:00 and emails every member 30 days and 7 days before their membership renews. Each notice is recorded in subscription_renewal_notices before it is sent, so the same one cannot go twice and we can show what was sent, to whom and when.',
             'done_on'      => '2026-09',
-            'note'         => 'Sent to every member rather than by state — where somebody lives is not reliably known. Lead times are in config/subscriptions.php, so a state that names a specific window is a settings change. DEPENDS ON the host running Laravel\'s scheduler; two other jobs already rely on it, so if those run, this runs.',
+            'note'         => 'Sent to every member rather than by state, where somebody lives is not reliably known. Lead times are in config/subscriptions.php, so a state that names a specific window is a settings change. DEPENDS ON the host running Laravel\'s scheduler; two other jobs already rely on it, so if those run, this runs.',
         ],
 
         [
@@ -67,7 +67,7 @@ return [
             'status'       => 'not_applicable',
             'implemented'  => null,
             'done_on'      => null,
-            'note'         => 'GigResource offers no free trials — there are no trial fields on plans or subscriptions, so nothing can be in breach today. If a trial is ever added, this must be built WITH it rather than after it.',
+            'note'         => 'GigResource offers no free trials. There are no trial fields on plans or subscriptions, so nothing can be in breach today. If a trial is ever added, this must be built WITH it rather than after it.',
         ],
 
     ],

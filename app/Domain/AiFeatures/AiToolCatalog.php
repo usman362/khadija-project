@@ -129,7 +129,7 @@ final class AiToolCatalog
             'marketplace' => ['name' => 'Marketplace Suite', 'emoji' => '🤝', 'tagline' => 'Connect buyers and professionals, intelligently.'],
             'business'    => ['name' => 'Business Suite',     'emoji' => '💼', 'tagline' => 'Grow your event business.'],
             'operations'  => ['name' => 'Operations Suite',  'emoji' => '📄', 'tagline' => 'Communicate faster. Close more business.'],
-            'automation'  => ['name' => 'Automation Suite',  'emoji' => '🚀', 'tagline' => 'Automation, analytics & insights — coming soon.'],
+            'automation'  => ['name' => 'Automation Suite',  'emoji' => '🚀', 'tagline' => 'Automation, analytics & insights, coming soon.'],
         ];
     }
 

@@ -24,7 +24,7 @@ class BookingCancelled extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Booking Cancelled — ' . config('app.name'),
+            subject: 'Booking Cancelled: ' . config('app.name'),
         );
     }
 

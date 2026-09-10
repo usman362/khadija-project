@@ -335,7 +335,7 @@
                 {{-- 5 · Budget --}}
                 <section class="gb-card" id="gb-budget">
                     <div class="gb-card-hd"><span class="ic">💰</span><h3>Budget</h3></div>
-                    <p class="gb-card-sub">Give vendors a target so you get realistic proposals. This is an estimate — you can adjust later.</p>
+                    <p class="gb-card-sub">Give vendors a target so you get realistic proposals. This is an estimate. You can adjust later.</p>
 
                     <div class="gb-field">
                         <label class="gb-label">Budget</label>
@@ -398,7 +398,7 @@
                     <div class="gb-pvcard">
                         <div class="gb-pv-cover">
                             🎉
-                            <div class="gb-pv-ring" title="Gig readiness — how complete your listing is">
+                            <div class="gb-pv-ring" title="Gig readiness: how complete your listing is">
                                 <svg viewBox="0 0 44 44">
                                     <circle cx="22" cy="22" r="19" fill="none" stroke="var(--border-color)" stroke-width="4"/>
                                     <circle id="pvRingBar" cx="22" cy="22" r="19" fill="none" stroke="var(--gb)" stroke-width="4" stroke-linecap="round" stroke-dasharray="119.4" stroke-dashoffset="119.4"/>

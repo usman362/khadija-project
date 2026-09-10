@@ -23,7 +23,7 @@ final class ClientCalendar
     public const STAGES = [
         'confirmed' => ['Booked', '#10b981'],
         'open'      => ['Open for proposals', '#f59e0b'],
-        'draft'     => ['Draft — not sent yet', '#9ca3af'],
+        'draft'     => ['Draft, not sent yet', '#9ca3af'],
         'completed' => ['Completed', '#6366f1'],
         'cancelled' => ['Cancelled', '#ef4444'],
     ];

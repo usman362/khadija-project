@@ -3,7 +3,7 @@
 @php
     use Illuminate\Support\Str;
 
-    $seoTitle       = 'Hire ' . $category->name . ' — Verified Pros on GigResource';
+    $seoTitle       = 'Hire ' . $category->name . ': Verified Pros on GigResource';
     $seoDescription = $category->short_description
         ?: ('Browse top-rated ' . strtolower($category->name) . ' on GigResource. Compare quotes, read reviews, and book the right pro with secure, protected payments.');
     $seoImage       = $category->cover_image ? asset('storage/' . $category->cover_image) : null;
@@ -276,7 +276,7 @@
         <span class="cl-eyebrow"><span class="dot"></span>{{ $category->parent->name ?? 'Featured Category' }}</span>
         <h1>Hire <span class="grad">{{ $category->name }}</span></h1>
         <p class="lede">
-            {{ $category->long_description ?: $category->short_description ?: ('Browse ' . strtolower($category->name) . ' for your next event. Compare profiles, reviews, and quotes — with secure, protected payments on every booking.') }}
+            {{ $category->long_description ?: $category->short_description ?: ('Browse ' . strtolower($category->name) . ' for your next event. Compare profiles, reviews, and quotes, with secure, protected payments on every booking.') }}
         </p>
         {{-- "4.8 Avg rating" and "24h Avg quote time" used to sit here as hard-coded
              literals — invented numbers presented as platform data, and exactly the
@@ -377,7 +377,7 @@
     @else
         <div class="cl-empty">
             <h3>No pros listed in this category yet</h3>
-            <p>Be the first — or browse our other categories to find the right vendor for your event.</p>
+            <p>Be the first, or browse our other categories to find the right vendor for your event.</p>
             <a href="{{ route('public.browse') }}">Browse all professionals</a>
         </div>
     @endif

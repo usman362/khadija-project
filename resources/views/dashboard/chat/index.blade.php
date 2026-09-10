@@ -124,7 +124,7 @@
                                 <option value="{{ $booking->id }}"
                                     data-client="{{ $booking->client_id }}"
                                     data-supplier="{{ $booking->supplier_id }}">
-                                    #{{ $booking->id }} — {{ $booking->event->title ?? 'N/A' }} ({{ ucfirst($booking->status) }})
+                                    #{{ $booking->id }}: {{ $booking->event->title ?? 'N/A' }} ({{ ucfirst($booking->status) }})
                                 </option>
                             @endforeach
                         </select>

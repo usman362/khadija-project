@@ -188,10 +188,10 @@ class ExportDesignTokens extends Command
         }
 
         $this->newLine();
-        $this->info(ucfirst($portal).' — '.count($rows).' colour tokens');
+        $this->info(ucfirst($portal).': '.count($rows).' colour tokens');
 
         if (! $hasDarkTheme) {
-            $this->line('  No dark theme on this portal — these are the only values,');
+            $this->line('  No dark theme on this portal. These are the only values,');
             $this->line('  and the designer should not produce dark screens for it.');
         } else {
             $same = count(array_filter($rows, fn ($r) => $r['note'] !== ''));

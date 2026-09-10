@@ -71,7 +71,7 @@ class SwitchTaxonomy extends Command
 
         if (array_sum($stranded) > 0) {
             $this->newLine();
-            $this->error('Not switching — the links above would point at categories the site can no longer see.');
+            $this->error('Not switching: the links above would point at categories the site can no longer see.');
             $this->line('Fix ' . self::MAP_PATH . ', then run this again with --remap.');
 
             return self::FAILURE;

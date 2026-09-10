@@ -108,12 +108,12 @@ class AiGuestCapacityController extends Controller
                     . " more before spacing feels tight (comfort estimate: {$comfort}).";
             } else {
                 $tips[] = "You're about " . ($guests - $comfort)
-                    . " guests over the comfort estimate of {$comfort} — consider a larger space or a {$style} alternative.";
+                    . " guests over the comfort estimate of {$comfort}. Consider a larger space or a {$style} alternative.";
             }
             $buffetLines = max(1, (int) ceil($guests / $buffetCap));
             $tips[] = "Plan for roughly {$buffetLines} buffet or service line(s) to keep the meal flowing (about {$buffetCap} guests each).";
             $restroomSets = max(1, (int) ceil($guests / $restroomCap));
-            $tips[] = "Aim for about {$restroomSets} restroom set(s) and keep exits clear — legal capacity is estimated near {$legal}.";
+            $tips[] = "Aim for about {$restroomSets} restroom set(s) and keep exits clear, legal capacity is estimated near {$legal}.";
 
             return response()->json([
                 'success' => true,

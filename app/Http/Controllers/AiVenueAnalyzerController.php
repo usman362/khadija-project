@@ -71,7 +71,7 @@ class AiVenueAnalyzerController extends Controller
             if ($requiredSqft > $sqft) {
                 $verdict = 'Over capacity';
             } elseif ($requiredSqft > $sqft * 0.85) {
-                $verdict = 'Tight — consider fewer guests or a bigger space';
+                $verdict = 'Tight, consider fewer guests or a bigger space';
             } else {
                 $verdict = 'Comfortable fit';
             }
@@ -109,18 +109,18 @@ class AiVenueAnalyzerController extends Controller
                 . number_format($maxCapacity) . ' guests in a ' . $style . ' setup.';
             if ($dance) {
                 $tips[] = 'A dance floor adds roughly ' . number_format($danceAdd)
-                    . ' sq ft (20%) — keep it central so it doesn\'t block service paths.';
+                    . ' sq ft (20%). Keep it central so it doesn\'t block service paths.';
             }
             if ($verdict === 'Over capacity') {
                 $overflow = max(0, $guests - $maxCapacity);
-                $tips[] = 'You are about ' . number_format($overflow) . ' guests over a comfortable limit — '
+                $tips[] = 'You are about ' . number_format($overflow) . ' guests over a comfortable limit: '
                     . 'consider a larger venue, a cocktail-style layout, or trimming the list.';
             } elseif ($verdict === 'Comfortable fit') {
                 $tips[] = 'You have comfortable headroom (using about ' . $utilizationPct
-                    . '% of estimated capacity) — good for lounge areas, a photo booth, or a bar station.';
+                    . '% of estimated capacity), good for lounge areas, a photo booth, or a bar station.';
             } else {
                 $tips[] = 'This is a tight fit (about ' . $utilizationPct
-                    . '% of capacity) — reduce table sizes or move to a mingling layout to free up space.';
+                    . '% of capacity), reduce table sizes or move to a mingling layout to free up space.';
             }
 
             return response()->json([

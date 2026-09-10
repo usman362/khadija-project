@@ -696,7 +696,7 @@
                             @forelse($bookings->whereNotIn('status', \App\Domain\Finance\ClientTotals::VOID_STATUSES) as $b)
                                 <tr>
                                     <td style="padding-left:18px;"><div class="ev-name">{{ $b->supplier?->name ?? 'Professional' }}</div></td>
-                                    <td>@if($b->event)<a href="{{ route('client.events.show', $b->event_id) }}">{{ $b->event->title }}</a>@else — @endif</td>
+                                    <td>@if($b->event)<a href="{{ route('client.events.show', $b->event_id) }}">{{ $b->event->title }}</a>@else, @endif</td>
                                     <td>{{ $b->category?->name ?? '—' }}</td>
                                     <td>{{ $b->event?->starts_at?->format('M d, Y') ?? 'Not scheduled' }}</td>
                                     <td>{{ $b->event?->starts_at?->format('g:i A') ?? '—' }}@if($b->event?->ends_at) – {{ $b->event->ends_at->format('g:i A') }}@endif</td>
@@ -720,7 +720,7 @@
                                 @php
                                     $pay = match (true) {
                                         $b->status === 'completed' => ['Paid', 'completed'],
-                                        in_array($b->status, \App\Domain\Finance\ClientTotals::VOID_STATUSES, true) => ['Cancelled — nothing owed', 'cancelled'],
+                                        in_array($b->status, \App\Domain\Finance\ClientTotals::VOID_STATUSES, true) => ['Cancelled. Nothing owed', 'cancelled'],
                                         $b->event?->starts_at && $b->event->starts_at->isPast() => ['Overdue', 'cancelled'],
                                         $b->status === 'confirmed' => ['Agreed, not yet paid', 'pending'],
                                         default => ['Awaiting professional', 'pending'],
@@ -890,13 +890,13 @@
                                         <div class="cl-calendar-day {{ $cursor->isToday() ? 'today' : '' }} {{ $muted ? 'ec-muted' : '' }}">
                                             {{-- The number opens that day's list. --}}
                                             <a class="day-num ec-daylink" href="{{ $calLink(['calview' => 'day', 'cal' => $key]) }}"
-                                               aria-label="{{ $cursor->format('l, F j') }}{{ $dayEvs->count() ? ' — ' . $dayEvs->count() . ' event' . ($dayEvs->count() === 1 ? '' : 's') : '' }}">{{ $cursor->day }}</a>
+                                               aria-label="{{ $cursor->format('l, F j') }}{{ $dayEvs->count() ? ': ' . $dayEvs->count() . ' event' . ($dayEvs->count() === 1 ? '' : 's') : '' }}">{{ $cursor->day }}</a>
                                             @foreach($dayEvs->take($perDay) as $ev)
                                                 @php [$stLabel, $stColour] = $calStages[$ev->stage()] ?? ['Event', '#f97316']; @endphp
                                                 {{-- Coloured by the stage every other screen reports. --}}
                                                 <a href="{{ route('client.events.show', $ev) }}" class="cl-calendar-event ec-ev" data-no-live
                                                    style="background:{{ $stColour }}1f;color:{{ $stColour }};border-left:3px solid {{ $stColour }};"
-                                                   title="{{ $ev->title }} — {{ $stLabel }}">{{ \Illuminate\Support\Str::limit($ev->title, $c['view'] === 'week' ? 22 : 14) }}</a>
+                                                   title="{{ $ev->title }}: {{ $stLabel }}">{{ \Illuminate\Support\Str::limit($ev->title, $c['view'] === 'week' ? 22 : 14) }}</a>
                                             @endforeach
                                             @if($dayEvs->count() > $perDay)
                                                 <a class="ec-more" href="{{ $calLink(['calview' => 'day', 'cal' => $key]) }}">+{{ $dayEvs->count() - $perDay }} more</a>

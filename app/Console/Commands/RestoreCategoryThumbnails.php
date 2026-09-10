@@ -71,7 +71,7 @@ class RestoreCategoryThumbnails extends Command
         $this->newLine();
         $this->line($apply
             ? "Restored: <fg=green>{$restored}</>"
-            : "Would restore: <fg=yellow>{$restored}</>  (nothing saved — add --apply)");
+            : "Would restore: <fg=yellow>{$restored}</>  (nothing saved. Add --apply)");
 
         if ($missing > 0) {
             $this->warn("Skipped {$missing}: the file named in cover_image is not on disk.");

@@ -126,9 +126,9 @@ class AiChecklistGeneratorController extends Controller
 
             $eventLabel = $validated['event_type'];
             $summary = $guests
-                ? "Suggested plan for your {$eventLabel} on {$eventDate->format('M j, Y')} — {$total} tasks across "
+                ? "Suggested plan for your {$eventLabel} on {$eventDate->format('M j, Y')}: {$total} tasks across "
                     . count($groups) . " milestones, sized for about {$guests} guests. Dates are estimates you can adjust."
-                : "Suggested plan for your {$eventLabel} on {$eventDate->format('M j, Y')} — {$total} tasks across "
+                : "Suggested plan for your {$eventLabel} on {$eventDate->format('M j, Y')}: {$total} tasks across "
                     . count($groups) . " milestones. Dates are estimates you can adjust.";
 
             return response()->json([

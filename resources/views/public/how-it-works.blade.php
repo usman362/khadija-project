@@ -1,7 +1,7 @@
 @extends('layouts.landing')
 
 @php
-    $seoTitle       = 'How It Works — Simple Steps, Unforgettable Events | GigResource';
+    $seoTitle       = 'How It Works: Simple Steps, Unforgettable Events | GigResource';
     $seoDescription = 'See how GigResource works: find the right event professionals, connect and discuss, book and pay securely, and bring your event to life.';
 @endphp
 

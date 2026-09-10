@@ -58,7 +58,7 @@
 <div class="pab" data-pab>
     <div class="pab-head">📣 Turn this into a request</div>
     <div class="pab-note">
-        What you entered above is carried across — you can change any of it before it goes out,
+        What you entered above is carried across. You can change any of it before it goes out,
         and nothing is published until you say so.
     </div>
     <form method="POST" action="{{ route('client.bsr.from-tool') }}">

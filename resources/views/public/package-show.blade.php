@@ -3,7 +3,7 @@
 @php
     $pro     = $package->user;
     $profile = $pro?->profile;
-    $seoTitle = $package->title . ' — ' . ($pro?->name ?? 'GigResource');
+    $seoTitle = $package->title . ': ' . ($pro?->name ?? 'GigResource');
     $seoDescription = \Illuminate\Support\Str::limit(strip_tags((string) $package->description), 155)
         ?: ('Book ' . $package->title . ' on GigResource.');
 
@@ -128,7 +128,7 @@
     <div class="pk-container">
         @if($preview ?? false)
             <div class="pk-previewbar">
-                <b>Preview — this package is not live.</b>
+                <b>Preview. This package is not live.</b>
                 <span>This is exactly what a client will see once you publish it. Nobody else can open this page.</span>
                 <a href="{{ route('professional.packages.index') }}">Back to My Packages →</a>
             </div>
@@ -177,7 +177,7 @@
                 @unless($ownArt)
                     {{-- Said out loud. A stand-in photograph that reads as this
                          professional's own work is a claim about them. --}}
-                    <p class="pk-stock">Stock image — this professional has not uploaded photos for this package yet.</p>
+                    <p class="pk-stock">Stock image. This professional has not uploaded photos for this package yet.</p>
                 @endunless
 
                 <h1 class="pk-title">{{ $package->title }}</h1>
@@ -334,7 +334,7 @@
                         @else
                             <a class="pk-cta pk-cta-primary" href="{{ $bookUrl }}">Book this package · ${{ number_format((float) $package->price, 0) }}</a>
                             <div style="font-size:11.5px;color:var(--muted);margin-top:7px;text-align:center;line-height:1.5;">
-                                You are not charged when you send it — {{ $pro?->name ?? 'the professional' }} confirms the date first.
+                                You are not charged when you send it: {{ $pro?->name ?? 'the professional' }} confirms the date first.
                             </div>
                         @endif
 

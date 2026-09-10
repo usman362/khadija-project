@@ -5,4 +5,4 @@
 @section('err-title')
     Something <span class="grad">broke on our end</span>
 @endsection
-@section('err-tagline', 'This one\'s on us — our team has been notified and we\'re looking into it. Please try again in a moment, or head home to keep moving.')
+@section('err-tagline', 'This one\'s on us. Our team has been notified and we\'re looking into it. Please try again in a moment, or head home to keep moving.')

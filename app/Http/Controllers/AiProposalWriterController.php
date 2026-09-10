@@ -154,7 +154,7 @@ class AiProposalWriterController extends Controller
         $body  = trim((string) $data['draft']);
 
         $open = match ($tone) {
-            'friendly_casual'    => "Hi there!\n\nThanks so much for thinking of us — ",
+            'friendly_casual'    => "Hi there!\n\nThanks so much for thinking of us: ",
             'confident_bold'     => "Hello,\n\nYou're in expert hands. ",
             'warm_personal'      => "Hello,\n\nIt would be a genuine pleasure to be part of your event. ",
             default              => "Dear Client,\n\nThank you for the opportunity. ",
@@ -197,7 +197,7 @@ class AiProposalWriterController extends Controller
         $eventPhrase = trim(($p['theme'] ? $p['theme'] . ' ' : '') . $p['eventType']);
         $dateClause  = $p['date'] ? ' on ' . $p['date'] : '';
         $opening = match ($tone) {
-            'confident_bold'   => "Thank you for considering me for your {$eventPhrase}{$dateClause} — I'd be thrilled to make it exceptional.",
+            'confident_bold'   => "Thank you for considering me for your {$eventPhrase}{$dateClause}. I'd be thrilled to make it exceptional.",
             'creative_playful' => "Thank you so much for thinking of me for your {$eventPhrase}{$dateClause}!",
             'warm_personal'    => "Thank you for considering me for your {$eventPhrase}{$dateClause}. It would be an honour to be part of your day.",
             default            => "Thank you for considering me for your {$eventPhrase}{$dateClause}.",

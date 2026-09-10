@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', 'Post an Event — Checkout & Payment')
+@section('title', 'Post an Event: Checkout & Payment')
 @section('page-title', '🔒 Checkout & Secure Your Package')
 @section('page-subtitle', 'Review your selections, sign the contract, and pay your deposit to secure your date.')
 @include('client.post-event._styles')

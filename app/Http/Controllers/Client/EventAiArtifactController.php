@@ -83,7 +83,7 @@ class EventAiArtifactController extends Controller
             return back()->with('status', 'That result is already attached to this request.');
         }
 
-        return back()->with('status', 'Attached to this request. You can remove it here anytime — your saved result stays put.');
+        return back()->with('status', 'Attached to this request. You can remove it here anytime. Your saved result stays put.');
     }
 
     public function destroy(Request $request, EventAiArtifact $artifact): RedirectResponse

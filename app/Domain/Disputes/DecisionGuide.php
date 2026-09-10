@@ -40,7 +40,7 @@ final class DecisionGuide
             [
                 'finding'  => 'Service delivered but part of the agreed scope was not met',
                 'suggests' => $c::PARTIAL_PRORATED,
-                'because'  => 'The held balance splits to the unmet portion of that service line — not to the whole booking.',
+                'because'  => 'The held balance splits to the unmet portion of that service line, not to the whole booking.',
             ],
             [
                 'finding'  => 'Non-conformance that can still be corrected before the client needs it',
@@ -65,7 +65,7 @@ final class DecisionGuide
             [
                 'finding'  => 'Evidence submitted by a party was fabricated or altered',
                 'suggests' => $c::REFUND_NON_CONFORMING,
-                'because'  => 'Fraud is a case-level finding as well as a financial one — see the resolution type, the repeat-offender ladder in §7, and account action.',
+                'because'  => 'Fraud is a case-level finding as well as a financial one. See the resolution type, the repeat-offender ladder in §7, and account action.',
             ],
         ];
     }

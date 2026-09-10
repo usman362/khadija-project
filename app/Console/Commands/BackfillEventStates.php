@@ -38,13 +38,13 @@ class BackfillEventStates extends Command
         $events = $this->pending(Event::query()->whereNull('state'), 'client_id');
         $packages = $this->pending(Package::query()->whereNull('state'), 'user_id');
 
-        $this->line(sprintf('Events without a state:   %d — %d can be filled from their client.',
+        $this->line(sprintf('Events without a state:   %d: %d can be filled from their client.',
             Event::whereNull('state')->count(), $events->count()));
-        $this->line(sprintf('Packages without a state: %d — %d can be filled from their owner.',
+        $this->line(sprintf('Packages without a state: %d: %d can be filled from their owner.',
             Package::whereNull('state')->count(), $packages->count()));
 
         if ($dry) {
-            $this->comment('Dry run — nothing written.');
+            $this->comment('Dry run. Nothing written.');
 
             return self::SUCCESS;
         }
@@ -62,7 +62,7 @@ class BackfillEventStates extends Command
         $stranded = Event::whereNull('state')->count();
 
         if ($stranded > 0) {
-            $this->warn("{$stranded} events still have none — their client has no state on file either.");
+            $this->warn("{$stranded} events still have none. Their client has no state on file either.");
         }
 
         return self::SUCCESS;

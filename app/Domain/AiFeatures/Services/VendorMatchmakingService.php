@@ -324,9 +324,9 @@ Rules:
 - Return up to 5 matches, ranked 1-5 (rank 1 = best)
 - match_score is 0-100 (integer)
 - Only use supplier_ids that appear in the provided list
-- The reasoning must be CONCRETE — cite specific skills, experience, or rate that match the requirement
+- The reasoning must be CONCRETE, cite specific skills, experience, or rate that match the requirement
 - If fewer than 5 are good fits, return fewer matches (quality over quantity)
-- Never invent supplier details — only use what's provided
+- Never invent supplier details, only use what's provided
 PROMPT;
     }
 }

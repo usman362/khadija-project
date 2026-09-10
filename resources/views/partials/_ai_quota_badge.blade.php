@@ -29,7 +29,7 @@
          second "Unlimited on your plan" pill was redundant. --}}
 @elseif($remaining <= 0)
     <div style="display:inline-flex; align-items:center; gap:7px; padding:6px 14px; margin-bottom:18px; border-radius:999px; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#ef4444; font-size:12.5px; font-weight:700;">
-        Monthly limit reached — resets on the 1st
+        Monthly limit reached, resets on the 1st
     </div>
 @else
     <div style="display:inline-flex; align-items:center; gap:7px; padding:6px 14px; margin-bottom:18px; border-radius:999px; background:{{ $low ? 'rgba(245,158,11,0.12)' : 'rgba(37,99,235,0.10)' }}; border:1px solid {{ $low ? 'rgba(245,158,11,0.3)' : 'rgba(37,99,235,0.25)' }}; color:{{ $low ? '#f59e0b' : '#2563eb' }}; font-size:12.5px; font-weight:700;">

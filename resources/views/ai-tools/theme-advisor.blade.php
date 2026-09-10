@@ -92,8 +92,8 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Starter', '#64748b', 'Pick your own theme, colours and style ideas and assemble your board by hand — no suggestions.'],
-        'semi'    => ['Semi', '#7c3aed', 'We suggest a palette, mood and décor — reword or swap any item before you use it.'],
+        'manual'  => ['Starter', '#64748b', 'Pick your own theme, colours and style ideas and assemble your board by hand: no suggestions.'],
+        'semi'    => ['Semi', '#7c3aed', 'We suggest a palette, mood and décor, reword or swap any item before you use it.'],
         'maximum' => ['Maximum', '#16a34a', 'Enter your event and we build the full palette, mood board and styling for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];

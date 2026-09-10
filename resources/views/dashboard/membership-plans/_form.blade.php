@@ -17,7 +17,7 @@
                 <option value="{{ $val }}" {{ ($plan?->billing_cycle ?? '12_month') === $val ? 'selected' : '' }}>{{ $label }}</option>
             @endforeach
         </select>
-        <small class="text-muted">Flat contract — no monthly rebills.</small>
+        <small class="text-muted">Flat contract: no monthly rebills.</small>
     </div>
     <div class="col-12 mb-3">
         <label class="form-label">Description</label>
@@ -99,8 +99,8 @@
                         <input type="text" name="features[]" class="form-control form-control-sm" value="{{ $feature->feature }}" placeholder="Feature description">
                     </div>
                     <div class="col-md-4">
-                        <select name="feature_codes[]" class="form-select form-select-sm" aria-label="— No gate —">
-                            <option value="">— No gate —</option>
+                        <select name="feature_codes[]" class="form-select form-select-sm" aria-label="No gate">
+                            <option value="">No gate</option>
                             @foreach($aiFeatureCodes as $code)
                                 <option value="{{ $code }}" @selected($feature->feature_code === $code)>{{ \App\Domain\AiFeatures\AiFeatureCode::label($code) }}</option>
                             @endforeach
@@ -120,8 +120,8 @@
                     <input type="text" name="features[]" class="form-control form-control-sm" placeholder="Feature description">
                 </div>
                 <div class="col-md-4">
-                    <select name="feature_codes[]" class="form-select form-select-sm" aria-label="— No gate —">
-                        <option value="">— No gate —</option>
+                    <select name="feature_codes[]" class="form-select form-select-sm" aria-label="No gate">
+                        <option value="">No gate</option>
                         @foreach($aiFeatureCodes as $code)
                             <option value="{{ $code }}">{{ \App\Domain\AiFeatures\AiFeatureCode::label($code) }}</option>
                         @endforeach

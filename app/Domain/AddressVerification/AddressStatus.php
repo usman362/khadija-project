@@ -42,7 +42,7 @@ final class AddressStatus
             self::NEEDS_CORRECTION         => 'Needs Correction',
             self::MANUAL_REVIEW_REQUIRED   => 'Manual Review Required',
             self::REGISTRATION_BLOCKED     => 'Registration Blocked',
-            self::PRIVATE_CLIENT_HIDDEN    => 'Private Client Address — Hidden Until Booking Confirmed',
+            self::PRIVATE_CLIENT_HIDDEN    => 'Private Client Address: Hidden Until Booking Confirmed',
             default                        => 'Pending Verification',
         };
     }

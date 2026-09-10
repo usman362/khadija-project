@@ -1,5 +1,5 @@
 @extends('layouts.client')
-@section('title', 'Post an Event — Build Your Event')
+@section('title', 'Post an Event: Build Your Event')
 @section('page-title', 'What does your event need?')
 @section('page-subtitle', 'Select the services you need and we will find the best packages.')
 @include('client.post-event._styles')

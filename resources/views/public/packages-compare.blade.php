@@ -1,7 +1,7 @@
 @extends('layouts.landing')
 
-@section('title', 'Compare Packages — GigResource')
-@section('meta_description', 'Put up to three service packages side by side — price, what is included, coverage, guests and service area.')
+@section('title', 'Compare Packages | GigResource')
+@section('meta_description', 'Put up to three service packages side by side, price, what is included, coverage, guests and service area.')
 
 @push('styles')
 <style>
@@ -69,7 +69,7 @@
 
             <div class="cmp-head">
                 <h1>Compare {{ $packages->count() }} Package{{ $packages->count() === 1 ? '' : 's' }}</h1>
-                <p>Side by side — price, what is included, coverage, guests and where the professional works.</p>
+                <p>Side by side, price, what is included, coverage, guests and where the professional works.</p>
             </div>
 
             {{-- Say where the missing ones went.
@@ -82,7 +82,7 @@
                     <b>{{ $missing }} of the {{ $askedFor }} you picked {{ $missing === 1 ? 'is' : 'are' }} not shown here.</b>
                     <span>
                         {{ $missing === 1 ? 'It is' : 'They are' }} offered in another state, and GigResource works
-                        within one state for now — so {{ $missing === 1 ? 'it is not' : 'they are not' }} something
+                        within one state for now, so {{ $missing === 1 ? 'it is not' : 'they are not' }} something
                         you can book. <a href="{{ route('public.packages') }}">Back to packages</a>
                     </span>
                 </div>
@@ -156,7 +156,7 @@
                                             <ul class="cmp-list">
                                                 @foreach(array_slice($p->includes, 0, 6) as $inc)<li>{{ is_array($inc) ? ($inc['label'] ?? reset($inc)) : $inc }}</li>@endforeach
                                             </ul>
-                                        @else — @endif
+                                        @else, @endif
                                     </td>
                                 @endforeach
                             </tr>

@@ -223,7 +223,7 @@
     </div>
 
     <h1>Your Account is Scheduled for Deletion</h1>
-    <p class="sub">Hi <strong style="color:#fff;">{{ $user->name }}</strong> — you have some time to change your mind.</p>
+    <p class="sub">Hi <strong style="color:#fff;">{{ $user->name }}</strong>. You have some time to change your mind.</p>
 
     <div class="countdown-box">
         <div class="countdown-big">{{ $user->daysUntilDeletion() }}</div>
@@ -236,7 +236,7 @@
     <div class="info-list">
         <p>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            During this period your account is locked — you can only restore or sign out.
+            During this period your account is locked. You can only restore or sign out.
         </p>
         <p>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>

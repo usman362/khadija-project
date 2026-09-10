@@ -223,7 +223,7 @@
             });
 
             retotal();
-            note.textContent = 'Suggested — change anything you like.';
+            note.textContent = 'Suggested, change anything you like.';
         } catch (err) {
             note.textContent = 'Could not suggest a split just now.';
         } finally {

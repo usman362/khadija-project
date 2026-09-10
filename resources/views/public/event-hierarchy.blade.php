@@ -1,6 +1,6 @@
 @extends('layouts.landing')
 
-@section('title', 'Event Hierarchy Review — GigResource')
+@section('title', 'Event Hierarchy Review | GigResource')
 @section('meta_description', 'Walk the event hierarchy: main event, main service, sub-main service and specific component.')
 
 @php
@@ -87,12 +87,12 @@
                                     <label for="ehL{{ $n }}">{{ $level['prompt'] }}</label>
                                     <select id="ehL{{ $n }}" data-level="{{ $n }}" @disabled($n !== 1)>
                                         @if($n === 1)
-                                            <option value="">— Choose a Main Event —</option>
+                                            <option value="">Choose a Main Event</option>
                                             @foreach($events as $event)
                                                 <option value="{{ $event->id }}">{{ $event->name }}</option>
                                             @endforeach
                                         @else
-                                            <option value="">— Select Level {{ $n - 1 }} First —</option>
+                                            <option value="">Select Level {{ $n - 1 }} First</option>
                                         @endif
                                     </select>
                                     <div class="eh-note" data-note="{{ $n }}"></div>
@@ -175,7 +175,7 @@
     // previous Level 2 is not a valid answer to the new one.
     function lockBelow(n) {
         for (var i = n + 1; i <= 4; i++) {
-            selects[i].innerHTML = '<option value="">— Select Level ' + (i - 1) + ' First —</option>';
+            selects[i].innerHTML = '<option value="">Select Level ' + (i - 1) + ' First</option>';
             selects[i].value = '';
             selects[i].disabled = true;
             card(i).classList.add('is-off');
@@ -206,7 +206,7 @@
             .then(function (res) {
                 // Outcome B, as the server sees it.
                 if (!res.ok || res.d.blocked) {
-                    target.innerHTML = '<option value="">— Select Level ' + (level - 1) + ' First —</option>';
+                    target.innerHTML = '<option value="">Select Level ' + (level - 1) + ' First</option>';
                     target.disabled = true;
                     card(level).classList.add('is-off');
                     message('blocked', res.d.message || 'Please select a Main Event (Level 1) first.',
@@ -217,14 +217,14 @@
                 var opts = res.d.options || [];
 
                 if (!opts.length) {
-                    target.innerHTML = '<option value="">— Nothing listed —</option>';
+                    target.innerHTML = '<option value="">Nothing listed</option>';
                     target.disabled = true;
                     card(level).classList.add('is-off');
                     note(level).textContent = res.d.empty_reason || '';
                     return;
                 }
 
-                var html = '<option value="">— Choose a ' + LABELS[level] + ' —</option>';
+                var html = '<option value="">Choose a ' + LABELS[level] + '</option>';
                 opts.forEach(function (o) {
                     html += '<option value="' + o.id + '">' + o.name + (o.tier ? ' · ' + o.tier : '') + '</option>';
                 });
@@ -234,7 +234,7 @@
                 note(level).textContent = opts.length + ' option' + (opts.length === 1 ? '' : 's') + ' from the source.';
             })
             .catch(function () {
-                target.innerHTML = '<option value="">— Could not load —</option>';
+                target.innerHTML = '<option value="">Could not load</option>';
                 note(level).textContent = 'Something went wrong loading this level.';
             });
     }

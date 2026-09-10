@@ -170,7 +170,7 @@ class BudgetAllocatorService
     private function categoryNote(string $cat, float $amount, int $guests, string $currency): string
     {
         if ($guests > 0 && str_contains($cat, 'Catering')) {
-            return 'About ' . $currency . ' ' . number_format($amount / max(1, $guests), 0) . ' per guest — food, service & beverages.';
+            return 'About ' . $currency . ' ' . number_format($amount / max(1, $guests), 0) . ' per guest, food, service & beverages.';
         }
         return match (true) {
             str_contains($cat, 'Venue')        => 'Rental, tables, chairs, linens and core setup.',
@@ -189,12 +189,12 @@ class BudgetAllocatorService
         if ($guests > 0) {
             $tips[] = 'Your per-guest budget is roughly ' . $currency . ' ' . number_format($total / max(1, $guests), 0) . '. Confirm caterer minimums early.';
         }
-        $tips[] = 'Keep the Contingency line untouched until the final two weeks — it covers the surprises every event has.';
+        $tips[] = 'Keep the Contingency line untouched until the final two weeks. It covers the surprises every event has.';
         $tips[] = 'Book the top two categories (' . $allocations[0]['category'] . ', ' . ($allocations[1]['category'] ?? $allocations[0]['category']) . ') first; they drive availability and price.';
         if ($total < 5000) {
             $tips[] = 'On a lean budget, prioritise one standout element and keep the rest simple rather than spreading thin.';
         } else {
-            $tips[] = 'Ask vendors for package deals across categories — bundling often saves 8–12%.';
+            $tips[] = 'Ask vendors for package deals across categories, bundling often saves 8–12%.';
         }
         return $tips;
     }

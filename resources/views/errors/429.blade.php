@@ -5,7 +5,7 @@
 @section('err-title')
     Whoa, <span class="grad">slow down a bit</span>
 @endsection
-@section('err-tagline', 'You\'ve sent too many requests in a short window. Please wait a minute and try again — this is just a safety guardrail to protect the platform.')
+@section('err-tagline', 'You\'ve sent too many requests in a short window. Please wait a minute and try again. This is just a safety guardrail to protect the platform.')
 
 @section('err-actions')
     <a href="javascript:setTimeout(()=>location.reload(),60000);location.reload();" class="err-btn err-btn-primary">

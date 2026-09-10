@@ -117,8 +117,8 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Starter', '#64748b', 'Score the venue factors yourself — we average them into an overall verdict, no suggestions.'],
-        'semi'    => ['Semi', '#2563eb', 'the tool analyzes the space — adjust the figures, verdict and notes and utilization recalculates live.'],
+        'manual'  => ['Starter', '#64748b', 'Score the venue factors yourself. We average them into an overall verdict, no suggestions.'],
+        'semi'    => ['Semi', '#2563eb', 'the tool analyzes the space, adjust the figures, verdict and notes and utilization recalculates live.'],
         'maximum' => ['Maximum', '#16a34a', 'Enter your space and the tool analyzes capacity, fit and gaps for you.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -136,7 +136,7 @@
     {{-- Starter — hand-built venue scorecard, no AI, computed client-side --}}
     <div class="va-form-card va-mano">
         <h3>🏛 Score My Venue</h3>
-        <div class="sub">Rate each factor yourself — we average them into an overall venue score. No suggestions.</div>
+        <div class="sub">Rate each factor yourself. We average them into an overall venue score. No suggestions.</div>
         <div style="margin-bottom:14px;">
             <label class="va-lbl">Venue Name (optional)</label>
             <input type="text" id="vamName" class="va-inp" placeholder="e.g. The Garden Estate">
@@ -326,8 +326,8 @@
     function verdictFor(score) {
         if (score >= 85) return ['Excellent venue', '#15803d'];
         if (score >= 70) return ['Good venue', '#16a34a'];
-        if (score >= 50) return ['Fair — some trade-offs', '#d97706'];
-        return ['Weak fit — keep looking', '#dc2626'];
+        if (score >= 50) return ['Fair. Some trade-offs', '#d97706'];
+        return ['Weak fit. Keep looking', '#dc2626'];
     }
     function recalc() {
         const scores = Array.from(rows.querySelectorAll('input[type="range"]')).map(function (i) { return parseInt(i.value, 10) || 0; });

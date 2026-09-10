@@ -167,11 +167,11 @@ class FormController extends Controller
     {
         return match ($this->stateOf($submission, $user)) {
             'action'    => 'Open it and accept or decline',
-            'completed' => 'Nothing — this is finished',
-            'closed'    => 'Nothing — this is closed',
+            'completed' => 'Nothing. This is finished',
+            'closed'    => 'Nothing. This is closed',
             default     => $submission->needsApproval()
                 ? 'Waiting on ' . ($submission->counterparty?->name ?? 'the other party')
-                : 'With our team — no action needed',
+                : 'With our team: no action needed',
         };
     }
 

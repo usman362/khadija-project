@@ -75,7 +75,7 @@ class DepositCheckout
             'price_data' => [
                 'currency' => 'usd',
                 'product_data' => [
-                    'name' => 'Booking deposit — '.$f->event->title,
+                    'name' => 'Booking deposit: '.$f->event->title,
                     'description' => 'Secures '.$f->supplier->name.' for this booking.',
                 ],
                 'unit_amount' => (int) round(((float) $f->deposit_amount) * 100),

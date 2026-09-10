@@ -17,7 +17,7 @@
 --}}
 <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px;">
     <h1 style="margin:0;">Uploaded Files</h1>
-    <span style="font-size:13px;color:#64748b;">Rule R54 — one pipeline for every upload.</span>
+    <span style="font-size:13px;color:#64748b;">Rule R54: one pipeline for every upload.</span>
 </div>
 
 @if(config('uploads.scanner') === \App\Domain\Uploads\Scanners\UnavailableScanner::class)

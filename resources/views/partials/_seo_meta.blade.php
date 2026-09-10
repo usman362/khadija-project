@@ -23,8 +23,8 @@
     // brand is not already there, so neither convention double-brands.
     $title        = isset($seoTitle) && $seoTitle
         ? (\Illuminate\Support\Str::contains($seoTitle, $brand) ? $seoTitle : $seoTitle . ' | ' . $brand)
-        : $brand . ' — ' . $tagline;
-    $description  = $seoDescription ?? 'GigResource is the marketplace for event professionals — photographers, caterers, DJs, planners and more. Get quotes, sign contracts, and pay securely.';
+        : $brand . ': ' . $tagline;
+    $description  = $seoDescription ?? 'GigResource is the marketplace for event professionals, photographers, caterers, DJs, planners and more. Get quotes, sign contracts, and pay securely.';
     $description  = trim(preg_replace('/\s+/', ' ', $description));
     $description  = mb_substr($description, 0, 160);
     $image        = $seoImage ?? asset('images/og-default.jpg');

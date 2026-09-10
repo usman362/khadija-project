@@ -63,7 +63,7 @@
                             @if($isSaved)
                                 <form method="POST" action="{{ route('client.saved-professionals.destroy', $pro) }}" style="flex:1;">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="mp-btn" title="Saved — click to unsave">★ Saved</button>
+                                    <button type="submit" class="mp-btn" title="Saved. Click to unsave">★ Saved</button>
                                 </form>
                             @else
                                 <form method="POST" action="{{ route('client.saved-professionals.store') }}" style="flex:1;">

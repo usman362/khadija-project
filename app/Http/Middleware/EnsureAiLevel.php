@@ -43,7 +43,7 @@ class EnsureAiLevel
                 if ($grant < PHP_INT_MAX && ($user->aiCreditsUsedThisMonth() + $cost) > $grant) {
                     return response()->json([
                         'success'   => false,
-                        'message'   => "You've used your AI Assist Credits for this month. They reset on the 1st — upgrade your plan for more.",
+                        'message'   => "You've used your AI Assist Credits for this month. They reset on the 1st. Upgrade your plan for more.",
                         'remaining' => $user->aiCreditsRemaining(),
                     ], 429);
                 }

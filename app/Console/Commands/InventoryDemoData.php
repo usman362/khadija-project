@@ -87,6 +87,12 @@ class InventoryDemoData extends Command
      * Titles DemoGigsSeeder writes. Matched exactly, never by prefix — a real
      * client is perfectly entitled to raise an event called "Corporate Gala".
      */
+    /*
+     * These keep their dashes on purpose. They are matched exactly against
+     * titles DemoGigsSeeder already wrote into the database; the site-wide
+     * dash removal of 2026-09-10 changed them and every stray demo event on a
+     * real account stopped being found. They are lookup keys, not copy.
+     */
     public const DEMO_GIG_TITLES = [
         'Luxury Garden Wedding Photography',
         'Corporate Gala — Full Production',
@@ -300,7 +306,7 @@ class InventoryDemoData extends Command
         $this->info('Demo accounts');
 
         if ($accounts === []) {
-            $this->line('  none — no address matches @example.test or @example.com');
+            $this->line('  none: no address matches @example.test or @example.com');
 
             return;
         }
@@ -330,7 +336,7 @@ class InventoryDemoData extends Command
         $this->newLine();
         $this->info('Demo events sitting on REAL accounts');
         $this->line('  These came from the seeder\'s owner fallback. They are next to');
-        $this->line('  genuine events belonging to a real person — read before removing.');
+        $this->line('  genuine events belonging to a real person. Read before removing.');
         $this->newLine();
 
         if ($rows === []) {

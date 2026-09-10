@@ -276,7 +276,7 @@ class MyPackagesShelfTest extends TestCase
         $this->actingAs($pro)->get(route('public.package', $draft->slug))
             ->assertOk()
             ->assertSee('Not live yet')
-            ->assertSee('this package is not live');
+            ->assertSee('This package is not live');
     }
 
     public function test_nobody_else_can_open_an_unpublished_package(): void

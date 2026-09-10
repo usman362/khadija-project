@@ -44,13 +44,13 @@ class PrototypeToolToRequestController extends Controller
         ],
         'esr' => [
             'label'  => 'Post as ER',
-            'blurb'  => 'Same, but flagged as a rush — within 72 hours, professionals notified with priority.',
+            'blurb'  => 'Same, but flagged as a rush, within 72 hours, professionals notified with priority.',
             'status' => 'proposed',
             'icon'   => '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
         ],
         'dsr' => [
             'label'  => 'Send Direct Request',
-            'blurb'  => 'Skip the board — take the plan straight to a professional you already want.',
+            'blurb'  => 'Skip the board, take the plan straight to a professional you already want.',
             'status' => 'proposed',
             'icon'   => '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
         ],
@@ -62,7 +62,7 @@ class PrototypeToolToRequestController extends Controller
         ],
         'attach' => [
             'label'  => 'Attach to Existing Event',
-            'blurb'  => 'Add the result to an event already being planned. This one already works — nine tools have it today.',
+            'blurb'  => 'Add the result to an event already being planned. This one already works: nine tools have it today.',
             'status' => 'built',
             'icon'   => '<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>',
         ],
@@ -134,7 +134,7 @@ class PrototypeToolToRequestController extends Controller
                 'carries' => ['Event type Conference', '4 services', 'Guest count 300'],
             ],
             'timeline-builder' => [
-                'headline' => 'Run-of-show — Saturday, 8 hours',
+                'headline' => 'Run-of-show: Saturday, 8 hours',
                 'rows' => [
                     ['14:00', 'Vendor load-in & setup', '2 hrs'],
                     ['16:00', 'Guest arrival & cocktails', '1 hr'],

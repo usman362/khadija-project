@@ -20,7 +20,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Sign In — GigResource</title>
+    <title>Sign In | GigResource</title>
     <link rel="icon" type="image/png" href="{{ asset('gigresource-logos/gigresource-icon.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -144,7 +144,7 @@
         <div class="rg-hero">
             <h1>Welcome back to<br>GigResource <span class="grad">Marketplace</span></h1>
             <div class="rg-slogan">Connect. Create. Celebrate.</div>
-            <p class="rg-sub">Sign in to manage your events, bookings, and connections — all in one place.</p>
+            <p class="rg-sub">Sign in to manage your events, bookings, and connections. All in one place.</p>
             <div class="rg-div"></div>
 
             <div class="rg-feat">

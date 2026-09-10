@@ -46,7 +46,7 @@ final class RequestLifecycle
         self::AWARDED     => 'Booked / Awarded',
         self::CLOSED      => 'Closed',
         self::COMPLETED   => 'Completed',
-        self::DATE_PASSED => 'Closed — event date passed',
+        self::DATE_PASSED => 'Closed, event date passed',
     ];
 
     /** §2 — the tiers, in days => dollars. */

@@ -150,7 +150,7 @@ class AiReviewWriterController extends Controller
         $body1    = "{$first} was {$traits} throughout the entire process.";
         $extras   = array_slice($pos, 3);
         $body2    = ! empty($extras)
-            ? ucfirst($first) . " and the team delivered " . $this->phrase($extras) . " — every detail handled with care."
+            ? ucfirst($first) . " and the team delivered " . $this->phrase($extras) . ". Every detail handled with care."
             : "{$first} and the team handled every detail with real care and skill.";
         $body3    = "Their attention to detail, creativity, and warm personality made a huge difference in the overall experience.";
 

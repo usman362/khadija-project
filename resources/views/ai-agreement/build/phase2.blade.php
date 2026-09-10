@@ -1,8 +1,8 @@
 @extends($aiLayout ?? 'layouts.client')
 
-@section('title', 'Agreement — Negotiation')
+@section('title', 'Agreement: Negotiation')
 @section('page-title', 'Agreement Builder')
-@section('page-subtitle', 'Phase 2 — Collaboration & Negotiation')
+@section('page-subtitle', 'Phase 2: Collaboration & Negotiation')
 
 {{-- Agreement Builder · Phase 2. Both parties collaborate on the tool draft —
      editing clauses, tracking versions and redlines, and threading comments —

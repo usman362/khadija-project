@@ -311,8 +311,8 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Starter', '#64748b', 'Build your budget by hand — add categories & amounts yourself, no suggestions.'],
-        'semi'    => ['Semi', '#2563eb', 'We recommend a budget split — you adjust the amounts before saving.'],
+        'manual'  => ['Starter', '#64748b', 'Build your budget by hand. Add categories & amounts yourself, no suggestions.'],
+        'semi'    => ['Semi', '#2563eb', 'We recommend a budget split. You adjust the amounts before saving.'],
         'maximum' => ['Maximum', '#16a34a', 'Enter your event and we allocate the entire budget across categories.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
@@ -390,7 +390,7 @@
     {{-- Form --}}
     <div class="bat-card">
         <div class="bat-card-title">Event Details</div>
-        <div class="bat-card-desc">{{ $isSemi ? 'Fill in what you know — we recommend a split you can adjust.' : 'Fill in what you know — the more detail, the better the allocation.' }}</div>
+        <div class="bat-card-desc">{{ $isSemi ? 'Fill in what you know. We recommend a split you can adjust.' : 'Fill in what you know: the more detail, the better the allocation.' }}</div>
 
         <div class="bat-error" id="batError"></div>
 
@@ -556,7 +556,7 @@
 
     function renderResult(res) {
         document.getElementById('batResultTotal').textContent = res.currency + ' ' + formatNum(res.total);
-        document.getElementById('batSummary').textContent = (LEVEL === 'semi' ? 'Recommended split — adjust any amount to fit your needs. ' : '') + (res.summary || '');
+        document.getElementById('batSummary').textContent = (LEVEL === 'semi' ? 'Recommended split, adjust any amount to fit your needs. ' : '') + (res.summary || '');
 
         const list = document.getElementById('batAllocList');
         list.innerHTML = '';
