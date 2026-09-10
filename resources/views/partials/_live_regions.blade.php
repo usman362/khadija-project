@@ -18,7 +18,11 @@
 @once
 @push('styles')
 <style>
-    [data-live-region] { position: relative; transition: opacity .12s ease; }
+    /* :where() has no specificity, so a region the page has already
+       positioned keeps it. Without it this rule, loaded last, turned the My
+       Events rail from sticky into relative — it stopped following the scroll. */
+    :where([data-live-region]) { position: relative; }
+    [data-live-region] { transition: opacity .12s ease; }
     [data-live-region].lv-busy { opacity: .5; pointer-events: none; }
     [data-live-region].lv-busy::after {
         content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; border-radius: 2px;

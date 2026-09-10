@@ -115,7 +115,7 @@
     .mg-pso-bar { display: flex; height: 10px; border-radius: 999px; overflow: hidden; background: var(--border-color); }
 
     /* Recent activity + quick actions */
-    .mg-row2 { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; margin-top: 18px; }
+    .mg-row2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin-top: 18px; }
     .mg-act-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--border-color); }
     .mg-act-row:last-child { border-bottom: 0; }
     .mg-act-dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -127,7 +127,6 @@
     .mg-act-body { flex: 1; min-width: 0; }
     .mg-act-text { font-size: 12.5px; color: var(--text-primary); }
     .mg-act-time { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; }
-    .mg-qa-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .mg-qa { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; padding: 14px; border-radius: 10px; background: var(--bg-card-hover); border: 1px solid var(--border-color); text-decoration: none; color: var(--text-primary); position: relative; }
     .mg-qa:hover { border-color: rgba(249,115,22,0.30); }
     .mg-qa svg { width: 18px; height: 18px; color: var(--accent-text); }
@@ -409,7 +408,11 @@
         display: none;
     }
     /* The sub-tabs are buttons now, not decorative spans. */
-    button.mg-subtab { background: none; border: 0; font: inherit; cursor: pointer; }
+    /* A button reset that keeps what .mg-subtab set: `border: 0` took the
+       active underline with it and `font: inherit` undid the 13px size, which
+       is why the live strip had no underline and oversized labels. */
+    button.mg-subtab { background: none; border-width: 0 0 2px; border-style: solid; border-color: transparent;
+        font-family: inherit; cursor: pointer; }
     .mg-filter-panel { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px;
         padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-card); }
     .mg-filter-panel[hidden] { display: none !important; }
@@ -440,6 +443,11 @@
         text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .ec-more { display: block; margin-top: 3px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-decoration: none; }
     .ec-more:hover { color: #c2410c; }
+    /* Seven equal columns. With the table's default layout a column widened
+       to fit its longest entry, so the one day with an event pushed the rest
+       of the week into slivers. */
+    .ec-grid { table-layout: fixed; }
+    .ec-grid .cl-calendar-day { min-width: 0; overflow: hidden; }
     .ec-week .cl-calendar-day { min-height: 220px; }
     .ec-agenda { display: flex; flex-direction: column; }
     .ec-agenda-row { display: flex; align-items: center; gap: 12px; padding: 13px 6px; border-bottom: 1px solid var(--border-color);
@@ -720,7 +728,9 @@
             </div>
         </div>
 
-        {{-- Recent Activity + Quick Actions --}}
+        {{-- Recent Activity, full width. Quick Actions beside it was removed
+             on Ali's call, 2026-09-10 — every one of its links is already in
+             the sidebar. --}}
         <div class="mg-row2">
             <div class="mg-card">
                 <div class="mg-rail-head"><div class="mg-rail-title">Recent Professional Activity</div></div>
@@ -736,16 +746,6 @@
                 @empty
                     <div style="font-size:12px;color:var(--text-muted);padding:12px 0;text-align:center;">No recent activity</div>
                 @endforelse
-            </div>
-            <div class="mg-card">
-                <div class="mg-rail-head"><div class="mg-rail-title">Quick Actions</div></div>
-                <div class="mg-qa-grid">
-                    {{-- Post an Event is in the filter row; a second copy here was the third on the page. --}}
-                    <a href="{{ route('client.search.index') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg><span>Invite Professionals</span></a>
-                    {{-- It said View Proposals and opened Bookings. --}}
-                    <a href="{{ route('client.proposals.index') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>View Proposals</span></a>
-                    <a href="{{ route('client.bookings.index') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Manage Bookings</span></a>
-                </div>
             </div>
         </div>
     </div>
@@ -1140,6 +1140,12 @@
             document.querySelectorAll('.cl-tab-content').forEach(c => c.classList.remove('active'));
             this.classList.add('active');
             document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+
+            // The address names the view on screen. Switching tabs left it
+            // alone, so it could say calview=month over the events list.
+            var u = new URL(location.href);
+            u.searchParams.set('tab', this.dataset.tab);
+            history.replaceState({ lv: u.toString() }, '', u.toString());
         });
     });
 
