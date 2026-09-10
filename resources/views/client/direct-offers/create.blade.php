@@ -49,6 +49,12 @@
 
     .do-sec { border: 1px solid var(--border-color); border-radius: 14px; background: var(--bg-card); margin-bottom: 14px; overflow: hidden; }
     .do-sec-hd { display: flex; align-items: center; gap: 9px; padding: 13px 16px; border-bottom: 1px solid var(--border-color); }
+    /* The section headings are the shared numbered ones now, so this card
+       supplies the bar around them rather than its own heading markup. */
+    .do-sec > .fsec-h { margin: 0; padding: 13px 16px; border-bottom: 1px solid var(--border-color); }
+    .do-sec.req > .fsec-h { background: rgba(249,115,22,.06); }
+    .do-sec.ai  > .fsec-h { background: rgba(22,163,74,.07); }
+    .do-sec.ai  > .fsec-h .fsec-n, .do-sec.ai > .fsec-h .fsec-tag { background: var(--ai); }
     .do-sec.req .do-sec-hd { background: rgba(249,115,22,.06); }
     .do-sec.ai .do-sec-hd { background: rgba(22,163,74,.07); }
     .do-sec-hd h4 { font-size: 14px; font-weight: 800; color: var(--text-primary); }
@@ -151,7 +157,7 @@
              door with no way back to change it. --}}
         @unless($selectedPro)
             <div class="do-sec req">
-                <div class="do-sec-hd"><h4>What do you need?</h4><span class="do-tag">START HERE</span></div>
+                <x-form-section :n="1" title="What do you need?" tag="START HERE" />
                 <div class="do-sec-bd">
                     <div class="do-field">
                         <label>Service</label>
@@ -172,7 +178,7 @@
 
         {{-- Choose Professional --}}
         <div class="do-sec req">
-            <div class="do-sec-hd"><h4>Choose Professional</h4><span class="do-tag">YOUR INPUT</span></div>
+            <x-form-section :n="2" title="Choose Professional" tag="YOUR INPUT" required />
             <div class="do-sec-bd">
                 @if($selectedPro)
                     <div class="do-pro" style="margin-bottom:12px;">
@@ -241,7 +247,7 @@
 
         {{-- Event Details --}}
         <div class="do-sec req">
-            <div class="do-sec-hd"><h4>Event Details</h4><span class="do-tag">YOUR INPUT</span></div>
+            <x-form-section :n="3" title="Event Details" tag="YOUR INPUT" required />
             <div class="do-sec-bd">
                 <div class="do-field"><label>Event Name <span style="color:#dc2626;">*</span></label><input class="do-input" name="event_name" value="{{ old('event_name') }}" placeholder="e.g. Luxury Wedding Reception" required>@error('event_name')<p style="color:#dc2626;font-size:12px;margin-top:5px;">{{ $message }}</p>@enderror</div>
                 <div class="do-field">
@@ -279,10 +285,7 @@
 
         {{-- Service Needs (adapts by type) --}}
         <div class="do-sec req">
-            <div class="do-sec-hd">
-                <h4>Service Needs</h4>
-                <span class="do-tag">YOUR INPUT</span>
-            </div>
+            <x-form-section :n="4" title="Service Needs" tag="YOUR INPUT" required />
             <div class="do-sec-bd">
                 {{-- SSR: single service.
 
@@ -346,7 +349,7 @@
 
         {{-- Budget & Payment --}}
         <div class="do-sec req">
-            <div class="do-sec-hd"><h4>Budget &amp; Payment</h4><span class="do-tag">YOUR INPUT</span></div>
+            <x-form-section :n="5" title="Budget & Payment" tag="YOUR INPUT" />
             <div class="do-sec-bd">
                 <div class="do-row">
                     <div class="do-field"><label>Budget Range (min)</label><input type="number" class="do-input" name="budget_min" placeholder="7000"></div>
@@ -366,7 +369,7 @@
 
         {{-- AI Summary (green) --}}
         <div class="do-sec ai">
-            <div class="do-sec-hd"><h4>Request Summary</h4><span class="do-tag">AUTO-DRAFTED</span></div>
+            <x-form-section :n="6" title="Request Summary" tag="AUTO-DRAFTED" />
             <div class="do-sec-bd">
                 <div class="do-ai-row"><span class="ck">✓</span><span>We draft a clear, structured request from your inputs so the pro understands scope instantly.</span></div>
                 <div class="do-ai-row"><span class="ck">✓</span><span>Suggests a fair budget band based on your services, location and guest count.</span></div>

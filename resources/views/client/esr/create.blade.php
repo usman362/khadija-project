@@ -103,7 +103,7 @@
 
         {{-- 1. Emergency & timing --}}
         <div class="esr-card">
-            <div class="esr-sec-h"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Emergency &amp; Timing</div>
+            <x-form-section :n="1" title="Emergency & Timing" required />
             <div class="esr-field">
                 <label for="esrOrgType">This request is for <span class="esr-req">*</span></label>
                 <select name="organization_type" id="esrOrgType" class="esr-input" required>
@@ -161,7 +161,7 @@
 
         {{-- 2. Services --}}
         <div class="esr-card">
-            <div class="esr-sec-h"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span data-scope-only="single">The Service You Need</span><span data-scope-only="multi">Services You Need</span> <span class="esr-req">*</span></div>
+            <x-form-section :n="2" required><span data-scope-only="single">The Service You Need</span><span data-scope-only="multi">Services You Need</span></x-form-section>
             <p style="font-size:12.5px;color:var(--text-muted,#6b7280);margin:-6px 0 12px;">
                 <span data-scope-only="single">Pick the one service you need covered — choosing another replaces it.</span>
                 <span data-scope-only="multi">Pick every service you need covered. Each one is bid on separately.</span>
@@ -171,7 +171,7 @@
 
         {{-- 3. Budget & details --}}
         <div class="esr-card">
-            <div class="esr-sec-h"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Budget &amp; Details</div>
+            <x-form-section :n="3" title="Budget & Details" />
             <div class="esr-grid2">
                 <div class="esr-field"><label>Budget (visible to responders only)</label><input type="number" name="budget_min" class="esr-input" value="{{ old('budget_min') }}" placeholder="e.g. 2000"></div>
             </div>
