@@ -408,6 +408,18 @@
     .cl-multiselect-option.hidden {
         display: none;
     }
+    /* The sub-tabs are buttons now, not decorative spans. */
+    button.mg-subtab { background: none; border: 0; font: inherit; cursor: pointer; }
+    .mg-filter-panel { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px;
+        padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-card); }
+    .mg-filter-panel[hidden] { display: none !important; }
+    .mg-filter-panel label { display: flex; flex-direction: column; gap: 5px; font-size: 11.5px; font-weight: 700; color: var(--text-secondary); }
+    .mg-filter-count { display: inline-flex; min-width: 17px; height: 17px; padding: 0 5px; margin-left: 4px; border-radius: 999px;
+        background: #f97316; color: #fff; font-size: 10.5px; font-weight: 800; align-items: center; justify-content: center; }
+    .mg-filter-clear { font-size: 12.5px; font-weight: 700; color: #ea580c; text-decoration: none; align-self: center; }
+    a.mg-filter-btn { text-decoration: none; }
+    a.cl-calendar-event { display: block; text-decoration: none; color: inherit; }
+    .mg-rail-period { font-size: 11px; font-weight: 700; color: var(--text-muted); }
 </style>
 @endpush
 
@@ -415,19 +427,12 @@
 <div class="mg-layout">
 <div class="mg-main">
 
-    {{-- Header button row (greeting lives in the topbar) --}}
-    <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
-        <button class="cl-btn cl-btn-primary" style="background:#c2410c;border-color:#c2410c;" onclick="window.location.href='{{ route('client.post-event.choose') }}'">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Post New Event
-        </button>
-    </div>
 
     {{-- View-mode tabs --}}
     <div class="mg-viewtabs" id="viewTabs">
-        <button class="cl-tab mg-viewtab active" data-tab="masterlist">
+        <button class="cl-tab mg-viewtab active" data-tab="list">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-            Master List
+            Events List
         </button>
         <button class="cl-tab mg-viewtab" data-tab="calendar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -468,31 +473,64 @@
 
     {{-- Filter row --}}
     <form method="GET" action="{{ route('client.events.index') }}" class="mg-filter-row">
-        <input type="hidden" name="tab" value="masterlist">
+        <input type="hidden" name="tab" value="list">
+        @if(request('period'))<input type="hidden" name="period" value="{{ request('period') }}">@endif
         <select name="status" class="mg-filter-select" onchange="this.form.submit()" aria-label="All Events">
             <option value="">All Events</option>
-            @foreach (['pending', 'published', 'confirmed', 'in_progress', 'completed', 'cancelled'] as $s)
-                <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ ucfirst(str_replace('_', ' ', $s)) }}</option>
+            @foreach ($statuses as $key => $label)
+                <option value="{{ $key }}" {{ request('status') === $key ? 'selected' : '' }}>{{ $label }}</option>
             @endforeach
         </select>
         <div class="mg-filter-search-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input type="text" name="search" class="mg-filter-search" placeholder="Search events, professionals..." value="{{ request('search') }}">
         </div>
-        <button type="submit" class="mg-filter-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filters</button>
-        <button type="button" class="mg-filter-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
-        <button type="button" class="mg-filter-btn coral" onclick="window.location.href='{{ route('client.post-event.choose') }}'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Master List</button>
+        @php $moreFilters = (int) request()->filled('category') + (int) request()->filled('when'); @endphp
+        {{-- Was a second submit button with nothing behind it. It opens the
+             filters the row has no room for: service and when. --}}
+        <button type="button" class="mg-filter-btn" data-filter-toggle aria-expanded="{{ $moreFilters ? 'true' : 'false' }}" aria-controls="mgFilterPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filters @if($moreFilters)<span class="mg-filter-count">{{ $moreFilters }}</span>@endif</button>
+        {{-- Was a button with no handler. Downloads exactly what is listed. --}}
+        <a href="{{ route('client.events.export', request()->only(['search', 'status', 'category', 'when'])) }}" class="mg-filter-btn" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</a>
+        {{-- The only Post an Event on the page. It said "Create Master List",
+             a thing this product has never had. --}}
+        <a href="{{ route('client.post-event.choose') }}" class="mg-filter-btn coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Post an Event</a>
+
+        <div class="mg-filter-panel" id="mgFilterPanel" @unless($moreFilters) hidden @endunless>
+            <label>Service
+                <select name="category" class="mg-filter-select" aria-label="Service">
+                    <option value="">Any service</option>
+                    @foreach ($categories as $cat)
+                        <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                    @endforeach
+                </select>
+            </label>
+            <label>When
+                <select name="when" class="mg-filter-select" aria-label="When">
+                    <option value="">Any time</option>
+                    <option value="upcoming" @selected(request('when') === 'upcoming')>Upcoming</option>
+                    <option value="past" @selected(request('when') === 'past')>Already happened</option>
+                    <option value="undated" @selected(request('when') === 'undated')>No date yet</option>
+                </select>
+            </label>
+            <button type="submit" class="mg-filter-btn coral">Apply</button>
+            @if(request()->hasAny(['search', 'status', 'category', 'when']))
+                <a href="{{ route('client.events.index') }}" class="mg-filter-clear">Clear all</a>
+            @endif
+        </div>
     </form>
 
-    {{-- ════════════ MASTER LIST (default) ════════════ --}}
-    <div class="cl-tab-content active" id="tab-masterlist">
+    {{-- ════════════ EVENTS LIST (default) ════════════ --}}
+    <div class="cl-tab-content active" id="tab-list">
         <div class="mg-card" style="padding:0;overflow:hidden;">
-            {{-- Sub-tabs (visual) --}}
-            <div class="mg-subtabs" style="padding:0 18px;">
-                <span class="mg-subtab active">Event Master List</span>
-                <span class="mg-subtab">Professional Schedule</span>
-                <span class="mg-subtab">Payment Tracker</span>
+            {{-- These were three spans marked "(visual)" — two of them did
+                 nothing when clicked. They are three real views now: the
+                 events, who is booked for when, and what each booking costs. --}}
+            <div class="mg-subtabs" style="padding:0 18px;" role="tablist">
+                <button type="button" class="mg-subtab active" data-subtab="events" role="tab" aria-selected="true">Events List</button>
+                <button type="button" class="mg-subtab" data-subtab="schedule" role="tab" aria-selected="false">Professional Schedule</button>
+                <button type="button" class="mg-subtab" data-subtab="payments" role="tab" aria-selected="false">Payment Tracker</button>
             </div>
+            <div data-subpane="events">
             <div style="overflow-x:auto;">
                 <table class="mg-table">
                     <thead>
@@ -512,11 +550,16 @@
                         @forelse($events as $event)
                             @php
                                 $bk = $event->bookings ?? collect();
-                                $needed    = $bk->count() ?: ($event->professionals_needed ?? '—');
+                                // One professional per service asked for. It was
+                                // the number of bookings — i.e. how many had
+                                // already answered, not how many were needed.
+                                $needed    = $event->categories->count() ?: '—';
                                 $confirmed = $bk->where('status', 'confirmed')->count();
                                 $pending   = $bk->where('status', 'requested')->count();
                                 $budget    = $event->budget ?? 0;
-                                $spent     = $bk->where('status', 'completed')->sum(fn($b) => $b->total_amount ?? $b->agreed_price ?? 0);
+                                // bookings.price — total_amount and agreed_price
+                                // never existed, which is why this read $0.
+                                $spent     = $bk->where('status', 'completed')->sum('price');
                             @endphp
                             <tr>
                                 <td style="padding-left:18px;">
@@ -535,7 +578,7 @@
                                         <button type="button" class="mg-row-kebab" aria-haspopup="true" aria-expanded="false" title="More actions">⋯</button>
                                         <div class="mg-menu-pop" data-row-menu-pop>
                                             <a href="{{ route('client.events.show', $event) }}">View event</a>
-                                            <a href="{{ route('client.proposals.index') }}">View proposals</a>
+                                            <a href="{{ route('client.events.show', $event) }}#proposals">View proposals</a>
                                             @unless($event->is_published)
                                                 <form method="POST" action="{{ route('client.events.publish', $event) }}">
                                                     @csrf
@@ -548,7 +591,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);">No events yet. Click <b>Post New Event</b> to get started.</td></tr>
+                            <tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);">@if(request()->hasAny(['search', 'status', 'category', 'when']))No events match these filters. <a href="{{ route('client.events.index') }}">Clear filters</a>@else No events yet. Click <b>Post an Event</b> to get started.@endif</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -559,6 +602,60 @@
                     {{ $events->onEachSide(1)->links() }}
                 </div>
             @endif
+            </div>{{-- /events subpane --}}
+
+            {{-- Who is booked, for which event, when. --}}
+            <div data-subpane="schedule" hidden>
+                <div style="overflow-x:auto;">
+                    <table class="mg-table">
+                        <thead><tr><th style="padding-left:18px;">Professional</th><th>Event</th><th>Service</th><th>Date</th><th>Time</th><th style="padding-right:18px;">Status</th></tr></thead>
+                        <tbody>
+                            @forelse($bookings->whereNotIn('status', \App\Domain\Finance\ClientTotals::VOID_STATUSES) as $b)
+                                <tr>
+                                    <td style="padding-left:18px;"><div class="ev-name">{{ $b->supplier?->name ?? 'Professional' }}</div></td>
+                                    <td>@if($b->event)<a href="{{ route('client.events.show', $b->event_id) }}">{{ $b->event->title }}</a>@else — @endif</td>
+                                    <td>{{ $b->category?->name ?? '—' }}</td>
+                                    <td>{{ $b->event?->starts_at?->format('M d, Y') ?? 'Not scheduled' }}</td>
+                                    <td>{{ $b->event?->starts_at?->format('g:i A') ?? '—' }}@if($b->event?->ends_at) – {{ $b->event->ends_at->format('g:i A') }}@endif</td>
+                                    <td style="padding-right:18px;"><span class="mg-status-pill mg-status-{{ $b->status }}">{{ $b->status === 'requested' ? 'Awaiting reply' : ucfirst($b->status) }}</span></td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No professionals booked yet.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {{-- What each booking costs and where the money stands. --}}
+            <div data-subpane="payments" hidden>
+                <div style="overflow-x:auto;">
+                    <table class="mg-table">
+                        <thead><tr><th style="padding-left:18px;">Professional</th><th>Event</th><th>Amount</th><th style="padding-right:18px;">Payment</th></tr></thead>
+                        <tbody>
+                            @forelse($bookings as $b)
+                                @php
+                                    $pay = match (true) {
+                                        $b->status === 'completed' => ['Paid', 'completed'],
+                                        in_array($b->status, \App\Domain\Finance\ClientTotals::VOID_STATUSES, true) => ['Cancelled — nothing owed', 'cancelled'],
+                                        $b->event?->starts_at && $b->event->starts_at->isPast() => ['Overdue', 'cancelled'],
+                                        $b->status === 'confirmed' => ['Agreed, not yet paid', 'pending'],
+                                        default => ['Awaiting professional', 'pending'],
+                                    };
+                                @endphp
+                                <tr>
+                                    <td style="padding-left:18px;"><div class="ev-name">{{ $b->supplier?->name ?? 'Professional' }}</div></td>
+                                    <td>{{ $b->event?->title ?? '—' }}</td>
+                                    <td style="font-weight:600;color:var(--text-primary);">{{ $b->price !== null ? '$' . number_format((float) $b->price, 0) : '—' }}</td>
+                                    <td style="padding-right:18px;"><span class="mg-status-pill mg-status-{{ $pay[1] }}">{{ $pay[0] }}</span></td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted);">Nothing to pay yet.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         {{-- Professional Status Overview bar --}}
@@ -569,11 +666,10 @@
                 <span><span class="dot" style="background:#f59e0b;"></span>Pending<b>{{ $proStatus['pending'] }}</b></span>
                 <span><span class="dot" style="background:#94a3b8;"></span>Not Scheduled<b>{{ $proStatus['not_scheduled'] }}</b></span>
                 <span><span class="dot" style="background:#ef4444;"></span>Cancelled<b>{{ $proStatus['cancelled'] }}</b></span>
-                <span><span class="dot" style="background:#8b5cf6;"></span>Rescheduled<b>{{ $proStatus['rescheduled'] }}</b></span>
             </div>
             @php
                 $psTotal = max(1, array_sum($proStatus));
-                $psColors = ['confirmed'=>'#10b981','pending'=>'#f59e0b','not_scheduled'=>'#94a3b8','cancelled'=>'#ef4444','rescheduled'=>'#8b5cf6'];
+                $psColors = ['confirmed'=>'#10b981','pending'=>'#f59e0b','not_scheduled'=>'#94a3b8','cancelled'=>'#ef4444'];
             @endphp
             <div class="mg-pso-bar">
                 @foreach($psColors as $k => $c)
@@ -603,9 +699,10 @@
             <div class="mg-card">
                 <div class="mg-rail-head"><div class="mg-rail-title">Quick Actions</div></div>
                 <div class="mg-qa-grid">
-                    <a href="{{ route('client.post-event.choose') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg><span>Post an Event</span></a>
+                    {{-- Post an Event is in the filter row; a second copy here was the third on the page. --}}
                     <a href="{{ route('client.search.index') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg><span>Invite Professionals</span></a>
-                    <a href="{{ route('client.bookings.index') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>View Proposals</span></a>
+                    {{-- It said View Proposals and opened Bookings. --}}
+                    <a href="{{ route('client.proposals.index') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>View Proposals</span></a>
                     <a href="{{ route('client.bookings.index') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Manage Bookings</span></a>
                 </div>
             </div>
@@ -634,14 +731,14 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                 <div class="cl-calendar-month">{{ $currentDate->format('F Y') }}</div>
                 <div class="cl-calendar-nav">
-                    <a href="{{ route('client.events.index', ['month' => $prevMonth->month, 'year' => $prevMonth->year]) }}" style="text-decoration:none;">
-                        <button type="button" aria-label="Filter events"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+                    <a href="{{ route('client.events.index', ['month' => $prevMonth->month, 'year' => $prevMonth->year, 'tab' => 'calendar']) }}" style="text-decoration:none;">
+                        <button type="button" aria-label="Previous month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
                     </a>
-                    <a href="{{ route('client.events.index', ['month' => now()->month, 'year' => now()->year]) }}" style="text-decoration:none;">
+                    <a href="{{ route('client.events.index', ['month' => now()->month, 'year' => now()->year, 'tab' => 'calendar']) }}" style="text-decoration:none;">
                         <button class="today-btn">Today</button>
                     </a>
-                    <a href="{{ route('client.events.index', ['month' => $nextMonth->month, 'year' => $nextMonth->year]) }}" style="text-decoration:none;">
-                        <button type="button" aria-label="Change the view"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+                    <a href="{{ route('client.events.index', ['month' => $nextMonth->month, 'year' => $nextMonth->year, 'tab' => 'calendar']) }}" style="text-decoration:none;">
+                        <button type="button" aria-label="Next month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
                     </a>
                 </div>
             </div>
@@ -669,7 +766,7 @@
                                         <div class="cl-calendar-day {{ $isToday ? 'today' : '' }}">
                                             <div class="day-num">{{ $dayCounter }}</div>
                                             @foreach (array_slice($dayEvents, 0, 2) as $de)
-                                                <div class="cl-calendar-event">{{ Str::limit($de->title, 14) }}</div>
+                                                <a href="{{ route('client.events.show', $de->id) }}" class="cl-calendar-event" title="{{ $de->title }}">{{ Str::limit($de->title, 14) }}</a>
                                             @endforeach
                                             @if (count($dayEvents) > 2)
                                                 <div style="font-size:10px; color: var(--text-muted); margin-top:2px;">+{{ count($dayEvents) - 2 }} more</div>
@@ -751,8 +848,8 @@
                 <div style="min-width: 150px;">
                     <select name="status" class="cl-form-select" style="padding: 10px 14px;" aria-label="All Status">
                         <option value="">All Status</option>
-                        @foreach (['pending', 'published', 'confirmed', 'in_progress', 'completed', 'cancelled'] as $s)
-                            <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ ucfirst(str_replace('_', ' ', $s)) }}</option>
+                        @foreach ($statuses as $key => $label)
+                            <option value="{{ $key }}" {{ request('status') === $key ? 'selected' : '' }}>{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -893,26 +990,23 @@
 
         {{-- Event Overview donut --}}
         <div class="mg-rail-card">
-            <div class="mg-rail-head"><div class="mg-rail-title">Event Overview</div><select class="mg-rail-sel" aria-label="This Month"><option>This Month</option></select></div>
+            <div class="mg-rail-head"><div class="mg-rail-title">Event Overview</div>@include('client.events._period_select')</div>
             @php
-                $evTotal = max(1, $stats['total']);
-                $evPie = [
-                    ['lbl'=>'Confirmed',  'val'=>$stats['confirmed'], 'color'=>'#10b981'],
-                    ['lbl'=>'Pending',    'val'=>$stats['pending'],   'color'=>'#f59e0b'],
-                    ['lbl'=>'In Progress','val'=>$proStatus['not_scheduled'], 'color'=>'#6366f1'],
-                    ['lbl'=>'Not Started','val'=>max(0, $stats['total'] - $stats['confirmed'] - $stats['pending']), 'color'=>'#94a3b8'],
-                ];
+                // Events by stage — every slice is an event, so they add up to
+                // the number in the middle. It mixed booking counts in before.
+                $evTotal = max(1, $overview['total']);
+                $evPie = array_values(array_filter($overview['stages'], fn ($p) => $p['val'] > 0)) ?: [['lbl' => 'No events', 'val' => 0, 'color' => '#e5e7eb']];
                 $cur = 0; $segs = [];
                 foreach ($evPie as $p) { $deg = ($p['val'] / $evTotal) * 360; $segs[] = "{$p['color']} {$cur}deg ".($cur+$deg)."deg"; $cur += $deg; }
                 $evConic = 'conic-gradient('.implode(', ', $segs).')';
             @endphp
             <div class="mg-donut" style="background:{{ $evConic }};border-radius:50%;">
                 <div style="position:absolute;inset:13px;background:var(--bg-card);border-radius:50%;z-index:1;"></div>
-                <div class="mg-donut-center"><span class="num">{{ $stats['total'] }}</span><span class="lbl">Total Events</span></div>
+                <div class="mg-donut-center"><span class="num">{{ $overview['total'] }}</span><span class="lbl">{{ $period === 'all' ? 'Total Events' : 'Posted ' . strtolower($periods[$period]) }}</span></div>
             </div>
             <div class="mg-legend">
                 @foreach($evPie as $p)
-                    @php $pp = $stats['total'] > 0 ? round(($p['val']/$stats['total'])*100) : 0; @endphp
+                    @php $pp = $overview['total'] > 0 ? round(($p['val']/$overview['total'])*100) : 0; @endphp
                     <div class="row"><span class="dot" style="background:{{ $p['color'] }};"></span><span class="lbl">{{ $p['lbl'] }}</span><span class="val">{{ $p['val'] }} ({{ $pp }}%)</span></div>
                 @endforeach
             </div>
@@ -920,18 +1014,19 @@
 
         {{-- Professional Status --}}
         <div class="mg-rail-card">
-            <div class="mg-rail-head"><div class="mg-rail-title">Professional Status</div></div>
+            <div class="mg-rail-head"><div class="mg-rail-title">Professional Status</div>@if($period !== 'all')<span class="mg-rail-period">{{ $periods[$period] }}</span>@endif</div>
             <div class="mg-pstat-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Confirmed</span><span class="val">{{ $proStatus['confirmed'] }}</span></div>
             <div class="mg-pstat-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pending</span><span class="val">{{ $proStatus['pending'] }}</span></div>
             <div class="mg-pstat-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Not Scheduled</span><span class="val">{{ $proStatus['not_scheduled'] }}</span></div>
             <div class="mg-pstat-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Cancelled</span><span class="val">{{ $proStatus['cancelled'] }}</span></div>
-            <div class="mg-pstat-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Rescheduled</span><span class="val">{{ $proStatus['rescheduled'] }}</span></div>
         </div>
 
         {{-- Payment Summary --}}
         <div class="mg-rail-card">
-            <div class="mg-rail-head"><div class="mg-rail-title">Payment Summary</div><select class="mg-rail-sel" aria-label="This Month"><option>This Month</option></select></div>
-            <div style="font-size:11px;color:var(--text-muted);">Total Spent</div>
+            <div class="mg-rail-head"><div class="mg-rail-title">Payment Summary</div>@include('client.events._period_select')</div>
+            {{-- It said "Total Spent" over a figure that included money not yet
+                 paid. It is everything booked; "Paid" below is what was spent. --}}
+            <div style="font-size:11px;color:var(--text-muted);">Total booked</div>
             <div class="mg-pay-total">${{ number_format($payment['total'], 0) }}</div>
             <div class="mg-pay-grid">
                 <div class="paid"><b>${{ number_format($payment['paid'], 0) }}</b><span style="color:var(--text-muted);">Paid</span></div>
@@ -943,19 +1038,21 @@
 
         {{-- Upcoming Deadlines --}}
         <div class="mg-rail-card">
-            <div class="mg-rail-head"><div class="mg-rail-title">Upcoming Deadlines</div></div>
+            {{-- These are event dates, not deadlines, and every row said
+                 "Finalize event details" whatever state the event was in. --}}
+            <div class="mg-rail-head"><div class="mg-rail-title">Coming Up</div></div>
             @forelse($deadlines as $dl)
                 @php $daysLeft = (int) ceil(now()->diffInHours($dl->starts_at, false) / 24); @endphp
                 <div class="mg-dl-row">
                     <span class="mg-dl-bar"></span>
                     <div class="mg-dl-body">
                         <div class="mg-dl-title">{{ \Illuminate\Support\Str::limit($dl->title, 22) }}</div>
-                        <div class="mg-dl-sub">Finalize event details</div>
+                        <div class="mg-dl-sub">{{ $dl->starts_at->format('D, M j · g:i A') }}</div>
                     </div>
-                    <span class="mg-dl-due">Due in {{ max(0, $daysLeft) }} day{{ $daysLeft === 1 ? '' : 's' }}</span>
+                    <span class="mg-dl-due">{{ $daysLeft <= 0 ? 'Today' : 'In ' . $daysLeft . ' day' . ($daysLeft === 1 ? '' : 's') }}</span>
                 </div>
             @empty
-                <div style="font-size:12px;color:var(--text-muted);text-align:center;padding:8px 0;">No upcoming deadlines</div>
+                <div style="font-size:12px;color:var(--text-muted);text-align:center;padding:8px 0;">Nothing in the next two weeks</div>
             @endforelse
         </div>
     </aside>
@@ -983,10 +1080,37 @@
         window.location.href='{{ route('client.post-event.choose') }}';
     }
 
-    // Open details tab if ?tab=details
-    if (new URLSearchParams(window.location.search).get('tab') === 'details') {
-        document.querySelector('[data-tab="details"]').click();
-    }
+    // Open whichever view the URL names — the calendar's month arrows reload
+    // the page, and used to drop the client back on the list every time.
+    (function () {
+        var want = new URLSearchParams(window.location.search).get('tab');
+        var tab = want && document.querySelector('#viewTabs [data-tab="' + want + '"]');
+        if (tab) tab.click();
+    })();
+
+    // Events List / Professional Schedule / Payment Tracker.
+    document.querySelectorAll('[data-subtab]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('[data-subtab]').forEach(function (b) {
+                b.classList.toggle('active', b === btn);
+                b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+            });
+            document.querySelectorAll('[data-subpane]').forEach(function (pane) {
+                pane.hidden = pane.dataset.subpane !== btn.dataset.subtab;
+            });
+        });
+    });
+
+    // Filters opens the service / when panel.
+    (function () {
+        var btn = document.querySelector('[data-filter-toggle]');
+        var panel = document.getElementById('mgFilterPanel');
+        if (!btn || !panel) return;
+        btn.addEventListener('click', function () {
+            panel.hidden = !panel.hidden;
+            btn.setAttribute('aria-expanded', panel.hidden ? 'false' : 'true');
+        });
+    })();
 
     // Close any open multi-select dropdowns on Escape.
     document.addEventListener('keydown', function(e) {

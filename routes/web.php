@@ -871,6 +871,10 @@ Route::middleware('auth')->group(function () {
          */
 
         Route::get('/events', [ClientEventController::class, 'index'])->middleware('permission:events.view_any')->name('client.events.index');
+        // The Export button on My Events. Same filters as the list, so what
+        // downloads is what is on screen. Above /events/{event} so "export" is
+        // never read as an event id.
+        Route::get('/events/export', [ClientEventController::class, 'export'])->middleware('permission:events.view_any')->name('client.events.export');
         // "Create a Gig" (bidding builder) retired in favour of the "Post an Event" flow — redirect any old links.
         Route::get('/events/create', fn () => redirect()->route('client.post-event.choose'))->name('client.events.create');
         Route::post('/events', [ClientEventController::class, 'store'])->middleware('permission:events.create')->name('client.events.store');
