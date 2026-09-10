@@ -420,11 +420,47 @@
     a.mg-filter-btn { text-decoration: none; }
     a.cl-calendar-event { display: block; text-decoration: none; color: inherit; }
     .mg-rail-period { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+
+    /* Calendar */
+    .ec-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+    .ec-title { display: flex; align-items: center; gap: 8px; }
+    .ec-title .cl-calendar-month { margin: 0 0 0 6px; }
+    .ec-nav { width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--border-color); display: inline-flex;
+        align-items: center; justify-content: center; font-size: 18px; line-height: 1; color: var(--text-secondary); text-decoration: none; }
+    .ec-nav:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+    .ec-views { display: inline-flex; padding: 3px; gap: 3px; border: 1px solid var(--border-color); border-radius: 10px; }
+    .ec-view { padding: 6px 13px; border-radius: 7px; font-size: 12.5px; font-weight: 700; color: var(--text-secondary); text-decoration: none; }
+    .ec-view:hover { color: var(--text-primary); }
+    .ec-view.is-active { background: #c2410c; color: #fff; }
+    .ec-view.lv-pending { background: rgba(249,115,22,.12); color: #c2410c; opacity: 1; }
+    a.ec-daylink { text-decoration: none; color: inherit; border-radius: 50%; }
+    a.ec-daylink:hover { text-decoration: underline; }
+    .ec-muted { opacity: .45; }
+    .ec-ev { display: block; margin-top: 3px; padding: 2px 6px; border-radius: 5px; font-size: 11px; font-weight: 700;
+        text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ec-more { display: block; margin-top: 3px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-decoration: none; }
+    .ec-more:hover { color: #c2410c; }
+    .ec-week .cl-calendar-day { min-height: 220px; }
+    .ec-agenda { display: flex; flex-direction: column; }
+    .ec-agenda-row { display: flex; align-items: center; gap: 12px; padding: 13px 6px; border-bottom: 1px solid var(--border-color);
+        text-decoration: none; color: inherit; }
+    .ec-agenda-row:last-child { border-bottom: 0; }
+    .ec-agenda-row:hover { background: var(--bg-card-hover); }
+    .ec-agenda-time { flex: none; width: 92px; font-size: 12.5px; font-weight: 700; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+    .ec-agenda-time small { display: block; font-weight: 600; color: var(--text-muted); }
+    .ec-dot { flex: none; width: 9px; height: 9px; border-radius: 50%; }
+    .ec-agenda-body b { display: block; font-size: 14px; color: var(--text-primary); }
+    .ec-agenda-body small { font-size: 12px; font-weight: 700; }
+    .ec-empty { font-size: 13px; color: var(--text-muted); margin: 14px 2px 0; }
+    .ec-empty a { font-weight: 700; color: #c2410c; }
+    .ec-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; font-size: 12px; color: var(--text-secondary); }
+    .ec-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .ec-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 </style>
 @endpush
 
 @section('content')
-<div class="mg-layout">
+<div class="mg-layout" data-live-scope>
 <div class="mg-main">
 
 
@@ -472,10 +508,15 @@
     </div>
 
     {{-- Filter row --}}
-    <form method="GET" action="{{ route('client.events.index') }}" class="mg-filter-row">
+    {{-- Filtering redraws the list and the details in place; this row
+         stays bright so the box being typed in is never dimmed. --}}
+    <form method="GET" action="{{ route('client.events.index') }}" class="mg-filter-row"
+          id="mgFilters" data-live-region data-live-busy="mgListCard mgDetails">
         <input type="hidden" name="tab" value="list">
         @if(request('period'))<input type="hidden" name="period" value="{{ request('period') }}">@endif
-        <select name="status" class="mg-filter-select" onchange="this.form.submit()" aria-label="All Events">
+        {{-- requestSubmit, not submit(): submit() skips the submit event,
+             so nothing listening could keep this on the page. --}}
+        <select name="status" class="mg-filter-select" onchange="this.form.requestSubmit()" aria-label="All Events">
             <option value="">All Events</option>
             @foreach ($statuses as $key => $label)
                 <option value="{{ $key }}" {{ request('status') === $key ? 'selected' : '' }}>{{ $label }}</option>
@@ -483,7 +524,7 @@
         </select>
         <div class="mg-filter-search-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" name="search" class="mg-filter-search" placeholder="Search events, professionals..." value="{{ request('search') }}">
+            <input type="text" name="search" class="mg-filter-search" placeholder="Search events, professionals..." value="{{ request('search') }}" data-live-search autocomplete="off">
         </div>
         @php $moreFilters = (int) request()->filled('category') + (int) request()->filled('when'); @endphp
         {{-- Was a second submit button with nothing behind it. It opens the
@@ -521,7 +562,7 @@
 
     {{-- ════════════ EVENTS LIST (default) ════════════ --}}
     <div class="cl-tab-content active" id="tab-list">
-        <div class="mg-card" style="padding:0;overflow:hidden;">
+        <div class="mg-card" style="padding:0;overflow:hidden;" id="mgListCard" data-live-region>
             {{-- These were three spans marked "(visual)" — two of them did
                  nothing when clicked. They are three real views now: the
                  events, who is booked for when, and what each booking costs. --}}
@@ -710,83 +751,108 @@
     </div>
 
     {{-- ════════════ CALENDAR VIEW ════════════ --}}
+    {{-- A day, a week or a month, all in the address. Every control is a link
+         to this page, so it changes in place (partials/_live_regions) and
+         still works as a plain link. --}}
     <div class="cl-tab-content" id="tab-calendar">
-        <div class="cl-card">
-            @php
-                $currentDate = \Carbon\Carbon::create($year, $month, 1);
-                $daysInMonth = $currentDate->daysInMonth;
-                $firstDayOfWeek = $currentDate->dayOfWeek; // 0=Sun
-                $today = now();
-                $prevMonth = $currentDate->copy()->subMonth();
-                $nextMonth = $currentDate->copy()->addMonth();
-
-                // Index events by day
-                $eventsByDay = [];
-                foreach ($calendarEvents as $ce) {
-                    $day = $ce->starts_at->day;
-                    $eventsByDay[$day][] = $ce;
-                }
-            @endphp
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <div class="cl-calendar-month">{{ $currentDate->format('F Y') }}</div>
-                <div class="cl-calendar-nav">
-                    <a href="{{ route('client.events.index', ['month' => $prevMonth->month, 'year' => $prevMonth->year, 'tab' => 'calendar']) }}" style="text-decoration:none;">
-                        <button type="button" aria-label="Previous month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
-                    </a>
-                    <a href="{{ route('client.events.index', ['month' => now()->month, 'year' => now()->year, 'tab' => 'calendar']) }}" style="text-decoration:none;">
-                        <button class="today-btn">Today</button>
-                    </a>
-                    <a href="{{ route('client.events.index', ['month' => $nextMonth->month, 'year' => $nextMonth->year, 'tab' => 'calendar']) }}" style="text-decoration:none;">
-                        <button type="button" aria-label="Next month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
-                    </a>
+        @php
+            $c = $calendar;
+            $calLink = fn (array $over) => route('client.events.index', array_merge(
+                request()->except(['page', 'month', 'year']), ['tab' => 'calendar'], $over
+            ));
+            $calStages = \App\Support\ClientCalendar::STAGES;
+            $unit = ['day' => 'day', 'week' => 'week', 'month' => 'month'][$c['view']];
+            $perDay = $c['view'] === 'week' ? 6 : 3;
+        @endphp
+        <div class="cl-card ec-card" id="mgCal" data-live-region>
+            <div class="ec-head">
+                <div class="ec-title">
+                    <a class="ec-nav" href="{{ $calLink(['calview' => $c['view'], 'cal' => $c['prev']->format('Y-m-d')]) }}" aria-label="Previous {{ $unit }}">‹</a>
+                    <a class="ec-nav" href="{{ $calLink(['calview' => $c['view'], 'cal' => $c['next']->format('Y-m-d')]) }}" aria-label="Next {{ $unit }}">›</a>
+                    <h3 class="cl-calendar-month">{{ $c['title'] }}</h3>
+                </div>
+                <div class="ec-views" role="group" aria-label="Calendar view">
+                    <a class="ec-view {{ $c['view'] === 'day' && $c['anchor']->isToday() ? 'is-active' : '' }}"
+                       href="{{ $calLink(['calview' => 'day', 'cal' => now()->format('Y-m-d')]) }}">Today</a>
+                    <a class="ec-view {{ $c['view'] === 'week' ? 'is-active' : '' }}"
+                       href="{{ $calLink(['calview' => 'week', 'cal' => $c['anchor']->format('Y-m-d')]) }}">Week</a>
+                    <a class="ec-view {{ $c['view'] === 'month' ? 'is-active' : '' }}"
+                       href="{{ $calLink(['calview' => 'month', 'cal' => $c['anchor']->format('Y-m-d')]) }}">Month</a>
                 </div>
             </div>
 
-            <table class="cl-calendar">
-                <thead>
-                    <tr>
-                        <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php $dayCounter = 1; $started = false; @endphp
-                    @for ($row = 0; $row < 6 && $dayCounter <= $daysInMonth; $row++)
-                        <tr>
-                            @for ($col = 0; $col < 7; $col++)
-                                @if (!$started && $col < $firstDayOfWeek)
-                                    <td><div class="cl-calendar-day empty"></div></td>
-                                @elseif ($dayCounter <= $daysInMonth)
+            @if($c['view'] === 'day')
+                @php $dayList = $c['byDate']->get($c['anchor']->format('Y-m-d'), collect()); @endphp
+                <div class="ec-agenda">
+                    @forelse($dayList as $ev)
+                        @php [$stLabel, $stColour] = $calStages[$ev->stage()] ?? ['Event', '#f97316']; @endphp
+                        <a class="ec-agenda-row" href="{{ route('client.events.show', $ev) }}" data-no-live>
+                            <span class="ec-agenda-time">{{ $ev->starts_at->format('g:i A') }}@if($ev->ends_at)<small>– {{ $ev->ends_at->format('g:i A') }}</small>@endif</span>
+                            <span class="ec-dot" style="background:{{ $stColour }};"></span>
+                            <span class="ec-agenda-body"><b>{{ $ev->title }}</b><small style="color:{{ $stColour }};">{{ $stLabel }}</small></span>
+                        </a>
+                    @empty
+                        <p class="ec-empty">
+                            Nothing on {{ $c['anchor']->isToday() ? 'today' : $c['anchor']->format('l, M j') }}.
+                            <a href="{{ $calLink(['calview' => 'month', 'cal' => $c['anchor']->format('Y-m-d')]) }}">See the month</a>
+                        </p>
+                    @endforelse
+                </div>
+            @else
+                <table class="cl-calendar ec-grid ec-{{ $c['view'] }}">
+                    <thead><tr>@foreach(['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] as $dow)<th>{{ $dow }}</th>@endforeach</tr></thead>
+                    <tbody>
+                        @php $cursor = $c['first']->copy(); @endphp
+                        @while($cursor->lte($c['last']))
+                            <tr>
+                                @for($i = 0; $i < 7; $i++)
                                     @php
-                                        $started = true;
-                                        $isToday = $today->year == $year && $today->month == $month && $today->day == $dayCounter;
-                                        $dayEvents = $eventsByDay[$dayCounter] ?? [];
+                                        $key    = $cursor->format('Y-m-d');
+                                        $dayEvs = $c['byDate']->get($key, collect());
+                                        $muted  = $c['view'] === 'month' && $cursor->month !== $c['anchor']->month;
                                     @endphp
                                     <td>
-                                        <div class="cl-calendar-day {{ $isToday ? 'today' : '' }}">
-                                            <div class="day-num">{{ $dayCounter }}</div>
-                                            @foreach (array_slice($dayEvents, 0, 2) as $de)
-                                                <a href="{{ route('client.events.show', $de->id) }}" class="cl-calendar-event" title="{{ $de->title }}">{{ Str::limit($de->title, 14) }}</a>
+                                        <div class="cl-calendar-day {{ $cursor->isToday() ? 'today' : '' }} {{ $muted ? 'ec-muted' : '' }}">
+                                            {{-- The number opens that day's list. --}}
+                                            <a class="day-num ec-daylink" href="{{ $calLink(['calview' => 'day', 'cal' => $key]) }}"
+                                               aria-label="{{ $cursor->format('l, F j') }}{{ $dayEvs->count() ? ' — ' . $dayEvs->count() . ' event' . ($dayEvs->count() === 1 ? '' : 's') : '' }}">{{ $cursor->day }}</a>
+                                            @foreach($dayEvs->take($perDay) as $ev)
+                                                @php [$stLabel, $stColour] = $calStages[$ev->stage()] ?? ['Event', '#f97316']; @endphp
+                                                {{-- Coloured by the stage every other screen reports. --}}
+                                                <a href="{{ route('client.events.show', $ev) }}" class="cl-calendar-event ec-ev" data-no-live
+                                                   style="background:{{ $stColour }}1f;color:{{ $stColour }};border-left:3px solid {{ $stColour }};"
+                                                   title="{{ $ev->title }} — {{ $stLabel }}">{{ \Illuminate\Support\Str::limit($ev->title, $c['view'] === 'week' ? 22 : 14) }}</a>
                                             @endforeach
-                                            @if (count($dayEvents) > 2)
-                                                <div style="font-size:10px; color: var(--text-muted); margin-top:2px;">+{{ count($dayEvents) - 2 }} more</div>
+                                            @if($dayEvs->count() > $perDay)
+                                                <a class="ec-more" href="{{ $calLink(['calview' => 'day', 'cal' => $key]) }}">+{{ $dayEvs->count() - $perDay }} more</a>
                                             @endif
                                         </div>
                                     </td>
-                                    @php $dayCounter++; @endphp
-                                @else
-                                    <td><div class="cl-calendar-day empty"></div></td>
-                                @endif
-                            @endfor
-                        </tr>
-                    @endfor
-                </tbody>
-            </table>
+                                    @php $cursor->addDay(); @endphp
+                                @endfor
+                            </tr>
+                        @endwhile
+                    </tbody>
+                </table>
+                @if($c['byDate']->isEmpty())
+                    <p class="ec-empty">Nothing scheduled this {{ $unit }}. <a href="{{ route('client.post-event.choose') }}" data-no-live>Post an event</a> to see it here.</p>
+                @endif
+            @endif
+
+            @if($c['stagesShown']->isNotEmpty())
+                {{-- Only the stages on screen. --}}
+                <div class="ec-legend">
+                    @foreach($c['stagesShown'] as $st)
+                        <span><i style="background:{{ $calStages[$st][1] }};"></i>{{ $calStages[$st][0] }}</span>
+                    @endforeach
+                </div>
+            @endif
         </div>
     </div>
 
     {{-- ════════════ DETAILS VIEW ════════════ --}}
     <div class="cl-tab-content" id="tab-details">
+    <div id="mgDetails" data-live-region>
         {{-- Stats Row --}}
         <div class="cl-grid cl-grid-4" style="margin-bottom: 24px;">
             <div class="cl-card">
@@ -981,12 +1047,13 @@
                 </div>
             </div>
         @endif
+    </div>{{-- /#mgDetails --}}
     </div>
 
 </div>{{-- /.mg-main --}}
 
     {{-- ════════════ RIGHT RAIL ════════════ --}}
-    <aside class="mg-rail">
+    <aside class="mg-rail" id="mgRail" data-live-region>
 
         {{-- Event Overview donut --}}
         <div class="mg-rail-card">
@@ -1062,6 +1129,7 @@
 @endsection
 
 @include('partials._row-menu-script')
+@include('partials._live_regions')
 @push('scripts')
 <script>
 
@@ -1089,28 +1157,29 @@
     })();
 
     // Events List / Professional Schedule / Payment Tracker.
-    document.querySelectorAll('[data-subtab]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            document.querySelectorAll('[data-subtab]').forEach(function (b) {
-                b.classList.toggle('active', b === btn);
-                b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
-            });
-            document.querySelectorAll('[data-subpane]').forEach(function (pane) {
-                pane.hidden = pane.dataset.subpane !== btn.dataset.subtab;
-            });
+    // Delegated: the list card is swapped for a fresh copy on every filter,
+    // and a listener bound to the old buttons would die with them.
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest ? e.target.closest('[data-subtab]') : null;
+        if (!btn) return;
+        document.querySelectorAll('[data-subtab]').forEach(function (b) {
+            b.classList.toggle('active', b === btn);
+            b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+        });
+        document.querySelectorAll('[data-subpane]').forEach(function (pane) {
+            pane.hidden = pane.dataset.subpane !== btn.dataset.subtab;
         });
     });
 
-    // Filters opens the service / when panel.
-    (function () {
-        var btn = document.querySelector('[data-filter-toggle]');
+    // Filters opens the service / when panel. Delegated for the same reason.
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest ? e.target.closest('[data-filter-toggle]') : null;
+        if (!btn) return;
         var panel = document.getElementById('mgFilterPanel');
-        if (!btn || !panel) return;
-        btn.addEventListener('click', function () {
-            panel.hidden = !panel.hidden;
-            btn.setAttribute('aria-expanded', panel.hidden ? 'false' : 'true');
-        });
-    })();
+        if (!panel) return;
+        panel.hidden = !panel.hidden;
+        btn.setAttribute('aria-expanded', panel.hidden ? 'false' : 'true');
+    });
 
     // Close any open multi-select dropdowns on Escape.
     document.addEventListener('keydown', function(e) {

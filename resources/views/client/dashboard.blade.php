@@ -758,13 +758,8 @@
      * state is — status against is_published, with status winning. Reading it
      * here means the calendar cannot disagree with the rest of the portal.
      */
-    $calStages = [
-        'confirmed' => ['Booked', '#10b981'],
-        'open'      => ['Open for proposals', '#f59e0b'],
-        'draft'     => ['Draft — not sent yet', '#9ca3af'],
-        'completed' => ['Completed', '#6366f1'],
-        'cancelled' => ['Cancelled', '#ef4444'],
-    ];
+    // Shared with My Events, so an entry's colour means the same on both.
+    $calStages = \App\Support\ClientCalendar::STAGES;
 
     // Only the stages actually on screen. A legend listing states this month
     // does not contain is a legend explaining someone else's calendar.

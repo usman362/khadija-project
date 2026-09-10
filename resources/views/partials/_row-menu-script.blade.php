@@ -52,12 +52,19 @@
         openMenu = null;
     }
 
-    document.querySelectorAll('[data-row-menu]').forEach(function (menu) {
-        var trigger = menu.querySelector('button[aria-haspopup]');
-        if (!trigger) return;
+    /*
+     * One listener on the document, not one per menu.
+     *
+     * Each menu used to get its own listener when the page loaded. My Events
+     * now redraws its list in place (partials/_live_regions), and the fresh
+     * rows arrived with no listener — the ⋯ did nothing after the first
+     * search. Listening at the document catches menus that did not exist yet.
+     */
+    document.addEventListener('click', function (e) {
+        var trigger = e.target.closest ? e.target.closest('[data-row-menu] button[aria-haspopup]') : null;
 
-        trigger.addEventListener('click', function (e) {
-            e.stopPropagation();
+        if (trigger) {
+            var menu = trigger.closest('[data-row-menu]');
             var wasOpen = menu === openMenu;
             close();
             if (wasOpen) return;
@@ -65,14 +72,17 @@
             trigger.setAttribute('aria-expanded', 'true');
             openMenu = menu;
             place(menu);
-        });
+            return;
+        }
 
-        // Picking an item closes the menu; the link or submit still runs.
-        var pop = menu.querySelector('[data-row-menu-pop]');
-        if (pop) pop.addEventListener('click', function () { close(); });
+        // Anywhere else — including an item in the menu — closes it; the
+        // link or submit that was clicked still runs.
+        close();
     });
 
-    document.addEventListener('click', close);
+    // A redraw replaced the rows; the menu that was open went with them.
+    document.addEventListener('live:swapped', function () { openMenu = null; });
+
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
     // Fixed popups don't travel with their trigger — put them back.
     window.addEventListener('resize', function () { if (openMenu) place(openMenu); });

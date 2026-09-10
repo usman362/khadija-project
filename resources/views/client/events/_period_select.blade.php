@@ -5,10 +5,12 @@
     rail should not reset what the client was looking at.
 --}}
 <form method="GET" action="{{ route('client.events.index') }}" style="margin:0;">
-    @foreach(request()->only(['search', 'status', 'category', 'when']) as $k => $v)
+    {{-- The tab and the calendar's place too: changing the rail from the
+         calendar must not turn a reload into the list. --}}
+    @foreach(request()->only(['search', 'status', 'category', 'when', 'tab', 'calview', 'cal']) as $k => $v)
         @if($v !== null && $v !== '')<input type="hidden" name="{{ $k }}" value="{{ $v }}">@endif
     @endforeach
-    <select name="period" class="mg-rail-sel" aria-label="Period" onchange="this.form.submit()">
+    <select name="period" class="mg-rail-sel" aria-label="Period" onchange="this.form.requestSubmit()">
         @foreach($periods as $key => $label)
             <option value="{{ $key }}" @selected($period === $key)>{{ $label }}</option>
         @endforeach

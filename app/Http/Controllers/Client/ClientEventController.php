@@ -228,14 +228,17 @@ class ClientEventController extends Controller
             ->sortBy(fn ($b) => $b->event?->starts_at?->timestamp ?? PHP_INT_MAX)
             ->values();
 
-        // Calendar data: events for the chosen month
-        $month = $request->integer('month', (int) now()->format('m'));
-        $year = $request->integer('year', (int) now()->format('Y'));
-        $calendarEvents = Event::where('client_id', $user->id)
-            ->whereNotNull('starts_at')
-            ->whereMonth('starts_at', $month)
-            ->whereYear('starts_at', $year)
-            ->get(['id', 'title', 'starts_at', 'ends_at', 'status']);
+        /*
+         * The calendar tab: a day, a week or a month, in the address so it
+         * survives a reload. It was a month grid only, every entry the same
+         * orange, nothing clickable but the title. ?month=&year= links from
+         * before still land on the month they meant.
+         */
+        $calAnchor = $request->query('cal')
+            ?: ($request->filled('month') && $request->filled('year')
+                ? sprintf('%04d-%02d-01', $request->integer('year'), $request->integer('month'))
+                : null);
+        $calendar = \App\Support\ClientCalendar::build($user, $request->query('calview'), $calAnchor);
 
         $categories = Category::active()->orderBy('name')->get(['id', 'name']);
 
@@ -281,7 +284,7 @@ class ClientEventController extends Controller
         $activity = $activity->filter(fn ($a) => $a['when'] !== null)->sortByDesc('when')->take(4)->values();
 
         return view('client.events.index', compact(
-            'events', 'stats', 'calendarEvents', 'categories', 'month', 'year',
+            'events', 'stats', 'calendar', 'categories',
             'totalSpent', 'proStatus', 'payment', 'deadlines', 'activity',
             'overview', 'bookings', 'period'
         ) + [
