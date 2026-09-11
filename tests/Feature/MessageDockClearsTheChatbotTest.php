@@ -18,7 +18,7 @@ use Tests\TestCase;
  */
 class MessageDockClearsTheChatbotTest extends TestCase
 {
-    private const LAUNCHER = 52;   // .md-launch
+    private const LAUNCHER = 52;   // .md-launch height (a labelled pill since Sir Peter's mockup, 2026-09-11)
     private const GAP = 14;
 
     private function px(string $css, string $selector, string $prop): int
@@ -38,15 +38,16 @@ class MessageDockClearsTheChatbotTest extends TestCase
         $bubbleRight  = $this->px($bot, '.aic-bubble', 'right');
         $bubbleSize   = $this->px($bot, '.aic-bubble', 'width');
 
-        $this->assertSame(self::LAUNCHER, $this->px($dock, '.md-launch', 'width'));
+        $this->assertSame(self::LAUNCHER, $this->px($dock, '.md-launch', 'height'));
 
         $dockRight  = $this->px($dock, 'body:has(.aic-bubble) .md', 'right');
         $dockBottom = $this->px($dock, 'body:has(.aic-bubble) .md', 'bottom');
 
         // Clear of the bubble, with the gap.
         $this->assertSame($bubbleBottom + $bubbleSize + self::GAP, $dockBottom);
-        // Centred on it.
-        $this->assertSame($bubbleRight + intdiv($bubbleSize - self::LAUNCHER, 2), $dockRight);
+        // Right edges lined up: the launcher is a pill now, wider than the
+        // bubble, so it cannot be centred on it without overhanging the corner.
+        $this->assertSame($bubbleRight, $dockRight);
     }
 
     /**
@@ -61,7 +62,7 @@ class MessageDockClearsTheChatbotTest extends TestCase
         $this->assertMatchesRegularExpression('/@media \(max-width: 520px\) \{\s*\.md \{ flex-direction: column;/', $dock);
         // Width leaves the launcher's own right margin on the left as well.
         $this->assertStringContainsString('.md-win { width: calc(100vw - 36px); }', $dock);                          // 2 × 18
-        $this->assertStringContainsString('body:has(.aic-bubble) .md-win { width: calc(100vw - 54px); }', $dock);   // 2 × 27
+        $this->assertStringContainsString('body:has(.aic-bubble) .md-win { width: calc(100vw - 48px); }', $dock);   // 2 × 24
     }
 
     /** With the assistant off there is nothing to clear; the launcher keeps the corner. */

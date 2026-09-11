@@ -28,9 +28,11 @@ class ConversationController extends Controller
 
         $query = Conversation::forUser($user)
             ->with([
-                'participants:id,name,email',
+                // Photo, last seen and service, for the dock's rows.
+                'participants:id,name,email,avatar,last_active_at,primary_role',
+                'participants.serviceCategories:id,name',
                 'booking:id,event_id,status',
-                'event:id,title',
+                'event:id,title,source',
             ])
             ->withCount(['messages as unread_count' => function ($q) use ($user) {
                 $q->where('sender_id', '!=', $user->id)
@@ -52,7 +54,23 @@ class ConversationController extends Controller
                 ->whereColumn('conversation_id', 'conversations.id')
                 ->latest('created_at')
                 ->limit(1),
+            ])
+            // Starred by this person (the dock's Favorites tab).
+            ->addSelect(['favorited_at' => \Illuminate\Support\Facades\DB::table('conversation_participants')
+                ->select('favorited_at')
+                ->whereColumn('conversation_participants.conversation_id', 'conversations.id')
+                ->where('conversation_participants.user_id', $user->id)
+                ->limit(1),
             ]);
+
+        // The dock's Unread and Favorites tabs.
+        if ($request->input('filter') === 'unread') {
+            $query->whereHas('messages', fn ($q) => $q->where('sender_id', '!=', $user->id)
+                ->whereDoesntHave('reads', fn ($r) => $r->where('user_id', $user->id)));
+        } elseif ($request->input('filter') === 'favorites') {
+            $query->whereHas('participants', fn ($q) => $q->where('users.id', $user->id)
+                ->whereNotNull('conversation_participants.favorited_at'));
+        }
 
         if ($request->filled('type')) {
             $query->ofType($request->input('type'));
@@ -64,6 +82,38 @@ class ConversationController extends Controller
         }
 
         $conversations = $query->orderByDesc('last_message_at')->paginate(30);
+
+        // What a row in the dock shows about the other person, worked out
+        // once here rather than in the browser.
+        $conversations->through(function (Conversation $c) use ($user) {
+            $peer = $c->participants->firstWhere('id', '!=', $user->id);
+
+            $c->setAttribute('peer', $peer ? [
+                'id'       => $peer->id,
+                'name'     => $peer->name,
+                'avatar'   => $peer->avatar_url,
+                'online'   => (bool) ($peer->last_active_at && \Illuminate\Support\Carbon::parse($peer->last_active_at)->gt(now()->subMinutes(5))),
+                'subtitle' => $peer->primary_role === 'professional'
+                    ? ($peer->serviceCategories->first()?->name ?? 'Professional')
+                    : ucfirst((string) ($peer->primary_role ?: 'member')),
+            ] : null);
+
+            // With its timezone: a bare "2026-09-11 11:00:00" is read by the
+            // browser as local time, so a message sent a minute ago in
+            // Pakistan showed as "5h".
+            if ($c->last_message_at) {
+                $c->setAttribute('last_message_at', \Illuminate\Support\Carbon::parse($c->last_message_at)->toIso8601String());
+            }
+
+            $c->setAttribute('request_type', match (true) {
+                ! $c->event                                   => null,
+                $c->event->source === 'esr'                   => 'Emergency Request',
+                str_contains((string) $c->event->source, 'direct') => 'Direct Request',
+                default                                       => 'Bidding Request',
+            });
+
+            return $c;
+        });
 
         return response()->json($conversations);
     }
@@ -290,6 +340,18 @@ class ConversationController extends Controller
         return back()->with('status', $muted
             ? 'Muted. New messages here will not add to your unread count.'
             : 'Unmuted.');
+    }
+
+    /** Star or unstar this conversation, for this person only. */
+    public function favorite(Request $request, Conversation $conversation): JsonResponse
+    {
+        $this->authorize('view', $conversation);
+
+        $user = $request->user();
+        $was  = $conversation->participants()->where('users.id', $user->id)->first()?->pivot?->favorited_at;
+        $conversation->participants()->updateExistingPivot($user->id, ['favorited_at' => $was ? null : now()]);
+
+        return response()->json(['favorited' => ! $was]);
     }
 
     /**
