@@ -318,7 +318,8 @@
         }
 
         /* ═══════════════════════ THEME TOGGLE ═══════════════════════ */
-        .cl-ai-toggle { color: #7c3aed; }
+        /* After .cl-theme-toggle's own colour would win, so it is qualified. */
+        .cl-theme-toggle.cl-ai-toggle { color: #7c3aed; }
         .cl-theme-toggle {
             width: 40px;
             height: 40px;
@@ -1502,11 +1503,12 @@
                 @endphp
                 @if($__aiOn)
                     <button type="button" class="cl-theme-toggle cl-ai-toggle" data-ai-open title="AI Assistant" aria-label="Open AI assistant">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.8L19 9.7l-4.1 3.2 1.3 5.1L12 15.3 7.8 18l1.3-5.1L5 9.7l5.1-1.9z"/></svg>
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1"/><circle cx="9" cy="14" r="1.2" fill="currentColor"/><circle cx="15" cy="14" r="1.2" fill="currentColor"/><path d="M2 13v2M22 13v2"/></svg>
                     </button>
                 @endif
 
-                @include('partials._topbar-messages', ['portal' => 'client'])
+                {{-- No Messages icon here: the Messages button in the corner and the
+                     sidebar's Messages (Inbox) already open them (Ali, 2026-09-11). --}}
 
                 {{-- Notifications bell + account, both real dropdowns --}}
                 @include('partials._topbar-menus', ['portal' => 'client', 'trigger' => 'avatar'])

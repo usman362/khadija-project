@@ -44,6 +44,10 @@ class AiAssistantInHeaderTest extends TestCase
         $this->assertStringContainsString('id="aiChatPanel"', $html);
         $this->assertStringNotContainsString('id="aiChatBubble"', $html);
 
+        // The header's Messages icon is gone; the corner button and the
+        // sidebar open Messages (Ali, 2026-09-11).
+        $this->assertStringNotContainsString('class="tb-icon-btn" title="Messages"', $html);
+
         // Beside the theme toggle, in the header.
         $this->assertMatchesRegularExpression('/id="theme-toggle".*?data-ai-open/s', $html);
     }
