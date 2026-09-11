@@ -579,7 +579,7 @@
                 <h3>{{ $t('why_choose', 'heading', 'Why Choose GigResource?') }}</h3>
                 @php
                     $why = [
-                        ['<path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/>', 'Quality You Can Trust', 'Every professional is verified &amp; reviewed'],
+                        ['<path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/>', 'Quality You Can Trust', 'Reviews come from real, completed bookings'],
                         ['<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>', 'All-in-One Convenience', 'Everything you need in one place'],
                         ['<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>', 'Time &amp; Cost Saving', 'Smart tools to save you time &amp; money'],
                         ['<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>', 'Flexible for Every Event', 'Any type, any size, in your area'],

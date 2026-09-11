@@ -19,9 +19,10 @@
  * 2026-09-09). The colour and the icon inside each one are Khadijah's, and
  * they are here so she can change them without a code change.
  *
- *   events_completed     bookings of this client that reached completed
- *   paid_on_time         agreements funded on or before the balance was due
- *   repeat_professional  professionals this client has booked more than once
+ *   id_verified          client ID verification completed (not built yet: 0)
+ *   events_completed     distinct events with a booking that reached completed
+ *   prompt_payer         paid on time at least once, and nothing late this month
+ *   reviews_written      reviews this client has submitted
  */
 return [
 
@@ -32,42 +33,48 @@ return [
     'verified_colour'  => '#2563eb',
     'top_rated_colour' => '#f59e0b',
 
+    /*
+     * Sir Peter's PM-14 client badge spec (answered Sep 5): four badges, all
+     * automatic, simple flat icons in brand blue (shield, calendar stack,
+     * checkmark card, star speech bubble). Shown on the client's own profile
+     * and next to their name where professionals see it, not on the dashboard.
+     */
     'client' => [
         [
-            'key'   => 'first-event',
-            'name'  => 'First Event',
-            'blurb' => 'Completed your first event on GigResource.',
-            'icon'  => '🎉',
-            'colour' => '#f59e0b',
-            'rule'  => 'events_completed',
-            'need'  => 1,
+            'key'    => 'verified-client',
+            'name'   => 'Verified Client',
+            'blurb'  => 'Awarded when you complete ID verification.',
+            'icon'   => '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>',
+            'colour' => '#2563eb',
+            'rule'   => 'id_verified',
+            'need'   => 1,
         ],
         [
-            'key'   => 'seasoned-host',
-            'name'  => 'Seasoned Host',
-            'blurb' => 'Completed five events.',
-            'icon'  => '🏆',
-            'colour' => '#f97316',
-            'rule'  => 'events_completed',
-            'need'  => 5,
+            'key'    => 'frequent-planner',
+            'name'   => 'Frequent Planner',
+            'blurb'  => 'Five events completed on GigResource.',
+            'icon'   => '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="15" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M6 3.5h12" opacity=".6"/></svg>',
+            'colour' => '#2563eb',
+            'rule'   => 'events_completed',
+            'need'   => 5,
         ],
         [
-            'key'   => 'pays-on-time',
-            'name'  => 'Pays On Time',
-            'blurb' => 'Settled three agreements on or before the balance was due.',
-            'icon'  => '⏱',
-            'colour' => '#10b981',
-            'rule'  => 'paid_on_time',
-            'need'  => 3,
+            'key'    => 'prompt-payer',
+            'name'   => 'Prompt Payer',
+            'blurb'  => 'Pays on time. Checked every month, and removed after a late payment.',
+            'icon'   => '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M8 15l2 2 4-4"/></svg>',
+            'colour' => '#2563eb',
+            'rule'   => 'prompt_payer',
+            'need'   => 1,
         ],
         [
-            'key'   => 'they-came-back',
-            'name'  => 'Worth Coming Back To',
-            'blurb' => 'Booked the same professional more than once.',
-            'icon'  => '🤝',
-            'colour' => '#6366f1',
-            'rule'  => 'repeat_professional',
-            'need'  => 1,
+            'key'    => 'community-voice',
+            'name'   => 'Community Voice',
+            'blurb'  => 'Three reviews written for professionals.',
+            'icon'   => '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M12 6.8l1.1 2.2 2.4.3-1.7 1.7.4 2.4-2.2-1.2-2.2 1.2.4-2.4-1.7-1.7 2.4-.3z"/></svg>',
+            'colour' => '#2563eb',
+            'rule'   => 'reviews_written',
+            'need'   => 3,
         ],
     ],
 ];

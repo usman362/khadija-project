@@ -12,7 +12,7 @@ class FaqSeeder extends Seeder
         $faqs = [
             [
                 'question' => 'How does GigResource work?',
-                'answer' => 'GigResource connects event organizers (clients) with event service professionals (photographers, caterers, DJs, planners and more). Create an account, browse professionals by service, send a request, agree the details through the built-in messaging, and book. You can post one request and let professionals respond, or send a request straight to a professional you have chosen.',
+                'answer' => 'GigResource connects Clients with event Professionals (photographers, caterers, DJs, planners and more). Create an account, browse professionals by service, send a request, agree the details through the built-in messaging, and book. You can post one request and let professionals respond, or send a request straight to a professional you have chosen.',
                 'category' => 'General',
                 'sort_order' => 1,
             ],

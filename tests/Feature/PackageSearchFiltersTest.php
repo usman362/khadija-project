@@ -216,22 +216,42 @@ class PackageSearchFiltersTest extends TestCase
     public function test_the_rail_counts_honour_the_other_filters(): void
     {
         $pro = $this->pro();
-        $this->package($pro, ['price' => 2000, 'services' => ['Photography']]);
-        $this->package($pro, ['price' => 40000, 'services' => ['Photography']]);
+        // A locked name: package-card tags show locked Level 2 names only (OA-135).
+        $svc = $this->lockedService();
+        $this->package($pro, ['price' => 2000, 'services' => [$svc]]);
+        $this->package($pro, ['price' => 40000, 'services' => [$svc]]);
 
         // Unfiltered: both photography packages are counted.
         $this->get('/packages')->assertOk()->assertSee('Showing <b>2</b> Package', false);
 
-        // Budget-capped: the count beside "Photography" must drop with the list,
+        // Budget-capped: the count beside the service must drop with the list,
         // or the rail promises two and the filter delivers one.
         $capped = $this->get('/packages?budget_max=5000');
         $capped->assertOk()->assertSee('Showing <b>1</b> Package', false);
-        $capped->assertSee('Photography');
+        $capped->assertSee($svc);
         $this->assertStringNotContainsString(
             '>2</span>',
             $this->railFor($capped->getContent()),
             'a service count outran the filtered list',
         );
+    }
+
+    /**
+     * OA-135: package-card tags are locked Level 2 names only. A service the
+     * professional typed that is not a locked name ("Planning / Coordination")
+     * is not shown as if it were a category.
+     */
+    public function test_card_tags_show_locked_names_only(): void
+    {
+        $svc = $this->lockedService();
+        $this->package($this->pro(), ['services' => [$svc, 'Planning / Coordination']]);
+
+        $html = $this->get('/packages')->assertOk()->getContent();
+        $start = strpos($html, 'class="pk-tags"');
+        $tags = $start !== false ? substr($html, $start, 600) : '';
+
+        $this->assertStringContainsString(e($svc), $tags);
+        $this->assertStringNotContainsString('Planning / Coordination', $tags);
     }
 
     /** The service checkbox block only, so an unrelated "2" cannot fail the test. */

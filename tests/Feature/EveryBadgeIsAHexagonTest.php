@@ -42,7 +42,8 @@ class EveryBadgeIsAHexagonTest extends TestCase
         foreach ([
             'resources/views/public/browse.blade.php',
             'resources/views/public/professional/show.blade.php',
-            'resources/views/client/dashboard.blade.php',
+            // PM-14 moved the client badges off the dashboard to the profile.
+            'resources/views/client/profile/index.blade.php',
         ] as $file) {
             $this->assertStringContainsString('<x-hex-badge', file_get_contents(base_path($file)),
                 "{$file} draws a badge without the component that fixes the shape.");

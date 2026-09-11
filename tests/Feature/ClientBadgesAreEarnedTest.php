@@ -6,21 +6,22 @@ use App\Domain\Badges\ClientBadges;
 use App\Models\{Booking, Event, Finalization, User};
 use App\Support\ServiceArea;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /**
  * Client badges are awarded from the record, or not at all.
  *
- * The dashboard card said badges "are awarded from what you actually do on
- * GigResource — events completed, paying on time, and coming back to the same
- * professionals" and then never awarded one. These are those three sentences,
- * measured against what the platform already records.
+ * The four badges and their rules are Sir Peter's PM-14 spec (Sep 5):
+ * Verified Client, Frequent Planner, Prompt Payer, Community Voice. All
+ * automatic, flat icons in brand blue, shown on the client's own profile and
+ * not on the dashboard.
  *
  * The thing this must never do is what the verification badges once did: a
  * seeder stamped a timestamp and ten profiles wore a licence badge with no
  * document behind them. So there is no award method here and nothing to
- * stamp — a badge is counted from the bookings and agreements every time it is
- * shown, which also means it cannot outlive the thing that earned it.
+ * stamp — a badge is counted from the record every time it is shown, which
+ * also means it cannot outlive the thing that earned it.
  */
 class ClientBadgesAreEarnedTest extends TestCase
 {
@@ -51,16 +52,19 @@ class ClientBadgesAreEarnedTest extends TestCase
         return $pro;
     }
 
-    private function booking(User $pro, string $status = 'completed'): Booking
+    private function event(): Event
     {
-        $event = Event::create([
+        return Event::create([
             'title' => 'Job', 'client_id' => $this->client->id,
             'created_by' => $this->client->id, 'status' => 'completed',
             'starts_at' => now()->subMonth(),
         ]);
+    }
 
+    private function booking(User $pro, string $status = 'completed', ?Event $event = null): Booking
+    {
         return Booking::create([
-            'event_id' => $event->id, 'client_id' => $this->client->id,
+            'event_id' => ($event ?? $this->event())->id, 'client_id' => $this->client->id,
             'supplier_id' => $pro->id, 'created_by' => $this->client->id,
             'status' => $status, 'price' => 500,
         ]);
@@ -71,66 +75,83 @@ class ClientBadgesAreEarnedTest extends TestCase
         return ClientBadges::earnedBy($this->client->fresh())->pluck('key')->all();
     }
 
+    public function test_the_four_badges_are_the_pm14_spec(): void
+    {
+        $this->assertSame(
+            ['Verified Client', 'Frequent Planner', 'Prompt Payer', 'Community Voice'],
+            collect(config('badges.client'))->pluck('name')->all(),
+        );
+
+        foreach (config('badges.client') as $b) {
+            $this->assertSame('#2563eb', $b['colour'], "{$b['name']} is not brand blue");
+            $this->assertStringStartsWith('<svg', $b['icon'], "{$b['name']} is not a flat icon");
+        }
+    }
+
     public function test_a_new_client_has_earned_nothing(): void
     {
         $this->assertSame([], $this->keys());
     }
 
-    public function test_one_completed_event_earns_the_first_one(): void
+    /**
+     * There is no client ID verification yet, so nobody is a Verified Client.
+     * It is not approximated from email or address checks.
+     */
+    public function test_nobody_is_a_verified_client_without_id_verification(): void
     {
-        $this->booking($this->pro());
+        $this->client->forceFill(['email_verified_at' => now()])->save();
 
-        $this->assertContains('first-event', $this->keys());
-        $this->assertNotContains('seasoned-host', $this->keys());
+        $this->assertNotContains('verified-client', $this->keys());
     }
 
-    /** A booking that has not completed has not been done. */
-    public function test_an_unfinished_booking_earns_nothing(): void
-    {
-        $this->booking($this->pro(), 'confirmed');
+    /* ── Frequent Planner: the 5th completed event ─────────── */
 
-        $this->assertSame([], $this->keys());
-    }
-
-    public function test_five_completed_events_earn_the_second(): void
+    public function test_five_completed_events_earn_frequent_planner(): void
     {
         foreach (range(1, 5) as $i) {
             $this->booking($this->pro());
         }
 
-        $this->assertContains('seasoned-host', $this->keys());
+        $this->assertContains('frequent-planner', $this->keys());
     }
 
-    /** Coming back is about people, not bookings. */
-    public function test_booking_the_same_professional_twice_counts_once(): void
+    public function test_four_is_not_enough(): void
     {
-        $pro = $this->pro();
-        $this->booking($pro);
-        $this->booking($pro);
+        foreach (range(1, 4) as $i) {
+            $this->booking($this->pro());
+        }
 
-        $this->assertContains('they-came-back', $this->keys());
+        $this->assertNotContains('frequent-planner', $this->keys());
     }
 
-    public function test_two_different_professionals_is_not_coming_back(): void
+    /** Events, not bookings: five professionals at one event is one event. */
+    public function test_several_bookings_on_one_event_count_once(): void
     {
-        $this->booking($this->pro());
-        $this->booking($this->pro());
+        $event = $this->event();
 
-        $this->assertNotContains('they-came-back', $this->keys());
+        foreach (range(1, 5) as $i) {
+            $this->booking($this->pro(), 'completed', $event);
+        }
+
+        $this->assertNotContains('frequent-planner', $this->keys());
     }
 
-    /* ── Paid on time ───────────────────────────────────────── */
+    /** Completed, not just booked. */
+    public function test_unfinished_bookings_earn_nothing(): void
+    {
+        foreach (range(1, 5) as $i) {
+            $this->booking($this->pro(), 'confirmed');
+        }
+
+        $this->assertSame([], $this->keys());
+    }
+
+    /* ── Prompt Payer: on time, and nothing late this month ── */
 
     private function agreement(?string $due, ?string $funded): void
     {
-        $event = Event::create([
-            'title' => 'Agreed job', 'client_id' => $this->client->id,
-            'created_by' => $this->client->id, 'status' => 'completed',
-            'starts_at' => now()->subMonth(),
-        ]);
-
         Finalization::create([
-            'event_id' => $event->id, 'client_id' => $this->client->id,
+            'event_id' => $this->event()->id, 'client_id' => $this->client->id,
             'supplier_id' => $this->pro()->id, 'status' => 'complete',
             'agreed_price' => 500,
             'balance_due_on' => $due,
@@ -138,43 +159,75 @@ class ClientBadgesAreEarnedTest extends TestCase
         ]);
     }
 
-    public function test_paying_before_the_due_date_counts(): void
+    public function test_paying_on_time_earns_prompt_payer(): void
     {
-        foreach (range(1, 3) as $i) {
-            $this->agreement(now()->subDays(10)->toDateString(), now()->subDays(12)->toDateTimeString());
-        }
+        $this->agreement(now()->subDays(10)->toDateString(), now()->subDays(12)->toDateTimeString());
 
-        $this->assertContains('pays-on-time', $this->keys());
+        $this->assertContains('prompt-payer', $this->keys());
     }
 
-    public function test_paying_late_does_not(): void
+    /** "Revoked if a late payment occurs." */
+    public function test_a_late_payment_this_month_takes_it_away(): void
     {
-        foreach (range(1, 3) as $i) {
-            $this->agreement(now()->subDays(10)->toDateString(), now()->subDays(2)->toDateTimeString());
-        }
+        $this->agreement(now()->subDays(40)->toDateString(), now()->subDays(41)->toDateTimeString());
+        $this->agreement(now()->subDays(10)->toDateString(), now()->subDays(2)->toDateTimeString());
 
-        $this->assertNotContains('pays-on-time', $this->keys());
+        $this->assertNotContains('prompt-payer', $this->keys());
     }
 
-    /**
-     * An agreement with no due date cannot be late — and must not be counted
-     * as early either. That would be a badge for a deadline nobody set.
-     */
+    /** An unpaid balance that has fallen due is late too. */
+    public function test_an_unpaid_balance_past_due_takes_it_away(): void
+    {
+        $this->agreement(now()->subDays(40)->toDateString(), now()->subDays(41)->toDateTimeString());
+        $this->agreement(now()->subDays(3)->toDateString(), null);
+
+        $this->assertNotContains('prompt-payer', $this->keys());
+    }
+
+    /** "Re-evaluated monthly, not permanent": an old late payment no longer counts. */
+    public function test_it_comes_back_after_a_clean_month(): void
+    {
+        $this->agreement(now()->subDays(60)->toDateString(), now()->subDays(50)->toDateTimeString());
+        $this->agreement(now()->subDays(10)->toDateString(), now()->subDays(12)->toDateTimeString());
+
+        $this->assertContains('prompt-payer', $this->keys());
+    }
+
+    /** No due date: cannot be late, and is not counted as on time either. */
     public function test_an_agreement_with_no_due_date_counts_neither_way(): void
     {
-        foreach (range(1, 3) as $i) {
-            $this->agreement(null, now()->subDays(2)->toDateTimeString());
-        }
+        $this->agreement(null, now()->subDays(2)->toDateTimeString());
 
-        $this->assertNotContains('pays-on-time', $this->keys());
+        $this->assertNotContains('prompt-payer', $this->keys());
+    }
+
+    /* ── Community Voice: the 3rd submitted review ─────────── */
+
+    private function review(): void
+    {
+        $pro = $this->pro();
+
+        DB::table('reviews')->insert([
+            'reviewer_id' => $this->client->id, 'reviewee_id' => $pro->id,
+            'booking_id' => $this->booking($pro)->id, 'rating' => 5,
+            'comment' => 'Great work.', 'created_at' => now(), 'updated_at' => now(),
+        ]);
+    }
+
+    public function test_three_reviews_earn_community_voice(): void
+    {
+        $this->review();
+        $this->review();
+        $this->assertNotContains('community-voice', $this->keys());
+
+        $this->review();
+        $this->assertContains('community-voice', $this->keys());
     }
 
     /* ── The rules are the Owner's, and they are not in the code ── */
 
     public function test_the_rules_live_in_config(): void
     {
-        $this->assertNotEmpty(config('badges.client'));
-
         config(['badges.client' => [[
             'key' => 'tester', 'name' => 'Tester', 'blurb' => 'x', 'icon' => '★',
             'rule' => 'events_completed', 'need' => 2,
@@ -193,76 +246,51 @@ class ClientBadgesAreEarnedTest extends TestCase
         $this->assertFalse(method_exists(ClientBadges::class, 'award'));
         $this->assertFalse(method_exists(ClientBadges::class, 'grant'));
 
-        // And none of it is stored, so nothing can be stamped onto an account.
         $this->assertFalse(
             \Illuminate\Support\Facades\Schema::hasTable('user_badges'),
             'Badges in a table can be written by a seeder — which is exactly how the licence badges went wrong.',
         );
     }
 
-    /* ── On the page ────────────────────────────────────────── */
+    /* ── Where they appear ──────────────────────────────────── */
 
-    public function test_the_dashboard_shows_what_was_earned(): void
+    /** PM-14: on the client's own profile. */
+    public function test_the_profile_shows_the_badges(): void
     {
-        $this->booking($this->pro());
+        foreach (range(1, 5) as $i) {
+            $this->booking($this->pro());
+        }
 
-        $this->actingAs($this->client->fresh())
-            ->get(route('client.dashboard'))
+        $html = $this->actingAs($this->client->fresh())
+            ->get(route('client.profile.index'))
             ->assertSuccessful()
-            ->assertSee('First Event');
+            ->getContent();
+
+        $this->assertStringContainsString('Frequent Planner', $html);
+        $this->assertStringContainsString('hexb-crest', $html);
+        // Not yet won is shown, drained, rather than hidden.
+        $this->assertStringContainsString('is-locked', $html);
+        $this->assertStringContainsString('Community Voice', $html);
     }
 
-    /** And what is still to do, rather than an empty panel. */
-    public function test_the_dashboard_shows_the_next_one(): void
+    /** PM-14: "NOT on the main dashboard, to avoid clutter." (OA-134) */
+    public function test_the_dashboard_has_no_badge_panel(): void
     {
         $html = $this->actingAs($this->client)
             ->get(route('client.dashboard'))
             ->assertSuccessful()
             ->getContent();
 
-        $this->assertStringContainsString('Completed your first event', $html);
-        $this->assertStringContainsString('0 of 1', $html);
+        $this->assertStringNotContainsString('Client Badges', $html);
+        $this->assertStringNotContainsString('Badges Earned', $html);
+        $this->assertStringNotContainsString('Frequent Planner', $html);
     }
 
-    /* ── The shape is settled; the colours are not ours ────── */
-
-    /**
-     * Every badge is a hexagon.
-     *
-     * Sir Peter, 2026-09-09: "we are now and only using the hexagon style
-     * badges across the users". One component owns the shape, so a second
-     * badge style cannot turn up somewhere later — and it is the same polygon
-     * the client tier crest already used, rather than a second opinion about
-     * what a hexagon is on this site.
-     */
-    public function test_badges_are_drawn_as_hexagons(): void
-    {
-        $this->booking($this->pro());
-
-        $html = $this->actingAs($this->client->fresh())
-            ->get(route('client.dashboard'))
-            ->assertSuccessful()
-            ->getContent();
-
-        $this->assertStringContainsString('hexb-crest', $html);
-        // A real hexagon, waist centred at 25/75. It was 14/62 -- a shield --
-        // until Sir Peter saw it on 2026-09-10. EveryBadgeIsAHexagonTest holds
-        // the shape itself; this only checks the page actually gets the rule.
-        $this->assertStringContainsString('polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)', $html);
-        $this->assertStringContainsString('hex-shape', $html);
-
-        // And the old pill has gone, rather than sitting alongside.
-        $this->assertStringNotContainsString('class="od-badge"', $html);
-    }
-
-    /**
-     * The colour and the icon inside each one are Khadijah's decision, so they
-     * are settings rather than markup.
-     */
+    /** The colour and the icon are settings rather than markup. */
     public function test_the_colour_and_icon_come_from_config(): void
     {
         config(['badges.client' => [[
-            'key' => 'first-event', 'name' => 'First Event', 'blurb' => 'x',
+            'key' => 'frequent-planner', 'name' => 'Frequent Planner', 'blurb' => 'x',
             'icon' => '✿', 'colour' => '#123456',
             'rule' => 'events_completed', 'need' => 1,
         ]]]);
@@ -270,21 +298,10 @@ class ClientBadgesAreEarnedTest extends TestCase
         $this->booking($this->pro());
 
         $html = $this->actingAs($this->client->fresh())
-            ->get(route('client.dashboard'))
+            ->get(route('client.profile.index'))
             ->getContent();
 
         $this->assertStringContainsString('#123456', $html);
         $this->assertStringContainsString('✿', $html);
-    }
-
-    /** What is not won yet is shown, drained — not hidden. */
-    public function test_a_badge_not_yet_won_is_still_on_the_page(): void
-    {
-        $html = $this->actingAs($this->client)
-            ->get(route('client.dashboard'))
-            ->getContent();
-
-        $this->assertStringContainsString('is-locked', $html);
-        $this->assertStringContainsString('Seasoned Host', $html);
     }
 }

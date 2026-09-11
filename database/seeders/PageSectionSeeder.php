@@ -108,7 +108,7 @@ class PageSectionSeeder extends Seeder
                 'key'     => 'why_choose',
                 'heading' => 'Why Choose GigResource?',
                 'payload' => ['items' => [
-                    ['title' => 'Quality You Can Trust',    'text' => 'Every professional is verified & reviewed'],
+                    ['title' => 'Quality You Can Trust',    'text' => 'Reviews come from real, completed bookings'],
                     ['title' => 'All-in-One Convenience',   'text' => 'Everything you need in one place'],
                     ['title' => 'Time & Cost Saving',       'text' => 'Smart tools to save you time & money'],
                     ['title' => 'Flexible for Every Event', 'text' => 'Any type, any size, in your area'],

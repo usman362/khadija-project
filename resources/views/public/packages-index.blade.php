@@ -468,7 +468,16 @@
                                 $rating   = $pro?->reviews_avg ? number_format($pro->reviews_avg, 1) : null;
                                 $bookings = $card['bookings'][$pro?->id] ?? null;
                                 $responds = ResponseStats::brief($card['responds'][$pro?->id] ?? null);
-                                $svcTags  = $pkg->services ?: ($pkg->category ? [$pkg->category->name] : []);
+                                // OA-135: tags are locked Level 2 names only. The
+                                // package's own category (or its parent) first,
+                                // then any service the professional listed that
+                                // matches a locked name exactly. Free text is dropped.
+                                $__locked = \App\Http\Controllers\Public\PackageController::services();
+                                $__isLocked = fn ($n) => $n && in_array(mb_strtolower(trim($n)), array_map('mb_strtolower', $__locked), true);
+                                $__l2 = collect([$pkg->category?->name, $pkg->category?->parent?->name])->first($__isLocked);
+                                $svcTags  = collect([$__l2])
+                                    ->merge(collect((array) ($pkg->services ?: []))->filter($__isLocked))
+                                    ->filter()->unique(fn ($n) => mb_strtolower(trim($n)))->values()->all();
                                 $area     = trim(($pro?->profile?->city ? $pro->profile->city . ', ' : '')
                                             . ($pro?->profile?->state ?: $pkg->state ?: ''), ', ');
                                 $isSaved  = in_array($pkg->id, $savedIds, true);

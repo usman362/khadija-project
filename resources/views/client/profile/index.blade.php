@@ -255,6 +255,28 @@
                     <b>{{ $user->public_id }}</b>
                 </div>
             @endif
+
+            {{-- Sir Peter's PM-14 client badges: shown here, on the client's own
+                 profile, and not on the dashboard. Counted from the record on
+                 every load. Not yet won is shown drained, with what earns it. --}}
+            @php $__badges = \App\Domain\Badges\ClientBadges::progressFor($user); @endphp
+            @if($__badges->isNotEmpty())
+                <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-color);text-align:center;">
+                    <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">Badges</div>
+                    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px 10px;">
+                        @foreach($__badges as $b)
+                            <x-hex-badge
+                                :icon="$b['icon']"
+                                :label="$b['name']"
+                                :colour="$b['colour'] ?? '#2563eb'"
+                                :earned="$b['earned']"
+                                :size="40"
+                                :title="$b['earned'] ? $b['blurb'] : $b['blurb'] . ' (' . $b['progress'] . ' of ' . $b['need'] . ')'"
+                            />
+                        @endforeach
+                    </div>
+                </div>
+            @endif
             @if($user->avatar)
                 <div class="pf-avatar-actions">
                     <form action="{{ route('client.profile.avatar.remove') }}" method="POST">

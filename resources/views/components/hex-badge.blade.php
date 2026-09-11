@@ -67,7 +67,9 @@
                  font-size: {{ round($size * 0.42) }}px;
                  background: linear-gradient(160deg, {{ $colour }} 0%, color-mix(in srgb, {{ $colour }} 62%, #0f172a) 100%);
                  box-shadow: inset 0 0 0 2px color-mix(in srgb, #fff 42%, {{ $colour }});">
-        <span>{{ $icon }}</span>
+        {{-- PM-14 asks for flat icons, not emoji. An icon from config may be
+             an inline SVG; it is only ever read from config, never from input. --}}
+        <span style="display:inline-flex;">@if(str_starts_with(ltrim((string) $icon), '<svg')){!! $icon !!}@else{{ $icon }}@endif</span>
     </span>
     @if($label)<span class="hexb-label">{{ $label }}</span>@endif
 </span>

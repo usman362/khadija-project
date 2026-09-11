@@ -4,9 +4,9 @@ namespace App\Domain\Badges;
 
 use App\Models\Booking;
 use App\Models\Finalization;
+use App\Models\Review;
 use App\Models\User;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Which badges a client has actually earned.
@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\DB;
  * method, and no seeder can stamp one — which is the mistake the verification
  * badges made, where a seeded timestamp put a licence badge on ten profiles
  * that had never uploaded a document.
+ *
+ * The four badges and their rules are Sir Peter's PM-14 spec (Sep 5).
  */
 final class ClientBadges
 {
@@ -55,36 +57,57 @@ final class ClientBadges
             ->values();
     }
 
-    /** @return array<string, int> the three things the rules are measured against */
+    /** @return array<string, int> the things the rules are measured against */
     private static function measure(User $client): array
     {
         return [
+            /*
+             * Verified Client: "automatic on ID verification completion".
+             * There is no ID verification for clients on the platform yet, so
+             * nobody has completed one and nobody holds this badge. It is not
+             * approximated with email or address checks: that would put a
+             * "Verified" label on something that was never verified.
+             */
+            'id_verified' => 0,
+
+            // Frequent Planner: completed EVENTS, not bookings. Three
+            // professionals at one wedding are one event.
             'events_completed' => Booking::where('client_id', $client->id)
                 ->where('status', 'completed')
-                ->count(),
+                ->distinct()
+                ->count('event_id'),
 
-            /*
-             * On or before the day the balance was due.
-             *
-             * Both dates have to be there. An agreement with no due date on it
-             * cannot be late, and counting it as paid on time would hand out a
-             * badge for a deadline nobody set.
-             */
-            'paid_on_time' => Finalization::where('client_id', $client->id)
-                ->whereNotNull('funded_at')
-                ->whereNotNull('balance_due_on')
-                ->whereColumn('funded_at', '<=', 'balance_due_on')
-                ->count(),
+            'prompt_payer' => self::promptPayer($client),
 
-            // Professionals booked more than once — the count is of people,
-            // not of bookings, so five jobs with one professional is one.
-            'repeat_professional' => DB::table('bookings')
-                ->where('client_id', $client->id)
-                ->whereNotNull('supplier_id')
-                ->groupBy('supplier_id')
-                ->havingRaw('COUNT(*) > 1')
-                ->pluck('supplier_id')
-                ->count(),
+            // Community Voice: reviews this client has submitted.
+            'reviews_written' => Review::where('reviewer_id', $client->id)->count(),
         ];
+    }
+
+    /**
+     * Prompt Payer: "re-evaluated monthly, revoked if a late/failed payment
+     * occurs, not permanent". Held while the client has paid on time at least
+     * once and nothing fell due in the last month without being paid on time.
+     * A late payment older than a month no longer counts against them.
+     */
+    private static function promptPayer(User $client): int
+    {
+        $onTime = Finalization::where('client_id', $client->id)
+            ->whereNotNull('funded_at')
+            ->whereNotNull('balance_due_on')
+            ->whereColumn('funded_at', '<=', 'balance_due_on')
+            ->exists();
+
+        if (! $onTime) {
+            return 0;
+        }
+
+        $lateThisMonth = Finalization::where('client_id', $client->id)
+            ->whereNotNull('balance_due_on')
+            ->whereBetween('balance_due_on', [now()->subMonth()->startOfDay(), now()->endOfDay()])
+            ->where(fn ($q) => $q->whereNull('funded_at')->orWhereColumn('funded_at', '>', 'balance_due_on'))
+            ->exists();
+
+        return $lateThisMonth ? 0 : 1;
     }
 }

@@ -89,7 +89,7 @@
         align-items: start;
     }
     .od-top-left { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
-    .od-row-a { display: grid; grid-template-columns: 0.82fr 1.05fr 1.2fr; gap: 14px; align-items: start; }
+    .od-row-a { display: grid; grid-template-columns: 0.82fr 1.05fr; gap: 14px; align-items: start; }
     .od-row-b { display: grid; grid-template-columns: 1.9fr 1.2fr; gap: 14px; align-items: start; }
     .od-top-right { min-width: 0; }
     .od-card {
@@ -1010,7 +1010,7 @@
         </div>
         <div class="od-emerg-title">EMERGENCY REQUEST</div>
         <div class="od-emerg-urgent">URGENT</div>
-        <p class="od-emerg-desc">Need help now? Post your request and verified pros can apply right away.</p>
+        <p class="od-emerg-desc">Need help now? Post your request and available professionals can respond right away.</p>
         <a href="{{ route('client.esr.create') }}" class="od-emerg-btn">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h6l-1 8 10-12h-6l1-8z"/></svg>
             Post a Rush Request
@@ -1062,62 +1062,9 @@
         <a href="{{ route('client.profile.index') }}" class="od-profile-cta">Profile &amp; settings</a>
     </div>
 
-    {{-- Client Special Badges — checklist row 192.
+    {{-- Client badges moved to the client's own profile: Sir Peter's
+         PM-14 spec says "NOT on the main dashboard, to avoid clutter" (OA-134). --}}
 
-         The widget showed ten badge icons to every client, earned or not,
-         while a count elsewhere on the page said something different. Nobody
-         had ten badges; nobody had any, because no badge has an award rule
-         yet — the badge rulebook is PROPOSED, not locked.
-
-         So it shows what is true. Ten decorative icons implying ten
-         achievements is the kind of thing a client notices on the first
-         screen and stops trusting the rest of the page over. --}}
-    <div class="od-card od-a-badges">
-        <div class="od-card-head">
-            <span class="od-card-title">Client Badges</span>
-        </div>
-
-        {{-- The card said what earns a badge and then never awarded one. These
-             are those same three sentences, measured: events completed, paid on
-             or before the balance was due, and professionals booked more than
-             once. Counted from the record on every load, so a badge cannot
-             outlive the thing that earned it. --}}
-        @php $__badges = \App\Domain\Badges\ClientBadges::progressFor($user); @endphp
-
-        {{-- Hexagons, and only hexagons (Sir Peter, 2026-09-09). The shape is
-             the component's; the colour and the icon come from config, which
-             is Khadijah's to set. Locked ones are shown greyed rather than
-             hidden — a client who can see what there is to win has a reason to
-             go and win it. --}}
-        <div class="od-badges">
-            @foreach($__badges as $b)
-                <x-hex-badge
-                    :icon="$b['icon']"
-                    :label="$b['name']"
-                    :colour="$b['colour'] ?? '#f97316'"
-                    :earned="$b['earned']"
-                    :title="$b['earned'] ? $b['blurb'] : $b['blurb'] . ': ' . $b['progress'] . ' of ' . $b['need']"
-                />
-            @endforeach
-        </div>
-
-        @php $__next = $__badges->where('earned', false)->first(); @endphp
-
-        @if($__next)
-            {{-- What is left to do, rather than an empty panel that reads as
-                 "you have nothing". --}}
-            <div class="od-badge-next">
-                <b>{{ $__next['icon'] }} {{ $__next['name'] }}</b>
-                <span>{{ $__next['blurb'] }}</span>
-                <div class="od-badge-bar"><i style="width: {{ $__next['need'] > 0 ? round(($__next['progress'] / $__next['need']) * 100) : 0 }}%;"></i></div>
-                <small>{{ $__next['progress'] }} of {{ $__next['need'] }}</small>
-            </div>
-        @elseif($__badges->isNotEmpty())
-            <p style="font-size:12.5px;color:var(--text-muted);line-height:1.6;margin:10px 0 0;">
-                That is every badge. All of them earned.
-            </p>
-        @endif
-    </div>
 
 
     </div>{{-- /.od-row-a --}}
