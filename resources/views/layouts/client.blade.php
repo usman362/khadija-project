@@ -318,6 +318,7 @@
         }
 
         /* ═══════════════════════ THEME TOGGLE ═══════════════════════ */
+        .cl-ai-toggle { color: #7c3aed; }
         .cl-theme-toggle {
             width: 40px;
             height: 40px;
@@ -1490,6 +1491,21 @@
                     <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 </button>
 
+                {{-- The AI assistant, as an icon beside the theme toggle rather than
+                     a floating bubble (Sir Peter, 2026-09-11: the Switch to
+                     Professional button will go, so this is its home). Same
+                     condition the assistant itself uses to appear at all. --}}
+                @php
+                    $__aiOn = auth()->check()
+                        && (bool) \App\Models\Setting::get('chatbot.enabled', true)
+                        && ! empty(\App\Models\Setting::get('openai.api_key') ?: config('services.openai.key'));
+                @endphp
+                @if($__aiOn)
+                    <button type="button" class="cl-theme-toggle cl-ai-toggle" data-ai-open title="AI Assistant" aria-label="Open AI assistant">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.8L19 9.7l-4.1 3.2 1.3 5.1L12 15.3 7.8 18l1.3-5.1L5 9.7l5.1-1.9z"/></svg>
+                    </button>
+                @endif
+
                 @include('partials._topbar-messages', ['portal' => 'client'])
 
                 {{-- Notifications bell + account, both real dropdowns --}}
@@ -1528,7 +1544,8 @@
     @include('partials._role_enable_modal')
 
     {{-- AI Chatbot floating widget --}}
-    @include('partials._ai_chatbot_widget')
+    {{-- Opened from the header icon; no floating bubble on the client side. --}}
+    @include('partials._ai_chatbot_widget', ['bubble' => false])
 
     <script>
         // Close sidebar on mobile when clicking outside

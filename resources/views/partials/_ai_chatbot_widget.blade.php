@@ -10,12 +10,14 @@
      without squeezing the conversation (Ali, 2026-09-11). --}}
 @if(auth()->check() && $chatbotEnabled && !empty($chatbotKey)
     && ! request()->routeIs('client.chat.*', 'professional.chat.*', 'app.chat.*'))
+@if($bubble ?? true)
 <div id="aiChatBubble" class="aic-bubble" role="button" aria-label="Open AI assistant" tabindex="0">
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
     </svg>
     <span class="aic-bubble-dot"></span>
 </div>
+@endif
 
 <div id="aiChatPanel" class="aic-panel" aria-hidden="true">
     <div class="aic-header">
@@ -666,20 +668,22 @@
         // One window in the corner at a time: Messages closes (partials/_message_dock).
         document.dispatchEvent(new CustomEvent('gr:float-open', { detail: 'ai' }));
         panel.setAttribute('aria-hidden', 'false');
-        bubble.classList.add('hidden');
+        bubble?.classList.add('hidden');
         setTimeout(() => input.focus(), 300);
         refreshLimit();
     }
     function closePanel() {
         panel.classList.remove('open');
         panel.setAttribute('aria-hidden', 'true');
-        bubble.classList.remove('hidden');
+        bubble?.classList.remove('hidden');
     }
 
-    bubble.addEventListener('click', openPanel);
+    bubble?.addEventListener('click', openPanel);
+    // The client header opens it from an icon instead of the bubble.
+    document.querySelectorAll('[data-ai-open]').forEach(b => b.addEventListener('click', () => panel.classList.contains('open') ? closePanel() : openPanel()));
     // Messages opened: the assistant steps out of the way.
     document.addEventListener('gr:float-open', e => { if (e.detail !== 'ai' && panel.classList.contains('open')) closePanel(); });
-    bubble.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPanel(); } });
+    bubble?.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPanel(); } });
     closeBtn.addEventListener('click', closePanel);
 
     // ── New conversation ──

@@ -53,8 +53,11 @@ class FloatingButtonsLeaveRoomTest extends TestCase
         $this->assertStringNotContainsString('class="aic-bubble"',
             $this->actingAs($client)->get(route('client.chat.index'))->assertOk()->getContent());
 
-        $this->assertStringContainsString('class="aic-bubble"',
-            $this->actingAs($client)->get(route('client.dashboard'))->assertOk()->getContent());
+        // Elsewhere on the client side it is opened from the header icon; there
+        // is no floating bubble at all (Sir Peter, 2026-09-11).
+        $dashboard = $this->actingAs($client)->get(route('client.dashboard'))->assertOk()->getContent();
+        $this->assertStringContainsString('data-ai-open', $dashboard);
+        $this->assertStringNotContainsString('class="aic-bubble"', $dashboard);
     }
 
     /** The room at the foot of the page is worked out from the buttons' own sizes. */
