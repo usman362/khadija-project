@@ -27,29 +27,28 @@
      * Two floating buttons, one corner.
      *
      * The AI assistant's bubble (partials/_ai_chatbot_widget) sits in the
-     * corner: 24px in, 58px round. The Messages button stacks above it with a
-     * 14px gap, right edges lined up, and only where the bubble is actually on
+     * corner: 24px in, 58px round. The Messages button stacks above it,
+     * centred on it with a 14px gap, and only where the bubble is actually on
      * the page. MessageDockClearsTheChatbotTest holds these numbers to the
      * bubble's.
      */
-    body:has(.aic-bubble) .md { right: 24px; bottom: 96px; }   /* 24 + 58 + 14 */
+    body:has(.aic-bubble) .md { right: 27px; bottom: 96px; }   /* 24 + (58-52)/2 · 24 + 58 + 14 */
 
     /* A phone: the window as wide as the screen allows, same margin both sides. */
     @media (max-width: 520px) {
         .md { flex-direction: column; align-items: flex-end; }
         .md-win { width: calc(100vw - 36px); }                              /* right: 18px, both sides */
-        body:has(.aic-bubble) .md-win { width: calc(100vw - 48px); }        /* right: 24px, both sides */
+        body:has(.aic-bubble) .md-win { width: calc(100vw - 54px); }        /* right: 27px, both sides */
     }
 
-    /* The launcher: Sir Peter's mockup, 2026-09-11. A labelled pill with the
-       unread count, not an unlabelled circle. */
-    .md-launch { height: 52px; padding: 0 18px 0 16px; border-radius: 999px; border: 0; cursor: pointer;
+    /* The launcher: an icon, the same round shape as the AI bubble beside it
+       (Ali, 2026-09-11: the labelled pill from the mockup looked heavy there).
+       The window above it is the mockup's. */
+    .md-launch { width: 52px; height: 52px; border-radius: 50%; border: 0; cursor: pointer;
         background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; box-shadow: 0 12px 28px -10px rgba(234,88,12,.7);
-        display: inline-flex; align-items: center; gap: 10px; position: relative; font: inherit; font-size: 15px; font-weight: 700; }
-    .md-launch svg { width: 22px; height: 22px; flex: none; }
-    .md-launch .md-chev { width: 16px; height: 16px; transition: transform .2s; }
-    .md.is-open .md-launch .md-chev { transform: rotate(180deg); }
-    .md-launch .md-dot { position: absolute; top: -6px; left: 32px; min-width: 20px; height: 20px;
+        display: flex; align-items: center; justify-content: center; position: relative; }
+    .md-launch svg { width: 23px; height: 23px; }
+    .md-launch .md-dot { position: absolute; top: -3px; right: -3px; min-width: 20px; height: 20px;
         border-radius: 999px; background: #dc2626; color: #fff; font-size: 11px; font-weight: 800;
         display: flex; align-items: center; justify-content: center; padding: 0 6px; border: 2px solid #fff; }
 
@@ -438,9 +437,7 @@
 
     <button type="button" class="md-launch" data-md-launch aria-label="Messages">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9.9 9.9 0 0 1-4.2-.9L3 20l1.3-3.8A8.2 8.2 0 0 1 3 11.5a8.4 8.4 0 0 1 9-8.4 8.4 8.4 0 0 1 9 8.4z"/></svg>
-        Messages
         <span class="md-dot" data-md-dot hidden>0</span>
-        <svg class="md-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="18 15 12 9 6 15"/></svg>
     </button>
 </div>
 @endif

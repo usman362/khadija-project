@@ -65,8 +65,7 @@ class FloatingButtonsLeaveRoomTest extends TestCase
 
         preg_match('/\.aic-bubble\s*\{[^}]*bottom:\s*(\d+)px;[^}]*height:\s*(\d+)px/s', $bot, $b);
         preg_match('/body:has\(\.aic-bubble\) \.md \{ right: \d+px; bottom: (\d+)px; \}/', $dock, $d);
-        // Its height: the launcher is a labelled pill since Sir Peter's mockup (2026-09-11).
-        preg_match('/\.md-launch \{ height: (\d+)px/', $dock, $l);
+        preg_match('/\.md-launch \{ width: (\d+)px/', $dock, $l);
         $this->assertCount(3, $b, 'Could not read the bubble size.');
         $this->assertCount(2, $d, 'Could not read where the messages button sits.');
         $this->assertCount(2, $l, 'Could not read the messages button size.');
