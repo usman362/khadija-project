@@ -110,6 +110,8 @@ class CancellationController extends Controller
             'role'     => $role,
             'bookings' => $bookings,
             'events'   => $events,
+            // D-2: what cancelling each event would return, booking by booking.
+            'eventQuotes' => $events->mapWithKeys(fn ($e) => [$e->id => $this->eventBreakdown($e)]),
             'quotes'   => $quotes,
             'kinds'    => $role === 'client'
                             ? array_intersect_key(CancellationRequest::KINDS, array_flip(CancellationRequest::CLIENT_KINDS))
@@ -243,6 +245,10 @@ class CancellationController extends Controller
             'A cancellation for this event is already waiting for approval.',
         );
 
+        // D-2: each booking on the event is quoted under its own tier, and the
+        // quotes are kept as the client saw them, as for a single booking.
+        $breakdown = $this->eventBreakdown($event);
+
         $cancellation = CancellationRequest::create([
             'booking_id'         => null,
             'event_id'           => $event->id,
@@ -253,11 +259,49 @@ class CancellationController extends Controller
             'detail'             => $data['detail'] ?? null,
             'certified'          => true,
             'certification_text' => 'I understand this event stays live until an administrator approves the cancellation, and that any professional already working on it will be told.',
-        ]);
+        ] + ($breakdown === [] ? [] : [
+            'quoted_breakdown' => $breakdown,
+            'quoted_agreed'    => round(array_sum(array_column($breakdown, 'agreed')), 2),
+            'quoted_deposit'   => round(array_sum(array_column($breakdown, 'deposit')), 2),
+            'quoted_balance'   => round(array_sum(array_column($breakdown, 'balance')), 2),
+            'quoted_refund'    => round(array_sum(array_column($breakdown, 'refund')), 2),
+            'quoted_tier'      => 'Each booking by its own notice period',
+            'days_before'      => $breakdown[0]['days_before'] ?? null,
+        ]));
 
         return redirect()
             ->route('cancellations.show', $cancellation)
             ->with('status', "Recorded as {$cancellation->reference}. Your event stays live until an administrator approves this.");
+    }
+
+    /**
+     * D-2: one refund quote per booking on the event, each under its own tier.
+     *
+     * @return array<int, array{booking_id:int, professional:?string, agreed:float, deposit:float, balance:float, refund:float, tier:string, days_before:?int}>
+     */
+    private function eventBreakdown(\App\Models\Event $event): array
+    {
+        return $event->bookings()
+            ->whereIn('status', ['requested', 'confirmed'])
+            ->with(['supplier:id,name', 'latestFinalization'])
+            ->orderBy('id')
+            ->get()
+            ->map(function (Booking $b) {
+                $q = CancellationPolicy::quote($b);
+
+                return [
+                    'booking_id'   => $b->id,
+                    'professional' => $b->supplier?->name,
+                    'agreed'       => $q['agreed'],
+                    'deposit'      => $q['deposit'],
+                    'balance'      => $q['balance'],
+                    'refund'       => $q['refund'],
+                    'tier'         => $q['tier'],
+                    'days_before'  => $q['days_before'],
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     public function show(Request $request, CancellationRequest $cancellation): View

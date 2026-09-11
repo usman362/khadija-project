@@ -54,6 +54,7 @@ class CancellationRequest extends Model
         'booking_id', 'event_id', 'raised_by', 'raised_role', 'kind', 'reason', 'detail',
         'occurred_at', 'waited_minutes',
         'quoted_agreed', 'quoted_deposit', 'quoted_balance', 'quoted_refund', 'quoted_tier', 'days_before',
+        'quoted_breakdown',
         'status', 'resolution_note', 'actioned_by', 'actioned_at', 'dispute_case_id',
         'certified', 'certification_text',
     ];
@@ -69,6 +70,8 @@ class CancellationRequest extends Model
             'quoted_balance' => 'decimal:2',
             'quoted_refund'  => 'decimal:2',
             'days_before'    => 'integer',
+            // D-2: one quote per booking when a whole event is cancelled.
+            'quoted_breakdown' => 'array',
             'waited_minutes' => 'integer',
         ];
     }

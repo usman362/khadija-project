@@ -38,6 +38,15 @@
     .cmp-btn { display: block; text-align: center; background: var(--pk); color: #fff; border-radius: 10px; padding: 10px; font-size: 13px; font-weight: 800; }
     .cmp-btn:hover { background: var(--pk-dark); }
 
+    /* PM-10: differences stand out, matching rows fade. */
+    .cmp-table tr.is-same th.row, .cmp-table tr.is-same td { opacity: .5; }
+    .cmp-table tr.is-diff th.row { color: var(--pk-dark); box-shadow: inset 3px 0 0 var(--pk); }
+    .cmp-table tr.is-diff td { background: #fffaf5; }
+    .cmp-table.only-diff tr.is-same { display: none; }
+    .cmp-tools { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+    .cmp-legend { font-size: 12.5px; color: var(--muted); }
+    .cmp-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: #fffaf5; box-shadow: inset 3px 0 0 var(--pk); margin-right: 5px; vertical-align: -1px; }
+    .cmp-toggle { border: 1px solid var(--line); background: #fff; border-radius: 9px; padding: 7px 12px; font: inherit; font-size: 12.5px; font-weight: 800; color: var(--pk-dark); cursor: pointer; }
     .cmp-empty { background: #fff; border: 1px dashed var(--line); border-radius: 18px; padding: 56px 20px; text-align: center; }
     .cmp-empty h2 { font-size: 18px; margin: 8px 0 6px; }
     .cmp-empty p { color: var(--muted); margin: 0 0 18px; }
@@ -65,6 +74,15 @@
                 // The union of every service any of them includes, so a package
                 // that lacks one shows a real gap rather than a shorter list.
                 $allServices = $packages->flatMap(fn ($p) => $p->services ?: [])->unique()->values();
+
+                // PM-10 (Sir Peter, Sep 5): highlight what differs, mute what
+                // matches. Decided here, from the same values each cell prints.
+                $__multi = $packages->count() > 1;
+                $__row = fn (array $vals) => ! $__multi ? '' : (
+                    count(array_unique(array_map(fn ($v) => mb_strtolower(trim((string) $v)), $vals))) > 1 ? 'is-diff' : 'is-same'
+                );
+                $__area = fn ($p) => trim(($p->user?->profile?->city ? $p->user->profile->city . ', ' : '') . ($p->user?->profile?->state ?: $p->state ?: ''), ', ') ?: '—';
+                $__cover = fn ($p) => $p->coverage ?: $p->duration ?: '—';
             @endphp
 
             <div class="cmp-head">
@@ -88,6 +106,14 @@
                 </div>
             @endif
 
+            @if($__multi)
+                <div class="cmp-tools">
+                    <span class="cmp-legend"><i></i>Highlighted rows are where these packages differ. Matching rows are faded.</span>
+                    <button type="button" class="cmp-toggle" data-cmp-toggle
+                            onclick="var t=document.querySelector('.cmp-table');t.classList.toggle('only-diff');this.textContent=t.classList.contains('only-diff')?'Show all rows':'Show differences only';">Show differences only</button>
+                </div>
+            @endif
+
             <div class="cmp-scroll">
                 <table class="cmp-table">
                     <tbody>
@@ -101,7 +127,7 @@
                                 </td>
                             @endforeach
                         </tr>
-                        <tr>
+                        <tr class="{{ $__row($packages->pluck('price')->all()) }}">
                             <th class="row" scope="row">Total price</th>
                             @foreach($packages as $p)
                                 <td>
@@ -111,21 +137,21 @@
                                 </td>
                             @endforeach
                         </tr>
-                        <tr>
+                        <tr class="{{ $__row($packages->map($__cover)->all()) }}">
                             <th class="row" scope="row">Coverage</th>
-                            @foreach($packages as $p)<td>{{ $p->coverage ?: $p->duration ?: '—' }}</td>@endforeach
+                            @foreach($packages as $p)<td>{{ $__cover($p) }}</td>@endforeach
                         </tr>
-                        <tr>
+                        <tr class="{{ $__row($packages->map(fn ($p) => $p->guests ?: '—')->all()) }}">
                             <th class="row" scope="row">Guests</th>
                             @foreach($packages as $p)<td>{{ $p->guests ?: '—' }}</td>@endforeach
                         </tr>
-                        <tr>
+                        <tr class="{{ $__row($packages->map($__area)->all()) }}">
                             <th class="row" scope="row">Service area</th>
                             @foreach($packages as $p)
-                                <td>{{ trim(($p->user?->profile?->city ? $p->user->profile->city . ', ' : '') . ($p->user?->profile?->state ?: $p->state ?: ''), ', ') ?: '—' }}</td>
+                                <td>{{ $__area($p) }}</td>
                             @endforeach
                         </tr>
-                        <tr>
+                        <tr class="{{ $__row($packages->map(fn ($p) => $p->availability ?: '—')->all()) }}">
                             <th class="row" scope="row">Availability</th>
                             @foreach($packages as $p)<td>{{ $p->availability ?: '—' }}</td>@endforeach
                         </tr>
@@ -133,7 +159,7 @@
                         {{-- One row per service any of them offers, so the gaps line
                              up. This is the whole point of the screen. --}}
                         @foreach($allServices as $svc)
-                            <tr>
+                            <tr class="{{ $__row($packages->map(fn ($p) => in_array($svc, $p->services ?: [], true) ? 'yes' : 'no')->all()) }}">
                                 <th class="row" scope="row">{{ $svc }}</th>
                                 @foreach($packages as $p)
                                     <td>
@@ -148,7 +174,7 @@
                         @endforeach
 
                         @if($packages->contains(fn ($p) => ! empty($p->includes)))
-                            <tr>
+                            <tr class="{{ $__row($packages->map(fn ($p) => json_encode(array_slice($p->includes ?: [], 0, 6)))->all()) }}">
                                 <th class="row" scope="row">Also includes</th>
                                 @foreach($packages as $p)
                                     <td>

@@ -105,6 +105,18 @@
                     </span>
                     @if(! in_array($event->status, ['published', 'pending'], true))
                         <span class="cl-badge cl-badge-{{ $event->status }}">{{ ucfirst(str_replace('_', ' ', $event->status)) }}</span>
+                        {{-- D-2: "Cancelled", with who and when. --}}
+                        @if($event->status === 'cancelled')
+                            @php
+                                $__cx = \App\Models\CancellationRequest::where('event_id', $event->id)
+                                    ->where('kind', \App\Models\CancellationRequest::CLIENT_CANCELS_EVENT)
+                                    ->where('status', \App\Models\CancellationRequest::APPROVED)
+                                    ->latest('actioned_at')->first();
+                            @endphp
+                            @if($__cx?->actioned_at)
+                                <span style="font-size:12px;color:var(--text-muted);">Cancelled by Client on {{ $__cx->actioned_at->format('M j, Y') }}</span>
+                            @endif
+                        @endif
                     @endif
                     {{-- Request TYPE and SCOPE, the same model the professional board
                          uses: BR is broadcast bidding, ER is that with urgency, DR

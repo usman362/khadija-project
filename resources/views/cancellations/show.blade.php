@@ -78,6 +78,19 @@
                     <div class="dsp-row"><dt>Remaining balance</dt><dd>${{ number_format($request->quoted_balance, 2) }}</dd></div>
                     <div class="dsp-row"><dt>Refund</dt><dd>${{ number_format($request->quoted_refund, 2) }}</dd></div>
                 </dl>
+                {{-- D-2: a whole event is quoted booking by booking, each under
+                     its own notice period. --}}
+                @if(! empty($request->quoted_breakdown))
+                    <p class="dsp-sec" style="margin-top:14px;">Booking by booking</p>
+                    <dl style="margin:0;">
+                        @foreach($request->quoted_breakdown as $row)
+                            <div class="dsp-row">
+                                <dt>{{ $row['professional'] ?? 'Professional' }}<br><small style="font-weight:500;">{{ $row['tier'] }}</small></dt>
+                                <dd>${{ number_format((float) $row['refund'], 2) }} of ${{ number_format((float) $row['balance'], 2) }}</dd>
+                            </div>
+                        @endforeach
+                    </dl>
+                @endif
                 <p class="dsp-hint" style="margin-top:10px;">
                     {{ $request->policyTierLabel() }}. The deposit is not refundable, so it is not part
                     of this figure.

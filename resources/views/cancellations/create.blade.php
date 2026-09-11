@@ -26,6 +26,8 @@
         .cx-tiers th { border-top:0; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-muted); }
         .cx-quote { display:none; }
         .cx-quote.is-shown { display:block; }
+        .cx-evq { display:none; margin-top:10px; }
+        .cx-evq.is-shown { display:block; }
         .cx-fig { display:flex; justify-content:space-between; padding:7px 0; border-top:1px solid var(--border-color); font-size:13.5px; }
         .cx-fig:first-of-type { border-top:0; }
         .cx-fig b { font-weight:800; }
@@ -97,7 +99,8 @@
 
                     <div class="dsp-field" data-cx-for="{{ \App\Models\CancellationRequest::CLIENT_CANCELS_EVENT }}">
                         <label class="dsp-label" for="event_id">Which event</label>
-                        <select name="event_id" id="event_id" class="dsp-select">
+                        <select name="event_id" id="event_id" class="dsp-select"
+                                onchange="document.querySelectorAll('.cx-evq').forEach(q => q.classList.toggle('is-shown', q.dataset.event === this.value))">
                             <option value="">Choose an event…</option>
                             @foreach($events as $ev)
                                 <option value="{{ $ev->id }}" @selected(old('event_id') == $ev->id)>
@@ -108,6 +111,25 @@
                         </select>
                         @error('event_id') <p class="dsp-err">{{ $message }}</p> @enderror
                         <p class="dsp-hint">Your event stays live, and professionals can still reply, until an administrator approves this.</p>
+
+                        {{-- D-2: every booking on the event is refunded under its own
+                             notice period, and the client sees each one first. --}}
+                        @foreach(($eventQuotes ?? collect()) as $evId => $rows)
+                            @if(! empty($rows))
+                                <div class="dsp-card cx-evq {{ (string) old('event_id') === (string) $evId ? 'is-shown' : '' }}" data-event="{{ $evId }}">
+                                    <p class="dsp-sec">If this is approved, each booking is refunded on its own</p>
+                                    <dl style="margin:0;">
+                                        @foreach($rows as $row)
+                                            <div class="dsp-row">
+                                                <dt>{{ $row['professional'] ?? 'Professional' }}<br><small style="font-weight:500;">{{ $row['tier'] }}</small></dt>
+                                                <dd>${{ number_format((float) $row['refund'], 2) }} of ${{ number_format((float) $row['balance'], 2) }}</dd>
+                                            </div>
+                                        @endforeach
+                                    </dl>
+                                    <p class="dsp-hint" style="margin-top:8px;">Deposits are not refundable, so they are not part of these figures.</p>
+                                </div>
+                            @endif
+                        @endforeach
                     </div>
                 @endif
 

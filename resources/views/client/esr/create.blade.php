@@ -206,6 +206,11 @@
         <div class="esr-card esr-foot">
             {{-- Was this page's own wording, and the only page that carried it.
                  Shared now, with the agreement Sir Peter asked for. --}}
+            {{-- PM-3 (Sir Peter, Sep 5): one flat surcharge on emergency requests. --}}
+            <p style="font-size:12.5px;line-height:1.6;color:var(--text-secondary,#374151);margin:0 0 10px;">
+                Emergency requests add a flat <b>{{ \App\Domain\Requests\EmergencySurcharge::label() }}</b> to the
+                professional's price. It is included in the total you agree before anything is booked.
+            </p>
             @include('client.partials._request_fee_terms', ['action' => 'posting this rush request'])
             <button type="submit" class="esr-btn">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>

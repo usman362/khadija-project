@@ -29,7 +29,9 @@ final class Award
             [
                 'bid_id'        => $bid->id,
                 'client_id'     => $bid->event->client_id,
-                'agreed_price'  => $bid->amount,
+                // PM-3: an emergency request's agreement starts at the
+                // professional's price plus the 25% surcharge.
+                'agreed_price'  => EmergencySurcharge::priceFor($bid->event, (float) $bid->amount),
                 'scope'         => $bid->plan,
                 'payment_terms' => $bid->terms,
             ]

@@ -82,6 +82,29 @@ class AdminCancellationController extends Controller
                     'status'       => 'cancelled',
                     'is_published' => false,
                 ]);
+
+                /*
+                 * D-2 (Sir Peter, Sep 5): the event's bookings go with it, each
+                 * under its own cancellation tier, and each professional gets
+                 * the standard message. Until now the event was cancelled and
+                 * its bookings stayed confirmed.
+                 */
+                $quoted = collect($cancellation->quoted_breakdown ?? [])->keyBy('booking_id');
+
+                $cancellation->event->bookings()
+                    ->whereIn('status', ['requested', 'confirmed'])
+                    ->with(['supplier', 'latestFinalization'])
+                    ->get()
+                    ->each(function ($booking) use ($cancellation, $quoted) {
+                        $tier = $quoted[$booking->id]['tier']
+                            ?? \App\Domain\Cancellations\CancellationPolicy::quote($booking)['tier'];
+
+                        $booking->update(['status' => 'cancelled']);
+
+                        $booking->supplier?->notify(
+                            new \App\Notifications\EventCancelledByClient($cancellation->event, $tier)
+                        );
+                    });
             }
         });
 
