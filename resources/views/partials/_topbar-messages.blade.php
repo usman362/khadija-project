@@ -14,7 +14,9 @@
     $__route = $__portal === 'professional' ? 'professional.chat.index' : 'client.chat.index';
 @endphp
 
-<a href="{{ route($__route) }}" class="tb-icon-btn" title="Messages"
+{{-- $opensDock: open the Messages window (partials/_message_dock) rather than
+     the page. The link still goes to the page wherever there is no window. --}}
+<a href="{{ route($__route) }}" class="tb-icon-btn" title="Messages" @if(! empty($opensDock)) data-md-open @endif
    aria-label="Messages{{ $__unread > 0 ? ': ' . $__unread . ' unread' : '' }}">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     @if($__unread > 0)

@@ -1199,7 +1199,8 @@
 
     {{-- The pop-up messenger (Ideas 2 and 3). It decides for itself whether
          this account gets it, so the layout does not need to know the rule. --}}
-    @include('partials._message_dock')
+    {{-- No corner button: the header's Messages icon opens it. --}}
+    @include('partials._message_dock', ['launcher' => false])
 
     @stack('styles')
 </head>
@@ -1507,8 +1508,9 @@
                     </button>
                 @endif
 
-                {{-- No Messages icon here: the Messages button in the corner and the
-                     sidebar's Messages (Inbox) already open them (Ali, 2026-09-11). --}}
+                {{-- Opens the Messages window, like the corner button did; the
+                     corner button is gone on the client side (Ali, 2026-09-11). --}}
+                @include('partials._topbar-messages', ['portal' => 'client', 'opensDock' => true])
 
                 {{-- Notifications bell + account, both real dropdowns --}}
                 @include('partials._topbar-menus', ['portal' => 'client', 'trigger' => 'avatar'])

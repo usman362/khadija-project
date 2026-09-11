@@ -298,8 +298,15 @@
     function counts(rows) {
         var unreadMsgs = rows.reduce(function (n, c) { return n + (c.muted_at ? 0 : Number(c.unread_count || 0)); }, 0);
         var unreadConvs = rows.filter(function (c) { return ! c.muted_at && Number(c.unread_count || 0) > 0; }).length;
-        dot.textContent = unreadMsgs > 99 ? '99+' : unreadMsgs;
-        dot.hidden = ! unreadMsgs;
+        if (dot) {
+            dot.textContent = unreadMsgs > 99 ? '99+' : unreadMsgs;
+            dot.hidden = ! unreadMsgs;
+        }
+        // The header's Messages icon carries the count where there is no corner button.
+        document.querySelectorAll('[data-md-open] .tb-icon-badge').forEach(function (b) {
+            b.textContent = unreadMsgs > 9 ? '9+' : unreadMsgs;
+            b.style.display = unreadMsgs ? '' : 'none';
+        });
         unreadTab.textContent = unreadConvs;
         unreadTab.hidden = ! unreadConvs;
     }
@@ -334,16 +341,7 @@
         var t = e.target.closest('[data-md-tab]');
         if (t) { setTab(t.dataset.mdTab); return; }
 
-        if (e.target.closest('[data-md-launch]')) {
-            dock.classList.toggle('is-open');
-            dock.classList.remove('is-min');
-            if (dock.classList.contains('is-open')) {
-                // One window in the corner at a time: the assistant closes.
-                document.dispatchEvent(new CustomEvent('gr:float-open', { detail: 'messages' }));
-                if (! open) showList();
-            }
-            return;
-        }
+        if (e.target.closest('[data-md-launch]')) { toggleDock(); return; }
 
         // Minimise keeps the conversation exactly where it was.
         if (e.target.closest('[data-md-min]')) { dock.classList.toggle('is-min'); return; }
@@ -389,6 +387,21 @@
                 input.value = text;
                 body.insertAdjacentHTML('beforeend', '<div class="md-note">That did not send. Try again.</div>');
             });
+    });
+
+    function toggleDock() {
+        dock.classList.toggle('is-open');
+        dock.classList.remove('is-min');
+        if (dock.classList.contains('is-open')) {
+            // One window in the corner at a time: the assistant closes.
+            document.dispatchEvent(new CustomEvent('gr:float-open', { detail: 'messages' }));
+            if (! open) showList();
+        }
+    }
+
+    // The header's Messages icon opens the window instead of the page.
+    document.querySelectorAll('[data-md-open]').forEach(function (a) {
+        a.addEventListener('click', function (e) { e.preventDefault(); toggleDock(); });
     });
 
     // The assistant opened: this one steps out of the way.
@@ -458,10 +471,12 @@
         </form>
     </div>
 
+    @if($launcher ?? true)
     <button type="button" class="md-launch" data-md-launch aria-label="Messages">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9.9 9.9 0 0 1-4.2-.9L3 20l1.3-3.8A8.2 8.2 0 0 1 3 11.5a8.4 8.4 0 0 1 9-8.4 8.4 8.4 0 0 1 9 8.4z"/></svg>
         <span class="md-dot" data-md-dot hidden>0</span>
     </button>
+    @endif
 </div>
 @endif
 @endauth
