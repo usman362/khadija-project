@@ -31,17 +31,36 @@ class ClientSavedProfessionalController extends Controller
             // Saving yourself is already blocked, but an older self-booking
             // would still surface here as someone you have "worked with".
             ->where('supplier_id', '!=', $user->id)
-            ->with(['supplier.profile', 'supplier' => fn ($q) => $q->withAvg(
-                ['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating'
-            )])
+            ->with([
+                'supplier' => fn ($q) => $q
+                    ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')
+                    ->withCount(['reviewsReceived as reviews_count' => fn ($r) => $r->where('is_hidden', false)]),
+                'supplier.profile',
+                'supplier.serviceCategories:id,name',
+                'event:id,title',
+            ])
             ->get()
             ->groupBy('supplier_id')
-            ->map(fn ($rows) => [
-                'pro'       => $rows->first()->supplier,
-                'times'     => $rows->count(),
-                'last'      => $rows->max('created_at'),
-                'completed' => $rows->where('status', 'completed')->count(),
-            ])
+            ->map(function ($rows) {
+                // "Worked together" means a booking that went ahead, so a
+                // cancelled one is not the last time (unless all were).
+                $went = $rows->where('status', '!=', 'cancelled');
+                $went = $went->isNotEmpty() ? $went : $rows;
+
+                // By id: two bookings made in the same second tie on
+                // created_at, and the older one was being named as the last.
+                $latest = $went->sortByDesc('id')->first();
+
+                return [
+                    'pro'        => $rows->first()->supplier,
+                    'times'      => $rows->count(),
+                    'last'       => $went->max('created_at'),
+                    'completed'  => $rows->where('status', 'completed')->count(),
+                    // What was actually agreed, so cancelled bookings are left out.
+                    'spent'      => (float) $rows->whereIn('status', ['confirmed', 'completed'])->sum('price'),
+                    'last_event' => $latest?->event?->title,
+                ];
+            })
             ->filter(fn ($r) => $r['pro'])
             ->sortByDesc('last')
             ->values();
@@ -50,14 +69,24 @@ class ClientSavedProfessionalController extends Controller
 
         $saved = $user->savedProfessionals()
             ->excludingSelf($user)
-            ->with('profile')
+            ->with(['profile', 'serviceCategories:id,name'])
             ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')
+            ->withCount(['reviewsReceived as reviews_count' => fn ($r) => $r->where('is_hidden', false)])
             ->get();
+
+        // The strip across the top. Counted from the same rows as the cards.
+        $stats = [
+            'worked'   => $workedWith->count(),
+            'saved'    => $saved->count(),
+            'bookings' => $workedWith->sum('times'),
+            'spent'    => $workedWith->sum('spent'),
+        ];
 
         return view('client.saved-professionals.index', [
             'workedWith' => $workedWith,
             'saved'      => $saved,
             'savedIds'   => $savedIds,
+            'stats'      => $stats,
         ]);
     }
 
