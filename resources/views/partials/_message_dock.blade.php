@@ -34,13 +34,6 @@
      */
     body:has(.aic-bubble) .md { right: 27px; bottom: 96px; }   /* 24 + (58-52)/2 · 24 + 58 + 14 */
 
-    /* A phone: the window as wide as the screen allows, same margin both sides. */
-    @media (max-width: 520px) {
-        .md { flex-direction: column; align-items: flex-end; }
-        .md-win { width: calc(100vw - 36px); }                              /* right: 18px, both sides */
-        body:has(.aic-bubble) .md-win { width: calc(100vw - 54px); }        /* right: 27px, both sides */
-    }
-
     /* The launcher: an icon, the same round shape as the AI bubble beside it
        (Ali, 2026-09-11: the labelled pill from the mockup looked heavy there).
        The window above it is the mockup's. */
@@ -52,10 +45,22 @@
         border-radius: 999px; background: #dc2626; color: #fff; font-size: 11px; font-weight: 800;
         display: flex; align-items: center; justify-content: center; padding: 0 6px; border: 2px solid #fff; }
 
-    .md-win { width: 380px; max-width: calc(100vw - 36px); background: var(--bg-card, #fff);
+    /*
+     * The window opens where the AI assistant's panel opens, the same size,
+     * over the corner buttons (Ali, 2026-09-11). Only one of the two is open
+     * at a time; see gr:float-open below. MessageDockClearsTheChatbotTest holds
+     * the numbers to the panel's.
+     */
+    .md-win { position: fixed; right: 24px; bottom: 24px; width: 380px; height: 600px;
+        max-width: calc(100vw - 48px); max-height: calc(100vh - 48px); z-index: 9999;
+        background: var(--bg-card, #fff);
         border: 1px solid var(--border-color, #e5e7eb); border-radius: 18px; overflow: hidden;
         box-shadow: 0 28px 70px -24px rgba(15,27,53,.55); display: none; flex-direction: column; }
     .md.is-open .md-win { display: flex; }
+    /* Open, the window covers the corner, so its button steps aside like the
+       assistant's bubble does. Minimised, the window is just its header. */
+    .md.is-open .md-launch { visibility: hidden; }
+    .md.is-min .md-win { height: auto; }
     /* Minimised keeps the window, and the conversation inside it, exactly
        where it was; only the body is put away. */
     .md.is-min .md-body, .md.is-min .md-compose, .md.is-min .md-tools, .md.is-min .md-foot { display: none; }
@@ -83,7 +88,7 @@
     .md-tab i { font-style: normal; min-width: 18px; height: 18px; border-radius: 999px; background: #dc2626; color: #fff;
         font-size: 10.5px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; padding: 0 5px; }
 
-    .md-body { height: 380px; max-height: calc(100vh - 330px); overflow-y: auto; padding: 6px 8px; }
+    .md-body { flex: 1; min-height: 0; overflow-y: auto; padding: 6px 8px; }
     .md-row { display: flex; gap: 12px; align-items: flex-start; width: 100%; text-align: left; position: relative;
         border: 0; background: none; cursor: pointer; padding: 12px 10px; border-radius: 12px; font: inherit; }
     .md-row + .md-row { border-top: 1px solid var(--border-color, #f1f5f9); }
@@ -131,7 +136,11 @@
     .md-icon[hidden], .md-compose[hidden], .md-dot[hidden], .md-tools[hidden], .md-foot[hidden],
     .md-head-t small[hidden], .md-tab i[hidden] { display: none !important; }
 
-    @media (max-width: 520px) { .md { right: 12px; bottom: 12px; } .md-win { width: calc(100vw - 24px); } }
+    /* A phone: full screen, as the assistant's panel is. */
+    @media (max-width: 520px) {
+        .md { right: 12px; bottom: 12px; }
+        .md-win { right: 0; bottom: 0; left: 0; width: 100%; max-width: none; height: 100%; max-height: 100vh; border-radius: 0; }
+    }
 </style>
 @endpush
 
@@ -323,7 +332,11 @@
         if (e.target.closest('[data-md-launch]')) {
             dock.classList.toggle('is-open');
             dock.classList.remove('is-min');
-            if (dock.classList.contains('is-open') && ! open) showList();
+            if (dock.classList.contains('is-open')) {
+                // One window in the corner at a time: the assistant closes.
+                document.dispatchEvent(new CustomEvent('gr:float-open', { detail: 'messages' }));
+                if (! open) showList();
+            }
             return;
         }
 
@@ -371,6 +384,11 @@
                 input.value = text;
                 body.insertAdjacentHTML('beforeend', '<div class="md-note">That did not send. Try again.</div>');
             });
+    });
+
+    // The assistant opened: this one steps out of the way.
+    document.addEventListener('gr:float-open', function (e) {
+        if (e.detail !== 'messages') dock.classList.remove('is-open', 'is-min');
     });
 
     // The unread count on the launcher, without opening anything.

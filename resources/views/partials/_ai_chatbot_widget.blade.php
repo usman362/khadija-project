@@ -663,6 +663,8 @@
     // ── Open/close ──
     function openPanel() {
         panel.classList.add('open');
+        // One window in the corner at a time: Messages closes (partials/_message_dock).
+        document.dispatchEvent(new CustomEvent('gr:float-open', { detail: 'ai' }));
         panel.setAttribute('aria-hidden', 'false');
         bubble.classList.add('hidden');
         setTimeout(() => input.focus(), 300);
@@ -675,6 +677,8 @@
     }
 
     bubble.addEventListener('click', openPanel);
+    // Messages opened: the assistant steps out of the way.
+    document.addEventListener('gr:float-open', e => { if (e.detail !== 'ai' && panel.classList.contains('open')) closePanel(); });
     bubble.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPanel(); } });
     closeBtn.addEventListener('click', closePanel);
 

@@ -58,10 +58,8 @@ class MessageDockClearsTheChatbotTest extends TestCase
     {
         $dock = file_get_contents(resource_path('views/partials/_message_dock.blade.php'));
 
-        $this->assertMatchesRegularExpression('/@media \(max-width: 520px\) \{\s*\.md \{ flex-direction: column;/', $dock);
-        // Width leaves the launcher's own right margin on the left as well.
-        $this->assertStringContainsString('.md-win { width: calc(100vw - 36px); }', $dock);                          // 2 × 18
-        $this->assertStringContainsString('body:has(.aic-bubble) .md-win { width: calc(100vw - 54px); }', $dock);   // 2 × 27
+        // Full screen, as the assistant's panel is on a phone.
+        $this->assertMatchesRegularExpression('/@media \(max-width: 520px\) \{[^}]*\}\s*\.md-win \{ right: 0; bottom: 0; left: 0; width: 100%;/s', $dock);
     }
 
     /** With the assistant off there is nothing to clear; the launcher keeps the corner. */
@@ -71,5 +69,30 @@ class MessageDockClearsTheChatbotTest extends TestCase
 
         $this->assertStringContainsString('body:has(.aic-bubble) .md {', $dock);
         $this->assertMatchesRegularExpression('/^\s*\.md \{ position: fixed; right: 18px; bottom: 18px;/m', $dock);
+    }
+
+    /**
+     * Ali, 2026-09-11: the Messages window opens where the assistant's panel
+     * opens, the same size, and only one of the two is open at a time.
+     */
+    public function test_the_window_opens_where_the_assistant_does(): void
+    {
+        $bot  = file_get_contents(resource_path('views/partials/_ai_chatbot_widget.blade.php'));
+        $dock = file_get_contents(resource_path('views/partials/_message_dock.blade.php'));
+
+        foreach (['right', 'bottom', 'width', 'height'] as $prop) {
+            $this->assertSame($this->px($bot, '.aic-panel', $prop), $this->px($dock, '.md-win', $prop), "The windows differ in {$prop}.");
+        }
+    }
+
+    public function test_opening_one_closes_the_other(): void
+    {
+        $bot  = file_get_contents(resource_path('views/partials/_ai_chatbot_widget.blade.php'));
+        $dock = file_get_contents(resource_path('views/partials/_message_dock.blade.php'));
+
+        $this->assertStringContainsString("new CustomEvent('gr:float-open', { detail: 'ai' })", $bot);
+        $this->assertStringContainsString("new CustomEvent('gr:float-open', { detail: 'messages' })", $dock);
+        $this->assertStringContainsString("addEventListener('gr:float-open'", $bot);
+        $this->assertStringContainsString("addEventListener('gr:float-open'", $dock);
     }
 }
