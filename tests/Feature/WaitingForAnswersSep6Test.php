@@ -124,6 +124,20 @@ class WaitingForAnswersSep6Test extends TestCase
             ->assertSee(route('cancellations.create', ['kind' => CancellationRequest::CLIENT_CANCELS_EVENT]), false);
     }
 
+    /**
+     * Sir Peter, Sep 11: "Service Needs, but what is the input?" With no
+     * service or professional chosen yet, the section must say what to do,
+     * not sit empty under "YOUR INPUT".
+     */
+    public function test_direct_request_service_needs_is_never_empty(): void
+    {
+        $client = $this->account('client');
+
+        $this->actingAs($client)->get(route('client.direct-offers.create'))
+            ->assertOk()
+            ->assertSee('Choose the service you need at the top of this page.');
+    }
+
     /** D-10: no emojis in the guided event planner. */
     public function test_the_event_planner_has_no_emojis(): void
     {

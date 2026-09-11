@@ -312,6 +312,21 @@
                     $__askAtTop = ! $selectedPro && ! $__chosen;
                 @endphp
 
+                {{-- Sir Peter, Sep 11: with the dropdown hidden the section was
+                     empty under "YOUR INPUT", so nothing said what to do. --}}
+                @if($__askAtTop)
+                    <div class="do-svc-single">
+                        <div class="do-field">
+                            <label>Service requested</label>
+                            <p class="do-hint" style="margin:0;">
+                                Choose the service you need at the top of this page. It will appear here,
+                                along with the professionals who offer it.
+                                <a href="#" onclick="document.querySelector('[aria-label=&quot;Choose a service…&quot;]')?.focus(); window.scrollTo({top:0,behavior:'smooth'}); return false;"
+                                   style="color:#ea580c;font-weight:700;">Choose a service</a>
+                            </p>
+                        </div>
+                    </div>
+                @endif
                 <div class="do-svc-single" @if($__askAtTop) hidden @endif>
                     <div class="do-field">
                         <label>Service requested</label>
