@@ -95,4 +95,19 @@ class MessageDockClearsTheChatbotTest extends TestCase
         $this->assertStringContainsString("addEventListener('gr:float-open'", $bot);
         $this->assertStringContainsString("addEventListener('gr:float-open'", $dock);
     }
+
+    /** Found live: the dock's z-index capped the open window under the bubble. */
+    public function test_an_open_window_is_above_the_bubble(): void
+    {
+        $bot  = file_get_contents(resource_path('views/partials/_ai_chatbot_widget.blade.php'));
+        $dock = file_get_contents(resource_path('views/partials/_message_dock.blade.php'));
+
+        preg_match('/\.aic-bubble\s*\{[^}]*z-index:\s*(\d+)/s', $bot, $b);
+        preg_match('/\.md\.is-open \{ z-index: (\d+); \}/', $dock, $d);
+
+        $this->assertCount(2, $b);
+        $this->assertCount(2, $d);
+        $this->assertGreaterThan((int) $b[1], (int) $d[1]);
+        $this->assertStringContainsString('body:has(.md.is-open) .aic-bubble { visibility: hidden; }', $dock);
+    }
 }

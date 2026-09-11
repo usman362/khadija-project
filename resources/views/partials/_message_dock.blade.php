@@ -60,6 +60,11 @@
     /* Open, the window covers the corner, so its button steps aside like the
        assistant's bubble does. Minimised, the window is just its header. */
     .md.is-open .md-launch { visibility: hidden; }
+    /* .md's own z-index (900) is the ceiling for everything inside it, so an
+       open window has to lift the whole dock above the assistant's bubble
+       (9998), and the bubble steps aside as it does for its own panel. */
+    .md.is-open { z-index: 10000; }
+    body:has(.md.is-open) .aic-bubble { visibility: hidden; }
     .md.is-min .md-win { height: auto; }
     /* Minimised keeps the window, and the conversation inside it, exactly
        where it was; only the body is put away. */
