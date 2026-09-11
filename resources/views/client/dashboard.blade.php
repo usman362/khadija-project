@@ -1059,6 +1059,15 @@
              "35 / 50 events" — two different totals for one client. --}}
         {{-- "View my public profile" led to the client portfolio, removed
              2026-08-25. A client has no public profile to view. --}}
+        {{-- Not the badge panel (PM-14 keeps that off the dashboard), just the
+             count and the way to the full list. --}}
+        @php $__bdg = \App\Domain\Badges\ClientBadges::progressFor($user); @endphp
+        @if($__bdg->isNotEmpty())
+            <div style="font-size:12.5px;color:var(--text-muted);margin:10px 0 12px;">
+                Badges: <b style="color:var(--text-primary);">{{ $__bdg->where('earned', true)->count() }} of {{ $__bdg->count() }} earned</b>
+                · <a href="{{ route('client.badges.index') }}" style="color:#ea580c;font-weight:700;">See all</a>
+            </div>
+        @endif
         <a href="{{ route('client.profile.index') }}" class="od-profile-cta">Profile &amp; settings</a>
     </div>
 
