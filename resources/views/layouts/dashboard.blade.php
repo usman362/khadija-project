@@ -274,6 +274,13 @@
                             </a>
                         </li>
 
+                        <li class="nav-item {{ request()->routeIs('app.admin.badges.*') ? 'active' : '' }}">
+                            <a href="{{ route('app.admin.badges.index') }}" class="nav-link">
+                                <i class="link-icon ic-purple" data-lucide="award"></i>
+                                <span class="link-title">Badges</span>
+                            </a>
+                        </li>
+
                         <li class="nav-item {{ request()->routeIs('app.admin.waitlist.*') ? 'active' : '' }}">
                             <a href="{{ route('app.admin.waitlist.index') }}" class="nav-link">
                                 <i class="link-icon ic-orange" data-lucide="map-pin"></i>

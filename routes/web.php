@@ -1307,6 +1307,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/uploads/{file}/reject', [\App\Http\Controllers\Dashboard\AdminUploadModerationController::class, 'reject'])->name('app.admin.uploads.reject');
         Route::post('/uploads/{file}/remove', [\App\Http\Controllers\Dashboard\AdminUploadModerationController::class, 'remove'])->name('app.admin.uploads.remove');
 
+        // Every badge in one place, for Khadijah to review colours and icons.
+        Route::get('/badges', [\App\Http\Controllers\Dashboard\AdminBadgeController::class, 'index'])->name('app.admin.badges.index');
         Route::get('/verifications', [\App\Http\Controllers\Dashboard\AdminVerificationController::class, 'index'])->name('app.admin.verifications.index');
         Route::post('/verifications/{profile}/approve', [\App\Http\Controllers\Dashboard\AdminVerificationController::class, 'approve'])->name('app.admin.verifications.approve');
         Route::post('/verifications/{profile}/reject', [\App\Http\Controllers\Dashboard\AdminVerificationController::class, 'reject'])->name('app.admin.verifications.reject');
