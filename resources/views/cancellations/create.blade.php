@@ -78,13 +78,19 @@
                     <div class="dsp-field">
                         <label class="dsp-label">What are you cancelling</label>
                         <div class="cx-what">
+                            @php
+                                // Arriving from "Cancel an event" opens on that option.
+                                $__cxKind = old('kind', request('kind') === \App\Models\CancellationRequest::CLIENT_CANCELS_EVENT || $bookings->isEmpty()
+                                    ? \App\Models\CancellationRequest::CLIENT_CANCELS_EVENT
+                                    : \App\Models\CancellationRequest::CLIENT_CANCELS);
+                            @endphp
                             @if($bookings->isNotEmpty())
                                 <label><input type="radio" name="kind" value="{{ \App\Models\CancellationRequest::CLIENT_CANCELS }}"
-                                              @checked(old('kind', \App\Models\CancellationRequest::CLIENT_CANCELS) === \App\Models\CancellationRequest::CLIENT_CANCELS)>
+                                              @checked($__cxKind === \App\Models\CancellationRequest::CLIENT_CANCELS)>
                                     <span><b>A booking</b><small>A professional is already engaged for this.</small></span></label>
                             @endif
                             <label><input type="radio" name="kind" value="{{ \App\Models\CancellationRequest::CLIENT_CANCELS_EVENT }}"
-                                          @checked(old('kind', $bookings->isEmpty() ? \App\Models\CancellationRequest::CLIENT_CANCELS_EVENT : null) === \App\Models\CancellationRequest::CLIENT_CANCELS_EVENT)>
+                                          @checked($__cxKind === \App\Models\CancellationRequest::CLIENT_CANCELS_EVENT)>
                                 <span><b>A whole event</b><small>Takes the request down. An administrator approves it first.</small></span></label>
                         </div>
                     </div>

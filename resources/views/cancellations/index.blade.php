@@ -22,9 +22,18 @@
          professionals can cancel one and keep the other two, and a button
          promising to cancel the event would be promising something the page
          does not do. Raised with Sir Peter. --}}
-    <a href="{{ route('cancellations.create') }}" class="cl-btn cl-btn-primary">
-        {{ ($role ?? 'client') === 'professional' ? 'Report a no-show' : 'Cancel a booking' }}
-    </a>
+    {{-- DIR-15 (Sep 3): both, side by side. A booking is cancelled by the
+         client alone; a whole event goes to an administrator first. --}}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        @if(($role ?? 'client') !== 'professional')
+            <a href="{{ route('cancellations.create', ['kind' => \App\Models\CancellationRequest::CLIENT_CANCELS_EVENT]) }}" class="cl-btn">
+                Cancel an event
+            </a>
+        @endif
+        <a href="{{ route('cancellations.create') }}" class="cl-btn cl-btn-primary">
+            {{ ($role ?? 'client') === 'professional' ? 'Report a no-show' : 'Cancel a booking' }}
+        </a>
+    </div>
 </div>
 
 @if(session('status'))

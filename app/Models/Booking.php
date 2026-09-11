@@ -72,6 +72,17 @@ class Booking extends Model
      */
     protected static function booted(): void
     {
+        // OA-141: one account cannot be both sides of a booking. A client was
+        // shown as their own hired professional, with "Message" and "Confirm"
+        // offered to themselves.
+        static::saving(function (self $booking) {
+            if ($booking->client_id && $booking->client_id === $booking->supplier_id) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'supplier_id' => 'A booking needs a client and a different professional.',
+                ]);
+            }
+        });
+
         static::saved(function (self $booking) {
             if (! in_array($booking->status, ['confirmed', 'completed'], true)) {
                 return;

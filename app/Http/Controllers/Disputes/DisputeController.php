@@ -67,13 +67,15 @@ class DisputeController extends Controller
      * key so the tile lands on the filing form with the classification already
      * chosen. "Other" opens the form with all twelve to pick from.
      */
+    // OA-148: Sir Peter's PM-4 list (Sep 5), word for word and in his order.
+    // Cancellation is not a dispute; it has its own page.
     public const COMMON_ISSUES = [
-        ['payment_dispute',    'Payment Dispute',    'Issues with payment, refunds, or extra charges.'],
-        ['cancellation',       'Cancellation',       'Cancellation fees or last-minute changes.'],
-        ['no_show',            'No-Show',            'Client or professional did not show up.'],
-        ['incomplete_service', 'Incomplete Service',  'Service did not match the agreed scope.'],
-        ['damage_claim',       'Damaged Property',   'Damage to equipment or venue.'],
-        [null,                 'Other Issue',        'Something else not listed here.'],
+        ['no_show',            'No-show',                 'The client or professional did not show up.'],
+        ['incomplete_service', 'Service not as described', 'What was delivered did not match what was agreed.'],
+        ['damage_claim',       'Property damage',         'Damage to equipment or the venue.'],
+        ['late_arrival',       'Late arrival/departure',  'Arrived late or left early.'],
+        ['payment_dispute',    'Payment discrepancy',     'A charge or amount that does not match.'],
+        ['other',              'Other',                   'Something else not listed here.'],
     ];
 
     public function index(Request $request): View
@@ -193,11 +195,13 @@ class DisputeController extends Controller
         return view('disputes.create', [
             'layout'   => $this->layout($user),
             'bookings' => $bookings,
-            'taxonomy' => DisputeClassification::TAXONOMY,
+            // The person filing picks from PM-4's six; staff classify further.
+            'taxonomy' => DisputeClassification::FILING_TYPES,
             'filing'   => $user->isProfessionalMode() ? 'professional' : 'client',
+            'windowDays' => DisputeClassification::FILING_WINDOW_DAYS,
             // Arrived from a "Common Issues" tile, which already asked what the
             // problem is — so the form does not ask again.
-            'chosen'   => array_key_exists((string) $request->query('taxonomy'), DisputeClassification::TAXONOMY)
+            'chosen'   => array_key_exists((string) $request->query('taxonomy'), DisputeClassification::FILING_TYPES)
                 ? (string) $request->query('taxonomy')
                 : null,
         ]);
@@ -209,7 +213,7 @@ class DisputeController extends Controller
 
         $data = $request->validate([
             'booking_id'       => ['required', 'integer', 'exists:bookings,id'],
-            'taxonomy'         => ['required', 'string', 'in:' . implode(',', array_keys(DisputeClassification::TAXONOMY))],
+            'taxonomy'         => ['required', 'string', 'in:' . implode(',', array_keys(DisputeClassification::FILING_TYPES))],
             'summary'          => ['required', 'string', 'min:20', 'max:5000'],
             'work_performed'   => ['nullable', 'string', 'max:5000'],
             'attempted_direct' => ['required', 'in:yes,no'],
@@ -222,6 +226,18 @@ class DisputeController extends Controller
             in_array($user->id, [$booking->client_id, $booking->supplier_id], true),
             403,
         );
+
+        // D-9, Sir Peter's answer of Sep 5: a dispute can be opened up to 14
+        // days after the event ends. Undated events are not held to it.
+        $ended = $booking->event?->ends_at ?? $booking->event?->starts_at;
+        $days  = DisputeClassification::FILING_WINDOW_DAYS;
+
+        if ($ended && \Illuminate\Support\Carbon::parse($ended)->addDays($days)->endOfDay()->isPast()) {
+            throw ValidationException::withMessages([
+                'booking_id' => "Disputes can be opened up to {$days} days after the event. This event ended on "
+                    . \Illuminate\Support\Carbon::parse($ended)->format('M j, Y') . '.',
+            ]);
+        }
 
         // One open case per service line. A second one on the same booking is
         // not a duplicate to be classified later (§6 sets a higher bar for

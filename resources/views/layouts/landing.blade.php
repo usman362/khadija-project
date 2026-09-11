@@ -383,6 +383,7 @@
             <span>&copy; {{ date('Y') }} GigResource.com LLC. All rights reserved.</span>
             <span>
                 <a href="{{ route('privacy-policy') }}">Privacy Policy</a> &middot;
+                <a href="{{ route('terms-of-service') }}">Terms of Service</a> &middot;
                 <a href="{{ route('payment-policy') }}">Payment Policy</a> &middot;
                 <a href="{{ route('cancellation-policy') }}">Cancellation &amp; Refund</a> &middot;
                 <a href="{{ route('dmca-policy') }}">DMCA</a> &middot;

@@ -139,11 +139,14 @@ class ClientReportCountsTest extends TestCase
     {
         $event = $this->event();
 
-        Booking::create([
+        // Booking now refuses this (OA-141), but rows like it already exist on
+        // the live site, so the report must still leave them out. Written
+        // around the model's rule to stand for that old data.
+        Booking::withoutEvents(fn () => Booking::create([
             'event_id' => $event->id, 'client_id' => $this->client->id,
             'created_by' => $this->client->id, 'supplier_id' => $this->client->id,
             'status' => 'completed', 'price' => 100, 'currency' => 'USD',
-        ]);
+        ]));
 
         $this->assertCount(0, $this->report()->professionals());
     }

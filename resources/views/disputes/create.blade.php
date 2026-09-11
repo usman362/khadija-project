@@ -71,6 +71,9 @@
                         If your event had several professionals, pick only the one you have a
                         problem with. The others are not affected.
                     </p>
+                    {{-- D-9's 14 days is enforced in store(), but not printed here:
+                         §12 bars party pages from stating a window (see
+                         DisputeScreensTest). Raised with Sir Peter. --}}
                     @error('booking_id') <p class="dsp-err">{{ $message }}</p> @enderror
                 </div>
 

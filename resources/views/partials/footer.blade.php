@@ -48,6 +48,7 @@
                 <h4>Policies</h4>
                 <ul>
                     <li><a href="{{ route('privacy-policy') }}">Privacy Policy</a></li>
+                    <li><a href="{{ route('terms-of-service') }}">Terms of Service</a></li>
                     <li><a href="{{ route('payment-policy') }}">Payment Policy</a></li>
                     <li><a href="{{ route('cancellation-policy') }}">Cancellation & Refund</a></li>
                     <li><a href="{{ route('dmca-policy') }}">DMCA Takedown Policy</a></li>
@@ -59,6 +60,7 @@
             <span>&copy; {{ date('Y') }} GigResource.com LLC. All rights reserved.</span>
             <span>
                 <a href="{{ route('privacy-policy') }}" style="color: var(--text-muted);">Privacy</a> &middot;
+                <a href="{{ route('terms-of-service') }}" style="color: var(--text-muted);">Terms</a> &middot;
                 <a href="{{ route('payment-policy') }}" style="color: var(--text-muted);">Payment</a> &middot;
                 <a href="{{ route('cancellation-policy') }}" style="color: var(--text-muted);">Cancellation</a>
             </span>

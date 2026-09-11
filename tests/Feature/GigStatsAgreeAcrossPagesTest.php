@@ -152,9 +152,11 @@ class GigStatsAgreeAcrossPagesTest extends TestCase
         $this->gig('confirmed', 'now');
 
         $other = User::factory()->create();
+        // A different client: one account cannot be both sides (OA-141).
+        $otherClient = User::factory()->create();
         Booking::create([
             'event_id'    => Event::first()->id,
-            'client_id'   => $other->id,
+            'client_id'   => $otherClient->id,
             'supplier_id' => $other->id,
             'created_by'  => $other->id,
             'status'      => 'confirmed',

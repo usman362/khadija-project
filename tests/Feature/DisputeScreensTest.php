@@ -127,7 +127,8 @@ class DisputeScreensTest extends TestCase
     {
         $this->actingAs($this->client)->post(route('disputes.store'), [
             'booking_id'       => $this->booking->id,
-            'taxonomy'         => 'fraud',
+            // One of PM-4's six (OA-148); 'fraud' is for staff to classify.
+            'taxonomy'         => 'payment_dispute',
             'summary'          => 'I believe the invoice they sent me was fabricated entirely.',
             'attempted_direct' => 'no',
             'certify_truthful' => '1',

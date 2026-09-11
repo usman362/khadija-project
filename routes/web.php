@@ -117,6 +117,19 @@ Route::get('/privacy-policy', function () {
     return view('policies.show', ['policy' => $policy, 'fallbackTitle' => 'Privacy Policy', 'policyType' => 'privacy_policy', 'existingSignature' => $existingSignature]);
 })->name('privacy-policy');
 
+// OA-137: every page that asks people to sign up links to the Terms. Shows the
+// approved text once Legal's version is loaded as a policy page; until then
+// the page says it is being finalised rather than inventing terms.
+Route::get('/terms-of-service', function () {
+    $policy = \App\Models\PolicyPage::findBySlug('terms-of-service');
+    $existingSignature = auth()->check()
+        ? \App\Models\PolicySignature::where('user_id', auth()->id())->where('policy_type', 'terms_of_service')->latest()->first()
+        : null;
+    // Nothing to sign until there is text to agree to.
+    $hasText = $policy && $policy->content;
+    return view('policies.show', ['policy' => $policy, 'fallbackTitle' => 'Terms of Service', 'policyType' => $hasText ? 'terms_of_service' : null, 'existingSignature' => $hasText ? $existingSignature : null]);
+})->name('terms-of-service');
+
 Route::get('/ai-agreement', function () {
     $policy = \App\Models\PolicyPage::findBySlug('ai-usage-agreement');
     $existingSignature = auth()->check()

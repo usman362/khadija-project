@@ -22,6 +22,8 @@
         <b>$0</b> to post. You only pay a single <b>$2.99</b> when you finalize
         with a professional.<br>
         Nothing is charged to post, and nothing if the request goes unfilled.
+        {{-- D-3, Sir Peter's answer of Sep 5. --}}
+        Once charged, the $2.99 is non-refundable.
     </p>
 
     <label class="rft-agree">

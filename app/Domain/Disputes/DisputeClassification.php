@@ -51,7 +51,25 @@ final class DisputeClassification
         'safety_concern'          => 'Safety Concern',
         'communication_issue'     => 'Communication Issue',
         'cancellation'            => 'Cancellation',
+        'other'                   => 'Other',
     ];
+
+    /**
+     * What the person filing chooses from: Sir Peter's PM-4 list (Sep 5),
+     * word for word and in his order (OA-148). Every key is also in TAXONOMY,
+     * so staff keep their fuller classification.
+     */
+    public const FILING_TYPES = [
+        'no_show'            => 'No-show',
+        'incomplete_service' => 'Service not as described',
+        'damage_claim'       => 'Property damage',
+        'late_arrival'       => 'Late arrival/departure',
+        'payment_dispute'    => 'Payment discrepancy',
+        'other'              => 'Other',
+    ];
+
+    /** D-9: days after the event ends in which a dispute can be opened. */
+    public const FILING_WINDOW_DAYS = 14;
 
     /* ── §5 Financial outcome — what happens to the held balance ── */
 

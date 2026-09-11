@@ -48,7 +48,7 @@
     .ep-pan { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; }
     .ep-pan h4 { font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; }
     .ep-rec { font-size: 12px; color: var(--text-secondary); line-height: 1.5; padding: 7px 0 7px 22px; position: relative; border-bottom: 1px dashed var(--border-color); }
-    .ep-rec:last-child { border-bottom: none; } .ep-rec::before { content: '✨'; position: absolute; left: 2px; top: 6px; }
+    .ep-rec:last-child { border-bottom: none; } .ep-rec::before { content: '•'; position: absolute; left: 2px; top: 6px; }
     .ep-mk { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--border-color); }
     .ep-mk:last-child { border-bottom: none; }
     .ep-mk-av { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--ep), var(--ep-strong)); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; flex-shrink: 0; }
@@ -120,7 +120,7 @@
     @if($isManual)
     {{-- Starter — hand-built checklist, no suggestions --}}
     <div class="ep-form-card">
-        <h3>🗓 Build My Checklist</h3>
+        <h3>Build My Checklist</h3>
         <div class="sub">Add each task yourself. Set a name, priority and due date. Fully yours.</div>
         <div id="epmRows" style="display:flex;flex-direction:column;gap:10px;"></div>
         <button type="button" id="epmAdd" style="margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--ep-strong);background:rgba(249,115,22,.09);border:1px solid rgba(249,115,22,.28);border-radius:10px;padding:9px 15px;cursor:pointer;font-family:inherit;">+ Add task</button>
@@ -129,7 +129,7 @@
     @else
     {{-- Interactive planner (Semi / Maximum) --}}
     <div class="ep-form-card">
-        <h3>🗓 Plan My Event</h3>
+        <h3>Plan My Event</h3>
         <div class="sub">{{ $isSemi ? "Enter your details and instantly drafts a plan you can adjust." : "Enter your details and we build the full milestone plan, vendor list and budget split." }}</div>
         <form id="epForm">
             <div class="ep-fgrid">
@@ -163,7 +163,7 @@
                     <input type="text" name="location" class="ep-inp" maxlength="200" placeholder="e.g. Baltimore, MD">
                 </div>
             </div>
-            <button type="submit" class="ep-go" id="epGo">{{ $isSemi ? '✨ Suggest My Plan' : '🤖 Build My Full Plan' }}</button>
+            <button type="submit" class="ep-go" id="epGo">{{ $isSemi ? 'Suggest My Plan' : 'Build My Full Plan' }}</button>
             <div class="ep-err" id="epErr"></div>
         </form>
     </div>
@@ -181,20 +181,20 @@
         <div class="ep-out-summary" id="epSummary"></div>
         <div class="ep-grid">
             <div class="ep-card">
-                <div class="ep-card-hd">✅ Milestone Plan</div>
+                <div class="ep-card-hd">Milestone Plan</div>
                 <div id="epMilestones" style="padding: 4px 16px;"></div>
             </div>
             <aside class="ep-rail">
                 <div class="ep-pan">
-                    <h4>🧩 Vendor Categories</h4>
+                    <h4>Vendor Categories</h4>
                     <div id="epVendors"></div>
                 </div>
                 <div class="ep-pan">
-                    <h4>💰 Budget Split</h4>
+                    <h4>Budget Split</h4>
                     <div id="epBudget"></div>
                 </div>
                 <div class="ep-pan">
-                    <h4>💡 Planning Tips</h4>
+                    <h4>Planning Tips</h4>
                     <div id="epTips"></div>
                 </div>
             </aside>
@@ -208,8 +208,7 @@
              invented: no borrowed wedding, no vendor the client never chose. --}}
         @if (! $snap->hasEvent())
             <div class="ep-card" style="text-align:center; padding:28px 20px;">
-                <div style="font-size:30px; line-height:1;">🗓️</div>
-                <h4 style="margin:10px 0 6px; font-size:16px;">No event to plan yet</h4>
+                <h4 style="margin:0 0 6px; font-size:16px;">No event to plan yet</h4>
                 <p style="margin:0 0 14px; color:var(--text-muted,#64748b); font-size:14px;">
                     Post an event and your dates, budget and booked professionals appear here.
                 </p>
@@ -220,9 +219,9 @@
             <div>
                 <h2>{{ $snap->event->title ?: 'Untitled event' }}</h2>
                 <div class="meta">
-                    @if($snap->event->starts_at)📅 {{ $snap->event->starts_at->format('M j, Y') }}@endif
-                    @if($snap->event->location) · 📍 {{ $snap->event->location }}@endif
-                    @if($snap->event->guest_count) · 👥 {{ $snap->event->guest_count }} guests @endif
+                    @if($snap->event->starts_at){{ $snap->event->starts_at->format('M j, Y') }}@endif
+                    @if($snap->event->location) · {{ $snap->event->location }}@endif
+                    @if($snap->event->guest_count) · {{ $snap->event->guest_count }} guests @endif
                     @if($snap->daysToEvent() !== null) · {{ $snap->daysToEvent() }} days to go @endif
                 </div>
             </div>
@@ -230,7 +229,7 @@
 
         <div class="ep-grid">
             <div class="ep-card">
-                <div class="ep-card-hd">🤝 Professionals you've booked</div>
+                <div class="ep-card-hd">Professionals you've booked</div>
                 @forelse($snap->vendors as $v)
                     <div class="ep-vd" style="display:flex; justify-content:space-between; padding:10px 14px; border-bottom:1px solid var(--border,#e2e8f0);">
                         <div><b>{{ $v['name'] }}</b><div style="font-size:13px; color:var(--text-muted,#64748b);">{{ $v['service'] }}</div></div>
@@ -246,7 +245,7 @@
             <aside>
                 @if($suggested->isNotEmpty())
                 <div class="ep-card">
-                    <div class="ep-card-hd">✨ Professionals in your state</div>
+                    <div class="ep-card-hd">Professionals in your state</div>
                     @foreach($suggested as $pro)
                         <div style="padding:10px 14px; border-bottom:1px solid var(--border,#e2e8f0);">
                             <b>{{ $pro->name }}</b>
@@ -257,7 +256,7 @@
                 @endif
 
                 <div class="ep-card">
-                    <div class="ep-card-hd">💡 Planning tips</div>
+                    <div class="ep-card-hd">Planning tips</div>
                     @foreach($tips as $t)<div class="ep-rec" style="padding-left:22px;">{{ $t }}</div>@endforeach
                 </div>
             </aside>
