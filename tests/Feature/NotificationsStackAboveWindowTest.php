@@ -46,21 +46,22 @@ class NotificationsStackAboveWindowTest extends TestCase
         $this->assertStringContainsString("right: {$w[1]}px !important; bottom: calc({$w[2]}px + min(600px, 58vh) + 12px) !important;", $layout);
         $this->assertStringContainsString("width: {$w[3]}px; min-width: {$w[3]}px; max-width: {$w[3]}px;", $layout);
 
-        // The shade is the site's own light grey, not a new colour.
-        $this->assertStringContainsString('color-mix(in srgb, var(--bg-primary, #f3f4f6) 80%, transparent)', $layout);
+        // Sir Peter: grey only around the two, not over the whole page, in
+        // the site's own light grey.
+        $this->assertStringNotContainsString('body.gr-stack::before', $layout);
+        $this->assertStringContainsString('background: var(--border-color, #e5e7eb); border-radius: 24px;', $layout);
     }
 
-    /** Found live: the shade covered the notifications, capped by the header's z-index. */
-    public function test_the_notifications_are_above_the_shade(): void
+    /** The backing sits under the header (so the bell's menu is above it) and under the windows. */
+    public function test_the_backing_sits_under_the_panels(): void
     {
         $layout = file_get_contents(resource_path('views/layouts/client.blade.php'));
+        preg_match('/#grStackBack \{ position: fixed; z-index: (\d+);/', $layout, $b);
+        preg_match('/\.cl-topbar \{[^}]*z-index: (\d+);/', $layout, $h);
 
-        preg_match('/body\.gr-stack::before \{[^}]*z-index: (\d+);/', $layout, $shade);
-        preg_match('/body\.gr-stack \.cl-topbar \{ z-index: (\d+); \}/', $layout, $header);
-
-        $this->assertCount(2, $shade);
-        $this->assertCount(2, $header);
-        $this->assertGreaterThan((int) $shade[1], (int) $header[1]);
-        $this->assertStringContainsString('body.gr-stack .cl-topbar-right > :not([data-notif-menu]) { opacity: .3; }', $layout);
+        $this->assertCount(2, $b);
+        $this->assertCount(2, $h);
+        $this->assertLessThan((int) $h[1], (int) $b[1]);
+        $this->assertStringContainsString('<div id="grStackBack" aria-hidden="true"></div>', $layout);
     }
 }

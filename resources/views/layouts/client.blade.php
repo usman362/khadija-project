@@ -321,28 +321,25 @@
         /*
          * Notifications with Messages or the AI assistant open (Sir Peter,
          * 2026-09-11): the notifications sit centred above the window, the
-         * same width, 12px apart, and the page behind fades under the site's
-         * own light grey so it stops competing for attention. The window
-         * gives up some height to make room. Desktop only; on a phone the
-         * window is already full screen.
+         * same width, 12px apart, and the two sit on one light grey backing
+         * (the site's own border grey), not a shade over the whole page
+         * ("just around the borders of the two sections"). The window gives
+         * up some height to make room. Desktop only; on a phone the window
+         * is already full screen.
          */
         @media (min-width: 521px) {
-            body.gr-stack::before { content: ''; position: fixed; inset: 0; z-index: 9990; pointer-events: none;
-                background: color-mix(in srgb, var(--bg-primary, #f3f4f6) 80%, transparent); }
             body.gr-stack .md-win, body.gr-stack .aic-panel { height: min(600px, 58vh) !important; }
-            /* The bell's menu lives in the sticky header, whose own z-index
-               (100) was the ceiling for it, so the shade covered the
-               notifications too. The header rises above the shade and fades
-               everything in it except the notifications. */
-            body.gr-stack .cl-topbar { z-index: 10001; }
-            body.gr-stack .cl-topbar > :not(.cl-topbar-right),
-            body.gr-stack .cl-topbar-right > :not([data-notif-menu]) { opacity: .3; }
             body.gr-stack .tbm[data-notif-menu] .tbm-pop {
                 position: fixed !important; left: auto !important; top: auto !important;
                 right: 24px !important; bottom: calc(24px + min(600px, 58vh) + 12px) !important;
                 width: 380px; min-width: 380px; max-width: 380px;
                 max-height: calc(100vh - min(600px, 58vh) - 60px); overflow-y: auto; z-index: 10001;
             }
+            /* Under the header (100), so the bell's menu stays on top of it,
+               and under both windows; sized to them by the script below. */
+            #grStackBack { position: fixed; z-index: 99; display: none; pointer-events: none;
+                background: var(--border-color, #e5e7eb); border-radius: 24px; }
+            body.gr-stack #grStackBack { display: block; }
         }
 
         /* After .cl-theme-toggle's own colour would win, so it is qualified. */
@@ -1579,15 +1576,38 @@
     @include('partials._ai_chatbot_widget', ['bubble' => false])
 
     {{-- Notifications + Messages/AI open together: stack them (see gr-stack above). --}}
+    <div id="grStackBack" aria-hidden="true"></div>
     <script>
     (function () {
         var notif = document.querySelector('.tbm[data-notif-menu]');
         if (! notif) return;
 
+        var back = document.getElementById('grStackBack');
+        var PAD = 10;
+
+        // The grey backing: one rounded rectangle around the notifications
+        // and the window, measured from the two themselves.
+        function fit() {
+            if (! back || ! document.body.classList.contains('gr-stack')) return;
+            var pop = notif.querySelector('.tbm-pop').getBoundingClientRect();
+            var winEl = document.querySelector('#msgDock.is-open .md-win') || document.querySelector('.aic-panel.open');
+            if (! winEl) return;
+            var win = winEl.getBoundingClientRect();
+            var left = Math.min(pop.left, win.left) - PAD, right = Math.max(pop.right, win.right) + PAD;
+            var top = Math.min(pop.top, win.top) - PAD, bottom = Math.max(pop.bottom, win.bottom) + PAD;
+            back.style.left = left + 'px';
+            back.style.top = top + 'px';
+            back.style.width = (right - left) + 'px';
+            back.style.height = (bottom - top) + 'px';
+        }
+
         function sync() {
             var windowOpen = !! document.querySelector('#msgDock.is-open:not(.is-min), .aic-panel.open');
             document.body.classList.toggle('gr-stack', notif.classList.contains('open') && windowOpen);
+            requestAnimationFrame(fit);
         }
+
+        window.addEventListener('resize', function () { requestAnimationFrame(fit); });
 
         var watch = new MutationObserver(sync);
         [notif, document.getElementById('msgDock'), document.getElementById('aiChatPanel')].forEach(function (el) {
