@@ -49,4 +49,18 @@ class NotificationsStackAboveWindowTest extends TestCase
         // The shade is the site's own light grey, not a new colour.
         $this->assertStringContainsString('color-mix(in srgb, var(--bg-primary, #f3f4f6) 80%, transparent)', $layout);
     }
+
+    /** Found live: the shade covered the notifications, capped by the header's z-index. */
+    public function test_the_notifications_are_above_the_shade(): void
+    {
+        $layout = file_get_contents(resource_path('views/layouts/client.blade.php'));
+
+        preg_match('/body\.gr-stack::before \{[^}]*z-index: (\d+);/', $layout, $shade);
+        preg_match('/body\.gr-stack \.cl-topbar \{ z-index: (\d+); \}/', $layout, $header);
+
+        $this->assertCount(2, $shade);
+        $this->assertCount(2, $header);
+        $this->assertGreaterThan((int) $shade[1], (int) $header[1]);
+        $this->assertStringContainsString('body.gr-stack .cl-topbar-right > :not([data-notif-menu]) { opacity: .3; }', $layout);
+    }
 }

@@ -330,6 +330,13 @@
             body.gr-stack::before { content: ''; position: fixed; inset: 0; z-index: 9990; pointer-events: none;
                 background: color-mix(in srgb, var(--bg-primary, #f3f4f6) 80%, transparent); }
             body.gr-stack .md-win, body.gr-stack .aic-panel { height: min(600px, 58vh) !important; }
+            /* The bell's menu lives in the sticky header, whose own z-index
+               (100) was the ceiling for it, so the shade covered the
+               notifications too. The header rises above the shade and fades
+               everything in it except the notifications. */
+            body.gr-stack .cl-topbar { z-index: 10001; }
+            body.gr-stack .cl-topbar > :not(.cl-topbar-right),
+            body.gr-stack .cl-topbar-right > :not([data-notif-menu]) { opacity: .3; }
             body.gr-stack .tbm[data-notif-menu] .tbm-pop {
                 position: fixed !important; left: auto !important; top: auto !important;
                 right: 24px !important; bottom: calc(24px + min(600px, 58vh) + 12px) !important;
