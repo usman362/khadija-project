@@ -966,6 +966,9 @@ Route::middleware('auth')->group(function () {
 
         // Client Profile & Settings
         Route::get('/profile', [ClientProfileController::class, 'index'])->name('client.profile.index');
+        // Account verification: upload an ID for the Verified Client badge (PM-14).
+        Route::get('/verification', [\App\Http\Controllers\Client\ClientVerificationController::class, 'show'])->name('client.verification.show');
+        Route::post('/verification', [\App\Http\Controllers\Client\ClientVerificationController::class, 'store'])->middleware('throttle:10,60')->name('client.verification.store');
         Route::patch('/profile/general', [ClientProfileController::class, 'updateGeneral'])->name('client.profile.update.general');
         Route::patch('/profile/company', [ClientProfileController::class, 'updateCompany'])->name('client.profile.update.company');
         Route::patch('/profile/social', [ClientProfileController::class, 'updateSocial'])->name('client.profile.update.social');
@@ -1307,6 +1310,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/verifications', [\App\Http\Controllers\Dashboard\AdminVerificationController::class, 'index'])->name('app.admin.verifications.index');
         Route::post('/verifications/{profile}/approve', [\App\Http\Controllers\Dashboard\AdminVerificationController::class, 'approve'])->name('app.admin.verifications.approve');
         Route::post('/verifications/{profile}/reject', [\App\Http\Controllers\Dashboard\AdminVerificationController::class, 'reject'])->name('app.admin.verifications.reject');
+        // A client's ID is on the private disk, so it is streamed to admins rather than linked.
+        Route::get('/verifications/{profile}/identity', [\App\Http\Controllers\Dashboard\AdminVerificationController::class, 'identityDocument'])->name('app.admin.verifications.identity');
 
         // Policy Pages
         Route::get('/policies', [AdminPolicyController::class, 'index'])->name('app.admin.policies.index');

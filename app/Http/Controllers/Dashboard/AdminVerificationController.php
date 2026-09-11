@@ -20,7 +20,14 @@ use Illuminate\View\View;
  */
 class AdminVerificationController extends Controller
 {
-    private const BADGES = ['trade_license', 'liability_insurance', 'workers_comp'];
+    // 'identity' is the client's account verification (PM-14 Verified Client).
+    // Its document is on the PRIVATE disk; the others are on the public one.
+    private const BADGES = ['trade_license', 'liability_insurance', 'workers_comp', 'identity'];
+
+    private static function diskFor(string $badge): string
+    {
+        return $badge === 'identity' ? 'local' : 'public';
+    }
 
     public function index(Request $request): View
     {
@@ -86,6 +93,14 @@ class AdminVerificationController extends Controller
         return back()->with('status', ucfirst(str_replace('_', ' ', $validated['badge'])) . ' approved for ' . $profile->user->name . '.');
     }
 
+    /** The client's ID, streamed from the private disk to an administrator. */
+    public function identityDocument(UserProfile $profile)
+    {
+        abort_unless($profile->identity_doc && Storage::disk('local')->exists($profile->identity_doc), 404);
+
+        return Storage::disk('local')->response($profile->identity_doc);
+    }
+
     public function reject(Request $request, UserProfile $profile): RedirectResponse
     {
         $validated = $request->validate([
@@ -96,14 +111,18 @@ class AdminVerificationController extends Controller
         $docCol = "{$badge}_doc";
 
         if ($profile->$docCol) {
-            Storage::disk('public')->delete($profile->$docCol);
+            Storage::disk(self::diskFor($badge))->delete($profile->$docCol);
         }
 
         $profile->update([
             $docCol => null,
             "{$badge}_number" => null,
             "{$badge}_verified_at" => null,
-        ]);
+        ] + ($badge === 'identity' ? [
+            // What the client reads on their verification page.
+            'identity_submitted_at'  => null,
+            'identity_rejected_note' => 'We could not verify that ID. Please send a clear photo of a valid ID in your own name.',
+        ] : []));
 
         return back()->with('status', ucfirst(str_replace('_', ' ', $badge)) . ' rejected, document removed.');
     }

@@ -37,6 +37,7 @@
                     <th>Trade License</th>
                     <th>Liability Insurance</th>
                     <th>Workers' Comp</th>
+                    <th>Client ID</th>
                     <th>Last Update</th>
                 </tr>
                 </thead>
@@ -47,12 +48,16 @@
                             <div class="fw-semibold">{{ $profile->user?->name ?? 'Unknown' }}</div>
                             <div class="text-muted small">{{ $profile->user?->email }}</div>
                         </td>
-                        @foreach(['trade_license', 'liability_insurance', 'workers_comp'] as $badge)
+                        @foreach(['trade_license', 'liability_insurance', 'workers_comp', 'identity'] as $badge)
                             @php
                                 $status = $profile->badgeStatus($badge);
                                 $doc = $profile->{"{$badge}_doc"};
                                 $number = $profile->{"{$badge}_number"};
                                 $verifiedAt = $profile->{"{$badge}_verified_at"};
+                                // A client's ID is on the private disk, streamed to admins only.
+                                $docUrl = $badge === 'identity'
+                                    ? route('app.admin.verifications.identity', $profile)
+                                    : asset('storage/' . $doc);
                             @endphp
                             <td style="min-width:220px;">
                                 @if($status === 'verified')
@@ -61,7 +66,7 @@
                                         <small class="text-muted">{{ $verifiedAt->format('M d, Y') }}</small>
                                     </div>
                                     @if($number)<div class="small text-muted">#{{ $number }}</div>@endif
-                                    <a href="{{ asset('storage/' . $doc) }}" target="_blank" class="small">View doc</a>
+                                    <a href="{{ $docUrl }}" target="_blank" class="small">View doc</a>
                                     <form method="POST" action="{{ route('app.admin.verifications.reject', $profile) }}" class="d-inline">
                                         @csrf
                                         <input type="hidden" name="badge" value="{{ $badge }}">
@@ -71,7 +76,7 @@
                                 @elseif($status === 'pending')
                                     <div class="mb-1"><span class="badge bg-warning text-dark">Pending</span></div>
                                     @if($number)<div class="small text-muted">#{{ $number }}</div>@endif
-                                    <a href="{{ asset('storage/' . $doc) }}" target="_blank" class="small d-block mb-2">View document →</a>
+                                    <a href="{{ $docUrl }}" target="_blank" class="small d-block mb-2">View document →</a>
                                     <div class="d-flex gap-1">
                                         <form method="POST" action="{{ route('app.admin.verifications.approve', $profile) }}">
                                             @csrf

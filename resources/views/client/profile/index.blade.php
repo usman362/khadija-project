@@ -243,6 +243,17 @@
             <div class="pf-avatar-name">{{ $user->name }}</div>
             <div class="pf-avatar-email">{{ $user->email }}</div>
             <span class="pf-avatar-role">Client</span>
+            {{-- Account verification, where a client looks for it. --}}
+            @php $__vs = \App\Http\Controllers\Client\ClientVerificationController::statusOf($user->getOrCreateProfile()); @endphp
+            <div style="margin-top:8px;font-size:12.5px;">
+                @if($__vs === 'verified')
+                    <span style="color:#166534;font-weight:700;">✓ Verified account</span>
+                @elseif($__vs === 'pending')
+                    <a href="{{ route('client.verification.show') }}" style="color:#92400e;font-weight:700;">ID being reviewed</a>
+                @else
+                    <a href="{{ route('client.verification.show') }}" style="color:#ea580c;font-weight:700;">Verify your identity</a>
+                @endif
+            </div>
 
             {{-- Idea 1 (Sir Peter): the permanent account reference. Shown
                  where a client would look for it when support asks, and

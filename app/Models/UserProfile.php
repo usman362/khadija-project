@@ -101,6 +101,12 @@ class UserProfile extends Model
         'workers_comp_number',
         'workers_comp_doc',
         'workers_comp_verified_at',
+        // Client account verification (PM-14 Verified Client)
+        'identity_number',
+        'identity_doc',
+        'identity_submitted_at',
+        'identity_verified_at',
+        'identity_rejected_note',
         // Address verification (§7.3–7.5)
         'address_status',
         'address_verification_attempts',
@@ -134,6 +140,8 @@ class UserProfile extends Model
             'liability_insurance_expires_on' => 'date',
             'liability_insurance_coverage' => 'integer',
             'workers_comp_verified_at' => 'datetime',
+            'identity_submitted_at' => 'datetime',
+            'identity_verified_at' => 'datetime',
             'address_flagged_home' => 'boolean',
             'address_verification_attempts' => 'integer',
             'address_verified_at' => 'datetime',

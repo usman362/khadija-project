@@ -220,6 +220,24 @@ final class FormRegistry
                 ],
             ],
 
+            /* ── Account verification (clients) ─────────────────── */
+            // Opens its own page: an ID upload is not a text form, and the
+            // file goes to the private disk. See ClientVerificationController.
+            'identity_verification' => [
+                'title'    => 'Verify Your Identity',
+                'row'      => null,
+                'audience' => self::CLIENT,
+                'purpose'  => 'Verify your ID to get the Verified Client badge.',
+                'route'    => 'client.verification.show',
+                'fields'   => [
+                    ['name' => 'document_type', 'label' => 'Type of ID', 'type' => 'select', 'required' => true,
+                     'options' => \App\Http\Controllers\Client\ClientVerificationController::TYPES],
+                    ['name' => 'document', 'label' => 'Photo or scan of your ID', 'type' => 'text', 'required' => true],
+                    ['name' => 'certify', 'type' => 'certification', 'required' => true,
+                     'text' => 'This is my own, valid ID, and the name on it is the name on my account.'],
+                ],
+            ],
+
             /* ── Row 237 — Influencer Program Application ─────── */
             'influencer_application' => [
                 'title'    => 'Apply to the Influencer Program',
@@ -385,6 +403,11 @@ final class FormRegistry
     /** The link to open a form, addressed by its name. */
     public static function url(string $key): string
     {
+        // A form with a page of its own opens that page.
+        if ($route = self::get($key)['route'] ?? null) {
+            return route($route);
+        }
+
         return route('forms.create', self::slugFor($key));
     }
 
@@ -445,7 +468,7 @@ final class FormRegistry
         'account' => [
             'label' => 'Account & Verification',
             'blurb' => 'Verification, program applications and campaign plans.',
-            'keys'  => ['elite_verification', 'influencer_application', 'campaign_plan'],
+            'keys'  => ['elite_verification', 'identity_verification', 'influencer_application', 'campaign_plan'],
         ],
         'safety' => [
             'label' => 'Safety & Support',

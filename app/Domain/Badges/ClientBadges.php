@@ -63,12 +63,14 @@ final class ClientBadges
         return [
             /*
              * Verified Client: "automatic on ID verification completion".
-             * There is no ID verification for clients on the platform yet, so
-             * nobody has completed one and nobody holds this badge. It is not
-             * approximated with email or address checks: that would put a
-             * "Verified" label on something that was never verified.
+             * Completion is the team approving the ID the client uploaded
+             * (ClientVerificationController). Not approximated with email or
+             * address checks: that would put a "Verified" label on something
+             * that was never verified.
              */
-            'id_verified' => 0,
+            'id_verified' => \App\Models\UserProfile::where('user_id', $client->id)
+                ->whereNotNull('identity_verified_at')
+                ->exists() ? 1 : 0,
 
             // Frequent Planner: completed EVENTS, not bookings. Three
             // professionals at one wedding are one event.

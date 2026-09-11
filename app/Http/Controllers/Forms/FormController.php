@@ -175,8 +175,14 @@ class FormController extends Controller
         };
     }
 
-    public function create(Request $request, string $key): View
+    public function create(Request $request, string $key): View|RedirectResponse
     {
+        // A form with a page of its own (identity verification) opens there.
+        $own = FormRegistry::get(FormRegistry::keyFor($key) ?? $key)['route'] ?? null;
+        if ($own) {
+            return redirect()->route($own);
+        }
+
         $user       = $request->user();
         /*
          * The URL carries the form's NAME now ("share-your-story"), not its
