@@ -275,7 +275,8 @@
                 <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-color);text-align:center;">
                     <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">Badges</div>
                     <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px 10px;">
-                        @foreach($__badges as $b)
+                        {{-- A handful here; the full list has its own page. --}}
+                        @foreach($__badges->take(6) as $b)
                             <x-hex-badge
                                 :icon="$b['icon']"
                                 :label="$b['name']"
@@ -286,6 +287,9 @@
                             />
                         @endforeach
                     </div>
+                    <a href="{{ route('client.badges.index') }}" style="display:inline-block;margin-top:10px;font-size:12.5px;font-weight:700;color:#ea580c;">
+                        See all badges ({{ $__badges->where('earned', true)->count() }} of {{ $__badges->count() }} earned)
+                    </a>
                 </div>
             @endif
             @if($user->avatar)

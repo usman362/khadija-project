@@ -968,6 +968,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/profile', [ClientProfileController::class, 'index'])->name('client.profile.index');
         // Account verification: upload an ID for the Verified Client badge (PM-14).
         Route::get('/verification', [\App\Http\Controllers\Client\ClientVerificationController::class, 'show'])->name('client.verification.show');
+        // Every badge, earned or not, with progress (Sir Peter, 2026-09-11).
+        Route::get('/badges', [\App\Http\Controllers\Client\ClientBadgeController::class, 'index'])->name('client.badges.index');
         Route::post('/verification', [\App\Http\Controllers\Client\ClientVerificationController::class, 'store'])->middleware('throttle:10,60')->name('client.verification.store');
         Route::patch('/profile/general', [ClientProfileController::class, 'updateGeneral'])->name('client.profile.update.general');
         Route::patch('/profile/company', [ClientProfileController::class, 'updateCompany'])->name('client.profile.update.company');
