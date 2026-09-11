@@ -318,6 +318,26 @@
         }
 
         /* ═══════════════════════ THEME TOGGLE ═══════════════════════ */
+        /*
+         * Notifications with Messages or the AI assistant open (Sir Peter,
+         * 2026-09-11): the notifications sit centred above the window, the
+         * same width, 12px apart, and the page behind fades under the site's
+         * own light grey so it stops competing for attention. The window
+         * gives up some height to make room. Desktop only; on a phone the
+         * window is already full screen.
+         */
+        @media (min-width: 521px) {
+            body.gr-stack::before { content: ''; position: fixed; inset: 0; z-index: 9990; pointer-events: none;
+                background: color-mix(in srgb, var(--bg-primary, #f3f4f6) 80%, transparent); }
+            body.gr-stack .md-win, body.gr-stack .aic-panel { height: min(600px, 58vh) !important; }
+            body.gr-stack .tbm[data-notif-menu] .tbm-pop {
+                position: fixed !important; left: auto !important; top: auto !important;
+                right: 24px !important; bottom: calc(24px + min(600px, 58vh) + 12px) !important;
+                width: 380px; min-width: 380px; max-width: 380px;
+                max-height: calc(100vh - min(600px, 58vh) - 60px); overflow-y: auto; z-index: 10001;
+            }
+        }
+
         /* After .cl-theme-toggle's own colour would win, so it is qualified. */
         .cl-theme-toggle.cl-ai-toggle { color: #7c3aed; }
         .cl-theme-toggle {
@@ -1550,6 +1570,24 @@
     {{-- AI Chatbot floating widget --}}
     {{-- Opened from the header icon; no floating bubble on the client side. --}}
     @include('partials._ai_chatbot_widget', ['bubble' => false])
+
+    {{-- Notifications + Messages/AI open together: stack them (see gr-stack above). --}}
+    <script>
+    (function () {
+        var notif = document.querySelector('.tbm[data-notif-menu]');
+        if (! notif) return;
+
+        function sync() {
+            var windowOpen = !! document.querySelector('#msgDock.is-open:not(.is-min), .aic-panel.open');
+            document.body.classList.toggle('gr-stack', notif.classList.contains('open') && windowOpen);
+        }
+
+        var watch = new MutationObserver(sync);
+        [notif, document.getElementById('msgDock'), document.getElementById('aiChatPanel')].forEach(function (el) {
+            if (el) watch.observe(el, { attributes: true, attributeFilter: ['class'] });
+        });
+    })();
+    </script>
 
     <script>
         // Close sidebar on mobile when clicking outside
