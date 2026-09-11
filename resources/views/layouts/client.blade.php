@@ -4,6 +4,8 @@
 <head>
     {{-- Anti-FOUC: apply the saved theme BEFORE first paint so there's no light/dark flash. --}}
     <script>(function(){try{var t=localStorage.getItem('cl-theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+    {{-- The left menu's icons-only state, also before first paint (Sir Peter, 2026-09-12). --}}
+    <script>(function(){try{if(localStorage.getItem('cl-side')==='mini')document.documentElement.classList.add('cl-side-mini');}catch(e){}})();</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -622,6 +624,39 @@
         .cl-user-info { flex: 1; min-width: 0; }
         .cl-user-name { font-size: 13px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .cl-user-role { font-size: 11px; color: var(--text-muted); }
+
+        /*
+         * Icons only (Sir Peter, 2026-09-12): the left menu folds to its icons,
+         * like the Messages page's right column folds away. Names show on
+         * hover; the choice is remembered. PC and laptop only: on a phone the
+         * menu is already off-canvas.
+         */
+        .cl-side-toggle { display: flex; align-items: center; gap: 10px; width: 100%; margin: 0 0 8px;
+            padding: 8px 10px; border: 0; border-radius: var(--radius-sm); background: none; cursor: pointer;
+            font: inherit; font-size: 12px; font-weight: 600; color: var(--text-muted); text-align: left; white-space: nowrap; }
+        .cl-side-toggle:hover { background: rgba(0, 0, 0, 0.035); color: var(--text-primary); }
+        .cl-side-toggle svg { width: 17px; height: 17px; flex-shrink: 0; transition: transform .2s; }
+        @media (min-width: 769px) {
+            html.cl-side-mini .cl-sidebar { width: var(--sidebar-collapsed); }
+            html.cl-side-mini .cl-main { margin-left: var(--sidebar-collapsed); }
+            html.cl-side-mini .cl-sidebar-brand { padding: 0; justify-content: center; }
+            html.cl-side-mini .cl-sidebar-brand .brand-logo-img { max-width: 34px; object-fit: cover; object-position: left center; }
+            html.cl-side-mini .cl-sidebar-nav { padding: 12px 10px; }
+            /* Section names become a thin line, so the groups still read as groups. */
+            html.cl-side-mini .cl-nav-label { font-size: 0; padding: 0; margin: 8px 6px; border-top: 1px solid var(--border-color); }
+            html.cl-side-mini .cl-nav-link { font-size: 0; justify-content: center; gap: 0; padding: 9px 0; }
+            html.cl-side-mini .cl-nav-link span { font-size: 0; }
+            html.cl-side-mini .cl-nav-link[data-coming-soon]::after,
+            html.cl-side-mini .cl-nav-badge:not(.cl-nav-badge-count) { display: none; }
+            /* An unread count shrinks to a dot on the icon. */
+            html.cl-side-mini .cl-nav-badge.cl-nav-badge-count { position: absolute; top: 4px; right: 12px; width: 9px; height: 9px; font-size: 0; }
+            html.cl-side-mini .cl-sidebar-footer { padding: 12px 10px; }
+            html.cl-side-mini .cl-side-toggle { justify-content: center; font-size: 0; gap: 0; padding: 9px 0; }
+            html.cl-side-mini .cl-side-toggle svg { transform: rotate(180deg); }
+            html.cl-side-mini .cl-user-card { justify-content: center; padding: 6px 0; }
+            html.cl-side-mini .cl-user-info { display: none; }
+        }
+        @media (max-width: 768px) { .cl-side-toggle { display: none; } }
 
         /* ═══════════════════════ MAIN CONTENT ═══════════════════════ */
         .cl-main {
@@ -1476,6 +1511,10 @@
             <span>Contact Support</span>
         </a>
         <div class="cl-sidebar-footer">
+            <button type="button" class="cl-side-toggle" data-side-mini aria-label="Show icons only" title="Show icons only">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><polyline points="16 15 13 12 16 9"/></svg>
+                <span>Collapse menu</span>
+            </button>
             <a href="{{ route('client.profile.index') }}" class="cl-user-card" title="View profile">
                 <div class="cl-user-avatar"><img src="{{ auth()->user()?->avatar_url }}" alt="" style="width:100%;height:100%;border-radius:inherit;object-fit:cover;display:block;"></div>
                 <div class="cl-user-info">
@@ -1574,6 +1613,34 @@
     {{-- AI Chatbot floating widget --}}
     {{-- Opened from the header icon; no floating bubble on the client side. --}}
     @include('partials._ai_chatbot_widget', ['bubble' => false])
+
+    {{-- The left menu's icons-only switch (see cl-side-mini above). --}}
+    <script>
+    (function () {
+        var btn = document.querySelector('[data-side-mini]');
+        if (! btn) return;
+        var root = document.documentElement;
+
+        // With the names hidden, each icon says what it is on hover.
+        document.querySelectorAll('.cl-sidebar .cl-nav-link').forEach(function (a) {
+            if (! a.getAttribute('title')) a.setAttribute('title', a.textContent.replace(/\s+/g, ' ').trim());
+        });
+
+        function label() {
+            var mini = root.classList.contains('cl-side-mini');
+            btn.setAttribute('aria-label', mini ? 'Show the full menu' : 'Show icons only');
+            btn.setAttribute('title', mini ? 'Show the full menu' : 'Show icons only');
+            btn.setAttribute('aria-pressed', mini ? 'true' : 'false');
+        }
+
+        btn.addEventListener('click', function () {
+            root.classList.toggle('cl-side-mini');
+            try { localStorage.setItem('cl-side', root.classList.contains('cl-side-mini') ? 'mini' : 'full'); } catch (e) {}
+            label();
+        });
+        label();
+    })();
+    </script>
 
     {{-- Notifications + Messages/AI open together: stack them (see gr-stack above). --}}
     <div id="grStackBack" aria-hidden="true"></div>
