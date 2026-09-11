@@ -444,7 +444,7 @@ final class FormRegistry
         ],
         'account' => [
             'label' => 'Account & Verification',
-            'blurb' => 'Verification, programme applications and campaign plans.',
+            'blurb' => 'Verification, program applications and campaign plans.',
             'keys'  => ['elite_verification', 'influencer_application', 'campaign_plan'],
         ],
         'safety' => [
