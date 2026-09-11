@@ -427,10 +427,13 @@
     .od-empty-illus { padding: 26px 12px; text-align: center; color: var(--text-muted); font-size: 13px; }
     .od-empty-illus svg { width: 64px; height: 64px; opacity: 0.5; margin-bottom: 8px; }
 
-    /* To-Do List + Attendee Management + Achievements + Activity row */
+    /* To-Do List + Attendee Management + Recent Activity.
+       Three cards: the Achievements card that made this four columns is gone,
+       and a fourth, empty column was leaving a gap on the right and squeezing
+       Recent Activity into the narrowest one. */
     .od-row-3 {
         display: grid;
-        grid-template-columns: 1fr 1.55fr 0.95fr 1.05fr;
+        grid-template-columns: 1fr 1.2fr 1.4fr;
         gap: 14px;
         margin-bottom: 16px;
         align-items: start;
@@ -534,12 +537,13 @@
     .od-activity-ico.amber { background: rgba(245, 158, 11, 0.15); color: var(--warn-text); }
     .od-activity-body { flex: 1; min-width: 0; }
     .od-activity-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
-    .od-activity-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; display: flex; gap: 8px; align-items: center; }
+    .od-activity-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
     .od-activity-time { white-space: nowrap; }
 
     @media (max-width: 1500px) {
         .od-top { grid-template-columns: 1fr; }
         .od-row-3 { grid-template-columns: 1fr 1fr; }
+        .od-row-3 > .od-a-activity { grid-column: 1 / -1; }
     }
     @media (max-width: 1100px) {
         .od-stats { grid-template-columns: repeat(2, 1fr); }
@@ -1333,7 +1337,7 @@
          rule yet; the rulebook is PM-14 and is still being written. When it
          exists, the honest card above is where the count belongs. --}}
 
-    <div class="od-card">
+    <div class="od-card od-a-activity">
         <div class="od-card-head">
             <span class="od-card-title">Recent Activity</span>
         </div>
