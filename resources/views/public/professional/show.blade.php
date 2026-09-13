@@ -839,6 +839,16 @@
                         <span class="pp-tag new-vendor">✨ New Vendor</span>
                     @endif
                 </div>
+                {{-- An independent research link, not an endorsement: BBB's public
+                     search, no account or data feed (PM answers, Sep 6 §8). --}}
+                @php $__bbbName = trim((string) ($pro->profile?->company_name ?: $pro->name)); @endphp
+                @if($__bbbName !== '')
+                    <a class="pp-bbb" href="https://www.bbb.org/search?find_country=USA&amp;find_text={{ urlencode($__bbbName) }}"
+                       target="_blank" rel="noopener nofollow"
+                       style="display:inline-block;margin-top:8px;font-size:12.5px;color:var(--muted,#6b7280);text-decoration:underline;">
+                        Research this business on BBB.org
+                    </a>
+                @endif
             </div>
             <div class="pp-hero-cta">
                 <a href="{{ $primaryHref }}" class="pp-btn pp-btn-primary">

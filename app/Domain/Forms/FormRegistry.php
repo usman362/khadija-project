@@ -238,6 +238,48 @@ final class FormRegistry
                 ],
             ],
 
+            /* ── D-28 / PM-11: the three forms still owed (PM answers, Sep 6) ── */
+            // The dispute form already exists on the Disputes page, with the
+            // same PM-4 issue types; this card opens it rather than a copy.
+            'contract_dispute' => [
+                'title'    => 'Contract Dispute',
+                'row'      => null,
+                'audience' => self::ANYONE,
+                'purpose'  => 'Report a problem with a booking: a no-show, damage, or a payment that does not match.',
+                'route'    => 'disputes.create',
+                'fields'   => [
+                    ['name' => 'booking_id', 'label' => 'Which booking', 'type' => 'booking', 'required' => true],
+                ],
+            ],
+            'feature_request' => [
+                'title'    => 'Feature Request',
+                'row'      => null,
+                'audience' => self::ANYONE,
+                'purpose'  => 'Suggest something GigResource should add or change.',
+                'fields'   => [
+                    ['name' => 'title', 'label' => 'Title', 'type' => 'text', 'required' => true,
+                     'note' => 'One line that sums up the idea.'],
+                    ['name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'required' => true,
+                     'note' => 'What you would like, and what it would help you do.'],
+                    ['name' => 'user_type', 'label' => 'You are a', 'type' => 'select', 'required' => true,
+                     'options' => ['client' => 'Client', 'professional' => 'Professional', 'influencer' => 'Influencer', 'other' => 'Other']],
+                ],
+            ],
+            'partnership_inquiry' => [
+                'title'    => 'Partnership / Business Inquiry',
+                'row'      => null,
+                'audience' => self::ANYONE,
+                'purpose'  => 'Talk to us about working together.',
+                'fields'   => [
+                    ['name' => 'company', 'label' => 'Company name', 'type' => 'text', 'required' => true],
+                    ['name' => 'contact', 'label' => 'Contact info', 'type' => 'text', 'required' => true,
+                     'note' => 'The best email or phone number to reach you.'],
+                    ['name' => 'inquiry_type', 'label' => 'Inquiry type', 'type' => 'select', 'required' => true,
+                     'options' => ['partnership' => 'Partnership', 'sponsorship' => 'Sponsorship', 'vendor' => 'Supplier or vendor', 'press' => 'Press or media', 'other' => 'Something else']],
+                    ['name' => 'message', 'label' => 'Message', 'type' => 'textarea', 'required' => true],
+                ],
+            ],
+
             /* ── Row 237 — Influencer Program Application ─────── */
             'influencer_application' => [
                 'title'    => 'Apply to the Influencer Program',
@@ -473,7 +515,12 @@ final class FormRegistry
         'safety' => [
             'label' => 'Safety & Support',
             'blurb' => 'Help from our team, reporting content, and telling us how it went.',
-            'keys'  => ['support_request', 'content_report', 'testimonial'],
+            'keys'  => ['support_request', 'content_report', 'testimonial', 'contract_dispute'],
+        ],
+        'ideas' => [
+            'label' => 'Ideas & Partnerships',
+            'blurb' => 'Suggest a feature, or talk to us about working together.',
+            'keys'  => ['feature_request', 'partnership_inquiry'],
         ],
     ];
 

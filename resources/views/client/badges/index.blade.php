@@ -38,7 +38,7 @@
 <div class="bdg-grid">
     @foreach($badges as $b)
         <div class="bdg-card {{ $b['earned'] ? 'is-earned' : '' }}">
-            <x-hex-badge :icon="$b['icon']" :colour="$b['colour'] ?? '#2563eb'" :earned="$b['earned']" :size="52" />
+            <x-hex-badge flat :icon="$b['icon']" :colour="$b['colour'] ?? '#2563eb'" :earned="$b['earned']" :size="52" />
             <div style="flex:1;min-width:0;">
                 <h4>{{ $b['name'] }}</h4>
                 <p>{{ $b['blurb'] }}</p>

@@ -24,6 +24,9 @@ final class Award
     /** Open the agreement for this proposal, or pick up the one already open. */
     public static function openFinalization(Bid $bid): Finalization
     {
+        // OA-104: in regulated categories only a Verified professional's bid.
+        RegulatedAcceptance::ensure($bid);
+
         return Finalization::firstOrCreate(
             ['event_id' => $bid->event_id, 'supplier_id' => $bid->supplier_id, 'category_id' => $bid->category_id],
             [
@@ -46,6 +49,10 @@ final class Award
      */
     public static function book(Finalization $f, string $notes): Booking
     {
+        if ($f->bid) {
+            RegulatedAcceptance::ensure($f->bid);
+        }
+
         $booking = Booking::updateOrCreate(
             ['event_id' => $f->event_id, 'supplier_id' => $f->supplier_id, 'category_id' => $f->category_id],
             [

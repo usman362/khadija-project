@@ -82,8 +82,13 @@ class ClientBadgesAreEarnedTest extends TestCase
             collect(config('badges.client'))->pluck('name')->all(),
         );
 
+        // Colours from the PM's answers of Sep 6: distinct, to tell apart at a glance.
+        $this->assertSame(
+            ['#2F6FED', '#2E9E5B', '#1B8A8A', '#C99A2E'],
+            collect(config('badges.client'))->pluck('colour')->all(),
+        );
+
         foreach (config('badges.client') as $b) {
-            $this->assertSame('#2563eb', $b['colour'], "{$b['name']} is not brand blue");
             $this->assertStringStartsWith('<svg', $b['icon'], "{$b['name']} is not a flat icon");
         }
     }

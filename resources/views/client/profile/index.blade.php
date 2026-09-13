@@ -277,7 +277,7 @@
                     <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px 10px;">
                         {{-- A handful here; the full list has its own page. --}}
                         @foreach($__badges->take(6) as $b)
-                            <x-hex-badge
+                            <x-hex-badge flat
                                 :icon="$b['icon']"
                                 :label="$b['name']"
                                 :colour="$b['colour'] ?? '#2563eb'"

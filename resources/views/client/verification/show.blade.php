@@ -40,7 +40,7 @@
     <div class="vf-card">
         <div class="vf-head">
             @if($vc)
-                <x-hex-badge :icon="$vc['icon']" :colour="$vc['colour']" :earned="$status === 'verified'" :size="52" />
+                <x-hex-badge flat :icon="$vc['icon']" :colour="$vc['colour']" :earned="$status === 'verified'" :size="52" />
             @endif
             <div>
                 <h3>Verified Client</h3>

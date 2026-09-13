@@ -31,8 +31,8 @@
         @foreach($client as $b)
             <div class="bg-item">
                 <div class="bg-pair">
-                    <div><x-hex-badge :icon="$b['icon']" :colour="$b['colour'] ?? '#2563eb'" :size="56" /><small>Earned</small></div>
-                    <div><x-hex-badge :icon="$b['icon']" :colour="$b['colour'] ?? '#2563eb'" :earned="false" :size="56" /><small>Not yet</small></div>
+                    <div><x-hex-badge flat :icon="$b['icon']" :colour="$b['colour'] ?? '#2563eb'" :size="56" /><small>Earned</small></div>
+                    <div><x-hex-badge flat :icon="$b['icon']" :colour="$b['colour'] ?? '#2563eb'" :earned="false" :size="56" /><small>Not yet</small></div>
                 </div>
                 <h6>{{ $b['name'] }}</h6>
                 <p>{{ $b['blurb'] }}</p>
