@@ -54,7 +54,7 @@
             @if($submission->submitter?->public_id)
                 <p class="dsp-hint" style="margin-top:4px;">
                     {{ $submission->submitted_by === auth()->id() ? 'Your' : "Their" }}
-                    GigResource ID: <b style="user-select:all;">{{ $submission->submitter->public_id }}</b>
+                    GigResource ID: <b style="user-select:all;">{{ \App\Support\GigResourceId::display($submission->submitter->public_id) }}</b>
                 </p>
             @endif
         </div>

@@ -51,7 +51,7 @@ class ClientBookingController extends Controller
             ->with([
                 'event:id,title,starts_at,ends_at,location,venue,guest_count,event_type,description',
                 'event.categories:id,name',
-                'supplier:id,name,email',
+                'supplier:id,name,email,public_id',
                 'supplier.profile:id,user_id,city,state,trade_license_verified_at,liability_insurance_verified_at,liability_insurance_expires_on',
                 // The contract itself. There is a real agreements table behind
                 // this, with a PDF service and a both-parties-accepted gate on
@@ -184,7 +184,10 @@ class ClientBookingController extends Controller
 
     private function base($user)
     {
-        return Booking::where('client_id', $user->id);
+        // A booking where the client is their own professional is test data,
+        // never a real booking (OA-141 / OA-154); it is not listed.
+        return Booking::where('client_id', $user->id)
+            ->where(fn ($q) => $q->whereNull('supplier_id')->orWhereColumn('supplier_id', '!=', 'client_id'));
     }
 
     /**

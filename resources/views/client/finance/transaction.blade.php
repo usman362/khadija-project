@@ -97,7 +97,7 @@
             @if ($booking->supplier?->public_id)
                 <div class="tx-line">
                     <span class="l">GigResource ID</span>
-                    <span class="v" style="user-select:all;">{{ $booking->supplier->public_id }}</span>
+                    <span class="v" style="user-select:all;">{{ \App\Support\GigResourceId::display($booking->supplier->public_id) }}</span>
                 </div>
             @endif
             <div class="tx-line">

@@ -76,7 +76,13 @@ class Booking extends Model
         // shown as their own hired professional, with "Message" and "Confirm"
         // offered to themselves.
         static::saving(function (self $booking) {
-            if ($booking->client_id && $booking->client_id === $booking->supplier_id) {
+            // Only when the parties are being set. An old row that already has
+            // the same account on both sides must not turn a status change into
+            // an error on the client's screen (OA-154); it is left out of lists
+            // and removed with bookings:purge-self-referential instead.
+            $settingParties = ! $booking->exists || $booking->isDirty(['client_id', 'supplier_id']);
+
+            if ($settingParties && $booking->client_id && $booking->client_id === $booking->supplier_id) {
                 throw \Illuminate\Validation\ValidationException::withMessages([
                     'supplier_id' => 'A booking needs a client and a different professional.',
                 ]);

@@ -148,6 +148,17 @@
 <div class="rv-layout">
 <div class="rv-main">
 
+@if(session('reviewed'))
+    {{-- DIR-32: the natural moment to ask for a story is straight after a review. --}}
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--bg-card);border:1px solid var(--border-color);border-radius:14px;padding:14px 18px;margin-bottom:16px;">
+        <div>
+            <b style="display:block;font-size:14px;color:var(--text-primary);">Want to share more about how it went?</b>
+            <span style="font-size:13px;color:var(--text-muted);">Tell us your story. It stays private unless you say we can share it.</span>
+        </div>
+        <a href="{{ \App\Domain\Forms\FormRegistry::url('testimonial') }}" style="font-weight:700;font-size:13px;color:#fff;background:#f97316;border-radius:10px;padding:9px 16px;text-decoration:none;">Share Your Story</a>
+    </div>
+@endif
+
     {{-- Stat cards --}}
     <div class="rv-stats">
         <div class="rv-stat"><div class="rv-stat-ico indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div><div class="rv-stat-label">Total Reviews</div><div class="rv-stat-value">{{ $stats['total'] }}</div><div class="rv-stat-sub">All time</div></div></div>

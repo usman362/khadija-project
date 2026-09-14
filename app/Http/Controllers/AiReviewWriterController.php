@@ -50,7 +50,13 @@ class AiReviewWriterController extends Controller
 
     public function show(Request $request): View
     {
-        $review = $this->composeAll(self::DEFAULTS);
+        // OA-157: every tool starts blank. A pre-written review looked like a
+        // real one somebody had submitted; the example stays as placeholder text.
+        $sample = $this->composeAll(self::DEFAULTS);
+        $review = [
+            'formats' => array_fill_keys(array_keys($sample['formats']), ''),
+            'words'   => array_fill_keys(array_keys($sample['words']), 0),
+        ] + $sample;
 
         $level = AiAccess::level($request->user(), 'review-writer');
         if ($request->user()?->isAdmin() && in_array($request->query('preview'), ['manual', 'semi', 'maximum'], true)) {

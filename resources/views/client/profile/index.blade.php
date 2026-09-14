@@ -263,7 +263,7 @@
             @if($user->public_id)
                 <div class="pf-grid">
                     <span>GigResource ID</span>
-                    <b>{{ $user->public_id }}</b>
+                    <b>{{ \App\Support\GigResourceId::display($user->public_id) }}</b>
                 </div>
             @endif
 

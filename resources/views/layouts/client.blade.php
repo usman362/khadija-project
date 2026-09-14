@@ -344,6 +344,14 @@
             body.gr-stack #grStackBack { display: block; }
         }
 
+        /* DIR-37: a GigResource ID that opens the person's profile. */
+        .gr-id-link { color: var(--brand-text, #c2410c); font-weight: 700; text-decoration: none; white-space: nowrap; }
+        .gr-id-link:hover { text-decoration: underline; }
+
+        /* #69: placeholders in the page's own font, not the browser's serif default. */
+        textarea::placeholder, input::placeholder { font-family: inherit; }
+        textarea { font-family: inherit; }
+
         /* After .cl-theme-toggle's own colour would win, so it is qualified. */
         .cl-theme-toggle.cl-ai-toggle { color: #7c3aed; }
         .cl-theme-toggle {

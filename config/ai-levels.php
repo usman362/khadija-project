@@ -75,7 +75,7 @@ return [
     // a tier label.
     'labels' => [
         'none'    => 'Locked',
-        'manual'  => 'Manual',
+        'manual'  => 'Free',
         'semi'    => 'Semi',
         'maximum' => 'Maximum',
     ],

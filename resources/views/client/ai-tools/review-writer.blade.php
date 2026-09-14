@@ -262,11 +262,11 @@
                 <div class="rw-form-grid">
                     <div>
                         <div class="rw-2col">
-                            <div class="rw-fld"><label>Professional / Service Provider <span style="color:var(--rw);">*</span></label><input class="rw-input" id="rw-provider" value="{{ $defaults['provider'] }}" placeholder="e.g. Sarah Bennett Photography"></div>
+                            <div class="rw-fld"><label>Professional / Service Provider <span style="color:var(--rw);">*</span></label><input class="rw-input" id="rw-provider" value="" placeholder="e.g. Sarah Bennett Photography"></div>
                             <div class="rw-fld"><label>Service Type <span class="opt">(optional)</span></label><input class="rw-input" id="rw-service" placeholder="e.g. Wedding Photography"></div>
                         </div>
                         <div class="rw-2col">
-                            <div class="rw-fld"><label>Event Type <span class="opt">(optional)</span></label><input class="rw-input" id="rw-event" value="{{ $defaults['event'] }}" placeholder="e.g. My wedding in March"></div>
+                            <div class="rw-fld"><label>Event Type <span class="opt">(optional)</span></label><input class="rw-input" id="rw-event" value="" placeholder="e.g. My wedding in March"></div>
                             <div class="rw-fld"><label>Your Rating <span style="color:var(--rw);">*</span></label><div class="rw-cookie-input" id="rw-rating">@for($i = 1; $i <= 5; $i++)<span data-v="{{ $i }}">{!! $rw_cookie($i <= 5) !!}</span>@endfor</div><div class="rw-cookie-lbl" id="rw-rating-lbl">Excellent</div></div>
                         </div>
                         <div class="rw-fld">
@@ -277,7 +277,7 @@
                                 <button type="button" class="rw-tone" data-tone="professional"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Professional</button>
                             </div>
                         </div>
-                        <div class="rw-fld"><label>Your Quick Thoughts <span style="color:var(--rw);">*</span> <span class="opt">(bullet points, keywords, or full sentences. Anything works)</span></label><textarea class="rw-textarea" id="rw-thoughts" placeholder="e.g. On time, great energy, captured amazing candid shots, professional team, delivered edits in 2 weeks...">{{ $defaults['thoughts'] }}</textarea></div>
+                        <div class="rw-fld"><label>Your Quick Thoughts <span style="color:var(--rw);">*</span> <span class="opt">(bullet points, keywords, or full sentences. Anything works)</span></label><textarea class="rw-textarea" id="rw-thoughts" placeholder="e.g. On time, great energy, captured amazing candid shots, professional team, delivered edits in 2 weeks..."></textarea></div>
                         @unless($isManual)<button type="button" class="rw-gen-btn" id="rw-generate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>{{ $isSemi ? '✨ Suggest a Review' : '🤖 Write My Review' }}</button>@endunless
                     </div>
                     <div class="rw-tips">
@@ -314,7 +314,7 @@
                     <span class="rw-tab" data-fmt="custom">Custom</span>
                 </div>
                 @endunless
-                <div class="rw-review-text" id="rw-review-text" @unless($isMax)contenteditable="true" spellcheck="true"@endunless @if($isManual)data-placeholder="Write your review here…" style="min-height:150px;"@endif>{{ $isManual ? '' : $review['formats']['detailed'] }}</div>
+                <div class="rw-review-text" id="rw-review-text" @unless($isMax)contenteditable="true" spellcheck="true"@endunless data-placeholder="{{ $isManual ? 'Write your review here…' : 'Your review appears here once you add your thoughts and generate it.' }}" style="min-height:150px;">{{ $isManual ? '' : $review['formats']['detailed'] }}</div>
                 <div class="rw-gr-foot">
                     <span class="rw-wc">Word Count: <b id="rw-wc">{{ $review['words']['detailed'] }}</b></span>
                     <div style="display:flex;gap:8px;">

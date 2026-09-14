@@ -55,6 +55,20 @@ class GigResourceId
      */
     public const DIGITS = 6;
 
+    /**
+     * How the reference is shown: with the locked "GR-" prefix (DIR-38,
+     * GR-CL-###### / GR-PRO-###### / GR-INF-######). Stored without it, so
+     * nothing already recorded or quoted changes.
+     */
+    public static function display(?string $id): ?string
+    {
+        if (blank($id)) {
+            return null;
+        }
+
+        return str_starts_with($id, 'GR-') ? $id : 'GR-' . $id;
+    }
+
     public static function prefixFor(?string $role): string
     {
         return self::PREFIXES[$role] ?? self::FALLBACK_PREFIX;

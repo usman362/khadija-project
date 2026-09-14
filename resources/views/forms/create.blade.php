@@ -39,6 +39,7 @@
             <div class="dsp-field">
                 <label class="dsp-label" for="{{ $name }}">
                     {{ $field['label'] }}
+                    @if($field['required'] ?? false)<span style="color:#dc2626;" aria-hidden="true"> *</span>@endif
                     @unless($field['required'] ?? false)
                         <span style="font-weight:600;color:var(--text-muted);">(optional)</span>
                     @endunless

@@ -216,7 +216,7 @@
                                     <div class="pr-prop-ico" style="background:{{ $icoColor }};">{{ $ico }}</div>
                                     <div>
                                         <div class="pr-prop-name">{{ \Illuminate\Support\Str::limit($p->event?->title ?? 'Proposal', 20) }}</div>
-                                        <div class="pr-prop-sub">{{ $p->supplier?->name ?? '—' }}@if($p->category) · <span style="color:var(--info-text);font-weight:600;">{{ $p->category->name }}</span>@endif</div>
+                                        <div class="pr-prop-sub">{{ $p->supplier?->name ?? '—' }}@if($p->supplier?->public_id)<span class="gr-id"> (<a href="{{ route('public.professional.show', $p->supplier->id) }}" class="gr-id-link" title="Open their profile">{{ \App\Support\GigResourceId::display($p->supplier->public_id) }}</a>)</span>@endif<span>@if($p->category) · <span style="color:var(--info-text);font-weight:600;">{{ $p->category->name }}</span>@endif</span></div>
                                     </div>
                                 </div>
                             </td>

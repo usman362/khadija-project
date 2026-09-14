@@ -29,7 +29,8 @@ class ToolLevelWordingTest extends TestCase
     {
         $labels = config('ai-levels.labels');
 
-        $this->assertSame('Manual', $labels['manual']);
+        // OA-158 (Sep 12): the locked PM-1 vocabulary is Free / Semi / Maximum.
+        $this->assertSame('Free', $labels['manual']);
         $this->assertSame('Semi', $labels['semi']);
         $this->assertSame('Maximum', $labels['maximum']);
     }
@@ -55,7 +56,7 @@ class ToolLevelWordingTest extends TestCase
         }
 
         $this->assertSame(
-            ['Manual', 'Semi', 'Maximum'],
+            ['Free', 'Semi', 'Maximum'],
             array_values(config('toolkit-tiers.tiers')),
             'the toolkit tab table must use the same three names',
         );

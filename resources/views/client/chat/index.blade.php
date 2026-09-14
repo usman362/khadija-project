@@ -598,15 +598,24 @@
                 <div class="cm-side-photo">
                     <img src="{{ $info['avatar'] }}" alt="" loading="lazy">
                     <div class="cm-side-name">
-                        <b>{{ $info['name'] }}</b>
-                        @if($info['public_id'])<span style="user-select:all;">{{ $info['public_id'] }}</span>@endif
+                        {{-- DIR-37/38: the ID in brackets beside the name, and the ID
+                             itself is the link to their profile. --}}
+                        <b>{{ $info['name'] }}
+                            @if($info['public_id'])
+                                @if($info['profileUrl'] ?? null)
+                                    (<a href="{{ $info['profileUrl'] }}" class="gr-id-link" title="Open their profile">{{ \App\Support\GigResourceId::display($info['public_id']) }}</a>)
+                                @else
+                                    ({{ \App\Support\GigResourceId::display($info['public_id']) }})
+                                @endif
+                            @endif
+                        </b>
                         {{-- A timestamp, to five minutes. Deliberately not "online". --}}
                         @if($info['lastActive'])<em>Last active {{ $info['lastActive'] }}</em>@endif
                     </div>
                 </div>
                 <p class="cm-side-role">
                     {{ auth()->user()?->activeRole() === 'professional' ? 'Client' : 'Professional' }}@if($info['location']) · {{ $info['location'] }}@endif
-                    @if($info['profileUrl'] ?? null)<a href="{{ $info['profileUrl'] }}">View full profile</a>@endif
+                    {{-- No separate "View full profile": the ID above is the link (DIR-37). --}}
                 </p>
 
                 @if($info['job'])
@@ -647,7 +656,7 @@
                 <div class="cm-info-rows">
                     {{-- First in the list: support and disputes ask for it, and it
                          never changes. Selectable, so it is copied, not retyped. --}}
-                    @if($info['public_id'] ?? null)<div><span>GigResource ID</span><b style="user-select:all;">{{ $info['public_id'] }}</b></div>@endif
+                    @if($info['public_id'] ?? null)<div><span>GigResource ID</span><b style="user-select:all;">{{ \App\Support\GigResourceId::display($info['public_id']) }}</b></div>@endif
                     @if($info['email'])<div><span>Email</span><b>{{ $info['email'] }}</b></div>@endif
                     @if($info['phone'])<div><span>Phone</span><b>{{ $info['phone'] }}</b></div>@endif
                     @if($info['member_since'])<div><span>On GigResource since</span><b>{{ $info['member_since'] }}</b></div>@endif

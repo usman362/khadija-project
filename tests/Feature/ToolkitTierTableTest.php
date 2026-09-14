@@ -226,7 +226,8 @@ class ToolkitTierTableTest extends TestCase
         $response = $this->actingAs($this->user())->get(route('client.toolkit.tiers'));
 
         $response->assertSuccessful();
-        $response->assertSee('MANUAL');
+        // OA-158: the free tier's card is headed Free, not Manual.
+        $response->assertDontSee('MANUAL');
         $response->assertSee('SEMI');
         $response->assertSee('MAXIMUM');
         $response->assertSee('$2.99');
@@ -239,7 +240,7 @@ class ToolkitTierTableTest extends TestCase
         $html = $this->actingAs($this->user())->get(route('client.toolkit.tiers'))
             ->assertSuccessful()->getContent();
 
-        $this->assertStringContainsString('Manual includes no tools', $html);
+        $this->assertStringContainsString('Free includes no tools', $html);
 
         // Inside the Manual card specifically — the comparison table below it
         // legitimately marks tools as not included for every tier.

@@ -21,7 +21,7 @@ return [
     |
     */
 
-    'tiers' => ['manual' => 'Manual', 'semi' => 'Semi', 'maximum' => 'Maximum'],
+    'tiers' => ['manual' => 'Free', 'semi' => 'Semi', 'maximum' => 'Maximum'],
 
     // One-time purchases, not subscriptions. Both sides pay the same.
     'prices' => ['manual' => 0.00, 'semi' => 2.99, 'maximum' => 5.99],

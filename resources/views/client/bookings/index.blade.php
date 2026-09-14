@@ -581,7 +581,7 @@
                         </div>
                         <div class="b">
                             <div class="t">{{ $b->event->title }}</div>
-                            <div class="s">{{ $b->supplier?->name ?? 'Professional' }}</div>
+                            <div class="s">{{ $b->supplier?->name ?? 'Professional' }}@if($b->supplier?->public_id)<span class="gr-id"> (<a href="{{ route('public.professional.show', $b->supplier->id) }}" class="gr-id-link" title="Open their profile">{{ \App\Support\GigResourceId::display($b->supplier->public_id) }}</a>)</span>@endif</div>
                         </div>
                     </div>
                 @endforeach

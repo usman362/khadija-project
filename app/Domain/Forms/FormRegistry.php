@@ -515,7 +515,8 @@ final class FormRegistry
         'safety' => [
             'label' => 'Safety & Support',
             'blurb' => 'Help from our team, reporting content, and telling us how it went.',
-            'keys'  => ['support_request', 'content_report', 'testimonial', 'contract_dispute'],
+            // DIR-32: Share Your Story moved out; it is offered after a review.
+            'keys'  => ['support_request', 'content_report', 'contract_dispute'],
         ],
         'ideas' => [
             'label' => 'Ideas & Partnerships',

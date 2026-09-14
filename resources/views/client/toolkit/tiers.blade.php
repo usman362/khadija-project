@@ -142,7 +142,7 @@
                          Twelve "not included" rows would only make it look
                          broken. --}}
                     <div class="tk-empty">
-                        <b>Manual includes no tools.</b>
+                        <b>Free includes no tools.</b>
                         Choose Semi or Maximum to unlock the toolkit.
                     </div>
                 @else

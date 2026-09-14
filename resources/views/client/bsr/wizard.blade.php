@@ -408,7 +408,7 @@
             </div>
             <div class="bw-field">
                 <label>Guest count</label>
-                <input type="number" name="guest_count" min="1" value="{{ $data['guest_count'] ?? '' }}" placeholder="150">
+                <input type="number" name="guest_count" min="1" value="{{ $data['guest_count'] ?? '' }}" placeholder="e.g. 150">
             </div>
         </div>
         <div class="bw-two">

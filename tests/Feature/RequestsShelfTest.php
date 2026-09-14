@@ -152,6 +152,8 @@ class RequestsShelfTest extends TestCase
         // A form in two areas is a form somebody files twice; a form in none
         // is one nobody can reach from this screen.
         $grouped = array_merge(...array_column(FormRegistry::GROUPS, 'keys'));
+        // DIR-32: Share Your Story is reached from Reviews, after a review.
+        $grouped[] = 'testimonial';
 
         $this->assertSame([], array_diff(array_keys(FormRegistry::all()), $grouped), 'a form is in no area');
         $this->assertSame(count($grouped), count(array_unique($grouped)), 'a form is in two areas');

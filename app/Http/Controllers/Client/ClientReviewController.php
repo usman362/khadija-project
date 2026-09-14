@@ -134,6 +134,8 @@ class ClientReviewController extends Controller
             ]
         );
 
-        return back()->with('status', 'Thanks. Your review has been posted.');
+        // DIR-32: Share Your Story is offered here, after a review, instead of
+        // under Safety & Support.
+        return back()->with('status', 'Thanks. Your review has been posted.')->with('reviewed', true);
     }
 }
