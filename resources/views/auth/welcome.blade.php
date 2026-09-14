@@ -42,8 +42,22 @@
             <p>Your account has been created and you have <b>full access</b> to the platform.</p>
             <p>GigResource is available in <span class="wc-where">{{ $where }}</span>. You can start browsing professionals and posting requests right away.</p>
 
+            {{-- DIR-34: verification is offered here, at sign-up, rather than
+                 left for a client to find later from the dashboard. --}}
+            @if($user->primary_role === 'client' && \Illuminate\Support\Facades\Route::has('client.verification.show'))
+                <div style="margin:18px auto 0;max-width:460px;text-align:left;border:1px solid #bfdbfe;background:#eff6ff;border-radius:14px;padding:14px 16px;">
+                    <b style="display:block;font-size:14.5px;color:#1e3a8a;">Verify your account now</b>
+                    <span style="display:block;font-size:13px;color:#1e40af;margin-top:3px;line-height:1.5;">It takes a couple of minutes, and earns the Verified Client badge professionals see on your profile.</span>
+                </div>
+            @endif
+
             <div class="wc-btns">
-                <a href="{{ url('/dashboard') }}" class="wc-btn primary">Go to my dashboard</a>
+                @if($user->primary_role === 'client' && \Illuminate\Support\Facades\Route::has('client.verification.show'))
+                    <a href="{{ route('client.verification.show') }}" class="wc-btn primary">Verify my account</a>
+                    <a href="{{ url('/dashboard') }}" class="wc-btn">Do it later</a>
+                @else
+                    <a href="{{ url('/dashboard') }}" class="wc-btn primary">Go to my dashboard</a>
+                @endif
             </div>
         @else
             <div class="wc-ic soon">

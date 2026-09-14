@@ -87,6 +87,9 @@ class ClientChatController extends Controller
             'eventFilters' => collect($list)->pluck('event')->filter()
                 ->unique('id')->sortBy('title')->values()->all(),
             'recipients' => User::where('id', '!=', $user->id)->select('id', 'name')->orderBy('name')->get(),
+            // DIR-29: who a group chat can include, professionals only.
+            'groupCandidates' => User::where('id', '!=', $user->id)->where('primary_role', 'professional')
+                ->select('id', 'name')->orderBy('name')->get(),
         ];
     }
 
@@ -138,7 +141,10 @@ class ClientChatController extends Controller
             : null;
 
         return [
-            'name'         => $pro?->name ?? 'Professional',
+            // DIR-29: a group chat names everyone in it.
+            'name'         => ($c->participants->where('id', '!=', $user->id)->count() > 1)
+                ? $c->participants->where('id', '!=', $user->id)->pluck('name')->implode(', ')
+                : ($pro?->name ?? 'Professional'),
             // Idea 1: the permanent reference. Two professionals with the same
             // name are told apart here, in the conversation, rather than on a
             // profile page the client would have to go and find — and it is
@@ -234,6 +240,8 @@ class ClientChatController extends Controller
     private function summarize(Conversation $c, $user): array
     {
         $other = $c->participants->firstWhere('id', '!=', $user->id) ?? $c->participants->first();
+        // DIR-29: a group chat reads as everyone in it, not just the first person.
+        $others = $c->participants->where('id', '!=', $user->id)->values();
         $last  = $c->messages->first();
         $event = $c->event ?? $c->booking?->event;
         $unread = $c->messages()->where('sender_id', '!=', $user->id)
@@ -249,7 +257,8 @@ class ClientChatController extends Controller
 
         return [
             'id' => $c->id,
-            'name' => $other?->name ?? 'Conversation',
+            'name' => $others->count() > 1 ? $others->pluck('name')->implode(', ') : ($other?->name ?? 'Conversation'),
+            'group' => $others->count() > 1,
             // Idea 1 (Sir Peter): the other party's permanent reference, in the
             // one place a client is most likely to need it — two professionals
             // with the same name are told apart here, not on a profile page
@@ -352,7 +361,10 @@ class ClientChatController extends Controller
                 ->where('status', 'submitted')
                 ->whereHas('event', fn ($q) => $q->where('client_id', $user->id))
                 ->count(),
-            'reply'     => $this->avgResponseTime($conversations, $user),
+            // DIR-30 / OA-119: both directions, from real messages only, and
+            // not shown until there are enough replies to mean something.
+            'reply'       => $this->avgResponseTime($conversations, $user, true),
+            'their_reply' => $this->avgResponseTime($conversations, $user, false),
             // Agreed and not yet paid. Not "secured": nothing is held.
             'unpaid'          => \App\Domain\Finance\ClientTotals::agreedUnpaid($user),
             'unpaid_bookings' => Booking::where('client_id', $user->id)->where('status', 'confirmed')->count(),
@@ -360,7 +372,14 @@ class ClientChatController extends Controller
     }
 
     /** Average reply latency: mean gap from an inbound message to the user's next reply. */
-    private function avgResponseTime($conversations, $user): string
+    /** Replies needed before an average is shown (OA-119: one test thread said 926.3 h). */
+    private const REPLY_MINIMUM = 3;
+
+    /**
+     * Average time to answer. $mine: how fast this person answers the others;
+     * otherwise how fast the others answer this person.
+     */
+    private function avgResponseTime($conversations, $user, bool $mine = true): string
     {
         $ids = $conversations->pluck('id');
         if ($ids->isEmpty()) {
@@ -375,7 +394,9 @@ class ClientChatController extends Controller
         foreach ($byConv as $list) {
             $pending = null;
             foreach ($list as $m) {
-                if ((int) $m->sender_id !== (int) $user->id) {
+                $fromUser = (int) $m->sender_id === (int) $user->id;
+                // The side waiting for an answer, and the side giving it.
+                if ($fromUser !== $mine) {
                     $pending ??= $m->created_at;
                 } elseif ($pending !== null) {
                     $gaps[] = $pending->diffInMinutes($m->created_at);
@@ -383,8 +404,8 @@ class ClientChatController extends Controller
                 }
             }
         }
-        if (empty($gaps)) {
-            return '—';
+        if (count($gaps) < self::REPLY_MINIMUM) {
+            return 'N/A';
         }
         $avg = (int) round(array_sum($gaps) / count($gaps));
         // Short enough for the card: "Under a minute" broke onto two lines.

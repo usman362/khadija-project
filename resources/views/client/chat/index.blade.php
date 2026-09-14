@@ -329,7 +329,11 @@
             <div class="cm-stat">
                 <div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Your reply time</div>
                 <div class="v">{{ $stats['reply'] }}</div>
-                <div class="s">Your average time to answer</div>
+                <div class="s">
+                    Your average time to answer.
+                    Professionals: <b>{{ $stats['their_reply'] ?? 'N/A' }}</b>
+                    @if(($stats['reply'] ?? '') === 'N/A' || ($stats['their_reply'] ?? '') === 'N/A')<br>N/A until there are at least 3 replies.@endif
+                </div>
             </div>
             <a class="cm-stat is-link" href="{{ route('client.bookings.index') }}">
                 <div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(234,88,12,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>{{-- One word (Ali, 2026-09-11). Not "Paid": this is money agreed and
@@ -714,10 +718,28 @@
     <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:16px;padding:24px;width:380px;max-width:90vw;">
         <h3 style="font-size:17px;font-weight:800;color:var(--text-primary);margin:0 0 4px;">New Message</h3>
         <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 16px;">Start a conversation with a professional or contact.</p>
+        {{-- DIR-29: a chat with one person, or a group with 2 to 3 professionals. --}}
+        <div style="display:flex;gap:8px;margin-bottom:14px;">
+            <label style="font-size:12.5px;font-weight:700;display:flex;gap:6px;align-items:center;cursor:pointer;"><input type="radio" name="cm-mode" value="one" checked> One person</label>
+            <label style="font-size:12.5px;font-weight:700;display:flex;gap:6px;align-items:center;cursor:pointer;"><input type="radio" name="cm-mode" value="group"> Group chat</label>
+        </div>
+        <div id="cm-group-box" hidden>
+            <label style="font-size:12px;font-weight:700;color:var(--text-primary);display:block;margin-bottom:6px;">Choose 2 or 3 professionals</label>
+            <div style="max-height:200px;overflow:auto;border:1px solid var(--border-color);border-radius:9px;padding:6px 10px;margin-bottom:8px;">
+                @forelse($groupCandidates as $g)
+                    <label style="display:flex;gap:8px;align-items:center;font-size:13px;padding:5px 0;cursor:pointer;"><input type="checkbox" class="cm-group-pick" value="{{ $g->id }}"> {{ $g->name }}</label>
+                @empty
+                    <span style="font-size:12.5px;color:var(--text-muted);">No professionals to add yet.</span>
+                @endforelse
+            </div>
+            <p id="cm-group-note" style="font-size:12px;color:var(--text-muted);margin:0 0 14px;">Pick 2 or 3.</p>
+        </div>
+        <div id="cm-one-box">
         <label style="font-size:12px;font-weight:700;color:var(--text-primary);display:block;margin-bottom:6px;">Recipient</label>
         <select id="cm-modal-recipient" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--border-color);border-radius:9px;background:var(--bg-card);color:var(--text-primary);font-size:13px;margin-bottom:16px;font-family:inherit;">
             @foreach($recipients as $r)<option value="{{ $r->id }}">{{ $r->name }}</option>@endforeach
         </select>
+        </div>
         <div style="display:flex;gap:10px;justify-content:flex-end;">
             <button type="button" id="cm-modal-cancel" style="padding:10px 16px;border:1px solid var(--border-color);border-radius:9px;background:var(--bg-card);color:var(--text-secondary);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Cancel</button>
             <button type="button" id="cm-modal-start" style="padding:10px 18px;border:none;border-radius:9px;background:linear-gradient(135deg,#fb923c,#ea580c);color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">Start Conversation</button>
@@ -943,14 +965,27 @@
     // Create Message → start a real conversation.
     const modal = $('cm-modal');
     if ($('cm-create')) $('cm-create').addEventListener('click', () => { if (modal) modal.style.display = 'flex'; });
+    document.querySelectorAll('input[name="cm-mode"]').forEach(r => r.addEventListener('change', () => {
+        const g = r.value === 'group' && r.checked;
+        if (r.checked) { $('cm-group-box').hidden = !g; $('cm-one-box').hidden = g; }
+    }));
+    document.querySelectorAll('.cm-group-pick').forEach(cb => cb.addEventListener('change', () => {
+        const n = document.querySelectorAll('.cm-group-pick:checked').length;
+        if (n > 3) { cb.checked = false; }
+        $('cm-group-note').style.color = ''; $('cm-group-note').textContent = Math.min(n, 3) + ' of 3 picked.';
+    }));
     if ($('cm-modal-cancel')) $('cm-modal-cancel').addEventListener('click', () => { if (modal) modal.style.display = 'none'; });
     if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
     if ($('cm-modal-start')) $('cm-modal-start').addEventListener('click', async function () {
+        const group = (document.querySelector('input[name="cm-mode"]:checked') || {}).value === 'group';
+        const picked = [...document.querySelectorAll('.cm-group-pick:checked')].map(x => parseInt(x.value, 10));
         const rid = $('cm-modal-recipient') ? $('cm-modal-recipient').value : null;
-        if (!rid) return;
+        if (group && (picked.length < 2 || picked.length > 3)) { $('cm-group-note').textContent = 'Pick 2 or 3 professionals.'; $('cm-group-note').style.color = '#b91c1c'; return; }
+        if (!group && !rid) return;
+        const ids = group ? picked : [parseInt(rid, 10)];
         this.disabled = true; this.style.opacity = '0.7';
         try {
-            const res = await fetch(@json(route('conversations.store')), { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }, body: JSON.stringify({ type: 'direct', participant_ids: [parseInt(rid, 10)] }) });
+            const res = await fetch(@json(route('conversations.store')), { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }, body: JSON.stringify({ type: 'direct', participant_ids: ids }) });
             if (res.ok) { const c = await res.json(); window.location.href = @json(url('/client/messages')) + '/' + c.id; return; }
         } catch (e) {}
         this.disabled = false; this.style.opacity = '';

@@ -136,9 +136,12 @@ class ChatStatsCardsTest extends TestCase
     /** 926.3h read like a typo; past two days it is days. */
     public function test_a_long_reply_time_is_said_in_days(): void
     {
+        // Three replies, the minimum before an average is shown (OA-119).
         $a = $this->pro(); $c = $this->chat($a);
-        $this->say($c, $a, 'Hello', now()->subDays(5));
-        $this->say($c, $this->client, 'Sorry for the wait', now()->subDays(2));
+        foreach ([30, 20, 10] as $i => $start) {
+            $this->say($c, $a, 'Hello ' . $i, now()->subDays($start)->subMinutes($i));
+            $this->say($c, $this->client, 'Sorry for the wait ' . $i, now()->subDays($start - 3)->subMinutes($i));
+        }
 
         $this->assertStringContainsString('<div class="v">3 days</div>', $this->card('Your reply time', $this->cards()));
     }
