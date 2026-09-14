@@ -81,8 +81,9 @@ class EventTypesMobileOrderTest extends TestCase
 
         $html = $this->get(route('public.event-types'))->assertSuccessful()->getContent();
 
-        $this->assertStringContainsString('The number is how many service categories you can choose from', $html);
-        $this->assertStringContainsString('service categories to choose from for a Bachelor Party', $html);
+        // OA-111 (Sep 12): the number is the per-event recommended count.
+        $this->assertStringContainsString('The number is how many service categories are recommended for that event', $html);
+        $this->assertStringContainsString('service categories recommended for a Bachelor Party', $html);
 
         // A list of ten must not call itself all of them.
         $this->assertStringNotContainsString('<h4>All Event Types</h4>', $html);

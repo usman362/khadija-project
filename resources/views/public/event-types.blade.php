@@ -213,9 +213,14 @@
                href="{{ route('public.event-types', array_filter(['group' => $name, 'q' => $q])) }}">{{ $name }} <b>{{ $count }}</b></a>
         @endforeach
         @if($chips->count() > 5)
-            <button type="button" class="et-gchip" data-et-more>More ({{ $chips->count() - 5 }}) ▾</button>
+            {{-- OA-113: the number is event types, like every other chip, so
+                 the row adds up to the total. --}}
+            <button type="button" class="et-gchip" data-et-more>More <b>{{ $chips->slice(5)->sum() }}</b> ▾</button>
         @endif
     </div>
+    <p class="et-rail-note" style="text-align:center;margin:6px 0 0;">
+        Numbers show how many event types are in each group, {{ $chips->sum() }} in all.
+    </p>
 
     <div class="et-browse">
         <aside class="et-rail-card">
@@ -223,15 +228,15 @@
                  all event types" link directly underneath contradicting it. --}}
             <h4>Most to plan for</h4>
             <p class="et-rail-note">
-                The number is how many service categories you can choose from.
+                The number is how many service categories are recommended for that event.
             </p>
             @foreach($rail as $r)
                 {{-- The badge shows the TOTAL you will find on the page, not the
                      recommended subset. A badge of 17 opening onto 27 tiles is
                      what made the number read as broken. --}}
                 <a class="et-rail-row" href="{{ route('public.category', $r['slug']) }}"
-                   title="{{ $r['of_total'] }} service categories to choose from for a {{ $r['name'] }}">
-                    <span>{{ $r['name'] }}</span><b>{{ $r['of_total'] }}</b>
+                   title="{{ $r['recommended'] }} of {{ $r['of_total'] }} service categories recommended for a {{ $r['name'] }}">
+                    <span>{{ $r['name'] }}</span><b>{{ $r['recommended'] }}</b>
                 </a>
             @endforeach
             <a class="et-rail-all" href="{{ route('public.event-types') }}">View all event types →</a>
@@ -274,7 +279,10 @@
                                      the page it opens lists all 27 categories with
                                      these ones marked. So the card promised 17 and
                                      delivered 27, and the word was wrong as well. --}}
-                                {{ $et['of_total'] }} service {{ \Illuminate\Support\Str::plural('category', $et['of_total']) }}
+                                {{-- OA-111: the per-event count from the Parent-Child map
+                                     (Wedding 17, Corporate 13, Fundraiser 9, Holiday Party
+                                     11), not the 27 every card showed. --}}
+                                {{ $et['recommended'] }} recommended service {{ \Illuminate\Support\Str::plural('category', $et['recommended']) }}
                             </div>
                         </div>
                         <span class="et-all-arw">›</span>

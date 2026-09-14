@@ -89,6 +89,32 @@ class Booking extends Model
             }
         });
 
+        /*
+         * OA-114 / OA-115: one status. A booking cancelled (a professional
+         * withdrawing, a client cancelling) left its event Confirmed in My
+         * Events while Bookings said Cancelled. When no booking on the event is
+         * still confirmed or completed, the event stops being Confirmed: a
+         * Direct Request, sent to that one professional, is cancelled with it;
+         * any other request goes back to being open.
+         */
+        static::saved(function (self $booking) {
+            if ($booking->status !== 'cancelled' || ! $booking->wasChanged('status')) {
+                return;
+            }
+
+            $event = $booking->event;
+
+            if (! $event || $event->status !== 'confirmed'
+                || $event->bookings()->whereIn('status', ['confirmed', 'completed'])->exists()) {
+                return;
+            }
+
+            $event->forceFill([
+                'status'      => $event->source === 'direct_offer' ? 'cancelled' : 'published',
+                'supplier_id' => null,
+            ])->saveQuietly();
+        });
+
         static::saved(function (self $booking) {
             if (! in_array($booking->status, ['confirmed', 'completed'], true)) {
                 return;

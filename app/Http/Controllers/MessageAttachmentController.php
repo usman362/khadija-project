@@ -41,6 +41,14 @@ class MessageAttachmentController extends Controller
 
         $file = $request->file('file');
 
+        // OA-121: sample assets (SampleVideo_1280x720_1mb.mp4, neutral-person.png)
+        // kept turning up as attachments in real conversations.
+        if (\App\Support\PlaceholderAssets::looksLikeOne($file->getClientOriginalName())) {
+            return response()->json([
+                'message' => 'That looks like a sample file rather than one of yours. Choose the file you meant to send.',
+            ], 422);
+        }
+
         if (! in_array($file->getMimeType(), self::ALLOWED_MIMES)) {
             return response()->json([
                 // "File type not allowed" left the person guessing. Say what is.
