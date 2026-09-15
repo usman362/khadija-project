@@ -1124,8 +1124,8 @@
         var empty = [];
         box.querySelectorAll('input:checked').forEach(function (input) {
             var row = input.closest('.svc-cell');
-            var pros = row ? row.querySelector('.svc-pros') : null;
-            if (pros && Number(pros.textContent) === 0) empty.push(row.querySelector('.svc-text').textContent);
+            var pros = row ? row.querySelector('.svc-pros.is-none') : null;
+            if (pros) empty.push(row.querySelector('.svc-text').textContent);
         });
 
         warn.hidden = empty.length === 0;

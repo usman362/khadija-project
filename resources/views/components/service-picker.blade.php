@@ -118,8 +118,11 @@
     .svc-picker { --svc: {{ $accent }}; --svc-strong: {{ $accentStrong }}; }
     .svc-search { position: relative; display: flex; gap: 9px; margin-bottom: 14px; }
     .svc-search .svc-ico { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); pointer-events: none; }
-    .svc-search input { flex: 1; border: 1.5px solid var(--border-color); border-radius: 11px; padding: 11px 13px 11px 38px; font-size: 13.5px; color: var(--text-primary); background: var(--bg-card); font-family: inherit; }
-    .svc-search input:focus { outline: none; border-color: var(--svc); }
+    /* The page's own form styles are on `input`, so the room made for the
+       search icon has to be claimed from inside the picker or the placeholder
+       starts underneath it. */
+    .svc-picker .svc-search input[type="text"] { flex: 1; min-width: 0; border: 1.5px solid var(--border-color); border-radius: 11px; padding: 11px 13px 11px 40px; font-size: 13.5px; color: var(--text-primary); background: var(--bg-card); font-family: inherit; }
+    .svc-picker .svc-search input[type="text"]:focus { outline: none; border-color: var(--svc); }
     .svc-search button { flex-shrink: 0; border: none; border-radius: 11px; padding: 0 20px; font-size: 13.5px; font-weight: 800; color: #fff; background: var(--svc); cursor: pointer; }
     .svc-search button:hover { background: var(--svc-strong); }
 
@@ -156,7 +159,15 @@
     .svc-group:not(.open) .svc-group-body { display: none; }
     .svc-group.hide { display: none; }
 
-    .svc-item { display: flex; align-items: center; gap: 9px; border: 1.5px solid var(--border-color); border-radius: 10px; padding: 10px 12px; font-size: 12.5px; font-weight: 600; color: var(--text-secondary); background: var(--bg-card); cursor: pointer; user-select: none; }
+    /* A long service name wraps inside its own row rather than pushing the
+       count onto a second line, which is what made one cell in a row of three
+       taller than the other two. */
+    /* Scoped to the picker, because the forms this sits inside all style
+       `label` themselves -- the wizard's `.bw-field label { display: block }`
+       was beating a bare `.svc-item`, so the row stopped being a flex row and
+       the count sat against the name instead of at the end. */
+    .svc-picker .svc-grid .svc-item { display: flex; align-items: flex-start; gap: 9px; height: 100%; margin: 0; border: 1.5px solid var(--border-color); border-radius: 10px; padding: 10px 12px; font-size: 12.5px; font-weight: 600; line-height: 1.35; color: var(--text-secondary); background: var(--bg-card); cursor: pointer; user-select: none; }
+    .svc-picker .svc-grid .svc-item .svc-text { flex: 1; min-width: 0; }
     .svc-item:hover { border-color: var(--svc); }
     .svc-item input { position: absolute; opacity: 0; pointer-events: none; }
     .svc-box { flex-shrink: 0; width: 17px; height: 17px; border: 1.5px solid var(--border-color); border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; transition: all .12s; }
@@ -165,8 +176,11 @@
     .svc-item.sel .svc-box { background: var(--svc); border-color: var(--svc); }
     .svc-item.sel .svc-box svg { opacity: 1; }
     .svc-cell.hide { display: none; }
-    .svc-pros { margin-left: auto; flex-shrink: 0; min-width: 22px; text-align: center; font-size: 10.5px; font-weight: 800; border-radius: 999px; padding: 2px 6px; background: #dcfce7; color: #15803d; }
-    .svc-pros.is-none { background: var(--bg-muted, #f3f4f6); color: var(--text-muted, #6b7280); }
+    /* How many professionals cover this service. A number worth reading is
+       green; none is a quiet grey dash, because a grid of bold zeroes reads as
+       a page full of errors rather than as information. */
+    .svc-pros { flex-shrink: 0; min-width: 20px; text-align: center; font-size: 10.5px; font-weight: 800; line-height: 17px; border-radius: 999px; padding: 0 6px; background: #dcfce7; color: #15803d; }
+    .svc-pros.is-none { background: none; padding: 0; color: var(--text-muted, #9ca3af); font-weight: 700; }
     .svc-none { font-size: 12.5px; color: var(--text-muted); padding: 16px 4px; text-align: center; display: none; }
 
     /* Level 4. Appears only once its service is picked, because a detail with
@@ -499,7 +513,7 @@
                                 @if(array_key_exists($cat->id, (array) $proCounts))
                                     @php($pros = (int) $proCounts[$cat->id])
                                     <span class="svc-pros {{ $pros ? '' : 'is-none' }}"
-                                          title="{{ $pros ? $pros . ' ' . Str::plural('professional', $pros) . ' in your state offer this' : 'Nobody in your state offers this yet. You can still ask' }}">{{ $pros }}</span>
+                                          title="{{ $pros ? $pros . ' ' . Str::plural('professional', $pros) . ' in your state offer this' : 'Nobody in your state offers this yet. You can still ask' }}">{{ $pros ?: '–' }}</span>
                                 @endif
                             </label>
                             @if($details && $options->isNotEmpty())
