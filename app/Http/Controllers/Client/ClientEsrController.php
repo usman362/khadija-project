@@ -116,7 +116,8 @@ class ClientEsrController extends Controller
             'fee_agreed'   => ['accepted'],
             'services'     => ['required', 'array', 'min:1'],
             'services.*'   => ['integer', 'exists:categories,id', new \App\Rules\BookableService],
-        ] + \App\Domain\Requests\CoreFacts::rules('event_name', 'description', 'needed_by') + [
+        ] + \App\Domain\Requests\ServiceDetails::rules()
+          + \App\Domain\Requests\CoreFacts::rules('event_name', 'description', 'needed_by') + [
             // Catering only — the rule is required or nullable depending on
             // what was ticked, which is why it is built rather than written.
         ] + \App\Domain\Requests\FoodDelivery::rules(
@@ -209,7 +210,7 @@ class ClientEsrController extends Controller
             'sealed_proposals'  => false,
         ]);
 
-        $event->categories()->sync($services->all());
+        \App\Domain\Requests\ServiceDetails::apply($event, $services->all(), $data);
 
         // Sir Peter, 2026-09-02: an ER naming several services says what each
         // one is worth, the same as a BR. Responders answer on one service, so

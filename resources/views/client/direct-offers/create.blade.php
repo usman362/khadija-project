@@ -351,7 +351,9 @@
                 <div class="do-svc-multi">
                     <div class="do-field">
                         <label>Services requested (pick all that apply)</label>
-                        <x-service-picker :categories="$categories" name="services" :selected="old('services', [])" />
+                        <x-service-picker :categories="$categories" name="services" :selected="old('services', [])"
+                                          :details="true" :detail-selected="old('service_details', [])"
+                                          :missing="true" :missing-value="old('service_missing')" />
 
                         {{-- Appears the moment a catering or bar service is ticked. --}}
                         @include('partials._food_delivery', [

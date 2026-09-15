@@ -83,9 +83,11 @@ class ServiceCoverageIsShownWhenPickingTest extends TestCase
             ->assertSuccessful()
             ->getContent();
 
-        $this->assertStringContainsString('data-pros="2"', $html);
-        $this->assertStringContainsString('data-pros="0"', $html);
-        $this->assertStringContainsString('bw-svc-pros', $html);
+        // The count is on the service row in the shared picker, which all three
+        // request forms use now.
+        $this->assertStringContainsString('professionals in your state offer this', $html);
+        $this->assertStringContainsString('Nobody in your state offers this yet', $html);
+        $this->assertStringContainsString('svc-pros', $html);
     }
 
     /** The warning is on the step that has the choice, not five steps later. */

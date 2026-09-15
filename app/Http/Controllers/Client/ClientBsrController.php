@@ -161,10 +161,17 @@ class ClientBsrController extends Controller
             return [];
         }
 
-        return \App\Support\ServiceAvailability::countsByService(
-            $this->serviceCatalogue($data, $request)->pluck('id')->all(),
+        $ids = $this->serviceCatalogue($data, $request)->pluck('id')->all();
+
+        $counts = \App\Support\ServiceAvailability::countsByService(
+            $ids,
             \App\Support\StateMatching::requestState($request->user()),
         );
+
+        // A service nobody covers is the one the client most needs told about,
+        // and it is the one the count query has no row for. Every service on
+        // the page gets a number, even when that number is none.
+        return collect($ids)->mapWithKeys(fn ($id) => [$id => $counts[$id] ?? 0])->all();
     }
 
     private function availabilityFor(string $step, array $data, Request $request): array
@@ -204,7 +211,9 @@ class ClientBsrController extends Controller
     private function serviceCatalogue(array $data, Request $request)
     {
         $all = Category::active()->bookableServices()
-            ->orderBy('name')->get(['id', 'name', 'parent_id'])->unique('name')->values();
+            // search_terms comes along: the picker searches the words clients
+            // type, not only the service's own name.
+            ->orderBy('name')->get(['id', 'name', 'parent_id', 'search_terms'])->unique('name')->values();
 
         // The page says "the services below are ordered by what this kind of
         // event usually needs". It was alphabetical, so the line was untrue.
@@ -377,6 +386,16 @@ class ClientBsrController extends Controller
             $validated['scope'] = count($validated['services'] ?? []) >= 2 ? 'multi' : 'single';
 
             /*
+             * A detail only exists as part of the service it belongs to. A
+             * client who ticks Buffet Catering, chooses Breakfast, then unticks
+             * the service must not leave Breakfast behind on the request.
+             */
+            $validated['service_details'] = \App\Domain\Requests\ServiceDetails::prune(
+                (array) ($validated['service_details'] ?? []),
+                (array) ($validated['services'] ?? []),
+            );
+
+            /*
              * The client's own wording becomes the request's working title, so
              * they name their event once rather than twice — step 2 asks for a
              * title, and somebody who has just typed "Maryland's Horse Show
@@ -474,6 +493,11 @@ class ClientBsrController extends Controller
         Session::put(self::KEY, [
             'draft_id'          => $event->id,
             'services'          => $event->categories->pluck('id')->all(),
+            'service_details'   => $event->categories
+                ->filter(fn ($c) => $c->pivot->specialty_id)
+                ->mapWithKeys(fn ($c) => [$c->id => $c->pivot->specialty_id])
+                ->all(),
+            'service_missing'   => $event->service_missing,
             'scope'             => $event->categories->count() >= 2 ? 'multi' : 'single',
             'event_type'        => $event->event_type,
             'organization_type' => $event->organization_type,
@@ -849,6 +873,12 @@ class ClientBsrController extends Controller
                 'services'          => ['required', 'array', 'min:1', 'max:12'],
                 'services.*'        => ['integer', 'exists:categories,id', new \App\Rules\BookableService],
                 /*
+                 * Level 4: the optional detail under a chosen service, and the
+                 * client's own words when the list has no name for what they
+                 * need. Shared with the direct and emergency forms.
+                 */
+                ...\App\Domain\Requests\ServiceDetails::rules(),
+                /*
                  * Required, and first on the page.
                  *
                  * It was nullable and sat below the services, so a client who
@@ -1059,6 +1089,7 @@ class ClientBsrController extends Controller
             'title'             => $d['title'] ?? 'Untitled request',
             'description'       => $d['description'] ?? null,
             'event_type'        => $d['event_type'] ?? null,
+            'service_missing'   => $d['service_missing'] ?? null,
             'organization_type' => $d['organization_type'] ?? null,
             'starts_at'         => $startsAt,
             // Step 7's optional end time. Null stays null — an event with no
@@ -1104,7 +1135,16 @@ class ClientBsrController extends Controller
             ? tap(Event::where('client_id', $user->id)->findOrFail($d['draft_id']))->update($attrs)
             : Event::create($attrs);
 
-        $event->categories()->sync($d['services'] ?? []);
+        /*
+         * Each service, with the level 4 detail the client chose under it.
+         * Matching still happens on the service (Khadijah, 15 Sep): the detail
+         * travels with the request so professionals read it and later search
+         * can use it, and it changes nothing about who the request reaches.
+         */
+        $event->categories()->sync(\App\Domain\Requests\ServiceDetails::sync(
+            (array) ($d['services'] ?? []),
+            (array) ($d['service_details'] ?? []),
+        ));
 
         /*
          * The per-service budget, written only for the services this request

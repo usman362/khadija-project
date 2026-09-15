@@ -147,7 +147,8 @@ class ClientDirectOfferController extends Controller
             'service_single'  => ['required_without:services', 'nullable', 'string', 'max:120'],
             'budget_min'      => ['nullable', 'integer', 'min:0'],
             'request_type'    => ['nullable', 'in:SSR,MSR'],
-        ] + \App\Domain\Requests\CoreFacts::rules('event_name', 'description', 'event_date') + [
+        ] + \App\Domain\Requests\ServiceDetails::rules()
+          + \App\Domain\Requests\CoreFacts::rules('event_name', 'description', 'event_date') + [
             // Catering only. Required or nullable depending on what was
             // ticked, so the question is only mandatory where it was asked.
             'delivery_mode'   => [
@@ -267,7 +268,7 @@ class ClientDirectOfferController extends Controller
                 ->limit(1)->pluck('id');
         }
         if ($categoryIds->isNotEmpty()) {
-            $event->categories()->sync($categoryIds->all());
+            \App\Domain\Requests\ServiceDetails::apply($event, $categoryIds->all(), $data);
         }
 
         // Sir Peter, 2026-09-02: a DR naming several services says what each

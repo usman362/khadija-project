@@ -166,7 +166,10 @@
                 <span data-scope-only="single">Pick the one service you need covered, choosing another replaces it.</span>
                 <span data-scope-only="multi">Pick every service you need covered. Each one is bid on separately.</span>
             </p>
-            <x-service-picker :categories="$categories" name="services" :selected="old('services', [])" :single="$scope === 'single'" />
+            <x-service-picker :categories="$categories" name="services" :selected="old('services', [])"
+                              :single="$scope === 'single'"
+                              :details="true" :detail-selected="old('service_details', [])"
+                              :missing="true" :missing-value="old('service_missing')" />
         </div>
 
         {{-- 3. Budget & details --}}

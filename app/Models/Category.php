@@ -14,6 +14,7 @@ class Category extends Model
         'slug',
         'short_description',
         'long_description',
+        'search_terms',
         'cover_image',
         'thumbnail',
         'icon',
@@ -159,6 +160,39 @@ class Category extends Model
         return config('taxonomy.version', 'v1') === 'v2'
             ? $query->ofKind(self::EVENT_TYPE)
             : $query->whereNull('parent_id');
+    }
+
+    /** Level 4: the optional detail a client can add to this level 3 service. */
+    public function specialties(): HasMany
+    {
+        return $this->hasMany(Category::class, 'parent_id')
+            ->where('kind', self::SERVICE_SPECIALTY)
+            ->orderBy('sort_order');
+    }
+
+    /**
+     * Which event types this service is offered for, and the mirror image.
+     *
+     * Khadijah's sheet is explicit that not every service belongs under every
+     * event: a Trade Show has no Wedding Planning in it. The picker opens on
+     * the client's own event, so it reads this rather than the whole tree.
+     */
+    public function eventTypes(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'event_type_service', 'service_id', 'event_type_id')
+            ->withTimestamps();
+    }
+
+    public function services(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'event_type_service', 'event_type_id', 'service_id')
+            ->withTimestamps();
+    }
+
+    /** The words a client might type for this service, beside its own name. */
+    public function searchTermList(): array
+    {
+        return array_values(array_filter(array_map('trim', explode(';', (string) $this->search_terms))));
     }
 
     /** How relevant each service category is to each archetype. */

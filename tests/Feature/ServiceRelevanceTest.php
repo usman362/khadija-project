@@ -117,12 +117,18 @@ class ServiceRelevanceTest extends TestCase
         $this->assertStringContainsString('Everything is still here', $markup);
     }
 
-    /** Each service carries the category the matrix actually ranks. */
+    /**
+     * The category the matrix ranks is on the page.
+     *
+     * The services are grouped under their category now, so the id sits on the
+     * group instead of being repeated on each of its services. It is the same
+     * id the matrix ranks by; what moved is where it is written.
+     */
     public function test_each_service_carries_the_category_the_matrix_ranks(): void
     {
         $markup = file_get_contents(resource_path('views/components/service-picker.blade.php'));
 
-        $this->assertStringContainsString('data-parent="{{ $cat->parent_id }}"', $markup);
+        $this->assertStringContainsString('data-group="{{ $parentId }}"', $markup);
     }
 
     /* ── The word "Category" meant three things at once ─────── */

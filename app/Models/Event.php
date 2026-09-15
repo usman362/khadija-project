@@ -52,6 +52,8 @@ class Event extends Model
         'category_id',
         // BR wizard fields
         'event_type',
+        // What the client typed when the service list had no name for it.
+        'service_missing',
         'organization_type',
         'budget_min',
         'budget_max',
@@ -271,9 +273,14 @@ class Event extends Model
         return $this->belongsTo(Category::class);
     }
 
+    /**
+     * The services asked for, each carrying the optional level 4 detail the
+     * client added to it ("Buffet Catering → Breakfast"). Matching stays on the
+     * service itself: the detail is extra precision, not a second requirement.
+     */
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class)->withTimestamps();
+        return $this->belongsToMany(Category::class)->withPivot('specialty_id')->withTimestamps();
     }
 
     public function creator(): BelongsTo

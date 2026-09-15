@@ -341,20 +341,21 @@
                  it. The availability step used to break this news at step 7,
                  five steps after the choice was made and with the whole form
                  already filled in. --}}
-            <div class="bw-svc" id="bwSvc">
-                @foreach($categories as $c)
-                    @php $pros = $proCounts[$c->id] ?? 0; @endphp
-                    <label data-pros="{{ $pros }}" data-name="{{ $c->name }}" data-parent="{{ $c->parent_id }}">
-                        <input type="checkbox" name="services[]" value="{{ $c->id }}"
-                               @checked(in_array($c->id, (array) ($data['services'] ?? [])))>
-                        <span class="bw-svc-name">{{ $c->name }}</span>
-                        @if($pros > 0)
-                            <span class="bw-svc-pros" title="{{ $pros }} {{ \Illuminate\Support\Str::plural('professional', $pros) }} in your state offer this">{{ $pros }}</span>
-                        @else
-                            <span class="bw-svc-pros is-none" title="Nobody in your state offers this yet. You can still ask">0</span>
-                        @endif
-                    </label>
-                @endforeach
+            {{-- One picker, three forms. Khadijah, 2026-09-15: "please make
+                 this same picker component reusable across all three request
+                 forms, so we maintain one taxonomy/search implementation
+                 rather than three separate versions." --}}
+            <div id="bwSvc">
+                <x-service-picker
+                    :categories="$categories"
+                    name="services"
+                    :selected="(array) ($data['services'] ?? [])"
+                    :pro-counts="$proCounts"
+                    :details="true"
+                    :detail-selected="(array) ($data['service_details'] ?? [])"
+                    :missing="true"
+                    :missing-value="$data['service_missing'] ?? null"
+                    :live-event-type="true" />
             </div>
 
             {{-- Filled in by the script below as they tick, so the warning
@@ -978,7 +979,18 @@
     {{-- ── 8 · Review ──────────────────────────────────────── --}}
     @elseif($step === 'review')
         @php
-            $svcNames = $categories->whereIn('id', (array) ($data['services'] ?? []))->pluck('name');
+            $details = \App\Models\Category::whereIn('id', array_filter((array) ($data['service_details'] ?? [])))
+                ->pluck('name', 'id');
+
+            // "Buffet Catering (Breakfast)" — the service, and the client's own
+            // extra precision under it, so the review shows what was asked for.
+            $svcNames = $categories->whereIn('id', (array) ($data['services'] ?? []))
+                ->map(function ($c) use ($data, $details) {
+                    $detail = $details[$data['service_details'][$c->id] ?? null] ?? null;
+
+                    return $detail ? "{$c->name} ({$detail})" : $c->name;
+                })->values();
+
             $isMulti  = count((array) ($data['services'] ?? [])) >= 2;
         @endphp
         <h3>Review &amp; publish</h3>
@@ -987,6 +999,9 @@
         <div class="bw-rev"><span>Request type</span><b>BR. Open to bidding</b></div>
         <div class="bw-rev"><span>Scope</span><b>{{ $isMulti ? 'MSR, multi-service' : 'SSR, single service' }}</b></div>
         <div class="bw-rev"><span>Services</span><b>{{ $svcNames->implode(', ') ?: '—' }}</b></div>
+        @if(filled($data['service_missing'] ?? null))
+            <div class="bw-rev"><span>Also asked for</span><b>{{ $data['service_missing'] }}</b></div>
+        @endif
         {{-- Written for them from the event type, area and month; this is
              the one place to rename it. Left blank, the automatic name stays. --}}
         <div class="bw-rev bw-rev-name"><span>Name</span>
@@ -1108,8 +1123,9 @@
 
         var empty = [];
         box.querySelectorAll('input:checked').forEach(function (input) {
-            var row = input.closest('label');
-            if (row && Number(row.dataset.pros) === 0) empty.push(row.dataset.name);
+            var row = input.closest('.svc-cell');
+            var pros = row ? row.querySelector('.svc-pros') : null;
+            if (pros && Number(pros.textContent) === 0) empty.push(row.querySelector('.svc-text').textContent);
         });
 
         warn.hidden = empty.length === 0;
@@ -1127,41 +1143,22 @@
 
     /* The list follows the event type.
        The line under that dropdown has always said the services are ordered by
-       what this kind of event usually needs. On the server they now are — and
-       here they follow along the moment the dropdown changes, instead of only
-       after the step is saved.
+       what this kind of event usually needs. The picker does that ordering for
+       all three request forms now, so this only has to tell it which event the
+       client picked — the same etp:change the event type picker sends.
 
        Nothing is hidden. A wedding can still want something the matrix calls
        occasional; occasional is not forbidden. */
-    var RELEVANCE = @json($relevance ?? []);
     var typeEl = document.getElementById('bwEventType');
-    var natural = Array.prototype.slice.call(box.querySelectorAll('label'));
 
-    function reorder() {
-        if (! typeEl || ! RELEVANCE.tiers) return;
-
-        var arche = RELEVANCE.archetypeOf[String(typeEl.value || '').toLowerCase()];
-        var tiers = arche ? RELEVANCE.tiers[arche] : null;
-
-        var list = natural.slice();
-
-        if (tiers) {
-            list.sort(function (a, b) {
-                var ra = RELEVANCE.order.indexOf(tiers[a.dataset.parent] || null);
-                var rb = RELEVANCE.order.indexOf(tiers[b.dataset.parent] || null);
-                if (ra === -1) ra = RELEVANCE.order.length;
-                if (rb === -1) rb = RELEVANCE.order.length;
-                // Alphabetical inside a tier, which is the order the server
-                // sent — so the same event type always gives the same list.
-                return ra - rb || natural.indexOf(a) - natural.indexOf(b);
-            });
-        }
-
-        list.forEach(function (row) { box.appendChild(row); });
+    function announce() {
+        document.dispatchEvent(new CustomEvent('etp:change', { detail: { value: typeEl.value || null } }));
     }
 
-    if (typeEl) typeEl.addEventListener('change', reorder);
-    reorder();
+    if (typeEl) {
+        typeEl.addEventListener('change', announce);
+        announce();
+    }
 })();
 </script>
 @endif

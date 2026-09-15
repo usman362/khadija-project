@@ -85,25 +85,44 @@ class ServicesFollowTheEventTypeTest extends TestCase
             ->getContent();
     }
 
+    /** The service names in the order the page lists them. */
     private function order(string $html): array
     {
         preg_match_all('/data-name="([^"]+)"/', $html, $m);
 
+        return array_map('ucwords', $m[1]);
+    }
+
+    /** The category headings, in the order the page lists them. */
+    private function headings(string $html): array
+    {
+        preg_match_all('/<span>([^<]+)<\/span>\s*<span class="n">/', $html, $m);
+
         return $m[1];
     }
 
-    /** With no event type chosen there is nothing to rank by, so A to Z. */
+    /**
+     * With no event type chosen there is nothing to rank by, so A to Z — by
+     * category, which is how the services are grouped since Khadijah's four
+     * levels went in, and then A to Z inside each one.
+     */
     public function test_without_an_event_type_the_list_is_alphabetical(): void
     {
-        $order = $this->order($this->step());
+        $groups = $this->headings($this->step());
 
         $this->assertLessThan(
-            array_search('Zebra Photography', $order, true),
-            array_search('Abbey Waste Removal', $order, true),
+            array_search('Waste', $groups, true),
+            array_search('Photography', $groups, true),
         );
     }
 
-    /** Once one is chosen, what that event needs comes first. */
+    /**
+     * Once one is chosen, what that event needs comes first.
+     *
+     * The ranking is applied to the headings in the browser, the moment the
+     * dropdown changes and again on load, so what the page has to carry is the
+     * matrix itself and the event type to read it with.
+     */
     public function test_choosing_an_event_type_puts_what_it_needs_first(): void
     {
         $this->actingAs($this->client)->post(route('client.bsr.save', 'service'), [
@@ -112,13 +131,13 @@ class ServicesFollowTheEventTypeTest extends TestCase
             'organization_type' => array_key_first(\App\Http\Controllers\Client\ClientBsrController::ORG_TYPES),
         ]);
 
-        $order = $this->order($this->step());
+        $html = $this->step();
+        $essential = Category::where('slug', 'photography-order')->value('id');
 
-        $this->assertLessThan(
-            array_search('Abbey Waste Removal', $order, true),
-            array_search('Zebra Photography', $order, true),
-            'The list is still alphabetical, so the line under the dropdown is still untrue.',
-        );
+        $this->assertStringContainsString('"Wedding":{"' . $essential . '":"Essential"}', $html,
+            'The page carries no ranking for this event type, so nothing can be put first.');
+        $this->assertStringContainsString('value="Wedding" selected', $html,
+            'The chosen event type is not on the page, so there is nothing to rank by.');
     }
 
     /** Ordered, never filtered — everything is still on the page. */
@@ -141,9 +160,11 @@ class ServicesFollowTheEventTypeTest extends TestCase
     {
         $html = $this->step();
 
-        $this->assertStringContainsString('data-parent=', $html,
-            'Rows carry no category, so the browser cannot rank them.');
-        $this->assertStringContainsString("typeEl.addEventListener('change', reorder)", $html,
+        // The category the matrix ranks now sits on the heading the services
+        // are grouped under, rather than on each service row.
+        $this->assertStringContainsString('data-group=', $html,
+            'Nothing carries a category, so the browser cannot rank anything.');
+        $this->assertStringContainsString("typeEl.addEventListener('change', announce)", $html,
             'Changing the event type does not reorder anything until the step is saved.');
     }
 }

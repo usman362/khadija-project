@@ -141,6 +141,15 @@ class SidebarListsAreAlphabeticalTest extends TestCase
 
             $body = file_get_contents($file->getPathname());
 
+            /*
+             * Level 4 details are the exception, and a small one: three to five
+             * options under a single service, in the order the sheet states
+             * them. That order carries meaning alphabetical order destroys --
+             * Breakfast, Lunch, Dinner, Reception becomes Breakfast, Dinner,
+             * Lunch, Reception. This is not a listing anyone browses.
+             */
+            $body = preg_replace('/public function specialties\(\).*?\n    \}/s', '', $body);
+
             // Packages and plans have a sort_order their owner controls. This
             // is only about category and service listings.
             if (! str_contains($body, 'Category')) {
