@@ -493,10 +493,7 @@ class ClientBsrController extends Controller
         Session::put(self::KEY, [
             'draft_id'          => $event->id,
             'services'          => $event->categories->pluck('id')->all(),
-            'service_details'   => $event->categories
-                ->filter(fn ($c) => $c->pivot->specialty_id)
-                ->mapWithKeys(fn ($c) => [$c->id => $c->pivot->specialty_id])
-                ->all(),
+            'service_details'   => \App\Domain\Requests\ServiceDetails::of($event),
             'service_missing'   => $event->service_missing,
             'scope'             => $event->categories->count() >= 2 ? 'multi' : 'single',
             'event_type'        => $event->event_type,

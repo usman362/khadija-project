@@ -70,7 +70,7 @@ class ServicePickerLevelFourTest extends TestCase
     {
         return $this->actingAs($this->client)->post(route('client.bsr.save', 'service'), $override + [
             'services'          => [$this->service->id],
-            'service_details'   => [$this->service->id => $this->detail->id],
+            'service_details'   => [$this->service->id => [$this->detail->id]],
             'event_type'        => $this->eventType->name,
             'organization_type' => 'individual',
         ]);
@@ -84,7 +84,7 @@ class ServicePickerLevelFourTest extends TestCase
             ->assertSee('Catering &amp; Food Services', false)
             ->assertSee('Buffet Catering')
             ->assertSee('Breakfast')
-            ->assertSee('service_details[' . $this->service->id . ']', false);
+            ->assertSee('service_details[' . $this->service->id . '][]', false);
     }
 
     /**
@@ -105,7 +105,7 @@ class ServicePickerLevelFourTest extends TestCase
         $this->saveServiceStep()->assertSessionHasNoErrors();
 
         $this->assertSame(
-            [$this->service->id => $this->detail->id],
+            [$this->service->id => [$this->detail->id]],
             session('bsr_wizard')['service_details'],
         );
     }
@@ -119,7 +119,7 @@ class ServicePickerLevelFourTest extends TestCase
         $this->saveServiceStep();
         $this->actingAs($this->client)->post(route('client.bsr.save', 'service'), [
             'services'          => [$this->service->id],
-            'service_details'   => [$this->service->id => $this->detail->id],
+            'service_details'   => [$this->service->id => [$this->detail->id]],
             'event_type'        => $this->eventType->name,
             'organization_type' => 'individual',
             'action'            => 'draft',
@@ -128,7 +128,7 @@ class ServicePickerLevelFourTest extends TestCase
         $event = \App\Models\Event::where('client_id', $this->client->id)->firstOrFail();
 
         $this->assertSame([$this->service->id], $event->categories->pluck('id')->all());
-        $this->assertSame($this->detail->id, (int) $event->categories->first()->pivot->specialty_id);
+        $this->assertSame([$this->service->id => [$this->detail->id]], \App\Domain\Requests\ServiceDetails::of($event));
     }
 
     /** A detail filed under a different service is refused, not stored. */
@@ -141,8 +141,8 @@ class ServicePickerLevelFourTest extends TestCase
 
         $this->saveServiceStep([
             'services'        => [$other->id],
-            'service_details' => [$other->id => $this->detail->id],
-        ])->assertSessionHasErrors('service_details.' . $other->id);
+            'service_details' => [$other->id => [$this->detail->id]],
+        ])->assertSessionHasErrors('service_details.' . $other->id . '.0');
     }
 
     /**
@@ -178,6 +178,44 @@ class ServicePickerLevelFourTest extends TestCase
         $this->assertSame(
             'vintage car for the entrance',
             \App\Models\Event::where('client_id', $this->client->id)->firstOrFail()->service_missing,
+        );
+    }
+
+    /**
+     * Sir Peter, 16 Sep: more than one detail under a service, "in case the
+     * client needs more than one". Catering for Breakfast and Lunch is one
+     * service asked for twice over, not a choice between the two.
+     */
+    public function test_several_details_can_be_chosen_under_one_service(): void
+    {
+        $lunch = Category::create([
+            'name' => 'Lunch', 'slug' => 'buffet-catering-lunch-t', 'parent_id' => $this->service->id,
+            'kind' => Category::SERVICE_SPECIALTY, 'is_active' => true,
+        ]);
+
+        $this->saveServiceStep([
+            'service_details' => [$this->service->id => [$this->detail->id, $lunch->id]],
+            'action'          => 'draft',
+        ])->assertSessionHasNoErrors();
+
+        $event = \App\Models\Event::where('client_id', $this->client->id)->firstOrFail();
+
+        $this->assertSame(
+            [$this->service->id => [$this->detail->id, $lunch->id]],
+            \App\Domain\Requests\ServiceDetails::of($event),
+        );
+        $this->assertSame(
+            ['Buffet Catering (Breakfast, Lunch)'],
+            \App\Domain\Requests\ServiceDetails::labels([$this->service], \App\Domain\Requests\ServiceDetails::of($event))->all(),
+        );
+    }
+
+    /** A draft saved when a service carried one detail still opens. */
+    public function test_a_single_saved_detail_reads_as_a_list_of_one(): void
+    {
+        $this->assertSame(
+            [$this->service->id => [$this->detail->id]],
+            \App\Domain\Requests\ServiceDetails::prune([$this->service->id => $this->detail->id], [$this->service->id]),
         );
     }
 

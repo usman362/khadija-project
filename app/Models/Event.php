@@ -274,13 +274,13 @@ class Event extends Model
     }
 
     /**
-     * The services asked for, each carrying the optional level 4 detail the
-     * client added to it ("Buffet Catering → Breakfast"). Matching stays on the
+     * The services asked for, each carrying the optional level 4 details the
+     * client added to it ("Buffet Catering → Breakfast, Lunch"). Matching stays on the
      * service itself: the detail is extra precision, not a second requirement.
      */
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class)->withPivot('specialty_id')->withTimestamps();
+        return $this->belongsToMany(Category::class)->withPivot('specialty_ids')->withTimestamps();
     }
 
     public function creator(): BelongsTo

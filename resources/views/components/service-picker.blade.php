@@ -9,7 +9,8 @@
     // single-service request (SSR, or an ER scoped to one service) can't be
     // submitted with two. Flip it live by setting data-svc-single on the root.
     'single' => false,
-    // The optional extra choice under a service ("Buffet Catering → Breakfast").
+    // The optional extra choices under a service ("Buffet Catering → Breakfast,
+    // Lunch"), as many as apply.
     // Off where the picker is not filling in a request — a professional listing
     // what they do is answering a different question.
     'details' => false,
@@ -75,7 +76,9 @@
             ->groupBy('parent_id')
         : collect();
 
-    $detailFor = fn ($cat) => (string) ($detailSelected[$cat->id] ?? '');
+    // Ids ticked under a service. A single id (a draft saved before several
+    // were allowed) reads as a list of one.
+    $detailFor = fn ($cat) => array_map('intval', (array) ($detailSelected[$cat->id] ?? []));
 
     /*
      * Which services are offered for which event type (Khadijah's level 1 to
@@ -166,7 +169,13 @@
        `label` themselves -- the wizard's `.bw-field label { display: block }`
        was beating a bare `.svc-item`, so the row stopped being a flex row and
        the count sat against the name instead of at the end. */
-    .svc-picker .svc-grid .svc-item { display: flex; align-items: flex-start; gap: 9px; height: 100%; margin: 0; border: 1.5px solid var(--border-color); border-radius: 10px; padding: 10px 12px; font-size: 12.5px; font-weight: 600; line-height: 1.35; color: var(--text-secondary); background: var(--bg-card); cursor: pointer; user-select: none; }
+    /* A cell is its service row plus, once picked, its detail chips. The row
+       grows to line up with its neighbours; a cell whose chips are open takes
+       the whole line, so the chips have room and nothing beside them is
+       stretched to match. */
+    .svc-picker .svc-cell { display: flex; flex-direction: column; min-width: 0; }
+    .svc-picker .svc-cell.detail-open { grid-column: 1 / -1; }
+    .svc-picker .svc-grid .svc-item { display: flex; align-items: flex-start; gap: 9px; flex: 1 0 auto; margin: 0; border: 1.5px solid var(--border-color); border-radius: 10px; padding: 10px 12px; font-size: 12.5px; font-weight: 600; line-height: 1.35; color: var(--text-secondary); background: var(--bg-card); cursor: pointer; user-select: none; }
     .svc-picker .svc-grid .svc-item .svc-text { flex: 1; min-width: 0; }
     .svc-item:hover { border-color: var(--svc); }
     .svc-item input { position: absolute; opacity: 0; pointer-events: none; }
@@ -185,10 +194,15 @@
 
     /* Level 4. Appears only once its service is picked, because a detail with
        nothing to attach to is a question about nothing. */
-    .svc-detail { margin-top: 6px; }
-    .svc-detail[hidden] { display: none; }
-    .svc-detail select { width: 100%; border: 1.5px solid var(--border-color); border-radius: 9px; padding: 8px 10px; font-size: 12px; font-family: inherit; color: var(--text-secondary); background: var(--bg-card); }
-    .svc-detail select:focus { outline: none; border-color: var(--svc); }
+    .svc-picker .svc-detail { margin: 6px 0 0; padding: 8px 10px 9px; border: 1px dashed var(--border-color); border-radius: 9px; display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+    .svc-picker .svc-detail[hidden] { display: none; }
+    .svc-picker .svc-detail legend { float: left; width: 100%; padding: 0; margin: 0 0 2px; font-size: 11px; font-weight: 800; color: var(--text-secondary); }
+    .svc-picker .svc-detail legend span { font-weight: 600; color: var(--text-muted); }
+    .svc-picker .svc-chip { display: inline-flex; align-items: center; margin: 0; cursor: pointer; }
+    .svc-picker .svc-chip input { position: absolute; opacity: 0; pointer-events: none; }
+    .svc-picker .svc-chip span { border: 1.5px solid var(--border-color); border-radius: 999px; padding: 3px 10px; font-size: 11.5px; font-weight: 600; color: var(--text-secondary); background: var(--bg-card); }
+    .svc-picker .svc-chip input:checked + span { border-color: var(--svc); background: rgba(249,115,22,.1); color: var(--svc-strong); font-weight: 700; }
+    .svc-picker .svc-chip input:focus-visible + span { outline: 2px solid var(--svc); outline-offset: 1px; }
 
     .svc-missing { margin-top: 12px; }
     .svc-missing > button { border: none; background: none; padding: 0; font-family: inherit; font-size: 12.5px; font-weight: 700; color: var(--svc-strong); cursor: pointer; text-decoration: underline; }
@@ -242,7 +256,8 @@
                 var detail = cell.querySelector('.svc-detail');
                 if (!detail) return;
                 detail.hidden = !on;
-                if (!on) detail.querySelector('select').value = '';
+                cell.classList.toggle('detail-open', on);
+                if (!on) detail.querySelectorAll('input').forEach(function (i) { i.checked = false; });
             });
 
             groups.forEach(function (group) {
@@ -503,7 +518,7 @@
                     @foreach($items as $cat)
                         @php($val = $valOf($cat))
                         @php($options = $specialties[$cat->id] ?? collect())
-                        <div class="svc-cell" data-cell data-id="{{ $cat->id }}"
+                        <div class="svc-cell {{ $details && $options->isNotEmpty() && in_array($val, $selectedVals) ? 'detail-open' : '' }}" data-cell data-id="{{ $cat->id }}"
                              data-name="{{ Str::lower($cat->name) }}"
                              data-terms="{{ Str::lower(implode(' ', $termsOf($cat))) }}">
                             <label class="svc-item {{ in_array($val, $selectedVals) ? 'sel' : '' }}">
@@ -517,15 +532,19 @@
                                 @endif
                             </label>
                             @if($details && $options->isNotEmpty())
-                                <div class="svc-detail" @if(! in_array($val, $selectedVals)) hidden @endif>
-                                    <select name="{{ $detailName }}[{{ $cat->id }}]"
-                                            aria-label="{{ $cat->name }}: which type, optional">
-                                        <option value="">Any type, no preference</option>
-                                        @foreach($options as $option)
-                                            <option value="{{ $option->id }}" @selected($detailFor($cat) === (string) $option->id)>{{ $option->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                {{-- As many as apply: catering for Lunch AND Dinner is one
+                                     service with two details (Sir Peter, 16 Sep). None
+                                     ticked means no preference. --}}
+                                <fieldset class="svc-detail" @if(! in_array($val, $selectedVals)) hidden @endif>
+                                    <legend>Which type? <span>Optional, pick any</span></legend>
+                                    @foreach($options as $option)
+                                        <label class="svc-chip">
+                                            <input type="checkbox" name="{{ $detailName }}[{{ $cat->id }}][]" value="{{ $option->id }}"
+                                                   @checked(in_array($option->id, $detailFor($cat)))>
+                                            <span>{{ $option->name }}</span>
+                                        </label>
+                                    @endforeach
+                                </fieldset>
                             @endif
                         </div>
                     @endforeach

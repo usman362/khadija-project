@@ -979,17 +979,13 @@
     {{-- ── 8 · Review ──────────────────────────────────────── --}}
     @elseif($step === 'review')
         @php
-            $details = \App\Models\Category::whereIn('id', array_filter((array) ($data['service_details'] ?? [])))
-                ->pluck('name', 'id');
-
-            // "Buffet Catering (Breakfast)" — the service, and the client's own
-            // extra precision under it, so the review shows what was asked for.
-            $svcNames = $categories->whereIn('id', (array) ($data['services'] ?? []))
-                ->map(function ($c) use ($data, $details) {
-                    $detail = $details[$data['service_details'][$c->id] ?? null] ?? null;
-
-                    return $detail ? "{$c->name} ({$detail})" : $c->name;
-                })->values();
+            // "Buffet Catering (Breakfast, Lunch)" — the service, and the
+            // client's own extra precision under it, so the review shows what
+            // was asked for.
+            $svcNames = \App\Domain\Requests\ServiceDetails::labels(
+                $categories->whereIn('id', (array) ($data['services'] ?? [])),
+                \App\Domain\Requests\ServiceDetails::prune((array) ($data['service_details'] ?? []), (array) ($data['services'] ?? [])),
+            );
 
             $isMulti  = count((array) ($data['services'] ?? [])) >= 2;
         @endphp
@@ -1105,7 +1101,7 @@
     var out = document.getElementById('bwScope');
     if (!box || !out) return;
     function sync() {
-        var n = box.querySelectorAll('input:checked').length;
+        var n = box.querySelectorAll('.svc-item input:checked').length;
         out.innerHTML = n === 0
             ? 'Pick your services: the scope follows automatically.'
             : (n === 1
@@ -1122,7 +1118,7 @@
         if (!warn) return;
 
         var empty = [];
-        box.querySelectorAll('input:checked').forEach(function (input) {
+        box.querySelectorAll('.svc-item input:checked').forEach(function (input) {
             var row = input.closest('.svc-cell');
             var pros = row ? row.querySelector('.svc-pros.is-none') : null;
             if (pros) empty.push(row.querySelector('.svc-text').textContent);
