@@ -105,6 +105,19 @@
     .pr-nba a:hover { border-color: rgba(249,115,22,0.30); }
     .pr-nba svg { width: 14px; height: 14px; color: var(--brand-text); flex-shrink: 0; }
 
+    .pr-eventpick select { height: 100%; min-height: 38px; border: 1px solid var(--border-color); border-radius: 10px; padding: 0 12px; font-size: 12.5px; font-family: inherit; color: var(--text-primary); background: var(--bg-card); max-width: 240px; }
+    .pr-cov { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; font-size: 12px; border-bottom: 1px solid var(--border-color); }
+    .pr-cov span { color: var(--text-secondary); }
+    .pr-cov b { white-space: nowrap; color: #c2410c; }
+    .pr-cov b.is-awarded { color: #15803d; }
+    .pr-cov b.is-open { color: var(--text-muted); }
+    .pr-cov-link { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 800; color: var(--brand-text, #c2410c); }
+    .pr-taken { font-size: 10.5px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
+    .pr-svc { font-weight: 700; color: var(--text-primary); }
+    .pr-svcdate { display: inline-block; margin-top: 3px; font-size: 10px; font-weight: 700; border-radius: 999px; padding: 1px 7px; background: var(--bg-muted, #f3f4f6); color: var(--text-muted); }
+    .pr-svcdate.is-confirmed { background: #dcfce7; color: #15803d; }
+    .pr-svcdate.is-unconfirmed { background: #fef3c7; color: #b45309; }
+    .pr-svcdate.is-clash { background: #fee2e2; color: #b91c1c; }
     @media (max-width: 1200px) { .pr-layout { grid-template-columns: 1fr; } .pr-rail { position: static; } .pr-stats { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 700px) { .pr-stats { grid-template-columns: repeat(2, 1fr); } .pr-table { font-size: 11px; } }
 </style>
@@ -151,7 +164,7 @@
     {{-- Pipeline tabs --}}
     <div class="pr-tabs">
         @foreach($tabs as $key => [$label, $count])
-            <a href="{{ route('client.proposals.index', ['tab' => $key]) }}" class="pr-tab {{ $tab === $key ? 'active' : '' }}">{{ $label }} <span class="cnt">{{ $count }}</span></a>
+            <a href="{{ route('client.proposals.index', array_filter(['tab' => $key, 'event' => $scoped?->id])) }}" class="pr-tab {{ $tab === $key ? 'active' : '' }}">{{ $label }} <span class="cnt">{{ $count }}</span></a>
         @endforeach
     </div>
 
@@ -161,17 +174,29 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input type="search" name="search" value="{{ request('search') }}" placeholder="Search proposals by event title, client, or keywords...">
             <input type="hidden" name="tab" value="{{ $tab }}">
+            @if($scoped)<input type="hidden" name="event" value="{{ $scoped->id }}">@endif
+        </form>
+        {{-- One request at a time: every figure above follows this. --}}
+        <form method="GET" class="pr-eventpick">
+            <input type="hidden" name="tab" value="{{ $tab }}">
+            <select name="event" aria-label="Show proposals for" onchange="this.form.submit()">
+                <option value="">All events</option>
+                @foreach($events as $ev)
+                    <option value="{{ $ev->id }}" @selected($scoped?->id === $ev->id)>{{ \Illuminate\Support\Str::limit($ev->title, 40) }}</option>
+                @endforeach
+            </select>
         </form>
         {{-- "Filters" and "Date Range" were <button> elements with no form and
              no handler, sitting beside a search box that worked. --}}
         <form method="GET" class="pr-daterange">
             <input type="hidden" name="tab" value="{{ $tab }}">
             @if(request('search'))<input type="hidden" name="search" value="{{ request('search') }}">@endif
+            @if($scoped)<input type="hidden" name="event" value="{{ $scoped->id }}">@endif
             <label><span>From</span><input type="date" name="from" value="{{ $from }}" aria-label="Proposals from date"></label>
             <label><span>To</span><input type="date" name="to" value="{{ $to }}" aria-label="Proposals to date"></label>
             <button type="submit" class="pr-tool-btn solid">Apply</button>
             @if($from || $to)
-                <a class="pr-tool-btn" href="{{ route('client.proposals.index', ['tab' => $tab]) }}">Clear</a>
+                <a class="pr-tool-btn" href="{{ route('client.proposals.index', array_filter(['tab' => $tab, 'event' => $scoped?->id])) }}">Clear</a>
             @endif
         </form>
     </div>
@@ -183,6 +208,7 @@
                 <thead>
                     <tr>
                         <th style="padding-left:18px;">Proposal</th>
+                        <th>Service</th>
                         <th>Event &amp; Client</th>
                         <th>Date</th>
                         <th>Amount</th>
@@ -216,9 +242,14 @@
                                     <div class="pr-prop-ico" style="background:{{ $icoColor }};">{{ $ico }}</div>
                                     <div>
                                         <div class="pr-prop-name">{{ \Illuminate\Support\Str::limit($p->event?->title ?? 'Proposal', 20) }}</div>
-                                        <div class="pr-prop-sub">{{ $p->supplier?->name ?? '—' }}@if($p->supplier?->public_id)<span class="gr-id"> (<a href="{{ route('public.professional.show', $p->supplier->id) }}" class="gr-id-link" title="Open their profile">{{ \App\Support\GigResourceId::display($p->supplier->public_id) }}</a>)</span>@endif<span>@if($p->category) · <span style="color:var(--info-text);font-weight:600;">{{ $p->category->name }}</span>@endif</span></div>
+                                        <div class="pr-prop-sub">{{ $p->supplier?->name ?? '—' }}@if($p->supplier?->public_id)<span class="gr-id"> (<a href="{{ route('public.professional.show', $p->supplier->id) }}" class="gr-id-link" title="Open their profile">{{ \App\Support\GigResourceId::display($p->supplier->public_id) }}</a>)</span>@endif</div>
                                     </div>
                                 </div>
+                            </td>
+                            <td>
+                                @php $__date = \App\Domain\Requests\ProposalDate::check($p); @endphp
+                                <div class="pr-svc">{{ $p->category->name ?? 'Whole request' }}</div>
+                                <div class="pr-svcdate is-{{ $__date }}">{{ \App\Domain\Requests\ProposalDate::label($__date, $p->event?->starts_at) }}</div>
                             </td>
                             <td>
                                 <div class="pr-ec">
@@ -241,7 +272,17 @@
                             </td>
                             <td style="padding-right:18px;">
                                 <div class="pr-actions-cell">
-                                    @if($pipe === 'pending')
+                                    @php
+                                        // Another professional already holds this service: the
+                                        // proposal can still be read, no longer accepted.
+                                        $__held = $pipe === 'pending' && $p->event
+                                            ? \App\Domain\Requests\ServiceCoverage::awardFor($p->event, $p->category_id)
+                                            : null;
+                                        $__taken = $__held && (int) $__held->supplier_id !== (int) $p->supplier_id;
+                                    @endphp
+                                    @if($__taken)
+                                        <span class="pr-taken" title="Booked with {{ $__held->supplier?->name }}">Service booked</span>
+                                    @elseif($pipe === 'pending')
                                         {{-- Into the agreement, like Compare and the chat: scope,
                                              price, schedule, contract and the fee before a booking. --}}
                                         <form method="POST" action="{{ route('client.finalize.start', $p->id) }}" style="display:inline;">
@@ -276,14 +317,14 @@
                             </td>
                         </tr>
                         <tr id="prthread-{{ $p->id }}" style="display:none;">
-                            <td colspan="7" style="padding:0 18px 16px;background:var(--bg-soft, #f8fafc);">
+                            <td colspan="8" style="padding:0 18px 16px;background:var(--bg-soft, #f8fafc);">
                                 {{-- The row toggle already revealed this; expanded skips the
                                      partial's own second toggle so one click is enough. --}}
                                 @include('professional.bidding-board._bid-thread', ['bid' => $p, 'replyRoute' => 'client.proposals.reply', 'meId' => auth()->id(), 'expanded' => true])
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="7" style="text-align:center;padding:50px;color:var(--text-muted);">No proposals in <b>{{ $tabs[$tab][0] ?? 'this view' }}</b> yet.</td></tr>
+                        <tr><td colspan="8" style="text-align:center;padding:50px;color:var(--text-muted);">No proposals in <b>{{ $tabs[$tab][0] ?? 'this view' }}</b> yet.</td></tr>
                     @endforelse
                 </tbody>
             </table>
@@ -299,6 +340,30 @@
 
 {{-- Right rail --}}
 <aside class="pr-rail">
+    {{-- Scoped to one request: where each of its services stands, and the
+         way into the per-service view on the request itself. --}}
+    @if($scoped)
+        @php
+            $__ev = \App\Models\Event::with('categories:id,name')->find($scoped->id);
+            $__cov = \App\Domain\Requests\ServiceCoverage::for($__ev, $__ev->bids()->get());
+        @endphp
+        <div class="pr-rail-card">
+            <div class="pr-rail-title">Services on this request</div>
+            @foreach($__cov as $c)
+                <div class="pr-cov">
+                    <span>{{ $c['service']->name ?? 'Whole request' }}</span>
+                    <b class="is-{{ $c['state'] }}">
+                        @switch($c['state'])
+                            @case('awarded') Booked @break
+                            @case('has_bids') {{ $c['bids']->count() }} {{ \Illuminate\Support\Str::plural('proposal', $c['bids']->count()) }} @break
+                            @default None yet
+                        @endswitch
+                    </b>
+                </div>
+            @endforeach
+            <a class="pr-cov-link" href="{{ route('client.events.show', [$scoped->id, 'tab' => 'proposals']) }}">Compare by service →</a>
+        </div>
+    @endif
     <div class="pr-rail-card">
         <div class="pr-rail-title">Proposal Health</div>
         @php $overallHealth = $stats['submitted'] > 0 ? min(95, 50 + $stats['accepted'] * 8) : 0; @endphp

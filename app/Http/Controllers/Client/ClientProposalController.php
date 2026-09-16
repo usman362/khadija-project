@@ -33,6 +33,23 @@ class ClientProposalController extends Controller
         // Every bid placed on an event this client owns.
         $base = Bid::whereHas('event', fn ($q) => $q->where('client_id', $user->id));
 
+        /*
+         * One event at a time. Sir Peter, 17 Sep: the totals read as the whole
+         * account, with no way to see one multi-service request on its own.
+         * Scoping the base query scopes every figure on the page with it:
+         * the tiles, the tabs and the pipeline all read from here.
+         */
+        $events = Event::where('client_id', $user->id)
+            ->whereHas('bids')
+            ->orderByDesc('created_at')
+            ->get(['id', 'title']);
+
+        $scoped = $events->firstWhere('id', (int) $request->query('event'));
+
+        if ($scoped) {
+            $base->where('event_id', $scoped->id);
+        }
+
         $stats = [
             'submitted'   => (clone $base)->count(),
             'pending'     => (clone $base)->whereIn('status', self::PENDING)->count(),
@@ -48,7 +65,7 @@ class ClientProposalController extends Controller
 
         $tab = $request->string('tab')->toString() ?: 'all';
         $query = (clone $base)
-            ->with(['event:id,title,starts_at,location,status', 'event.categories:id,name',
+            ->with(['event:id,title,starts_at,location,status,client_id', 'event.categories:id,name',
                 'category:id,name', 'supplier:id,name,public_id', 'replies.user:id,name'])
             ->latest();
 
@@ -104,7 +121,7 @@ class ClientProposalController extends Controller
             'total'          => $pendingValue + $acceptedValue,
         ];
 
-        return view('client.proposals.index', compact('stats', 'proposals', 'tab', 'pipeline', 'from', 'to'));
+        return view('client.proposals.index', compact('stats', 'proposals', 'tab', 'pipeline', 'from', 'to', 'events', 'scoped'));
     }
 
     /**
@@ -126,9 +143,22 @@ class ClientProposalController extends Controller
         $q      = trim((string) $request->query('q', ''));
         $only   = (string) $request->query('only', '');     // verified | insured | ''
 
+        $event->loadMissing('categories:id,name');
+
+        /*
+         * One service at a time on a multi-service request (Sir Peter, 17 Sep):
+         * competing bids on the same service, side by side. Anything that is
+         * not one of this request's own services is ignored rather than
+         * trusted, so a hand-edited link cannot filter on something else.
+         */
+        $service = $event->categories->firstWhere('id', (int) $request->query('service'));
+
         $bids = Bid::where('event_id', $event->id)
-            ->with(['supplier.profile', 'category:id,name', 'replies.user:id,name'])
+            ->when($service, fn ($q) => $q->where('category_id', $service->id))
+            ->with(['supplier.profile', 'category:id,name', 'replies.user:id,name', 'event'])
             ->get();
+
+        $coverage = \App\Domain\Requests\ServiceCoverage::for($event, Bid::where('event_id', $event->id)->get());
 
         // Rating and review count per professional, in one query rather than per row.
         $stats = \App\Models\Review::selectRaw('reviewee_id, AVG(rating) as avg_rating, COUNT(*) as total')
@@ -138,13 +168,23 @@ class ClientProposalController extends Controller
             ->get()
             ->keyBy('reviewee_id');
 
-        $awardedTo = Booking::where('event_id', $event->id)
-            ->whereNotIn('status', ['cancelled'])
-            ->value('supplier_id');
+        /*
+         * Who holds each service. This used to be one supplier for the whole
+         * event, so the moment one service was booked every other bid on the
+         * request read "Not Selected" and lost its buttons, including bids on
+         * services nobody had been chosen for yet.
+         */
+        $holders = $coverage->mapWithKeys(fn ($r) => [
+            (int) ($r['service']->id ?? 0) => $r['booking']?->supplier_id,
+        ]);
 
-        $rows = $bids->map(function (Bid $b) use ($stats, $event, $awardedTo) {
+        $rows = $bids->map(function (Bid $b) use ($stats, $event, $holders) {
             $p  = $b->supplier?->profile;
             $st = $stats->get($b->supplier_id);
+            $awardedTo = $holders[(int) ($b->category_id ?? 0)] ?? null;
+            $budget = $b->category_id ? $event->budgetForService((int) $b->category_id) : null;
+            $budget = $budget ?: ($event->categories->count() > 1 ? null : $event->budget);
+            $date = \App\Domain\Requests\ProposalDate::check($b);
 
             return [
                 'bid'        => $b,
@@ -159,7 +199,10 @@ class ClientProposalController extends Controller
                     && \App\Support\VerifiedBadge::holds($p, 'workers_comp')
                     && \App\Support\InsuranceRequirement::isCovered($p),
                 'city'       => $p?->city,
-                'overBudget' => $event->budget && $b->amount > $event->budget,
+                'budget'     => $budget,
+                'overBudget' => $budget && $b->amount > $budget,
+                'taken'      => (bool) $awardedTo,
+                'date'       => $date,
                 'state'      => match (true) {
                     $awardedTo && (int) $awardedTo === (int) $b->supplier_id => 'accepted',
                     (bool) $awardedTo                                        => 'not_selected',
@@ -191,8 +234,9 @@ class ClientProposalController extends Controller
             'event'     => $event,
             'rows'      => $rows->values(),
             'total'     => $bids->count(),
-            'awardedTo' => $awardedTo,
             'filters'   => compact('sort', 'q', 'only'),
+            'service'   => $service,
+            'coverage'  => $coverage,
             // Deliberately NOT offered as columns: distance (no coordinates are
             // stored on a profile) and response time (nothing records it). The
             // mockup lists both; inventing them would be worse than omitting.

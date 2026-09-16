@@ -38,6 +38,16 @@
     .cp-tag { border-radius: 6px; padding: 2px 8px; font-size: 10.5px; font-weight: 800; }
     .cp-tag.ok { background: rgba(22,163,74,.13); color: var(--ok-text); }
     .cp-tag.no { background: rgba(100,116,139,.15); color: var(--text-muted); }
+    .cp-date { border-radius: 999px; padding: 1px 8px; font-weight: 700; }
+    .cp-date.is-confirmed { background: #dcfce7; color: #15803d; }
+    .cp-date.is-unconfirmed { background: #fef3c7; color: #b45309; }
+    .cp-date.is-clash { background: #fee2e2; color: #b91c1c; }
+    .cp-svcs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .cp-svc { display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--border-color); border-radius: 999px; padding: 6px 12px; font-size: 12.5px; font-weight: 700; color: var(--text-secondary); text-decoration: none; background: var(--bg-card); }
+    .cp-svc small { font-size: 11px; font-weight: 800; color: var(--text-muted); }
+    .cp-svc.is-open { border-style: dashed; }
+    .cp-svc.is-awarded small { color: #15803d; }
+    .cp-svc.on { border-color: #c2410c; color: #c2410c; background: rgba(234,88,12,.07); }
     .cp-note { font-size: 13px; color: var(--text-secondary); margin-top: 8px; line-height: 1.6; }
     .cp-right { text-align: right; min-width: 210px; }
     .cp-amt { font-size: 19px; font-weight: 800; color: var(--text-primary); }
@@ -78,7 +88,12 @@
         <span>{{ $total }} {{ Str::plural('proposal', $total) }} received</span>
         @if($event->starts_at)<span>📅 {{ $event->starts_at->format('M j, Y') }}</span>@endif
         @if($event->location)<span>📍 {{ $event->location }}</span>@endif
-        @if($event->budget)<span>💰 Budget ${{ number_format($event->budget) }}</span>@endif
+        @php $__svcBudget = $service ? $event->budgetForService($service->id) : null; @endphp
+        @if($__svcBudget)
+            <span>💰 {{ $service->name }} budget ${{ number_format($__svcBudget) }}</span>
+        @elseif($event->budget)
+            <span>💰 Budget ${{ number_format($event->budget) }}</span>
+        @endif
     </div>
 </div>
 
@@ -86,7 +101,31 @@
     🔒 <span><b>Sealed proposals.</b> Each amount is visible only to you and the professional who sent it. They cannot see each other's bids, rankings or negotiations. Compare the full scope, terms and qualifications, not only price.</span>
 </div>
 
+{{-- One service at a time on a multi-service request, so bids for the same
+     service sit together (Sir Peter, 17 Sep). Each chip says where that service
+     stands, including the ones nobody has bid on. --}}
+@if($coverage->count() > 1)
+    <nav class="cp-svcs" aria-label="Services on this request">
+        <a class="cp-svc {{ $service ? '' : 'on' }}" href="{{ route('client.proposals.compare', $event) }}">All services</a>
+        @foreach($coverage as $c)
+            @continue(! $c['service'])
+            <a class="cp-svc {{ $service && $service->id === $c['service']->id ? 'on' : '' }} is-{{ $c['state'] }}"
+               href="{{ route('client.proposals.compare', [$event, 'service' => $c['service']->id]) }}">
+                {{ $c['service']->name }}
+                <small>
+                    @switch($c['state'])
+                        @case('awarded') Booked @break
+                        @case('has_bids') {{ $c['bids']->count() }} @break
+                        @default None yet
+                    @endswitch
+                </small>
+            </a>
+        @endforeach
+    </nav>
+@endif
+
 <form method="GET" action="{{ route('client.proposals.compare', $event) }}" class="cp-bar">
+    @if($service)<input type="hidden" name="service" value="{{ $service->id }}">@endif
     <input class="s" type="search" name="q" value="{{ $f['q'] }}" placeholder="Search professional or city…">
     <select name="only" aria-label="All professionals">
         <option value="">All professionals</option>
@@ -101,7 +140,7 @@
     </select>
     <button type="submit">Apply</button>
     @if($f['q'] || $f['only'])
-        <a class="clear" href="{{ route('client.proposals.compare', $event) }}">Clear</a>
+        <a class="clear" href="{{ route('client.proposals.compare', array_filter([$event, 'service' => $service?->id])) }}">Clear</a>
     @endif
 </form>
 
@@ -126,7 +165,9 @@
              data-years="{{ $r['years'] ? $r['years'] . ' yrs' : '—' }}"
              data-city="{{ $r['city'] ?: '—' }}"
              data-insured="{{ $r['insured'] ? 'Insured' : 'Not on file' }}"
-             data-verified="{{ $r['verified'] ? 'Verified' : 'Not verified' }}">
+             data-verified="{{ $r['verified'] ? 'Verified' : 'Not verified' }}"
+             data-service="{{ $b->category->name ?? 'Whole request' }}"
+             data-date="{{ \App\Domain\Requests\ProposalDate::label($r['date'], $event->starts_at) }}">
         <input type="checkbox" class="cp-check" style="margin-top:4px;" aria-label="Select {{ $pro->name ?? 'professional' }} to compare">
 
         <div style="min-width:0;">
@@ -142,6 +183,7 @@
                 @if($r['years'])<span>{{ $r['years'] }} yrs experience</span>@endif
                 @if($r['city'])<span>📍 {{ $r['city'] }}</span>@endif
                 @if($b->category)<span>{{ $b->category->name }}</span>@endif
+                <span class="cp-date is-{{ $r['date'] }}">{{ \App\Domain\Requests\ProposalDate::label($r['date'], $event->starts_at) }}</span>
                 <span>Submitted {{ $b->created_at->humanAgo() }}</span>
             </div>
             @if($b->note)<p class="cp-note">{{ $b->note }}</p>@endif
@@ -156,14 +198,14 @@
         <div class="cp-right">
             <span class="cp-state {{ $r['state'] }}">{{ Str::title(str_replace('_', ' ', $r['state'])) }}</span>
             <div class="cp-amt">${{ number_format($b->amount) }}</div>
-            @if($event->budget)
+            @if($r['budget'])
                 <div class="cp-budget" style="color:{{ $r['overBudget'] ? '#d97706' : '#16a34a' }};">
                     {{ $r['overBudget'] ? 'Above budget' : 'Within budget' }}
                 </div>
             @endif
             <div class="cp-acts">
                 @if($pro)<a class="cp-btn" href="{{ route('public.professional.show', $pro) }}">Profile</a>@endif
-                @if(! $awardedTo && $r['state'] !== 'declined')
+                @if(! $r['taken'] && $r['state'] !== 'declined')
                     {{-- R12: Reply is a counter-offer, not a message — the two are
                          deliberately different things. General questions belong in
                          the message thread, so that's where this points. --}}
@@ -177,7 +219,13 @@
                          spot: scope, price, schedule, terms, contract and deposit
                          all get agreed first, and either side can still back out
                          until it is signed and funded. --}}
-                    <form method="POST" action="{{ route('client.finalize.start', $b) }}" style="display:inline;">
+                    @php
+                        $__warn = \App\Domain\Requests\ProposalDate::needsWarning($r['date'])
+                            ? \App\Domain\Requests\ProposalDate::warning($r['date'], $event->starts_at, $pro?->name) . ' Continue anyway?'
+                            : null;
+                    @endphp
+                    <form method="POST" action="{{ route('client.finalize.start', $b) }}" style="display:inline;"
+                          @if($__warn) onsubmit="return confirm(@js($__warn));" @endif>
                         @csrf
                         <button type="submit" class="cp-btn go">Select &amp; finalize</button>
                     </form>
@@ -228,14 +276,17 @@
     go.addEventListener('click', function () {
         var s = selected();
         if (s.length < 2) return;
-        var fields = [['name','Professional'],['amount','Bid'],['rating','Rating'],
+        // Values come from the page but are written as HTML here, so they are
+        // escaped: a professional names themselves.
+        function esc(v) { var d = document.createElement('div'); d.textContent = v == null ? '' : v; return d.innerHTML; }
+        var fields = [['name','Professional'],['service','Service'],['amount','Bid'],['date','Your date'],['rating','Rating'],
                       ['years','Experience'],['city','Based in'],['verified','Verification'],['insured','Insurance']];
         var html = '<table><tr><th></th>' + s.map(function (r) {
-            return '<th>' + r.dataset.name + '</th>';
+            return '<th>' + esc(r.dataset.name) + '</th>';
         }).join('') + '</tr>';
         fields.slice(1).forEach(function (f) {
             html += '<tr><th>' + f[1] + '</th>' + s.map(function (r) {
-                return '<td><b>' + r.dataset[f[0]] + '</b></td>';
+                return '<td><b>' + esc(r.dataset[f[0]]) + '</b></td>';
             }).join('') + '</tr>';
         });
         panel.innerHTML = html + '</table>';

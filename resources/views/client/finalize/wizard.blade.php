@@ -46,6 +46,7 @@
     @media (max-width: 620px) { .fz-two { grid-template-columns: 1fr; } }
 
     .fz-row { display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid var(--border-color); font-size: 13px; }
+    .fz-date-warn { margin-top: 12px; background: #fef3c7; border: 1px solid #fcd34d; color: #92400e; border-radius: 10px; padding: 10px 13px; font-size: 13px; font-weight: 600; line-height: 1.55; }
     .fz-row:last-of-type { border-bottom: 0; }
     .fz-row span { color: var(--text-muted); font-weight: 600; }
     .fz-row b { color: var(--text-primary); text-align: right; }
@@ -137,8 +138,20 @@
 
         <div class="fz-row"><span>Bid amount</span><b>${{ number_format((float) ($bid->amount ?? 0)) }}</b></div>
         <div class="fz-row"><span>Submitted</span><b>{{ $bid?->created_at?->format('M j, Y · g:i A') ?? '—' }}</b></div>
-        @if($bid?->available_confirmed)
-            <div class="fz-row"><span>Availability</span><b>Confirmed for the date</b></div>
+        @if($bid?->category)
+            <div class="fz-row"><span>Service</span><b>{{ $bid->category->name }}</b></div>
+        @endif
+        {{-- The date the proposal holds for, and the warning before it turns
+             into an agreement when it does not (Sir Peter, 17 Sep). --}}
+        @if($bid)
+            @php $__date = \App\Domain\Requests\ProposalDate::check($bid); @endphp
+            <div class="fz-row"><span>Your date</span><b>{{ \App\Domain\Requests\ProposalDate::label($__date, $event->starts_at) }}</b></div>
+            @if(\App\Domain\Requests\ProposalDate::needsWarning($__date))
+                <div class="fz-date-warn" role="alert">
+                    ⚠ {{ \App\Domain\Requests\ProposalDate::warning($__date, $event->starts_at, $pro->name) }}
+                    Nothing is booked yet, so you can message them first and come back.
+                </div>
+            @endif
         @endif
         @if($bid?->breakdown)
             <div style="margin-top:14px;">

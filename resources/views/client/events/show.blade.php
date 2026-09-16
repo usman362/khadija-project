@@ -10,8 +10,11 @@
 
     {{-- ── Header ───────────────────────────────────────────── --}}
     @php
-        $evProposals = $event->bookings->where('status', 'requested')->count();
         $evBids      = isset($bids) ? $bids->count() : 0;
+        // How many of the services asked for have at least one proposal, or
+        // are already booked. "0 Proposals" beside "7 Sealed Bids" counted
+        // an old kind of row and said nothing about coverage.
+        $evCovered   = $coverage->filter(fn ($r) => $r['service'] && $r['state'] !== 'open')->count();
         $evDaysToGo  = $event->starts_at ? (int) round(now()->startOfDay()->diffInDays($event->starts_at->startOfDay(), false)) : null;
     @endphp
 
@@ -68,6 +71,30 @@
         .ev-prop:last-child { border-bottom: 0; }
         .ev-prop-meta { display: flex; gap: 10px; flex-wrap: wrap; font-size: 12px; color: var(--text-muted); margin-top: 4px; }
         .ev-prop-note { font-size: 13px; color: var(--text-secondary); margin-top: 8px; line-height: 1.6; }
+
+        /* Per-service proposals (Sir Peter, 17 Sep). */
+        .ev-cov { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-bottom: 10px; }
+        .ev-cov-item { border: 1.5px solid var(--border-color); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; }
+        .ev-cov-name { font-size: 13px; font-weight: 800; color: var(--text-primary); }
+        .ev-cov-state { font-size: 12px; font-weight: 700; }
+        .ev-cov-item.is-awarded { border-color: #86efac; background: rgba(22,163,74,.06); }
+        .ev-cov-item.is-awarded .ev-cov-state { color: #15803d; }
+        .ev-cov-item.is-has_bids .ev-cov-state { color: #c2410c; }
+        .ev-cov-item.is-open { border-style: dashed; }
+        .ev-cov-item.is-open .ev-cov-state { color: var(--text-muted); }
+        .ev-cov-note { font-size: 12.5px; color: var(--text-secondary); margin: 0 0 16px; }
+        .ev-svc-group + .ev-svc-group { margin-top: 18px; }
+        .ev-svc-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 12px; background: var(--bg-subtle, rgba(0,0,0,.025)); border-radius: 10px; }
+        .ev-svc-head b { display: block; font-size: 14px; color: var(--text-primary); }
+        .ev-svc-head span { font-size: 12px; color: var(--text-muted); }
+        .ev-svc-booked { margin-top: 10px; font-size: 12.5px; color: #15803d; background: rgba(22,163,74,.07); border-radius: 9px; padding: 8px 12px; }
+        .ev-svc-empty { font-size: 13px; color: var(--text-muted); padding: 14px 4px; }
+        .ev-date { display: inline-block; margin-top: 7px; font-size: 11.5px; font-weight: 700; border-radius: 999px; padding: 2px 9px; }
+        .ev-date.is-confirmed { background: #dcfce7; color: #15803d; }
+        .ev-date.is-unconfirmed { background: #fef3c7; color: #b45309; }
+        .ev-date.is-clash { background: #fee2e2; color: #b91c1c; }
+        .ev-date.is-no_date { background: var(--bg-muted, #f3f4f6); color: var(--text-muted); }
+        .ev-won { font-size: 12px; font-weight: 800; color: #15803d; padding: 5px 10px; border-radius: 8px; background: rgba(22,163,74,.1); }
 
         /* Questions + activity + empty */
         .ev-q { border: 1px solid var(--border-color); border-radius: 12px; padding: 13px 15px; margin-bottom: 10px; }
@@ -287,9 +314,9 @@
     @endif
 
     <div class="ev-stats">
-        <div class="ev-stat"><b>{{ $evProposals }}</b><span>Proposals</span></div>
-        <div class="ev-stat"><b>{{ $evBids }}</b><span>Sealed Bids</span></div>
+        <div class="ev-stat"><b>{{ $evBids }}</b><span>Proposals</span></div>
         <div class="ev-stat"><b>{{ $event->categories->count() }}</b><span>Services</span></div>
+        <div class="ev-stat"><b>{{ $evCovered }} of {{ $event->categories->count() }}</b><span>Services with proposals</span></div>
         <div class="ev-stat">
             <b>{{ $evDaysToGo === null ? '—' : ($evDaysToGo > 0 ? $evDaysToGo : ($evDaysToGo === 0 ? 'Today' : 'Past')) }}</b>
             <span>{{ $evDaysToGo !== null && $evDaysToGo > 0 ? 'Days to go' : 'Event date' }}</span>
@@ -633,48 +660,126 @@
 
     {{-- ── Proposals ────────────────────────────────────────── --}}
     @if($tab === 'proposals')
+        @php
+            $__open = \App\Domain\Requests\ServiceCoverage::uncovered($coverage);
+            $__multi = $coverage->count() > 1;
+        @endphp
         <div class="cl-card">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
                 <h3 style="font-size:16px;font-weight:600;">Proposals received ({{ $bids->count() }})</h3>
                 @if($bids->count() > 1)
                     <a class="cl-btn cl-btn-primary cl-btn-sm" style="background:#c2410c;border-color:#c2410c;"
-                       href="{{ route('client.proposals.compare', $event) }}">Compare proposals</a>
+                       href="{{ route('client.proposals.compare', $event) }}">Compare all proposals</a>
                 @endif
             </div>
 
             <div class="ev-sealed">🔒 <b>Sealed proposals.</b> Each amount is visible only to you and the professional who sent it. Competitors cannot see each other's bids.</div>
 
-            @forelse($bids as $bid)
-                @php $sup = $bid->supplier; $prof = $sup?->profile; @endphp
-                <div class="ev-prop">
-                    <div style="min-width:0;">
-                        <div style="font-size:14.5px;font-weight:800;color:var(--text-primary);">{{ $sup?->name ?? 'Professional' }}</div>
-                        <div class="ev-prop-meta">
-                            @if($prof?->headline)<span>{{ $prof->headline }}</span>@endif
-                            @if($prof?->city)<span>📍 {{ $prof->city }}</span>@endif
-                            @if($bid->category)<span>{{ $bid->category->name }}</span>@endif
-                            <span>Submitted {{ $bid->created_at->humanAgo() }}</span>
+            {{-- Sir Peter, 17 Sep: on a multi-service request, say which
+                 services are covered and which are not, before the detail. --}}
+            @if($__multi)
+                <div class="ev-cov" data-coverage>
+                    @foreach($coverage as $row)
+                        <div class="ev-cov-item is-{{ $row['state'] }}">
+                            <span class="ev-cov-name">{{ $row['service']->name ?? 'Whole request' }}</span>
+                            <span class="ev-cov-state">
+                                @switch($row['state'])
+                                    @case('awarded') Booked with {{ $row['booking']->supplier->name ?? 'a professional' }} @break
+                                    @case('has_bids') {{ $row['bids']->count() }} {{ Str::plural('proposal', $row['bids']->count()) }} @break
+                                    @default No proposals yet
+                                @endswitch
+                            </span>
                         </div>
-                        @if($bid->note)<p class="ev-prop-note">{{ $bid->note }}</p>@endif
-                    </div>
-                    <div style="text-align:right;white-space:nowrap;">
-                        <div style="font-size:19px;font-weight:800;color:var(--text-primary);">${{ number_format($bid->amount) }}</div>
-                        @if($event->budget)
-                            <div style="font-size:11.5px;font-weight:700;color:{{ $bid->amount <= $event->budget ? '#16a34a' : '#d97706' }};">
-                                {{ $bid->amount <= $event->budget ? 'Within budget' : 'Above budget' }}
+                    @endforeach
+                </div>
+                @if($__open->isNotEmpty())
+                    <p class="ev-cov-note">
+                        <b>Still uncovered:</b> {{ $__open->pluck('service.name')->implode(', ') }}.
+                        This request stays open for {{ $__open->count() === 1 ? 'it' : 'them' }} while you choose the rest.
+                    </p>
+                @endif
+            @endif
+
+            @foreach($coverage as $row)
+                @php
+                    $__svc = $row['service'];
+                    $__budget = $__svc ? $event->budgetForService($__svc->id) : null;
+                    $__budget = $__budget ?: (! $__multi ? $event->budget : null);
+                @endphp
+                <section class="ev-svc-group" id="{{ $__svc ? 'service-' . $__svc->id : 'service-all' }}">
+                    @if($__multi)
+                        <div class="ev-svc-head">
+                            <div>
+                                <b>{{ $__svc->name ?? 'Whole request' }}</b>
+                                <span>
+                                    @if($__budget) Your budget ${{ number_format($__budget) }} · @endif
+                                    @if($row['lowest'] !== null) Lowest ${{ number_format($row['lowest']) }} @else No proposals yet @endif
+                                </span>
                             </div>
-                        @endif
-                        <div style="margin-top:8px;display:flex;gap:6px;justify-content:flex-end;">
-                            <a class="cl-btn cl-btn-ghost cl-btn-sm" href="{{ route('public.professional.show', $sup) }}">View profile</a>
+                            @if($__svc && $row['bids']->count() > 1)
+                                <a class="cl-btn cl-btn-ghost cl-btn-sm"
+                                   href="{{ route('client.proposals.compare', [$event, 'service' => $__svc->id]) }}">Compare {{ $row['bids']->count() }} side by side</a>
+                            @endif
                         </div>
-                    </div>
-                </div>
-            @empty
-                <div class="ev-empty">
-                    <b>No proposals yet</b>
-                    <p>{{ $type === 'DR' ? 'The professional you sent this to has not responded yet.' : 'Professionals are being notified. Proposals appear here as they come in.' }}</p>
-                </div>
-            @endforelse
+                    @endif
+
+                    @if($row['booking'])
+                        <div class="ev-svc-booked">✓ Booked with <b>{{ $row['booking']->supplier->name ?? 'a professional' }}</b>. The other proposals for this service can no longer be chosen.</div>
+                    @endif
+
+                    @forelse($row['bids'] as $bid)
+                        @php
+                            $sup = $bid->supplier; $prof = $sup?->profile;
+                            $__date = $bidDates[$bid->id] ?? 'no_date';
+                            $__won = $row['booking'] && (int) $row['booking']->supplier_id === (int) $bid->supplier_id;
+                            $__warn = \App\Domain\Requests\ProposalDate::needsWarning($__date)
+                                ? \App\Domain\Requests\ProposalDate::warning($__date, $event->starts_at, $sup?->name)
+                                : null;
+                        @endphp
+                        <div class="ev-prop">
+                            <div style="min-width:0;">
+                                <div style="font-size:14.5px;font-weight:800;color:var(--text-primary);">{{ $sup?->name ?? 'Professional' }}</div>
+                                <div class="ev-prop-meta">
+                                    @if($prof?->headline)<span>{{ $prof->headline }}</span>@endif
+                                    @if($prof?->city)<span>📍 {{ $prof->city }}</span>@endif
+                                    @if(! $__multi && $bid->category)<span>{{ $bid->category->name }}</span>@endif
+                                    <span>Submitted {{ $bid->created_at->humanAgo() }}</span>
+                                </div>
+                                <div class="ev-date is-{{ $__date }}">{{ \App\Domain\Requests\ProposalDate::label($__date, $event->starts_at) }}</div>
+                                @if($bid->availability_note)<p class="ev-prop-note">On timing: {{ $bid->availability_note }}</p>@endif
+                                @if($bid->note)<p class="ev-prop-note">{{ $bid->note }}</p>@endif
+                            </div>
+                            <div style="text-align:right;white-space:nowrap;">
+                                <div style="font-size:19px;font-weight:800;color:var(--text-primary);">${{ number_format($bid->amount) }}</div>
+                                @if($__budget)
+                                    <div style="font-size:11.5px;font-weight:700;color:{{ $bid->amount <= $__budget ? '#16a34a' : '#d97706' }};">
+                                        {{ $bid->amount <= $__budget ? 'Within budget' : 'Above budget' }}
+                                    </div>
+                                @endif
+                                <div style="margin-top:8px;display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;">
+                                    <a class="cl-btn cl-btn-ghost cl-btn-sm" href="{{ route('public.professional.show', $sup) }}">View profile</a>
+                                    @if($__won)
+                                        <span class="ev-won">Booked</span>
+                                    @elseif(! $row['booking'] && ! in_array($bid->status, ['declined', 'withdrawn'], true))
+                                        {{-- Accepting one service never touches the others:
+                                             each is agreed on its own. A date that does not
+                                             hold asks once more before going ahead. --}}
+                                        <form method="POST" action="{{ route('client.finalize.start', $bid) }}"
+                                              @if($__warn) onsubmit="return confirm(@js($__warn . ' Continue anyway?'));" @endif>
+                                            @csrf
+                                            <button type="submit" class="cl-btn cl-btn-primary cl-btn-sm">Select &amp; finalize</button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="ev-svc-empty">
+                            {{ $type === 'DR' ? 'The professional you sent this to has not responded yet.' : 'No proposals for this service yet. Professionals who offer it are being notified.' }}
+                        </div>
+                    @endforelse
+                </section>
+            @endforeach
         </div>
     @endif
 

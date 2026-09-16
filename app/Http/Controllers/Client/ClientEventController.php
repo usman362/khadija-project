@@ -519,6 +519,12 @@ class ClientEventController extends Controller
         // request is no longer open for proposals.
         $award = $event->bookings->first(fn ($b) => ! in_array($b->status, ['cancelled', 'declined'], true));
 
+        // Sir Peter, 17 Sep: proposals grouped by the service they are for,
+        // with the services nobody has bid on said out loud, and each
+        // proposal's standing on the client's date.
+        $coverage = \App\Domain\Requests\ServiceCoverage::for($event, $bids);
+        $bidDates = $bids->mapWithKeys(fn ($b) => [$b->id => \App\Domain\Requests\ProposalDate::check($b->setRelation('event', $event))]);
+
         // Clarifying questions live on the bid threads — a reply with no counter
         // amount is a question rather than a negotiation move.
         $questions = $bids->flatMap(fn ($b) => $b->replies->map(fn ($r) => [
@@ -599,7 +605,7 @@ class ClientEventController extends Controller
             'event', 'categories', 'selectedCategoryIds', 'bids',
             'type', 'scope', 'tab', 'award', 'questions', 'activity',
             'attendees', 'attendeeSummary', 'availableArtifacts',
-            'files', 'filesKey'
+            'files', 'filesKey', 'coverage', 'bidDates'
         ));
     }
 

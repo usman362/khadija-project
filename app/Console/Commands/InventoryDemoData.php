@@ -74,6 +74,12 @@ class InventoryDemoData extends Command
         'saffron.demo@example.test',
         'sofia.demo@example.test',
         'velvetnotes.demo@example.test',
+        // demo:msr-scenario, the multi-service proposals test request.
+        'grandoak.msr.demo@example.test',
+        'velvetbeats.msr.demo@example.test',
+        'evermore.msr.demo@example.test',
+        'snapspin.msr.demo@example.test',
+        'glowbooth.msr.demo@example.test',
     ];
 
     /**

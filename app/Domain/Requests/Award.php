@@ -27,6 +27,8 @@ final class Award
         // OA-104: in regulated categories only a Verified professional's bid.
         RegulatedAcceptance::ensure($bid);
 
+        self::ensureServiceIsFree($bid);
+
         return Finalization::firstOrCreate(
             ['event_id' => $bid->event_id, 'supplier_id' => $bid->supplier_id, 'category_id' => $bid->category_id],
             [
@@ -51,6 +53,7 @@ final class Award
     {
         if ($f->bid) {
             RegulatedAcceptance::ensure($f->bid);
+            self::ensureServiceIsFree($f->bid);
         }
 
         $booking = Booking::updateOrCreate(
@@ -70,5 +73,28 @@ final class Award
         $f->bid?->update(['status' => 'won']);
 
         return $booking;
+    }
+
+    /**
+     * One service, one professional.
+     *
+     * Every award is keyed on the professional as well as the service, which
+     * is what lets two professionals split a request. It also meant nothing
+     * stopped two of them being booked for the SAME service. Checked when the
+     * agreement opens and again when it books, since another agreement for the
+     * service can finish in between.
+     */
+    private static function ensureServiceIsFree(Bid $bid): void
+    {
+        $held = ServiceCoverage::awardFor($bid->event, $bid->category_id);
+
+        if ($held && (int) $held->supplier_id !== (int) $bid->supplier_id) {
+            $service = $bid->category?->name ?? 'This request';
+
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'bid' => "{$service} is already booked with " . ($held->supplier?->name ?? 'another professional')
+                    . '. Cancel that booking first if you want to choose someone else.',
+            ]);
+        }
     }
 }
