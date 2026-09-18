@@ -1276,9 +1276,15 @@
     {{-- The pop-up messenger (Ideas 2 and 3). It decides for itself whether
          this account gets it, so the layout does not need to know the rule. --}}
     {{-- No corner button: the header's Messages icon opens it. --}}
+    {{-- Sir Peter, 18 Sep: the Live Message Dock along the bottom.
+         Both docks are run here, so their styles and scripts reach the
+         stacks, but their markup is held and printed in <body>: a <div> in
+         <head> ends the head early, so the bars and their icons drew before
+         any of their CSS and flashed full size on every page load. --}}
+    @php ob_start(); @endphp
     @include('partials._message_dock', ['launcher' => false])
-    {{-- Sir Peter, 18 Sep: the Live Message Dock along the bottom. --}}
     @include('partials._live_message_dock')
+    @php $__dockMarkup = ob_get_clean(); @endphp
 
     @stack('styles')
 </head>
@@ -1742,6 +1748,7 @@
             });
         })();
     </script>
+    {!! $__dockMarkup ?? '' !!}
     @stack('scripts')
 
     {{-- Inline form validation: live blur/submit messages on data-validate inputs --}}
