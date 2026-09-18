@@ -29,7 +29,7 @@ class ConversationController extends Controller
         $query = Conversation::forUser($user)
             ->with([
                 // Photo, last seen and service, for the dock's rows.
-                'participants:id,name,email,avatar,last_active_at,primary_role',
+                'participants:id,name,email,avatar,last_active_at,primary_role,public_id',
                 'participants.serviceCategories:id,name',
                 'booking:id,event_id,status',
                 'event:id,title,source',
@@ -41,6 +41,8 @@ class ConversationController extends Controller
             ->addSelect(['last_message_body' => Message::select('body')
                 ->whereColumn('conversation_id', 'conversations.id')
                 ->latest('created_at')
+                // Two messages in the same second: the later row wins.
+                ->latest('id')
                 ->limit(1),
             ])
             // The dock leaves muted conversations out of its unread total.
@@ -50,9 +52,20 @@ class ConversationController extends Controller
                 ->where('conversation_participants.user_id', $user->id)
                 ->limit(1),
             ])
+            // Who spoke last: the Live Message Dock shows "Responded" once the
+            // reply is the user's own, and "Unread" or "Read" otherwise.
+            ->addSelect(['last_message_sender_id' => Message::select('sender_id')
+                ->whereColumn('conversation_id', 'conversations.id')
+                ->latest('created_at')
+                // Two messages in the same second: the later row wins.
+                ->latest('id')
+                ->limit(1),
+            ])
             ->addSelect(['last_message_at' => Message::select('created_at')
                 ->whereColumn('conversation_id', 'conversations.id')
                 ->latest('created_at')
+                // Two messages in the same second: the later row wins.
+                ->latest('id')
                 ->limit(1),
             ])
             // Starred by this person (the dock's Favorites tab).
@@ -93,6 +106,10 @@ class ConversationController extends Controller
                 'name'     => $peer->name,
                 'avatar'   => $peer->avatar_url,
                 'online'   => (bool) ($peer->last_active_at && \Illuminate\Support\Carbon::parse($peer->last_active_at)->gt(now()->subMinutes(5))),
+                // The dock's chat header links the name to their public page and
+                // shows their GigResource ID, for professionals.
+                'gr_id'    => $peer->public_id ? \App\Support\GigResourceId::display($peer->public_id) : null,
+                'profile'  => $peer->primary_role === 'professional' ? route('public.professional.show', $peer->id) : null,
                 'subtitle' => $peer->primary_role === 'professional'
                     ? ($peer->serviceCategories->first()?->name ?? 'Professional')
                     : ucfirst((string) ($peer->primary_role ?: 'member')),

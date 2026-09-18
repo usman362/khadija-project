@@ -80,9 +80,14 @@ class MessageDockClearsTheChatbotTest extends TestCase
         $bot  = file_get_contents(resource_path('views/partials/_ai_chatbot_widget.blade.php'));
         $dock = file_get_contents(resource_path('views/partials/_message_dock.blade.php'));
 
-        foreach (['right', 'bottom', 'width', 'height'] as $prop) {
+        foreach (['right', 'width'] as $prop) {
             $this->assertSame($this->px($bot, '.aic-panel', $prop), $this->px($dock, '.md-win', $prop), "The windows differ in {$prop}.");
         }
+
+        // Both sit on the same floor: the top of the Live Message Dock's bar
+        // where it is on the page, 24px from the bottom where it is not.
+        $this->assertMatchesRegularExpression('/\.aic-panel\s*\{[^}]*bottom: var\(--lmd-base, 24px\)/s', $bot);
+        $this->assertMatchesRegularExpression('/\.md-win\s*\{[^}]*bottom: calc\(var\(--lmd-base, 24px\)/s', $dock);
     }
 
     public function test_opening_one_closes_the_other(): void

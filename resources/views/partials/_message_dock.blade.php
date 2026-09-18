@@ -51,7 +51,9 @@
      * at a time; see gr:float-open below. MessageDockClearsTheChatbotTest holds
      * the numbers to the panel's.
      */
-    .md-win { position: fixed; right: 24px; bottom: 24px; width: 380px; height: 600px;
+    /* On the client pages the Live Message Dock (partials/_live_message_dock)
+       sets these, so the window sits above its bar and its chat window. */
+    .md-win { position: fixed; right: 24px; bottom: calc(var(--lmd-base, 24px) + var(--lmd-chat, 0px)); width: 380px; height: var(--md-h, 600px);
         max-width: calc(100vw - 48px); max-height: calc(100vh - 48px); z-index: 9999;
         background: var(--bg-card, #fff);
         border: 1px solid var(--border-color, #e5e7eb); border-radius: 18px; overflow: hidden;
@@ -336,6 +338,9 @@
         }
 
         var rowEl = e.target.closest('[data-open]');
+        // With the Live Message Dock on the page, a conversation opens in its
+        // chat window below this list, as in Sir Peter's mockup.
+        if (rowEl && window.grLiveDock && window.grLiveDock.open(rowEl.dataset.open)) return;
         if (rowEl) { showThread(rowEl.dataset.open); return; }
 
         var t = e.target.closest('[data-md-tab]');
@@ -404,10 +409,14 @@
         a.addEventListener('click', function (e) { e.preventDefault(); toggleDock(); });
     });
 
-    // The assistant opened: this one steps out of the way.
+    // The assistant opened: this one steps out of the way. The Live Message
+    // Dock's chat window stacks under this list instead.
     document.addEventListener('gr:float-open', function (e) {
-        if (e.detail !== 'messages') dock.classList.remove('is-open', 'is-min');
+        if (e.detail !== 'messages' && e.detail !== 'live-dock') dock.classList.remove('is-open', 'is-min');
     });
+
+    // The Live Message Dock opens this list from its bar.
+    window.grMessages = { toggle: toggleDock };
 
     // The unread count on the launcher, without opening anything.
     refreshCounts();

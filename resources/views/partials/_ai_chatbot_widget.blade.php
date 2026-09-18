@@ -195,9 +195,10 @@
     /* ── Panel ── */
     .aic-panel {
         position: fixed;
-        bottom: 24px; right: 24px;
+        /* Above the Live Message Dock's bar where there is one (client pages). */
+        bottom: var(--lmd-base, 24px); right: 24px;
         width: 380px; height: 600px;
-        max-height: calc(100vh - 48px);
+        max-height: calc(100vh - var(--lmd-base, 24px) - 96px);
         background: #0f1629;
         border: 1px solid rgba(255,255,255,0.08);
         border-radius: 18px;

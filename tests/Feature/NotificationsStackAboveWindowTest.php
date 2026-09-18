@@ -39,12 +39,15 @@ class NotificationsStackAboveWindowTest extends TestCase
         $layout = file_get_contents(resource_path('views/layouts/client.blade.php'));
         $dock   = file_get_contents(resource_path('views/partials/_message_dock.blade.php'));
 
-        // Same width and right edge as the window (380 / 24), 12px above it.
-        preg_match('/\.md-win \{ position: fixed; right: (\d+)px; bottom: (\d+)px; width: (\d+)px;/', $dock, $w);
-        $this->assertCount(4, $w);
+        // Same width and right edge as the window (380 / 24), and above
+        // everything open in the column. With the Live Message Dock on the
+        // page that is its chat window and the list together, which it
+        // measures into --notif-bottom; without it, 12px above the window.
+        preg_match('/\.md-win \{ position: fixed; right: (\d+)px; bottom: [^;]+; width: (\d+)px;/', $dock, $w);
+        $this->assertCount(3, $w);
 
-        $this->assertStringContainsString("right: {$w[1]}px !important; bottom: calc({$w[2]}px + min(600px, 58vh) + 12px) !important;", $layout);
-        $this->assertStringContainsString("width: {$w[3]}px; min-width: {$w[3]}px; max-width: {$w[3]}px;", $layout);
+        $this->assertStringContainsString("right: {$w[1]}px !important; bottom: var(--notif-bottom, calc(24px + min(600px, 58vh) + 12px)) !important;", $layout);
+        $this->assertStringContainsString("width: {$w[2]}px; min-width: {$w[2]}px; max-width: {$w[2]}px;", $layout);
 
         // Sir Peter: grey only around the two, not over the whole page, in
         // the site's own light grey.

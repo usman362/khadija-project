@@ -336,12 +336,15 @@
          * is already full screen.
          */
         @media (min-width: 521px) {
-            body.gr-stack .md-win, body.gr-stack .aic-panel { height: min(600px, 58vh) !important; }
+            body.gr-stack .md-win, body.gr-stack .aic-panel { height: min(var(--md-h, 600px), 58vh) !important; }
             body.gr-stack .tbm[data-notif-menu] .tbm-pop {
                 position: fixed !important; left: auto !important; top: auto !important;
-                right: 24px !important; bottom: calc(24px + min(600px, 58vh) + 12px) !important;
+                /* Above whatever is open in the right-hand column: the Live
+                   Message Dock sets --notif-bottom to clear its chat window
+                   and the messages list together. */
+                right: 24px !important; bottom: var(--notif-bottom, calc(24px + min(600px, 58vh) + 12px)) !important;
                 width: 380px; min-width: 380px; max-width: 380px;
-                max-height: calc(100vh - min(600px, 58vh) - 60px); overflow-y: auto; z-index: 10001;
+                max-height: var(--notif-max, calc(100vh - min(600px, 58vh) - 60px)); overflow-y: auto; z-index: 10001;
             }
             /* Under the header (100), so the bell's menu stays on top of it,
                and under both windows; sized to them by the script below. */
@@ -1274,6 +1277,8 @@
          this account gets it, so the layout does not need to know the rule. --}}
     {{-- No corner button: the header's Messages icon opens it. --}}
     @include('partials._message_dock', ['launcher' => false])
+    {{-- Sir Peter, 18 Sep: the Live Message Dock along the bottom. --}}
+    @include('partials._live_message_dock')
 
     @stack('styles')
 </head>
@@ -1675,11 +1680,16 @@
         function fit() {
             if (! back || ! document.body.classList.contains('gr-stack')) return;
             var pop = notif.querySelector('.tbm-pop').getBoundingClientRect();
-            var winEl = document.querySelector('#msgDock.is-open .md-win') || document.querySelector('.aic-panel.open');
-            if (! winEl) return;
-            var win = winEl.getBoundingClientRect();
-            var left = Math.min(pop.left, win.left) - PAD, right = Math.max(pop.right, win.right) + PAD;
-            var top = Math.min(pop.top, win.top) - PAD, bottom = Math.max(pop.bottom, win.bottom) + PAD;
+            // Every window open in the right-hand column, stacked: the Live
+            // Message Dock's chat, the messages list, the assistant.
+            var wins = ['#lmdChat:not([hidden])', '#msgDock.is-open .md-win', '.aic-panel.open']
+                .map(function (q) { return document.querySelector(q); }).filter(Boolean)
+                .map(function (el) { return el.getBoundingClientRect(); });
+            if (! wins.length) return;
+            var left = Math.min.apply(null, [pop.left].concat(wins.map(function (w) { return w.left; }))) - PAD;
+            var right = Math.max.apply(null, [pop.right].concat(wins.map(function (w) { return w.right; }))) + PAD;
+            var top = Math.min.apply(null, [pop.top].concat(wins.map(function (w) { return w.top; }))) - PAD;
+            var bottom = Math.max.apply(null, [pop.bottom].concat(wins.map(function (w) { return w.bottom; }))) + PAD;
             back.style.left = left + 'px';
             back.style.top = top + 'px';
             back.style.width = (right - left) + 'px';
@@ -1687,7 +1697,7 @@
         }
 
         function sync() {
-            var windowOpen = !! document.querySelector('#msgDock.is-open:not(.is-min), .aic-panel.open');
+            var windowOpen = !! document.querySelector('#msgDock.is-open:not(.is-min), .aic-panel.open, #lmdChat:not([hidden])');
             document.body.classList.toggle('gr-stack', notif.classList.contains('open') && windowOpen);
             requestAnimationFrame(fit);
         }
@@ -1695,8 +1705,8 @@
         window.addEventListener('resize', function () { requestAnimationFrame(fit); });
 
         var watch = new MutationObserver(sync);
-        [notif, document.getElementById('msgDock'), document.getElementById('aiChatPanel')].forEach(function (el) {
-            if (el) watch.observe(el, { attributes: true, attributeFilter: ['class'] });
+        [notif, document.getElementById('msgDock'), document.getElementById('aiChatPanel'), document.getElementById('lmdChat')].forEach(function (el) {
+            if (el) watch.observe(el, { attributes: true, attributeFilter: ['class', 'hidden'] });
         });
     })();
     </script>
