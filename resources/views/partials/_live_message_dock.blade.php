@@ -48,7 +48,10 @@
 
     .lmd-sep { width: 1px; align-self: stretch; background: var(--border-color, #e5e7eb); flex: none; }
 
-    .lmd-tabs { display: flex; gap: 8px; flex: 1; min-width: 0; overflow: hidden; }
+    /* Tabs, then + and +N straight after them (Sir Peter's dock), with the
+       space left over pushed to the right, before Do Not Disturb. */
+    .lmd-mid { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+    .lmd-tabs { display: flex; gap: 8px; flex: 0 1 auto; min-width: 0; overflow: hidden; }
     .lmd-empty { align-self: center; border: 0; background: none; padding: 0; font: inherit; font-size: 12.5px; color: var(--text-muted, #6b7280); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .lmd-empty:hover { color: var(--text-primary, #111827); }
     .lmd-tab { display: flex; align-items: center; gap: 9px; flex: 0 1 210px; min-width: 160px;
@@ -77,6 +80,13 @@
 
     .lmd-dnd { display: flex; align-items: center; gap: 8px; flex: none; font-size: 11.5px; color: var(--text-muted, #6b7280); }
     .lmd-dnd b { display: block; font-size: 12px; color: var(--text-primary, #111827); }
+    .lmd-sound { border: 0; background: none; padding: 4px; cursor: pointer; color: #2563eb; display: inline-flex; flex: none; border-radius: 8px; }
+    .lmd-sound:hover { background: #eff6ff; }
+    .lmd-sound svg { width: 20px; height: 20px; }
+    .lmd-sound [data-off] { display: none; }
+    .lmd-sound[aria-pressed="true"] { color: var(--text-muted, #6b7280); }
+    .lmd-sound[aria-pressed="true"] [data-on] { display: none; }
+    .lmd-sound[aria-pressed="true"] [data-off] { display: inline; }
     .lmd-switch { position: relative; width: 38px; height: 22px; border-radius: 999px; background: #cbd5e1; border: 0;
         cursor: pointer; flex: none; transition: background .15s; }
     .lmd-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%;
@@ -182,6 +192,8 @@
     var moreBtn = bar.querySelector('[data-lmd-more]');
     var totalEl = document.querySelectorAll('[data-lmd-total]');
     var dndBtn = bar.querySelector('[data-lmd-dnd]');
+    var soundBtn = bar.querySelector('[data-lmd-sound]');
+    var midEl = bar.querySelector('[data-lmd-mid]');
     var me = @json(auth()->id());
     var csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
     var urls = {
@@ -233,18 +245,37 @@
 
     /* ── Do Not Disturb (§8) ─────────────────────────────────── */
     function dndOn() { try { return localStorage.getItem(DND) === '1'; } catch (e) { return false; } }
-    function paintDnd() { dndBtn.setAttribute('aria-checked', dndOn() ? 'true' : 'false'); }
-    dndBtn.addEventListener('click', function () {
+    function paintDnd() {
+        var on = dndOn();
+        dndBtn.setAttribute('aria-checked', on ? 'true' : 'false');
+        soundBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        soundBtn.title = on ? 'Sound off (Do Not Disturb): click to turn it on' : 'Sound on: click to mute';
+    }
+    function toggleDnd() {
         try { localStorage.setItem(DND, dndOn() ? '0' : '1'); } catch (e) {}
         paintDnd();
-    });
+        // Turning sound back on plays the ping once, so the client hears it works.
+        if (! dndOn()) ping();
+    }
+    dndBtn.addEventListener('click', toggleDnd);
+    soundBtn.addEventListener('click', toggleDnd);
     paintDnd();
+
+    // Browsers only allow sound after the person has clicked on the page,
+    // so the sound is readied on the first click; later pings then play.
+    document.addEventListener('pointerdown', function () {
+        try {
+            audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+            if (audio.state === 'suspended') audio.resume();
+        } catch (e) {}
+    }, { once: true });
 
     /* One short ping, made here so there is no sound file to load. */
     var audio = null;
     function ping() {
         try {
             audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+            if (audio.state === 'suspended') audio.resume();
             var o = audio.createOscillator(), g = audio.createGain();
             o.type = 'sine'; o.frequency.value = 880;
             g.gain.setValueAtTime(0.0001, audio.currentTime);
@@ -308,7 +339,8 @@
 
     /* ── Tabs (§2, §9) ───────────────────────────────────────── */
     function capacity() {
-        var room = tabsEl.getBoundingClientRect().width;
+        // The group's width less the + and +N buttons beside the tabs.
+        var room = midEl.getBoundingClientRect().width - 110;
         return Math.max(1, Math.min(4, Math.floor((room + 8) / 168)));
     }
 
@@ -580,15 +612,22 @@
     </button>
     <span class="lmd-sep"></span>
 
-    <div class="lmd-tabs" data-lmd-tabs></div>
+    <div class="lmd-mid" data-lmd-mid>
+        <div class="lmd-tabs" data-lmd-tabs></div>
 
-    <button type="button" class="lmd-btn" data-lmd-list title="Start or open another conversation" aria-label="Open another conversation">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    </button>
-    <button type="button" class="lmd-btn" data-lmd-more hidden aria-label="More conversations">+0</button>
+        <button type="button" class="lmd-btn" data-lmd-list title="Start or open another conversation" aria-label="Open another conversation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button type="button" class="lmd-btn" data-lmd-more hidden aria-label="More conversations">+0</button>
+    </div>
     <span class="lmd-sep"></span>
 
     <div class="lmd-dnd">
+        {{-- Sound on or off at a glance; the same setting as the switch. --}}
+        <button type="button" class="lmd-sound" data-lmd-sound aria-pressed="false" title="Sound on: click to mute" aria-label="Message sound">
+            <svg data-on viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+            <svg data-off viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>
+        </button>
         <button type="button" class="lmd-switch" role="switch" aria-checked="false" data-lmd-dnd aria-label="Do Not Disturb"></button>
         <span><b>Do Not Disturb</b>Still receive messages (no sound)</span>
     </div>
