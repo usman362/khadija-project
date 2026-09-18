@@ -603,6 +603,10 @@ class ClientBsrController extends Controller
             $issues['requirements'] = 'Describe what you need, so professionals can price it.';
         }
 
+        if (empty($d['budget_min']) && empty($d['budget_max'])) {
+            $issues['budget'] = 'Give a budget. A rough estimate is fine.';
+        }
+
         if (empty($d['starts_at'])) {
             $issues['availability'] = 'Set the date and start time of your event.';
         }
@@ -1076,7 +1080,9 @@ class ClientBsrController extends Controller
                 ],
             ],
             'budget' => [
-                'budget_min' => ['nullable', 'numeric', 'min:0', 'max:9999999'],
+                // Sir Peter, 19 Sep: a budget is required, even a rough one.
+                // Either figure will do: a "from", a "to", or both.
+                'budget_min' => ['required_without:budget_max', 'nullable', 'numeric', 'min:1', 'max:9999999'],
                 // Compared with the bottom only when there is one: a client who
                 // gives just a top figure was refused with "must be at least
                 // the bottom" against a bottom they never entered.
@@ -1145,6 +1151,9 @@ class ClientBsrController extends Controller
     {
         return [
             'services.required'          => 'Pick at least one service you need.',
+            'budget_min.required' => 'Give a budget. A rough estimate is fine.',
+            'budget_min.required_without' => 'Give a budget. A rough estimate is fine.',
+            'budget_min.min' => 'Give a budget. A rough estimate is fine.',
             'organization_type.required' => 'Tell us who the request is for.',
             'title.required'             => 'Give your event a name.',
             'description.required'       => 'Describe what you need. Professionals bid on this.',
@@ -1158,7 +1167,7 @@ class ClientBsrController extends Controller
             'event_date.after_or_equal'  => 'Pick a date that has not already passed.',
             'event_start_time.required'  => 'Set the time your event starts.',
             'confirm.accepted'           => 'Confirm the details before publishing.',
-            'delivery_mode.required'     => 'Say how the food should get there.',
+            'delivery_mode.required'     => 'Say how the food gets to your event, or that no delivery is needed.',
         ];
     }
 

@@ -159,11 +159,28 @@ class RequestFeeTermsTest extends TestCase
         );
     }
 
+    /** Sir Peter, 19 Sep: a budget is required on every form, even a rough one. */
+    public function test_a_request_without_a_budget_is_refused(): void
+    {
+        $this->actingAs($this->client)
+            ->post(route('client.esr.store'), $this->esrPayload(['budget_min' => null]))
+            ->assertSessionHasErrors(['budget_min' => 'Give a budget. A rough estimate is fine.']);
+
+        $this->actingAs($this->client)
+            ->post(route('client.direct-offers.store'), $this->drPayload(['budget_min' => null]))
+            ->assertSessionHasErrors('budget_min');
+
+        // The request form no longer asks for a payment plan; the professional proposes one.
+        $this->actingAs($this->client)->get(route('client.direct-offers.create'))
+            ->assertOk()->assertDontSee('Preferred Payment')->assertDontSee('worth to you');
+    }
+
     private function esrPayload(array $over = []): array
     {
         return array_merge([
             'fee_agreed' => 1,
             'reason' => 'professional_cancelled',
+            'budget_min' => 1500,
             'organization_type' => 'individual',
             'needed_by' => now()->addDays(2)->toDateTimeString(),
             'services' => [$this->service->id],
@@ -178,6 +195,7 @@ class RequestFeeTermsTest extends TestCase
         return array_merge([
             'fee_agreed' => 1,
             'professional_id' => $this->pro->id,
+            'budget_min' => 1500,
             'event_name' => 'Garden Reception',
             'organization_type' => 'individual',
             'request_type' => 'MSR',

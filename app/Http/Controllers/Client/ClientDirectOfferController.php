@@ -145,7 +145,8 @@ class ClientDirectOfferController extends Controller
             'services'        => ['required_without:service_single', 'array'],
             'services.*'      => ['integer', 'exists:categories,id', new \App\Rules\BookableService],
             'service_single'  => ['required_without:services', 'nullable', 'string', 'max:120'],
-            'budget_min'      => ['nullable', 'integer', 'min:0'],
+            // Sir Peter, 19 Sep: a budget is required, even a rough one.
+            'budget_min'      => ['required', 'integer', 'min:1'],
             'request_type'    => ['nullable', 'in:SSR,MSR'],
         ] + \App\Domain\Requests\ServiceDetails::rules()
           + \App\Domain\Requests\CoreFacts::rules('event_name', 'description', 'event_date') + [
@@ -166,12 +167,14 @@ class ClientDirectOfferController extends Controller
              */
             'fee_agreed'      => ['accepted'],
         ], [
+            'budget_min.required' => 'Give a budget. A rough estimate is fine.',
+            'budget_min.min' => 'Give a budget. A rough estimate is fine.',
             'professional_id.required' => 'Choose which professional this request goes to.',
             'organization_type.required' => 'Tell us who the request is for.',
             'services.required_without' => 'Choose at least one service you need.',
             'service_single.required_without' => 'Choose the service you need.',
             'fee_agreed.accepted' => 'Please confirm you understand the $2.99 fee applies when you finalize with a professional.',
-            'delivery_mode.required' => 'Say how the food should get there.',
+            'delivery_mode.required' => 'Say how the food gets to your event, or that no delivery is needed.',
         ] + \App\Domain\Requests\CoreFacts::messages('event_name', 'description', 'event_date'));
 
         $user = $request->user();

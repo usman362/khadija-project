@@ -370,11 +370,11 @@
 
         {{-- Budget & Payment --}}
         <div class="do-sec req">
-            <x-form-section :n="5" title="Budget & Payment" tag="YOUR INPUT" />
+            <x-form-section :n="5" title="Budget" tag="YOUR INPUT" />
             <div class="do-sec-bd">
                 <div class="do-row">
-                    <div class="do-field"><label>Budget Range (min)</label><input type="number" class="do-input" name="budget_min" placeholder="7000"></div>
-                    <div class="do-field"><label>Budget Range (max)</label><input type="number" class="do-input" name="budget_max" placeholder="8500"></div>
+                    <div class="do-field"><label>Budget <span style="color:#dc2626;">*</span></label><input type="number" class="do-input" name="budget_min" min="1" required value="{{ old('budget_min') }}" placeholder="7000"><p style="font-size:11.5px;color:var(--text-muted);margin:4px 0 0;">A rough estimate is fine.</p>@error('budget_min')<p style="color:#dc2626;font-size:12px;margin:4px 0 0;">{{ $message }}</p>@enderror</div>
+                    <div class="do-field"><label>Budget up to <span style="font-weight:500;color:var(--text-muted);">(optional)</span></label><input type="number" class="do-input" name="budget_max" min="1" value="{{ old('budget_max') }}" placeholder="8500"></div>
                 </div>
                     @include('client.partials._service_budget_split', [
                         'pickerName' => 'services',
@@ -382,9 +382,10 @@
                         'suggestUrl' => route('client.bsr.suggest-split'),
                     ])
 
-                <div class="do-field"><label>Preferred Payment</label>
-                    <select class="do-input" name="payment" aria-label="Deposit + balance before event"><option>Deposit + balance before event</option><option>Milestone payments</option><option>Full on completion</option></select>
-                </div>
+                {{-- Sir Peter, 19 Sep: the client does not pick a payment plan here.
+                     The professional proposes one in the agreement, and only then
+                     can the client counter it. (The select was never saved.) --}}
+                <p style="font-size:12.5px;color:var(--text-muted);margin:8px 0 0;">How payment works is proposed by the professional in the agreement. You can counter it there.</p>
             </div>
         </div>
 

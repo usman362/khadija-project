@@ -184,6 +184,7 @@ class RequestFormsConsistencyTest extends TestCase
     public function test_the_emergency_request_keeps_the_clients_own_name(): void
     {
         $this->actingAs($this->client)->post(route('client.esr.store'), [
+            'budget_min' => 1500,
             'fee_agreed' => 1,
             'organization_type' => 'individual',
             'reason'      => array_key_first(\App\Http\Controllers\Client\ClientEsrController::REASONS),
@@ -214,6 +215,7 @@ class RequestFormsConsistencyTest extends TestCase
     public function test_the_emergency_request_stores_who_it_is_for(): void
     {
         $this->actingAs($this->client)->post(route('client.esr.store'), [
+            'budget_min' => 1500,
             'event_name'  => 'Test event',
             'description' => 'Enough detail here for the professional to price the work properly.',
             'fee_agreed' => 1,

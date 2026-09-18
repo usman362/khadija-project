@@ -51,6 +51,7 @@ class DirectOfferServiceMismatchTest extends TestCase
         $response = $this->actingAs(User::findOrFail($client->id))
             ->from('/client/direct-offers/create')
             ->post('/client/direct-offers', [
+                'budget_min' => 1500,
                 'fee_agreed' => 1,
                 'request_type' => 'MSR',
                 'professional_id' => $pro->id,

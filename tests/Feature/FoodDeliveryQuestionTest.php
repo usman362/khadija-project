@@ -96,7 +96,7 @@ class FoodDeliveryQuestionTest extends TestCase
         $html = $this->requirementsHtml();
 
         $this->assertStringContainsString('name="delivery_mode"', $html);
-        $this->assertStringContainsString('How will this order be delivered?', $html);
+        $this->assertStringContainsString('How will the food or drinks get to your event?', $html);
         $this->assertStringContainsString(FoodDelivery::PROFESSIONAL_DELIVERS, $html);
         $this->assertStringContainsString(FoodDelivery::CLIENT_COLLECTS, $html);
     }
@@ -113,7 +113,10 @@ class FoodDeliveryQuestionTest extends TestCase
     {
         $this->pick($this->catering);
 
-        $this->assertCount(2, FoodDelivery::CHOICES);
+        // Three answers since 19 Sep (the third is "no delivery needed"), and
+        // still no courier among them.
+        $this->assertCount(3, FoodDelivery::CHOICES);
+        $this->assertArrayHasKey(FoodDelivery::NOT_NEEDED, FoodDelivery::CHOICES);
         $this->assertStringNotContainsString('courier', $this->requirementsHtml());
 
         $this->actingAs($this->client)
@@ -122,6 +125,21 @@ class FoodDeliveryQuestionTest extends TestCase
                 'delivery_mode' => 'courier_wanted',
             ])
             ->assertSessionHasErrors('delivery_mode');
+    }
+
+    /** Sir Peter, 19 Sep: a caterer who cooks on site needs no delivery at all. */
+    public function test_no_delivery_needed_is_an_answer(): void
+    {
+        $this->pick($this->catering);
+
+        $this->assertStringContainsString('No delivery needed', $this->requirementsHtml());
+
+        $this->actingAs($this->client)
+            ->post(route('client.bsr.save', 'requirements'), [
+                'description'   => 'A sit-down dinner for eighty people, cooked on site.',
+                'delivery_mode' => FoodDelivery::NOT_NEEDED,
+            ])
+            ->assertSessionHasNoErrors();
     }
 
     /** The point of asking only where it means something. */

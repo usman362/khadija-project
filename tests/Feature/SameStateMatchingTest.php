@@ -146,6 +146,7 @@ class SameStateMatchingTest extends TestCase
 
         $this->actingAs($client)
             ->post(route('client.direct-offers.store'), [
+            'budget_min' => 1500,
             'description' => 'Enough detail here for the professional to price the work properly.',
             'event_date'  => now()->addDays(30)->format('Y-m-d'),
                 'fee_agreed' => 1,

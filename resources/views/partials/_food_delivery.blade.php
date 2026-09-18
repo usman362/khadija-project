@@ -37,8 +37,8 @@
 @endonce
 
 <div class="fd-block" data-food-delivery @if(! $shown) hidden @endif>
-    <h4>How will this order be delivered?</h4>
-    <p class="fd-lede">Your preference. You and the professional agree the final arrangement between you. Delivery is priced differently from collection, so saying now keeps the quotes comparable.</p>
+    <h4>How will the food or drinks get to your event?</h4>
+    <p class="fd-lede">Pick what fits. If it is prepared or served at the event itself, choose "No delivery needed". You and the professional agree the final details; saying now keeps the quotes comparable.</p>
 
     <div class="fd-opts">
         @foreach($fd::CHOICES as $value => $label)

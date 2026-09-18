@@ -20,6 +20,7 @@ final class FoodDelivery
 {
     public const CLIENT_COLLECTS       = 'client_collects';
     public const PROFESSIONAL_DELIVERS = 'professional_delivers';
+    public const NOT_NEEDED            = 'not_needed';
 
     /*
      * Two, and only two.
@@ -42,6 +43,9 @@ final class FoodDelivery
     public const CHOICES = [
         self::PROFESSIONAL_DELIVERS => 'Professional Delivery. They bring it to the event',
         self::CLIENT_COLLECTS       => 'Client Pickup. We collect it from them',
+        // Sir Peter, 19 Sep: what if no delivery is needed at all? A caterer
+        // who cooks on site, or a bar served at the event, needs neither.
+        self::NOT_NEEDED            => 'No delivery needed. It is prepared or served at the event',
     ];
 
     /** The service categories whose services are food. */

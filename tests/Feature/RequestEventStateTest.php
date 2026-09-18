@@ -113,6 +113,7 @@ class RequestEventStateTest extends TestCase
         $client = $this->user('client', 'VA');
 
         $this->actingAs($client)->post(route('client.esr.store'), [
+            'budget_min' => 1500,
             'event_name'  => 'Test event',
             'description' => 'Enough detail here for the professional to price the work properly.',
             'fee_agreed' => 1,
@@ -201,6 +202,7 @@ class RequestEventStateTest extends TestCase
         $pro->serviceCategories()->attach($service->id);
 
         $this->actingAs($client)->post(route('client.direct-offers.store'), [
+            'budget_min' => 1500,
             'description' => 'Enough detail here for the professional to price the work properly.',
             'event_date'  => now()->addDays(30)->format('Y-m-d'),
             'fee_agreed' => 1,

@@ -28,10 +28,10 @@
 @endphp
 
 <div class="sbs" data-sbs data-picker="{{ $pickerName }}" hidden>
-    <h4>What is each service worth to you?</h4>
+    <h4>Budget for each service <span style="font-weight:600;color:var(--text-muted);">(optional)</span></h4>
     <p class="sbs-help">
-        Professionals quote on one service each, so this is the figure the right
-        one sees. Leave any of them blank if you would rather not say.
+        Each professional quotes on one service, so they see only the amount for
+        their service. Leave any of them blank if you would rather not split it.
     </p>
 
     <div data-sbs-rows></div>

@@ -104,7 +104,8 @@ class ClientEsrController extends Controller
              * the same words. This one used to invent its own title from the
              * services picked and take no description at all.
              */
-            'budget_min'   => ['nullable', 'integer', 'min:0'],
+            // Sir Peter, 19 Sep: a budget is required, even a rough one.
+            'budget_min'   => ['required', 'integer', 'min:1'],
             'scope'        => ['nullable', 'in:single,multi'],
 
             /*
@@ -126,12 +127,14 @@ class ClientEsrController extends Controller
             // A rush request asks when it is NEEDED BY rather than when it
             // runs. Same fact, and this page's wording wins over the shared
             // one because "+" keeps the left-hand keys.
+            'budget_min.required' => 'Give a budget. A rough estimate is fine.',
+            'budget_min.min' => 'Give a budget. A rough estimate is fine.',
             'needed_by.required' => 'When do you need this by?',
             'services.required' => 'Select at least one service you need.',
             'fee_agreed.accepted' => 'Please confirm you understand the $2.99 fee applies when you finalize with a professional.',
             'reason.required'   => 'Tell us why this is urgent.',
         ] + \App\Domain\Requests\CoreFacts::messages('event_name', 'description', 'needed_by') + [
-            'delivery_mode.required' => 'Say how the food should get there.',
+            'delivery_mode.required' => 'Say how the food gets to your event, or that no delivery is needed.',
         ]);
 
         $user     = $request->user();

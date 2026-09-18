@@ -163,6 +163,7 @@ class ServicePickerCatalogTest extends TestCase
         $babyShower = $this->babyShower();
 
         $this->actingAs($this->client)->post(route('client.esr.store'), [
+            'budget_min' => 1500,
             'description' => 'Enough detail here for the professional to price the work properly.',
             'fee_agreed' => 1,
                 'organization_type' => 'individual',
@@ -181,6 +182,7 @@ class ServicePickerCatalogTest extends TestCase
         $babyShower = $this->babyShower();
 
         $errors = $this->actingAs($this->client)->post(route('client.esr.store'), [
+            'budget_min' => 1500,
             'description' => 'Enough detail here for the professional to price the work properly.',
             'fee_agreed' => 1,
                 'organization_type' => 'individual',
@@ -197,6 +199,7 @@ class ServicePickerCatalogTest extends TestCase
     public function test_a_real_service_is_still_accepted(): void
     {
         $this->actingAs($this->client)->post(route('client.esr.store'), [
+            'budget_min' => 1500,
             'description' => 'Enough detail here for the professional to price the work properly.',
             'fee_agreed' => 1,
                 'organization_type' => 'individual',

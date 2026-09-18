@@ -689,11 +689,12 @@
     {{-- ── 4 · Budget ──────────────────────────────────────── --}}
     @elseif($step === 'budget')
         <h3>Budget</h3>
-        <p class="lede">A range is optional, but requests that show one get more accurate proposals. Professionals may bid above it with an explanation.</p>
+        <p class="lede">Give your budget, even a rough estimate: a "from", a "to", or both. It helps professionals send accurate proposals, and they may bid above it with an explanation.</p>
         <div class="bw-two">
             <div class="bw-field">
-                <label>Budget from</label>
-                <input type="number" name="budget_min" min="0" step="1" value="{{ old('budget_min', $data['budget_min'] ?? '') }}" placeholder="e.g. 800">
+                <label>Budget from <span style="color:#dc2626;">*</span></label>
+                <input type="number" name="budget_min" min="1" step="1" value="{{ old('budget_min', $data['budget_min'] ?? '') }}" placeholder="e.g. 800">
+                @error('budget_min')<p class="bw-err">{{ $message }}</p>@enderror
             </div>
             <div class="bw-field">
                 <label>Budget to</label>
@@ -720,10 +721,10 @@
 
         @if($__svcs->isNotEmpty())
             <div class="bw-split">
-                <h4>What is each service worth to you?</h4>
+                <h4>Budget for each service <span class="bw-optional">Optional</span></h4>
                 <p class="bw-help" style="margin-top:0;">
-                    Professionals bid on one service each, so this is the figure the
-                    right one sees. Fill in every service so they add up to your
+                    Each professional bids on one service, so they see only the amount
+                    for their service. Fill in every service so they add up to your
                     budget, or leave them all blank.
                 </p>
 

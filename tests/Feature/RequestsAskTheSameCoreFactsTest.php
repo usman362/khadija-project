@@ -90,6 +90,7 @@ class RequestsAskTheSameCoreFactsTest extends TestCase
     {
         $this->actingAs($this->client)
             ->post(route('client.esr.store'), [
+                'budget_min' => 1500,
                 'reason'            => array_key_first(\App\Http\Controllers\Client\ClientEsrController::REASONS),
                 'organization_type' => 'individual',
                 'services'          => [$this->service->id],
@@ -102,6 +103,7 @@ class RequestsAskTheSameCoreFactsTest extends TestCase
     {
         $this->actingAs($this->client)
             ->post(route('client.direct-offers.store'), [
+                'budget_min' => 1500,
                 'professional_id'   => $this->pro()->id,
                 'organization_type' => 'individual',
                 'services'          => [$this->service->id],
@@ -118,6 +120,7 @@ class RequestsAskTheSameCoreFactsTest extends TestCase
     {
         $this->actingAs($this->client)
             ->post(route('client.esr.store'), [
+                'budget_min' => 1500,
                 'reason'            => array_key_first(\App\Http\Controllers\Client\ClientEsrController::REASONS),
                 'organization_type' => 'individual',
                 'services'          => [$this->service->id],
@@ -140,6 +143,7 @@ class RequestsAskTheSameCoreFactsTest extends TestCase
     {
         $this->actingAs($this->client)
             ->post(route('client.direct-offers.store'), [
+                'budget_min' => 1500,
                 'professional_id'   => $this->pro()->id,
                 'organization_type' => 'individual',
                 'services'          => [$this->service->id],

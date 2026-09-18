@@ -176,7 +176,7 @@
         <div class="esr-card">
             <x-form-section :n="3" title="Budget & Details" />
             <div class="esr-grid2">
-                <div class="esr-field"><label>Budget (visible to responders only)</label><input type="number" name="budget_min" class="esr-input" value="{{ old('budget_min') }}" placeholder="e.g. 2000"></div>
+                <div class="esr-field"><label>Budget <span style="color:#dc2626;">*</span></label><input type="number" name="budget_min" class="esr-input" min="1" required value="{{ old('budget_min') }}" placeholder="e.g. 2000"><p style="font-size:11.5px;color:var(--text-muted);margin:4px 0 0;">A rough estimate is fine. Only professionals who respond see it.</p>@error('budget_min')<p style="color:#dc2626;font-size:12px;margin:4px 0 0;">{{ $message }}</p>@enderror</div>
             </div>
             @include('client.partials._service_budget_split', [
                 'pickerName' => 'services',
