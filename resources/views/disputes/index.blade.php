@@ -103,6 +103,7 @@
     .dr-issue span span { display: block; font-size: 11.5px; color: var(--text-muted); line-height: 1.4; }
     .dr-issue .arw { margin-left: auto; color: var(--text-muted); font-size: 15px; }
     .dr-note { display: flex; gap: 10px; align-items: flex-start; background: var(--bg-hover, rgba(59,130,246,.05)); border: 1px solid var(--border-color); border-radius: 11px; padding: 12px 15px; font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-top: 14px; }
+    .dr-rail .dr-note { margin-top: 0; }
 
     /* Rail */
     .dr-rail { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 20px; }
@@ -338,15 +339,17 @@
                     </a>
                 @endforeach
             </div>
-            <div class="dr-note">
-                <span style="display:inline-flex;flex-shrink:0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
-                <span>Keep all communication on GigResource. It helps us understand what happened and resolve issues faster.</span>
-            </div>
         </div>
     </div>
 
     {{-- ── Right rail ────────────────────────────────────────────── --}}
     <aside class="dr-rail">
+        {{-- Sir Peter, 17 Sep: this note sits with the other guidance on the right. --}}
+        <div class="dr-note">
+            <span style="display:inline-flex;flex-shrink:0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+            <span>Keep all communication on GigResource. It helps us understand what happened and resolve issues faster.</span>
+        </div>
+
         <div class="dr-rc">
             <h4>How Disputes Work</h4>
             {{-- The five steps are the state machine's own path, in its own
