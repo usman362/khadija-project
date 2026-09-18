@@ -51,7 +51,7 @@
 
                     {{-- Suggested Additions --}}
                     <div style="margin-top:16px; background:var(--pe-purple-l); border:1px solid #ddd6fe; border-radius:12px; padding:14px;">
-                        <h4 style="margin:0 0 4px; font-size:13px; font-weight:800; color:var(--pe-purple);">✨ Suggested Additions</h4>
+                        <h4 style="margin:0 0 4px; font-size:13px; font-weight:800; color:var(--pe-purple);">Suggested Additions</h4>
                         <p style="margin:0 0 10px; font-size:12px; color:#5b21b6;">Based on similar events, clients also add these services:</p>
                         <div style="display:flex; flex-wrap:wrap; gap:8px;">
                             @foreach($aiAdditions as $add)
@@ -65,7 +65,7 @@
 
                 {{-- Tip --}}
                 <div class="pe-aitip">
-                    <span class="ic">✨</span>
+                    <span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg></span>
                     <div>
                         <h4>Tip</h4>
                         <p>The more accurate your details, the better we can match the right packages.</p>

@@ -31,7 +31,7 @@
 @endonce
 
 <div class="ate" data-ate>
-    <div class="ate-head">📌 Add this to your event <span class="ate-mode">{{ $auto ? 'Auto-attach' : 'Manual' }}</span></div>
+    <div class="ate-head">Add this to your event <span class="ate-mode">{{ $auto ? 'Auto-attach' : 'Manual' }}</span></div>
     <div class="ate-note">{{ $auto
         ? 'Your plan supports one-click auto-attach. Save this result straight to your event.'
         : 'Free plan: generate a result, then save it to your event below.' }}</div>

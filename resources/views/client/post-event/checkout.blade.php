@@ -1,6 +1,6 @@
 @extends('layouts.client')
 @section('title', 'Post an Event: Checkout & Payment')
-@section('page-title', '🔒 Checkout & Secure Your Package')
+@section('page-title', 'Checkout & Secure Your Package')
 @section('page-subtitle', 'Review your selections, sign the contract, and pay your deposit to secure your date.')
 @include('client.post-event._styles')
 
@@ -80,12 +80,12 @@
                     <div class="pe-card" style="margin-bottom:0;">
                         <h3 style="margin-bottom:12px;">Secure Your Date</h3>
                         @foreach([
-                            ['⚡','Instant Confirmation','Your date is locked the moment your deposit clears.'],
-                            ['🛡️','Payment on Agreement','You pay when you and the professional have agreed the price and the work.'],
-                            ['🔄','Free Date Changes (1x)','Reschedule your event once at no extra cost.'],
+                            ['zap','Instant Confirmation','Your date is locked the moment your deposit clears.'],
+                            ['shield','Payment on Agreement','You pay when you and the professional have agreed the price and the work.'],
+                            ['refresh','Free Date Changes (1x)','Reschedule your event once at no extra cost.'],
                         ] as $point)
                             <div style="display:flex; gap:10px; padding:9px 0; border-bottom:1px dashed var(--pe-line-2);">
-                                <span style="font-size:16px; flex-shrink:0;">{{ $point[0] }}</span>
+                                <span style="flex-shrink:0; display:inline-flex; color:var(--pe-purple);">@if($point[0] === 'zap')<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>@elseif($point[0] === 'shield')<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>@else<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>@endif</span>
                                 <div>
                                     <div style="font-weight:800; font-size:13px;">{{ $point[1] }}</div>
                                     <div class="pe-muted">{{ $point[2] }}</div>
@@ -97,7 +97,7 @@
 
                 {{-- Buyer Protection strip --}}
                 <div class="pe-card" style="margin-top:18px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                    <span style="font-size:16px;">🛡️</span>
+                    <span style="display:inline-flex; color:var(--pe-purple);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
                     <div style="font-weight:800; font-size:13px;">Buyer Protection</div>
                     <div class="pe-muted" style="font-size:12.5px;">Secure Payments · Verified Professionals · Dedicated Customer Support</div>
                 </div>
@@ -138,7 +138,7 @@
                         </label>
                     @endforeach
 
-                    <a href="{{ route('client.post-event.confirmed') }}" class="pe-btn" style="width:100%; margin-top:8px;">🔒 Pay Deposit Securely</a>
+                    <a href="{{ route('client.post-event.confirmed') }}" class="pe-btn" style="width:100%; margin-top:8px;">Pay Deposit Securely</a>
                 </div>
             </aside>
         </div>

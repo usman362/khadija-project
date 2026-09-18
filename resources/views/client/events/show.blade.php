@@ -488,7 +488,7 @@
                  other professionals can't. Sorted lowest-first. --}}
             <div class="cl-card" style="margin-top:20px;">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                    <h3 style="font-size:16px;font-weight:600;">🔒 Sealed Bids Received ({{ $bids->count() }})</h3>
+                    <h3 style="font-size:16px;font-weight:600;">Sealed Bids Received ({{ $bids->count() }})</h3>
                 </div>
                 <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:16px;">
                     Bid amounts are hidden from other professionals, only you can see them here.
@@ -676,7 +676,7 @@
                 @endif
             </div>
 
-            <div class="ev-sealed">🔒 <b>Sealed proposals.</b> Each amount is visible only to you and the professional who sent it. Competitors cannot see each other's bids.</div>
+            <div class="ev-sealed"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> <span><b>Sealed proposals.</b> Each amount is visible only to you and the professional who sent it. Competitors cannot see each other's bids.</span></div>
 
             {{-- Sir Peter, 17 Sep: on a multi-service request, say which
                  services are covered and which are not, before the detail. --}}
@@ -744,7 +744,7 @@
                                 <div style="font-size:14.5px;font-weight:800;color:var(--text-primary);">{{ $sup?->name ?? 'Professional' }}</div>
                                 <div class="ev-prop-meta">
                                     @if($prof?->headline)<span>{{ $prof->headline }}</span>@endif
-                                    @if($prof?->city)<span>📍 {{ $prof->city }}</span>@endif
+                                    @if($prof?->city)<span>{{ $prof->city }}</span>@endif
                                     @if(! $__multi && $bid->category)<span>{{ $bid->category->name }}</span>@endif
                                     <span>Submitted {{ $bid->created_at->humanAgo() }}</span>
                                 </div>

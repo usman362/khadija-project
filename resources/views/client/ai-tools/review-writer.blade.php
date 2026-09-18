@@ -233,23 +233,10 @@
         <div class="rw-hero-txt"><b>Review Builder</b><p>The tool analyzes your experience and helps you write clear, honest, and impactful reviews.</p></div>
     </div>
 
-    {{-- rating cards --}}
-    <div class="rw-ratings">
-        @foreach($metrics['cards'] as [$label, $score, $tag])
-            <div class="rw-rcard">
-                <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>{{ $label }}</div>
-                <div class="val">{{ $score }}</div>
-                <div class="rw-cookies">@for($i = 1; $i <= 5; $i++){!! $rw_cookie($i <= round($score)) !!}@endfor</div>
-                <div class="tag {{ $tag === 'Very Good' ? 'vg' : '' }}">{{ $tag }}</div>
-            </div>
-        @endforeach
-        <div class="rw-rcard">
-            <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Would Hire Again</div>
-            <div class="val" style="color:var(--ok-text);">Yes</div>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">93% probability</div>
-            <div class="tag">High likelihood</div>
-        </div>
-    </div>
+    {{-- The row of rating cards above the form (4.8 overall, 4.9 communication,
+         "93% probability" of hiring again) was invented: nothing had been
+         rated yet. Removed with the rest of the sample figures (Khadijah,
+         13 Sep: the builder's starting state). --}}
 
     {{-- main --}}
     <div class="rw-main">
@@ -267,7 +254,7 @@
                         </div>
                         <div class="rw-2col">
                             <div class="rw-fld"><label>Event Type <span class="opt">(optional)</span></label><input class="rw-input" id="rw-event" value="" placeholder="e.g. My wedding in March"></div>
-                            <div class="rw-fld"><label>Your Rating <span style="color:var(--rw);">*</span></label><div class="rw-cookie-input" id="rw-rating">@for($i = 1; $i <= 5; $i++)<span data-v="{{ $i }}">{!! $rw_cookie($i <= 5) !!}</span>@endfor</div><div class="rw-cookie-lbl" id="rw-rating-lbl">Excellent</div></div>
+                            <div class="rw-fld"><label>Your Rating <span style="color:var(--rw);">*</span></label><div class="rw-cookie-input" id="rw-rating">@for($i = 1; $i <= 5; $i++)<span data-v="{{ $i }}">{!! $rw_cookie(false) !!}</span>@endfor</div><div class="rw-cookie-lbl" id="rw-rating-lbl">Tap to rate</div></div>
                         </div>
                         <div class="rw-fld">
                             <label>Preferred Tone <span style="color:var(--rw);">*</span></label>
@@ -278,7 +265,7 @@
                             </div>
                         </div>
                         <div class="rw-fld"><label>Your Quick Thoughts <span style="color:var(--rw);">*</span> <span class="opt">(bullet points, keywords, or full sentences. Anything works)</span></label><textarea class="rw-textarea" id="rw-thoughts" placeholder="e.g. On time, great energy, captured amazing candid shots, professional team, delivered edits in 2 weeks..."></textarea></div>
-                        @unless($isManual)<button type="button" class="rw-gen-btn" id="rw-generate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>{{ $isSemi ? '✨ Suggest a Review' : '🤖 Write My Review' }}</button>@endunless
+                        @unless($isManual)<button type="button" class="rw-gen-btn" id="rw-generate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>{{ $isSemi ? 'Suggest a Review' : 'Write My Review' }}</button>@endunless
                     </div>
                     <div class="rw-tips">
                         <div class="rw-tips-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg>Smart Review Tips</div>
@@ -352,41 +339,14 @@
 
         {{-- RIGHT sidebar --}}
         <div class="rw-col">
-            <div class="rw-card">
-                <div class="rw-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.8 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg><b>Reputation Insights</b></div>
-                <div class="rw-rep">
-                    <span class="rw-ring" style="background:conic-gradient(#ea580c {{ $metrics['reputation']['score'] / 5 * 100 }}%, var(--bg-card-hover) 0);"><b>{{ $metrics['reputation']['score'] }}</b></span>
-                    <div class="rw-rep-info"><b>Excellent</b><p>Based on {{ $metrics['reputation']['count'] }} reviews</p><p>{{ $metrics['reputation']['rank'] }}</p></div>
-                </div>
-                @foreach($metrics['reputation']['bars'] as [$k, $v])
-                    <div class="rw-bar-row"><span class="k">{{ $k }}</span><span class="rw-bar"><i style="width:{{ $v }}%;"></i></span><span class="v">{{ $v }}%</span></div>
-                @endforeach
-                <a href="{{ route('client.reviews.index') }}" class="rw-link">View full reputation <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
-            </div>
-
-            <div class="rw-card">
-                <div class="rw-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a7 7 0 1 0 0-14 7 7 0 0 0 0 14z"/><path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12"/></svg><b>Vendor Badges</b></div>
-                <div class="rw-badges">
-                    @foreach($metrics['badges'] as [$name, $ic])
-                        <div class="rw-badge"><span class="rw-badge-ic">{!! $rw_badge_ico($ic) !!}</span><span>{{ $name }}</span></div>
-                    @endforeach
-                </div>
-                <a href="{{ route('client.reviews.index') }}" class="rw-link" style="display:block;text-align:center;">View all badges →</a>
-            </div>
-
-            <div class="rw-card">
-                <div class="rw-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><b>Event Details</b></div>
-                <div class="rw-ev-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/></svg><b>Corporate Gala 2026</b></div>
-                <div class="rw-ev-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Baltimore, MD</div>
-                <div class="rw-ev-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Jun 15, 2026</div>
-                <div class="rw-ev-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Guest Count <b>200</b></div>
-                <a href="{{ route('client.events.index') }}" class="rw-link">Edit Event Details <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
-            </div>
-
+            {{-- Reputation Insights, Vendor Badges and Event Details were fixed
+                 sample figures (a 4.8 score, "Top 10% in Photography", a
+                 "Corporate Gala 2026" for 200 in Baltimore) shown to every
+                 client as though they were theirs. Removed. --}}
             <div class="rw-card">
                 <div class="rw-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><b>Privacy &amp; Publishing</b></div>
-                <label class="rw-check"><input type="checkbox" checked><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span>Make review public</span></label>
-                <label class="rw-check"><input type="checkbox" checked><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span>Show on vendor profile</span></label>
+                <label class="rw-check"><input type="checkbox"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span>Make review public</span></label>
+                <label class="rw-check"><input type="checkbox"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span>Show on vendor profile</span></label>
                 <label class="rw-check"><input type="checkbox"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span>Show on my profile</span></label>
                 <label class="rw-check"><input type="checkbox"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span>Anonymous review</span></label>
                 <div class="rw-pub-btns">
@@ -399,14 +359,8 @@
 
     {{-- bottom row --}}
     <div class="rw-bottom">
-        <div class="rw-card">
-            <div class="rw-sec-h"><span class="n">4</span><b>Contract &amp; Service Checklist</b></div>
-            <p class="rw-sec-sub">How well did this vendor meet the agreement?</p>
-            @foreach($metrics['checklist'] as [$label, $val])
-                <div class="rw-cl-row"><span class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>{{ $label }}</span><span class="y">{{ $val }}</span></div>
-            @endforeach
-            <a href="{{ route('client.reviews.index') }}" class="rw-link" style="display:block;text-align:center;">View Full Checklist →</a>
-        </div>
+        {{-- The contract checklist came pre-answered "Yes" to everything.
+             Removed rather than shown answered for the client. --}}
         <div class="rw-card">
             <div class="rw-sec-h"><span class="n">5</span><b>Private Notes</b></div>
             <p class="rw-sec-sub">For your reference only</p>
@@ -435,8 +389,9 @@
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
     const $ = (id) => document.getElementById(id);
     let review = @json($review);
-    let fmt = 'detailed', rating = 5, tone = 'balanced';
-    const RWORDS = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+    // Nothing is rated until the client rates it.
+    let fmt = 'detailed', rating = 0, tone = 'balanced';
+    const RWORDS = ['Tap to rate', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
 
     function cookieSvg(on) {
         const base = on ? '#e0a458' : '#e5e7eb', chip = on ? '#7c3f12' : '#cbd5e1';
@@ -467,6 +422,8 @@
     document.querySelectorAll('.rw-tab').forEach((t) => t.addEventListener('click', function () { showFmt(this.dataset.fmt); }));
 
     async function generate(btn) {
+        // A review needs the client's own rating first; nothing is assumed.
+        if (! rating) { $('rw-rating-lbl').textContent = 'Pick a rating first'; $('rw-rating').scrollIntoView({ block: 'center' }); return; }
         const o = btn ? btn.innerHTML : null;
         if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
         try {

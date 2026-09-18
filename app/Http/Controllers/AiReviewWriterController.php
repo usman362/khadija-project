@@ -234,30 +234,13 @@ class AiReviewWriterController extends Controller
     }
 
     /**
-     * Rating cards + reputation metrics shown around the form (display data).
+     * The platforms a review can be shared to. The sample scores, badges and
+     * checklist answers that used to sit here were shown to every client as
+     * their own, and are gone (Khadijah, 13 Sep).
      */
     private function metrics(): array
     {
         return [
-            'cards' => [
-                ['Overall Experience', 4.8, 'Excellent'],
-                ['Communication', 4.9, 'Excellent'],
-                ['Timeliness', 4.7, 'Very Good'],
-                ['Quality of Service', 4.8, 'Excellent'],
-                ['Value for Money', 4.6, 'Very Good'],
-            ],
-            'reputation' => [
-                'score' => 4.8, 'count' => 24, 'rank' => 'Top 10% in Photography',
-                'bars'  => [['Professionalism', 98], ['Communication', 96], ['Timeliness', 95], ['Quality', 94], ['Value', 88]],
-            ],
-            'badges' => [
-                ['Top Rated', 'crown'], ['On Time Pro', 'clock'], ['Great Communicator', 'chat'],
-                ['High Quality', 'gem'], ['Repeat Client Favorite', 'star'], ['Trusted Partner', 'shield'],
-            ],
-            'checklist' => [
-                ['Arrived On Time', 'Yes'], ['Stayed Within Budget', 'Yes'], ['Delivered Agreed Services', 'Yes'],
-                ['Communication', 'Excellent'], ['Quality as Expected', 'Yes'], ['Would Hire Again', 'Yes'],
-            ],
             'platforms' => ['GigResource', 'Google', 'Facebook', 'LinkedIn', 'The Knot', 'WeddingWire', 'Yelp'],
         ];
     }

@@ -31,7 +31,7 @@
                 {{ $aiId_tier }}
             </span>
             <span style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:800; color:#fff; background:{{ $aiId_lvlColor }}; border-radius:999px; padding:5px 12px;">
-                ✨ {{ $aiId_lvlLabel }}
+                {{ $aiId_lvlLabel }}
             </span>
         </div>
     @endif

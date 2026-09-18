@@ -509,7 +509,7 @@
                                         @endif
                                     @endauth
 
-                                    @if($pkg->photosCount())<span class="pk-photos">📷 {{ $pkg->photosCount() }} Photos</span>@endif
+                                    @if($pkg->photosCount())<span class="pk-photos">{{ $pkg->photosCount() }} Photos</span>@endif
                                     @if(count($gallery) > 1)
                                         <button class="pk-nav prev" type="button" onclick="pkSlide(this,-1)" aria-label="Previous photo">‹</button>
                                         <button class="pk-nav next" type="button" onclick="pkSlide(this,1)" aria-label="Next photo">›</button>
@@ -558,7 +558,7 @@
                                         @if($f['date'] !== '')
                                             <span class="free">✓ Available on {{ \Illuminate\Support\Carbon::parse($f['date'])->format('M j, Y') }}</span>
                                         @endif
-                                        @if($pkg->availability)<span>🗓 {{ $pkg->availability }}</span>@endif
+                                        @if($pkg->availability)<span>{{ $pkg->availability }}</span>@endif
                                         {{-- "Serves MD" used to sit here. It says what the
                                              SERVICE AREA cell two lines above already says,
                                              and R38 means it can never say anything else —
@@ -603,7 +603,7 @@
                     </div>
                 @else
                     <div class="pk-empty">
-                        <div style="font-size:40px;">🎁</div>
+                        <div style="opacity:.6;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div>
                         <h3>No packages match these filters</h3>
                         <p>Try removing a service, a package has to include every one you tick, or widen the budget.</p>
                         <a href="{{ route('public.packages') }}">Clear filters</a>

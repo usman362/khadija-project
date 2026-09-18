@@ -74,7 +74,7 @@
 </style>
 
 @if(session('status'))
-    <div class="cl-card" style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:12px 16px;margin-bottom:16px;font-size:13.5px;">✅ {{ session('status') }}</div>
+    <div class="cl-card" style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:12px 16px;margin-bottom:16px;font-size:13.5px;">{{ session('status') }}</div>
 @endif
 {{-- Validation errors are rendered once, by layouts.client, for every
      page. This screen used to print its own copy as well, so a failed
@@ -106,7 +106,7 @@
         <b>{{ $pro->name }}</b>
         <div class="fz-pro-meta">
             {{ $pro->profile?->headline ?? 'Event professional' }}
-            @if($pro->profile?->city) · 📍 {{ $pro->profile->city }} @endif
+            @if($pro->profile?->city) · {{ $pro->profile->city }} @endif
         </div>
     </div>
     <div class="fz-price">
@@ -148,7 +148,7 @@
             <div class="fz-row"><span>Your date</span><b>{{ \App\Domain\Requests\ProposalDate::label($__date, $event->starts_at) }}</b></div>
             @if(\App\Domain\Requests\ProposalDate::needsWarning($__date))
                 <div class="fz-date-warn" role="alert">
-                    ⚠ {{ \App\Domain\Requests\ProposalDate::warning($__date, $event->starts_at, $pro->name) }}
+                    {{ \App\Domain\Requests\ProposalDate::warning($__date, $event->starts_at, $pro->name) }}
                     Nothing is booked yet, so you can message them first and come back.
                 </div>
             @endif
@@ -201,7 +201,7 @@
             @endif
         </div>
         <div class="fz-note info">
-            💸 <span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> <span>
                 <b>Your fee: ${{ number_format($clientFee, 2) }}</b>, charged once when this finalizes. Posting was free, and nothing is charged if you don't book.
                 The professional's commission ({{ $proRate }}%) comes out of their payout, not your price.
             </span>
@@ -283,7 +283,7 @@ PAYMENT TERMS
 
         @if($fin->client_signed_at)
             <div class="fz-note ok" style="margin-top:14px;">
-                ✍️ <span><b>Signed.</b> You signed as {{ $fin->client_signature }} on {{ $fin->client_signed_at->format('M j, Y · g:i A') }}. {{ $pro->name }} counter-signed on {{ $fin->supplier_signed_at?->format('M j, Y · g:i A') }}.</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> <span><b>Signed.</b> You signed as {{ $fin->client_signature }} on {{ $fin->client_signed_at->format('M j, Y · g:i A') }}. {{ $pro->name }} counter-signed on {{ $fin->supplier_signed_at?->format('M j, Y · g:i A') }}.</span>
             </div>
         @else
             <div class="fz-f" style="margin-top:16px;">
@@ -308,7 +308,7 @@ PAYMENT TERMS
 
         @if($fin->isFunded())
             <div class="fz-note ok" style="margin-top:16px;">
-                ✅ <span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> <span>
                     <b>Booked.</b> The deposit was secured on {{ $fin->funded_at->format('M j, Y · g:i A') }}.
                     @if($fin->payment_mode === 'test')
                         This ran in <b>test mode</b>: no real money moved.
@@ -325,18 +325,18 @@ PAYMENT TERMS
                  means the redirect is expected rather than alarming. --}}
             @if(\App\Domain\Payments\DepositCheckout::isConfigured())
                 <div class="fz-note info" style="margin-top:16px;">
-                    💳 <span>You'll enter your card on <b>Stripe's secure page</b>, then come
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> <span>You'll enter your card on <b>Stripe's secure page</b>, then come
                     straight back here. Your card details never touch GigResource.</span>
                 </div>
             @endif
 
             @if($payMode === 'test')
                 <div class="fz-note warn" style="margin-top:16px;">
-                    🧪 <span><b>Test mode.</b> Payments are running against test credentials, so no real money will move. The booking will be created and marked as a test-mode deposit. Switch Payment Settings to Live (after go-live) to take real deposits.</span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> <span><b>Test mode.</b> Payments are running against test credentials, so no real money will move. The booking will be created and marked as a test-mode deposit. Switch Payment Settings to Live (after go-live) to take real deposits.</span>
                 </div>
             @elseif(! $goLive)
                 <div class="fz-note warn" style="margin-top:16px;">
-                    🔒 <span><b>Live payments are locked.</b> The platform hasn't gone live yet, so a real charge will be refused. Set Payment Settings to Test mode to run this through.</span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> <span><b>Live payments are locked.</b> The platform hasn't gone live yet, so a real charge will be refused. Set Payment Settings to Test mode to run this through.</span>
                 </div>
             @endif
 
@@ -372,7 +372,7 @@ PAYMENT TERMS
             <h4>Finalization checklist</h4>
             @foreach($steps as $key => [$label, $col])
                 <div class="fz-ck">
-                    <i>{{ $fin->completed($key) ? '✅' : ($key === $step ? '🔵' : '⚪️') }}</i>
+                    <i>@if($fin->completed($key))<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>@elseif($key === $step)<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>@else<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/></svg>@endif</i>
                     <div><b>{{ $label }}</b><span>{{ $fin->completed($key) ? 'Done' : ($key === $step ? 'In progress' : 'Not started') }}</span></div>
                 </div>
             @endforeach
@@ -381,15 +381,15 @@ PAYMENT TERMS
 
         <div class="fz-rail">
             <h4>Fees</h4>
-            <div class="fz-ck"><i>✅</i><div><b>Free to post</b><span>Nothing charged to publish a request.</span></div></div>
-            <div class="fz-ck"><i>💳</i><div><b>${{ number_format($clientFee, 2) }} service fee</b><span>Once, only when this finalizes.</span></div></div>
-            <div class="fz-ck"><i>🚫</i><div><b>$0 if nothing books</b><span>Back out before signing and funding and you pay nothing.</span></div></div>
+            <div class="fz-ck"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></i><div><b>Free to post</b><span>Nothing charged to publish a request.</span></div></div>
+            <div class="fz-ck"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></i><div><b>${{ number_format($clientFee, 2) }} service fee</b><span>Once, only when this finalizes.</span></div></div>
+            <div class="fz-ck"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></i><div><b>$0 if nothing books</b><span>Back out before signing and funding and you pay nothing.</span></div></div>
         </div>
 
         <div class="fz-rail">
             <h4>Good to know</h4>
-            <div class="fz-ck"><i>↩️</i><div><b>You can still back out</b><span>Until both sides have signed and the deposit is secured.</span></div></div>
-            <div class="fz-ck"><i>🔒</i><div><b>Held by our processor</b><span>Funds sit with the licensed payment processor until contract terms are met.</span></div></div>
+            <div class="fz-ck"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg></i><div><b>You can still back out</b><span>Until both sides have signed and the deposit is secured.</span></div></div>
+            <div class="fz-ck"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></i><div><b>Held by our processor</b><span>Funds sit with the licensed payment processor until contract terms are met.</span></div></div>
         </div>
     </aside>
 </div>

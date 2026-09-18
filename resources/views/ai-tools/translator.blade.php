@@ -54,7 +54,7 @@
     @if($isManual)
     {{-- Starter — browse the phrasebook by hand, no auto-translate --}}
     <div class="tr-card">
-        <h3>📖 Event Phrasebook</h3>
+        <h3>Event Phrasebook</h3>
         <div class="det">Pick a language and browse the common booking phrases yourself.</div>
         <div class="tr-langs" id="trmLangs">
             @foreach($languages as $i => $lang)
@@ -74,7 +74,7 @@
     {{-- Semi / Maximum — the translator --}}
     <div class="tr-grid">
         <div class="tr-card">
-            <h3>🌐 Phrase to translate</h3>
+            <h3>Phrase to translate</h3>
             <div class="det">Common booking phrases, close wording still finds a match</div>
             <div class="tr-err" id="trErr"></div>
             <form id="trForm">
@@ -87,11 +87,11 @@
                     <span class="tr-lang" data-lang="portuguese">Portuguese</span>
                 </div>
                 <input type="hidden" name="target_language" id="trLang" value="spanish">
-                <button class="tr-btn" id="trBtn" type="submit">{{ $isSemi ? '✨ Suggest a Translation' : '🔄 Translate' }}</button>
+                <button class="tr-btn" id="trBtn" type="submit">{{ $isSemi ? 'Suggest a Translation' : 'Translate' }}</button>
             </form>
         </div>
         <div class="tr-card">
-            <h3>{{ $isSemi ? '✨ Suggested Translation' : '✨ Translation' }}</h3>
+            <h3>{{ $isSemi ? 'Suggested Translation' : 'Translation' }}</h3>
             <div class="det" id="trTargetDet">{{ $isSemi ? 'Edit the suggestion before you use it' : 'Pick a language and translate' }}</div>
             <div id="trOut"><p class="tr-empty">The translation and closest phrasebook matches will appear here.</p></div>
             <p class="tr-note">This covers the most common event phrases across five languages. Wording outside those phrases is not translated yet.</p>

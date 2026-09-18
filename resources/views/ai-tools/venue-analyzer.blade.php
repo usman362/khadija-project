@@ -48,7 +48,7 @@
     .va-pan { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 15px; }
     .va-pan h4 { font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; }
     .va-alert { font-size: 12px; color: var(--text-secondary); line-height: 1.5; padding: 8px 0 8px 22px; position: relative; border-bottom: 1px dashed var(--border-color); }
-    .va-alert:last-child { border-bottom: none; } .va-alert::before { content: '⚠️'; position: absolute; left: 0; top: 7px; font-size: 11px; }
+    .va-alert:last-child { border-bottom: none; } .va-alert::before { content: ''; position: absolute; left: 4px; top: 14px; width: 6px; height: 6px; border-radius: 50%; background: #d97706; }
     .va-hc { display: flex; justify-content: space-between; font-size: 12.5px; padding: 7px 0; border-bottom: 1px dashed var(--border-color); }
     .va-hc:last-child { border-bottom: none; } .va-hc b { color: var(--text-primary); font-weight: 800; }
     .va-score-ring { text-align: center; } .va-score-ring b { font-size: 30px; font-weight: 800; color: var(--va); } .va-score-ring span { font-size: 11px; color: var(--text-muted); }
@@ -135,13 +135,13 @@
     @if($isManual)
     {{-- Starter — hand-built venue scorecard, no AI, computed client-side --}}
     <div class="va-form-card va-mano">
-        <h3>🏛 Score My Venue</h3>
+        <h3>Score My Venue</h3>
         <div class="sub">Rate each factor yourself. We average them into an overall venue score. No suggestions.</div>
         <div style="margin-bottom:14px;">
             <label class="va-lbl">Venue Name (optional)</label>
             <input type="text" id="vamName" class="va-inp" placeholder="e.g. The Garden Estate">
         </div>
-        <h4>📋 Venue Factors</h4>
+        <h4>Venue Factors</h4>
         <div id="vamRows"></div>
         <button type="button" id="vamAdd" class="va-madd">+ Add factor</button>
         <div class="va-mscore">
@@ -153,7 +153,7 @@
     @else
     {{-- Interactive analyzer (Semi / Maximum) --}}
     <div class="va-form-card">
-        <h3>📐 Analyze My Venue Space</h3>
+        <h3>Analyze My Venue Space</h3>
         <div class="sub">{{ $isSemi ? 'We suggest a capacity and space fit you can adjust before using.' : 'Enter the venue size and your guest count and we work out capacity and space fit.' }}</div>
         <form id="vaForm">
             <div class="va-fgrid">
@@ -178,7 +178,7 @@
                     <label class="va-chk"><input type="checkbox" name="has_dancefloor" value="1"> Include a dance floor</label>
                 </div>
             </div>
-            <button type="submit" class="va-go" id="vaGo">{{ $isSemi ? '✨ Suggest Venue Analysis' : '🤖 Analyze My Venue' }}</button>
+            <button type="submit" class="va-go" id="vaGo">{{ $isSemi ? 'Suggest Venue Analysis' : 'Analyze My Venue' }}</button>
             <div class="va-err" id="vaErr"></div>
         </form>
     </div>
@@ -200,11 +200,11 @@
             <div class="va-metric"><b id="vaUtil"></b><div class="l">Utilization</div></div>
         </div>
         <div class="va-card" style="margin-bottom:16px;">
-            <div class="va-card-hd">🔍 Area Breakdown</div>
+            <div class="va-card-hd">Area Breakdown</div>
             <div id="vaBreakdown" style="padding: 6px 16px;"></div>
         </div>
         <div class="va-pan">
-            <h4>💡 Suggestions</h4>
+            <h4>Suggestions</h4>
             <div id="vaTips"></div>
         </div>
     </div>
@@ -277,7 +277,7 @@
 
         const v = res.verdict || '';
         const cls = v.startsWith('Over') ? 'over' : (v.startsWith('Tight') ? 'tight' : 'good');
-        const icon = cls === 'over' ? '🚫' : (cls === 'tight' ? '⚠️' : '✅');
+        const icon = cls === 'over' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>' : (cls === 'tight' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>');
         const verdictEl = document.getElementById('vaVerdict');
         verdictEl.className = 'va-verdict ' + cls;
         verdictEl.innerHTML = editable

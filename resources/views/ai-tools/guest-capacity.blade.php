@@ -52,7 +52,7 @@
     .gc-slider label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; } .gc-slider label b { color: var(--gc); }
     .gc-slider input { width: 100%; accent-color: var(--gc); }
     .gc-tip { font-size: 12px; color: var(--text-secondary); line-height: 1.5; padding: 8px 0 8px 22px; position: relative; border-bottom: 1px dashed var(--border-color); }
-    .gc-tip:last-child { border-bottom: none; } .gc-tip::before { content: '✨'; position: absolute; left: 2px; top: 7px; }
+    .gc-tip:last-child { border-bottom: none; } .gc-tip::before { content: ''; position: absolute; left: 5px; top: 14px; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .55; }
 
     @media (max-width: 1000px) { .gc-grid { grid-template-columns: minmax(0,1fr); } .gc-stats, .gc-ins { grid-template-columns: 1fr 1fr; } }
 
@@ -100,7 +100,7 @@
     @if($isManual)
     {{-- Starter — hand-built capacity calculator, no AI, computed client-side --}}
     <div class="gc-gen">
-        <h3>📐 Build My Capacity Estimate</h3>
+        <h3>Build My Capacity Estimate</h3>
         <div class="sub">Enter your own numbers and adjust space-per-guest: the math runs right here.</div>
         <div class="gc-form-grid">
             <div class="gc-field">
@@ -128,7 +128,7 @@
         <div class="gc-mano">
             <div class="gc-stats" id="gcmStats"></div>
             <div class="gc-card">
-                <div class="gc-card-hd"><h3>⚖️ Legal vs Comfort Capacity</h3></div>
+                <div class="gc-card-hd"><h3>Legal vs Comfort Capacity</h3></div>
                 <div class="gc-bars">
                     <div class="gc-cap">
                         <div class="gc-cap-top" id="gcmCapTop"></div>
@@ -143,7 +143,7 @@
     @else
     {{-- AI planner (Semi / Maximum) --}}
     <div class="gc-gen">
-        <h3>📐 Estimate Your Capacity</h3>
+        <h3>Estimate Your Capacity</h3>
         <div class="sub">{{ $isSemi ? 'We estimate comfort and legal capacity. You can adjust the figures and the score recalculates.' : 'Enter your space and guest details and we estimate comfort, legal capacity and flow insights.' }}</div>
         <form id="gcForm">
             <div class="gc-form-grid">
@@ -192,12 +192,12 @@
         <div class="gc-grid">
             <div>
                 <div class="gc-card">
-                    <div class="gc-card-hd"><h3>📊 Capacity Insights</h3></div>
+                    <div class="gc-card-hd"><h3>Capacity Insights</h3></div>
                     <div class="gc-ins" id="gcInsights"></div>
                 </div>
 
                 <div class="gc-card">
-                    <div class="gc-card-hd"><h3>⚖️ Legal vs Comfort Capacity</h3></div>
+                    <div class="gc-card-hd"><h3>Legal vs Comfort Capacity</h3></div>
                     <div class="gc-bars">
                         <div class="gc-cap">
                             <div class="gc-cap-top" id="gcCapTop"></div>
@@ -210,7 +210,7 @@
 
             <aside class="gc-rail">
                 <div class="gc-pan">
-                    <h4>✨ Tips</h4>
+                    <h4>Tips</h4>
                     <div id="gcTips"></div>
                 </div>
             </aside>

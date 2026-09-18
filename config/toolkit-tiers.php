@@ -23,8 +23,10 @@ return [
 
     'tiers' => ['manual' => 'Free', 'semi' => 'Semi', 'maximum' => 'Maximum'],
 
-    // One-time purchases, not subscriptions. Both sides pay the same.
-    'prices' => ['manual' => 0.00, 'semi' => 2.99, 'maximum' => 5.99],
+    // Monthly plans (D-23, Khadijah, 13 Sep: "confirmed MONTHLY subscription
+    // ($4.99 / $9.99), not a one-time purchase"). Both sides pay the same.
+    'prices' => ['manual' => 0.00, 'semi' => 4.99, 'maximum' => 9.99],
+    'billing' => 'monthly',
 
     /*
     | Toolkit access is a purchased entitlement tied to account status — it is

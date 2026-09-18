@@ -157,7 +157,7 @@
      other, is one control drawn twice. --}}
 <div class="dr-stats">
     <a class="dr-stat {{ $f['tab'] === 'all' ? 'on' : '' }}" href="{{ $link(['tab' => null, 'page' => null]) }}">
-        <span class="ic a">🗂</span>
+        <span class="ic a"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
         <span>
             <span class="lbl">Open Cases</span>
             <span class="n">{{ $counts['open'] }}</span>
@@ -165,7 +165,7 @@
         </span>
     </a>
     <a class="dr-stat {{ $f['tab'] === 'action' ? 'on' : '' }}" href="{{ $link(['tab' => 'action', 'page' => null]) }}">
-        <span class="ic b">⏱</span>
+        <span class="ic b"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
         <span>
             <span class="lbl">Waiting on You</span>
             <span class="n">{{ $counts['action'] }}</span>
@@ -173,7 +173,7 @@
         </span>
     </a>
     <a class="dr-stat {{ $f['tab'] === 'review' ? 'on' : '' }}" href="{{ $link(['tab' => 'review', 'page' => null]) }}">
-        <span class="ic c">🔍</span>
+        <span class="ic c"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
         <span>
             <span class="lbl">Under Review</span>
             <span class="n">{{ $counts['review'] }}</span>
@@ -181,7 +181,7 @@
         </span>
     </a>
     <a class="dr-stat {{ $f['tab'] === 'resolved' ? 'on' : '' }}" href="{{ $link(['tab' => 'resolved', 'page' => null]) }}">
-        <span class="ic d">✅</span>
+        <span class="ic d"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
         <span>
             <span class="lbl">Resolved</span>
             <span class="n">{{ $counts['resolved'] }}</span>
@@ -199,17 +199,17 @@
             </div>
             <div class="dr-steps">
                 <div class="dr-step">
-                    <div class="row"><span class="num">1</span><span class="ic">💬</span></div>
+                    <div class="row"><span class="num">1</span><span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span></div>
                     <b>Message the Other Party</b>
                     <span>Keep the conversation on GigResource so it is documented.</span>
                 </div>
                 <div class="dr-step">
-                    <div class="row"><span class="num">2</span><span class="ic">🤝</span></div>
+                    <div class="row"><span class="num">2</span><span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span></div>
                     <b>Request a Resolution</b>
                     <span>Ask for a correction, refund, replacement or other remedy.</span>
                 </div>
                 <div class="dr-step">
-                    <div class="row"><span class="num">3</span><span class="ic">🕐</span></div>
+                    <div class="row"><span class="num">3</span><span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span></div>
                     <b>Allow Response Time</b>
                     {{-- Not "a fair chance", and no "24–48 hours": "fair" is on
                          DecisionGuide::BANNED_WORDING, and §12 holds every
@@ -218,7 +218,7 @@
                     <span>Give the other party time to reply before escalating.</span>
                 </div>
                 <div class="dr-step">
-                    <div class="row"><span class="num">4</span><span class="ic">🚩</span></div>
+                    <div class="row"><span class="num">4</span><span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span></div>
                     <b>Escalate if Unresolved</b>
                     <span>If it is still not settled, file a formal dispute.</span>
                 </div>
@@ -264,7 +264,7 @@
 
             @if($cases->isEmpty())
                 <div class="dr-none">
-                    <div class="art">🗃️</div>
+                    <div class="art"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg></div>
                     @if($f['tab'] !== 'all' || $f['taxonomy'] || $f['range'] !== 'all')
                         <h3>Nothing in this view</h3>
                         <p>No case matches these filters.</p>
@@ -326,20 +326,20 @@
                 <a class="dr-raillink" style="margin:0;" href="{{ route('disputes.create') }}">View all issue types →</a>
             </div>
             <div class="dr-issues">
-                @php $issueIcon = ['payment_dispute' => '💳', 'cancellation' => '📅', 'no_show' => '🚷', 'incomplete_service' => '🧩', 'damage_claim' => '🛠', null => '💬']; @endphp
+                @php $issueIcon = ['payment_dispute' => '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>', 'cancellation' => '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>', 'no_show' => '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="18" y1="8" x2="23" y2="13"/><line x1="23" y1="8" x2="18" y2="13"/></svg>', 'incomplete_service' => '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', 'damage_claim' => '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>', null => '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>']; @endphp
                 @foreach($issues as [$key, $label, $note])
                     {{-- Each tile lands on the filing form with the
                          classification already chosen, so the form does not ask
                          a question the tile just answered. --}}
                     <a class="dr-issue" href="{{ $key ? route('disputes.create', ['taxonomy' => $key]) : route('disputes.create') }}">
-                        <span class="ic">{{ $issueIcon[$key] ?? '💬' }}</span>
+                        <span class="ic">{!! $issueIcon[$key] ?? $issueIcon[null] !!}</span>
                         <span><b>{{ $label }}</b><span>{{ $note }}</span></span>
                         <span class="arw">›</span>
                     </a>
                 @endforeach
             </div>
             <div class="dr-note">
-                <span>ℹ️</span>
+                <span style="display:inline-flex;flex-shrink:0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
                 <span>Keep all communication on GigResource. It helps us understand what happened and resolve issues faster.</span>
             </div>
         </div>
@@ -381,7 +381,7 @@
         </div>
 
         <div class="dr-rc">
-            <h4>🎧 Need Help?</h4>
+            <h4>Need Help?</h4>
             <p>Read the answers to common questions, or ask our support team.</p>
             <a class="dr-railbtn" href="{{ route('public.faq') }}">Visit the FAQ</a>
             <a class="dr-raillink" href="{{ \App\Domain\Forms\FormRegistry::url('support_request') }}">Contact Support →</a>

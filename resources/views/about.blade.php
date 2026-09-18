@@ -173,7 +173,7 @@
                 <div class="ab-pcards">
                     <div class="ab-pcard">
                         <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=120&q=80&auto=format&fit=crop" alt="">
-                        <b>Event Organizer</b>
+                        <b>Client</b>
                         <div class="stars">★★★★★</div>
                     </div>
                     <div class="ab-pcard">
@@ -198,7 +198,7 @@
             {{-- New message float --}}
             <div class="ab-float ab-float-msg">
                 <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=90&q=80&auto=format&fit=crop" alt="">
-                <div><b>New Message</b><span>Looking forward to it! 🎉</span></div>
+                <div><b>New Message</b><span>Looking forward to it!</span></div>
             </div>
 
             {{-- plant --}}
@@ -241,7 +241,7 @@
             <div class="ab-story-txt">
                 <span class="ab-eyebrow pill">Our Story</span>
                 <h2 class="ab-h2">Built for Better<br>Event Experiences</h2>
-                <p>Planning an event should be exciting—not stressful. GigResource was created to help event organizers find the right professionals, communicate easily, and manage bookings with confidence.</p>
+                <p>Planning an event should be exciting—not stressful. GigResource was created to help clients find the right professionals, communicate easily, and manage bookings with confidence.</p>
                 <p>Whether it's a corporate event, wedding, private celebration, or live experience, our goal is to simplify every step of the process.</p>
             </div>
         </div>
@@ -387,10 +387,10 @@
         </div>
         <div class="ab-serve">
             <div class="ab-serve-card">
-                <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80&auto=format&fit=crop" alt="Event organizer" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80&auto=format&fit=crop" alt="Client planning an event" loading="lazy">
                 <div class="ab-serve-body">
                     <span class="ab-serve-ico" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);box-shadow:0 8px 16px rgba(37,99,235,0.3);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
-                    <div><h4>Event Organizers</h4><p>Find the right talent for your event.</p></div>
+                    <div><h4>Clients</h4><p>Find the right professionals for your event.</p></div>
                 </div>
             </div>
             <div class="ab-serve-card">

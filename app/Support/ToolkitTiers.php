@@ -68,7 +68,7 @@ class ToolkitTiers
             ->values();
     }
 
-    /** What one tier costs, as a one-time purchase. */
+    /** What one tier costs per month (D-23: monthly plans, not one-time). */
     public static function price(string $tier): float
     {
         return (float) config("toolkit-tiers.prices.{$tier}", 0.0);
@@ -163,11 +163,11 @@ class ToolkitTiers
     }
 
     /**
-     * What upgrading from Semi to Maximum costs.
+     * How much more Maximum costs than Semi each month.
      *
-     * The difference, not the full price: config says the Semi payment is
-     * credited, and quoting $5.99 to somebody who has already paid $2.99 would
-     * be quoting them the wrong number.
+     * This was the one-time upgrade price when the toolkit was a one-time
+     * purchase. With monthly plans (D-23) the page quotes both monthly
+     * prices instead; this is kept for anything that still wants the gap.
      */
     public static function upgradeDifference(): float
     {

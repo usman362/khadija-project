@@ -61,7 +61,7 @@
 
         @if($packages->isEmpty())
             <div class="cmp-empty">
-                <div style="font-size:38px;">⚖️</div>
+                <div style="opacity:.6;"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M5 21h14"/><path d="M3 7h18"/><path d="M6 7l-3 7a3 3 0 0 0 6 0z"/><path d="M18 7l-3 7a3 3 0 0 0 6 0z"/></svg></div>
                 <h2>Nothing to compare yet</h2>
                 <p>Tick “Compare” on up to {{ $compareMax }} packages, then come back here.</p>
                 <a href="{{ route('public.packages') }}">Browse packages</a>

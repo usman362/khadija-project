@@ -77,25 +77,20 @@ class ClientBlockersAnswersTest extends TestCase
 
     /* ── Forms (D-28) ──────────────────────────────────────── */
 
-    public function test_the_final_forms_are_offered(): void
+    /**
+     * Khadijah, 13 Sep: the seven forms already live are the final list; the
+     * three added on Sep 6 (Contract Dispute, Feature Request, Partnership
+     * Inquiry) are withdrawn.
+     */
+    public function test_the_withdrawn_forms_are_not_offered(): void
     {
         $groups = FormRegistry::groupsForAudience(FormRegistry::CLIENT);
         $all = collect($groups)->flatMap(fn ($g) => array_keys($g['forms']))->all();
 
         foreach (['feature_request', 'partnership_inquiry', 'contract_dispute'] as $key) {
-            $this->assertContains($key, $all);
+            $this->assertNotContains($key, $all);
+            $this->assertArrayNotHasKey($key, FormRegistry::all());
         }
-        // The dispute card opens the existing dispute form, not a second one.
-        $this->assertSame(route('disputes.create'), FormRegistry::url('contract_dispute'));
-    }
-
-    public function test_a_feature_request_can_be_sent(): void
-    {
-        $client = $this->user('client');
-
-        $this->actingAs($client)->post(route('forms.store', FormRegistry::slugFor('feature_request')), [
-            'title' => 'Dark mode on the calendar', 'description' => 'The calendar is bright at night.', 'user_type' => 'client',
-        ])->assertSessionHasNoErrors();
     }
 
     /* ── FAQ, badges, BBB ──────────────────────────────────── */

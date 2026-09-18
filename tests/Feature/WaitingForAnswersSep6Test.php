@@ -67,9 +67,12 @@ class WaitingForAnswersSep6Test extends TestCase
             $this->assertArrayHasKey($key, DisputeClassification::TAXONOMY, "{$key} has no staff classification");
         }
 
-        $tiles = array_column(\App\Http\Controllers\Disputes\DisputeController::COMMON_ISSUES, 1);
-        $this->assertSame(array_values(DisputeClassification::FILING_TYPES), $tiles);
-        $this->assertNotContains('Cancellation', $tiles, 'Cancellation is not a dispute type');
+        // The tiles are the filing list itself now, so each has its line.
+        $this->assertSame(
+            array_keys(DisputeClassification::FILING_TYPES),
+            array_keys(\App\Http\Controllers\Disputes\DisputeController::ISSUE_NOTES),
+        );
+        $this->assertNotContains('Cancellation', DisputeClassification::FILING_TYPES, 'Cancellation is not a dispute type');
     }
 
     /** D-9: disputes open up to 14 days after the event, and not after. */

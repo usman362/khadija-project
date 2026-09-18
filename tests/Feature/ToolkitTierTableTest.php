@@ -12,8 +12,8 @@ use Tests\TestCase;
  * a subset of the 12 tools, shown as a tab table rather than toggle buttons.
  *
  *   Manual   nothing, always, both sides — a preset, not a list
- *   Semi     $2.99 one-time — 5 tools for a client, 6 for a professional
- *   Maximum  all twelve, $5.99 one-time
+ *   Semi     $4.99 a month — 5 tools for a client, 6 for a professional
+ *   Maximum  all twelve, $9.99 a month (D-23, 13 Sep: monthly, not one-time)
  *
  * Professionals are gated by membership on top of that: Starter gets Manual
  * only, and Elite is offered Maximum only — the top membership has nothing
@@ -85,11 +85,12 @@ class ToolkitTierTableTest extends TestCase
         }
     }
 
-    public function test_the_prices_are_free_two_ninety_nine_and_five_ninety_nine(): void
+    public function test_the_prices_are_free_four_ninety_nine_and_nine_ninety_nine_a_month(): void
     {
         $this->assertSame(0.0, ToolkitTiers::price('manual'));
-        $this->assertSame(2.99, ToolkitTiers::price('semi'));
-        $this->assertSame(5.99, ToolkitTiers::price('maximum'));
+        $this->assertSame(4.99, ToolkitTiers::price('semi'));
+        $this->assertSame(9.99, ToolkitTiers::price('maximum'));
+        $this->assertSame('monthly', config('toolkit-tiers.billing'));
     }
 
     public function test_the_two_sides_have_different_semi_sets(): void
@@ -230,8 +231,8 @@ class ToolkitTierTableTest extends TestCase
         $response->assertDontSee('MANUAL');
         $response->assertSee('SEMI');
         $response->assertSee('MAXIMUM');
-        $response->assertSee('$2.99');
-        $response->assertSee('$5.99');
+        $response->assertSee('$4.99');
+        $response->assertSee('$9.99');
         $response->assertSee('FREE');
     }
 
@@ -293,15 +294,16 @@ class ToolkitTierTableTest extends TestCase
         }
     }
 
-    public function test_the_upgrade_price_is_the_difference_not_the_full_price(): void
+    /** D-23: monthly plans, said the same way everywhere on the page. */
+    public function test_the_page_says_monthly_and_never_one_time(): void
     {
-        // Quoting $5.99 to somebody who already paid $2.99 is quoting them the
-        // wrong number; the config says the Semi payment is credited.
-        $this->assertSame(3.0, ToolkitTiers::upgradeDifference());
-
-        $this->actingAs($this->user())->get(route('client.toolkit.tiers'))
+        $html = $this->actingAs($this->user())->get(route('client.toolkit.tiers'))
             ->assertSuccessful()
-            ->assertSee('$3.00 difference');
+            ->assertSee('/month', false)
+            ->getContent();
+
+        $this->assertStringNotContainsStringIgnoringCase('one-time', $html);
+        $this->assertStringNotContainsStringIgnoringCase('no monthly fees', $html);
     }
 
     public function test_the_comparison_covers_every_tool_exactly_once(): void

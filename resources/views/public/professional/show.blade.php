@@ -836,7 +836,7 @@
                                      title="Licence, insurance and workers' comp all on file and approved" />
                     @endif
                     @if($isNew)
-                        <span class="pp-tag new-vendor">✨ New Vendor</span>
+                        <span class="pp-tag new-vendor">New Vendor</span>
                     @endif
                 </div>
                 {{-- An independent research link, not an endorsement: BBB's public

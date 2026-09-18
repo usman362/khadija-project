@@ -91,7 +91,7 @@
                 {{-- Right rail --}}
                 <aside class="pe-rail">
                     <div class="pe-rail-card pe-rail-why">
-                        <h4>✨ Why we need this?</h4>
+                        <h4>Why we need this?</h4>
                         <p class="pe-muted" style="margin:-6px 0 10px;">The more details you give, GigResource IQ™ can find the perfect packages.</p>
                         @foreach(['Find the right packages faster','Get accurate pricing estimates','Ensure availability','Personalized recommendations'] as $why)
                             <div class="pe-check">

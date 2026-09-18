@@ -110,7 +110,7 @@
     @if($isManual)
     {{-- Starter — hand-built style board, no suggestions --}}
     <div class="ta-sec ta-mano">
-        <h3>🎨 Build My Style Board</h3>
+        <h3>Build My Style Board</h3>
         <div class="ta-field" style="margin-bottom:12px;">
             <label>Theme Name</label>
             <input type="text" id="tamName" placeholder="e.g. Elegant Garden Romance">
@@ -120,12 +120,12 @@
             <input type="text" id="tamDesc" placeholder="e.g. Lush greenery, soft blush florals, timeless elegance">
         </div>
 
-        <h4>🎨 My Colour Palette</h4>
+        <h4>My Colour Palette</h4>
         <div id="tamSwatches"></div>
         <button type="button" id="tamAddSw" class="ta-add">+ Add colour</button>
         <div class="ta-strip" id="tamStrip"></div>
 
-        <h4>🪄 My Style Ideas</h4>
+        <h4>My Style Ideas</h4>
         <div id="tamIdeas"></div>
         <button type="button" id="tamAddIdea" class="ta-add">+ Add idea</button>
 
@@ -134,7 +134,7 @@
     @else
     {{-- Advisor form (Semi / Maximum) --}}
     <div class="ta-sec">
-        <h3>🎯 Build Your Palette</h3>
+        <h3>Build Your Palette</h3>
         <div style="font-size:12.5px;color:var(--text-muted);margin:-6px 0 14px;">{{ $isSemi ? 'We suggest a palette and styling you can reword or swap before using.' : 'We build a full palette, mood and décor plan from your details.' }}</div>
         <form id="taForm">
             <div class="ta-form-grid">
@@ -185,20 +185,20 @@
         {{-- Row 226 — post it as a request: bidding, urgent, or a draft. --}}
         <x-post-as-request tool-key="theme-advisor" tool-name="Style & Inspiration" form-id="taForm" />
         <div class="ta-sec">
-            <h3>🎨 Your Suggested Palette</h3>
+            <h3>Your Suggested Palette</h3>
             <div class="ta-out-sum" id="taSummary"></div>
             <div class="ta-palette" id="taPalette"></div>
         </div>
         <div class="ta-sec">
-            <h3>💭 Mood Keywords</h3>
+            <h3>Mood Keywords</h3>
             <div class="ta-chips" id="taMood"></div>
         </div>
         <div class="ta-sec">
-            <h3>🪄 Décor Suggestions</h3>
+            <h3>Décor Suggestions</h3>
             <ul class="ta-list" id="taDecor"></ul>
         </div>
         <div class="ta-sec">
-            <h3>✨ Styling Tips</h3>
+            <h3>Styling Tips</h3>
             <ul class="ta-list" id="taTips"></ul>
         </div>
     </div>

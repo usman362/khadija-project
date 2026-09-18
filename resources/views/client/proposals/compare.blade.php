@@ -76,7 +76,7 @@
 </style>
 
 @if(session('status'))
-    <div class="cl-card" style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:12px 16px;margin-bottom:16px;font-size:13.5px;">✅ {{ session('status') }}</div>
+    <div class="cl-card" style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:12px 16px;margin-bottom:16px;font-size:13.5px;">{{ session('status') }}</div>
 @endif
 
 @php $f = $filters; @endphp
@@ -86,19 +86,19 @@
     <div class="cp-title">{{ $event->title }}</div>
     <div class="cp-meta">
         <span>{{ $total }} {{ Str::plural('proposal', $total) }} received</span>
-        @if($event->starts_at)<span>📅 {{ $event->starts_at->format('M j, Y') }}</span>@endif
-        @if($event->location)<span>📍 {{ $event->location }}</span>@endif
+        @if($event->starts_at)<span>{{ $event->starts_at->format('M j, Y') }}</span>@endif
+        @if($event->location)<span>{{ $event->location }}</span>@endif
         @php $__svcBudget = $service ? $event->budgetForService($service->id) : null; @endphp
         @if($__svcBudget)
-            <span>💰 {{ $service->name }} budget ${{ number_format($__svcBudget) }}</span>
+            <span>{{ $service->name }} budget ${{ number_format($__svcBudget) }}</span>
         @elseif($event->budget)
-            <span>💰 Budget ${{ number_format($event->budget) }}</span>
+            <span>Budget ${{ number_format($event->budget) }}</span>
         @endif
     </div>
 </div>
 
 <div class="cp-sealed">
-    🔒 <span><b>Sealed proposals.</b> Each amount is visible only to you and the professional who sent it. They cannot see each other's bids, rankings or negotiations. Compare the full scope, terms and qualifications, not only price.</span>
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> <span><b>Sealed proposals.</b> Each amount is visible only to you and the professional who sent it. They cannot see each other's bids, rankings or negotiations. Compare the full scope, terms and qualifications, not only price.</span>
 </div>
 
 {{-- One service at a time on a multi-service request, so bids for the same
@@ -181,7 +181,7 @@
                 @if($r['insured'])<span class="cp-tag ok">Insured</span>@else<span class="cp-tag no">No insurance on file</span>@endif
                 @if($r['rating'])<span>★ {{ $r['rating'] }} ({{ $r['reviews'] }})</span>@else<span>No reviews yet</span>@endif
                 @if($r['years'])<span>{{ $r['years'] }} yrs experience</span>@endif
-                @if($r['city'])<span>📍 {{ $r['city'] }}</span>@endif
+                @if($r['city'])<span>{{ $r['city'] }}</span>@endif
                 @if($b->category)<span>{{ $b->category->name }}</span>@endif
                 <span class="cp-date is-{{ $r['date'] }}">{{ \App\Domain\Requests\ProposalDate::label($r['date'], $event->starts_at) }}</span>
                 <span>Submitted {{ $b->created_at->humanAgo() }}</span>

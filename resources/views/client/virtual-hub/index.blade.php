@@ -228,10 +228,10 @@
         <div class="vh-sec-head"><span class="vh-sec-title">Explore Specialized Virtual Services</span><a href="{{ route('public.event-types') }}" class="vh-sec-link">View all categories →</a></div>
         @php
             $vhSvcDefaults = [
-                ['Livestream Directors', '📹'], ['Broadcast Engineers', '🎚'], ['Virtual Venue Architects', '🏛'],
-                ['Digital Engagement', '💬'], ['Hybrid AV Integrators', '🔌'], ['Virtual Moderators', '🤖'],
+                ['Livestream Directors', null], ['Broadcast Engineers', null], ['Virtual Venue Architects', null],
+                ['Digital Engagement', null], ['Hybrid AV Integrators', null], ['Virtual Moderators', null],
             ];
-            $vhSvcs = $categories->count() ? $categories->map(fn($c) => [$c->name, $c->icon ?: '🎯'])->toArray() : $vhSvcDefaults;
+            $vhSvcs = $categories->count() ? $categories->map(fn($c) => [$c->name, $c->icon])->toArray() : $vhSvcDefaults;
         @endphp
         <div class="vh-svc-grid">
             @foreach($vhSvcs as [$name, $icon])

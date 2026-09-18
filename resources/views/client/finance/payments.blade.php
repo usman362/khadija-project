@@ -307,10 +307,11 @@
 
 {{-- Right rail --}}
 <aside class="pay-rail">
-    <div class="pay-rail-card">
-        <div class="pay-rail-title">Quick Actions</div>
-        <a href="{{ route('client.search.index') }}" class="pay-qa"><div class="pay-qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div><div class="pay-qa-body"><div class="pay-qa-name">Pay Vendor</div><div class="pay-qa-sub">Send instant payment</div></div></a>
-    </div>
+    {{-- D-26 (Khadijah, 13 Sep): "Pay Vendor · Send instant payment" is gone.
+         Money is held until a booking is confirmed and paid through its
+         agreement; an instant payment to a professional contradicts that,
+         and the link only ever went to search. It was the only quick action,
+         so the card went with it. --}}
 
     {{--
         Removed 2026-08-15. "Payment Insights" made three claims and measured

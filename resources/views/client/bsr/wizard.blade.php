@@ -218,7 +218,7 @@
 </style>
 
 @if(session('status'))
-    <div class="cl-card" style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:12px 16px;margin-bottom:16px;font-size:13.5px;">✅ {{ session('status') }}</div>
+    <div class="cl-card" style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:12px 16px;margin-bottom:16px;font-size:13.5px;">{{ session('status') }}</div>
 @endif
 
 {{-- Row 226 — where the pre-filled answers came from, said out loud and kept

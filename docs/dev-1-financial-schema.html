@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>DEV-1 Financial Schema and Payment Flow</title>
+<style>
+  @page { size: A4; margin: 15mm 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; color: #1f2937; font-size: 9.8pt; line-height: 1.45; margin: 0; }
+  h1 { font-size: 19pt; color: #1e3a8a; margin: 0 0 3px; }
+  h2 { font-size: 13pt; color: #111827; margin: 20px 0 6px; padding-bottom: 3px; border-bottom: 2px solid #f97316; page-break-after: avoid; }
+  h3 { font-size: 10.8pt; color: #1e3a8a; margin: 14px 0 4px; page-break-after: avoid; }
+  p { margin: 5px 0; }
+  .sub { color: #6b7280; margin: 0 0 12px; }
+  .box { border: 1px solid #e5e7eb; border-radius: 8px; padding: 9px 12px; background: #f8fafc; margin: 8px 0; page-break-inside: avoid; }
+  .box.warn { background: #fffbeb; border-color: #fcd34d; }
+  .box.ok { background: #f0fdf4; border-color: #86efac; }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0 4px; }
+  th { text-align: left; font-size: 8pt; text-transform: uppercase; letter-spacing: .35px; color: #6b7280; padding: 4px 6px; border-bottom: 1px solid #d1d5db; background: #f9fafb; }
+  td { padding: 4px 6px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+  td:first-child { font-family: ui-monospace, Menlo, monospace; font-size: 8.6pt; white-space: nowrap; color: #111827; }
+  tr { page-break-inside: avoid; }
+  code { font-family: ui-monospace, Menlo, monospace; font-size: 8.8pt; background: #f1f5f9; padding: 0 3px; border-radius: 3px; }
+  .flow { font-family: ui-monospace, Menlo, monospace; font-size: 8.6pt; background: #0f172a; color: #e2e8f0; border-radius: 8px; padding: 10px 12px; white-space: pre; line-height: 1.5; page-break-inside: avoid; margin: 6px 0; }
+  ul, ol { margin: 4px 0 4px 18px; padding: 0; }
+  li { margin: 2px 0; }
+  .tag { display: inline-block; font-size: 7.8pt; font-weight: 700; border-radius: 999px; padding: 0 7px; background: #e0e7ff; color: #3730a3; }
+  .tag.new { background: #dcfce7; color: #166534; }
+  .tag.chg { background: #fef3c7; color: #92400e; }
+  .small { font-size: 8.8pt; color: #6b7280; }
+  .pb { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<h1>DEV-1: Financial Schema and Payment Flow</h1>
+<p class="sub">GigResource, for PM and Owner review. September 18, 2026. Builds on the money ledger proposal (A1, Aug 22). Nothing in this document is built until it is approved; it unblocks G-1 to G-14.</p>
+
+<div class="box ok">
+  <b>In one paragraph.</b> Every money movement is one row in an append-only ledger, and no total is ever stored and edited. A booking's price, what is held, what is owed to the professional and what GigResource earned are all sums over those rows. Payments move through one state machine (authorize, capture, hold, release, pay out), every step is idempotent, and the moment a payment is secured is a single database transaction that also authorizes the work. The payment schedule is a flexible, ordered list of stages set by the professional on their proposal, so G-14 needs no later migration.
+</div>
+
+<h2>1. Rules this design follows</h2>
+<ul>
+  <li><b>Held until confirmed</b> (D-5): client money is captured and held by the platform, and released to the professional only after the work is done and the dispute window has passed.</li>
+  <li><b>Append-only</b>: corrections and refunds are new rows that reverse earlier rows by reference. Nothing financial is updated in place or deleted.</li>
+  <li><b>Totals are derived</b>: there is no editable <code>booking.total</code>. Upgrades are separate line items that add to the client's running total (B3).</li>
+  <li><b>Commission on the service fee only</b>: 5% Starter, 3% Pro, 1.5% Elite, taken at capture from the tier the professional holds at that moment (G-11). Never on reimbursements, taxes or the request fee.</li>
+  <li><b>$2.99 request fee</b>: charged once at final submission, non-refundable in every case (D-3, G-13). Drafts are free.</li>
+  <li><b>Provider-agnostic</b>: every provider reference is stored with the provider's name, so the D-11 choice (Stripe or Square) does not change the schema. Examples below use Stripe terms because every other record names Stripe.</li>
+  <li><b>Idempotent everywhere</b>: every charge, webhook, expiry run and payout can be repeated safely (G-5, G-6).</li>
+</ul>
+
+<h2>2. Tables</h2>
+<p class="small"><span class="tag new">new</span> new table &nbsp; <span class="tag chg">change</span> change to an existing table. All money is <code>decimal(12,2)</code> in USD with a <code>currency</code> column; all timestamps are UTC.</p>
+
+<h3>2.1 <code>payment_schedules</code> and <code>payment_schedule_stages</code> <span class="tag new">new</span> (D-32, G-14)</h3>
+<p>The professional sets the schedule on their proposal; the client accepts or declines it with the proposal, through the existing Proposals flow. The default is deposit plus balance, and extra stages are allowed.</p>
+<table>
+  <tr><th>Column</th><th>Meaning</th></tr>
+  <tr><td>payment_schedules.id</td><td>One schedule per proposal (bid), copied onto the agreement (finalization) when it is accepted.</td></tr>
+  <tr><td>bid_id / finalization_id</td><td>Where it was proposed, and the agreement it became part of. The accepted copy is frozen.</td></tr>
+  <tr><td>status</td><td><code>proposed</code> → <code>accepted</code> / <code>declined</code> / <code>superseded</code></td></tr>
+  <tr><td>stages.sequence</td><td>1, 2, 3 … the order stages fall due.</td></tr>
+  <tr><td>stages.label</td><td>"Deposit", "Second payment", "Balance".</td></tr>
+  <tr><td>stages.amount</td><td>Fixed amount of the service price; the stages always add up to the agreed price.</td></tr>
+  <tr><td>stages.due_rule</td><td><code>on_acceptance</code>, <code>on_date</code>, <code>days_before_event</code>, <code>on_completion</code></td></tr>
+  <tr><td>stages.due_on / due_offset_days</td><td>The date or offset the rule needs.</td></tr>
+  <tr><td>stages.state</td><td><code>scheduled</code> → <code>due</code> → <code>secured</code> → <code>released</code> (or <code>refunded</code>, <code>failed</code>)</td></tr>
+</table>
+<p><b>Guardrails, checked on save:</b> no single stage may be 100% of the price (so a one-stage schedule is refused); at most <b>5</b> stages (proposed cap, see §6); amounts must sum exactly to the agreed price; sequence and due dates must move forward.</p>
+
+<h3>2.2 <code>payment_intents</code> <span class="tag new">new</span></h3>
+<p>One row per attempt to take money for one purpose. It holds the provider's state for that charge.</p>
+<table>
+  <tr><th>Column</th><th>Meaning</th></tr>
+  <tr><td>purpose</td><td><code>request_fee</code>, <code>stage</code>, <code>upgrade</code>, <code>subscription</code></td></tr>
+  <tr><td>payer_user_id</td><td>Who pays.</td></tr>
+  <tr><td>event_id / booking_id</td><td>What it is for.</td></tr>
+  <tr><td>stage_id / amendment_id</td><td>The stage or upgrade it pays, when there is one.</td></tr>
+  <tr><td>amount, currency</td><td></td></tr>
+  <tr><td>provider, provider_ref</td><td>For example <code>stripe</code> and the PaymentIntent id.</td></tr>
+  <tr><td>state</td><td><code>created</code> → <code>requires_action</code> → <code>authorized</code> → <code>captured</code>; or <code>failed</code>, <code>canceled</code>, <code>expired</code></td></tr>
+  <tr><td>idempotency_key</td><td>Unique. See §4.</td></tr>
+  <tr><td>attempts, last_error, next_retry_at</td><td>Retry bookkeeping.</td></tr>
+  <tr><td>authorized_at, captured_at, expires_at</td><td></td></tr>
+</table>
+
+<h3>2.3 <code>payment_attempts</code> <span class="tag new">new</span></h3>
+<p>Append-only log of each try at an intent: time, outcome, provider response code and message. It is used for support, for audit, and to decide retries.</p>
+
+<h3>2.4 <code>ledger_entries</code> <span class="tag new">new</span> (the spine, from A1)</h3>
+<table>
+  <tr><th>Column</th><th>Meaning</th></tr>
+  <tr><td>entry_type</td><td>One of the types in the table below.</td></tr>
+  <tr><td>party_user_id</td><td>Whose money the row is about: the client, the professional, or null for GigResource.</td></tr>
+  <tr><td>event_id, booking_id</td><td>Context.</td></tr>
+  <tr><td>subject_type / subject_id</td><td>The stage, amendment, reimbursement, payout or intent that produced it.</td></tr>
+  <tr><td>amount, sign</td><td>Amount always positive; sign <code>+</code> is money into GigResource, <code>-</code> is money out.</td></tr>
+  <tr><td>state</td><td><code>pending</code> → <code>held</code> → <code>released</code> / <code>refunded</code> / <code>failed</code></td></tr>
+  <tr><td>payment_intent_id</td><td>The charge that backs it.</td></tr>
+  <tr><td>reverses_id</td><td>Set on a refund or correction; points at the row it reverses.</td></tr>
+  <tr><td>metadata (json)</td><td>Tier and rate used, provider fee detail, tax jurisdiction.</td></tr>
+  <tr><td>occurred_at</td><td>When it happened. Rows are never edited after they settle.</td></tr>
+</table>
+<table>
+  <tr><th>entry_type</th><th>What it records</th></tr>
+  <tr><td>request_fee</td><td>The $2.99 at final submission (non-refundable).</td></tr>
+  <tr><td>stage_charge</td><td>A schedule stage captured and held.</td></tr>
+  <tr><td>upgrade_charge</td><td>A secured Live Event Upgrade or change order, one row each, never merged (B3).</td></tr>
+  <tr><td>commission</td><td>GigResource's share of a captured service amount, at the tier rate.</td></tr>
+  <tr><td>reimbursement</td><td>Approved out-of-pocket cost; passes through with no commission (G-12).</td></tr>
+  <tr><td>provider_fee</td><td>The processor's fee on a charge.</td></tr>
+  <tr><td>tax</td><td>Tax, if collected (see §6).</td></tr>
+  <tr><td>release</td><td>Held money becomes payable to the professional.</td></tr>
+  <tr><td>refund, adjustment</td><td>Reverses specific earlier rows, by reference.</td></tr>
+  <tr><td>payout</td><td>Money sent to the professional.</td></tr>
+</table>
+
+<h3>2.5 <code>booking_amendments</code> <span class="tag new">new</span> (draft amendment lifecycle, G-7; Live Event Upgrades)</h3>
+<p>This replaces A1's <code>booking_upgrades</code>. One table covers upgrades (time, service or add-on) and change orders. Live Event Upgrades stay under Owner hold B-3: the table is designed here, but no rows are written until the hold lifts.</p>
+<table>
+  <tr><th>Column</th><th>Meaning</th></tr>
+  <tr><td>kind</td><td><code>time_upgrade</code>, <code>service_upgrade</code>, <code>addon</code>, <code>change_order</code></td></tr>
+  <tr><td>booking_id, requested_by</td><td></td></tr>
+  <tr><td>description, amount</td><td>What changes, and its price.</td></tr>
+  <tr><td>extra_minutes / new_end_at</td><td>For time upgrades: the extended end time (G-10).</td></tr>
+  <tr><td>state</td><td><code>draft</code> → <code>proposed</code> → <code>accepted</code> → <code>payment_secured</code> → <code>applied</code>; or <code>rejected</code>, <code>withdrawn</code>, <code>expired</code></td></tr>
+  <tr><td>respond_by</td><td>The deadline for the other side to answer (D-4). It includes the 15-minute grace period (G-9).</td></tr>
+  <tr><td>payment_intent_id</td><td>The charge that must be captured before <code>applied</code>.</td></tr>
+</table>
+
+<h3>2.6 <code>reimbursements</code> <span class="tag new">new</span> (G-12)</h3>
+<p>Columns: <code>booking_id</code>, <code>requested_by</code>, <code>description</code>, <code>amount</code>, <code>receipt_path</code>, and <code>state</code> (<code>submitted</code> → <code>approved</code> / <code>rejected</code> → <code>paid</code>). An approved reimbursement becomes a <code>reimbursement</code> ledger row with no commission.</p>
+
+<h3>2.7 <code>payout_items</code> <span class="tag new">new</span> and <code>payouts</code> <span class="tag chg">change</span></h3>
+<p><code>payout_items</code> links each payout to the <code>release</code> rows it pays, so every dollar sent can be traced back to a booking. To <code>payouts</code> add <code>provider</code>, <code>provider_ref</code>, <code>idempotency_key</code> and <code>failure_reason</code>, and the states <code>pending</code> → <code>in_transit</code> → <code>paid</code> / <code>failed</code>.</p>
+
+<h3>2.8 <code>webhook_events</code> <span class="tag new">new</span> (G-4)</h3>
+<p>Columns: <code>provider</code>, <code>provider_event_id</code> (unique per provider), <code>type</code>, <code>payload</code>, <code>signature_valid</code>, <code>received_at</code>, <code>processed_at</code>, <code>status</code>, <code>error</code>. The handler checks the signature, stores the event and answers 2xx within 5 seconds; processing happens later on a queue. A repeated event id is acknowledged and ignored.</p>
+
+<h3>2.9 <code>idempotency_keys</code> <span class="tag new">new</span> (G-5)</h3>
+<p>Columns: <code>key</code> (unique), <code>scope</code>, <code>request_hash</code>, <code>response</code>, <code>locked_until</code>, <code>created_at</code>. A second request with the same key gets the first response back instead of a second charge.</p>
+
+<h3>2.10 <code>live_event_timeline_entries</code> <span class="tag new">new</span> (G-3)</h3>
+<p>An immutable, append-only record of what happened during a live event: check-in, upgrade requested, accepted, secured, applied, extended end time, and completion marked. Columns: <code>booking_id</code>, <code>actor_id</code>, <code>kind</code>, <code>data</code> (json), <code>occurred_at</code>. There is no update or delete path, and the model refuses both. Written under Owner hold B-3 only once it lifts.</p>
+
+<h3>2.11 Changes to existing tables <span class="tag chg">change</span></h3>
+<table>
+  <tr><th>Table</th><th>Change</th></tr>
+  <tr><td>bookings</td><td>Add <code>work_authorized_at</code> (G-2). It is set only by the Payment Secured transaction (§3.3) when the first stage that must be paid before work is secured. Screens and actions that start work check it.</td></tr>
+  <tr><td>payments</td><td>Make <code>user_subscription_id</code> nullable and add <code>purpose</code>. It remains the record for subscriptions; booking money moves to <code>payment_intents</code>.</td></tr>
+  <tr><td>finalizations</td><td>Keep <code>deposit_percent</code> and <code>deposit_amount</code> for existing rows. New agreements read the accepted <code>payment_schedule</code> instead.</td></tr>
+</table>
+
+<h2>3. Payment-state flow</h2>
+
+<h3>3.1 The request fee (G-13, D-3)</h3>
+<div class="flow">Client presses Publish (final submission)
+  → intent(purpose=request_fee, $2.99), idempotency key = request:{event_id}
+  → authorize + capture at once
+  → captured: ledger request_fee (+2.99, held→released to GigResource)
+              request is published
+  → failed:   request stays a draft, client sees why, can retry
+  No refund path exists for this fee (declined, withdrawn, expired alike).</div>
+
+<h3>3.2 A schedule stage: authorization, capture, hold</h3>
+<div class="flow">stage.scheduled ──(due rule reached)──▶ stage.due
+   └─ intent created (key = stage:{stage_id}:{attempt_window})
+        requires_action ─▶ client completes 3-D Secure / confirms
+        authorized ─▶ captured immediately (held-until-confirmed model)
+             └─ PAYMENT SECURED transaction (3.3)
+        failed ─▶ retry (3.4)</div>
+
+<h3>3.3 The Payment Secured transaction (G-1)</h3>
+<p>This runs once per captured intent, inside one database transaction. It is triggered by the webhook, or by the synchronous confirm, whichever arrives first. Both paths use the same idempotency key.</p>
+<ol>
+  <li>Lock the intent row (<code>SELECT … FOR UPDATE</code>). If it is already <code>captured</code>, stop: this is a repeat.</li>
+  <li>Set the intent to <code>captured</code> and the stage (or amendment) to <code>secured</code>.</li>
+  <li>Write the ledger rows: <code>stage_charge</code> (or <code>upgrade_charge</code>) as <code>held</code>, <code>commission</code> at the tier rate on the service part only, and <code>provider_fee</code>.</li>
+  <li>If this is the first stage required before work, set <code>bookings.work_authorized_at</code>.</li>
+  <li>For an upgrade, set the amendment to <code>applied</code>, and extend <code>new_end_at</code> for time upgrades.</li>
+  <li>Append a <code>live_event_timeline_entries</code> row where the booking is live.</li>
+  <li>Commit, then queue notifications. Notifications are never sent inside the transaction, so a failure to notify cannot undo the money.</li>
+</ol>
+
+<h3>3.4 Retries and failure</h3>
+<div class="flow">failed (card declined / insufficient funds / requires new method)
+  → attempts += 1, payment_attempts row written
+  → retry at +1 day and +3 days (max 3 attempts), client notified each time
+  → client may pay now with another method at any point (same stage, new key window)
+  → after the last attempt: stage.failed
+       deposit stage failed  → agreement not funded; booking not confirmed
+       later stage failed    → booking flagged "payment overdue"; PM rule decides
+                               whether it cancels (see §6)</div>
+
+<h3>3.5 Expiry job (G-6)</h3>
+<p>A scheduled job runs every 5 minutes. It picks up expired authorizations, proposals past their deadline and amendments past <code>respond_by</code> (grace included), with <code>SELECT … FOR UPDATE SKIP LOCKED</code>. It moves each one to <code>expired</code> exactly once, so two workers or a rerun never double-process a row.</p>
+
+<h3>3.6 Release and payout</h3>
+<div class="flow">Work marked complete (both sides, or auto after the event)
+  → dispute window runs (14 days, D-9)
+  → no open dispute: held stage_charge / upgrade_charge rows get a release row
+       payable = charges − commission − provider_fee + reimbursements
+  → payout run groups release rows per professional (payout_items)
+       key = payout:{professional}:{run_date}
+       pending → in_transit → paid          (failed → retried, then support)
+  → open dispute: release waits; the dispute outcome writes release and/or refund rows</div>
+
+<h3>3.7 Refunds and cancellations</h3>
+<p>A refund never edits a charge. It writes <code>refund</code> rows that point, through <code>reverses_id</code>, at the exact rows they reverse. The amount comes from the cancellation tiers per booking (D-2), and a partial refund reverses part of a row. Commission on a refunded service amount is reversed with it. The $2.99 request fee is never refunded.</p>
+
+<h2>4. Idempotency keys (the four patterns, G-5)</h2>
+<table>
+  <tr><th>Pattern</th><th>Key</th><th>Protects against</th></tr>
+  <tr><td>Client-initiated charge</td><td>request:{event} / stage:{stage}:{window} / upgrade:{amendment}</td><td>A double click or retried request charging twice.</td></tr>
+  <tr><td>Provider webhook</td><td>{provider}:{event_id}</td><td>The provider delivering the same event more than once.</td></tr>
+  <tr><td>Scheduled jobs</td><td>expire:{table}:{id}:{state}</td><td>Two workers, or a rerun, expiring the same row twice.</td></tr>
+  <tr><td>Payouts</td><td>payout:{professional}:{run_date}</td><td>The same money sent twice.</td></tr>
+</table>
+
+<h2>5. How this unblocks Section 6</h2>
+<table>
+  <tr><th>Item</th><th>Where it lives in this design</th></tr>
+  <tr><td>G-1 Payment Secured</td><td>§3.3, one transaction</td></tr>
+  <tr><td>G-2 work_authorized_at</td><td>bookings column, set only by §3.3</td></tr>
+  <tr><td>G-3 timeline</td><td>live_event_timeline_entries (append-only)</td></tr>
+  <tr><td>G-4 webhook</td><td>webhook_events; 2xx within 5 s, async, signature checked</td></tr>
+  <tr><td>G-5 idempotency</td><td>§4, idempotency_keys</td></tr>
+  <tr><td>G-6 expiry job</td><td>§3.5</td></tr>
+  <tr><td>G-7 amendments</td><td>booking_amendments lifecycle</td></tr>
+  <tr><td>G-8 push notifications</td><td>queued after commit in §3.3 (FCM and APNs, 30-second target)</td></tr>
+  <tr><td>G-9 15-minute grace</td><td>respond_by includes it</td></tr>
+  <tr><td>G-10 extended end time</td><td>booking_amendments.new_end_at, applied in §3.3</td></tr>
+  <tr><td>G-11 commission at capture</td><td>commission row in §3.3, tier snapshot in metadata</td></tr>
+  <tr><td>G-12 reimbursements</td><td>reimbursements table and ledger row, no commission</td></tr>
+  <tr><td>G-13 $2.99 at final submission</td><td>§3.1</td></tr>
+  <tr><td>G-14 multi-stage schedules</td><td>payment_schedules and stages (§2.1)</td></tr>
+</table>
+
+<h2>6. Decisions needed</h2>
+<div class="box warn">
+<ol>
+  <li><b>D-11 provider:</b> Stripe or Square. The schema works with either; the webhook handler and the hold mechanism (Stripe Connect, or Square's equivalent) depend on it.</li>
+  <li><b>Stage cap:</b> 5 stages is proposed. Should there also be a minimum for the first stage (for example 10%)?</li>
+  <li><b>Retry schedule:</b> 3 attempts at +1 and +3 days is proposed. Also needed: what happens to a confirmed booking whose later stage fails for good (cancel it, or leave it flagged for the team)?</li>
+  <li><b>Payout timing:</b> release after the 14-day dispute window is proposed. Is there a payout schedule (weekly?) or a minimum amount?</li>
+  <li><b>Taxes:</b> record only in V1, or calculate and collect? Which states?</li>
+</ol>
+</div>
+
+<h2>7. Build order once approved</h2>
+<ol>
+  <li>Ledger, intents, attempts, webhook events and idempotency keys, plus read helpers (owed, held, earned, paid).</li>
+  <li>$2.99 at final submission (G-13), the smallest complete path end to end.</li>
+  <li>Payment schedules on proposals (G-14) and stage payments with the Payment Secured transaction (G-1, G-2, G-11).</li>
+  <li>Retries and the expiry job (G-5, G-6), then release, payouts and refunds.</li>
+  <li>Amendments, the timeline and grace or extended time (G-3, G-7, G-9, G-10), once the Owner lifts B-3.</li>
+</ol>
+<p class="small">Existing screens keep working throughout: finance pages read from the ledger once it exists, and until then they keep showing N/A where there is no real data.</p>
+
+</body>
+</html>

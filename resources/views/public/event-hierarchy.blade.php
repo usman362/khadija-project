@@ -105,7 +105,7 @@
                     {{-- The three outcomes from the diagram, in one place: the
                          page is only ever in one of them. --}}
                     <div class="eh-msg is-idle" id="ehMsg">
-                        <span>ℹ️</span>
+                        <span style="display:inline-flex;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
                         <span>
                             <b>Please start by selecting a Main Event (Level 1).</b>
                             <span class="sub">This will unlock the next options.</span>
@@ -116,7 +116,7 @@
                 </div>
 
                 <div class="eh-summary">
-                    <h3>💡 Summary</h3>
+                    <h3>Summary</h3>
                     <ul>
                         <li>The order is fixed: Level 1 → Level 2 → Level 3 → Level 4.</li>
                         <li>Only data that exists in the source is shown.</li>
@@ -138,7 +138,7 @@
             </div>
 
             <div class="eh-how">
-                <h3>ℹ️ HOW IT WORKS</h3>
+                <h3>HOW IT WORKS</h3>
                 <ol>
                     @foreach($levels as $n => $level)
                         <li>{{ $n === 4 ? 'View' : 'Choose' }} a {{ $level['label'] }} (Level {{ $n }})</li>
@@ -164,7 +164,7 @@
     function message(kind, title, sub) {
         var box = document.getElementById('ehMsg');
         box.className = 'eh-msg is-' + kind;
-        box.innerHTML = '<span>' + (kind === 'ok' ? '✅' : kind === 'blocked' ? '⚠️' : 'ℹ️') + '</span>' +
+        box.innerHTML = '<span style="display:inline-flex;flex-shrink:0;">' + (kind === 'ok' ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>' : kind === 'blocked' ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>') + '</span>' +
             '<span><b></b><span class="sub"></span></span>';
         box.querySelector('b').textContent = title;
         box.querySelector('.sub').textContent = sub || '';

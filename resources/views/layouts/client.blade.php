@@ -1555,7 +1555,7 @@
             {{-- Orange welcome banner: greeting + search (matches reference) --}}
             <div class="cl-banner">
                 <div class="cl-banner-text">
-                    <h1>@yield('page-title', 'Welcome back, ' . (auth()->user()?->name ?? 'there') . '! 👋')</h1>
+                    <h1>@yield('page-title', 'Welcome back, ' . (auth()->user()?->name ?? 'there') . '!')</h1>
                     <p>@yield('page-subtitle', "Let's create amazing events together")</p>
                 </div>
                 <div class="cl-banner-search">

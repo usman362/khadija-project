@@ -294,7 +294,7 @@
     {{-- ══════════════ HERO ══════════════ --}}
     <section class="br-hero">
         <div class="lp-container">
-            <h1 class="br-h1">Find Your <span class="b">Vibe</span>. Book the <span class="o">Pro</span>. ✨</h1>
+            <h1 class="br-h1">Find Your <span class="b">Vibe</span>. Book the <span class="o">Pro</span>.</h1>
             <p class="br-hero-sub">Every verified event professional, right at your fingertips.</p>
 
             <form action="{{ route('public.browse') }}" method="GET" autocomplete="off" class="br-search">
@@ -747,7 +747,7 @@
                     <a href="{{ route('register') }}" class="br-btn-ghost" style="padding:11px 20px;">Join as Professional</a>
                 </div>
             </div>
-            <div class="br-cta-emoji">📅</div>
+            <div class="br-cta-emoji"><svg width="78" height="78" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke-width:1.5;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
         </section>
 
         {{-- ══════════════ TRUST STRIP ══════════════ --}}

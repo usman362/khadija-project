@@ -73,7 +73,7 @@
                 </div>
 
                 <div class="pe-aitip" style="margin-bottom:18px;">
-                    <span class="ic">✨</span>
+                    <span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg></span>
                     <div>
                         <h4>Tip</h4>
                         <p>The more services you add, the more accurate your matches will be.</p>
@@ -108,7 +108,7 @@
                 </div>
 
                 <div class="pe-rail-card pe-rail-why">
-                    <h4 style="color:var(--pe-purple);">✨ Suggestion</h4>
+                    <h4 style="color:var(--pe-purple);">Suggestion</h4>
                     <p class="pe-muted" style="margin:-6px 0 12px;">Based on similar events:</p>
                     @foreach($aiSuggested as $suggest)
                         <div class="pe-rail-row" style="border-bottom:none; padding:5px 0;">

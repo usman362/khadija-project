@@ -63,19 +63,19 @@ class DisputeController extends Controller
     ];
 
     /**
-     * The six situations the "Common Issues" row offers, each a real taxonomy
-     * key so the tile lands on the filing form with the classification already
-     * chosen. "Other" opens the form with all twelve to pick from.
+     * The line under each "Common Issues" tile. The tiles themselves are
+     * DisputeClassification::FILING_TYPES, Sir Peter's PM-4 list, so the row
+     * and the filing form read from one list and cannot drift apart
+     * (Khadijah, 13 Sep: "replace the Disputes page's current issue-type list").
+     * Cancellation is not a dispute; it has its own page.
      */
-    // OA-148: Sir Peter's PM-4 list (Sep 5), word for word and in his order.
-    // Cancellation is not a dispute; it has its own page.
-    public const COMMON_ISSUES = [
-        ['no_show',            'No-show',                 'The client or professional did not show up.'],
-        ['incomplete_service', 'Service not as described', 'What was delivered did not match what was agreed.'],
-        ['damage_claim',       'Property damage',         'Damage to equipment or the venue.'],
-        ['late_arrival',       'Late arrival/departure',  'Arrived late or left early.'],
-        ['payment_dispute',    'Payment discrepancy',     'A charge or amount that does not match.'],
-        ['other',              'Other',                   'Something else not listed here.'],
+    public const ISSUE_NOTES = [
+        'no_show'            => 'The client or professional did not show up.',
+        'incomplete_service' => 'What was delivered did not match what was agreed.',
+        'damage_claim'       => 'Damage to equipment or the venue.',
+        'late_arrival'       => 'Arrived late or left early.',
+        'payment_dispute'    => 'A charge or amount that does not match.',
+        'other'              => 'Something else not listed here.',
     ];
 
     public function index(Request $request): View
@@ -147,8 +147,11 @@ class DisputeController extends Controller
             'counts'   => $counts,
             'tabs'     => self::TABS,
             'ranges'   => self::RANGES,
-            'issues'   => self::COMMON_ISSUES,
-            'taxonomy' => DisputeClassification::TAXONOMY,
+            'issues'   => collect(DisputeClassification::FILING_TYPES)
+                ->map(fn ($label, $key) => [$key, $label, self::ISSUE_NOTES[$key] ?? ''])
+                ->values()->all(),
+            // The filter offers the same six the client can file under.
+            'taxonomy' => DisputeClassification::FILING_TYPES,
             'filters'  => ['tab' => $tab, 'range' => $range, 'taxonomy' => $taxonomy],
             'viewer'   => $user->isProfessionalMode() ? 'professional' : 'client',
             'needsAction' => fn (DisputeCase $c) => $this->needsActionFrom($c, $user),

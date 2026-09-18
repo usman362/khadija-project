@@ -49,45 +49,36 @@
             <div class="aic-welcome-icon">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             </div>
-            <div class="aic-welcome-title">Hi {{ auth()->user()->name }}! 👋</div>
+            <div class="aic-welcome-title">Hi {{ auth()->user()->name }}!</div>
             <div class="aic-welcome-text">How can I help you today?</div>
             <div class="aic-suggestions">
                 {{-- Visible label is short for the bricks layout, but data-msg
                      carries the full question so the AI gets proper context. --}}
                 <button type="button" class="aic-suggestion" data-msg="How do I post a wedding event?">
-                    <span class="aic-suggestion-emoji">💍</span>
                     <span class="aic-suggestion-text">Post a wedding</span>
                 </button>
                 <button type="button" class="aic-suggestion" data-msg="What categories of professionals can I find on the platform?">
-                    <span class="aic-suggestion-emoji">🎉</span>
                     <span class="aic-suggestion-text">Categories</span>
                 </button>
                 <button type="button" class="aic-suggestion" data-msg="How does the influencer program work?">
-                    <span class="aic-suggestion-emoji">📣</span>
                     <span class="aic-suggestion-text">Influencer program</span>
                 </button>
                 <button type="button" class="aic-suggestion" data-msg="What are the commission tiers for influencers?">
-                    <span class="aic-suggestion-emoji">💰</span>
                     <span class="aic-suggestion-text">Commission tiers</span>
                 </button>
                 <button type="button" class="aic-suggestion" data-msg="How do I plan a corporate event?">
-                    <span class="aic-suggestion-emoji">🏢</span>
                     <span class="aic-suggestion-text">Corporate event</span>
                 </button>
                 <button type="button" class="aic-suggestion" data-msg="Help me find a DJ for my birthday party">
-                    <span class="aic-suggestion-emoji">🎂</span>
                     <span class="aic-suggestion-text">Find a DJ</span>
                 </button>
                 <button type="button" class="aic-suggestion" data-msg="How does pricing work for the platform?">
-                    <span class="aic-suggestion-emoji">💳</span>
                     <span class="aic-suggestion-text">Pricing</span>
                 </button>
                 <button type="button" class="aic-suggestion" data-msg="How do I switch between client and professional mode?">
-                    <span class="aic-suggestion-emoji">🔄</span>
                     <span class="aic-suggestion-text">Switch mode</span>
                 </button>
                 <button type="button" class="aic-suggestion" data-msg="What is the photo upload limit on my profile?">
-                    <span class="aic-suggestion-emoji">📸</span>
                     <span class="aic-suggestion-text">Photo limit</span>
                 </button>
             </div>
@@ -891,11 +882,10 @@
     }
 
     function fileIconFor(type) {
-        if (type.startsWith('image/'))      return '🖼️';
-        if (type === 'application/pdf')      return '📄';
-        if (type.includes('word'))           return '📝';
-        if (type.startsWith('text/'))        return '📃';
-        return '📎';
+        const svg = inner => `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`;
+        if (type.startsWith('image/')) return svg('<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>');
+        if (type === 'application/pdf' || type.includes('word') || type.startsWith('text/')) return svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/>');
+        return svg('<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>');
     }
 
     function renderAttachments() {

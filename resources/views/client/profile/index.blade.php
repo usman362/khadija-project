@@ -637,7 +637,7 @@
 
             <div style="margin-top:20px;padding:14px 18px;background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.2);border-radius:var(--radius-sm);">
                 <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.6;">
-                    <strong style="color:var(--text-primary);">💡 How it works:</strong>
+                    <strong style="color:var(--text-primary);">How it works:</strong>
                     Once you enable both modes, a quick-switch button appears in your top navigation bar.
                     Your data, messages, and bookings stay separate between modes, just like Freelancer or Upwork.
                 </div>

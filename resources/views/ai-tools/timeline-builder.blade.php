@@ -107,7 +107,7 @@
     @if($isManual)
     {{-- Starter — hand-built run-of-show, no suggestions --}}
     <div class="tb-form-card">
-        <h3>🛠 Build My Run-of-Show</h3>
+        <h3>Build My Run-of-Show</h3>
         <div class="sub">Add each slot yourself. Set the time and what's happening.</div>
         <div id="tbmRows" style="display:flex;flex-direction:column;gap:8px;"></div>
         <button type="button" id="tbmAdd" style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#2563eb;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.25);border-radius:9px;padding:8px 14px;cursor:pointer;font-family:inherit;">+ Add time slot</button>
@@ -115,7 +115,7 @@
     @else
     {{-- Interactive builder --}}
     <div class="tb-form-card">
-        <h3>🛠 Build My Run-of-Show</h3>
+        <h3>Build My Run-of-Show</h3>
         <div class="sub">{{ $isSemi ? "Enter your event. We suggest a timeline you can edit." : "Enter your event details and we build the run-of-show with real clock times." }}</div>
         <form id="tbForm">
             <div class="tb-fgrid">
@@ -142,7 +142,7 @@
                     <input type="number" name="duration_hours" class="tb-inp" min="2" max="12" step="0.5" value="6" required>
                 </div>
             </div>
-            <button type="submit" class="tb-go" id="tbGo">{{ $isSemi ? '✨ Suggest a Timeline' : '🤖 Build My Timeline' }}</button>
+            <button type="submit" class="tb-go" id="tbGo">{{ $isSemi ? 'Suggest a Timeline' : 'Build My Timeline' }}</button>
             <div class="tb-err" id="tbErr"></div>
         </form>
     </div>
@@ -160,7 +160,7 @@
         <x-post-as-request tool-key="timeline-builder" tool-name="Timeline Builder" form-id="tbForm" />
         <div class="tb-out-summary" id="tbSummary"></div>
         <div class="tb-card">
-            <h3>📋 Suggested Run-of-Show</h3>
+            <h3>Suggested Run-of-Show</h3>
             <div id="tbSchedule"></div>
         </div>
     </div>
@@ -194,7 +194,7 @@
         </div>
 
         <div data-tb-panel="workflow">
-            <h3>📅 Event Day Timeline · Sat, June 14</h3>
+            <h3>Event Day Timeline · Sat, June 14</h3>
         <div style="min-width:680px;">
             <div class="tb-hours">
                 <div class="sp"></div>
@@ -214,7 +214,7 @@
         </div>
 
         <div data-tb-panel="schedule" hidden>
-            <h3>🕒 Operational Schedule</h3>
+            <h3>Operational Schedule</h3>
             <div style="overflow-x:auto;">
                 <table class="tb-sched">
                     <thead>
@@ -272,7 +272,7 @@
          page could not keep and are gone until they can be. --}}
     <div class="tb-acts">
         <button type="button" class="tb-btn primary" id="tbDownload" disabled
-                title="Build a timeline first">⬇ Export Timeline</button>
+                title="Build a timeline first">Export Timeline</button>
     </div>
 </div>
 @endsection

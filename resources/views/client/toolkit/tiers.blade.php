@@ -96,7 +96,7 @@
 @section('content')
 <div class="tk">
     <div class="tk-head">
-        <h2>Choose Your Toolkit Power <span class="tk-pill">ONE-TIME PURCHASE</span></h2>
+        <h2>Choose Your Toolkit Power <span class="tk-pill">MONTHLY PLANS</span></h2>
         <p>Unlock the right tools to plan, hire and manage your event with confidence.</p>
     </div>
 
@@ -106,7 +106,7 @@
              every account. Saying so is the difference between a price list and
              a button that pretends to take money. --}}
         <div class="tk-note">
-            <span>✅</span>
+            <span style="display:inline-flex;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
             <span>
                 <b>Every tool is already unlocked on your account.</b>
                 <span class="sub">The toolkit is open to everyone during launch. The tiers below are what it will cost once it goes on sale.</span>
@@ -123,13 +123,13 @@
             <div class="tk-card {{ $isRec ? 'rec' : '' }} {{ $isTop ? 'top' : '' }}">
                 @if($isRec)<span class="tk-rec">RECOMMENDED</span>@endif
 
-                <span class="ic">{{ $card['key'] === 'manual' ? '👤' : ($isRec ? '🚀' : '👑') }}</span>
+                <span class="ic">@if($card['key'] === 'manual')<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>@elseif($isRec)<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>@else<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>@endif</span>
                 <h3>{{ Str::upper($card['label']) }}</h3>
                 <div class="sub">{{ $card['tagline'] }}</div>
 
                 @if($card['price'] > 0)
-                    <div class="tk-price">{{ $money($card['price']) }}</div>
-                    <div class="tk-terms">one-time payment</div>
+                    <div class="tk-price">{{ $money($card['price']) }}<small style="font-size:.45em;font-weight:700;">/month</small></div>
+                    <div class="tk-terms">billed monthly</div>
                 @else
                     <div class="tk-price free">FREE</div>
                     <div class="tk-terms">included with your account</div>
@@ -153,7 +153,7 @@
                     </div>
                     <div class="tk-mini">
                         @foreach($card['adds'] as $tool)
-                            <div><span class="e">🧰</span><span>{{ $tool['name'] }}</span></div>
+                            <div><span class="e" style="display:inline-flex;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span><span>{{ $tool['name'] }}</span></div>
                         @endforeach
                     </div>
                 @endif
@@ -177,17 +177,17 @@
                          up — which is a thing that actually happens. --}}
                     <a class="tk-cta {{ $isRec || $isTop ? 'solid' : '' }}"
                        href="{{ \App\Domain\Forms\FormRegistry::url('support_request') }}">{{ $isTop ? 'Unlock Maximum' : 'Choose ' . $card['label'] }}</a>
-                    <div class="tk-foot">One-time payment · No monthly fees</div>
+                    <div class="tk-foot">Monthly plan · Cancel anytime</div>
                 @endif
             </div>
         @endforeach
     </div>
 
     <div class="tk-upgrade">
-        <span>🔄</span>
+        <span style="display:inline-flex;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>
         <span>
-            <b>Semi {{ $money($cards->firstWhere('key', 'semi')['price'] ?? 0) }} → Maximum? Pay only the {{ $money($difference) }} difference.</b>
-            <span>Upgrade anytime and we credit your Semi payment toward Maximum.</span>
+            <b>On Semi ({{ $money($cards->firstWhere('key', 'semi')['price'] ?? 0) }}/month)? Move up to Maximum ({{ $money($cards->firstWhere('key', 'maximum')['price'] ?? 0) }}/month) any time.</b>
+            <span>Your plan changes to the new monthly price.</span>
         </span>
     </div>
 
@@ -244,11 +244,11 @@
         </div>
 
         <div class="tk-assure">
-            <div class="tk-a"><span class="e">🔒</span><span><b>One-Time Payment</b><span>Pay once. Access stays with your account while it is open.</span></span></div>
-            <div class="tk-a"><span class="e">🛡</span><span><b>No Monthly Fees</b><span>No recurring toolkit subscription.</span></span></div>
-            <div class="tk-a"><span class="e">↗</span><span><b>Upgrade Anytime</b><span>Pay only the difference when you upgrade.</span></span></div>
-            <div class="tk-a"><span class="e">⚡</span><span><b>Instant Access</b><span>Tools unlock immediately after purchase.</span></span></div>
-            <div class="tk-a"><span class="e">🎧</span><span><b>Help When You Need It</b><span>Support is here when you need it.</span></span></div>
+            <div class="tk-a"><span class="e" style="display:inline-flex;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span><b>Monthly Plan</b><span>One monthly price. Access stays while your plan and account are active.</span></span></div>
+            <div class="tk-a"><span class="e" style="display:inline-flex;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span><b>Cancel Anytime</b><span>Stop your plan whenever you like.</span></span></div>
+            <div class="tk-a"><span class="e">↗</span><span><b>Upgrade Anytime</b><span>Move from Semi to Maximum whenever you need more.</span></span></div>
+            <div class="tk-a"><span class="e" style="display:inline-flex;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><span><b>Instant Access</b><span>Tools unlock immediately after purchase.</span></span></div>
+            <div class="tk-a"><span class="e" style="display:inline-flex;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span><span><b>Help When You Need It</b><span>Support is here when you need it.</span></span></div>
         </div>
 
         <div class="tk-help">
@@ -260,8 +260,8 @@
         </div>
 
         <p class="tk-small">
-            All toolkit purchases are one-time payments. There are no monthly fees, and toolkit access stays
-            with your account while it is open. Upgrading from Semi to Maximum pays the difference.
+            Toolkit plans are billed monthly. Access stays while your plan and your account are active,
+            and you can move between Semi and Maximum at any time.
         </p>
     </div>
 </div>

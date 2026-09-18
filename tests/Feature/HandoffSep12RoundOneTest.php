@@ -88,7 +88,7 @@ class HandoffSep12RoundOneTest extends TestCase
     /** #74: required fields are marked. */
     public function test_required_fields_are_marked(): void
     {
-        $this->actingAs($this->user('client'))->get(route('forms.create', FormRegistry::slugFor('feature_request')))
+        $this->actingAs($this->user('client'))->get(route('forms.create', FormRegistry::slugFor('support_request')))
             ->assertOk()->assertSee('<span style="color:#dc2626;" aria-hidden="true"> *</span>', false);
     }
 

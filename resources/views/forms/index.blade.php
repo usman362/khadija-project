@@ -16,7 +16,9 @@
         array_merge($carry, $over), fn ($v) => $v !== null && $v !== ''
     ));
 
-    $groupIcon = ['bookings' => '📅', 'payments' => '💳', 'account' => '🛡', 'safety' => '🚩'];
+    // Line icons for the four request areas (D-21: no emoji on client pages).
+    $groupIcon = ['bookings' => '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>', 'payments' => '<rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>', 'account' => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>', 'safety' => '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>'];
+    $groupSvg = fn ($slug, $size = 18) => '<svg width="' . $size . '" height="' . $size . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . ($groupIcon[$slug] ?? '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>') . '</svg>';
     $badge = ['action' => 'warn', 'review' => 'info', 'completed' => 'ok', 'closed' => 'muted'];
     $stateLabel = ['action' => 'Needs Your Action', 'review' => 'Under Review', 'completed' => 'Completed', 'closed' => 'Closed'];
 @endphp
@@ -113,7 +115,7 @@
      other, is one control drawn twice. --}}
 <div class="rq-stats">
     <a class="rq-stat {{ $f['tab'] === 'action' ? 'on' : '' }}" href="{{ $link(['tab' => 'action', 'page' => null]) }}">
-        <span class="ic warn">⏱</span>
+        <span class="ic warn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
         <span>
             <span class="lbl">Needs Your Action</span>
             <span class="n">{{ $counts['action'] }}</span>
@@ -121,7 +123,7 @@
         </span>
     </a>
     <a class="rq-stat {{ $f['tab'] === 'review' ? 'on' : '' }}" href="{{ $link(['tab' => 'review', 'page' => null]) }}">
-        <span class="ic">🔍</span>
+        <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
         <span>
             <span class="lbl">Under Review</span>
             <span class="n">{{ $counts['review'] }}</span>
@@ -129,7 +131,7 @@
         </span>
     </a>
     <a class="rq-stat {{ $f['tab'] === 'completed' ? 'on' : '' }}" href="{{ $link(['tab' => 'completed', 'page' => null]) }}">
-        <span class="ic ok">✅</span>
+        <span class="ic ok"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
         <span>
             <span class="lbl">Completed</span>
             <span class="n">{{ $counts['completed'] }}</span>
@@ -137,7 +139,7 @@
         </span>
     </a>
     <a class="rq-stat {{ $f['tab'] === 'all' ? 'on' : '' }}" href="{{ $link(['tab' => null, 'page' => null]) }}">
-        <span class="ic">🗂</span>
+        <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
         <span>
             <span class="lbl">All Requests</span>
             <span class="n">{{ $counts['all'] }}</span>
@@ -160,7 +162,7 @@
                  cannot promise four request types and then show one. --}}
             <a class="rq-group {{ $f['group'] === $slug ? 'on' : '' }}"
                href="{{ $f['group'] === $slug ? $link(['group' => null]) : $link(['group' => $slug]) }}">
-                <span class="ic">{{ $groupIcon[$slug] ?? '📄' }}</span>
+                <span class="ic">{!! $groupSvg($slug) !!}</span>
                 <b>{{ $group['label'] }}</b>
                 <span>{{ $group['blurb'] }}</span>
                 <span class="n">{{ count($group['forms']) }} request type{{ count($group['forms']) === 1 ? '' : 's' }} →</span>
@@ -175,7 +177,7 @@
     @php $shownGroups = $f['group'] !== '' ? array_intersect_key($groups, [$f['group'] => true]) : $groups; @endphp
     @foreach($shownGroups as $slug => $group)
         <div class="rq-groupsec">
-            <div class="rq-groupsec-h">{{ $groupIcon[$slug] ?? '📄' }} {{ $group['label'] }}</div>
+            <div class="rq-groupsec-h">{{ $group['label'] }}</div>
             <div class="rq-forms">
                 @foreach($group['forms'] as $key => $form)
                     <a class="rq-form" href="{{ \App\Domain\Forms\FormRegistry::url($key) }}">
@@ -226,7 +228,7 @@
 
     @if($submissions->isEmpty())
         <div class="rq-none">
-            <div style="font-size:38px;opacity:.5;">🗃️</div>
+            <div style="opacity:.5;"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg></div>
             @if($f['tab'] !== 'all' || $f['q'] || $f['group'] || $f['range'] !== 'all')
                 <h3>Nothing in this view</h3>
                 <p>No request matches these filters.</p>
@@ -299,7 +301,7 @@
     @endif
 
     <div class="rq-note">
-        <span>ℹ️</span>
+        <span style="display:inline-flex;flex-shrink:0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
         <span>Everything you send here is kept on file with its reference, so you and our team are always reading the same record.</span>
     </div>
 </div>

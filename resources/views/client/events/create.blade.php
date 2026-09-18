@@ -198,7 +198,7 @@
 
                 {{-- 1 · Basics --}}
                 <section class="gb-card" id="gb-basics">
-                    <div class="gb-card-hd"><span class="ic">📋</span><h3>Basics</h3></div>
+                    <div class="gb-card-hd"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></span><h3>Basics</h3></div>
                     <p class="gb-card-sub">The essentials about your event.</p>
 
                     <div class="gb-field">
@@ -236,11 +236,11 @@
 
                 {{-- 2 · Describe Your Project --}}
                 <section class="gb-card" id="gb-describe">
-                    <div class="gb-card-hd"><span class="ic">📝</span><h3>Describe Your Project</h3></div>
+                    <div class="gb-card-hd"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span><h3>Describe Your Project</h3></div>
                     <p class="gb-card-sub">Tell professionals what you're looking for. Not sure where to start? Start from a template.</p>
 
                     <div class="gb-ai">
-                        <div class="gb-ai-hd"><span>✨</span> Suggestions</div>
+                        <div class="gb-ai-hd"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg> Suggestions</div>
                         <ul class="gb-ai-list">
                             <li>Mention the service, event type and location so vendors know if they're a fit.</li>
                             <li>Note your guest count and any key moments you want covered.</li>
@@ -258,13 +258,13 @@
 
                 {{-- 3 · Inspiration Photos --}}
                 <section class="gb-card" id="gb-inspiration">
-                    <div class="gb-card-hd"><span class="ic">🖼️</span><h3>Inspiration Photos (Optional)</h3></div>
+                    <div class="gb-card-hd"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span><h3>Inspiration Photos (Optional)</h3></div>
                     <p class="gb-card-sub">Add visual references so vendors understand the look and feel you're after.</p>
 
                     <div class="gb-uploads">
-                        <div class="gb-tile ph">🎨</div>
-                        <div class="gb-tile ph">📷</div>
-                        <div class="gb-tile ph">🌸</div>
+                        <div class="gb-tile ph"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></div>
+                        <div class="gb-tile ph"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                        <div class="gb-tile ph"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg></div>
                         <label class="gb-tile add">
                             <span style="font-size:24px;">+</span>
                             <span>Upload Photo</span>
@@ -307,7 +307,7 @@
 
                 {{-- 4 · Timeline --}}
                 <section class="gb-card" id="gb-timeline">
-                    <div class="gb-card-hd"><span class="ic">📅</span><h3>Timeline</h3></div>
+                    <div class="gb-card-hd"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><h3>Timeline</h3></div>
                     <p class="gb-card-sub">When is your event happening?</p>
 
                     <div class="gb-row">
@@ -334,7 +334,7 @@
 
                 {{-- 5 · Budget --}}
                 <section class="gb-card" id="gb-budget">
-                    <div class="gb-card-hd"><span class="ic">💰</span><h3>Budget</h3></div>
+                    <div class="gb-card-hd"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><h3>Budget</h3></div>
                     <p class="gb-card-sub">Give vendors a target so you get realistic proposals. This is an estimate. You can adjust later.</p>
 
                     <div class="gb-field">
@@ -349,7 +349,7 @@
 
                 {{-- 6 · Requirements / Advanced Options --}}
                 <section class="gb-card" id="gb-requirements">
-                    <div class="gb-card-hd"><span class="ic">⚙️</span><h3>Requirements</h3></div>
+                    <div class="gb-card-hd"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span><h3>Requirements</h3></div>
                     <p class="gb-card-sub">Optional preferences for how vendors bid on your gig.</p>
 
                     <details class="gb-adv">
@@ -397,7 +397,7 @@
 
                     <div class="gb-pvcard">
                         <div class="gb-pv-cover">
-                            🎉
+                            <span style="display:inline-flex;color:#fff;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
                             <div class="gb-pv-ring" title="Gig readiness: how complete your listing is">
                                 <svg viewBox="0 0 44 44">
                                     <circle cx="22" cy="22" r="19" fill="none" stroke="var(--border-color)" stroke-width="4"/>
@@ -440,17 +440,25 @@
         <div class="gb-tools-grid">
             @php
                 $gbTools = [
-                    ['route' => 'ai-tools.budget-allocator',   'icon' => '💵', 'name' => 'Budget Planner',    'desc' => 'Break a total budget into smart category estimates.'],
-                    ['route' => 'ai-tools.vendor-matchmaking', 'icon' => '🤝', 'name' => 'Best Match',  'desc' => 'Get suggested vendors that fit your event.'],
-                    ['route' => 'ai-tools.timeline-builder',   'icon' => '🗓️', 'name' => 'Timeline Builder',    'desc' => 'Draft a day-of schedule for your event.'],
-                    ['route' => 'ai-tools.checklist-generator','icon' => '✅', 'name' => 'Smart Checklist',  'desc' => 'Generate a planning checklist to stay on track.'],
-                    ['route' => 'ai-tools.venue-analyzer',     'icon' => '🏛️', 'name' => 'Venue Compatibility Check',      'desc' => 'Review venue notes for fit and considerations.'],
-                    ['route' => 'ai-tools.theme-advisor',      'icon' => '🎨', 'name' => 'Style & Inspiration','desc' => 'Explore theme and styling suggestions.'],
+                    ['route' => 'ai-tools.budget-allocator',   'icon' => 'dollar', 'name' => 'Budget Planner',    'desc' => 'Break a total budget into smart category estimates.'],
+                    ['route' => 'ai-tools.vendor-matchmaking', 'icon' => 'users', 'name' => 'Best Match',  'desc' => 'Get suggested vendors that fit your event.'],
+                    ['route' => 'ai-tools.timeline-builder',   'icon' => 'calendar', 'name' => 'Timeline Builder',    'desc' => 'Draft a day-of schedule for your event.'],
+                    ['route' => 'ai-tools.checklist-generator','icon' => 'checksq', 'name' => 'Smart Checklist',  'desc' => 'Generate a planning checklist to stay on track.'],
+                    ['route' => 'ai-tools.venue-analyzer',     'icon' => 'building', 'name' => 'Venue Compatibility Check',      'desc' => 'Review venue notes for fit and considerations.'],
+                    ['route' => 'ai-tools.theme-advisor',      'icon' => 'droplet', 'name' => 'Style & Inspiration','desc' => 'Explore theme and styling suggestions.'],
+                ];
+                $gbIcons = [
+                    'dollar' => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+                    'users' => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+                    'calendar' => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+                    'checksq' => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+                    'building' => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/></svg>',
+                    'droplet' => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>',
                 ];
             @endphp
             @foreach($gbTools as $tool)
                 <a href="{{ route($tool['route']) }}" class="gb-tool">
-                    <span class="tic">{{ $tool['icon'] }}</span>
+                    <span class="tic">{!! $gbIcons[$tool['icon']] ?? '' !!}</span>
                     <b>{{ $tool['name'] }}</b>
                     <span>{{ $tool['desc'] }}</span>
                     <span class="use">Use tool →</span>

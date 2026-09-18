@@ -182,7 +182,7 @@
     @if($isManual)
     {{-- Starter — build your own roster by hand, no suggestions --}}
     <div class="sp-card sp-mb">
-        <div class="sp-tl-h"><b>🛠 Build My Staff Roster</b><span style="font-size:12.5px;color:var(--text-muted);">Total staff: <b id="spm-total" style="color:var(--sp);">0</b></span></div>
+        <div class="sp-tl-h"><b>Build My Staff Roster</b><span style="font-size:12.5px;color:var(--text-muted);">Total staff: <b id="spm-total" style="color:var(--sp);">0</b></span></div>
         <div id="spmRows" style="display:flex;flex-direction:column;gap:10px;"></div>
         <button type="button" id="spmAdd" style="margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--sp);background:var(--sp-soft);border:1px solid rgba(37,99,235,.28);border-radius:10px;padding:9px 15px;cursor:pointer;font-family:inherit;">+ Add role</button>
         <div style="margin-top:14px;font-size:12px;color:var(--text-muted);">Want us to build this roster + timeline for you automatically? <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--sp);font-weight:700;text-decoration:none;">Upgrade →</a></div>

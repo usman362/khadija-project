@@ -66,19 +66,19 @@
     @if($isManual)
     {{-- Starter — hand-built agreement, no suggestions --}}
     <div class="ca-card ca-mano">
-        <h3>📝 Build My Agreement</h3>
+        <h3>Build My Agreement</h3>
         <div style="font-size:12.5px;color:var(--text-muted);margin:-6px 0 14px;">Assemble your own draft by hand. Add, edit and remove clauses. No suggestions.</div>
         <label class="ca-lbl">Agreement Title</label>
         <input class="ca-in" id="camTitle" placeholder="e.g. Service Agreement: Wedding Floral &amp; Décor">
         <div id="camClauses"></div>
         <button type="button" id="camAdd" class="ca-add">+ Add clause</button>
-        <div class="ca-disc" style="display:block;margin-top:14px;">⚠️ This is a draft template for your convenience and is not legal advice, have a professional review it before signing.</div>
+        <div class="ca-disc" style="display:block;margin-top:14px;">This is a draft template for your convenience and is not legal advice, have a professional review it before signing.</div>
     </div>
     @else
     <div class="ca-stats">@foreach($stats as [$lbl, $val, $tone])<div class="ca-stat {{ $tone }}"><b>{{ $val }}</b><div class="l">{{ $lbl }}</div></div>@endforeach</div>
     <div class="ca-grid">
         <div class="ca-card">
-            <h3>📄 Event & Agreement Details</h3>
+            <h3>Event & Agreement Details</h3>
             <div style="font-size:12.5px;color:var(--text-muted);margin:-6px 0 12px;">{{ $isSemi ? 'instantly drafts an agreement you can reword clause by clause before using.' : 'instantly drafts a full plain-English agreement from your details.' }}</div>
             <div class="ca-err" id="caErr"></div>
             <form id="caForm">
@@ -118,11 +118,11 @@
                         </select>
                     </div>
                 </div>
-                <button class="ca-btn" id="caBtn" type="submit">{{ $isSemi ? '✨ Suggest Draft Agreement' : '🤖 Draft My Agreement' }}</button>
+                <button class="ca-btn" id="caBtn" type="submit">{{ $isSemi ? 'Suggest Draft Agreement' : 'Draft My Agreement' }}</button>
             </form>
         </div>
         <div class="ca-card">
-            <h3 id="caTitle">📝 Draft Agreement</h3>
+            <h3 id="caTitle">Draft Agreement</h3>
             <x-add-to-event tool-key="contract-assistant" tool-name="Contract Assistant" :event-id="request('event_id')" />
         {{-- Row 226 — post it as a request: bidding, urgent, or a draft. --}}
         <x-post-as-request tool-key="contract-assistant" tool-name="Contract Assistant" form-id="caForm" />
@@ -184,7 +184,7 @@
         // "Semi" renders the title, summary and every clause as editable
         // fields the user can reword; "Maximum" is read-only.
         const editable = LEVEL === 'semi';
-        titleEl.textContent = '📝 ' + (res.title || 'Draft Agreement');
+        titleEl.textContent = (res.title || 'Draft Agreement');
         let html = '';
         if (editable) {
             html += '<label class="ca-lbl">Title</label>' +
@@ -205,7 +205,7 @@
             });
         }
         out.innerHTML = html || '<p class="ca-empty">No clauses generated.</p>';
-        if (res.disclaimer) { disc.textContent = '⚠️ ' + res.disclaimer; disc.style.display = 'block'; }
+        if (res.disclaimer) { disc.textContent = res.disclaimer; disc.style.display = 'block'; }
     }
 })();
 

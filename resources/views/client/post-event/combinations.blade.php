@@ -12,7 +12,7 @@
         {{-- Title and subtitle are in the banner at the top of every client page. --}}
         {{-- Tip --}}
         <div class="pe-aitip" style="margin-bottom:22px;">
-            <span class="ic">✨</span>
+            <span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg></span>
             <div>
                 <h4>Tip</h4>
                 <p>When no single package covers everything, we bundle the best combinations to give you full coverage at the best value.</p>

@@ -55,7 +55,7 @@
     <div class="ma-stats">@foreach($stats as [$lbl, $val, $tone])<div class="ma-stat {{ $tone }}"><b>{{ $val }}</b><div class="l">{{ $lbl }}</div></div>@endforeach</div>
     <div class="ma-grid">
         <div class="ma-card">
-            <h3>💬 What do you want to say?</h3>
+            <h3>What do you want to say?</h3>
             <div class="ma-err" id="maErr"></div>
             <form id="maForm">
                 <label class="ma-lbl">Purpose</label>
@@ -77,7 +77,7 @@
                     <span class="ma-tone" data-tone="warm">Warm</span>
                 </div>
                 <input type="hidden" name="tone" id="maTone" value="friendly">
-                @unless($isManual)<button class="ma-btn" id="maBtn" type="submit">{{ $isSemi ? '✨ Suggest Messages' : '✍️ Draft My Message' }}</button>@endunless
+                @unless($isManual)<button class="ma-btn" id="maBtn" type="submit">{{ $isSemi ? 'Suggest Messages' : 'Draft My Message' }}</button>@endunless
                 @if($isManual)<div style="font-size:12px;color:var(--text-muted);margin-top:6px;">Use these as notes, then write your message on the right. <a href="{{ Route::has('membership.plans') ? route('membership.plans') : url('/#pricing') }}" style="color:var(--ma,#2563eb);font-weight:700;text-decoration:none;">Want it drafted for you? Upgrade →</a></div>@endif
             </form>
         </div>
@@ -89,11 +89,11 @@
             <input class="ma-in" id="mamSubject" placeholder="Subject line">
             <label class="ma-lbl">Message</label>
             <textarea class="ma-in" id="mamBody" style="min-height:200px;" placeholder="Write your message here…"></textarea>
-            <button type="button" class="ma-btn" id="mamCopy" style="margin-top:12px;">📋 Copy message</button>
+            <button type="button" class="ma-btn" id="mamCopy" style="margin-top:12px;">Copy message</button>
         </div>
         @else
         <div class="ma-card">
-            <h3>{{ $isMax ? '📨 Drafted Messages' : '📨 Suggested Messages' }}</h3>
+            <h3>{{ $isMax ? 'Drafted Messages' : 'Suggested Messages' }}</h3>
             <x-add-to-event tool-key="message-assistant" tool-name="Message Builder" :event-id="request('event_id')" />
             <div class="ma-summary" id="maSummary" style="display:none;"></div>
             <div id="maOut"><p class="ma-empty">Choose a purpose and tone, then draft your message: a few options will appear here.</p></div>
@@ -170,7 +170,7 @@
                 + '<div class="ma-ready">' + esc(v.label) + '</div>'
                 + '<div class="ma-subj">Subject: ' + esc(v.subject) + '</div>'
                 + bodyHtml
-                + '<button type="button" class="ma-copy" data-body="' + esc(v.body) + '">📋 Copy</button>'
+                + '<button type="button" class="ma-copy" data-body="' + esc(v.body) + '">Copy</button>'
                 + '</div>';
         });
         out.innerHTML = html || '<p class="ma-empty">No drafts generated.</p>';
@@ -181,7 +181,7 @@
                 const txt = ta ? ta.value : (b.getAttribute('data-body') || '');
                 navigator.clipboard?.writeText(txt);
                 b.textContent = '✓ Copied';
-                setTimeout(() => { b.textContent = '📋 Copy'; }, 1500);
+                setTimeout(() => { b.textContent = 'Copy'; }, 1500);
             });
         });
     }
@@ -197,7 +197,7 @@
         const txt = (subj ? 'Subject: ' + subj + '\n\n' : '') + body;
         navigator.clipboard?.writeText(txt);
         copyBtn.textContent = '✓ Copied';
-        setTimeout(() => { copyBtn.textContent = '📋 Copy message'; }, 1500);
+        setTimeout(() => { copyBtn.textContent = 'Copy message'; }, 1500);
     });
 })();
 </script>

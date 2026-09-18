@@ -185,9 +185,9 @@
                 <div class="pw-sec-num">{{ $isManual ? 'Write Your Proposal' : ($isSemi ? 'Your Draft, refine it' : '2. Your Auto-generated Proposal') }}</div>
                 @if($isSemi || $isMax)
                 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px;">
-                    <button type="button" class="pw-assist" data-assist="improve">✨ Improve</button>
-                    <button type="button" class="pw-assist" data-assist="rewrite">✨ Rewrite</button>
-                    <button type="button" class="pw-assist" data-assist="expand">✨ Expand</button>
+                    <button type="button" class="pw-assist" data-assist="improve">Improve</button>
+                    <button type="button" class="pw-assist" data-assist="rewrite">Rewrite</button>
+                    <button type="button" class="pw-assist" data-assist="expand">Expand</button>
                     @if($isSemi)
                         <select class="pw-select" id="pw-tone" style="max-width:190px;margin-left:auto;">@foreach($tones as $k => $v)<option value="{{ $k }}">{{ $v }}</option>@endforeach</select>
                     @endif
@@ -286,7 +286,7 @@
     <div class="pw-banner">
         <span class="pw-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
         <div class="pw-banner-txt"><b>Write Better. Win More. Grow Your Business.</b><p>Proposal Builder helps you create personalized, high-converting proposals that impress clients and win more bookings.</p></div>
-        <a id="pw-create"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Create Your Proposal Now ✨</a>
+        <a id="pw-create"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Create Your Proposal Now</a>
     </div>
 </div>
 

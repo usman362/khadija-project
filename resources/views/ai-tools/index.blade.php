@@ -148,10 +148,15 @@
                             \App\Domain\AiFeatures\ToolkitTiers::tierFor($t, $isPro ? 'professional' : 'client')
                         ))
                         <div class="akt-badges">
-                            {{-- OA-155: the account's own level, the same on every card.
-                                 What a single tool offers is its toolkit tier beside it. --}}
+                            {{-- PM-1 (Khadijah, 13 Sep): per card, the level this account
+                                 actually gets on THIS tool. The account's tier sets it
+                                 (Starter: Free; Pro: Free + Semi; Elite: all three), and a
+                                 tool that only goes up to Semi stops there. The account-wide
+                                 tag said Maximum on Contract Assistant while the tool ran
+                                 at Semi, which is the disagreement she saw. --}}
                             @php($acct = collect(AiAccess::unlockedLevels(auth()->user()))->sortByDesc(fn ($l) => array_search($l, ['manual', 'semi', 'maximum'], true))->first() ?? 'manual')
-                            <span class="akt-lvl lvl-{{ $acct }}" title="Your account's level">Your level: {{ AiAccess::label($acct) }}</span>
+                            @php($capped = $lvl !== $acct)
+                            <span class="akt-lvl lvl-{{ $lvl }}" title="{{ $capped ? 'The highest level this tool offers' : 'Your level on this tool' }}">Your level: {{ AiAccess::label($lvl) }}{{ $capped ? ' (tool max)' : '' }}</span>
                             @if($tier)
                                 <span class="akt-tier" title="The toolkit tier that unlocks this tool">{{ $tier }} toolkit</span>
                             @endif
