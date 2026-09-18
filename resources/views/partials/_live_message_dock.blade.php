@@ -49,6 +49,8 @@
     .lmd-sep { width: 1px; align-self: stretch; background: var(--border-color, #e5e7eb); flex: none; }
 
     .lmd-tabs { display: flex; gap: 8px; flex: 1; min-width: 0; overflow: hidden; }
+    .lmd-empty { align-self: center; border: 0; background: none; padding: 0; font: inherit; font-size: 12.5px; color: var(--text-muted, #6b7280); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lmd-empty:hover { color: var(--text-primary, #111827); }
     .lmd-tab { display: flex; align-items: center; gap: 9px; flex: 0 1 210px; min-width: 160px;
         border: 1.5px solid var(--border-color, #e5e7eb); border-radius: 12px; background: var(--bg-card, #fff);
         padding: 7px 10px; cursor: pointer; text-align: left; font: inherit; position: relative; }
@@ -336,7 +338,10 @@
         }
 
         overflow = ids.filter(function (id) { return shown.indexOf(id) === -1; });
-        tabsEl.innerHTML = shown.map(function (id) { return tabHtml(convs[id]); }).join('');
+        // Nothing open: say what the empty space is for, instead of a blank bar.
+        tabsEl.innerHTML = shown.length
+            ? shown.map(function (id) { return tabHtml(convs[id]); }).join('')
+            : '<button type="button" class="lmd-empty" data-lmd-list>No chats open. Click + to open a conversation.</button>';
         moreBtn.hidden = ! overflow.length;
         moreBtn.textContent = '+' + overflow.length;
         layout();
