@@ -20,7 +20,6 @@
 @php
     $__lmdUser = auth()->user();
     $__lmdFull = route('client.chat.index');
-    $__lmdInitials = collect(explode(' ', trim($__lmdUser->name)))->map(fn ($p) => mb_substr($p, 0, 1))->take(2)->implode('');
 @endphp
 
 @once
@@ -36,13 +35,6 @@
        Continue at the bottom of a page. */
     body.has-lmd .cl-main { padding-bottom: 86px; }
 
-    .lmd-home { display: flex; align-items: center; gap: 10px; border: 0; background: none; cursor: pointer;
-        padding: 4px 12px 4px 4px; border-radius: 12px; text-align: left; font: inherit; flex: none; }
-    .lmd-home:hover { background: var(--bg-card-hover, #f8fafc); }
-    .lmd-me { width: 40px; height: 40px; border-radius: 10px; background: #2563eb; color: #fff; font-weight: 800;
-        font-size: 14px; display: flex; align-items: center; justify-content: center; flex: none; }
-    .lmd-home b { display: flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--text-primary, #111827); }
-    .lmd-home small { display: block; font-size: 11.5px; color: var(--text-muted, #6b7280); }
     .lmd-count { min-width: 20px; height: 20px; border-radius: 999px; background: #dc2626; color: #fff; font-size: 11px;
         font-weight: 800; display: inline-flex; align-items: center; justify-content: center; padding: 0 6px; }
 
@@ -52,8 +44,6 @@
        space left over pushed to the right, before Do Not Disturb. */
     .lmd-mid { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
     .lmd-tabs { display: flex; gap: 8px; flex: 0 1 auto; min-width: 0; overflow: hidden; }
-    .lmd-empty { align-self: center; border: 0; background: none; padding: 0; font: inherit; font-size: 12.5px; color: var(--text-muted, #6b7280); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .lmd-empty:hover { color: var(--text-primary, #111827); }
     .lmd-tab { display: flex; align-items: center; gap: 9px; flex: 0 1 210px; min-width: 160px;
         border: 1.5px solid var(--border-color, #e5e7eb); border-radius: 12px; background: var(--bg-card, #fff);
         padding: 7px 10px; cursor: pointer; text-align: left; font: inherit; position: relative; }
@@ -65,6 +55,10 @@
     .lmd-tab-t b { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--text-primary, #111827);
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .lmd-tab-t small { display: block; font-size: 11px; color: var(--text-muted, #6b7280); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lmd-tab-t small { display: flex; gap: 8px; align-items: baseline; }
+    .lmd-tab-t small .lmd-pv { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lmd-tab-t small em { font-style: normal; flex: none; }
+    .lmd-ok { font-style: normal; color: #16a34a; font-weight: 800; }
     .lmd-tab .lmd-count { position: absolute; top: -7px; right: -7px; border: 2px solid var(--bg-card, #fff); }
 
     /* Conversation state, kept apart from the role colours. */
@@ -156,6 +150,71 @@
     .lmd-cf a { color: #2563eb; }
     .lmd-cf .is-muted { color: #dc2626; }
 
+    /* ── Sir Peter's dock (18 Sep), matched piece by piece ─────── */
+    .lmd-ch { padding: 14px 14px 12px; align-items: flex-start; }
+    .lmd-ch .lmd-av { width: 46px; height: 46px; }
+    .lmd-ch-t small.role { color: var(--text-secondary, #4b5563); }
+    .lmd-ch-t .on { display: flex; align-items: center; gap: 5px; margin-top: 2px; font-size: 11.5px; }
+    .lmd-ch-t .on::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #16a34a; }
+    .lmd-ch .lmd-ic { margin-top: 6px; }
+    .lmd-ic-box { border: 1.5px solid #2563eb; color: #2563eb; }
+    .lmd-ic-box:hover { background: #eff6ff; color: #2563eb; }
+    .lmd-body { background: var(--bg-card, #fff); gap: 10px; padding: 14px; }
+    .lmd-msg { max-width: 80%; padding: 10px 13px; border-radius: 14px; background: var(--bg-card-hover, #f1f5f9); }
+    .lmd-msg small { justify-content: flex-start; }
+    .lmd-msg.is-mine { background: #e8f0fe; }
+    .lmd-msg.is-mine small { justify-content: flex-end; }
+    .lmd-att { display: flex; align-items: center; gap: 8px; margin-top: 6px; padding: 7px 9px; border-radius: 10px;
+        background: rgba(255,255,255,.7); border: 1px solid var(--border-color, #e5e7eb); color: #2563eb; font-size: 12px;
+        font-weight: 700; text-decoration: none; word-break: break-all; }
+    .lmd-att img { width: 100%; max-height: 160px; object-fit: cover; border-radius: 8px; display: block; }
+    .lmd-att.is-img { padding: 3px; display: block; }
+    .lmd-typing { display: inline-flex; align-self: flex-start; align-items: center; gap: 10px; margin: 0 14px 8px;
+        padding: 8px 14px; border-radius: 999px; background: var(--bg-card-hover, #f1f5f9); font-size: 12px; color: var(--text-secondary, #4b5563); }
+    .lmd-typing[hidden] { display: none; }
+    .lmd-dots { display: inline-flex; gap: 3px; }
+    .lmd-dots i { width: 5px; height: 5px; border-radius: 50%; background: #64748b; animation: lmdDot 1.2s infinite; }
+    .lmd-dots i:nth-child(2) { animation-delay: .15s; } .lmd-dots i:nth-child(3) { animation-delay: .3s; }
+    @keyframes lmdDot { 0%, 60%, 100% { opacity: .3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-2px); } }
+    .lmd-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 14px 0; border-top: 1px solid var(--border-color, #e5e7eb); }
+    .lmd-chips[hidden] { display: none; }
+    .lmd-chip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 4px 8px; border-radius: 8px;
+        background: #eff6ff; color: #1d4ed8; font-size: 11.5px; font-weight: 700; }
+    .lmd-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
+    .lmd-chip.is-bad { background: #fef2f2; color: #b91c1c; }
+    .lmd-chip button { border: 0; background: none; color: inherit; cursor: pointer; font-weight: 800; padding: 0; }
+    .lmd-compose { align-items: center; gap: 10px; padding: 12px 14px; }
+    .lmd-field { flex: 1; min-width: 0; display: flex; align-items: center; gap: 2px; position: relative;
+        border: 1px solid var(--border-color, #e5e7eb); border-radius: 12px; padding: 0 6px 0 0; background: var(--bg-card, #fff); }
+    .lmd-field:focus-within { border-color: #2563eb; }
+    .lmd-compose .lmd-field input { border: 0; padding: 12px 12px; background: transparent; }
+    .lmd-compose .lmd-field input:focus { outline: none; }
+    .lmd-compose .lmd-fi { border: 0; background: none; width: 32px; height: 32px; border-radius: 8px; color: var(--text-secondary, #4b5563); padding: 0; }
+    .lmd-compose .lmd-fi:hover { background: var(--bg-card-hover, #f1f5f9); }
+    .lmd-compose .lmd-fi svg { width: 19px; height: 19px; }
+    .lmd-compose .lmd-send { width: 44px; height: 44px; border-radius: 12px; }
+    .lmd-emojis { position: absolute; right: 0; bottom: calc(100% + 8px); z-index: 3; width: 232px; display: grid;
+        grid-template-columns: repeat(8, 1fr); gap: 2px; padding: 8px; background: var(--bg-card, #fff);
+        border: 1px solid var(--border-color, #e5e7eb); border-radius: 12px; box-shadow: 0 16px 40px -18px rgba(15,27,53,.5); }
+    .lmd-emojis[hidden] { display: none; }
+    .lmd-emojis button { border: 0; background: none; font-size: 18px; line-height: 1; padding: 4px 0; border-radius: 6px; cursor: pointer; }
+    .lmd-emojis button:hover { background: var(--bg-card-hover, #f1f5f9); }
+    .lmd-cf { gap: 14px; padding: 10px 14px 12px; border-top: 1px solid var(--border-color, #e5e7eb); }
+    .lmd-cf svg { width: 16px; height: 16px; }
+    .lmd-cf [data-lmd-mute] { color: var(--text-primary, #111827); }
+    .lmd-cf [data-lmd-mute] svg { color: #dc2626; }
+    .lmd-cf [data-lmd-profile] { color: var(--text-primary, #111827); }
+    .lmd-cf [data-lmd-profile] svg { color: #2563eb; }
+    .lmd-cf a.is-link { color: #2563eb; }
+    .lmd-cf .lmd-cf-more { margin-left: auto; color: var(--text-secondary, #374151); letter-spacing: 1px; font-size: 13px; }
+
+    /* The bar's right side, as drawn: speaker, switch, two lines, then settings. */
+    .lmd-set { font-weight: 500; font-size: 12px; color: var(--text-secondary, #4b5563); padding-left: 14px;
+        border-left: 1px solid var(--border-color, #e5e7eb); align-self: stretch; }
+    .lmd-dnd span { font-size: 11px; line-height: 1.35; max-width: 150px; }
+    .lmd-dnd small { display: block; font-size: 11px; }
+    .lmd-cf > * { white-space: nowrap; }
+
     /* ── A phone: one bubble, the list opens as a sheet ───────── */
     .lmd-bubble { display: none; position: fixed; right: 16px; bottom: 16px; z-index: 890; border: 0; cursor: pointer;
         align-items: center; gap: 8px; padding: 12px 16px; border-radius: 999px; background: #2563eb; color: #fff;
@@ -166,8 +225,7 @@
     /* A smaller laptop: the controls give up their words before the
        conversations give up their tabs. */
     @media (max-width: 1360px) {
-        .lmd-home small, .lmd-dnd span, .lmd-set span { display: none; }
-        .lmd-dnd::before { content: 'DND'; font-weight: 800; color: var(--text-secondary, #374151); font-size: 11.5px; }
+        .lmd-dnd small, .lmd-set span { display: none; }
     }
 
     @media (max-width: 768px) {
@@ -347,13 +405,16 @@
     function tabHtml(c) {
         var p = c.peer || { name: 'Conversation', avatar: '' };
         var st = status(c), unread = Number(c.unread_count || 0);
-        var who = c.last_message_sender_id === me ? 'You: ' : '';
+        var mine = c.last_message_sender_id === me;
+        var who = mine ? '' : ((p.name || '').split(' ')[0] + ': ');
         return '<button type="button" class="lmd-tab' + (st === 'unread' ? ' is-unread' : '') + (state.expanded === c.id ? ' is-open' : '')
             + '" data-lmd-open="' + c.id + '" title="' + esc(p.name) + '">'
             + '<img class="lmd-av" src="' + esc(p.avatar) + '" alt="">'
-            + '<span class="lmd-tab-t"><b>' + (st === 'responded' ? '<span class="lmd-st is-responded" title="You replied">✓</span>'
-                : '<span class="lmd-st is-' + st + '" title="' + (st === 'unread' ? 'Unread' : 'Read, not answered yet') + '"></span>')
-            + esc(p.name) + '</b><small>' + esc(who + (c.last_message_body || '')) + (c.last_message_at ? ' · ' + esc(ago(c.last_message_at)) : '') + '</small></span>'
+            // Red dot unread, grey dot read; the green tick on the preview line is "you replied".
+            + '<span class="lmd-tab-t"><b><span class="lmd-st is-' + (st === 'unread' ? 'unread' : 'read') + '" title="'
+                + (st === 'unread' ? 'Unread' : (st === 'responded' ? 'You replied' : 'Read, not answered yet')) + '"></span>'
+            + esc(p.name) + '</b><small><span class="lmd-pv">' + (mine ? '<i class="lmd-ok">✓</i> ' : '') + esc(who + (c.last_message_body || '')) + '</span>'
+            + (c.last_message_at ? '<em>' + esc(ago(c.last_message_at)) + '</em>' : '') + '</small></span>'
             + (unread ? '<span class="lmd-count">' + unread + '</span>' : '')
             + '</button>';
     }
@@ -370,10 +431,8 @@
         }
 
         overflow = ids.filter(function (id) { return shown.indexOf(id) === -1; });
-        // Nothing open: say what the empty space is for, instead of a blank bar.
-        tabsEl.innerHTML = shown.length
-            ? shown.map(function (id) { return tabHtml(convs[id]); }).join('')
-            : '<button type="button" class="lmd-empty" data-lmd-list>No chats open. Click + to open a conversation.</button>';
+        // Only real conversations show; with none open the bar keeps just + (18 Sep).
+        tabsEl.innerHTML = shown.map(function (id) { return tabHtml(convs[id]); }).join('');
         moreBtn.hidden = ! overflow.length;
         moreBtn.textContent = '+' + overflow.length;
         layout();
@@ -403,6 +462,14 @@
     var cForm = chat.querySelector('[data-lmd-form]');
     var cInput = chat.querySelector('[data-lmd-input]');
     var cMenu = chat.querySelector('[data-lmd-menu]');
+    var cTyping = chat.querySelector('[data-lmd-typing]');
+    var cTypingName = chat.querySelector('[data-lmd-typing-name]');
+    var cChips = chat.querySelector('[data-lmd-chips]');
+    var cFile = chat.querySelector('[data-lmd-file]');
+    var cEmojis = chat.querySelector('[data-lmd-emojis]');
+    var uploadUrl = @json(route('attachments.store'));
+    var typingUrl = @json(route('conversations.typing', ['conversation' => '__ID__']));
+    var pendingFiles = [];   // { name, id|null, bad }
 
     function tick(m) {
         // Read only when the other side's read is on record. There is no
@@ -414,7 +481,13 @@
     function msgHtml(m) {
         var mine = m.sender_id === me;
         var time = m.created_at ? new Date(m.created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '';
-        return '<div class="lmd-msg' + (mine ? ' is-mine' : '') + '">' + esc(m.body)
+        var atts = (m.attachments || []).map(function (a) {
+            var url = esc(a.url || '#'), name = esc(a.file_name || 'File');
+            return a.is_image
+                ? '<a class="lmd-att is-img" href="' + url + '" target="_blank" rel="noopener"><img src="' + url + '" alt="' + name + '" loading="lazy"></a>'
+                : '<a class="lmd-att" href="' + url + '" target="_blank" rel="noopener">' + name + (a.size_label ? ' · ' + esc(a.size_label) : '') + '</a>';
+        }).join('');
+        return '<div class="lmd-msg' + (mine ? ' is-mine' : '') + '">' + esc(m.body) + atts
             + '<small>' + esc(time) + (mine ? ' ' + tick(m) : '') + '</small></div>';
     }
 
@@ -424,12 +497,14 @@
         var name = p.profile ? '<a href="' + esc(p.profile) + '" target="_blank" rel="noopener">' + esc(p.name) + '</a>' : '<span class="n">' + esc(p.name) + '</span>';
         var av = '<img class="lmd-av" src="' + esc(p.avatar) + '" alt="">';
         cHead.innerHTML = (p.profile ? '<a href="' + esc(p.profile) + '" target="_blank" rel="noopener" aria-label="View profile">' + av + '</a>' : av)
-            + '<div class="lmd-ch-t">' + name + '<small>' + esc(sub) + (p.online ? ' · <span class="on">● Online now</span>' : '') + '</small></div>';
+            + '<div class="lmd-ch-t">' + name + (sub ? '<small class="role">' + esc(sub) + '</small>' : '')
+            + (p.online ? '<small class="on">Online now</small>' : '') + '</div>';
 
         chat.querySelectorAll('[data-lmd-page]').forEach(function (a) { a.href = at(urls.page, c.id); });
         chat.querySelectorAll('[data-lmd-profile]').forEach(function (a) { a.hidden = ! p.profile; if (p.profile) a.href = p.profile; });
         chat.querySelectorAll('[data-lmd-mute]').forEach(function (b) {
-            b.textContent = c.muted_at ? 'Unmute' : 'Mute';
+            var label = b.querySelector('span') || b;
+            label.textContent = c.muted_at ? 'Unmute' : 'Mute';
             b.classList.toggle('is-muted', !! c.muted_at);
         });
     }
@@ -443,7 +518,15 @@
         get(at(urls.show, id)).then(function (data) {
             var msgs = ((data.messages || {}).data || []).slice().reverse();
             var nearBottom = cBody.scrollHeight - cBody.scrollTop - cBody.clientHeight < 60;
-            cBody.innerHTML = msgs.map(msgHtml).join('') || '<div class="lmd-note">No messages yet. Say hello.</div>';
+            var html = msgs.map(msgHtml).join('') || '<div class="lmd-note">No messages yet. Say hello.</div>';
+            // A quiet refresh that changed nothing leaves the list alone, so
+            // a message being read does not jump.
+            // A message still sending, or failed with its Retry, is not wiped.
+            var busy = cBody.querySelector('.lmd-msg.is-failed, .lmd-msg[data-pending]');
+            if (! quiet || (! busy && cBody.dataset.html !== html)) { cBody.innerHTML = html; cBody.dataset.html = html; }
+            var typers = data.typing || [];
+            cTyping.hidden = ! typers.length;
+            cTypingName.textContent = typers.length ? String(typers[0]).split(' ')[0] + ' is typing…' : '';
             if (! quiet || nearBottom) cBody.scrollTop = cBody.scrollHeight;
             chat.dataset.last = String(c.last_message_at);
 
@@ -460,6 +543,7 @@
         id = Number(id);
         delete state.closed[id];
         if (state.tabs.indexOf(id) === -1) state.tabs.unshift(id);
+        if (state.expanded !== id) { pendingFiles = []; paintChips(); cTyping.hidden = true; cBody.dataset.html = ''; }
         state.expanded = id;
         save();
         chat.hidden = false;
@@ -486,17 +570,20 @@
         renderTabs();
     }
 
-    function send(text) {
+    function send(text, attachmentIds) {
         var id = state.expanded;
+        attachmentIds = attachmentIds || [];
         var pending = document.createElement('div');
         pending.className = 'lmd-msg is-mine';
+        pending.dataset.pending = '1';
         pending.innerHTML = esc(text) + '<small>Sending…</small>';
         cBody.querySelector('.lmd-note')?.remove();
         cBody.appendChild(pending);
         cBody.scrollTop = cBody.scrollHeight;
 
-        post(at(urls.send, id), { body: text }).then(function (m) {
+        post(at(urls.send, id), { body: text, attachment_ids: attachmentIds }).then(function (m) {
             pending.outerHTML = msgHtml(m);
+            cBody.dataset.html = '';
             var c = convs[id];
             if (c) { c.last_message_sender_id = me; c.last_message_body = m.body; c.last_message_at = m.created_at; }
             chat.dataset.last = String(c && c.last_message_at);
@@ -504,16 +591,77 @@
         }).catch(function () {
             pending.classList.add('is-failed');
             pending.querySelector('small').innerHTML = 'Did not send. <button type="button">Retry</button>';
-            pending.querySelector('button').addEventListener('click', function () { pending.remove(); send(text); });
+            pending.querySelector('button').addEventListener('click', function () { pending.remove(); send(text, attachmentIds); });
         });
     }
 
     cForm.addEventListener('submit', function (e) {
         e.preventDefault();
+        if (! state.expanded) return;
+        if (pendingFiles.some(function (f) { return ! f.id && ! f.bad; })) return;   // still uploading
+        var ids = pendingFiles.filter(function (f) { return f.id; }).map(function (f) { return f.id; });
         var text = cInput.value.trim();
-        if (! text || ! state.expanded) return;
+        // The API needs a body; a file on its own says what was sent.
+        if (! text && ids.length) text = 'Sent ' + ids.length + ' attachment' + (ids.length > 1 ? 's' : '') + '.';
+        if (! text) return;
         cInput.value = '';
-        send(text);
+        pendingFiles = []; paintChips();
+        cEmojis.hidden = true;
+        send(text, ids);
+    });
+
+    /* ── Typing: tell the other side, at most every 3 seconds ──── */
+    var lastTyping = 0;
+    cInput.addEventListener('input', function () {
+        var now = Date.now();
+        if (! state.expanded || ! cInput.value.trim() || now - lastTyping < 3000) return;
+        lastTyping = now;
+        post(at(typingUrl, state.expanded)).catch(function () {});
+    });
+
+    // While a conversation is open, check it every few seconds: new replies
+    // and "is typing" both come from here.
+    setInterval(function () {
+        if (state.expanded && ! chat.hidden && ! document.hidden) loadThread(state.expanded, true);
+    }, 4000);
+
+    /* ── Attachments: upload on pick, join on send ─────────────── */
+    function paintChips() {
+        cChips.hidden = ! pendingFiles.length;
+        cChips.innerHTML = pendingFiles.map(function (f, i) {
+            return '<span class="lmd-chip' + (f.bad ? ' is-bad' : '') + '"><span>' + esc(f.bad ? f.name + ': ' + f.bad : (f.id ? '' : 'Uploading… ') + f.name)
+                + '</span><button type="button" data-lmd-chip-rm="' + i + '" aria-label="Remove">×</button></span>';
+        }).join('');
+        layout();
+    }
+    cFile.addEventListener('change', function () {
+        var id = state.expanded;
+        Array.prototype.forEach.call(cFile.files || [], function (file) {
+            var f = { name: file.name, id: null, bad: null };
+            pendingFiles.push(f);
+            var fd = new FormData();
+            fd.append('file', file);
+            fd.append('conversation_id', id);
+            fetch(uploadUrl, { method: 'POST', credentials: 'same-origin', body: fd,
+                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf } })
+                .then(function (r) { return r.json().then(function (j) { if (! r.ok) throw j; return j; }); })
+                .then(function (j) { f.id = j.id; paintChips(); })
+                .catch(function (j) { f.bad = (j && (j.message || (j.errors && Object.values(j.errors)[0][0]))) || 'Could not upload'; paintChips(); });
+        });
+        cFile.value = '';
+        paintChips();
+    });
+
+    /* ── Emoji: a small grid, inserted where the cursor is ─────── */
+    var EMOJI = ['😀','😂','😊','😍','🥳','😎','🤔','😅','👍','👏','🙏','🙌','🎉','❤️','🔥','✨','✅','👌','💯','📸','🎵','🍰','🥂','📅'];
+    cEmojis.innerHTML = EMOJI.map(function (e) { return '<button type="button" data-lmd-emo>' + e + '</button>'; }).join('');
+    cEmojis.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-lmd-emo]');
+        if (! b) return;
+        var v = cInput.value, a = cInput.selectionStart ?? v.length, z = cInput.selectionEnd ?? v.length;
+        cInput.value = v.slice(0, a) + b.textContent + v.slice(z);
+        cInput.focus();
+        cInput.setSelectionRange(a + b.textContent.length, a + b.textContent.length);
     });
 
     document.addEventListener('click', function (e) {
@@ -526,6 +674,12 @@
         }
         if (e.target.closest('[data-lmd-more]')) { openMore(); return; }
         if (! e.target.closest('.lmd-more')) document.querySelector('.lmd-more')?.remove();
+
+        if (e.target.closest('[data-lmd-attach]')) { cFile.click(); return; }
+        if (e.target.closest('[data-lmd-emoji]')) { cEmojis.hidden = ! cEmojis.hidden; return; }
+        if (! e.target.closest('[data-lmd-emojis]')) cEmojis.hidden = true;
+        var rm = e.target.closest('[data-lmd-chip-rm]');
+        if (rm) { pendingFiles.splice(Number(rm.dataset.lmdChipRm), 1); paintChips(); return; }
 
         if (e.target.closest('[data-lmd-min]')) { minimize(); return; }
         if (e.target.closest('[data-lmd-close]')) { cMenu.hidden = true; closeCard(); return; }
@@ -603,14 +757,7 @@
 @endonce
 
 <div class="lmd-bar" id="lmdBar" role="region" aria-label="Live Messages">
-    <button type="button" class="lmd-home" data-lmd-list title="All conversations">
-        <span class="lmd-me">{{ $__lmdInitials ?: 'Me' }}</span>
-        <span>
-            <b>Live Messages <span class="lmd-count" data-lmd-total hidden>0</span></b>
-            <small>Stay connected while you work.</small>
-        </span>
-    </button>
-    <span class="lmd-sep"></span>
+    {{-- No "Live Messages" block: the bar shows the conversations themselves (18 Sep). --}}
 
     <div class="lmd-mid" data-lmd-mid>
         <div class="lmd-tabs" data-lmd-tabs></div>
@@ -629,7 +776,7 @@
             <svg data-off viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>
         </button>
         <button type="button" class="lmd-switch" role="switch" aria-checked="false" data-lmd-dnd aria-label="Do Not Disturb"></button>
-        <span><b>Do Not Disturb</b>Still receive messages (no sound)</span>
+        <span><b>Do Not Disturb</b><small>Still receive messages (no sound)</small></span>
     </div>
     <a class="lmd-set" href="{{ route('client.notifications.index') }}" title="Message Settings" aria-label="Message Settings">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
@@ -644,13 +791,13 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </button>
         <a class="lmd-ic" data-lmd-page href="{{ $__lmdFull }}" aria-label="Open in Messages" title="Open in Messages">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="14" height="14" rx="2"/><path d="M8 3h13v13"/></svg>
         </a>
         <button type="button" class="lmd-ic" data-lmd-close aria-label="Close" title="Close">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
         <span style="position:relative;">
-            <button type="button" class="lmd-ic" data-lmd-dots aria-label="More options" title="More options">
+            <button type="button" class="lmd-ic lmd-ic-box" data-lmd-dots aria-label="More options" title="More options">
                 <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
             </button>
             <div class="lmd-menu" data-lmd-menu hidden>
@@ -664,16 +811,31 @@
 
     <div class="lmd-body" data-lmd-body></div>
 
+    {{-- "Sarah is typing…", from the other side's keystrokes (polled). --}}
+    <div class="lmd-typing" data-lmd-typing hidden><span class="lmd-dots"><i></i><i></i><i></i></span><span data-lmd-typing-name></span></div>
+
+    <div class="lmd-chips" data-lmd-chips hidden></div>
     <form class="lmd-compose" data-lmd-form>
-        <input type="text" data-lmd-input placeholder="Type a message…" maxlength="5000" autocomplete="off" aria-label="Type a message">
-        <button type="submit" aria-label="Send">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>
+        <div class="lmd-field">
+            <input type="text" data-lmd-input placeholder="Type a message…" maxlength="5000" autocomplete="off" aria-label="Type a message">
+            <button type="button" class="lmd-fi" data-lmd-attach aria-label="Add attachment" title="Add attachment">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+            </button>
+            <button type="button" class="lmd-fi" data-lmd-emoji aria-label="Add emoji" title="Add emoji">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </button>
+            <div class="lmd-emojis" data-lmd-emojis hidden></div>
+        </div>
+        <input type="file" data-lmd-file accept="{{ \App\Http\Controllers\MessageAttachmentController::ACCEPT_ATTRIBUTE }}" multiple hidden>
+        <button type="submit" class="lmd-send" aria-label="Send">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.4 20.4 22 12 2.4 3.6 2.4 10.2 16 12 2.4 13.8z"/></svg>
         </button>
     </form>
     <div class="lmd-cf">
-        <button type="button" data-lmd-mute>Mute</button>
-        <a data-lmd-profile href="{{ $__lmdFull }}" target="_blank" rel="noopener" hidden>View Profile</a>
-        <a data-lmd-page href="{{ $__lmdFull }}">Open in Messages</a>
+        <button type="button" data-lmd-mute><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13.7 21a2 2 0 0 1-3.4 0"/><path d="M18.6 13A17.9 17.9 0 0 1 18 8"/><path d="M6.3 6.3A5.8 5.8 0 0 0 6 8c0 7-3 9-3 9h14"/><path d="M18 8a6 6 0 0 0-9.3-5"/><line x1="2" y1="2" x2="22" y2="22"/></svg><span>Mute</span></button>
+        <a data-lmd-profile href="{{ $__lmdFull }}" target="_blank" rel="noopener" hidden><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0z"/></svg>View Profile</a>
+        <a class="is-link" data-lmd-page href="{{ $__lmdFull }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>Open in Messages</a>
+        <button type="button" class="lmd-cf-more" data-lmd-dots aria-label="More options">•••</button>
     </div>
 </div>
 

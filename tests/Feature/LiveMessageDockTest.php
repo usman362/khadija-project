@@ -162,4 +162,34 @@ class LiveMessageDockTest extends TestCase
         $this->assertStringContainsString('.lmd-bar, .lmd-chat { display: none !important; }', $dock);
         $this->assertStringContainsString('class="lmd-bubble"', $dock);
     }
+
+    /** Sir Peter's dock: "Sarah is typing…" works without a socket server. */
+    public function test_typing_shows_in_the_other_persons_window_for_a_few_seconds(): void
+    {
+        $c = $this->conversation();
+
+        $this->actingAs($this->pro)->postJson(route('conversations.typing', $c))->assertOk();
+
+        $this->actingAs($this->client)->getJson(route('conversations.show', $c))
+            ->assertOk()->assertJsonPath('typing', [$this->pro->name]);
+
+        // Your own typing is never shown back to you.
+        $this->actingAs($this->pro)->getJson(route('conversations.show', $c))
+            ->assertOk()->assertJsonPath('typing', []);
+
+        $this->travel(10)->seconds();
+        $this->actingAs($this->client)->getJson(route('conversations.show', $c))
+            ->assertOk()->assertJsonPath('typing', []);
+    }
+
+    /** The window matches the drawing: attachment, emoji, typing, and the footer actions. */
+    public function test_the_chat_window_has_every_control_from_the_drawing(): void
+    {
+        $html = $this->actingAs($this->client)->get(route('client.dashboard'))->assertOk()->getContent();
+
+        foreach (['data-lmd-attach', 'data-lmd-emoji', 'data-lmd-typing', 'data-lmd-file', 'data-lmd-sound',
+                  'data-lmd-mute', 'data-lmd-profile', 'Open in Messages', 'Do Not Disturb', 'Message Settings'] as $needle) {
+            $this->assertStringContainsString($needle, $html, "missing: {$needle}");
+        }
+    }
 }

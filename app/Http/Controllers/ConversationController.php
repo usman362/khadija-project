@@ -217,7 +217,24 @@ class ConversationController extends Controller
         return response()->json([
             'conversation' => $conversation,
             'messages' => $messages,
+            // Who else is typing right now, for the Live Messages window.
+            'typing' => $this->typingPeers($conversation, $request->user()),
         ]);
+    }
+
+    /** The cache key a typing signal lives under: a few seconds, then gone. */
+    private static function typingKey(int $conversationId, int $userId): string
+    {
+        return "typing:{$conversationId}:{$userId}";
+    }
+
+    /** Names of the other participants who typed in the last few seconds. */
+    private function typingPeers(Conversation $conversation, $me): array
+    {
+        return $conversation->participants
+            ->reject(fn ($p) => $p->id === $me->id)
+            ->filter(fn ($p) => \Illuminate\Support\Facades\Cache::has(self::typingKey($conversation->id, $p->id)))
+            ->pluck('name')->values()->all();
     }
 
     /**
@@ -410,7 +427,20 @@ class ConversationController extends Controller
     {
         $this->authorize('view', $conversation);
 
-        broadcast(new TypingStarted($conversation, $request->user()))->toOthers();
+        /*
+         * Remembered for a few seconds, so a page that asks (the Live Messages
+         * window polls) can show "is typing". Shared hosting runs no socket
+         * server, so the broadcast alone reached nobody; it is still sent for
+         * a page that does listen, and a broadcaster that is down is not the
+         * typist's problem.
+         */
+        \Illuminate\Support\Facades\Cache::put(self::typingKey($conversation->id, $request->user()->id), true, now()->addSeconds(6));
+
+        try {
+            broadcast(new TypingStarted($conversation, $request->user()))->toOthers();
+        } catch (\Throwable) {
+            // Not logged: it would be one line per keystroke pause.
+        }
 
         return response()->json(['ok' => true]);
     }

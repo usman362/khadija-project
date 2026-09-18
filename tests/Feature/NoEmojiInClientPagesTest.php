@@ -55,6 +55,8 @@ class NoEmojiInClientPagesTest extends TestCase
         'partials/_ai_chatbot_widget.blade.php' => '/class="aic-emoji-tab|^\s*(events|people|food|symbols|objects):\s*\[/',
         // The thumbs-up quick-send button, and the script that sends it.
         'client/chat/index.blade.php' => '/id="cm-thumbs"|box\.value.*\'👍\'/',
+        // The Live Messages window's emoji picker: the palette it inserts from.
+        'partials/_live_message_dock.blade.php' => '/^\s*var EMOJI = \[/',
     ];
 
     /** Plain symbols in the scanned ranges that are typography, not emoji. */
