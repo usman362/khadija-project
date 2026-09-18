@@ -100,7 +100,7 @@
     .lmd-more button:hover { background: var(--bg-card-hover, #f8fafc); }
 
     /* ── The chat window ─────────────────────────────────────── */
-    .lmd-chat { position: fixed; right: 24px; bottom: var(--lmd-base, 24px); z-index: 9990;
+    .lmd-chat { position: fixed; right: var(--lmd-chat-right, 24px); bottom: var(--lmd-base, 24px); z-index: 9990;
         width: 380px; max-width: calc(100vw - 48px); height: var(--lmd-chat-h, 460px);
         display: flex; flex-direction: column; background: var(--bg-card, #fff);
         border: 1px solid var(--border-color, #e5e7eb); border-radius: 18px; overflow: hidden;
@@ -188,7 +188,7 @@
         border: 1px solid var(--border-color, #e5e7eb); border-radius: 12px; padding: 0 6px 0 0; background: var(--bg-card, #fff); }
     .lmd-field:focus-within { border-color: #2563eb; }
     .lmd-compose .lmd-field input { border: 0; padding: 12px 12px; background: transparent; }
-    .lmd-compose .lmd-field input:focus { outline: none; }
+    .lmd-compose .lmd-field input:focus, .lmd-compose .lmd-field input:focus-visible { outline: none; box-shadow: none; }
     .lmd-compose .lmd-fi { border: 0; background: none; width: 32px; height: 32px; border-radius: 8px; color: var(--text-secondary, #4b5563); padding: 0; }
     .lmd-compose .lmd-fi:hover { background: var(--bg-card-hover, #f1f5f9); }
     .lmd-compose .lmd-fi svg { width: 19px; height: 19px; }
@@ -719,13 +719,31 @@
 
         // The notifications keep a readable share when they sit on top.
         var forWindows = room - (notifOpen && (chatOpen || listOpen) ? 170 : 0);
-        var chatH = chatOpen ? Math.round(Math.min(460, listOpen ? forWindows * 0.52 : forWindows)) : 0;
-        var listH = Math.round(Math.max(220, Math.min(600, window.innerHeight * 0.58, chatOpen ? forWindows - chatH - 12 : forWindows)));
-        var notifBottom = base + (chatOpen ? chatH + 12 : 0) + (listOpen ? listH + 12 : 0);
+
+        /*
+         * Side by side, the way Freelancer does it: the Messages list against
+         * the right edge, the conversation beside it, both standing on the
+         * bar. Only a screen too narrow for two windows next to the menu
+         * falls back to stacking them.
+         */
+        var side = window.innerWidth - (document.querySelector('.cl-sidebar')?.offsetWidth || 0);
+        var sideBySide = listOpen && chatOpen && side >= 380 * 2 + 12 + 48;
+        var chatH, listH, notifBottom;
+        if (sideBySide || ! (listOpen && chatOpen)) {
+            chatH = chatOpen ? Math.round(Math.min(520, forWindows)) : 0;
+            listH = Math.round(Math.max(220, Math.min(600, window.innerHeight * 0.58, forWindows)));
+            notifBottom = base + Math.max(chatOpen ? chatH + 12 : 0, listOpen ? listH + 12 : 0);
+        } else {
+            chatH = Math.round(Math.min(460, forWindows * 0.52));
+            listH = Math.round(Math.max(220, Math.min(600, window.innerHeight * 0.58, forWindows - chatH - 12)));
+            notifBottom = base + chatH + 12 + listH + 12;
+        }
 
         root.setProperty('--lmd-base', base + 'px');
         root.setProperty('--lmd-chat-h', chatH + 'px');
-        root.setProperty('--lmd-chat', chatOpen ? (chatH + 12) + 'px' : '0px');
+        root.setProperty('--lmd-chat-right', sideBySide ? (24 + 380 + 12) + 'px' : '24px');
+        // Stacked only: the list then stands on the chat window.
+        root.setProperty('--lmd-chat', chatOpen && listOpen && ! sideBySide ? (chatH + 12) + 'px' : '0px');
         root.setProperty('--md-h', listH + 'px');
         root.setProperty('--notif-bottom', notifBottom + 'px');
         root.setProperty('--notif-max', Math.max(140, window.innerHeight - notifBottom - 16) + 'px');
