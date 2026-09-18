@@ -45,6 +45,8 @@ class Event extends Model
         'published_at',
         'starts_at',
         'ends_at',
+        // Other days the client could hold it on (Sir Peter, 16 Sep).
+        'backup_dates',
         'created_by',
         'client_id',
         'supplier_id',
@@ -164,6 +166,7 @@ class Event extends Model
         return [
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
+            'backup_dates' => 'array',
             'published_at' => 'datetime',
             'is_published' => 'boolean',
             'budget' => 'decimal:2',

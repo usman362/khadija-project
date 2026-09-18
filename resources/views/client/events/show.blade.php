@@ -634,6 +634,9 @@
                     </div>
                 @endif
                 <div class="ev-req-row"><span>Event date</span><b>{{ $event->starts_at?->format('M j, Y · g:i A') ?? 'Flexible' }}</b></div>
+                @if(! empty($event->backup_dates))
+                    <div class="ev-req-row"><span>Backup dates</span><b>{{ collect($event->backup_dates)->map(fn ($d) => \Illuminate\Support\Carbon::parse($d)->format('M j, Y'))->implode(', ') }}</b></div>
+                @endif
                 <div class="ev-req-row"><span>Location</span><b>{{ $event->location ?: '—' }}</b></div>
                 <div class="ev-req-row"><span>Guest count</span><b>{{ $event->guest_count ? number_format($event->guest_count) : '—' }}</b></div>
                 {{-- Catering requests only. Absent on every other request,

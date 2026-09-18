@@ -140,6 +140,9 @@ class RequestAvailabilityStepTest extends TestCase
         $save('proposals', []);
         $save('files', []);
 
+        // The date is asked on the availability step itself.
+        $save('availability', ['event_date' => now()->addMonth()->toDateString(), 'event_start_time' => '18:00']);
+
         return $this->actingAs($this->client)->get(route('client.bsr.step', $step))->assertOk();
     }
 

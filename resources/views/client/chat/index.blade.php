@@ -859,6 +859,12 @@
         infoShow(mainGrid.classList.contains('panel-closed'));
     });
 
+    /* Sir Peter, 16 Sep: collapsing the menu on this page hides the far-right
+       column too, leaving the conversation the room. Expanding brings both
+       back. The details button still opens the column on its own. */
+    document.addEventListener('cl:side-mini', (e) => infoShow(! (e.detail && e.detail.mini)));
+    if (document.documentElement.classList.contains('cl-side-mini')) infoShow(false);
+
     // 👍: sends on its own from an empty box; joins a draft otherwise.
     (function () {
         const thumbs = $('cm-thumbs'), box = $('cm-input'), form = $('cm-form');

@@ -186,16 +186,37 @@ class ClientBsrController extends Controller
             ? \Illuminate\Support\Carbon::parse($data['starts_at'])
             : null;
 
-        if ($services === [] || $date === null) {
+        if ($services === []) {
             // Nothing to count yet. The view says which answer is missing
             // rather than showing a confident zero.
-            return ['availability' => null, 'availabilityDays' => [], 'availabilityDate' => $date];
+            return ['availability' => null, 'availabilityDays' => [], 'availabilityDate' => null];
+        }
+
+        if ($date === null) {
+            /*
+             * The date is asked on this step now, so a first visit has none.
+             * Whether anybody offers these services at all does not depend on
+             * the day, and "nobody does" is the one thing worth saying before
+             * the client picks one.
+             */
+            $probe = \App\Support\ServiceAvailability::on($services, $state, now());
+
+            return [
+                'availability'     => $probe['matched'] === 0 ? $probe : null,
+                'availabilityDays' => [],
+                'availabilityDate' => null,
+            ];
         }
 
         return [
             'availability'     => \App\Support\ServiceAvailability::on($services, $state, $date),
             'availabilityDays' => \App\Support\ServiceAvailability::around($services, $state, $date),
             'availabilityDate' => $date,
+            // The same count for each backup day, so the client can see
+            // whether offering it actually widens the field.
+            'backupAvailability' => collect($data['backup_dates'] ?? [])
+                ->mapWithKeys(fn ($d) => [$d => \App\Support\ServiceAvailability::on($services, $state, \Illuminate\Support\Carbon::parse($d))])
+                ->all(),
         ];
     }
 
@@ -357,6 +378,18 @@ class ClientBsrController extends Controller
 
             $validated['starts_at'] = $start->format('Y-m-d H:i:s');
 
+            /*
+             * Backup dates: each day once, in order, never the preferred day
+             * itself, and none left blank. They carry the same start and end
+             * time as the preferred date; a professional who can do another
+             * day at another time says so in their proposal.
+             */
+            $validated['backup_dates'] = collect($validated['backup_dates'] ?? [])
+                ->filter()
+                ->map(fn ($d) => \Illuminate\Support\Carbon::parse($d)->toDateString())
+                ->reject(fn ($d) => $d === $date->toDateString())
+                ->unique()->sort()->values()->all();
+
             if (! empty($validated['event_end_time'])) {
                 $end = $date->copy()->setTimeFromTimeString($validated['event_end_time']);
 
@@ -504,6 +537,7 @@ class ClientBsrController extends Controller
             'starts_at'         => $event->starts_at?->format('Y-m-d\TH:i'),
             // Resuming a draft has to bring step 7's end time back with it.
             'ends_at'           => $event->ends_at?->format('Y-m-d\TH:i'),
+            'backup_dates'      => $event->backup_dates ?? [],
             'location'          => $event->location,
             'venue'             => $event->venue,
             'guest_count'       => $event->guest_count,
@@ -898,8 +932,10 @@ class ClientBsrController extends Controller
              */
             // No name on this step any more: it is built from step 1's answers
             // and can be renamed on the review step. See save().
+            // No date on this step either: it is asked once, on step 7,
+            // beside who is free on it (Sir Peter, 16 Sep: step 5 and 6 must
+            // not ask the same question twice).
             'event' => [
-                'starts_at'   => ['nullable', 'date'],
                 'location'    => ['nullable', 'string', 'max:200'],
                 /*
                  * Which KIND of answer they gave. The field was one free-text
@@ -983,6 +1019,9 @@ class ClientBsrController extends Controller
                 'event_start_time'   => ['required', 'date_format:H:i'],
                 'event_end_time'     => ['nullable', 'date_format:H:i'],
                 'availability_note'  => ['nullable', 'string', 'max:500'],
+                // Up to three other days the client could hold it on.
+                'backup_dates'       => ['nullable', 'array', 'max:3'],
+                'backup_dates.*'     => ['nullable', 'date', 'after_or_equal:today'],
             ],
             'review' => [
                 'confirm' => ['accepted'],
@@ -1005,6 +1044,8 @@ class ClientBsrController extends Controller
             'proposal_deadline.after'    => 'The proposal deadline has to be in the future.',
             'proposal_deadline.required' => 'Choose when proposals close. No standard window has been approved yet, so this can’t be set for you.',
             'event_date.required'        => 'Set the date your event runs.',
+            'backup_dates.max'           => 'Add up to three backup dates.',
+            'backup_dates.*.after_or_equal' => 'A backup date cannot be in the past.',
             'event_date.after_or_equal'  => 'Pick a date that has not already passed.',
             'event_start_time.required'  => 'Set the time your event starts.',
             'confirm.accepted'           => 'Confirm the details before publishing.',
@@ -1091,6 +1132,7 @@ class ClientBsrController extends Controller
             'starts_at'         => $startsAt,
             // Step 7's optional end time. Null stays null — an event with no
             // stated finish is a real answer, not a missing one.
+            'backup_dates'      => ! empty($d['backup_dates']) ? array_values($d['backup_dates']) : null,
             'ends_at'           => ! empty($d['ends_at'])
                 ? \Illuminate\Support\Carbon::parse($d['ends_at'])
                 : null,

@@ -5,7 +5,13 @@
     {{-- Anti-FOUC: apply the saved theme BEFORE first paint so there's no light/dark flash. --}}
     <script>(function(){try{var t=localStorage.getItem('cl-theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
     {{-- The left menu's icons-only state, also before first paint (Sir Peter, 2026-09-12). --}}
+    {{-- Sir Peter, 16 Sep: the menu collapses on the Messages page only, and
+         takes the far-right column with it. Every other page keeps the full
+         menu, so a choice made while chatting does not follow the client
+         around the site. --}}
+    @if(request()->routeIs('client.chat.*'))
     <script>(function(){try{if(localStorage.getItem('cl-side')==='mini')document.documentElement.classList.add('cl-side-mini');}catch(e){}})();</script>
+    @endif
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -1519,10 +1525,12 @@
             <span>Contact Support</span>
         </a>
         <div class="cl-sidebar-footer">
+            @if(request()->routeIs('client.chat.*'))
             <button type="button" class="cl-side-toggle" data-side-mini aria-label="Show icons only" title="Show icons only">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><polyline points="16 15 13 12 16 9"/></svg>
                 <span>Collapse menu</span>
             </button>
+            @endif
             <a href="{{ route('client.profile.index') }}" class="cl-user-card" title="View profile">
                 <div class="cl-user-avatar"><img src="{{ auth()->user()?->avatar_url }}" alt="" style="width:100%;height:100%;border-radius:inherit;object-fit:cover;display:block;"></div>
                 <div class="cl-user-info">
@@ -1645,6 +1653,8 @@
             root.classList.toggle('cl-side-mini');
             try { localStorage.setItem('cl-side', root.classList.contains('cl-side-mini') ? 'mini' : 'full'); } catch (e) {}
             label();
+            // The Messages page closes its details column along with it.
+            document.dispatchEvent(new CustomEvent('cl:side-mini', { detail: { mini: root.classList.contains('cl-side-mini') } }));
         });
         label();
     })();

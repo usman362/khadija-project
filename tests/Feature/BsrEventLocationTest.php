@@ -128,8 +128,16 @@ class BsrEventLocationTest extends TestCase
         // Before any location is given, the town on their profile stands in.
         $this->assertSame("{$type} · Baltimore", $this->wizard()['title']);
 
-        $this->step(['location_kind' => 'area', 'location' => 'Annapolis, MD', 'starts_at' => '2027-10-09T18:00'])
+        $this->step(['location_kind' => 'area', 'location' => 'Annapolis, MD'])
             ->assertSessionHasNoErrors();
+
+        $this->assertSame("{$type} · Annapolis", $this->wizard()['title']);
+
+        // The date is asked once, on the availability step, and the month
+        // joins the name from there.
+        $this->actingAs($this->client)->post(route('client.bsr.save', 'availability'), [
+            'event_date' => '2027-10-09', 'event_start_time' => '18:00',
+        ])->assertSessionHasNoErrors();
 
         $this->assertSame("{$type} · Annapolis · October 2027", $this->wizard()['title']);
     }

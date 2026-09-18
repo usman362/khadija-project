@@ -15,7 +15,7 @@ class ClientMenuIconsOnlyTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_the_menu_can_fold_to_icons(): void
+    private function client(): User
     {
         $this->seed(\Database\Seeders\PermissionSeeder::class);
         $this->seed(\Database\Seeders\RolePermissionSeeder::class);
@@ -27,7 +27,16 @@ class ClientMenuIconsOnlyTest extends TestCase
             'service_area_status' => ServiceArea::SUPPORTED,
         ]);
 
-        $html = $this->actingAs($client->fresh())->get(route('client.dashboard'))->assertOk()->getContent();
+        return $client->fresh();
+    }
+
+    /**
+     * Sir Peter, 16 Sep: the collapse belongs to the Messages page, where it
+     * takes the far-right column with it and gives the conversation the room.
+     */
+    public function test_the_menu_can_fold_to_icons_on_the_messages_page(): void
+    {
+        $html = $this->actingAs($this->client())->get(route('client.chat.index'))->assertOk()->getContent();
 
         // The switch, in the menu.
         $this->assertStringContainsString('data-side-mini', $html);
@@ -36,6 +45,19 @@ class ClientMenuIconsOnlyTest extends TestCase
         // Remembered, and applied before the page paints so it does not jump.
         $this->assertStringContainsString("localStorage.getItem('cl-side')==='mini'", $html);
         $this->assertLessThan(strpos($html, '<body'), strpos($html, "getItem('cl-side')"));
+
+        // Folding the menu closes the details column too.
+        $this->assertStringContainsString("addEventListener('cl:side-mini'", $html);
+    }
+
+    /** "not on all the other webpages if even possible" */
+    public function test_other_pages_keep_the_full_menu(): void
+    {
+        $html = $this->actingAs($this->client())->get(route('client.dashboard'))->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('class="cl-side-toggle" data-side-mini', $html);
+        $this->assertStringNotContainsString("localStorage.getItem('cl-side')==='mini'", $html,
+            'A collapse chosen on Messages must not follow the client to other pages.');
     }
 
     public function test_it_uses_the_collapsed_width_and_only_on_a_computer(): void

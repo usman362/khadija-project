@@ -62,6 +62,8 @@
     }
     .bw-field textarea { min-height: 130px; resize: vertical; line-height: 1.6; }
     .bw-field textarea[rows='3'] { min-height: 84px; }
+    .bw-backups { margin-top: 4px; }
+    .bw-backups > label { display: block; font-size: 12.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
     .bw-help { font-size: 12px; color: var(--text-muted); margin-top: 5px; line-height: 1.5; }
     /* The two ways of answering "where is it". */
     .bw-locpick { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px; margin-bottom: 10px; }
@@ -402,10 +404,19 @@
         {{-- No "Event name" box: step 1 already asked what the event is, and
              the name is built from that. It can be renamed on the last step. --}}
         <div class="bw-two">
+            {{-- The date is asked once, on step 7, beside who is free on it,
+                 and that is also where backup dates go (Sir Peter, 16 Sep).
+                 It used to be asked here as well, then again there. --}}
             <div class="bw-field">
-                <label>Event date &amp; time</label>
-                <input type="datetime-local" name="starts_at" value="{{ $data['starts_at'] ?? '' }}">
-                <p class="bw-help">Leave blank if the date is still flexible.</p>
+                <label>Event date</label>
+                <p class="bw-help" style="margin-top:0;">
+                    @if(! empty($data['starts_at']))
+                        {{ \Illuminate\Support\Carbon::parse($data['starts_at'])->format('M j, Y · g:i A') }}.
+                        You can change it on the Availability step.
+                    @else
+                        You'll pick the date on the Availability step, where you can see who is free and add backup dates.
+                    @endif
+                </p>
             </div>
             <div class="bw-field">
                 <label>Guest count</label>
@@ -826,6 +837,34 @@
                 </div>
             </div>
 
+            {{-- Backup dates (Sir Peter, 16 Sep): "the professionals might be
+                 only available on certain times or dates". Up to three, all
+                 optional, same times as the preferred date. Each shows how
+                 many matching professionals have that day clear. --}}
+            @php
+                $__backups = array_values((array) old('backup_dates', $data['backup_dates'] ?? []));
+                $__backupCounts = $backupAvailability ?? [];
+            @endphp
+            <div class="bw-backups">
+                <label>Backup dates <span style="font-weight:500;color:var(--text-muted)">(optional, up to 3)</span></label>
+                <p class="bw-help" style="margin:0 0 8px;">Other days you could hold the event. Professionals see them on your request, so someone busy on your first choice can still offer.</p>
+                <div class="bw-three">
+                    @for($i = 0; $i < 3; $i++)
+                        @php $__d = $__backups[$i] ?? ''; @endphp
+                        <div class="bw-field">
+                            <input type="date" name="backup_dates[]" min="{{ now()->toDateString() }}"
+                                   value="{{ $__d }}" aria-label="Backup date {{ $i + 1 }}">
+                            @if($__d && isset($__backupCounts[$__d]))
+                                @php $__c = $__backupCounts[$__d]; @endphp
+                                <div class="bw-hint">
+                                    {{ $__c['nothing_booked'] }} of {{ $__c['matched'] }} matching {{ \Illuminate\Support\Str::plural('professional', $__c['matched']) }} have this day clear
+                                </div>
+                            @endif
+                        </div>
+                    @endfor
+                </div>
+            </div>
+
             {{-- No time-zone picker.
                  The mockup has one, and for a marketplace that spanned zones it
                  would be right. R38 makes the client and the professional
@@ -846,7 +885,7 @@
                 <b>Nothing to check yet</b>
                 <p>
                     @if(empty($data['services'] ?? []))
-                        Pick your services on step 1 and set a date on step 2, and this will show who is free.
+                        Pick your services on step 1 and set your date above, and this will show who is free.
                     @else
                         Set your event date above and this will show who is free.
                     @endif
@@ -1024,6 +1063,9 @@
 </script>
 @endpush
         <div class="bw-rev"><span>Event date</span><b>{{ ! empty($data['starts_at']) ? \Illuminate\Support\Carbon::parse($data['starts_at'])->format('M j, Y · g:i A') : 'Flexible' }}@if(! empty($data['ends_at'])) – {{ \Illuminate\Support\Carbon::parse($data['ends_at'])->format('g:i A') }}@endif</b></div>
+        @if(! empty($data['backup_dates']))
+            <div class="bw-rev"><span>Backup dates</span><b>{{ collect($data['backup_dates'])->map(fn ($d) => \Illuminate\Support\Carbon::parse($d)->format('M j, Y'))->implode(', ') }}</b></div>
+        @endif
         <div class="bw-rev"><span>Location</span><b>{{ $data['location'] ?? '—' }}{{ ! empty($data['venue']) ? ' · ' . $data['venue'] : '' }}</b></div>
         <div class="bw-rev"><span>Guests</span><b>{{ ! empty($data['guest_count']) ? number_format($data['guest_count']) : '—' }}</b></div>
         @if($asksFoodDelivery)
