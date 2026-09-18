@@ -62,7 +62,38 @@
     }
     .bw-field textarea { min-height: 130px; resize: vertical; line-height: 1.6; }
     .bw-field textarea[rows='3'] { min-height: 84px; }
-    .bw-backups { margin-top: 4px; }
+    .bw-revlist { border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+    .bw-revrow { display: grid; grid-template-columns: 170px minmax(0,1fr) auto 26px; gap: 12px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--border-color); font-size: 13px; }
+    .bw-revrow:last-child { border-bottom: 0; }
+    .bw-revrow-l { font-weight: 800; color: var(--text-primary); }
+    .bw-revrow-v { color: var(--text-secondary); min-width: 0; overflow-wrap: anywhere; }
+    .bw-revrow-e { font-size: 12.5px; font-weight: 700; color: #1d4ed8; text-decoration: none; }
+    .bw-revrow-s { width: 22px; height: 22px; border-radius: 50%; background: #15803d; color: #fff; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+    .bw-revrow.is-bad { background: rgba(220,38,38,.04); }
+    .bw-revrow.is-bad .bw-revrow-s { background: #dc2626; }
+    .bw-issues { margin-top: 14px; border-color: #fca5a5 !important; background: #fef2f2 !important; }
+    .bw-issue { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 8px 0 0; font-size: 13px; }
+    .bw-issue a { font-weight: 800; color: #b91c1c; }
+    .bw-btn.go[disabled] { opacity: .5; cursor: not-allowed; }
+    @media (max-width: 700px) { .bw-revrow { grid-template-columns: 1fr auto 26px; } .bw-revrow-v { grid-column: 1 / -1; grid-row: 2; } }
+    .bw-needpanel { margin-top: 12px; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-subtle, rgba(0,0,0,.015)); }
+    .bw-needpanel[hidden] { display: none; }
+    .bw-towns-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .bw-statelock { font-size: 11.5px; font-weight: 800; color: #c2410c; background: rgba(249,115,22,.1); border-radius: 999px; padding: 2px 9px; }
+    .bw-town { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .bw-town [hidden] { display: none; }
+    .bw-venuetypes { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 12px; margin-bottom: 10px; }
+    .bw-venuetypes label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin: 0; }
+    .bw-note[hidden] { display: none; }
+    .bw-backups { margin-top: 10px; padding-top: 12px; border-top: 1px dashed var(--border-color); }
+    .bw-backups-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+    .bw-backup-row { display: grid; grid-template-columns: 110px minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) auto; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .bw-backup-n { font-size: 12.5px; color: var(--text-primary); }
+    .bw-backup-note { grid-column: 2 / -1; margin-top: -2px; }
+    .bw-backup-rm { border: 0; background: none; color: #dc2626; font-weight: 700; font-size: 12.5px; cursor: pointer; font-family: inherit; }
+    .bw-backup-add { width: 100%; border: 1.5px dashed #93c5fd; background: rgba(37,99,235,.04); color: #1d4ed8; border-radius: 10px; padding: 10px; font-weight: 800; font-size: 13px; cursor: pointer; font-family: inherit; }
+    .bw-backup-add[hidden] { display: none; }
+    @media (max-width: 700px) { .bw-backup-row { grid-template-columns: 1fr 1fr; } .bw-backup-n { grid-column: 1 / -1; } .bw-backup-note { grid-column: 1 / -1; } }
     .bw-backups > label { display: block; font-size: 12.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
     .bw-help { font-size: 12px; color: var(--text-muted); margin-top: 5px; line-height: 1.5; }
     /* The two ways of answering "where is it". */
@@ -360,6 +391,12 @@
                     :live-event-type="true" />
             </div>
 
+            {{-- A venue service picked: step 2 asks where. --}}
+            <div class="bw-note" data-bw-venue-added data-ids="{{ $venueServices->pluck('id')->implode(',') }}" hidden>
+                <b>Venue service added</b>
+                <p>You've selected a Venues &amp; Event Spaces service. On the next step, we'll ask about your event location.</p>
+            </div>
+
             {{-- Filled in by the script below as they tick, so the warning
                  arrives with the choice rather than after it. --}}
             <div class="bw-note warn" id="bwNoPros" hidden>
@@ -424,72 +461,193 @@
             </div>
         </div>
         <div class="bw-two">
-            {{-- Two ways to answer, because both are real.
-
-                 The field was a single free-text box with "Baltimore, MD" in it,
-                 so every request stored a city and nothing else — and
-                 location_precision, which the database has carried all along,
-                 stayed 'unresolved'. Distance from a professional cannot be
-                 worked out from a city name, so it could never be worked out at
-                 all.
-
-                 A venue hunt genuinely has no address yet; everything else
-                 usually does. Asking which one they have beats guessing. --}}
             @php
-                // old() first, and it has to be: the "that looks like an area"
-                // check rejects the step, so the client lands back here with
-                // nothing saved. Reading the saved state alone blanked the box
-                // they had just typed into and reset the choice they had just
-                // made, which is why picking "I know the address" looked like
-                // it did nothing at all.
+                // old() first: a rejected step lands back here with nothing
+                // saved, and the client's own answers must still be on screen.
                 $__loc  = old('location', $data['location'] ?? '');
                 $__prof = auth()->user()?->profile;
-                // Only a real street address counts as "my address"; a city
-                // alone would fill a street-address answer with an area.
+                // Only a real street address counts as "my address".
                 $__home = filled($__prof?->address) ? trim(implode(', ', array_filter([
                     $__prof?->address, $__prof?->city, trim(($__prof?->state ?? '') . ' ' . ($__prof?->zip_code ?? '')),
                 ]))) : '';
                 $__kind = old('location_kind', ! empty($data['location_mine']) ? 'mine'
-                    : ($data['location_kind'] ?? ($__home !== '' ? 'mine' : ($__loc === '' ? 'exact' : 'area'))));
+                    : ($data['location_kind'] ?? ($__home !== '' ? 'mine' : 'exact')));
                 if ($__kind === 'mine' && $__home === '') { $__kind = 'exact'; }
-                // Under "use my address" the box stays empty; the profile is the answer.
-                if ($__kind === 'mine') { $__loc = ''; }
+                if ($__kind === 'area') { $__kind = $__home !== '' ? 'mine' : 'exact'; }
+                $__need = old('location_need', $data['location_need'] ?? (($data['location_kind'] ?? null) === 'area' ? 'unsure' : 'have'));
+                $__towns = array_values(array_filter((array) old('preferred_locations', $data['preferred_locations'] ?? [])));
+                if (! $__towns) { $__towns = ['']; }
+                $__stateCode = $__prof?->state;
+                $__stateName = config('geo.allowed_states')[$__stateCode] ?? $__stateCode;
+                $__picked = array_map('intval', (array) ($data['services'] ?? []));
+                $__venueIds = $venueServices->pluck('id')->map(fn ($i) => (int) $i)->all();
+                $__hasVenue = array_intersect($__picked, $__venueIds) !== [];
+                $__oldTypes = array_map('intval', (array) old('venue_types', []));
             @endphp
 
-            <div class="bw-field bw-locfield">
-                <label>Where is the event?</label>
+            <div class="bw-field bw-locfield" data-bw-need>
+                <label>Do you already have a venue or event location?</label>
 
-                {{-- Sir Peter's three answers, 11 Sep. --}}
+                {{-- Sir Peter's three answers (18 Sep). Each opens only its own
+                     fields; the others are switched off so they do not post. --}}
                 <div class="bw-locpick">
-                    @if($__home !== '')
-                        <label class="bw-locopt">
-                            <input type="radio" name="location_kind" value="mine" @checked($__kind === 'mine')>
-                            <span><b>Use my address</b><small>{{ $__home }}</small></span>
-                        </label>
-                    @endif
                     <label class="bw-locopt">
-                        <input type="radio" name="location_kind" value="exact" @checked($__kind === 'exact')>
-                        <span><b>Enter a different address</b><small>Lets us judge how far professionals are from it</small></span>
+                        <input type="radio" name="location_need" value="have" @checked($__need === 'have')>
+                        <span><b>Yes, I already have a location</b><small>I know the exact address or venue.</small></span>
                     </label>
                     <label class="bw-locopt">
-                        <input type="radio" name="location_kind" value="area" @checked($__kind === 'area')>
-                        <span><b>I don't know the exact address yet</b><small>Just the city and state for now</small></span>
+                        <input type="radio" name="location_need" value="need_venue" @checked($__need === 'need_venue')>
+                        <span><b>No, I need to find a venue</b><small>I'm looking for a venue and professionals who provide one.</small></span>
+                    </label>
+                    <label class="bw-locopt">
+                        <input type="radio" name="location_need" value="unsure" @checked($__need === 'unsure')>
+                        <span><b>Not sure yet</b><small>Still planning; no specific location.</small></span>
                     </label>
                 </div>
 
-                {{-- The box belongs to the option above it. Unlabelled and
-                     sitting under both, it read as a third thing on the page
-                     and never changed when the choice did. --}}
-                <div data-bw-locbox @if($__kind === 'mine') hidden @endif>
-                    <label class="bw-loclabel" for="bw_location" data-bw-loclabel>{{
-                        $__kind === 'area' ? 'City and state' : 'Street address'
-                    }}</label>
+                {{-- Yes: the address, from the profile or typed. --}}
+                <div class="bw-needpanel" data-bw-panel="have" @if($__need !== 'have') hidden @endif>
+                    <div class="bw-locpick">
+                        @if($__home !== '')
+                            <label class="bw-locopt">
+                                <input type="radio" name="location_kind" value="mine" @checked($__kind === 'mine')>
+                                <span><b>Use my address</b><small>{{ $__home }}</small></span>
+                            </label>
+                        @endif
+                        <label class="bw-locopt">
+                            <input type="radio" name="location_kind" value="exact" @checked($__kind === 'exact')>
+                            <span><b>Enter the address</b><small>Lets us judge how far professionals are from it</small></span>
+                        </label>
+                    </div>
+                    <div data-bw-locbox @if($__kind === 'mine') hidden @endif>
+                        <label class="bw-loclabel" for="bw_location">Street address</label>
+                        <input type="text" name="location" id="bw_location" value="{{ $__need === 'have' && $__kind !== 'mine' ? $__loc : '' }}"
+                               placeholder="e.g. 1234 Garden Way, Baltimore, MD 21201" data-bw-location>
+                    </div>
+                    <label class="bw-loclabel" for="bw_venue">Venue name <span class="bw-optional">Optional</span></label>
+                    <input type="text" name="venue" id="bw_venue" value="{{ $data['venue'] ?? '' }}" placeholder="e.g. Oregon Ridge Park">
+                </div>
 
-                    <input type="text" name="location" id="bw_location" value="{{ $__loc }}"
-                           placeholder="{{ $__kind === 'area' ? 'e.g. Baltimore, MD' : 'e.g. 1234 Garden Way, Baltimore, MD 21201' }}"
-                           data-bw-location>
+                {{-- No: where the venue should be, and what kind. --}}
+                <div class="bw-needpanel" data-bw-panel="need_venue" @if($__need !== 'need_venue') hidden @endif>
+                    <div class="bw-towns-h">
+                        <b>Preferred location(s)</b>
+                        @if($__stateName)<span class="bw-statelock">{{ $__stateName }} only</span>@endif
+                    </div>
+                    <p class="bw-help" style="margin:0 0 8px;">Add the cities or towns where you'd like the venue, up to {{ \App\Domain\Requests\VenueRule::MAX_PREFERRED }}.</p>
+                    <div data-bw-towns data-max="{{ \App\Domain\Requests\VenueRule::MAX_PREFERRED }}">
+                        @foreach($__towns as $__t)
+                            <div class="bw-town" data-bw-town>
+                                <input type="text" name="preferred_locations[]" value="{{ $__t }}" placeholder="City or town, e.g. Bel Air" aria-label="City or town">
+                                <button type="button" class="bw-backup-rm" data-bw-town-rm>Remove</button>
+                            </div>
+                        @endforeach
+                    </div>
+                    <button type="button" class="bw-backup-add" data-bw-town-add>+ Add Another Location</button>
+                    @error('preferred_locations')<p class="bw-err">{{ $message }}</p>@enderror
+
+                    <label class="bw-loclabel">What type of venue or space are you looking for? <span class="bw-optional">Optional</span></label>
+                    <p class="bw-help" style="margin:0 0 6px;">These are the Venues &amp; Event Spaces services. Ticking one adds it to your request.</p>
+                    <div class="bw-venuetypes">
+                        @foreach($venueServices as $__v)
+                            <label>
+                                <input type="checkbox" name="venue_types[]" value="{{ $__v->id }}"
+                                       @checked(in_array((int) $__v->id, $__picked, true) || in_array((int) $__v->id, $__oldTypes, true))>
+                                <span>{{ $__v->name }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+
+                    {{-- Said up front, before Continue, when step 1 has no venue
+                         service yet; the server refuses the step on the same rule. --}}
+                    <div class="bw-note warn" data-bw-venue-warn @if($__hasVenue) hidden @endif>
+                        <b>Add a venue service to continue</b>
+                        <p>You need to find a venue, but no Venues &amp; Event Spaces service is selected yet. Tick one above, or
+                            <a href="{{ route('client.bsr.step', 'service') }}">go to Service Selection</a>.</p>
+                    </div>
+                    @error('location_need')<p class="bw-err">{{ $message }}</p>@enderror
+                </div>
+
+                {{-- Not sure: just the area. --}}
+                <div class="bw-needpanel" data-bw-panel="unsure" @if($__need !== 'unsure') hidden @endif>
+                    <input type="hidden" name="location_kind" value="area" @disabled($__need !== 'unsure')>
+                    <label class="bw-loclabel" for="bw_area">City and state</label>
+                    <input type="text" name="location" id="bw_area" value="{{ $__need === 'unsure' ? $__loc : '' }}" placeholder="e.g. Baltimore, MD" @disabled($__need !== 'unsure')>
                 </div>
             </div>
+@push('scripts')
+<script>
+(function () {
+    const root = document.querySelector('[data-bw-need]');
+    if (!root) return;
+    const venueIds = @json($__venueIds);
+    const alreadyVenue = @json($__hasVenue);
+
+    // Only the chosen answer's fields are sent.
+    function show(need) {
+        root.querySelectorAll('[data-bw-panel]').forEach(function (p) {
+            const on = p.dataset.bwPanel === need;
+            p.hidden = !on;
+            p.querySelectorAll('input, select, textarea').forEach(function (i) { i.disabled = !on; });
+        });
+        if (need === 'have') { mine(); }
+    }
+
+    // "Use my address" needs no box; the profile is the answer.
+    function mine() {
+        const k = root.querySelector('[data-bw-panel="have"] input[name="location_kind"]:checked');
+        const box = root.querySelector('[data-bw-locbox]');
+        if (box) box.hidden = k && k.value === 'mine';
+        const loc = root.querySelector('[data-bw-location]');
+        if (loc) loc.disabled = !!(k && k.value === 'mine');
+    }
+
+    root.querySelectorAll('input[name="location_need"]').forEach(function (r) {
+        r.addEventListener('change', function () { if (r.checked) show(r.value); });
+    });
+    root.querySelectorAll('[data-bw-panel="have"] input[name="location_kind"]').forEach(function (r) {
+        r.addEventListener('change', mine);
+    });
+
+    // The venue warning clears the moment a venue type is ticked.
+    const warn = root.querySelector('[data-bw-venue-warn]');
+    function venueCheck() {
+        if (!warn) return;
+        const ticked = Array.from(root.querySelectorAll('input[name="venue_types[]"]:checked')).length > 0;
+        warn.hidden = alreadyVenue || ticked;
+    }
+    root.querySelectorAll('input[name="venue_types[]"]').forEach(function (c) { c.addEventListener('change', venueCheck); });
+
+    // Towns: add up to the cap, remove any but the last one.
+    const towns = root.querySelector('[data-bw-towns]');
+    const addTown = root.querySelector('[data-bw-town-add]');
+    function townsSync() {
+        const n = towns.querySelectorAll('[data-bw-town]').length;
+        addTown.hidden = n >= +towns.dataset.max;
+        towns.querySelectorAll('[data-bw-town-rm]').forEach(function (b) { b.hidden = n <= 1; });
+    }
+    addTown.addEventListener('click', function () {
+        const row = towns.querySelector('[data-bw-town]').cloneNode(true);
+        row.querySelector('input').value = '';
+        towns.appendChild(row);
+        townsSync();
+        row.querySelector('input').focus();
+    });
+    towns.addEventListener('click', function (e) {
+        const rm = e.target.closest('[data-bw-town-rm]');
+        if (!rm) return;
+        rm.closest('[data-bw-town]').remove();
+        townsSync();
+    });
+
+    const checked = root.querySelector('input[name="location_need"]:checked');
+    show(checked ? checked.value : 'have');
+    townsSync();
+    venueCheck();
+})();
+</script>
+@endpush
+
             {{-- The state selector that stood here is gone.
                  Sir Peter's State Boundary Rule (2026-08-25) matches every
                  request by the client's own home state, whatever state the
@@ -507,59 +665,10 @@
                     </p>
                 </div>
             @endif
-            <div class="bw-field">
-                <label>Venue <span class="bw-optional">Optional</span></label>
-                <input type="text" name="venue" value="{{ $data['venue'] ?? '' }}" placeholder="e.g. Oregon Ridge Park">
-                <p class="bw-help">Helps professionals understand the setting.</p>
-            </div>
         </div>
 
     {{-- ── 3 · Requirements ────────────────────────────────── --}}
-@push('scripts')
-<script>
-// The placeholder should show the shape of answer being asked for, and "use my
-// address" should fill it rather than making them type it again.
-(function () {
-    const field = document.querySelector('[data-bw-location]');
-    if (!field) return;
 
-    const hints = {
-        exact: { label: 'Street address', ph: 'e.g. 1234 Garden Way, Baltimore, MD 21201' },
-        area:  { label: 'City and state',  ph: 'e.g. Baltimore, MD' },
-    };
-
-    const label = document.querySelector('[data-bw-loclabel]');
-    const box = document.querySelector('[data-bw-locbox]');
-
-    // One place decides what the box is asking for, so the label and the
-    // placeholder can never disagree with the option that is selected.
-    // "Use my address" needs no box at all: the profile is the answer.
-    function follow(kind) {
-        if (box) { box.hidden = kind === 'mine'; }
-        if (kind === 'mine') { return; }
-
-        const h = hints[kind] || hints.area;
-        field.placeholder = h.ph;
-        if (label) { label.textContent = h.label; }
-    }
-
-    document.querySelectorAll('input[name="location_kind"]').forEach(function (radio) {
-        radio.addEventListener('change', function () {
-            if (radio.checked) {
-                follow(radio.value);
-                if (radio.value !== 'mine') { field.focus(); }
-            }
-        });
-    });
-
-    // The page can load with either option already chosen — after a rejected
-    // step, or on a returning draft — so the box is brought into line with
-    // whatever is checked rather than with whichever one is first.
-    const checked = document.querySelector('input[name="location_kind"]:checked');
-    if (checked) { follow(checked.value); }
-})();
-</script>
-@endpush
 
     @elseif($step === 'requirements')
         <h3>What should professionals know?</h3>
@@ -837,33 +946,107 @@
                 </div>
             </div>
 
-            {{-- Backup dates (Sir Peter, 16 Sep): "the professionals might be
-                 only available on certain times or dates". Up to three, all
-                 optional, same times as the preferred date. Each shows how
-                 many matching professionals have that day clear. --}}
+            {{-- Backup dates (Sir Peter, 16 and 18 Sep): other days the client
+                 could hold the event, up to five, each with its own times.
+                 Optional. Each shows how many matching professionals have that
+                 day clear, and a professional confirms one of these dates, or
+                 the preferred one, on their proposal. --}}
             @php
-                $__backups = array_values((array) old('backup_dates', $data['backup_dates'] ?? []));
+                $__max = \App\Domain\Requests\EventDates::MAX_BACKUPS;
+                $__backups = array_values(\App\Domain\Requests\EventDates::normalize((array) old('backup_dates', $data['backup_dates'] ?? [])));
                 $__backupCounts = $backupAvailability ?? [];
             @endphp
-            <div class="bw-backups">
-                <label>Backup dates <span style="font-weight:500;color:var(--text-muted)">(optional, up to 3)</span></label>
-                <p class="bw-help" style="margin:0 0 8px;">Other days you could hold the event. Professionals see them on your request, so someone busy on your first choice can still offer.</p>
-                <div class="bw-three">
-                    @for($i = 0; $i < 3; $i++)
-                        @php $__d = $__backups[$i] ?? ''; @endphp
-                        <div class="bw-field">
-                            <input type="date" name="backup_dates[]" min="{{ now()->toDateString() }}"
-                                   value="{{ $__d }}" aria-label="Backup date {{ $i + 1 }}">
-                            @if($__d && isset($__backupCounts[$__d]))
-                                @php $__c = $__backupCounts[$__d]; @endphp
-                                <div class="bw-hint">
+            <div class="bw-backups" data-bw-backups data-max="{{ $__max }}">
+                <div class="bw-backups-h">
+                    <label>Add backup dates <span style="font-weight:500;color:var(--text-muted)">(optional)</span></label>
+                    <span class="bw-hint" data-bw-backup-count>{{ count($__backups) }} of {{ $__max }} backup dates added</span>
+                </div>
+                <p class="bw-help" style="margin:0 0 8px;">If you're open to other dates, add up to {{ $__max }}. All services will still be for the same date and time.</p>
+
+                <div data-bw-backup-rows>
+                    @foreach($__backups as $i => $b)
+                        <div class="bw-backup-row" data-bw-backup-row>
+                            <b class="bw-backup-n">Backup date <span data-n>{{ $i + 1 }}</span></b>
+                            <input type="date" name="backup_dates[{{ $i }}][date]" min="{{ now()->toDateString() }}" value="{{ $b['date'] }}" aria-label="Backup date">
+                            <input type="time" name="backup_dates[{{ $i }}][start]" value="{{ $b['start'] }}" aria-label="Start time">
+                            <input type="time" name="backup_dates[{{ $i }}][end]" value="{{ $b['end'] }}" aria-label="End time (optional)">
+                            <button type="button" class="bw-backup-rm" data-bw-backup-rm>Remove</button>
+                            @if(isset($__backupCounts[$b['date']]))
+                                @php $__c = $__backupCounts[$b['date']]; @endphp
+                                <div class="bw-hint bw-backup-note">
                                     {{ $__c['nothing_booked'] }} of {{ $__c['matched'] }} matching {{ \Illuminate\Support\Str::plural('professional', $__c['matched']) }} have this day clear
                                 </div>
                             @endif
                         </div>
-                    @endfor
+                    @endforeach
+                </div>
+
+                <button type="button" class="bw-backup-add" data-bw-backup-add @if(count($__backups) >= $__max) hidden @endif>+ Add Another Backup Date</button>
+
+                <template data-bw-backup-tpl>
+                    <div class="bw-backup-row" data-bw-backup-row>
+                        <b class="bw-backup-n">Backup date <span data-n></span></b>
+                        <input type="date" data-f="date" min="{{ now()->toDateString() }}" aria-label="Backup date">
+                        <input type="time" data-f="start" aria-label="Start time">
+                        <input type="time" data-f="end" aria-label="End time (optional)">
+                        <button type="button" class="bw-backup-rm" data-bw-backup-rm>Remove</button>
+                    </div>
+                </template>
+
+                <div class="bw-note" style="margin-top:12px;">
+                    <b>One event, one date for all services</b>
+                    <p>Every service you hire must be for the same date and time. Professionals say which of your dates they can do when they send a proposal. If a proposal is for a different date from the one you have already accepted, you will be warned and cannot accept it.</p>
                 </div>
             </div>
+@push('scripts')
+<script>
+(function () {
+    const box = document.querySelector('[data-bw-backups]');
+    if (!box) return;
+    const rows = box.querySelector('[data-bw-backup-rows]');
+    const add = box.querySelector('[data-bw-backup-add]');
+    const tpl = box.querySelector('[data-bw-backup-tpl]');
+    const count = box.querySelector('[data-bw-backup-count]');
+    const max = +box.dataset.max;
+    const start = document.getElementById('av_start');
+    const end = document.getElementById('av_end');
+
+    // Names follow position, so the rows always post as 0, 1, 2 …
+    function renumber() {
+        const all = rows.querySelectorAll('[data-bw-backup-row]');
+        all.forEach(function (row, i) {
+            row.querySelector('[data-n]').textContent = i + 1;
+            row.querySelectorAll('input').forEach(function (inp) {
+                const f = inp.dataset.f || inp.name.replace(/^.*\[(\w+)\]$/, '$1');
+                inp.dataset.f = f;
+                inp.name = 'backup_dates[' + i + '][' + f + ']';
+            });
+        });
+        count.textContent = all.length + ' of ' + max + ' backup dates added';
+        add.hidden = all.length >= max;
+    }
+
+    add.addEventListener('click', function () {
+        const row = tpl.content.firstElementChild.cloneNode(true);
+        // A new backup starts on the preferred times; they can be changed.
+        if (start && start.value) row.querySelector('[data-f="start"]').value = start.value;
+        if (end && end.value) row.querySelector('[data-f="end"]').value = end.value;
+        rows.appendChild(row);
+        renumber();
+        row.querySelector('[data-f="date"]').focus();
+    });
+
+    rows.addEventListener('click', function (e) {
+        const rm = e.target.closest('[data-bw-backup-rm]');
+        if (!rm) return;
+        rm.closest('[data-bw-backup-row]').remove();
+        renumber();
+    });
+
+    renumber();
+})();
+</script>
+@endpush
 
             {{-- No time-zone picker.
                  The mockup has one, and for a marketplace that spanned zones it
@@ -1028,18 +1211,56 @@
 
             $isMulti  = count((array) ($data['services'] ?? [])) >= 2;
         @endphp
-        <h3>Review &amp; publish</h3>
-        <p class="lede">This is what professionals will see. You can edit any of it after publishing, right up until you choose someone.</p>
+        <h3>Review &amp; Submit</h3>
+        <p class="lede">Take a final look. Each section links back to its step, and anything that still needs fixing is marked. You can edit the request after publishing, right up until you choose someone.</p>
 
-        <div class="bw-rev"><span>Request type</span><b>BR. Open to bidding</b></div>
-        <div class="bw-rev"><span>Scope</span><b>{{ $isMulti ? 'MSR, multi-service' : 'SSR, single service' }}</b></div>
-        <div class="bw-rev"><span>Services</span><b>{{ $svcNames->implode(', ') ?: '—' }}</b></div>
-        @if(filled($data['service_missing'] ?? null))
-            <div class="bw-rev"><span>Also asked for</span><b>{{ $data['service_missing'] }}</b></div>
-        @endif
+        @php
+            $__issues = $reviewIssues ?? [];
+            $__edit = fn ($s) => route('client.bsr.step', ['step' => $s, 'return' => 'review']);
+            $__backs = \App\Domain\Requests\EventDates::normalize((array) ($data['backup_dates'] ?? []));
+            $__need = $data['location_need'] ?? null;
+            $__loc = match ($__need) {
+                \App\Domain\Requests\VenueRule::NEED => 'Need to find a venue · Preferred: ' . implode(', ', (array) ($data['preferred_locations'] ?? [])),
+                \App\Domain\Requests\VenueRule::UNSURE => 'Not sure yet · ' . ($data['location'] ?? 'no area given'),
+                default => ($data['location'] ?? '—') . (! empty($data['venue']) ? ' · ' . $data['venue'] : ''),
+            };
+            $__date = ! empty($data['starts_at'])
+                ? \Illuminate\Support\Carbon::parse($data['starts_at'])->format('D, M j, Y · g:i A') . (! empty($data['ends_at']) ? ' – ' . \Illuminate\Support\Carbon::parse($data['ends_at'])->format('g:i A') : '')
+                : 'Not set';
+            if ($__backs) {
+                $__date .= ' · Backups: ' . collect($__backs)->map(fn ($b) => \App\Domain\Requests\EventDates::label($b + ['primary' => false], false))->implode('; ');
+            }
+            $__rows = [
+                ['Event type', $data['event_type'] === ($otherEventType ?? null) ? ($data['event_title'] ?? 'Other') : ($data['event_type'] ?? '—'), 'service', 'service'],
+                ['Services (' . count((array) ($data['services'] ?? [])) . ')', ($isMulti ? 'MSR · ' : 'SSR · ') . ($svcNames->implode(', ') ?: '—') . (filled($data['service_missing'] ?? null) ? ' · Also asked for: ' . $data['service_missing'] : ''), 'service', 'service'],
+                ['Event location', $__loc, 'event', 'event'],
+                ['Event date & time', $__date, 'availability', 'availability'],
+                ['Guest count', ! empty($data['guest_count']) ? number_format($data['guest_count']) : 'Not stated', 'event', 'event'],
+                ['Event requirements', \Illuminate\Support\Str::limit((string) ($data['description'] ?? ''), 140) ?: 'Not written yet', 'requirements', 'requirements'],
+                ['Budget', (! empty($data['budget_min']) || ! empty($data['budget_max'])) ? '$' . number_format((float) ($data['budget_min'] ?? 0)) . ' – $' . number_format((float) ($data['budget_max'] ?? 0)) : 'Not stated', 'budget', 'budget'],
+                ['Proposal settings', (($data['sealed_proposals'] ?? true) ? 'Sealed bids' : 'Open bids') . ' · respond by ' . (! empty($data['proposal_deadline']) ? \Illuminate\Support\Carbon::parse($data['proposal_deadline'])->format('M j, Y') : ($defaultWindowHours ? $defaultWindowHours . ' hours after posting' : 'not set')), 'proposals', 'proposals'],
+                ['Files & attachments', $files->count() ? $files->count() . ' ' . \Illuminate\Support\Str::plural('file', $files->count()) . ' · ' . $files->pluck('file_name')->implode(', ') : 'None', 'files', 'files'],
+            ];
+            if ($asksFoodDelivery) {
+                array_splice($__rows, 5, 0, [['Food delivery', \App\Domain\Requests\FoodDelivery::label($data['delivery_mode'] ?? null) ?: 'Not answered', 'requirements', 'requirements']]);
+            }
+        @endphp
+
+        <div class="bw-revlist">
+            @foreach($__rows as [$__label, $__value, $__step, $__key])
+                @php $__bad = isset($__issues[$__key]) && in_array($__label, ['Services (' . count((array) ($data['services'] ?? [])) . ')', 'Event requirements', 'Event date & time'], true); @endphp
+                <div class="bw-revrow {{ $__bad ? 'is-bad' : '' }}">
+                    <span class="bw-revrow-l">{{ $__label }}</span>
+                    <span class="bw-revrow-v">{{ $__value }}</span>
+                    <a class="bw-revrow-e" href="{{ $__edit($__step) }}">Edit</a>
+                    <span class="bw-revrow-s" title="{{ $__bad ? 'Needs attention' : 'Looks good' }}">{{ $__bad ? '!' : '✓' }}</span>
+                </div>
+            @endforeach
+        </div>
+
         {{-- Written for them from the event type, area and month; this is
              the one place to rename it. Left blank, the automatic name stays. --}}
-        <div class="bw-rev bw-rev-name"><span>Name</span>
+        <div class="bw-rev bw-rev-name" style="margin-top:12px;"><span>Request name</span>
             <b data-bw-name>{{ old('title', $data['title'] ?? '') }}
                 <button type="button" class="bw-rename" data-bw-rename>Rename</button></b>
             <input type="text" name="title" value="{{ old('title', $data['title'] ?? '') }}" maxlength="200"
@@ -1062,37 +1283,20 @@
 })();
 </script>
 @endpush
-        <div class="bw-rev"><span>Event date</span><b>{{ ! empty($data['starts_at']) ? \Illuminate\Support\Carbon::parse($data['starts_at'])->format('M j, Y · g:i A') : 'Flexible' }}@if(! empty($data['ends_at'])) – {{ \Illuminate\Support\Carbon::parse($data['ends_at'])->format('g:i A') }}@endif</b></div>
-        @if(! empty($data['backup_dates']))
-            <div class="bw-rev"><span>Backup dates</span><b>{{ collect($data['backup_dates'])->map(fn ($d) => \Illuminate\Support\Carbon::parse($d)->format('M j, Y'))->implode(', ') }}</b></div>
-        @endif
-        <div class="bw-rev"><span>Location</span><b>{{ $data['location'] ?? '—' }}{{ ! empty($data['venue']) ? ' · ' . $data['venue'] : '' }}</b></div>
-        <div class="bw-rev"><span>Guests</span><b>{{ ! empty($data['guest_count']) ? number_format($data['guest_count']) : '—' }}</b></div>
-        @if($asksFoodDelivery)
-            <div class="bw-rev"><span>Food delivery</span><b>{{ \App\Domain\Requests\FoodDelivery::label($data['delivery_mode'] ?? null) ?: '—' }}</b></div>
-        @endif
-        <div class="bw-rev"><span>Budget</span><b>
-            @if(! empty($data['budget_min']) || ! empty($data['budget_max']))
-                ${{ number_format((float) ($data['budget_min'] ?? 0)) }} – ${{ number_format((float) ($data['budget_max'] ?? 0)) }}
-            @else Not stated @endif
-        </b></div>
-        <div class="bw-rev"><span>Proposal deadline</span><b>{{ ! empty($data['proposal_deadline']) ? \Illuminate\Support\Carbon::parse($data['proposal_deadline'])->format('M j, Y · g:i A') : ($defaultWindowHours ? 'Standard ' . $defaultWindowHours . '-hour window' : 'Not set') }}</b></div>
-        <div class="bw-rev"><span>Proposals</span><b>{{ ($data['sealed_proposals'] ?? true) ? 'Sealed' : 'Open' }} · questions {{ ($data['questions_enabled'] ?? true) ? 'allowed' : 'off' }}</b></div>
-        {{-- Named on the review too. A file the client attached three steps
-             back is part of what they are about to publish, and a summary that
-             omits it is a summary they cannot check. --}}
-        <div class="bw-rev"><span>Files</span><b>
-            @if($files->count())
-                {{ $files->count() }} attached · {{ $files->pluck('file_name')->implode(', ') }}
-            @else
-                None
-            @endif
-        </b></div>
 
-        @if(! empty($data['description']))
-            <div style="margin-top:16px;">
-                <label style="font-size:12.5px;font-weight:800;color:var(--text-primary);">Description</label>
-                <p style="font-size:13.5px;color:var(--text-secondary);line-height:1.7;white-space:pre-line;margin-top:6px;">{{ $data['description'] }}</p>
+        {{-- Anything still in the way, each with the way back to fix it.
+             Submitting is held until the list is empty, here and again on the
+             server. --}}
+        @if($__issues)
+            <div class="bw-note warn bw-issues" data-bw-issues>
+                <b>Action required before submitting</b>
+                <p>{{ count($__issues) }} {{ \Illuminate\Support\Str::plural('issue', count($__issues)) }} {{ count($__issues) === 1 ? 'needs' : 'need' }} to be fixed before this request can be submitted.</p>
+                @foreach($__issues as $__s => $__msg)
+                    <div class="bw-issue">
+                        <span>{{ $__msg }}</span>
+                        <a href="{{ $__edit($__s) }}">{{ $__s === 'service' ? 'Go to Service Selection' : 'Go to ' . ($steps[$__s] ?? 'that step') }} →</a>
+                    </div>
+                @endforeach
             </div>
         @endif
 
@@ -1112,8 +1316,8 @@
                 @if($prev)<a class="bw-btn" href="{{ route('client.bsr.step', $prev) }}">Back</a>@endif
                 <button type="submit" name="action" value="draft" class="bw-btn">Save draft</button>
             </div>
-            <button type="submit" name="action" value="next" class="bw-btn go">
-                {{ $step === 'review' ? 'Publish request' : 'Continue' }}
+            <button type="submit" name="action" value="next" class="bw-btn go" @if($step === 'review' && ! empty($reviewIssues)) disabled title="Fix the issues above to submit" @endif>
+                {{ $step === 'review' ? 'Submit Bidding Request' : 'Continue' }}
             </button>
         </div>
     </div>
@@ -1175,7 +1379,16 @@
               + (empty.length > 2 ? ' and ' + (empty.length - 2) + ' more' : '') + ' yet';
     }
 
-    box.addEventListener('change', function () { sync(); coverage(); });
+    const venueNote = document.querySelector('[data-bw-venue-added]');
+    const venueIds = venueNote ? venueNote.dataset.ids.split(',').filter(Boolean) : [];
+    function venue() {
+        if (!venueNote) return;
+        venueNote.hidden = !Array.from(box.querySelectorAll('.svc-item input:checked'))
+            .some(function (i) { return venueIds.indexOf(i.value) !== -1; });
+    }
+
+    box.addEventListener('change', function () { sync(); coverage(); venue(); });
+    venue();
     sync();
     coverage();
 

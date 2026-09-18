@@ -283,7 +283,9 @@ class RequestFilesTest extends TestCase
         $this->assertNull(RequestAttachment::first()->event_id);
 
         $this->actingAs($client)->post(route('client.bsr.save', 'files'));
-        $this->actingAs($client)->post(route('client.bsr.save', 'availability'));
+        $this->actingAs($client)->post(route('client.bsr.save', 'availability'), [
+            'event_date' => now()->addDays(45)->toDateString(), 'event_start_time' => '18:00',
+        ]);
         $this->actingAs($client)->post(route('client.bsr.save', 'review'), ['confirm' => 1]);
 
         $event = Event::where('client_id', $client->id)->latest('id')->first();

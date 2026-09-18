@@ -28,6 +28,7 @@ final class Award
         RegulatedAcceptance::ensure($bid);
 
         self::ensureServiceIsFree($bid);
+        self::ensureSameDate($bid);
 
         return Finalization::firstOrCreate(
             ['event_id' => $bid->event_id, 'supplier_id' => $bid->supplier_id, 'category_id' => $bid->category_id],
@@ -72,7 +73,56 @@ final class Award
 
         $f->bid?->update(['status' => 'won']);
 
+        if ($f->bid) {
+            self::moveToChosenDate($f->bid);
+        }
+
         return $booking;
+    }
+
+    /**
+     * Every service on one date. A proposal for a different day from one
+     * already accepted on this request cannot be accepted.
+     */
+    private static function ensureSameDate(Bid $bid): void
+    {
+        if (ProposalDate::check($bid) === ProposalDate::MISMATCH) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'bid' => ProposalDate::warning(ProposalDate::MISMATCH, $bid->event?->starts_at, $bid->supplier?->name, $bid),
+            ]);
+        }
+    }
+
+    /**
+     * The first booking made on one of the client's backup dates moves the
+     * request to that date: the start and end become that option's, and the
+     * old preferred date becomes a backup, so nothing the client offered is
+     * lost.
+     */
+    private static function moveToChosenDate(Bid $bid): void
+    {
+        $event = $bid->event;
+        $o = EventDates::option($event, ProposalDate::dayOf($bid));
+
+        if (! $o || $o['primary']) {
+            return;
+        }
+
+        $old = EventDates::options($event)[0];
+        $backups = collect(EventDates::options($event))
+            ->where('primary', false)
+            ->reject(fn ($b) => $b['date'] === $o['date'])
+            ->map(fn ($b) => ['date' => $b['date'], 'start' => $b['start'], 'end' => $b['end']])
+            ->push(['date' => $old['date'], 'start' => $old['start'], 'end' => $old['end']])
+            ->sortBy('date')->values()->all();
+
+        $start = \Illuminate\Support\Carbon::parse($o['date'] . ' ' . ($o['start'] ?: '00:00'));
+        $end = $o['end'] ? \Illuminate\Support\Carbon::parse($o['date'] . ' ' . $o['end']) : null;
+        if ($end && $end->lessThanOrEqualTo($start)) {
+            $end->addDay();
+        }
+
+        $event->forceFill(['starts_at' => $start, 'ends_at' => $end, 'backup_dates' => $backups])->save();
     }
 
     /**

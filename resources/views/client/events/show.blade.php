@@ -94,6 +94,24 @@
         .ev-date.is-unconfirmed { background: #fef3c7; color: #b45309; }
         .ev-date.is-clash { background: #fee2e2; color: #b91c1c; }
         .ev-date.is-no_date { background: var(--bg-muted, #f3f4f6); color: var(--text-muted); }
+        .ev-date.is-different { background: #fef3c7; color: #b45309; }
+        .ev-date.is-mismatch { background: #fee2e2; color: #b91c1c; }
+        .ev-progress { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin-bottom: 12px; }
+        .ev-progress > div { border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 14px; display: flex; flex-direction: column; gap: 3px; }
+        .ev-progress b { font-size: 13.5px; color: var(--text-primary); }
+        .ev-progress-c b { font-size: 22px; color: #15803d; }
+        .ev-progress span, .ev-progress details { font-size: 12.5px; color: var(--text-secondary); }
+        .ev-progress summary { cursor: pointer; font-weight: 700; color: #1d4ed8; margin-top: 3px; }
+        .ev-prop-id { font-size: 11.5px; font-weight: 700; color: var(--text-muted); margin-left: 6px; }
+        .ev-pstatus { font-size: 10.5px; font-weight: 800; border-radius: 999px; padding: 1px 8px; margin-left: 6px; vertical-align: middle; }
+        .ev-pstatus.is-info { background: #dbeafe; color: #1d4ed8; }
+        .ev-pstatus.is-ok { background: #dcfce7; color: #15803d; }
+        .ev-pstatus.is-no { background: var(--bg-muted, #f3f4f6); color: var(--text-muted); }
+        .ev-reply { margin-top: 8px; text-align: left; white-space: normal; }
+        .ev-reply summary { cursor: pointer; font-size: 12.5px; font-weight: 700; color: #1d4ed8; text-align: right; list-style: none; }
+        .ev-reply form { margin-top: 6px; display: flex; flex-direction: column; gap: 6px; min-width: 260px; }
+        .ev-reply textarea, .ev-reply input { border: 1px solid var(--border-color); border-radius: 8px; padding: 7px 9px; font: inherit; font-size: 12.5px; background: var(--bg-card); color: var(--text-primary); }
+        .ev-reply input { width: 150px; }
         .ev-won { font-size: 12px; font-weight: 800; color: #15803d; padding: 5px 10px; border-radius: 8px; background: rgba(22,163,74,.1); }
 
         /* Questions + activity + empty */
@@ -186,22 +204,34 @@
             </div>
         </div>
 
+        {{-- Sir Peter's request header: the date and times, where, how many
+             services, the budget range, and a reference the client can quote. --}}
         <div class="ev-meta">
             @if($event->starts_at)
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>{{ $event->starts_at->format('M d, Y · g:i A') }}</div>
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>{{ $event->starts_at->format('D, M j, Y · g:i A') }}@if($event->ends_at && $event->ends_at->gt($event->starts_at)) – {{ $event->ends_at->format('g:i A') }}@endif</div>
             @endif
-            @if($event->location)
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>{{ $event->location }}</div>
+            @if($event->location || $event->location_need === \App\Domain\Requests\VenueRule::NEED)
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    @if($event->location_need === \App\Domain\Requests\VenueRule::NEED)
+                        {{ implode(', ', (array) $event->preferred_locations) ?: $event->location }} (need to find a venue)
+                    @else
+                        {{ $event->location }}
+                    @endif
+                </div>
             @endif
-            @if($event->budget)
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>${{ number_format($event->budget, 2) }}</div>
+            <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>{{ $event->categories->count() }} {{ \Illuminate\Support\Str::plural('service', $event->categories->count()) }}</div>
+            @if($event->budget_min || $event->budget_max)
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Budget: ${{ number_format((float) $event->budget_min) }} – ${{ number_format((float) $event->budget_max) }}</div>
+            @elseif($event->budget)
+                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Budget: ${{ number_format((float) $event->budget) }}</div>
             @endif
             @if($event->guest_count)
                 <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>{{ number_format($event->guest_count) }} guests</div>
             @endif
+            <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Request ID: <b style="margin-left:4px;">{{ $event->reference() }}</b></div>
         </div>
 
-        @if($event->locationPlacementFailed())
+        @if($event->locationPlacementFailed() && $event->location_need !== \App\Domain\Requests\VenueRule::NEED)
             <div style="margin-top:14px;padding:14px 16px;border:1px solid #fdba74;background:#fff7ed;border-radius:12px;">
                 <div style="font-weight:800;color:#9a3412;margin-bottom:4px;">We could not place this location</div>
                 <p style="margin:0;font-size:13.5px;color:#7c2d12;">Professionals cannot be matched by travel distance until you enter a street, venue, or a more specific ZIP. This is not the same as having no professionals available.</p>
@@ -635,7 +665,7 @@
                 @endif
                 <div class="ev-req-row"><span>Event date</span><b>{{ $event->starts_at?->format('M j, Y · g:i A') ?? 'Flexible' }}</b></div>
                 @if(! empty($event->backup_dates))
-                    <div class="ev-req-row"><span>Backup dates</span><b>{{ collect($event->backup_dates)->map(fn ($d) => \Illuminate\Support\Carbon::parse($d)->format('M j, Y'))->implode(', ') }}</b></div>
+                    <div class="ev-req-row"><span>Backup dates</span><b>{{ collect(\App\Domain\Requests\EventDates::options($event))->where('primary', false)->map(fn ($o) => \App\Domain\Requests\EventDates::label($o, false))->implode('; ') }}</b></div>
                 @endif
                 <div class="ev-req-row"><span>Location</span><b>{{ $event->location ?: '—' }}</b></div>
                 <div class="ev-req-row"><span>Guest count</span><b>{{ $event->guest_count ? number_format($event->guest_count) : '—' }}</b></div>
@@ -677,6 +707,38 @@
             </div>
 
             <div class="ev-sealed"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> <span><b>Sealed proposals.</b> Each amount is visible only to you and the professional who sent it. Competitors cannot see each other's bids.</span></div>
+
+            {{-- Event progress and the date, as on Sir Peter's proposals page:
+                 how many services have proposals and how many are accepted,
+                 then the date every service must share, with the backups. --}}
+            @php
+                $__svcRows = $coverage->filter(fn ($r) => $r['service']);
+                $__withBids = $__svcRows->where('state', '!=', 'open')->count();
+                $__accepted = $__svcRows->where('state', 'awarded')->count();
+                $__total = max(1, $__svcRows->count());
+                $__opts = \App\Domain\Requests\EventDates::options($event);
+                $__locked = \App\Domain\Requests\ProposalDate::lockedDate($event);
+            @endphp
+            <div class="ev-progress">
+                <div class="ev-progress-c">
+                    <b>{{ (int) round($__withBids / $__total * 100) }}%</b>
+                    <span>{{ $__withBids }} of {{ $__svcRows->count() }} {{ Str::plural('service', $__svcRows->count()) }} have proposals · {{ $__accepted }} accepted · {{ $__svcRows->count() - $__withBids }} waiting</span>
+                </div>
+                @if($__opts)
+                    <div class="ev-progress-d">
+                        <b>{{ $__locked ? 'Event date (set by an accepted service)' : 'Preferred date' }}</b>
+                        <span>{{ \App\Domain\Requests\EventDates::label($__opts[0]) }}</span>
+                        @if(count($__opts) > 1)
+                            <details>
+                                <summary>View all date options</summary>
+                                @foreach($__opts as $o)
+                                    <div>{{ \App\Domain\Requests\EventDates::label($o) }} {{ $o['primary'] ? '(preferred)' : '(backup)' }}</div>
+                                @endforeach
+                            </details>
+                        @endif
+                    </div>
+                @endif
+            </div>
 
             {{-- Sir Peter, 17 Sep: on a multi-service request, say which
                  services are covered and which are not, before the detail. --}}
@@ -727,7 +789,7 @@
                     @endif
 
                     @if($row['booking'])
-                        <div class="ev-svc-booked">✓ Booked with <b>{{ $row['booking']->supplier->name ?? 'a professional' }}</b>. The other proposals for this service can no longer be chosen.</div>
+                        <div class="ev-svc-booked">✓ Booked with <b>{{ rtrim($row['booking']->supplier->name ?? 'a professional', '.') }}</b>. The other proposals for this service can no longer be chosen.</div>
                     @endif
 
                     @forelse($row['bids'] as $bid)
@@ -736,21 +798,40 @@
                             $__date = $bidDates[$bid->id] ?? 'no_date';
                             $__won = $row['booking'] && (int) $row['booking']->supplier_id === (int) $bid->supplier_id;
                             $__warn = \App\Domain\Requests\ProposalDate::needsWarning($__date)
-                                ? \App\Domain\Requests\ProposalDate::warning($__date, $event->starts_at, $sup?->name)
+                                ? \App\Domain\Requests\ProposalDate::warning($__date, $event->starts_at, $sup?->name, $bid)
                                 : null;
+                            $__blocked = \App\Domain\Requests\ProposalDate::blocks($__date);
+                            $__rating = $sup ? $sup->reviewsReceived->where('is_hidden', false)->avg('rating') : null;
+                            $__ratingN = $sup ? $sup->reviewsReceived->where('is_hidden', false)->count() : 0;
+                            $__status = match (true) {
+                                $__won => ['Accepted', 'ok'],
+                                in_array($bid->status, ['declined'], true) => ['Declined', 'no'],
+                                in_array($bid->status, ['withdrawn'], true) => ['Withdrawn', 'no'],
+                                $bid->replies->isNotEmpty() => ['Replied', 'info'],
+                                default => ['New', 'info'],
+                            };
                         @endphp
                         <div class="ev-prop">
                             <div style="min-width:0;">
-                                <div style="font-size:14.5px;font-weight:800;color:var(--text-primary);">{{ $sup?->name ?? 'Professional' }}</div>
+                                <div style="font-size:14.5px;font-weight:800;color:var(--text-primary);">
+                                    {{ $sup?->name ?? 'Professional' }}
+                                    @if($sup?->public_id)<span class="ev-prop-id">{{ \App\Support\GigResourceId::display($sup->public_id) }}</span>@endif
+                                    <span class="ev-pstatus is-{{ $__status[1] }}">{{ $__status[0] }}</span>
+                                </div>
                                 <div class="ev-prop-meta">
+                                    @if($__ratingN)<span>★ {{ number_format($__rating, 1) }} ({{ $__ratingN }} {{ Str::plural('review', $__ratingN) }})</span>@else<span>No reviews yet</span>@endif
                                     @if($prof?->headline)<span>{{ $prof->headline }}</span>@endif
                                     @if($prof?->city)<span>{{ $prof->city }}</span>@endif
                                     @if(! $__multi && $bid->category)<span>{{ $bid->category->name }}</span>@endif
                                     <span>Submitted {{ $bid->created_at->humanAgo() }}</span>
                                 </div>
-                                <div class="ev-date is-{{ $__date }}">{{ \App\Domain\Requests\ProposalDate::label($__date, $event->starts_at) }}</div>
+                                <div class="ev-date is-{{ $__date }}">{{ \App\Domain\Requests\ProposalDate::label($__date, $event->starts_at, $bid) }}</div>
                                 @if($bid->availability_note)<p class="ev-prop-note">On timing: {{ $bid->availability_note }}</p>@endif
-                                @if($bid->note)<p class="ev-prop-note">{{ $bid->note }}</p>@endif
+                                @if($bid->note)<p class="ev-prop-note">"{{ $bid->note }}"</p>@endif
+                                @if($bid->replies->isNotEmpty())
+                                    @php $__last = $bid->replies->last(); @endphp
+                                    <p class="ev-prop-note" style="font-size:12px;color:var(--text-muted);">Last reply from {{ $__last->user?->name ?? 'someone' }} {{ $__last->created_at->humanAgo() }}@if($__last->counter_amount) · countered at ${{ number_format($__last->counter_amount) }}@endif</p>
+                                @endif
                             </div>
                             <div style="text-align:right;white-space:nowrap;">
                                 <div style="font-size:19px;font-weight:800;color:var(--text-primary);">${{ number_format($bid->amount) }}</div>
@@ -766,14 +847,39 @@
                                     @elseif(! $row['booking'] && ! in_array($bid->status, ['declined', 'withdrawn'], true))
                                         {{-- Accepting one service never touches the others:
                                              each is agreed on its own. A date that does not
-                                             hold asks once more before going ahead. --}}
-                                        <form method="POST" action="{{ route('client.finalize.start', $bid) }}"
-                                              @if($__warn) onsubmit="return confirm(@js($__warn . ' Continue anyway?'));" @endif>
+                                             hold asks once more before going ahead, and one
+                                             for a different day from a service already
+                                             accepted cannot be accepted at all. --}}
+                                        @if($__blocked)
+                                            <span class="ev-won" style="background:#fee2e2;color:#b91c1c;" title="{{ $__warn ?? \App\Domain\Requests\ProposalDate::warning($__date, $event->starts_at, $sup?->name, $bid) }}">Different date</span>
+                                        @else
+                                            <form method="POST" action="{{ route('client.finalize.start', $bid) }}"
+                                                  @if($__warn) onsubmit="return confirm(@js($__warn . ' Continue anyway?'));" @endif>
+                                                @csrf
+                                                <button type="submit" class="cl-btn cl-btn-primary cl-btn-sm">Accept</button>
+                                            </form>
+                                        @endif
+                                        <form method="POST" action="{{ route('client.proposals.decline', $bid) }}"
+                                              onsubmit="return confirm('Decline this proposal?');">
                                             @csrf
-                                            <button type="submit" class="cl-btn cl-btn-primary cl-btn-sm">Select &amp; finalize</button>
+                                            <button type="submit" class="cl-btn cl-btn-ghost cl-btn-sm">Decline</button>
                                         </form>
                                     @endif
                                 </div>
+                                @if(! $__won && ! in_array($bid->status, ['declined', 'withdrawn'], true))
+                                    {{-- Reply: a question or a counter-offer, on this proposal's own thread. --}}
+                                    <details class="ev-reply">
+                                        <summary>Reply</summary>
+                                        <form method="POST" action="{{ route('client.proposals.reply', $bid) }}">
+                                            @csrf
+                                            <textarea name="note" rows="2" maxlength="1000" placeholder="Ask a question or explain a counter-offer" aria-label="Reply to {{ $sup?->name }}"></textarea>
+                                            <div style="display:flex;gap:6px;align-items:center;justify-content:flex-end;">
+                                                <input type="number" name="counter_amount" min="1" placeholder="Counter $ (optional)" aria-label="Counter amount">
+                                                <button type="submit" class="cl-btn cl-btn-primary cl-btn-sm">Send</button>
+                                            </div>
+                                        </form>
+                                    </details>
+                                @endif
                             </div>
                         </div>
                     @empty

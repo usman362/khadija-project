@@ -117,7 +117,8 @@
     .pr-svcdate { display: inline-block; margin-top: 3px; font-size: 10px; font-weight: 700; border-radius: 999px; padding: 1px 7px; background: var(--bg-muted, #f3f4f6); color: var(--text-muted); }
     .pr-svcdate.is-confirmed { background: #dcfce7; color: #15803d; }
     .pr-svcdate.is-unconfirmed { background: #fef3c7; color: #b45309; }
-    .pr-svcdate.is-clash { background: #fee2e2; color: #b91c1c; }
+    .pr-svcdate.is-clash, .pr-svcdate.is-mismatch { background: #fee2e2; color: #b91c1c; }
+    .pr-svcdate.is-different { background: #fef3c7; color: #b45309; }
     @media (max-width: 1200px) { .pr-layout { grid-template-columns: 1fr; } .pr-rail { position: static; } .pr-stats { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 700px) { .pr-stats { grid-template-columns: repeat(2, 1fr); } .pr-table { font-size: 11px; } }
 </style>
@@ -249,7 +250,7 @@
                             <td>
                                 @php $__date = \App\Domain\Requests\ProposalDate::check($p); @endphp
                                 <div class="pr-svc">{{ $p->category->name ?? 'Whole request' }}</div>
-                                <div class="pr-svcdate is-{{ $__date }}">{{ \App\Domain\Requests\ProposalDate::label($__date, $p->event?->starts_at) }}</div>
+                                <div class="pr-svcdate is-{{ $__date }}">{{ \App\Domain\Requests\ProposalDate::label($__date, $p->event?->starts_at, $p) }}</div>
                             </td>
                             <td>
                                 <div class="pr-ec">
@@ -282,6 +283,9 @@
                                     @endphp
                                     @if($__taken)
                                         <span class="pr-taken" title="Booked with {{ $__held->supplier?->name }}">Service booked</span>
+                                    @elseif($pipe === 'pending' && \App\Domain\Requests\ProposalDate::blocks($__date))
+                                        {{-- Every service on one date: this one is for a different day. --}}
+                                        <span class="pr-taken" title="{{ \App\Domain\Requests\ProposalDate::warning($__date, $p->event?->starts_at, $p->supplier?->name, $p) }}">Different date</span>
                                     @elseif($pipe === 'pending')
                                         {{-- Into the agreement, like Compare and the chat: scope,
                                              price, schedule, contract and the fee before a booking. --}}

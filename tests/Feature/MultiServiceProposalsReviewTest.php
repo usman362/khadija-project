@@ -226,7 +226,7 @@ class MultiServiceProposalsReviewTest extends TestCase
 
         $html = $this->proposalsTab();
         $this->assertStringContainsString('Confirmed for ' . $this->event->starts_at->format('M j, Y'), $html);
-        $this->assertStringContainsString('Has not confirmed ' . $this->event->starts_at->format('M j, Y'), $html);
+        $this->assertStringContainsString('Has not confirmed a date', $html);
     }
 
     /** Already booked elsewhere that day outranks the tick they gave. */
@@ -256,7 +256,7 @@ class MultiServiceProposalsReviewTest extends TestCase
         $this->actingAs($this->client)
             ->get(route('client.finalize.step', [$fin, 'bid']))
             ->assertOk()
-            ->assertSee('Glow Booth has not confirmed they are free on', false);
+            ->assertSee('Glow Booth has not confirmed they can do your date', false);
     }
 
     public function test_an_event_with_no_date_has_nothing_to_check(): void

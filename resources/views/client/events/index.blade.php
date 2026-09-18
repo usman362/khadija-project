@@ -95,6 +95,15 @@
     .mg-status-in_progress { background: rgba(99,102,241,0.15); color: var(--accent-text); }
     .mg-status-not_started, .mg-status-not_scheduled { background: var(--border-color); color: var(--text-muted); }
     .mg-status-cancelled   { background: rgba(239,68,68,0.15); color: var(--bad-text); }
+    .mg-status-open        { background: rgba(245,158,11,0.18); color: var(--warn-text); }
+    .mg-status-booked, .mg-status-completed, .mg-status-paid { background: rgba(16,185,129,0.15); color: var(--ok-text); }
+    .mg-status-past, .mg-status-draft { background: var(--border-color); color: var(--text-muted); }
+    .mg-status-partial     { background: rgba(99,102,241,0.15); color: var(--accent-text); }
+    .mg-status-overdue     { background: rgba(239,68,68,0.15); color: var(--bad-text); }
+    .mg-row-view { display: inline-block; font-size: 12px; font-weight: 700; color: var(--brand-text); text-decoration: none; padding: 5px 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-right: 4px; }
+    .mg-row-view:hover { border-color: #f97316; }
+    .mg-rail-note { font-size: 12px; line-height: 1.5; color: var(--text-muted); }
+    .mg-rail-note b { color: var(--text-primary); }
     .mg-row-kebab { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 16px; padding: 2px 6px; }
     .mg-row-kebab:hover { color: var(--brand-text); }
     /* Row "more actions" menu — the kebab used to be a bare link to the event,
@@ -532,20 +541,20 @@
                             <div><div class="mg-stat-label">Total Events</div><div class="mg-stat-value">{{ $stats['total'] }}</div><div class="mg-stat-delta flat">All time</div></div>
         </div>
         <div class="mg-stat">
-            <div class="mg-stat-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div><div class="mg-stat-label">Booked</div><div class="mg-stat-value">{{ $stats['confirmed'] }}</div><div class="mg-stat-delta flat">Events with a pro hired</div></div>
+            <div class="mg-stat-ico amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div><div class="mg-stat-label">Open</div><div class="mg-stat-value">{{ $stats['list_open'] }}</div><div class="mg-stat-delta flat">Taking proposals</div></div>
         </div>
         <div class="mg-stat">
-            <div class="mg-stat-ico amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-            <div><div class="mg-stat-label">Open</div><div class="mg-stat-value">{{ $stats['open'] }}</div><div class="mg-stat-delta flat">Taking proposals</div></div>
+            <div class="mg-stat-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div><div class="mg-stat-label">In Progress</div><div class="mg-stat-value">{{ $stats['list_in_progress'] }}</div><div class="mg-stat-delta flat">Professionals booked</div></div>
         </div>
         <div class="mg-stat">
             <div class="mg-stat-ico indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg></div>
             <div><div class="mg-stat-label">Completed</div><div class="mg-stat-value">{{ $stats['completed'] }}</div><div class="mg-stat-delta flat">Events finished</div></div>
         </div>
         <div class="mg-stat">
-            <div class="mg-stat-ico purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-            <div><div class="mg-stat-label">Total Spent</div><div class="mg-stat-value">${{ number_format($totalSpent, 0) }}</div><div class="mg-stat-delta flat">On completed events</div></div>
+            <div class="mg-stat-ico purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="14" x2="15" y2="20"/><line x1="15" y1="14" x2="9" y2="20"/></svg></div>
+            <div><div class="mg-stat-label">Past Events</div><div class="mg-stat-value">{{ $stats['list_past'] }}</div><div class="mg-stat-delta flat">Date has passed</div></div>
         </div>
     </div>
 
@@ -558,10 +567,16 @@
         @if(request('period'))<input type="hidden" name="period" value="{{ request('period') }}">@endif
         {{-- requestSubmit, not submit(): submit() skips the submit event,
              so nothing listening could keep this on the page. --}}
-        <select name="status" class="mg-filter-select" onchange="this.form.requestSubmit()" aria-label="All Events">
-            <option value="">All Events</option>
+        <select name="status" class="mg-filter-select" onchange="this.form.requestSubmit()" aria-label="All Statuses">
+            <option value="">All Statuses</option>
             @foreach ($statuses as $key => $label)
                 <option value="{{ $key }}" {{ request('status') === $key ? 'selected' : '' }}>{{ $label }}</option>
+            @endforeach
+        </select>
+        <select name="type" class="mg-filter-select" onchange="this.form.requestSubmit()" aria-label="All Event Types">
+            <option value="">All Event Types</option>
+            @foreach ($eventTypeOptions as $typeOpt)
+                <option value="{{ $typeOpt }}" @selected(request('type') === $typeOpt)>{{ $typeOpt }}</option>
             @endforeach
         </select>
         <div class="mg-filter-search-wrap">
@@ -572,8 +587,11 @@
         {{-- Was a second submit button with nothing behind it. It opens the
              filters the row has no room for: service and when. --}}
         <button type="button" class="mg-filter-btn" data-filter-toggle aria-expanded="{{ $moreFilters ? 'true' : 'false' }}" aria-controls="mgFilterPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filters @if($moreFilters)<span class="mg-filter-count">{{ $moreFilters }}</span>@endif</button>
+        @if(request()->hasAny(['search', 'status', 'type', 'category', 'when']))
+            <a href="{{ route('client.events.index') }}" class="mg-filter-btn">Reset</a>
+        @endif
         {{-- Was a button with no handler. Downloads exactly what is listed. --}}
-        <a href="{{ route('client.events.export', request()->only(['search', 'status', 'category', 'when'])) }}" class="mg-filter-btn" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</a>
+        <a href="{{ route('client.events.export', request()->only(['search', 'status', 'type', 'category', 'when'])) }}" class="mg-filter-btn" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</a>
         {{-- The only Post an Event on the page. It said "Create Master List",
              a thing this product has never had. --}}
         <a href="{{ route('client.post-event.choose') }}" class="mg-filter-btn coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Post an Event</a>
@@ -596,7 +614,7 @@
                 </select>
             </label>
             <button type="submit" class="mg-filter-btn coral">Apply</button>
-            @if(request()->hasAny(['search', 'status', 'category', 'when']))
+            @if(request()->hasAny(['search', 'status', 'type', 'category', 'when']))
                 <a href="{{ route('client.events.index') }}" class="mg-filter-clear">Clear all</a>
             @endif
         </div>
@@ -618,14 +636,13 @@
                 <table class="mg-table">
                     <thead>
                         <tr>
-                            <th style="padding-left:18px;">Event Name</th>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Pros Needed</th>
+                            <th style="padding-left:18px;">Event</th>
+                            <th>Date &amp; Time</th>
+                            <th>Type</th>
+                            <th>Proposals</th>
                             <th>Confirmed</th>
-                            <th>Pending</th>
                             <th>Status</th>
-                            <th>Budget / Spent</th>
+                            <th>Budget</th>
                             <th style="padding-right:18px;"></th>
                         </tr>
                     </thead>
@@ -633,30 +650,39 @@
                         @forelse($events as $event)
                             @php
                                 $bk = $event->bookings ?? collect();
-                                // One professional per service asked for. It was
-                                // the number of bookings — i.e. how many had
-                                // already answered, not how many were needed.
-                                $needed    = $event->categories->count() ?: '—';
-                                $confirmed = $bk->where('status', 'confirmed')->count();
-                                $pending   = $bk->where('status', 'requested')->count();
-                                $budget    = $event->budget ?? 0;
-                                // bookings.price — total_amount and agreed_price
-                                // never existed, which is why this read $0.
-                                $spent     = $bk->where('status', 'completed')->sum('price');
+                                // Confirmed out of the services asked for: one
+                                // professional per service.
+                                $needed    = $event->categories->count();
+                                $confirmed = $bk->whereIn('status', ['confirmed', 'completed'])->count();
+                                $stageKey  = $event->listStage();
+                                $where     = $event->location_need === \App\Domain\Requests\VenueRule::NEED && $event->preferred_locations
+                                    ? implode(', ', $event->preferred_locations) . ' (finding a venue)'
+                                    : ($event->venue ?: $event->location);
                             @endphp
                             <tr>
                                 <td style="padding-left:18px;">
-                                    <div class="ev-name">{{ $event->title }}</div>
-                                    <div class="ev-sub">{{ $event->starts_at?->format('M d, Y') ?? 'No date' }}@if($event->starts_at) · {{ $event->starts_at->format('g:i A') }}@endif</div>
+                                    <a href="{{ route('client.events.show', $event) }}" class="ev-name" style="text-decoration:none;color:inherit;">{{ $event->title }}</a>
+                                    <div class="ev-sub">{{ $where ?: 'Location not set' }}</div>
                                 </td>
-                                <td>{{ $event->starts_at?->format('M d, Y') ?? '—' }}</td>
-                                <td>{{ $event->starts_at?->format('g:i A') ?? '—' }}@if($event->ends_at) – {{ $event->ends_at->format('g:i A') }}@endif</td>
-                                <td class="num">{{ $needed }}</td>
-                                <td class="num" style="color:var(--ok-text);">{{ $confirmed }}</td>
-                                <td class="num" style="color:var(--warn-text);">{{ $pending }}</td>
-                                <td><span class="mg-status-pill mg-status-{{ $event->status }}">{{ ucfirst(str_replace('_', ' ', $event->status)) }}</span></td>
-                                <td style="white-space:nowrap;font-weight:600;color:var(--text-primary);">${{ number_format($budget, 0) }} / ${{ number_format($spent, 0) }}</td>
-                                <td style="padding-right:18px;text-align:right;">
+                                <td style="white-space:nowrap;">
+                                    {{ $event->starts_at?->format('M j, Y') ?? 'No date yet' }}
+                                    @if($event->starts_at)<div class="ev-sub">{{ $event->starts_at->format('g:i A') }}@if($event->ends_at && $event->ends_at->gt($event->starts_at)) – {{ $event->ends_at->format('g:i A') }}@endif</div>@endif
+                                </td>
+                                <td>{{ $event->event_type ?: '—' }}</td>
+                                <td class="num">{{ $event->bids_count }}</td>
+                                <td class="num" style="color:var(--ok-text);">{{ $confirmed }}@if($needed) / {{ $needed }}@endif</td>
+                                <td><span class="mg-status-pill mg-status-{{ $stageKey }}">{{ \App\Models\Event::LIST_STAGES[$stageKey] ?? ucfirst($stageKey) }}</span></td>
+                                <td style="white-space:nowrap;font-weight:600;color:var(--text-primary);">
+                                    @if($event->budget_min && $event->budget_max)
+                                        ${{ number_format($event->budget_min, 0) }} – ${{ number_format($event->budget_max, 0) }}
+                                    @elseif($event->budget)
+                                        ${{ number_format($event->budget, 0) }}
+                                    @else
+                                        <span style="color:var(--text-muted);font-weight:500;">Not set</span>
+                                    @endif
+                                </td>
+                                <td style="padding-right:18px;text-align:right;white-space:nowrap;">
+                                    <a href="{{ route('client.events.show', $event) }}" class="mg-row-view">View</a>
                                     <div class="mg-menu" data-row-menu>
                                         <button type="button" class="mg-row-kebab" aria-haspopup="true" aria-expanded="false" title="More actions">⋯</button>
                                         <div class="mg-menu-pop" data-row-menu-pop>
@@ -674,7 +700,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);">@if(request()->hasAny(['search', 'status', 'category', 'when']))No events match these filters. <a href="{{ route('client.events.index') }}">Clear filters</a>@else No events yet. Click <b>Post an Event</b> to get started.@endif</td></tr>
+                            <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);">@if(request()->hasAny(['search', 'status', 'type', 'category', 'when']))No events match these filters. <a href="{{ route('client.events.index') }}">Clear filters</a>@else No events yet. Click <b>Post an Event</b> to get started.@endif</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -714,30 +740,31 @@
             <div data-subpane="payments" hidden>
                 <div style="overflow-x:auto;">
                     <table class="mg-table">
-                        <thead><tr><th style="padding-left:18px;">Professional</th><th>Event</th><th>Amount</th><th style="padding-right:18px;">Payment</th></tr></thead>
+                        <thead><tr><th style="padding-left:18px;">Professional</th><th>Event</th><th>Amount</th><th>Paid</th><th>Due Date</th><th>Status</th><th style="padding-right:18px;"></th></tr></thead>
                         <tbody>
-                            @forelse($bookings as $b)
-                                @php
-                                    $pay = match (true) {
-                                        $b->status === 'completed' => ['Paid', 'completed'],
-                                        in_array($b->status, \App\Domain\Finance\ClientTotals::VOID_STATUSES, true) => ['Cancelled. Nothing owed', 'cancelled'],
-                                        $b->event?->starts_at && $b->event->starts_at->isPast() => ['Overdue', 'cancelled'],
-                                        $b->status === 'confirmed' => ['Agreed, not yet paid', 'pending'],
-                                        default => ['Awaiting professional', 'pending'],
-                                    };
-                                @endphp
+                            @forelse($payRows as $r)
                                 <tr>
-                                    <td style="padding-left:18px;"><div class="ev-name">{{ $b->supplier?->name ?? 'Professional' }}</div></td>
-                                    <td>{{ $b->event?->title ?? '—' }}</td>
-                                    <td style="font-weight:600;color:var(--text-primary);">{{ $b->price !== null ? '$' . number_format((float) $b->price, 0) : '—' }}</td>
-                                    <td style="padding-right:18px;"><span class="mg-status-pill mg-status-{{ $pay[1] }}">{{ $pay[0] }}</span></td>
+                                    <td style="padding-left:18px;"><div class="ev-name">{{ $r['professional'] }}</div>@if($r['service'])<div class="ev-sub">{{ $r['service'] }}</div>@endif</td>
+                                    <td>{{ $r['event'] ?? '—' }}@if($r['date'])<div class="ev-sub">{{ $r['date']->format('M j, Y') }}</div>@endif</td>
+                                    <td style="font-weight:600;color:var(--text-primary);">{{ $r['amount'] !== null ? '$' . number_format($r['amount'], 0) : 'Not set' }}</td>
+                                    <td>${{ number_format($r['paid'], 0) }}</td>
+                                    <td>{{ $r['due']?->format('M j, Y') ?? '—' }}</td>
+                                    <td>
+                                        <span class="mg-status-pill mg-status-{{ $r['status'] }}">{{ $r['label'] }}</span>
+                                        @if($r['overdue'])<span class="mg-status-pill mg-status-overdue">Overdue</span>@endif
+                                    </td>
+                                    <td style="padding-right:18px;text-align:right;white-space:nowrap;">
+                                        @if($r['pay_url'])<a href="{{ $r['pay_url'] }}" class="mg-row-view" style="background:#f97316;border-color:#f97316;color:#fff;">Pay Now</a>@endif
+                                        @if($r['view_url'])<a href="{{ $r['view_url'] }}" class="mg-row-view">View</a>@endif
+                                    </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted);">Nothing to pay yet.</td></tr>
+                                <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">Nothing to pay yet. Payments show here once you accept a proposal.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
+                <p class="mg-rail-note" style="padding:10px 18px 14px;margin:0;">Overdue shows only when an amount is set and its due date has passed.</p>
             </div>
         </div>
 
@@ -1155,6 +1182,12 @@
             </div>
         </div>
 
+        {{-- Past Event Status: how an event gets there. --}}
+        <div class="mg-rail-card">
+            <div class="mg-rail-head"><div class="mg-rail-title">Past Event Status</div></div>
+            <p class="mg-rail-note" style="margin:0;">When an event's date has passed and it was not completed or cancelled, it moves to <b>Past Event</b> automatically.</p>
+        </div>
+
         {{-- Professional Status --}}
         <div class="mg-rail-card">
             <div class="mg-rail-head"><div class="mg-rail-title">Professional Status</div>@if($period !== 'all')<span class="mg-rail-period">{{ $periods[$period] }}</span>@endif</div>
@@ -1176,7 +1209,7 @@
                 <div class="pend"><b>${{ number_format($payment['pending'], 0) }}</b><span style="color:var(--text-muted);">Pending</span></div>
                 <div class="over"><b>${{ number_format($payment['overdue'], 0) }}</b><span style="color:var(--text-muted);">Overdue</span></div>
             </div>
-            <a href="{{ route('app.payments.history') }}" class="mg-rail-link">View Payment Tracker <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+            <a href="{{ route('client.events.index', ['tab' => 'list', 'sub' => 'payments']) }}" class="mg-rail-link" data-open-subtab="payments">View Payment Tracker <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         </div>
 
         {{-- Upcoming Deadlines --}}
@@ -1252,6 +1285,20 @@
             pane.hidden = pane.dataset.subpane !== btn.dataset.subtab;
         });
     });
+
+    // "View Payment Tracker" in the rail opens that tab here, and ?sub=payments
+    // opens it on arrival, so the link works from a fresh page too.
+    function openSubtab(name) {
+        var btn = document.querySelector('[data-subtab="' + name + '"]');
+        if (btn) { btn.click(); btn.scrollIntoView({ block: 'nearest' }); return true; }
+        return false;
+    }
+    document.addEventListener('click', function (e) {
+        var link = e.target.closest ? e.target.closest('[data-open-subtab]') : null;
+        if (link && openSubtab(link.dataset.openSubtab)) e.preventDefault();
+    });
+    var wantSub = new URLSearchParams(location.search).get('sub');
+    if (wantSub) openSubtab(wantSub);
 
     // Filters opens the service / when panel. Delegated for the same reason.
     document.addEventListener('click', function (e) {

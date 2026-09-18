@@ -209,10 +209,30 @@
         <h3>Confirm availability</h3>
         <p class="lede">The client is comparing people who can actually do the date. Say so plainly, and flag anything conditional.</p>
 
-        <label class="bd-check">
-            <input type="checkbox" name="available_confirmed" value="1" @checked(! empty($data['available_confirmed']))>
-            <span><b>I am available on {{ $event->starts_at?->format('M j, Y') ?? 'the requested date' }}</b>@if($event->location) in {{ $event->location }}@endif and can deliver the services requested.</span>
-        </label>
+        @php $__opts = \App\Domain\Requests\EventDates::options($event); @endphp
+        @if($__opts)
+            {{-- The client's preferred date and their backups. Every service on
+                 the request ends up on one date, so the proposal names which
+                 one this professional can do. --}}
+            <p class="bd-help" style="margin-bottom:8px;">Which of the client's dates can you do?@if($event->location) The event is in {{ $event->location }}.@endif</p>
+            @foreach($__opts as $o)
+                <label class="bd-check">
+                    <input type="radio" name="confirmed_date" value="{{ $o['date'] }}"
+                           @checked(($data['confirmed_date'] ?? null) === $o['date'])>
+                    <span><b>{{ \App\Domain\Requests\EventDates::label($o) }}</b> {{ $o['primary'] ? '(client\'s preferred date)' : '(backup date)' }}</span>
+                </label>
+            @endforeach
+            <label class="bd-check">
+                <input type="radio" name="confirmed_date" value="none"
+                       @checked(! empty($data['date_answered']) && empty($data['confirmed_date']))>
+                <span><b>None of these dates work for me</b> Say below what would.</span>
+            </label>
+        @else
+            <label class="bd-check">
+                <input type="checkbox" name="available_confirmed" value="1" @checked(! empty($data['available_confirmed']))>
+                <span><b>I am available on the requested date</b>@if($event->location) in {{ $event->location }}@endif and can deliver the services requested.</span>
+            </label>
+        @endif
 
         <div class="bd-f">
             <label>Anything the client should know about timing?</label>
@@ -260,7 +280,8 @@
         <div class="bd-rev"><span>Your bid</span><b>${{ number_format((int) ($data['amount'] ?? 0)) }}</b></div>
         @if($rate)<div class="bd-rev"><span>Commission ({{ $rate }}%)</span><b>−${{ number_format((int) ($data['amount'] ?? 0) - (int) ($net ?? 0)) }}</b></div>@endif
         <div class="bd-rev"><span>Estimated net payout</span><b>${{ number_format((int) ($net ?? 0)) }}</b></div>
-        <div class="bd-rev"><span>Available on the date</span><b>{{ ! empty($data['available_confirmed']) ? 'Confirmed' : 'Not confirmed' }}</b></div>
+        @php $__o = \App\Domain\Requests\EventDates::option($event, $data['confirmed_date'] ?? null); @endphp
+        <div class="bd-rev"><span>Your date</span><b>{{ $__o ? \App\Domain\Requests\EventDates::label($__o) . ($__o['primary'] ? '' : ' (backup)') : (! empty($data['available_confirmed']) ? 'Confirmed' : 'None of the client\'s dates') }}</b></div>
         @if(! empty($data['breakdown']))
             <div class="bd-rev"><span>Breakdown</span><b>{{ count($data['breakdown']) }} {{ Str::plural('line', count($data['breakdown'])) }} · ${{ number_format(collect($data['breakdown'])->sum('cost')) }}</b></div>
         @endif

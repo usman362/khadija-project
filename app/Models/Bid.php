@@ -11,7 +11,7 @@ class Bid extends Model
     protected $fillable = [
         'event_id', 'category_id', 'supplier_id', 'amount', 'note', 'is_public', 'status',
         // Proposal fields collected by the Submit Your Bid wizard
-        'breakdown', 'above_budget_reason', 'available_confirmed',
+        'breakdown', 'above_budget_reason', 'available_confirmed', 'confirmed_date',
         'availability_note', 'plan', 'terms', 'submitted_at',
     ];
 
@@ -20,6 +20,7 @@ class Bid extends Model
         'amount'    => 'integer',
         'breakdown' => 'array',
         'available_confirmed' => 'boolean',
+        'confirmed_date' => 'date',
         'submitted_at' => 'datetime',
     ];
 

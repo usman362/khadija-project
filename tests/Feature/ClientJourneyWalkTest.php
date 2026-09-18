@@ -94,6 +94,9 @@ class ClientJourneyWalkTest extends TestCase
             'proposal_deadline' => now()->addWeeks(2)->format('Y-m-d\TH:i'),
         ]) && '');
         $this->step('16. Wizard: files', fn () => $save('files', []) && '');
+        $this->step('16b. Wizard: date & time', fn () => $save('availability', [
+            'event_date' => now()->addMonths(3)->toDateString(), 'event_start_time' => '15:00',
+        ]) && '');
         $this->step('17. Publish the request', function () use ($client) {
             $r = $this->actingAs($client)->post(route('client.bsr.save', 'review'), ['confirm' => 1]);
             $errs = session('errors');

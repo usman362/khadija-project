@@ -143,6 +143,7 @@ class BiddingWindowTest extends TestCase
         $save('budget', ['budget_min' => 2000, 'budget_max' => 3000]);
         $save('proposals', $proposals);
         $save('files', []);
+        $save('availability', ['event_date' => now()->addMonths(3)->toDateString(), 'event_start_time' => '17:00']);
         $this->actingAs($this->client)->post(route('client.bsr.save', 'review'), ['confirm' => 1])
             ->assertSessionHasNoErrors();
 

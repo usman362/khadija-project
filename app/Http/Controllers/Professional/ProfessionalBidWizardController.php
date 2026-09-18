@@ -61,6 +61,8 @@ class ProfessionalBidWizardController extends Controller
                 'breakdown'           => $existing->breakdown ?: [],
                 'above_budget_reason' => $existing->above_budget_reason,
                 'available_confirmed' => (bool) $existing->available_confirmed,
+                'confirmed_date'      => $existing->confirmed_date?->toDateString(),
+                'date_answered'       => (bool) $existing->available_confirmed || filled($existing->availability_note),
                 'availability_note'   => $existing->availability_note,
                 'plan'                => $existing->plan,
                 'terms'               => $existing->terms,
@@ -105,11 +107,21 @@ class ProfessionalBidWizardController extends Controller
             'amount.required'   => 'Enter your bid amount.',
             'above_budget_reason.required' => 'Your bid is above the client’s range, explain the added value or cost.',
             'available_confirmed.accepted' => 'Confirm you are available on the event date.',
+            'confirmed_date.required' => 'Pick the date you can do, or say none of them work.',
+            'availability_note.required_if' => 'Tell the client which dates or times would work for you.',
             'plan.required'     => 'Describe how you will deliver this.',
             'plan.min'          => 'A little more detail. This is what the client compares against price.',
             'sealed_ack.accepted' => 'Acknowledge that your bid is sealed before continuing.',
             'confirm.accepted'  => 'Confirm your proposal before submitting.',
         ]);
+
+        // A named date is a confirmed date; "none of these" is an honest no.
+        if ($step === 'availability' && array_key_exists('confirmed_date', $validated)) {
+            $none = $validated['confirmed_date'] === 'none';
+            $validated['available_confirmed'] = ! $none;
+            $validated['confirmed_date'] = $none ? null : $validated['confirmed_date'];
+            $validated['date_answered'] = true;
+        }
 
         // Line items arrive as parallel arrays; keep only complete rows.
         if ($step === 'price') {
@@ -243,9 +255,20 @@ class ProfessionalBidWizardController extends Controller
                     ? ['required', 'string', 'min:10', 'max:1000']
                     : ['nullable', 'string', 'max:1000'],
             ]),
-            'availability' => [
+            /*
+             * Which of the client's dates can you do? The client offers a
+             * preferred date and up to five backups (EventDates), and every
+             * service on the request must end up on the same one, so the
+             * professional names the day rather than ticking "available".
+             * "None of these" is an answer too, with a note saying what is.
+             * A request with no date yet keeps the single tick.
+             */
+            'availability' => \App\Domain\Requests\EventDates::options($event) === [] ? [
                 'available_confirmed' => ['accepted'],
                 'availability_note'   => ['nullable', 'string', 'max:600'],
+            ] : [
+                'confirmed_date'      => ['required', 'in:none,' . collect(\App\Domain\Requests\EventDates::options($event))->pluck('date')->implode(',')],
+                'availability_note'   => ['nullable', 'required_if:confirmed_date,none', 'string', 'max:600'],
             ],
             'plan'  => ['plan'  => ['required', 'string', 'min:20', 'max:4000']],
             'terms' => ['terms' => ['nullable', 'string', 'max:4000']],
@@ -263,7 +286,7 @@ class ProfessionalBidWizardController extends Controller
     {
         $ok = [
             ! empty($d['amount']),
-            ! empty($d['available_confirmed']),
+            ! empty($d['available_confirmed']) || ! empty($d['date_answered']),
             ! empty($d['plan']),
             true,   // terms optional
             true,   // files optional
@@ -287,6 +310,7 @@ class ProfessionalBidWizardController extends Controller
             'breakdown'           => $d['breakdown'] ?? [],
             'above_budget_reason' => $d['above_budget_reason'] ?? null,
             'available_confirmed' => (bool) ($d['available_confirmed'] ?? false),
+            'confirmed_date'      => $d['confirmed_date'] ?? null,
             'availability_note'   => $d['availability_note'] ?? null,
             'plan'                => $d['plan'] ?? null,
             'terms'               => $d['terms'] ?? null,

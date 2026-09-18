@@ -71,7 +71,7 @@ class BsrAvailabilityStepTest extends TestCase
         // And now it opens, rather than bouncing back the way it always did.
         $this->actingAs($client)->get(route('client.bsr.step', 'review'))
             ->assertSuccessful()
-            ->assertSee('Review &amp; publish', false);
+            ->assertSee('Review &amp; Submit', false);
     }
 
     public function test_the_step_asks_for_a_date_and_both_times(): void

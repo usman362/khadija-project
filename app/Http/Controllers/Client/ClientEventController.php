@@ -12,21 +12,6 @@ use Illuminate\View\View;
 
 class ClientEventController extends Controller
 {
-    /**
-     * The statuses an event can actually be in, for both filter dropdowns.
-     *
-     * Both lists offered "In progress", which no event has ever been — the
-     * status does not exist, so picking it always returned nothing and looked
-     * like a broken filter. One list now, so the two dropdowns cannot differ.
-     */
-    public const FILTER_STATUSES = [
-        'pending'   => 'Pending',
-        'published' => 'Published',
-        'confirmed' => 'Confirmed',
-        'completed' => 'Completed',
-        'cancelled' => 'Cancelled',
-    ];
-
     /** The right rail's period choices. Only the rail is scoped; the list is not. */
     public const PERIODS = [
         'all'   => 'All time',
@@ -44,6 +29,8 @@ class ClientEventController extends Controller
 
         $query = Event::where('client_id', $user->id)
             ->with(['categories:id,name,icon', 'supplier:id,name', 'bookings.supplier:id,name'])
+            // The Proposals column: how many professionals have bid.
+            ->withCount('bids')
             ->latest();
 
         /*
@@ -65,8 +52,31 @@ class ClientEventController extends Controller
             });
         }
 
-        if ($request->filled('status') && array_key_exists($request->string('status')->toString(), self::FILTER_STATUSES)) {
-            $query->where('status', $request->string('status')->toString());
+        /*
+         * The status filter speaks the same words as the Status column
+         * (Event::listStage): Open, In Progress, Booked, Completed, Past Event,
+         * Draft, Cancelled. It used to filter on the raw status column, so
+         * "Past Event", which is worked out from the date, could not be picked.
+         */
+        $status = $request->string('status')->toString();
+        $booked = fn ($q) => $q->whereIn('status', ['confirmed', 'completed']);
+        $live = fn ($q) => $q->whereNotIn('status', ['cancelled', 'completed'])
+            ->where(fn ($p) => $p->where('status', 'published')->orWhere('status', 'confirmed')->orWhere('is_published', true));
+        $notPast = fn ($q) => $q->where(fn ($p) => $p->whereNull('starts_at')->orWhere('starts_at', '>=', now()));
+
+        match ($status) {
+            'open'        => $query->where($live)->where($notPast)->where('status', '!=', 'confirmed')->whereDoesntHave('bookings', $booked),
+            'in_progress' => $query->where($live)->where($notPast)->where('status', '!=', 'confirmed')->whereHas('bookings', $booked),
+            'booked'      => $query->where('status', 'confirmed')->where($notPast),
+            'past'        => $query->where($live)->where('starts_at', '<', now()),
+            'draft'       => $query->whereNotIn('status', ['cancelled', 'completed', 'confirmed', 'published'])->where('is_published', false),
+            'completed', 'cancelled' => $query->where('status', $status),
+            default       => null,
+        };
+
+        // The event type the request was posted for (Wedding, Corporate …).
+        if ($request->filled('type')) {
+            $query->where('event_type', $request->string('type')->toString());
         }
 
         if ($request->filled('category')) {
@@ -123,6 +133,19 @@ class ClientEventController extends Controller
         ];
 
         /*
+         * The tiles along the top count by the same Status the list shows
+         * (Event::listStage), so a tile and the filter it matches always
+         * agree. In Progress takes in Booked: both are underway.
+         */
+        $listStages = (clone $baseEvents)
+            ->with(['bookings' => fn ($q) => $q->select('id', 'event_id', 'status')])
+            ->get(['id', 'status', 'is_published', 'starts_at'])
+            ->countBy(fn ($e) => $e->listStage());
+        $stats['list_open']        = (int) ($listStages['open'] ?? 0);
+        $stats['list_in_progress'] = (int) ($listStages['in_progress'] ?? 0) + (int) ($listStages['booked'] ?? 0);
+        $stats['list_past']        = (int) ($listStages['past'] ?? 0);
+
+        /*
          * Money, from App\Domain\Finance\ClientTotals — the one calculation
          * every finance page uses.
          *
@@ -153,29 +176,25 @@ class ClientEventController extends Controller
          */
         $railEvents = (clone $baseEvents)
             ->when($since, fn ($q) => $q->where('created_at', '>=', $since))
+            ->with(['bookings' => fn ($q) => $q->select('id', 'event_id', 'status')])
             ->get(['id', 'status', 'is_published', 'starts_at']);
 
         /*
-         * "Open" means what the Open tile above it means (OA-143): taking
-         * proposals AND not already over. Counted by stage alone, a party that
-         * happened last week with nobody hired was an open slice, so the tile
-         * said Open 2 and the donut beside it said Open 8. A past event that
-         * never got anyone is its own slice, because that is its own fact.
+         * By the same Status the list and the tiles use (Event::listStage),
+         * so the donut, the tiles and the filter never disagree. A past event
+         * that never got anyone is Past Event, which is its own fact.
          */
-        $byStage = $railEvents->countBy(function ($e) {
-            $stage = $e->stage();
-
-            return $stage === 'open' && $e->starts_at && $e->starts_at->isPast() ? 'lapsed' : $stage;
-        });
+        $byStage = $railEvents->countBy(fn ($e) => $e->listStage());
         $overview = [
             'total'  => $railEvents->count(),
             'stages' => [
-                ['key' => 'open',      'lbl' => 'Open',      'val' => (int) ($byStage['open'] ?? 0),      'color' => '#f59e0b'],
-                ['key' => 'lapsed',    'lbl' => 'Ended, not booked', 'val' => (int) ($byStage['lapsed'] ?? 0), 'color' => '#cbd5e1'],
-                ['key' => 'confirmed', 'lbl' => 'Booked',    'val' => (int) ($byStage['confirmed'] ?? 0), 'color' => '#10b981'],
-                ['key' => 'completed', 'lbl' => 'Completed', 'val' => (int) ($byStage['completed'] ?? 0), 'color' => '#6366f1'],
-                ['key' => 'draft',     'lbl' => 'Draft',     'val' => (int) ($byStage['draft'] ?? 0),     'color' => '#94a3b8'],
-                ['key' => 'cancelled', 'lbl' => 'Cancelled', 'val' => (int) ($byStage['cancelled'] ?? 0), 'color' => '#ef4444'],
+                ['key' => 'open',        'lbl' => 'Open',        'val' => (int) ($byStage['open'] ?? 0),        'color' => '#f59e0b'],
+                ['key' => 'in_progress', 'lbl' => 'In Progress', 'val' => (int) ($byStage['in_progress'] ?? 0), 'color' => '#6366f1'],
+                ['key' => 'booked',      'lbl' => 'Booked',      'val' => (int) ($byStage['booked'] ?? 0),      'color' => '#10b981'],
+                ['key' => 'completed',   'lbl' => 'Completed',   'val' => (int) ($byStage['completed'] ?? 0),   'color' => '#0ea5e9'],
+                ['key' => 'past',        'lbl' => 'Past Event',  'val' => (int) ($byStage['past'] ?? 0),        'color' => '#cbd5e1'],
+                ['key' => 'draft',       'lbl' => 'Draft',       'val' => (int) ($byStage['draft'] ?? 0),       'color' => '#94a3b8'],
+                ['key' => 'cancelled',   'lbl' => 'Cancelled',   'val' => (int) ($byStage['cancelled'] ?? 0),   'color' => '#ef4444'],
             ],
         ];
 
@@ -196,17 +215,16 @@ class ClientEventController extends Controller
             'cancelled'     => (clone $railBookings)->whereIn('status', \App\Domain\Finance\ClientTotals::VOID_STATUSES)->count(),
         ];
 
-        // Payment Summary — paid, still owed, and owed for an event already past.
-        $paid    = (float) (clone $railBookings)->where('status', 'completed')->sum('price');
-        $owed    = (float) (clone $railBookings)->whereIn('status', ['requested', 'confirmed'])->sum('price');
-        $overdue = (float) (clone $railBookings)->whereIn('status', ['requested', 'confirmed'])
-            ->whereHas('event', fn ($q) => $q->where('starts_at', '<', now()))->sum('price');
-        $payment = [
-            'total'   => $paid + $owed,
-            'paid'    => $paid,
-            'pending' => max(0, $owed - $overdue),
-            'overdue' => $overdue,
-        ];
+        /*
+         * Payment Summary and the Payment Tracker tab read the same rows
+         * (App\Domain\Finance\PaymentTracker), so the totals beside the tab
+         * are the tab added up. Overdue only when an amount is set and its
+         * due date has passed; an event date going by is not a due date.
+         */
+        $payment = \App\Domain\Finance\PaymentTracker::summary(
+            \App\Domain\Finance\PaymentTracker::rows($user, $since)
+        );
+        $payRows = \App\Domain\Finance\PaymentTracker::rows($user);
 
         // Coming up — events starting in the next 14 days.
         $deadlines = (clone $baseEvents)
@@ -286,9 +304,11 @@ class ClientEventController extends Controller
         return view('client.events.index', compact(
             'events', 'stats', 'calendar', 'categories',
             'totalSpent', 'proStatus', 'payment', 'deadlines', 'activity',
-            'overview', 'bookings', 'period'
+            'overview', 'bookings', 'period', 'payRows'
         ) + [
-            'statuses' => self::FILTER_STATUSES,
+            'statuses' => \App\Models\Event::LIST_STAGES,
+            'eventTypeOptions' => Event::where('client_id', $request->user()->id)->whereNotNull('event_type')
+                ->distinct()->orderBy('event_type')->pluck('event_type'),
             'periods'  => self::PERIODS,
         ]);
     }
@@ -317,7 +337,7 @@ class ClientEventController extends Controller
                     $event->starts_at?->format('Y-m-d') ?? '',
                     $event->starts_at?->format('g:i A') ?? '',
                     $event->ends_at?->format('g:i A') ?? '',
-                    self::FILTER_STATUSES[$event->status] ?? ucfirst((string) $event->status),
+                    \App\Models\Event::LIST_STAGES[$event->listStage()] ?? ucfirst((string) $event->status),
                     $event->categories->pluck('name')->implode('; '),
                     $bk->where('status', 'confirmed')->count(),
                     $bk->where('status', 'requested')->count(),

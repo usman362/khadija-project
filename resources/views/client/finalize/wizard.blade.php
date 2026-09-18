@@ -145,10 +145,10 @@
              into an agreement when it does not (Sir Peter, 17 Sep). --}}
         @if($bid)
             @php $__date = \App\Domain\Requests\ProposalDate::check($bid); @endphp
-            <div class="fz-row"><span>Your date</span><b>{{ \App\Domain\Requests\ProposalDate::label($__date, $event->starts_at) }}</b></div>
+            <div class="fz-row"><span>Your date</span><b>{{ \App\Domain\Requests\ProposalDate::label($__date, $event->starts_at, $bid) }}</b></div>
             @if(\App\Domain\Requests\ProposalDate::needsWarning($__date))
                 <div class="fz-date-warn" role="alert">
-                    {{ \App\Domain\Requests\ProposalDate::warning($__date, $event->starts_at, $pro->name) }}
+                    {{ \App\Domain\Requests\ProposalDate::warning($__date, $event->starts_at, $pro->name, $bid) }}
                     Nothing is booked yet, so you can message them first and come back.
                 </div>
             @endif

@@ -35,6 +35,9 @@ class Event extends Model
         'description',
         'budget',
         'location',
+        // "Do you already have a venue?" and, when not, where it should be.
+        'location_need',
+        'preferred_locations',
         'venue',
         'guest_count',
         // Catering only — see App\Domain\Requests\FoodDelivery.
@@ -167,6 +170,7 @@ class Event extends Model
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
             'backup_dates' => 'array',
+            'preferred_locations' => 'array',
             'published_at' => 'datetime',
             'is_published' => 'boolean',
             'budget' => 'decimal:2',
@@ -424,6 +428,63 @@ class Event extends Model
             default => $this->is_published ? 'open' : 'draft',
         };
     }
+
+    /**
+     * The reference a client can quote: "BR-00118" for a bidding request,
+     * "DR-" for a direct one, "ER-" for an emergency. Built from the id, so
+     * it never changes and never needs storing.
+     */
+    public function reference(): string
+    {
+        $prefix = match ($this->source) {
+            'esr'          => 'ER',
+            'direct_offer' => 'DR',
+            default        => 'BR',
+        };
+
+        return $prefix . '-' . str_pad((string) $this->id, 5, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * The status My Events shows, one word per row (Sir Peter's My Events).
+     *
+     * Past Event is automatic: an event whose date has gone by and that was
+     * not completed or cancelled moves there by itself. In Progress is an
+     * open request where someone has already been booked for part of it.
+     * Everything else is stage().
+     */
+    public function listStage(): string
+    {
+        $stage = $this->stage();
+
+        if (in_array($stage, ['cancelled', 'completed', 'draft'], true)) {
+            return $stage;
+        }
+
+        if ($this->starts_at && $this->starts_at->isPast()) {
+            return 'past';
+        }
+
+        if ($stage === 'confirmed') {
+            return 'booked';
+        }
+
+        $booked = $this->relationLoaded('bookings')
+            ? $this->bookings->whereIn('status', ['confirmed', 'completed'])->isNotEmpty()
+            : $this->bookings()->whereIn('status', ['confirmed', 'completed'])->exists();
+
+        return $booked ? 'in_progress' : 'open';
+    }
+
+    public const LIST_STAGES = [
+        'open'        => 'Open',
+        'in_progress' => 'In Progress',
+        'booked'      => 'Booked',
+        'completed'   => 'Completed',
+        'past'        => 'Past Event',
+        'draft'       => 'Draft',
+        'cancelled'   => 'Cancelled',
+    ];
 
     /** Only a genuine draft may be finished and published. */
     public function isDraft(): bool

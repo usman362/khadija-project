@@ -77,11 +77,15 @@ class BsrEventLocationTest extends TestCase
             ->assertSuccessful()
             ->getContent();
 
-        // Sir Peter's three answers, 11 Sep.
+        // Sir Peter's three answers, 18 Sep: have a venue, need one, not sure.
+        $this->assertStringContainsString('Do you already have a venue or event location?', $html);
+        $this->assertStringContainsString('name="location_need" value="have"', $html);
+        $this->assertStringContainsString('name="location_need" value="need_venue"', $html);
+        $this->assertStringContainsString('name="location_need" value="unsure"', $html);
+        // "Yes" still offers their own address or a typed one.
         $this->assertStringContainsString('name="location_kind"', $html);
         $this->assertStringContainsString('Use my address', $html);
-        $this->assertStringContainsString('Enter a different address', $html);
-        $this->assertStringContainsString('know the exact address yet', $html);
+        $this->assertStringContainsString('Enter the address', $html);
     }
 
     /** Their own address is offered as a choice, shown in full. */
@@ -331,8 +335,8 @@ class BsrEventLocationTest extends TestCase
             ->assertSuccessful()
             ->getContent();
 
-        $this->assertStringContainsString('data-bw-loclabel', $html);
-        $this->assertStringContainsString("querySelectorAll('input[name=\"location_kind\"]')", $html,
+        $this->assertStringContainsString('data-bw-need', $html);
+        $this->assertStringContainsString("querySelectorAll('input[name=\"location_need\"]')", $html,
             'The radios have no listener on the step that shows them.');
     }
 

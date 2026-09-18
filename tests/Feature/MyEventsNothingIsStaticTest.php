@@ -180,7 +180,8 @@ class MyEventsNothingIsStaticTest extends TestCase
 
         $payments = $this->between($html, 'data-subpane="payments"', '</table>');
         $this->assertStringContainsString('$2,200', $payments);
-        $this->assertStringContainsString('Agreed, not yet paid', $payments);
+        $this->assertStringContainsString('mg-status-pending">Pending<', $payments);
+        $this->assertStringNotContainsString('Overdue<', $payments, 'no due date, so never overdue');
     }
 
     /** The period dropdown changes the rail, and only the rail. */
@@ -216,7 +217,7 @@ class MyEventsNothingIsStaticTest extends TestCase
 
         $donut = $this->between($html, 'mg-rail-title">Event Overview', 'mg-rail-title">Professional Status');
         $this->assertMatchesRegularExpression('/lbl">Open<\/span><span class="val">1 \(/', $donut);
-        $this->assertStringContainsString('Ended, not booked', $donut);
+        $this->assertMatchesRegularExpression('/lbl">Past Event<\/span><span class="val">1 \(/', $donut);
     }
 
     /** Numbers the system cannot back are not drawn. */

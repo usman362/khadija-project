@@ -129,6 +129,11 @@ class ClientBsrController extends Controller
             'orgTypes'        => self::ORG_TYPES,
             'draftId'         => $data['draft_id'] ?? null,
             'defaultWindowHours' => config('bsr.default_proposal_window_hours'),
+            // The venue services: the kinds of venue on step 2, and the ones
+            // step 1 notices being picked.
+            'venueServices'   => \App\Domain\Requests\VenueRule::services(),
+            // Anything still in the way of publishing, for the review step.
+            'reviewIssues'    => $step === 'review' ? $this->reviewIssues($data) : [],
             // Step 6. Read on every step so the review step can list them too.
             'filesKey' => $this->filesKey($request),
             'files'    => RequestAttachmentController::forDraft(
@@ -214,8 +219,8 @@ class ClientBsrController extends Controller
             'availabilityDate' => $date,
             // The same count for each backup day, so the client can see
             // whether offering it actually widens the field.
-            'backupAvailability' => collect($data['backup_dates'] ?? [])
-                ->mapWithKeys(fn ($d) => [$d => \App\Support\ServiceAvailability::on($services, $state, \Illuminate\Support\Carbon::parse($d))])
+            'backupAvailability' => collect(\App\Domain\Requests\EventDates::normalize((array) ($data['backup_dates'] ?? [])))
+                ->mapWithKeys(fn ($b) => [$b['date'] => \App\Support\ServiceAvailability::on($services, $state, \Illuminate\Support\Carbon::parse($b['date']))])
                 ->all(),
         ];
     }
@@ -340,8 +345,17 @@ class ClientBsrController extends Controller
             $validated['location']      = $home;
             $validated['location_kind'] = 'exact';
             $validated['location_mine'] = true;
+            $validated['location_need'] = \App\Domain\Requests\VenueRule::HAVE;
+            $validated['preferred_locations'] = [];
+        } elseif ($step === 'event' && ($validated['location_need'] ?? null) === \App\Domain\Requests\VenueRule::NEED) {
+            $validated = $this->venueHunt($validated, $data, $request);
         } elseif ($step === 'event') {
             $validated['location_mine'] = false;
+            // An answer from before the three-way question: the kind of
+            // location given says which of the three it was.
+            $validated['location_need'] ??= ($validated['location_kind'] ?? null) === 'area'
+                ? \App\Domain\Requests\VenueRule::UNSURE : \App\Domain\Requests\VenueRule::HAVE;
+            $validated['preferred_locations'] = [];
 
             if (($validated['location_kind'] ?? null) === 'exact') {
                 $typed = trim((string) ($validated['location'] ?? ''));
@@ -379,16 +393,17 @@ class ClientBsrController extends Controller
             $validated['starts_at'] = $start->format('Y-m-d H:i:s');
 
             /*
-             * Backup dates: each day once, in order, never the preferred day
-             * itself, and none left blank. They carry the same start and end
-             * time as the preferred date; a professional who can do another
-             * day at another time says so in their proposal.
+             * Backup dates: up to five, each with its own start and end time
+             * (a backup left without times takes the preferred ones). Each
+             * day once, in order, never the preferred day itself, none blank.
+             * See App\Domain\Requests\EventDates.
              */
-            $validated['backup_dates'] = collect($validated['backup_dates'] ?? [])
-                ->filter()
-                ->map(fn ($d) => \Illuminate\Support\Carbon::parse($d)->toDateString())
-                ->reject(fn ($d) => $d === $date->toDateString())
-                ->unique()->sort()->values()->all();
+            $validated['backup_dates'] = \App\Domain\Requests\EventDates::normalize(
+                (array) ($validated['backup_dates'] ?? []),
+                $date->toDateString(),
+                $validated['event_start_time'],
+                $validated['event_end_time'] ?? null,
+            );
 
             if (! empty($validated['event_end_time'])) {
                 $end = $date->copy()->setTimeFromTimeString($validated['event_end_time']);
@@ -482,6 +497,12 @@ class ClientBsrController extends Controller
         }
 
         if ($step === 'review') {
+        // Nothing still flagged on the review step gets published.
+        if ($issues = $this->reviewIssues($data)) {
+            return redirect()->route('client.bsr.step', 'review')
+                ->withErrors(['review' => 'Fix the items marked below before submitting.']);
+        }
+
         /*
          * Ten posted requests a day — Khadijah's sheet, 29 Aug. Counted only
          * when a request actually goes PUBLIC: saving a draft, or a form that
@@ -517,6 +538,78 @@ class ClientBsrController extends Controller
         return redirect()->route('client.bsr.step', $next);
     }
 
+    /**
+     * "No, I need to find a venue": the towns it should be in, and the kinds
+     * of venue wanted.
+     *
+     * The towns are kept as a list, and the first stands in as the request's
+     * location so matching and the name still have somewhere to read from. The
+     * venue kinds are venue services, so ticking one adds it to the request,
+     * and the request cannot go on without at least one (VenueRule).
+     */
+    private function venueHunt(array $validated, array $data, Request $request): array
+    {
+        $towns = collect($validated['preferred_locations'] ?? [])
+            ->map(fn ($t) => trim((string) $t))->filter()->unique()->values()->all();
+
+        if ($towns === []) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'preferred_locations' => 'Add at least one city or town where you would like the venue.',
+            ]);
+        }
+
+        $services = array_values(array_unique(array_merge(
+            array_map('intval', (array) ($data['services'] ?? [])),
+            array_map('intval', (array) ($validated['venue_types'] ?? [])),
+        )));
+
+        $validated['services']            = $services;
+        $validated['scope']               = count($services) >= 2 ? 'multi' : 'single';
+        $validated['preferred_locations'] = $towns;
+        $validated['location_kind']       = 'area';
+        $validated['location_mine']       = false;
+
+        $state = $request->user()?->profile?->state;
+        $validated['location'] = $towns[0] . ($state ? ', ' . $state : '');
+
+        if ($problem = \App\Domain\Requests\VenueRule::problem($validated)) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['location_need' => $problem]);
+        }
+
+        return $validated;
+    }
+
+    /**
+     * What stops this request being submitted, keyed by the step that fixes it.
+     *
+     * Sir Peter's Review & Submit: every section gets a check, and anything
+     * wrong is listed with the way back to it, with Submit held until it is
+     * fixed. The same list is checked again when the request is submitted, so
+     * a form posted around the page cannot publish it either.
+     *
+     * @return array<string, string>
+     */
+    private function reviewIssues(array $d): array
+    {
+        $issues = [];
+
+        if (empty($d['services'])) {
+            $issues['service'] = 'Pick at least one service.';
+        } elseif ($venue = \App\Domain\Requests\VenueRule::problem($d)) {
+            $issues['service'] = $venue;
+        }
+
+        if (blank($d['description'] ?? null)) {
+            $issues['requirements'] = 'Describe what you need, so professionals can price it.';
+        }
+
+        if (empty($d['starts_at'])) {
+            $issues['availability'] = 'Set the date and start time of your event.';
+        }
+
+        return $issues;
+    }
+
     /** Resume an existing unpublished request in the wizard. */
     public function resume(Request $request, Event $event): RedirectResponse
     {
@@ -539,6 +632,8 @@ class ClientBsrController extends Controller
             'ends_at'           => $event->ends_at?->format('Y-m-d\TH:i'),
             'backup_dates'      => $event->backup_dates ?? [],
             'location'          => $event->location,
+            'location_need'     => $event->location_need,
+            'preferred_locations' => (array) $event->preferred_locations,
             'venue'             => $event->venue,
             'guest_count'       => $event->guest_count,
             'description'       => $event->description,
@@ -947,6 +1042,18 @@ class ClientBsrController extends Controller
                  */
                 // 'mine' = the address on their profile, filled in by save().
                 'location_kind' => ['nullable', 'in:mine,exact,area'],
+                /*
+                 * "Do you already have a venue or event location?" Have one,
+                 * need to find one, or not sure yet. A client looking for a
+                 * venue names up to five towns for it, and may tick the kinds
+                 * of venue they want, which are the venue services themselves.
+                 * See App\Domain\Requests\VenueRule.
+                 */
+                'location_need'         => ['nullable', 'in:have,need_venue,unsure'],
+                'preferred_locations'   => ['nullable', 'array', 'max:' . \App\Domain\Requests\VenueRule::MAX_PREFERRED],
+                'preferred_locations.*' => ['nullable', 'string', 'max:80'],
+                'venue_types'           => ['nullable', 'array'],
+                'venue_types.*'         => ['integer', 'in:' . implode(',', \App\Domain\Requests\VenueRule::serviceIds() ?: [0])],
                 // The event-state field was removed from the form on
                 // 2026-08-25: the State Boundary Rule matches every request by
                 // the client's own home state, so choosing one changed nothing.
@@ -1020,8 +1127,10 @@ class ClientBsrController extends Controller
                 'event_end_time'     => ['nullable', 'date_format:H:i'],
                 'availability_note'  => ['nullable', 'string', 'max:500'],
                 // Up to three other days the client could hold it on.
-                'backup_dates'       => ['nullable', 'array', 'max:3'],
-                'backup_dates.*'     => ['nullable', 'date', 'after_or_equal:today'],
+                'backup_dates'         => ['nullable', 'array', 'max:' . \App\Domain\Requests\EventDates::MAX_BACKUPS],
+                'backup_dates.*.date'  => ['nullable', 'date', 'after_or_equal:today'],
+                'backup_dates.*.start' => ['nullable', 'date_format:H:i'],
+                'backup_dates.*.end'   => ['nullable', 'date_format:H:i'],
             ],
             'review' => [
                 'confirm' => ['accepted'],
@@ -1044,8 +1153,8 @@ class ClientBsrController extends Controller
             'proposal_deadline.after'    => 'The proposal deadline has to be in the future.',
             'proposal_deadline.required' => 'Choose when proposals close. No standard window has been approved yet, so this can’t be set for you.',
             'event_date.required'        => 'Set the date your event runs.',
-            'backup_dates.max'           => 'Add up to three backup dates.',
-            'backup_dates.*.after_or_equal' => 'A backup date cannot be in the past.',
+            'backup_dates.max'           => 'Add up to five backup dates.',
+            'backup_dates.*.date.after_or_equal' => 'A backup date cannot be in the past.',
             'event_date.after_or_equal'  => 'Pick a date that has not already passed.',
             'event_start_time.required'  => 'Set the time your event starts.',
             'confirm.accepted'           => 'Confirm the details before publishing.',
@@ -1137,6 +1246,8 @@ class ClientBsrController extends Controller
                 ? \Illuminate\Support\Carbon::parse($d['ends_at'])
                 : null,
             'location'          => $d['location'] ?? null,
+            'location_need'     => $d['location_need'] ?? null,
+            'preferred_locations' => ! empty($d['preferred_locations']) ? array_values($d['preferred_locations']) : null,
             'state'             => \App\Support\StateMatching::requestState($user),
             'venue'             => $d['venue'] ?? null,
             'guest_count'       => $d['guest_count'] ?? null,

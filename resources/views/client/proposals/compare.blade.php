@@ -41,7 +41,8 @@
     .cp-date { border-radius: 999px; padding: 1px 8px; font-weight: 700; }
     .cp-date.is-confirmed { background: #dcfce7; color: #15803d; }
     .cp-date.is-unconfirmed { background: #fef3c7; color: #b45309; }
-    .cp-date.is-clash { background: #fee2e2; color: #b91c1c; }
+    .cp-date.is-clash, .cp-date.is-mismatch { background: #fee2e2; color: #b91c1c; }
+    .cp-date.is-different { background: #fef3c7; color: #b45309; }
     .cp-svcs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
     .cp-svc { display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--border-color); border-radius: 999px; padding: 6px 12px; font-size: 12.5px; font-weight: 700; color: var(--text-secondary); text-decoration: none; background: var(--bg-card); }
     .cp-svc small { font-size: 11px; font-weight: 800; color: var(--text-muted); }
@@ -167,7 +168,7 @@
              data-insured="{{ $r['insured'] ? 'Insured' : 'Not on file' }}"
              data-verified="{{ $r['verified'] ? 'Verified' : 'Not verified' }}"
              data-service="{{ $b->category->name ?? 'Whole request' }}"
-             data-date="{{ \App\Domain\Requests\ProposalDate::label($r['date'], $event->starts_at) }}">
+             data-date="{{ \App\Domain\Requests\ProposalDate::label($r['date'], $event->starts_at, $b) }}">
         <input type="checkbox" class="cp-check" style="margin-top:4px;" aria-label="Select {{ $pro->name ?? 'professional' }} to compare">
 
         <div style="min-width:0;">
@@ -183,7 +184,7 @@
                 @if($r['years'])<span>{{ $r['years'] }} yrs experience</span>@endif
                 @if($r['city'])<span>{{ $r['city'] }}</span>@endif
                 @if($b->category)<span>{{ $b->category->name }}</span>@endif
-                <span class="cp-date is-{{ $r['date'] }}">{{ \App\Domain\Requests\ProposalDate::label($r['date'], $event->starts_at) }}</span>
+                <span class="cp-date is-{{ $r['date'] }}">{{ \App\Domain\Requests\ProposalDate::label($r['date'], $event->starts_at, $b) }}</span>
                 <span>Submitted {{ $b->created_at->humanAgo() }}</span>
             </div>
             @if($b->note)<p class="cp-note">{{ $b->note }}</p>@endif
@@ -205,7 +206,7 @@
             @endif
             <div class="cp-acts">
                 @if($pro)<a class="cp-btn" href="{{ route('public.professional.show', $pro) }}">Profile</a>@endif
-                @if(! $r['taken'] && $r['state'] !== 'declined')
+                @if(! $r['taken'] && $r['state'] !== 'declined' && ! \App\Domain\Requests\ProposalDate::blocks($r['date']))
                     {{-- R12: Reply is a counter-offer, not a message — the two are
                          deliberately different things. General questions belong in
                          the message thread, so that's where this points. --}}
@@ -221,7 +222,7 @@
                          until it is signed and funded. --}}
                     @php
                         $__warn = \App\Domain\Requests\ProposalDate::needsWarning($r['date'])
-                            ? \App\Domain\Requests\ProposalDate::warning($r['date'], $event->starts_at, $pro?->name) . ' Continue anyway?'
+                            ? \App\Domain\Requests\ProposalDate::warning($r['date'], $event->starts_at, $pro?->name, $b) . ' Continue anyway?'
                             : null;
                     @endphp
                     <form method="POST" action="{{ route('client.finalize.start', $b) }}" style="display:inline;"
