@@ -1212,6 +1212,23 @@
             <a href="{{ route('client.events.index', ['tab' => 'list', 'sub' => 'payments']) }}" class="mg-rail-link" data-open-subtab="payments">View Payment Tracker <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         </div>
 
+        {{-- Upcoming Payments: owed, with a due date, soonest first. --}}
+        <div class="mg-rail-card">
+            <div class="mg-rail-head"><div class="mg-rail-title">Upcoming Payments</div></div>
+            @forelse($upcomingPayments as $up)
+                <div class="mg-dl-row">
+                    <span class="mg-dl-bar" @if($up['overdue']) style="background:#ef4444;" @endif></span>
+                    <div class="mg-dl-body">
+                        <div class="mg-dl-title">{{ \Illuminate\Support\Str::limit($up['professional'], 24) }}</div>
+                        <div class="mg-dl-sub">${{ number_format($up['balance'], 0) }} · Due {{ $up['due']->format('M j, Y') }}</div>
+                    </div>
+                    <span class="mg-status-pill mg-status-{{ $up['overdue'] ? 'overdue' : $up['status'] }}">{{ $up['overdue'] ? 'Overdue' : $up['label'] }}</span>
+                </div>
+            @empty
+                <div style="font-size:12px;color:var(--text-muted);text-align:center;padding:8px 0;">No payments due</div>
+            @endforelse
+        </div>
+
         {{-- Upcoming Deadlines --}}
         <div class="mg-rail-card">
             {{-- These are event dates, not deadlines, and every row said

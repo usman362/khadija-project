@@ -105,7 +105,9 @@ class ClientEventController extends Controller
         $events = $this->filteredQuery($request)->paginate(12)->withQueryString();
 
         $baseEvents  = Event::where('client_id', $user->id);
-        $bookingBase = \App\Models\Booking::where('client_id', $user->id);
+        // Rows naming the client as their own professional are old bad data
+        // (new bookings refuse it); nothing on this page counts them.
+        $bookingBase = \App\Models\Booking::where('client_id', $user->id)->where('supplier_id', '!=', $user->id);
 
         /*
          * Checklist rows 86, 101 and 125 — every tile counts EVENTS, and each
@@ -225,6 +227,7 @@ class ClientEventController extends Controller
             \App\Domain\Finance\PaymentTracker::rows($user, $since)
         );
         $payRows = \App\Domain\Finance\PaymentTracker::rows($user);
+        $upcomingPayments = \App\Domain\Finance\PaymentTracker::upcoming($payRows);
 
         // Coming up — events starting in the next 14 days.
         $deadlines = (clone $baseEvents)
@@ -304,7 +307,7 @@ class ClientEventController extends Controller
         return view('client.events.index', compact(
             'events', 'stats', 'calendar', 'categories',
             'totalSpent', 'proStatus', 'payment', 'deadlines', 'activity',
-            'overview', 'bookings', 'period', 'payRows'
+            'overview', 'bookings', 'period', 'payRows', 'upcomingPayments'
         ) + [
             'statuses' => \App\Models\Event::LIST_STAGES,
             'eventTypeOptions' => Event::where('client_id', $request->user()->id)->whereNotNull('event_type')

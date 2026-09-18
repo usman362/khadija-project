@@ -41,12 +41,16 @@ class PaymentTracker
     /** @return Collection<int, array> */
     public static function rows(User $client, ?CarbonInterface $since = null): Collection
     {
+        // A client never owes themselves: a row naming their own account as
+        // the professional is bad data, not a payment, and is left out.
         $finalizations = Finalization::where('client_id', $client->id)
+            ->where('supplier_id', '!=', $client->id)
             ->when($since, fn ($q) => $q->where('created_at', '>=', $since))
             ->with(['event:id,title,starts_at', 'supplier:id,name', 'category:id,name', 'booking:id,status,price'])
             ->get();
 
         $bookings = Booking::where('client_id', $client->id)
+            ->where('supplier_id', '!=', $client->id)
             ->whereNotIn('id', Finalization::where('client_id', $client->id)->whereNotNull('booking_id')->pluck('booking_id'))
             ->when($since, fn ($q) => $q->where('created_at', '>=', $since))
             ->with(['event:id,title,starts_at', 'supplier:id,name', 'category:id,name'])
@@ -77,6 +81,15 @@ class PaymentTracker
 
         return $rows->concat($bookings->map(fn (Booking $b) => self::fromBooking($b)))
             ->sortBy(fn ($r) => [$r['status'] === 'cancelled' ? 1 : 0, $r['due']?->timestamp ?? $r['date']?->timestamp ?? PHP_INT_MAX])
+            ->values();
+    }
+
+    /** Money still owed with a due date, soonest first, for Upcoming Payments. */
+    public static function upcoming(Collection $rows, int $take = 3): Collection
+    {
+        return $rows->filter(fn ($r) => $r['status'] !== 'cancelled' && $r['balance'] > 0 && $r['due'] !== null)
+            ->sortBy(fn ($r) => $r['due']->timestamp)
+            ->take($take)
             ->values();
     }
 

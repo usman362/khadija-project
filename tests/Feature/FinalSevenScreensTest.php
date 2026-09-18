@@ -343,6 +343,48 @@ class FinalSevenScreensTest extends TestCase
         $this->assertEquals(6200, PaymentTracker::summary($rows)['total']);
     }
 
+    /** Sir Peter's review: the client's own name must never appear as a professional they owe. */
+    public function test_the_client_is_never_listed_as_their_own_professional(): void
+    {
+        $e = $this->event();
+        // New bookings already refuse this; old rows written before that
+        // rule are put in directly, the way they sit on the live database.
+        \Illuminate\Support\Facades\DB::table('bookings')->insert([
+            'event_id' => $e->id, 'client_id' => $this->client->id, 'supplier_id' => $this->client->id,
+            'created_by' => $this->client->id, 'status' => 'confirmed', 'price' => 500,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        Finalization::create([
+            'event_id' => $e->id, 'client_id' => $this->client->id, 'supplier_id' => $this->client->id,
+            'status' => 'in_progress', 'agreed_price' => 400,
+        ]);
+
+        $this->assertCount(0, PaymentTracker::rows($this->client));
+
+        $payments = $this->actingAs($this->client)->get(route('client.events.index'))->assertOk()->getContent();
+        $payments = substr($payments, strpos($payments, 'data-subpane="payments"'));
+        $this->assertStringNotContainsString(e($this->client->name), substr($payments, 0, strpos($payments, '</table>')));
+    }
+
+    /** No amount, or a due date still ahead: never Overdue. Upcoming Payments says the same. */
+    public function test_overdue_is_never_shown_early_or_without_an_amount(): void
+    {
+        $e = $this->event(['starts_at' => now()->subDays(10), 'ends_at' => null]);
+        $this->finalization($e, ['balance_due_on' => now()->subDays(5)]);                          // no amount
+        $this->finalization($e, ['agreed_price' => 2500, 'balance_due_on' => now()->addDays(17)]); // due later
+
+        $rows = PaymentTracker::rows($this->client);
+        $this->assertSame(0, $rows->where('overdue', true)->count());
+        $this->assertEquals(0, PaymentTracker::summary($rows)['overdue']);
+
+        $up = PaymentTracker::upcoming($rows);
+        $this->assertCount(1, $up);
+        $this->assertSame('pending', $up[0]['status']);
+
+        $this->actingAs($this->client)->get(route('client.events.index'))
+            ->assertOk()->assertSee('Upcoming Payments')->assertDontSee('mg-status-overdue">Overdue', false);
+    }
+
     /* ── The professional's side of screen 6 ─────────────────── */
 
     /** A professional picks which of the client's dates they can do, or none. */
