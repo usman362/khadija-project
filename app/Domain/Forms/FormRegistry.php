@@ -248,6 +248,8 @@ final class FormRegistry
                 'title'    => 'Apply to the Influencer Program',
                 'row'      => 237,
                 'audience' => self::ANYONE,
+                // Ali, 19 Sep: not offered to clients.
+                'not_for'  => [self::CLIENT],
                 'purpose'  => 'Ask to join the program.',
                 'fields'   => [
                     ['name' => 'audience_where', 'label' => 'Where your audience is', 'type' => 'textarea', 'required' => true,
@@ -441,10 +443,14 @@ final class FormRegistry
     /** Forms this person may file. */
     public static function forAudience(string $audience): array
     {
-        return array_filter(
-            self::all(),
-            fn ($form) => $form['audience'] === $audience || $form['audience'] === self::ANYONE,
-        );
+        return array_filter(self::all(), fn ($form) => self::offeredTo($form, $audience));
+    }
+
+    /** May this audience file this form? Its own audience or anyone, less any it is kept from. */
+    public static function offeredTo(array $form, string $audience): bool
+    {
+        return ($form['audience'] === $audience || $form['audience'] === self::ANYONE)
+            && ! in_array($audience, $form['not_for'] ?? [], true);
     }
 
     /**

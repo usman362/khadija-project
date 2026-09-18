@@ -345,4 +345,15 @@ class FormsAuditTest extends TestCase
 
         return FormSubmission::firstOrFail();
     }
+
+    /** Ali, 19 Sep: a client is not offered the Influencer Program. */
+    public function test_a_client_is_not_offered_the_influencer_program(): void
+    {
+        $this->assertArrayNotHasKey('influencer_application', FormRegistry::forAudience(FormRegistry::CLIENT));
+        $this->assertArrayHasKey('influencer_application', FormRegistry::forAudience(FormRegistry::PROFESSIONAL));
+
+        $this->actingAs($this->client)->get(route('forms.create', 'influencer_application'))->assertForbidden();
+        $this->actingAs($this->client)->get(route('forms.index'))
+            ->assertOk()->assertDontSee('Apply to the Influencer Program');
+    }
 }

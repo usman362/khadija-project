@@ -196,11 +196,7 @@ class FormController extends Controller
 
         // A form is offered to the people who can file it. Anything else
         // produces submissions nobody can action.
-        abort_unless(
-            $definition['audience'] === FormRegistry::ANYONE
-                || $definition['audience'] === $this->audience($user),
-            403,
-        );
+        abort_unless(FormRegistry::offeredTo($definition, $this->audience($user)), 403);
 
         return view('forms.create', [
             'layout'     => $this->layout($user),
