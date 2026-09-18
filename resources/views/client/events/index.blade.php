@@ -102,6 +102,16 @@
     .mg-status-overdue     { background: rgba(239,68,68,0.15); color: var(--bad-text); }
     .mg-row-view { display: inline-block; font-size: 12px; font-weight: 700; color: var(--brand-text); text-decoration: none; padding: 5px 12px; border: 1px solid var(--border-color); border-radius: 8px; margin-right: 4px; }
     .mg-row-view:hover { border-color: #f97316; }
+    .mg-pay-table td { font-size: 12.5px; }
+    .mg-pay-pro { display: flex; align-items: center; gap: 10px; min-width: 170px; }
+    .mg-pay-pro img { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; flex: none; background: #e5e7eb; }
+    .mg-pay-table .mg-menu { vertical-align: middle; }
+    .mg-pay-about { display: flex; gap: 14px; align-items: center; margin: 12px 18px 16px; padding: 14px 16px; border: 1px solid #bfdbfe; background: #eff6ff; border-radius: 12px; }
+    .mg-pay-about-i { width: 38px; height: 38px; border-radius: 50%; background: #2563eb; color: #fff; font-weight: 800; font-size: 18px; font-family: Georgia, serif; display: flex; align-items: center; justify-content: center; flex: none; }
+    .mg-pay-about b { display: block; font-size: 13.5px; color: var(--text-primary); margin-bottom: 4px; }
+    .mg-pay-about ul { margin: 0; padding-left: 16px; font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+    .mg-pay-about > a { margin-left: auto; font-size: 13px; font-weight: 700; color: #1d4ed8; text-decoration: none; white-space: nowrap; }
+    @media (max-width: 900px) { .mg-pay-about { flex-wrap: wrap; } .mg-pay-about > a { margin-left: 0; } }
     .mg-rail-note { font-size: 12px; line-height: 1.5; color: var(--text-muted); }
     .mg-rail-note b { color: var(--text-primary); }
     .mg-row-kebab { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 16px; padding: 2px 6px; }
@@ -739,32 +749,65 @@
             {{-- What each booking costs and where the money stands. --}}
             <div data-subpane="payments" hidden>
                 <div style="overflow-x:auto;">
-                    <table class="mg-table">
-                        <thead><tr><th style="padding-left:18px;">Professional</th><th>Event</th><th>Amount</th><th>Paid</th><th>Due Date</th><th>Status</th><th style="padding-right:18px;"></th></tr></thead>
+                    <table class="mg-table mg-pay-table">
+                        <thead><tr><th style="padding-left:18px;">Professional</th><th>Event</th><th>Service</th><th>Event Date</th><th>Amount</th><th>Payment</th><th>Status</th><th>Due Date</th><th style="padding-right:18px;text-align:right;">Actions</th></tr></thead>
                         <tbody>
                             @forelse($payRows as $r)
                                 <tr>
-                                    <td style="padding-left:18px;"><div class="ev-name">{{ $r['professional'] }}</div>@if($r['service'])<div class="ev-sub">{{ $r['service'] }}</div>@endif</td>
-                                    <td>{{ $r['event'] ?? '—' }}@if($r['date'])<div class="ev-sub">{{ $r['date']->format('M j, Y') }}</div>@endif</td>
-                                    <td style="font-weight:600;color:var(--text-primary);">{{ $r['amount'] !== null ? '$' . number_format($r['amount'], 0) : 'Not set' }}</td>
-                                    <td>${{ number_format($r['paid'], 0) }}</td>
-                                    <td>{{ $r['due']?->format('M j, Y') ?? '—' }}</td>
-                                    <td>
+                                    <td style="padding-left:18px;">
+                                        <div class="mg-pay-pro">
+                                            <img src="{{ $r['avatar'] }}" alt="">
+                                            <div><div class="ev-name">{{ $r['professional'] }}</div>@if($r['pro_id'])<div class="ev-sub">{{ $r['pro_id'] }}</div>@endif</div>
+                                        </div>
+                                    </td>
+                                    <td>{{ $r['event'] ?? '—' }}</td>
+                                    <td>{{ $r['service'] ?? '—' }}</td>
+                                    <td style="white-space:nowrap;">{{ $r['date']?->format('M j, Y') ?? '—' }}</td>
+                                    <td style="font-weight:600;color:var(--text-primary);white-space:nowrap;">{{ $r['amount'] !== null ? '$' . number_format($r['amount'], 0) : '—' }}</td>
+                                    <td style="white-space:nowrap;">{{ $r['amount'] !== null ? '$' . number_format($r['paid'], 0) : '—' }}</td>
+                                    <td style="white-space:nowrap;">
                                         <span class="mg-status-pill mg-status-{{ $r['status'] }}">{{ $r['label'] }}</span>
                                         @if($r['overdue'])<span class="mg-status-pill mg-status-overdue">Overdue</span>@endif
                                     </td>
+                                    <td style="white-space:nowrap;">{{ $r['due']?->format('M j, Y') ?? '—' }}</td>
                                     <td style="padding-right:18px;text-align:right;white-space:nowrap;">
-                                        @if($r['pay_url'])<a href="{{ $r['pay_url'] }}" class="mg-row-view" style="background:#f97316;border-color:#f97316;color:#fff;">Pay Now</a>@endif
-                                        @if($r['view_url'])<a href="{{ $r['view_url'] }}" class="mg-row-view">View</a>@endif
+                                        @if($r['pay_url'])
+                                            <a href="{{ $r['pay_url'] }}" class="mg-row-view">Pay Now</a>
+                                        @elseif($r['set_url'])
+                                            <a href="{{ $r['set_url'] }}" class="mg-row-view">Set Amount</a>
+                                        @elseif($r['view_url'])
+                                            <a href="{{ $r['view_url'] }}" class="mg-row-view">View</a>
+                                        @endif
+                                        <div class="mg-menu" data-row-menu>
+                                            <button type="button" class="mg-row-kebab" aria-haspopup="true" aria-expanded="false" title="More actions">⋮</button>
+                                            <div class="mg-menu-pop" data-row-menu-pop>
+                                                @if($r['view_url'])<a href="{{ $r['view_url'] }}">View details</a>@endif
+                                                @if($r['event_id'])<a href="{{ route('client.events.show', $r['event_id']) }}">View event</a>@endif
+                                                @if($r['profile_url'])<a href="{{ $r['profile_url'] }}">View professional</a>@endif
+                                                <a href="{{ route('client.chat.index') }}">Message professional</a>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">Nothing to pay yet. Payments show here once you accept a proposal.</td></tr>
+                                <tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);">Nothing to pay yet. Payments show here once you accept a proposal.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
-                <p class="mg-rail-note" style="padding:10px 18px 14px;margin:0;">Overdue shows only when an amount is set and its due date has passed.</p>
+                {{-- Sir Peter's "About payment statuses" box, in the rules this tab follows. --}}
+                <div class="mg-pay-about">
+                    <span class="mg-pay-about-i">i</span>
+                    <div>
+                        <b>About payment statuses</b>
+                        <ul>
+                            <li>"Overdue" is only shown when a payment amount is set and the due date has passed.</li>
+                            <li>If no amount has been set yet, the status shows "Pending Amount" or "Not Scheduled" instead of "Overdue".</li>
+                            <li>Payments are made to professionals through GigResource. Your own account is never listed here.</li>
+                        </ul>
+                    </div>
+                    <a href="{{ url('/payment-policy') }}">Learn more about payments →</a>
+                </div>
             </div>
         </div>
 
@@ -1214,7 +1257,7 @@
 
         {{-- Upcoming Payments: owed, with a due date, soonest first. --}}
         <div class="mg-rail-card">
-            <div class="mg-rail-head"><div class="mg-rail-title">Upcoming Payments</div></div>
+            <div class="mg-rail-head"><div class="mg-rail-title">Upcoming Payments</div><a href="{{ route('client.events.index', ['sub' => 'payments']) }}" class="mg-rail-link" style="margin:0;" data-open-subtab="payments">View All</a></div>
             @forelse($upcomingPayments as $up)
                 <div class="mg-dl-row">
                     <span class="mg-dl-bar" @if($up['overdue']) style="background:#ef4444;" @endif></span>

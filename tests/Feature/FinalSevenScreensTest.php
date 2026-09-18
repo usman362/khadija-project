@@ -138,6 +138,28 @@ class FinalSevenScreensTest extends TestCase
             ->assertSee('View all date options');
     }
 
+    /** Sir Peter's proposals page: a request that is out opens on it. */
+    public function test_the_event_page_opens_on_proposals_by_service(): void
+    {
+        $e = $this->event();
+        $e->categories()->sync([$this->dj->id, $this->hall->id]);
+        $this->bid($e, $this->pro('Velvet Beats'), $this->dj, $e->starts_at->toDateString());
+
+        $this->actingAs($this->client)->get(route('client.events.show', $e))
+            ->assertOk()
+            ->assertSee('Proposals by Service')
+            ->assertSee('Confirmed Date &amp; Time', false)
+            ->assertSee('Event Progress')
+            ->assertSee('Quick Tips')
+            ->assertSee('Still uncovered:</b> Banquet Halls', false)
+            ->assertSee('Messages');
+
+        // A draft opens on its details instead.
+        $draft = $this->event(['status' => 'pending', 'is_published' => false]);
+        $this->actingAs($this->client)->get(route('client.events.show', $draft))
+            ->assertOk()->assertDontSee('Proposals by Service');
+    }
+
     public function test_the_reference_says_what_kind_of_request_it_is(): void
     {
         $this->assertStringStartsWith('BR-', $this->event()->reference());
@@ -300,6 +322,11 @@ class FinalSevenScreensTest extends TestCase
                 ->map(fn ($f) => $rows->first(fn ($r) => $r['event_id'] === $f->event_id && $r['amount'] === ($f->agreed_price !== null ? (float) $f->agreed_price : null))['status'])
                 ->all(),
         );
+
+        // No price yet: Set Amount opens the agreement's Price step.
+        $this->assertSame(route('client.finalize.step', [$noPrice, 'price']), $rows->firstWhere('status', 'pending_amount')['set_url']);
+        $this->actingAs($this->client)->get(route('client.events.index'))->assertOk()
+            ->assertSee('Set Amount')->assertSee('About payment statuses')->assertSee('Learn more about payments');
 
         $sum = PaymentTracker::summary($rows);
         $this->assertEquals(250, $sum['paid']);

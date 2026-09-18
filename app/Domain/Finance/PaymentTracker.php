@@ -46,14 +46,14 @@ class PaymentTracker
         $finalizations = Finalization::where('client_id', $client->id)
             ->where('supplier_id', '!=', $client->id)
             ->when($since, fn ($q) => $q->where('created_at', '>=', $since))
-            ->with(['event:id,title,starts_at', 'supplier:id,name', 'category:id,name', 'booking:id,status,price'])
+            ->with(['event:id,title,starts_at', 'supplier:id,name,avatar,public_id,primary_role', 'category:id,name', 'booking:id,status,price'])
             ->get();
 
         $bookings = Booking::where('client_id', $client->id)
             ->where('supplier_id', '!=', $client->id)
             ->whereNotIn('id', Finalization::where('client_id', $client->id)->whereNotNull('booking_id')->pluck('booking_id'))
             ->when($since, fn ($q) => $q->where('created_at', '>=', $since))
-            ->with(['event:id,title,starts_at', 'supplier:id,name', 'category:id,name'])
+            ->with(['event:id,title,starts_at', 'supplier:id,name,avatar,public_id,primary_role', 'category:id,name'])
             ->get();
 
         /*
@@ -130,13 +130,14 @@ class PaymentTracker
             default => 0.0,
         };
 
-        return self::row($status, $amount, $paid, $f->balance_due_on, $date, [
-            'professional' => $f->supplier?->name ?? 'Professional',
+        return self::row($status, $amount, $paid, $f->balance_due_on, $date, self::who($f->supplier) + [
             'service'      => $f->category?->name,
             'event'        => $f->event?->title,
             'event_id'     => $f->event_id,
             // Pay Now carries on the agreement, which ends at Secure Payment.
-            'pay_url'      => $f->status === 'in_progress' ? route('client.finalize.step', $f) : null,
+            'pay_url'      => $f->status === 'in_progress' && $amount !== null ? route('client.finalize.step', $f) : null,
+            // No price yet: the agreement's Price step is where it is set.
+            'set_url'      => $f->status === 'in_progress' && $amount === null ? route('client.finalize.step', [$f, 'price']) : null,
             'view_url'     => $booking
                 ? route('client.payments.show', $booking->id)
                 : ($f->event_id ? route('client.events.show', $f->event_id) : null),
@@ -156,14 +157,25 @@ class PaymentTracker
             default => 'pending',
         };
 
-        return self::row($status, $amount, $status === 'paid' ? (float) $amount : 0.0, null, $date, [
-            'professional' => $b->supplier?->name ?? 'Professional',
+        return self::row($status, $amount, $status === 'paid' ? (float) $amount : 0.0, null, $date, self::who($b->supplier) + [
             'service'      => $b->category?->name,
             'event'        => $b->event?->title,
             'event_id'     => $b->event_id,
             'pay_url'      => null,
+            'set_url'      => null,
             'view_url'     => route('client.payments.show', $b->id),
         ]);
+    }
+
+    /** Who the row is with: name, picture, GigResource ID, profile. */
+    private static function who($supplier): array
+    {
+        return [
+            'professional' => $supplier?->name ?? 'Professional',
+            'avatar'       => $supplier?->avatar_url,
+            'pro_id'       => $supplier?->public_id ? \App\Support\GigResourceId::display($supplier->public_id) : null,
+            'profile_url'  => $supplier && $supplier->primary_role === 'professional' ? route('public.professional.show', $supplier->id) : null,
+        ];
     }
 
     private static function row(string $status, ?float $amount, float $paid, $due, $date, array $extra): array

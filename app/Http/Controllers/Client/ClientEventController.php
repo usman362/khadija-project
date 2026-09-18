@@ -534,9 +534,11 @@ class ClientEventController extends Controller
 
         // Which tab is open. Everything is rendered server-side and switched by
         // query string, so a tab is linkable and survives a reload.
-        $tab = in_array($request->query('tab'), ['overview', 'requirements', 'proposals', 'attendees', 'questions', 'files', 'activity'], true)
+        // A request that is out opens on its proposals (Sir Peter's page); a
+        // draft, which has none yet, on its details.
+        $tab = in_array($request->query('tab'), ['overview', 'requirements', 'proposals', 'attendees', 'questions', 'files', 'messages', 'activity'], true)
             ? $request->query('tab')
-            : 'overview';
+            : ($event->isDraft() ? 'overview' : 'proposals');
 
         // The award, if the client already picked someone. Once this exists the
         // request is no longer open for proposals.

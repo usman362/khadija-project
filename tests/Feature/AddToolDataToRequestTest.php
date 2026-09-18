@@ -77,7 +77,8 @@ class AddToolDataToRequestTest extends TestCase
 
         $current = $this->event(title: 'This year');
 
-        $page = $this->actingAs($this->client)->get(route('client.events.show', $current));
+        // Event Details: a request that is out opens on its proposals.
+        $page = $this->actingAs($this->client)->get(route('client.events.show', [$current, 'tab' => 'overview']));
 
         $page->assertOk();
         $page->assertSee('Add tool data from your other events', false);

@@ -27,7 +27,15 @@
         .ev-title { font-size: 26px; font-weight: 800; letter-spacing: -0.01em; color: var(--text-primary); margin: 0 0 9px; }
         .ev-chips { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; }
         .ev-cat { font-size: 11.5px; font-weight: 700; color: var(--text-secondary); background: var(--bg-subtle, rgba(0,0,0,.04)); border: 1px solid var(--border-color); border-radius: 999px; padding: 3px 10px; }
-        .ev-meta { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-color); }
+        .ev-top { display: flex; gap: 20px; align-items: flex-start; }
+        .ev-img { width: 150px; height: 112px; border-radius: 12px; object-fit: cover; flex: none; background: linear-gradient(135deg, #fed7aa, #fdba74); display: flex; align-items: center; justify-content: center; color: #c2410c; }
+        .ev-img svg { width: 40px; height: 40px; }
+        @media (max-width: 700px) { .ev-top { flex-direction: column; } .ev-img { width: 100%; height: 140px; } }
+        .ev-title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+        .ev-title-row .ev-title { margin: 0; }
+        .ev-meta { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 10px; }
+        .ev-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+        .ev-meta-row .ev-sep { color: var(--border-color); }
         .ev-meta div { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-secondary); font-weight: 600; }
         .ev-meta svg { width: 15px; height: 15px; color: var(--accent-orange, #f97316); flex-shrink: 0; }
         .ev-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
@@ -133,8 +141,20 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
             Back to My Events
         </a>
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
-            <div style="min-width:0;">
+        @php
+            // The picture: the event type's artwork, else the first service's.
+            $__evImg = \App\Models\Category::query()->eventTypes()->where('name', $event->event_type)->first()?->imageUrl()
+                ?? $event->categories->first(fn ($c) => $c->imageUrl())?->imageUrl();
+        @endphp
+        <div class="ev-top">
+            @if($__evImg)
+                <img class="ev-img" src="{{ $__evImg }}" alt="">
+            @else
+                <div class="ev-img" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+            @endif
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; flex: 1; min-width: 0;">
+            <div style="min-width:0;flex:1;">
+                <div class="ev-title-row">
                 <h2 class="ev-title">{{ $event->title }}</h2>
                 <div class="ev-chips">
                     {{-- Publish state once; the workflow status only when it adds
@@ -148,6 +168,10 @@
                           @if($lifecycle === 'expired') style="background:#fef3c7;color:#b45309;" @endif>
                         {{ \App\Domain\Requests\RequestLifecycle::LABELS[$lifecycle] }}
                     </span>
+                </div>
+                </div>
+                @include('client.events._event_meta')
+                <div class="ev-chips">
                     @if(! in_array($event->status, ['published', 'pending'], true))
                         <span class="cl-badge cl-badge-{{ $event->status }}">{{ ucfirst(str_replace('_', ' ', $event->status)) }}</span>
                         {{-- D-2: "Cancelled", with who and when. --}}
@@ -176,7 +200,7 @@
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                 <button type="button" class="cl-btn cl-btn-ghost cl-btn-sm" onclick="document.getElementById('editEventModal').classList.add('show')">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                    Edit
+                    Edit Request
                 </button>
                 {{-- OA-115: the same two-column disagreement as OA-140. This
                      offered the wizard and a Publish button on events that were
@@ -204,32 +228,7 @@
             </div>
         </div>
 
-        {{-- Sir Peter's request header: the date and times, where, how many
-             services, the budget range, and a reference the client can quote. --}}
-        <div class="ev-meta">
-            @if($event->starts_at)
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>{{ $event->starts_at->format('D, M j, Y · g:i A') }}@if($event->ends_at && $event->ends_at->gt($event->starts_at)) – {{ $event->ends_at->format('g:i A') }}@endif</div>
-            @endif
-            @if($event->location || $event->location_need === \App\Domain\Requests\VenueRule::NEED)
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    @if($event->location_need === \App\Domain\Requests\VenueRule::NEED)
-                        {{ implode(', ', (array) $event->preferred_locations) ?: $event->location }} (need to find a venue)
-                    @else
-                        {{ $event->location }}
-                    @endif
-                </div>
-            @endif
-            <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>{{ $event->categories->count() }} {{ \Illuminate\Support\Str::plural('service', $event->categories->count()) }}</div>
-            @if($event->budget_min || $event->budget_max)
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Budget: ${{ number_format((float) $event->budget_min) }} – ${{ number_format((float) $event->budget_max) }}</div>
-            @elseif($event->budget)
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Budget: ${{ number_format((float) $event->budget) }}</div>
-            @endif
-            @if($event->guest_count)
-                <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>{{ number_format($event->guest_count) }} guests</div>
-            @endif
-            <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Request ID: <b style="margin-left:4px;">{{ $event->reference() }}</b></div>
-        </div>
+        </div>{{-- /ev-top --}}
 
         @if($event->locationPlacementFailed() && $event->location_need !== \App\Domain\Requests\VenueRule::NEED)
             <div style="margin-top:14px;padding:14px 16px;border:1px solid #fdba74;background:#fff7ed;border-radius:12px;">
@@ -343,6 +342,7 @@
         </div>
     @endif
 
+    @if($tab !== 'proposals')
     <div class="ev-stats">
         <div class="ev-stat"><b>{{ $evBids }}</b><span>Proposals</span></div>
         <div class="ev-stat"><b>{{ $event->categories->count() }}</b><span>Services</span></div>
@@ -352,20 +352,24 @@
             <span>{{ $evDaysToGo !== null && $evDaysToGo > 0 ? 'Days to go' : 'Event date' }}</span>
         </div>
     </div>
+    @endif
 
 
     {{-- Six tabs, server-rendered and switched by query string so each one is
          linkable and survives a reload. Peter's mockup has these as JS tabs;
          a client sharing a link to the Proposals tab is the common case. --}}
     @php
+        // Sir Peter's order: Proposals, Event Details, Files, Messages, Activity,
+        // with this platform's Requirements, Attendees and Questions kept.
         $evTabs = [
-            'overview'     => ['Overview', null],
-            'requirements' => ['Requirements', $event->categories->count()],
             'proposals'    => ['Proposals', $bids->count()],
+            'overview'     => ['Event Details', null],
+            'requirements' => ['Requirements', $event->categories->count()],
             // R60 — the guest list lives on the event it belongs to.
             'attendees'    => ['Attendees', $attendeeSummary['total']],
             'questions'    => ['Questions', $questions->count()],
             'files'        => ['Files', null],
+            'messages'     => ['Messages', null],
             'activity'     => ['Activity', $activity->count()],
         ];
     @endphp
@@ -691,204 +695,36 @@
         </div>
     @endif
 
-    {{-- ── Proposals ────────────────────────────────────────── --}}
+    {{-- ── Proposals, by service (Sir Peter's proposals page) ── --}}
     @if($tab === 'proposals')
+        @include('client.events._proposals_by_service')
+    @endif
+
+    {{-- ── Messages about this request ───────────────────────── --}}
+    @if($tab === 'messages')
         @php
-            $__open = \App\Domain\Requests\ServiceCoverage::uncovered($coverage);
-            $__multi = $coverage->count() > 1;
+            $__convs = \App\Models\Conversation::where('event_id', $event->id)
+                ->whereHas('participants', fn ($q) => $q->where('users.id', auth()->id()))
+                ->addSelect(['last_message_at' => \App\Models\Message::select('created_at')
+                    ->whereColumn('conversation_id', 'conversations.id')->latest()->limit(1)])
+                ->with('participants:id,name,avatar')->orderByDesc('last_message_at')->get();
         @endphp
         <div class="cl-card">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
-                <h3 style="font-size:16px;font-weight:600;">Proposals received ({{ $bids->count() }})</h3>
-                @if($bids->count() > 1)
-                    <a class="cl-btn cl-btn-primary cl-btn-sm" style="background:#c2410c;border-color:#c2410c;"
-                       href="{{ route('client.proposals.compare', $event) }}">Compare all proposals</a>
-                @endif
-            </div>
-
-            <div class="ev-sealed"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> <span><b>Sealed proposals.</b> Each amount is visible only to you and the professional who sent it. Competitors cannot see each other's bids.</span></div>
-
-            {{-- Event progress and the date, as on Sir Peter's proposals page:
-                 how many services have proposals and how many are accepted,
-                 then the date every service must share, with the backups. --}}
-            @php
-                $__svcRows = $coverage->filter(fn ($r) => $r['service']);
-                $__withBids = $__svcRows->where('state', '!=', 'open')->count();
-                $__accepted = $__svcRows->where('state', 'awarded')->count();
-                $__total = max(1, $__svcRows->count());
-                $__opts = \App\Domain\Requests\EventDates::options($event);
-                $__locked = \App\Domain\Requests\ProposalDate::lockedDate($event);
-            @endphp
-            <div class="ev-progress">
-                <div class="ev-progress-c">
-                    <b>{{ (int) round($__withBids / $__total * 100) }}%</b>
-                    <span>{{ $__withBids }} of {{ $__svcRows->count() }} {{ Str::plural('service', $__svcRows->count()) }} have proposals · {{ $__accepted }} accepted · {{ $__svcRows->count() - $__withBids }} waiting</span>
-                </div>
-                @if($__opts)
-                    <div class="ev-progress-d">
-                        <b>{{ $__locked ? 'Event date (set by an accepted service)' : 'Preferred date' }}</b>
-                        <span>{{ \App\Domain\Requests\EventDates::label($__opts[0]) }}</span>
-                        @if(count($__opts) > 1)
-                            <details>
-                                <summary>View all date options</summary>
-                                @foreach($__opts as $o)
-                                    <div>{{ \App\Domain\Requests\EventDates::label($o) }} {{ $o['primary'] ? '(preferred)' : '(backup)' }}</div>
-                                @endforeach
-                            </details>
-                        @endif
+            <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Messages about this request</h3>
+            @forelse($__convs as $__c)
+                @php $__peer = $__c->participants->firstWhere('id', '!=', auth()->id()); @endphp
+                <a href="{{ route('client.chat.show', $__c) }}" class="ev-act-row" style="text-decoration:none;align-items:center;">
+                    <img src="{{ $__peer?->avatar_url }}" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
+                    <div style="flex:1;min-width:0;">
+                        <b style="display:block;font-size:13.5px;color:var(--text-primary);">{{ $__peer?->name ?? 'Conversation' }}</b>
+                        <span style="font-size:12px;color:var(--text-muted);">{{ $__c->last_message_at ? \Illuminate\Support\Carbon::parse($__c->last_message_at)->humanAgo() : 'No messages yet' }}</span>
                     </div>
-                @endif
-            </div>
-
-            {{-- Sir Peter, 17 Sep: on a multi-service request, say which
-                 services are covered and which are not, before the detail. --}}
-            @if($__multi)
-                <div class="ev-cov" data-coverage>
-                    @foreach($coverage as $row)
-                        <div class="ev-cov-item is-{{ $row['state'] }}">
-                            <span class="ev-cov-name">{{ $row['service']->name ?? 'Whole request' }}</span>
-                            <span class="ev-cov-state">
-                                @switch($row['state'])
-                                    @case('awarded') Booked with {{ $row['booking']->supplier->name ?? 'a professional' }} @break
-                                    @case('has_bids') {{ $row['bids']->count() }} {{ Str::plural('proposal', $row['bids']->count()) }} @break
-                                    @default No proposals yet
-                                @endswitch
-                            </span>
-                        </div>
-                    @endforeach
-                </div>
-                @if($__open->isNotEmpty())
-                    <p class="ev-cov-note">
-                        <b>Still uncovered:</b> {{ $__open->pluck('service.name')->implode(', ') }}.
-                        This request stays open for {{ $__open->count() === 1 ? 'it' : 'them' }} while you choose the rest.
-                    </p>
-                @endif
-            @endif
-
-            @foreach($coverage as $row)
-                @php
-                    $__svc = $row['service'];
-                    $__budget = $__svc ? $event->budgetForService($__svc->id) : null;
-                    $__budget = $__budget ?: (! $__multi ? $event->budget : null);
-                @endphp
-                <section class="ev-svc-group" id="{{ $__svc ? 'service-' . $__svc->id : 'service-all' }}">
-                    @if($__multi)
-                        <div class="ev-svc-head">
-                            <div>
-                                <b>{{ $__svc->name ?? 'Whole request' }}</b>
-                                <span>
-                                    @if($__budget) Your budget ${{ number_format($__budget) }} · @endif
-                                    @if($row['lowest'] !== null) Lowest ${{ number_format($row['lowest']) }} @else No proposals yet @endif
-                                </span>
-                            </div>
-                            @if($__svc && $row['bids']->count() > 1)
-                                <a class="cl-btn cl-btn-ghost cl-btn-sm"
-                                   href="{{ route('client.proposals.compare', [$event, 'service' => $__svc->id]) }}">Compare {{ $row['bids']->count() }} side by side</a>
-                            @endif
-                        </div>
-                    @endif
-
-                    @if($row['booking'])
-                        <div class="ev-svc-booked">✓ Booked with <b>{{ rtrim($row['booking']->supplier->name ?? 'a professional', '.') }}</b>. The other proposals for this service can no longer be chosen.</div>
-                    @endif
-
-                    @forelse($row['bids'] as $bid)
-                        @php
-                            $sup = $bid->supplier; $prof = $sup?->profile;
-                            $__date = $bidDates[$bid->id] ?? 'no_date';
-                            $__won = $row['booking'] && (int) $row['booking']->supplier_id === (int) $bid->supplier_id;
-                            $__warn = \App\Domain\Requests\ProposalDate::needsWarning($__date)
-                                ? \App\Domain\Requests\ProposalDate::warning($__date, $event->starts_at, $sup?->name, $bid)
-                                : null;
-                            $__blocked = \App\Domain\Requests\ProposalDate::blocks($__date);
-                            $__rating = $sup ? $sup->reviewsReceived->where('is_hidden', false)->avg('rating') : null;
-                            $__ratingN = $sup ? $sup->reviewsReceived->where('is_hidden', false)->count() : 0;
-                            $__status = match (true) {
-                                $__won => ['Accepted', 'ok'],
-                                in_array($bid->status, ['declined'], true) => ['Declined', 'no'],
-                                in_array($bid->status, ['withdrawn'], true) => ['Withdrawn', 'no'],
-                                $bid->replies->isNotEmpty() => ['Replied', 'info'],
-                                default => ['New', 'info'],
-                            };
-                        @endphp
-                        <div class="ev-prop">
-                            <div style="min-width:0;">
-                                <div style="font-size:14.5px;font-weight:800;color:var(--text-primary);">
-                                    {{ $sup?->name ?? 'Professional' }}
-                                    @if($sup?->public_id)<span class="ev-prop-id">{{ \App\Support\GigResourceId::display($sup->public_id) }}</span>@endif
-                                    <span class="ev-pstatus is-{{ $__status[1] }}">{{ $__status[0] }}</span>
-                                </div>
-                                <div class="ev-prop-meta">
-                                    @if($__ratingN)<span>★ {{ number_format($__rating, 1) }} ({{ $__ratingN }} {{ Str::plural('review', $__ratingN) }})</span>@else<span>No reviews yet</span>@endif
-                                    @if($prof?->headline)<span>{{ $prof->headline }}</span>@endif
-                                    @if($prof?->city)<span>{{ $prof->city }}</span>@endif
-                                    @if(! $__multi && $bid->category)<span>{{ $bid->category->name }}</span>@endif
-                                    <span>Submitted {{ $bid->created_at->humanAgo() }}</span>
-                                </div>
-                                <div class="ev-date is-{{ $__date }}">{{ \App\Domain\Requests\ProposalDate::label($__date, $event->starts_at, $bid) }}</div>
-                                @if($bid->availability_note)<p class="ev-prop-note">On timing: {{ $bid->availability_note }}</p>@endif
-                                @if($bid->note)<p class="ev-prop-note">"{{ $bid->note }}"</p>@endif
-                                @if($bid->replies->isNotEmpty())
-                                    @php $__last = $bid->replies->last(); @endphp
-                                    <p class="ev-prop-note" style="font-size:12px;color:var(--text-muted);">Last reply from {{ $__last->user?->name ?? 'someone' }} {{ $__last->created_at->humanAgo() }}@if($__last->counter_amount) · countered at ${{ number_format($__last->counter_amount) }}@endif</p>
-                                @endif
-                            </div>
-                            <div style="text-align:right;white-space:nowrap;">
-                                <div style="font-size:19px;font-weight:800;color:var(--text-primary);">${{ number_format($bid->amount) }}</div>
-                                @if($__budget)
-                                    <div style="font-size:11.5px;font-weight:700;color:{{ $bid->amount <= $__budget ? '#16a34a' : '#d97706' }};">
-                                        {{ $bid->amount <= $__budget ? 'Within budget' : 'Above budget' }}
-                                    </div>
-                                @endif
-                                <div style="margin-top:8px;display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;">
-                                    <a class="cl-btn cl-btn-ghost cl-btn-sm" href="{{ route('public.professional.show', $sup) }}">View profile</a>
-                                    @if($__won)
-                                        <span class="ev-won">Booked</span>
-                                    @elseif(! $row['booking'] && ! in_array($bid->status, ['declined', 'withdrawn'], true))
-                                        {{-- Accepting one service never touches the others:
-                                             each is agreed on its own. A date that does not
-                                             hold asks once more before going ahead, and one
-                                             for a different day from a service already
-                                             accepted cannot be accepted at all. --}}
-                                        @if($__blocked)
-                                            <span class="ev-won" style="background:#fee2e2;color:#b91c1c;" title="{{ $__warn ?? \App\Domain\Requests\ProposalDate::warning($__date, $event->starts_at, $sup?->name, $bid) }}">Different date</span>
-                                        @else
-                                            <form method="POST" action="{{ route('client.finalize.start', $bid) }}"
-                                                  @if($__warn) onsubmit="return confirm(@js($__warn . ' Continue anyway?'));" @endif>
-                                                @csrf
-                                                <button type="submit" class="cl-btn cl-btn-primary cl-btn-sm">Accept</button>
-                                            </form>
-                                        @endif
-                                        <form method="POST" action="{{ route('client.proposals.decline', $bid) }}"
-                                              onsubmit="return confirm('Decline this proposal?');">
-                                            @csrf
-                                            <button type="submit" class="cl-btn cl-btn-ghost cl-btn-sm">Decline</button>
-                                        </form>
-                                    @endif
-                                </div>
-                                @if(! $__won && ! in_array($bid->status, ['declined', 'withdrawn'], true))
-                                    {{-- Reply: a question or a counter-offer, on this proposal's own thread. --}}
-                                    <details class="ev-reply">
-                                        <summary>Reply</summary>
-                                        <form method="POST" action="{{ route('client.proposals.reply', $bid) }}">
-                                            @csrf
-                                            <textarea name="note" rows="2" maxlength="1000" placeholder="Ask a question or explain a counter-offer" aria-label="Reply to {{ $sup?->name }}"></textarea>
-                                            <div style="display:flex;gap:6px;align-items:center;justify-content:flex-end;">
-                                                <input type="number" name="counter_amount" min="1" placeholder="Counter $ (optional)" aria-label="Counter amount">
-                                                <button type="submit" class="cl-btn cl-btn-primary cl-btn-sm">Send</button>
-                                            </div>
-                                        </form>
-                                    </details>
-                                @endif
-                            </div>
-                        </div>
-                    @empty
-                        <div class="ev-svc-empty">
-                            {{ $type === 'DR' ? 'The professional you sent this to has not responded yet.' : 'No proposals for this service yet. Professionals who offer it are being notified.' }}
-                        </div>
-                    @endforelse
-                </section>
-            @endforeach
+                    <span style="font-size:12.5px;font-weight:700;color:#1d4ed8;">Open →</span>
+                </a>
+            @empty
+                <div class="ev-empty"><b>No messages about this request yet</b><p>When you and a professional message about this request, the conversation shows here.</p>
+                    <a class="cl-btn cl-btn-ghost cl-btn-sm" href="{{ route('client.chat.index') }}">Open Messages</a></div>
+            @endforelse
         </div>
     @endif
 
