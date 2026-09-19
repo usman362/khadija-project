@@ -242,6 +242,6 @@ class RequestEventStateTest extends TestCase
         $this->openEventStep($client)
             ->assertOk()
             ->assertSee('Delaware', false)
-            ->assertSee('within one state', false);
+            ->assertSee('visible only to professionals in', false);
     }
 }

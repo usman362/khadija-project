@@ -76,6 +76,59 @@
     .bw-issue a { font-weight: 800; color: #b91c1c; }
     .bw-btn.go[disabled] { opacity: .5; cursor: not-allowed; }
     @media (max-width: 700px) { .bw-revrow { grid-template-columns: 1fr auto 26px; } .bw-revrow-v { grid-column: 1 / -1; grid-row: 2; } }
+    /* ── Step 2, Sir Peter's layout (19 Sep) ── */
+    .ed-head { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+    .ed-num { width: 54px; height: 54px; border-radius: 50%; background: #ea580c; color: #fff; font-size: 24px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex: none; }
+    .ed-head h3 { font-size: 24px; font-weight: 800; color: #1e3a8a; margin: 0 0 2px; }
+    .ed-card { border: 1px solid var(--border-color); border-radius: 14px; padding: 16px 18px; background: var(--bg-card); }
+    .ed-card-h { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+    .ed-card-h svg { width: 26px; height: 26px; color: #1d4ed8; flex: none; margin-top: 1px; }
+    .ed-card-h b { display: block; font-size: 17px; font-weight: 800; color: #1e3a8a; }
+    .ed-card-h span { display: block; font-size: 13px; color: var(--text-secondary); }
+    .ed-info { display: flex; align-items: center; gap: 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #1e3a8a; margin-bottom: 14px; }
+    .ed-info-i { width: 22px; height: 22px; border-radius: 50%; background: #2563eb; color: #fff; font-weight: 800; font-size: 13px; font-family: Georgia, serif; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+    .ed-q { display: block; font-size: 13.5px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
+    .ed-opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 4px; }
+    @media (max-width: 900px) { .ed-opts { grid-template-columns: 1fr; } }
+    .ed-opt { position: relative; display: flex; align-items: flex-start; gap: 10px; padding: 14px 12px; border: 1.5px solid var(--border-color); border-radius: 12px; cursor: pointer; background: var(--bg-card); }
+    .ed-opt input { margin-top: 3px; accent-color: #16a34a; }
+    .ed-opt svg { width: 30px; height: 30px; color: #1d4ed8; flex: none; }
+    .ed-opt b { display: block; font-size: 13px; font-weight: 800; color: var(--text-primary); }
+    .ed-opt small { display: block; font-size: 11.5px; color: var(--text-muted); line-height: 1.4; margin-top: 2px; }
+    .ed-opt:has(input:checked) { border-color: #16a34a; background: rgba(22,163,74,.06); }
+    .ed-need { background: #fffbeb; border-color: #fde68a; }
+    .ed-need-h { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+    .ed-need-h svg { width: 30px; height: 30px; color: #c2410c; flex: none; }
+    .ed-need-h b { display: block; font-size: 15px; font-weight: 800; color: #1e3a8a; }
+    .ed-need-h span { display: block; font-size: 12.5px; color: var(--text-secondary); }
+    .ed-need-h .bw-statelock { margin-left: auto; white-space: nowrap; }
+    .ed-towngrid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) auto; gap: 12px; align-items: start; }
+    @media (max-width: 900px) { .ed-towngrid { grid-template-columns: 1fr; } }
+    .ed-lock { display: flex; align-items: center; gap: 8px; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; background: var(--bg-subtle, #f3f4f6); font-size: 13px; color: var(--text-secondary); }
+    .ed-lock svg { width: 15px; height: 15px; }
+    .ed-townadd { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; padding-top: 22px; }
+    .ed-townadd small { font-size: 12px; color: var(--text-muted); }
+    .ed-addbtn { border: 1.5px solid #ea580c; color: #c2410c; background: var(--bg-card); border-radius: 9px; padding: 9px 14px; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+    .ed-addbtn[hidden] { display: none; }
+    .ed-types { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+    .ed-warn { display: flex; gap: 14px; align-items: flex-start; margin-top: 12px; border: 1.5px solid #fca5a5; background: #fef2f2; border-radius: 12px; padding: 14px 16px; }
+    .ed-warn[hidden] { display: none; }
+    .ed-warn-i { width: 32px; height: 32px; border-radius: 50%; background: #dc2626; color: #fff; font-weight: 800; font-size: 17px; display: flex; align-items: center; justify-content: center; flex: none; }
+    .ed-warn b { display: block; font-size: 14.5px; color: #b91c1c; margin-bottom: 3px; }
+    .ed-warn p { font-size: 12.5px; color: #7f1d1d; margin: 0 0 8px; line-height: 1.5; }
+    .ed-warn-btn { display: inline-block; border: 1.5px solid #dc2626; color: #b91c1c; background: #fff; border-radius: 8px; padding: 6px 12px; font-size: 12.5px; font-weight: 800; text-decoration: none; }
+    .ed-rail-steps { list-style: none; padding: 0; margin: 0; }
+    .ed-rail-steps li { display: flex; gap: 10px; margin-bottom: 10px; font-size: 12.5px; color: var(--text-secondary); line-height: 1.45; }
+    .ed-rail-steps li i { width: 24px; height: 24px; border-radius: 50%; background: #dc2626; color: #fff; font-style: normal; font-weight: 800; font-size: 12px; display: flex; align-items: center; justify-content: center; flex: none; }
+    .ed-rail-steps b { display: block; color: var(--text-primary); }
+    .ed-rail-req { border-color: #fecaca !important; background: #fef2f2 !important; }
+    .ed-rail-req[hidden] { display: none !important; }
+    .ed-rail-req h4 { color: #b91c1c !important; }
+    .ed-rail-req p { font-size: 12.5px; color: #7f1d1d; line-height: 1.5; margin: 0 0 8px; }
+    .ed-rail-req a, .ed-rail-link { font-size: 12.5px; font-weight: 800; color: #1d4ed8; }
+    .ed-rail-checks { list-style: none; padding: 0; margin: 0; }
+    .ed-rail-checks li { display: flex; gap: 8px; font-size: 12.5px; color: var(--text-secondary); margin-bottom: 6px; line-height: 1.4; }
+    .ed-rail-checks li::before { content: '✓'; color: #16a34a; font-weight: 800; }
     .bw-needpanel { margin-top: 12px; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-subtle, rgba(0,0,0,.015)); }
     .bw-needpanel[hidden] { display: none; }
     .bw-towns-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
@@ -435,15 +488,170 @@
 
     {{-- ── 2 · Event details ───────────────────────────────── --}}
     @elseif($step === 'event')
-        <h3>About the event</h3>
-        <p class="lede">The basics professionals need to know before they can price anything.</p>
+        @php
+            // old() first: a rejected step lands back here with nothing
+            // saved, and the client's own answers must still be on screen.
+            $__loc  = old('location', $data['location'] ?? '');
+            $__prof = auth()->user()?->profile;
+            // Only a real street address counts as "my address".
+            $__home = filled($__prof?->address) ? trim(implode(', ', array_filter([
+                $__prof?->address, $__prof?->city, trim(($__prof?->state ?? '') . ' ' . ($__prof?->zip_code ?? '')),
+            ]))) : '';
+            $__kind = old('location_kind', ! empty($data['location_mine']) ? 'mine'
+                : ($data['location_kind'] ?? ($__home !== '' ? 'mine' : 'exact')));
+            if ($__kind === 'mine' && $__home === '') { $__kind = 'exact'; }
+            if ($__kind === 'area') { $__kind = $__home !== '' ? 'mine' : 'exact'; }
+            $__need = old('location_need', $data['location_need'] ?? (($data['location_kind'] ?? null) === 'area' ? 'unsure' : 'have'));
+            $__towns = array_values(array_filter((array) old('preferred_locations', $data['preferred_locations'] ?? [])));
+            if (! $__towns) { $__towns = ['']; }
+            $__stateCode = $__prof?->state;
+            $__stateName = config('geo.allowed_states')[$__stateCode] ?? $__stateCode;
+            $__picked = array_map('intval', (array) ($data['services'] ?? []));
+            $__venueIds = $venueServices->pluck('id')->map(fn ($i) => (int) $i)->all();
+            $__hasVenue = array_intersect($__picked, $__venueIds) !== [];
+            $__oldTypes = array_map('intval', (array) old('venue_types', []));
+            $__maxTowns = \App\Domain\Requests\VenueRule::MAX_PREFERRED;
+        @endphp
 
-        {{-- No "Event name" box: step 1 already asked what the event is, and
-             the name is built from that. It can be renamed on the last step. --}}
-        <div class="bw-two">
-            {{-- The date is asked once, on step 7, beside who is free on it,
-                 and that is also where backup dates go (Sir Peter, 16 Sep).
-                 It used to be asked here as well, then again there. --}}
+        {{-- Sir Peter's Step 2 (19 Sep): the big step heading, then one Event
+             Location card holding the three answers and what each one asks. --}}
+        <div class="ed-head">
+            <span class="ed-num">2</span>
+            <div>
+                <h3>Event Details</h3>
+                <p class="lede" style="margin:0;">Tell us about your event so professionals can provide the best proposals.</p>
+            </div>
+        </div>
+
+        <div class="ed-card" data-bw-need>
+            <div class="ed-card-h">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+                <div>
+                    <b>Event Location</b>
+                    <span>Help us understand your location needs. This helps us match you with the right professionals.</span>
+                </div>
+            </div>
+            @if($__stateName)
+                {{-- The State Boundary Rule, said once, where the location is asked. --}}
+                <div class="ed-info"><span class="ed-info-i">i</span><span>Your request will be visible only to professionals in <b>{{ $__stateName }}</b>, based on your account settings.</span></div>
+            @endif
+
+            <label class="ed-q">Do you already have a venue or event location?</label>
+            <div class="ed-opts">
+                <label class="ed-opt">
+                    <input type="radio" name="location_need" value="have" @checked($__need === 'have')>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span><b>Yes, I already have a location</b><small>I know the exact address or venue.</small></span>
+                </label>
+                <label class="ed-opt">
+                    <input type="radio" name="location_need" value="need_venue" @checked($__need === 'need_venue')>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 21v-4h6v4M8 7h2M14 7h2M8 11h2M14 11h2"/></svg>
+                    <span><b>No, I need to find a venue or space</b><small>I'm looking for a venue and professionals who provide or can help find one.</small></span>
+                </label>
+                <label class="ed-opt">
+                    <input type="radio" name="location_need" value="unsure" @checked($__need === 'unsure')>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span><b>Not sure yet</b><small>I'm still planning and don't have a specific location.</small></span>
+                </label>
+            </div>
+            @error('location_need')<p class="bw-err">{{ $message }}</p>@enderror
+
+            {{-- Yes: the address, from the profile or typed. --}}
+            <div class="bw-needpanel" data-bw-panel="have" @if($__need !== 'have') hidden @endif>
+                <div class="bw-locpick">
+                    @if($__home !== '')
+                        <label class="bw-locopt">
+                            <input type="radio" name="location_kind" value="mine" @checked($__kind === 'mine')>
+                            <span><b>Use my address</b><small>{{ $__home }}</small></span>
+                        </label>
+                    @endif
+                    <label class="bw-locopt">
+                        <input type="radio" name="location_kind" value="exact" @checked($__kind === 'exact')>
+                        <span><b>Enter the address</b><small>Lets us judge how far professionals are from it</small></span>
+                    </label>
+                </div>
+                <div data-bw-locbox @if($__kind === 'mine') hidden @endif>
+                    <label class="bw-loclabel" for="bw_location">Street address</label>
+                    <input type="text" name="location" id="bw_location" value="{{ $__need === 'have' && $__kind !== 'mine' ? $__loc : '' }}"
+                           placeholder="e.g. 1234 Garden Way, Baltimore, MD 21201" data-bw-location>
+                </div>
+                <label class="bw-loclabel" for="bw_venue">Venue name <span class="bw-optional">Optional</span></label>
+                <input type="text" name="venue" id="bw_venue" value="{{ $data['venue'] ?? '' }}" placeholder="e.g. Oregon Ridge Park">
+            </div>
+
+            {{-- No: where the venue should be, and what kind. --}}
+            <div class="bw-needpanel ed-need" data-bw-panel="need_venue" @if($__need !== 'need_venue') hidden @endif>
+                <div class="ed-need-h">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 21v-4h6v4M8 7h2M14 7h2M8 11h2M14 11h2"/></svg>
+                    <div>
+                        <b>Preferred location(s)</b>
+                        <span>Add one or more cities or towns where you'd like the venue to be. You can add up to {{ $__maxTowns }} locations.</span>
+                    </div>
+                    @if($__stateName)<span class="bw-statelock">{{ $__stateName }} Only</span>@endif
+                </div>
+                <div class="ed-towngrid">
+                    <div>
+                        <label class="bw-loclabel" style="margin-top:0;">City or Town <span class="bw-optional" style="text-transform:none;">(required)</span></label>
+                        <div data-bw-towns data-max="{{ $__maxTowns }}">
+                            @foreach($__towns as $__t)
+                                <div class="bw-town" data-bw-town>
+                                    <input type="text" name="preferred_locations[]" value="{{ $__t }}" placeholder="City or town, e.g. Bel Air" aria-label="City or town">
+                                    <button type="button" class="bw-backup-rm" data-bw-town-rm>Remove</button>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div>
+                        <label class="bw-loclabel" style="margin-top:0;">State</label>
+                        <div class="ed-lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>{{ $__stateName ?: 'Your state' }} (locked)</div>
+                    </div>
+                    <div class="ed-townadd">
+                        <button type="button" class="ed-addbtn" data-bw-town-add>+ Add Another Location</button>
+                        <small data-bw-town-count>{{ count(array_filter($__towns)) ?: 1 }} of {{ $__maxTowns }} locations added</small>
+                    </div>
+                </div>
+                @error('preferred_locations')<p class="bw-err">{{ $message }}</p>@enderror
+
+                <label class="bw-loclabel">What type of venue or space are you looking for? <span class="bw-optional">Optional</span></label>
+                <p class="bw-help" style="margin:0 0 6px;">Select all that apply. These match the service types in Venues &amp; Event Spaces.</p>
+                <div class="bw-venuetypes ed-types">
+                    @foreach($venueServices as $__v)
+                        <label>
+                            <input type="checkbox" name="venue_types[]" value="{{ $__v->id }}"
+                                   @checked(in_array((int) $__v->id, $__picked, true) || in_array((int) $__v->id, $__oldTypes, true))>
+                            <span>{{ $__v->name }}</span>
+                        </label>
+                    @endforeach
+                </div>
+
+                {{-- Said up front, before Continue, when step 1 has no venue
+                     service yet; the server refuses the step on the same rule. --}}
+                <div class="ed-warn" data-bw-venue-warn @if($__hasVenue) hidden @endif>
+                    <span class="ed-warn-i">!</span>
+                    <div>
+                        <b>Add a venue service to continue</b>
+                        <p>You told us you need to find or rent a venue, but no Venues &amp; Event Spaces service is selected in Step 1. Tick a venue type above, or go back and add one.</p>
+                        <a class="ed-warn-btn" href="{{ route('client.bsr.step', ['step' => 'service', 'return' => 'event']) }}">← Go to Service Selection</a>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Not sure: just the area. --}}
+            <div class="bw-needpanel" data-bw-panel="unsure" @if($__need !== 'unsure') hidden @endif>
+                <input type="hidden" name="location_kind" value="area" @disabled($__need !== 'unsure')>
+                <label class="bw-loclabel" for="bw_area">City and state</label>
+                <input type="text" name="location" id="bw_area" value="{{ $__need === 'unsure' ? $__loc : '' }}" placeholder="e.g. Baltimore, MD" @disabled($__need !== 'unsure')>
+            </div>
+        </div>
+
+        {{-- The rest of the basics. No "Event name": step 1 already asked what
+             the event is; it can be renamed on the last step. The date is asked
+             once, on step 7, beside who is free on it. --}}
+        <div class="bw-two" style="margin-top:14px;">
+            <div class="bw-field">
+                <label>Guest count</label>
+                <input type="number" name="guest_count" min="1" value="{{ $data['guest_count'] ?? '' }}" placeholder="e.g. 150">
+            </div>
             <div class="bw-field">
                 <label>Event date</label>
                 <p class="bw-help" style="margin-top:0;">
@@ -455,126 +663,7 @@
                     @endif
                 </p>
             </div>
-            <div class="bw-field">
-                <label>Guest count</label>
-                <input type="number" name="guest_count" min="1" value="{{ $data['guest_count'] ?? '' }}" placeholder="e.g. 150">
-            </div>
         </div>
-        <div class="bw-two">
-            @php
-                // old() first: a rejected step lands back here with nothing
-                // saved, and the client's own answers must still be on screen.
-                $__loc  = old('location', $data['location'] ?? '');
-                $__prof = auth()->user()?->profile;
-                // Only a real street address counts as "my address".
-                $__home = filled($__prof?->address) ? trim(implode(', ', array_filter([
-                    $__prof?->address, $__prof?->city, trim(($__prof?->state ?? '') . ' ' . ($__prof?->zip_code ?? '')),
-                ]))) : '';
-                $__kind = old('location_kind', ! empty($data['location_mine']) ? 'mine'
-                    : ($data['location_kind'] ?? ($__home !== '' ? 'mine' : 'exact')));
-                if ($__kind === 'mine' && $__home === '') { $__kind = 'exact'; }
-                if ($__kind === 'area') { $__kind = $__home !== '' ? 'mine' : 'exact'; }
-                $__need = old('location_need', $data['location_need'] ?? (($data['location_kind'] ?? null) === 'area' ? 'unsure' : 'have'));
-                $__towns = array_values(array_filter((array) old('preferred_locations', $data['preferred_locations'] ?? [])));
-                if (! $__towns) { $__towns = ['']; }
-                $__stateCode = $__prof?->state;
-                $__stateName = config('geo.allowed_states')[$__stateCode] ?? $__stateCode;
-                $__picked = array_map('intval', (array) ($data['services'] ?? []));
-                $__venueIds = $venueServices->pluck('id')->map(fn ($i) => (int) $i)->all();
-                $__hasVenue = array_intersect($__picked, $__venueIds) !== [];
-                $__oldTypes = array_map('intval', (array) old('venue_types', []));
-            @endphp
-
-            <div class="bw-field bw-locfield" data-bw-need>
-                <label>Do you already have a venue or event location?</label>
-
-                {{-- Sir Peter's three answers (18 Sep). Each opens only its own
-                     fields; the others are switched off so they do not post. --}}
-                <div class="bw-locpick">
-                    <label class="bw-locopt">
-                        <input type="radio" name="location_need" value="have" @checked($__need === 'have')>
-                        <span><b>Yes, I already have a location</b><small>I know the exact address or venue.</small></span>
-                    </label>
-                    <label class="bw-locopt">
-                        <input type="radio" name="location_need" value="need_venue" @checked($__need === 'need_venue')>
-                        <span><b>No, I need to find a venue</b><small>I'm looking for a venue and professionals who provide one.</small></span>
-                    </label>
-                    <label class="bw-locopt">
-                        <input type="radio" name="location_need" value="unsure" @checked($__need === 'unsure')>
-                        <span><b>Not sure yet</b><small>Still planning; no specific location.</small></span>
-                    </label>
-                </div>
-
-                {{-- Yes: the address, from the profile or typed. --}}
-                <div class="bw-needpanel" data-bw-panel="have" @if($__need !== 'have') hidden @endif>
-                    <div class="bw-locpick">
-                        @if($__home !== '')
-                            <label class="bw-locopt">
-                                <input type="radio" name="location_kind" value="mine" @checked($__kind === 'mine')>
-                                <span><b>Use my address</b><small>{{ $__home }}</small></span>
-                            </label>
-                        @endif
-                        <label class="bw-locopt">
-                            <input type="radio" name="location_kind" value="exact" @checked($__kind === 'exact')>
-                            <span><b>Enter the address</b><small>Lets us judge how far professionals are from it</small></span>
-                        </label>
-                    </div>
-                    <div data-bw-locbox @if($__kind === 'mine') hidden @endif>
-                        <label class="bw-loclabel" for="bw_location">Street address</label>
-                        <input type="text" name="location" id="bw_location" value="{{ $__need === 'have' && $__kind !== 'mine' ? $__loc : '' }}"
-                               placeholder="e.g. 1234 Garden Way, Baltimore, MD 21201" data-bw-location>
-                    </div>
-                    <label class="bw-loclabel" for="bw_venue">Venue name <span class="bw-optional">Optional</span></label>
-                    <input type="text" name="venue" id="bw_venue" value="{{ $data['venue'] ?? '' }}" placeholder="e.g. Oregon Ridge Park">
-                </div>
-
-                {{-- No: where the venue should be, and what kind. --}}
-                <div class="bw-needpanel" data-bw-panel="need_venue" @if($__need !== 'need_venue') hidden @endif>
-                    <div class="bw-towns-h">
-                        <b>Preferred location(s)</b>
-                        @if($__stateName)<span class="bw-statelock">{{ $__stateName }} only</span>@endif
-                    </div>
-                    <p class="bw-help" style="margin:0 0 8px;">Add the cities or towns where you'd like the venue, up to {{ \App\Domain\Requests\VenueRule::MAX_PREFERRED }}.</p>
-                    <div data-bw-towns data-max="{{ \App\Domain\Requests\VenueRule::MAX_PREFERRED }}">
-                        @foreach($__towns as $__t)
-                            <div class="bw-town" data-bw-town>
-                                <input type="text" name="preferred_locations[]" value="{{ $__t }}" placeholder="City or town, e.g. Bel Air" aria-label="City or town">
-                                <button type="button" class="bw-backup-rm" data-bw-town-rm>Remove</button>
-                            </div>
-                        @endforeach
-                    </div>
-                    <button type="button" class="bw-backup-add" data-bw-town-add>+ Add Another Location</button>
-                    @error('preferred_locations')<p class="bw-err">{{ $message }}</p>@enderror
-
-                    <label class="bw-loclabel">What type of venue or space are you looking for? <span class="bw-optional">Optional</span></label>
-                    <p class="bw-help" style="margin:0 0 6px;">These are the Venues &amp; Event Spaces services. Ticking one adds it to your request.</p>
-                    <div class="bw-venuetypes">
-                        @foreach($venueServices as $__v)
-                            <label>
-                                <input type="checkbox" name="venue_types[]" value="{{ $__v->id }}"
-                                       @checked(in_array((int) $__v->id, $__picked, true) || in_array((int) $__v->id, $__oldTypes, true))>
-                                <span>{{ $__v->name }}</span>
-                            </label>
-                        @endforeach
-                    </div>
-
-                    {{-- Said up front, before Continue, when step 1 has no venue
-                         service yet; the server refuses the step on the same rule. --}}
-                    <div class="bw-note warn" data-bw-venue-warn @if($__hasVenue) hidden @endif>
-                        <b>Add a venue service to continue</b>
-                        <p>You need to find a venue, but no Venues &amp; Event Spaces service is selected yet. Tick one above, or
-                            <a href="{{ route('client.bsr.step', 'service') }}">go to Service Selection</a>.</p>
-                    </div>
-                    @error('location_need')<p class="bw-err">{{ $message }}</p>@enderror
-                </div>
-
-                {{-- Not sure: just the area. --}}
-                <div class="bw-needpanel" data-bw-panel="unsure" @if($__need !== 'unsure') hidden @endif>
-                    <input type="hidden" name="location_kind" value="area" @disabled($__need !== 'unsure')>
-                    <label class="bw-loclabel" for="bw_area">City and state</label>
-                    <input type="text" name="location" id="bw_area" value="{{ $__need === 'unsure' ? $__loc : '' }}" placeholder="e.g. Baltimore, MD" @disabled($__need !== 'unsure')>
-                </div>
-            </div>
 @push('scripts')
 <script>
 (function () {
@@ -591,6 +680,7 @@
             p.querySelectorAll('input, select, textarea').forEach(function (i) { i.disabled = !on; });
         });
         if (need === 'have') { mine(); }
+        if (typeof venueCheck === 'function') venueCheck();
     }
 
     // "Use my address" needs no box; the profile is the answer.
@@ -615,14 +705,20 @@
         if (!warn) return;
         const ticked = Array.from(root.querySelectorAll('input[name="venue_types[]"]:checked')).length > 0;
         warn.hidden = alreadyVenue || ticked;
+        // The rail's "A venue service is required" says the same, only while it applies.
+        const railReq = document.querySelector('[data-ed-rail-req]');
+        const needNow = (root.querySelector('input[name="location_need"]:checked') || {}).value === 'need_venue';
+        if (railReq) railReq.hidden = ! needNow || alreadyVenue || ticked;
     }
     root.querySelectorAll('input[name="venue_types[]"]').forEach(function (c) { c.addEventListener('change', venueCheck); });
 
     // Towns: add up to the cap, remove any but the last one.
     const towns = root.querySelector('[data-bw-towns]');
     const addTown = root.querySelector('[data-bw-town-add]');
+    const townCount = root.querySelector('[data-bw-town-count]');
     function townsSync() {
         const n = towns.querySelectorAll('[data-bw-town]').length;
+        if (townCount) townCount.textContent = n + ' of ' + towns.dataset.max + ' locations added';
         addTown.hidden = n >= +towns.dataset.max;
         towns.querySelectorAll('[data-bw-town-rm]').forEach(function (b) { b.hidden = n <= 1; });
     }
@@ -648,24 +744,8 @@
 </script>
 @endpush
 
-            {{-- The state selector that stood here is gone.
-                 Sir Peter's State Boundary Rule (2026-08-25) matches every
-                 request by the client's own home state, whatever state the
-                 event is in — so picking one changed nothing, and the hint
-                 under it ("Professionals in this state are the ones who can
-                 bid") was untrue for any state but their own. Stated instead
-                 of asked, and it comes back when cross-state opens up. --}}
-            @php $__homeState = config('geo.allowed_states')[auth()->user()?->profile?->state] ?? null; @endphp
-            @if($__homeState)
-                <div class="bw-field">
-                    <label>Who can bid</label>
-                    <p class="bw-hint" style="margin-top:0;">
-                        Professionals in <b>{{ $__homeState }}</b> | GigResource works within one state for now,
-                        so that is who sees this request even if the event itself is elsewhere.
-                    </p>
-                </div>
-            @endif
-        </div>
+    {{-- The state rule, formerly a "Who can bid" note here, is the blue bar
+         at the top of the Event Location card. --}}
 
     {{-- ── 3 · Requirements ────────────────────────────────── --}}
 
@@ -1318,7 +1398,7 @@
                 <button type="submit" name="action" value="draft" class="bw-btn">Save draft</button>
             </div>
             <button type="submit" name="action" value="next" class="bw-btn go" @if($step === 'review' && ! empty($reviewIssues)) disabled title="Fix the issues above to submit" @endif>
-                {{ $step === 'review' ? 'Submit Bidding Request' : 'Continue' }}
+                {{ $step === 'review' ? 'Submit Bidding Request' : 'Continue →' }}
             </button>
         </div>
     </div>
@@ -1328,13 +1408,47 @@
         <div class="hr-card">
             <h4>Step {{ $stepIndex + 1 }} of {{ count($steps) }}</h4>
             <div class="bw-bar"><i style="width: {{ $pct }}%;"></i></div>
-            <p style="font-size:11.5px;color:var(--text-muted);">{{ $pct }}% complete</p>
+            <p style="font-size:11.5px;color:var(--text-muted);display:flex;justify-content:space-between;"><b style="color:var(--text-primary);">{{ $steps[$step] ?? '' }}</b><span>{{ $pct }}% complete</span></p>
         </div>
 
         {{-- The four hand-written rules that were here said the same things as
              the emergency and direct pages did, in different words. They are
              in config/request-help.php now, shared with both. --}}
-        @include('partials._help_rail', ['flow' => 'br'])
+        @if($step === 'event')
+            @include('partials._help_rail_styles')
+            {{-- Step 2's own rail, as on Sir Peter's screen. --}}
+            <div class="hr-card">
+                <h4>How this step works</h4>
+                <ul class="ed-rail-steps">
+                    <li><i>1</i><span><b>Tell us about your event location</b>Choose whether you already have a location, need a venue, or are not sure yet.</span></li>
+                    <li><i>2</i><span><b>Provide the details</b>Enter the address or preferred cities, and any additional information.</span></li>
+                    <li><i>3</i><span><b>Continue</b>Click Continue to move to the next step.</span></li>
+                </ul>
+            </div>
+            <div class="hr-card ed-rail-req" data-ed-rail-req hidden>
+                <h4>A venue service is required</h4>
+                <p>You selected "No, I need to find a venue or space" but haven't added a Venues &amp; Event Spaces service in Step 1.</p>
+                <a href="{{ route('client.bsr.step', ['step' => 'service', 'return' => 'event']) }}">Go to Service Selection →</a>
+            </div>
+            <div class="hr-card">
+                <h4>Need help with location options?</h4>
+                <ul class="ed-rail-checks">
+                    <li>Not sure which location option to choose? Pick "Not sure yet" and give the area.</li>
+                    <li>Tell us what you know and we'll help you find the right professionals.</li>
+                </ul>
+            </div>
+            <div class="hr-card">
+                <h4>Tips for better proposals</h4>
+                <ul class="ed-rail-checks">
+                    <li>Be as specific as possible</li>
+                    <li>Include your preferred cities</li>
+                    <li>Add a venue service if you're here to find one</li>
+                    <li>You can update the location later if needed</li>
+                </ul>
+            </div>
+        @else
+            @include('partials._help_rail', ['flow' => 'br'])
+        @endif
     </aside>
 </div>
 </form>
