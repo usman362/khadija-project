@@ -78,7 +78,6 @@
     @media (max-width: 700px) { .bw-revrow { grid-template-columns: 1fr auto 26px; } .bw-revrow-v { grid-column: 1 / -1; grid-row: 2; } }
     /* ── Step 2, Sir Peter's layout (19 Sep) ── */
     .ed-head { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
-    .ed-num { width: 54px; height: 54px; border-radius: 50%; background: #ea580c; color: #fff; font-size: 24px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex: none; }
     .ed-head h3 { font-size: 24px; font-weight: 800; color: #1e3a8a; margin: 0 0 2px; }
     .ed-card { border: 1px solid var(--border-color); border-radius: 14px; padding: 16px 18px; background: var(--bg-card); }
     .ed-card-h { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
@@ -516,7 +515,6 @@
         {{-- Sir Peter's Step 2 (19 Sep): the big step heading, then one Event
              Location card holding the three answers and what each one asks. --}}
         <div class="ed-head">
-            <span class="ed-num">2</span>
             <div>
                 <h3>Event Details</h3>
                 <p class="lede" style="margin:0;">Tell us about your event so professionals can provide the best proposals.</p>
