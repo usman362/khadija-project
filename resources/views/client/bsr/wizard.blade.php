@@ -538,17 +538,17 @@
             <div class="ed-opts">
                 <label class="ed-opt">
                     <input type="radio" name="location_need" value="have" @checked($__need === 'have')>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                     <span><b>Yes, I already have a location</b><small>I know the exact address or venue.</small></span>
                 </label>
                 <label class="ed-opt">
                     <input type="radio" name="location_need" value="need_venue" @checked($__need === 'need_venue')>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 21v-4h6v4M8 7h2M14 7h2M8 11h2M14 11h2"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 21v-4h6v4M8 7h2M14 7h2M8 11h2M14 11h2"/></svg>
                     <span><b>No, I need to find a venue or space</b><small>I'm looking for a venue and professionals who provide or can help find one.</small></span>
                 </label>
                 <label class="ed-opt">
                     <input type="radio" name="location_need" value="unsure" @checked($__need === 'unsure')>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     <span><b>Not sure yet</b><small>I'm still planning and don't have a specific location.</small></span>
                 </label>
             </div>
@@ -580,7 +580,7 @@
             {{-- No: where the venue should be, and what kind. --}}
             <div class="bw-needpanel ed-need" data-bw-panel="need_venue" @if($__need !== 'need_venue') hidden @endif>
                 <div class="ed-need-h">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 21v-4h6v4M8 7h2M14 7h2M8 11h2M14 11h2"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 21v-4h6v4M8 7h2M14 7h2M8 11h2M14 11h2"/></svg>
                     <div>
                         <b>Preferred location(s)</b>
                         <span>Add one or more cities or towns where you'd like the venue to be. You can add up to {{ $__maxTowns }} locations.</span>
