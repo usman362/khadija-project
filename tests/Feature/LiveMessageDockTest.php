@@ -282,4 +282,39 @@ class LiveMessageDockTest extends TestCase
             default => '#2563eb',
         };
     }
+
+    /** Sir Peter, 22 Sep: Priorities and Dates as their own tabs, behind "More". */
+    public function test_the_messages_list_can_be_filtered_by_priority_and_by_date(): void
+    {
+        $withLevel = $this->conversation();
+        $m = $withLevel->messages()->create(['sender_id' => $this->pro->id, 'body' => 'Please confirm']);
+        $m->forceFill(['priority' => 'urgent'])->save();
+
+        $plain = $this->conversation();
+        $plain->messages()->create(['sender_id' => $this->pro->id, 'body' => 'Just saying hello']);
+
+        $priority = $this->actingAs($this->client)->getJson(route('conversations.index', ['filter' => 'priority']))
+            ->assertOk()->json('data');
+        $this->assertSame([$withLevel->id], array_column($priority, 'id'));
+
+        // Dates: only the conversations about an event that has one.
+        $this->assertSame([], $this->actingAs($this->client)
+            ->getJson(route('conversations.index', ['filter' => 'dates']))->assertOk()->json('data'));
+
+        $event = \App\Models\Event::create([
+            'title' => 'Dated event', 'client_id' => $this->client->id, 'created_by' => $this->client->id,
+            'status' => 'published', 'is_published' => true, 'starts_at' => now()->addDays(9),
+        ]);
+        $plain->forceFill(['event_id' => $event->id])->save();
+
+        $dates = $this->actingAs($this->client)->getJson(route('conversations.index', ['filter' => 'dates']))
+            ->assertOk()->json('data');
+        $this->assertSame([$plain->id], array_column($dates, 'id'));
+
+        // And the tabs themselves are on the page.
+        $this->actingAs($this->client)->get(route('client.dashboard'))->assertOk()
+            ->assertSee('data-md-tab="priority"', false)
+            ->assertSee('data-md-tab="dates"', false)
+            ->assertSee('data-md-more', false);
+    }
 }

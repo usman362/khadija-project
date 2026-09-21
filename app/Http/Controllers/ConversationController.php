@@ -84,6 +84,43 @@ class ConversationController extends Controller
                 ->limit(1),
             ]);
 
+        /*
+         * The dock's tabs. Priorities and Dates are Sir Peter's (22 Sep):
+         * the levels people set, worst first, and the conversations that are
+         * about an event with a date, soonest first.
+         */
+        if ($request->input('filter') === 'priority') {
+            // Worst first. A CASE, not MySQL's FIELD(), so the same order
+            // comes out of the test database as out of the live one.
+            $rank = ['critical' => 5, 'urgent' => 4, 'priority' => 3, 'important' => 2, 'routine' => 1];
+            $case = 'CASE ' . implode(' ', array_map(
+                fn ($l, $n) => "WHEN priority = '{$l}' THEN {$n}",
+                array_keys($rank), $rank
+            )) . ' ELSE 0 END';
+
+            $query->whereHas('messages', fn ($q) => $q->whereNotNull('priority'))
+                ->addSelect(['priority_rank' => Message::selectRaw("MAX({$case})")
+                    ->whereColumn('conversation_id', 'conversations.id'),
+                ])
+                ->reorder('priority_rank', 'desc');
+        } elseif ($request->input('filter') === 'dates') {
+            // The event this conversation is about, whether it is named on the
+            // conversation or reached through its booking. Soonest first.
+            $viaBooking = \App\Models\Event::select('events.starts_at')
+                ->join('bookings', 'bookings.event_id', '=', 'events.id')
+                ->whereColumn('bookings.id', 'conversations.booking_id')
+                ->limit(1);
+
+            $query->where(fn ($q) => $q
+                ->whereHas('event', fn ($e) => $e->whereNotNull('starts_at'))
+                ->orWhereHas('booking.event', fn ($e) => $e->whereNotNull('starts_at')))
+                ->addSelect(['event_starts_at' => \App\Models\Event::selectRaw('starts_at')
+                    ->whereColumn('events.id', 'conversations.event_id')->limit(1),
+                ])
+                ->addSelect(['booking_starts_at' => $viaBooking])
+                ->reorder(\Illuminate\Support\Facades\DB::raw('COALESCE(event_starts_at, booking_starts_at)'), 'asc');
+        }
+
         // The dock's Unread and Favorites tabs.
         if ($request->input('filter') === 'unread') {
             $query->whereHas('messages', fn ($q) => $q->where('sender_id', '!=', $user->id)

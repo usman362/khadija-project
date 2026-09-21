@@ -92,6 +92,9 @@
         color: var(--text-secondary, #374151); padding: 10px 0; border-bottom: 2.5px solid transparent; margin-bottom: -1px;
         display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
     .md-tab.is-on { color: #ea580c; border-bottom-color: #ea580c; }
+    .md-tab.md-more { flex: none; padding-left: 10px; padding-right: 10px; color: var(--text-muted, #6b7280); }
+    .md-tabs-more { border-top: 0; }
+    .md-tabs-more[hidden] { display: none; }
     .md-tab i { font-style: normal; min-width: 18px; height: 18px; border-radius: 999px; background: #dc2626; color: #fff;
         font-size: 10.5px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; padding: 0 5px; }
 
@@ -257,6 +260,8 @@
 
             if (! rows.length) {
                 body.innerHTML = '<div class="md-note">' + ({
+                    priority: 'No conversation has a priority set yet.',
+                    dates: 'No conversation is about an event with a date yet.',
                     recent: search.value.trim() ? 'No conversations match that.' : 'No conversations yet.',
                     unread: 'You are all caught up.',
                     favorites: 'Star a conversation to keep it here.',
@@ -353,6 +358,14 @@
         // chat window below this list, as in Sir Peter's mockup.
         if (rowEl && window.grLiveDock && window.grLiveDock.open(rowEl.dataset.open)) return;
         if (rowEl) { showThread(rowEl.dataset.open); return; }
+
+        var more = e.target.closest('[data-md-more]');
+        if (more) {
+            var extra = dock.querySelector('[data-md-tabs-more]');
+            extra.hidden = ! extra.hidden;
+            more.setAttribute('aria-expanded', extra.hidden ? 'false' : 'true');
+            return;
+        }
 
         var t = e.target.closest('[data-md-tab]');
         if (t) { setTab(t.dataset.mdTab); return; }
@@ -470,10 +483,17 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.5" y2="16.5"/></svg>
                 <input type="search" data-md-search placeholder="Search messages…" aria-label="Search messages" autocomplete="off">
             </label>
+            {{-- Sir Peter, 22 Sep: Priorities and Dates as tabs too, behind
+                 "More" so the row of tabs still fits. --}}
             <div class="md-tabs" role="tablist">
                 <button type="button" class="md-tab is-on" data-md-tab="recent" role="tab">Recent</button>
                 <button type="button" class="md-tab" data-md-tab="unread" role="tab">Unread <i data-md-unread-count hidden>0</i></button>
                 <button type="button" class="md-tab" data-md-tab="favorites" role="tab">Favorites</button>
+                <button type="button" class="md-tab md-more" data-md-more aria-expanded="false" title="More filters">More</button>
+            </div>
+            <div class="md-tabs md-tabs-more" data-md-tabs-more hidden role="tablist">
+                <button type="button" class="md-tab" data-md-tab="priority" role="tab">Priorities</button>
+                <button type="button" class="md-tab" data-md-tab="dates" role="tab">Dates</button>
             </div>
         </div>
 
