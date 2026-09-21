@@ -251,4 +251,35 @@ class LiveMessageDockTest extends TestCase
         $this->assertStringNotContainsString('Create a Package', $html);
         $this->assertStringContainsString('--lmd-accent: #ea580c', $html);
     }
+
+    /** One colour per account type (Sir Peter, 22 Sep). */
+    public function test_each_account_type_has_its_own_colour(): void
+    {
+        $this->actingAs($this->client)->get(route('client.dashboard'))
+            ->assertOk()->assertSee('--lmd-accent: #ea580c', false);
+
+        $admin = \App\Models\User::factory()->create(['primary_role' => 'admin']);
+        $admin->assignRole('admin');
+        $this->assertSame('#16a34a', $this->accentFor($admin));
+
+        $influencer = \App\Models\User::factory()->create(['primary_role' => 'influencer']);
+        $influencer->assignRole('influencer');
+        $this->assertSame('#7C3AED', $this->accentFor($influencer));
+
+        // Anyone else in the dock, the professional included, reads in blue.
+        $this->assertSame('#2563eb', $this->accentFor($this->pro));
+    }
+
+    /** The colour the dock would draw for this account. */
+    private function accentFor(\App\Models\User $user): string
+    {
+        $isClient = $user->hasRole('client') && ! $user->isProfessionalMode();
+
+        return match (true) {
+            $user->hasRole('admin') => '#16a34a',
+            $user->hasRole('influencer') => '#7C3AED',
+            $isClient => '#ea580c',
+            default => '#2563eb',
+        };
+    }
 }

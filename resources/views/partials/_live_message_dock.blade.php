@@ -21,12 +21,17 @@
     $__lmdUser = auth()->user();
     $__lmdFull = route('client.chat.index');
     /*
-     * Sir Peter, 21 Sep: the client's own colour is the site orange; admin,
-     * professional and (later) influencer accounts read in purple. One accent
-     * drives the bubbles, the send button and the priority ticks.
+     * One colour per account type (Sir Peter, 22 Sep): client orange,
+     * professional blue, admin green, influencer purple. It drives your own
+     * message bubbles and the send button.
      */
     $__lmdIsClient = $__lmdUser?->hasRole('client') && ! $__lmdUser?->isProfessionalMode();
-    $__lmdAccent = $__lmdIsClient ? '#ea580c' : '#7C3AED';
+    $__lmdAccent = match (true) {
+        (bool) $__lmdUser?->hasRole('admin')       => '#16a34a',
+        (bool) $__lmdUser?->hasRole('influencer')  => '#7C3AED',
+        $__lmdIsClient                             => '#ea580c',
+        default                                    => '#2563eb',
+    };
     // His third menu item: clients post an event, everyone else makes a package.
     $__lmdMake = $__lmdIsClient
         ? ['label' => 'Post an Event', 'url' => route('client.post-event.choose')]
