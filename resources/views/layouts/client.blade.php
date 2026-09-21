@@ -1702,18 +1702,47 @@
             back.style.height = (bottom - top) + 'px';
         }
 
+        /*
+         * Where the notifications sit: above EVERY window open in the right
+         * column, the assistant included. The dock used to work this out from
+         * its own two windows only, so with the assistant open the
+         * notifications were placed behind it and could not be seen (Sir
+         * Peter, 21 Sep).
+         */
+        function place() {
+            var wins = ['#lmdChat:not([hidden])', '#msgDock.is-open:not(.is-min) .md-win', '.aic-panel.open']
+                .map(function (q) { return document.querySelector(q); }).filter(Boolean)
+                .map(function (el) { return el.getBoundingClientRect(); })
+                .filter(function (r) { return r.height > 0; });
+
+            var bar = document.getElementById('lmdBar');
+            var base = bar && window.innerWidth > 768 ? bar.offsetHeight + 12 : 24;
+            var bottom = wins.length
+                ? Math.round(window.innerHeight - Math.min.apply(null, wins.map(function (w) { return w.top; })) + 12)
+                : base;
+
+            var root = document.documentElement.style;
+            root.setProperty('--notif-bottom', bottom + 'px');
+            root.setProperty('--notif-max', Math.max(140, window.innerHeight - bottom - 60) + 'px');
+        }
+
         function sync() {
             var windowOpen = !! document.querySelector('#msgDock.is-open:not(.is-min), .aic-panel.open, #lmdChat:not([hidden])');
             document.body.classList.toggle('gr-stack', notif.classList.contains('open') && windowOpen);
+            place();
             requestAnimationFrame(fit);
         }
 
-        window.addEventListener('resize', function () { requestAnimationFrame(fit); });
+        document.addEventListener('gr:stack-changed', sync);
+
+        window.addEventListener('resize', function () { place(); requestAnimationFrame(fit); });
 
         var watch = new MutationObserver(sync);
-        [notif, document.getElementById('msgDock'), document.getElementById('aiChatPanel'), document.getElementById('lmdChat')].forEach(function (el) {
+        [notif, document.getElementById('msgDock'), document.getElementById('aiChatPanel'), document.getElementById('lmdChat'),
+         document.querySelector('.aic-panel')].forEach(function (el) {
             if (el) watch.observe(el, { attributes: true, attributeFilter: ['class', 'hidden'] });
         });
+        sync();
     })();
     </script>
 

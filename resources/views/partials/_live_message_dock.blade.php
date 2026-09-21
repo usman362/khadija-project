@@ -745,8 +745,9 @@
         // Stacked only: the list then stands on the chat window.
         root.setProperty('--lmd-chat', chatOpen && listOpen && ! sideBySide ? (chatH + 12) + 'px' : '0px');
         root.setProperty('--md-h', listH + 'px');
-        root.setProperty('--notif-bottom', notifBottom + 'px');
-        root.setProperty('--notif-max', Math.max(140, window.innerHeight - notifBottom - 16) + 'px');
+        // --notif-bottom and --notif-max are set by the layout's stacking
+        // script, which can see the assistant's panel as well as these two.
+        document.dispatchEvent(new CustomEvent('gr:stack-changed'));
     }
 
     window.addEventListener('resize', renderTabs);
