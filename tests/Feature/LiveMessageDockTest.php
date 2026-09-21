@@ -192,4 +192,63 @@ class LiveMessageDockTest extends TestCase
             $this->assertStringContainsString($needle, $html, "missing: {$needle}");
         }
     }
+
+    /** Sir Peter, 21 Sep: five levels, set by either person, shown in one place. */
+    public function test_a_message_can_be_given_a_priority(): void
+    {
+        $c = $this->conversation();
+        $m = $c->messages()->create(['sender_id' => $this->pro->id, 'body' => 'Can you confirm today?']);
+
+        // The person who received it may mark it too, not only the sender.
+        $this->actingAs($this->client)
+            ->postJson(route('conversations.messages.priority', [$c, $m]), ['priority' => 'urgent'])
+            ->assertOk()->assertJsonPath('label', 'Urgent');
+
+        $this->assertSame('urgent', $m->fresh()->priority);
+
+        // The list carries it, so the row can show the badge.
+        $this->actingAs($this->client)->getJson(route('conversations.index'))
+            ->assertOk()->assertJsonPath('data.0.last_message_priority', 'urgent');
+
+        // Routine takes the badge back off.
+        $this->actingAs($this->client)
+            ->postJson(route('conversations.messages.priority', [$c, $m]), ['priority' => 'routine'])
+            ->assertOk();
+        $this->assertNull($m->fresh()->priority);
+
+        // Not a level we offer.
+        $this->actingAs($this->client)
+            ->postJson(route('conversations.messages.priority', [$c, $m]), ['priority' => 'screaming'])
+            ->assertStatus(422);
+    }
+
+    /** A stranger cannot label somebody else's conversation. */
+    public function test_only_the_people_in_the_conversation_can_set_a_priority(): void
+    {
+        $c = $this->conversation();
+        $m = $c->messages()->create(['sender_id' => $this->pro->id, 'body' => 'Hello']);
+
+        $stranger = \App\Models\User::factory()->create(['primary_role' => 'client']);
+        $stranger->assignRole('client');
+
+        $this->actingAs($stranger)
+            ->postJson(route('conversations.messages.priority', [$c, $m]), ['priority' => 'urgent'])
+            ->assertForbidden();
+    }
+
+    /** The per-message menu and the client's own colour. */
+    public function test_the_window_offers_the_priority_menu_and_the_clients_action(): void
+    {
+        $html = $this->actingAs($this->client)->get(route('client.dashboard'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('data-lmd-msg-menu', $html);
+        $this->assertStringContainsString('Message Priority', $html);
+        foreach (['Routine', 'Important', 'Priority', 'Urgent', 'Critical'] as $level) {
+            $this->assertStringContainsString('>' . $level . '<', $html);
+        }
+        // Clients are offered Post an Event; Create a Package is the pro's.
+        $this->assertStringContainsString('Post an Event', $html);
+        $this->assertStringNotContainsString('Create a Package', $html);
+        $this->assertStringContainsString('--lmd-accent: #ea580c', $html);
+    }
 }

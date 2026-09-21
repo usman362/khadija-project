@@ -112,6 +112,9 @@
     .md-sub { color: var(--text-secondary, #4b5563); }
     .md-ctx { color: var(--text-muted, #6b7280); }
     .md-last { color: var(--text-primary, #111827); margin-top: 2px; }
+    .md-pri { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 800;
+        border: 1px solid currentColor; border-radius: 999px; padding: 1px 8px; margin: 3px 0; }
+    .md-pri-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
     .md-row-side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex: none; padding-top: 20px; }
     .md-unread { min-width: 20px; height: 20px; border-radius: 999px; background: #dc2626;
         color: #fff; font-size: 10.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; padding: 0 6px; }
@@ -209,6 +212,13 @@
 
     function row(c) {
         var p = c.peer || { name: 'Conversation', avatar: '', online: false, subtitle: '' };
+        // Sir Peter, 21 Sep: the level on one line only, here on the row.
+        var LEVELS = @json(\App\Domain\Messaging\MessagePriority::LEVELS);
+        var COLOURS = @json(\App\Domain\Messaging\MessagePriority::COLOURS);
+        var pri = c.last_message_priority && LEVELS[c.last_message_priority]
+            ? '<span class="md-pri" style="color:' + COLOURS[c.last_message_priority] + ';"><span class="md-pri-dot"></span>'
+              + esc(LEVELS[c.last_message_priority]) + '</span>'
+            : '';
         var unread = Number(c.unread_count || 0);
         var ctx = [c.event && c.event.title, c.request_type].filter(Boolean).join(' · ');
 
@@ -219,6 +229,7 @@
             +   '<span class="md-row-top"><b>' + esc(p.name) + '</b><time>' + esc(ago(c.last_message_at)) + '</time></span>'
             +   (p.subtitle ? '<span class="md-sub">' + esc(p.subtitle) + '</span>' : '')
             +   (ctx ? '<span class="md-ctx">' + esc(ctx) + '</span>' : '')
+            +   pri
             +   '<span class="md-last">' + esc(c.last_message_body || 'No messages yet') + '</span>'
             + '</span>'
             + '<span class="md-row-side">'

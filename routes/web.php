@@ -1163,6 +1163,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/conversations/{conversation}/messages', [ConversationController::class, 'storeMessage'])->middleware('permission:messages.create')->name('conversations.messages.store');
     Route::post('/conversations/{conversation}/read', [ConversationController::class, 'markAsRead'])->middleware('permission:messages.view')->name('conversations.mark-read');
     Route::post('/conversations/{conversation}/typing', [ConversationController::class, 'typing'])->middleware('permission:messages.view')->name('conversations.typing');
+    // How urgent a message is (Sir Peter, 21 Sep): Routine … Critical.
+    Route::post('/conversations/{conversation}/messages/{message}/priority', [ConversationController::class, 'priority'])->middleware('permission:messages.view')->name('conversations.messages.priority');
     // Archive or restore, for the person asking only.
     Route::post('/conversations/{conversation}/archive', [ConversationController::class, 'archive'])->middleware('permission:messages.view')->name('conversations.archive');
     // Mute is per person and per conversation; block is between the two people.

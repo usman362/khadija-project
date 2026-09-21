@@ -87,8 +87,10 @@ class MyEventsNothingIsStaticTest extends TestCase
         $this->assertStringNotContainsString('Post New Event', $html);
         $this->assertStringContainsString('Events List', $html);
 
-        // One button, in the filter row.
-        $this->assertSame(1, substr_count($html, '>Post an Event</a>'));
+        // One button on the page itself, in the filter row. The Live Messages
+        // window's per-message menu offers the same action (Sir Peter, 21 Sep),
+        // which is not a second button on this page.
+        $this->assertSame(1, substr_count($html, 'class="mg-filter-btn coral"><svg'));
     }
 
     /** The money was $0 for everyone because it read columns that do not exist. */

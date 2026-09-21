@@ -20,11 +20,26 @@
 @php
     $__lmdUser = auth()->user();
     $__lmdFull = route('client.chat.index');
+    /*
+     * Sir Peter, 21 Sep: the client's own colour is the site orange; admin,
+     * professional and (later) influencer accounts read in purple. One accent
+     * drives the bubbles, the send button and the priority ticks.
+     */
+    $__lmdIsClient = $__lmdUser?->hasRole('client') && ! $__lmdUser?->isProfessionalMode();
+    $__lmdAccent = $__lmdIsClient ? '#ea580c' : '#7C3AED';
+    // His third menu item: clients post an event, everyone else makes a package.
+    $__lmdMake = $__lmdIsClient
+        ? ['label' => 'Post an Event', 'url' => route('client.post-event.choose')]
+        : ['label' => 'Create a Package', 'url' => route('professional.packages.create')];
+    $__lmdLevels = \App\Domain\Messaging\MessagePriority::LEVELS;
+    $__lmdLevelColours = \App\Domain\Messaging\MessagePriority::COLOURS;
 @endphp
 
 @once
 @push('styles')
 <style>
+    :root { --lmd-accent: {{ $__lmdAccent }}; }
+
     /* ── The bar ─────────────────────────────────────────────── */
     .lmd-bar { position: fixed; bottom: 0; left: var(--sidebar-width, 236px); right: 0; z-index: 890;
         display: flex; align-items: center; gap: 10px; padding: 10px 18px;
@@ -58,6 +73,7 @@
     .lmd-tab-t small { display: flex; gap: 8px; align-items: baseline; }
     .lmd-tab-t small .lmd-pv { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .lmd-tab-t small em { font-style: normal; flex: none; }
+    .lmd-tab .lmd-pri { margin-top: 3px; }
     .lmd-ok { font-style: normal; color: #16a34a; font-weight: 800; }
     .lmd-tab .lmd-count { position: absolute; top: -7px; right: -7px; border: 2px solid var(--bg-card, #fff); }
 
@@ -162,7 +178,30 @@
     .lmd-body { background: var(--bg-card, #fff); gap: 10px; padding: 14px; }
     .lmd-msg { max-width: 80%; padding: 10px 13px; border-radius: 14px; background: var(--bg-card-hover, #f1f5f9); }
     .lmd-msg small { justify-content: flex-start; }
-    .lmd-msg.is-mine { background: #e8f0fe; }
+    /* Your own messages in your account's colour, the other person's in grey. */
+    .lmd-msg.is-mine { background: var(--lmd-accent); color: #fff; }
+    .lmd-msg.is-mine small, .lmd-msg.is-mine .lmd-tick { color: rgba(255,255,255,.92); }
+    .lmd-msg.is-mine .lmd-tick.is-read { color: #fff; }
+    .lmd-msg.is-mine .lmd-att { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.35); color: #fff; }
+    .lmd-msg.is-failed, .lmd-msg.is-failed small { color: #b91c1c; }
+    .lmd-msg { position: relative; }
+    .lmd-msg-row { display: flex; align-items: flex-start; gap: 4px; max-width: 86%; align-self: flex-start; }
+    .lmd-msg-row.is-mine { align-self: flex-end; flex-direction: row-reverse; }
+    .lmd-msg-row .lmd-msg { max-width: none; align-self: auto; }
+    .lmd-mk { border: 0; background: none; color: var(--text-muted, #6b7280); cursor: pointer; font-size: 15px; line-height: 1; padding: 6px 3px; border-radius: 6px; }
+    .lmd-mk:hover { background: var(--bg-card-hover, #f1f5f9); }
+    .lmd-mm { position: absolute; z-index: 30; width: 200px; background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 16px 40px -18px rgba(15,27,53,.5); padding: 5px; }
+    .lmd-mm[hidden] { display: none; }
+    .lmd-mm button, .lmd-mm a { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 0; background: none;
+        padding: 8px 10px; border-radius: 8px; font: inherit; font-size: 12.5px; color: var(--text-primary, #111827); text-decoration: none; cursor: pointer; }
+    .lmd-mm button:hover, .lmd-mm a:hover { background: var(--bg-card-hover, #f1f5f9); }
+    .lmd-mm .lmd-mm-h { font-size: 11px; font-weight: 800; color: var(--text-muted, #6b7280); padding: 6px 10px 2px; text-transform: uppercase; letter-spacing: .4px; }
+    .lmd-mm .lmd-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+    .lmd-pri { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 800; border-radius: 999px; padding: 2px 8px; border: 1px solid currentColor; }
+    .lmd-pri .lmd-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .lmd-msg .lmd-pri { margin-bottom: 4px; }
+    .lmd-msg.is-mine .lmd-pri { border-color: rgba(255,255,255,.7); color: #fff; }
     .lmd-msg.is-mine small { justify-content: flex-end; }
     .lmd-att { display: flex; align-items: center; gap: 8px; margin-top: 6px; padding: 7px 9px; border-radius: 10px;
         background: rgba(255,255,255,.7); border: 1px solid var(--border-color, #e5e7eb); color: #2563eb; font-size: 12px;
@@ -192,7 +231,7 @@
     .lmd-compose .lmd-fi { border: 0; background: none; width: 32px; height: 32px; border-radius: 8px; color: var(--text-secondary, #4b5563); padding: 0; }
     .lmd-compose .lmd-fi:hover { background: var(--bg-card-hover, #f1f5f9); }
     .lmd-compose .lmd-fi svg { width: 19px; height: 19px; }
-    .lmd-compose .lmd-send { width: 44px; height: 44px; border-radius: 12px; }
+    .lmd-compose .lmd-send { width: 44px; height: 44px; border-radius: 12px; background: var(--lmd-accent); }
     .lmd-emojis { position: absolute; right: 0; bottom: calc(100% + 8px); z-index: 3; width: 232px; display: grid;
         grid-template-columns: repeat(8, 1fr); gap: 2px; padding: 8px; background: var(--bg-card, #fff);
         border: 1px solid var(--border-color, #e5e7eb); border-radius: 12px; box-shadow: 0 16px 40px -18px rgba(15,27,53,.5); }
@@ -413,7 +452,11 @@
             // Red dot unread, grey dot read; the green tick on the preview line is "you replied".
             + '<span class="lmd-tab-t"><b><span class="lmd-st is-' + (st === 'unread' ? 'unread' : 'read') + '" title="'
                 + (st === 'unread' ? 'Unread' : (st === 'responded' ? 'You replied' : 'Read, not answered yet')) + '"></span>'
-            + esc(p.name) + '</b><small><span class="lmd-pv">' + (mine ? '<i class="lmd-ok">✓</i> ' : '') + esc(who + (c.last_message_body || '')) + '</span>'
+            + esc(p.name) + '</b>'
+            + (c.last_message_priority && LEVELS[c.last_message_priority]
+                ? '<span class="lmd-pri" style="color:' + LEVEL_COLOURS[c.last_message_priority] + ';"><span class="lmd-dot"></span>' + esc(LEVELS[c.last_message_priority]) + '</span>'
+                : '')
+            + '<small><span class="lmd-pv">' + (mine ? '<i class="lmd-ok">✓</i> ' : '') + esc(who + (c.last_message_body || '')) + '</span>'
             + (c.last_message_at ? '<em>' + esc(ago(c.last_message_at)) + '</em>' : '') + '</small></span>'
             + (unread ? '<span class="lmd-count">' + unread + '</span>' : '')
             + '</button>';
@@ -467,6 +510,11 @@
     var cChips = chat.querySelector('[data-lmd-chips]');
     var cFile = chat.querySelector('[data-lmd-file]');
     var cEmojis = chat.querySelector('[data-lmd-emojis]');
+    var cMsgMenu = document.querySelector('[data-lmd-mm]');
+    var priUrl = @json(route('conversations.messages.priority', ['conversation' => '__ID__', 'message' => '__MSG__']));
+    var LEVELS = @json($__lmdLevels);
+    var LEVEL_COLOURS = @json($__lmdLevelColours);
+    var menuFor = null;   // the message the open menu belongs to
     var uploadUrl = @json(route('attachments.store'));
     var typingUrl = @json(route('conversations.typing', ['conversation' => '__ID__']));
     var pendingFiles = [];   // { name, id|null, bad }
@@ -487,8 +535,15 @@
                 ? '<a class="lmd-att is-img" href="' + url + '" target="_blank" rel="noopener"><img src="' + url + '" alt="' + name + '" loading="lazy"></a>'
                 : '<a class="lmd-att" href="' + url + '" target="_blank" rel="noopener">' + name + (a.size_label ? ' · ' + esc(a.size_label) : '') + '</a>';
         }).join('');
-        return '<div class="lmd-msg' + (mine ? ' is-mine' : '') + '">' + esc(m.body) + atts
-            + '<small>' + esc(time) + (mine ? ' ' + tick(m) : '') + '</small></div>';
+        var pri = m.priority && LEVELS[m.priority]
+            ? '<span class="lmd-pri" style="color:' + LEVEL_COLOURS[m.priority] + ';"><span class="lmd-dot"></span>' + esc(LEVELS[m.priority]) + '</span><br>'
+            : '';
+
+        return '<div class="lmd-msg-row' + (mine ? ' is-mine' : '') + '" data-lmd-msg="' + m.id + '" data-priority="' + esc(m.priority || '') + '">'
+            + '<div class="lmd-msg' + (mine ? ' is-mine' : '') + '">' + pri + esc(m.body) + atts
+            + '<small>' + esc(time) + (mine ? ' ' + tick(m) : '') + '</small></div>'
+            + '<button type="button" class="lmd-mk" data-lmd-msg-menu aria-label="Message options">⋯</button>'
+            + '</div>';
     }
 
     function paintHead(c) {
@@ -576,6 +631,7 @@
         var pending = document.createElement('div');
         pending.className = 'lmd-msg is-mine';
         pending.dataset.pending = '1';
+        pending.style.alignSelf = 'flex-end';
         pending.innerHTML = esc(text) + '<small>Sending…</small>';
         cBody.querySelector('.lmd-note')?.remove();
         cBody.appendChild(pending);
@@ -674,6 +730,35 @@
         }
         if (e.target.closest('[data-lmd-more]')) { openMore(); return; }
         if (! e.target.closest('.lmd-more')) document.querySelector('.lmd-more')?.remove();
+
+        var mk = e.target.closest('[data-lmd-msg-menu]');
+        if (mk) {
+            var row = mk.closest('[data-lmd-msg]');
+            if (menuFor === row && ! cMsgMenu.hidden) { cMsgMenu.hidden = true; menuFor = null; return; }
+            menuFor = row;
+            cMsgMenu.hidden = false;
+            var b = mk.getBoundingClientRect();
+            cMsgMenu.style.position = 'fixed';
+            cMsgMenu.style.left = Math.max(8, Math.min(window.innerWidth - 210, b.left - 190)) + 'px';
+            cMsgMenu.style.top = Math.max(8, Math.min(window.innerHeight - cMsgMenu.offsetHeight - 8, b.bottom + 4)) + 'px';
+            return;
+        }
+        var lvl = e.target.closest('[data-lmd-pri]');
+        if (lvl && menuFor) {
+            var id = menuFor.dataset.lmdMsg;
+            var chosen = lvl.dataset.lmdPri;
+            post(at(priUrl.replace('__MSG__', id), state.expanded), { priority: chosen })
+                .then(function () { cBody.dataset.html = ''; loadThread(state.expanded, true); load(); })
+                .catch(function () {});
+            cMsgMenu.hidden = true; menuFor = null;
+            return;
+        }
+        if (e.target.closest('[data-lmd-reply-to]')) {
+            cMsgMenu.hidden = true; menuFor = null;
+            cInput.focus();
+            return;
+        }
+        if (! e.target.closest('[data-lmd-mm]')) { cMsgMenu.hidden = true; menuFor = null; }
 
         if (e.target.closest('[data-lmd-attach]')) { cFile.click(); return; }
         if (e.target.closest('[data-lmd-emoji]')) { cEmojis.hidden = ! cEmojis.hidden; return; }
@@ -801,6 +886,18 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
         <span>Message Settings</span>
     </a>
+</div>
+
+{{-- Sir Peter's per-message menu: priority, reply, and the one action that
+     differs by account type. One menu, moved to whichever message opened it. --}}
+<div class="lmd-mm" data-lmd-mm hidden>
+    <div class="lmd-mm-h">Message Priority</div>
+    @foreach($__lmdLevels as $__k => $__label)
+        <button type="button" data-lmd-pri="{{ $__k }}"><span class="lmd-dot" style="background:{{ $__lmdLevelColours[$__k] }};"></span>{{ $__label }}</button>
+    @endforeach
+    <div class="lmd-mm-h">Actions</div>
+    <button type="button" data-lmd-reply-to>Reply</button>
+    <a href="{{ $__lmdMake['url'] }}">{{ $__lmdMake['label'] }}</a>
 </div>
 
 <div class="lmd-chat" id="lmdChat" role="dialog" aria-label="Conversation" hidden>

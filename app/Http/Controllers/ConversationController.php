@@ -68,6 +68,14 @@ class ConversationController extends Controller
                 ->latest('id')
                 ->limit(1),
             ])
+            // The level most recently set in this conversation, for the row's
+            // badge. The newest message alone would drop the badge the moment
+            // anyone replied to an urgent one.
+            ->addSelect(['last_message_priority' => Message::select('priority')
+                ->whereColumn('conversation_id', 'conversations.id')
+                ->whereNotNull('priority')
+                ->latest('created_at')->latest('id')->limit(1),
+            ])
             // Starred by this person (the dock's Favorites tab).
             ->addSelect(['favorited_at' => \Illuminate\Support\Facades\DB::table('conversation_participants')
                 ->select('favorited_at')
@@ -219,6 +227,32 @@ class ConversationController extends Controller
             'messages' => $messages,
             // Who else is typing right now, for the Live Messages window.
             'typing' => $this->typingPeers($conversation, $request->user()),
+        ]);
+    }
+
+    /**
+     * Set or clear a message's priority (Sir Peter, 21 Sep).
+     *
+     * Either person in the conversation may set it: the one who sent it, and
+     * the one who has to act on it. "Routine" clears the badge rather than
+     * labelling every row.
+     */
+    public function priority(Request $request, Conversation $conversation, Message $message): JsonResponse
+    {
+        $this->authorize('view', $conversation);
+        abort_unless((int) $message->conversation_id === (int) $conversation->id, 404);
+
+        $validated = $request->validate([
+            'priority' => ['required', 'string', 'in:' . implode(',', array_keys(\App\Domain\Messaging\MessagePriority::LEVELS))],
+        ]);
+
+        $level = $validated['priority'];
+        $message->forceFill(['priority' => $level === \App\Domain\Messaging\MessagePriority::ROUTINE ? null : $level])->save();
+
+        return response()->json([
+            'id' => $message->id,
+            'priority' => $message->priority,
+            'label' => \App\Domain\Messaging\MessagePriority::label($message->priority),
         ]);
     }
 
