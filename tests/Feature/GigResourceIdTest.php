@@ -42,7 +42,7 @@ class GigResourceIdTest extends TestCase
     {
         $user = User::factory()->create(['primary_role' => null]);
 
-        $this->assertStringStartsWith('GR-', $user->fresh()->public_id);
+        $this->assertStringStartsWith('USR-', $user->fresh()->public_id);
     }
 
     /* ── Permanent ──────────────────────────────────────────── */

@@ -306,7 +306,7 @@
     This document was generated electronically by {{ config('app.name', 'GigResource') }} on
     <strong>{{ $generatedAt->format('F j, Y \a\t g:i A') }}</strong>.
     Both parties have indicated their acceptance via the platform's e-signature flow.<br>
-    Document reference: <span class="ref">GR-AGR-{{ str_pad($agreement->id, 6, '0', STR_PAD_LEFT) }}-v{{ $agreement->version ?? 1 }}</span>
+    Document reference: <span class="ref">AGR-{{ str_pad($agreement->id, 6, '0', STR_PAD_LEFT) }}-v{{ $agreement->version ?? 1 }}</span>
     &nbsp;·&nbsp; Retained for {{ \App\Domain\Agreements\Services\AgreementPdfService::RETENTION_DAYS }} days from generation.
 </div>
 

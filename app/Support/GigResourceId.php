@@ -41,8 +41,12 @@ class GigResourceId
         'admin' => 'ADM',
     ];
 
-    /** Used when a role has no prefix of its own — never guessed from elsewhere. */
-    public const FALLBACK_PREFIX = 'GR';
+    /**
+     * Used when a role has no prefix of its own — never guessed from
+     * elsewhere. It was "GR"; Sir Peter took that prefix off the platform on
+     * 2026-09-22, so an account with no role of its own reads USR-######.
+     */
+    public const FALLBACK_PREFIX = 'USR';
 
     /**
      * Six digits, which is 900,000 references per prefix.
@@ -56,9 +60,12 @@ class GigResourceId
     public const DIGITS = 6;
 
     /**
-     * How the reference is shown: with the locked "GR-" prefix (DIR-38,
-     * GR-CL-###### / GR-PRO-###### / GR-INF-######). Stored without it, so
-     * nothing already recorded or quoted changes.
+     * How the reference is shown: CL-######, PRO-######, INF-######.
+     *
+     * The "GR-" in front of it (DIR-38) is gone — Sir Peter, 2026-09-22:
+     * "Gr- prefix needs to be removed completely everywhere". Anything
+     * already stored with it is shown without it, so an old record reads the
+     * same as a new one.
      */
     public static function display(?string $id): ?string
     {
@@ -66,7 +73,16 @@ class GigResourceId
             return null;
         }
 
-        return str_starts_with($id, 'GR-') ? $id : 'GR-' . $id;
+        // Only the GR- that sits in FRONT of a real prefix comes off. An old
+        // fallback reference (GR-######) is somebody's actual reference and
+        // stays as it is.
+        foreach (array_merge(array_values(self::PREFIXES), ['USR']) as $prefix) {
+            if (str_starts_with($id, 'GR-' . $prefix . '-')) {
+                return substr($id, 3);
+            }
+        }
+
+        return $id;
     }
 
     public static function prefixFor(?string $role): string

@@ -297,7 +297,7 @@ class PostEventController extends Controller
     private function order(): array
     {
         return [
-            'number'    => 'GR-2026-0920-1558',
+            'number'    => 'ORD-2026-0920-1558',
             'placed'    => 'May 15, 2026 at 10:42 AM',
             'combo'     => 'Elite Wedding Experience + Luxury Floral & Cake Collection',
             'vendors'   => ['Elite Events Co.', 'Bloom & Co.'],

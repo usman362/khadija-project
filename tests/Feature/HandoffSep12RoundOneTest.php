@@ -63,11 +63,15 @@ class HandoffSep12RoundOneTest extends TestCase
         $this->assertNull($b->fresh());
     }
 
-    /** DIR-38: GR- prefix, stored value unchanged. */
-    public function test_ids_are_shown_with_the_gr_prefix(): void
+    /**
+     * DIR-38 put a "GR-" in front of every ID; Sir Peter took it back off on
+     * 2026-09-22, "completely everywhere". Anything stored with it still
+     * reads without it.
+     */
+    public function test_ids_are_shown_without_the_gr_prefix(): void
     {
-        $this->assertSame('GR-PRO-123456', GigResourceId::display('PRO-123456'));
-        $this->assertSame('GR-CL-123456', GigResourceId::display('GR-CL-123456'));
+        $this->assertSame('PRO-123456', GigResourceId::display('PRO-123456'));
+        $this->assertSame('CL-123456', GigResourceId::display('GR-CL-123456'));
         $this->assertNull(GigResourceId::display(null));
     }
 
