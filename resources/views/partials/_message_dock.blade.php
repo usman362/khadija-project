@@ -93,8 +93,9 @@
         display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
     .md-tab.is-on { color: #ea580c; border-bottom-color: #ea580c; }
     .md-tab.md-more { flex: none; padding-left: 10px; padding-right: 10px; color: var(--text-muted, #6b7280); }
-    .md-tabs-more { border-top: 0; }
-    .md-tabs-more[hidden] { display: none; }
+    /* Its own class, not .md-tabs: a rule that sets display on an element
+       that can carry [hidden] leaves it on screen swallowing clicks. */
+    .md-tabs-more:not([hidden]) { display: flex; align-items: stretch; border-bottom: 1px solid var(--border-color, #e5e7eb); }
     .md-tab i { font-style: normal; min-width: 18px; height: 18px; border-radius: 999px; background: #dc2626; color: #fff;
         font-size: 10.5px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; padding: 0 5px; }
 
@@ -491,7 +492,7 @@
                 <button type="button" class="md-tab" data-md-tab="favorites" role="tab">Favorites</button>
                 <button type="button" class="md-tab md-more" data-md-more aria-expanded="false" title="More filters">More</button>
             </div>
-            <div class="md-tabs md-tabs-more" data-md-tabs-more hidden role="tablist">
+            <div class="md-tabs-more" data-md-tabs-more hidden role="tablist">
                 <button type="button" class="md-tab" data-md-tab="priority" role="tab">Priorities</button>
                 <button type="button" class="md-tab" data-md-tab="dates" role="tab">Dates</button>
             </div>
