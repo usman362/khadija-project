@@ -110,6 +110,7 @@
     .do[data-type="MSR"] [data-types]:not([data-types~="MSR"]),
     .do[data-type="SSR"] .do-svc-multi { display: none; }
     .do:not([data-type="SSR"]) .do-svc-single { display: none; }
+    .do[data-type="SSR"] .do-hide-ssr { display: none; }
 
     @media (max-width: 1024px) { .do-layout { grid-template-columns: 1fr; } .do-rail { position: static; flex-direction: row; flex-wrap: wrap; } .do-rcard { flex:1; min-width: 240px; } }
     @media (max-width: 760px) { .do-types { grid-template-columns: 1fr; } }
@@ -121,6 +122,9 @@
                  background:var(--bg-soft,rgba(0,0,0,.02)); }
     .do-chosen b { font-size:13.5px; }
     .do-chosen span { font-size:11.5px; color:var(--text-muted,#6b7280); }
+    /* The chosen service's Level 4 terms, on step 1 beside the service. */
+    .do-l4 { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 14px; }
+    .do-l4 label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin: 0; }
 </style>
 @endpush
 
@@ -176,6 +180,32 @@
                             We only show professionals who offer this.
                         </p>
                     </div>
+
+                    {{-- Sir Peter, 22 Sep: the service's own Level 4 terms
+                         belong here, with the service, not on a later step. --}}
+                    @php
+                        $__l4 = ($serviceId ?? 0)
+                            ? \App\Models\Category::where('kind', \App\Models\Category::SERVICE_SPECIALTY)
+                                ->where('parent_id', $serviceId)->where('is_active', true)
+                                ->orderBy('sort_order')->get(['id', 'name'])
+                            : collect();
+                        $__l4Picked = array_map('intval', (array) (old('service_details')[$serviceId ?? 0] ?? []));
+                    @endphp
+                    @if($__l4->isNotEmpty())
+                        <div class="do-field">
+                            <label>What exactly do you need? <span style="font-weight:500;color:var(--text-muted);">(optional)</span></label>
+                            <div class="do-l4">
+                                @foreach($__l4 as $__term)
+                                    <label>
+                                        <input type="checkbox" name="service_details[{{ $serviceId }}][]" value="{{ $__term->id }}"
+                                               @checked(in_array((int) $__term->id, $__l4Picked, true))>
+                                        <span>{{ $__term->name }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                            <p style="font-size:11.5px;color:var(--text-muted);margin-top:5px;">Pick all that apply, or leave them blank.</p>
+                        </div>
+                    @endif
                 </div>
             </div>
         @endunless
@@ -287,8 +317,15 @@
             </div>
         </div>
 
-        {{-- Service Needs (adapts by type) --}}
-        <div class="do-sec req">
+        @php
+            $__chosenTop = ($serviceId ?? 0) ? $categories->firstWhere('id', $serviceId) : null;
+        @endphp
+        {{-- Service Needs (adapts by type).
+             On a single-service request whose service was chosen in step 1,
+             this section has nothing left to ask, so it is not drawn at all
+             (Sir Peter, 22 Sep). A multi-service request still picks its
+             services here. --}}
+        <div class="do-sec req {{ ($__chosenTop ?? null) ? 'do-hide-ssr' : '' }}">
             <x-form-section :n="4" title="Service Needs" tag="YOUR INPUT" required />
             <div class="do-sec-bd">
                 {{-- SSR: single service.
@@ -304,7 +341,7 @@
                      still there for the other way in: arriving from a
                      professional's own profile, where no service was picked. --}}
                 @php
-                    $__chosen = ($serviceId ?? 0) ? $categories->firstWhere('id', $serviceId) : null;
+                    $__chosen = $__chosenTop;
                     // Nothing chosen and nobody chosen: the question is already
                     // being asked at the top of the page, where it also does
                     // something — it finds the professionals. Asking again here
@@ -327,15 +364,13 @@
                         </div>
                     </div>
                 @endif
-                <div class="do-svc-single" @if($__askAtTop) hidden @endif>
+                <div class="do-svc-single" @if($__askAtTop || $__chosen) hidden @endif>
                     <div class="do-field">
                         <label>Service requested</label>
 
                         @if($__chosen)
-                            <div class="do-chosen">
-                                <b>{{ $__chosen->name }}</b>
-                                <span>chosen above</span>
-                            </div>
+                            {{-- Sir Peter, 22 Sep: asked in step 1, so it is not
+                                 shown again here. It still travels with the form. --}}
                             <input type="hidden" name="service_single" value="{{ $__chosen->name }}">
                         @elseif(! $__askAtTop)
                             <select class="do-input" name="service_single" aria-label="Service single">

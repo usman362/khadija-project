@@ -184,4 +184,45 @@ class DirectOfferServiceFirstTest extends TestCase
 
         $this->assertSame(2, Event::firstOrFail()->categories()->count());
     }
+
+    /**
+     * Sir Peter, 22 Sep: the Level 4 terms belong with the service in step 1,
+     * and step 4 must not ask for the service a second time.
+     */
+    public function test_step_one_carries_the_level_four_terms_and_step_four_does_not_repeat(): void
+    {
+        $service = $this->photography;
+        $term = Category::create([
+            'name' => 'Dinner', 'slug' => 'dinner-dr-l4', 'parent_id' => $service->id,
+            'kind' => Category::SERVICE_SPECIALTY, 'is_active' => true,
+        ]);
+
+        $page = $this->actingAs($this->client)
+            ->get(route('client.direct-offers.create', ['service' => $service->id]))
+            ->assertOk();
+
+        $page->assertSee('service_details[' . $service->id . '][]', false)
+            ->assertSee('Dinner')
+            ->assertSee('What exactly do you need?')
+            // The service is settled, so it is not shown again under Service Needs.
+            ->assertDontSee('chosen above')
+            ->assertSee('do-hide-ssr', false);
+
+        // And what is ticked there is saved on the request.
+        $this->actingAs($this->client)->post(route('client.direct-offers.store'), [
+            'fee_agreed' => 1,
+            'budget_min' => 1500,
+            'professional_id' => $this->photographer->id,
+            'event_name' => 'Level four request',
+            'organization_type' => 'individual',
+            'request_type' => 'SSR',
+            'services' => [$service->id],
+            'service_details' => [$service->id => [$term->id]],
+            'description' => 'Dinner catering for about eighty guests, plated service with staff.',
+            'event_date' => now()->addDays(30)->format('Y-m-d'),
+        ])->assertSessionHasNoErrors();
+
+        $event = \App\Models\Event::where('title', 'Level four request')->firstOrFail();
+        $this->assertSame([$term->id], (array) json_decode($event->categories->first()->pivot->specialty_ids, true));
+    }
 }
