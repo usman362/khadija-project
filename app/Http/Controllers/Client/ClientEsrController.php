@@ -44,6 +44,8 @@ class ClientEsrController extends Controller
 
         return view('client.esr.create', [
             'orgTypes' => \App\Models\Event::ORGANIZATION_TYPES,
+            // Sir Peter, 22 Sep: the kind of event, as the bidding request asks it.
+            'eventTypes' => Category::active()->eventTypes()->orderBy('name')->get(['id', 'name']),
             'categories' => $categories,
             'reasons'    => self::REASONS,
             'scope'      => $this->scopeOf($request->query('scope')),
@@ -106,6 +108,7 @@ class ClientEsrController extends Controller
              */
             // Sir Peter, 19 Sep: a budget is required, even a rough one.
             'budget_min'   => ['required', 'integer', 'min:1'],
+            'event_type'   => ['nullable', 'string', 'max:80'],
             'scope'        => ['nullable', 'in:single,multi'],
 
             /*
@@ -190,6 +193,7 @@ class ClientEsrController extends Controller
 
         $event = Event::create([
             'title'        => $data['event_name'],
+            'event_type'   => $data['event_type'] ?? null,
             'description'  => $data['description'] ?? null,
             'status'       => 'published',
             'is_published' => true,

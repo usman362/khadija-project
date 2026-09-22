@@ -277,4 +277,33 @@ class RequestFormsConsistencyTest extends TestCase
             ->get(route('client.bsr.resume', Event::firstOrFail()))
             ->assertForbidden();
     }
+
+    /** Sir Peter, 22 Sep: the kind of event is asked on all three forms now. */
+    public function test_the_direct_and_emergency_forms_ask_for_the_event_type(): void
+    {
+        \App\Models\Category::firstOrCreate(
+            ['slug' => 'wedding-forms-type'],
+            ['name' => 'Wedding', 'kind' => \App\Models\Category::EVENT_TYPE, 'is_active' => true],
+        );
+
+        $this->actingAs($this->client)->get(route('client.direct-offers.create'))
+            ->assertOk()->assertSee('name="event_type"', false)->assertSee('Wedding');
+
+        $this->actingAs($this->client)->get(route('client.esr.create'))
+            ->assertOk()->assertSee('name="event_type"', false)->assertSee('Wedding');
+
+        $this->actingAs($this->client)->post(route('client.esr.store'), [
+            'budget_min' => 1500,
+            'fee_agreed' => 1,
+            'event_type' => 'Wedding',
+            'event_name' => 'Rush wedding cover',
+            'description' => 'A replacement photographer for a wedding this Saturday afternoon.',
+            'organization_type' => 'individual',
+            'reason' => array_key_first(\App\Http\Controllers\Client\ClientEsrController::REASONS),
+            'needed_by' => now()->addHours(30)->format('Y-m-d\TH:i'),
+            'services' => [$this->service->id],
+        ])->assertSessionHasNoErrors();
+
+        $this->assertSame('Wedding', \App\Models\Event::where('title', 'Rush wedding cover')->firstOrFail()->event_type);
+    }
 }

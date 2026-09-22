@@ -105,8 +105,12 @@ class ClientDirectOfferController extends Controller
 
         $orgTypes = \App\Models\Event::ORGANIZATION_TYPES;
 
+        // Sir Peter, 22 Sep: the kind of event, asked here as it is on the
+        // bidding request, with the client's own name for it alongside.
+        $eventTypes = Category::active()->eventTypes()->orderBy('name')->get(['id', 'name']);
+
         return view('client.direct-offers.create', compact(
-            'orgTypes',
+            'orgTypes', 'eventTypes',
             'pros', 'categories', 'selectedPro', 'type', 'serviceId',
         ));
     }
@@ -147,6 +151,7 @@ class ClientDirectOfferController extends Controller
             'service_single'  => ['required_without:services', 'nullable', 'string', 'max:120'],
             // Sir Peter, 19 Sep: a budget is required, even a rough one.
             'budget_min'      => ['required', 'integer', 'min:1'],
+            'event_type'      => ['nullable', 'string', 'max:80'],
             'request_type'    => ['nullable', 'in:SSR,MSR'],
         ] + \App\Domain\Requests\ServiceDetails::rules()
           + \App\Domain\Requests\CoreFacts::rules('event_name', 'description', 'event_date') + [
@@ -237,6 +242,7 @@ class ClientDirectOfferController extends Controller
 
         $event = Event::create([
             'title'        => $data['event_name'],
+            'event_type'   => $data['event_type'] ?? null,
             'description'  => $data['description'],
             'organization_type' => $data['organization_type'],
             'status'       => 'pending',

@@ -124,11 +124,24 @@
                  picked -- "Urgent: Buffet Catering" -- so the professional saw
                  a label nobody wrote and the client could not correct it. The
                  bidding and direct forms both ask; this one now does too. --}}
-            <div class="esr-field">
-                <label>Event Name <span class="esr-req">*</span></label>
-                <input name="event_name" class="esr-input" value="{{ old('event_name') }}"
-                       maxlength="200" placeholder="e.g. Corporate Lunch: Friday" required>
-                @error('event_name')<p class="esr-err">{{ $message }}</p>@enderror
+            <div class="esr-grid2">
+                <div class="esr-field">
+                    {{-- Sir Peter, 22 Sep: the kind of event, then your own name for it. --}}
+                    <label for="esrEventType">Event Type</label>
+                    <select name="event_type" id="esrEventType" class="esr-input">
+                        <option value="">Choose your event…</option>
+                        @foreach($eventTypes as $__t)
+                            <option value="{{ $__t->name }}" @selected(old('event_type') === $__t->name)>{{ $__t->name }}</option>
+                        @endforeach
+                        <option value="Other Event" @selected(old('event_type') === 'Other Event')>Other / not on this list</option>
+                    </select>
+                </div>
+                <div class="esr-field">
+                    <label>Event Name <span class="esr-req">*</span></label>
+                    <input name="event_name" class="esr-input" value="{{ old('event_name') }}"
+                           maxlength="200" placeholder="e.g. Corporate Lunch: Friday" required>
+                    @error('event_name')<p class="esr-err">{{ $message }}</p>@enderror
+                </div>
             </div>
 
             <div class="esr-grid3">

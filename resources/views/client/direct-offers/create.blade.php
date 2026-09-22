@@ -283,7 +283,19 @@
         <div class="do-sec req">
             <x-form-section :n="3" title="Event Details" tag="YOUR INPUT" required />
             <div class="do-sec-bd">
-                <div class="do-field"><label>Event Name <span style="color:#dc2626;">*</span></label><input class="do-input" name="event_name" value="{{ old('event_name') }}" placeholder="e.g. Luxury Wedding Reception" required>@error('event_name')<p style="color:#dc2626;font-size:12px;margin-top:5px;">{{ $message }}</p>@enderror</div>
+                <div class="do-row">
+                    <div class="do-field">
+                        <label for="doEventType">Event Type</label>
+                        <select class="do-input" name="event_type" id="doEventType">
+                            <option value="">Choose your event…</option>
+                            @foreach($eventTypes as $__t)
+                                <option value="{{ $__t->name }}" @selected(old('event_type') === $__t->name)>{{ $__t->name }}</option>
+                            @endforeach
+                            <option value="Other Event" @selected(old('event_type') === 'Other Event')>Other / not on this list</option>
+                        </select>
+                    </div>
+                    <div class="do-field"><label>Event Name <span style="color:#dc2626;">*</span></label><input class="do-input" name="event_name" value="{{ old('event_name') }}" placeholder="e.g. Luxury Wedding Reception" required>@error('event_name')<p style="color:#dc2626;font-size:12px;margin-top:5px;">{{ $message }}</p>@enderror</div>
+                </div>
                 <div class="do-field">
                     <label for="doOrgType">This request is for <span style="color:#dc2626;">*</span></label>
                     <select class="do-input" name="organization_type" id="doOrgType" required>
