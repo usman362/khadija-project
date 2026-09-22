@@ -1619,8 +1619,13 @@
                 <div class="cl-alert cl-alert-error">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
                     <div>
-                        @foreach($errors->all() as $error)
-                            <div>{{ $error }}</div>
+                        {{-- Sir Peter, 22 Sep: say which step an error is on,
+                             where the page has numbered steps. --}}
+                        @foreach($errors->getMessages() as $__field => $__messages)
+                            @php $__step = \App\Domain\Requests\FormSteps::numberFor($errorSteps ?? [], $__field); @endphp
+                            @foreach($__messages as $__message)
+                                <div>@if($__step)<b>Step {{ $__step }}:</b> @endif{{ $__message }}</div>
+                            @endforeach
                         @endforeach
                     </div>
                 </div>

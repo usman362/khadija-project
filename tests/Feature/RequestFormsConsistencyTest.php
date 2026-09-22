@@ -306,4 +306,20 @@ class RequestFormsConsistencyTest extends TestCase
 
         $this->assertSame('Wedding', \App\Models\Event::where('title', 'Rush wedding cover')->firstOrFail()->event_type);
     }
+
+    /** Sir Peter, 22 Sep: an error says which numbered step it belongs to. */
+    public function test_errors_name_the_step_they_belong_to(): void
+    {
+        $this->actingAs($this->client)->post(route('client.direct-offers.store'), [])
+            ->assertSessionHasErrors();
+
+        $page = $this->actingAs($this->client)->get(route('client.direct-offers.create'))->assertOk();
+        $page->assertSee('<b>Step 2:</b> Choose which professional this request goes to.', false);
+        $page->assertSee('<b>Step 5:</b> Give a budget. A rough estimate is fine.', false);
+
+        $this->actingAs($this->client)->post(route('client.esr.store'), [])->assertSessionHasErrors();
+
+        $this->actingAs($this->client)->get(route('client.esr.create'))->assertOk()
+            ->assertSee('<b>Step 1:</b> When do you need this by?', false);
+    }
 }

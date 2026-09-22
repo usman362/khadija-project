@@ -43,6 +43,7 @@ class ClientEsrController extends Controller
             ->orderBy('name')->get(['id', 'name']);
 
         return view('client.esr.create', [
+            'errorSteps' => \App\Domain\Requests\FormSteps::EMERGENCY,
             'orgTypes' => \App\Models\Event::ORGANIZATION_TYPES,
             // Sir Peter, 22 Sep: the kind of event, as the bidding request asks it.
             'eventTypes' => Category::active()->eventTypes()->orderBy('name')->get(['id', 'name']),

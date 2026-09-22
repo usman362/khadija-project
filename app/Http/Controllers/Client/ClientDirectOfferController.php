@@ -109,7 +109,10 @@ class ClientDirectOfferController extends Controller
         // bidding request, with the client's own name for it alongside.
         $eventTypes = Category::active()->eventTypes()->orderBy('name')->get(['id', 'name']);
 
-        return view('client.direct-offers.create', compact(
+        return view('client.direct-offers.create', [
+            // An error at the top says which numbered step it belongs to.
+            'errorSteps' => \App\Domain\Requests\FormSteps::DIRECT,
+        ] + compact(
             'orgTypes', 'eventTypes',
             'pros', 'categories', 'selectedPro', 'type', 'serviceId',
         ));
