@@ -188,17 +188,6 @@
             <label>Agreed price</label>
             <input type="number" name="agreed_price" min="1" step="1" value="{{ old('agreed_price', (int) $fin->agreed_price) }}">
             <p class="fz-help">Their original bid was ${{ number_format((float) ($bid->amount ?? 0)) }}.</p>
-            {{-- PM-3: an emergency request carries a flat 25% on top of the
-                 professional's price, already added when this agreement opened. --}}
-            @if(\App\Domain\Requests\EmergencySurcharge::applies($fin->event))
-                @php $__base = \App\Domain\Requests\EmergencySurcharge::baseOf((float) $fin->agreed_price); @endphp
-                <p class="fz-help">
-                    This is an emergency request, so the price includes the
-                    {{ \App\Domain\Requests\EmergencySurcharge::label() }} emergency surcharge:
-                    ${{ number_format($__base, 2) }} professional's price
-                    + ${{ number_format((float) $fin->agreed_price - $__base, 2) }} surcharge.
-                </p>
-            @endif
         </div>
         <div class="fz-note info">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> <span>

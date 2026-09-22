@@ -35,9 +35,15 @@ final class Award
             [
                 'bid_id'        => $bid->id,
                 'client_id'     => $bid->event->client_id,
-                // PM-3: an emergency request's agreement starts at the
-                // professional's price plus the 25% surcharge.
-                'agreed_price'  => EmergencySurcharge::priceFor($bid->event, (float) $bid->amount),
+                /*
+                  * The professional's own price, on every kind of request.
+                  * PM-3 put a flat 25% on emergency requests; Sir Peter took
+                  * it off on 2026-09-22: "we have no control over the ER fees
+                  * made the professionals, allow the professionals to decide
+                  * this". A professional who charges more for a rush job
+                  * prices the rush into their own bid.
+                  */
+                'agreed_price'  => (float) $bid->amount,
                 'scope'         => $bid->plan,
                 'payment_terms' => $bid->terms,
             ]

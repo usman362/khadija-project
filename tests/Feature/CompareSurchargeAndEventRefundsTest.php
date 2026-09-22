@@ -102,11 +102,16 @@ class CompareSurchargeAndEventRefundsTest extends TestCase
         ]);
     }
 
-    public function test_an_emergency_agreement_starts_25_percent_above_the_bid(): void
+    /**
+     * PM-3 put a flat 25% on an emergency agreement. Sir Peter took it off on
+     * 2026-09-22: the platform does not price a professional's rush work, so
+     * an emergency agreement starts at the bid, like every other one.
+     */
+    public function test_an_emergency_agreement_starts_at_the_bid(): void
     {
         $f = Award::openFinalization($this->bidOn('esr', 800));
 
-        $this->assertEqualsWithDelta(1000.0, (float) $f->agreed_price, 0.001);
+        $this->assertEqualsWithDelta(800.0, (float) $f->agreed_price, 0.001);
     }
 
     public function test_other_requests_start_at_the_bid(): void
@@ -116,12 +121,14 @@ class CompareSurchargeAndEventRefundsTest extends TestCase
         $this->assertEqualsWithDelta(800.0, (float) $f->agreed_price, 0.001);
     }
 
-    public function test_the_emergency_form_says_so(): void
+    /** And the form no longer promises one. */
+    public function test_the_emergency_form_does_not_announce_a_surcharge(): void
     {
         $this->actingAs($this->user('client'))
             ->get(route('client.esr.create'))
             ->assertOk()
-            ->assertSee('Emergency requests add a flat', false);
+            ->assertDontSee('Emergency requests add a flat', false)
+            ->assertDontSee('surcharge', false);
     }
 
     /* ── D-2 ───────────────────────────────────────────────── */
