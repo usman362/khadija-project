@@ -52,8 +52,22 @@ final class RadiusMatching
             return true;
         }
 
-        if (! self::originIsMatchable($pro) || ! self::eventIsMatchable($event)) {
+        if (! self::originIsMatchable($pro)) {
             return false;
+        }
+
+        /*
+         * OA-161 (Sir Peter, 20 Sep): a request whose address could not be
+         * placed used to be refused here, so it reached NOBODY — the client
+         * published it, saw a banner about travel distance, and waited for
+         * proposals that could never arrive.
+         *
+         * Distance cannot be measured without a point, so the request falls
+         * back to the boundary that always applies anyway: the state. It is
+         * shown to professionals in that state and hidden from the rest.
+         */
+        if (! self::eventIsMatchable($event)) {
+            return StateMatching::matches($pro->profile?->state, $event?->state);
         }
 
         /*

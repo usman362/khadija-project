@@ -121,7 +121,13 @@ class GeographicMatchingTest extends TestCase
         $this->assertFalse(RadiusMatching::allows($other, $event), 'R38 still wins over a huge radius');
     }
 
-    public function test_an_unresolved_event_never_matches(): void
+    /**
+     * OA-161 (Sir Peter, 20 Sep): a request whose address could not be placed
+     * used to reach nobody at all. Distance cannot be measured without a
+     * point, so it falls back to the state — professionals in that state see
+     * it, everyone else does not.
+     */
+    public function test_an_unplaced_event_falls_back_to_the_state(): void
     {
         $client = $this->user('client');
         $pro    = $this->placeOrigin($this->user('professional'), '21201', 40);
@@ -139,7 +145,27 @@ class GeographicMatchingTest extends TestCase
         ]);
 
         $this->assertTrue($event->locationPlacementFailed());
-        $this->assertFalse(RadiusMatching::allows($pro, $event));
+
+        // In Maryland, like the request: it is on their board.
+        $this->assertTrue(RadiusMatching::allows($pro, $event));
+
+        // In another state: still not theirs.
+        $elsewhere = $this->placeOrigin($this->user('professional', 'DE', 'Wilmington'), '19801', 40);
+        $this->assertFalse(RadiusMatching::allows($elsewhere, $event));
+    }
+
+    /** OA-161: the state may be spelled out, and the town stands in for a street it cannot match. */
+    public function test_a_spelled_out_state_is_understood(): void
+    {
+        $this->assertSame('MD', Geocoder::stateCode('maryland'));
+        $this->assertSame('MD', Geocoder::stateCode('MD'));
+        $this->assertNull(Geocoder::stateCode('abingdon'));
+
+        // With no geocoder configured in tests, the ZIP inside the line still
+        // places it, rather than the whole address being called unplaceable.
+        $placed = app(Geocoder::class)->fromFreeText('100 Light Street, Baltimore, Maryland 21202', 'MD');
+        $this->assertNotNull($placed->lat);
+        $this->assertSame('21202', $placed->zip);
     }
 
     public function test_saving_a_known_zip_on_the_origin_places_it(): void

@@ -24,6 +24,19 @@ class Geocoder
             if ($street !== null) {
                 return PlaceResult::exact($street['lat'], $street['lng'], $zip);
             }
+
+            /*
+             * The street did not match. A typo in a house number, an address
+             * too new for the file, an apartment written in the line: none of
+             * them mean the town is unknown. The town is tried on its own
+             * before the request is called unplaceable (OA-161).
+             */
+            if ($line && $city && $state) {
+                $town = $this->census(null, $city, $state, $zip);
+                if ($town !== null) {
+                    return PlaceResult::zip($town['lat'], $town['lng'], $zip);
+                }
+            }
         }
 
         if ($zip !== null) {
@@ -38,15 +51,54 @@ class Geocoder
         $text = trim((string) $text);
         $zip  = ZipCentroidTable::normalize($text);
 
-        $city = null;
-        $line = $text !== '' ? $text : null;
+        /*
+         * OA-161: "692 Kirkcaldy Way, Abingdon, Maryland" came back
+         * unresolved. The old parse only understood a two-letter code, so the
+         * state word stayed inside the address AND the account's state was
+         * appended after it, giving the geocoder "…, Maryland, MD".
+         *
+         * The parts are read from the end now: a state (spelled out or coded)
+         * is lifted off, the part before it is the town, and what is left is
+         * the street.
+         */
+        $parts = array_values(array_filter(array_map('trim', explode(',', $text)), fn ($p) => $p !== ''));
+        $city  = null;
 
-        if (preg_match('/^\s*([^,]+),\s*([A-Za-z]{2})\b/', $text, $m)) {
-            $city  = trim($m[1]);
-            $state = $state ?: strtoupper($m[2]);
+        if ($parts !== []) {
+            $last = preg_replace('/\s+\d{5}(-\d{4})?$/', '', (string) end($parts));
+            $code = self::stateCode($last);
+
+            if ($code !== null) {
+                array_pop($parts);
+                $state = $state ?: $code;
+            }
+
+            if (count($parts) > 1) {
+                $city = array_pop($parts);
+            }
         }
 
+        $line = $parts !== [] ? implode(', ', $parts) : null;
+
         return $this->place($line, $city, $state, $zip, $travelRadiusMiles);
+    }
+
+    /** "MD", "Maryland" or "maryland " => MD. Anything else => null. */
+    public static function stateCode(?string $raw): ?string
+    {
+        $raw = strtoupper(trim((string) $raw));
+
+        if ($raw === '') {
+            return null;
+        }
+
+        foreach (config('geo.allowed_states', []) as $code => $name) {
+            if ($raw === strtoupper($code) || $raw === strtoupper($name)) {
+                return $code;
+            }
+        }
+
+        return null;
     }
 
     public function fromZip(string $zip, ?float $travelRadiusMiles = null): PlaceResult

@@ -232,8 +232,8 @@
 
         @if($event->locationPlacementFailed() && $event->location_need !== \App\Domain\Requests\VenueRule::NEED)
             <div style="margin-top:14px;padding:14px 16px;border:1px solid #fdba74;background:#fff7ed;border-radius:12px;">
-                <div style="font-weight:800;color:#9a3412;margin-bottom:4px;">We could not place this location</div>
-                <p style="margin:0;font-size:13.5px;color:#7c2d12;">Professionals cannot be matched by travel distance until you enter a street, venue, or a more specific ZIP. This is not the same as having no professionals available.</p>
+                <div style="font-weight:800;color:#9a3412;margin-bottom:4px;">We could not place this location on the map</div>
+                <p style="margin:0;font-size:13.5px;color:#7c2d12;">Your request is still live: professionals in your state can see it and send proposals. Adding a street, venue or ZIP lets us also match by travel distance.</p>
             </div>
         @elseif($event->locationIsApproximate())
             <div style="margin-top:14px;padding:14px 16px;border:1px solid #93c5fd;background:#eff6ff;border-radius:12px;">
