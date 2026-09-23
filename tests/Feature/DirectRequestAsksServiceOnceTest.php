@@ -58,8 +58,11 @@ class DirectRequestAsksServiceOnceTest extends TestCase
      */
     private function timesAsked(string $html): int
     {
+        // Counted by the label the control carries, which is the page asking
+        // the question. The top selector's reload is built in script so that
+        // it can carry the request type, so its markup is not the marker.
         return substr_count($html, '<select class="do-input" name="service_single"')
-            + substr_count($html, "?service=' + this.value");
+            + substr_count($html, 'aria-label="Choose a service…"');
     }
 
     public function test_choosing_a_service_first_is_not_asked_again(): void
@@ -92,7 +95,7 @@ class DirectRequestAsksServiceOnceTest extends TestCase
 
         // The top selector is the one that asks, because it also does
         // something: it finds the professionals who offer that service.
-        $this->assertStringContainsString("?service=' + this.value", $html);
+        $this->assertStringContainsString('aria-label="Choose a service…"', $html);
 
         // And the lower one does not ask the same thing beside it.
         $this->assertStringNotContainsString('<select class="do-input" name="service_single"', $html);

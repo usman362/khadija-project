@@ -170,15 +170,27 @@
                 <div class="do-sec-bd">
                     <div class="do-field">
                         <label>Service</label>
-                        <select class="do-input"
-                                onchange="window.location = '{{ route('client.direct-offers.create') }}?service=' + this.value" aria-label="Choose a service…">
+                        {{-- Choosing a service reloads the page to narrow the
+                             professionals to the people who offer it. That
+                             reload carried the service and nothing else, so it
+                             came back on the default type: pick Multi-Service,
+                             choose a service, and the page snapped back to
+                             Single Service every time. The whole address is
+                             rebuilt here, so what has already been chosen
+                             survives the reload. --}}
+                        <select class="do-input" data-do-service
+                                data-url="{{ route('client.direct-offers.create') }}" aria-label="Choose a service…">
                             <option value="">Choose a service…</option>
                             @foreach($categories as $cat)
                                 <option value="{{ $cat->id }}" @selected(($serviceId ?? 0) === $cat->id)>{{ $cat->name }}</option>
                             @endforeach
                         </select>
                         <p style="font-size:11.5px;color:var(--text-muted);margin-top:5px;">
-                            We only show professionals who offer this.
+                            <span data-types="SSR">We only show professionals who offer this.</span>
+                            {{-- On a Multi-Service Request the services
+                                 themselves are picked further down, so this
+                                 one has a job of its own and says what it is. --}}
+                            <span data-types="MSR">We only show professionals who offer this. The services you are asking for go in <b>Services requested</b> below.</span>
                         </p>
                     </div>
 
@@ -483,6 +495,23 @@
 (function () {
     var root = document.getElementById('doRoot');
     var hidden = document.getElementById('doType');
+
+    /*
+     * Narrowing by service reloads the page, and the reload has to carry
+     * what has already been chosen — above all the request type, which the
+     * server reads from ?type= and otherwise defaults back to SSR.
+     */
+    var svc = document.querySelector('[data-do-service]');
+    if (svc) {
+        svc.addEventListener('change', function () {
+            var url = new URL(svc.dataset.url, window.location.origin);
+            var here = new URLSearchParams(window.location.search);
+            if (here.get('pro')) url.searchParams.set('pro', here.get('pro'));
+            url.searchParams.set('type', hidden.value || 'SSR');
+            if (svc.value) url.searchParams.set('service', svc.value);
+            window.location = url.toString();
+        });
+    }
     document.querySelectorAll('.do-type').forEach(function (card) {
         card.addEventListener('click', function () {
             var t = card.getAttribute('data-type');

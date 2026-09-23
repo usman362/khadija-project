@@ -225,4 +225,43 @@ class DirectOfferServiceFirstTest extends TestCase
         $event = \App\Models\Event::where('title', 'Level four request')->firstOrFail();
         $this->assertSame([$term->id], (array) json_decode($event->categories->first()->pivot->specialty_ids, true));
     }
+
+    /**
+     * Ali, 23 September: "MSR nahi chal raha, kuch bhi select karo to single
+     * service hi select hota hai."
+     *
+     * Choosing a service reloads the page to narrow the professionals to the
+     * people who offer it. The reload carried the service and nothing else,
+     * so the server read no ?type= and answered with its default — Single
+     * Service — undoing the choice the client had just made.
+     */
+    public function test_choosing_a_service_keeps_the_request_type(): void
+    {
+        $page = $this->actingAs($this->client)
+            ->get(route('client.direct-offers.create', ['type' => 'MSR']))
+            ->assertOk();
+
+        // The type asked for is the type the page is on.
+        $this->assertSame('MSR', $page->viewData('type'));
+        $page->assertSee('data-type="MSR"', false);
+
+        // And the reload the service picker triggers is built rather than
+        // hard-coded, so it can carry that type back.
+        $page->assertSee('data-do-service', false);
+        $page->assertDontSee("create') }}?service=' + this.value", false);
+        $this->assertStringNotContainsString(
+            "window.location = 'http://localhost/client/direct-offers/create?service=' + this.value",
+            $page->getContent(),
+        );
+
+        // The service is still applied when it arrives with the type.
+        $withBoth = $this->actingAs($this->client)
+            ->get(route('client.direct-offers.create', ['type' => 'MSR', 'service' => $this->photography->id]))
+            ->assertOk();
+
+        $this->assertSame('MSR', $withBoth->viewData('type'));
+        $this->assertSame($this->photography->id, $withBoth->viewData('serviceId'));
+        $this->assertTrue($withBoth->viewData('pros')->contains('id', $this->photographer->id));
+        $this->assertFalse($withBoth->viewData('pros')->contains('id', $this->florist->id));
+    }
 }
