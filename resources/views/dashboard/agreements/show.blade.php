@@ -313,7 +313,7 @@
                         @endif
                     </div>
                     <div>
-                        <div class="fw-semibold">{{ $agreement->booking->supplier->name ?? 'Vendor' }}</div>
+                        <div class="fw-semibold">{{ $agreement->booking->supplier->name ?? 'Professional' }}</div>
                         @if($agreement->supplierAccepted())
                             <small class="text-success">Accepted {{ $agreement->supplier_accepted_at->format('M d, Y h:i A') }}</small>
                         @else

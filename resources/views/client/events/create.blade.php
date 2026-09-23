@@ -175,7 +175,7 @@
             ['describe', 'Describe Your Project'],
             ['budget', 'Budget'],
             ['timeline', 'Timeline'],
-            ['vendors', 'Vendors'],
+            ['vendors', 'Professionals'],
             ['requirements', 'Requirements'],
             ['review', 'Review'],
             ['publish', 'Publish'],
@@ -242,9 +242,9 @@
                     <div class="gb-ai">
                         <div class="gb-ai-hd"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg> Suggestions</div>
                         <ul class="gb-ai-list">
-                            <li>Mention the service, event type and location so vendors know if they're a fit.</li>
+                            <li>Mention the service, event type and location so professionals know if they're a fit.</li>
                             <li>Note your guest count and any key moments you want covered.</li>
-                            <li>Ask vendors to share a portfolio and their availability for your date.</li>
+                            <li>Ask professionals to share a portfolio and their availability for your date.</li>
                         </ul>
                         <button type="button" class="gb-btn primary" id="gbApply">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21.4 8 14 2 9.4h7.6z"/></svg>
@@ -259,7 +259,7 @@
                 {{-- 3 · Inspiration Photos --}}
                 <section class="gb-card" id="gb-inspiration">
                     <div class="gb-card-hd"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span><h3>Inspiration Photos (Optional)</h3></div>
-                    <p class="gb-card-sub">Add visual references so vendors understand the look and feel you're after.</p>
+                    <p class="gb-card-sub">Add visual references so professionals understand the look and feel you're after.</p>
 
                     <div class="gb-uploads">
                         <div class="gb-tile ph"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></div>
@@ -335,7 +335,7 @@
                 {{-- 5 · Budget --}}
                 <section class="gb-card" id="gb-budget">
                     <div class="gb-card-hd"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><h3>Budget</h3></div>
-                    <p class="gb-card-sub">Give vendors a target so you get realistic proposals. This is an estimate. You can adjust later.</p>
+                    <p class="gb-card-sub">Give professionals a target so you get realistic proposals. This is an estimate. You can adjust later.</p>
 
                     <div class="gb-field">
                         <label class="gb-label">Budget</label>
@@ -350,7 +350,7 @@
                 {{-- 6 · Requirements / Advanced Options --}}
                 <section class="gb-card" id="gb-requirements">
                     <div class="gb-card-hd"><span class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span><h3>Requirements</h3></div>
-                    <p class="gb-card-sub">Optional preferences for how vendors bid on your gig.</p>
+                    <p class="gb-card-sub">Optional preferences for how professionals bid on your gig.</p>
 
                     <details class="gb-adv">
                         <summary>
@@ -359,7 +359,7 @@
                         </summary>
                         <div class="gb-adv-body">
                             <div class="gb-toggle">
-                                <div><b>Verified vendors only</b><span>Only vendors who've completed verification can bid.</span></div>
+                                <div><b>Verified professionals only</b><span>Only professionals who've completed verification can bid.</span></div>
                                 <span class="gb-sw on"></span>
                             </div>
                             <div class="gb-toggle">
@@ -367,7 +367,7 @@
                                 <span class="gb-sw"></span>
                             </div>
                             <div class="gb-toggle">
-                                <div><b>Allow questions from vendors</b><span>Let vendors ask clarifying questions before bidding.</span></div>
+                                <div><b>Allow questions from professionals</b><span>Let professionals ask clarifying questions before bidding.</span></div>
                                 <span class="gb-sw on"></span>
                             </div>
                         </div>
@@ -443,7 +443,7 @@
             @php
                 $gbTools = [
                     ['route' => 'ai-tools.budget-allocator',   'icon' => 'dollar', 'name' => 'Budget Planner',    'desc' => 'Break a total budget into smart category estimates.'],
-                    ['route' => 'ai-tools.vendor-matchmaking', 'icon' => 'users', 'name' => 'Best Match',  'desc' => 'Get suggested vendors that fit your event.'],
+                    ['route' => 'ai-tools.vendor-matchmaking', 'icon' => 'users', 'name' => 'Best Match',  'desc' => 'Get suggested professionals that fit your event.'],
                     ['route' => 'ai-tools.timeline-builder',   'icon' => 'calendar', 'name' => 'Timeline Builder',    'desc' => 'Draft a day-of schedule for your event.'],
                     ['route' => 'ai-tools.checklist-generator','icon' => 'checksq', 'name' => 'Smart Checklist',  'desc' => 'Generate a planning checklist to stay on track.'],
                     ['route' => 'ai-tools.venue-analyzer',     'icon' => 'building', 'name' => 'Venue Compatibility Check',      'desc' => 'Review venue notes for fit and considerations.'],
@@ -519,7 +519,7 @@
     // ---- Apply Suggestions -> fill description ----
     document.getElementById('gbApply').addEventListener('click', function () {
         var catNames = selectedCatNames();
-        var category = catNames.length ? catNames.join(' and ') : 'vendor';
+        var category = catNames.length ? catNames.join(' and ') : 'professional';
         var eventType = (titleEl.value.trim() || 'event');
         var location = (locEl.value.trim() || 'our area');
         var guests = guestsEl.value.trim();

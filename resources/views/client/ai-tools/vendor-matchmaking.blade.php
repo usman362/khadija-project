@@ -2,7 +2,7 @@
 
 @section('title', 'Best Match')
 @section('page-title', 'Best Match')
-@section('page-subtitle', 'Find vendors that fit your event.')
+@section('page-subtitle', 'Find professionals that fit your event.')
 
 {{-- Best Match — deterministic, dynamic matcher (no LLM). Ranks a
      vendor catalogue against the event theme/budget and the refine controls
@@ -128,9 +128,9 @@
     $level = $level ?? 'maximum';
     $isManual = $level === 'manual'; $isSemi = $level === 'semi'; $isMax = $level === 'maximum';
     $lvlMeta = [
-        'manual'  => ['Starter', '#64748b', 'Browse the vendor directory and choose who you want yourself. You choose yourself.'],
-        'semi'    => ['Semi', 'var(--brand, #8b5cf6)', 'Ranks the best-fit vendors, refine the theme, budget and match level to re-rank.'],
-        'maximum' => ['Maximum', '#16a34a', 'Auto-selects your best-fit vendor team from your event details.'],
+        'manual'  => ['Starter', '#64748b', 'Browse the professional directory and choose who you want yourself. You choose yourself.'],
+        'semi'    => ['Semi', 'var(--brand, #8b5cf6)', 'Ranks the best-fit professionals, refine the theme, budget and match level to re-rank.'],
+        'maximum' => ['Maximum', '#16a34a', 'Auto-selects your best-fit team of professionals from your event details.'],
     ];
     [$lvlLabel, $lvlColor, $lvlDesc] = $lvlMeta[$level] ?? $lvlMeta['maximum'];
 @endphp
@@ -183,7 +183,7 @@
             @if($isManual)
             {{-- Starter — browse the vendor directory and pick, no suggestions ranking --}}
             <div class="vm-card">
-                <div class="vm-tm-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><b>Browse Vendors</b> <span style="font-size:12px;font-weight:600;color:var(--text-muted);margin-left:2px;">(<span id="vm-dir-count">{{ count($directory) }}</span>)</span></div>
+                <div class="vm-tm-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><b>Browse Professionals</b> <span style="font-size:12px;font-weight:600;color:var(--text-muted);margin-left:2px;">(<span id="vm-dir-count">{{ count($directory) }}</span>)</span></div>
                 <div id="vm-directory" style="display:flex;flex-direction:column;gap:12px;margin-top:6px;">
                     @foreach($directory as $v)
                     <div class="vm-match vm-dir-row" data-cat="{{ $v['category'] }}" data-price="{{ $v['price'] }}" style="margin-top:0;">
@@ -199,7 +199,7 @@
                     </div>
                     @endforeach
                 </div>
-                <div class="vm-empty" id="vm-dir-empty" style="display:none;">No vendors match these filters. Try widening your budget or category.</div>
+                <div class="vm-empty" id="vm-dir-empty" style="display:none;">No professionals match these filters. Try widening your budget or category.</div>
             </div>
             @else
             {{-- Suggested matches (Semi / Maximum) --}}
@@ -228,7 +228,7 @@
             @if($isManual)
             {{-- Starter — plain on-page filters (no AI, no match threshold) --}}
             <div class="vm-card">
-                <div class="vm-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg><b>Filter Vendors</b></div>
+                <div class="vm-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg><b>Filter Professionals</b></div>
                 <div class="vm-fld">
                     <label>Category</label>
                     <div class="vm-select-wrap"><select class="vm-select" id="vm-category">@foreach($categories as $k => $v)<option value="{{ $k }}">{{ $v }}</option>@endforeach</select><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
@@ -270,13 +270,13 @@
 
             <div class="vm-card vm-help">
                 <div class="vm-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><b>Need More Help?</b></div>
-                <p>Chat with our event experts and get personalized vendor recommendations.</p>
+                <p>Chat with our event experts and get recommendations of your own.</p>
                 <a href="{{ route('client.chat.index') }}" class="vm-help-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat with Expert</a>
             </div>
 
             <div class="vm-card vm-help">
                 <div class="vm-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><b>Save This Search</b></div>
-                <p>We'll notify you if new vendors match your event.</p>
+                <p>We'll notify you if new professionals match your event.</p>
                 <button type="button" class="vm-help-btn" id="vm-save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>Save Search</button>
             </div>
         </div>
@@ -288,11 +288,11 @@
         <div class="vm-steps">
             <div class="vm-step"><span class="vm-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><b>1. Add Event Details</b><p>Tell us your theme, date, location, and budget.</p></div>
             <span class="vm-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-            <div class="vm-step"><span class="vm-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="M11 8v6M8 11h6"/></svg></span><b>2. Finds Best Matches</b><p>We scan hundreds of vendors to find the best fit.</p></div>
+            <div class="vm-step"><span class="vm-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="M11 8v6M8 11h6"/></svg></span><b>2. Finds Best Matches</b><p>We scan hundreds of professionals to find the best fit.</p></div>
             <span class="vm-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-            <div class="vm-step"><span class="vm-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span><b>3. Review Top Matches</b><p>See top vendors with match scores, reviews &amp; pricing.</p></div>
+            <div class="vm-step"><span class="vm-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span><b>3. Review Top Matches</b><p>See top professionals with match scores, reviews &amp; pricing.</p></div>
             <span class="vm-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-            <div class="vm-step"><span class="vm-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><b>4. Connect &amp; Chat</b><p>Message vendors directly and ask questions.</p></div>
+            <div class="vm-step"><span class="vm-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><b>4. Connect &amp; Chat</b><p>Message professionals directly and ask questions.</p></div>
             <span class="vm-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
             <div class="vm-step"><span class="vm-step-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M8 12l3 3 5-6"/></svg></span><b>5. Book with Confidence</b><p>Choose your favorite and book securely.</p></div>
         </div>
@@ -328,7 +328,7 @@
     const offerUrl = @json(route('client.direct-offers.create', ['pro' => '__PRO__']));
 
     function renderMatches(matches) {
-        if (!matches.length) { $('vm-matches').innerHTML = '<div class="vm-empty">No vendors match these filters. Try widening your budget or lowering the match threshold.</div>'; return; }
+        if (!matches.length) { $('vm-matches').innerHTML = '<div class="vm-empty">No professionals match these filters. Try widening your budget or lowering the match threshold.</div>'; return; }
         $('vm-matches').innerHTML = matches.map((m) => {
             const tags = m.tags.map((t) => '<span class="vm-tag">' + esc(t) + '</span>').join('') + (m.available ? '<span class="vm-tag vm-tag-avail">Available</span>' : '');
             return '<div class="vm-match"><div class="vm-match-top">'

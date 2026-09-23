@@ -30,7 +30,7 @@
         <div style="display:flex; gap:12px; align-items:flex-start; background:var(--pe-green-l); border:1px solid #bbf7d0; border-radius:12px; padding:14px 16px; margin-bottom:22px;">
             <svg viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.4" style="width:20px; height:20px; flex-shrink:0; margin-top:1px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             <div style="font-size:13px; color:var(--ok-text); line-height:1.5;">
-                <strong>Great news!</strong> Your vendor has marked the event as complete. Please review the final invoice and approve the release of funds.
+                <strong>Great news!</strong> Your professional has marked the event as complete. Please review the final invoice and approve the release of funds.
             </div>
         </div>
 

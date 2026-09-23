@@ -183,16 +183,16 @@ class AiChecklistGeneratorController extends Controller
                 '2 weeks before' => [
                     $guestLine,
                     $catering,
-                    'Confirm timeline with all vendors',
+                    'Confirm timeline with all professionals',
                     'Pick up attire and complete final fittings',
                 ],
                 '1 week before' => [
-                    'Prepare vendor payments and gratuities',
+                    'Prepare payments and gratuities',
                     'Assemble emergency kit and day-of essentials',
                     'Share final schedule with the wedding party',
                 ],
                 'Day of' => [
-                    'Delegate setup and vendor check-in to a point person',
+                    'Delegate setup and check-in to a point person',
                     'Keep hydrated and stick to the timeline',
                     'Assign someone to collect gifts and cards',
                 ],
@@ -219,7 +219,7 @@ class AiChecklistGeneratorController extends Controller
                 '2 weeks before' => [
                     $guestLine,
                     $catering,
-                    'Confirm vendor load-in and setup times',
+                    'Confirm load-in and setup times',
                     'Prepare presentation decks and backups',
                 ],
                 '1 week before' => [

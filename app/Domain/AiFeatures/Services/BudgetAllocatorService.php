@@ -195,7 +195,7 @@ class BudgetAllocatorService
         if ($total < 5000) {
             $tips[] = 'On a lean budget, prioritise one standout element and keep the rest simple rather than spreading thin.';
         } else {
-            $tips[] = 'Ask vendors for package deals across categories, bundling often saves 8–12%.';
+            $tips[] = 'Ask professionals for package deals across categories, bundling often saves 8–12%.';
         }
         return $tips;
     }

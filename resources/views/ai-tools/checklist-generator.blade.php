@@ -2,7 +2,7 @@
 
 @section('title', 'Smart Checklist')
 @section('page-title', 'Smart Checklist')
-@section('page-subtitle', 'Your prioritised plan, budget and vendor status in one place')
+@section('page-subtitle', 'Your prioritised plan, budget and professional status in one place')
 
 {{-- Smart Checklist (client). Shows the client's own event, budget and booked
      professionals, read from their records; the generator below builds a
@@ -230,7 +230,7 @@
             </div>
 
             <div class="cg-card">
-                <div class="cg-card-hd">Vendor Status</div>
+                <div class="cg-card-hd">Professional Status</div>
                 @forelse($vendors as $v)
                     <div class="cg-vd">
                         <div class="cg-vd-main"><h6>{{ $v['name'] }}</h6><span>{{ $v['service'] }}</span></div>
@@ -373,7 +373,7 @@
         rows.appendChild(div);
     }
     // Seed a few common starter tasks the client can rename, retime or remove.
-    [['Set overall budget and guest list', '12+ weeks before'], ['Book venue', '12+ weeks before'], ['Book key vendors (catering, photo)', '8 weeks before'], ['Send invitations', '4 weeks before']]
+    [['Set overall budget and guest list', '12+ weeks before'], ['Book venue', '12+ weeks before'], ['Book key professionals (catering, photo)', '8 weeks before'], ['Send invitations', '4 weeks before']]
         .forEach(([n, t]) => addRow(n, t, ''));
     add.addEventListener('click', () => addRow());
 })();

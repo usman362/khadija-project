@@ -377,7 +377,7 @@
     @else
         <div class="cl-empty">
             <h3>No pros listed in this category yet</h3>
-            <p>Be the first, or browse our other categories to find the right vendor for your event.</p>
+            <p>Be the first, or browse our other categories to find the right professional for your event.</p>
             <a href="{{ route('public.browse') }}">Browse all professionals</a>
         </div>
     @endif

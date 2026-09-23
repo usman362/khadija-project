@@ -136,7 +136,7 @@
                     <h2 style="margin-bottom:14px;">What is Next?</h2>
                     @php
                         $next = [
-                            ['Vendor is preparing your event', 'Your professionals have begun planning and will reach out with details soon.'],
+                            ['Your professionals are preparing your event', 'Your professionals have begun planning and will reach out with details soon.'],
                             ['Stay in touch', 'Use Messages to coordinate details, share inspiration, and ask questions.'],
                             ['Review your timeline', 'Track milestones as your event date approaches.'],
                             ['Final payment reminder', 'Your remaining balance is due before ' . $order['balanceDue'] . '.'],

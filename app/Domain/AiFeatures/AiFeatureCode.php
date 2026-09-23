@@ -25,7 +25,7 @@ final class AiFeatureCode
     {
         return match ($code) {
             self::BUDGET_ALLOCATOR    => 'AI Budget Allocator',
-            self::VENDOR_MATCHMAKING  => 'AI Vendor Matchmaking',
+            self::VENDOR_MATCHMAKING  => 'AI Best Match',
             self::REVIEW_WRITER       => 'AI Review Writer',
             default                   => ucwords(str_replace(['ai.', '_'], ['', ' '], $code)),
         };

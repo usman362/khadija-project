@@ -720,7 +720,10 @@
 @section('content')
 @php
     $topRated   = $pro->isTopRated();
-    $isVerified = $pro->isVerified();
+    // OA-165: the mark is withheld until a verification feature is defined
+    // (D-35). What the platform knows about the documents is untouched, and
+    // the Verified Credentials card below still lists them one by one.
+    $isVerified = \App\Support\VerifiedBadge::shown() && $pro->isVerified();
     $isNew      = $pro->isNewVendor();
     $primaryHref = auth()->check() ? route('client.chat.index', ['to' => $pro->id]) : route('login');
 
@@ -836,7 +839,7 @@
                                      title="Licence, insurance and workers' comp all on file and approved" />
                     @endif
                     @if($isNew)
-                        <span class="pp-tag new-vendor">New Vendor</span>
+                        <span class="pp-tag new-vendor">New Professional</span>
                     @endif
                 </div>
                 {{-- An independent research link, not an endorsement: BBB's public

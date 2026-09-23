@@ -211,7 +211,7 @@ class AiAgreementBuilderController extends Controller
                 ['title' => 'Payment Terms', 'status' => 'agreed', 'body' => 'Total $7,500. 30% deposit ($2,250) to secure the date; remaining balance due 7 days before the event.'],
                 ['title' => 'Event Timeline', 'status' => 'edited', 'body' => 'Setup 7:00 AM · Event 5:00 PM – 11:00 PM · Breakdown by 11:30 PM.', 'change' => 'Setup time changed 8:00 AM → 7:00 AM at client request.'],
                 ['title' => 'Cancellation Policy', 'status' => 'ai-suggested', 'body' => 'AI suggests: 50% refund if cancelled 30+ days prior; deposit non-refundable within 30 days. (Flagged as missing in Phase 1.)'],
-                ['title' => 'Liability & Insurance', 'status' => 'disputed', 'body' => 'Vendor carries general liability insurance covering the engagement.', 'change' => 'Client asked to specify coverage amount, awaiting response.'],
+                ['title' => 'Liability & Insurance', 'status' => 'disputed', 'body' => 'The professional carries general liability insurance covering the engagement.', 'change' => 'Client asked to specify coverage amount, awaiting response.'],
             ],
 
             // Version history with change highlights.
@@ -266,7 +266,7 @@ class AiAgreementBuilderController extends Controller
             // E-signatures from both parties.
             'signatures' => [
                 ['party' => 'Client', 'name' => 'Sarah Johnson', 'signed' => true, 'time' => 'May 25, 2025 · 2:14 PM', 'ip' => '74.12.x.x'],
-                ['party' => 'Professional (Vendor)', 'name' => 'Elite Events Co.', 'signed' => true, 'time' => 'May 25, 2025 · 3:02 PM', 'ip' => '98.20.x.x'],
+                ['party' => 'Professional', 'name' => 'Elite Events Co.', 'signed' => true, 'time' => 'May 25, 2025 · 3:02 PM', 'ip' => '98.20.x.x'],
             ],
 
             // Secure archive / compliance artifacts.

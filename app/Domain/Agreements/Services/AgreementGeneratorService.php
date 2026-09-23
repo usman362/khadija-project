@@ -196,7 +196,7 @@ Generate a professional service agreement based on the following booking details
 - Event Start: {$context['event_start']}
 - Event End: {$context['event_end']}
 - Client: {$context['client_name']} ({$context['client_email']})
-- Supplier/Vendor: {$context['supplier_name']} ({$context['supplier_email']})
+- Professional: {$context['supplier_name']} ({$context['supplier_email']})
 - Booking Status: {$context['booking_status']}
 - Booking Notes: {$context['booking_notes']}
 
@@ -273,7 +273,7 @@ TAIL;
     <p>This Service Agreement ("Agreement") is entered into between:</p>
     <ul>
         <li><strong>Client:</strong> {$context['client_name']} ({$context['client_email']}), hereinafter referred to as "Client"</li>
-        <li><strong>Service Provider:</strong> {$context['supplier_name']} ({$context['supplier_email']}), hereinafter referred to as "Vendor"</li>
+        <li><strong>Service Provider:</strong> {$context['supplier_name']} ({$context['supplier_email']}), hereinafter referred to as "Professional"</li>
     </ul>
 
     <h3>2. EVENT DETAILS</h3>
@@ -285,7 +285,7 @@ TAIL;
     </ul>
 
     <h3>3. SCOPE OF SERVICES</h3>
-    <p>The Vendor agrees to provide the following services for the above-mentioned event:</p>
+    <p>The Professional agrees to provide the following services for the above-mentioned event:</p>
     <ul>
         <li>Professional event services as discussed and agreed upon by both parties</li>
         <li>All necessary equipment and materials required for service delivery</li>
@@ -306,17 +306,17 @@ TAIL;
         <li>Cancellation 30+ days before event: Full refund minus 10% processing fee</li>
         <li>Cancellation 15-29 days before event: 50% refund</li>
         <li>Cancellation less than 15 days before event: No refund</li>
-        <li>Vendor cancellation: Full refund and best-effort replacement</li>
+        <li>Cancellation by the Professional: Full refund and best-effort replacement</li>
     </ul>
 
     <h3>6. RESPONSIBILITIES</h3>
     <h4>Client Responsibilities:</h4>
     <ul>
         <li>Provide accurate event details and timely communication</li>
-        <li>Ensure venue access for the Vendor at agreed times</li>
+        <li>Ensure venue access for the Professional at agreed times</li>
         <li>Make payments according to the agreed schedule</li>
     </ul>
-    <h4>Vendor Responsibilities:</h4>
+    <h4>Professional Responsibilities:</h4>
     <ul>
         <li>Deliver services as described in this agreement</li>
         <li>Maintain professional conduct throughout the event</li>
@@ -340,7 +340,7 @@ TAIL;
                 <p style="color: #999; font-size: 0.85em;">Digital signature pending...</p>
             </div>
             <div style="flex: 1;">
-                <p><strong>Vendor:</strong></p>
+                <p><strong>Professional:</strong></p>
                 <p>{$context['supplier_name']}</p>
                 <p style="color: #999; font-size: 0.85em;">Digital signature pending...</p>
             </div>

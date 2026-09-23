@@ -271,7 +271,7 @@
                         <div class="rw-tips-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg>Smart Review Tips</div>
                         <div class="rw-tip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Be specific about what you loved.</div>
                         <div class="rw-tip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Mention key strengths.</div>
-                        <div class="rw-tip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Share how the vendor impacted your event.</div>
+                        <div class="rw-tip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Share how the professional impacted your event.</div>
                         <div class="rw-tip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Add details about timeliness or communication.</div>
                         <div class="rw-kw-h">Suggested Keywords</div>
                         <div class="rw-kws">@foreach($keywords as $kw)<span class="rw-kw" data-kw="{{ $kw }}">{{ $kw }}</span>@endforeach</div>
@@ -346,7 +346,7 @@
             <div class="rw-card">
                 <div class="rw-side-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><b>Privacy &amp; Publishing</b></div>
                 <label class="rw-check"><input type="checkbox"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span>Make review public</span></label>
-                <label class="rw-check"><input type="checkbox"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span>Show on vendor profile</span></label>
+                <label class="rw-check"><input type="checkbox"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span>Show on their profile</span></label>
                 <label class="rw-check"><input type="checkbox"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span>Show on my profile</span></label>
                 <label class="rw-check"><input type="checkbox"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span>Anonymous review</span></label>
                 <div class="rw-pub-btns">
@@ -364,7 +364,7 @@
         <div class="rw-card">
             <div class="rw-sec-h"><span class="n">5</span><b>Private Notes</b></div>
             <p class="rw-sec-sub">For your reference only</p>
-            <textarea class="rw-textarea" id="rw-notes" style="min-height:120px;" placeholder="Great vendor, very reliable. Will book again for next year's gala. Loved how they handled the lighting challenges."></textarea>
+            <textarea class="rw-textarea" id="rw-notes" style="min-height:120px;" placeholder="Great to work with, very reliable. Will book again for next year's gala. Loved how they handled the lighting challenges."></textarea>
             <div style="font-size:11px;color:var(--text-muted);margin:8px 0;">Only you can see this note.</div>
             <button type="button" class="rw-draft-btn" id="rw-save-notes" style="width:100%;">Save Notes</button>
         </div>

@@ -28,8 +28,8 @@ final class AiToolCatalog
             ['key' => 'vendor-matchmaking', 'name' => 'Best Match',    'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.vendor-matchmaking', 'purpose' => 'Finds the best professionals by budget, location, rating & availability.'],
             ['key' => 'event-planner',      'name' => 'Guided Event Planner',        'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.event-planner', 'purpose' => 'Organises the event from planning through completion.'],
             ['key' => 'timeline-builder',   'name' => 'Timeline Builder',     'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.timeline-builder', 'purpose' => 'Creates an event timeline incl. setup, schedule and teardown.'],
-            ['key' => 'venue-analyzer',     'name' => 'Venue Compatibility Check',       'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.venue-analyzer', 'purpose' => 'Reviews venue details and recommends vendors, equipment & logistics.'],
-            ['key' => 'checklist-generator','name' => 'Smart Checklist',  'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.checklist-generator', 'purpose' => 'Builds a personalised event-planning checklist with budget & vendor status.'],
+            ['key' => 'venue-analyzer',     'name' => 'Venue Compatibility Check',       'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.venue-analyzer', 'purpose' => 'Reviews venue details and recommends professionals, equipment & logistics.'],
+            ['key' => 'checklist-generator','name' => 'Smart Checklist',  'audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.checklist-generator', 'purpose' => 'Builds a personalised event-planning checklist with budget & professional status.'],
             ['key' => 'guest-capacity',     'name' => 'Guest Capacity Calculator','audience' => 'client',      'status' => 'live',    'route' => 'ai-tools.guest-capacity', 'purpose' => 'Estimates staffing, seating, food, beverage and venue capacity.'],
             ['key' => 'theme-advisor',      'name' => 'Style & Inspiration','audience' => 'client',       'status' => 'live',    'route' => 'ai-tools.theme-advisor', 'purpose' => 'Recommends colours, décor, themes and styling.'],
 
@@ -184,11 +184,11 @@ final class AiToolCatalog
 
     private const FEATURES = [
         'budget-allocator'      => ['Smart budget distribution', 'Optimize spending', 'Stay on budget'],
-        'vendor-matchmaking'    => ['Smart vendor matching', 'Budget & location filters', 'Ratings & availability insights'],
+        'vendor-matchmaking'    => ['Smart matching of professionals', 'Budget & location filters', 'Ratings & availability insights'],
         'event-planner'         => ['Event planning assistant', 'Task management', 'Real-time updates'],
         'timeline-builder'      => ['Detailed timelines', 'Milestone tracking', 'Time conflict alerts'],
-        'venue-analyzer'        => ['Venue insights', 'Vendor recommendations', 'Logistics planning'],
-        'checklist-generator'   => ['Custom checklists', 'Budget tracking', 'Vendor status updates'],
+        'venue-analyzer'        => ['Venue insights', 'Who you will need', 'Logistics planning'],
+        'checklist-generator'   => ['Custom checklists', 'Budget tracking', 'Professional status updates'],
         'guest-capacity'        => ['Capacity calculations', 'Staffing estimates', 'Resource planning'],
         'theme-advisor'         => ['Theme suggestions', 'Color palettes', 'Style inspiration'],
         'pricing-assistant'     => ['Market-based pricing', 'Cost & margin breakdown', 'Competitive rates'],

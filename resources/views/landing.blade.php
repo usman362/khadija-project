@@ -622,7 +622,7 @@
                             <span class="st" aria-hidden="true">★★★★★</span>
                         </div>
                     @else
-                        <p>GigResource helped me find amazing vendors and grew my business 3X faster. The tools and support make my job so much easier!</p>
+                        <p>GigResource helped me find amazing professionals and grew my business 3X faster. The tools and support make my job so much easier!</p>
                         <div class="lp-testi-by">
                             <img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=120&q=80&auto=format&fit=crop" alt="">
                             <div><b>Sarah J.</b><small>Wedding Planner</small></div>

@@ -130,7 +130,7 @@
     {{-- Interactive planner (Semi / Maximum) --}}
     <div class="ep-form-card">
         <h3>Plan My Event</h3>
-        <div class="sub">{{ $isSemi ? "Enter your details and instantly drafts a plan you can adjust." : "Enter your details and we build the full milestone plan, vendor list and budget split." }}</div>
+        <div class="sub">{{ $isSemi ? "Enter your details and instantly drafts a plan you can adjust." : "Enter your details and we build the full milestone plan, professional list and budget split." }}</div>
         <form id="epForm">
             <div class="ep-fgrid">
                 <div>
@@ -186,7 +186,7 @@
             </div>
             <aside class="ep-rail">
                 <div class="ep-pan">
-                    <h4>Vendor Categories</h4>
+                    <h4>Professional Categories</h4>
                     <div id="epVendors"></div>
                 </div>
                 <div class="ep-pan">
@@ -375,7 +375,7 @@
         rows.appendChild(div);
     }
     // Seed a few common starter tasks the client can rename or remove.
-    [['Set overall budget', 'High'], ['Book venue', 'High'], ['Book key vendors (catering, photo)', 'Medium'], ['Send invites', 'Medium']]
+    [['Set overall budget', 'High'], ['Book venue', 'High'], ['Book key professionals (catering, photo)', 'Medium'], ['Send invites', 'Medium']]
         .forEach(([n, p]) => addRow(n, p, ''));
     add.addEventListener('click', () => addRow());
 })();

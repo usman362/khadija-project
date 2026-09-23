@@ -254,13 +254,13 @@
                             [$stLabel, $stTone] = \App\Support\GigStatus::for($v);
                         @endphp
                         <tr>
-                            <td style="padding-left:18px;"><div class="ea-vendor"><img src="{{ $v->supplier?->avatar_url ?? \App\Models\User::placeholderAvatarUri() }}" loading="lazy" alt=""><span class="nm">{{ $v->supplier?->name ?? 'Vendor' }}</span></div></td>
+                            <td style="padding-left:18px;"><div class="ea-vendor"><img src="{{ $v->supplier?->avatar_url ?? \App\Models\User::placeholderAvatarUri() }}" loading="lazy" alt=""><span class="nm">{{ $v->supplier?->name ?? 'Professional' }}</span></div></td>
                             <td>{{ \Illuminate\Support\Str::limit($v->supplier?->profile?->headline ?? $v->event?->title ?? 'Service', 16) }}</td>
                             <td><span class="ea-pill {{ $stTone }}">{{ $stLabel }}</span></td>
                             <td style="padding-right:18px;"><a class="ea-action-btn ghost" href="{{ route('client.bookings.index') }}">View in Bookings</a></td>
                         </tr>
                     @empty
-                        <tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted);">No vendor expenses yet.</td></tr>
+                        <tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted);">Nothing paid to a professional yet.</td></tr>
                     @endforelse
                 </tbody>
             </table>

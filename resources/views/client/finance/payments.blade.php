@@ -218,7 +218,7 @@
         </form>
         <div style="overflow-x:auto;">
             <table class="pay-table">
-                <thead><tr><th style="padding-left:18px;">Vendor</th><th>Status</th><th>Amount</th><th>Date</th><th style="padding-right:18px;"></th></tr></thead>
+                <thead><tr><th style="padding-left:18px;">Professional</th><th>Status</th><th>Amount</th><th>Date</th><th style="padding-right:18px;"></th></tr></thead>
                 <tbody>
                     @forelse($transactions as $t)
                         @php
@@ -240,7 +240,7 @@
                             <td style="padding-left:18px;">
                                 <div class="pay-vendor">
                                     <img src="{{ $t->supplier?->avatar_url ?? \App\Models\User::placeholderAvatarUri() }}" loading="lazy" alt="">
-                                    <div><div class="nm">{{ $t->supplier?->name ?? 'Vendor' }}</div><div class="sub">{{ \Illuminate\Support\Str::limit($t->supplier?->profile?->headline ?? $t->event?->title ?? '', 18) }}</div></div>
+                                    <div><div class="nm">{{ $t->supplier?->name ?? 'Professional' }}</div><div class="sub">{{ \Illuminate\Support\Str::limit($t->supplier?->profile?->headline ?? $t->event?->title ?? '', 18) }}</div></div>
                                 </div>
                             </td>
                             <td><span class="pay-pill {{ $t->status }}">{{ ucfirst($t->status) }}</span></td>
@@ -331,7 +331,7 @@
         @forelse($transactions->take(4) as $t)
             <div class="pay-act-row">
                 <div class="pay-act-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-                <div class="pay-act-body"><div class="pay-act-name">{{ ucfirst($t->status) }} · {{ \Illuminate\Support\Str::limit($t->supplier?->name ?? 'Vendor', 18) }}</div><div class="pay-act-time">{{ $t->updated_at?->humanAgo() }}</div></div>
+                <div class="pay-act-body"><div class="pay-act-name">{{ ucfirst($t->status) }} · {{ \Illuminate\Support\Str::limit($t->supplier?->name ?? 'Professional', 18) }}</div><div class="pay-act-time">{{ $t->updated_at?->humanAgo() }}</div></div>
             </div>
         @empty
             <div style="font-size:12px;color:var(--text-muted);text-align:center;padding:8px 0;">No activity yet</div>

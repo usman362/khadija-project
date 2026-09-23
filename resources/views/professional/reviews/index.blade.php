@@ -204,7 +204,7 @@
                     $metrics = [
                         ['punctuality', 'Punctuality (On-Time Load In)', 'Did the client clear the venue on time for setup?', '#10b981', 'M12 6 12 12 16 14|circle'],
                         ['communication', 'Communication Clarity', 'Was the plan clear and easy to follow?', '#2563eb', 'chat'],
-                        ['safety', 'Safety & Hospitality', 'Did the client provide a safe environment and take care of vendors?', '#8b5cf6', 'shield'],
+                        ['safety', 'Safety & Hospitality', 'Did the client provide a safe environment and take care of professionals?', '#8b5cf6', 'shield'],
                     ];
                     $defaults = ['punctuality' => 4, 'communication' => 5, 'safety' => 4];
                 @endphp
