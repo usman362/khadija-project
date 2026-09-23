@@ -497,7 +497,9 @@
                             && \App\Support\VerifiedBadge::licenceVerified($p)
                             && \App\Support\VerifiedBadge::holds($p, 'workers_comp')
                             && \App\Support\InsuranceRequirement::isCovered($p);
-                        $isTop = $avg >= 4.5 && $cnt > 0;
+                        // One rule for Top Rated, on the card and on the
+                        // profile the card opens (User::isTopRated).
+                        $isTop = $pro->isTopRated();
                         $gallery = collect($p ? $p->portfolioHeroUrls(4) : []);
                         $rate = $p?->hourly_rate;
 

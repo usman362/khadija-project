@@ -270,14 +270,31 @@ class User extends Authenticatable implements MustVerifyEmail
      * pros with strong ratings, enough sample size, AND all three
      * verification badges stamped.
      */
+    /**
+     * Reviews needed before an average is called a rating.
+     *
+     * The same reason Messages waits for three replies before printing an
+     * average time: one five-star review is not a record, and a badge that
+     * says otherwise is a claim the platform cannot back.
+     */
+    public const TOP_RATED_MINIMUM = 5;
+
+    /**
+     * Top Rated: enough reviews to mean something, and a high average.
+     *
+     * Two pages answered this differently. The search results asked for one
+     * review at 4.5, and this asked for five reviews AND all three documents
+     * verified, so the same professional was Top Rated on the card a client
+     * clicked and not on the profile it opened. Rating and paperwork are also
+     * different questions — a rating badge that quietly waits on a document
+     * is not a rating badge. So it is one rule, about ratings, and both pages
+     * read it from here.
+     */
     public function isTopRated(): bool
     {
         $stats = $this->reviewStats();
-        if ($stats['count'] < 5 || $stats['average'] < 4.5) {
-            return false;
-        }
-        $profile = $this->profile;
-        return $profile && count($profile->verifiedBadges()) === count(\App\Models\UserProfile::BADGES);
+
+        return $stats['count'] >= self::TOP_RATED_MINIMUM && $stats['average'] >= 4.5;
     }
 
     /**
