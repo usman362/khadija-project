@@ -17,6 +17,10 @@
     $sortF   = $f['sort'] ?? 'top';
     $zipF    = $f['zip'] ?? '';
     $total   = method_exists($pros, 'total') ? $pros->total() : $pros->count();
+    // OA-159: the header said "Found: 8 Pros" over six cards. The number on
+    // screen is now the number of cards on screen, and the rest of the total
+    // is stated as what it is — the next page.
+    $shown   = $pros->count();
     $locationIssue = $locationIssue ?? null;
 
 @endphp
@@ -448,7 +452,14 @@
                     </div>
                 @endif
                 <div class="br-results-head">
-                    <div class="br-found">Found: <b>{{ $total }} {{ Str::plural('Pro', $total) }}</b>{{ $cityF ? ' near '.$cityF : '' }}{{ $kw ? ' for “'.Str::title($kw).'”' : '' }}</div>
+                    <div class="br-found">
+                        @if($shown < $total)
+                            Showing <b>{{ $shown }} of {{ $total }} {{ Str::plural('Pro', $total) }}</b>
+                        @else
+                            Found: <b>{{ $shown }} {{ Str::plural('Pro', $shown) }}</b>
+                        @endif
+                        {{ $cityF ? ' near '.$cityF : '' }}{{ $kw ? ' for “'.Str::title($kw).'”' : '' }}
+                    </div>
                     <div class="br-results-tools">
                         <form action="{{ route('public.browse') }}" method="GET" autocomplete="off" id="brSortForm">
                             @if($kw)<input type="hidden" name="q" value="{{ $kw }}">@endif

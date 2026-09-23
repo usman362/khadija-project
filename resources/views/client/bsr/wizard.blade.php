@@ -174,6 +174,12 @@
     .bw-split-row .bw-amount::before { content: '$'; position: absolute; left: 11px; top: 50%;
         transform: translateY(-50%); font-size: 13px; color: var(--text-muted); pointer-events: none; }
     .bw-split-row input { padding-left: 22px; text-align: right; }
+    /* OA-160: the browser's own up/down arrows sat over the last digit of a
+       right-aligned amount, so $289 read as $28. The figures are typed, not
+       stepped, so the arrows come off. */
+    .bw-split-row input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+    .bw-split-row input[type="number"]::-webkit-outer-spin-button,
+    .bw-split-row input[type="number"]::-webkit-inner-spin-button { appearance: none; -webkit-appearance: none; margin: 0; }
     .bw-split-total { margin-top: 10px; padding-top: 10px; border-top: 1.5px solid var(--border-color); font-size: 13px; color: var(--text-muted); }
     .bw-split-total b { color: var(--text-primary); }
     .bw-split-gap { margin-left: 8px; font-weight: 700; }

@@ -68,6 +68,12 @@
                      border:1px solid var(--border-color,#e5e7eb); border-radius:10px;
                      font:inherit; font-size:13.5px; color:var(--text-primary,#111827);
                      background:var(--bg-page,transparent); }
+    /* OA-160: the browser's own up/down arrows sat over the last digit of a
+       right-aligned amount, so $289 read as $28. The figures are typed, not
+       stepped, so the arrows come off. */
+    .sbs-row input[type="number"] { appearance:textfield; -moz-appearance:textfield; }
+    .sbs-row input[type="number"]::-webkit-outer-spin-button,
+    .sbs-row input[type="number"]::-webkit-inner-spin-button { appearance:none; -webkit-appearance:none; margin:0; }
     .sbs-row input:focus { outline:none; border-color:var(--brand,#f97316);
                            box-shadow:0 0 0 3px color-mix(in srgb, var(--brand,#f97316) 14%, transparent); }
     .sbs-total { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px;
