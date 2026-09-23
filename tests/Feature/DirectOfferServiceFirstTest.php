@@ -264,4 +264,68 @@ class DirectOfferServiceFirstTest extends TestCase
         $this->assertTrue($withBoth->viewData('pros')->contains('id', $this->photographer->id));
         $this->assertFalse($withBoth->viewData('pros')->contains('id', $this->florist->id));
     }
+
+    /**
+     * Ali, 23 September: "yeh jo uper selected hai wohi niche again."
+     *
+     * The same fault OA-144 fixed for a single-service request, on the
+     * multi-service side: the service chosen at the top to find the
+     * professionals was offered again in Service Needs as one checkbox among
+     * all the others, with nothing saying the two were the same. It is now
+     * shown there as settled and left out of the picker.
+     */
+    public function test_a_multi_service_request_does_not_ask_for_the_chosen_service_twice(): void
+    {
+        $page = $this->actingAs($this->client)
+            ->get(route('client.direct-offers.create', ['type' => 'MSR', 'service' => $this->photography->id]))
+            ->assertOk();
+
+        $html = $page->getContent();
+
+        // Settled, and carried with the form rather than asked for again.
+        $this->assertStringContainsString('Other services you also need', $html);
+        $this->assertStringContainsString(
+            '<b>'.$this->photography->name.'</b> is already included, from step 1.',
+            $html,
+        );
+        $this->assertStringContainsString(
+            'name="services[]" value="'.$this->photography->id.'"',
+            $html,
+        );
+
+        // And it is not a tick box in the picker below: the field carrying it
+        // is there exactly once, and it is the hidden one.
+        $this->assertStringNotContainsString(
+            '<input type="checkbox" name="services[]" value="'.$this->photography->id.'"',
+            $html,
+        );
+        $this->assertSame(
+            1,
+            substr_count($html, 'name="services[]" value="'.$this->photography->id.'"'),
+            'the chosen service is carried once, not offered again',
+        );
+
+        // Both services reach the request: the one from step 1 and the extra.
+        // A multi-service request goes to one professional, so that person has
+        // to offer both — the rule that refuses it otherwise is R38's.
+        $this->photographer->serviceCategories()->syncWithoutDetaching([$this->florals->id]);
+
+        $this->actingAs($this->client)->post(route('client.direct-offers.store'), [
+            'fee_agreed' => 1,
+            'budget_min' => 2000,
+            'professional_id' => $this->photographer->id,
+            'event_name' => 'Two services at once',
+            'organization_type' => 'individual',
+            'request_type' => 'MSR',
+            'services' => [$this->photography->id, $this->florals->id],
+            'description' => 'Photography for the ceremony and flowers for the tables, about eighty guests.',
+            'event_date' => now()->addDays(30)->format('Y-m-d'),
+        ])->assertSessionHasNoErrors();
+
+        $event = \App\Models\Event::where('title', 'Two services at once')->firstOrFail();
+        $this->assertEqualsCanonicalizing(
+            [$this->photography->id, $this->florals->id],
+            $event->categories->pluck('id')->all(),
+        );
+    }
 }

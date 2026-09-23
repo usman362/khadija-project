@@ -169,7 +169,7 @@
                 <x-form-section :n="1" title="What do you need?" tag="START HERE" />
                 <div class="do-sec-bd">
                     <div class="do-field">
-                        <label>Service</label>
+                        <label><span data-types="SSR">Service</span><span data-types="MSR">Main service</span></label>
                         {{-- Choosing a service reloads the page to narrow the
                              professionals to the people who offer it. That
                              reload carried the service and nothing else, so it
@@ -190,7 +190,7 @@
                             {{-- On a Multi-Service Request the services
                                  themselves are picked further down, so this
                                  one has a job of its own and says what it is. --}}
-                            <span data-types="MSR">We only show professionals who offer this. The services you are asking for go in <b>Services requested</b> below.</span>
+                            <span data-types="MSR">We only show professionals who offer this. It counts as one of the services you are asking for; add the rest under <b>Service Needs</b> below.</span>
                         </p>
                     </div>
 
@@ -407,13 +407,36 @@
                     </div>
                     <div class="do-hint">SSR: a single, specific service from this professional.</div>
                 </div>
-                {{-- MSR / ER: multiple services --}}
+                {{-- MSR: the other services.
+
+                     OA-144 again, on the multi-service side. The service
+                     chosen at the top of the page was offered here a second
+                     time, as a checkbox among all the others, with nothing to
+                     say it was the same one. So it is shown here as settled —
+                     it travels with the form in a hidden field — and the
+                     picker asks only for what has not been asked for yet. --}}
                 <div class="do-svc-multi">
                     <div class="do-field">
-                        <label>Services requested (pick all that apply)</label>
-                        <x-service-picker :categories="$categories" name="services" :selected="old('services', [])"
-                                          :details="true" :detail-selected="old('service_details', [])"
-                                          :missing="true" :missing-value="old('service_missing')" />
+                        @if($__chosenTop)
+                            <label>Other services you also need</label>
+                            <p class="do-hint" style="margin:0 0 10px;">
+                                <b>{{ $__chosenTop->name }}</b> is already included, from step 1.
+                            </p>
+                            {{-- Disabled on an SSR, where this whole block is
+                                 hidden: a hidden field still submits, and a
+                                 single-service request must not carry a list. --}}
+                            <input type="hidden" name="services[]" value="{{ $__chosenTop->id }}"
+                                   data-msr-only @disabled($type === 'SSR')>
+                            <x-service-picker :categories="$categories->reject(fn ($c) => $c->name === $__chosenTop->name)"
+                                              name="services" :selected="old('services', [])"
+                                              :details="true" :detail-selected="old('service_details', [])"
+                                              :missing="true" :missing-value="old('service_missing')" />
+                        @else
+                            <label>Services requested (pick all that apply)</label>
+                            <x-service-picker :categories="$categories" name="services" :selected="old('services', [])"
+                                              :details="true" :detail-selected="old('service_details', [])"
+                                              :missing="true" :missing-value="old('service_missing')" />
+                        @endif
 
                         {{-- Appears the moment a catering or bar service is ticked. --}}
                         @include('partials._food_delivery', [
@@ -518,6 +541,10 @@
             document.querySelectorAll('.do-type').forEach(function (c) { c.classList.toggle('sel', c === card); });
             root.setAttribute('data-type', t);
             hidden.value = t;
+            // The multi-service block is only hidden, and a hidden field still
+            // submits, so what belongs to a multi-service request is switched
+            // off rather than merely put out of sight.
+            document.querySelectorAll('[data-msr-only]').forEach(function (el) { el.disabled = (t === 'SSR'); });
             document.querySelectorAll('#doTypeLbl, #doTypeLbl2').forEach(function (el) { el.textContent = t; });
         });
     });
