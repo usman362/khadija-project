@@ -122,6 +122,7 @@
                  background:var(--bg-soft,rgba(0,0,0,.02)); }
     .do-chosen b { font-size:13.5px; }
     .do-chosen span { font-size:11.5px; color:var(--text-muted,#6b7280); }
+    .do-ai-note { margin: 10px 0 0; font-size: 12px; line-height: 1.55; color: var(--text-muted, #6b7280); }
     /* The chosen service's Level 4 terms, on step 1 beside the service. */
     .do-l4 { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 14px; }
     .do-l4 label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin: 0; }
@@ -449,6 +450,10 @@
                      Peter read it as the acronym being oddly placed; it was
                      the layout, not the wording. --}}
                 <div class="do-ai-row" data-types="MSR"><span class="ck">✓</span><span>For an <b id="doTypeLbl">{{ $type }}</b>, each requested service is sent as its own separate agreement.</span></div>
+                {{-- Issue #24: the section is labelled AUTO-DRAFTED, which did
+                     not say who wrote it. This does, and says the words stay
+                     the client's to change. --}}
+                <p class="do-ai-note">This summary is drafted for you by GigResource's AI from the answers above. Nothing is sent until you press Send, and you can edit any answer first.</p>
             </div>
         </div>
 

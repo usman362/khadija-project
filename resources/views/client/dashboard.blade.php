@@ -938,7 +938,11 @@
                         </svg>{{ $__d['pct'] }}%
                     </span>
                 @endif
-                <span class="od-stat-sub">In progress</span>
+                {{-- Khadijah, 23 Sep: the number is how many gigs are open
+                     RIGHT NOW, while the percentage compares the gigs posted
+                     this month with last month. Saying so stops "3" and "75%"
+                     reading as the same measure. --}}
+                <span class="od-stat-sub">{{ $trendDelta($gigsSeries) ? 'posted vs last month' : 'In progress' }}</span>
             </div>
             @if($__pts = $sparkPoints($gigsSeries))
                 <svg class="od-stat-spark" width="58" height="22" viewBox="0 0 60 22" fill="none" aria-hidden="true"><polyline points="{{ $__pts }}" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -993,7 +997,9 @@
                         </svg>{{ $__d['pct'] }}%
                     </span>
                 @endif
-                <span class="od-stat-sub">Favorites</span>
+                {{-- Same rule as Active Gigs: the total is everything saved,
+                     the percentage is this month against last. --}}
+                <span class="od-stat-sub">{{ $trendDelta($savedSeries) ? 'saved vs last month' : 'Favorites' }}</span>
             </div>
             @if($__pts = $sparkPoints($savedSeries))
                 <svg class="od-stat-spark" width="58" height="22" viewBox="0 0 60 22" fill="none" aria-hidden="true"><polyline points="{{ $__pts }}" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
