@@ -41,6 +41,49 @@ class RoleColoursTest extends TestCase
         $this->assertSame(array_keys(self::TABLE), array_keys(RoleColours::ROLES));
     }
 
+    /**
+     * The row's colour is the other person's, and professional mode belongs to
+     * the signed-in session. Reading it about somebody else badged a
+     * professional who also holds a client role as "Client", in orange, beside
+     * their own blue avatar.
+     */
+    public function test_a_conversation_row_takes_the_other_persons_own_role(): void
+    {
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
+        $client = \App\Models\User::factory()->create(['primary_role' => 'client']);
+        $client->assignRole('client');
+
+        // A professional who also holds a client role, as many real ones do.
+        $pro = \App\Models\User::factory()->create(['name' => 'Priya Raghavan', 'primary_role' => 'professional']);
+        $pro->assignRole('professional');
+        $pro->assignRole('client');
+
+        $conversation = \App\Models\Conversation::create(['type' => 'direct', 'created_by' => $client->id]);
+        $conversation->addParticipant($client);
+        $conversation->addParticipant($pro);
+        \App\Models\Message::create(['conversation_id' => $conversation->id, 'sender_id' => $pro->id, 'body' => 'Hello']);
+
+        $peer = $this->actingAs($client)->getJson(route('conversations.index'))->assertOk()->json('data.0.peer');
+
+        $this->assertSame('professional', $peer['role']);
+        $this->assertSame('Professional', $peer['role_label']);
+        $this->assertSame(RoleColours::tintFor('professional'), $peer['tint']);
+        $this->assertSame(RoleColours::strongFor('professional'), $peer['strong']);
+    }
+
+    public function test_an_admin_keeps_green_whatever_the_account_registered_as(): void
+    {
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
+        $admin = \App\Models\User::factory()->create(['primary_role' => 'client']);
+        $admin->assignRole('admin');
+
+        $this->assertSame('admin', RoleColours::accountRole($admin));
+    }
+
     public function test_the_registration_role_chooser_uses_them(): void
     {
         $page = $this->get(route('register'))->assertOk()->getContent();

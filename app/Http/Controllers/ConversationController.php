@@ -36,6 +36,9 @@ class ConversationController extends Controller
             ->with([
                 // Photo, last seen and service, for the dock's rows.
                 'participants:id,name,email,avatar,last_active_at,primary_role,public_id',
+                // Their roles ride along: the row's colour asks whether they
+                // are an admin, and that must not be a query per row.
+                'participants.roles:id,name',
                 'participants.serviceCategories:id,name',
                 'booking:id,event_id,status',
                 'event:id,title,source',
@@ -170,10 +173,10 @@ class ConversationController extends Controller
                  * Dark for the badge" (Sir Peter's messaging rules, 23 Sep).
                  * Worked out here so every list colours a row the same way.
                  */
-                'role'       => \App\Support\RoleColours::roleOf($peer),
-                'role_label' => ucfirst(\App\Support\RoleColours::roleOf($peer)),
-                'tint'       => \App\Support\RoleColours::tint($peer),
-                'strong'     => \App\Support\RoleColours::strong($peer),
+                'role'       => $peerRole = \App\Support\RoleColours::accountRole($peer),
+                'role_label' => ucfirst($peerRole),
+                'tint'       => \App\Support\RoleColours::tintFor($peerRole),
+                'strong'     => \App\Support\RoleColours::strongFor($peerRole),
             ] : null);
 
             // With its timezone: a bare "2026-09-11 11:00:00" is read by the

@@ -192,10 +192,12 @@
     .lmd-msg-row .lmd-msg { max-width: none; align-self: auto; }
     .lmd-mk { border: 0; background: none; color: var(--text-muted, #6b7280); cursor: pointer; font-size: 15px; line-height: 1; padding: 6px 3px; border-radius: 6px; }
     .lmd-mk:hover { background: var(--bg-card-hover, #f1f5f9); }
-    /* Above the chat window (9990): the menu belongs beside the message's
-       three-dot icon, which is inside that window. It used to sit under it,
-       which is why it had been thrown 190px to the left, out over the page. */
-    .lmd-mm { position: fixed; z-index: 9995; width: 200px; background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e5e7eb);
+    /* Above both right-hand windows: the chat (9990) and the Messages panel
+       (10000). The menu belongs beside the message's three-dot icon, which is
+       inside the chat window; it used to sit under it, which is why it had
+       been thrown 190px to the left, out over the page, and when it was moved
+       back the Messages panel cut it in half. */
+    .lmd-mm { position: fixed; z-index: 10050; width: 200px; background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e5e7eb);
         border-radius: 12px; box-shadow: 0 16px 40px -18px rgba(15,27,53,.5); padding: 5px; }
     .lmd-mm[hidden] { display: none; }
     .lmd-mm button, .lmd-mm a { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 0; background: none;
@@ -764,7 +766,13 @@
             var id = menuFor.dataset.lmdMsg;
             var chosen = lvl.dataset.lmdPri;
             post(at(priUrl.replace('__MSG__', id), state.expanded), { priority: chosen })
-                .then(function () { cBody.dataset.html = ''; loadThread(state.expanded, true); load(); })
+                .then(function () {
+                    cBody.dataset.html = '';
+                    loadThread(state.expanded, true);
+                    load();
+                    // The Messages list shows the same conversation's level.
+                    if (window.grMessages && window.grMessages.refresh) window.grMessages.refresh();
+                })
                 .catch(function () {});
             cMsgMenu.hidden = true; menuFor = null;
             return;

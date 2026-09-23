@@ -23,16 +23,26 @@ final class RoleColours
         'affiliate'    => ['#FDF2F8', '#DB2777'],
     ];
 
-    /** The account type this user reads as, for colour only. */
+    /**
+     * The account type this user reads as, for colour only.
+     *
+     * Professional mode lives in the signed-in person's session, so it may
+     * only change their own colour. Asking it about somebody else mixed the
+     * viewer's session into the other person's row: a professional who also
+     * holds a client role came out orange and badged "Client" next to their
+     * own blue avatar, because the mode being read was never theirs.
+     */
     public static function roleOf(?User $user): string
     {
-        return match (true) {
-            $user?->hasRole('admin') => 'admin',
-            $user?->hasRole('influencer') => 'influencer',
-            (bool) $user?->hasRole('client') && ! $user?->isProfessionalMode() => 'client',
-            (bool) $user?->hasRole('professional') => 'professional',
-            default => 'client',
-        };
+        if (! $user) {
+            return 'client';
+        }
+
+        if (auth()->id() === $user->id && $user->hasRole('professional') && $user->isProfessionalMode()) {
+            return 'professional';
+        }
+
+        return self::accountRole($user);
     }
 
     /**
@@ -46,9 +56,27 @@ final class RoleColours
      */
     public static function accountRole(?User $user): string
     {
-        $role = strtolower(trim((string) $user?->primary_role));
+        if (! $user) {
+            return 'client';
+        }
 
-        return isset(self::ROLES[$role]) ? $role : self::roleOf($user);
+        // Admin is system-controlled and outranks whatever the account
+        // registered as, so it is settled before primary_role is read.
+        if ($user->hasRole('admin')) {
+            return 'admin';
+        }
+
+        $role = strtolower(trim((string) $user->primary_role));
+
+        if (isset(self::ROLES[$role])) {
+            return $role;
+        }
+
+        return match (true) {
+            $user->hasRole('influencer') => 'influencer',
+            $user->hasRole('professional') => 'professional',
+            default => 'client',
+        };
     }
 
     /** The strong colour: bubbles, buttons, the accent on a row. */

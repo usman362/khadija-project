@@ -456,7 +456,12 @@
     });
 
     // The Live Message Dock opens this list from its bar.
-    window.grMessages = { toggle: toggleDock };
+    /*
+     * refresh() is for the Live Messages dock: a priority set on a message
+     * there changes this list's rows, and waiting out the poll left the two
+     * showing different things on the same screen.
+     */
+    window.grMessages = { toggle: toggleDock, refresh: function () { if (! open) { showList(); } refreshCounts(); } };
 
     // The unread count on the launcher, without opening anything.
     refreshCounts();
