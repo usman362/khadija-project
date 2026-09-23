@@ -192,7 +192,10 @@
     .lmd-msg-row .lmd-msg { max-width: none; align-self: auto; }
     .lmd-mk { border: 0; background: none; color: var(--text-muted, #6b7280); cursor: pointer; font-size: 15px; line-height: 1; padding: 6px 3px; border-radius: 6px; }
     .lmd-mk:hover { background: var(--bg-card-hover, #f1f5f9); }
-    .lmd-mm { position: absolute; z-index: 30; width: 200px; background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e5e7eb);
+    /* Above the chat window (9990): the menu belongs beside the message's
+       three-dot icon, which is inside that window. It used to sit under it,
+       which is why it had been thrown 190px to the left, out over the page. */
+    .lmd-mm { position: fixed; z-index: 9995; width: 200px; background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e5e7eb);
         border-radius: 12px; box-shadow: 0 16px 40px -18px rgba(15,27,53,.5); padding: 5px; }
     .lmd-mm[hidden] { display: none; }
     .lmd-mm button, .lmd-mm a { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 0; background: none;
@@ -740,9 +743,20 @@
             menuFor = row;
             cMsgMenu.hidden = false;
             var b = mk.getBoundingClientRect();
+            /*
+             * "Positioned beside and vertically centered on that message's
+             * three-dot icon" (Sir Peter's messaging rules, 23 Sep). It used
+             * to be pinned 190px to the LEFT of the icon, which on a chat
+             * window docked to the right threw the menu across the page and
+             * over whatever happened to be there.
+             */
             cMsgMenu.style.position = 'fixed';
-            cMsgMenu.style.left = Math.max(8, Math.min(window.innerWidth - 210, b.left - 190)) + 'px';
-            cMsgMenu.style.top = Math.max(8, Math.min(window.innerHeight - cMsgMenu.offsetHeight - 8, b.bottom + 4)) + 'px';
+            var mw = cMsgMenu.offsetWidth || 200;
+            var mh = cMsgMenu.offsetHeight || 0;
+            // Beside it: to the right while there is room, otherwise to the left.
+            var left = b.right + 8 + mw <= window.innerWidth - 8 ? b.right + 8 : b.left - 8 - mw;
+            cMsgMenu.style.left = Math.max(8, Math.min(window.innerWidth - mw - 8, left)) + 'px';
+            cMsgMenu.style.top = Math.max(8, Math.min(window.innerHeight - mh - 8, b.top + (b.height / 2) - (mh / 2))) + 'px';
             return;
         }
         var lvl = e.target.closest('[data-lmd-pri]');

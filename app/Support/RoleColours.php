@@ -35,6 +35,22 @@ final class RoleColours
         };
     }
 
+    /**
+     * The role the account registered as, without asking the database.
+     *
+     * roleOf() reads the assigned roles, which is right when the colour has to
+     * follow what someone is doing right now — a client in professional mode
+     * works in blue. An avatar is drawn for every person in a list, and asking
+     * for each one's roles there is a query per row for an answer the account
+     * already carries, the same one its CL- / PRO- reference is built from.
+     */
+    public static function accountRole(?User $user): string
+    {
+        $role = strtolower(trim((string) $user?->primary_role));
+
+        return isset(self::ROLES[$role]) ? $role : self::roleOf($user);
+    }
+
     /** The strong colour: bubbles, buttons, the accent on a row. */
     public static function strong(?User $user): string
     {

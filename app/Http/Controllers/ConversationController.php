@@ -164,6 +164,16 @@ class ConversationController extends Controller
                 'subtitle' => $peer->primary_role === 'professional'
                     ? ($peer->serviceCategories->first()?->name ?? 'Professional')
                     : ucfirst((string) ($peer->primary_role ?: 'member')),
+                /*
+                 * "Each row background and role badge should follow the other
+                 * user's assigned role color, Light for the row background and
+                 * Dark for the badge" (Sir Peter's messaging rules, 23 Sep).
+                 * Worked out here so every list colours a row the same way.
+                 */
+                'role'       => \App\Support\RoleColours::roleOf($peer),
+                'role_label' => ucfirst(\App\Support\RoleColours::roleOf($peer)),
+                'tint'       => \App\Support\RoleColours::tint($peer),
+                'strong'     => \App\Support\RoleColours::strong($peer),
             ] : null);
 
             // With its timezone: a bare "2026-09-11 11:00:00" is read by the

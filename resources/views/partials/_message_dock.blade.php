@@ -104,8 +104,15 @@
     .md-row { display: flex; gap: 12px; align-items: flex-start; width: 100%; text-align: left; position: relative;
         border: 0; background: none; cursor: pointer; padding: 12px 10px; border-radius: 12px; font: inherit; }
     .md-row + .md-row { border-top: 1px solid var(--border-color, #f1f5f9); }
-    .md-row:hover { background: var(--bg-card-hover, #f8fafc); }
-    .md-row.is-unread { background: #fff4ec; }
+    /* The row wears the other person's role colour: Light behind it, Dark on
+       the badge (Sir Peter's messaging rules, 23 Sep). An unread row keeps its
+       own mark — the bold name, the count and the left edge — so the colour
+       stays free to say who you are talking to. */
+    .md-row { background: var(--md-row-tint, transparent); }
+    .md-row:hover { filter: brightness(0.97); }
+    .md-row.is-unread::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--md-row-strong, #ea580c); }
+    .md-role { display: inline-block; margin-top: 2px; padding: 1px 7px; border-radius: 999px;
+        font-size: 10.5px; font-weight: 700; color: #fff; background: var(--md-row-strong, #6b7280); }
     .md-avw { position: relative; flex: none; }
     .md-av { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; display: block; background: #f97316; }
     .md-on { position: absolute; right: 0; bottom: 1px; width: 12px; height: 12px; border-radius: 50%; background: #22c55e; border: 2px solid #fff; }
@@ -227,12 +234,19 @@
         var unread = Number(c.unread_count || 0);
         var ctx = [c.event && c.event.title, c.request_type].filter(Boolean).join(' · ');
 
-        return '<div class="md-row' + (unread ? ' is-unread' : '') + '" role="button" tabindex="0" data-open="' + c.id + '">'
+        // The two values the row is coloured with, straight from the server.
+        var tint = p.tint ? ' --md-row-tint:' + p.tint + ';' : '';
+        var strong = p.strong ? ' --md-row-strong:' + p.strong + ';' : '';
+        var role = p.role_label ? '<span class="md-role">' + esc(p.role_label) + '</span>' : '';
+
+        return '<div class="md-row' + (unread ? ' is-unread' : '') + '" role="button" tabindex="0" data-open="' + c.id + '"'
+            + (tint || strong ? ' style="' + tint + strong + '"' : '') + '>'
             + '<span class="md-avw"><img class="md-av" src="' + esc(p.avatar) + '" alt="">'
             + (p.online ? '<span class="md-on" title="Online"></span>' : '') + '</span>'
             + '<span class="md-row-who">'
             +   '<span class="md-row-top"><b>' + esc(p.name) + '</b><time>' + esc(ago(c.last_message_at)) + '</time></span>'
-            +   (p.subtitle ? '<span class="md-sub">' + esc(p.subtitle) + '</span>' : '')
+            +   role
+            +   (p.subtitle && p.subtitle !== p.role_label ? '<span class="md-sub">' + esc(p.subtitle) + '</span>' : '')
             +   (ctx ? '<span class="md-ctx">' + esc(ctx) + '</span>' : '')
             +   pri
             +   '<span class="md-last">' + esc(c.last_message_body || 'No messages yet') + '</span>'

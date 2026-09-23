@@ -173,12 +173,20 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $initials = htmlspecialchars($initials !== '' ? $initials : '?', ENT_XML1 | ENT_QUOTES, 'UTF-8');
 
-        // Stable per-user hue so two people never read as the same avatar.
-        $hue = crc32((string) ($this->id ?: $this->name)) % 360;
+        /*
+         * The account's role colour, not a hue hashed from the id.
+         *
+         * The hash put a purple circle beside "Admin User" and a pink one
+         * beside a professional — purple means Influencer and pink means
+         * Affiliate, so the avatar contradicted the label next to it. Two
+         * people of the same role now share a background and are still told
+         * apart by their initials, which is what the initials are for.
+         */
+        $fill = \App\Support\RoleColours::strongFor(\App\Support\RoleColours::accountRole($this));
 
         $svg = <<<SVG
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
-              <rect width="200" height="200" fill="hsl({$hue} 62% 46%)"/>
+              <rect width="200" height="200" fill="{$fill}"/>
               <text x="100" y="100" fill="#fff" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif"
                     font-size="88" font-weight="700" text-anchor="middle" dominant-baseline="central">{$initials}</text>
             </svg>
