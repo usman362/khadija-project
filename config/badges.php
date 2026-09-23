@@ -27,6 +27,16 @@
 return [
 
     /*
+     * Verification marks on the live site — OA-165 (Sir Peter, 2026-09-23).
+     *
+     * Off until a verification feature is defined (PM decision D-35). The
+     * documents, approvals and admin queue are untouched; this only decides
+     * whether a check-mark is shown to anybody.
+     */
+    'verification_marks' => env('VERIFICATION_MARKS', false),
+
+
+    /*
      * The two badges that are not earned by activity but by verification and
      * by reviews. Same hexagon, same rule about who picks the colour.
      */

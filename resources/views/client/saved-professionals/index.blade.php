@@ -161,7 +161,7 @@
                                 <div class="mp-who">
                                     <a href="{{ route('public.professional.show', $pro) }}" class="mp-name">
                                         {{ $pro->name }}
-                                        @if($pro->isVerified())
+                                        @if(\App\Support\VerifiedBadge::shown() && $pro->isVerified())
                                             <x-hex-badge inline size="18" icon="✓" :colour="config('badges.verified_colour', '#2563eb')" title="Licence, insurance and workers' comp approved" />
                                         @endif
                                         @if($pro->isTopRated())
@@ -261,7 +261,7 @@
                                 <div class="mp-who">
                                     <a href="{{ route('public.professional.show', $pro) }}" class="mp-name">
                                         {{ $pro->name }}
-                                        @if($pro->isVerified())
+                                        @if(\App\Support\VerifiedBadge::shown() && $pro->isVerified())
                                             <x-hex-badge inline size="18" icon="✓" :colour="config('badges.verified_colour', '#2563eb')" title="Licence, insurance and workers' comp approved" />
                                         @endif
                                         @if($pro->isTopRated())

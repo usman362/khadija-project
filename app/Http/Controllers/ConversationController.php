@@ -27,6 +27,12 @@ class ConversationController extends Controller
         $user = $request->user();
 
         $query = Conversation::forUser($user)
+            // The rules the policy enforces, applied to the list as well:
+            // a conversation a client may not hold is not in Recent, Unread,
+            // Favorites or search, not only barred when opened.
+            ->when(in_array($user->primary_role, \App\Domain\Messaging\MessagingPairs::ENFORCED, true),
+                fn ($q) => $q->whereDoesntHave('participants', fn ($p) => $p->where('users.id', '!=', $user->id)
+                    ->whereIn('primary_role', \App\Domain\Messaging\MessagingPairs::barredRoles($user))))
             ->with([
                 // Photo, last seen and service, for the dock's rows.
                 'participants:id,name,email,avatar,last_active_at,primary_role,public_id',
@@ -194,6 +200,15 @@ class ConversationController extends Controller
         ]);
 
         $user = $request->user();
+
+        // Roles that may not talk cannot be put in a conversation together,
+        // whichever of them asks for it.
+        foreach ($validated['participant_ids'] as $participantId) {
+            $other = \App\Models\User::find($participantId);
+            if ($other && ! \App\Domain\Messaging\MessagingPairs::allows($user, $other)) {
+                return response()->json(['message' => 'You cannot message this account.'], 403);
+            }
+        }
 
         // A block stops new conversations too, either way round.
         foreach ($validated['participant_ids'] as $participantId) {

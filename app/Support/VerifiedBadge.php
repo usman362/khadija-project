@@ -51,6 +51,19 @@ class VerifiedBadge
         return self::holds($profile, 'trade_license');
     }
 
+    /**
+     * Are verification marks shown at all?
+     *
+     * OA-165 (Sir Peter, 2026-09-23): "Remove every check-mark badge from the
+     * live site … until a verification feature is defined (PM decision
+     * D-35)." The documents, the approvals and the admin queue all stay; only
+     * the claim on screen is withheld. Turning it back on is this one line.
+     */
+    public static function shown(): bool
+    {
+        return (bool) config('badges.verification_marks', false);
+    }
+
     /** The same question for any badge in the list. */
     public static function holds(?UserProfile $profile, string $badge): bool
     {

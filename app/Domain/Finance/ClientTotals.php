@@ -83,6 +83,19 @@ class ClientTotals
         return (float) self::base($client, $eventId)->where('status', 'confirmed')->sum('price');
     }
 
+    /**
+     * How many bookings that figure is made of.
+     *
+     * The money and the count have to come from the same rows. Messages read
+     * the total off the bookings carrying a price and counted every confirmed
+     * booking, so one booking with no price agreed yet turned "$80" into
+     * "across 2 bookings" — an amount no pair of bookings adds up to.
+     */
+    public static function agreedUnpaidCount(User $client, ?int $eventId = null): int
+    {
+        return self::base($client, $eventId)->where('status', 'confirmed')->where('price', '>', 0)->count();
+    }
+
     /** Sent, not yet accepted by the professional. */
     public static function awaiting(User $client, ?int $eventId = null): float
     {

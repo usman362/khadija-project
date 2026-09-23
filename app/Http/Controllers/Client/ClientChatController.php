@@ -35,8 +35,14 @@ class ClientChatController extends Controller
     {
         $user = $request->user();
 
+        $barredRoles = \App\Domain\Messaging\MessagingPairs::barredRoles($user);
+
         $conversations = Conversation::query()
             ->whereHas('participants', fn ($q) => $q->where('users.id', $user->id))
+            // A client never sees another client here — not in the list, not
+            // in a tab, not through search (Sir Peter's messaging rules).
+            ->when($barredRoles, fn ($q) => $q->whereDoesntHave('participants',
+                fn ($p) => $p->where('users.id', '!=', $user->id)->whereIn('primary_role', $barredRoles)))
             ->with([
                 'participants:id,name,email,public_id,avatar,last_active_at',
                 'booking:id,event_id,status,price',
@@ -86,7 +92,8 @@ class ClientChatController extends Controller
             // filter that returns nothing.
             'eventFilters' => collect($list)->pluck('event')->filter()
                 ->unique('id')->sortBy('title')->values()->all(),
-            'recipients' => User::where('id', '!=', $user->id)->select('id', 'name')->orderBy('name')->get(),
+            'recipients' => \App\Domain\Messaging\MessagingPairs::scopeRecipients(
+                User::where('id', '!=', $user->id), $user)->select('id', 'name')->orderBy('name')->get(),
             // DIR-29: who a group chat can include, professionals only.
             'groupCandidates' => User::where('id', '!=', $user->id)->where('primary_role', 'professional')
                 ->select('id', 'name')->orderBy('name')->get(),
@@ -367,7 +374,7 @@ class ClientChatController extends Controller
             'their_reply' => $this->avgResponseTime($conversations, $user, false),
             // Agreed and not yet paid. Not "secured": nothing is held.
             'unpaid'          => \App\Domain\Finance\ClientTotals::agreedUnpaid($user),
-            'unpaid_bookings' => Booking::where('client_id', $user->id)->where('status', 'confirmed')->count(),
+            'unpaid_bookings' => \App\Domain\Finance\ClientTotals::agreedUnpaidCount($user),
         ];
     }
 

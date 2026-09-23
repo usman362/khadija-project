@@ -146,6 +146,13 @@ class ClientEventController extends Controller
         $stats['list_open']        = (int) ($listStages['open'] ?? 0);
         $stats['list_in_progress'] = (int) ($listStages['in_progress'] ?? 0) + (int) ($listStages['booked'] ?? 0);
         $stats['list_past']        = (int) ($listStages['past'] ?? 0);
+        // Completed came off the status column while its neighbours came off
+        // listStage, so the row could be counted twice or not at all.
+        $stats['list_completed']   = (int) ($listStages['completed'] ?? 0);
+        // What the four tiles beside Total do not show. Total Events counts
+        // every event, so without these the five tiles never added up.
+        $stats['list_draft']       = (int) ($listStages['draft'] ?? 0);
+        $stats['list_cancelled']   = (int) ($listStages['cancelled'] ?? 0);
 
         /*
          * Money, from App\Domain\Finance\ClientTotals — the one calculation

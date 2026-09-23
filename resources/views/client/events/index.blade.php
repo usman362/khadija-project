@@ -545,10 +545,15 @@
     <div class="mg-stats">
         <div class="mg-stat">
             <div class="mg-stat-ico coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-            {{-- Rows 86/101/125: every tile counts EVENTS, and each is a subset of
-     this one, so they add up. "This month" was wrong as well — the figure
-     was never date-scoped. --}}
-                            <div><div class="mg-stat-label">Total Events</div><div class="mg-stat-value">{{ $stats['total'] }}</div><div class="mg-stat-delta flat">All time</div></div>
+            {{-- Every tile counts EVENTS, and each is a subset of this one.
+                 OA-170: drafts and cancelled events have no tile of their own,
+                 so the caption names them and the five figures reconcile. --}}
+            @php
+                $notTiled = [];
+                if ($stats['list_draft'])     { $notTiled[] = $stats['list_draft'] . ' ' . \Illuminate\Support\Str::plural('draft', $stats['list_draft']); }
+                if ($stats['list_cancelled']) { $notTiled[] = $stats['list_cancelled'] . ' cancelled'; }
+            @endphp
+                            <div><div class="mg-stat-label">Total Events</div><div class="mg-stat-value">{{ $stats['total'] }}</div><div class="mg-stat-delta flat">{{ $notTiled ? 'All time, incl. ' . implode(' and ', $notTiled) : 'All time' }}</div></div>
         </div>
         <div class="mg-stat">
             <div class="mg-stat-ico amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
@@ -560,7 +565,7 @@
         </div>
         <div class="mg-stat">
             <div class="mg-stat-ico indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg></div>
-            <div><div class="mg-stat-label">Completed</div><div class="mg-stat-value">{{ $stats['completed'] }}</div><div class="mg-stat-delta flat">Events finished</div></div>
+            <div><div class="mg-stat-label">Completed</div><div class="mg-stat-value">{{ $stats['list_completed'] }}</div><div class="mg-stat-delta flat">Events finished</div></div>
         </div>
         <div class="mg-stat">
             <div class="mg-stat-ico purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="14" x2="15" y2="20"/><line x1="15" y1="14" x2="9" y2="20"/></svg></div>
@@ -1217,9 +1222,25 @@
                 <div style="position:absolute;inset:13px;background:var(--bg-card);border-radius:50%;z-index:1;"></div>
                 <div class="mg-donut-center"><span class="num">{{ $overview['total'] }}</span><span class="lbl">{{ $period === 'all' ? 'Total Events' : 'Posted ' . strtolower($periods[$period]) }}</span></div>
             </div>
+            @php
+                /*
+                 * Shares that total exactly 100 (largest remainder). Rounding
+                 * each slice on its own gave a legend reading 33/33/33 = 99%,
+                 * and a client counting the events found the figure wrong.
+                 */
+                $pct = [];
+                if ($overview['total'] > 0) {
+                    $exact = [];
+                    foreach ($evPie as $i => $p) { $exact[$i] = ($p['val'] / $overview['total']) * 100; $pct[$i] = (int) floor($exact[$i]); }
+                    $short = 100 - array_sum($pct);
+                    $order = array_keys($exact);
+                    usort($order, fn ($a, $b) => ($exact[$b] - $pct[$b]) <=> ($exact[$a] - $pct[$a]));
+                    for ($i = 0; $i < $short; $i++) { $pct[$order[$i % count($order)]]++; }
+                }
+            @endphp
             <div class="mg-legend">
-                @foreach($evPie as $p)
-                    @php $pp = $overview['total'] > 0 ? round(($p['val']/$overview['total'])*100) : 0; @endphp
+                @foreach($evPie as $i => $p)
+                    @php $pp = $pct[$i] ?? 0; @endphp
                     <div class="row"><span class="dot" style="background:{{ $p['color'] }};"></span><span class="lbl">{{ $p['lbl'] }}</span><span class="val">{{ $p['val'] }} ({{ $pp }}%)</span></div>
                 @endforeach
             </div>

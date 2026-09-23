@@ -247,7 +247,10 @@
             @php $__vs = \App\Http\Controllers\Client\ClientVerificationController::statusOf($user->getOrCreateProfile()); @endphp
             <div style="margin-top:8px;font-size:12.5px;">
                 @if($__vs === 'verified')
-                    <span style="color:#166534;font-weight:700;">✓ Verified account</span>
+                    {{-- OA-165: no verification mark until the feature is defined (D-35). --}}
+                    @if(\App\Support\VerifiedBadge::shown())
+                        <span style="color:#166534;font-weight:700;">✓ Verified account</span>
+                    @endif
                 @elseif($__vs === 'pending')
                     <a href="{{ route('client.verification.show') }}" style="color:#92400e;font-weight:700;">ID being reviewed</a>
                 @else

@@ -25,13 +25,10 @@
      * professional blue, admin green, influencer purple. It drives your own
      * message bubbles and the send button.
      */
-    $__lmdIsClient = $__lmdUser?->hasRole('client') && ! $__lmdUser?->isProfessionalMode();
-    $__lmdAccent = match (true) {
-        (bool) $__lmdUser?->hasRole('admin')       => '#16a34a',
-        (bool) $__lmdUser?->hasRole('influencer')  => '#7C3AED',
-        $__lmdIsClient                             => '#ea580c',
-        default                                    => '#2563eb',
-    };
+    $__lmdIsClient = \App\Support\RoleColours::roleOf($__lmdUser) === 'client';
+    // OA-164: the set-in-stone role colours, from one place.
+    $__lmdAccent = \App\Support\RoleColours::strong($__lmdUser);
+    $__lmdTint   = \App\Support\RoleColours::tint($__lmdUser);
     // His third menu item: clients post an event, everyone else makes a package.
     $__lmdMake = $__lmdIsClient
         ? ['label' => 'Post an Event', 'url' => route('client.post-event.choose')]
@@ -43,7 +40,7 @@
 @once
 @push('styles')
 <style>
-    :root { --lmd-accent: {{ $__lmdAccent }}; }
+    :root { --lmd-accent: {{ $__lmdAccent }}; --lmd-tint: {{ $__lmdTint }}; }
 
     /* ── The bar ─────────────────────────────────────────────── */
     .lmd-bar { position: fixed; bottom: 0; left: var(--sidebar-width, 236px); right: 0; z-index: 890;
@@ -68,8 +65,8 @@
         border: 1.5px solid var(--border-color, #e5e7eb); border-radius: 12px; background: var(--bg-card, #fff);
         padding: 7px 10px; cursor: pointer; text-align: left; font: inherit; position: relative; }
     .lmd-tab:hover { border-color: #93c5fd; }
-    .lmd-tab.is-unread { border-color: #2563eb; box-shadow: 0 0 0 1px #2563eb inset; }
-    .lmd-tab.is-open { background: #eff6ff; border-color: #2563eb; }
+    .lmd-tab.is-unread { border-color: var(--lmd-accent); box-shadow: 0 0 0 1px var(--lmd-accent) inset; }
+    .lmd-tab.is-open { background: var(--lmd-tint); border-color: var(--lmd-accent); }
     .lmd-av { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; background: #e5e7eb; flex: none; display: block; }
     .lmd-tab-t { min-width: 0; flex: 1; }
     .lmd-tab-t b { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--text-primary, #111827);
@@ -89,14 +86,14 @@
 
     .lmd-btn { border: 1.5px solid var(--border-color, #e5e7eb); background: var(--bg-card, #fff); border-radius: 10px;
         height: 42px; min-width: 42px; padding: 0 10px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 800;
-        color: #2563eb; display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: none; }
-    .lmd-btn:hover { background: #eff6ff; }
+        color: var(--lmd-accent); display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: none; }
+    .lmd-btn:hover { background: var(--lmd-tint); }
     .lmd-btn svg { width: 17px; height: 17px; }
 
     .lmd-dnd { display: flex; align-items: center; gap: 8px; flex: none; font-size: 11.5px; color: var(--text-muted, #6b7280); }
     .lmd-dnd b { display: block; font-size: 12px; color: var(--text-primary, #111827); }
-    .lmd-sound { border: 0; background: none; padding: 4px; cursor: pointer; color: #2563eb; display: inline-flex; flex: none; border-radius: 8px; }
-    .lmd-sound:hover { background: #eff6ff; }
+    .lmd-sound { border: 0; background: none; padding: 4px; cursor: pointer; color: var(--lmd-accent); display: inline-flex; flex: none; border-radius: 8px; }
+    .lmd-sound:hover { background: var(--lmd-tint); }
     .lmd-sound svg { width: 20px; height: 20px; }
     .lmd-sound [data-off] { display: none; }
     .lmd-sound[aria-pressed="true"] { color: var(--text-muted, #6b7280); }
@@ -106,7 +103,7 @@
         cursor: pointer; flex: none; transition: background .15s; }
     .lmd-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%;
         background: #fff; transition: left .15s; }
-    .lmd-switch[aria-checked="true"] { background: #2563eb; }
+    .lmd-switch[aria-checked="true"] { background: var(--lmd-accent); }
     .lmd-switch[aria-checked="true"]::after { left: 19px; }
     .lmd-set { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700;
         color: var(--text-secondary, #374151); text-decoration: none; flex: none; }
@@ -149,10 +146,10 @@
     .lmd-body { flex: 1; min-height: 0; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; overscroll-behavior: contain; }
     .lmd-msg { max-width: 82%; padding: 9px 12px; border-radius: 14px; font-size: 13px; line-height: 1.5; word-break: break-word;
         background: var(--bg-card-hover, #f1f5f9); color: var(--text-primary, #111827); align-self: flex-start; }
-    .lmd-msg.is-mine { align-self: flex-end; background: #eff6ff; }
+    .lmd-msg.is-mine { align-self: flex-end; background: var(--lmd-tint); }
     .lmd-msg small { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 3px; font-size: 10.5px; color: var(--text-muted, #6b7280); }
     .lmd-tick { font-weight: 800; letter-spacing: -2px; }
-    .lmd-tick.is-read { color: #2563eb; }
+    .lmd-tick.is-read { color: var(--lmd-accent); }
     .lmd-msg.is-failed { background: #fef2f2; }
     .lmd-msg.is-failed small { color: #b91c1c; }
     .lmd-msg.is-failed button { border: 0; background: none; color: #b91c1c; font: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; padding: 0; }
@@ -161,14 +158,14 @@
     .lmd-compose { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--border-color, #e5e7eb); }
     .lmd-compose input { flex: 1; min-width: 0; border: 1px solid var(--border-color, #e5e7eb); border-radius: 12px;
         padding: 10px 12px; font: inherit; font-size: 13px; background: var(--bg-card, #fff); color: var(--text-primary, #111827); }
-    .lmd-compose input:focus { outline: none; border-color: #2563eb; }
-    .lmd-compose button { border: 0; border-radius: 12px; background: #2563eb; color: #fff; width: 46px; cursor: pointer;
+    .lmd-compose input:focus { outline: none; border-color: var(--lmd-accent); }
+    .lmd-compose button { border: 0; border-radius: 12px; background: var(--lmd-accent); color: #fff; width: 46px; cursor: pointer;
         display: inline-flex; align-items: center; justify-content: center; flex: none; }
     .lmd-compose button svg { width: 18px; height: 18px; }
     .lmd-cf { display: flex; align-items: center; gap: 14px; padding: 8px 14px 10px; font-size: 12.5px; }
     .lmd-cf button, .lmd-cf a { border: 0; background: none; padding: 0; font: inherit; font-weight: 700; cursor: pointer;
         color: var(--text-secondary, #374151); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
-    .lmd-cf a { color: #2563eb; }
+    .lmd-cf a { color: var(--lmd-accent); }
     .lmd-cf .is-muted { color: #dc2626; }
 
     /* ── Sir Peter's dock (18 Sep), matched piece by piece ─────── */
@@ -178,8 +175,8 @@
     .lmd-ch-t .on { display: flex; align-items: center; gap: 5px; margin-top: 2px; font-size: 11.5px; }
     .lmd-ch-t .on::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #16a34a; }
     .lmd-ch .lmd-ic { margin-top: 6px; }
-    .lmd-ic-box { border: 1.5px solid #2563eb; color: #2563eb; }
-    .lmd-ic-box:hover { background: #eff6ff; color: #2563eb; }
+    .lmd-ic-box { border: 1.5px solid var(--lmd-accent); color: var(--lmd-accent); }
+    .lmd-ic-box:hover { background: var(--lmd-tint); color: var(--lmd-accent); }
     .lmd-body { background: var(--bg-card, #fff); gap: 10px; padding: 14px; }
     .lmd-msg { max-width: 80%; padding: 10px 13px; border-radius: 14px; background: var(--bg-card-hover, #f1f5f9); }
     .lmd-msg small { justify-content: flex-start; }
@@ -209,7 +206,7 @@
     .lmd-msg.is-mine .lmd-pri { border-color: rgba(255,255,255,.7); color: #fff; }
     .lmd-msg.is-mine small { justify-content: flex-end; }
     .lmd-att { display: flex; align-items: center; gap: 8px; margin-top: 6px; padding: 7px 9px; border-radius: 10px;
-        background: rgba(255,255,255,.7); border: 1px solid var(--border-color, #e5e7eb); color: #2563eb; font-size: 12px;
+        background: rgba(255,255,255,.7); border: 1px solid var(--border-color, #e5e7eb); color: var(--lmd-accent); font-size: 12px;
         font-weight: 700; text-decoration: none; word-break: break-all; }
     .lmd-att img { width: 100%; max-height: 160px; object-fit: cover; border-radius: 8px; display: block; }
     .lmd-att.is-img { padding: 3px; display: block; }
@@ -223,14 +220,14 @@
     .lmd-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 14px 0; border-top: 1px solid var(--border-color, #e5e7eb); }
     .lmd-chips[hidden] { display: none; }
     .lmd-chip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 4px 8px; border-radius: 8px;
-        background: #eff6ff; color: #1d4ed8; font-size: 11.5px; font-weight: 700; }
+        background: var(--lmd-tint); color: #1d4ed8; font-size: 11.5px; font-weight: 700; }
     .lmd-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
     .lmd-chip.is-bad { background: #fef2f2; color: #b91c1c; }
     .lmd-chip button { border: 0; background: none; color: inherit; cursor: pointer; font-weight: 800; padding: 0; }
     .lmd-compose { align-items: center; gap: 10px; padding: 12px 14px; }
     .lmd-field { flex: 1; min-width: 0; display: flex; align-items: center; gap: 2px; position: relative;
         border: 1px solid var(--border-color, #e5e7eb); border-radius: 12px; padding: 0 6px 0 0; background: var(--bg-card, #fff); }
-    .lmd-field:focus-within { border-color: #2563eb; }
+    .lmd-field:focus-within { border-color: var(--lmd-accent); }
     .lmd-compose .lmd-field input { border: 0; padding: 12px 12px; background: transparent; }
     .lmd-compose .lmd-field input:focus, .lmd-compose .lmd-field input:focus-visible { outline: none; box-shadow: none; }
     .lmd-compose .lmd-fi { border: 0; background: none; width: 32px; height: 32px; border-radius: 8px; color: var(--text-secondary, #4b5563); padding: 0; }
@@ -248,8 +245,8 @@
     .lmd-cf [data-lmd-mute] { color: var(--text-primary, #111827); }
     .lmd-cf [data-lmd-mute] svg { color: #dc2626; }
     .lmd-cf [data-lmd-profile] { color: var(--text-primary, #111827); }
-    .lmd-cf [data-lmd-profile] svg { color: #2563eb; }
-    .lmd-cf a.is-link { color: #2563eb; }
+    .lmd-cf [data-lmd-profile] svg { color: var(--lmd-accent); }
+    .lmd-cf a.is-link { color: var(--lmd-accent); }
     .lmd-cf .lmd-cf-more { margin-left: auto; color: var(--text-secondary, #374151); letter-spacing: 1px; font-size: 13px; }
 
     /* The bar's right side, as drawn: speaker, switch, two lines, then settings. */
@@ -261,10 +258,10 @@
 
     /* ── A phone: one bubble, the list opens as a sheet ───────── */
     .lmd-bubble { display: none; position: fixed; right: 16px; bottom: 16px; z-index: 890; border: 0; cursor: pointer;
-        align-items: center; gap: 8px; padding: 12px 16px; border-radius: 999px; background: #2563eb; color: #fff;
-        font: inherit; font-weight: 800; font-size: 14px; box-shadow: 0 14px 30px -12px rgba(37,99,235,.7); }
+        align-items: center; gap: 8px; padding: 12px 16px; border-radius: 999px; background: var(--lmd-accent); color: #fff;
+        font: inherit; font-weight: 800; font-size: 14px; box-shadow: 0 14px 30px -12px rgba(0,0,0,.35); }
     .lmd-bubble svg { width: 20px; height: 20px; }
-    .lmd-bubble .lmd-count { background: #fff; color: #2563eb; }
+    .lmd-bubble .lmd-count { background: #fff; color: var(--lmd-accent); }
 
     /* A smaller laptop: the controls give up their words before the
        conversations give up their tabs. */

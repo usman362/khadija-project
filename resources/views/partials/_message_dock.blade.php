@@ -38,7 +38,7 @@
        (Ali, 2026-09-11: the labelled pill from the mockup looked heavy there).
        The window above it is the mockup's. */
     .md-launch { width: 52px; height: 52px; border-radius: 50%; border: 0; cursor: pointer;
-        background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; box-shadow: 0 12px 28px -10px rgba(234,88,12,.7);
+        background: linear-gradient(135deg, #f97316, var(--lmd-accent, #EA580C)); color: #fff; box-shadow: 0 12px 28px -10px rgba(234,88,12,.7);
         display: flex; align-items: center; justify-content: center; position: relative; }
     .md-launch svg { width: 23px; height: 23px; }
     .md-launch .md-dot { position: absolute; top: -3px; right: -3px; min-width: 20px; height: 20px;
@@ -91,7 +91,8 @@
     .md-tab { flex: 1; border: 0; background: none; cursor: pointer; font: inherit; font-size: 13.5px; font-weight: 700;
         color: var(--text-secondary, #374151); padding: 10px 0; border-bottom: 2.5px solid transparent; margin-bottom: -1px;
         display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-    .md-tab.is-on { color: #ea580c; border-bottom-color: #ea580c; }
+    /* OA-164: the panel takes the viewer's own role colour. */
+    .md-tab.is-on { color: var(--lmd-accent, #EA580C); border-bottom-color: var(--lmd-accent, #EA580C); }
     .md-tab.md-more { flex: none; padding-left: 10px; padding-right: 10px; color: var(--text-muted, #6b7280); }
     /* Its own class, not .md-tabs: a rule that sets display on an element
        that can carry [hidden] leaves it on screen swallowing clicks. */

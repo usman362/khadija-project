@@ -294,7 +294,7 @@
                             <div class="bk-title">{{ $event?->title ?: 'Booking #' . $booking->id }}</div>
                             <div class="bk-sub">
                                 <b>{{ $pro?->name ?? 'Professional removed' }}</b>
-                                @if(\App\Support\VerifiedBadge::licenceVerified($profile))
+                                @if(\App\Support\VerifiedBadge::shown() && \App\Support\VerifiedBadge::licenceVerified($profile))
                                     <span class="bk-verified">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified
                                     </span>
@@ -361,9 +361,16 @@
                                     @endif
                                 </span>
                             </div>
+                            @php
+                                // OA-167: a cancelled booking owes nothing. It
+                                // kept showing the full price as outstanding,
+                                // so a client saw $5,000 due on work called off.
+                                $void = in_array($booking->status, \App\Domain\Finance\ClientTotals::VOID_STATUSES, true);
+                                $due  = $void ? 0 : max(0, $price - $paid);
+                            @endphp
                             <div class="bk-kv">
                                 <span class="k">Outstanding</span>
-                                <span class="v {{ $price > 0 ? '' : 'muted' }}">{{ $price > 0 ? '$' . number_format(max(0, $price - $paid)) : '—' }}</span>
+                                <span class="v {{ $price > 0 && ! $void ? '' : 'muted' }}">{{ $price > 0 ? '$' . number_format($due) : '—' }}@if($void && $price > 0) <span class="bk-tag">cancelled</span>@endif</span>
                             </div>
                             <div class="bk-kv">
                                 <span class="k">Currency</span>

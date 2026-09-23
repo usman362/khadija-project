@@ -18,6 +18,13 @@ class ConversationPolicy
             return false;
         }
 
+        // A pair the messaging rules do not allow (a client with another
+        // client) is refused here, so a typed id or a saved link cannot open
+        // what the lists leave out.
+        if (\App\Domain\Messaging\MessagingPairs::blocks($user, $conversation->loadMissing('participants'))) {
+            return false;
+        }
+
         return $user->isAdmin() || $conversation->hasParticipant($user);
     }
 
@@ -36,6 +43,10 @@ class ConversationPolicy
         // limit; BlockGuard refuses the row itself as well.
         if (\App\Domain\Messaging\Blocking::stopsMessaging($user->id, $conversation)) {
             return \Illuminate\Auth\Access\Response::deny(\App\Domain\Messaging\Blocking::MESSAGE);
+        }
+
+        if (\App\Domain\Messaging\MessagingPairs::blocks($user, $conversation->loadMissing('participants'))) {
+            return \Illuminate\Auth\Access\Response::deny('You cannot message this account.');
         }
 
         return $user->isAdmin() || $conversation->hasParticipant($user);

@@ -1322,7 +1322,14 @@
                 ['Event date & time', $__date, 'availability', 'availability'],
                 ['Guest count', ! empty($data['guest_count']) ? number_format($data['guest_count']) : 'Not stated', 'event', 'event'],
                 ['Event requirements', \Illuminate\Support\Str::limit((string) ($data['description'] ?? ''), 140) ?: 'Not written yet', 'requirements', 'requirements'],
-                ['Budget', (! empty($data['budget_min']) || ! empty($data['budget_max'])) ? '$' . number_format((float) ($data['budget_min'] ?? 0)) . ' – $' . number_format((float) ($data['budget_max'] ?? 0)) : 'Not stated', 'budget', 'budget'],
+                // A range needs both ends. With only one, the Review said
+                // "$499 – $0", which reads as a budget of nothing.
+                ['Budget', match (true) {
+                    ! empty($data['budget_min']) && ! empty($data['budget_max']) => '$' . number_format((float) $data['budget_min']) . ' – $' . number_format((float) $data['budget_max']),
+                    ! empty($data['budget_min']) => 'From $' . number_format((float) $data['budget_min']),
+                    ! empty($data['budget_max']) => 'Up to $' . number_format((float) $data['budget_max']),
+                    default => 'Not stated',
+                }, 'budget', 'budget'],
                 ['Proposal settings', (($data['sealed_proposals'] ?? true) ? 'Sealed bids' : 'Open bids') . ' · respond by ' . (! empty($data['proposal_deadline']) ? \Illuminate\Support\Carbon::parse($data['proposal_deadline'])->format('M j, Y') : ($defaultWindowHours ? $defaultWindowHours . ' hours after posting' : 'not set')), 'proposals', 'proposals'],
                 ['Files & attachments', $files->count() ? $files->count() . ' ' . \Illuminate\Support\Str::plural('file', $files->count()) . ' · ' . $files->pluck('file_name')->implode(', ') : 'None', 'files', 'files'],
             ];

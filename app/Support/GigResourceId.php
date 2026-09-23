@@ -39,6 +39,8 @@ class GigResourceId
         'professional' => 'PRO',
         'influencer' => 'INF',
         'admin' => 'ADM',
+        // OA-163: the five formats are CL- / PRO- / INF- / ADM- / AFF-.
+        'affiliate' => 'AFF',
     ];
 
     /**

@@ -178,7 +178,9 @@
                 <span class="cp-name">Professional</span>
             @endif
             <div class="cp-facts">
-                @if($r['verified'])<span class="cp-tag ok">✓ Verified</span>@else<span class="cp-tag no">Not verified</span>@endif
+                @if(\App\Support\VerifiedBadge::shown())
+                    @if($r['verified'])<span class="cp-tag ok">✓ Verified</span>@else<span class="cp-tag no">Not verified</span>@endif
+                @endif
                 @if($r['insured'])<span class="cp-tag ok">Insured</span>@else<span class="cp-tag no">No insurance on file</span>@endif
                 @if($r['rating'])<span>★ {{ $r['rating'] }} ({{ $r['reviews'] }})</span>@else<span>No reviews yet</span>@endif
                 @if($r['years'])<span>{{ $r['years'] }} yrs experience</span>@endif

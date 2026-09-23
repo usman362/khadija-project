@@ -491,7 +491,10 @@
                         // ISSUE-1: the approval alone was what showed. Every badge on
                         // the site belonged to a demo account with no document behind
                         // it, stamped by a seeder. The document is now required too.
-                        $isVerified = \App\Support\VerifiedBadge::licenceVerified($p)
+                        // OA-165: the mark is withheld until the feature is defined (D-35).
+                        // The rules that depend on verification are untouched.
+                        $isVerified = \App\Support\VerifiedBadge::shown()
+                            && \App\Support\VerifiedBadge::licenceVerified($p)
                             && \App\Support\VerifiedBadge::holds($p, 'workers_comp')
                             && \App\Support\InsuranceRequirement::isCovered($p);
                         $isTop = $avg >= 4.5 && $cnt > 0;
