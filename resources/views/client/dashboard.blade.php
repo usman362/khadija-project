@@ -658,20 +658,19 @@
 
     $savedPros = $user->savedProfessionals()->count();
 
-    /* This month against last, or nothing at all. A percentage needs a figure
-       to be a percentage OF; last month at zero has none. */
-    $trendDelta = function (array $series): ?array {
-        $now  = (float) ($series[count($series) - 1] ?? 0);
-        $prev = (float) ($series[count($series) - 2] ?? 0);
-
-        if ($prev <= 0.0) {
-            return null;
-        }
-
-        $pct = (int) round((($now - $prev) / $prev) * 100);
-
-        return ['pct' => abs($pct), 'up' => $pct >= 0];
-    };
+    /*
+     * What this month came to, in the measure the line is drawn from.
+     *
+     * A percentage used to sit here: this month's figure against last
+     * month's. It was arithmetic on the right numbers and it still read as
+     * nonsense, because the big number beside it is a different measure —
+     * "Active Gigs 3" with "125%" under it invites the reader to divide one
+     * by the other, and nothing they can do with those two figures is true.
+     * A percentage belongs to a number, and these tiles have two. So the
+     * foot states this month's figure and says what it counts, and the
+     * reader is never asked to guess which number it belongs to.
+     */
+    $thisMonth = fn (array $series): float => (float) ($series[count($series) - 1] ?? 0);
 
     /* A polyline through the client's own months, scaled to its own peak. */
     $sparkPoints = function (array $series): ?string {
@@ -904,13 +903,6 @@
         </div>
         <div class="od-stat-foot">
             <div>
-                @if($__d = $trendDelta($spentSeries))
-                    <span class="od-stat-delta {{ $__d['up'] ? '' : 'is-down' }}">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                            <polyline points="{{ $__d['up'] ? '18 15 12 9 6 15' : '18 9 12 15 6 9' }}"/>
-                        </svg>{{ $__d['pct'] }}%
-                    </span>
-                @endif
                 <span class="od-stat-sub">{{ $periodLabel }}</span>
             </div>
             @if($__pts = $sparkPoints($spentSeries))
@@ -931,18 +923,16 @@
         </div>
         <div class="od-stat-foot">
             <div>
-                @if($__d = $trendDelta($gigsSeries))
-                    <span class="od-stat-delta {{ $__d['up'] ? '' : 'is-down' }}">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                            <polyline points="{{ $__d['up'] ? '18 15 12 9 6 15' : '18 9 12 15 6 9' }}"/>
-                        </svg>{{ $__d['pct'] }}%
-                    </span>
-                @endif
-                {{-- Khadijah, 23 Sep: the number is how many gigs are open
-                     RIGHT NOW, while the percentage compares the gigs posted
-                     this month with last month. Saying so stops "3" and "75%"
-                     reading as the same measure. --}}
-                <span class="od-stat-sub">{{ $trendDelta($gigsSeries) ? 'posted vs last month' : 'In progress' }}</span>
+                {{-- The number above is how many gigs are open right now;
+                     this is what was posted this month, which is what the
+                     line beside it is drawn from. --}}
+                <span class="od-stat-sub">
+                    @if($__m = (int) $thisMonth($gigsSeries))
+                        {{ $__m }} {{ \Illuminate\Support\Str::plural('gig', $__m) }} posted this month
+                    @else
+                        In progress
+                    @endif
+                </span>
             </div>
             @if($__pts = $sparkPoints($gigsSeries))
                 <svg class="od-stat-spark" width="58" height="22" viewBox="0 0 60 22" fill="none" aria-hidden="true"><polyline points="{{ $__pts }}" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -962,13 +952,6 @@
         </div>
         <div class="od-stat-foot">
             <div>
-                @if($__d = $trendDelta($completedSeries))
-                    <span class="od-stat-delta {{ $__d['up'] ? '' : 'is-down' }}">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                            <polyline points="{{ $__d['up'] ? '18 15 12 9 6 15' : '18 9 12 15 6 9' }}"/>
-                        </svg>{{ $__d['pct'] }}%
-                    </span>
-                @endif
                 <span class="od-stat-sub">{{ $periodLabel }}</span>
             </div>
             @if($__pts = $sparkPoints($completedSeries))
@@ -990,16 +973,15 @@
         </div>
         <div class="od-stat-foot">
             <div>
-                @if($__d = $trendDelta($savedSeries))
-                    <span class="od-stat-delta {{ $__d['up'] ? '' : 'is-down' }}">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                            <polyline points="{{ $__d['up'] ? '18 15 12 9 6 15' : '18 9 12 15 6 9' }}"/>
-                        </svg>{{ $__d['pct'] }}%
-                    </span>
-                @endif
                 {{-- Same rule as Active Gigs: the total is everything saved,
-                     the percentage is this month against last. --}}
-                <span class="od-stat-sub">{{ $trendDelta($savedSeries) ? 'saved vs last month' : 'Favorites' }}</span>
+                     this is what was added since the month began. --}}
+                <span class="od-stat-sub">
+                    @if($__m = (int) $thisMonth($savedSeries))
+                        {{ $__m }} saved this month
+                    @else
+                        Favorites
+                    @endif
+                </span>
             </div>
             @if($__pts = $sparkPoints($savedSeries))
                 <svg class="od-stat-spark" width="58" height="22" viewBox="0 0 60 22" fill="none" aria-hidden="true"><polyline points="{{ $__pts }}" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>

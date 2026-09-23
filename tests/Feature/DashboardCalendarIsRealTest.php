@@ -58,6 +58,14 @@ class DashboardCalendarIsRealTest extends TestCase
      * quietly ignored and every seeded payment lands in the current month —
      * which would make a period test pass or fail for the wrong reason.
      */
+    /** A gig posted on a given day: the Active Gigs line counts when it was posted. */
+    private function eventOn(\Carbon\Carbon $when): void
+    {
+        $event = $this->event('Posted '.$when->format('M j'), 'published', true, $when->copy()->addMonths(2));
+
+        Event::where('id', $event->id)->update(['created_at' => $when, 'updated_at' => $when]);
+    }
+
     private function paymentOn(\Carbon\Carbon $when, float $amount): void
     {
         $payment = Payment::create([
@@ -167,8 +175,6 @@ class DashboardCalendarIsRealTest extends TestCase
 
         $this->assertStringNotContainsString('class="od-stat-spark"', $html,
             'A sparkline was drawn for an account with nothing in it.');
-        $this->assertStringNotContainsString('class="od-stat-delta', $html,
-            'A percentage was shown with nothing to compare against.');
     }
 
     /** And a card with history draws its own. */
@@ -178,11 +184,29 @@ class DashboardCalendarIsRealTest extends TestCase
             $this->paymentOn(now()->subMonths($back)->startOfMonth()->addDay(), 100 * ($i + 1));
         }
 
+        $this->assertStringContainsString('class="od-stat-spark"', $this->dashboard());
+    }
+
+    /**
+     * Ali, 24 September: "125%???" over an Active Gigs figure of 3.
+     *
+     * The percentage was this month's postings against last month's, and the
+     * number above it is how many gigs are open right now. Both were right
+     * and the pair was unreadable, because a percentage printed beside a
+     * number reads as being that number's. Each tile now states this month's
+     * figure and says what it counts.
+     */
+    public function test_no_tile_shows_a_percentage_of_a_different_measure(): void
+    {
+        $this->eventOn(now()->startOfMonth()->addDay());
+        $this->eventOn(now()->startOfMonth()->addDays(2));
+        $this->eventOn(now()->subMonth()->startOfMonth()->addDay());
+
         $html = $this->dashboard();
 
-        $this->assertStringContainsString('class="od-stat-spark"', $html);
-        // 200 last month to 300 this month is +50%.
-        $this->assertStringContainsString('50%', $html);
+        $this->assertStringNotContainsString('class="od-stat-delta', $html,
+            'A percentage was printed beside a number it is not a percentage of.');
+        $this->assertStringContainsString('2 gigs posted this month', $html);
     }
 
     public function test_saved_professionals_counts_the_saved_professionals(): void
