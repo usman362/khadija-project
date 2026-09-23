@@ -310,6 +310,14 @@ class DemoProfessionalsSeeder extends Seeder
                 'location'   => $data['city'] . ', ' . $data['state'],
             ]);
 
+            /*
+             * The booking is made before the work happens. Leaving created_at
+             * at the time of seeding put every one of these records after its
+             * own event, which My Events then showed as a job confirmed for a
+             * date that had already gone by (OA-168).
+             */
+            $made = (clone $when)->subDays(rand(21, 60));
+
             $booking = Booking::create([
                 'event_id'   => $event->id,
                 'client_id'  => $reviewer->id,
@@ -318,7 +326,9 @@ class DemoProfessionalsSeeder extends Seeder
                 'status'     => 'completed',
                 'price'      => $data['rate'] * rand(3, 8),
                 'currency'   => 'USD',
-                'booked_at'  => $when,
+                'booked_at'  => $made,
+                'created_at' => $made,
+                'updated_at' => $when,
             ]);
 
             Review::create([

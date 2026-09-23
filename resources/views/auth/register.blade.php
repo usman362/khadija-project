@@ -12,11 +12,25 @@
     $recaptchaSiteKey  = $recaptchaSettings->getRecaptchaSiteKey();
     $recaptchaVersion  = $recaptchaSettings->get('recaptcha.version', 'v2');
 
-    // Role chips — each carries its own brand colour; the active one is filled.
-    $roles = [
-        'professional'   => ['label' => 'Professional', 'c' => '#2563eb', 'cd' => '#1d4ed8', 'soft' => '#eff4ff'],
-        'client'     => ['label' => 'Client',       'c' => '#f97316', 'cd' => '#ea580c', 'soft' => '#fff3ea'],
-        'influencer' => ['label' => 'Influencer',   'c' => '#ec4899', 'cd' => '#db2777', 'soft' => '#fdf0f7'],
+    /*
+     * Role chips, in the set-in-stone role colours (OA-164). Each role has one
+     * Dark and one Light value and no third shade, so the chip's text, its
+     * filled state and its border all come from the Dark one. Influencer was
+     * pink here, which is now the Affiliate colour.
+     */
+    $roles = [];
+    foreach (['professional' => 'Professional', 'client' => 'Client', 'influencer' => 'Influencer'] as $__r => $__label) {
+        $roles[$__r] = [
+            'label' => $__label,
+            'c'     => \App\Support\RoleColours::strongFor($__r),
+            'cd'    => \App\Support\RoleColours::strongFor($__r),
+            'soft'  => \App\Support\RoleColours::tintFor($__r),
+        ];
+    }
+    $roleIcons = [
+        'professional' => '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+        'client'       => '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+        'influencer'   => '<path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
     ];
 @endphp
 <!DOCTYPE html>
@@ -246,18 +260,14 @@
 
             <div class="rg-iam">I am a...</div>
             <div class="rg-roles">
-                <button type="button" class="rg-role" data-role="professional" data-c="#2563eb" data-soft="#eff4ff" aria-pressed="{{ $active === 'professional' ? 'true' : 'false' }}" style="{{ $active==='professional' ? 'background:#2563eb;color:#fff;border-color:transparent;' : 'color:#2563eb;border-color:#bfd3ff;' }}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                    Professional
-                </button>
-                <button type="button" class="rg-role" data-role="client" data-c="#f97316" data-soft="#fff3ea" aria-pressed="{{ $active === 'client' ? 'true' : 'false' }}" style="{{ $active==='client' ? 'background:#f97316;color:#fff;border-color:transparent;' : 'color:#f97316;border-color:#fdd3b0;' }}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    Client
-                </button>
-                <button type="button" class="rg-role" data-role="influencer" data-c="#ec4899" data-soft="#fdf0f7" aria-pressed="{{ $active === 'influencer' ? 'true' : 'false' }}" style="{{ $active==='influencer' ? 'background:#ec4899;color:#fff;border-color:transparent;' : 'color:#ec4899;border-color:#f9c1de;' }}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
-                    Influencer
-                </button>
+                @foreach($roles as $key => $role)
+                    <button type="button" class="rg-role" data-role="{{ $key }}" data-c="{{ $role['c'] }}" data-soft="{{ $role['soft'] }}"
+                            aria-pressed="{{ $active === $key ? 'true' : 'false' }}"
+                            style="{{ $active === $key ? 'background:' . $role['c'] . ';color:#fff;border-color:transparent;' : 'color:' . $role['c'] . ';border-color:' . $role['c'] . ';' }}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $roleIcons[$key] !!}</svg>
+                        {{ $role['label'] }}
+                    </button>
+                @endforeach
             </div>
 
             <form method="POST" action="{{ route('register') }}" id="rgForm" class="rg-form">

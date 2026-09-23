@@ -57,8 +57,9 @@
     .akt-name { font-size: 15.5px; font-weight: 800; color: var(--text-primary); }
     .akt-badges { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 10px; }
     .akt-badge { font-size: 10px; font-weight: 800; padding: 2px 9px; border-radius: 999px; text-transform: uppercase; letter-spacing: .3px; }
-    .akt-badge.client { background: rgba(249,115,22,.14); color: #ea580c; }
-    .akt-badge.professional { background: rgba(37,99,235,.14); color: #2563eb; }
+    /* OA-164: the role colours, Light behind and Dark in front. */
+    .akt-badge.client { background: {{ \App\Support\RoleColours::tintFor('client') }}; color: {{ \App\Support\RoleColours::strongFor('client') }}; }
+    .akt-badge.professional { background: {{ \App\Support\RoleColours::tintFor('professional') }}; color: {{ \App\Support\RoleColours::strongFor('professional') }}; }
     .akt-badge.both { background: rgba(22,163,74,.14); color: #16a34a; }
     .akt-lvl { font-size: 10px; font-weight: 800; padding: 2px 9px; border-radius: 999px; letter-spacing: .2px; white-space: nowrap; }
     .lvl-manual  { background: rgba(100,116,139,.16); color: #64748b; }
