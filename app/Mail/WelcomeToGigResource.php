@@ -24,7 +24,7 @@ class WelcomeToGigResource extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Welcome to ' . config('app.name'),
+            subject: 'Welcome to ' . config('brand.name'),
             replyTo: array_filter([config('emails.reply_to')]),
         );
     }

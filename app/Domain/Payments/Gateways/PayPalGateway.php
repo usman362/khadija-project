@@ -53,7 +53,7 @@ class PayPalGateway implements PaymentGatewayInterface
                     ]),
                 ]],
                 'application_context' => [
-                    'brand_name' => config('app.name'),
+                    'brand_name' => config('brand.name'),
                     'return_url' => route('app.payments.success') . '?gateway=paypal',
                     'cancel_url' => route('app.payments.cancel') . '?gateway=paypal',
                     'user_action' => 'PAY_NOW',

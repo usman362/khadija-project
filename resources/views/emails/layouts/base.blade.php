@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', config('app.name'))</title>
+    <title>@yield('title', config('brand.name'))</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -131,7 +131,7 @@
     <div class="wrapper">
         <div class="container">
             <div class="header">
-                <a href="{{ url('/') }}" class="header-logo">{{ config('app.name') }}</a>
+                <a href="{{ url('/') }}" class="header-logo">{{ config('brand.name') }}</a>
             </div>
 
             <div class="content">
@@ -139,12 +139,12 @@
             </div>
 
             <div class="footer">
-                <p>This is an automated message from {{ config('app.name') }}.</p>
+                <p>This is an automated message from {{ config('brand.name') }}.</p>
                 <p>
                     <a href="{{ url('/') }}">Visit Website</a> &nbsp;·&nbsp;
                     <a href="{{ url('/privacy-policy') }}">Privacy Policy</a>
                 </p>
-                <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
+                <p>&copy; {{ date('Y') }} {{ config('brand.name') }}. All rights reserved.</p>
             </div>
         </div>
     </div>

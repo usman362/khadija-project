@@ -2,7 +2,7 @@
     <div class="container">
         <div class="footer-grid">
             <div>
-                <div class="footer-brand"><img src="{{ asset('gigresource-logos/gigresource-logo-dark.png') }}" alt="{{ config('app.name') }}" style="height: 46px;"></div>
+                <div class="footer-brand"><img src="{{ asset('gigresource-logos/gigresource-logo-dark.png') }}" alt="{{ config('brand.name') }}" style="height: 46px;"></div>
                 <p class="footer-desc">
                     Connecting Professionals & Clients for Perfect Events.
                     Create unforgettable experiences with our curated network of verified experts.

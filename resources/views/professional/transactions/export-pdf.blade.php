@@ -132,7 +132,7 @@
     <header>
         <div>
             <h1>Transactions Report</h1>
-            <div style="color:#6b7280;">{{ config('app.name') }}</div>
+            <div style="color:#6b7280;">{{ config('brand.name') }}</div>
         </div>
         <div class="meta">
             Generated {{ $generatedAt->format('M j, Y g:i A') }}<br>

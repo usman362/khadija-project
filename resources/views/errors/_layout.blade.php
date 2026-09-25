@@ -16,7 +16,7 @@
      text — so every error page's browser tab read
      "@yield('err-code') · GigResource" instead of "404 · GigResource".
      yieldContent() is the same thing as an expression. --}}
-@section('title', $__env->yieldContent('err-code') . ' · ' . config('app.name'))
+@section('title', $__env->yieldContent('err-code') . ' · ' . config('brand.name'))
 
 @push('meta')
     <meta name="robots" content="noindex, nofollow">

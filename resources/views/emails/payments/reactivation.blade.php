@@ -12,7 +12,7 @@
 <p>
     Your account reactivation payment has been processed successfully and your
     account is now <strong>fully restored</strong>. The scheduled deletion has been cancelled
-    and you can continue using {{ config('app.name') }} as before.
+    and you can continue using {{ config('brand.name') }} as before.
 </p>
 
 <div class="details-box">

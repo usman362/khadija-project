@@ -1,6 +1,6 @@
 @extends('layouts.landing')
 
-@section('title', ($post->meta_title ?: $post->title) . ' - ' . config('app.name', 'Khadija'))
+@section('title', ($post->meta_title ?: $post->title) . ' - ' . config('brand.name'))
 
 @push('styles')
 <style>

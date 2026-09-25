@@ -1093,7 +1093,7 @@
             <div class="pp-card">
                 <h3 class="pp-card-title">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                    How booking works on {{ config('app.name') }}
+                    How booking works on {{ config('brand.name') }}
                 </h3>
                 <div class="pp-steps">
                     @foreach($howItWorks as $i => [$title, $detail])
@@ -1247,7 +1247,7 @@
                  Row 165 and Open Decisions row 37 both say hold it, and this
                  comment is here so nobody adds it back as a tidy-up. --}}
             <div class="pp-card">
-                <div class="pp-ver-head">Accepted on {{ config('app.name') }}</div>
+                <div class="pp-ver-head">Accepted on {{ config('brand.name') }}</div>
                 <dl style="margin:0;">
                     @foreach($acceptedOn as [$label, $value, $note])
                         <div class="pp-kv" title="{{ $note }}">
@@ -1258,7 +1258,7 @@
                 </dl>
                 <p class="pp-kv-note">
                     Money is held by the licensed payment processor and released once the work is
-                    confirmed. {{ config('app.name') }} does not hold your funds.
+                    confirmed. {{ config('brand.name') }} does not hold your funds.
                 </p>
             </div>
 
@@ -1323,7 +1323,7 @@
                     <div class="pp-ver-item {{ $topRated ? '' : 'none' }}">
                         <div class="pp-ver-check">{!! $topRated ? '✓' : '✕' !!}</div>
                         <div class="pp-ver-body">
-                            <div class="pp-ver-label">{{ config('app.name') }} Top Rated</div>
+                            <div class="pp-ver-label">{{ config('brand.name') }} Top Rated</div>
                             <div class="pp-ver-status">
                                 {{ $topRated ? 'Awarded' : 'Needs 5+ reviews at 4.5★ and full verification' }}
                             </div>

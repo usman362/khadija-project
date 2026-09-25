@@ -5,7 +5,7 @@
 @section('content')
 <h1>Hi {{ $user->name }},</h1>
 
-<p>We received a request to reset the password on your {{ config('app.name') }} account.</p>
+<p>We received a request to reset the password on your {{ config('brand.name') }} account.</p>
 
 @include('emails.partials.button', ['url' => $url, 'label' => 'Reset my password'])
 

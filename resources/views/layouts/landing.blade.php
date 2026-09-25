@@ -218,8 +218,8 @@
              width and the burger — the only way back to the navigation — was
              clipped along with everything after it. --}}
         <button type="button" class="lpn-burger" id="lpnBurger" aria-label="Menu" aria-expanded="false" aria-controls="lpnMobile">&#9776;</button>
-        <a href="{{ route('landing') }}" class="lpn-brand" aria-label="{{ config('app.name') }} home">
-            <img src="{{ asset('gigresource-logos/gigresource-logo-light.png') }}" alt="{{ config('app.name') }}" class="lpn-logo-img">
+        <a href="{{ route('landing') }}" class="lpn-brand" aria-label="{{ config('brand.name') }} home">
+            <img src="{{ asset('gigresource-logos/gigresource-logo-light.png') }}" alt="{{ config('brand.name') }}" class="lpn-logo-img">
         </a>
 
         <div class="lpn-links">
@@ -330,7 +330,7 @@
         <div class="lpf-grid">
             <div>
                 <div class="lpf-brand-mark">
-                    <img src="{{ asset('gigresource-logos/gigresource-logo-dark.png') }}" alt="{{ config('app.name') }}" class="lpf-logo-img">
+                    <img src="{{ asset('gigresource-logos/gigresource-logo-dark.png') }}" alt="{{ config('brand.name') }}" class="lpf-logo-img">
                 </div>
                 <p class="lpf-about">The all-in-one marketplace connecting clients with verified event professionals to plan, manage, and deliver unforgettable experiences.</p>
                 <div class="lpf-socials">

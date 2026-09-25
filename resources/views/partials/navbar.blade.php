@@ -9,7 +9,7 @@
     <div class="navbar-row navbar-row-top">
         <div class="container">
             <a href="{{ route('landing') }}" class="navbar-brand">
-                <img src="{{ asset('gigresource-logos/gigresource-logo-dark.png') }}" alt="{{ config('app.name') }}" class="navbar-logo">
+                <img src="{{ asset('gigresource-logos/gigresource-logo-dark.png') }}" alt="{{ config('brand.name') }}" class="navbar-logo">
             </a>
 
             <div class="navbar-actions">
@@ -88,7 +88,7 @@
             --}}
             <div class="mobile-nav" id="mobileNav" aria-hidden="true">
                 <div class="mobile-nav-head">
-                    <a href="{{ route('landing') }}" class="mobile-nav-brand">{{ config('app.name', 'GigResource') }}</a>
+                    <a href="{{ route('landing') }}" class="mobile-nav-brand">{{ config('brand.name') }}</a>
                     <button type="button" class="mobile-nav-close" id="mobileNavClose" aria-label="Close menu">&times;</button>
                 </div>
 

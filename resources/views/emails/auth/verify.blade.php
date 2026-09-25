@@ -5,7 +5,7 @@
 @section('content')
 <h1>Hi {{ $user->name }},</h1>
 
-<p>Thanks for joining {{ config('app.name') }}. Please confirm this is your email address.</p>
+<p>Thanks for joining {{ config('brand.name') }}. Please confirm this is your email address.</p>
 
 @include('emails.partials.button', ['url' => $url, 'label' => 'Confirm my email'])
 

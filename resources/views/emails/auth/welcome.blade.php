@@ -1,6 +1,6 @@
 @extends('emails.layouts.base')
 
-@section('title', 'Welcome to ' . config('app.name'))
+@section('title', 'Welcome to ' . config('brand.name'))
 
 @section('content')
 <h1>Welcome, {{ $user->name }}.</h1>

@@ -1,6 +1,6 @@
 @extends('layouts.landing')
 
-@section('title', ($policy->title ?? $fallbackTitle) . ' - ' . config('app.name', 'Khadija'))
+@section('title', ($policy->title ?? $fallbackTitle) . ' - ' . config('brand.name'))
 
 @push('styles')
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">

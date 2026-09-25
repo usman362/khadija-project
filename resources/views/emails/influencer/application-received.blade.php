@@ -10,7 +10,7 @@
 <h1>Thanks for applying, {{ $influencer->full_name ?? 'there' }}!</h1>
 
 <p>
-    We've received your application to join the {{ config('app.name') }} affiliate program.
+    We've received your application to join the {{ config('brand.name') }} affiliate program.
     Our team will review your details and get back to you by email as soon as your account is approved.
 </p>
 

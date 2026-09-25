@@ -11,7 +11,7 @@
             </div>
             <div class="col-md-8 ps-md-0">
                 <div class="auth-form-wrapper px-4 py-5">
-                    <a href="{{ url('/') }}" class="nobleui-logo d-block mb-2">{{ config('app.name', 'App') }}</a>
+                    <a href="{{ url('/') }}" class="nobleui-logo d-block mb-2">{{ config('brand.name') }}</a>
                     <h4 class="mb-2">Confirm Password</h4>
                     <p class="text-secondary mb-4">Please confirm your password before continuing.</p>
 

@@ -191,7 +191,7 @@ class AccountReactivationService
                     'currency' => strtolower($payment->currency),
                     'product_data' => [
                         'name'        => 'Account Reactivation',
-                        'description' => 'Reactivate your ' . config('app.name') . ' account and cancel scheduled deletion.',
+                        'description' => 'Reactivate your ' . config('brand.name') . ' account and cancel scheduled deletion.',
                     ],
                     'unit_amount' => (int) round($payment->amount * 100),
                 ],
@@ -253,7 +253,7 @@ class AccountReactivationService
                     ],
                 ]],
                 'application_context' => [
-                    'brand_name'  => config('app.name'),
+                    'brand_name'  => config('brand.name'),
                     'user_action' => 'PAY_NOW',
                     'return_url'  => route('account.reactivation.success') . '?gateway=paypal&reactivation_payment_id=' . $payment->id,
                     'cancel_url'  => route('account.reactivation.cancel')  . '?gateway=paypal&reactivation_payment_id=' . $payment->id,

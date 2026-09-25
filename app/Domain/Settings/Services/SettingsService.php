@@ -172,7 +172,7 @@ class SettingsService
 
     public function defaultChatbotSystemPrompt(): string
     {
-        return "You are the AI assistant for " . config('app.name', 'GigResource') . ", an event booking marketplace. "
+        return "You are the AI assistant for " . config('brand.name') . ", an event booking marketplace. "
             . "You help users with:\n"
             . "1. Platform questions (how to post events, bookings, payments, etc.)\n"
             . "2. Navigating features (profile, dual-mode client/professional switching, influencer program, policies)\n"
