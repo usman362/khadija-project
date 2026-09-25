@@ -672,7 +672,9 @@
                                 $stageKey  = $event->listStage();
                                 $where     = $event->location_need === \App\Domain\Requests\VenueRule::NEED && $event->preferred_locations
                                     ? implode(', ', $event->preferred_locations) . ' (finding a venue)'
-                                    : ($event->venue ?: $event->location);
+                                    // Issue #14: a web address is not a place.
+                                    : (\App\Domain\Requests\VenueRule::place($event->venue)
+                                        ?: \App\Domain\Requests\VenueRule::place($event->location));
                             @endphp
                             <tr>
                                 <td style="padding-left:18px;">

@@ -26,6 +26,33 @@ final class VenueRule
     public const MAX_PREFERRED = 5;
 
     /** The venue services (level 3 under Venues & Event Spaces). */
+    /**
+     * A place, or nothing.
+     *
+     * Issue #14: a booking's venue read "social.bxlpubcrawl.com". A web
+     * address is not somewhere anyone can turn up to, and printing one where
+     * the venue goes tells a client to drive to a domain name. Where the
+     * stored value is an address on the internet rather than one on a map, it
+     * is treated as not set, which is the truth about it.
+     *
+     * The check is deliberately narrow: a real venue may well contain a dot
+     * ("St. Mary's Hall", "Suite 4.2"), so only a scheme, a www., or a bare
+     * host ending in a known-looking suffix with no spaces in it counts.
+     */
+    public static function place(?string $value): ?string
+    {
+        $value = trim((string) $value);
+
+        if ($value === '') {
+            return null;
+        }
+
+        $looksLikeUrl = (bool) preg_match('#^(https?://|www\.)#i', $value)
+            || (! str_contains($value, ' ') && (bool) preg_match('#^[a-z0-9.-]+\.[a-z]{2,24}(/|$)#i', $value));
+
+        return $looksLikeUrl ? null : $value;
+    }
+
     public static function services(): Collection
     {
         return Category::query()->bookableServices()->active()

@@ -94,7 +94,7 @@ class ClientPackageBookingController extends Controller
         $validated = $request->validate([
             'event_title' => ['required', 'string', 'max:255'],
             'date'        => ['required', 'date', 'after_or_equal:today'],
-            'location'    => ['nullable', 'string', 'max:255'],
+            'location'    => ['nullable', 'string', 'max:255', new \App\Rules\PlaceNotALink],
             'guests'      => ['nullable', 'integer', 'min:1', 'max:100000'],
             'notes'       => ['nullable', 'string', 'max:1000'],
             'agree'       => ['accepted'],

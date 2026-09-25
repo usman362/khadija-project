@@ -572,7 +572,7 @@
                     </div>
                     <div>
                         <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 3px;">Location</div>
-                        <div style="font-size: 14px; font-weight: 500;">{{ $event->location ?: '—' }}</div>
+                        <div style="font-size: 14px; font-weight: 500;">{{ \App\Domain\Requests\VenueRule::place($event->location) ?: '—' }}</div>
                     </div>
                     <div>
                         <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 3px;">Budget</div>
@@ -671,7 +671,7 @@
                 @if(! empty($event->backup_dates))
                     <div class="ev-req-row"><span>Backup dates</span><b>{{ collect(\App\Domain\Requests\EventDates::options($event))->where('primary', false)->map(fn ($o) => \App\Domain\Requests\EventDates::label($o, false))->implode('; ') }}</b></div>
                 @endif
-                <div class="ev-req-row"><span>Location</span><b>{{ $event->location ?: '—' }}</b></div>
+                <div class="ev-req-row"><span>Location</span><b>{{ \App\Domain\Requests\VenueRule::place($event->location) ?: '—' }}</b></div>
                 <div class="ev-req-row"><span>Guest count</span><b>{{ $event->guest_count ? number_format($event->guest_count) : '—' }}</b></div>
                 {{-- Catering requests only. Absent on every other request,
                      rather than shown as a dash nobody can fill in. --}}

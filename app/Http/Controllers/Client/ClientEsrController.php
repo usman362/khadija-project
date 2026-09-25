@@ -96,7 +96,7 @@ class ClientEsrController extends Controller
             'reason'       => ['required', 'in:' . implode(',', array_keys(self::REASONS))],
             // Asked on every request form now (Peter, 2026-08-20).
             'organization_type' => ['required', 'in:' . implode(',', array_keys(\App\Models\Event::ORGANIZATION_TYPES))],
-            'location'     => ['nullable', 'string', 'max:200'],
+            'location'     => ['nullable', 'string', 'max:200', new \App\Rules\PlaceNotALink],
             // R38 / R71 — the state the work happens in. See
             // StateMatching::requestState for why this is asked, not assumed.
             // Removed from the form on 2026-08-25 — see StateMatching::requestState().

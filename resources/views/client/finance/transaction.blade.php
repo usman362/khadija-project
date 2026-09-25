@@ -81,7 +81,7 @@
                 <span class="v">{{ $booking->event?->starts_at?->format('D, M j, Y') ?? $booking->booked_at?->format('D, M j, Y') ?? '—' }}</span>
             </div>
             @if ($booking->event?->location)
-                <div class="tx-line"><span class="l">Location</span><span class="v">{{ $booking->event->location }}</span></div>
+                <div class="tx-line"><span class="l">Location</span><span class="v">{{ \App\Domain\Requests\VenueRule::place($booking->event->location) ?: 'Not set' }}</span></div>
             @endif
             <div class="tx-line">
                 <span class="l">Professional</span>

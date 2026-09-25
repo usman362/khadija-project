@@ -68,7 +68,6 @@
     .pr-ps-in_progress { background: rgba(99,102,241,0.15); color: var(--accent-text); }
     .pr-ps-completed { background: rgba(99,102,241,0.15); color: var(--accent-text); }
     .pr-ps-declined  { background: rgba(239,68,68,0.15); color: var(--bad-text); }
-    .pr-ring { width: 38px; height: 38px; }
     .pr-actions-cell { display: flex; gap: 6px; }
     .pr-act-btn { width: 28px; height: 28px; border-radius: 7px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
     .pr-act-btn:hover { color: var(--brand-text); border-color: rgba(249,115,22,0.30); }
@@ -91,10 +90,14 @@
     /* Right rail */
     .pr-rail-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 16px; }
     .pr-rail-title { font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; }
-    .pr-health { display: flex; gap: 14px; align-items: center; }
-    .pr-health-ring { width: 64px; height: 64px; flex-shrink: 0; }
-    .pr-health-txt { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
-    .pr-health-txt b { color: var(--text-primary); display: block; margin-bottom: 2px; }
+    .pr-stand { display: flex; flex-direction: column; gap: 9px; }
+    .pr-stand-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12.5px; }
+    .pr-stand-row .lbl { display: inline-flex; align-items: center; gap: 8px; color: var(--text-secondary); }
+    .pr-stand-row .lbl i { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+    .pr-stand-row b { font-size: 14px; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+    .pr-stand-total { margin-top: 3px; padding-top: 9px; border-top: 1px solid var(--border-color);
+        font-size: 11.5px; color: var(--text-muted); }
+    .pr-stand-note { margin: 10px 0 0; font-size: 11.5px; color: var(--text-secondary); line-height: 1.45; }
     .pr-pipe-row { display: flex; justify-content: space-between; margin: 8px 0; }
     .pr-pipe-col .lbl { font-size: 10.5px; color: var(--text-muted); }
     .pr-pipe-col .val { font-size: 17px; font-weight: 800; color: var(--text-primary); }
@@ -141,7 +144,6 @@
         'declined', 'withdrawn', 'cancelled' => 'declined',
         default => $s,
     };
-    $ringColor = fn ($score) => $score >= 80 ? '#10b981' : ($score >= 50 ? '#f59e0b' : '#ef4444');
 @endphp
 
 <div class="pr-layout">
@@ -214,7 +216,6 @@
                         <th>Date</th>
                         <th>Amount</th>
                         <th>Status</th>
-                        <th>Health</th>
                         <th style="padding-right:18px;">Actions</th>
                     </tr>
                 </thead>
@@ -224,15 +225,16 @@
                             $pipe = $statusToPipe($p->status);
                             $amount = $p->amount ?? $p->total_amount ?? $p->agreed_price ?? 0;
                             /*
-                             * This was a "health score" drawn at random inside a
-                             * band per pipeline stage — so the same proposal
-                             * scored differently on every reload, and the ring
-                             * around it looked like a measurement. The stage is
-                             * the only thing actually known, so the ring now
-                             * reads the stage rather than dressing it up.
+                             * A "Health" column stood here. It began as a score
+                             * drawn at random inside a band per stage, so the
+                             * same proposal scored differently on every reload;
+                             * it was then made to read the stage, which only
+                             * moved the problem — a ring with 100 in it is a
+                             * measurement to anyone looking at it, and the
+                             * Status column beside it already said "Accepted".
+                             * The same figure also disagreed with the rail,
+                             * which called the whole page 58 out of 100.
                              */
-                            $score = match ($pipe) { 'accepted', 'completed' => 100, 'pending', 'in_progress' => 50, default => 0 };
-                            $col = $ringColor($score);
                             $ico = strtoupper(substr($p->event?->title ?? 'P', 0, 1));
                             $icoColors = ['#f97316','#6366f1','#10b981','#8b5cf6','#ec4899','#06b6d4'];
                             $icoColor = $icoColors[$p->id % count($icoColors)];
@@ -264,13 +266,6 @@
                             </td>
                             <td><div class="pr-amt">{{ $amount ? '$' . number_format($amount, 0) : '—' }}</div><div class="pr-amt-sub">Total</div></td>
                             <td><span class="pr-pstatus pr-ps-{{ $pipe }}">{{ ucfirst(str_replace('_', ' ', $pipe)) }}</span></td>
-                            <td>
-                                <svg class="pr-ring" viewBox="0 0 36 36">
-                                    <path d="M18 2.5a15.5 15.5 0 1 1 0 31 15.5 15.5 0 0 1 0-31" fill="none" stroke="var(--border-color)" stroke-width="3"/>
-                                    <path d="M18 2.5a15.5 15.5 0 1 1 0 31 15.5 15.5 0 0 1 0-31" fill="none" stroke="{{ $col }}" stroke-width="3" stroke-dasharray="{{ $score }}, 100" stroke-linecap="round"/>
-                                    <text x="18" y="21" text-anchor="middle" font-size="11" font-weight="800" fill="{{ $col }}">{{ $score }}</text>
-                                </svg>
-                            </td>
                             <td style="padding-right:18px;">
                                 <div class="pr-actions-cell">
                                     @php
@@ -368,17 +363,28 @@
             <a class="pr-cov-link" href="{{ route('client.events.show', [$scoped->id, 'tab' => 'proposals']) }}">Compare by service →</a>
         </div>
     @endif
+    {{-- Issue #21.
+
+         "Proposal Health" printed a figure out of 100 with a word beside it,
+         "58 · Fair". The figure was 50 plus eight for each accepted proposal,
+         capped at 95: an invented number, and one that disagreed with the 100
+         shown against an accepted proposal in the table. The sentence under it
+         claimed a chance of closing "based on response time and views", and
+         neither of those is measured anywhere.
+
+         What is actually known is where the proposals stand, so that is what
+         it says. --}}
     <div class="pr-rail-card">
-        <div class="pr-rail-title">Proposal Health</div>
-        @php $overallHealth = $stats['submitted'] > 0 ? min(95, 50 + $stats['accepted'] * 8) : 0; @endphp
-        <div class="pr-health">
-            <svg class="pr-health-ring" viewBox="0 0 36 36">
-                <path d="M18 2.5a15.5 15.5 0 1 1 0 31 15.5 15.5 0 0 1 0-31" fill="none" stroke="var(--border-color)" stroke-width="3.5"/>
-                <path d="M18 2.5a15.5 15.5 0 1 1 0 31 15.5 15.5 0 0 1 0-31" fill="none" stroke="{{ $ringColor($overallHealth) }}" stroke-width="3.5" stroke-dasharray="{{ $overallHealth }}, 100" stroke-linecap="round"/>
-                <text x="18" y="21" text-anchor="middle" font-size="10" font-weight="800" fill="{{ $ringColor($overallHealth) }}">{{ $overallHealth }}</text>
-            </svg>
-            <div class="pr-health-txt"><b>{{ $overallHealth >= 70 ? 'Good' : ($overallHealth >= 40 ? 'Fair' : 'Needs work') }}</b>Your proposals have a {{ $overallHealth >= 70 ? 'good' : 'moderate' }} chance of closing based on response time and views.</div>
+        <div class="pr-rail-title">Where your proposals stand</div>
+        <div class="pr-stand">
+            <div class="pr-stand-row"><span class="lbl"><i style="background:#f59e0b;"></i>Waiting on you</span><b>{{ $stats['pending'] }}</b></div>
+            <div class="pr-stand-row"><span class="lbl"><i style="background:#10b981;"></i>Accepted</span><b>{{ $stats['accepted'] }}</b></div>
+            <div class="pr-stand-row"><span class="lbl"><i style="background:#94a3b8;"></i>Declined or passed</span><b>{{ $stats['declined'] }}</b></div>
+            <div class="pr-stand-total"><span>{{ $stats['submitted'] }} {{ \Illuminate\Support\Str::plural('proposal', $stats['submitted']) }} in all</span></div>
         </div>
+        @if($stats['pending'] > 0)
+            <p class="pr-stand-note">A professional is waiting on an answer for {{ $stats['pending'] === 1 ? 'one of these' : $stats['pending'] . ' of these' }}.</p>
+        @endif
     </div>
 
     <div class="pr-rail-card">

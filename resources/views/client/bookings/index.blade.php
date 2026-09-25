@@ -330,7 +330,12 @@
                             </div>
                             <div class="bk-kv">
                                 <span class="k">Location</span>
-                                <span class="v {{ ($event?->venue || $event?->location) ? '' : 'muted' }}">{{ $event?->venue ?: ($event?->location ?: 'Not set') }}</span>
+                                @php
+                                    // Issue #14: a web address is not a venue.
+                                    $__where = \App\Domain\Requests\VenueRule::place($event?->venue)
+                                        ?: \App\Domain\Requests\VenueRule::place($event?->location);
+                                @endphp
+                                <span class="v {{ $__where ? '' : 'muted' }}">{{ $__where ?: 'Not set' }}</span>
                             </div>
                             <div class="bk-kv">
                                 <span class="k">Guests</span>

@@ -392,7 +392,11 @@
 
                 <label class="rg-agree">
                     <input type="checkbox" name="agree" value="1" {{ old('agree') ? 'checked' : '' }} required>
-                    <span>I confirm I am 18 or older and agree to the <a href="{{ route('platform-disclaimer') }}" target="_blank">Terms of Service</a> and <a href="{{ route('privacy-policy') }}" target="_blank">Privacy Policy</a></span>
+                    {{-- OA-137: these said Terms of Service and opened the platform
+                             disclaimer, which is a different document. Somebody
+                             ticking this box has to be able to read the thing they
+                             are agreeing to. --}}
+                    <span>I confirm I am 18 or older and agree to the <a href="{{ route('terms-of-service') }}" target="_blank">Terms of Service</a> and <a href="{{ route('privacy-policy') }}" target="_blank">Privacy Policy</a></span>
                 </label>
 
                 @if($showRecaptcha && $recaptchaSiteKey)
@@ -467,7 +471,7 @@
                 </button>
             </form>
 
-            <div class="rg-foot">By creating an account, you agree to our <a href="{{ route('platform-disclaimer') }}">Terms of Service</a> and <a href="{{ route('privacy-policy') }}">Privacy Policy</a>.</div>
+            <div class="rg-foot">By creating an account, you agree to our <a href="{{ route('terms-of-service') }}">Terms of Service</a> and <a href="{{ route('privacy-policy') }}">Privacy Policy</a>.</div>
             <div class="rg-foot" style="margin-top:8px;">Are you a professional? <a href="#" id="rgProLink">Join as a professional</a></div>
         </div>
     </main>

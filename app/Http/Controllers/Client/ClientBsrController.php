@@ -728,7 +728,7 @@ class ClientBsrController extends Controller
             'event_date'  => ['nullable', 'date'],
             'guest_count' => ['nullable', 'integer', 'min:1', 'max:1000000'],
             'budget'      => ['nullable', 'numeric', 'min:0', 'max:99999999'],
-            'location'    => ['nullable', 'string', 'max:200'],
+            'location'    => ['nullable', 'string', 'max:200', new \App\Rules\PlaceNotALink],
         ]);
 
         // An event type the client typed into a tool is free text; it only
@@ -1035,7 +1035,7 @@ class ClientBsrController extends Controller
             // beside who is free on it (Sir Peter, 16 Sep: step 5 and 6 must
             // not ask the same question twice).
             'event' => [
-                'location'    => ['nullable', 'string', 'max:200'],
+                'location'    => ['nullable', 'string', 'max:200', new \App\Rules\PlaceNotALink],
                 /*
                  * Which KIND of answer they gave. The field was one free-text
                  * box, so a city and a full address arrived looking identical

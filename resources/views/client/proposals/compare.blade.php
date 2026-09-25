@@ -88,7 +88,7 @@
     <div class="cp-meta">
         <span>{{ $total }} {{ Str::plural('proposal', $total) }} received</span>
         @if($event->starts_at)<span>{{ $event->starts_at->format('M j, Y') }}</span>@endif
-        @if($event->location)<span>{{ $event->location }}</span>@endif
+        @if(\App\Domain\Requests\VenueRule::place($event->location))<span>{{ \App\Domain\Requests\VenueRule::place($event->location) }}</span>@endif
         @php $__svcBudget = $service ? $event->budgetForService($service->id) : null; @endphp
         @if($__svcBudget)
             <span>{{ $service->name }} budget ${{ number_format($__svcBudget) }}</span>

@@ -241,7 +241,7 @@ class ClientVirtualHubController extends Controller
             'starts_at'    => ['required', 'date'],
             'ends_at'      => ['nullable', 'date', 'after:starts_at'],
             'guest_count'  => ['nullable', 'integer', 'min:1', 'max:1000000'],
-            'location'     => ['nullable', 'required_if:event_format,hybrid', 'string', 'max:200'],
+            'location'     => ['nullable', 'required_if:event_format,hybrid', 'string', 'max:200', new \App\Rules\PlaceNotALink],
             'platform'     => ['nullable', 'string', 'max:60'],
             'meeting_url'  => ['nullable', 'url', 'max:500'],
         ], $this->messages());
