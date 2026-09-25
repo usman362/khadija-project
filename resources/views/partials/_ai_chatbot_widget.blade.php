@@ -26,7 +26,9 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
             </div>
             <div>
-                <div class="aic-title">AI Assistant</div>
+                {{-- Named as Sir Peter drew it, and from the one place the
+                     product's name lives, so a server setting cannot rename it. --}}
+                <div class="aic-title">{{ config('brand.name') }} Assistant</div>
                 <div class="aic-subtitle" id="aicStatus">Here to help</div>
             </div>
         </div>
@@ -51,36 +53,20 @@
             </div>
             <div class="aic-welcome-title">Hi {{ auth()->user()->name }}!</div>
             <div class="aic-welcome-text">How can I help you today?</div>
-            <div class="aic-suggestions">
-                {{-- Visible label is short for the bricks layout, but data-msg
-                     carries the full question so the AI gets proper context. --}}
-                <button type="button" class="aic-suggestion" data-msg="How do I post a wedding event?">
-                    <span class="aic-suggestion-text">Post a wedding</span>
-                </button>
-                <button type="button" class="aic-suggestion" data-msg="What categories of professionals can I find on the platform?">
-                    <span class="aic-suggestion-text">Categories</span>
-                </button>
-                <button type="button" class="aic-suggestion" data-msg="How does the influencer program work?">
-                    <span class="aic-suggestion-text">Influencer program</span>
-                </button>
-                <button type="button" class="aic-suggestion" data-msg="What are the commission tiers for influencers?">
-                    <span class="aic-suggestion-text">Commission tiers</span>
-                </button>
-                <button type="button" class="aic-suggestion" data-msg="How do I plan a corporate event?">
-                    <span class="aic-suggestion-text">Corporate event</span>
-                </button>
-                <button type="button" class="aic-suggestion" data-msg="Help me find a DJ for my birthday party">
-                    <span class="aic-suggestion-text">Find a DJ</span>
-                </button>
-                <button type="button" class="aic-suggestion" data-msg="How does pricing work for the platform?">
-                    <span class="aic-suggestion-text">Pricing</span>
-                </button>
-                <button type="button" class="aic-suggestion" data-msg="How do I switch between client and professional mode?">
-                    <span class="aic-suggestion-text">Switch mode</span>
-                </button>
-                <button type="button" class="aic-suggestion" data-msg="What is the photo upload limit on my profile?">
-                    <span class="aic-suggestion-text">Photo limit</span>
-                </button>
+            {{-- Sir Peter's meeting notes, 25 Sep: a tree that narrows,
+                 instead of a wall of unrelated chips. Main category, then a
+                 subcategory, then the issue, then the answer. --}}
+            <div class="aic-topics" id="aicTopics" data-tree='@json(\App\Domain\Support\SupportTopics::TREE)'
+                 data-staff="{{ \App\Domain\Forms\FormRegistry::url(\App\Domain\Support\SupportTopics::STAFF_FORM) }}">
+                <nav class="aic-crumbs" id="aicCrumbs" aria-label="Where you are"></nav>
+                <div class="aic-topic-list" id="aicTopicList"></div>
+                <div class="aic-topic-foot">
+                    <button type="button" class="aic-topic-back" id="aicTopicBack" hidden>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                        Back
+                    </button>
+                </div>
+            </div>
             </div>
         </div>
         <div id="aicMessages" class="aic-messages"></div>
@@ -261,6 +247,46 @@
     .aic-welcome-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
     .aic-welcome-text { font-size: 13px; color: #94a3b8; margin-bottom: 20px; }
     /* Suggestion pills — compact bricks layout, multiple per row */
+    /* ── The support topics (Sir Peter, 25 Sep) ────────────── */
+    .aic-topics { text-align: left; }
+    .aic-crumbs { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 12px; margin-bottom: 12px; }
+    .aic-crumb { background: none; border: 0; padding: 0; font: inherit; font-size: 12px; font-weight: 600;
+        color: #f97316; cursor: pointer; }
+    .aic-crumb[disabled] { color: #94a3b8; cursor: default; font-weight: 500; }
+    .aic-crumb-sep { color: #cbd5e1; }
+
+    .aic-topic-list { display: flex; flex-direction: column; gap: 8px; }
+    .aic-topic {
+        display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+        padding: 12px 14px; border-radius: 12px; cursor: pointer; font: inherit;
+        border: 1.5px solid rgba(148,163,184,.32); background: rgba(148,163,184,.08); color: inherit;
+    }
+    .aic-topic:hover, .aic-topic:focus-visible { border-color: #f97316; background: rgba(249,115,22,.10); }
+    .aic-topic-ico { width: 34px; height: 34px; border-radius: 10px; flex: none;
+        display: inline-flex; align-items: center; justify-content: center;
+        background: rgba(249,115,22,.14); color: #ea580c; }
+    .aic-topic-ico svg { width: 17px; height: 17px; }
+    .aic-topic-b { min-width: 0; flex: 1; }
+    .aic-topic-b strong { display: block; font-size: 13.5px; font-weight: 700; }
+    .aic-topic-b span { display: block; font-size: 11.5px; color: #94a3b8; margin-top: 1px; }
+    .aic-topic-arrow { flex: none; color: #94a3b8; }
+    .aic-topic-arrow svg { width: 15px; height: 15px; display: block; }
+
+    /* The two doors that stay open at every level. */
+    .aic-topic.is-other .aic-topic-ico { background: rgba(148,163,184,.18); color: #94a3b8; }
+    .aic-topic.is-staff { border-color: rgba(249,115,22,.45); }
+    .aic-topic.is-staff .aic-topic-ico { background: rgba(249,115,22,.16); color: #ea580c; }
+
+    .aic-topic-foot { margin-top: 12px; }
+    .aic-topic-back { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 999px;
+        border: 1.5px solid rgba(148,163,184,.4); background: none; color: inherit; font: inherit;
+        font-size: 12.5px; font-weight: 700; cursor: pointer; }
+    .aic-topic-back[hidden] { display: none; }
+    .aic-topic-back:hover { border-color: #f97316; color: #f97316; }
+
+    [data-theme="light"] .aic-topic-b span,
+    [data-bs-theme="light"] .aic-topic-b span { color: #64748b; }
+
     .aic-suggestions {
         display: flex;
         flex-wrap: wrap;
@@ -772,14 +798,138 @@
         }
     }
 
-    // ── Suggestions ──
-    document.querySelectorAll('.aic-suggestion').forEach(s => {
-        s.addEventListener('click', () => {
-            input.value = s.dataset.msg;
-            updateSendState();
-            sendMessage();
+    // ── Support topics ──
+    // Main category, then a subcategory, then the issue, then the answer.
+    // "Other / None of these" and "Talk to Staff" are offered at every level,
+    // so the tree can never close around somebody whose problem is not on it.
+    const topics    = document.getElementById('aicTopics');
+    const crumbsEl  = document.getElementById('aicCrumbs');
+    const topicList = document.getElementById('aicTopicList');
+    const topicBack = document.getElementById('aicTopicBack');
+
+    if (topics) {
+        const TREE  = JSON.parse(topics.dataset.tree || '{}');
+        const STAFF = topics.dataset.staff || '';
+        let path = [];
+
+        const ICONS = {
+            calendar:  '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+            megaphone: '<path d="M3 11v2a1 1 0 0 0 1 1h3l6 4V6L7 10H4a1 1 0 0 0-1 1z"/><path d="M17 9a4 4 0 0 1 0 6"/>',
+            clipboard: '<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>',
+            users:     '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/>',
+            document:  '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+            clock:     '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+            card:      '<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>',
+            rotate:    '<polyline points="1 4 1 10 7 10"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/>',
+            user:      '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+            shield:    '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+            lock:      '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+            chat:      '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+            bell:      '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
+            dots:      '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
+            headset:   '<path d="M18.7 8a7 7 0 0 0-13.4 0"/><path d="M3 14v-2a2 2 0 0 1 2-2h1v6H5a2 2 0 0 1-2-2z"/><path d="M21 14v-2a2 2 0 0 0-2-2h-1v6h1a2 2 0 0 0 2-2z"/><path d="M18 16v1a3 3 0 0 1-3 3h-3"/>',
+            issue:     '<circle cx="12" cy="12" r="10"/><path d="M12 16v.01"/><path d="M12 8v5"/>',
+        };
+
+        const icon = (name) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (ICONS[name] || ICONS.issue) + '</svg>';
+        const esc  = (t) => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+        function nodeAt(p) {
+            let node = { children: TREE };
+            for (const key of p) {
+                const kids = node.children || {};
+                if (!(key in kids)) return null;
+                node = kids[key];
+            }
+            return node;
+        }
+
+        function row(opts) {
+            return '<button type="button" class="aic-topic' + (opts.cls ? ' ' + opts.cls : '') + '"'
+                + (opts.key !== undefined ? ' data-topic-key="' + esc(opts.key) + '"' : '')
+                + (opts.ask ? ' data-topic-ask="' + esc(opts.ask) + '"' : '')
+                + (opts.act ? ' data-topic-act="' + opts.act + '"' : '') + '>'
+                + '<span class="aic-topic-ico">' + icon(opts.icon) + '</span>'
+                + '<span class="aic-topic-b"><strong>' + esc(opts.label) + '</strong>'
+                + (opts.blurb ? '<span>' + esc(opts.blurb) + '</span>' : '') + '</span>'
+                + '<span class="aic-topic-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>'
+                + '</button>';
+        }
+
+        function render() {
+            const node  = nodeAt(path) || { children: TREE };
+            const kids  = node.children || {};
+            const names = [];
+            let walk = { children: TREE };
+            for (const key of path) { walk = (walk.children || {})[key]; names.push(walk.label); }
+
+            // Where you are, and a way back to any step of it.
+            let crumbs = '<button type="button" class="aic-crumb" data-topic-crumb="0"'
+                + (path.length ? '' : ' disabled') + '>All topics</button>';
+            names.forEach((name, i) => {
+                crumbs += '<span class="aic-crumb-sep">&rsaquo;</span>'
+                    + '<button type="button" class="aic-crumb" data-topic-crumb="' + (i + 1) + '"'
+                    + (i === names.length - 1 ? ' disabled' : '') + '>' + esc(name) + '</button>';
+            });
+            crumbsEl.innerHTML = crumbs;
+
+            let html = '';
+            if (Array.isArray(kids)) {
+                kids.forEach((leaf, i) => {
+                    html += row({ key: i, label: leaf.label, ask: leaf.ask, icon: 'issue' });
+                });
+            } else {
+                Object.keys(kids).forEach(key => {
+                    const child = kids[key];
+                    html += row({ key: key, label: child.label, blurb: child.blurb, icon: child.icon });
+                });
+            }
+
+            html += row({
+                cls: 'is-other', act: 'other', icon: 'dots',
+                label: 'Other / None of these',
+                blurb: 'Tell me in your own words',
+            });
+            html += row({
+                cls: 'is-staff', act: 'staff', icon: 'headset',
+                label: 'Talk to Staff',
+                blurb: 'Reach a person at GigResource',
+            });
+
+            topicList.innerHTML = html;
+            topicBack.hidden = path.length === 0;
+        }
+
+        topicList.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-topic-key], [data-topic-act]');
+            if (!btn) return;
+
+            const act = btn.dataset.topicAct;
+            if (act === 'staff') { if (STAFF) window.location.href = STAFF; return; }
+            if (act === 'other') {
+                input.focus();
+                input.placeholder = 'Tell me what you need help with…';
+                return;
+            }
+
+            const ask = btn.dataset.topicAsk;
+            if (ask) { input.value = ask; updateSendState(); sendMessage(); return; }
+
+            path = path.concat([btn.dataset.topicKey]);
+            render();
         });
-    });
+
+        crumbsEl.addEventListener('click', (e) => {
+            const crumb = e.target.closest('[data-topic-crumb]');
+            if (!crumb || crumb.disabled) return;
+            path = path.slice(0, Number(crumb.dataset.topicCrumb));
+            render();
+        });
+
+        topicBack.addEventListener('click', () => { path = path.slice(0, -1); render(); });
+
+        render();
+    }
 
     // ════════════════════════════════════════════════════════════════
     // ── Emoji picker ──
