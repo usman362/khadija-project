@@ -612,10 +612,21 @@
         request()->query(), ['period' => $key]
     ));
 
+    /*
+     * Money that actually left the client, from the same place every other
+     * finance page reads it: the bookings that were completed.
+     *
+     * It summed the payments table instead. A booking is completed on this
+     * platform without a payment row necessarily existing, so a client who
+     * had paid for finished work saw "Total Spent $0.00" on the dashboard
+     * while My Events, Spending and Payments all showed the money. This card
+     * read $0.00 for a different reason once before, on 2026-08-25; a figure
+     * with its own private source is how that keeps happening.
+     */
     $totalSpent = (float) $inPeriod(
-        \App\Models\Payment::where('user_id', $user->id)->where('status', 'completed'),
-        'created_at'
-    )->sum('amount');
+        \App\Domain\Finance\ClientTotals::base($user)->where('status', 'completed'),
+        'updated_at'
+    )->sum('price');
 
     /*
      * The four cards' trend lines.
@@ -635,10 +646,11 @@
         return $trendMonths->map(fn ($m) => (float) $countFor($m->copy(), $m->copy()->endOfMonth()))->all();
     };
 
-    $spentSeries = $seriesFor(fn ($from, $to) => \App\Models\Payment::where('user_id', $user->id)
+    // The line under the figure is drawn from the figure's own source.
+    $spentSeries = $seriesFor(fn ($from, $to) => \App\Domain\Finance\ClientTotals::base($user)
         ->where('status', 'completed')
-        ->whereBetween('created_at', [$from, $to])
-        ->sum('amount'));
+        ->whereBetween('updated_at', [$from, $to])
+        ->sum('price'));
 
     $completedSeries = $seriesFor(fn ($from, $to) => \App\Models\Booking::where('client_id', $user->id)
         ->where('status', 'completed')

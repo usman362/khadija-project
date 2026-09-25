@@ -43,32 +43,49 @@ class ClientDashboardHonestyTest extends TestCase
         return $this->actingAs($u)->get(route('client.dashboard'))->assertOk()->getContent();
     }
 
-    /** The number moves with real money, instead of being a permanent zero. */
-    public function test_total_spent_reflects_completed_payments(): void
+    /**
+     * The number moves with real money, instead of being a permanent zero.
+     *
+     * It was read off the payments table, which holds nothing while the
+     * gateways are off — sixty-two completed bookings on this platform and
+     * not one payment row — so the card was $0.00 for every client while My
+     * Events, Spending and Payments all showed the money. It now reads the
+     * one calculation those pages read.
+     */
+    public function test_total_spent_reflects_the_money_that_left(): void
     {
         $client = $this->client();
 
         $this->assertStringContainsString('$0.00', $this->dashboard($client));
 
-        Payment::create([
-            'user_id' => $client->id, 'gateway' => 'test', 'status' => 'completed',
-            'amount' => 1250.50, 'currency' => 'USD', 'completed_at' => now(),
-        ]);
+        $this->bookingFor($client, 'completed', 1250.50);
 
         $this->assertStringContainsString('$1,250.50', $this->dashboard($client));
     }
 
-    /** Pending money is not spent money. */
-    public function test_an_incomplete_payment_is_not_counted_as_spent(): void
+    /** Money agreed and not yet paid is not spent money. */
+    public function test_work_not_finished_is_not_counted_as_spent(): void
     {
         $client = $this->client();
 
-        Payment::create([
-            'user_id' => $client->id, 'gateway' => 'test', 'status' => 'pending',
-            'amount' => 900, 'currency' => 'USD',
-        ]);
+        $this->bookingFor($client, 'confirmed', 900);
 
         $this->assertStringNotContainsString('$900.00', $this->dashboard($client));
+    }
+
+    private function bookingFor(User $client, string $status, float $price): void
+    {
+        $pro = User::factory()->create(['primary_role' => 'professional']);
+
+        $event = \App\Models\Event::create([
+            'title' => 'Reception', 'client_id' => $client->id, 'created_by' => $client->id,
+            'status' => 'published', 'is_published' => true, 'starts_at' => now()->subDays(5),
+        ]);
+
+        \App\Models\Booking::create([
+            'event_id' => $event->id, 'client_id' => $client->id, 'supplier_id' => $pro->id,
+            'created_by' => $client->id, 'status' => $status, 'price' => $price,
+        ]);
     }
 
     public function test_an_empty_calendar_shows_nothing_rather_than_invented_events(): void

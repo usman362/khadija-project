@@ -66,14 +66,31 @@ class DashboardCalendarIsRealTest extends TestCase
         Event::where('id', $event->id)->update(['created_at' => $when, 'updated_at' => $when]);
     }
 
+    /**
+     * Money the client spent, in the month it was spent.
+     *
+     * A completed booking, because that is where this platform records what a
+     * client paid: the payments table holds nothing while the gateways are
+     * off, so a Total Spent read from it is $0.00 for everybody.
+     */
     private function paymentOn(\Carbon\Carbon $when, float $amount): void
     {
-        $payment = Payment::create([
-            'user_id' => $this->client->id, 'status' => 'completed',
-            'amount' => $amount, 'gateway' => 'manual', 'currency' => 'USD',
+        $pro = User::factory()->create(['primary_role' => 'professional']);
+
+        $event = Event::create([
+            'title' => 'Paid '.$when->format('M j'), 'client_id' => $this->client->id,
+            'created_by' => $this->client->id, 'status' => 'completed',
+            'is_published' => true, 'starts_at' => $when->copy()->subDay(),
         ]);
 
-        Payment::where('id', $payment->id)->update([
+        $booking = \App\Models\Booking::create([
+            'event_id' => $event->id, 'client_id' => $this->client->id,
+            'supplier_id' => $pro->id, 'created_by' => $this->client->id,
+            'status' => 'completed', 'price' => $amount,
+        ]);
+
+        // Completed in that month: the figure and its line both read this.
+        \App\Models\Booking::where('id', $booking->id)->update([
             'created_at' => $when, 'updated_at' => $when,
         ]);
     }
