@@ -61,9 +61,19 @@
        space left over pushed to the right, before Do Not Disturb. */
     .lmd-mid { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
     .lmd-tabs { display: flex; gap: 8px; flex: 0 1 auto; min-width: 0; overflow: hidden; }
-    .lmd-tab { display: flex; align-items: center; gap: 9px; flex: 0 1 210px; min-width: 160px;
+    /*
+     * Sir Peter's meeting notes, 25 Sep: a conversation shows the person's
+     * picture and first name, and nothing else. The priority, the read tick,
+     * the message icon and the message title all came off the strip — they
+     * were four pieces of furniture standing between the client and the next
+     * conversation, and the strip is for getting to a conversation.
+     */
+    .lmd-tab { display: flex; align-items: center; gap: 9px; flex: 0 0 auto; width: 150px;
         border: 1.5px solid var(--border-color, #e5e7eb); border-radius: 12px; background: var(--bg-card, #fff);
         padding: 7px 10px; cursor: pointer; text-align: left; font: inherit; position: relative; }
+    /* Crowded: the pictures alone, so several more fit across the top. */
+    .lmd-tab.is-mini { width: 46px; justify-content: center; padding: 5px; }
+    .lmd-tab.is-mini .lmd-tab-t { display: none; }
     .lmd-tab:hover { border-color: #93c5fd; }
     .lmd-tab.is-unread { border-color: var(--lmd-accent); box-shadow: 0 0 0 1px var(--lmd-accent) inset; }
     .lmd-tab.is-open { background: var(--lmd-tint); border-color: var(--lmd-accent); }
@@ -90,11 +100,33 @@
     .lmd-btn:hover { background: var(--lmd-tint); }
     .lmd-btn svg { width: 17px; height: 17px; }
 
-    .lmd-dnd { display: flex; align-items: center; gap: 8px; flex: none; font-size: 11.5px; color: var(--text-muted, #6b7280); }
-    .lmd-dnd b { display: block; font-size: 12px; color: var(--text-primary, #111827); }
-    .lmd-sound { border: 0; background: none; padding: 4px; cursor: pointer; color: var(--lmd-accent); display: inline-flex; flex: none; border-radius: 8px; }
-    .lmd-sound:hover { background: var(--lmd-tint); }
-    .lmd-sound svg { width: 20px; height: 20px; }
+    /*
+     * "Do not display long labels such as Message Settings permanently."
+     * Four icons in one group on the right, each naming itself on hover in
+     * three words at most. The words are still in the markup for a screen
+     * reader; what changed is that they stop taking the room up.
+     */
+    .lmd-ctrls { display: flex; align-items: center; gap: 4px; flex: none; margin-left: auto; }
+    .lmd-cbtn { position: relative; width: 38px; height: 38px; border-radius: 10px; border: 1.5px solid transparent;
+        background: none; color: var(--text-secondary, #374151); cursor: pointer; flex: none;
+        display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+    .lmd-cbtn:hover { background: var(--lmd-tint); border-color: var(--border-color, #e5e7eb); }
+    .lmd-cbtn svg { width: 19px; height: 19px; }
+    .lmd-cbtn.is-add { color: var(--lmd-accent); }
+    /* On, and saying so: Do Not Disturb wears the account's own colour. */
+    .lmd-cbtn[aria-checked="true"] { background: var(--lmd-tint); border-color: var(--lmd-accent); color: var(--lmd-accent); }
+    .lmd-csep { width: 1px; height: 20px; background: var(--border-color, #e5e7eb); flex: none; }
+
+    .lmd-cbtn::after {
+        content: attr(data-tip); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+        background: #111827; color: #fff; font-size: 11.5px; font-weight: 600; line-height: 1;
+        padding: 6px 9px; border-radius: 7px; white-space: nowrap; pointer-events: none;
+        opacity: 0; transition: opacity .12s; z-index: 2;
+    }
+    .lmd-cbtn:hover::after, .lmd-cbtn:focus-visible::after { opacity: 1; }
+    @media (prefers-reduced-motion: reduce) { .lmd-cbtn::after { transition: none; } }
+
+    .lmd-sound [data-on], .lmd-sound [data-off] { width: 19px; height: 19px; }
     .lmd-sound [data-off] { display: none; }
     .lmd-sound[aria-pressed="true"] { color: var(--text-muted, #6b7280); }
     .lmd-sound[aria-pressed="true"] [data-on] { display: none; }
@@ -442,29 +474,35 @@
     }
 
     /* ── Tabs (§2, §9) ───────────────────────────────────────── */
-    function capacity() {
-        // The group's width less the + and +N buttons beside the tabs.
-        var room = midEl.getBoundingClientRect().width - 110;
-        return Math.max(1, Math.min(4, Math.floor((room + 8) / 168)));
+    /*
+     * How many conversations fit, and in which of the two views.
+     *
+     * Named view first: picture and first name. When there are more
+     * conversations than that view has room for, every one of them condenses
+     * to its picture alone, which is what Sir Peter's drawing shows — not a
+     * row where some are named and some are not.
+     */
+    var NAMED = 158;   // chip + gap
+    var MINI  = 50;    // picture + gap
+
+    function fitFor(width) {
+        var room = Math.max(0, midEl.getBoundingClientRect().width - 50);   // the "…" button
+
+        return Math.max(1, Math.floor(room / width));
     }
 
-    function tabHtml(c) {
+    function tabHtml(c, mini) {
         var p = c.peer || { name: 'Conversation', avatar: '' };
-        var st = status(c), unread = Number(c.unread_count || 0);
-        var mine = c.last_message_sender_id === me;
-        var who = mine ? '' : ((p.name || '').split(' ')[0] + ': ');
-        return '<button type="button" class="lmd-tab' + (st === 'unread' ? ' is-unread' : '') + (state.expanded === c.id ? ' is-open' : '')
+        var unread = Number(c.unread_count || 0);
+        // The first name is what the strip shows; the whole name is the title,
+        // for the picture-only view and for anyone hovering.
+        var first = (p.name || '').split(' ')[0] || 'Conversation';
+
+        return '<button type="button" class="lmd-tab' + (mini ? ' is-mini' : '')
+            + (status(c) === 'unread' ? ' is-unread' : '') + (state.expanded === c.id ? ' is-open' : '')
             + '" data-lmd-open="' + c.id + '" title="' + esc(p.name) + '">'
             + '<img class="lmd-av" src="' + esc(p.avatar) + '" alt="">'
-            // Red dot unread, grey dot read; the green tick on the preview line is "you replied".
-            + '<span class="lmd-tab-t"><b><span class="lmd-st is-' + (st === 'unread' ? 'unread' : 'read') + '" title="'
-                + (st === 'unread' ? 'Unread' : (st === 'responded' ? 'You replied' : 'Read, not answered yet')) + '"></span>'
-            + esc(p.name) + '</b>'
-            + (c.last_message_priority && LEVELS[c.last_message_priority]
-                ? '<span class="lmd-pri" style="color:' + LEVEL_COLOURS[c.last_message_priority] + ';"><span class="lmd-dot"></span>' + esc(LEVELS[c.last_message_priority]) + '</span>'
-                : '')
-            + '<small><span class="lmd-pv">' + (mine ? '<i class="lmd-ok">✓</i> ' : '') + esc(who + (c.last_message_body || '')) + '</span>'
-            + (c.last_message_at ? '<em>' + esc(ago(c.last_message_at)) + '</em>' : '') + '</small></span>'
+            + '<span class="lmd-tab-t"><b>' + esc(first) + '</b></span>'
             + (unread ? '<span class="lmd-count">' + unread + '</span>' : '')
             + '</button>';
     }
@@ -472,7 +510,8 @@
     var overflow = [];
     function renderTabs() {
         var ids = state.tabs.filter(function (id) { return convs[id]; });
-        var cap = capacity();
+        var mini = ids.length > fitFor(NAMED);
+        var cap = fitFor(mini ? MINI : NAMED);
         var shown = ids.slice(0, cap);
 
         // The expanded one never drops out of view while it is being used.
@@ -481,10 +520,11 @@
         }
 
         overflow = ids.filter(function (id) { return shown.indexOf(id) === -1; });
-        // Only real conversations show; with none open the bar keeps just + (18 Sep).
-        tabsEl.innerHTML = shown.map(function (id) { return tabHtml(convs[id]); }).join('');
+        // Only real conversations show; with none open the bar keeps just the
+        // controls on the right (18 Sep).
+        tabsEl.innerHTML = shown.map(function (id) { return tabHtml(convs[id], mini); }).join('');
         moreBtn.hidden = ! overflow.length;
-        moreBtn.textContent = '+' + overflow.length;
+        moreBtn.title = overflow.length + ' more ' + (overflow.length === 1 ? 'conversation' : 'conversations');
         layout();
     }
 
@@ -890,26 +930,32 @@
     <div class="lmd-mid" data-lmd-mid>
         <div class="lmd-tabs" data-lmd-tabs></div>
 
-        <button type="button" class="lmd-btn" data-lmd-list title="Start or open another conversation" aria-label="Open another conversation">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        </button>
-        <button type="button" class="lmd-btn" data-lmd-more hidden aria-label="More conversations">+0</button>
+        {{-- The rest of the conversations, behind one button. It was "+N"
+             beside a second "+" that meant something else entirely. --}}
+        <button type="button" class="lmd-btn" data-lmd-more hidden aria-label="More conversations">…</button>
     </div>
-    <span class="lmd-sep"></span>
 
-    <div class="lmd-dnd">
-        {{-- Sound on or off at a glance; the same setting as the switch. --}}
-        <button type="button" class="lmd-sound" data-lmd-sound aria-pressed="false" title="Sound on: click to mute" aria-label="Message sound">
+    {{-- Sir Peter's meeting notes, 25 Sep: sound, Do Not Disturb, settings
+         and new message, as icons, in one group on the right. --}}
+    <div class="lmd-ctrls">
+        <button type="button" class="lmd-cbtn lmd-sound" data-lmd-sound data-tip="Sound" aria-pressed="false" aria-label="Message sound">
             <svg data-on viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
             <svg data-off viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>
         </button>
-        <button type="button" class="lmd-switch" role="switch" aria-checked="false" data-lmd-dnd aria-label="Do Not Disturb"></button>
-        <span><b>Do Not Disturb</b><small>Still receive messages (no sound)</small></span>
+        <span class="lmd-csep"></span>
+        <button type="button" class="lmd-cbtn" role="switch" aria-checked="false" data-lmd-dnd
+                data-tip="Do Not Disturb" aria-label="Do Not Disturb">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+        <span class="lmd-csep"></span>
+        <a class="lmd-cbtn" href="{{ route('client.notifications.index') }}" data-tip="Message Settings" aria-label="Message Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+        </a>
+        <span class="lmd-csep"></span>
+        <button type="button" class="lmd-cbtn is-add" data-lmd-list data-tip="New Message" aria-label="New Message">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
     </div>
-    <a class="lmd-set" href="{{ route('client.notifications.index') }}" title="Message Settings" aria-label="Message Settings">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
-        <span>Message Settings</span>
-    </a>
 </div>
 
 {{-- Sir Peter's per-message menu: priority, reply, and the one action that
