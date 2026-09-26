@@ -12,7 +12,7 @@
        a summarizer, invented milestone dates) are gone; what replaced them
        is the booking's own agreement-log history. */
 
-    .bk-layout { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 18px; align-items: start; }
+    .bk-layout { display: grid; grid-template-columns: minmax(0, 1fr) var(--cl-rail); gap: var(--cl-rail-gap); align-items: start; }
     .bk-main { min-width: 0; }
     .bk-rail { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 80px; }
 

@@ -28,7 +28,7 @@
     .bw-step.on small { color: var(--brand-text); }
     .bw-step.done small { color: var(--text-secondary); }
 
-    .bw-grid { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 20px; align-items: start; }
+    .bw-grid { display: grid; grid-template-columns: minmax(0,1fr) var(--cl-rail); gap: var(--cl-rail-gap); align-items: start; }
     @media (max-width: 1000px) { .bw-grid { grid-template-columns: minmax(0,1fr); } }
 
     .bw-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 22px 24px; }

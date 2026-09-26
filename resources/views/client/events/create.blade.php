@@ -37,7 +37,7 @@
     .gb-step.active .n { background: var(--gb); border-color: var(--gb); color: #fff; }
 
     /* ---- Layout ---- */
-    .gb-grid { display: grid; grid-template-columns: 1fr 360px; gap: 22px; align-items: start; }
+    .gb-grid { display: grid; grid-template-columns: 1fr var(--cl-rail); gap: var(--cl-rail-gap); align-items: start; }
     @media (max-width: 980px) { .gb-grid { grid-template-columns: 1fr; } .gb-aside { position: static !important; } }
     .gb-main { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
     .gb-aside { position: sticky; top: 18px; display: flex; flex-direction: column; gap: 16px; }

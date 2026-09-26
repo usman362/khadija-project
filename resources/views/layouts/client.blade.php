@@ -682,6 +682,18 @@
         .cl-main {
             --cl-max: 1760px;
             --cl-gutter: 26px;
+            /*
+             * Sir Peter, 27 Sep: "the ER was finally aligned... i would like to
+             * have all the main center body's of the others as well."
+             *
+             * Seventeen pages each carried their own rail width and their own
+             * gap — 270, 280, 290, 300, 320, 340, 360, 380, with gaps of 18,
+             * 20, 22 and 24 — so the centre body finished in a different place
+             * on every one of them. These are the Emergency Request's, which
+             * is the page he picked as right, and every page reads them.
+             */
+            --cl-rail: 340px;
+            --cl-rail-gap: 20px;
             --cl-edge: max(var(--cl-gutter), calc((100% - var(--cl-max)) / 2 + var(--cl-gutter)));
             margin-left: var(--sidebar-width);
             min-height: 100vh;

@@ -39,7 +39,7 @@
 @endphp
 
 <style>
-    .pbs { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: start; }
+    .pbs { display: grid; grid-template-columns: minmax(0, 1fr) var(--cl-rail); gap: var(--cl-rail-gap); align-items: start; }
     /* Narrower than the drawing: the side panel moves under the tables, its
        cards side by side, so every column of the tables still fits. */
     @media (max-width: 1440px) {

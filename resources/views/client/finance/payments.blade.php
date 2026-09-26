@@ -10,7 +10,7 @@
        Matches "Clients dashboard Payments" mockup. Real booking amounts
        drive the figures; the secure payment/Stripe split + 1099 thresholds are
        derived placeholders pending the Stripe Connect sandbox. */
-    .pay-layout { display: grid; grid-template-columns: minmax(0,1fr) 280px; gap: 18px; align-items: start; }
+    .pay-layout { display: grid; grid-template-columns: minmax(0,1fr) var(--cl-rail); gap: var(--cl-rail-gap); align-items: start; }
     .pay-main { min-width: 0; }
     .pay-rail { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 80px; }
     .pay-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 18px; }

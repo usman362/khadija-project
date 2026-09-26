@@ -109,6 +109,51 @@ class ClientPagesShareOneColumnTest extends TestCase
         );
     }
 
+    /**
+     * Sir Peter, 27 September: "the ER was finally aligned... i would like to
+     * have all the main center body's of the others as well."
+     *
+     * Seventeen pages each carried their own rail width and gap — 270, 280,
+     * 290, 300, 320, 340, 360, 380, with gaps of 18, 20, 22 and 24 — so the
+     * centre body finished in a different place on every one of them. The
+     * Emergency Request is the one he picked as right, and its two numbers are
+     * now the platform's, declared beside the column they sit in.
+     */
+    public function test_every_page_takes_the_rail_from_one_measurement(): void
+    {
+        $layout = $this->layout();
+
+        $this->assertSame(1, substr_count($layout, '--cl-rail:'));
+        $this->assertSame(1, substr_count($layout, '--cl-rail-gap:'));
+        $this->assertStringContainsString('--cl-rail: 340px;', $layout);
+
+        $pages = [
+            'client/esr/create', 'client/bsr/wizard', 'client/direct-offers/create',
+            'client/events/index', 'client/proposals/index', 'client/bookings/index',
+            'client/finance/payments', 'client/finance/spending', 'client/finance/transaction',
+            'client/finalize/wizard', 'client/events/_proposals_by_service', 'client/events/create',
+            'client/toolkit/plan', 'client/virtual-hub/index', 'client/packages/book',
+            'client/post-event/_styles', 'client/post-event/choose',
+        ];
+
+        $own = [];
+
+        foreach ($pages as $page) {
+            $css = file_get_contents(base_path("resources/views/{$page}.blade.php"));
+
+            if (! str_contains($css, 'var(--cl-rail)')) {
+                $own[] = "{$page} does not use the shared rail";
+            }
+
+            // A page-level grid with its own width in pixels is how they drifted.
+            if (preg_match('/grid-template-columns:\s*(?:minmax\(0,\s*1fr\)|1fr)\s+\d+px/', $css, $m)) {
+                $own[] = "{$page} still sets its own rail: {$m[0]}";
+            }
+        }
+
+        $this->assertSame([], $own, "pages with a rail of their own:\n".implode("\n", $own));
+    }
+
     /** And every client page still renders both of them. */
     public function test_every_client_page_uses_that_column(): void
     {

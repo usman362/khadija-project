@@ -31,7 +31,7 @@
     .fz-step small { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); }
     .fz-step.on small { color: var(--brand-text); }
 
-    .fz-grid { display: grid; grid-template-columns: minmax(0,1fr) 290px; gap: 18px; align-items: start; }
+    .fz-grid { display: grid; grid-template-columns: minmax(0,1fr) var(--cl-rail); gap: var(--cl-rail-gap); align-items: start; }
     @media (max-width: 1000px) { .fz-grid { grid-template-columns: minmax(0,1fr); } }
 
     .fz-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 22px 24px; }

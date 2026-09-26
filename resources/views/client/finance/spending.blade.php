@@ -10,7 +10,7 @@
        For an event-planner client "Earnings" = the project funds they
        manage and disburse to vendors. Real booking amounts drive figures;
        secure payment/Stripe split + 1099 status are derived pending Stripe sandbox. */
-    .ea-layout { display: grid; grid-template-columns: minmax(0,1fr) 280px; gap: 18px; align-items: start; }
+    .ea-layout { display: grid; grid-template-columns: minmax(0,1fr) var(--cl-rail); gap: var(--cl-rail-gap); align-items: start; }
     .ea-main { min-width: 0; }
     .ea-rail { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 80px; }
     .ea-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 18px; }

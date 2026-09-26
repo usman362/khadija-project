@@ -9,7 +9,7 @@
     .pw { max-width: 1180px; min-width: 0; }
     /* The page was one column, so it was the only request flow with nothing
        beside it explaining itself. */
-    .pw-layout { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 20px; align-items: start; }
+    .pw-layout { display: grid; grid-template-columns: minmax(0,1fr) var(--cl-rail); gap: var(--cl-rail-gap); align-items: start; }
     @media (max-width: 1024px) { .pw-layout { grid-template-columns: minmax(0,1fr); } }
     .pw-head { margin-bottom: 18px; }
     .pw-head h1 { font-size: 23px; font-weight: 800; margin: 0 0 4px; color: var(--text-primary); }

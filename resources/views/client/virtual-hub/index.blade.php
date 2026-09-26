@@ -11,7 +11,7 @@
        telemetry need a streaming (RTMP) backend that does not exist yet —
        those panels show representative placeholder values (commented).
        Pro-discovery + RFP sections use real supplier/event data. */
-    .vh-layout { display: grid; grid-template-columns: minmax(0,1fr) 270px; gap: 18px; align-items: start; }
+    .vh-layout { display: grid; grid-template-columns: minmax(0,1fr) var(--cl-rail); gap: var(--cl-rail-gap); align-items: start; }
     .vh-main { min-width: 0; }
     .vh-rail { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 80px; }
     .vh-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 16px; }

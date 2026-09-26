@@ -27,7 +27,7 @@
 <style>
     .do { --do: #f97316; --do-strong: #ea580c; --ai: #16a34a; max-width: 100%; margin: 0 auto; }
     /* Fill large screens: form + contextual rail side-by-side, stacks on narrow. */
-    .do-layout { display: grid; grid-template-columns: minmax(0,1fr) 340px; gap: 20px; align-items: start; }
+    .do-layout { display: grid; grid-template-columns: minmax(0,1fr) var(--cl-rail); gap: var(--cl-rail-gap); align-items: start; }
     .do-rail { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 88px; }
     .do-rcard { background: var(--bg-card,#fff); border: 1px solid var(--border-color,#e5e7eb); border-radius: 16px; padding: 18px; }
     .do-rcard h4 { font-size: 13px; font-weight: 800; color: var(--text-primary,#111827); margin-bottom: 13px; display:flex; align-items:center; gap:8px; }

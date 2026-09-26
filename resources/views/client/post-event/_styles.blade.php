@@ -10,7 +10,13 @@
            layout's job; a page does not paint its own. */
         min-height:100%; color:var(--pe-ink); }
     .pe-wrap * { box-sizing:border-box; }
-    .pe-container { max-width:1280px; margin:0 auto; padding:0 24px; }
+    /*
+     * The Post an Event pages sat in a column of their own — capped at 1280
+     * and padded by another 24px — inside the page column they were already
+     * in. So their centre body started and ended somewhere no other client
+     * page does. The page already has a column; this stays inside it.
+     */
+    .pe-container { width:100%; }
 
     /* ── wizard progress bar ── */
     .pe-wizard { display:flex; align-items:center; gap:0; overflow-x:auto; padding:18px 24px; background:var(--pe-card);
@@ -31,7 +37,7 @@
     .pe-main { padding:26px 0 60px; }
     .pe-h1 { font-size:26px; font-weight:800; letter-spacing:-.6px; margin:0 0 4px; display:flex; align-items:center; gap:8px; }
     .pe-sub { color:var(--pe-muted); font-size:14px; margin:0 0 22px; }
-    .pe-grid { display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:22px; align-items:start; }
+    .pe-grid { display:grid; grid-template-columns:minmax(0,1fr) var(--cl-rail); gap:var(--cl-rail-gap); align-items:start; }
     @media (max-width:980px){ .pe-grid { grid-template-columns:minmax(0,1fr); } }
 
     /* ── cards ── */

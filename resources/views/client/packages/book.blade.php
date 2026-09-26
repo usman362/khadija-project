@@ -6,7 +6,7 @@
 
 @push('styles')
 <style>
-    .pb-grid { display: grid; grid-template-columns: minmax(0,1fr) 340px; gap: 18px; align-items: start; }
+    .pb-grid { display: grid; grid-template-columns: minmax(0,1fr) var(--cl-rail); gap: var(--cl-rail-gap); align-items: start; }
     @media (max-width: 900px) { .pb-grid { grid-template-columns: 1fr; } }
     .pb-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 18px 20px; }
     .pb-card + .pb-card { margin-top: 14px; }

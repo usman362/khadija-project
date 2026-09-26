@@ -6,7 +6,7 @@
 
 @push('styles')
 <style>
-    .tx-grid { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 18px; align-items: start; }
+    .tx-grid { display: grid; grid-template-columns: minmax(0,1fr) var(--cl-rail); gap: var(--cl-rail-gap); align-items: start; }
     @media (max-width: 900px) { .tx-grid { grid-template-columns: 1fr; } }
     .tx-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px; }
     .tx-card + .tx-card { margin-top: 14px; }

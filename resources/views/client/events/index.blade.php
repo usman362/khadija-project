@@ -11,7 +11,7 @@
        master-list table, professional-status bar, recent activity +
        quick actions, and a right rail (Event Overview donut / Pro
        Status / Payment Summary / Upcoming Deadlines). */
-    .mg-layout { display: grid; grid-template-columns: minmax(0,1fr) 280px; gap: 18px; align-items: start; }
+    .mg-layout { display: grid; grid-template-columns: minmax(0,1fr) var(--cl-rail); gap: var(--cl-rail-gap); align-items: start; }
     .mg-main { min-width: 0; }
     .mg-rail { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 80px; }
 
@@ -261,9 +261,8 @@
 
     .cl-event-actions { display: flex; gap: 8px; flex-shrink: 0; }
 
-    /* Two column for view + preview */
-    .cl-two-col { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
-    @media (max-width: 1024px) { .cl-two-col { grid-template-columns: 1fr; } }
+    /* A .cl-two-col rule stood here, a third column width for a block this
+       page does not have: nothing in the markup ever carried the class. */
 
     /* Live Preview */
     .cl-preview-card {

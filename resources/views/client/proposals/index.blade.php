@@ -10,7 +10,7 @@
        Matches Khadija's "Proposal Client_s side" mockup — 6 stat cards,
        pipeline tabs, proposal table with health-score rings, and a right
        rail (Proposal Health / Revenue Pipeline / Next Best Actions). */
-    .pr-layout { display: grid; grid-template-columns: minmax(0,1fr) 280px; gap: 18px; align-items: start; }
+    .pr-layout { display: grid; grid-template-columns: minmax(0,1fr) var(--cl-rail); gap: var(--cl-rail-gap); align-items: start; }
     .pr-main { min-width: 0; }
     .pr-rail { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 80px; }
     .pr-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 18px; }

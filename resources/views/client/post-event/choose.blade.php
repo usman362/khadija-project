@@ -22,8 +22,8 @@
     /* Two rows named explicitly — the cards, then the hint card. `grid-row:
        1 / -1` on the rail counts to the last EXPLICIT line, so without these
        the span collapsed to row 1 and the rail stopped at the cards. */
-    .rc-layout { display:grid; grid-template-columns:minmax(0,1fr) 300px; grid-template-rows:auto auto;
-        gap:20px; align-items:stretch; }
+    .rc-layout { display:grid; grid-template-columns:minmax(0,1fr) var(--cl-rail); grid-template-rows:auto auto;
+        gap:var(--cl-rail-gap); align-items:stretch; }
     @media (max-width:1180px) { .rc-layout { grid-template-columns:1fr; grid-template-rows:none; } }
 
     .rc-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
