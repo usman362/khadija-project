@@ -87,8 +87,18 @@
             grid-template-columns: 1fr !important;
         }
 
-        /* Page-content side padding on small phones */
-        .cl-content,
+        /*
+         * Page-content side padding on small phones.
+         *
+         * This set the page's padding directly, which put the page on 14px
+         * while the bar above it stayed on its own number, so the two parted
+         * company again at phone width — a third place carrying its own edge.
+         * On the client side it now moves the shared gutter instead, and the
+         * bar follows the page because both read it. The other layouts keep
+         * the direct override until they are given a column of their own.
+         */
+        .cl-main { --cl-gutter: 14px; }
+
         .pf-content,
         .dashboard-content,
         main.py-4 > .container,

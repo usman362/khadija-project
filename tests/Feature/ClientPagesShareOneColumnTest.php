@@ -85,6 +85,30 @@ class ClientPagesShareOneColumnTest extends TestCase
         }
     }
 
+    /**
+     * And nothing else reaches in to set the page's edge behind the bar's
+     * back. A shared partial was forcing the content to 14px on a phone while
+     * the bar kept its own number — a third place carrying its own edge, and
+     * the same fault one layer down.
+     */
+    public function test_no_shared_partial_sets_the_page_edge_on_its_own(): void
+    {
+        $mobile = file_get_contents(base_path('resources/views/partials/_mobile_fixes.blade.php'));
+
+        $this->assertStringNotContainsString(
+            ".cl-content,\n        .pf-content",
+            $mobile,
+            'The mobile partial is setting the client page edge directly again.',
+        );
+        $this->assertStringContainsString('.cl-main { --cl-gutter: 14px; }', $mobile);
+
+        // Whatever a partial does, the page's own edge comes from the gutter.
+        $this->assertSame(
+            0,
+            preg_match('/\.cl-content[^{]*\{[^}]*padding-(left|right|inline)[^}]*!important/s', $mobile),
+        );
+    }
+
     /** And every client page still renders both of them. */
     public function test_every_client_page_uses_that_column(): void
     {
