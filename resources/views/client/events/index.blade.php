@@ -786,7 +786,10 @@
                                             <a href="{{ $r['view_url'] }}" class="mg-row-view">View</a>
                                         @endif
                                         <div class="mg-menu" data-row-menu>
-                                            <button type="button" class="mg-row-kebab" aria-haspopup="true" aria-expanded="false" title="More actions">⋮</button>
+                                            {{-- The same control, the same glyph: the two
+                                                 rows on this page were drawn with different
+                                                 dots. --}}
+                                            <button type="button" class="mg-row-kebab" aria-haspopup="true" aria-expanded="false" title="More actions">⋯</button>
                                             <div class="mg-menu-pop" data-row-menu-pop>
                                                 @if($r['view_url'])<a href="{{ $r['view_url'] }}">View details</a>@endif
                                                 @if($r['event_id'])<a href="{{ route('client.events.show', $r['event_id']) }}">View event</a>@endif

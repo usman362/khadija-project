@@ -299,7 +299,7 @@
                                             @endunless
                                         @endif
                                         <details data-pbs-pop>
-                                            <summary class="pbs-kebab" aria-label="More">⋮</summary>
+                                            <summary class="pbs-kebab" aria-label="More actions">⋯</summary>
                                             <div class="pbs-pop" style="width:200px;">
                                                 @if($sup)<a href="{{ route('public.professional.show', $sup) }}">View profile</a>@endif
                                                 @if($svc && $count > 1)<a href="{{ route('client.proposals.compare', [$event, 'service' => $svc->id]) }}">Compare side by side</a>@endif

@@ -18,7 +18,7 @@
     .rv-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 18px; }
 
     /* Stat cards */
-    .rv-stats { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 12px; margin-bottom: 16px; }
+    .rv-stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin-bottom: 16px; }
     .rv-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; }
     .rv-stat-ico { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .rv-stat-ico svg { width: 18px; height: 18px; }
@@ -67,9 +67,6 @@
     .rv-rc-meta { font-size: 11px; color: var(--text-muted); display: flex; gap: 12px; flex-wrap: wrap; margin-top: 2px; }
     .rv-rc-gateway { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 6px; background: var(--bg-card-hover); border: 1px solid var(--border-color); font-size: 11px; font-weight: 600; color: var(--text-secondary); }
     .rv-rc-gateway svg { width: 12px; height: 12px; }
-    .rv-rc-payout { font-size: 11px; font-weight: 700; color: var(--ok-text); display: inline-flex; align-items: center; gap: 4px; }
-    .rv-rc-payout svg { width: 12px; height: 12px; }
-    .rv-rc-kebab { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 16px; }
 
     /* 4-column metrics body */
     .rv-rc-body { display: grid; grid-template-columns: 1.1fr 1.1fr 1.1fr 1fr; gap: 16px; padding: 16px 18px; }
@@ -165,7 +162,13 @@
         <div class="rv-stat"><div class="rv-stat-ico amber"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div><div class="rv-stat-label">Avg Rating</div><div class="rv-stat-value">{{ number_format($stats['avg'], 1) }}</div><div class="rv-stat-sub">Out of 5</div></div></div>
         <div class="rv-stat"><div class="rv-stat-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/></svg></div><div><div class="rv-stat-label">Positive (4–5★)</div><div class="rv-stat-value">{{ $stats['positive'] }}</div><div class="rv-stat-sub">{{ $stats['positive_pct'] }}% of reviews</div></div></div>
         <div class="rv-stat"><div class="rv-stat-ico red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3z"/></svg></div><div><div class="rv-stat-label">Negative (1–2★)</div><div class="rv-stat-value">{{ $stats['negative'] }}</div><div class="rv-stat-sub">{{ $stats['negative_pct'] }}% of reviews</div></div></div>
-        <div class="rv-stat"><div class="rv-stat-ico coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="rv-stat-label">Avg Response</div><div class="rv-stat-value">14m</div><div class="rv-stat-sub">During event week</div></div></div>
+        {{-- An "Avg Response 14m / During event week" tile stood here. The
+             14m was typed in: the same figure for every client, on a page
+             about reviews, beside four figures that are counted from the
+             client's own reviews. The platform does measure reply time, and
+             does it properly — Messages waits for three replies before it
+             will print an average — so the honest version of this already
+             exists where it belongs. --}}
     </div>
 
     {{-- Rating filter chips --}}
@@ -225,8 +228,14 @@
                                  Payment Review" depending on whether the review's
                                  id was even. A review is verified because it came
                                  from a completed booking, not by a payment
-                                 provider, and neither provider is connected. --}}
-                            <span class="rv-rc-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified Review</span>
+                                 provider, and neither provider is connected.
+
+                                 OA-165 names review cards among the places a
+                                 check-mark badge is withheld from until a
+                                 verification feature is defined (D-35). The
+                                 fact is kept and the mark is not: the words
+                                 still say where the review came from. --}}
+                            <span class="rv-rc-badge">@if(\App\Support\VerifiedBadge::shown())<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>@endif From a completed booking</span>
                         </div>
                         <div class="rv-rc-title">{{ $eventTitle }}</div>
                         <div class="rv-rc-meta">
@@ -234,8 +243,15 @@
                             <span>Date: {{ $r->created_at?->format('M d, Y') }}</span>
                         </div>
                     </div>
-                    <span class="rv-rc-payout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Verified Payout</span>
-                    <button class="rv-rc-kebab">⋮</button>
+                    {{-- "Verified Payout" with a tick sat here on every card,
+                         whatever had happened. No payout has been made through
+                         this platform at all — the gateways are off and the
+                         payments table is empty — so it was a claim about money
+                         on every review ever written.
+
+                         The kebab beside it went with it: a button with a style
+                         rule, no menu and no handler anywhere, so it did nothing
+                         when a client clicked it. --}}
                 </div>
 
                 <div class="rv-rc-body">
