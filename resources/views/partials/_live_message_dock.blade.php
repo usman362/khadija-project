@@ -106,16 +106,16 @@
      * three words at most. The words are still in the markup for a screen
      * reader; what changed is that they stop taking the room up.
      */
-    .lmd-ctrls { display: flex; align-items: center; gap: 4px; flex: none; margin-left: auto; }
-    .lmd-cbtn { position: relative; width: 38px; height: 38px; border-radius: 10px; border: 1.5px solid transparent;
-        background: none; color: var(--text-secondary, #374151); cursor: pointer; flex: none;
+    .lmd-ctrls { display: flex; align-items: center; gap: 10px; flex: none; margin-left: auto; }
+    .lmd-cbtn { position: relative; width: 42px; height: 42px; border-radius: 11px;
+        border: 1.5px solid var(--border-color, #e5e7eb); background: var(--bg-card, #fff);
+        color: var(--text-secondary, #374151); cursor: pointer; flex: none;
         display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
-    .lmd-cbtn:hover { background: var(--lmd-tint); border-color: var(--border-color, #e5e7eb); }
+    .lmd-cbtn:hover { background: var(--lmd-tint); border-color: var(--lmd-accent); }
     .lmd-cbtn svg { width: 19px; height: 19px; }
     .lmd-cbtn.is-add { color: var(--lmd-accent); }
     /* On, and saying so: Do Not Disturb wears the account's own colour. */
     .lmd-cbtn[aria-checked="true"] { background: var(--lmd-tint); border-color: var(--lmd-accent); color: var(--lmd-accent); }
-    .lmd-csep { width: 1px; height: 20px; background: var(--border-color, #e5e7eb); flex: none; }
 
     .lmd-cbtn::after {
         content: attr(data-tip); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
@@ -935,26 +935,25 @@
         <button type="button" class="lmd-btn" data-lmd-more hidden aria-label="More conversations">…</button>
     </div>
 
-    {{-- Sir Peter's meeting notes, 25 Sep: sound, Do Not Disturb, settings
-         and new message, as icons, in one group on the right. --}}
+    {{-- Sir Peter's meeting notes, 25 Sep, and the drawing that came with
+         them: new message, sound, Do Not Disturb, settings, each in its own
+         box on the right. The note listed the "+" last and said it could move
+         if that read better; the drawing puts it first, so it is first. --}}
     <div class="lmd-ctrls">
+        <button type="button" class="lmd-cbtn is-add" data-lmd-list data-tip="New Message" aria-label="New Message">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
         <button type="button" class="lmd-cbtn lmd-sound" data-lmd-sound data-tip="Sound" aria-pressed="false" aria-label="Message sound">
             <svg data-on viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
             <svg data-off viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>
         </button>
-        <span class="lmd-csep"></span>
         <button type="button" class="lmd-cbtn" role="switch" aria-checked="false" data-lmd-dnd
                 data-tip="Do Not Disturb" aria-label="Do Not Disturb">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
         </button>
-        <span class="lmd-csep"></span>
         <a class="lmd-cbtn" href="{{ route('client.notifications.index') }}" data-tip="Message Settings" aria-label="Message Settings">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
         </a>
-        <span class="lmd-csep"></span>
-        <button type="button" class="lmd-cbtn is-add" data-lmd-list data-tip="New Message" aria-label="New Message">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        </button>
     </div>
 </div>
 

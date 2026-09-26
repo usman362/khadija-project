@@ -80,6 +80,17 @@ class MessageDockMeetingNotesTest extends TestCase
         // The label that used to sit there all day, and its explanation.
         $this->assertStringNotContainsString('<span>Message Settings</span>', $dock);
         $this->assertStringNotContainsString('Still receive messages (no sound)', $dock);
+
+        /*
+         * And in the order the drawing shows them. The written note listed the
+         * "+" last and allowed it to move if that read better; the drawing that
+         * came with it puts it first, so it is first.
+         */
+        preg_match_all('/data-tip="([^"]+)"/', $dock, $order);
+        $this->assertSame(
+            ['New Message', 'Sound', 'Do Not Disturb', 'Message Settings'],
+            $order[1],
+        );
     }
 
     /** "Do not create a new standalone messaging webpage as the solution." */
