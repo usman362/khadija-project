@@ -122,6 +122,12 @@ class ClientToClientMessagingTest extends TestCase
 
     public function test_it_is_not_on_the_messages_page_and_the_other_client_cannot_be_picked(): void
     {
+        // Named here rather than left to the factory: a generated name with an
+        // apostrophe in it comes back escaped in the markup, and the test then
+        // fails on the punctuation instead of on the rule it is about.
+        $this->otherClient->forceFill(['name' => 'Dana Whitfield'])->save();
+        $this->pro->forceFill(['name' => 'Priya Raghavan'])->save();
+
         $this->conversationBetween($this->client, $this->otherClient);
         $this->conversationBetween($this->client, $this->pro);
 

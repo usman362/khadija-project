@@ -1401,19 +1401,16 @@
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                         Messages (Inbox)
                         {{-- Real unread MESSAGES (this counted notifications before,
-                             and showed a hardcoded 2 when there were none). --}}
-                        @php
-                            $unread = auth()->check()
-                                ? \App\Models\Message::where('recipient_id', auth()->id())
-                                    ->whereDoesntHave('reads', fn ($q) => $q->where('user_id', auth()->id()))
-                                    // Not from conversations this person muted. A message
-                                    // with no conversation still counts.
-                                    ->where(fn ($q) => $q->whereNull('conversation_id')->orWhereNotIn('conversation_id',
-                                        \Illuminate\Support\Facades\DB::table('conversation_participants')
-                                            ->where('user_id', auth()->id())->whereNotNull('muted_at')->pluck('conversation_id')))
-                                    ->count()
-                                : 0;
-                        @endphp
+                             and showed a hardcoded 2 when there were none).
+
+                             It then counted them its own way: rows addressed by
+                             recipient_id, which is null in a group conversation,
+                             and with no idea about the conversations a client is
+                             not allowed to open. So the badge could disagree with
+                             the list beside it, and could hold a number nothing
+                             the client did would ever clear. One question, one
+                             place: App\Domain\Messaging\Unread. --}}
+                        @php $unread = \App\Domain\Messaging\Unread::forUser(auth()->user()); @endphp
                         @if($unread > 0)
                             <span class="cl-nav-badge cl-nav-badge-count">{{ $unread > 9 ? '9+' : $unread }}</span>
                         @endif
