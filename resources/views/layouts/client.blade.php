@@ -676,7 +676,13 @@
         @media (max-width: 768px) { .cl-side-toggle { display: none; } }
 
         /* ═══════════════════════ MAIN CONTENT ═══════════════════════ */
+        /* One column for the whole client side: its width, its gutter, and
+           the padding a full-width element needs to line its contents up with
+           it. Change the gutter here and the bar and the page move together. */
         .cl-main {
+            --cl-max: 1760px;
+            --cl-gutter: 26px;
+            --cl-edge: max(var(--cl-gutter), calc((100% - var(--cl-max)) / 2 + var(--cl-gutter)));
             margin-left: var(--sidebar-width);
             min-height: 100vh;
             transition: var(--transition);
@@ -734,7 +740,25 @@
         }
 
         /* ══════ Client topbar — orange welcome banner ══════ */
-        .cl-topbar { display: flex; align-items: center; gap: 16px; padding: 12px 26px 2px; position: sticky; top: 0; z-index: 100; background: var(--bg-primary); }
+        /*
+         * Sir Peter, 25 Sep: "go thru each of the client's webpages to align
+         * them."
+         *
+         * The bar and the page beneath it were two columns, not one. The
+         * content is capped at --cl-max and centred; the bar was not capped at
+         * all, so on any screen wider than that the orange banner's edges and
+         * the cards' edges parted company, and nothing on the page lined up
+         * with anything above it. They agreed on a narrow screen, which is why
+         * it looked fixed sometimes.
+         *
+         * The bar keeps its full-width background — it is sticky, and a capped
+         * one would let the page scroll past it at the sides — while its
+         * contents sit in the same column as the page, by the same two
+         * measurements. Every client page inherits it from here; there is
+         * nothing to align page by page.
+         */
+        .cl-topbar { display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 100; background: var(--bg-primary);
+            padding: 12px var(--cl-edge) 2px; }
         .cl-banner { flex: 1; min-width: 0; display: flex; align-items: center; gap: 16px; background: linear-gradient(120deg, #fb923c 0%, #f97316 50%, #ea580c 100%); border-radius: 14px; padding: 12px 18px; box-shadow: 0 6px 20px rgba(249,115,22,0.25); }
         .cl-banner-text { flex-shrink: 0; }
         .cl-banner-text h1 { font-size: 17px; font-weight: 800; color: #fff; margin: 0; line-height: 1.2; }
@@ -884,8 +908,8 @@
         }
 
         .cl-content {
-            padding: 24px 26px 28px;
-            max-width: 1760px;
+            padding: 24px var(--cl-gutter) 28px;
+            max-width: var(--cl-max);
             margin: 0 auto;
         }
 
@@ -1198,7 +1222,9 @@
             .cl-sidebar.open { transform: translateX(0); }
             .cl-main { margin-left: 0; }
             .cl-mobile-toggle { display: flex; }
-            .cl-content { padding: 20px 16px; }
+            /* Narrow: one gutter for both, so they stay on the same line. */
+            .cl-main { --cl-gutter: 16px; }
+            .cl-content { padding-block: 20px; }
             .cl-grid-4, .cl-grid-3, .cl-grid-2 { grid-template-columns: 1fr; }
             .cl-navbar { padding: 0 16px; gap: 8px; }
             .cl-navbar-center { display: none; }
