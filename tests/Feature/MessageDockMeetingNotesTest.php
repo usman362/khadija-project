@@ -93,6 +93,35 @@ class MessageDockMeetingNotesTest extends TestCase
         );
     }
 
+    /**
+     * Sir Peter, 27 September, marking up the chat window: remove the two
+     * "more options" menus.
+     *
+     * Every item in them was already on the window. Mute and View Profile sit
+     * along the bottom, Open in Messages is both an icon in the header and a
+     * link at the bottom, and Close is the cross beside it. Two ways to do
+     * the same four things, one of them hidden behind a click.
+     */
+    public function test_the_chat_window_has_no_more_options_menu(): void
+    {
+        $dock = $this->dock();
+
+        foreach (['data-lmd-dots', 'data-lmd-menu', 'lmd-cf-more', 'lmd-menu'] as $gone) {
+            $this->assertStringNotContainsString($gone, $dock, "The \"{$gone}\" menu is back.");
+        }
+
+        // And the things it held are still on the window: Mute and View
+        // Profile along the bottom, Open in Messages and Close in the header.
+        foreach ([
+            '<button type="button" data-lmd-mute>',
+            '<a data-lmd-profile ',
+            'aria-label="Open in Messages"',
+            'data-lmd-close aria-label="Close"',
+        ] as $kept) {
+            $this->assertStringContainsString($kept, $dock, "\"{$kept}\" went with the menu.");
+        }
+    }
+
     /** "Do not create a new standalone messaging webpage as the solution." */
     public function test_the_popup_is_still_the_popup(): void
     {

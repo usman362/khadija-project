@@ -168,12 +168,6 @@
         color: var(--text-muted, #6b7280); display: inline-flex; align-items: center; justify-content: center; flex: none; position: relative; }
     .lmd-ic:hover { background: var(--bg-card-hover, #f1f5f9); color: var(--text-primary, #111827); }
     .lmd-ic svg { width: 17px; height: 17px; }
-    .lmd-menu { position: absolute; top: 34px; right: 0; z-index: 2; width: 190px; background: var(--bg-card, #fff);
-        border: 1px solid var(--border-color, #e5e7eb); border-radius: 12px; box-shadow: 0 16px 40px -18px rgba(15,27,53,.5); padding: 5px; }
-    .lmd-menu[hidden] { display: none; }
-    .lmd-menu a, .lmd-menu button { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 8px 10px;
-        border-radius: 8px; font: inherit; font-size: 13px; color: var(--text-primary, #111827); text-decoration: none; cursor: pointer; }
-    .lmd-menu a:hover, .lmd-menu button:hover { background: var(--bg-card-hover, #f1f5f9); }
 
     .lmd-body { flex: 1; min-height: 0; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; overscroll-behavior: contain; }
     .lmd-msg { max-width: 82%; padding: 9px 12px; border-radius: 14px; font-size: 13px; line-height: 1.5; word-break: break-word;
@@ -207,8 +201,6 @@
     .lmd-ch-t .on { display: flex; align-items: center; gap: 5px; margin-top: 2px; font-size: 11.5px; }
     .lmd-ch-t .on::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #16a34a; }
     .lmd-ch .lmd-ic { margin-top: 6px; }
-    .lmd-ic-box { border: 1.5px solid var(--lmd-accent); color: var(--lmd-accent); }
-    .lmd-ic-box:hover { background: var(--lmd-tint); color: var(--lmd-accent); }
     .lmd-body { background: var(--bg-card, #fff); gap: 10px; padding: 14px; }
     .lmd-msg { max-width: 80%; padding: 10px 13px; border-radius: 14px; background: var(--bg-card-hover, #f1f5f9); }
     .lmd-msg small { justify-content: flex-start; }
@@ -284,7 +276,6 @@
     .lmd-cf [data-lmd-profile] { color: var(--text-primary, #111827); }
     .lmd-cf [data-lmd-profile] svg { color: var(--lmd-accent); }
     .lmd-cf a.is-link { color: var(--lmd-accent); }
-    .lmd-cf .lmd-cf-more { margin-left: auto; color: var(--text-secondary, #374151); letter-spacing: 1px; font-size: 13px; }
 
     /* The bar's right side, as drawn: speaker, switch, two lines, then settings. */
     .lmd-set { font-weight: 500; font-size: 12px; color: var(--text-secondary, #4b5563); padding-left: 14px;
@@ -313,7 +304,7 @@
     }
 
     /* display beats the hidden attribute, so these say so. */
-    .lmd-count[hidden], .lmd-btn[hidden], .lmd-menu a[hidden], .lmd-cf a[hidden] { display: none !important; }
+    .lmd-count[hidden], .lmd-btn[hidden], .lmd-cf a[hidden] { display: none !important; }
 </style>
 @endpush
 
@@ -551,7 +542,6 @@
     var cBody = chat.querySelector('[data-lmd-body]');
     var cForm = chat.querySelector('[data-lmd-form]');
     var cInput = chat.querySelector('[data-lmd-input]');
-    var cMenu = chat.querySelector('[data-lmd-menu]');
     var cTyping = chat.querySelector('[data-lmd-typing]');
     var cTypingName = chat.querySelector('[data-lmd-typing-name]');
     var cChips = chat.querySelector('[data-lmd-chips]');
@@ -649,7 +639,6 @@
         state.expanded = id;
         save();
         chat.hidden = false;
-        cMenu.hidden = true;
         renderTabs();
         loadThread(id);
         setTimeout(function () { cInput.focus(); }, 50);
@@ -831,9 +820,7 @@
         if (rm) { pendingFiles.splice(Number(rm.dataset.lmdChipRm), 1); paintChips(); return; }
 
         if (e.target.closest('[data-lmd-min]')) { minimize(); return; }
-        if (e.target.closest('[data-lmd-close]')) { cMenu.hidden = true; closeCard(); return; }
-        if (e.target.closest('[data-lmd-dots]')) { cMenu.hidden = ! cMenu.hidden; return; }
-        if (! e.target.closest('[data-lmd-menu]')) cMenu.hidden = true;
+        if (e.target.closest('[data-lmd-close]')) { closeCard(); return; }
 
         if (e.target.closest('[data-lmd-mute]')) {
             var id2 = state.expanded;
@@ -842,7 +829,6 @@
                 paintHead(convs[id2]);
                 load();
             }).catch(function () {});
-            cMenu.hidden = true;
             return;
         }
 
@@ -981,17 +967,11 @@
         <button type="button" class="lmd-ic" data-lmd-close aria-label="Close" title="Close">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-        <span style="position:relative;">
-            <button type="button" class="lmd-ic lmd-ic-box" data-lmd-dots aria-label="More options" title="More options">
-                <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
-            </button>
-            <div class="lmd-menu" data-lmd-menu hidden>
-                <button type="button" data-lmd-mute>Mute</button>
-                <a data-lmd-profile href="{{ $__lmdFull }}" target="_blank" rel="noopener" hidden>View Profile</a>
-                <a data-lmd-page href="{{ $__lmdFull }}">Open in Messages</a>
-                <button type="button" data-lmd-close>Close</button>
-            </div>
-        </span>
+        {{-- Sir Peter, 27 Sep: a "more options" menu stood here, and every
+             item in it was already on the window. Mute and View Profile are
+             along the bottom, Open in Messages is both the icon to the left
+             and a link at the bottom, and Close is the ✕ beside it. Two ways
+             to do the same four things, one of them hidden behind a click. --}}
     </div>
 
     <div class="lmd-body" data-lmd-body></div>
@@ -1020,7 +1000,6 @@
         <button type="button" data-lmd-mute><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13.7 21a2 2 0 0 1-3.4 0"/><path d="M18.6 13A17.9 17.9 0 0 1 18 8"/><path d="M6.3 6.3A5.8 5.8 0 0 0 6 8c0 7-3 9-3 9h14"/><path d="M18 8a6 6 0 0 0-9.3-5"/><line x1="2" y1="2" x2="22" y2="22"/></svg><span>Mute</span></button>
         <a data-lmd-profile href="{{ $__lmdFull }}" target="_blank" rel="noopener" hidden><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0z"/></svg>View Profile</a>
         <a class="is-link" data-lmd-page href="{{ $__lmdFull }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>Open in Messages</a>
-        <button type="button" class="lmd-cf-more" data-lmd-dots aria-label="More options">•••</button>
     </div>
 </div>
 
