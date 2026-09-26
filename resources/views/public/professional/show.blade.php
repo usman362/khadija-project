@@ -725,7 +725,21 @@
     // the Verified Credentials card below still lists them one by one.
     $isVerified = \App\Support\VerifiedBadge::shown() && $pro->isVerified();
     $isNew      = $pro->isNewVendor();
-    $primaryHref = auth()->check() ? route('client.chat.index', ['to' => $pro->id]) : route('login');
+    /*
+     * Sir Peter, 27 Sep: "why does both the Request a Quote and Message go the
+     * same weblink".
+     *
+     * They did: one address served both buttons, so the one that says it will
+     * get you a quote opened a chat window instead, and a client who wanted a
+     * price had to type the whole request out by hand in a message.
+     *
+     * Two buttons, two destinations. Request a Quote opens the Direct Request
+     * with this professional already chosen — the form takes ?pro and settles
+     * on them, which is the "arriving from a profile" path it was written for.
+     * Message is the one that opens the conversation.
+     */
+    $quoteHref   = auth()->check() ? route('client.direct-offers.create', ['pro' => $pro->id]) : route('login');
+    $messageHref = auth()->check() ? route('client.chat.index', ['to' => $pro->id]) : route('login');
 
     /*
      * Checklist row 209 — the page showed the avatar initials and nothing
@@ -854,11 +868,11 @@
                 @endif
             </div>
             <div class="pp-hero-cta">
-                <a href="{{ $primaryHref }}" class="pp-btn pp-btn-primary">
+                <a href="{{ $quoteHref }}" class="pp-btn pp-btn-primary">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
                     Request a Quote
                 </a>
-                <a href="{{ $primaryHref }}" class="pp-btn pp-btn-secondary">
+                <a href="{{ $messageHref }}" class="pp-btn pp-btn-secondary">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     Message
                 </a>
@@ -1414,11 +1428,11 @@
 
 {{-- ── Mobile sticky CTA bar ───────────────────────────────── --}}
 <div class="pp-sticky-cta" aria-label="Quick actions">
-    <a href="{{ $primaryHref }}" class="pp-btn pp-btn-primary">
+    <a href="{{ $quoteHref }}" class="pp-btn pp-btn-primary">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         Request a Quote
     </a>
-    <a href="{{ $primaryHref }}" class="pp-btn secondary-sm" aria-label="Message {{ $pro->name }}">
+    <a href="{{ $messageHref }}" class="pp-btn secondary-sm" aria-label="Message {{ $pro->name }}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     </a>
 </div>
