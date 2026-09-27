@@ -111,14 +111,23 @@ class ClientBlockersAnswersTest extends TestCase
         $this->assertStringNotContainsString('linear-gradient(160deg, #2F6FED', $html);
     }
 
-    public function test_a_profile_links_to_bbb(): void
+    /**
+     * The BBB link was this answer once; Sir Peter withdrew it on 27 Sep:
+     * "let's remove the external text link... keep all provider validation
+     * native... it was a waste of an idea."
+     *
+     * It sent a client off the platform to check a professional the platform
+     * is meant to vouch for, and a search on a business name proves nothing
+     * by itself.
+     */
+    public function test_a_profile_does_not_send_the_client_off_to_bbb(): void
     {
         $pro = $this->user('professional');
         $pro->profile->update(['company_name' => 'Rossi Studio']);
 
         $this->actingAs($this->user('client'))->get(route('public.professional.show', $pro))
             ->assertOk()
-            ->assertSee('https://www.bbb.org/search?find_country=USA&amp;find_text=Rossi+Studio', false)
-            ->assertSee('Research this business on BBB.org');
+            ->assertDontSee('bbb.org', false)
+            ->assertDontSee('Research this business');
     }
 }

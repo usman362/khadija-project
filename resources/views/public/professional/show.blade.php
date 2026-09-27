@@ -856,16 +856,15 @@
                         <span class="pp-tag new-vendor">New Professional</span>
                     @endif
                 </div>
-                {{-- An independent research link, not an endorsement: BBB's public
-                     search, no account or data feed (PM answers, Sep 6 §8). --}}
-                @php $__bbbName = trim((string) ($pro->profile?->company_name ?: $pro->name)); @endphp
-                @if($__bbbName !== '')
-                    <a class="pp-bbb" href="https://www.bbb.org/search?find_country=USA&amp;find_text={{ urlencode($__bbbName) }}"
-                       target="_blank" rel="noopener nofollow"
-                       style="display:inline-block;margin-top:8px;font-size:12.5px;color:var(--muted,#6b7280);text-decoration:underline;">
-                        Research this business on BBB.org
-                    </a>
-                @endif
+                {{-- Sir Peter, 27 Sep: "let's remove the external text link
+                     (Research this business on BBB.org). Instead, keep all
+                     provider validation native... it was a waste of an idea."
+
+                     It sent a client off the platform to check a professional
+                     the platform is supposed to be able to vouch for, and a
+                     search on a name proves nothing by itself. What stands in
+                     for it is native: Top Rated, the rating, and whatever the
+                     verification feature turns out to be (D-35). --}}
             </div>
             <div class="pp-hero-cta">
                 <a href="{{ $quoteHref }}" class="pp-btn pp-btn-primary">
