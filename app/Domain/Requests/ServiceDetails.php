@@ -78,8 +78,9 @@ class ServiceDetails
                 'specialty_ids' => isset($details[(int) $id]) ? json_encode($details[(int) $id]) : null,
                 // When each service runs (App\Domain\Requests\ServiceTimeline).
                 // Null means it follows the event's own hours.
-                'starts_at' => $times[(int) $id]['starts_at'] ?? null,
-                'ends_at'   => $times[(int) $id]['ends_at'] ?? null,
+                'starts_at'   => $times[(int) $id]['starts_at'] ?? null,
+                'ends_at'     => $times[(int) $id]['ends_at'] ?? null,
+                'timing_note' => $times[(int) $id]['timing_note'] ?? null,
             ]])
             ->all();
     }

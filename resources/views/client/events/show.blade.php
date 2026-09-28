@@ -651,12 +651,15 @@
                          the same booking were handed the same hours whatever
                          the client wanted (Sir Peter, 27 Sep). --}}
                     @foreach(\App\Domain\Requests\ServiceTimeline::of($event) as $__row)
-                        @if($__row['starts_at'])
+                        @if($__row['starts_at'] || $__row['note'])
                             <div class="ev-req-row">
                                 <span>{{ $__row['name'] }}</span>
-                                <b>{{ $__row['starts_at']->format('g:i A') }}@if($__row['ends_at']) to {{ $__row['ends_at']->format('g:i A') }}@endif
-                                    @if($__d = \App\Domain\Requests\ServiceTimeline::duration($__row['minutes'])) · {{ $__d }}@endif
-                                    @unless($__row['own']) · with the event @endunless
+                                <b>
+                                    @if($__row['starts_at']){{ $__row['starts_at']->format('g:i A') }}@if($__row['ends_at']) to {{ $__row['ends_at']->format('g:i A') }}@endif
+                                        @if($__d = \App\Domain\Requests\ServiceTimeline::duration($__row['minutes'])) · {{ $__d }}@endif
+                                        @unless($__row['own']) · with the event @endunless
+                                    @endif
+                                    @if($__row['note'])<span style="display:block;font-weight:600;color:var(--text-muted);">{{ $__row['note'] }}</span>@endif
                                 </b>
                             </div>
                         @endif

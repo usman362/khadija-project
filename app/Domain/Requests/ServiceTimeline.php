@@ -35,7 +35,7 @@ class ServiceTimeline
     /**
      * The times as they were posted: [service id => ['start' => H:i, 'end' => H:i]].
      *
-     * @return array<int, array{starts_at: ?string, ends_at: ?string}>
+     * @return array<int, array{starts_at: ?Carbon, ends_at: ?Carbon, timing_note: ?string}>
      */
     public static function fromInput(array $times, array $serviceIds, ?CarbonInterface $eventDay): array
     {
@@ -47,9 +47,15 @@ class ServiceTimeline
             $start = trim((string) ($times[$id]['start'] ?? ''));
             $end   = trim((string) ($times[$id]['end'] ?? ''));
 
+            $note = trim((string) ($times[$id]['note'] ?? ''));
+
             $out[$id] = [
-                'starts_at' => $day && $start !== '' ? $day->copy()->setTimeFromTimeString($start) : null,
-                'ends_at'   => $day && $end !== '' ? $day->copy()->setTimeFromTimeString($end) : null,
+                'starts_at'   => $day && $start !== '' ? $day->copy()->setTimeFromTimeString($start) : null,
+                'ends_at'     => $day && $end !== '' ? $day->copy()->setTimeFromTimeString($end) : null,
+                // Where a rough time goes when the exact one is not settled,
+                // and where "setup can start from 3pm" goes now that the one
+                // box asking it for everything has gone.
+                'timing_note' => $note !== '' ? mb_substr($note, 0, 150) : null,
             ];
         }
 
@@ -60,7 +66,7 @@ class ServiceTimeline
      * Every service on a request, with the times it runs and where they came
      * from, in the order the services are attached.
      *
-     * @return array<int, array{id: int, name: string, starts_at: ?Carbon, ends_at: ?Carbon, own: bool, minutes: ?int}>
+     * @return array<int, array{id: int, name: string, note: ?string, starts_at: ?Carbon, ends_at: ?Carbon, own: bool, minutes: ?int}>
      */
     public static function of(Event $event): array
     {
@@ -75,6 +81,7 @@ class ServiceTimeline
             return [
                 'id'        => $c->id,
                 'name'      => $c->name,
+                'note'      => $c->pivot->timing_note ?: null,
                 'starts_at' => $start,
                 'ends_at'   => $end,
                 // Whether the client set this one, or it follows the event.

@@ -182,7 +182,10 @@ class RequestAvailabilityStepTest extends TestCase
             'event_date'       => now()->addDays(30)->toDateString(),
             'event_start_time' => '18:00',
             'event_end_time'   => '23:00',
-            'service_times'    => [$first => ['start' => '19:00', 'end' => '21:00']],
+            'service_times'    => [$first => [
+                'start' => '19:00', 'end' => '21:00',
+                'note'  => 'Setup can start from 3pm.',
+            ]],
         ])->assertSessionHasNoErrors();
 
         $this->actingAs($this->client)->post(route('client.bsr.save', 'review'), ['confirm' => 1])
@@ -197,6 +200,7 @@ class RequestAvailabilityStepTest extends TestCase
         $this->assertSame('19:00', $mine['starts_at']->format('H:i'));
         $this->assertSame('21:00', $mine['ends_at']->format('H:i'));
         $this->assertSame('2 hrs', \App\Domain\Requests\ServiceTimeline::duration($mine['minutes']));
+        $this->assertSame('Setup can start from 3pm.', $mine['note']);
     }
 
     /** A service left blank runs for the whole event, and says so. */
@@ -231,6 +235,12 @@ class RequestAvailabilityStepTest extends TestCase
 
         $this->assertStringNotContainsString('Anything they should know about timing?', $html);
         $this->assertStringNotContainsString('name="availability_note"', $html);
-        $this->assertStringContainsString('When does each service run?', $html);
+
+        // Replaced, not merely removed: his reason for taking it off was that
+        // it "is asked after each service", so each service has a note of its
+        // own and a rough time can go in it.
+        $this->assertStringContainsString('Service schedule / Timeline (per service)', $html);
+        $this->assertStringContainsString('[note]', $html);
+        $this->assertStringContainsString('rough time', $html);
     }
 }

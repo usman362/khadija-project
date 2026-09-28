@@ -1200,6 +1200,7 @@ class ClientBsrController extends Controller
                 'service_times'          => ['nullable', 'array'],
                 'service_times.*.start'  => ['nullable', 'date_format:H:i'],
                 'service_times.*.end'    => ['nullable', 'date_format:H:i'],
+                'service_times.*.note'   => ['nullable', 'string', 'max:150'],
                 // "Anything they should know about timing?" came off this step
                 // on his instruction: it is asked per service now, so asking it
                 // once more for the whole request asked the same thing twice.

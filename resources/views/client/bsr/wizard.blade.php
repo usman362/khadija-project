@@ -168,8 +168,13 @@
 
     /* When each service runs. */
     .bw-times { display: flex; flex-direction: column; gap: 10px; }
-    .bw-time-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px; align-items: center;
+    .bw-time-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .bw-time-tip { margin: 0; font-size: 11.5px; font-weight: 600; color: var(--accent-text, #1d4ed8);
+        background: rgba(29,78,216,.08); border-radius: 9px; padding: 7px 11px; max-width: 320px; line-height: 1.4; }
+    .bw-time-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px 14px; align-items: center;
         border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; }
+    .bw-time-note { grid-column: 1 / -1; margin-bottom: 0; }
+    .bw-time-note label { font-size: 11px; }
     .bw-time-name { font-size: 13.5px; font-weight: 700; color: var(--text-primary); min-width: 0; }
     .bw-time-fields { display: flex; align-items: flex-end; gap: 10px; }
     .bw-time-fields .bw-field label { font-size: 11px; }
@@ -1309,9 +1314,12 @@
                 $__evEnd = old('event_end_time', $data['event_end_time'] ?? '');
             @endphp
             <div class="bw-sec">
-                <div class="bw-sec-h">
-                    <b>When does each service run?</b>
-                    <span>Optional. Leave a service blank and it runs for the whole event. Professionals see these hours on your request.</span>
+                <div class="bw-sec-h bw-time-head">
+                    <div>
+                        <b>Service schedule / Timeline (per service)</b>
+                        <span>Set the start and end time for each service. Professionals see this timeline when they bid.</span>
+                    </div>
+                    <p class="bw-time-tip">If the exact times are not set yet, give a rough time or write a note.</p>
                 </div>
 
                 <div class="bw-times">
@@ -1335,6 +1343,20 @@
                                 </div>
                                 <span class="bw-time-for" data-bw-span>Follows the event</span>
                             </div>
+                            {{-- The single "Anything they should know about
+                                 timing?" box came off this step because, in Sir
+                                 Peter's words, it "is asked after each service".
+                                 This is where it is asked, and where a rough
+                                 time goes when the exact one is not settled. --}}
+                            <div class="bw-field bw-time-note">
+                                <label for="nt_{{ $__svc->id }}">Timing note <span class="bw-optional">Optional</span></label>
+                                <input type="text" id="nt_{{ $__svc->id }}"
+                                       name="service_times[{{ $__svc->id }}][note]" maxlength="150"
+                                       data-counter="ntCount{{ $__svc->id }}"
+                                       value="{{ $__times[$__svc->id]['note'] ?? '' }}"
+                                       placeholder="e.g. setup can start from 3pm">
+                                <div class="bw-hint" style="text-align:right;"><span id="ntCount{{ $__svc->id }}">0</span> / 150</div>
+                            </div>
                         </div>
                     @endforeach
                 </div>
@@ -1354,6 +1376,20 @@
 @push('scripts')
 <script>
 (function () {
+    /*
+     * The "0 / 150" beside a note.
+     *
+     * data-counter was on the old timing box too and nothing ever read it, so
+     * the count sat at zero however much was typed. It counts now.
+     */
+    document.querySelectorAll('[data-counter]').forEach(function (field) {
+        var out = document.getElementById(field.dataset.counter);
+        if (!out) return;
+        var show = function () { out.textContent = String(field.value.length); };
+        field.addEventListener('input', show);
+        show();
+    });
+
     /*
      * Each service's hours: the duration beside it, and a plain line naming
      * any two that cross. The overlap is named, never refused — two services
@@ -1464,9 +1500,12 @@
                 foreach ($__times as $__id => $__t) {
                     $__from = trim((string) ($__t['start'] ?? ''));
                     $__to   = trim((string) ($__t['end'] ?? ''));
+                    $__note = trim((string) ($__t['note'] ?? ''));
                     $__name = $__chosenNames[(int) $__id] ?? null;
-                    if (! $__name || ($__from === '' && $__to === '')) { continue; }
-                    $__hourBits[] = $__name . ' ' . trim(($__from !== '' ? $__from : '') . ($__to !== '' ? ' to ' . $__to : ''));
+                    if (! $__name || ($__from === '' && $__to === '' && $__note === '')) { continue; }
+                    $__hourBits[] = trim($__name . ' '
+                        . trim(($__from !== '' ? $__from : '') . ($__to !== '' ? ' to ' . $__to : ''))
+                        . ($__note !== '' ? ' (' . $__note . ')' : ''));
                 }
                 $__serviceHours = $__hourBits ? implode(' · ', $__hourBits) : 'All services run with the event';
             $__issues = $reviewIssues ?? [];
