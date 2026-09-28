@@ -161,6 +161,11 @@
         padding: 2px 6px; line-height: 1.3; }
     .bw-svc-pros.is-none { color: #b45309; background: rgba(245,158,11,.16); }
     .bw-loclabel { display: block; font-size: 12px; font-weight: 700; color: var(--text-primary); margin: 12px 0 5px; }
+    .bw-loclabel .req { color: var(--bad-text); }
+    .bw-locpair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 700px) { .bw-locpair { grid-template-columns: 1fr; } }
+    .bw-lochint { margin: 8px 0 0; font-size: 11.5px; color: var(--text-muted); line-height: 1.45; }
+    .bw-card input[readonly] { background: var(--bg-card-hover, #f1f5f9); color: var(--text-muted); cursor: default; }
     .bw-locmine { border: 0; background: none; padding: 0; font: inherit; font-weight: 700; color: var(--brand, #f97316); cursor: pointer; text-decoration: underline; }
     /* The per-service budget breakdown. */
     .bw-split { border: 1.5px solid var(--border-color); border-radius: 12px; padding: 14px 16px; margin-top: 16px; background: var(--bg-card); }
@@ -510,6 +515,9 @@
             $__towns = array_values(array_filter((array) old('preferred_locations', $data['preferred_locations'] ?? [])));
             if (! $__towns) { $__towns = ['']; }
             $__stateCode = $__prof?->state;
+            // The state the request is served in. It is the client's own,
+            // by the State Boundary Rule, so it is shown rather than asked.
+            $__stateName = config('geo.us_states')[$__stateCode] ?? $__stateCode;
             $__stateName = config('geo.allowed_states')[$__stateCode] ?? $__stateCode;
             $__picked = array_map('intval', (array) ($data['services'] ?? []));
             $__venueIds = $venueServices->pluck('id')->map(fn ($i) => (int) $i)->all();
@@ -574,10 +582,40 @@
                         <span><b>Enter the address</b><small>Lets us judge how far professionals are from it</small></span>
                     </label>
                 </div>
+                {{-- Sir Peter, 27 Sep: "the city and state is vital to make sure
+                     that the system or website doesn't mix up the street address
+                     with other cities and state bc the street names might
+                     overlap."
+
+                     It was one free-text box. "682 kirkcaldy way" went through,
+                     and every step after it had to guess which town that was.
+                     They are three answers, and the two that decide where the
+                     event is are required. --}}
                 <div data-bw-locbox @if($__kind === 'mine') hidden @endif>
                     <label class="bw-loclabel" for="bw_location">Street address</label>
                     <input type="text" name="location" id="bw_location" value="{{ $__need === 'have' && $__kind !== 'mine' ? $__loc : '' }}"
-                           placeholder="e.g. 1234 Garden Way, Baltimore, MD 21201" data-bw-location>
+                           placeholder="e.g. 1234 Garden Way" data-bw-location>
+                    <div class="bw-locpair">
+                        <div>
+                            <label class="bw-loclabel" for="bw_city">City <span class="req">*</span></label>
+                            <input type="text" name="city" id="bw_city" value="{{ old('city', $data['city'] ?? '') }}"
+                                   placeholder="e.g. Baltimore">
+                            @error('city')<p class="bw-err">{{ $message }}</p>@enderror
+                        </div>
+                        <div>
+                            {{-- Shown, not asked. A state field stood here once and
+                                 was taken out on 2026-08-25 because choosing one
+                                 changed nothing: every request is matched by the
+                                 client's own state. Putting a free choice back
+                                 would be a control that does not do what it
+                                 looks like it does — and a client who picked
+                                 another state would post a request no
+                                 professional could answer. --}}
+                            <label class="bw-loclabel" for="bw_state">State</label>
+                            <input type="text" id="bw_state" value="{{ $__stateName ?: 'Not set on your account' }}" readonly>
+                        </div>
+                    </div>
+                    <p class="bw-lochint">The street on its own is not enough: the same street name exists in several towns, so the city is what tells us which one you mean. Requests are served in your own state.</p>
                 </div>
                 <label class="bw-loclabel" for="bw_venue">Venue name <span class="bw-optional">Optional</span></label>
                 <input type="text" name="venue" id="bw_venue" value="{{ $data['venue'] ?? '' }}" placeholder="e.g. Oregon Ridge Park">

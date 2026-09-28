@@ -366,6 +366,20 @@ class ClientBsrController extends Controller
                             . 'Add the street and number, or choose "I don\'t know the exact address yet".',
                     ]);
                 }
+
+                /*
+                 * A street with no town is the fault Sir Peter reported: the
+                 * same street name exists in several of them, so the request
+                 * cannot be placed and the guessing starts. Only when a street
+                 * was actually given — leaving the whole address for later is
+                 * still allowed, and asks for nothing.
+                 */
+                if ($typed !== '' && trim((string) ($validated['city'] ?? '')) === '') {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'city' => 'Add the city. The same street name exists in several towns, '
+                            . 'and the city is what tells us which one you mean.',
+                    ]);
+                }
             }
         }
 
@@ -905,10 +919,19 @@ class ClientBsrController extends Controller
             return $type;
         }
 
-        // The town: the second part of a street address, the first part of
-        // "City, ST", or the profile's city when nothing was given yet.
-        $parts = array_values(array_filter(array_map('trim', explode(',', (string) ($d['location'] ?? '')))));
-        $area  = ($d['location_kind'] ?? null) === 'exact' && count($parts) >= 2 ? $parts[1] : ($parts[0] ?? '');
+        /*
+         * The town. The client gives it now (Sir Peter, 27 Sep), so it is read
+         * rather than picked out of a comma-separated string: the parsing
+         * below is only for the answers that have no city of their own — an
+         * area, the address on their profile, and drafts saved before the
+         * field existed.
+         */
+        $area = trim((string) ($d['city'] ?? ''));
+
+        if ($area === '') {
+            $parts = array_values(array_filter(array_map('trim', explode(',', (string) ($d['location'] ?? '')))));
+            $area  = ($d['location_kind'] ?? null) === 'exact' && count($parts) >= 2 ? $parts[1] : ($parts[0] ?? '');
+        }
 
         if ($area === '' || preg_match('/\d/', $area)) {
             $area = trim((string) $request->user()?->profile?->city);
@@ -1058,10 +1081,22 @@ class ClientBsrController extends Controller
                 'preferred_locations.*' => ['nullable', 'string', 'max:80'],
                 'venue_types'           => ['nullable', 'array'],
                 'venue_types.*'         => ['integer', 'in:' . implode(',', \App\Domain\Requests\VenueRule::serviceIds() ?: [0])],
-                // The event-state field was removed from the form on
-                // 2026-08-25: the State Boundary Rule matches every request by
-                // the client's own home state, so choosing one changed nothing.
-                // Nothing is validated because nothing is submitted.
+                /*
+                 * Sir Peter, 27 Sep: the city is the client's to give. He typed
+                 * a street on its own and it went through, and street names
+                 * repeat from town to town, so everything downstream had to
+                 * guess which one he meant.
+                 *
+                 * Required only when they say they have a location and are
+                 * typing it: there is no city to give when they are still
+                 * looking for a venue, or using the address on their account.
+                 */
+                'city' => ['nullable', 'string', 'max:120', new \App\Rules\PlaceNotALink],
+                // The state is shown, not asked. It was a field once and came
+                // out on 2026-08-25, because the State Boundary Rule matches
+                // every request by the client's own state and choosing another
+                // changed nothing. Nothing is validated because nothing is
+                // submitted.
                 'venue'       => ['nullable', 'string', 'max:200'],
                 'guest_count' => ['nullable', 'integer', 'min:1', 'max:1000000'],
             ],
@@ -1255,6 +1290,7 @@ class ClientBsrController extends Controller
                 ? \Illuminate\Support\Carbon::parse($d['ends_at'])
                 : null,
             'location'          => $d['location'] ?? null,
+            'city'              => $d['city'] ?? null,
             'location_need'     => $d['location_need'] ?? null,
             'preferred_locations' => ! empty($d['preferred_locations']) ? array_values($d['preferred_locations']) : null,
             'state'             => \App\Support\StateMatching::requestState($user),

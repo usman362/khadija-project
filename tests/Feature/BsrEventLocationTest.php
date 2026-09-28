@@ -151,8 +151,13 @@ class BsrEventLocationTest extends TestCase
     {
         $this->startWizard();
 
-        $this->step(['location_kind' => 'exact', 'location' => '1234 Garden Way, Towson, MD 21204'])
-            ->assertSessionHasNoErrors();
+        // The town is its own answer now, so the name is read from it rather
+        // than picked out of the address (Sir Peter, 27 Sep).
+        $this->step([
+            'location_kind' => 'exact',
+            'location' => '1234 Garden Way',
+            'city' => 'Towson',
+        ])->assertSessionHasNoErrors();
 
         $this->assertStringContainsString('· Towson', $this->wizard()['title']);
     }
@@ -255,8 +260,11 @@ class BsrEventLocationTest extends TestCase
     /** Claiming an exact address and typing a city is the silent version of the old bug. */
     public function test_a_city_is_refused_when_they_said_they_knew_the_address(): void
     {
+        // The city is given separately; what is refused is a town typed into
+        // the street box when they said they knew the address.
         $this->step([
-            'title' => 'Harbour Gala', 'location_kind' => 'exact', 'location' => 'Baltimore, MD',
+            'title' => 'Harbour Gala', 'location_kind' => 'exact',
+            'location' => 'Baltimore, MD', 'city' => 'Baltimore',
         ])->assertSessionHasErrors('location');
     }
 
@@ -264,7 +272,7 @@ class BsrEventLocationTest extends TestCase
     {
         $this->step([
             'title' => 'Harbour Gala', 'location_kind' => 'exact',
-            'location' => '1234 Garden Way, Baltimore, MD 21201',
+            'location' => '1234 Garden Way', 'city' => 'Baltimore',
         ])->assertSessionHasNoErrors();
     }
 

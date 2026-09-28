@@ -35,6 +35,10 @@ class Event extends Model
         'description',
         'budget',
         'location',
+        // Sir Peter, 27 Sep: the city and the state are the client's to give,
+        // not the platform's to work out from a street name that half a dozen
+        // towns share.
+        'city',
         // "Do you already have a venue?" and, when not, where it should be.
         'location_need',
         'preferred_locations',
@@ -137,7 +141,7 @@ class Event extends Model
                 $event->published_at = now();
             }
 
-            $textDirty = $event->isDirty(['location', 'venue', 'state']);
+            $textDirty = $event->isDirty(['location', 'city', 'venue', 'state']);
             $pointDirty = $event->isDirty(['location_lat', 'location_lng', 'location_precision']);
 
             if ($textDirty && ! $pointDirty) {
@@ -195,9 +199,16 @@ class Event extends Model
      */
     public function applyLocationGeocode(): void
     {
+        /*
+         * The city goes in with the street now (Sir Peter, 27 Sep). A street
+         * on its own left the geocoder to work out which town it meant from a
+         * name that repeats across the state, which is what put requests on
+         * the wrong side of the map, or nowhere at all.
+         */
         $text = trim(implode(', ', array_filter([
             trim((string) $this->venue) ?: null,
             trim((string) $this->location) ?: null,
+            trim((string) $this->city) ?: null,
         ])));
 
         if ($text === '' && ! ZipCentroidTable::normalize((string) $this->location_zip)) {
