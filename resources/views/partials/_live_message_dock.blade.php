@@ -158,6 +158,8 @@
     .lmd-chat[hidden] { display: none; }
     .lmd-ch { display: flex; align-items: center; gap: 10px; padding: 12px 12px 10px; border-bottom: 1px solid var(--border-color, #e5e7eb); }
     .lmd-ch .lmd-av { width: 42px; height: 42px; }
+    .lmd-ch-who { display: flex; align-items: center; gap: 7px; margin: 2px 0 1px; }
+    .lmd-ch-role { font-size: 10.5px; font-weight: 800; letter-spacing: .2px; padding: 2px 7px; border-radius: 999px; }
     .lmd-ch-t { flex: 1; min-width: 0; }
     .lmd-ch-t a, .lmd-ch-t span.n { display: block; font-size: 15px; font-weight: 800; color: var(--text-primary, #111827);
         text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -214,8 +216,22 @@
     .lmd-msg-row { display: flex; align-items: flex-start; gap: 4px; max-width: 86%; align-self: flex-start; }
     .lmd-msg-row.is-mine { align-self: flex-end; flex-direction: row-reverse; }
     .lmd-msg-row .lmd-msg { max-width: none; align-self: auto; }
-    .lmd-mk { border: 0; background: none; color: var(--text-muted, #6b7280); cursor: pointer; font-size: 15px; line-height: 1; padding: 6px 3px; border-radius: 6px; }
+    /*
+     * Sir Peter, 28 Sep: "Drop the top three dots, keep message actions on
+     * hover." The dots belong to the message, because Message Priority does —
+     * so they stay on it and step out of the way until the message is
+     * pointed at, which is what he asked for when he said the thread should
+     * read clean.
+     *
+     * Kept visible for a keyboard, which has no hover, and for anyone who has
+     * asked for less motion.
+     */
+    .lmd-mk { border: 0; background: none; color: var(--text-muted, #6b7280); cursor: pointer; font-size: 15px;
+        line-height: 1; padding: 6px 3px; border-radius: 6px; opacity: 0; transition: opacity .12s; }
+    .lmd-msg-row:hover .lmd-mk, .lmd-mk:focus-visible, .lmd-mk[aria-expanded="true"] { opacity: 1; }
     .lmd-mk:hover { background: var(--bg-card-hover, #f1f5f9); }
+    @media (hover: none) { .lmd-mk { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .lmd-mk { transition: none; } }
     /* Above both right-hand windows: the chat (9990) and the Messages panel
        (10000). The menu belongs beside the message's three-dot icon, which is
        inside the chat window; it used to sit under it, which is why it had
@@ -579,17 +595,30 @@
         return '<div class="lmd-msg-row' + (mine ? ' is-mine' : '') + '" data-lmd-msg="' + m.id + '" data-priority="' + esc(m.priority || '') + '">'
             + '<div class="lmd-msg' + (mine ? ' is-mine' : '') + '">' + pri + esc(m.body) + atts
             + '<small>' + esc(time) + (mine ? ' ' + tick(m) : '') + '</small></div>'
-            + '<button type="button" class="lmd-mk" data-lmd-msg-menu aria-label="Message options">⋯</button>'
+            + '<button type="button" class="lmd-mk" data-lmd-msg-menu aria-expanded="false" aria-label="Message options">⋯</button>'
             + '</div>';
     }
 
     function paintHead(c) {
         var p = c.peer || {};
-        var sub = [p.subtitle, p.gr_id].filter(Boolean).join(' · ');
+        /*
+         * Sir Peter's Option 4, 28 Sep: who they are and what this
+         * conversation is about, without opening anything. The role in its own
+         * colour and the reference on one line; the service and the event on
+         * the next. Both were already known — the header simply did not say
+         * the event.
+         */
+        var role = p.role_label
+            ? '<span class="lmd-ch-role" style="background:' + esc(p.tint) + ';color:' + esc(p.strong) + ';">' + esc(p.role_label) + '</span>'
+            : '';
+        var who = [role, p.gr_id ? '<small class="role">' + esc(p.gr_id) + '</small>' : ''].filter(Boolean).join('');
+        var about = [p.subtitle, c.event && c.event.title].filter(Boolean).join(' · ');
         var name = p.profile ? '<a href="' + esc(p.profile) + '" target="_blank" rel="noopener">' + esc(p.name) + '</a>' : '<span class="n">' + esc(p.name) + '</span>';
         var av = '<img class="lmd-av" src="' + esc(p.avatar) + '" alt="">';
         cHead.innerHTML = (p.profile ? '<a href="' + esc(p.profile) + '" target="_blank" rel="noopener" aria-label="View profile">' + av + '</a>' : av)
-            + '<div class="lmd-ch-t">' + name + (sub ? '<small class="role">' + esc(sub) + '</small>' : '')
+            + '<div class="lmd-ch-t">' + name
+            + (who ? '<span class="lmd-ch-who">' + who + '</span>' : '')
+            + (about ? '<small class="role">' + esc(about) + '</small>' : '')
             + (p.online ? '<small class="on">Online now</small>' : '') + '</div>';
 
         chat.querySelectorAll('[data-lmd-page]').forEach(function (a) { a.href = at(urls.page, c.id); });
@@ -770,9 +799,12 @@
         var mk = e.target.closest('[data-lmd-msg-menu]');
         if (mk) {
             var row = mk.closest('[data-lmd-msg]');
+            chat.querySelectorAll('[data-lmd-msg-menu]').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+
             if (menuFor === row && ! cMsgMenu.hidden) { cMsgMenu.hidden = true; menuFor = null; return; }
             menuFor = row;
             cMsgMenu.hidden = false;
+            mk.setAttribute('aria-expanded', 'true');
             var b = mk.getBoundingClientRect();
             /*
              * "Positioned beside and vertically centered on that message's
