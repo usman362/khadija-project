@@ -646,6 +646,21 @@
                     <div class="ev-req-row"><span>Services requested</span><b>—</b></div>
                 @elseif($__split->isEmpty())
                     <div class="ev-req-row"><span>Services requested</span><b>{{ $event->categories->pluck('name')->implode(', ') }}</b></div>
+                    {{-- When each service runs. A request carried one start and
+                         one end for everything, so a DJ and a photographer on
+                         the same booking were handed the same hours whatever
+                         the client wanted (Sir Peter, 27 Sep). --}}
+                    @foreach(\App\Domain\Requests\ServiceTimeline::of($event) as $__row)
+                        @if($__row['starts_at'])
+                            <div class="ev-req-row">
+                                <span>{{ $__row['name'] }}</span>
+                                <b>{{ $__row['starts_at']->format('g:i A') }}@if($__row['ends_at']) to {{ $__row['ends_at']->format('g:i A') }}@endif
+                                    @if($__d = \App\Domain\Requests\ServiceTimeline::duration($__row['minutes'])) · {{ $__d }}@endif
+                                    @unless($__row['own']) · with the event @endunless
+                                </b>
+                            </div>
+                        @endif
+                    @endforeach
                 @else
                     <div class="ev-req-row" style="display:block;">
                         <span>Services requested</span>

@@ -298,7 +298,11 @@ class Event extends Model
      */
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class)->withPivot('specialty_ids')->withTimestamps();
+        // starts_at / ends_at: when this service runs, which can differ from
+        // the event's own hours (App\Domain\Requests\ServiceTimeline).
+        return $this->belongsToMany(Category::class)
+            ->withPivot('specialty_ids', 'starts_at', 'ends_at')
+            ->withTimestamps();
     }
 
     public function creator(): BelongsTo

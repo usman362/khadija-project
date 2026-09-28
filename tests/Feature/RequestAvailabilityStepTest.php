@@ -161,28 +161,76 @@ class RequestAvailabilityStepTest extends TestCase
         }
     }
 
-    /** The client's timing note reaches the professional who reads the request. */
-    public function test_the_timing_note_is_stored_and_shown_to_the_professional(): void
+    /**
+     * The hours each service runs reach the professional who reads the
+     * request, and the one timing note does not, because it is not asked any
+     * more.
+     *
+     * Sir Peter, 27 September: "with this newer set up, we can remove the
+     * 'Anything they should know about timing?' question bc its asked after
+     * each service."
+     */
+    public function test_each_service_carries_its_own_hours(): void
     {
-        $pro = $this->pro();
         $this->walkTo('availability');
 
-        // The step now carries the event date and start time as well — they
-        // are marked required on Sir Peter's mockup, and this is the screen
-        // where a client looking at who is free would change them.
+        $services = (array) (session('bsr_wizard')['services'] ?? []);
+        $this->assertNotEmpty($services, 'The walk should have chosen a service.');
+        $first = (int) $services[0];
+
         $this->actingAs($this->client)->post(route('client.bsr.save', 'availability'), [
-            'event_date'        => now()->addDays(30)->toDateString(),
-            'event_start_time'  => '18:00',
-            'availability_note' => 'Setup can start from 3pm.',
+            'event_date'       => now()->addDays(30)->toDateString(),
+            'event_start_time' => '18:00',
+            'event_end_time'   => '23:00',
+            'service_times'    => [$first => ['start' => '19:00', 'end' => '21:00']],
         ])->assertSessionHasNoErrors();
 
         $this->actingAs($this->client)->post(route('client.bsr.save', 'review'), ['confirm' => 1])
             ->assertSessionHasNoErrors();
 
         $event = Event::where('client_id', $this->client->id)->latest('id')->firstOrFail();
-        $this->assertSame('Setup can start from 3pm.', $event->schedule_note);
+        $rows = \App\Domain\Requests\ServiceTimeline::of($event->load('categories'));
 
-        $this->actingAs($pro)->get(route('professional.gigs.show', $event))
-            ->assertOk()->assertSee('Setup can start from 3pm.', false);
+        $mine = collect($rows)->firstWhere('id', $first);
+        $this->assertNotNull($mine);
+        $this->assertTrue($mine['own'], 'The service kept its own hours.');
+        $this->assertSame('19:00', $mine['starts_at']->format('H:i'));
+        $this->assertSame('21:00', $mine['ends_at']->format('H:i'));
+        $this->assertSame('2 hrs', \App\Domain\Requests\ServiceTimeline::duration($mine['minutes']));
+    }
+
+    /** A service left blank runs for the whole event, and says so. */
+    public function test_a_service_with_no_hours_follows_the_event(): void
+    {
+        $this->walkTo('availability');
+
+        $this->actingAs($this->client)->post(route('client.bsr.save', 'availability'), [
+            'event_date'       => now()->addDays(30)->toDateString(),
+            'event_start_time' => '18:00',
+            'event_end_time'   => '23:00',
+        ])->assertSessionHasNoErrors();
+
+        $this->actingAs($this->client)->post(route('client.bsr.save', 'review'), ['confirm' => 1])
+            ->assertSessionHasNoErrors();
+
+        $event = Event::where('client_id', $this->client->id)->latest('id')->firstOrFail();
+        $row = \App\Domain\Requests\ServiceTimeline::of($event->load('categories'))[0];
+
+        $this->assertFalse($row['own']);
+        $this->assertSame('18:00', $row['starts_at']->format('H:i'));
+        $this->assertSame('23:00', $row['ends_at']->format('H:i'));
+    }
+
+    /** And the question it replaced is off the step. */
+    public function test_the_one_timing_question_is_gone(): void
+    {
+        $this->walkTo('availability');
+
+        $html = $this->actingAs($this->client)
+            ->get(route('client.bsr.step', 'availability'))->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('Anything they should know about timing?', $html);
+        $this->assertStringNotContainsString('name="availability_note"', $html);
+        $this->assertStringContainsString('When does each service run?', $html);
     }
 }

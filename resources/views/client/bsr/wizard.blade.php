@@ -165,6 +165,22 @@
     .bw-locpair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     @media (max-width: 700px) { .bw-locpair { grid-template-columns: 1fr; } }
     .bw-lochint { margin: 8px 0 0; font-size: 11.5px; color: var(--text-muted); line-height: 1.45; }
+
+    /* When each service runs. */
+    .bw-times { display: flex; flex-direction: column; gap: 10px; }
+    .bw-time-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px; align-items: center;
+        border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; }
+    .bw-time-name { font-size: 13.5px; font-weight: 700; color: var(--text-primary); min-width: 0; }
+    .bw-time-fields { display: flex; align-items: flex-end; gap: 10px; }
+    .bw-time-fields .bw-field label { font-size: 11px; }
+    .bw-time-fields input[type=time] { width: 130px; }
+    .bw-time-for { font-size: 11.5px; font-weight: 700; color: var(--text-muted); white-space: nowrap; padding-bottom: 10px; }
+    .bw-time-overlap { margin: 12px 0 0; font-size: 12px; color: var(--text-secondary); line-height: 1.45; }
+    .bw-time-overlap[hidden] { display: none; }
+    @media (max-width: 760px) {
+        .bw-time-row { grid-template-columns: 1fr; }
+        .bw-time-fields { flex-wrap: wrap; }
+    }
     .bw-card input[readonly] { background: var(--bg-card-hover, #f1f5f9); color: var(--text-muted); cursor: default; }
     .bw-locmine { border: 0; background: none; padding: 0; font: inherit; font-weight: 700; color: var(--brand, #f97316); cursor: pointer; text-decoration: underline; }
     /* The per-service budget breakdown. */
@@ -1118,7 +1134,10 @@
 
                 <div class="bw-note" style="margin-top:12px;">
                     <b>One event, one date for all services</b>
-                    <p>Every service you hire must be for the same date and time. Professionals say which of your dates they can do when they send a proposal. If a proposal is for a different date from the one you have already accepted, you will be warned and cannot accept it.</p>
+                    {{-- "the same date and time" was true until each service
+                         got its own hours (Sir Peter, 27 Sep). The date is
+                         still one; the hours within it need not be. --}}
+                    <p>Every service you hire must be for the same date. The hours within that day can differ, and you set them below. Professionals say which of your dates they can do when they send a proposal. If a proposal is for a different date from the one you have already accepted, you will be warned and cannot accept it.</p>
                 </div>
             </div>
 @push('scripts')
@@ -1272,30 +1291,127 @@
             </div>
         @endif
 
-        {{-- ── Note to the professional ────────────────────── --}}
-        <div class="bw-sec">
-            <div class="bw-sec-h">
-                <b>Anything they should know about timing?</b>
-                <span>Optional. Professionals see this on your request.</span>
-            </div>
-            <div class="bw-field" style="margin-bottom:0;">
-                <label for="av_note" class="sr-only-label">Timing notes for the professional</label>
-                <textarea id="av_note" name="availability_note" rows="3" maxlength="500"
-                          data-counter="avCount"
-                          placeholder="e.g. setup can start from 3pm, or we can move the date by a week">{{ old('availability_note', $data['availability_note'] ?? '') }}</textarea>
-                <div class="bw-hint" style="text-align:right;"><span id="avCount">0</span> / 500</div>
-            </div>
+        {{-- ── When each service runs ──────────────────────── --}}
+        {{-- Sir Peter, 27 Sep: "the timeline added into this as a sub-step per
+             service, so that the bidders can see when each service is to
+             start/end or a rough idea... so that services dont over lap or
+             maybe they will need to."
 
-            <div class="bw-callout">
-                <b>Ask them to confirm the date</b>
-                <p>Professionals reply with a proposal. Availability above is a count, not a booking. Ask them to
-                   confirm the date and time when they respond.</p>
+             In this step, not a step of its own: he settled that himself, and
+             it is the step that already asks when the event runs. The single
+             "Anything they should know about timing?" box came out with it —
+             the same question, asked once for everything, when it is now asked
+             of each service. --}}
+        @if($chosenServices->isNotEmpty())
+            @php
+                $__times = old('service_times', $data['service_times'] ?? []);
+                $__evStart = old('event_start_time', $data['event_start_time'] ?? '');
+                $__evEnd = old('event_end_time', $data['event_end_time'] ?? '');
+            @endphp
+            <div class="bw-sec">
+                <div class="bw-sec-h">
+                    <b>When does each service run?</b>
+                    <span>Optional. Leave a service blank and it runs for the whole event. Professionals see these hours on your request.</span>
+                </div>
+
+                <div class="bw-times">
+                    @foreach($chosenServices as $__svc)
+                        <div class="bw-time-row" data-bw-time-row>
+                            <div class="bw-time-name">{{ $__svc->name }}</div>
+                            <div class="bw-time-fields">
+                                <div class="bw-field" style="margin-bottom:0;">
+                                    <label for="st_{{ $__svc->id }}">Starts</label>
+                                    <input type="time" id="st_{{ $__svc->id }}"
+                                           name="service_times[{{ $__svc->id }}][start]"
+                                           value="{{ $__times[$__svc->id]['start'] ?? '' }}"
+                                           data-bw-start data-event-start="{{ $__evStart }}">
+                                </div>
+                                <div class="bw-field" style="margin-bottom:0;">
+                                    <label for="en_{{ $__svc->id }}">Ends</label>
+                                    <input type="time" id="en_{{ $__svc->id }}"
+                                           name="service_times[{{ $__svc->id }}][end]"
+                                           value="{{ $__times[$__svc->id]['end'] ?? '' }}"
+                                           data-bw-end data-event-end="{{ $__evEnd }}">
+                                </div>
+                                <span class="bw-time-for" data-bw-span>Follows the event</span>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                {{-- Named, never refused. Two services at once is often the
+                     point: the photographer shoots while the DJ plays. --}}
+                <p class="bw-time-overlap" data-bw-overlap hidden></p>
+
+                <div class="bw-callout">
+                    <b>Ask them to confirm the date</b>
+                    <p>Professionals reply with a proposal. Availability above is a count, not a booking. Ask them to
+                       confirm the date and time when they respond.</p>
+                </div>
             </div>
-        </div>
+        @endif
 
 @push('scripts')
 <script>
 (function () {
+    /*
+     * Each service's hours: the duration beside it, and a plain line naming
+     * any two that cross. The overlap is named, never refused — two services
+     * at once is often the point, and Sir Peter's own note says so.
+     */
+    function minutes(v) {
+        if (!v) return null;
+        var p = v.split(':');
+        return (Number(p[0]) * 60) + Number(p[1]);
+    }
+
+    function span(row) {
+        var s = row.querySelector('[data-bw-start]'), e = row.querySelector('[data-bw-end]');
+        var a = minutes(s.value) ?? minutes(s.dataset.eventStart);
+        var b = minutes(e.value) ?? minutes(e.dataset.eventEnd);
+        return (a === null || b === null || b <= a) ? null : { a: a, b: b, own: !!(s.value || e.value) };
+    }
+
+    function label(m) {
+        var h = Math.floor(m / 60), r = m % 60;
+        return ((h ? h + ' hr' + (h > 1 ? 's' : '') : '') + (r ? ' ' + r + ' min' : '')).trim();
+    }
+
+    function paint() {
+        var rows = Array.prototype.slice.call(document.querySelectorAll('[data-bw-time-row]'));
+        var spans = [];
+
+        rows.forEach(function (row) {
+            var out = row.querySelector('[data-bw-span]');
+            var sp = span(row);
+            if (!sp) { out.textContent = 'Follows the event'; spans.push(null); return; }
+            out.textContent = label(sp.b - sp.a) + (sp.own ? '' : ' (follows the event)');
+            spans.push(sp);
+        });
+
+        var names = rows.map(function (r) { return r.querySelector('.bw-time-name').textContent.trim(); });
+        var pairs = [];
+        for (var i = 0; i < spans.length; i++) {
+            for (var j = i + 1; j < spans.length; j++) {
+                if (spans[i] && spans[j] && spans[i].a < spans[j].b && spans[j].a < spans[i].b) {
+                    pairs.push(names[i] + ' and ' + names[j]);
+                }
+            }
+        }
+
+        var note = document.querySelector('[data-bw-overlap]');
+        if (!note) return;
+        note.hidden = pairs.length === 0;
+        note.textContent = pairs.length
+            ? 'Running at the same time: ' + pairs.join(', ') + '. That is fine if you meant it.'
+            : '';
+    }
+
+    document.querySelectorAll('[data-bw-time-row] input').forEach(function (i) {
+        i.addEventListener('input', paint);
+    });
+    if (document.querySelector('[data-bw-time-row]')) paint();
+
     // Clicking a nearby day sets the date field rather than making the client
     // read the number here and retype the date somewhere else.
     var date = document.getElementById('av_date');
@@ -1338,6 +1454,21 @@
         <p class="lede">Take a final look. Each section links back to its step, and anything that still needs fixing is marked. You can edit the request after publishing, right up until you choose someone.</p>
 
         @php
+                /*
+                 * When each service runs, named in words. Blank means it
+                 * follows the event, which is what the step says too.
+                 */
+                $__times = (array) ($data['service_times'] ?? []);
+                $__chosenNames = $chosenServices->pluck('name', 'id');
+                $__hourBits = [];
+                foreach ($__times as $__id => $__t) {
+                    $__from = trim((string) ($__t['start'] ?? ''));
+                    $__to   = trim((string) ($__t['end'] ?? ''));
+                    $__name = $__chosenNames[(int) $__id] ?? null;
+                    if (! $__name || ($__from === '' && $__to === '')) { continue; }
+                    $__hourBits[] = $__name . ' ' . trim(($__from !== '' ? $__from : '') . ($__to !== '' ? ' to ' . $__to : ''));
+                }
+                $__serviceHours = $__hourBits ? implode(' · ', $__hourBits) : 'All services run with the event';
             $__issues = $reviewIssues ?? [];
             $__edit = fn ($s) => route('client.bsr.step', ['step' => $s, 'return' => 'review']);
             $__backs = \App\Domain\Requests\EventDates::normalize((array) ($data['backup_dates'] ?? []));
@@ -1358,6 +1489,9 @@
                 ['Services (' . count((array) ($data['services'] ?? [])) . ')', ($isMulti ? 'MSR · ' : 'SSR · ') . ($svcNames->implode(', ') ?: '—') . (filled($data['service_missing'] ?? null) ? ' · Also asked for: ' . $data['service_missing'] : ''), 'service', 'service'],
                 ['Event location', $__loc, 'event', 'event'],
                 ['Event date & time', $__date, 'availability', 'availability'],
+                // The hours each service runs, so the client sees on the last
+                // step what the bidders will see (Sir Peter, 27 Sep).
+                ['Service hours', $__serviceHours, 'availability', 'availability'],
                 ['Guest count', ! empty($data['guest_count']) ? number_format($data['guest_count']) : 'Not stated', 'event', 'event'],
                 ['Event requirements', \Illuminate\Support\Str::limit((string) ($data['description'] ?? ''), 140) ?: 'Not written yet', 'requirements', 'requirements'],
                 // A range needs both ends. With only one, the Review said

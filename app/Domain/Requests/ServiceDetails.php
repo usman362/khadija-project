@@ -69,13 +69,17 @@ class ServiceDetails
      * @param  array<int>  $serviceIds
      * @return array<int, array{specialty_ids: string|null}>
      */
-    public static function sync(array $serviceIds, array $details): array
+    public static function sync(array $serviceIds, array $details, array $times = []): array
     {
         $details = self::prune($details, $serviceIds);
 
         return collect($serviceIds)
             ->mapWithKeys(fn ($id) => [(int) $id => [
                 'specialty_ids' => isset($details[(int) $id]) ? json_encode($details[(int) $id]) : null,
+                // When each service runs (App\Domain\Requests\ServiceTimeline).
+                // Null means it follows the event's own hours.
+                'starts_at' => $times[(int) $id]['starts_at'] ?? null,
+                'ends_at'   => $times[(int) $id]['ends_at'] ?? null,
             ]])
             ->all();
     }

@@ -44,6 +44,24 @@ class ClientBsrController extends Controller
     /** One definition, on the model that owns the column. */
     public const ORG_TYPES = \App\Models\Event::ORGANIZATION_TYPES;
 
+    /**
+     * The services this request has so far, in the order they were picked.
+     *
+     * @return \Illuminate\Support\Collection<int, \App\Models\Category>
+     */
+    private function chosenServices(array $data): \Illuminate\Support\Collection
+    {
+        $ids = array_values(array_filter(array_map('intval', (array) ($data['services'] ?? []))));
+
+        if (! $ids) {
+            return collect();
+        }
+
+        $byId = Category::whereIn('id', $ids)->get(['id', 'name'])->keyBy('id');
+
+        return collect($ids)->map(fn ($id) => $byId->get($id))->filter()->values();
+    }
+
     private const KEY = 'bsr_wizard';
 
     public function show(Request $request, string $step = 'service'): View|RedirectResponse
@@ -96,6 +114,13 @@ class ClientBsrController extends Controller
             // alphabetical, which made that line untrue.
             'categories'    => $this->serviceCatalogue($data, $request),
             'focusNames'    => $this->focusNames($data),
+            /*
+             * The services already chosen, in the order they were chosen, so
+             * the availability step can ask when each of them runs (Sir Peter,
+             * 27 Sep). Names, not ids: the step is about what the client
+             * recognises, and the catalogue is grouped for picking.
+             */
+            'chosenServices' => $this->chosenServices($data),
             /*
              * How many professionals offer each service, in the client's own
              * state — shown beside the service while they are picking.
@@ -1166,7 +1191,18 @@ class ClientBsrController extends Controller
                 'event_date'         => [...\App\Domain\Requests\CoreFacts::dateRule(), 'after_or_equal:today'],
                 'event_start_time'   => ['required', 'date_format:H:i'],
                 'event_end_time'     => ['nullable', 'date_format:H:i'],
-                'availability_note'  => ['nullable', 'string', 'max:500'],
+                /*
+                 * When each service runs. Sir Peter, 27 Sep: a sub-step per
+                 * service so bidders see when each one starts and ends. Every
+                 * one is optional — a service with nothing entered follows the
+                 * event's own hours.
+                 */
+                'service_times'          => ['nullable', 'array'],
+                'service_times.*.start'  => ['nullable', 'date_format:H:i'],
+                'service_times.*.end'    => ['nullable', 'date_format:H:i'],
+                // "Anything they should know about timing?" came off this step
+                // on his instruction: it is asked per service now, so asking it
+                // once more for the whole request asked the same thing twice.
                 // Up to three other days the client could hold it on.
                 'backup_dates'         => ['nullable', 'array', 'max:' . \App\Domain\Requests\EventDates::MAX_BACKUPS],
                 'backup_dates.*.date'  => ['nullable', 'date', 'after_or_equal:today'],
@@ -1339,6 +1375,11 @@ class ClientBsrController extends Controller
         $event->categories()->sync(\App\Domain\Requests\ServiceDetails::sync(
             (array) ($d['services'] ?? []),
             (array) ($d['service_details'] ?? []),
+            \App\Domain\Requests\ServiceTimeline::fromInput(
+                (array) ($d['service_times'] ?? []),
+                (array) ($d['services'] ?? []),
+                $startsAt,
+            ),
         ));
 
         /*
