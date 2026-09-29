@@ -48,6 +48,14 @@
         background: var(--lmd-panel, var(--bg-card, #fff)); border-top: 1px solid var(--border-color, #e5e7eb);
         box-shadow: 0 -8px 24px -18px rgba(15,27,53,.35); font-family: inherit; }
     html.cl-side-mini .lmd-bar { left: var(--sidebar-collapsed, 72px); }
+    /* An empty band reads as something left behind rather than as a feature,
+       and it was on every page, because a client with no conversation open
+       still got the full white strip with its top edge and its shadow. Bare,
+       the bar draws nothing and lets the page through; the controls keep
+       their own boxes and stay clickable. */
+    .lmd-bar.is-bare { background: none; border-top: 0; box-shadow: none; pointer-events: none; }
+    .lmd-bar.is-bare .lmd-mid { display: none; }
+    .lmd-bar.is-bare .lmd-ctrls { pointer-events: auto; }
     /* The page keeps room for the bar, so it never covers a Save, Accept or
        Continue at the bottom of a page. */
     body.has-lmd .cl-main { padding-bottom: 86px; }
@@ -540,6 +548,11 @@
         // Only real conversations show; with none open the bar keeps just the
         // controls on the right (18 Sep).
         tabsEl.innerHTML = shown.map(function (id) { return tabHtml(convs[id], mini); }).join('');
+        // With nothing open the bar has nothing to hold, so it stops being a
+        // bar: the band, its edge and its shadow come off and only the four
+        // controls remain. Sir Peter, 29 Sep, of the empty white strip across
+        // the foot of every page: "remove this whatever it is".
+        bar.classList.toggle('is-bare', shown.length === 0);
         moreBtn.hidden = ! overflow.length;
         moreBtn.title = overflow.length + ' more ' + (overflow.length === 1 ? 'conversation' : 'conversations');
         layout();
