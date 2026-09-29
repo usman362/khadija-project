@@ -164,9 +164,17 @@ class ConversationController extends Controller
                 // shows their GigResource ID, for professionals.
                 'gr_id'    => $peer->public_id ? \App\Support\GigResourceId::display($peer->public_id) : null,
                 'profile'  => $peer->primary_role === 'professional' ? route('public.professional.show', $peer->id) : null,
-                'subtitle' => $peer->primary_role === 'professional'
-                    ? ($peer->serviceCategories->first()?->name ?? 'Professional')
-                    : ucfirst((string) ($peer->primary_role ?: 'member')),
+                /*
+                 * Sir Peter, 29 Sep: "the first one listed professional twice".
+                 * It did. This line fell back to the role name, and since the
+                 * header gained a role badge of its own it then said
+                 * "Professional" under a badge already reading Professional,
+                 * which tells the reader nothing they cannot see. The line is
+                 * the service they offer, and nothing at all when there is no
+                 * service on record: an empty line is more honest than a
+                 * repeated one, and the header still names the role once.
+                 */
+                'subtitle' => $peer->serviceCategories->first()?->name,
                 /*
                  * "Each row background and role badge should follow the other
                  * user's assigned role color, Light for the row background and

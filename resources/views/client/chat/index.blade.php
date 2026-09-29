@@ -570,9 +570,15 @@
                             <button type="button" class="cm-thumbs" id="cm-thumbs" title="Send a thumbs up" aria-label="Send a thumbs up">👍</button>
                             <button type="submit" class="cm-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Send</button>
                         </div>
+                        {{-- Sir Peter, 29 Sep: "the Manage Email Notifications is
+                             already located in the header so this is repetitive".
+                             It is reached from the header menu and from the message
+                             window's settings icon; a third copy under the box you
+                             are typing in is one more thing between the client and
+                             sending the message. The line that reports what just
+                             happened stays. --}}
                         <div class="cm-c-foot">
                             <span id="cm-note"></span>
-                            <a href="{{ route('client.notifications.index') }}">Manage Email Notifications</a>
                         </div>
                     </form>
                 </div>

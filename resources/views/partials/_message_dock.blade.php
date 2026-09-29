@@ -55,7 +55,7 @@
        sets these, so the window sits above its bar and its chat window. */
     .md-win { position: fixed; right: 24px; bottom: calc(var(--lmd-base, 24px) + var(--lmd-chat, 0px)); width: 380px; height: var(--md-h, 600px);
         max-width: calc(100vw - 48px); max-height: calc(100vh - 48px); z-index: 9999;
-        background: var(--bg-card, #fff);
+        background: var(--lmd-panel, var(--bg-card, #fff));
         border: 1px solid var(--border-color, #e5e7eb); border-radius: 18px; overflow: hidden;
         box-shadow: 0 28px 70px -24px rgba(15,27,53,.55); display: none; flex-direction: column; }
     .md.is-open .md-win { display: flex; }

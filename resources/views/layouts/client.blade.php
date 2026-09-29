@@ -44,6 +44,16 @@
             --bg-primary: #0a0e1a;
             --bg-secondary: #111827;
             --bg-card: rgba(17, 24, 39, 0.7);
+
+            /* Sir Peter, 29 Sep: "make the background grey a little more so
+               its not a see-thru". The message window took --bg-card, which in
+               this theme is 70% opaque, so the page really did show through it.
+               These are solid, and they are declared here rather than in the
+               dock itself because the dock is shared with the professional
+               side, which is not in scope. It keeps its present colours. */
+            --lmd-panel: #111827;
+            --lmd-canvas: #0f1623;
+            --lmd-bubble: #1f2937;
             --bg-card-hover: rgba(31, 41, 55, 0.8);
             --bg-sidebar: #0d1321;
             --border-color: rgba(255, 255, 255, 0.06);
@@ -108,6 +118,14 @@
             --bg-card: #ffffff;
             --bg-card-hover: #f8fafc;
             --bg-sidebar: #ffffff;
+
+            /* A white window on a near-white page, with near-white bubbles on
+               it, has no edge anywhere the eye can find. The window stays
+               white and the message area behind the bubbles is grey, so the
+               bubbles sit on something and the window ends somewhere. */
+            --lmd-panel: #ffffff;
+            --lmd-canvas: #eef1f5;
+            --lmd-bubble: #ffffff;
             --border-color: rgba(15, 23, 42, 0.12);
             --border-glow: rgba(99, 102, 241, 0.2);
             --text-primary: #1e293b;
@@ -772,10 +790,16 @@
         .cl-topbar { display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 100; background: var(--bg-primary);
             padding: 12px var(--cl-edge) 2px; }
         .cl-banner { flex: 1; min-width: 0; display: flex; align-items: center; gap: 16px; background: linear-gradient(120deg, #fb923c 0%, #f97316 50%, #ea580c 100%); border-radius: 14px; padding: 12px 18px; box-shadow: 0 6px 20px rgba(249,115,22,0.25); }
-        .cl-banner-text { flex-shrink: 0; }
-        .cl-banner-text h1 { font-size: 17px; font-weight: 800; color: #fff; margin: 0; line-height: 1.2; }
+        /* Sir Peter, 29 Sep: the search bar looked different on every page.
+           It did. The title never shrank and the search took whatever room was
+           left, so a long page title made a short box: the Emergency Request's
+           search began at 509, the dashboard's at 565, the Direct Request's at
+           640. The box is a fixed width now and the title gives way instead,
+           so the search is the same on every page. */
+        .cl-banner-text { flex: 1 1 auto; min-width: 0; overflow: hidden; }
+        .cl-banner-text h1 { font-size: 17px; font-weight: 800; color: #fff; margin: 0; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .cl-banner-text p { font-size: 11.5px; color: #fff; margin: 2px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 340px; }
-        .cl-banner-search { flex: 1; min-width: 120px; position: relative; margin-left: 6px; }
+        .cl-banner-search { flex: 0 0 500px; min-width: 120px; position: relative; margin-left: 6px; }
         .cl-banner-search > svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); pointer-events: none; z-index: 1; }
         .cl-banner-search form { margin: 0; }
         .cl-banner-search input { width: 100%; height: 42px; border-radius: 10px; border: none; padding: 0 44px 0 40px; background: #fff; font-size: 13px; color: #1e293b; outline: none; }

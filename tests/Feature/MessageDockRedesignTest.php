@@ -68,7 +68,14 @@ class MessageDockRedesignTest extends TestCase
         $this->assertSame('Priya Raghavan', $row['peer']['name']);
         $this->assertTrue($row['peer']['online']);
         $this->assertNotEmpty($row['peer']['avatar']);
-        $this->assertSame('Professional', $row['peer']['subtitle']);   // no service on file yet
+        /*
+         * Sir Peter, 29 Sep: "the first one listed professional twice". The
+         * header names the role on its own badge, so this line is the service
+         * and nothing when there is none. It used to fall back to the role
+         * name, which put "Professional" under a badge already saying it.
+         */
+        $this->assertNull($row['peer']['subtitle']);   // no service on file yet
+        $this->assertSame('Professional', $row['peer']['role_label']);
         $this->assertSame('Johnson Wedding', $row['event']['title']);
         $this->assertSame('Direct Request', $row['request_type']);
     }

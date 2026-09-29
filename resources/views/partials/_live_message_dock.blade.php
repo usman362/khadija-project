@@ -45,7 +45,7 @@
     /* ── The bar ─────────────────────────────────────────────── */
     .lmd-bar { position: fixed; bottom: 0; left: var(--sidebar-width, 236px); right: 0; z-index: 890;
         display: flex; align-items: center; gap: 10px; padding: 10px 18px;
-        background: var(--bg-card, #fff); border-top: 1px solid var(--border-color, #e5e7eb);
+        background: var(--lmd-panel, var(--bg-card, #fff)); border-top: 1px solid var(--border-color, #e5e7eb);
         box-shadow: 0 -8px 24px -18px rgba(15,27,53,.35); font-family: inherit; }
     html.cl-side-mini .lmd-bar { left: var(--sidebar-collapsed, 72px); }
     /* The page keeps room for the bar, so it never covers a Save, Accept or
@@ -152,7 +152,7 @@
     /* ── The chat window ─────────────────────────────────────── */
     .lmd-chat { position: fixed; right: var(--lmd-chat-right, 24px); bottom: var(--lmd-base, 24px); z-index: 9990;
         width: 380px; max-width: calc(100vw - 48px); height: var(--lmd-chat-h, 460px);
-        display: flex; flex-direction: column; background: var(--bg-card, #fff);
+        display: flex; flex-direction: column; background: var(--lmd-panel, var(--bg-card, #fff));
         border: 1px solid var(--border-color, #e5e7eb); border-radius: 18px; overflow: hidden;
         box-shadow: 0 28px 70px -24px rgba(15,27,53,.55); }
     .lmd-chat[hidden] { display: none; }
@@ -203,8 +203,8 @@
     .lmd-ch-t .on { display: flex; align-items: center; gap: 5px; margin-top: 2px; font-size: 11.5px; }
     .lmd-ch-t .on::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #16a34a; }
     .lmd-ch .lmd-ic { margin-top: 6px; }
-    .lmd-body { background: var(--bg-card, #fff); gap: 10px; padding: 14px; }
-    .lmd-msg { max-width: 80%; padding: 10px 13px; border-radius: 14px; background: var(--bg-card-hover, #f1f5f9); }
+    .lmd-body { background: var(--lmd-canvas, var(--bg-card, #fff)); gap: 10px; padding: 14px; }
+    .lmd-msg { max-width: 80%; padding: 10px 13px; border-radius: 14px; background: var(--lmd-bubble, var(--bg-card-hover, #f1f5f9)); }
     .lmd-msg small { justify-content: flex-start; }
     /* Your own messages in your account's colour, the other person's in grey. */
     .lmd-msg.is-mine { background: var(--lmd-accent); color: #fff; }
@@ -272,7 +272,17 @@
     .lmd-compose { align-items: center; gap: 10px; padding: 12px 14px; }
     .lmd-field { flex: 1; min-width: 0; display: flex; align-items: center; gap: 2px; position: relative;
         border: 1px solid var(--border-color, #e5e7eb); border-radius: 12px; padding: 0 6px 0 0; background: var(--bg-card, #fff); }
-    .lmd-field:focus-within { border-color: var(--lmd-accent); }
+    /* Sir Peter, 29 Sep: "why is there two color? in the users input". The
+       browser draws its own ring on a focused field, in its own blue, and
+       that was the one colour on the window belonging to nobody: the send
+       button, the links along the bottom and the field's own edge are all
+       the account's colour. The field now says it is focused in that same
+       colour, and the browser's ring is taken off the box it was drawn on.
+       The buttons inside keep a visible focus of their own, in the account's
+       colour too, because a keyboard needs to see where it is. */
+    .lmd-field:focus-within { border-color: var(--lmd-accent); box-shadow: 0 0 0 3px var(--lmd-tint); }
+    .lmd-field input:focus, .lmd-field input:focus-visible { outline: none; box-shadow: none; }
+    .lmd-field .lmd-fi:focus-visible { outline: 2px solid var(--lmd-accent); outline-offset: 2px; }
     .lmd-compose .lmd-field input { border: 0; padding: 12px 12px; background: transparent; }
     .lmd-compose .lmd-field input:focus, .lmd-compose .lmd-field input:focus-visible { outline: none; box-shadow: none; }
     .lmd-compose .lmd-fi { border: 0; background: none; width: 32px; height: 32px; border-radius: 8px; color: var(--text-secondary, #4b5563); padding: 0; }
