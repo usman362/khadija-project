@@ -291,11 +291,17 @@
     .cm-c-foot a { color: var(--cm); font-weight: 700; text-decoration: none; }
 
     .cm-compose { border-top: 1px solid var(--border-color); padding: 14px 18px 16px; }
-    .cm-c-box textarea { width: 100%; box-sizing: border-box; min-height: 56px; padding: 11px 13px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); color: var(--text-primary); font-size: 13px; font-family: inherit; resize: vertical; outline: none; }
-    .cm-c-box textarea:focus { border-color: var(--cm); }
-    .cm-c-row { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 10px; }
-    .cm-send { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border: none; border-radius: 9px; background: linear-gradient(135deg, #fb923c, #ea580c); color: #fff; font-size: 13.5px; font-weight: 800; cursor: pointer; font-family: inherit; }
-    .cm-send svg { width: 14px; height: 14px; }
+    /* One border around the box and its controls, so the composer reads as a
+       single thing to type into rather than a field with a toolbar beneath it.
+       The border lives on the row; the box inside it carries none of its own. */
+    .cm-c-field { display: flex; align-items: flex-end; gap: 8px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-card); padding: 5px 7px 5px 3px; }
+    .cm-c-field:focus-within { border-color: var(--cm); }
+    .cm-c-box textarea { flex: 1; min-width: 0; width: 100%; box-sizing: border-box; min-height: 46px; max-height: 180px; padding: 11px 13px; border: 0; border-radius: 10px; background: transparent; color: var(--text-primary); font-size: 13px; font-family: inherit; resize: vertical; outline: none; }
+    .cm-c-box textarea:focus { border-color: transparent; }
+    @media (max-width: 640px) { .cm-c-field { flex-wrap: wrap; } .cm-c-box textarea { flex-basis: 100%; } }
+    .cm-c-row { display: flex; align-items: center; justify-content: flex-end; gap: 6px; flex: none; }
+    .cm-send { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; padding: 0; border: none; border-radius: 10px; background: linear-gradient(135deg, #fb923c, #ea580c); color: #fff; cursor: pointer; font-family: inherit; flex: none; }
+    .cm-send svg { width: 17px; height: 17px; }
     .cm-empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text-muted); padding: 60px; text-align: center; font-size: 13px; }
 
     @media (max-width: 1100px) { .cm-top { grid-template-columns: 1fr; } .cm-stats { grid-template-columns: repeat(3, minmax(0,1fr)); } .cm-main { grid-template-columns: 1fr; } }
@@ -531,8 +537,13 @@
                     </div>
 
                     <form class="cm-c-box" id="cm-form">
-                        <textarea id="cm-input" placeholder="Type your message..."></textarea>
                         <div class="cm-chips" id="cm-chips" style="display:none;"></div>
+                        {{-- Sir Peter, 29 Sep, with a before and an after: the box
+                             you type in and the controls belong on one row, inside
+                             one border, rather than the controls sitting on a line
+                             of their own underneath. --}}
+                        <div class="cm-c-field">
+                        <textarea id="cm-input" placeholder="Type your message..."></textarea>
                         <div class="cm-c-row">
                             <div class="cm-c-icons">
                                 <button type="button" id="cm-emoji-btn" title="Emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></button>
@@ -568,7 +579,8 @@
                                  An empty box sends it; with a draft in the box it is added
                                  to the draft instead, so nothing typed is ever lost. --}}
                             <button type="button" class="cm-thumbs" id="cm-thumbs" title="Send a thumbs up" aria-label="Send a thumbs up">👍</button>
-                            <button type="submit" class="cm-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Send</button>
+                            <button type="submit" class="cm-send" aria-label="Send" title="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+                        </div>
                         </div>
                         {{-- Sir Peter, 29 Sep: "the Manage Email Notifications is
                              already located in the header so this is repetitive".
