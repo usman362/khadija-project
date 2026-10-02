@@ -86,10 +86,28 @@
     $done = collect($keys)->filter(fn ($k) => $fin->completed($k))->count();
 @endphp
 
+@php
+    use App\Domain\Agreements\Workspace;
+    $wsState = Workspace::status($fin);
+    [$wsLabel, $wsColour, $wsMeaning] = Workspace::STATES[$wsState];
+@endphp
 <div class="fz-top">
     <div>
-        <div class="fz-h">Finalize With Professional</div>
-        <p class="fz-sub">Agree the scope, price, schedule and terms, sign, and secure the deposit. Either side can still back out until both have signed and the deposit is secured.</p>
+        <div class="fz-h">Agreement With Professional</div>
+        {{-- Sir Peter's document: "Move Forward... does not mean the provider
+             is hired", and the page should not use "Booked / Awarded"
+             language while the terms are still being worked out. So it says
+             where the agreement actually stands, in the six words his
+             recommended status table uses. --}}
+        <p class="fz-sub">
+            <span style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:{{ $wsColour }};">
+                <i style="width:8px;height:8px;border-radius:50%;background:{{ $wsColour }};display:inline-block;"></i>{{ $wsLabel }}
+            </span>
+            &middot; {{ $wsMeaning }}
+            @unless(Workspace::signingOpen($fin))
+                You are not booked yet, and either side can still step away.
+            @endunless
+        </p>
     </div>
     @if($fin->status !== 'booked')
         <form method="POST" action="{{ route('client.finalize.cancel', $fin) }}"

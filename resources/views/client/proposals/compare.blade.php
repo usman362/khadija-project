@@ -230,7 +230,7 @@
                     <form method="POST" action="{{ route('client.finalize.start', $b) }}" style="display:inline;"
                           @if($__warn) onsubmit="return confirm(@js($__warn));" @endif>
                         @csrf
-                        <button type="submit" class="cp-btn go">Select &amp; finalize</button>
+                        <button type="submit" class="cp-btn go" title="Review details, ask questions, and work toward an agreement. You are not booked yet.">Move Forward</button>
                     </form>
                 @endif
             </div>

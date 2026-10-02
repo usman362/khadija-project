@@ -165,7 +165,7 @@
         <div class="pbs-head">
             <div>
                 <h3>Proposals by Service</h3>
-                <p>Review and compare proposals for each service. Accept one professional per service.</p>
+                <p>Review and compare proposals for each service. Moving forward with one opens an agreement to work out; it does not book them.</p>
             </div>
             <form method="GET" action="{{ route('client.events.show', $event) }}">
                 <input type="hidden" name="tab" value="proposals">
@@ -275,7 +275,7 @@
                                                 <form method="POST" action="{{ route('client.finalize.start', $bid) }}"
                                                       @if($warn) onsubmit="return confirm(@js($warn . ' Continue anyway?'));" @endif>
                                                     @csrf
-                                                    <button type="submit" class="pbs-btn is-accept">Accept</button>
+                                                    <button type="submit" class="pbs-btn is-accept" title="Review details, ask questions, and work toward an agreement. You are not booked yet.">Move Forward</button>
                                                 </form>
                                             @endif
                                         @endif

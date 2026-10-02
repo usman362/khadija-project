@@ -286,7 +286,7 @@
                                              price, schedule, contract and the fee before a booking. --}}
                                         <form method="POST" action="{{ route('client.finalize.start', $p->id) }}" style="display:inline;">
                                             @csrf
-                                            <button type="submit" class="pr-act-btn pr-act-accept" title="Accept &amp; award"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></button>
+                                            <button type="submit" class="pr-act-btn pr-act-accept" title="Move forward: Review details, ask questions, and work toward an agreement. You are not booked yet."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></button>
                                         </form>
                                         <form method="POST" action="{{ route('client.proposals.decline', $p->id) }}" style="display:inline;">
                                             @csrf
