@@ -335,9 +335,14 @@
     [data-bs-theme="light"] .aic-welcome-text { color: #64748b; }
 
     /* Messages */
-    .aic-messages { display: flex; flex-direction: column; gap: 12px; }
+    /* Khadijah, 30 Sep: "messages stay centred not on corners... add space and
+       keep replies in centred". A reply took 85% of the width and sat against
+       the edge it was aligned to, so both the long answers and the short ones
+       ran into the corner. They are narrower now, with a margin on the side
+       they are pinned to, so neither end touches the frame. */
+    .aic-messages { display: flex; flex-direction: column; gap: 14px; padding: 4px 14px 2px; }
     .aic-msg {
-        max-width: 85%;
+        max-width: 78%;
         padding: 10px 14px;
         border-radius: 14px;
         font-size: 13.5px;
@@ -347,11 +352,13 @@
     }
     .aic-msg-user {
         align-self: flex-end;
+        margin-right: 4px;
         background: linear-gradient(135deg, #6366f1, #8b5cf6);
         color: #fff;
         border-bottom-right-radius: 4px;
     }
     .aic-msg-assistant {
+        margin-left: 4px;
         align-self: flex-start;
         background: rgba(255,255,255,0.05);
         color: #e2e8f0;
@@ -732,7 +739,7 @@
             const data = await r.json();
             renderHistory(data.conversations || []);
         } catch (e) {
-            historyList.innerHTML = '<div class="aic-history-empty">Failed to load history.</div>';
+            historyList.innerHTML = '<div class="aic-history-empty">The history could not be loaded. Please try again, and tell us if it keeps happening.</div>';
         }
     });
 
@@ -744,7 +751,7 @@
 
     function renderHistory(items) {
         if (!items.length) {
-            historyList.innerHTML = '<div class="aic-history-empty">No previous conversations yet.</div>';
+            historyList.innerHTML = '<div class="aic-history-empty">Nothing here yet. Conversations you have with the assistant are kept here, so you can come back to one.</div>';
             return;
         }
         historyList.innerHTML = items.map(c => `
