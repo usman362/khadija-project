@@ -798,6 +798,19 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/finalize/{finalization}-cancel', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'cancel'])
             ->name('client.finalize.cancel');
+        /*
+         * The Agreement Workspace's negotiation controls: "Both Client and
+         * Professional/Influencer should be able to Accept Current Terms,
+         * Propose Changes, or Decline" (Sir Peter's document, section 5).
+         * The client's half; the professional's opens with their side.
+         */
+        Route::post('/finalize/{finalization}/approve', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'approveTerms'])
+            ->name('client.finalize.approve');
+        Route::post('/finalize/{finalization}/propose-changes', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'proposeChanges'])
+            ->name('client.finalize.propose');
+        Route::post('/finalize/{finalization}/decline', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'declineAgreement'])
+            ->name('client.finalize.decline');
+
         Route::post('/proposals/{bid}/accept', [\App\Http\Controllers\Client\ClientProposalController::class, 'accept'])
             ->middleware('permission:bookings.update')->name('client.proposals.accept');
         Route::post('/proposals/{bid}/decline', [\App\Http\Controllers\Client\ClientProposalController::class, 'decline'])

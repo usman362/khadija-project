@@ -143,6 +143,48 @@ class ClientFinalizeController extends Controller
 
     // ── steps ────────────────────────────────────────────────────────
 
+    /**
+     * "Accept Current Terms" — approval of the version in front of you.
+     *
+     * Not of the agreement in the abstract: if the price changes afterwards,
+     * this stops counting, which is the point of recording the version with
+     * it. See App\Domain\Agreements\Workspace.
+     */
+    public function approveTerms(Request $request, Finalization $finalization): RedirectResponse
+    {
+        $this->authorizeClient($request, $finalization);
+
+        \App\Domain\Agreements\Workspace::approve($finalization, $request->user());
+
+        return back()->with('status', \App\Domain\Agreements\Workspace::bothApproved($finalization->fresh())
+            ? 'Both of you have approved these terms. The agreement is ready to sign.'
+            : 'You approved these terms. It now waits on the professional.');
+    }
+
+    /** "Propose Changes" — send it back to be negotiated, with a reason. */
+    public function proposeChanges(Request $request, Finalization $finalization): RedirectResponse
+    {
+        $this->authorizeClient($request, $finalization);
+
+        $data = $request->validate([
+            'reason' => ['required', 'string', 'min:5', 'max:2000'],
+        ], ['reason.required' => 'Say what you would like changed.']);
+
+        \App\Domain\Agreements\Workspace::proposeChanges($finalization, $request->user(), $data['reason']);
+
+        return back()->with('status', 'Sent back for changes. Any approvals and signatures on the old terms no longer stand.');
+    }
+
+    /** "Decline" — one party ends this agreement path. */
+    public function declineAgreement(Request $request, Finalization $finalization): RedirectResponse
+    {
+        $this->authorizeClient($request, $finalization);
+
+        \App\Domain\Agreements\Workspace::decline($finalization, $request->user());
+
+        return back()->with('status', 'You declined this agreement.');
+    }
+
     private function saveBid(Finalization $f): void
     {
         $f->update(['bid_reviewed_at' => now()]);

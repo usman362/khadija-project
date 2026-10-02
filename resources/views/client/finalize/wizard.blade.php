@@ -9,6 +9,24 @@
      is that either side may back out until a final agreement is made, so each
      step is stored with a timestamp and "booked" is only reached at step 7. --}}
 
+@push('styles')
+<style>
+    .fz-ws { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .fz-ws-said { font-size: 12.5px; font-weight: 700; color: var(--text-secondary); }
+    .fz-ws-d { position: relative; }
+    .fz-ws-d > summary { list-style: none; cursor: pointer; }
+    .fz-ws-d > summary::-webkit-details-marker { display: none; }
+    .fz-ws-d form { position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; width: 320px; max-width: 80vw;
+        display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px;
+        background: var(--bg-card); border: 1px solid var(--border-color); box-shadow: 0 18px 44px -18px rgba(15,27,53,.45); }
+    .fz-ws-d textarea { width: 100%; box-sizing: border-box; font-family: inherit; font-size: 13px; padding: 9px 11px;
+        border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-primary); resize: vertical; }
+    .fz-ws-warn { margin: 0; font-size: 11.5px; line-height: 1.5; color: var(--text-muted); }
+    .fz-change { margin: 12px 0 0; padding: 11px 14px; border-radius: 11px; font-size: 13px; line-height: 1.55;
+        background: rgba(217,119,6,.1); border: 1px solid rgba(217,119,6,.3); color: var(--text-primary); }
+</style>
+@endpush
+
 @section('content')
 <style>
     .fz-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
@@ -91,6 +109,14 @@
     $wsState = Workspace::status($fin);
     [$wsLabel, $wsColour, $wsMeaning] = Workspace::STATES[$wsState];
 @endphp
+@if($fin->change_request && $wsState === Workspace::NEGOTIATING)
+    <p class="fz-change">
+        <b>Changes were asked for{{ $fin->change_requested_by === auth()->id() ? ' by you' : '' }}
+        @if($fin->change_requested_at) on {{ $fin->change_requested_at->format('M j') }}@endif:</b>
+        {{ $fin->change_request }}
+        <br><small>The agreement is on version {{ Workspace::version($fin) }}. Approvals and signatures given to earlier terms no longer stand.</small>
+    </p>
+@endif
 <div class="fz-top">
     <div>
         <div class="fz-h">Agreement With Professional</div>
@@ -109,13 +135,42 @@
             @endunless
         </p>
     </div>
-    @if($fin->status !== 'booked')
+    {{-- Sir Peter's document, section 5: "Both Client and Professional should
+         be able to Accept Current Terms, Propose Changes, or Decline." The
+         client's three; the professional's open with their side. --}}
+    <div class="fz-ws">
+        @if($wsState !== Workspace::DECLINED && ! $fin->funded_at)
+            @if(! Workspace::clientApproved($fin))
+                <form method="POST" action="{{ route('client.finalize.approve', $fin) }}">
+                    @csrf
+                    <button type="submit" class="fz-btn ok">Accept current terms</button>
+                </form>
+            @else
+                {{-- A ternary, not an @if: Blade will not compile a directive
+                     that follows a word character, so "professional@endif"
+                     left the @if open and the whole view failed to parse. --}}
+                <span class="fz-ws-said">You approved version {{ Workspace::version($fin) }}{{ Workspace::supplierApproved($fin) ? '.' : ', waiting on the professional.' }}</span>
+            @endif
+
+            <details class="fz-ws-d">
+                <summary class="fz-btn">Propose changes</summary>
+                <form method="POST" action="{{ route('client.finalize.propose', $fin) }}">
+                    @csrf
+                    <textarea name="reason" rows="3" maxlength="2000" required placeholder="What would you like changed, and why?"></textarea>
+                    <p class="fz-ws-warn">This sends the agreement back to be negotiated. Any approvals or signatures on the current terms stop counting, because they were given to different terms.</p>
+                    <button type="submit" class="fz-btn ok">Send it back</button>
+                </form>
+            </details>
+        @endif
+
+        @if($fin->status !== 'booked')
         <form method="POST" action="{{ route('client.finalize.cancel', $fin) }}"
               onsubmit="return confirm('Cancel this finalization? The other proposals reopen.');">
             @csrf
             <button type="submit" class="fz-btn bad">Back out</button>
         </form>
-    @endif
+        @endif
+    </div>
 </div>
 
 <div class="fz-pro">
@@ -291,6 +346,23 @@ PAYMENT TERMS
         @if($fin->client_signed_at)
             <div class="fz-note ok" style="margin-top:14px;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> <span><b>Signed.</b> You signed as {{ $fin->client_signature }} on {{ $fin->client_signed_at->format('M j, Y · g:i A') }}. {{ $pro->name }} counter-signed on {{ $fin->supplier_signed_at?->format('M j, Y · g:i A') }}.</span>
+            </div>
+        @elseif(! Workspace::signingOpen($fin))
+            {{-- "E-signature should unlock only after both parties approve the
+                 same agreement version" (Sir Peter's document, section 6).
+                 Before that there is nothing settled to sign, and holding out
+                 the pen says there is. --}}
+            <div class="fz-note info" style="margin-top:14px;">
+                <span><b>Not ready to sign.</b>
+                    @if(! Workspace::clientApproved($fin) && ! Workspace::supplierApproved($fin))
+                        Neither of you has accepted these terms yet.
+                    @elseif(! Workspace::clientApproved($fin))
+                        {{ $pro->name }} has accepted these terms. Accept them yourself to open signing.
+                    @else
+                        You have accepted these terms. It waits on {{ $pro->name }}.
+                    @endif
+                    Signing opens once you have both accepted the same version.
+                </span>
             </div>
         @else
             <div class="fz-f" style="margin-top:16px;">
