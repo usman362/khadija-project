@@ -39,6 +39,27 @@
                     </div>
                 @endforeach
             </dl>
+
+            {{-- Ali, 1 Oct: a support request can carry a picture or a
+                 document. They are listed rather than shown, because what was
+                 sent may be a PDF or a spreadsheet, and because opening one
+                 goes through the route that checks who is asking. --}}
+            @if($submission->attachments()->isNotEmpty())
+                <p class="dsp-sec" style="margin-top:16px;">Files sent with this</p>
+                <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;">
+                    @foreach($submission->attachments() as $file)
+                        <li>
+                            <a href="{{ route('uploads.show', $file) }}" style="color:var(--cl-accent,#ea580c);font-weight:700;text-decoration:none;">
+                                {{ $file->original_name }}
+                            </a>
+                            <span class="dsp-hint" style="margin:0 0 0 6px;display:inline;">
+                                {{ number_format($file->size / 1024, 0) }} KB
+                            </span>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+
             <p class="dsp-hint" style="margin-top:12px;">
                 Sent by {{ $submission->submitted_by === auth()->id() ? 'you' : ($submission->submitter?->name ?? 'someone') }}
                 on {{ $submission->created_at?->format('M j, Y') }}.

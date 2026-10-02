@@ -126,6 +126,15 @@ final class FormRegistry
                      'note' => 'Include dates, names and any reference numbers you have. The more specific, the faster this gets answered.'],
                     ['name' => 'contact_email', 'label' => 'Reply to', 'type' => 'text', 'required' => false,
                      'note' => 'Leave blank to use the address on your account.'],
+                    /*
+                     * Ali, 1 Oct: let them attach a picture or a document, so a
+                     * broken page can be shown rather than described. A
+                     * screenshot settles in one look what a paragraph of
+                     * "the button does nothing" cannot.
+                     */
+                    ['name' => 'files', 'label' => 'Screenshots or documents', 'type' => 'files', 'required' => false,
+                     'purpose' => 'support_attachment', 'max' => 5,
+                     'note' => 'Up to five, 10 MB each. Pictures, PDFs and Office documents. Only you and the support team can open them.'],
                     // No certification: asking someone to sign a declaration
                     // before they can report a broken page is a reason not to
                     // report it.

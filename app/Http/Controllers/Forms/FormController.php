@@ -233,6 +233,26 @@ class FormController extends Controller
                 continue;
             }
 
+            /*
+             * Ali, 1 Oct: Contact Support takes a picture or a document now.
+             *
+             * The limits are the purpose's own, read from config rather than
+             * written again here, so the list the browser offers, the list the
+             * validator accepts and the list the pipeline stores are one list.
+             */
+            if (($field['type'] ?? null) === 'files') {
+                $purpose = $field['purpose'] ?? 'support_attachment';
+                $limits  = config("uploads.purposes.{$purpose}", []);
+
+                $rules[$name]       = ['nullable', 'array', 'max:'.($field['max'] ?? 5)];
+                $rules[$name.'.*']  = array_filter([
+                    'file',
+                    ! empty($limits['extensions']) ? 'mimes:'.implode(',', $limits['extensions']) : null,
+                    ! empty($limits['max_kb']) ? 'max:'.$limits['max_kb'] : null,
+                ]);
+                continue;
+            }
+
             $rules[$name] = array_filter([
                 ($field['required'] ?? false) ? 'required' : 'nullable',
                 match ($field['type'] ?? 'text') {
@@ -253,6 +273,36 @@ class FormController extends Controller
             if (($field['type'] ?? null) === 'certification') {
                 continue;
             }
+
+            /*
+             * Files go down R54's one upload path like everything else: into
+             * quarantine, scanned, decided on, and only then stored. What the
+             * submission keeps is the record's id, never a path, so the file
+             * is reachable only through the route that checks who is asking.
+             * A file the pipeline refuses is reported rather than dropped
+             * quietly, because somebody who attached a screenshot and sent it
+             * is entitled to know it did not arrive.
+             */
+            if (($field['type'] ?? null) === 'files') {
+                $kept = [];
+
+                foreach ((array) ($data[$field['name']] ?? []) as $upload) {
+                    $record = app(\App\Domain\Uploads\UploadPipeline::class)
+                        ->accept($upload, $field['purpose'] ?? 'support_attachment', $user);
+
+                    if ($record->status === \App\Models\UploadedFile::REJECTED) {
+                        return back()
+                            ->withInput()
+                            ->withErrors([$field['name'] => $record->decision_reason ?: 'That file could not be accepted.']);
+                    }
+
+                    $kept[] = $record->id;
+                }
+
+                $payload[$field['name']] = $kept;
+                continue;
+            }
+
             $payload[$field['name']] = $data[$field['name']] ?? null;
         }
 

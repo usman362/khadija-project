@@ -16,7 +16,12 @@
     <a href="{{ route('forms.index') }}" class="cl-btn">Back</a>
 </div>
 
-<form method="POST" action="{{ route('forms.store', $key) }}">
+@php
+    // A form that takes no file does not need a multipart body, so it keeps
+    // the plain encoding it has always had.
+    $takesFiles = collect($definition['fields'])->contains(fn ($f) => ($f['type'] ?? '') === 'files');
+@endphp
+<form method="POST" action="{{ route('forms.store', $key) }}" @if($takesFiles) enctype="multipart/form-data" @endif>
     @csrf
 
     <div class="dsp-card">
@@ -88,6 +93,19 @@
                     @case('number')
                         <input type="number" name="{{ $name }}" id="{{ $name }}" class="dsp-input"
                                value="{{ old($name) }}" @required($field['required'] ?? false)>
+                        @break
+
+                    @case('files')
+                        {{-- The accepted list comes from the purpose, so what
+                             the browser offers and what the server keeps are
+                             the same list in one place. --}}
+                        @php
+                            $purpose = $field['purpose'] ?? 'support_attachment';
+                            $accept  = collect(config("uploads.purposes.{$purpose}.extensions", []))
+                                ->map(fn ($e) => '.' . $e)->implode(',');
+                        @endphp
+                        <input type="file" name="{{ $name }}[]" id="{{ $name }}" class="dsp-input"
+                               multiple accept="{{ $accept }}">
                         @break
 
                     @case('date')

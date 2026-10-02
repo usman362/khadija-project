@@ -125,6 +125,31 @@ return [
         ],
 
         /*
+        | Ali, 1 Oct: Contact Support should take a picture or a document, so
+        | somebody reporting a broken page can show it rather than describe it.
+        |
+        | Private, because a support request carries whatever the person
+        | happened to have on screen: an invoice, an address, a booking. Only
+        | the uploader and an admin can read it, which is who a support file
+        | is for. It holds for a year, long enough to settle whatever it was
+        | sent about.
+        */
+        'support_attachment' => [
+            'label'            => 'Support attachment',
+            'disk'             => 'private',
+            'extensions'       => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt'],
+            'mimes'            => [
+                'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf',
+                'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'text/plain',
+            ],
+            'max_kb'           => 10240,
+            'holds_for_review' => false,
+            'retain_days'      => 365,
+        ],
+
+        /*
         | Admin-authored site content — category artwork, blog images, CMS.
         | Public by design and uploaded by staff, so it does not hold.
         */

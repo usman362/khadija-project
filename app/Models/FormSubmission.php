@@ -83,6 +83,10 @@ class FormSubmission extends Model
                 continue;   // shown separately, with its stored wording
             }
 
+            if (($field['type'] ?? null) === 'files') {
+                continue;   // shown separately, as files you can open
+            }
+
             $value = $this->payload[$field['name']] ?? null;
 
             if ($value === null || $value === '') {
@@ -93,6 +97,37 @@ class FormSubmission extends Model
         }
 
         return $out;
+    }
+
+    /**
+     * The files sent with this submission.
+     *
+     * The payload keeps ids, not paths, so what comes back here is whatever
+     * still exists and is still releasable: a file the pipeline later rejected
+     * or retention removed simply stops appearing, rather than leaving a link
+     * that answers with an error.
+     *
+     * @return \Illuminate\Support\Collection<int, \App\Models\UploadedFile>
+     */
+    public function attachments(): \Illuminate\Support\Collection
+    {
+        $definition = $this->definition();
+
+        if ($definition === null) {
+            return collect();
+        }
+
+        $ids = collect($definition['fields'])
+            ->where('type', 'files')
+            ->flatMap(fn ($field) => (array) ($this->payload[$field['name']] ?? []))
+            ->filter()
+            ->all();
+
+        if ($ids === []) {
+            return collect();
+        }
+
+        return UploadedFile::whereIn('id', $ids)->get()->filter->isReleasable()->values();
     }
 
     public function submitter(): BelongsTo
