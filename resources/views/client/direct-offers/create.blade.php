@@ -132,20 +132,27 @@
 @section('content')
 <div class="do" data-type="{{ $type }}" id="doRoot">
 
-    {{-- Request type --}}
-    <div class="do-types">
-        @foreach($types as [$code, $name, $desc])
-            <div class="do-type {{ $type === $code ? 'sel' : '' }}" data-type="{{ $code }}">
-                <span class="do-type-code">{{ $code }}</span>
-                <h5>{{ $name }}</h5>
-                <p>{{ $desc }}</p>
-            </div>
-        @endforeach
-    </div>
-
     <div class="do-layout">
     <form method="POST" action="{{ route('client.direct-offers.store') }}">
         @csrf
+
+        {{-- Sir Peter, 29 Sep: "i dont understand why image 1 is all aligned
+             but the others are not". The Emergency Request is image 1, and the
+             difference was here: its scope chooser sits inside the column with
+             the form, while this one sat above the whole layout. So the two
+             cards ran the full width of the page, out under the rail, and the
+             form beneath them stopped short at the column's edge. Two cards of
+             unequal width with an empty third of a row beside them, above a
+             narrower form. It sits in the column now, as his page does. --}}
+        <div class="do-types">
+            @foreach($types as [$code, $name, $desc])
+                <div class="do-type {{ $type === $code ? 'sel' : '' }}" data-type="{{ $code }}">
+                    <span class="do-type-code">{{ $code }}</span>
+                    <h5>{{ $name }}</h5>
+                    <p>{{ $desc }}</p>
+                </div>
+            @endforeach
+        </div>
         {{-- Validation errors are rendered once, by layouts.client, for every
              page. This screen used to print its own copy as well, so a failed
              submit showed the same sentence twice. --}}

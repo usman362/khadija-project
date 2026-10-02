@@ -189,4 +189,38 @@ class ClientPagesShareOneColumnTest extends TestCase
 
         $this->assertSame([], $wrong, "these pages are outside the shared column:\n".implode("\n", $wrong));
     }
+
+    /**
+     * Sir Peter, 29 September: "i dont understand why image 1 is all aligned
+     * but the others are not."
+     *
+     * Image 1 was the Emergency Request, whose scope chooser sits inside the
+     * column with the form. The Direct Request's sat above the whole layout,
+     * so its two cards ran the full width of the page, out under the rail,
+     * while the form beneath them stopped at the column's edge. Nothing in
+     * the page said why, because the difference was which side of one div
+     * the block was written on.
+     */
+    public function test_a_request_pages_chooser_sits_inside_the_column(): void
+    {
+        foreach ([
+            'client/direct-offers/create.blade.php' => ['do-layout', 'do-types'],
+            'client/esr/create.blade.php'           => ['esr-layout', 'esr-scope'],
+        ] as $view => [$column, $chooser]) {
+            $markup = file_get_contents(base_path("resources/views/{$view}"));
+
+            $columnAt  = strpos($markup, 'class="'.$column.'"');
+            $chooserAt = strpos($markup, 'class="'.$chooser.'"');
+
+            $this->assertNotFalse($columnAt, "{$view} has no {$column}.");
+            $this->assertNotFalse($chooserAt, "{$view} has no {$chooser}.");
+
+            $this->assertGreaterThan(
+                $columnAt,
+                $chooserAt,
+                "{$view}: the chooser is written above the column again, so it spans the "
+                .'whole page while the form below it does not.',
+            );
+        }
+    }
 }
