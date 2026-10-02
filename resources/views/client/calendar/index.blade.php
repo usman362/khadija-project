@@ -16,7 +16,8 @@
     .cal-tab { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--border-color);
         background: var(--bg-card); text-align: left; font-family: inherit; cursor: pointer; width: 100%; }
     .cal-tab.is-on { border-color: var(--accent-orange, #ea580c); background: rgba(249,115,22,.08); }
-    .cal-tab:disabled { cursor: not-allowed; opacity: .62; }
+    a.cal-tab { text-decoration: none; }
+    .cal-tab.is-off { cursor: default; opacity: .62; }
     .cal-tab-ico { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex: none; }
     .cal-tab-ico svg { width: 17px; height: 17px; }
     .cal-tab b { display: block; font-size: 13.5px; font-weight: 800; color: var(--text-primary); line-height: 1.2; }
@@ -60,41 +61,55 @@
              shifts, which say when they are busy. So the other three say what
              they are waiting for instead of opening onto a month of invented
              free days. --}}
+        @php
+            $tabLink = fn (string $t) => route('client.calendar.index', array_merge(
+                request()->only(['calview', 'cal', 'anchor']), ['tab' => $t]
+            ));
+        @endphp
         <div class="cal-tabs">
-            <button type="button" class="cal-tab is-on" aria-current="page">
+            <a href="{{ $tabLink('calendar') }}" class="cal-tab {{ $tab === 'calendar' ? 'is-on' : '' }}">
                 <span class="cal-tab-ico" style="background:rgba(249,115,22,.14);color:#ea580c;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 </span>
                 <span><b>My Calendar</b><span>My events and schedule</span></span>
-            </button>
-            <button type="button" class="cal-tab" disabled title="Not built yet: nothing records your available dates.">
-                <span class="cal-tab-ico" style="background:rgba(37,99,235,.1);color:#2563eb;">
+            </a>
+            <a href="{{ $tabLink('availability') }}" class="cal-tab {{ $tab === 'availability' ? 'is-on' : '' }}">
+                <span class="cal-tab-ico" style="background:rgba(16,185,129,.12);color:#059669;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 </span>
-                <span><b>My Availability</b><span>Coming next</span></span>
-            </button>
-            <button type="button" class="cal-tab" disabled title="Professionals do not record their available dates yet.">
+                <span><b>My Availability</b><span>Set your available dates</span></span>
+            </a>
+            <span class="cal-tab is-off" title="Professionals do not record their available dates yet.">
                 <span class="cal-tab-ico" style="background:rgba(29,78,216,.1);color:#1d4ed8;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 </span>
                 <span><b>Hired Professionals</b><span>Waiting on their side</span></span>
-            </button>
-            <button type="button" class="cal-tab" disabled title="The influencer side is not open yet.">
+            </span>
+            <span class="cal-tab is-off" title="The influencer side is not open yet.">
                 <span class="cal-tab-ico" style="background:rgba(109,40,217,.1);color:#6d28d9;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"/></svg>
                 </span>
                 <span><b>Hired Influencers</b><span>Waiting on their side</span></span>
-            </button>
+            </span>
         </div>
 
-        @include('client._calendar', [
-            'calendar' => $calendar,
-            'calRoute' => 'client.calendar.index',
-            'calFixed' => [],
-        ])
+        @if($tab === 'calendar')
+            @include('client._calendar', [
+                'calendar' => $calendar,
+                'calRoute' => 'client.calendar.index',
+                'calFixed' => [],
+            ])
+        @else
+            @include('client.calendar._availability', [
+                'calendar'     => $calendar,
+                'availability' => $availability,
+                'tally'        => $tally,
+            ])
+        @endif
 
         {{-- Counted from the same events the grid above is drawn from, over
              the range on screen, so the two can never disagree. --}}
+        @if($tab === 'calendar')
         <div class="cal-counts">
             <div class="cal-count">
                 <b>{{ $counts['in_range'] }}</b>
@@ -103,6 +118,7 @@
             <div class="cal-count"><b>{{ $counts['confirmed'] }}</b><span>Booked</span></div>
             <div class="cal-count"><b>{{ $counts['needs_you'] }}</b><span>Taking proposals</span></div>
         </div>
+        @endif
     </div>
 
     <aside class="cal-rail">
@@ -137,11 +153,24 @@
         </div>
 
         <div class="cal-card">
-            <div class="cal-rail-h"><h3>Availability</h3></div>
-            <p class="cal-wait">
-                <b>Not here yet.</b> Nothing on GigResource records when somebody is free, only when they are
-                already booked. Setting your own dates, and seeing your hired professionals', is the next
-                piece of this screen.
+            <div class="cal-rail-h"><h3>Your availability</h3></div>
+            @if($tally[\App\Domain\Calendar\Availability::AVAILABLE] || $tally[\App\Domain\Calendar\Availability::UNAVAILABLE])
+                <p class="cal-wait">
+                    This {{ $calendar['view'] }}: <b>{{ $tally[\App\Domain\Calendar\Availability::AVAILABLE] }}</b>
+                    {{ \Illuminate\Support\Str::plural('day', $tally[\App\Domain\Calendar\Availability::AVAILABLE]) }} marked available,
+                    <b>{{ $tally[\App\Domain\Calendar\Availability::UNAVAILABLE] }}</b> blocked.
+                    Every other day is simply unanswered.
+                </p>
+            @else
+                <p class="cal-wait">
+                    You have not marked any days this {{ $calendar['view'] }}. Open
+                    <a href="{{ route('client.calendar.index', ['tab' => 'availability']) }}">My Availability</a>
+                    to say which days suit you.
+                </p>
+            @endif
+            <p class="cal-wait" style="margin-top:10px;">
+                <b>Your hired professionals' availability is not here yet.</b> Nothing records when they are
+                free, only when they are already booked, and entering it is theirs to do.
             </p>
         </div>
     </aside>

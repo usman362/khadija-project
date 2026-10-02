@@ -118,14 +118,31 @@ class ClientCalendarPageTest extends TestCase
         }
     }
 
-    /** The tabs that have no data say so rather than opening onto nothing. */
+    /**
+     * The tabs that have no data say so rather than opening onto nothing.
+     *
+     * My Availability joined the working ones on 2 October, when somewhere to
+     * record it was built. The other two still wait on the sides that would
+     * enter it, and say which.
+     */
     public function test_the_unbuilt_tabs_are_honest_about_it(): void
     {
         $this->actingAs($this->client)
             ->get(route('client.calendar.index'))
             ->assertOk()
-            ->assertSee('My Availability')
+            ->assertSee('Hired Professionals')
+            ->assertSee('Hired Influencers')
             ->assertSee('Waiting on their side')
-            ->assertSee('Nothing on GigResource records when somebody is free', false);
+            ->assertSee('already booked, and entering it is theirs to do', false);
+    }
+
+    /** And the one that now works is reachable as a tab of its own. */
+    public function test_my_availability_is_a_tab_that_opens(): void
+    {
+        $this->actingAs($this->client)
+            ->get(route('client.calendar.index', ['tab' => 'availability']))
+            ->assertOk()
+            ->assertSee('Say which days suit you', false)
+            ->assertSee('Block a stretch of dates');
     }
 }

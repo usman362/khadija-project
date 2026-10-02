@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Client;
 
+use App\Domain\Calendar\Availability;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Support\ClientCalendar;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -73,6 +75,75 @@ class ClientCalendarController extends Controller
             'needs_you' => $inRange->filter(fn ($e) => $e->stage() === 'open')->count(),
         ];
 
-        return view('client.calendar.index', compact('calendar', 'grid', 'upcoming', 'counts'));
+        // Which of Sir Peter's four tabs is open. Only two of them answer.
+        $tab = in_array($request->query('tab'), ['availability'], true) ? $request->query('tab') : 'calendar';
+
+        $availability = Availability::between($user, $calendar['first'], $calendar['last']);
+        $tally        = Availability::tally($availability);
+
+        return view('client.calendar.index', compact(
+            'calendar', 'grid', 'upcoming', 'counts', 'tab', 'availability', 'tally',
+        ));
+    }
+
+    /**
+     * Say something about one day, or take it back.
+     *
+     * The control that sets an answer is the control that removes it: marking
+     * a day the state it already holds clears it. One button, no separate
+     * undo to find.
+     */
+    public function markDay(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'day'   => ['required', 'date_format:Y-m-d'],
+            'state' => ['required', 'in:available,unavailable'],
+            'back'  => ['nullable', 'string', 'max:300'],
+        ]);
+
+        Availability::mark($request->user(), $data['day'], $data['state']);
+
+        return $this->backToCalendar($data['back'] ?? null);
+    }
+
+    /** Block a stretch of dates in one go. */
+    public function markRange(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'from'  => ['required', 'date_format:Y-m-d'],
+            'to'    => ['required', 'date_format:Y-m-d'],
+            'state' => ['required', 'in:available,unavailable'],
+            'back'  => ['nullable', 'string', 'max:300'],
+        ]);
+
+        $written = Availability::markRange($request->user(), $data['from'], $data['to'], $data['state']);
+
+        [$word] = Availability::STATES[$data['state']];
+
+        return $this->backToCalendar($data['back'] ?? null)
+            ->with('status', $written . ' ' . \Illuminate\Support\Str::plural('day', $written) . ' marked ' . strtolower($word) . '.');
+    }
+
+    /**
+     * Back where they were, including the month and the tab, and never off
+     * this site: the address comes from the page and is therefore theirs to
+     * tamper with.
+     */
+    private function backToCalendar(?string $back): RedirectResponse
+    {
+        $fallback = route('client.calendar.index', ['tab' => 'availability']);
+
+        if (! $back) {
+            return redirect()->to($fallback);
+        }
+
+        $path = parse_url($back, PHP_URL_PATH) ?: '';
+        $qs   = parse_url($back, PHP_URL_QUERY);
+
+        if ($path !== '/client/calendar') {
+            return redirect()->to($fallback);
+        }
+
+        return redirect()->to('/client/calendar' . ($qs ? '?' . $qs : ''));
     }
 }

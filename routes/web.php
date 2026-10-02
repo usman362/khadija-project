@@ -892,6 +892,15 @@ Route::middleware('auth')->group(function () {
             ->middleware('permission:events.view_any')
             ->name('client.calendar.index');
 
+        // "why not Available as well?" — the client says so here.
+        Route::post('/calendar/availability', [\App\Http\Controllers\Client\ClientCalendarController::class, 'markDay'])
+            ->middleware('permission:events.view_any')
+            ->name('client.calendar.availability');
+
+        Route::post('/calendar/availability/range', [\App\Http\Controllers\Client\ClientCalendarController::class, 'markRange'])
+            ->middleware('permission:events.view_any')
+            ->name('client.calendar.availability.range');
+
         Route::get('/events', [ClientEventController::class, 'index'])->middleware('permission:events.view_any')->name('client.events.index');
         // The Export button on My Events. Same filters as the list, so what
         // downloads is what is on screen. Above /events/{event} so "export" is
