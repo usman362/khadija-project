@@ -883,6 +883,15 @@ Route::middleware('auth')->group(function () {
          * until the rebuild; nothing points at them.
          */
 
+        /*
+         * Sir Peter, 24 Sep: the calendar gets an address of its own, and a
+         * place in the left menu, "instead of search around my events webpage
+         * to find it".
+         */
+        Route::get('/calendar', [\App\Http\Controllers\Client\ClientCalendarController::class, 'index'])
+            ->middleware('permission:events.view_any')
+            ->name('client.calendar.index');
+
         Route::get('/events', [ClientEventController::class, 'index'])->middleware('permission:events.view_any')->name('client.events.index');
         // The Export button on My Events. Same filters as the list, so what
         // downloads is what is on screen. Above /events/{event} so "export" is

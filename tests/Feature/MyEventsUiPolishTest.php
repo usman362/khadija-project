@@ -51,10 +51,16 @@ class MyEventsUiPolishTest extends TestCase
         $this->assertStringContainsString('border-width: 0 0 2px', $m[1]);
     }
 
-    /** One day with an event pushed the other six columns into slivers. */
+    /**
+     * One day with an event pushed the other six columns into slivers.
+     *
+     * The calendar moved into a partial of its own on 2 October, when the
+     * Calendar & Availability page was given an address and both screens
+     * started drawing the same one. The rule moved with it.
+     */
     public function test_the_calendar_has_seven_equal_columns(): void
     {
-        $this->assertStringContainsString('.ec-grid { table-layout: fixed; }', $this->source('client/events/index'));
+        $this->assertStringContainsString('.ec-grid { table-layout: fixed; }', $this->source('client/_calendar'));
     }
 
     /** The live-region rule, loaded last, made the sticky rail stop following the scroll. */
