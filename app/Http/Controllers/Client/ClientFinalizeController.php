@@ -148,6 +148,13 @@ class ClientFinalizeController extends Controller
         $f->update(['bid_reviewed_at' => now()]);
     }
 
+    /*
+     * Each saver reports what it changed to App\Domain\Agreements\Workspace.
+     * A material term changed after somebody approved or signed raises the
+     * agreement's version, and their approval stops counting, because it was
+     * approval of something else. The rule lives in one place so that it
+     * holds wherever the terms are edited from.
+     */
     private function saveScope(Request $request, Finalization $f): void
     {
         $d = $request->validate([
@@ -155,6 +162,7 @@ class ClientFinalizeController extends Controller
         ], ['scope.required' => 'Confirm what is being delivered.']);
 
         $f->update($d + ['scope_agreed_at' => now()]);
+        \App\Domain\Agreements\Workspace::termsChanged($f, array_keys($d));
     }
 
     private function savePrice(Request $request, Finalization $f): void
@@ -164,6 +172,7 @@ class ClientFinalizeController extends Controller
         ], ['agreed_price.required' => 'Confirm the final price.']);
 
         $f->update($d + ['price_agreed_at' => now()]);
+        \App\Domain\Agreements\Workspace::termsChanged($f, array_keys($d));
     }
 
     private function saveSchedule(Request $request, Finalization $f): void
@@ -178,6 +187,7 @@ class ClientFinalizeController extends Controller
         ]);
 
         $f->update($d + ['schedule_agreed_at' => now()]);
+        \App\Domain\Agreements\Workspace::termsChanged($f, array_keys($d));
     }
 
     private function saveTerms(Request $request, Finalization $f): void
@@ -195,6 +205,7 @@ class ClientFinalizeController extends Controller
         $d['deposit_amount'] = round(((float) $f->agreed_price) * $d['deposit_percent'] / 100, 2);
 
         $f->update($d + ['terms_agreed_at' => now()]);
+        \App\Domain\Agreements\Workspace::termsChanged($f, array_keys($d));
     }
 
     private function saveContract(Request $request, Finalization $f): void
@@ -211,11 +222,28 @@ class ClientFinalizeController extends Controller
             'contract_body'    => $this->contractBody($f),
             'client_signature' => $d['client_signature'],
             'client_signed_at' => now(),
+            /*
+             * Which terms this signature was given to. Without it, a price
+             * changed afterwards would leave the signature sitting under
+             * terms the client never saw, which Sir Peter's document calls
+             * the one thing that must never happen.
+             */
+            'client_signed_version' => $f->terms_version,
             // The professional signs from their own side. Demo and test
             // environments need the flow to complete, so pre-launch their
             // counter-signature is recorded here and labelled as such.
             'supplier_signature' => $f->supplier->name,
             'supplier_signed_at' => now(),
+            'supplier_signed_version' => $f->terms_version,
+            /*
+             * Pre-launch, the professional's side is not open, so their
+             * approval is recorded with their stand-in signature rather than
+             * left blank: an agreement that shows "awaiting signatures"
+             * forever is not a truer picture than this one, and this is
+             * labelled as what it is.
+             */
+            'client_approved_version'   => $f->terms_version,
+            'supplier_approved_version' => $f->terms_version,
         ]);
     }
 

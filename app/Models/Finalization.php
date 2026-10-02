@@ -30,7 +30,21 @@ class Finalization extends Model
         'balance_due_on'     => 'date',
         'agreed_price'       => 'decimal:2',
         'deposit_amount'     => 'decimal:2',
+        'change_requested_at' => 'datetime',
+        'declined_at'         => 'datetime',
     ];
+
+    /**
+     * Which version of the terms each side approved and signed.
+     *
+     * See App\Domain\Agreements\Workspace: approval is approval of a
+     * version, so that changing a price cannot leave a signature sitting
+     * under terms the person never saw.
+     */
+    public function workspaceStatus(): string
+    {
+        return \App\Domain\Agreements\Workspace::status($this);
+    }
 
     public function event(): BelongsTo    { return $this->belongsTo(Event::class); }
     public function bid(): BelongsTo      { return $this->belongsTo(Bid::class); }
