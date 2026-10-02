@@ -24,6 +24,20 @@ class ClientSavedProfessionalController extends Controller
     {
         $user = $request->user();
 
+        /*
+         * Khadijah, 30 Sep: "there should be button to add review, then that
+         * review will appear on Reviews page."
+         *
+         * A review belongs to a booking, not to a person, so the card offers
+         * one only where there is a completed booking with that professional
+         * that this client has not reviewed yet. That is also why it does not
+         * always appear: there has to be finished work behind it.
+         */
+        $reviewed = \App\Models\Review::where('reviewer_id', $user->id)
+            ->pluck('booking_id')
+            ->filter()
+            ->all();
+
         // Pros this client has hired: distinct suppliers across their bookings,
         // with how many times and the most recent engagement.
         $workedWith = Booking::where('created_by', $user->id)
@@ -41,7 +55,7 @@ class ClientSavedProfessionalController extends Controller
             ])
             ->get()
             ->groupBy('supplier_id')
-            ->map(function ($rows) {
+            ->map(function ($rows) use ($reviewed) {
                 // "Worked together" means a booking that went ahead, so a
                 // cancelled one is not the last time (unless all were).
                 $went = $rows->where('status', '!=', 'cancelled');
@@ -59,6 +73,13 @@ class ClientSavedProfessionalController extends Controller
                     // What was actually agreed, so cancelled bookings are left out.
                     'spent'      => (float) $rows->whereIn('status', ['confirmed', 'completed'])->sum('price'),
                     'last_event' => $latest?->event?->title,
+                    // The booking a review would be about: the most recent
+                    // finished one that has not been reviewed.
+                    'to_review'  => $rows
+                        ->where('status', 'completed')
+                        ->whereNotIn('id', $reviewed)
+                        ->sortByDesc('id')
+                        ->first(),
                 ];
             })
             ->filter(fn ($r) => $r['pro'])

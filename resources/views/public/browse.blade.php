@@ -576,7 +576,7 @@
                                         <button type="submit" class="br-fav {{ $isSaved ? 'is-on' : '' }}"
                                                 aria-pressed="{{ $isSaved ? 'true' : 'false' }}"
                                                 aria-label="{{ $isSaved ? 'Remove ' . $pro->name . ' from My Professionals' : 'Save ' . $pro->name . ' to My Professionals' }}"
-                                                title="{{ $isSaved ? 'Saved, press to remove' : 'Save to My Professionals' }}"><svg viewBox="0 0 24 24" fill="{{ $isSaved ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></button>
+                                                title="{{ $isSaved ? 'Saved, press to remove' : 'Save to My Professionals' }}">{{-- Khadijah, 30 Sep: one mark for saving, everywhere. This was a heart here and a star on My Professionals, for the same act. --}}<svg viewBox="0 0 24 24" fill="{{ $isSaved ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
                                     </form>
                                 @endauth
                             </div>

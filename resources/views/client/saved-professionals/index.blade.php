@@ -6,7 +6,12 @@
 
 @push('styles')
 <style>
-    .mp-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+    /* Khadijah, 30 Sep: "why are the 4 marked in red cards so so so wide?"
+       They each took a quarter of the page whatever they held, so most of
+       every card was the empty space she drew a box around. They are as wide
+       as they need to be now and sit to the left, which is where the eye
+       looks for them. */
+    .mp-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 236px)); justify-content: start; gap: 14px; margin-bottom: 18px; }
     .mp-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px 18px; display: flex; gap: 14px; align-items: center; }
     .mp-stat-ico { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex: none; }
     .mp-stat-ico svg { width: 20px; height: 20px; }
@@ -32,8 +37,23 @@
     .mp-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; transition: box-shadow .15s, transform .15s; }
     .mp-card:hover { box-shadow: 0 14px 34px -18px rgba(15,27,53,.35); transform: translateY(-1px); }
     .mp-cover { height: 58px; background: linear-gradient(120deg, #fff1e6, #ffe4d1 45%, #fde7f3); }
+    .mp-btn.icon svg { width: 17px; height: 17px; }
+    .mp-rev > summary { list-style: none; cursor: pointer; }
+    .mp-rev > summary::-webkit-details-marker { display: none; }
+    .mp-rev { margin-top: 10px; }
+    .mp-rev > summary { display: inline-flex; width: auto; }
+    .mp-rev-form { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; padding: 12px; border-radius: 12px;
+        background: var(--bg-card-hover, #f8fafc); border: 1px solid var(--border-color); }
+    .mp-rev-l { font-size: 12px; font-weight: 700; color: var(--text-secondary); }
+    .mp-rev-form select, .mp-rev-form textarea { width: 100%; box-sizing: border-box; font-family: inherit; font-size: 13px;
+        padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-primary); }
+    .mp-rev-form textarea { resize: vertical; }
     .mp-body { padding: 0 18px 16px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
-    .mp-top { display: flex; gap: 14px; align-items: flex-end; margin-top: -30px; }
+    /* Khadijah, 30 Sep: "no distance between name and cover... drag it little
+       bit down". The picture hung 30px over the band and the name, bottom
+       aligned to it, ended up starting four pixels under the edge. A smaller
+       overlap drops the whole row and gives the name room to breathe. */
+    .mp-top { display: flex; gap: 14px; align-items: flex-end; margin-top: -18px; }
     .mp-avw { position: relative; flex: none; }
     .mp-av { width: 64px; height: 64px; border-radius: 18px; object-fit: cover; border: 3px solid var(--bg-card); background: #f97316; display: block; box-shadow: 0 6px 16px -8px rgba(15,27,53,.4); }
     .mp-on { position: absolute; right: -2px; bottom: -2px; width: 14px; height: 14px; border-radius: 50%; background: #22c55e; border: 2.5px solid var(--bg-card); }
@@ -98,7 +118,7 @@
         </div>
         <div class="mp-stat">
             <div class="mp-stat-ico" style="background:rgba(245,158,11,.14);color:#d97706;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
             </div>
             <div><b>{{ $stats['saved'] }}</b><span>Saved</span></div>
         </div>
@@ -212,16 +232,41 @@
                                 @if($isSaved)
                                     <form method="POST" action="{{ route('client.saved-professionals.destroy', $pro) }}">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="mp-btn icon is-on" title="Saved. Click to remove" aria-label="Remove from saved">★</button>
+                                        <button type="submit" class="mp-btn icon is-on" title="Saved. Click to remove" aria-label="Remove from saved"><svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
                                     </form>
                                 @else
                                     <form method="POST" action="{{ route('client.saved-professionals.store') }}">
                                         @csrf
                                         <input type="hidden" name="professional_id" value="{{ $pro->id }}">
-                                        <button type="submit" class="mp-btn icon" title="Save" aria-label="Save">☆</button>
+                                        <button type="submit" class="mp-btn icon" title="Save" aria-label="Save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></button>
                                     </form>
                                 @endif
                             </div>
+
+                            {{-- Khadijah, 30 Sep: "there should be button to add
+                                 review, then that review will appear on Reviews
+                                 page." It appears where there is finished work to
+                                 review and no review of it yet, because a review
+                                 belongs to a booking rather than to a person. --}}
+                            @if($row['to_review'])
+                                <details class="mp-rev">
+                                    <summary class="mp-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"/></svg>
+                                        Write a review
+                                    </summary>
+                                    <form method="POST" action="{{ route('client.reviews.store', $row['to_review']) }}" class="mp-rev-form">
+                                        @csrf
+                                        <label class="mp-rev-l" for="rv-{{ $pro->id }}">How was it?</label>
+                                        <select name="rating" id="rv-{{ $pro->id }}" required>
+                                            @foreach([5 => 'Excellent', 4 => 'Good', 3 => 'Fair', 2 => 'Poor', 1 => 'Bad'] as $n => $word)
+                                                <option value="{{ $n }}">{{ $n }} out of 5, {{ $word }}</option>
+                                            @endforeach
+                                        </select>
+                                        <textarea name="comment" required maxlength="2000" rows="3" placeholder="What went well, and what could have been better?"></textarea>
+                                        <button type="submit" class="mp-btn primary">Post review</button>
+                                    </form>
+                                </details>
+                            @endif
                         </div>
                     </div>
                 @endforeach
@@ -237,9 +282,9 @@
 
         @if($saved->isEmpty())
             <div class="mp-empty">
-                <div class="mp-empty-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"/></svg></div>
+                <div class="mp-empty-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
                 <h4>Nothing saved yet</h4>
-                <p>Tap the star on any professional, here or on their profile, to keep them close.</p>
+                <p>Tap the bookmark on any professional, here or on their profile, to keep them close.</p>
                 <a href="{{ route('client.search.index') }}">Browse professionals</a>
             </div>
         @else
