@@ -30,8 +30,6 @@
     .cm-actions { display: flex; flex-direction: column; gap: 10px; }
     .cm-btn-primary { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px; border: none; border-radius: 11px; background: linear-gradient(135deg, #fb923c, #ea580c); color: #fff; font-size: 13.5px; font-weight: 800; cursor: pointer; font-family: inherit; }
     .cm-btn-primary svg { width: 15px; height: 15px; }
-    .cm-btn-ghost { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: 1px solid var(--border-color); border-radius: 11px; background: var(--bg-card); color: var(--text-secondary); font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
-    .cm-btn-ghost svg { width: 14px; height: 14px; color: var(--brand-text); }
 
     .cm-main { display: grid; grid-template-columns: minmax(0,340px) minmax(0,1fr); gap: 16px; }
     /* A third column for the details panel; a thin rail when it is collapsed. */
@@ -350,7 +348,6 @@
         </div>
         <div class="cm-actions">
             <button type="button" class="cm-btn-primary" id="cm-create"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Message</button>
-            <button type="button" class="cm-btn-ghost" id="cm-ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>Compose</button>
         </div>
     </div>
 
@@ -1015,12 +1012,10 @@
         this.disabled = false; this.style.opacity = '';
     });
 
-    // Compose → drop a polished draft into the active thread.
-    if ($('cm-ai')) $('cm-ai').addEventListener('click', () => {
-        const i = $('cm-input');
-        if (i) { i.value = "Hi! Following up on our event, could you please confirm the final details and timeline? Happy to share anything you need from my side. Thank you!"; i.focus(); }
-        else if (modal) modal.style.display = 'flex';
-    });
+    /* Sir Peter, 29 Sep: "technically this suggestion and compose doing same
+       job so remove this compose thing". Both put a ready-made sentence in the
+       box; the Suggestion does it with a reason beside it, which is the better
+       of the two, so Compose and its one canned paragraph are gone. */
 })();
 </script>
 
