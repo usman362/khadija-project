@@ -87,10 +87,17 @@ class MyEventsNothingIsStaticTest extends TestCase
         $this->assertStringNotContainsString('Post New Event', $html);
         $this->assertStringContainsString('Events List', $html);
 
-        // One button on the page itself, in the filter row. The Live Messages
-        // window's per-message menu offers the same action (Sir Peter, 21 Sep),
-        // which is not a second button on this page.
-        $this->assertSame(1, substr_count($html, 'class="mg-filter-btn coral"><svg'));
+        /*
+         * Post an Event moved up into the bar beside the search on 2 October
+         * (Sir Peter: "can the post an event button be place in the same row
+         * as search"), so it is on every client page rather than only this
+         * one. What this still holds is that there is exactly one of it: a
+         * copy left behind in the filter row would be the same button twice
+         * on one screen, which is what the move was meant to stop.
+         */
+        $this->assertSame(0, substr_count($html, 'class="mg-filter-btn coral"><svg'),
+            'Post an Event is back in the filter row as well as in the bar.');
+        $this->assertSame(1, substr_count($html, 'class="cl-banner-post"'));
     }
 
     /** The money was $0 for everyone because it read columns that do not exist. */

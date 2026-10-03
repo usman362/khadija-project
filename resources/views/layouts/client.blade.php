@@ -799,7 +799,13 @@
         .cl-banner-text { flex: 1 1 auto; min-width: 0; overflow: hidden; }
         .cl-banner-text h1 { font-size: 17px; font-weight: 800; color: #fff; margin: 0; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .cl-banner-text p { font-size: 11.5px; color: #fff; margin: 2px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 340px; }
-        .cl-banner-search { flex: 0 0 500px; min-width: 120px; position: relative; margin-left: 6px; }
+        .cl-banner-search { flex: 0 0 360px; min-width: 120px; position: relative; margin-left: 6px; }
+        .cl-banner-post { display: inline-flex; align-items: center; gap: 7px; flex: none; height: 42px; padding: 0 16px; margin-left: 10px;
+            border-radius: 10px; background: #fff; color: var(--brand-strong, #ea580c); font-size: 13px; font-weight: 800;
+            text-decoration: none; white-space: nowrap; box-shadow: 0 2px 8px -4px rgba(15,27,53,.35); }
+        .cl-banner-post:hover { background: #fff7ed; }
+        .cl-banner-post svg { width: 15px; height: 15px; }
+        @media (max-width: 1280px) { .cl-banner-post span { display: none; } .cl-banner-post { padding: 0 13px; } }
         .cl-banner-search > svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); pointer-events: none; z-index: 1; }
         .cl-banner-search form { margin: 0; }
         .cl-banner-search input { width: 100%; height: 42px; border-radius: 10px; border: none; padding: 0 44px 0 40px; background: #fff; font-size: 13px; color: #1e293b; outline: none; }
@@ -1632,6 +1638,10 @@
                     <h1>@yield('page-title', 'Welcome back, ' . (auth()->user()?->name ?? 'there') . '!')</h1>
                     <p>@yield('page-subtitle', "Let's create amazing events together")</p>
                 </div>
+                {{-- Sir Peter, 2 Oct: "Can the post an event button be place in
+                     the same row as search by reducing the input area bc right
+                     now having post an event buttons stands out like a sore
+                     thumb". The search gives up the width it takes. --}}
                 <div class="cl-banner-search">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                     <form action="{{ route('public.browse') }}" method="GET">
@@ -1639,6 +1649,10 @@
                     </form>
                     <kbd>⌘ K</kbd>
                 </div>
+                <a href="{{ route('client.post-event.choose') }}" class="cl-banner-post">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span>Post an Event</span>
+                </a>
             </div>
 
             <div class="cl-topbar-right">

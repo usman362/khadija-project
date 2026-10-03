@@ -68,7 +68,7 @@
                 </div>
             </div>
             </div>
-        </div>
+            {{-- One </div> too many stood here. It closed the panel early, so the history overlay and the whole footer, the message box, the attach and emoji buttons and the send arrow, fell outside it and laid themselves out across the bottom of the page. --}}
         <div id="aicMessages" class="aic-messages"></div>
     </div>
 

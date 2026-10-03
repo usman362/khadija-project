@@ -531,9 +531,9 @@
         @endif
         {{-- Was a button with no handler. Downloads exactly what is listed. --}}
         <a href="{{ route('client.events.export', request()->only(['search', 'status', 'type', 'category', 'when'])) }}" class="mg-filter-btn" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</a>
-        {{-- The only Post an Event on the page. It said "Create Master List",
-             a thing this product has never had. --}}
-        <a href="{{ route('client.post-event.choose') }}" class="mg-filter-btn coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Post an Event</a>
+        {{-- Post an Event moved up into the bar beside the search (Sir Peter,
+             2 Oct), where it is on every page rather than only on this one. A
+             second copy here would be the same button twice on one screen. --}}
 
         <div class="mg-filter-panel" id="mgFilterPanel" @unless($moreFilters) hidden @endunless>
             <label>Service
