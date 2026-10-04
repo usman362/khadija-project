@@ -139,7 +139,7 @@ class ClientAvailabilityTest extends TestCase
             ->assertOk()
             ->assertSee('Available')
             ->assertSee('Unavailable')
-            ->assertSee('Not answered');
+            ->assertSee('Not set');   // renamed with Sir Peter's 4 Oct design: one click, three states
     }
 
     /** Nonsense is refused rather than stored. */

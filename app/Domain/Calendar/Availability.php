@@ -34,7 +34,9 @@ final class Availability
     /** How each state is named and coloured, wherever it is drawn. */
     public const STATES = [
         self::AVAILABLE   => ['Available', '#10b981'],
-        self::UNAVAILABLE => ['Unavailable', '#94a3b8'],
+        // Red, from Sir Peter's 4 October comparison. Grey now means the
+        // third answer, which is no answer at all.
+        self::UNAVAILABLE => ['Unavailable', '#ef4444'],
     ];
 
     public static function isState(?string $state): bool

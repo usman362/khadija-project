@@ -27,12 +27,13 @@
     .av-day.is-today { border-color: var(--accent-orange, #ea580c); }
     .av-num { font-size: 12.5px; font-weight: 800; color: var(--text-primary); }
     .av-ev { font-size: 10.5px; font-weight: 700; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .av-set { display: flex; gap: 5px; margin-top: auto; }
-    .av-btn { flex: 1; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 8px; padding: 4px 0;
-        font-family: inherit; font-size: 10.5px; font-weight: 800; cursor: pointer; color: var(--text-muted); }
-    .av-btn:hover { border-color: var(--text-muted); }
-    .av-btn.on-free { background: rgba(16,185,129,.14); border-color: #10b981; color: #047857; }
-    .av-btn.on-busy { background: rgba(148,163,184,.2); border-color: #94a3b8; color: #475569; }
+    .av-set { display: flex; margin-top: auto; }
+    .av-btn { flex: 1; display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; border-radius: 8px;
+        padding: 4px 2px; font-family: inherit; font-size: 11px; font-weight: 700; cursor: pointer; color: var(--text-muted); text-align: left; }
+    .av-btn.is-set { color: var(--text-primary); }
+    .av-btn:hover { background: var(--bg-card-hover, #f1f5f9); }
+    .av-btn i { width: 9px; height: 9px; border-radius: 50%; flex: none; display: inline-block;
+        background: transparent; border: 1.5px solid var(--border-color); }
 
     .av-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; font-size: 12px; color: var(--text-secondary); }
     .av-legend span { display: inline-flex; align-items: center; gap: 6px; }
@@ -98,19 +99,46 @@
                                 @if($evs->isNotEmpty())
                                     <span class="av-ev" title="{{ $evs->pluck('title')->implode(', ') }}">{{ $evs->count() }} {{ \Illuminate\Support\Str::plural('event', $evs->count()) }}</span>
                                 @endif
-                                <span class="av-set">
-                                    @foreach([Availability::AVAILABLE => ['Free', 'on-free'], Availability::UNAVAILABLE => ['Busy', 'on-busy']] as $value => [$word, $cls])
-                                        <form method="POST" action="{{ route('client.calendar.availability') }}" style="display:contents;">
-                                            @csrf
-                                            <input type="hidden" name="day" value="{{ $key }}">
-                                            <input type="hidden" name="state" value="{{ $value }}">
-                                            <input type="hidden" name="back" value="{{ $back }}">
-                                            <button type="submit" class="av-btn {{ $state === $value ? $cls : '' }}"
-                                                    title="{{ $cursor->format('M j') }}: {{ $state === $value ? 'marked ' . strtolower(Availability::STATES[$value][0]) . ', press to clear' : 'mark ' . strtolower(Availability::STATES[$value][0]) }}"
-                                                    aria-pressed="{{ $state === $value ? 'true' : 'false' }}">{{ $word }}</button>
-                                        </form>
-                                    @endforeach
-                                </span>
+                                @php
+                                    /*
+                                     * Sir Peter, 4 Oct, with a version from
+                                     * ChatGPT beside ours: one row per day, a
+                                     * dot and a word, one click. He is right
+                                     * that two buttons on every square was
+                                     * noisier than it needed to be.
+                                     *
+                                     * His version defaults every day to
+                                     * Unavailable. That part is not taken: a
+                                     * new client would open the month to
+                                     * thirty one red dots, with the platform
+                                     * saying they are busy on days nobody
+                                     * asked them about. So the click cycles
+                                     * through three, and an untouched day is
+                                     * hollow and says Not set.
+                                     *
+                                     * Posting the state a day already holds
+                                     * clears it, which is what turns the last
+                                     * step of the cycle back to nothing.
+                                     */
+                                    $next = $state === null
+                                        ? Availability::AVAILABLE
+                                        : Availability::UNAVAILABLE;
+
+                                    [$word, $dot] = $state
+                                        ? Availability::STATES[$state]
+                                        : ['Not set', null];
+                                @endphp
+                                <form method="POST" action="{{ route('client.calendar.availability') }}" class="av-set">
+                                    @csrf
+                                    <input type="hidden" name="day" value="{{ $key }}">
+                                    <input type="hidden" name="state" value="{{ $next }}">
+                                    <input type="hidden" name="back" value="{{ $back }}">
+                                    <button type="submit" class="av-btn {{ $state ? 'is-set' : '' }}"
+                                            title="{{ $cursor->format('M j') }}: {{ strtolower($word) }}. Click to change."
+                                            aria-label="{{ $cursor->format('l, F j') }}: {{ strtolower($word) }}. Click to change.">
+                                        <i style="{{ $dot ? 'background:' . $dot . ';border-color:' . $dot . ';' : '' }}"></i>{{ $word }}
+                                    </button>
+                                </form>
                             </div>
                         </td>
                         @php $cursor->addDay(); @endphp
@@ -122,9 +150,10 @@
 
     <div class="av-legend">
         @foreach(Availability::STATES as [$label, $colour])
-            <span><i style="background:{{ $colour }};"></i>{{ $label }}</span>
+            <span><i style="background:{{ $colour }};border-color:{{ $colour }};"></i>{{ $label }}</span>
         @endforeach
-        <span><i style="background:transparent;border:1px solid var(--border-color);"></i>Not answered</span>
+        <span><i style="background:transparent;border:1px solid var(--border-color);"></i>Not set</span>
+        <span style="color:var(--text-muted);">Click a day to change it.</span>
     </div>
 
     <div class="av-block">
