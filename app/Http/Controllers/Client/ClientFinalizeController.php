@@ -44,7 +44,8 @@ class ClientFinalizeController extends Controller
         // Keyed on the SERVICE too (B6): see App\Domain\Requests\Award.
         $fin = \App\Domain\Requests\Award::openFinalization($bid);
 
-        return redirect()->route('client.finalize.step', [$fin, 'bid']);
+        // Move Forward lands on the agreement, not on step one of a wizard.
+        return redirect()->route('client.finalize.overview', $fin);
     }
 
     public function show(Request $request, Finalization $finalization, string $step = 'bid'): View|RedirectResponse
@@ -84,6 +85,53 @@ class ClientFinalizeController extends Controller
             // so plainly instead of implying real money moved.
             'payMode'   => $this->paymentMode(),
             'goLive'    => filter_var(config('payments.go_live', false), FILTER_VALIDATE_BOOLEAN),
+        ]);
+    }
+
+    /**
+     * The Agreement Workspace, as Sir Peter drew it on 27 September.
+     *
+     * One page rather than a wizard: the client down the left, the agreement
+     * in the middle in his three phases, the professional down the right, and
+     * the conversation beside it, "all within the same area so they both can
+     * be directly one on one".
+     *
+     * The steps are still there and still do the work. This is where you
+     * arrive, what you read, and what you approve or send back from; a phase
+     * that has not been settled links to the step that settles it.
+     */
+    public function overview(Request $request, Finalization $finalization): View
+    {
+        $this->authorizeClient($request, $finalization);
+
+        $finalization->load([
+            'event.categories', 'supplier.profile', 'bid.category', 'payment',
+            'supplier' => fn ($q) => $q
+                ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')
+                ->withCount(['reviewsReceived as reviews_count' => fn ($r) => $r->where('is_hidden', false)]),
+        ]);
+
+        /*
+         * The conversation this agreement is about, so the messages sit beside
+         * the terms instead of being somewhere else. Only one that already
+         * exists: opening an agreement is not a reason to start a thread
+         * nobody asked for.
+         */
+        $conversation = \App\Models\Conversation::whereHas('participants', fn ($q) => $q->where('users.id', $request->user()->id))
+            ->whereHas('participants', fn ($q) => $q->where('users.id', $finalization->supplier_id))
+            ->latest('updated_at')
+            ->first();
+
+        return view('client.finalize.workspace', [
+            'fin'          => $finalization,
+            'event'        => $finalization->event,
+            'pro'          => $finalization->supplier,
+            'bid'          => $finalization->bid,
+            'steps'        => Finalization::STEPS,
+            'conversation' => $conversation,
+            'messages'     => $conversation
+                ? $conversation->messages()->with('sender:id,name,avatar')->latest()->take(12)->get()->reverse()
+                : collect(),
         ]);
     }
 

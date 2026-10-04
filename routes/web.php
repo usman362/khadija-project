@@ -786,6 +786,14 @@ Route::middleware('auth')->group(function () {
         // ── Finalize With Professional — the 7-step agreement ────────
         Route::post('/finalize/start/{bid}', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'start'])
             ->name('client.finalize.start');
+        /*
+         * The agreement as one page, which is where Move Forward lands.
+         * Declared above the {step?} route below: that wildcard would read
+         * "agreement" as the name of a step and bounce it to step one.
+         */
+        Route::get('/finalize/{finalization}/agreement', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'overview'])
+            ->name('client.finalize.overview');
+
         Route::get('/finalize/{finalization}/{step?}', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'show'])
             ->name('client.finalize.step');
         Route::post('/finalize/{finalization}/{step}', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'save'])
