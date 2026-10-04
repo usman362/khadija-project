@@ -20,6 +20,27 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Deposit
+    |--------------------------------------------------------------------------
+    | Sir Peter, 2 October: "The clients should not have to enter any deposits
+    | that the professionals and influencers role bc it's upto them to decide
+    | on the percentage if any."
+    |
+    | He is right, and the client no longer chooses one. The professional has
+    | nowhere to set theirs either, because their side of the agreement is not
+    | open yet, and the deposit is what the checkout charges: left empty it
+    | would take nothing. So until a professional can name their own figure,
+    | this is the one used, and the client is told where it came from rather
+    | than being asked to pick it.
+    |
+    | The 15 to 50 band stays the rule for whatever is set.
+    */
+    'deposit_percent_default' => (int) env('DEPOSIT_PERCENT_DEFAULT', 25),
+    'deposit_percent_min'     => 15,
+    'deposit_percent_max'     => 50,
+
+    /*
+    |--------------------------------------------------------------------------
     | Client request fee (R10)
     |--------------------------------------------------------------------------
     | "$0 to submit / post / bid; a single $2.99 only on finalization (per

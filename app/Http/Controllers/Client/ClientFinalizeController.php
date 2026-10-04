@@ -234,17 +234,24 @@ class ClientFinalizeController extends Controller
 
     private function saveTerms(Request $request, Finalization $f): void
     {
-        // R-rule: the deposit sits inside a 15–50% band. Enforced, not suggested.
+        /*
+         * Sir Peter, 2 Oct: "The clients should not have to enter any deposits
+         * that the professionals and influencers role bc it's upto them to
+         * decide on the percentage if any."
+         *
+         * So the client is not asked for one. The percentage comes from the
+         * platform until a professional can set their own, because the deposit
+         * is what the checkout charges and an empty one would take nothing.
+         * The client still says when the balance is due and on what terms:
+         * those are theirs.
+         */
         $d = $request->validate([
-            'deposit_percent' => ['required', 'integer', 'min:15', 'max:50'],
-            'balance_due_on'  => ['nullable', 'date'],
-            'payment_terms'   => ['nullable', 'string', 'max:2000'],
-        ], [
-            'deposit_percent.min' => 'The deposit has to be at least 15%.',
-            'deposit_percent.max' => 'The deposit cannot be more than 50%.',
+            'balance_due_on' => ['nullable', 'date'],
+            'payment_terms'  => ['nullable', 'string', 'max:2000'],
         ]);
 
-        $d['deposit_amount'] = round(((float) $f->agreed_price) * $d['deposit_percent'] / 100, 2);
+        $d['deposit_percent'] = (int) config('payments.deposit_percent_default', 25);
+        $d['deposit_amount']  = round(((float) $f->agreed_price) * $d['deposit_percent'] / 100, 2);
 
         $f->update($d + ['terms_agreed_at' => now()]);
         \App\Domain\Agreements\Workspace::termsChanged($f, array_keys($d));

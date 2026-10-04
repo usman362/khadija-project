@@ -27,6 +27,14 @@
 </style>
 @endpush
 
+@push('styles')
+<style>
+    .fz-readonly { display: flex; align-items: center; height: 42px; padding: 0 13px; border-radius: 10px;
+        border: 1px solid var(--border-color); background: var(--bg-card-hover, #f8fafc);
+        font-size: 13.5px; font-weight: 800; color: var(--text-primary); }
+</style>
+@endpush
+
 @section('content')
 <style>
     .fz-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
@@ -294,16 +302,18 @@
         <h3>Deposit &amp; payment terms</h3>
         <p class="lede">What secures the booking now, and when the rest is due.</p>
         <div class="fz-two">
+            @php $depPct = (int) ($fin->deposit_percent ?: config('payments.deposit_percent_default', 25)); @endphp
             <div class="fz-f">
                 <label>Deposit</label>
-                <select name="deposit_percent" id="fzPct">
-                    @foreach([15,20,25,30,35,40,45,50] as $p)
-                        <option value="{{ $p }}" @selected((int) old('deposit_percent', $fin->deposit_percent ?? 25) === $p)>{{ $p }}%</option>
-                    @endforeach
-                </select>
-                {{-- The 15–50% band is a platform rule, so the control can't
-                     offer anything outside it and the server checks again. --}}
-                <p class="fz-help">Deposits run between 15% and 50%. On ${{ number_format((float) $fin->agreed_price) }} that's <b id="fzAmt">$0</b>.</p>
+                {{-- Sir Peter, 2 Oct: "The clients should not have to enter any
+                     deposits that the professionals and influencers role bc
+                     it's upto them to decide on the percentage if any."
+
+                     So it is shown, not chosen. It is the platform's figure
+                     until a professional can set their own, and it says so
+                     rather than looking like something the client picked. --}}
+                <div class="fz-readonly">{{ $depPct }}% &middot; ${{ number_format(((float) $fin->agreed_price) * $depPct / 100, 2) }}</div>
+                <p class="fz-help">You do not set this. It is the professional's to decide, and until they can, GigResource uses {{ $depPct }}% of the agreed ${{ number_format((float) $fin->agreed_price) }}.</p>
             </div>
             <div class="fz-f">
                 <label>Balance due on</label>
@@ -475,17 +485,8 @@ PAYMENT TERMS
 </form>
 
 @if($step === 'terms')
-<script>
-(function () {
-    // Show the deposit in money, not just a percentage — the client is agreeing
-    // to a figure, so show them the figure.
-    var price = {{ (float) $fin->agreed_price }};
-    var pct   = document.getElementById('fzPct');
-    var out   = document.getElementById('fzAmt');
-    function sync() { out.textContent = '$' + Math.round(price * pct.value / 100).toLocaleString(); }
-    pct.addEventListener('change', sync);
-    sync();
-})();
-</script>
+{{-- The script that kept the money in step with a chosen percentage went
+     with the chooser. The figure is printed beside the percentage now,
+     because the client is still agreeing to a sum and should see the sum. --}}
 @endif
 @endsection
