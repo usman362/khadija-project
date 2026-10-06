@@ -147,4 +147,40 @@ class BudgetGuideTest extends TestCase
 
         $this->assertNull(BudgetGuide::forService($other));
     }
+
+    /** It reaches the screen, on a request for a single service. */
+    public function test_the_budget_step_shows_it_for_one_service(): void
+    {
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
+        $this->client->assignRole('client');
+        $this->client->getOrCreateProfile()->update([
+            'country' => 'US', 'state' => 'MD', 'city' => 'Baltimore',
+            'service_area_status' => \App\Support\ServiceArea::SUPPORTED,
+        ]);
+        $client = User::findOrFail($this->client->id);
+
+        foreach ([600, 750, 900] as $a) {
+            $this->bid($a);
+        }
+
+        /*
+         * The per-service breakdown further down that step only appears with
+         * more than one service, because there is nothing to split otherwise.
+         * A request for one service is the one that needs the guide most, so
+         * it has its own line.
+         */
+        $this->actingAs($client)
+            ->withSession(['bsr_wizard' => [
+                'services'          => [$this->service],
+                'organization_type' => 'Individual',
+                'title'             => 'Probe event',
+                'description'       => 'A description long enough to pass the step guard.',
+            ]])
+            ->get('/client/bsr/budget')
+            ->assertOk()
+            ->assertSee('have bid $600 to $900', false)
+            ->assertSee('A guide from real bids, not a quote.');
+    }
 }

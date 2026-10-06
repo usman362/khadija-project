@@ -194,6 +194,8 @@
     .bw-split-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border-color); }
     .bw-split-row label { flex: 1; min-width: 0; }
     .bw-guide { display: block; margin-top: 2px; font-size: 11.5px; font-weight: 600; color: var(--text-muted); }
+    .bw-guideline { margin: 12px 0 0; padding: 10px 13px; border-radius: 10px; font-size: 12.5px; line-height: 1.55;
+        background: var(--bg-card-hover, #f8fafc); border: 1px solid var(--border-color); color: var(--text-secondary); }
     .bw-split-row:last-of-type { border-bottom: 0; }
     .bw-split-row label { flex: 1; font-size: 13.5px; color: var(--text-primary); }
     /* An amount reads as an amount: the currency is shown rather than typed,
@@ -835,6 +837,22 @@
     @elseif($step === 'budget')
         <h3>Budget</h3>
         <p class="lede">Give your budget, even a rough estimate: a "from", a "to", or both. It helps professionals send accurate proposals, and they may bid above it with an explanation.</p>
+        @php
+            $__svcIds = array_values(array_filter(array_map('intval', (array) ($data['services'] ?? []))));
+
+            /*
+             * Sir Peter's estimator, 26 Sep. The per-service breakdown below
+             * only appears on a request with more than one service, because
+             * there is nothing to split otherwise. The guide is not a split,
+             * and a client asking for one service needs it most, so it is
+             * worked out here and shown either way.
+             */
+            $__guides = \App\Domain\Requests\BudgetGuide::forServices(
+                $__svcIds,
+                auth()->user()?->profile?->state,
+            );
+        @endphp
+
         <div class="bw-two">
             <div class="bw-field">
                 <label>Budget from <span style="color:#dc2626;">*</span></label>
@@ -846,6 +864,17 @@
                 <input type="number" name="budget_max" min="0" step="1" value="{{ old('budget_max', $data['budget_max'] ?? '') }}" placeholder="e.g. 1200">
             </div>
         </div>
+
+        {{-- On a single-service request this is the only place the guide can
+             go: the breakdown below is a split, and there is nothing to split.
+             It is the request that needs it most, since the whole budget is
+             for this one piece of work. --}}
+        @if(count($__svcIds) === 1 && ($__g1 = $__guides[$__svcIds[0]] ?? null))
+            <p class="bw-guideline">
+                {{ \App\Domain\Requests\BudgetGuide::sentence($__g1) }}
+                A guide from real bids, not a quote.
+            </p>
+        @endif
         {{-- The per-service split.
 
              Bids have always been per service — a professional bids on ONE of
@@ -857,24 +886,10 @@
              Only shown when there IS something to split. A single-service
              request has one budget and no breakdown to make. --}}
         @php
-            $__svcIds = array_values(array_filter(array_map('intval', (array) ($data['services'] ?? []))));
             $__svcs   = count($__svcIds) > 1
                 ? \App\Models\Category::whereIn('id', $__svcIds)->orderBy('name')->get(['id', 'name'])
                 : collect();
             $__split  = (array) ($data['service_budgets'] ?? []);
-
-            /*
-             * Sir Peter, 26 Sep: a rough estimator "so they are not over
-             * guessing", from what professionals charge. No price list
-             * exists, so this is built from what they have actually bid,
-             * which is the better evidence: a price list is what somebody
-             * hopes to charge, a bid is what they offered for a real job.
-             * It says nothing at all where there are too few to speak from.
-             */
-            $__guides = \App\Domain\Requests\BudgetGuide::forServices(
-                $__svcs->pluck('id')->all(),
-                auth()->user()?->profile?->state,
-            );
         @endphp
 
         @if($__svcs->isNotEmpty())
