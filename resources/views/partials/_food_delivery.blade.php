@@ -69,10 +69,20 @@ document.addEventListener('change', function (e) {
 /*
  * Show the question the moment a food service is ticked.
  *
- * Keyed on the service CATEGORY each service sits under (data-parent, already
- * rendered by the service picker), not on the service name — "Food Truck
- * Booking" has no word in it that a name check would catch, and a name check
- * would ask about delivery for "Food Photography".
+ * Keyed on the service CATEGORY each service sits under, not on the service
+ * name — "Food Truck Booking" has no word in it that a name check would
+ * catch, and a name check would ask about delivery for "Food Photography".
+ *
+ * Sir Peter, 6 Oct, on an Emergency Request that would not submit: "Step 2:
+ * Say how the food gets to your event... BUT there is no question there that
+ * asked this question". There was: hidden, waiting for this to reveal it, and
+ * reading a data-parent attribute on each service that nothing has ever
+ * rendered. So it never revealed itself on any form, while the server went on
+ * demanding an answer to a question nobody could see.
+ *
+ * The picker does say which category a service sits under: data-group, on the
+ * section around it. That is read now, rather than a second attribute being
+ * added to say the same thing twice.
  */
 (function () {
     var FOOD = @json(\App\Domain\Requests\FoodDelivery::foodCategoryIds());
@@ -83,8 +93,8 @@ document.addEventListener('change', function (e) {
         return Array.prototype.some.call(
             document.querySelectorAll('.svc-item input:checked'),
             function (input) {
-                var parent = parseInt(input.closest('.svc-item').dataset.parent, 10);
-                return FOOD.indexOf(parent) !== -1;
+                var group = input.closest('.svc-group');
+                return !! group && FOOD.indexOf(parseInt(group.dataset.group, 10)) !== -1;
             }
         );
     }
