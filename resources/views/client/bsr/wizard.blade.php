@@ -869,10 +869,20 @@
              go: the breakdown below is a split, and there is nothing to split.
              It is the request that needs it most, since the whole budget is
              for this one piece of work. --}}
-        @if(count($__svcIds) === 1 && ($__g1 = $__guides[$__svcIds[0]] ?? null))
+        @if(count($__svcIds) === 1)
+            @php
+                $__g1 = $__guides[$__svcIds[0]] ?? null;
+                $__st = auth()->user()?->profile?->state;
+            @endphp
             <p class="bw-guideline">
-                {{ \App\Domain\Requests\BudgetGuide::sentence($__g1) }}
-                A guide from real bids, not a quote.
+                @if($__g1)
+                    {{ \App\Domain\Requests\BudgetGuide::sentence($__g1) }}
+                    A guide from real bids, not a quote.
+                @else
+                    {{-- Saying nothing was worse than saying there is nothing:
+                         an empty space reads as a broken feature, and did. --}}
+                    {{ \App\Domain\Requests\BudgetGuide::silence((int) $__svcIds[0], $__st) }}
+                @endif
             </p>
         @endif
         {{-- The per-service split.
@@ -906,15 +916,17 @@
                     <div class="bw-split-row">
                         <label for="sb-{{ $svc->id }}">
                             {{ $svc->name }}
+                            {{-- What was actually bid, not a guess dressed as
+                                 one, and where there is too little to say, it
+                                 says that instead of leaving a gap that reads
+                                 as broken. --}}
                             @if($__g)
-                                {{-- What was actually bid, not a guess dressed
-                                     as one. The sentence says how many bids it
-                                     is drawn from and whether they were local,
-                                     so the client can weigh it. --}}
                                 <small class="bw-guide" title="{{ \App\Domain\Requests\BudgetGuide::sentence($__g) }}">
                                     Others bid ${{ number_format($__g['low']) }} to ${{ number_format($__g['high']) }}
                                     &middot; usually ${{ number_format($__g['typical']) }}
                                 </small>
+                            @else
+                                <small class="bw-guide">No bid history for this service yet</small>
                             @endif
                         </label>
                         <span class="bw-amount">

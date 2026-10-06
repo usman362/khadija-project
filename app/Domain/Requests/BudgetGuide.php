@@ -107,6 +107,37 @@ final class BudgetGuide
         ];
     }
 
+    /**
+     * How many bids there are for a service, whatever the answer.
+     *
+     * forService() returns nothing below the minimum, which is right: it must
+     * not quote a market it cannot see. But a screen that then says nothing at
+     * all is indistinguishable from a broken one, and that is how this looked
+     * when it first went out. So the page can ask how little there is and say
+     * so.
+     */
+    public static function bidCount(int $categoryId, ?string $state = null): int
+    {
+        $local = $state ? self::amounts($categoryId, $state)->count() : 0;
+
+        return max($local, self::amounts($categoryId, null)->count());
+    }
+
+    /** Why there is no figure, in the same voice as the figure itself. */
+    public static function silence(int $categoryId, ?string $state = null): string
+    {
+        $n = self::bidCount($categoryId, $state);
+
+        if ($n === 0) {
+            return 'No professional has bid on this service yet, so there is nothing to compare your budget with.';
+        }
+
+        return 'Only ' . $n . ' ' . \Illuminate\Support\Str::plural('professional', $n)
+            . ' ' . ($n === 1 ? 'has' : 'have') . ' bid on this service so far. '
+            . 'GigResource waits for ' . self::MINIMUM . ' before quoting a range, '
+            . 'because fewer than that is not a guide, it is an anecdote.';
+    }
+
     /** How to say it, in one sentence, without overstating what it is. */
     public static function sentence(array $guide): string
     {

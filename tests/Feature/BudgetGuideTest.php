@@ -183,4 +183,43 @@ class BudgetGuideTest extends TestCase
             ->assertSee('have bid $600 to $900', false)
             ->assertSee('A guide from real bids, not a quote.');
     }
+
+    /**
+     * Where there is no range, the screen says why.
+     *
+     * The first version simply showed nothing, which is indistinguishable
+     * from a feature that is broken, and was taken for one.
+     */
+    public function test_it_says_why_there_is_no_figure(): void
+    {
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
+        $this->client->assignRole('client');
+        $this->client->getOrCreateProfile()->update([
+            'country' => 'US', 'state' => 'MD', 'city' => 'Baltimore',
+            'service_area_status' => \App\Support\ServiceArea::SUPPORTED,
+        ]);
+        $client = User::findOrFail($this->client->id);
+
+        $session = ['bsr_wizard' => [
+            'services'          => [$this->service],
+            'organization_type' => 'Individual',
+            'title'             => 'Probe event',
+            'description'       => 'A description long enough to pass the step guard.',
+        ]];
+
+        // Nothing at all.
+        $this->actingAs($client)->withSession($session)->get('/client/bsr/budget')
+            ->assertOk()
+            ->assertSee('No professional has bid on this service yet');
+
+        // Something, but not enough, and it says how little.
+        $this->bid(500);
+        $this->bid(700);
+
+        $this->actingAs($client)->withSession($session)->get('/client/bsr/budget')
+            ->assertOk()
+            ->assertSee('Only 2 professionals have bid on this service so far', false);
+    }
 }
