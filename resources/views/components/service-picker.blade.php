@@ -356,6 +356,11 @@
         var searchBtn = root.querySelector('.svc-search button');
         if (searchBtn) searchBtn.addEventListener('click', function () { if (searchEl) searchEl.focus(); });
 
+        /* Clear all empties the picker. It cannot empty what the server is
+           holding on its own: that happens when the step is submitted, or
+           when the client leaves, which now discards the request. Before
+           those two met in the middle, a client could clear every service,
+           walk away, come back, and find them all ticked again. */
         var clear = root.querySelector('.svc-clear');
         if (clear) clear.addEventListener('click', function () {
             cells.forEach(function (cell) {

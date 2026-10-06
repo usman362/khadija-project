@@ -343,6 +343,34 @@ class ClientBsrController extends Controller
             : Category::whereIn('id', $focus)->orderBy('name')->pluck('name')->all();
     }
 
+    /**
+     * Leave, and leave nothing behind.
+     *
+     * Ali, 6 October: "yeh already selected q araha hai, mene exit button bhi
+     * press kia tha aur clear all bhi, to faida kia in buttons ka."
+     *
+     * Exit was a link to My Events and nothing more. The half-built request
+     * stayed in the session, so coming back to the wizard silently resumed it,
+     * with services the client had deliberately cleared still ticked. Clear
+     * all only unticked boxes in the browser, which the session never heard
+     * about.
+     *
+     * So Exit discards it. Keeping a part-built request is what Save draft is
+     * for, and it is the button right next to this one: two ways to leave,
+     * and now they mean different things.
+     */
+    public function exit(Request $request): RedirectResponse
+    {
+        $had = ! empty($this->state($request));
+
+        Session::forget(self::KEY);
+
+        return redirect()->route('client.events.index')->with(
+            'status',
+            $had ? 'Request discarded. Nothing was saved, and nothing was sent.' : null,
+        );
+    }
+
     /** Save one step and move on (or back, or straight to a draft). */
     public function save(Request $request, string $step): RedirectResponse
     {

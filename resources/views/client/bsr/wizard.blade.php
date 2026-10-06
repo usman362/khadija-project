@@ -369,7 +369,14 @@
     <div></div>
     <div class="bw-acts">
         @if($draftId)<span style="font-size:12px;color:var(--ok-text);font-weight:700;">✓ Draft saved</span>@endif
-        <a class="bw-btn" href="{{ route('client.events.index') }}">Exit</a>
+        {{-- Exit throws the half-built request away. Keeping one is what
+             Save draft is for, so the two buttons now mean different things,
+             and this one says which before it does it. --}}
+        <form method="POST" action="{{ route('client.bsr.exit') }}" style="display:inline;"
+              onsubmit="return confirm('Leave and discard this request? Nothing is saved unless you press Save draft.');">
+            @csrf
+            <button type="submit" class="bw-btn">Exit</button>
+        </form>
     </div>
 </div>
 

@@ -765,6 +765,11 @@ Route::middleware('auth')->group(function () {
             ->name('client.proposals.index');
 
         // ── BSR (Bidding Service Request) create wizard ──────────────
+        // Leaving the wizard throws the half-built request away; Save draft
+        // is the button for keeping one.
+        Route::post('/bsr/exit', [\App\Http\Controllers\Client\ClientBsrController::class, 'exit'])
+            ->name('client.bsr.exit');
+
         Route::get('/bsr/{step?}', [\App\Http\Controllers\Client\ClientBsrController::class, 'show'])
             ->middleware('permission:events.create')->name('client.bsr.step');
         Route::post('/bsr/{step}', [\App\Http\Controllers\Client\ClientBsrController::class, 'save'])
