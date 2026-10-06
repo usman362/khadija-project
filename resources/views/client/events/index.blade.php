@@ -31,7 +31,10 @@
 
     /* Stat cards */
     .mg-stats { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 12px; margin-bottom: 16px; }
-    .mg-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; }
+    .mg-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start;
+        text-decoration: none; transition: border-color .12s, box-shadow .12s; }
+    a.mg-stat:hover { border-color: var(--text-muted); }
+    a.mg-stat.is-on { border-color: var(--brand, #f97316); box-shadow: 0 0 0 1px var(--brand, #f97316) inset; }
     .mg-stat-ico { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .mg-stat-ico svg { width: 18px; height: 18px; }
     .mg-stat-ico.coral  { background: rgba(249,115,22,0.12); color: var(--brand-text); }
@@ -466,35 +469,57 @@
     </div>
 
     {{-- Stat cards --}}
+    {{-- The tiles are the status filter.
+
+         Sir Peter, 7 Oct: "many duplicated for the same purpose, can you go
+         thru this webpage and then make all the cards with the weblinks that
+         belong?" Pressing one narrows the list; Total Events clears it. Every
+         tile counts EVENTS and each is a subset of the first, so the figures
+         still reconcile, and drafts and cancelled events have no tile of
+         their own, which is why Total Events names them. --}}
+    @php
+        $mgLink = fn (?string $status) => route('client.events.index', array_filter(
+            array_merge(request()->except(['page', 'status']), ['tab' => 'list', 'status' => $status])
+        ));
+
+        $notTiled = [];
+        if ($stats['list_draft'])     { $notTiled[] = $stats['list_draft'] . ' ' . \Illuminate\Support\Str::plural('draft', $stats['list_draft']); }
+        if ($stats['list_cancelled']) { $notTiled[] = $stats['list_cancelled'] . ' cancelled'; }
+
+        $mgTiles = [
+            [null, 'Total Events', 'coral', $stats['total'],
+             $notTiled ? 'All time, incl. ' . implode(' and ', $notTiled) : 'All time',
+             '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'],
+            ['open', 'Open', 'amber', $stats['list_open'], 'Taking proposals',
+             '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'],
+            ['in_progress', 'In Progress', 'green', $stats['list_in_progress'], 'Professionals booked',
+             '<polyline points="20 6 9 17 4 12"/>'],
+            ['completed', 'Completed', 'indigo', $stats['list_completed'], 'Events finished',
+             '<path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/>'],
+            ['past', 'Past Events', 'purple', $stats['list_past'], 'Date has passed',
+             '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="14" x2="15" y2="20"/><line x1="15" y1="14" x2="9" y2="20"/>'],
+        ];
+    @endphp
     <div class="mg-stats">
-        <div class="mg-stat">
-            <div class="mg-stat-ico coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-            {{-- Every tile counts EVENTS, and each is a subset of this one.
-                 OA-170: drafts and cancelled events have no tile of their own,
-                 so the caption names them and the five figures reconcile. --}}
-            @php
-                $notTiled = [];
-                if ($stats['list_draft'])     { $notTiled[] = $stats['list_draft'] . ' ' . \Illuminate\Support\Str::plural('draft', $stats['list_draft']); }
-                if ($stats['list_cancelled']) { $notTiled[] = $stats['list_cancelled'] . ' cancelled'; }
-            @endphp
-                            <div><div class="mg-stat-label">Total Events</div><div class="mg-stat-value">{{ $stats['total'] }}</div><div class="mg-stat-delta flat">{{ $notTiled ? 'All time, incl. ' . implode(' and ', $notTiled) : 'All time' }}</div></div>
-        </div>
-        <div class="mg-stat">
-            <div class="mg-stat-ico amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-            <div><div class="mg-stat-label">Open</div><div class="mg-stat-value">{{ $stats['list_open'] }}</div><div class="mg-stat-delta flat">Taking proposals</div></div>
-        </div>
-        <div class="mg-stat">
-            <div class="mg-stat-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div><div class="mg-stat-label">In Progress</div><div class="mg-stat-value">{{ $stats['list_in_progress'] }}</div><div class="mg-stat-delta flat">Professionals booked</div></div>
-        </div>
-        <div class="mg-stat">
-            <div class="mg-stat-ico indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg></div>
-            <div><div class="mg-stat-label">Completed</div><div class="mg-stat-value">{{ $stats['list_completed'] }}</div><div class="mg-stat-delta flat">Events finished</div></div>
-        </div>
-        <div class="mg-stat">
-            <div class="mg-stat-ico purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="14" x2="15" y2="20"/><line x1="15" y1="14" x2="9" y2="20"/></svg></div>
-            <div><div class="mg-stat-label">Past Events</div><div class="mg-stat-value">{{ $stats['list_past'] }}</div><div class="mg-stat-delta flat">Date has passed</div></div>
-        </div>
+        @foreach($mgTiles as [$status, $label, $tone, $value, $caption, $icon])
+            {{-- data-no-live: this page swaps its list in place, and a tile
+                 is a change of filter rather than a refresh of the same one,
+                 so it navigates like a link. --}}
+            <a class="mg-stat {{ request('status') === $status || (! request('status') && $status === null) ? 'is-on' : '' }}"
+               data-no-live
+               href="{{ $mgLink($status) }}"
+               @if(request('status') === $status || (! request('status') && $status === null)) aria-current="page" @endif
+               title="{{ $status === null ? 'Show every event' : 'Show only ' . strtolower($label) }}">
+                <div class="mg-stat-ico {{ $tone }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">{!! $icon !!}</svg>
+                </div>
+                <div>
+                    <div class="mg-stat-label">{{ $label }}</div>
+                    <div class="mg-stat-value">{{ $value }}</div>
+                    <div class="mg-stat-delta flat">{{ $caption }}</div>
+                </div>
+            </a>
+        @endforeach
     </div>
 
     {{-- Filter row --}}
@@ -799,41 +824,12 @@
     {{-- ════════════ DETAILS VIEW ════════════ --}}
     <div class="cl-tab-content" id="tab-details">
     <div id="mgDetails" data-live-region>
-        {{-- Stats Row --}}
+        {{-- Sir Peter, 7 Oct: "many duplicated for the same purpose".
+
+             Three of the four tiles here counted what the tiles above the
+             list already count, in the same numbers, and those are the filter
+             now. Only the money was this view's own, so only the money stays. --}}
         <div class="cl-grid cl-grid-4" style="margin-bottom: 24px;">
-            <div class="cl-card">
-                <div class="cl-stat-card">
-                    <div class="cl-stat-icon blue">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    </div>
-                    <div>
-                        <div class="cl-stat-label">Total Events</div>
-                        <div class="cl-stat-value">{{ $stats['total'] }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="cl-card">
-                <div class="cl-stat-card">
-                    <div class="cl-stat-icon green">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                    </div>
-                    <div>
-                        <div class="cl-stat-label">Open Events</div>
-                        <div class="cl-stat-value">{{ $stats['open'] }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="cl-card">
-                <div class="cl-stat-card">
-                    <div class="cl-stat-icon yellow">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    </div>
-                    <div>
-                        <div class="cl-stat-label">Upcoming</div>
-                        <div class="cl-stat-value">{{ $stats['upcoming'] }}</div>
-                    </div>
-                </div>
-            </div>
             <div class="cl-card">
                 <div class="cl-stat-card">
                     <div class="cl-stat-icon pink">

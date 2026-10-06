@@ -18,7 +18,7 @@ use Tests\TestCase;
  *
  * The cards are the filter now.
  */
-class ProposalCardsAreTheFilterTest extends TestCase
+class StatCardsAreTheFilterTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -66,5 +66,40 @@ class ProposalCardsAreTheFilterTest extends TestCase
             ->get(route('client.proposals.index', ['tab' => 'accepted']))
             ->assertOk()
             ->assertSee('aria-current="page"', false);
+    }
+
+    /**
+     * My Events got the same treatment on the same day, and had the worse
+     * version of the fault: a second set of tiles inside Details View
+     * counting the same events again.
+     */
+    public function test_my_events_tiles_filter_and_do_not_repeat_themselves(): void
+    {
+        $page = $this->actingAs($this->client)->get(route('client.events.index'))->assertOk();
+
+        foreach (['open', 'in_progress', 'completed', 'past'] as $status) {
+            $page->assertSee('status=' . $status, false);
+        }
+
+        $markup = file_get_contents(base_path('resources/views/client/events/index.blade.php'));
+
+        $this->assertStringNotContainsString('cl-stat-label">Total Events', $markup,
+            'Details View counts the events a second time again.');
+        $this->assertStringNotContainsString('cl-stat-label">Open Events', $markup);
+        $this->assertStringContainsString('cl-stat-label">Total Budget', $markup,
+            'Total Budget was the one figure Details View owned; it should stay.');
+    }
+
+    /** The numbers on a filter must not move when you press it. */
+    public function test_the_tiles_count_everything_whatever_is_filtered(): void
+    {
+        $all = $this->actingAs($this->client)->get(route('client.events.index'))->getContent();
+        $one = $this->actingAs($this->client)->get(route('client.events.index', ['status' => 'past']))->getContent();
+
+        preg_match_all('/mg-stat-value">(\d+)</', $all, $a);
+        preg_match_all('/mg-stat-value">(\d+)</', $one, $b);
+
+        $this->assertSame($a[1], $b[1],
+            'Filtering changed the numbers on the filter, so pressing one tile renumbers the rest.');
     }
 }
