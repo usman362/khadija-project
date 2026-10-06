@@ -16,7 +16,10 @@
     .pr-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 18px; }
 
     .pr-stats { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 12px; margin-bottom: 16px; }
-    .pr-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px; display: flex; gap: 10px; align-items: center; }
+    .pr-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px; display: flex; gap: 10px; align-items: center;
+        text-decoration: none; transition: border-color .12s, box-shadow .12s; }
+    a.pr-stat:hover { border-color: var(--text-muted); }
+    a.pr-stat.is-on { border-color: var(--brand, #f97316); box-shadow: 0 0 0 1px var(--brand, #f97316) inset; }
     .pr-stat-ico { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .pr-stat-ico svg { width: 16px; height: 16px; }
     .pr-stat-ico.coral  { background: rgba(249,115,22,0.12); color: var(--brand-text); }
@@ -28,11 +31,8 @@
     .pr-stat-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
     .pr-stat-value { font-size: 20px; font-weight: 800; color: var(--text-primary); }
 
-    .pr-tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 14px; flex-wrap: wrap; }
-    .pr-tab { display: inline-flex; align-items: center; gap: 6px; padding: 10px 2px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-decoration: none; border-bottom: 2px solid transparent; margin-bottom: -1px; }
-    .pr-tab .cnt { font-size: 11px; color: var(--text-muted); }
-    .pr-tab.active { color: var(--brand-text); border-bottom-color: #f97316; }
-    .pr-tab.active .cnt { color: var(--brand-text); }
+    /* The pipeline tabs are gone: the stat cards above them said the same
+       six words with the same six numbers, and are the filter now. */
 
     .pr-toolbar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
     .pr-search { position: relative; flex: 1; min-width: 220px; }
@@ -129,14 +129,6 @@
 
 @section('content')
 @php
-    $tabs = [
-        'all'         => ['All Proposals', $stats['submitted']],
-        'pending'     => ['Pending', $stats['pending']],
-        'accepted'    => ['Accepted', $stats['accepted']],
-        'in_progress' => ['In Progress', $stats['in_progress']],
-        'completed'   => ['Completed', $stats['completed']],
-        'declined'    => ['Declined', $stats['declined']],
-    ];
     $statusToPipe = fn ($s) => match ($s) {
         'submitted', 'shortlisted', 'requested' => 'pending',
         'won', 'confirmed' => 'accepted',
@@ -154,20 +146,39 @@
         <button class="pr-tool-btn" style="background:#f97316;color:#fff;border-color:#f97316;" onclick="window.location='{{ route('client.post-event.choose') }}'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Post an Event</button>
     </div>
 
-    {{-- Stat cards --}}
-    <div class="pr-stats">
-        <div class="pr-stat"><div class="pr-stat-ico coral"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div><div><div class="pr-stat-label">Submitted</div><div class="pr-stat-value">{{ $stats['submitted'] }}</div></div></div>
-        <div class="pr-stat"><div class="pr-stat-ico amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="pr-stat-label">Pending</div><div class="pr-stat-value">{{ $stats['pending'] }}</div></div></div>
-        <div class="pr-stat"><div class="pr-stat-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><div><div class="pr-stat-label">Accepted</div><div class="pr-stat-value">{{ $stats['accepted'] }}</div></div></div>
-        <div class="pr-stat"><div class="pr-stat-ico indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div><div><div class="pr-stat-label">In Progress</div><div class="pr-stat-value">{{ $stats['in_progress'] }}</div></div></div>
-        <div class="pr-stat"><div class="pr-stat-ico purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div><div class="pr-stat-label">Completed</div><div class="pr-stat-value">{{ $stats['completed'] }}</div></div></div>
-        <div class="pr-stat"><div class="pr-stat-ico red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><div><div class="pr-stat-label">Declined</div><div class="pr-stat-value">{{ $stats['declined'] }}</div></div></div>
-    </div>
+    {{-- Stat cards.
 
-    {{-- Pipeline tabs --}}
-    <div class="pr-tabs">
-        @foreach($tabs as $key => [$label, $count])
-            <a href="{{ route('client.proposals.index', array_filter(['tab' => $key, 'event' => $scoped?->id])) }}" class="pr-tab {{ $tab === $key ? 'active' : '' }}">{{ $label }} <span class="cnt">{{ $count }}</span></a>
+         Sir Peter, 7 Oct: "duplicated for the same purpose, can you remove
+         the image 2 on the webpage but then make all the cards with the
+         weblinks since image 2 is no longer being used in the webpage."
+
+         The row of tabs under these said the same six words with the same six
+         numbers. The cards are the filter now, so there is one list of
+         states on the page and pressing one is how you narrow the table. --}}
+    @php
+        $prCards = [
+            'all'         => ['Submitted',   'coral',  $stats['submitted'],   '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>'],
+            'pending'     => ['Pending',     'amber',  $stats['pending'],     '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'],
+            'accepted'    => ['Accepted',    'green',  $stats['accepted'],    '<polyline points="20 6 9 17 4 12"/>'],
+            'in_progress' => ['In Progress', 'indigo', $stats['in_progress'], '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>'],
+            'completed'   => ['Completed',   'purple', $stats['completed'],   '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'],
+            'declined'    => ['Declined',    'red',    $stats['declined'],    '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>'],
+        ];
+    @endphp
+    <div class="pr-stats">
+        @foreach($prCards as $key => [$label, $tone, $count, $icon])
+            <a class="pr-stat {{ $tab === $key ? 'is-on' : '' }}"
+               href="{{ route('client.proposals.index', array_filter(['tab' => $key, 'event' => $scoped?->id])) }}"
+               @if($tab === $key) aria-current="page" @endif
+               title="{{ $key === 'all' ? 'Show every proposal' : 'Show only ' . strtolower($label) . ' proposals' }}">
+                <div class="pr-stat-ico {{ $tone }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">{!! $icon !!}</svg>
+                </div>
+                <div>
+                    <div class="pr-stat-label">{{ $label }}</div>
+                    <div class="pr-stat-value">{{ $count }}</div>
+                </div>
+            </a>
         @endforeach
     </div>
 
