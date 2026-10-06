@@ -26,6 +26,20 @@ class ServiceDetails
             'service_details.*'   => ['nullable', 'array'],
             'service_details.*.*' => ['nullable', 'integer', new \App\Rules\ServiceDetail],
             'service_missing'     => ['nullable', 'string', 'max:150'],
+
+            /*
+             * Sir Peter, 6 Oct: "if the client selects a MSRs when filling out
+             * the BR, ER, or DR, then each of them should make and have the
+             * timeline for each services requested."
+             *
+             * The bidding request validated these itself; the other two did
+             * not ask for them at all. Here, so all three ask and check the
+             * same way.
+             */
+            'service_times'         => ['nullable', 'array'],
+            'service_times.*.start' => ['nullable', 'date_format:H:i'],
+            'service_times.*.end'   => ['nullable', 'date_format:H:i'],
+            'service_times.*.note'  => ['nullable', 'string', 'max:150'],
         ];
     }
 
@@ -121,7 +135,21 @@ class ServiceDetails
     /** Write both onto a request in one step. */
     public static function apply(Event $event, array $serviceIds, array $input): void
     {
-        $event->categories()->sync(self::sync($serviceIds, (array) ($input['service_details'] ?? [])));
+        /*
+         * The hours each service runs travel with it, on the same pivot as
+         * its details. The bidding request did this from its own controller;
+         * doing it here means the Emergency and Direct Requests get it too,
+         * rather than three forms each remembering to.
+         */
+        $event->categories()->sync(self::sync(
+            $serviceIds,
+            (array) ($input['service_details'] ?? []),
+            ServiceTimeline::fromInput(
+                (array) ($input['service_times'] ?? []),
+                $serviceIds,
+                $event->starts_at,
+            ),
+        ));
 
         $missing = trim((string) ($input['service_missing'] ?? ''));
 

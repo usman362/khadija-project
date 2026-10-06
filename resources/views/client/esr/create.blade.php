@@ -185,6 +185,16 @@
                               :missing="true" :missing-value="old('service_missing')" />
         </div>
 
+        {{-- Sir Peter, 6 Oct: "if the client selects a MSRs when filling out
+             the BR, ER, or DR, then each of them should make and have the
+             timeline for each services requested." Live here, because the
+             services are picked on this same page. --}}
+        @include('client._service_timeline', [
+            'services' => \App\Models\Category::whereIn('id', array_map('intval', (array) old('services', [])))->get(['id', 'name']),
+            'times'    => old('service_times', []),
+            'live'     => true,
+        ])
+
         {{-- 3. Budget & details --}}
         <div class="esr-card">
             <x-form-section :n="3" title="Budget & Details" />

@@ -166,26 +166,9 @@
     @media (max-width: 700px) { .bw-locpair { grid-template-columns: 1fr; } }
     .bw-lochint { margin: 8px 0 0; font-size: 11.5px; color: var(--text-muted); line-height: 1.45; }
 
-    /* When each service runs. */
-    .bw-times { display: flex; flex-direction: column; gap: 10px; }
-    .bw-time-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-    .bw-time-tip { margin: 0; font-size: 11.5px; font-weight: 600; color: var(--accent-text, #1d4ed8);
-        background: rgba(29,78,216,.08); border-radius: 9px; padding: 7px 11px; max-width: 320px; line-height: 1.4; }
-    .bw-time-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 12px 14px; align-items: center;
-        border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; }
-    .bw-time-note { grid-column: 1 / -1; margin-bottom: 0; }
-    .bw-time-note label { font-size: 11px; }
-    .bw-time-name { font-size: 13.5px; font-weight: 700; color: var(--text-primary); min-width: 0; }
-    .bw-time-fields { display: flex; align-items: flex-end; gap: 10px; }
-    .bw-time-fields .bw-field label { font-size: 11px; }
-    .bw-time-fields input[type=time] { width: 130px; }
-    .bw-time-for { font-size: 11.5px; font-weight: 700; color: var(--text-muted); white-space: nowrap; padding-bottom: 10px; }
-    .bw-time-overlap { margin: 12px 0 0; font-size: 12px; color: var(--text-secondary); line-height: 1.45; }
-    .bw-time-overlap[hidden] { display: none; }
-    @media (max-width: 760px) {
-        .bw-time-row { grid-template-columns: 1fr; }
-        .bw-time-fields { flex-wrap: wrap; }
-    }
+    /* When each service runs: the styles moved with the markup into
+       client/_service_timeline, which pushes them once however many
+       forms include it. */
     .bw-card input[readonly] { background: var(--bg-card-hover, #f1f5f9); color: var(--text-muted); cursor: default; }
     .bw-locmine { border: 0; background: none; padding: 0; font: inherit; font-weight: 700; color: var(--brand, #f97316); cursor: pointer; text-decoration: underline; }
     /* The per-service budget breakdown. */
@@ -1377,171 +1360,14 @@
              "Anything they should know about timing?" box came out with it —
              the same question, asked once for everything, when it is now asked
              of each service. --}}
-        @if($chosenServices->isNotEmpty())
-            @php
-                $__times = old('service_times', $data['service_times'] ?? []);
-                $__evStart = old('event_start_time', $data['event_start_time'] ?? '');
-                $__evEnd = old('event_end_time', $data['event_end_time'] ?? '');
-            @endphp
-            <div class="bw-sec">
-                <div class="bw-sec-h bw-time-head">
-                    <div>
-                        <b>Service schedule / Timeline (per service)</b>
-                        <span>Set the start and end time for each service. Professionals see this timeline when they bid.</span>
-                    </div>
-                    <p class="bw-time-tip">If the exact times are not set yet, give a rough time or write a note.</p>
-                </div>
-
-                <div class="bw-times">
-                    @foreach($chosenServices as $__svc)
-                        <div class="bw-time-row" data-bw-time-row>
-                            <div class="bw-time-name">{{ $__svc->name }}</div>
-                            <div class="bw-time-fields">
-                                <div class="bw-field" style="margin-bottom:0;">
-                                    <label for="st_{{ $__svc->id }}">Starts</label>
-                                    <input type="time" id="st_{{ $__svc->id }}"
-                                           name="service_times[{{ $__svc->id }}][start]"
-                                           value="{{ $__times[$__svc->id]['start'] ?? '' }}"
-                                           data-bw-start data-event-start="{{ $__evStart }}">
-                                </div>
-                                <div class="bw-field" style="margin-bottom:0;">
-                                    <label for="en_{{ $__svc->id }}">Ends</label>
-                                    <input type="time" id="en_{{ $__svc->id }}"
-                                           name="service_times[{{ $__svc->id }}][end]"
-                                           value="{{ $__times[$__svc->id]['end'] ?? '' }}"
-                                           data-bw-end data-event-end="{{ $__evEnd }}">
-                                </div>
-                                <span class="bw-time-for" data-bw-span>Follows the event</span>
-                            </div>
-                            {{-- The single "Anything they should know about
-                                 timing?" box came off this step because, in Sir
-                                 Peter's words, it "is asked after each service".
-                                 This is where it is asked, and where a rough
-                                 time goes when the exact one is not settled. --}}
-                            <div class="bw-field bw-time-note">
-                                <label for="nt_{{ $__svc->id }}">Timing note <span class="bw-optional">Optional</span></label>
-                                <input type="text" id="nt_{{ $__svc->id }}"
-                                       name="service_times[{{ $__svc->id }}][note]" maxlength="150"
-                                       data-counter="ntCount{{ $__svc->id }}"
-                                       value="{{ $__times[$__svc->id]['note'] ?? '' }}"
-                                       placeholder="e.g. setup can start from 3pm">
-                                <div class="bw-hint" style="text-align:right;"><span id="ntCount{{ $__svc->id }}">0</span> / 150</div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-
-                {{-- Named, never refused. Two services at once is often the
-                     point: the photographer shoots while the DJ plays. --}}
-                <p class="bw-time-overlap" data-bw-overlap hidden></p>
-
-                <div class="bw-callout">
-                    <b>Ask them to confirm the date</b>
-                    <p>Professionals reply with a proposal. Availability above is a count, not a booking. Ask them to
-                       confirm the date and time when they respond.</p>
-                </div>
-            </div>
-        @endif
-
-@push('scripts')
-<script>
-(function () {
-    /*
-     * The "0 / 150" beside a note.
-     *
-     * data-counter was on the old timing box too and nothing ever read it, so
-     * the count sat at zero however much was typed. It counts now.
-     */
-    document.querySelectorAll('[data-counter]').forEach(function (field) {
-        var out = document.getElementById(field.dataset.counter);
-        if (!out) return;
-        var show = function () { out.textContent = String(field.value.length); };
-        field.addEventListener('input', show);
-        show();
-    });
-
-    /*
-     * Each service's hours: the duration beside it, and a plain line naming
-     * any two that cross. The overlap is named, never refused — two services
-     * at once is often the point, and Sir Peter's own note says so.
-     */
-    function minutes(v) {
-        if (!v) return null;
-        var p = v.split(':');
-        return (Number(p[0]) * 60) + Number(p[1]);
-    }
-
-    function span(row) {
-        var s = row.querySelector('[data-bw-start]'), e = row.querySelector('[data-bw-end]');
-        var a = minutes(s.value) ?? minutes(s.dataset.eventStart);
-        var b = minutes(e.value) ?? minutes(e.dataset.eventEnd);
-        return (a === null || b === null || b <= a) ? null : { a: a, b: b, own: !!(s.value || e.value) };
-    }
-
-    function label(m) {
-        var h = Math.floor(m / 60), r = m % 60;
-        return ((h ? h + ' hr' + (h > 1 ? 's' : '') : '') + (r ? ' ' + r + ' min' : '')).trim();
-    }
-
-    function paint() {
-        var rows = Array.prototype.slice.call(document.querySelectorAll('[data-bw-time-row]'));
-        var spans = [];
-
-        rows.forEach(function (row) {
-            var out = row.querySelector('[data-bw-span]');
-            var sp = span(row);
-            if (!sp) { out.textContent = 'Follows the event'; spans.push(null); return; }
-            out.textContent = label(sp.b - sp.a) + (sp.own ? '' : ' (follows the event)');
-            spans.push(sp);
-        });
-
-        var names = rows.map(function (r) { return r.querySelector('.bw-time-name').textContent.trim(); });
-        var pairs = [];
-        for (var i = 0; i < spans.length; i++) {
-            for (var j = i + 1; j < spans.length; j++) {
-                if (spans[i] && spans[j] && spans[i].a < spans[j].b && spans[j].a < spans[i].b) {
-                    pairs.push(names[i] + ' and ' + names[j]);
-                }
-            }
-        }
-
-        var note = document.querySelector('[data-bw-overlap]');
-        if (!note) return;
-        note.hidden = pairs.length === 0;
-        note.textContent = pairs.length
-            ? 'Running at the same time: ' + pairs.join(', ') + '. That is fine if you meant it.'
-            : '';
-    }
-
-    document.querySelectorAll('[data-bw-time-row] input').forEach(function (i) {
-        i.addEventListener('input', paint);
-    });
-    if (document.querySelector('[data-bw-time-row]')) paint();
-
-    // Clicking a nearby day sets the date field rather than making the client
-    // read the number here and retype the date somewhere else.
-    var date = document.getElementById('av_date');
-    document.querySelectorAll('.bw-day').forEach(function (b) {
-        b.addEventListener('click', function () {
-            if (!date) return;
-            date.value = b.dataset.date;
-            document.querySelectorAll('.bw-day').forEach(function (x) { x.classList.remove('on'); });
-            b.classList.add('on');
-            date.form && date.form.requestSubmit
-                ? null   // not submitted for them: they may still want to edit the time
-                : null;
-        });
-    });
-
-    var ta = document.getElementById('av_note'), out = document.getElementById('avCount');
-    if (ta && out) {
-        var tick = function () { out.textContent = ta.value.length; };
-        ta.addEventListener('input', tick);
-        tick();
-    }
-})();
-</script>
-@endpush
+        {{-- Drawn by client/_service_timeline, which the Emergency and
+             Direct Request forms include too (Sir Peter, 6 Oct). --}}
+        @include('client._service_timeline', [
+            'services'   => $chosenServices,
+            'times'      => old('service_times', $data['service_times'] ?? []),
+            'eventStart' => old('event_start_time', $data['event_start_time'] ?? ''),
+            'eventEnd'   => old('event_end_time', $data['event_end_time'] ?? ''),
+        ])
 
     {{-- ── 8 · Review ──────────────────────────────────────── --}}
     @elseif($step === 'review')

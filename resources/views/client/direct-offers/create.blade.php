@@ -445,6 +445,15 @@
                                               :missing="true" :missing-value="old('service_missing')" />
                         @endif
 
+                        {{-- Sir Peter, 6 Oct: the timeline belongs on this form
+                             too, for each service asked for. Live, because the
+                             services are picked on this same page. --}}
+                        @include('client._service_timeline', [
+                            'services' => \App\Models\Category::whereIn('id', array_map('intval', (array) old('services', [])))->get(['id', 'name']),
+                            'times'    => old('service_times', []),
+                            'live'     => true,
+                        ])
+
                         {{-- Appears the moment a catering or bar service is ticked. --}}
                         @include('partials._food_delivery', [
                             'mode'  => old('delivery_mode'),
