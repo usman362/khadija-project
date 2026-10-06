@@ -89,4 +89,32 @@ class LeavingTheWizardLeavesNothingTest extends TestCase
         $this->assertStringContainsString("route('client.bsr.exit')", $markup,
             'Exit is a plain link again, so it leaves the request behind.');
     }
+
+    /**
+     * The per-service timeline is on the availability step, and it is there
+     * for one service as well as for several.
+     *
+     * Asked for twice as missing, both times from the budget step, which is
+     * three steps earlier. It was never on that step: Sir Peter put it on the
+     * one that already asks when the event runs, and said so himself.
+     */
+    public function test_the_timeline_is_on_the_availability_step_even_for_one_service(): void
+    {
+        $cat = \App\Models\Category::create([
+            'name' => 'Uplighting & Ambient Lighting',
+            'slug' => 'uplighting-timeline-test',
+        ]);
+
+        $this->actingAs($this->client)
+            ->withSession(['bsr_wizard' => [
+                'services'          => [$cat->id],
+                'organization_type' => 'Individual',
+                'title'             => 'One service request',
+                'description'       => 'A description long enough to pass the step guard.',
+            ]])
+            ->get('/client/bsr/availability')
+            ->assertOk()
+            ->assertSee('Service schedule / Timeline', false)
+            ->assertSee('Uplighting &amp; Ambient Lighting', false);
+    }
 }
