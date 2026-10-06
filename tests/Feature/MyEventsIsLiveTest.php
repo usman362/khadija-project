@@ -55,7 +55,17 @@ class MyEventsIsLiveTest extends TestCase
         $a = strpos($html, 'id="mgCal"');
         $this->assertNotFalse($a, 'The calendar card is not on the page.');
 
-        return substr($html, $a, strpos($html, 'id="tab-details"', $a) - $a);
+        /*
+         * To the right rail, which is where the tab content ends. It used to
+         * cut at id="tab-details"; Details View was removed on 7 October and
+         * the slice silently became empty, so every assertion about the
+         * calendar passed against nothing.
+         */
+        $b = strpos($html, 'id="mgRail"', $a);
+
+        $this->assertNotFalse($b, 'The page no longer ends the way this slice expects.');
+
+        return substr($html, $a, $b - $a);
     }
 
     // ── The calendar ─────────────────────────────────────────────────
@@ -183,7 +193,8 @@ class MyEventsIsLiveTest extends TestCase
         $html = $this->actingAs($this->client)->get(route('client.events.index'))->assertOk()->getContent();
 
         $this->assertStringContainsString('data-live-scope', $html);
-        foreach (['mgFilters', 'mgListCard', 'mgCal', 'mgDetails', 'mgRail'] as $id) {
+        // mgDetails went with Details View on 7 October.
+        foreach (['mgFilters', 'mgListCard', 'mgCal', 'mgRail'] as $id) {
             $this->assertMatchesRegularExpression('/id="' . $id . '"[^>]*data-live-region|data-live-region[^>]*id="' . $id . '"/', $html, "#{$id} is not a live region.");
         }
 

@@ -462,10 +462,6 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             Calendar View
         </button>
-        <button class="cl-tab mg-viewtab" data-tab="details">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
-            Details View
-        </button>
     </div>
 
     {{-- Stat cards --}}
@@ -499,6 +495,15 @@
             ['past', 'Past Events', 'purple', $stats['list_past'], 'Date has passed',
              '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="14" x2="15" y2="20"/><line x1="15" y1="14" x2="9" y2="20"/>'],
         ];
+
+        /*
+         * The one figure Details View owned, kept when the view went. It is
+         * money rather than a count of events, so it is not a filter and does
+         * not pretend to be one: there is no list of "budget" to show.
+         * Cancelled events are left out, because a budget for something that
+         * is not happening is not money anyone is planning to spend.
+         */
+        $mgBudget = [number_format($stats['total_budget'], 2), 'Total Budget', 'All time, cancelled left out'];
     @endphp
     <div class="mg-stats">
         @foreach($mgTiles as [$status, $label, $tone, $value, $caption, $icon])
@@ -520,13 +525,24 @@
                 </div>
             </a>
         @endforeach
+
+        <div class="mg-stat">
+            <div class="mg-stat-ico amber">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div>
+                <div class="mg-stat-label">{{ $mgBudget[1] }}</div>
+                <div class="mg-stat-value">${{ $mgBudget[0] }}</div>
+                <div class="mg-stat-delta flat">{{ $mgBudget[2] }}</div>
+            </div>
+        </div>
     </div>
 
     {{-- Filter row --}}
     {{-- Filtering redraws the list and the details in place; this row
          stays bright so the box being typed in is never dimmed. --}}
     <form method="GET" action="{{ route('client.events.index') }}" class="mg-filter-row"
-          id="mgFilters" data-live-region data-live-busy="mgListCard mgDetails">
+          id="mgFilters" data-live-region data-live-busy="mgListCard">
         <input type="hidden" name="tab" value="list">
         @if(request('period'))<input type="hidden" name="period" value="{{ request('period') }}">@endif
         {{-- requestSubmit, not submit(): submit() skips the submit event,
@@ -648,6 +664,26 @@
                                     @endif
                                 </td>
                                 <td style="padding-right:18px;text-align:right;white-space:nowrap;">
+                                    {{-- The action this row's own stage calls for.
+
+                                         It lived in Details View, which was removed on
+                                         7 October for counting the same events twice.
+                                         The counting was duplication; this was not, and
+                                         a draft with no way to be finished is worse than
+                                         a tile too many. --}}
+                                    @php
+                                        $rowProposals   = $event->bookings->where('status', 'requested')->count();
+                                        $rowNegotiating = \App\Domain\Requests\RequestLifecycle::inExclusiveNegotiation($event);
+                                    @endphp
+                                    @if($event->isDraft())
+                                        <a href="{{ route('client.events.show', $event) }}" class="mg-row-view" style="color:#c2410c;font-weight:800;">Continue Draft</a>
+                                    @elseif($rowNegotiating)
+                                        <a href="{{ route('client.events.show', $event) }}" class="mg-row-view">Open Negotiation</a>
+                                    @elseif($rowProposals > 1)
+                                        <a href="{{ route('client.proposals.compare', $event) }}" class="mg-row-view">Compare Proposals ({{ $rowProposals }})</a>
+                                    @elseif($rowProposals === 1)
+                                        <a href="{{ route('client.events.show', $event) }}" class="mg-row-view">Review Proposal</a>
+                                    @endif
                                     <a href="{{ route('client.events.show', $event) }}" class="mg-row-view">View</a>
                                     <div class="mg-menu" data-row-menu>
                                         <button type="button" class="mg-row-kebab" aria-haspopup="true" aria-expanded="false" title="More actions">⋯</button>
@@ -822,175 +858,12 @@
     </div>
 
     {{-- ════════════ DETAILS VIEW ════════════ --}}
-    <div class="cl-tab-content" id="tab-details">
-    <div id="mgDetails" data-live-region>
-        {{-- Sir Peter, 7 Oct: "many duplicated for the same purpose".
-
-             Three of the four tiles here counted what the tiles above the
-             list already count, in the same numbers, and those are the filter
-             now. Only the money was this view's own, so only the money stays. --}}
-        <div class="cl-grid cl-grid-4" style="margin-bottom: 24px;">
-            <div class="cl-card">
-                <div class="cl-stat-card">
-                    <div class="cl-stat-icon pink">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                    </div>
-                    <div>
-                        <div class="cl-stat-label">Total Budget</div>
-                        <div class="cl-stat-value">${{ number_format($stats['total_budget'], 2) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- Search + Filter --}}
-        <div class="cl-card" style="margin-bottom: 20px;">
-            <form method="GET" action="{{ route('client.events.index') }}" style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
-                <input type="hidden" name="tab" value="details">
-                <div style="flex: 1; min-width: 200px;">
-                    <div class="cl-search-box">
-                        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                        <input type="text" name="search" placeholder="Search events..." value="{{ request('search') }}">
-                    </div>
-                </div>
-                <div style="min-width: 150px;">
-                    <select name="status" class="cl-form-select" style="padding: 10px 14px;" aria-label="All Status">
-                        <option value="">All Status</option>
-                        @foreach ($statuses as $key => $label)
-                            <option value="{{ $key }}" {{ request('status') === $key ? 'selected' : '' }}>{{ $label }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div style="min-width: 150px;">
-                    <select name="category" class="cl-form-select" style="padding: 10px 14px;" aria-label="All Categories">
-                        <option value="">All Categories</option>
-                        @foreach ($categories as $cat)
-                            <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <button type="submit" class="cl-btn cl-btn-primary cl-btn-sm">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    Filter
-                </button>
-            </form>
-        </div>
-
-        {{-- Events List --}}
-        @if($events->count())
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                @foreach($events as $event)
-                    <div class="cl-event-card">
-                        <div class="cl-event-date-badge">
-                            @if($event->starts_at)
-                                <div class="month">{{ $event->starts_at->format('M') }}</div>
-                                <div class="day">{{ $event->starts_at->format('d') }}</div>
-                            @else
-                                <div class="month">No</div>
-                                <div class="day">—</div>
-                            @endif
-                        </div>
-                        <div class="cl-event-info">
-                            <div class="cl-event-title">{{ $event->title }}</div>
-                            <div class="cl-event-meta">
-                                @if($event->categories->count())
-                                    @foreach($event->categories as $cat)
-                                        <span>
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                                            {{ $cat->name }}
-                                        </span>
-                                    @endforeach
-                                @endif
-                                <span>
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                    {{ $event->created_at->humanAgo() }}
-                                </span>
-                                <span class="cl-badge cl-badge-{{ $event->status }}">{{ ucfirst(str_replace('_', ' ', $event->status)) }}</span>
-                            </div>
-                        </div>
-                        {{-- Checklist rows 85 and 102 — the action belongs to
-                             the card's own status, not to a template.
-
-                             Both rows are the same fault seen twice: a draft
-                             lost "Continue Draft" and a request in negotiation
-                             lost its way back in, because every card got the
-                             same generic pair. "Compare Proposals" on a card
-                             with nought proposals is the tell. The client is
-                             left without the one action that actually moves
-                             that particular request forward. --}}
-                        @php
-                            $proposalCount = $event->bookings->where('status', 'requested')->count();
-                            $negotiating   = \App\Domain\Requests\RequestLifecycle::inExclusiveNegotiation($event);
-                        @endphp
-                        <div class="cl-event-actions">
-                            {{-- OA-140: this branched on the is_published flag, not the
-                                 status. A Confirmed event with the flag unset offered
-                                 "Continue Draft" and "Publish" — you cannot go back and
-                                 finish writing something professionals have already
-                                 answered. It asks the event's own stage now, which
-                                 resolves the two columns into one answer. --}}
-                            @if($event->isDraft())
-                                {{-- A draft's one job is to be finished. --}}
-                                <a href="{{ route('client.events.show', $event) }}" class="cl-btn cl-btn-primary cl-btn-sm"
-                                   style="background:#c2410c;border-color:#c2410c;">Continue Draft</a>
-                                <form method="POST" action="{{ route('client.events.publish', $event) }}" style="display:inline;">
-                                    @csrf
-                                    <button type="submit" class="cl-btn cl-btn-ghost cl-btn-sm">Publish</button>
-                                </form>
-                            @elseif($negotiating)
-                                <a href="{{ route('client.events.show', $event) }}" class="cl-btn cl-btn-primary cl-btn-sm">Open Negotiation</a>
-                            @elseif($proposalCount > 1)
-                                <a href="{{ route('client.proposals.compare', $event) }}" class="cl-btn cl-btn-primary cl-btn-sm">
-                                    Compare Proposals ({{ $proposalCount }})
-                                </a>
-                            @elseif($proposalCount === 1)
-                                <a href="{{ route('client.events.show', $event) }}" class="cl-btn cl-btn-primary cl-btn-sm">Review Proposal</a>
-                            @endif
-
-                            <a href="{{ route('client.events.show', $event) }}" class="cl-btn cl-btn-ghost cl-btn-sm">View</a>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            {{-- Pagination --}}
-            @if($events->hasPages())
-                <div class="cl-pagination">
-                    @if($events->onFirstPage())
-                        <span class="disabled"><span>&laquo;</span></span>
-                    @else
-                        <a href="{{ $events->previousPageUrl() }}">&laquo;</a>
-                    @endif
-
-                    @foreach($events->getUrlRange(1, $events->lastPage()) as $page => $url)
-                        @if($page == $events->currentPage())
-                            <span class="active"><span>{{ $page }}</span></span>
-                        @else
-                            <a href="{{ $url }}">{{ $page }}</a>
-                        @endif
-                    @endforeach
-
-                    @if($events->hasMorePages())
-                        <a href="{{ $events->nextPageUrl() }}">&raquo;</a>
-                    @else
-                        <span class="disabled"><span>&raquo;</span></span>
-                    @endif
-                </div>
-            @endif
-        @else
-            <div class="cl-card">
-                <div class="cl-empty">
-                    <div class="cl-empty-icon">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="16" x2="15" y2="16"/></svg>
-                    </div>
-                    <div class="cl-empty-title">No events found yet</div>
-                    <div class="cl-empty-text">Create your first event to get started with hiring professionals.</div>
-                    <button class="cl-btn cl-btn-primary" onclick="window.location.href='{{ route('client.post-event.choose') }}'">Create Your First Event</button>
-                </div>
-            </div>
-        @endif
-    </div>{{-- /#mgDetails --}}
-    </div>
+    {{-- Details View is gone. Sir Peter, 7 October, agreeing with the
+         recommendation: it listed the same events a second time, in a
+         different shape, with its own copy of the counts and its own
+         search box. Two tabs earn their place by answering different
+         questions. The one figure it owned, Total Budget, is a tile
+         above the list now. --}}
 
 </div>{{-- /.mg-main --}}
 

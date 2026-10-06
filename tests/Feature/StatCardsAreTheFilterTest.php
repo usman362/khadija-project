@@ -86,8 +86,13 @@ class StatCardsAreTheFilterTest extends TestCase
         $this->assertStringNotContainsString('cl-stat-label">Total Events', $markup,
             'Details View counts the events a second time again.');
         $this->assertStringNotContainsString('cl-stat-label">Open Events', $markup);
-        $this->assertStringContainsString('cl-stat-label">Total Budget', $markup,
-            'Total Budget was the one figure Details View owned; it should stay.');
+        // Total Budget was the one figure Details View owned. When that view
+        // went on 7 October it moved up to the tiles, so it is an mg- one now.
+        $this->assertStringContainsString('mg-stat-label">{{ $mgBudget[1] }}', $markup,
+            'Total Budget went with Details View; it was the one figure worth keeping.');
+
+        $this->assertStringNotContainsString('id="tab-details"', $markup,
+            'Details View is back, listing the same events a second time.');
     }
 
     /** The numbers on a filter must not move when you press it. */
