@@ -192,6 +192,8 @@
     .bw-split { border: 1.5px solid var(--border-color); border-radius: 12px; padding: 14px 16px; margin-top: 16px; background: var(--bg-card); }
     .bw-split h4 { margin: 0 0 2px; font-size: 14px; font-weight: 800; color: var(--text-primary); }
     .bw-split-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border-color); }
+    .bw-split-row label { flex: 1; min-width: 0; }
+    .bw-guide { display: block; margin-top: 2px; font-size: 11.5px; font-weight: 600; color: var(--text-muted); }
     .bw-split-row:last-of-type { border-bottom: 0; }
     .bw-split-row label { flex: 1; font-size: 13.5px; color: var(--text-primary); }
     /* An amount reads as an amount: the currency is shown rather than typed,
@@ -860,6 +862,19 @@
                 ? \App\Models\Category::whereIn('id', $__svcIds)->orderBy('name')->get(['id', 'name'])
                 : collect();
             $__split  = (array) ($data['service_budgets'] ?? []);
+
+            /*
+             * Sir Peter, 26 Sep: a rough estimator "so they are not over
+             * guessing", from what professionals charge. No price list
+             * exists, so this is built from what they have actually bid,
+             * which is the better evidence: a price list is what somebody
+             * hopes to charge, a bid is what they offered for a real job.
+             * It says nothing at all where there are too few to speak from.
+             */
+            $__guides = \App\Domain\Requests\BudgetGuide::forServices(
+                $__svcs->pluck('id')->all(),
+                auth()->user()?->profile?->state,
+            );
         @endphp
 
         @if($__svcs->isNotEmpty())
@@ -872,16 +887,37 @@
                 </p>
 
                 @foreach($__svcs as $svc)
+                    @php $__g = $__guides[$svc->id] ?? null; @endphp
                     <div class="bw-split-row">
-                        <label for="sb-{{ $svc->id }}">{{ $svc->name }}</label>
+                        <label for="sb-{{ $svc->id }}">
+                            {{ $svc->name }}
+                            @if($__g)
+                                {{-- What was actually bid, not a guess dressed
+                                     as one. The sentence says how many bids it
+                                     is drawn from and whether they were local,
+                                     so the client can weigh it. --}}
+                                <small class="bw-guide" title="{{ \App\Domain\Requests\BudgetGuide::sentence($__g) }}">
+                                    Others bid ${{ number_format($__g['low']) }} to ${{ number_format($__g['high']) }}
+                                    &middot; usually ${{ number_format($__g['typical']) }}
+                                </small>
+                            @endif
+                        </label>
                         <span class="bw-amount">
                             <input type="number" id="sb-{{ $svc->id }}" min="0" step="1"
                                    name="service_budgets[{{ $svc->id }}]"
                                    value="{{ old('service_budgets.' . $svc->id, $__split[$svc->id] ?? '') }}"
-                                   data-bw-split placeholder="0">
+                                   data-bw-split placeholder="{{ $__g ? (int) $__g['typical'] : '0' }}">
                         </span>
                     </div>
                 @endforeach
+
+                @if($__guides)
+                    <p class="bw-help" style="margin:4px 0 0;">
+                        The figures beside each service are what professionals have bid on GigResource for that
+                        work{{ collect($__guides)->contains(fn ($g) => $g['scope'] === 'state') ? ', in your state where there was enough to go on' : '' }}.
+                        They are a guide, not a quote.
+                    </p>
+                @endif
 
                 <div class="bw-split-total">
                     Breakdown adds up to <b data-bw-splittotal>$0</b>
