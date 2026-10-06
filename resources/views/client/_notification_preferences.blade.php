@@ -1,11 +1,23 @@
-@extends('layouts.client')
+{{--
+    Notification preferences.
 
-@section('title', 'Notification Preferences')
-@section('page-title', 'Notification Preferences')
-@section('page-subtitle', "Choose what you're told, and how.")
+    Sir Peter, 7 October: "all except one of the Client's Account Settings
+    looks like they have the image 3 but no the notifications tab or
+    webpage??"
 
+    He is right. Every other setting is a tab on Account Settings, with the
+    profile card and the account figures down the left. Notifications was a
+    page of its own with an empty column and a "Back to Account Settings"
+    link, which is the thing a tab exists to make unnecessary.
+
+    The panel lives here now and the settings page draws it as its
+    Notifications tab. /client/notifications still works and lands on that
+    tab, because links to it have been sent out.
+--}}
+@once
 @push('styles')
 <style>
+
     /* ── Notification Preferences (dedicated page) ── */
     .np-wrap { max-width: 760px; margin: 0 auto; }
     .np-back {
@@ -80,15 +92,10 @@
         transition: var(--transition);
     }
     .np-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
 </style>
 @endpush
-
-@section('content')
-<div class="np-wrap">
-    <a href="{{ route('client.profile.index') }}" class="np-back">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        Back to Account Settings
-    </a>
+@endonce
 
     @if(session('status'))
         <div class="np-success">{{ session('status') }}</div>
@@ -171,5 +178,3 @@
 
         <button type="submit" class="np-btn">Save Preferences</button>
     </form>
-</div>
-@endsection

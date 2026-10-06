@@ -336,7 +336,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                 Social Links
             </a>
-            <a href="{{ route('client.notifications.index') }}" class="pf-tab-link">
+            <a href="{{ route('client.profile.index', ['tab' => 'notifications']) }}" class="pf-tab-link {{ $tab === 'notifications' ? 'active' : '' }}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                 Notifications
             </a>
@@ -444,6 +444,14 @@
                 </div>
             </form>
         </div>
+        @endif
+
+        {{-- Notifications. Sir Peter, 7 Oct: it was the one setting that
+             was not a tab, so it opened a page with no profile card, no
+             account figures, and a link back to the thing it should have
+             been part of. --}}
+        @if($tab === 'notifications')
+            @include('client._notification_preferences')
         @endif
 
         {{-- Company Info --}}

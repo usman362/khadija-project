@@ -149,12 +149,18 @@ class ClientProfileController extends Controller
         return back()->with('status', 'Password changed successfully.');
     }
 
-    public function notifications(Request $request): View
+    /**
+     * Notification preferences are a tab on Account Settings, not a page.
+     *
+     * Sir Peter, 7 October: every other setting has the profile card and the
+     * account figures down the left; this one opened a bare page with a link
+     * back to the thing it should have been part of. The address stays,
+     * because it has been linked to from the message window and from mail,
+     * and lands on the tab.
+     */
+    public function notifications(Request $request): RedirectResponse
     {
-        $user = $request->user();
-        $profile = $user->getOrCreateProfile();
-
-        return view('client.notifications.index', compact('user', 'profile'));
+        return redirect()->route('client.profile.index', ['tab' => 'notifications']);
     }
 
     public function updateNotifications(Request $request): RedirectResponse

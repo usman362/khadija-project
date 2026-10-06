@@ -202,7 +202,15 @@ class ClientJourneyWalkTest extends TestCase
 
         /* ── 7. After the booking ──────────────────────────── */
         $this->step('22. Reviews page', fn () => $this->actingAs($client)->get(route('client.reviews.index'))->assertOk() && '');
-        $this->step('23. Notifications', fn () => $this->actingAs($client)->get(route('client.notifications.index'))->assertOk() && '');
+        // Notification preferences became a tab on Account Settings on 7
+        // October, so the old address redirects to it. Both ends are walked.
+        $this->step('23. Notifications', fn () => $this->actingAs($client)
+            ->get(route('client.notifications.index'))
+            ->assertRedirect(route('client.profile.index', ['tab' => 'notifications'])) && '');
+        $this->step('23b. Notification preferences', fn () => $this->actingAs($client)
+            ->get(route('client.profile.index', ['tab' => 'notifications']))
+            ->assertOk()
+            ->assertSee('Save Preferences') && '');
 
         fwrite(STDERR, "\n\nCLIENT JOURNEY\n" . implode("\n", $this->log) . "\n\n");
 
