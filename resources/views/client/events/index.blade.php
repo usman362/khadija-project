@@ -708,7 +708,7 @@
                                     <div class="mg-menu" data-row-menu>
                                         <button type="button" class="mg-row-kebab" aria-haspopup="true" aria-expanded="false" title="More actions">⋯</button>
                                         <div class="mg-menu-pop" data-row-menu-pop>
-                                            <a href="{{ route('client.events.show', $event) }}">View event</a>
+                                            <a href="{{ route('client.events.show', $event) }}">View event details</a>
                                             <a href="{{ route('client.events.show', $event) }}#proposals">View proposals</a>
                                             @unless($event->is_published)
                                                 <form method="POST" action="{{ route('client.events.publish', $event) }}">
@@ -797,9 +797,9 @@
                                             <button type="button" class="mg-row-kebab" aria-haspopup="true" aria-expanded="false" title="More actions">⋯</button>
                                             <div class="mg-menu-pop" data-row-menu-pop>
                                                 @if($r['view_url'])<a href="{{ $r['view_url'] }}">View details</a>@endif
-                                                @if($r['event_id'])<a href="{{ route('client.events.show', $r['event_id']) }}">View event</a>@endif
-                                                @if($r['profile_url'])<a href="{{ $r['profile_url'] }}">View professional</a>@endif
-                                                <a href="{{ route('client.chat.index') }}">Message professional</a>
+                                                @if($r['event_id'])<a href="{{ route('client.events.show', $r['event_id']) }}">View event details</a>@endif
+                                                @if($r['profile_url'])<a href="{{ $r['profile_url'] }}">{{ $r['profile_label'] }}</a>@endif
+                                                <a href="{{ route('client.chat.index') }}">{{ $r['message_label'] }}</a>
                                             </div>
                                         </div>
                                     </td>

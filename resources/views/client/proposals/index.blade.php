@@ -309,11 +309,14 @@
                                         <button type="button" class="pr-act-btn" title="More actions" aria-haspopup="true" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
                                         <div class="pr-menu-pop" data-row-menu-pop>
                                             @if($p->event)
-                                                <a href="{{ route('client.events.show', $p->event) }}">View event</a>
+                                                <a href="{{ route('client.events.show', $p->event) }}">View event details</a>
                                             @endif
-                                            <button type="button" onclick="var t=document.getElementById('prthread-{{ $p->id }}');t.style.display='table-row';t.scrollIntoView({block:'nearest'});">Message professional</button>
-                                            @if($p->supplier)
-                                                <a href="{{ route('public.professional.show', $p->supplier) }}">View profile</a>
+                                            <button type="button" onclick="var t=document.getElementById('prthread-{{ $p->id }}');t.style.display='table-row';t.scrollIntoView({block:'nearest'});">{{ \App\Support\SupplierProfile::messageLabel($p->supplier) }}</button>
+                                            {{-- The word and the link come from the same place, so
+                                                 "View influencer profile" can never point at the
+                                                 professional page, which refuses anyone else. --}}
+                                            @if($__prof = \App\Support\SupplierProfile::url($p->supplier))
+                                                <a href="{{ $__prof }}">{{ \App\Support\SupplierProfile::viewLabel($p->supplier) }}</a>
                                             @endif
                                             @if($pipe === 'pending')
                                                 <form method="POST" action="{{ route('client.proposals.decline', $p->id) }}">

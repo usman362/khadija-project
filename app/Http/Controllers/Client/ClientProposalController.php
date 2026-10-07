@@ -66,7 +66,7 @@ class ClientProposalController extends Controller
         $tab = $request->string('tab')->toString() ?: 'all';
         $query = (clone $base)
             ->with(['event:id,title,starts_at,location,status,client_id', 'event.categories:id,name',
-                'category:id,name', 'supplier:id,name,public_id', 'replies.user:id,name'])
+                'category:id,name', 'supplier:id,name,public_id,primary_role', 'replies.user:id,name'])
             ->latest();
 
         match ($tab) {

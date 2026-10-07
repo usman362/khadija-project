@@ -174,7 +174,11 @@ class PaymentTracker
             'professional' => $supplier?->name ?? 'Professional',
             'avatar'       => $supplier?->avatar_url,
             'pro_id'       => $supplier?->public_id ? \App\Support\GigResourceId::display($supplier->public_id) : null,
-            'profile_url'  => $supplier && $supplier->primary_role === 'professional' ? route('public.professional.show', $supplier->id) : null,
+            // One rule for the link and the words on it, so a row about an
+            // influencer cannot offer to show their professional profile.
+            'profile_url'   => \App\Support\SupplierProfile::url($supplier),
+            'profile_label' => \App\Support\SupplierProfile::viewLabel($supplier),
+            'message_label' => \App\Support\SupplierProfile::messageLabel($supplier),
         ];
     }
 
