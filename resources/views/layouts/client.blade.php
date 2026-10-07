@@ -97,6 +97,29 @@
             --brand-text: #fb923c;
             --info-text: #60a5fa;
             --accent-text: #a5b4fc;
+
+            /*
+             * Names that were being used before they existed.
+             *
+             * A var() with a fallback does not fail loudly: var(--bg-page, #fff)
+             * on an undeclared name is simply #fff, in both themes, for ever.
+             * That is why the searchable select — which is on every request
+             * form and every filter row — stayed a white box on the dark
+             * shell, and why nobody caught it reading the stylesheet: the
+             * component was written correctly against a variable nothing
+             * declared.
+             *
+             * Declared in both themes below, so the fallbacks are now only
+             * what they were meant to be: a last resort.
+             */
+            --bg-page: #111827;
+            --bg-body: #0a0e1a;
+            --bg-input: #111827;
+            --bg-muted: rgba(255, 255, 255, 0.06);
+            --bg-subtle: rgba(255, 255, 255, 0.04);
+            --bg-soft: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.08);
+            --danger-text: #f87171;
         }
 
         [data-theme="light"] {
@@ -157,6 +180,17 @@
             --brand-text: #9a3412;
             --info-text: #1e40af;
             --accent-text: #3730a3;
+
+            /* The same names, with the values their fallbacks had been
+               silently supplying to both themes alike. */
+            --bg-page: #ffffff;
+            --bg-body: #f5f6f8;
+            --bg-input: #ffffff;
+            --bg-muted: #f3f4f6;
+            --bg-subtle: rgba(0, 0, 0, 0.04);
+            --bg-soft: #f8fafc;
+            --border: #e5e7eb;
+            --danger-text: #991b1b;
         }
 
         [data-theme="light"] .cl-navbar {
@@ -370,6 +404,17 @@
                 background: var(--border-color, #e5e7eb); border-radius: 24px; }
             body.gr-stack #grStackBack { display: block; }
         }
+
+        /*
+         * A link nobody styled.
+         *
+         * The browser's own default is #0000EE, which is unreadable on the
+         * dark shell and wrong on the light one — "My Availability" on the
+         * calendar page was rendering at 1.9:1 against near-black. Only
+         * links with neither a class nor an inline colour are touched, so
+         * nothing that styles itself is overridden.
+         */
+        .cl-content a:not([class]):not([style]) { color: var(--brand-text); }
 
         /* DIR-37: a GigResource ID that opens the person's profile. */
         .gr-id-link { color: var(--brand-text, #c2410c); font-weight: 700; text-decoration: none; white-space: nowrap; }

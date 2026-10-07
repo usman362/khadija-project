@@ -39,6 +39,23 @@
 @endphp
 
 <style>
+    /*
+     * This block was written in literal blues, oranges and purples — deep
+     * text on pale tints — which is a light theme spelled out. On the dark
+     * shell the headings came out at 1.7:1 and the service bands kept their
+     * cream and ice-blue with light text on them.
+     *
+     * The hues stay: a service band is still orange, blue or purple, because
+     * that is how the three are told apart at a glance. What changes is that
+     * the tint is mixed against the card and the text against the page's own
+     * ink, so both follow whichever shell they are drawn in.
+     */
+    .pbs, .pbs-head, .pbs-back {
+        --pbs-blue: #2563eb; --pbs-orange: #ea580c; --pbs-purple: #7c3aed; --pbs-red: #dc2626;
+        --pbs-ink: color-mix(in srgb, var(--pbs-blue) 62%, var(--text-primary));
+        --pbs-link: color-mix(in srgb, var(--pbs-blue) 74%, var(--text-primary));
+        --pbs-line: color-mix(in srgb, var(--pbs-blue) 38%, var(--bg-card));
+    }
     .pbs { display: grid; grid-template-columns: minmax(0, 1fr) var(--cl-rail); gap: var(--cl-rail-gap); align-items: start; }
     /* Narrower than the drawing: the side panel moves under the tables, its
        cards side by side, so every column of the tables still fits. */
@@ -57,21 +74,24 @@
     .pbs-card span { display: block; font-size: 12.5px; color: var(--text-secondary); }
     .pbs-card .pbs-big { font-size: 17px; font-weight: 800; color: var(--text-primary); }
     .pbs-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
-    .pbs-head h3 { font-size: 20px; font-weight: 800; color: #1e3a8a; margin: 0; }
+    .pbs-head h3 { font-size: 20px; font-weight: 800; color: var(--pbs-ink); margin: 0; }
     .pbs-head p { font-size: 13px; color: var(--text-secondary); margin: 3px 0 0; }
     .pbs-sort { border: 1px solid var(--border-color); border-radius: 9px; padding: 7px 10px; font: inherit; font-size: 12.5px; font-weight: 700; background: var(--bg-card); color: var(--text-primary); }
     .pbs-svc { border: 1px solid var(--border-color); border-radius: 14px; background: var(--bg-card); overflow: hidden; margin-bottom: 14px; }
     .pbs-svc-h { display: flex; align-items: center; gap: 14px; padding: 12px 16px; }
-    .pbs-svc-h.t-orange { background: #fff7ed; } .pbs-svc-h.t-orange .pbs-svc-i, .pbs-svc-h.t-orange h4 { color: #c2410c; }
-    .pbs-svc-h.t-blue { background: #eff6ff; } .pbs-svc-h.t-blue .pbs-svc-i, .pbs-svc-h.t-blue h4 { color: #1d4ed8; }
-    .pbs-svc-h.t-purple { background: #f5f3ff; } .pbs-svc-h.t-purple .pbs-svc-i, .pbs-svc-h.t-purple h4 { color: #1e3a8a; }
+    .pbs-svc-h.t-orange { background: color-mix(in srgb, var(--pbs-orange) 12%, var(--bg-card)); }
+    .pbs-svc-h.t-orange .pbs-svc-i, .pbs-svc-h.t-orange h4 { color: color-mix(in srgb, var(--pbs-orange) 68%, var(--text-primary)); }
+    .pbs-svc-h.t-blue { background: color-mix(in srgb, var(--pbs-blue) 12%, var(--bg-card)); }
+    .pbs-svc-h.t-blue .pbs-svc-i, .pbs-svc-h.t-blue h4 { color: color-mix(in srgb, var(--pbs-blue) 68%, var(--text-primary)); }
+    .pbs-svc-h.t-purple { background: color-mix(in srgb, var(--pbs-purple) 12%, var(--bg-card)); }
+    .pbs-svc-h.t-purple .pbs-svc-i, .pbs-svc-h.t-purple h4 { color: color-mix(in srgb, var(--pbs-purple) 68%, var(--text-primary)); }
     .pbs-svc-h.t-green { background: #f0fdf4; } .pbs-svc-h.t-green .pbs-svc-i, .pbs-svc-h.t-green h4 { color: #15803d; }
     .pbs-svc-i svg { width: 34px; height: 34px; }
     .pbs-svc-h h4 { font-size: 16px; font-weight: 800; margin: 0; }
     .pbs-svc-h small { font-size: 12.5px; color: var(--text-secondary); }
     .pbs-svc-h .pbs-got { margin-left: auto; font-size: 12px; font-weight: 800; border-radius: 999px; padding: 4px 10px; background: #dcfce7; color: #15803d; white-space: nowrap; }
     .pbs-svc-h .pbs-got.is-wait { background: var(--bg-muted, #f3f4f6); color: var(--text-muted); }
-    .pbs-svc-h .pbs-cmp { font-size: 12px; font-weight: 700; color: #1d4ed8; text-decoration: none; white-space: nowrap; }
+    .pbs-svc-h .pbs-cmp { font-size: 12px; font-weight: 700; color: var(--pbs-link); text-decoration: none; white-space: nowrap; }
     .pbs-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
     .pbs-table th { text-align: left; font-size: 11.5px; font-weight: 700; color: var(--text-secondary); padding: 8px 10px; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
     .pbs-table td { padding: 11px 10px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
@@ -91,14 +111,15 @@
     .pbs-price { font-size: 14px; font-weight: 800; color: var(--text-primary); white-space: nowrap; }
     .pbs-msg { font-size: 12px; color: var(--text-secondary); min-width: 150px; max-width: 240px; line-height: 1.45; }
     .pbs-st { font-size: 11px; font-weight: 800; border-radius: 6px; padding: 3px 8px; white-space: nowrap; }
-    .pbs-st.is-info { background: #dbeafe; color: #1d4ed8; } .pbs-st.is-ok { background: #dcfce7; color: #15803d; } .pbs-st.is-no { background: var(--bg-muted, #f3f4f6); color: var(--text-muted); }
+    .pbs-st.is-info { background: color-mix(in srgb, var(--pbs-blue) 16%, var(--bg-card)); color: var(--pbs-link); }
+    .pbs-st.is-ok { background: color-mix(in srgb, #16a34a 16%, var(--bg-card)); color: var(--ok-text); } .pbs-st.is-no { background: var(--bg-muted, #f3f4f6); color: var(--text-muted); }
     .pbs-act { display: flex; gap: 5px; align-items: center; justify-content: flex-end; white-space: nowrap; position: relative; }
     .pbs-act form { margin: 0; }
     .pbs-btn { border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); border-radius: 7px; padding: 5px 10px; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block; }
     .pbs-btn.is-accept { background: #ea580c; border-color: #ea580c; color: #fff; }
-    .pbs-btn.is-reply { color: #1d4ed8; }
-    .pbs-btn.is-diff { background: #fee2e2; border-color: #fecaca; color: #b91c1c; cursor: help; }
-    .pbs-btn.is-won { background: #dcfce7; border-color: #bbf7d0; color: #15803d; }
+    .pbs-btn.is-reply { color: var(--pbs-link); }
+    .pbs-btn.is-diff { background: color-mix(in srgb, var(--pbs-red) 14%, var(--bg-card)); border-color: color-mix(in srgb, var(--pbs-red) 34%, var(--bg-card)); color: var(--bad-text); cursor: help; }
+    .pbs-btn.is-won { background: color-mix(in srgb, #16a34a 14%, var(--bg-card)); border-color: color-mix(in srgb, #16a34a 32%, var(--bg-card)); color: var(--ok-text); }
     .pbs-act details { position: static; }
     .pbs-act summary { list-style: none; }
     .pbs-act summary::-webkit-details-marker { display: none; }
@@ -111,7 +132,7 @@
     .pbs-empty { padding: 16px; font-size: 13px; color: var(--text-muted); }
     .pbs-booked { padding: 9px 16px; font-size: 12.5px; color: #15803d; background: rgba(22,163,74,.07); }
     .pbs-rail > div { border: 1px solid var(--border-color); border-radius: 14px; background: var(--bg-card); padding: 16px; margin-bottom: 14px; }
-    .pbs-rail h4 { font-size: 15px; font-weight: 800; color: #1e3a8a; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+    .pbs-rail h4 { font-size: 15px; font-weight: 800; color: var(--pbs-ink); margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
     .pbs-ring { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
     .pbs-ring-c { width: 78px; height: 78px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex: none; }
     .pbs-ring-c span { width: 62px; height: 62px; border-radius: 50%; background: var(--bg-card); display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800; color: var(--text-primary); }
@@ -120,13 +141,13 @@
     .pbs-checks { list-style: none; padding: 0; margin: 0 0 10px; }
     .pbs-checks li { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; color: var(--text-secondary); padding: 3px 0; line-height: 1.45; }
     .pbs-checks li::before { content: '✓'; width: 18px; height: 18px; border-radius: 50%; background: #16a34a; color: #fff; font-size: 10.5px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; flex: none; margin-top: 1px; }
-    .pbs-link { font-size: 13px; font-weight: 700; color: #1d4ed8; text-decoration: none; }
-    .pbs-dates summary { list-style: none; cursor: pointer; text-align: center; border: 1px solid #bfdbfe; border-radius: 9px; padding: 7px; font-size: 12.5px; font-weight: 700; color: #1d4ed8; margin-top: 10px; }
+    .pbs-link { font-size: 13px; font-weight: 700; color: var(--pbs-link); text-decoration: none; }
+    .pbs-dates summary { list-style: none; cursor: pointer; text-align: center; border: 1px solid var(--pbs-line); border-radius: 9px; padding: 7px; font-size: 12.5px; font-weight: 700; color: var(--pbs-link); margin-top: 10px; }
     .pbs-dates div { font-size: 12px; color: var(--text-secondary); padding: 4px 0; }
-    .pbs-rail .pbs-imp { border-color: #fecaca; background: #fef2f2; }
-    .pbs-rail .pbs-imp h4 { color: #b91c1c; }
-    .pbs-rail .pbs-imp p { font-size: 12.5px; color: #b91c1c; line-height: 1.55; margin: 0; }
-    .pbs-back { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border-color); border-radius: 9px; padding: 8px 14px; font-size: 13px; font-weight: 700; color: #1d4ed8; text-decoration: none; background: var(--bg-card); }
+    .pbs-rail .pbs-imp { border-color: color-mix(in srgb, var(--pbs-red) 34%, var(--bg-card)); background: color-mix(in srgb, var(--pbs-red) 10%, var(--bg-card)); }
+    .pbs-rail .pbs-imp h4 { color: var(--bad-text); }
+    .pbs-rail .pbs-imp p { font-size: 12.5px; color: var(--bad-text); line-height: 1.55; margin: 0; }
+    .pbs-back { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border-color); border-radius: 9px; padding: 8px 14px; font-size: 13px; font-weight: 700; color: var(--pbs-link); text-decoration: none; background: var(--bg-card); }
 </style>
 
 {{-- The three cards across the top: coverage, the date, the budget. --}}
@@ -138,7 +159,7 @@
     <div class="pbs-card">
         <div class="pbs-ico" style="background:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
         <div>
-            <b style="color:#1d4ed8;">{{ $pbsLocked ? 'Event date' : 'Primary event date' }}</b>
+            <b style="color:var(--pbs-link);">{{ $pbsLocked ? 'Event date' : 'Primary event date' }}</b>
             @if($pbsOpts)
                 <span class="pbs-big">{{ \Illuminate\Support\Carbon::parse($pbsOpts[0]['date'])->format('D, M j, Y') }}</span>
                 <span>{{ $pbsOpts[0]['start'] ? \Illuminate\Support\Str::after(EventDates::label($pbsOpts[0], false), ' · ') : 'Time not set' }}</span>
@@ -341,7 +362,7 @@
             @php $pbsOpen = \App\Domain\Requests\ServiceCoverage::uncovered($coverage); @endphp
             @if($pbsOpen->isNotEmpty() && $pbsRows->count() > 1)
                 {{-- Sir Peter, 17 Sep: name the services nobody has bid on yet. --}}
-                <p style="font-size:12.5px;color:#9a3412;background:#fff7ed;border-radius:9px;padding:8px 10px;margin:0 0 10px;">
+                <p style="font-size:12.5px;color:var(--brand-text);background:color-mix(in srgb, var(--pbs-orange) 12%, var(--bg-card));border-radius:9px;padding:8px 10px;margin:0 0 10px;">
                     <b>Still uncovered:</b> {{ $pbsOpen->pluck('service.name')->implode(', ') }}. This request stays open for {{ $pbsOpen->count() === 1 ? 'it' : 'them' }} while you choose the rest.
                 </p>
             @endif

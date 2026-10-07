@@ -21,7 +21,7 @@
                 {{-- Selected package combination --}}
                 <div class="pe-card" style="padding:0; overflow:hidden;">
                     @php $img = $order['img']; @endphp
-                    <div style="height:180px; background:#eee url('https://images.unsplash.com/{{ $img }}?w=600&q=80&auto=format&fit=crop') center/cover no-repeat;"></div>
+                    <div style="height:180px; background:var(--pe-line-2) url('https://images.unsplash.com/{{ $img }}?w=600&q=80&auto=format&fit=crop') center/cover no-repeat;"></div>
                     <div style="padding:22px;">
                         <h2 style="margin-bottom:8px;">Your Selected Package Combination</h2>
                         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">

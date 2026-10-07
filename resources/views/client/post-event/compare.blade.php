@@ -23,7 +23,12 @@
     .pe-cmp-btn { margin-top:14px; width:100%; }
 
     .pe-toggle-row { display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin:-8px 0 22px; }
-    .pe-toggle { display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; color:var(--pe-ink-2); cursor:pointer; user-select:none; }
+    /* These are <button>s. Without a background of their own they paint the
+       browser's buttonface — #efefef, a light grey the theme never chose, with
+       the page's own light text on it. */
+    .pe-toggle { display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700;
+        color:var(--pe-ink-2); cursor:pointer; user-select:none;
+        background:none; border:0; padding:0; font-family:inherit; }
     .pe-toggle .sw { width:36px; height:20px; border-radius:999px; background:var(--pe-line); position:relative; transition:.15s; flex-shrink:0; }
     .pe-toggle .sw::after { content:''; position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.2); transition:.15s; }
     .pe-toggle.on .sw { background:var(--pe-orange); }

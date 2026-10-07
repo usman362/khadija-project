@@ -52,7 +52,7 @@
                     {{-- Suggested Additions --}}
                     <div style="margin-top:16px; background:var(--pe-purple-l); border:1px solid #ddd6fe; border-radius:12px; padding:14px;">
                         <h4 style="margin:0 0 4px; font-size:13px; font-weight:800; color:var(--pe-purple);">Suggested Additions</h4>
-                        <p style="margin:0 0 10px; font-size:12px; color:#5b21b6;">Based on similar events, clients also add these services:</p>
+                        <p style="margin:0 0 10px; font-size:12px; color:var(--pe-purple-t);">Based on similar events, clients also add these services:</p>
                         <div style="display:flex; flex-wrap:wrap; gap:8px;">
                             @foreach($aiAdditions as $add)
                                 <span style="display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid #ddd6fe; border-radius:999px; padding:6px 12px; font-size:12.5px; font-weight:700; color:var(--pe-purple); cursor:pointer;">

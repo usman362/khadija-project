@@ -11,10 +11,17 @@
 
 @push('styles')
 <style>
-    .tk { --tk: #ea580c; --tk-soft: #fff7ed; }
+    /* Mixed against the card rather than written out, so the toolkit's
+       orange tint follows the shell instead of staying cream on near-black.
+       --tk-ink is the text that sits on it: deep on white, pale on dark. */
+    .tk { --tk: #ea580c;
+          --tk-soft: color-mix(in srgb, #f97316 9%, var(--bg-card, #fff));
+          --tk-line: color-mix(in srgb, #f97316 34%, var(--bg-card, #fff));
+          --tk-ink: #7c2d12; }
+    [data-theme="dark"] .tk { --tk: #fb923c; --tk-ink: #fed7aa; }
     .tk-head { margin-bottom: 20px; }
     .tk-head h2 { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 24px; font-weight: 800; color: var(--text-primary); margin: 0 0 6px; }
-    .tk-pill { font-size: 11px; font-weight: 800; letter-spacing: .3px; color: var(--tk); background: var(--tk-soft); border: 1px solid #fed7aa; border-radius: 999px; padding: 4px 11px; }
+    .tk-pill { font-size: 11px; font-weight: 800; letter-spacing: .3px; color: var(--tk); background: var(--tk-soft); border: 1px solid var(--tk-line); border-radius: 999px; padding: 4px 11px; }
     .tk-head p { font-size: 13.5px; color: var(--text-muted); margin: 0; }
 
     .tk-note { display: flex; gap: 10px; align-items: flex-start; border-radius: 12px; padding: 12px 16px; font-size: 13px; line-height: 1.55; margin-bottom: 18px;
@@ -50,9 +57,9 @@
     .tk-foot { font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 9px; }
 
     /* Upgrade bar */
-    .tk-upgrade { display: flex; gap: 12px; align-items: flex-start; background: var(--tk-soft); border: 1px solid #fed7aa; border-radius: 13px; padding: 14px 16px; margin: 16px 0 22px; font-size: 13px; color: #7c2d12; }
+    .tk-upgrade { display: flex; gap: 12px; align-items: flex-start; background: var(--tk-soft); border: 1px solid var(--tk-line); border-radius: 13px; padding: 14px 16px; margin: 16px 0 22px; font-size: 13px; color: var(--tk-ink); }
     .tk-upgrade b { font-weight: 800; }
-    .tk-upgrade span { display: block; font-size: 12px; color: #9a3412; margin-top: 2px; }
+    .tk-upgrade span { display: block; font-size: 12px; color: var(--tk-ink); margin-top: 2px; }
 
     /* Comparison */
     .tk-comp { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px; }
@@ -82,9 +89,9 @@
     .tk-a b { display: block; font-size: 12px; font-weight: 800; color: var(--text-primary); }
     .tk-a span { display: block; font-size: 11px; color: var(--text-muted); line-height: 1.4; }
 
-    .tk-help { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--tk-soft); border: 1px solid #fed7aa; border-radius: 13px; padding: 14px 16px; margin-top: 16px; }
-    .tk-help b { font-size: 13px; font-weight: 800; color: #7c2d12; }
-    .tk-help span { display: block; font-size: 12px; color: #9a3412; }
+    .tk-help { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--tk-soft); border: 1px solid var(--tk-line); border-radius: 13px; padding: 14px 16px; margin-top: 16px; }
+    .tk-help b { font-size: 13px; font-weight: 800; color: var(--tk-ink); }
+    .tk-help span { display: block; font-size: 12px; color: var(--tk-ink); }
     .tk-help a { border: 1px solid var(--tk); color: var(--tk); background: var(--bg-card); border-radius: 10px; padding: 9px 16px; font-size: 12.5px; font-weight: 800; text-decoration: none; white-space: nowrap; }
     .tk-small { font-size: 11.5px; color: var(--text-muted); margin-top: 14px; line-height: 1.5; }
 

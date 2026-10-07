@@ -91,7 +91,7 @@
                             @php
                                 $isDone = $stage['state'] === 'done';
                                 $isActive = $stage['state'] === 'active';
-                                $dotBg = $isDone ? 'var(--pe-green)' : ($isActive ? 'var(--pe-orange)' : '#eef1f5');
+                                $dotBg = $isDone ? 'var(--pe-green)' : ($isActive ? 'var(--pe-orange)' : 'var(--pe-line-2)');
                                 $dotColor = ($isDone || $isActive) ? '#fff' : 'var(--pe-muted)';
                                 $lineOn = $isDone;
                             @endphp

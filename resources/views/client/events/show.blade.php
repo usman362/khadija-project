@@ -99,10 +99,10 @@
         .ev-svc-empty { font-size: 13px; color: var(--text-muted); padding: 14px 4px; }
         .ev-date { display: inline-block; margin-top: 7px; font-size: 11.5px; font-weight: 700; border-radius: 999px; padding: 2px 9px; }
         .ev-date.is-confirmed { background: #dcfce7; color: #15803d; }
-        .ev-date.is-unconfirmed { background: #fef3c7; color: #b45309; }
+        .ev-date.is-unconfirmed { background: color-mix(in srgb, #f59e0b 16%, var(--bg-card)); color: var(--warn-text); }
         .ev-date.is-clash { background: #fee2e2; color: #b91c1c; }
         .ev-date.is-no_date { background: var(--bg-muted, #f3f4f6); color: var(--text-muted); }
-        .ev-date.is-different { background: #fef3c7; color: #b45309; }
+        .ev-date.is-different { background: color-mix(in srgb, #f59e0b 16%, var(--bg-card)); color: var(--warn-text); }
         .ev-date.is-mismatch { background: #fee2e2; color: #b91c1c; }
         .ev-progress { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin-bottom: 12px; }
         .ev-progress > div { border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 14px; display: flex; flex-direction: column; gap: 3px; }
@@ -165,7 +165,7 @@
                          names, because those are the mechanism. --}}
                     @php $lifecycle = \App\Domain\Requests\RequestLifecycle::statusFor($event); @endphp
                     <span class="cl-badge {{ $lifecycle === 'expired' ? '' : 'cl-badge-published' }}"
-                          @if($lifecycle === 'expired') style="background:#fef3c7;color:#b45309;" @endif>
+                          @if($lifecycle === 'expired') style="background:color-mix(in srgb, #f59e0b 16%, var(--bg-card));color:var(--warn-text);" @endif>
                         {{ \App\Domain\Requests\RequestLifecycle::LABELS[$lifecycle] }}
                     </span>
                 </div>
@@ -231,9 +231,9 @@
         </div>{{-- /ev-top --}}
 
         @if($event->locationPlacementFailed() && $event->location_need !== \App\Domain\Requests\VenueRule::NEED)
-            <div style="margin-top:14px;padding:14px 16px;border:1px solid #fdba74;background:#fff7ed;border-radius:12px;">
-                <div style="font-weight:800;color:#9a3412;margin-bottom:4px;">We could not place this location on the map</div>
-                <p style="margin:0;font-size:13.5px;color:#7c2d12;">Your request is still live: professionals in your state can see it and send proposals. Adding a street, venue or ZIP lets us also match by travel distance.</p>
+            <div style="margin-top:14px;padding:14px 16px;border:1px solid color-mix(in srgb, #f97316 40%, var(--bg-card));background:color-mix(in srgb, #f97316 10%, var(--bg-card));border-radius:12px;">
+                <div style="font-weight:800;color:var(--brand-text);margin-bottom:4px;">We could not place this location on the map</div>
+                <p style="margin:0;font-size:13.5px;color:var(--brand-text);">Your request is still live: professionals in your state can see it and send proposals. Adding a street, venue or ZIP lets us also match by travel distance.</p>
             </div>
         @elseif($event->locationIsApproximate())
             <div style="margin-top:14px;padding:14px 16px;border:1px solid #93c5fd;background:#eff6ff;border-radius:12px;">
@@ -259,11 +259,13 @@
             $isEsr   = $r33::isEsr($event);
         @endphp
 
-        <div class="cl-card" style="border:1px solid #fcd34d;background:#fffbeb;padding:18px 20px;margin-bottom:20px;">
-            <div style="font-size:15px;font-weight:800;color:#92400e;margin-bottom:5px;">
+        {{-- Mixed against the card: this was a cream panel, so on the dark shell
+             its own white buttons landed on it at 1.04 and vanished. --}}
+        <div class="cl-card" style="border:1px solid color-mix(in srgb, #f59e0b 42%, var(--bg-card));background:color-mix(in srgb, #f59e0b 10%, var(--bg-card));padding:18px 20px;margin-bottom:20px;">
+            <div style="font-size:15px;font-weight:800;color:var(--warn-text);margin-bottom:5px;">
                 This request has expired
             </div>
-            <p style="font-size:13px;color:#78350f;line-height:1.6;margin:0 0 14px;">
+            <p style="font-size:13px;color:var(--warn-text);line-height:1.6;margin:0 0 14px;">
                 The proposal deadline passed{{ $event->proposal_deadline ? ' on ' . $event->proposal_deadline->format('M j, g:i A') : '' }}.
                 Nothing has been deleted. Your proposals, messages and documents are all still here, and
                 no new proposals can arrive until you reopen it.
@@ -275,15 +277,15 @@
                       style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px;">
                     @csrf
                     <div>
-                        <label style="display:block;font-size:12px;font-weight:700;color:#92400e;margin-bottom:4px;">
+                        <label style="display:block;font-size:12px;font-weight:700;color:var(--warn-text);margin-bottom:4px;">
                             Reopen free, new deadline
                         </label>
                         <input type="datetime-local" name="proposal_deadline" required
                                max="{{ $event->starts_at?->format('Y-m-d\TH:i') }}"
-                               style="padding:8px 10px;border:1px solid #fcd34d;border-radius:9px;font-size:13px;">
+                               style="padding:8px 10px;border:1px solid color-mix(in srgb, #f59e0b 42%, var(--bg-card));border-radius:9px;font-size:13px;background:var(--bg-input);color:var(--text-primary);">
                     </div>
                     <button type="submit" class="cl-btn cl-btn-primary cl-btn-sm">Reopen at no cost</button>
-                    <span style="font-size:11.5px;color:#92400e;align-self:center;">
+                    <span style="font-size:11.5px;color:var(--warn-text);align-self:center;">
                         Free for the first 24 hours after the deadline. Doesn't use one of your extensions.
                     </span>
                 </form>
@@ -292,13 +294,13 @@
             @if($isEsr)
                 {{-- §5 — an emergency request's window is hours. Every paid
                      tier would land past the event, so none is offered. --}}
-                <p style="font-size:12.5px;color:#78350f;line-height:1.6;margin:0 0 12px;">
+                <p style="font-size:12.5px;color:var(--warn-text);line-height:1.6;margin:0 0 12px;">
                     Emergency requests can't be extended by days: the event is too close. You can close
                     this request, copy it as a new one, or turn it into a standard request if it is no
                     longer urgent.
                 </p>
             @elseif($options !== [])
-                <div style="font-size:12px;font-weight:700;color:#92400e;margin-bottom:8px;">
+                <div style="font-size:12px;font-weight:700;color:var(--warn-text);margin-bottom:8px;">
                     Extend it ({{ 3 - $used }} of 3 left)
                 </div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
@@ -308,7 +310,7 @@
                             <input type="hidden" name="days" value="{{ $option['days'] }}">
                             <input type="hidden" name="gateway" value="stripe">
                             <button type="submit" class="cl-btn cl-btn-ghost cl-btn-sm"
-                                    style="border-color:#fcd34d;color:#92400e;">
+                                    style="border-color:color-mix(in srgb, #f59e0b 42%, var(--bg-card));color:var(--warn-text);">
                                 +{{ $option['days'] }} days: ${{ number_format($option['price'], 2) }}
                                 <span style="display:block;font-size:10.5px;font-weight:600;opacity:.75;">
                                     until {{ $option['new_deadline']->format('M j') }}
@@ -318,12 +320,12 @@
                     @endforeach
                 </div>
             @elseif($used >= 3)
-                <p style="font-size:12.5px;color:#78350f;line-height:1.6;margin:0 0 12px;">
+                <p style="font-size:12.5px;color:var(--warn-text);line-height:1.6;margin:0 0 12px;">
                     You've used all three extensions on this request. You can close it, or copy it as a
                     fresh request: a copy starts over with a new set of extensions.
                 </p>
             @else
-                <p style="font-size:12.5px;color:#78350f;line-height:1.6;margin:0 0 12px;">
+                <p style="font-size:12.5px;color:var(--warn-text);line-height:1.6;margin:0 0 12px;">
                     There isn't room to extend this one: a new deadline would fall after the event itself.
                     Move the event date first, or close and copy it.
                 </p>

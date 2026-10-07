@@ -66,7 +66,7 @@
         display:flex; align-items:center; justify-content:center; flex-shrink:0; }
     .rc-post-ic svg { width:15px; height:15px; }
     .rc-post-b { min-width:0; flex:1; }
-    .rc-post-t { display:block; font-size:13px; font-weight:700; color:var(--pe-text,#1f2937); line-height:1.35; }
+    .rc-post-t { display:block; font-size:13px; font-weight:700; color:var(--pe-ink); line-height:1.35; }
     .rc-post-s { display:block; font-size:11.5px; color:var(--pe-muted); margin-top:3px; line-height:1.4; }
     .rc-post-w { font-size:11px; color:var(--pe-muted); white-space:nowrap; flex-shrink:0; padding-top:2px; }
     .rc-rail-foot { flex-shrink:0; font-size:11px; color:var(--pe-muted); margin:12px 0 0; padding-top:11px; border-top:1px solid var(--pe-line); }
@@ -76,15 +76,22 @@
        shape in Khadijah's design, rather than a loose paragraph in a box. */
     /* Column 1, row 2 — under the cards, not under the rail. Which is what
        keeps the rail level with the cards rather than with the whole column. */
+    /* The orange note: a tint of the brand, mixed from it rather than
+       written out, so it follows the shell instead of staying cream on a
+       near-black page. */
     .rc-note { grid-column:1; margin:0; display:flex; align-items:center; gap:16px;
-        background:#fffaf3; border:1px solid #f3c98b; border-radius:14px; padding:16px 20px; }
+        background:color-mix(in srgb, var(--pe-orange) 8%, var(--pe-card));
+        border:1px solid color-mix(in srgb, var(--pe-orange) 36%, var(--pe-card));
+        border-radius:14px; padding:16px 20px; }
     .rc-note-ic { width:38px; height:38px; border-radius:11px; flex-shrink:0; display:flex;
-        align-items:center; justify-content:center; background:#fdecd3; color:var(--pe-orange-d); }
+        align-items:center; justify-content:center;
+        background:color-mix(in srgb, var(--pe-orange) 18%, var(--pe-card));
+        color:var(--pe-orange-t); }
     .rc-note-ic svg { width:20px; height:20px; }
     .rc-note-b { flex:1; min-width:0; }
-    .rc-note-b h4 { margin:0 0 4px; font-size:13.5px; font-weight:800; color:var(--pe-text,#1f2937); }
+    .rc-note-b h4 { margin:0 0 4px; font-size:13.5px; font-weight:800; color:var(--pe-ink); }
     .rc-note-b p { margin:0; font-size:12.5px; color:var(--pe-muted); line-height:1.65; }
-    .rc-note-b b { color:var(--pe-orange-d); font-weight:700; }
+    .rc-note-b b { color:var(--pe-orange-t); font-weight:700; }
     .rc-note-art { width:120px; flex-shrink:0; }
     @media (max-width:820px) { .rc-note-art { display:none; } }
     .rc-card { display:flex; flex-direction:column; gap:10px; background:var(--pe-card); border:1px solid var(--pe-line);
@@ -100,8 +107,8 @@
     .rc-card p { font-size:13px; color:var(--pe-muted); margin:0; line-height:1.5; }
     .rc-tag { white-space:nowrap; font-size:10px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; padding:3px 8px;
         border-radius:999px; background:var(--pe-line-2); color:var(--pe-muted); }
-    .rc-tag.hot { background:#fff7ed; color:var(--pe-orange-d); }
-    .rc-tag.soon { background:#eef2ff; color:#4f46e5; }
+    .rc-tag.hot { background:color-mix(in srgb, var(--pe-orange) 16%, var(--pe-card)); color:var(--pe-orange-t); }
+    .rc-tag.soon { background:color-mix(in srgb, #6366f1 16%, var(--pe-card)); color:var(--pe-info-t); }
     .rc-foot { margin-top:auto; font-size:12.5px; font-weight:700; color:var(--pe-orange); display:flex; align-items:center; gap:6px; }
 </style>
 @endpush

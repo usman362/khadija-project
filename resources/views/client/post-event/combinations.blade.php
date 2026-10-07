@@ -34,8 +34,8 @@
                                 <div style="display:flex; align-items:stretch; flex-wrap:wrap; gap:10px;">
                                     @foreach($combo['packages'] as $pkg)
                                         @php $img = $pkg['img']; @endphp
-                                        <div style="flex:1; min-width:170px; border:1px solid var(--pe-line); border-radius:12px; overflow:hidden; background:#fff;">
-                                            <div style="height:96px; background:#eee url('https://images.unsplash.com/{{ $img }}?w=600&q=80&auto=format&fit=crop') center/cover no-repeat;"></div>
+                                        <div style="flex:1; min-width:170px; border:1px solid var(--pe-line); border-radius:12px; overflow:hidden; background:var(--pe-card);">
+                                            <div style="height:96px; background:var(--pe-line-2) url('https://images.unsplash.com/{{ $img }}?w=600&q=80&auto=format&fit=crop') center/cover no-repeat;"></div>
                                             <div style="padding:12px 12px 14px;">
                                                 <div style="font-weight:800; font-size:13.5px; line-height:1.3;">{{ $pkg['name'] }}</div>
                                                 <div class="pe-muted" style="margin:2px 0 8px;">By {{ $pkg['vendor'] }}</div>

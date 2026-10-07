@@ -26,19 +26,19 @@
     .pe-cz-sel b { color:var(--ok-text); }
     .pe-cz-pricec { text-align:right; }
     .pe-cz-pricec .p { font-size:15px; font-weight:800; }
-    .pe-cz-pricec a { display:block; font-size:11.5px; font-weight:700; color:var(--pe-orange-d); text-decoration:none; margin-top:2px; }
+    .pe-cz-pricec a { display:block; font-size:11.5px; font-weight:700; color:var(--pe-orange-t); text-decoration:none; margin-top:2px; }
 
     .pe-addon-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
     @media (max-width:900px){ .pe-addon-grid { grid-template-columns:repeat(2,1fr); } }
     @media (max-width:520px){ .pe-addon-grid { grid-template-columns:1fr; } }
-    .pe-addon { border:1px solid var(--pe-line); border-radius:14px; overflow:hidden; background:#fff; }
+    .pe-addon { border:1px solid var(--pe-line); border-radius:14px; overflow:hidden; background:var(--pe-card); }
     .pe-addon-img { height:96px; background-size:cover; background-position:center; }
     .pe-addon-body { padding:12px; }
     .pe-addon-nm { font-size:13.5px; font-weight:800; margin:0; }
     .pe-addon-meta { font-size:11.5px; color:var(--pe-muted); margin:2px 0 10px; }
-    .pe-addon-btn { width:100%; border:1px solid var(--pe-orange); background:#fff7ed; color:var(--pe-orange-d);
+    .pe-addon-btn { width:100%; border:1px solid var(--pe-orange); background:color-mix(in srgb, var(--pe-orange) 12%, var(--pe-card)); color:var(--pe-orange-t);
         font-size:12.5px; font-weight:800; font-family:inherit; padding:9px 10px; border-radius:10px; cursor:pointer; }
-    .pe-addon-btn:hover { background:#ffedd5; }
+    .pe-addon-btn:hover { background:color-mix(in srgb, var(--pe-orange) 22%, var(--pe-card)); }
 
     .pe-scroll-x { overflow-x:auto; }
 </style>
@@ -135,7 +135,7 @@
                     <div class="pe-rail-row"><span class="k">Package Subtotal</span><span class="v">${{ number_format($package['price']) }}</span></div>
                     <div class="pe-rail-row" style="border-top:1px solid var(--pe-line); padding-top:12px; margin-top:4px;">
                         <span class="k" style="font-weight:800; color:var(--pe-ink);">Estimated Total</span>
-                        <span class="v" style="font-size:17px; color:var(--pe-orange-d);">${{ number_format($package['price']) }}</span>
+                        <span class="v" style="font-size:17px; color:var(--pe-orange-t);">${{ number_format($package['price']) }}</span>
                     </div>
                 </div>
                 @include('client.post-event._rail')

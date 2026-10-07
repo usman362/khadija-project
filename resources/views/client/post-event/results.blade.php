@@ -17,7 +17,7 @@
                 View as:
                 <span style="display:inline-flex; border:1px solid var(--pe-line); border-radius:9px; overflow:hidden;">
                     <span style="padding:7px 12px; background:var(--pe-orange); color:#fff;">List</span>
-                    <span style="padding:7px 12px; background:#fff; color:var(--pe-ink-2); cursor:pointer;">Cards</span>
+                    <span style="padding:7px 12px; background:var(--pe-card); color:var(--pe-ink-2); cursor:pointer;">Cards</span>
                 </span>
             </div>
         </div>
@@ -31,7 +31,7 @@
                         <img
                             src="https://images.unsplash.com/{{ $package['img'] }}?w=400&q=80&auto=format&fit=crop"
                             alt="{{ $package['name'] }}"
-                            style="width:140px; height:140px; border-radius:12px; object-fit:cover; flex-shrink:0; background:#eee;">
+                            style="width:140px; height:140px; border-radius:12px; object-fit:cover; flex-shrink:0; background:var(--pe-line-2);">
 
                         {{-- Middle --}}
                         <div style="flex:1; min-width:0;">
@@ -103,15 +103,22 @@
 
                 <div class="pe-rail-card">
                     <h4>Match Score Guide</h4>
+{{-- One colour per band, with the chip and its text mixed from it against
+     the card. Mixing toward --pe-ink darkens the text on a white shell and
+     lightens it on a dark one, so the pair that was written out as two
+     hexes now follows the theme instead of staying a pale chip on black. --}}
                     @php $guide = [
-                        ['90-100%', 'Excellent', '#16a34a', '#dcfce7'],
-                        ['75-89%',  'Great',     '#0284c7', '#e0f2fe'],
-                        ['60-74%',  'Good',      '#d97706', '#ffedd5'],
-                        ['Below 60%', 'Fair',    '#6b7280', '#f1f5f9'],
+                        ['90-100%',   'Excellent', '#16a34a'],
+                        ['75-89%',    'Great',     '#0284c7'],
+                        ['60-74%',    'Good',      '#d97706'],
+                        ['Below 60%', 'Fair',      '#6b7280'],
                     ]; @endphp
                     @foreach($guide as $g)
                         <div style="display:flex; align-items:center; gap:10px; padding:6px 0;">
-                            <span style="width:52px; text-align:center; font-size:11px; font-weight:800; color:{{ $g[2] }}; background:{{ $g[3] }}; border-radius:6px; padding:3px 4px;">{{ $g[0] }}</span>
+                            <span style="width:52px; text-align:center; font-size:11px; font-weight:800;
+                                         color:color-mix(in srgb, {{ $g[2] }} 70%, var(--pe-ink));
+                                         background:color-mix(in srgb, {{ $g[2] }} 16%, var(--pe-card));
+                                         border-radius:6px; padding:3px 4px;">{{ $g[0] }}</span>
                             <span style="font-size:13px; font-weight:700; color:var(--pe-ink-2);">{{ $g[1] }}</span>
                         </div>
                     @endforeach

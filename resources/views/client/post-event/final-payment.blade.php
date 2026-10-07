@@ -66,7 +66,7 @@
                             @foreach($escrow as $e)
                                 @php
                                     $done = $e[1] === 'done';
-                                    $dotBg = $done ? 'var(--pe-green)' : '#eef1f5';
+                                    $dotBg = $done ? 'var(--pe-green)' : 'var(--pe-line-2)';
                                     $dotColor = $done ? '#fff' : 'var(--pe-muted)';
                                 @endphp
                                 <div style="flex:1; text-align:center; position:relative;">
@@ -92,7 +92,7 @@
                 <div class="pe-card">
                     <h2 style="margin-bottom:14px;">Choose Payment Method</h2>
 
-                    <label style="display:flex; gap:12px; align-items:flex-start; border:1.5px solid var(--pe-orange); border-radius:12px; padding:14px; margin-bottom:12px; background:#fff7ed; cursor:pointer;">
+                    <label style="display:flex; gap:12px; align-items:flex-start; border:1.5px solid var(--pe-orange); border-radius:12px; padding:14px; margin-bottom:12px; background:color-mix(in srgb, var(--pe-orange) 12%, var(--pe-card)); cursor:pointer;">
                         <input type="radio" name="pay_method" value="card" checked style="margin-top:3px; accent-color:var(--pe-orange);">
                         <div style="flex:1;">
                             <div style="font-size:14px; font-weight:800; color:var(--pe-ink);">Credit / Debit Card</div>
@@ -198,7 +198,7 @@
                     @foreach($whats as $w)
                         <div style="display:flex; gap:10px; align-items:flex-start; padding:7px 0;">
                             <span style="width:22px; height:22px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800;
-                                background:{{ $w[1] === 'done' ? 'var(--pe-green)' : ($w[1] === 'pending' ? 'var(--pe-orange)' : '#eef1f5') }};
+                                background:{{ $w[1] === 'done' ? 'var(--pe-green)' : ($w[1] === 'pending' ? 'var(--pe-orange)' : 'var(--pe-line-2)') }};
                                 color:{{ $w[1] === 'upcoming' ? 'var(--pe-muted)' : '#fff' }};">
                                 @if($w[1] === 'done')
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="width:12px; height:12px;"><polyline points="20 6 9 17 4 12"/></svg>

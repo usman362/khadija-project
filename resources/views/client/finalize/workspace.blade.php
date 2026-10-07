@@ -23,9 +23,12 @@
     .ws-prof:hover { background: var(--bg-card-hover, #f8fafc); }
 
     .ws-phase { margin: 0; padding: 9px 16px; font-size: 12px; font-weight: 800; letter-spacing: .01em; }
-    .ws-p1 { background: rgba(37,99,235,.08); color: #1d4ed8; }
-    .ws-p2 { background: rgba(16,185,129,.1); color: #047857; }
-    .ws-p3 { background: rgba(124,58,237,.09); color: #6d28d9; }
+    /* The three phases keep their hues; the text is mixed against the page's
+       own ink so it darkens on white and lightens on the dark shell, where
+       these deep values were coming out at 2.5:1. */
+    .ws-p1 { background: rgba(37,99,235,.08);  color: color-mix(in srgb, #2563eb 72%, var(--text-primary)); }
+    .ws-p2 { background: rgba(16,185,129,.1);  color: color-mix(in srgb, #10b981 72%, var(--text-primary)); }
+    .ws-p3 { background: rgba(124,58,237,.09); color: color-mix(in srgb, #7c3aed 72%, var(--text-primary)); }
 
     .ws-sec { display: flex; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--border-color); }
     .ws-n { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--bg-card-hover, #f1f5f9);
