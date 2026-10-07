@@ -147,6 +147,57 @@
     .cm-msg-body { min-width: 0; }
     .cm-msg-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
     .cm-msg.me .cm-msg-meta { text-align: right; }
+
+    /*
+     * The three things the message dock has drawn since 21 September and
+     * this page never did: whether a message has been read, what level the
+     * sender gave it, and whether the other person is typing.
+     *
+     * The tick is the dock's: one for sent, two when somebody else's read is
+     * on record. Nothing claims delivery, because nothing records it.
+     */
+    .cm-tick { font-weight: 800; letter-spacing: -2px; margin-left: 5px; color: var(--text-muted); }
+    .cm-tick.is-read { color: var(--ok-text); }
+
+    /* The level, in its own colour, above the words it describes. Routine is
+       the absence of a chip rather than a badge on every row. */
+    .cm-pri { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 800;
+        letter-spacing: .03em; text-transform: uppercase; margin-bottom: 4px; }
+    .cm-pri i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; display: inline-block; }
+    .cm-msg.me .cm-pri { justify-content: flex-end; width: 100%; }
+
+    /* The per-message menu. Shown on hover or focus, so a thread is not a
+       wall of dots, and always shown once it is open. */
+    .cm-msg-body { position: relative; }
+    .cm-msg-more { position: absolute; top: -2px; right: -26px; width: 22px; height: 22px; border: 0;
+        border-radius: 7px; background: none; color: var(--text-muted); cursor: pointer; opacity: 0;
+        transition: opacity .12s; font-size: 14px; line-height: 1; padding: 0; }
+    .cm-msg.me .cm-msg-more { right: auto; left: -26px; }
+    .cm-msg:hover .cm-msg-more, .cm-msg-more:focus-visible, .cm-msg-more[aria-expanded="true"] { opacity: 1; }
+    .cm-msg-more:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+    .cm-primenu { position: absolute; z-index: 60; min-width: 172px; padding: 5px; border-radius: 11px;
+        background: var(--bg-card); border: 1px solid var(--border-color);
+        box-shadow: 0 14px 34px rgba(15,23,42,.16); display: none; }
+    .cm-primenu.is-open { display: block; }
+    .cm-primenu b { display: block; font-size: 10.5px; font-weight: 800; text-transform: uppercase;
+        letter-spacing: .04em; color: var(--text-muted); padding: 6px 9px 4px; }
+    .cm-primenu button { display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: none;
+        padding: 7px 9px; border-radius: 8px; font: inherit; font-size: 12.5px; color: var(--text-primary);
+        cursor: pointer; text-align: left; }
+    .cm-primenu button:hover { background: var(--bg-card-hover); }
+    .cm-primenu button i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex: none; }
+    .cm-primenu button.is-on { font-weight: 800; }
+
+    /* Somebody is typing. A line that appears and goes again, never a space
+       held open for one that might. */
+    .cm-typing { display: none; align-items: center; gap: 7px; padding: 6px 2px 0;
+        font-size: 12px; color: var(--text-muted); }
+    .cm-typing.is-on { display: flex; }
+    .cm-typing span { width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+        animation: cmType 1.1s infinite ease-in-out; }
+    .cm-typing span:nth-child(2) { animation-delay: .15s; }
+    .cm-typing span:nth-child(3) { animation-delay: .3s; }
+    @keyframes cmType { 0%, 60%, 100% { opacity: .25; } 30% { opacity: 1; } }
     .cm-bubble { background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 13px; font-size: 13px; color: var(--text-primary); line-height: 1.5; word-break: break-word; }
     .cm-msg.me .cm-bubble { background: rgba(234,88,12,0.1); border-color: rgba(234,88,12,0.2); }
     /* align-items, because the default stretches every attachment to the
@@ -427,8 +478,15 @@
                     @forelse($thread['messages'] as $m)
                         <div class="cm-msg {{ $m['mine'] ? 'me' : '' }}">
                             <span class="cm-msg-av" style="background:{{ $m['mine'] ? '#1e293b' : '#ea580c' }};">{{ strtoupper(substr($m['sender'], 0, 1)) }}</span>
-                            <div class="cm-msg-body">
-                                <div class="cm-msg-meta">{{ $m['mine'] ? 'You' : $m['sender'] }} · {{ $m['time'] }}</div>
+                            <div class="cm-msg-body" data-msg="{{ $m['id'] }}" data-priority="{{ $m['priority'] ?? '' }}">
+                                <div class="cm-msg-meta">{{ $m['mine'] ? 'You' : $m['sender'] }} · {{ $m['time'] }}@if($m['mine'])<span class="cm-tick {{ $m['read'] ? 'is-read' : '' }}" title="{{ $m['read'] ? 'Read' : 'Sent' }}">{{ $m['read'] ? '✓✓' : '✓' }}</span>@endif</div>
+                                {{-- Either person may set a level, which is why the
+                                     button is on every message and not only on mine. --}}
+                                <button type="button" class="cm-msg-more" data-pri-open="{{ $m['id'] }}"
+                                        aria-expanded="false" aria-label="Message options">⋯</button>
+                                @if($m['priority'] && ($__l = $thread['levels'][$m['priority']] ?? null))
+                                    <div class="cm-pri" style="color:{{ $thread['levelColours'][$m['priority']] ?? 'currentColor' }};"><i></i>{{ $__l }}</div>
+                                @endif
                                 {{-- A message can be a file and nothing else. The bubble was
                                      printed regardless, so those arrived as an empty box
                                      sitting above the attachment. --}}
@@ -474,6 +532,29 @@
                         <div style="text-align:center;color:var(--text-muted);font-size:13px;margin:auto;">No messages yet. Start the conversation below.</div>
                     @endforelse
                 </div>
+
+                {{-- Who is typing, named. It appears and goes again rather
+                     than holding a line open for one who might. --}}
+                <div class="cm-typing" id="cm-typing" aria-live="polite">
+                    <span></span><span></span><span></span>
+                    <em id="cm-typing-who" style="font-style:normal;"></em>
+                </div>
+
+                {{-- One menu, moved to whichever message was asked. Five of
+                     them per thread would be five copies of the same list. --}}
+                <div class="cm-primenu" id="cm-primenu" role="menu">
+                    <b>Mark this message</b>
+                    @foreach($thread['levels'] as $__key => $__label)
+                        <button type="button" role="menuitem" data-pri-set="{{ $__key }}"
+                                style="color:{{ $thread['levelColours'][$__key] ?? 'currentColor' }};"><i></i>{{ $__label }}</button>
+                    @endforeach
+                    {{-- Routine is how a level comes off again: the endpoint
+                         stores null for it rather than labelling every row.
+                         A sixth "clear" entry would be a second name for the
+                         same thing, and the endpoint refuses anything outside
+                         the five. --}}
+                </div>
+
                 <div class="cm-suggest">
                     <svg class="spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.9 4.1L18 8l-4.1 1.9L12 14l-1.9-4.1L6 8l4.1-1.9L12 2z"/></svg>
                     <div><b>Suggestion</b><p>Ask for a written quote and confirm what's included.</p></div>
@@ -1128,6 +1209,8 @@ window.CHAT_LIVE = {
     box: '#cm-msgs', form: '#cm-form', input: '#cm-input',
     sendUrl: @json($thread['sendUrl']), showUrl: @json($thread['showUrl']), readUrl: @json($thread['readUrl']),
     meId: @json($thread['meId']), seen: @json(array_column($thread['messages'], 'id')),
+    priorityUrl: @json($thread['priorityUrl']), typingUrl: @json($thread['typingUrl']),
+    levels: @json($thread['levels']), levelColours: @json($thread['levelColours']),
     fileInput: '#cm-file', chips: '#cm-chips',
     uploadUrl: @json(route('attachments.store')), conversationId: @json($thread['id']),
     onError: function (msg) { const n = document.getElementById('cm-note'); if (n) { n.textContent = msg; setTimeout(() => { n.textContent = ''; }, 6000); } },
@@ -1175,9 +1258,202 @@ window.CHAT_LIVE = {
         var body = (m.body || '').trim();
         var bubble = body ? '<div class="cm-bubble">' + esc(body) + '</div>' : '';
 
-        return '<div class="cm-msg ' + (mine ? 'me' : '') + '"><span class="cm-msg-av" style="background:' + (mine ? '#1e293b' : '#ea580c') + ';">' + esc(name.charAt(0).toUpperCase()) + '</span><div class="cm-msg-body"><div class="cm-msg-meta">' + esc(name) + ' · ' + t + '</div>' + bubble + attBlock + '</div></div>';
+        /* The same three things the server renders, so a message that
+           arrives while the page is open is not a plainer one than the
+           message above it. */
+        var reads = m.reads || [];
+        var read = reads.some(function (r) { return Number(r.user_id) !== Number(window.CHAT_LIVE.meId); });
+        var tickHtml = mine
+            ? '<span class="cm-tick' + (read ? ' is-read' : '') + '" title="' + (read ? 'Read' : 'Sent') + '">' + (read ? '✓✓' : '✓') + '</span>'
+            : '';
+
+        var lv = m.priority || '';
+        var lvLabel = lv && window.CHAT_LIVE.levels ? window.CHAT_LIVE.levels[lv] : null;
+        var priHtml = lvLabel
+            ? '<div class="cm-pri" style="color:' + (window.CHAT_LIVE.levelColours[lv] || 'currentColor') + ';"><i></i>' + esc(lvLabel) + '</div>'
+            : '';
+
+        var more = '<button type="button" class="cm-msg-more" data-pri-open="' + (m.id != null ? m.id : '')
+            + '" aria-expanded="false" aria-label="Message options">⋯</button>';
+
+        return '<div class="cm-msg ' + (mine ? 'me' : '') + '"><span class="cm-msg-av" style="background:' + (mine ? '#1e293b' : '#ea580c') + ';">' + esc(name.charAt(0).toUpperCase()) + '</span>'
+            + '<div class="cm-msg-body" data-msg="' + (m.id != null ? m.id : '') + '" data-priority="' + esc(lv) + '">'
+            + '<div class="cm-msg-meta">' + esc(name) + ' · ' + t + tickHtml + '</div>'
+            + more + priHtml + bubble + attBlock + '</div></div>';
+    },
+
+    /*
+     * The poll already fetches the conversation, and the answer already
+     * carries who is typing and who has read what. Reading it here is what
+     * turns a tick from a thing drawn once into a thing that changes.
+     */
+    onPoll: function (d) {
+        var cfg = window.CHAT_LIVE;
+        var esc = function (x) { var e = document.createElement('div'); e.textContent = x == null ? '' : x; return e.innerHTML; };
+
+        var who = document.getElementById('cm-typing-who');
+        var line = document.getElementById('cm-typing');
+        var peers = (d && d.typing) || [];
+        if (line && who) {
+            if (peers.length) {
+                // The endpoint hands back names, not people.
+                who.textContent = peers.map(function (p) {
+                    return (typeof p === 'string' ? p : (p && p.name)) || 'Someone';
+                }).join(', ') + (peers.length > 1 ? ' are typing' : ' is typing');
+                line.classList.add('is-on');
+            } else {
+                line.classList.remove('is-on');
+            }
+        }
+
+        var arr = (d && d.messages && d.messages.data) ? d.messages.data : ((d && d.messages) || []);
+        arr.forEach(function (m) {
+            var body = document.querySelector('[data-msg="' + m.id + '"]');
+            if (! body) return;
+
+            // The tick, now that somebody else may have opened the thread.
+            var mine = Number(m.sender_id) === Number(cfg.meId);
+            var tickEl = body.querySelector('.cm-tick');
+            if (mine && tickEl) {
+                var read = (m.reads || []).some(function (r) { return Number(r.user_id) !== Number(cfg.meId); });
+                tickEl.textContent = read ? '✓✓' : '✓';
+                tickEl.title = read ? 'Read' : 'Sent';
+                tickEl.classList.toggle('is-read', read);
+            }
+
+            // The level, which the other person may have set.
+            var lv = m.priority || '';
+            if (body.getAttribute('data-priority') === lv) return;
+            body.setAttribute('data-priority', lv);
+
+            var chip = body.querySelector('.cm-pri');
+            var label = lv && cfg.levels ? cfg.levels[lv] : null;
+            if (! label) { if (chip) chip.remove(); return; }
+
+            if (! chip) {
+                chip = document.createElement('div');
+                chip.className = 'cm-pri';
+                body.insertBefore(chip, body.querySelector('.cm-bubble') || body.lastChild);
+            }
+            chip.style.color = (cfg.levelColours && cfg.levelColours[lv]) || 'currentColor';
+            chip.innerHTML = '<i></i>' + esc(label);
+        });
     },
 };
+
+/*
+ * The menu, the level it sets, and the typing heartbeat.
+ *
+ * One menu moved to the message that asked for it: five copies of the same
+ * list, one per message, is five times the markup for one list.
+ */
+(function () {
+    var cfg = window.CHAT_LIVE;
+    if (! cfg) return;
+
+    var csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    var menu = document.getElementById('cm-primenu');
+    var openFor = null;
+
+    function close() {
+        if (! menu) return;
+        menu.classList.remove('is-open');
+        document.querySelectorAll('.cm-msg-more[aria-expanded="true"]')
+            .forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+        openFor = null;
+    }
+
+    document.addEventListener('click', function (e) {
+        var opener = e.target.closest ? e.target.closest('[data-pri-open]') : null;
+
+        if (opener && menu) {
+            e.preventDefault();
+            var id = opener.getAttribute('data-pri-open');
+            if (openFor === id) { close(); return; }
+
+            close();
+            openFor = id;
+            opener.setAttribute('aria-expanded', 'true');
+
+            var r = opener.getBoundingClientRect();
+            menu.style.top = (window.scrollY + r.bottom + 6) + 'px';
+            // Kept on screen: a menu that opens past the right edge is a
+            // menu nobody can read the end of.
+            menu.style.left = Math.min(window.scrollX + r.left, window.scrollX + window.innerWidth - 190) + 'px';
+            menu.style.position = 'absolute';
+            menu.classList.add('is-open');
+
+            var now = (document.querySelector('[data-msg="' + id + '"]') || {}).dataset;
+            menu.querySelectorAll('[data-pri-set]').forEach(function (b) {
+                b.classList.toggle('is-on', b.getAttribute('data-pri-set') === ((now && now.priority) || ''));
+            });
+            return;
+        }
+
+        var choice = e.target.closest ? e.target.closest('[data-pri-set]') : null;
+        if (choice && openFor && cfg.priorityUrl) {
+            var level = choice.getAttribute('data-pri-set');
+            var url = cfg.priorityUrl.replace('__MSG__', openFor);
+            var id = openFor;
+            close();
+
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ priority: level || 'routine' }),
+            }).then(function (r) { return r.ok ? r.json() : null; }).then(function (saved) {
+                if (! saved) return;
+
+                /*
+                 * Drawn from what came back, not from what was clicked.
+                 * Routine is stored as no level at all, so clicking it and
+                 * then drawing "Routine" would put a label on the screen
+                 * that is not in the record. Straight away rather than on
+                 * the next poll: six seconds of nothing reads as a button
+                 * that did not work.
+                 */
+                var body = document.querySelector('[data-msg="' + id + '"]');
+                if (! body) return;
+
+                var lv = saved.priority || '';
+                body.setAttribute('data-priority', lv);
+
+                var chip = body.querySelector('.cm-pri');
+                if (! saved.label) { if (chip) chip.remove(); return; }
+                if (! chip) {
+                    chip = document.createElement('div');
+                    chip.className = 'cm-pri';
+                    body.insertBefore(chip, body.querySelector('.cm-bubble') || body.lastChild);
+                }
+                chip.style.color = (cfg.levelColours && cfg.levelColours[lv]) || 'currentColor';
+                chip.innerHTML = '<i></i>' + saved.label;
+            }).catch(function () {});
+            return;
+        }
+
+        if (! (menu && menu.contains(e.target))) close();
+    });
+
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+
+    /* Typing: told at most every three seconds while there is something in
+       the box, because it is a heartbeat and not a keystroke log. */
+    var input = document.querySelector(cfg.input);
+    var last = 0;
+    if (input && cfg.typingUrl) {
+        input.addEventListener('input', function () {
+            var now = Date.now();
+            if (now - last < 3000 || ! input.value.trim()) return;
+            last = now;
+            fetch(cfg.typingUrl, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+                credentials: 'same-origin',
+            }).catch(function () {});
+        });
+    }
+})();
 </script>
 @include('partials._chat_live')
 @endif

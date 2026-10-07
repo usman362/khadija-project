@@ -148,6 +148,14 @@
             const d = await res.json();
             const arr = (d.messages && d.messages.data) ? d.messages.data : (d.messages || []);
             arr.slice().reverse().forEach((m) => add(m));
+
+            /* Optional, and opt-in. The answer already carries who is typing
+               and who has read what; a page that wants to draw those says so
+               by defining onPoll. A page that does not is untouched, which is
+               why this partial can stay shared. */
+            if (typeof cfg.onPoll === 'function') {
+                try { cfg.onPoll(d, arr); } catch (e) { /* a page's own problem */ }
+            }
         } catch (e) { /* ignore */ }
     }
     setInterval(poll, 6000);

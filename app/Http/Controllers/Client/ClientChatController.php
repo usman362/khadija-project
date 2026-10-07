@@ -67,7 +67,13 @@ class ClientChatController extends Controller
         $activeConv = $activeId ? $conversations->firstWhere('id', $activeId) : $conversations->first();
         $thread = null;
         if ($activeConv) {
-            $activeConv->load(['messages.sender:id,name', 'messages.attachments', 'participants:id,name,email,public_id,avatar,last_active_at']);
+            // reads: who has seen each message. It is what a tick is drawn
+            // from, and the inbox had never loaded it.
+            $activeConv->load([
+                'messages.sender:id,name', 'messages.attachments',
+                'messages.reads:id,message_id,user_id,read_at',
+                'participants:id,name,email,public_id,avatar,last_active_at',
+            ]);
             $thread = $this->thread($activeConv, $user);
         }
 
@@ -304,6 +310,23 @@ class ClientChatController extends Controller
             'body' => $m->body,
             'time' => optional($m->created_at)->format('M d, Y · g:i A'),
             /*
+             * The two things the message dock has shown since 21 September
+             * and this page never did.
+             *
+             * priority is Sir Peter's own: "if the user considers the text
+             * messages as urgent then there needs to be" a way to say so.
+             * The column, the endpoint and the five levels all existed; the
+             * inbox simply never read or offered them, so a client who set a
+             * message Urgent in the dock saw no trace of it on the page they
+             * were sent to.
+             *
+             * read is from message_reads, the only record of anybody having
+             * seen anything. There is no "delivered" on record, so a sent
+             * message gets one tick and nothing is claimed about arrival.
+             */
+            'priority' => $m->priority,
+            'read' => $m->reads->contains(fn ($r) => (int) $r->user_id !== (int) $user->id),
+            /*
              * A url, because the tile in the thread was a plain <div>: the
              * reader could see a file had been sent and could not open it.
              * Reported in the 26 Aug walkthrough as "upload works, viewing
@@ -331,6 +354,11 @@ class ClientChatController extends Controller
             'showUrl' => route('conversations.show', $c->id),
             'readUrl' => route('conversations.mark-read', $c->id),
             'meId' => $user->id,
+            // __MSG__ is filled in on the page: one route, every message.
+            'priorityUrl' => route('conversations.messages.priority', ['conversation' => $c->id, 'message' => '__MSG__']),
+            'typingUrl' => route('conversations.typing', $c->id),
+            'levels' => \App\Domain\Messaging\MessagePriority::LEVELS,
+            'levelColours' => \App\Domain\Messaging\MessagePriority::COLOURS,
         ];
     }
 
