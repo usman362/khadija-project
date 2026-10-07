@@ -106,9 +106,20 @@
                     {{-- The event it is for. An agreement that does not name
                          what it is about is a page of figures. --}}
                     <p style="margin:3px 0 0;font-size:13px;font-weight:700;color:var(--text-secondary);">{{ $event?->title ?? 'This event' }}</p>
+                    @if($event)<div class="gr-ref" style="margin-top:3px;">{{ $event->reference() }}</div>@endif
                     <p style="margin:2px 0 0;font-size:12.5px;color:var(--text-muted);">Your request and this professional's proposal, in one place.</p>
                 </div>
-                <span class="ws-role" style="margin:0;background:{{ $sColour }}1f;color:{{ $sColour }};">{{ $sLabel }}</span>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+                    <span class="ws-role" style="margin:0;background:{{ $sColour }}1f;color:{{ $sColour }};">{{ $sLabel }}</span>
+                    {{-- Read it away from the screen, or send it to whoever
+                         else has to agree. It says "draft" on every page: it
+                         is not the signed contract, which comes from the
+                         booking once both sides have signed. --}}
+                    <a class="ws-btn" href="{{ route('client.finalize.draft', $fin) }}" style="white-space:nowrap;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Download agreement draft
+                    </a>
+                </div>
             </div>
             <p style="margin:10px 0 0;font-size:12.5px;color:var(--text-secondary);">
                 {{ $sMeaning }}
@@ -232,8 +243,15 @@
 
     {{-- ── The professional ───────────────────────────────── --}}
     <aside class="ws-card ws-who ws-pro-col">
-        <img src="{{ $pro->avatar_url }}" alt="{{ $pro->name }}">
+        {{-- Whether they are around to answer, where you are waiting on them. --}}
+        <span class="has-pres">
+            <img src="{{ $pro->avatar_url }}" alt="{{ $pro->name }}">
+            <x-presence-dot :user="$pro" size="13" style="right:6px;bottom:9px;" />
+        </span>
         <b>{{ $pro->name }}</b>
+        @if(\App\Support\Presence::label($pro))
+            <div class="ws-meta" style="margin-top:2px;">{{ \App\Support\Presence::label($pro) }}</div>
+        @endif
         <span class="ws-role" style="background:{{ RoleColours::tintFor('professional') }};color:{{ RoleColours::strongFor('professional') }};">{{ $svc ?? 'Professional' }}</span>
         <div class="ws-meta">
             Member since {{ $pro->created_at?->format('Y') }}

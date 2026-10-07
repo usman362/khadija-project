@@ -12,8 +12,11 @@ use App\Models\Finalization;
 use App\Models\Payment;
 use App\Domain\Settings\Services\SettingsService;
 use App\Support\Commission;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use App\Domain\Payments\DepositCheckout;
@@ -132,6 +135,47 @@ class ClientFinalizeController extends Controller
             'messages'     => $conversation
                 ? $conversation->messages()->with('sender:id,name,avatar')->latest()->take(12)->get()->reverse()
                 : collect(),
+        ]);
+    }
+
+    /**
+     * The draft as a document, at whatever stage it has reached.
+     *
+     * Sir Peter asked for this beside the workspace. It is not the contract:
+     * app.agreements.download refuses anything both sides have not accepted,
+     * and rightly — that file is the record of a booking. This one exists so
+     * a client can read the terms away from the screen, send them to whoever
+     * else has to agree, or keep what was offered before changes were asked
+     * for.
+     *
+     * So it says what it is on every page. A draft that looks like a contract
+     * is worse than no draft: it is a document somebody will believe binds
+     * the other side. Every term that is not settled yet is printed as not
+     * settled rather than left blank, because a blank reads as nothing owed.
+     */
+    public function draft(Request $request, Finalization $finalization): Response
+    {
+        $this->authorizeClient($request, $finalization);
+
+        $finalization->load(['event', 'supplier', 'bid.category', 'client']);
+
+        $pdf = Pdf::loadView('client.finalize.draft-pdf', [
+            'fin'         => $finalization,
+            'event'       => $finalization->event,
+            'pro'         => $finalization->supplier,
+            'client'      => $request->user(),
+            'service'     => $finalization->bid?->category?->name,
+            'generatedAt' => now(),
+        ])->setPaper('a4');
+
+        // Named so a folder of them stays sorted and tells them apart: the
+        // request's own reference, then the professional.
+        $name = trim(($finalization->event?->reference() ?? 'agreement') . '-'
+            . Str::slug($finalization->supplier?->name ?? 'professional') . '-draft') . '.pdf';
+
+        return response($pdf->output(), 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $name . '"',
         ]);
     }
 

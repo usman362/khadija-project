@@ -799,6 +799,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/finalize/{finalization}/agreement', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'overview'])
             ->name('client.finalize.overview');
 
+        /*
+         * The draft as a document. Above the {step?} wildcard for the same
+         * reason the overview is, and separate from app.agreements.download,
+         * which refuses anything both sides have not accepted — that is the
+         * signed contract, this is the thing you read before you sign it.
+         */
+        Route::get('/finalize/{finalization}/draft/download', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'draft'])
+            ->name('client.finalize.draft');
+
         Route::get('/finalize/{finalization}/{step?}', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'show'])
             ->name('client.finalize.step');
         Route::post('/finalize/{finalization}/{step}', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'save'])

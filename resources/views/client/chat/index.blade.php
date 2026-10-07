@@ -599,8 +599,10 @@
         {{-- The details column. Sir Peter, 2026-09-10, from a Freelancer chat:
              photo, name, the job the chat is about with an Award button, and
              chat options, in a panel that collapses to a thin rail.
-             "Active now" is left out on purpose: nothing records whether
-             someone is online, and a green dot we cannot back is a claim.
+             The dot was left out for a long time, because nothing recorded
+             whether someone was online and a green dot we cannot back is a
+             claim. TouchLastActive stamps every signed-in request now, so
+             App\Support\Presence has something to answer with.
              Whether an account gets the panel is MessengerAccess's call. --}}
         @if($info && \App\Support\MessengerAccess::panel(auth()->user()))
         <aside class="cm-card cm-side" id="cm-info" aria-label="Conversation details">
@@ -614,8 +616,13 @@
                     </button>
                 </div>
 
+                {{-- The dot sits inside the photo, not on its corner: this box
+                     clips what overflows it, so a dot hung off the edge would
+                     be sliced in half. --}}
                 <div class="cm-side-photo">
                     <img src="{{ $info['avatar'] }}" alt="" loading="lazy">
+                    <x-presence-dot :user="$info['peer'] ?? null" size="14"
+                                    style="right:9px;bottom:9px;" />
                     <div class="cm-side-name">
                         {{-- DIR-37/38: the ID in brackets beside the name, and the ID
                              itself is the link to their profile. --}}
@@ -628,8 +635,13 @@
                                 @endif
                             @endif
                         </b>
-                        {{-- A timestamp, to five minutes. Deliberately not "online". --}}
-                        @if($info['lastActive'])<em>Last active {{ $info['lastActive'] }}</em>@endif
+                        {{-- The words the dot stands for, so the colour is never
+                             the only thing carrying the meaning. --}}
+                        @if(\App\Support\Presence::label($info['peer'] ?? null))
+                            <em>{{ \App\Support\Presence::label($info['peer']) }}</em>
+                        @elseif($info['lastActive'])
+                            <em>Last active {{ $info['lastActive'] }}</em>
+                        @endif
                     </div>
                 </div>
                 <p class="cm-side-role">

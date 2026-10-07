@@ -454,6 +454,10 @@ class Event extends Model
         $prefix = match ($this->source) {
             'esr'          => 'ER',
             'direct_offer' => 'DR',
+            // A package is bought, not bid on. It used to fall to the default
+            // and read BR-, which named a bidding request nobody ever opened;
+            // that went unnoticed while the number appeared on one screen.
+            'package'      => 'PKG',
             default        => 'BR',
         };
 

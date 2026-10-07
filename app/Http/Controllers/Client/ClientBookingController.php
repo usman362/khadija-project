@@ -49,7 +49,7 @@ class ClientBookingController extends Controller
 
         $query = $this->base($user)
             ->with([
-                'event:id,title,starts_at,ends_at,location,venue,guest_count,event_type,description',
+                'event:id,title,starts_at,ends_at,location,venue,guest_count,event_type,description,source',
                 'event.categories:id,name',
                 'supplier:id,name,email,public_id',
                 'supplier.profile:id,user_id,city,state,trade_license_verified_at,liability_insurance_verified_at,liability_insurance_expires_on',

@@ -56,7 +56,6 @@
     .mp-top { display: flex; gap: 14px; align-items: flex-end; margin-top: -18px; }
     .mp-avw { position: relative; flex: none; }
     .mp-av { width: 64px; height: 64px; border-radius: 18px; object-fit: cover; border: 3px solid var(--bg-card); background: #f97316; display: block; box-shadow: 0 6px 16px -8px rgba(15,27,53,.4); }
-    .mp-on { position: absolute; right: -2px; bottom: -2px; width: 14px; height: 14px; border-radius: 50%; background: #22c55e; border: 2.5px solid var(--bg-card); }
     .mp-who { min-width: 0; padding-bottom: 2px; }
     .mp-name { font-size: 15.5px; font-weight: 800; color: var(--text-primary); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .mp-name:hover { color: var(--brand-text, #c2410c); }
@@ -168,7 +167,6 @@
                         $isSaved = $savedIds->contains($pro->id);
                         $services = $pro->serviceCategories->take(3);
                         $place = trim(collect([$pro->profile?->city, $pro->profile?->state])->filter()->implode(', '));
-                        $online = $pro->last_active_at && \Illuminate\Support\Carbon::parse($pro->last_active_at)->gt(now()->subMinutes(5));
                     @endphp
                     <div class="mp-card" data-mp-card data-mp-text="{{ strtolower($pro->name . ' ' . $services->pluck('name')->implode(' ')) }}">
                         <div class="mp-cover"></div>
@@ -176,7 +174,11 @@
                             <div class="mp-top">
                                 <div class="mp-avw">
                                     <img class="mp-av" src="{{ $pro->avatar_url }}" alt="{{ $pro->name }}">
-                                    @if($online)<span class="mp-on" title="Online now"></span>@endif
+                                    {{-- One rule for this dot, shared with the chat panel and
+                                         the agreement. The copy that lived here said five
+                                         minutes, which is exactly how often presence is
+                                         written, so somebody sitting on the page blinked out. --}}
+                                    <x-presence-dot :user="$pro" size="14" />
                                 </div>
                                 <div class="mp-who">
                                     <a href="{{ route('public.professional.show', $pro) }}" class="mp-name">
@@ -293,7 +295,6 @@
                     @php
                         $services = $pro->serviceCategories->take(3);
                         $place = trim(collect([$pro->profile?->city, $pro->profile?->state])->filter()->implode(', '));
-                        $online = $pro->last_active_at && \Illuminate\Support\Carbon::parse($pro->last_active_at)->gt(now()->subMinutes(5));
                     @endphp
                     <div class="mp-card" data-mp-card data-mp-text="{{ strtolower($pro->name . ' ' . $services->pluck('name')->implode(' ')) }}">
                         <div class="mp-cover" style="background:linear-gradient(120deg,#fffbeb,#fef3c7 45%,#fde7f3);"></div>
@@ -301,7 +302,11 @@
                             <div class="mp-top">
                                 <div class="mp-avw">
                                     <img class="mp-av" src="{{ $pro->avatar_url }}" alt="{{ $pro->name }}">
-                                    @if($online)<span class="mp-on" title="Online now"></span>@endif
+                                    {{-- One rule for this dot, shared with the chat panel and
+                                         the agreement. The copy that lived here said five
+                                         minutes, which is exactly how often presence is
+                                         written, so somebody sitting on the page blinked out. --}}
+                                    <x-presence-dot :user="$pro" size="14" />
                                 </div>
                                 <div class="mp-who">
                                     <a href="{{ route('public.professional.show', $pro) }}" class="mp-name">

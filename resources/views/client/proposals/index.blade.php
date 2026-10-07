@@ -269,6 +269,9 @@
                                 <div class="pr-ec">
                                     <div class="ev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>{{ \Illuminate\Support\Str::limit($p->event?->title ?? '—', 16) }}</div>
                                     <div class="loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/></svg>{{ \Illuminate\Support\Str::limit($p->event?->location ?? 'TBD', 16) }}</div>
+                                    {{-- Titles are cut to 16 characters here, so six rows of one
+                                         wedding all read alike. This is what tells them apart. --}}
+                                    @if($p->event)<div class="gr-ref">{{ $p->event->reference() }}</div>@endif
                                 </div>
                             </td>
                             <td>

@@ -375,6 +375,41 @@
         .gr-id-link { color: var(--brand-text, #c2410c); font-weight: 700; text-decoration: none; white-space: nowrap; }
         .gr-id-link:hover { text-decoration: underline; }
 
+        /*
+         * The request's own reference — BR-00118, DR-00065, ER-00042.
+         * Event::reference() has existed since the seven screens, but only the
+         * event's own page ever printed it, which is the one place you already
+         * know which request you are looking at. On a list where every row
+         * reads "Wedding Receptio...", it is the only thing telling them
+         * apart, and it is what a client quotes to support.
+         *
+         * user-select:all so one click takes the whole thing, and tabular
+         * figures so a column of them lines up.
+         */
+        .gr-ref {
+            font-size: 11px; font-weight: 700; letter-spacing: .02em;
+            color: var(--text-muted); user-select: all;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /*
+         * The presence dot. Sits on the corner of an avatar by default, and
+         * in the run of text with is-inline. The ring is the card behind it,
+         * so the dot reads as a dot and not as a bite out of the picture.
+         */
+        .pres-dot {
+            position: absolute; right: -1px; bottom: -1px;
+            width: var(--pres-size, 10px); height: var(--pres-size, 10px);
+            border-radius: 50%; background: var(--pres);
+            box-shadow: 0 0 0 2px var(--bg-card, #fff);
+        }
+        .pres-dot.is-inline {
+            position: static; display: inline-block; vertical-align: middle;
+            margin-right: 5px; box-shadow: none;
+        }
+        /* Anything carrying a dot has to be the thing it is positioned against. */
+        .has-pres { position: relative; display: inline-block; }
+
         /* #69: placeholders in the page's own font, not the browser's serif default. */
         textarea::placeholder, input::placeholder { font-family: inherit; }
         textarea { font-family: inherit; }

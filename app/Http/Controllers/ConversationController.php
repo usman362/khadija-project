@@ -159,7 +159,10 @@ class ConversationController extends Controller
                 'id'       => $peer->id,
                 'name'     => $peer->name,
                 'avatar'   => $peer->avatar_url,
-                'online'   => (bool) ($peer->last_active_at && \Illuminate\Support\Carbon::parse($peer->last_active_at)->gt(now()->subMinutes(5))),
+                // One rule, in App\Support\Presence. The copy that lived here
+                // used five minutes, the same interval presence is written at,
+                // so a person reading the page blinked out between stamps.
+                'online'   => \App\Support\Presence::isHere($peer),
                 // The dock's chat header links the name to their public page and
                 // shows their GigResource ID, for professionals.
                 'gr_id'    => $peer->public_id ? \App\Support\GigResourceId::display($peer->public_id) : null,

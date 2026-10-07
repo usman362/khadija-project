@@ -189,8 +189,11 @@ class ClientChatController extends Controller
             'blockUrl'     => route('conversations.block', $c),
             'blockedByMe'  => $pro ? \App\Domain\Messaging\Blocking::blocked($user->id, $pro->id) : false,
             'blockedMe'    => $pro ? \App\Domain\Messaging\Blocking::blocked($pro->id, $user->id) : false,
-            // When they were last here, to five minutes. Not "online".
+            // When they were last here. The panel used to say only this,
+            // because nothing recorded presence when it was written; it does
+            // now, so the panel carries the dot as well.
             'lastActive'   => $pro?->last_active_at ? \Illuminate\Support\Carbon::parse($pro->last_active_at)->humanAgo() : null,
+            'peer'         => $pro,
             'booking'      => $booking ? [
                 'title'  => $event?->title ?? 'Booking',
                 'ref'    => 'BK-' . str_pad((string) $booking->id, 4, '0', STR_PAD_LEFT),

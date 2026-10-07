@@ -665,6 +665,7 @@
                                 <td style="padding-left:18px;">
                                     <a href="{{ route('client.events.show', $event) }}" class="ev-name" style="text-decoration:none;color:inherit;">{{ $event->title }}</a>
                                     <div class="ev-sub">{{ $where ?: 'Location not set' }}</div>
+                                    <div class="gr-ref">{{ $event->reference() }}</div>
                                 </td>
                                 <td style="white-space:nowrap;">
                                     {{ $event->starts_at?->format('M j, Y') ?? 'No date yet' }}

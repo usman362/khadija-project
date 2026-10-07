@@ -292,6 +292,7 @@
                         <div class="bk-ico">{{ strtoupper(mb_substr($event?->title ?: 'B', 0, 1)) }}</div>
                         <div style="flex:1;min-width:0;">
                             <div class="bk-title">{{ $event?->title ?: 'Booking #' . $booking->id }}</div>
+                            @if($event)<div class="gr-ref">{{ $event->reference() }}</div>@endif
                             <div class="bk-sub">
                                 <b>{{ $pro?->name ?? 'Professional removed' }}</b>
                                 @if(\App\Support\VerifiedBadge::shown() && \App\Support\VerifiedBadge::licenceVerified($profile))
