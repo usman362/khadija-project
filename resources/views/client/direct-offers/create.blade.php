@@ -474,6 +474,9 @@
                 <div class="do-row">
                     <div class="do-field"><label>Budget <span style="color:#dc2626;">*</span></label><input type="number" class="do-input" name="budget_min" min="1" required value="{{ old('budget_min') }}" placeholder="7000"><p style="font-size:11.5px;color:var(--text-muted);margin:4px 0 0;">A rough estimate is fine.</p>@error('budget_min')<p style="color:#dc2626;font-size:12px;margin:4px 0 0;">{{ $message }}</p>@enderror</div>
                     <div class="do-field"><label>Budget up to <span style="font-weight:500;color:var(--text-muted);">(optional)</span></label><input type="number" class="do-input" name="budget_max" min="1" value="{{ old('budget_max') }}" placeholder="8500"></div>
+                    {{-- Sir Peter's estimator, 26 Sep. Live here, because the
+                         services are picked on this same page. --}}
+                    <div style="grid-column:1 / -1;">@include('client._budget_guide')</div>
                 </div>
                     @include('client.partials._service_budget_split', [
                         'pickerName' => 'services',

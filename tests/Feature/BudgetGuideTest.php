@@ -36,7 +36,17 @@ class BudgetGuideTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
         $this->client = User::factory()->create(['primary_role' => 'client']);
+        $this->client->assignRole('client');
+        $this->client->getOrCreateProfile()->update([
+            'country' => 'US', 'state' => 'MD', 'city' => 'Baltimore',
+            'service_area_status' => \App\Support\ServiceArea::SUPPORTED,
+        ]);
+        $this->client = User::findOrFail($this->client->id);
+
         $this->service = Category::create(['name' => 'Drone Photography', 'slug' => 'drone-photography-guide'])->id;
     }
 
@@ -151,15 +161,7 @@ class BudgetGuideTest extends TestCase
     /** It reaches the screen, on a request for a single service. */
     public function test_the_budget_step_shows_it_for_one_service(): void
     {
-        $this->seed(\Database\Seeders\PermissionSeeder::class);
-        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
-
-        $this->client->assignRole('client');
-        $this->client->getOrCreateProfile()->update([
-            'country' => 'US', 'state' => 'MD', 'city' => 'Baltimore',
-            'service_area_status' => \App\Support\ServiceArea::SUPPORTED,
-        ]);
-        $client = User::findOrFail($this->client->id);
+        $client = $this->client;
 
         foreach ([600, 750, 900] as $a) {
             $this->bid($a);
@@ -192,15 +194,7 @@ class BudgetGuideTest extends TestCase
      */
     public function test_it_says_why_there_is_no_figure(): void
     {
-        $this->seed(\Database\Seeders\PermissionSeeder::class);
-        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
-
-        $this->client->assignRole('client');
-        $this->client->getOrCreateProfile()->update([
-            'country' => 'US', 'state' => 'MD', 'city' => 'Baltimore',
-            'service_area_status' => \App\Support\ServiceArea::SUPPORTED,
-        ]);
-        $client = User::findOrFail($this->client->id);
+        $client = $this->client;
 
         $session = ['bsr_wizard' => [
             'services'          => [$this->service],
@@ -221,5 +215,60 @@ class BudgetGuideTest extends TestCase
         $this->actingAs($client)->withSession($session)->get('/client/bsr/budget')
             ->assertOk()
             ->assertSee('Only 2 professionals have bid on this service so far', false);
+    }
+
+    /**
+     * The one-page forms ask about services and money on the same screen, so
+     * the guide answers as services are ticked rather than being printed.
+     */
+    public function test_the_endpoint_answers_for_the_ticked_services(): void
+    {
+        foreach ([600, 750, 900] as $a) {
+            $this->bid($a);
+        }
+
+        $this->actingAs($this->client)
+            ->getJson(route('client.budget-guide', ['services' => [$this->service]]))
+            ->assertOk()
+            ->assertJsonPath('services.0.has', true)
+            ->assertJsonPath('services.0.low', 600)
+            ->assertJsonPath('services.0.high', 900)
+            ->assertJsonPath('services.0.typical', 750);
+    }
+
+    /** And says why, where there is nothing to say. */
+    public function test_the_endpoint_explains_an_empty_answer(): void
+    {
+        $this->bid(500);
+
+        $this->actingAs($this->client)
+            ->getJson(route('client.budget-guide', ['services' => [$this->service]]))
+            ->assertOk()
+            ->assertJsonPath('services.0.has', false)
+            ->assertSee('Only 1 professional has bid on this service so far', false);
+    }
+
+    /** Asking about nothing returns nothing, rather than everything. */
+    public function test_the_endpoint_needs_services_to_answer_about(): void
+    {
+        $this->actingAs($this->client)
+            ->getJson(route('client.budget-guide'))
+            ->assertOk()
+            ->assertExactJson(['services' => []]);
+    }
+
+    /** It is on both one-page forms. */
+    public function test_both_one_page_forms_show_the_guide(): void
+    {
+        foreach ([
+            'client/esr/create'           => 'Emergency Request',
+            'client/direct-offers/create' => 'Direct Request',
+        ] as $view => $name) {
+            $this->assertStringContainsString(
+                "client._budget_guide",
+                file_get_contents(base_path("resources/views/{$view}.blade.php")),
+                "The {$name} no longer shows what others have charged.",
+            );
+        }
     }
 }

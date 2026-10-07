@@ -914,6 +914,10 @@ Route::middleware('auth')->group(function () {
          * place in the left menu, "instead of search around my events webpage
          * to find it".
          */
+        // What professionals have charged, for the one-page request forms.
+        Route::get('/budget-guide', \App\Http\Controllers\Client\ClientBudgetGuideController::class)
+            ->name('client.budget-guide');
+
         Route::get('/calendar', [\App\Http\Controllers\Client\ClientCalendarController::class, 'index'])
             ->middleware('permission:events.view_any')
             ->name('client.calendar.index');
