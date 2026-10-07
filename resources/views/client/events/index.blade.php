@@ -109,7 +109,11 @@
        is only a suggestion — the actions column cannot shrink below its own
        buttons — so the minimum above is what actually buys the room, and the
        wrapper scrolls when the page cannot give it. */
-    .mg-table th:first-child, .mg-table td:first-child { width: 280px; min-width: 240px; }
+    .mg-table th:first-child, .mg-table td:first-child { min-width: 260px; }
+    /* The last column holds buttons. Left open it took every spare pixel on
+       a wide screen and left them floating in a gap; sized to its content,
+       the slack goes to the event's name. */
+    .mg-table th:last-child, .mg-table td:last-child { width: 1%; white-space: nowrap; }
     .mg-table .num,
     .mg-table th:nth-child(4), .mg-table th:nth-child(5),
     .mg-table th:nth-child(6), .mg-table th:nth-child(7) { width: 1%; white-space: nowrap; }

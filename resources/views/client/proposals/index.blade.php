@@ -63,12 +63,20 @@
      * page truly cannot give that much.
      */
     .pr-table { width: 100%; min-width: 1120px; border-collapse: collapse; font-size: 12.5px; }
-    .pr-table th:first-child, .pr-table td:first-child { width: 250px; }
-    .pr-table th:nth-child(2), .pr-table td:nth-child(2) { width: 180px; }
-    .pr-table th:nth-child(3), .pr-table td:nth-child(3) { width: 190px; }
+    /*
+     * Every column but the first is sized to what it holds, so the slack on
+     * a wide screen goes to the one carrying the longest words instead of
+     * pooling behind the buttons. Fixing the first column and leaving the
+     * last one open did the opposite: Actions grew to 300px and then to 560,
+     * and its icons sat in the corner of a mostly empty cell.
+     */
+    .pr-table th:first-child, .pr-table td:first-child { min-width: 250px; }
+    .pr-table th:nth-child(2), .pr-table td:nth-child(2) { min-width: 190px; }
+    .pr-table th:nth-child(3), .pr-table td:nth-child(3) { min-width: 200px; }
     .pr-table th:nth-child(4), .pr-table td:nth-child(4),
     .pr-table th:nth-child(5), .pr-table td:nth-child(5),
-    .pr-table th:nth-child(6), .pr-table td:nth-child(6) { width: 1%; white-space: nowrap; }
+    .pr-table th:nth-child(6), .pr-table td:nth-child(6),
+    .pr-table th:last-child, .pr-table td:last-child { width: 1%; white-space: nowrap; }
     .pr-table th { text-align: left; padding: 12px 10px; font-size: 10.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--border-color); }
     .pr-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); vertical-align: middle; }
     .pr-table tr:hover td { background: var(--bg-card-hover); }
@@ -291,8 +299,8 @@
                             </td>
                             <td>
                                 <div class="pr-ec">
-                                    <div class="ev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>{{ \Illuminate\Support\Str::limit($p->event?->title ?? '—', 22) }}</div>
-                                    <div class="loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/></svg>{{ \Illuminate\Support\Str::limit($p->event?->location ?? 'TBD', 22) }}</div>
+                                    <div class="ev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>{{ \Illuminate\Support\Str::limit($p->event?->title ?? '—', 34) }}</div>
+                                    <div class="loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/></svg>{{ \Illuminate\Support\Str::limit($p->event?->location ?? 'TBD', 30) }}</div>
                                     {{-- Titles are cut to 16 characters here, so six rows of one
                                          wedding all read alike. This is what tells them apart. --}}
                                     @if($p->event)<div class="gr-ref">{{ $p->event->reference() }}</div>@endif
