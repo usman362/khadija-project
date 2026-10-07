@@ -50,18 +50,34 @@ class ClientProposalController extends Controller
             $base->where('event_id', $scoped->id);
         }
 
-        $stats = [
-            'submitted'   => (clone $base)->count(),
-            'pending'     => (clone $base)->whereIn('status', self::PENDING)->count(),
-            'accepted'    => (clone $base)->where('status', 'won')->count(),
-            'in_progress' => (clone $base)->where('status', 'won')
-                ->whereHas('event', fn ($q) => $q->where('starts_at', '<=', now())
-                    ->where('ends_at', '>=', now()))->count(),
-            'completed'   => (clone $base)->where('status', 'won')
-                ->whereHas('event', fn ($q) => $q->where('status', 'completed'))->count(),
-            'declined'    => (clone $base)->whereIn('status', self::DECLINED)->count(),
-            'drafts'      => 0,
+        /*
+         * One definition per tile, used to count it and to filter to it.
+         *
+         * They were written twice, and the two copies had already drifted:
+         * the In Progress tile counted won proposals whose event is running
+         * right now, while the In Progress tab filtered on "won" alone. So
+         * the tile could read 0 and open a list of seven. That is the fault
+         * the 6 October package called its highest priority — a tile
+         * disagreeing with the thing it describes — and the only way a tile
+         * can be trusted to be a filter is if the filter is the tile.
+         */
+        $buckets = [
+            'submitted'   => fn ($q) => $q,
+            'pending'     => fn ($q) => $q->whereIn('status', self::PENDING),
+            'accepted'    => fn ($q) => $q->where('status', 'won'),
+            'in_progress' => fn ($q) => $q->where('status', 'won')
+                ->whereHas('event', fn ($e) => $e->where('starts_at', '<=', now())
+                    ->where('ends_at', '>=', now())),
+            'completed'   => fn ($q) => $q->where('status', 'won')
+                ->whereHas('event', fn ($e) => $e->where('status', 'completed')),
+            'declined'    => fn ($q) => $q->whereIn('status', self::DECLINED),
         ];
+
+        $stats = [];
+        foreach ($buckets as $key => $only) {
+            $stats[$key] = $only(clone $base)->count();
+        }
+        $stats['drafts'] = 0;
 
         $tab = $request->string('tab')->toString() ?: 'all';
         $query = (clone $base)
@@ -69,15 +85,9 @@ class ClientProposalController extends Controller
                 'category:id,name', 'supplier:id,name,public_id,primary_role', 'replies.user:id,name'])
             ->latest();
 
-        match ($tab) {
-            'pending'     => $query->whereIn('status', self::PENDING),
-            'accepted'    => $query->where('status', 'won'),
-            'completed'   => $query->where('status', 'won')
-                ->whereHas('event', fn ($q) => $q->where('status', 'completed')),
-            'declined'    => $query->whereIn('status', self::DECLINED),
-            'in_progress' => $query->where('status', 'won'),
-            default       => null,
-        };
+        if (isset($buckets[$tab]) && $tab !== 'submitted') {
+            $buckets[$tab]($query);
+        }
 
         /*
          * Date range. "Filters" and "Date Range" sat beside the search box as
