@@ -115,7 +115,13 @@ class ChatStatsCardsTest extends TestCase
         $card = $this->card('Unread', $this->cards());
 
         $this->assertStringContainsString('<div class="v">1</div>', $card);
-        $this->assertStringContainsString('conversation of 2 in your inbox', $card);
+        /*
+         * The caption was cut to one line on 7 October so the tile has no
+         * hole in it. What it has to keep saying is the unit — this figure
+         * counts conversations, not messages, which is the whole reason the
+         * line exists — and the denominator.
+         */
+        $this->assertStringContainsString('of 2 conversations', $card);
     }
 
     public function test_awaiting_counts_chats_where_their_message_is_last(): void

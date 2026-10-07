@@ -30,20 +30,26 @@
     .cm-stat.is-link:hover { border-color: var(--cm); }
     .cm-stat.is-active { border-color: var(--cm); box-shadow: 0 0 0 3px rgba(234,88,12,.14); }
     /*
-     * A column, so the caption can be pinned to the bottom. The figures were
-     * landing at different heights across the row because the labels wrap at
-     * different lengths — "Awaiting your reply" taking two lines pushed its
-     * own number a line lower than the one beside it. The number is the thing
-     * being compared along the row; it has to sit on one line.
+     * The figures were landing at different heights across the row, because
+     * a label that wraps — "Awaiting your reply" against "Unread" — pushes
+     * its own number a line lower than the one beside it. The number is the
+     * thing being compared along the row, so the label is held to one line
+     * and the number always starts in the same place.
+     *
+     * The caption was pinned to the bottom for a while, which lined the
+     * figures up and left a hole between each number and its caption. Every
+     * caption is one line now, so there is nothing to pin: the three pieces
+     * sit together and whatever slack a row has falls at the foot of the
+     * card, where it reads as padding rather than as something missing.
      */
     .cm-stat { display: flex; flex-direction: column; background: var(--bg-card);
         border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; }
     .cm-stat-h { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 700;
-        color: var(--text-muted); min-height: 26px; }
+        color: var(--text-muted); min-height: 26px; white-space: nowrap; overflow: hidden; }
     .cm-stat-ico { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .cm-stat-ico svg { width: 14px; height: 14px; }
     .cm-stat .v { font-size: 23px; font-weight: 800; color: var(--text-primary); margin: 7px 0 2px; }
-    .cm-stat .s { font-size: 11px; color: var(--text-muted); margin-top: auto; line-height: 1.45; }
+    .cm-stat .s { font-size: 11px; color: var(--text-muted); line-height: 1.45; }
     .cm-actions { display: flex; flex-direction: column; gap: 10px; }
     .cm-btn-primary { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px; border: none; border-radius: 11px; background: linear-gradient(135deg, #fb923c, #ea580c); color: #fff; font-size: 13.5px; font-weight: 800; cursor: pointer; font-family: inherit; }
     .cm-btn-primary svg { width: 15px; height: 15px; }
@@ -398,7 +404,10 @@
             <button type="button" class="cm-stat is-link" data-card-filter="unread" aria-pressed="false" title="Show only these">
                 <div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(234,88,12,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Unread</div>
                 <div class="v">{{ $stats['unread'] }}</div>
-                <div class="s">{{ \Illuminate\Support\Str::plural('conversation', $stats['unread']) }} of {{ $stats['inbox'] }} in your inbox</div>
+                {{-- The unit stays: the figure counts conversations, not
+                     messages, and saying so was the point of this line. "In
+                     your inbox" went — this is the inbox. --}}
+                <div class="s">of {{ $stats['inbox'] }} {{ \Illuminate\Support\Str::plural('conversation', $stats['inbox']) }}</div>
             </button>
             <button type="button" class="cm-stat is-link" data-card-filter="awaiting" aria-pressed="false" title="Show only these">
                 <div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(217,119,6,0.12);color:var(--warn-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg></span>Awaiting your reply</div>
@@ -408,20 +417,21 @@
             <a class="cm-stat is-link" href="{{ route('client.proposals.index') }}">
                 <div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(37,99,235,0.12);color:#1d4ed8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/></svg></span>Open proposals</div>
                 <div class="v">{{ $stats['proposals'] }}</div>
-                <div class="s">From people you are chatting with</div>
+                <div class="s">From people you chat with</div>
             </a>
             <div class="cm-stat">
                 <div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Your reply time</div>
                 <div class="v">{{ $stats['reply'] }}</div>
-                {{-- Three sentences in a stat tile is a paragraph. The first
-                     said what the big figure already says. What is left is the
-                     comparison, and the reason a figure may be missing — which
-                     stays on the page rather than hiding in a tooltip, because
-                     an unexplained N/A reads as something broken. --}}
+                {{-- One line, like the four beside it. It was three sentences,
+                     the first of which said what the big figure already says.
+                     While a figure is missing, the reason takes the line — an
+                     unexplained N/A reads as something broken, and the
+                     comparison has nothing to compare anyway. --}}
                 <div class="s">
-                    Theirs: <b>{{ $stats['their_reply'] ?? 'N/A' }}</b>
                     @if(($stats['reply'] ?? '') === 'N/A' || ($stats['their_reply'] ?? '') === 'N/A')
-                        <br>N/A until 3 replies.
+                        N/A until 3 replies each way
+                    @else
+                        Theirs: <b>{{ $stats['their_reply'] }}</b>
                     @endif
                 </div>
             </div>

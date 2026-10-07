@@ -125,22 +125,27 @@ class TheListsHaveRoomToBeReadTest extends TestCase
         $this->assertStringNotContainsString('class="cm-actions"', $html,
             'The action is back in the tile row as a column of its own.');
 
-        // A column, with the caption pinned to the bottom: that is what keeps
-        // the figures level however long the captions run.
+        /*
+         * What keeps the figures level is the label being held to one line.
+         * Pinning the caption to the bottom did it too, and left a hole
+         * between every number and its caption — the tiles read as padded
+         * out rather than filled. The label cannot wrap now, so the three
+         * pieces sit together and the slack falls at the foot of the card.
+         */
         $this->assertMatchesRegularExpression(
-            '/\.cm-stat\s*\{[^}]*flex-direction:\s*column/s',
+            '/\.cm-stat-h\s*\{[^}]*white-space:\s*nowrap/s',
             $html,
-            'The tile is no longer a column, so its caption cannot be pinned.'
-        );
-        $this->assertMatchesRegularExpression(
-            '/\.cm-stat\s\.s\s*\{[^}]*margin-top:\s*auto/s',
-            $html,
-            'The caption is no longer pinned, so the figures will drift apart again.'
+            'The label can wrap again, so a two-line one will push its figure below its neighbours.'
         );
         $this->assertMatchesRegularExpression(
             '/\.cm-stat-h\s*\{[^}]*min-height:/s',
             $html,
-            'The label has no floor, so a two-line one still pushes its figure down.'
+            'The label has no floor.'
+        );
+        $this->assertDoesNotMatchRegularExpression(
+            '/\.cm-stat\s\.s\s*\{[^}]*margin-top:\s*auto/s',
+            $html,
+            'The caption is pinned to the bottom again, which puts a hole back under every figure.'
         );
     }
 
