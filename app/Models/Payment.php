@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\ShowsTimesWhereTheReaderIs;
 
 class Payment extends Model
 {
+    use ShowsTimesWhereTheReaderIs;
+
     protected $fillable = [
         'user_id',
         'user_subscription_id',

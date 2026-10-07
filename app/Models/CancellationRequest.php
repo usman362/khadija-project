@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Domain\Cancellations\CancellationPolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\ShowsTimesWhereTheReaderIs;
 
 /**
  * Checklist row 155 — a cancellation, from either side.
@@ -15,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class CancellationRequest extends Model
 {
+    use ShowsTimesWhereTheReaderIs;
+
     /* What is being reported. One vocabulary for both directions. */
     public const CLIENT_CANCELS       = 'client_cancels';
     public const CLIENT_CANCELS_EVENT = 'client_cancels_event';

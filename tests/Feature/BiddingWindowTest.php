@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Support\DisplayTimezone;
 
 /**
  * Bidding windows, per the Owner's decision of 2026-08-22: a standard request
@@ -68,7 +69,7 @@ class BiddingWindowTest extends TestCase
             'event_name'  => 'Replacement DJ needed',
             'reason'      => 'professional_cancelled',
             'description' => 'Our DJ cancelled and we need a replacement for Saturday evening.',
-            'needed_by'   => now()->addDays(3)->format('Y-m-d H:i:s'),
+            'needed_by'   => DisplayTimezone::forInput(now()->addDays(3)),
             'services'    => [$category->id],
             'scope'       => 'single',
             'location'    => 'Baltimore, MD',
@@ -104,7 +105,7 @@ class BiddingWindowTest extends TestCase
             'event_name'  => 'Emergency catering',
             'reason'      => 'no_show',
             'description' => 'Caterer pulled out this morning and we need cover for tonight.',
-            'needed_by'   => $neededBy->format('Y-m-d H:i:s'),
+            'needed_by'   => DisplayTimezone::forInput($neededBy),
             'services'    => [$category->id],
             'scope'       => 'single',
             'location'    => 'Baltimore, MD',
@@ -138,7 +139,7 @@ class BiddingWindowTest extends TestCase
             'organization_type' => array_key_first(\App\Http\Controllers\Client\ClientBsrController::ORG_TYPES),
         ]);
         $save('event', [
-            'title' => 'Spring Wedding', 'starts_at' => now()->addMonths(3)->format('Y-m-d\TH:i'),
+            'title' => 'Spring Wedding', 'starts_at' => DisplayTimezone::forInput(now()->addMonths(3)),
             'location' => 'Baltimore', 'guest_count' => 120, 'event_state' => 'MD',
         ]);
         $save('requirements', ['description' => 'A photographer for a spring wedding, 120 guests, all day.']);
@@ -168,7 +169,7 @@ class BiddingWindowTest extends TestCase
     {
         $event = $this->publishStandardRequest(
             $this->service('DJ', 'dj'),
-            ['proposal_deadline' => now()->addHours(30)->format('Y-m-d\TH:i')],
+            ['proposal_deadline' => DisplayTimezone::forInput(now()->addHours(30))],
         );
 
         $this->assertEqualsWithDelta(30, now()->diffInHours($event->proposal_deadline), 1,

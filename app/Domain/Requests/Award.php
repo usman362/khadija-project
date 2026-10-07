@@ -122,8 +122,14 @@ final class Award
             ->push(['date' => $old['date'], 'start' => $old['start'], 'end' => $old['end']])
             ->sortBy('date')->values()->all();
 
-        $start = \Illuminate\Support\Carbon::parse($o['date'] . ' ' . ($o['start'] ?: '00:00'));
-        $end = $o['end'] ? \Illuminate\Support\Carbon::parse($o['date'] . ' ' . $o['end']) : null;
+        /*
+         * The backup day and its times are what the client wrote on the
+         * form, so they are read on the platform's clock. Parsed bare they
+         * would be UTC, and a noon reception would move itself to seven in
+         * the morning on the way into the record.
+         */
+        $start = \App\Support\DisplayTimezone::parse($o['date'] . ' ' . ($o['start'] ?: '00:00'));
+        $end = $o['end'] ? \App\Support\DisplayTimezone::parse($o['date'] . ' ' . $o['end']) : null;
         if ($end && $end->lessThanOrEqualTo($start)) {
             $end->addDay();
         }

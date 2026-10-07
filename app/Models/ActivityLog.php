@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\ShowsTimesWhereTheReaderIs;
 
 /**
  * Append-only log of security-sensitive user actions.
@@ -11,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ActivityLog extends Model
 {
+    use ShowsTimesWhereTheReaderIs;
+
     public const UPDATED_AT = null;
 
     protected $fillable = [

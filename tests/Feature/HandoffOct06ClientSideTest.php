@@ -123,15 +123,20 @@ class HandoffOct06ClientSideTest extends TestCase
     /** One time is one time, not a range from a moment to itself. */
     public function test_an_event_that_ends_when_it_starts_shows_one_time(): void
     {
-        $at = now()->addDays(10)->setTime(1, 4);
-        $e = $this->event(['starts_at' => $at, 'ends_at' => $at->copy()]);
+        // Wall-clock, the way a client types it: see the model's localWallTimes.
+        $at = now()->addDays(10)->setTime(1, 4)->format('Y-m-d H:i:s');
+        $e = $this->event(['starts_at' => $at, 'ends_at' => $at]);
 
-        $this->assertSame($at->format('g:i A'), $e->timeLabel());
+        $this->assertStringStartsWith('1:04 AM', (string) $e->timeLabel());
         $this->assertStringNotContainsString('–', (string) $e->timeLabel());
 
-        // A real range still reads as one.
-        $r = $this->event(['starts_at' => $at, 'ends_at' => $at->copy()->addHours(3)]);
-        $this->assertStringContainsString('–', (string) $r->timeLabel());
+        // A real range still reads as one, and names its clock.
+        $r = $this->event([
+            'starts_at' => $at,
+            'ends_at' => now()->addDays(10)->setTime(4, 4)->format('Y-m-d H:i:s'),
+        ]);
+        $this->assertStringContainsString('1:04 AM – 4:04 AM', (string) $r->timeLabel());
+        $this->assertStringContainsString(\App\Support\DisplayTimezone::abbreviation(), (string) $r->timeLabel());
     }
 
     /** And the form stops accepting one in the first place. */

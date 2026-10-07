@@ -438,6 +438,24 @@
                         <label class="pf-label">ZIP / Postal Code</label>
                         <input type="text" name="zip_code" class="pf-input" value="{{ old('zip_code', $profile->zip_code) }}">
                     </div>
+                    {{-- Issue #115: every time on the platform used to be printed
+                         in UTC, so a request made at one in the afternoon in
+                         Baltimore logged itself at five. There is no chooser here
+                         because there is nothing to choose: all seven jurisdictions
+                         GigResource serves keep the same clock. --}}
+                    <div>
+                        <label class="pf-label">Time zone</label>
+                        @php $__tz = \App\Support\DisplayTimezone::forUser($user); @endphp
+                        <p class="pf-input" style="margin:0;display:flex;align-items:center;">
+                            {{ \App\Support\DisplayTimezone::label($__tz) }}
+                            ({{ \App\Support\DisplayTimezone::abbreviation($__tz) }})
+                        </p>
+                        <p style="font-size:11.5px;color:var(--text-muted);margin:5px 0 0;">
+                            Every date and time on GigResource is shown on this clock, the one
+                            the states we serve keep.
+                        </p>
+                    </div>
+                </div>
                 </div>
                 <div style="margin-top: 20px; display: flex; gap: 12px;">
                     <button type="submit" class="pf-btn">Save Changes</button>

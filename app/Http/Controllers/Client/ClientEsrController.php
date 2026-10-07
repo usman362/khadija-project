@@ -168,7 +168,7 @@ class ClientEsrController extends Controller
          * client, who raised an EMERGENCY request, has no one to fall back
          * on.
          */
-        $neededBy = \Illuminate\Support\Carbon::parse($data['needed_by']);
+        $neededBy = \App\Support\DisplayTimezone::parse($data['needed_by']);
         $buffer   = (int) config('bsr.esr.closes_hours_before_start');
         $latest   = $neededBy->copy()->subHours($buffer);
 

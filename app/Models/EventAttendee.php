@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;
+use App\Models\Concerns\ShowsTimesWhereTheReaderIs;
 
 /**
  * One guest on one event's list — Rule R60.
@@ -16,6 +17,8 @@ use Illuminate\Support\Collection;
  */
 class EventAttendee extends Model
 {
+    use ShowsTimesWhereTheReaderIs;
+
     public const CONFIRMED   = 'confirmed';
     public const CANCELLED   = 'cancelled';
     public const NO_RESPONSE = 'no_response';

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\ShowsTimesWhereTheReaderIs;
 
 /**
  * A public review tied to a completed booking. Rating is 1..5.
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Review extends Model
 {
     use HasFactory;
+    use ShowsTimesWhereTheReaderIs;
 
     protected $fillable = [
         'reviewer_id',

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\ShowsTimesWhereTheReaderIs;
 
 /**
  * Rule R33 — one reactivation of a listing: the free grace reopen, or a paid
@@ -16,6 +17,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class EventExtension extends Model
 {
+    use ShowsTimesWhereTheReaderIs;
+
     public const STATUS_PENDING    = 'pending';
     public const STATUS_PROCESSING = 'processing';
     public const STATUS_COMPLETED  = 'completed';

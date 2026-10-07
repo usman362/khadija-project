@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Concerns\ShowsTimesWhereTheReaderIs;
 
 class Bid extends Model
 {
+    use ShowsTimesWhereTheReaderIs;
+
     protected $fillable = [
         'event_id', 'category_id', 'supplier_id', 'amount', 'note', 'is_public', 'status',
         // Proposal fields collected by the Submit Your Bid wizard

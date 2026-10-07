@@ -48,7 +48,7 @@ class DashboardCalendarIsRealTest extends TestCase
         return Event::create([
             'title' => $title, 'client_id' => $this->client->id,
             'created_by' => $this->client->id, 'status' => $status,
-            'is_published' => $published, 'starts_at' => $when,
+            'is_published' => $published, 'starts_at' => $when->format('Y-m-d H:i:s'),
         ]);
     }
 
@@ -80,7 +80,7 @@ class DashboardCalendarIsRealTest extends TestCase
         $event = Event::create([
             'title' => 'Paid '.$when->format('M j'), 'client_id' => $this->client->id,
             'created_by' => $this->client->id, 'status' => 'completed',
-            'is_published' => true, 'starts_at' => $when->copy()->subDay(),
+            'is_published' => true, 'starts_at' => $when->copy()->subDay()->format('Y-m-d H:i:s'),
         ]);
 
         $booking = \App\Models\Booking::create([

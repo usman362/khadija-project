@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\ShowsTimesWhereTheReaderIs;
 
 /**
  * The step-by-step agreement between a client and the professional they chose.
@@ -13,6 +14,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Finalization extends Model
 {
     use HasFactory;
+    use ShowsTimesWhereTheReaderIs;
+
+    /**
+     * The datetime fields a person types into a form, which are wall-clock
+     * in their own zone rather than instants. See the trait: everything else
+     * on this model is written by the application and is already UTC.
+     */
+    protected array $localWallTimes = ['service_start', 'service_end'];
 
     protected $guarded = ['id'];
 

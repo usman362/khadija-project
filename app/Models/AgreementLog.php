@@ -4,12 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\ShowsTimesWhereTheReaderIs;
 
 /**
  * Immutable log of agreement/booking state changes. Append-only; no updates or deletes.
  */
 class AgreementLog extends Model
 {
+    use ShowsTimesWhereTheReaderIs;
+
     public const UPDATED_AT = null;
 
     protected $table = 'agreement_log';

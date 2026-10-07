@@ -8,10 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Concerns\ShowsTimesWhereTheReaderIs;
 
 class Conversation extends Model
 {
     use HasFactory;
+    use ShowsTimesWhereTheReaderIs;
 
     protected $fillable = [
         'type',

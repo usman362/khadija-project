@@ -213,7 +213,7 @@ class ClientBsrController extends Controller
         $services = array_map('intval', (array) ($data['services'] ?? []));
         $state    = \App\Support\StateMatching::requestState($request->user());
         $date     = ! empty($data['starts_at'])
-            ? \Illuminate\Support\Carbon::parse($data['starts_at'])
+            ? \App\Support\DisplayTimezone::parse($data['starts_at'])
             : null;
 
         if ($services === []) {
@@ -245,7 +245,7 @@ class ClientBsrController extends Controller
             // The same count for each backup day, so the client can see
             // whether offering it actually widens the field.
             'backupAvailability' => collect(\App\Domain\Requests\EventDates::normalize((array) ($data['backup_dates'] ?? [])))
-                ->mapWithKeys(fn ($b) => [$b['date'] => \App\Support\ServiceAvailability::on($services, $state, \Illuminate\Support\Carbon::parse($b['date']))])
+                ->mapWithKeys(fn ($b) => [$b['date'] => \App\Support\ServiceAvailability::on($services, $state, \App\Support\DisplayTimezone::parse($b['date']))])
                 ->all(),
         ];
     }
@@ -454,7 +454,7 @@ class ClientBsrController extends Controller
          * know the three fields exist.
          */
         if ($step === 'availability') {
-            $date  = \Illuminate\Support\Carbon::parse($validated['event_date']);
+            $date  = \App\Support\DisplayTimezone::parse($validated['event_date']);
             $start = $date->copy()->setTimeFromTimeString($validated['event_start_time']);
 
             $validated['starts_at'] = $start->format('Y-m-d H:i:s');
@@ -490,7 +490,7 @@ class ClientBsrController extends Controller
             // A proposal deadline can never fall after the event; moving the
             // event earlier here can break a deadline that was fine on step 5.
             if (! empty($data['proposal_deadline'])
-                && \Illuminate\Support\Carbon::parse($data['proposal_deadline'])->greaterThan($start)) {
+                && \App\Support\DisplayTimezone::parse($data['proposal_deadline'])->greaterThan($start)) {
                 $validated['proposal_deadline'] = $start->copy()->subHour()->format('Y-m-d H:i:s');
             }
         }
@@ -820,7 +820,7 @@ class ClientBsrController extends Controller
             // client never took. Left blank, the wizard asks for one.
             'title'          => $this->titleFrom($eventType, $data['event_date'] ?? null),
             'starts_at'      => isset($data['event_date'])
-                ? \Illuminate\Support\Carbon::parse($data['event_date'])->format('Y-m-d\TH:i')
+                ? \App\Support\DisplayTimezone::parse($data['event_date'])->format('Y-m-d\TH:i')
                 : null,
             'guest_count'    => $data['guest_count'] ?? null,
             'location'       => $data['location'] ?? null,
@@ -874,7 +874,7 @@ class ClientBsrController extends Controller
             ->withInput(array_filter([
                 'event_name'  => $carried['title'] ?? null,
                 'needed_by'   => isset($carried['starts_at'])
-                    ? \Illuminate\Support\Carbon::parse($carried['starts_at'])->format('Y-m-d\TH:i')
+                    ? \App\Support\DisplayTimezone::parse($carried['starts_at'])->format('Y-m-d\TH:i')
                     : null,
                 'location'    => $carried['location'] ?? null,
                 'guest_count' => $carried['guest_count'] ?? null,
@@ -946,7 +946,7 @@ class ClientBsrController extends Controller
             return null;
         }
 
-        $when = $date ? \Illuminate\Support\Carbon::parse($date)->format('F Y') : null;
+        $when = $date ? \App\Support\DisplayTimezone::parse($date)->format('F Y') : null;
 
         return $when ? "{$eventType} in {$when}" : $eventType;
     }
@@ -991,7 +991,7 @@ class ClientBsrController extends Controller
         }
 
         $when = ! empty($d['starts_at'])
-            ? \Illuminate\Support\Carbon::parse($d['starts_at'])->format('F Y')
+            ? \App\Support\DisplayTimezone::parse($d['starts_at'])->format('F Y')
             : null;
 
         return implode(' · ', array_filter([$type, $area, $when]));
@@ -1316,10 +1316,10 @@ class ClientBsrController extends Controller
         $user = $request->user();
 
         $deadline = ! empty($d['proposal_deadline'])
-            ? \Illuminate\Support\Carbon::parse($d['proposal_deadline'])
+            ? \App\Support\DisplayTimezone::parse($d['proposal_deadline'])
             : null;
         $startsAt = ! empty($d['starts_at'])
-            ? \Illuminate\Support\Carbon::parse($d['starts_at'])
+            ? \App\Support\DisplayTimezone::parse($d['starts_at'])
             : null;
 
         // R37: no invented fallbacks. A window is used only if one has actually
@@ -1352,7 +1352,7 @@ class ClientBsrController extends Controller
             // stated finish is a real answer, not a missing one.
             'backup_dates'      => ! empty($d['backup_dates']) ? array_values($d['backup_dates']) : null,
             'ends_at'           => ! empty($d['ends_at'])
-                ? \Illuminate\Support\Carbon::parse($d['ends_at'])
+                ? \App\Support\DisplayTimezone::parse($d['ends_at'])
                 : null,
             'location'          => $d['location'] ?? null,
             'city'              => $d['city'] ?? null,

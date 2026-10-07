@@ -10,10 +10,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Concerns\ShowsTimesWhereTheReaderIs;
 
 class Event extends Model
 {
     use HasFactory;
+    use ShowsTimesWhereTheReaderIs;
+
+    /**
+     * The datetime fields a person types into a form, which are wall-clock
+     * in their own zone rather than instants. See the trait: everything else
+     * on this model is written by the application and is already UTC.
+     */
+    protected array $localWallTimes = ['starts_at', 'ends_at', 'proposal_deadline'];
 
     /**
      * Who the request is for — asked on every request form.
@@ -460,11 +469,18 @@ class Event extends Model
             return null;
         }
 
+        /*
+         * Issue #115: the zone is part of the time now that times are shown
+         * on the reader's clock rather than in UTC. "5:00 PM" alone was
+         * never ambiguous while everything was UTC and everything was wrong
+         * together; it is ambiguous the moment it is right.
+         */
+        $zone = \App\Support\DisplayTimezone::abbreviation(null, $this->starts_at);
         $from = $this->starts_at->format('g:i A');
 
         return $this->ends_at && $this->ends_at->gt($this->starts_at)
-            ? $from . ' – ' . $this->ends_at->format('g:i A')
-            : $from;
+            ? $from . ' – ' . $this->ends_at->format('g:i A') . ' ' . $zone
+            : $from . ' ' . $zone;
     }
 
     /**

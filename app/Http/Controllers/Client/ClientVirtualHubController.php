@@ -268,7 +268,7 @@ class ClientVirtualHubController extends Controller
             'budget_max'  => ['nullable', 'numeric', 'min:0', 'gte:budget_min'],
         ], $this->messages());
 
-        $starts = \Illuminate\Support\Carbon::parse($draft['starts_at']);
+        $starts = \App\Support\DisplayTimezone::parse($draft['starts_at']);
 
         $event = Event::create([
             'title'             => $draft['title'],
@@ -281,7 +281,7 @@ class ClientVirtualHubController extends Controller
             'is_published'      => true,
             'published_at'      => now(),
             'starts_at'         => $starts,
-            'ends_at'           => ! empty($draft['ends_at']) ? \Illuminate\Support\Carbon::parse($draft['ends_at']) : null,
+            'ends_at'           => ! empty($draft['ends_at']) ? \App\Support\DisplayTimezone::parse($draft['ends_at']) : null,
             'guest_count'       => $draft['guest_count'] ?? null,
             'budget_min'        => $data['budget_min'] ?? null,
             'budget_max'        => $data['budget_max'] ?? null,

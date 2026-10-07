@@ -39,7 +39,7 @@ class ClientEventLifecycleController extends Controller
 
         try {
             $this->extensions->graceReopen(
-                $event, $request->user(), \Illuminate\Support\Carbon::parse($data['proposal_deadline']),
+                $event, $request->user(), \App\Support\DisplayTimezone::parse($data['proposal_deadline']),
             );
         } catch (RuntimeException $e) {
             return back()->withErrors(['proposal_deadline' => $e->getMessage()]);

@@ -42,7 +42,7 @@ class MyEventsIsLiveTest extends TestCase
     {
         return Event::create($attrs + [
             'title' => $title, 'status' => 'published', 'is_published' => true,
-            'client_id' => $this->client->id, 'created_by' => $this->client->id, 'starts_at' => $startsAt,
+            'client_id' => $this->client->id, 'created_by' => $this->client->id, 'starts_at' => $startsAt->format('Y-m-d H:i:s'),
         ]);
     }
 

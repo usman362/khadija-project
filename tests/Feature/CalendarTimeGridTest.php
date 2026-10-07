@@ -33,12 +33,20 @@ class CalendarTimeGridTest extends TestCase
         $this->client = $this->client->fresh();
     }
 
+    /**
+     * The times in these tests are wall-clock: "ten in the morning" is what a
+     * client types and what the grid draws. Written as strings so the model
+     * reads them on the platform's clock, the way a form's values arrive —
+     * a bare Carbon would be an instant in UTC, which is six in the morning
+     * here, and every row in this file would be measuring the wrong hour.
+     */
     private function event(string $title, Carbon $start, ?Carbon $end = null): Event
     {
         return Event::create([
             'title' => $title, 'status' => 'published', 'is_published' => true,
             'client_id' => $this->client->id, 'created_by' => $this->client->id,
-            'starts_at' => $start, 'ends_at' => $end,
+            'starts_at' => $start->format('Y-m-d H:i:s'),
+            'ends_at'   => $end?->format('Y-m-d H:i:s'),
         ]);
     }
 

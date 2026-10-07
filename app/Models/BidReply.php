@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\ShowsTimesWhereTheReaderIs;
 
 class BidReply extends Model
 {
+    use ShowsTimesWhereTheReaderIs;
+
     protected $fillable = [
         'bid_id', 'user_id', 'counter_amount', 'note',
     ];

@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Support\DisplayTimezone;
 
 /**
  * Checklist rows 107, 108 and 112 — the emergency request's own rules, and
@@ -78,7 +79,7 @@ class EmergencyRequestRulesTest extends TestCase
     {
         $neededBy = now()->addHours(30);
 
-        $this->raiseEsr($neededBy->format('Y-m-d H:i:s'))->assertSessionHasNoErrors();
+        $this->raiseEsr(DisplayTimezone::forInput($neededBy))->assertSessionHasNoErrors();
 
         $event = Event::where('source', 'esr')->firstOrFail();
 
@@ -95,7 +96,7 @@ class EmergencyRequestRulesTest extends TestCase
      */
     public function test_the_twenty_four_hour_window_still_binds_on_a_distant_event(): void
     {
-        $this->raiseEsr(now()->addDays(10)->format('Y-m-d H:i:s'))->assertSessionHasNoErrors();
+        $this->raiseEsr(DisplayTimezone::forInput(now()->addDays(10)))->assertSessionHasNoErrors();
 
         $event = Event::where('source', 'esr')->firstOrFail();
 
@@ -108,7 +109,7 @@ class EmergencyRequestRulesTest extends TestCase
      */
     public function test_an_event_inside_the_buffer_is_refused_rather_than_published_dead(): void
     {
-        $this->raiseEsr(now()->addHours(3)->format('Y-m-d H:i:s'))
+        $this->raiseEsr(DisplayTimezone::forInput(now()->addHours(3)))
             ->assertSessionHasErrors('needed_by');
 
         $this->assertDatabaseCount('events', 0);
@@ -123,7 +124,7 @@ class EmergencyRequestRulesTest extends TestCase
      */
     public function test_an_esr_shows_a_single_budget_figure_not_a_range(): void
     {
-        $this->raiseEsr(now()->addHours(30)->format('Y-m-d H:i:s'), ['budget_min' => 600]);
+        $this->raiseEsr(DisplayTimezone::forInput(now()->addHours(30)), ['budget_min' => 600]);
 
         $event = Event::where('source', 'esr')->firstOrFail();
         $event->categories()->syncWithoutDetaching([$this->service()->id]);

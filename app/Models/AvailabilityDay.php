@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\ShowsTimesWhereTheReaderIs;
 
 /**
  * One person's answer about one day.
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class AvailabilityDay extends Model
 {
+    use ShowsTimesWhereTheReaderIs;
+
     public const AVAILABLE   = 'available';
     public const UNAVAILABLE = 'unavailable';
 
