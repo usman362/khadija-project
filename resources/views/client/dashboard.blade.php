@@ -1158,6 +1158,12 @@
         <div class="od-card od-live" id="odCalCard">
             <div class="od-card-head">
                 <span class="od-card-title">My Calendar &amp; Availability</span>
+                {{-- Sir Peter, 7 October: the card had no way out of itself.
+                     It carries the month and the view being looked at, so the
+                     full page opens where the eye already is, not on today. No
+                     data-live: this one leaves the dashboard. --}}
+                <a class="od-card-link"
+                   href="{{ route('client.calendar.index', ['calview' => $calView, 'cal' => $calAnchor->format('Y-m-d')]) }}">Open Calendar</a>
             </div>
             {{-- Links, not buttons with nothing behind them: the month being
                  looked at is in the address, so ‹ › work without script and
