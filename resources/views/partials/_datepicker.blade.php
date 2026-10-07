@@ -23,6 +23,30 @@
 
 <style>
     /*
+       The visible half of a date field, when the markup gave it no class
+       of its own. See the note by altInputClass below: until now these
+       inherited Bootstrap's class names, which do not exist here, and so
+       rendered as the browser's default box.
+    */
+    .dp-input {
+        width: 100%;
+        font-family: inherit;
+        font-size: 13.5px;
+        padding: 9px 12px;
+        border: 1px solid var(--border-color, #e5e7eb);
+        border-radius: 10px;
+        background: var(--bg-input, var(--bg-card, #fff));
+        color: var(--text-primary, #111827);
+        cursor: pointer;
+    }
+    .dp-input::placeholder { color: var(--text-muted, #6b7280); }
+    .dp-input:focus {
+        outline: none;
+        border-color: var(--accent-orange, #ea580c);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-orange, #ea580c) 14%, transparent);
+    }
+
+    /*
        Flatpickr theme.
        ─────────────────────────────────────────────────────────────
        This file used to be a DARK theme with a short light "override"
@@ -227,9 +251,28 @@
             var minDate    = input.getAttribute('data-flatpickr-min') || input.min || null;
             var maxDate    = input.getAttribute('data-flatpickr-max') || input.max || null;
 
+            /*
+             * The box a person actually sees is not the one in the markup.
+             *
+             * altInput hides the real field and puts a text input in front of
+             * it, and flatpickr's default class for that is "form-control
+             * input" — Bootstrap's names, which this site has never defined.
+             * So every date field on every screen was rendering with the
+             * browser's own 2px inset border, no padding and no radius, while
+             * the CSS written for it sat on a hidden element doing nothing.
+             * That is why they looked unfinished next to every other field.
+             *
+             * A field that carries its own class keeps exactly that class, so
+             * a form styled for its page still looks like its page. A field
+             * with none gets dp-input, which is the house style for a text
+             * box. Nothing gets Bootstrap's names.
+             */
+            var ownClass = (input.className || '').replace(/\bflatpickr\b/g, '').trim();
+
             window.flatpickr(input, {
                 dateFormat: enableTime ? 'Y-m-d H:i' : 'Y-m-d',
                 altInput:   true,
+                altInputClass: ownClass !== '' ? ownClass : 'dp-input',
                 altFormat:  enableTime ? 'M j, Y, h:i K' : 'M j, Y',
                 allowInput: false,
                 enableTime: enableTime,

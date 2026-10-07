@@ -39,14 +39,35 @@
     .av-legend span { display: inline-flex; align-items: center; gap: 6px; }
     .av-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 
-    .av-block { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-color); }
+    /*
+     * Two bare boxes in a row at the foot of the card: no labels, nothing
+     * saying which was the first day and which the last, and a shape that
+     * matched nothing else on the client's screens. It read as something
+     * left over rather than a tool.
+     *
+     * It is a panel now, with each field named above it, and the fields take
+     * the layout's own form styling so they look like every other field this
+     * client fills in.
+     */
+    .av-block { margin-top: 18px; padding: 16px 18px; border-radius: 14px;
+        border: 1px solid var(--border-color); background: var(--bg-subtle, rgba(0,0,0,.02)); }
     .av-block h3 { margin: 0 0 4px; font-size: 13.5px; font-weight: 800; color: var(--text-primary); }
-    .av-block p { margin: 0 0 10px; font-size: 12.5px; color: var(--text-muted); }
-    .av-block form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-    .av-block input[type="date"], .av-block select { font-family: inherit; font-size: 13px; padding: 8px 10px;
-        border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-primary); }
-    .av-block button { font-family: inherit; font-size: 13px; font-weight: 800; padding: 9px 16px; border: 0; border-radius: 9px;
-        background: var(--accent-orange, #ea580c); color: #fff; cursor: pointer; }
+    .av-block > p { margin: 0 0 14px; font-size: 12.5px; color: var(--text-muted); max-width: 62ch; }
+    .av-block form { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+    .av-field { display: flex; flex-direction: column; gap: 5px; min-width: 168px; }
+    .av-field label { font-size: 11.5px; font-weight: 700; letter-spacing: .02em;
+        text-transform: uppercase; color: var(--text-muted); }
+    .av-input, .av-block select { font-family: inherit; font-size: 13.5px; padding: 9px 12px;
+        border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-input, var(--bg-card));
+        color: var(--text-primary); width: 100%; cursor: pointer; }
+    .av-input::placeholder { color: var(--text-muted); }
+    .av-input:focus, .av-block select:focus { outline: none;
+        border-color: var(--accent-orange, #ea580c);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-orange, #ea580c) 14%, transparent); }
+    .av-block button { font-family: inherit; font-size: 13.5px; font-weight: 800; padding: 10px 20px; border: 0;
+        border-radius: 10px; background: var(--accent-orange, #ea580c); color: #fff; cursor: pointer; }
+    .av-block button:hover { background: var(--brand-strong, #c2410c); }
+    @media (max-width: 560px) { .av-field { min-width: 0; flex: 1 1 100%; } .av-block button { width: 100%; } }
 
     @media (max-width: 640px) { .av-day { min-height: 0; } .av-set { flex-direction: column; } }
 </style>
@@ -162,13 +183,38 @@
         <form method="POST" action="{{ route('client.calendar.availability.range') }}">
             @csrf
             <input type="hidden" name="back" value="{{ $back }}">
-            <input type="date" name="from" required aria-label="First day">
-            <input type="date" name="to" required aria-label="Last day">
-            <select name="state" aria-label="Mark them as">
-                <option value="{{ Availability::UNAVAILABLE }}">Mark unavailable</option>
-                <option value="{{ Availability::AVAILABLE }}">Mark available</option>
-            </select>
-            <button type="submit">Apply</button>
+            <div class="av-field">
+                <label for="av-from">First day</label>
+                {{-- The class travels to the box the client can see: the one
+                     in the markup is hidden the moment the picker loads. --}}
+                <input type="date" id="av-from" name="from" class="av-input" required
+                       value="{{ old('from') }}" max="{{ now()->addYears(3)->format('Y-m-d') }}">
+            </div>
+            <div class="av-field">
+                <label for="av-to">Last day</label>
+                <input type="date" id="av-to" name="to" class="av-input" required
+                       value="{{ old('to') }}" max="{{ now()->addYears(3)->format('Y-m-d') }}">
+            </div>
+            <div class="av-field">
+                <label for="av-state">Mark them as</label>
+                <select id="av-state" name="state">
+                    <option value="{{ Availability::UNAVAILABLE }}">Unavailable</option>
+                    <option value="{{ Availability::AVAILABLE }}">Available</option>
+                </select>
+            </div>
+            <button type="submit">Apply to these days</button>
         </form>
+        {{-- The first day fills the second's floor the moment it is chosen, so
+             a stretch cannot be asked for backwards. --}}
+        <script>
+        (function () {
+            var from = document.getElementById('av-from'), to = document.getElementById('av-to');
+            if (! from || ! to) return;
+            from.addEventListener('change', function () {
+                to.min = from.value;
+                if (to.value && to.value < from.value) to.value = from.value;
+            });
+        })();
+        </script>
     </div>
 </div>
