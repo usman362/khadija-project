@@ -669,17 +669,15 @@
                                 </td>
                                 <td style="white-space:nowrap;">
                                     {{ $event->starts_at?->format('M j, Y') ?? 'No date yet' }}
-                                    @if($event->starts_at)<div class="ev-sub">{{ $event->starts_at->format('g:i A') }}@if($event->ends_at && $event->ends_at->gt($event->starts_at)) – {{ $event->ends_at->format('g:i A') }}@endif</div>@endif
+                                    @if($__time = $event->timeLabel())<div class="ev-sub">{{ $__time }}</div>@endif
                                 </td>
                                 <td>{{ $event->event_type ?: '—' }}</td>
                                 <td class="num">{{ $event->bids_count }}</td>
                                 <td class="num" style="color:var(--ok-text);">{{ $confirmed }}@if($needed) / {{ $needed }}@endif</td>
                                 <td><span class="mg-status-pill mg-status-{{ $stageKey }}">{{ \App\Models\Event::LIST_STAGES[$stageKey] ?? ucfirst($stageKey) }}</span></td>
                                 <td style="white-space:nowrap;font-weight:600;color:var(--text-primary);">
-                                    @if($event->budget_min && $event->budget_max)
-                                        ${{ number_format($event->budget_min, 0) }} – ${{ number_format($event->budget_max, 0) }}
-                                    @elseif($event->budget)
-                                        ${{ number_format($event->budget, 0) }}
+                                    @if($__budget = $event->budgetLabel())
+                                        {{ $__budget }}
                                     @else
                                         <span style="color:var(--text-muted);font-weight:500;">Not set</span>
                                     @endif
@@ -748,7 +746,7 @@
                                     <td>@if($b->event)<a href="{{ route('client.events.show', $b->event_id) }}">{{ $b->event->title }}</a>@else, @endif</td>
                                     <td>{{ $b->category?->name ?? '—' }}</td>
                                     <td>{{ $b->event?->starts_at?->format('M d, Y') ?? 'Not scheduled' }}</td>
-                                    <td>{{ $b->event?->starts_at?->format('g:i A') ?? '—' }}@if($b->event?->ends_at) – {{ $b->event->ends_at->format('g:i A') }}@endif</td>
+                                    <td>{{ $b->event?->timeLabel() ?? '—' }}</td>
                                     <td style="padding-right:18px;"><span class="mg-status-pill mg-status-{{ $b->status }}">{{ $b->status === 'requested' ? 'Awaiting reply' : ucfirst($b->status) }}</span></td>
                                 </tr>
                             @empty

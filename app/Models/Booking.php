@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -280,5 +281,34 @@ class Booking extends Model
     public function activeAgreement(): HasOne
     {
         return $this->hasOne(Agreement::class)->where('status', '!=', 'rejected')->latestOfMany('version');
+    }
+
+    /**
+     * A client never owes themselves.
+     *
+     * Issue #117: "Dana Whitfield" was listed as her own professional on
+     * Spending and on the Payments ledger — a row claiming the account had
+     * engaged itself for money. PaymentTracker had refused these rows since
+     * Issue #51, in its own query, with its own comment; the two finance
+     * pages that build their lists straight off bookings never got the same
+     * guard, which is why the record vanished from Bookings and stayed on
+     * the other two.
+     *
+     * It is a scope rather than a condition copied a fourth time, and the
+     * money totals use it as well: a list that hides a row while the total
+     * above it still counts the money would trade one wrong page for a
+     * harder-to-see one.
+     *
+     * A booking with no professional on it yet is kept. That is a real
+     * booking waiting for one, not an account dealing with itself, and the
+     * Bookings page has always shown it — a plain `client_id != supplier_id`
+     * is never true against NULL, so the stricter reading would have hidden
+     * those rows from the money while Bookings went on listing them.
+     */
+    public function scopeNotSelfSupplied(Builder $query): Builder
+    {
+        return $query->where(fn ($q) => $q
+            ->whereNull('bookings.supplier_id')
+            ->orWhereColumn('bookings.supplier_id', '!=', 'bookings.client_id'));
     }
 }

@@ -323,7 +323,7 @@
                                 <span class="k">Time</span>
                                 <span class="v {{ $event?->starts_at ? '' : 'muted' }}">
                                     @if($event?->starts_at)
-                                        {{ $event->starts_at->format('g:i A') }}@if($event->ends_at) – {{ $event->ends_at->format('g:i A') }}@endif
+                                        {{ $event->timeLabel() }}
                                     @else
                                         Not set
                                     @endif
@@ -576,7 +576,18 @@
             <div class="bk-fin"><span class="l">Agreed total</span><span class="v">${{ number_format($financial['agreed_total']) }}</span></div>
             <div class="bk-fin"><span class="l">Deposits paid</span><span class="v">${{ number_format($financial['deposits_paid']) }}</span></div>
             <div class="bk-fin"><span class="l">Still outstanding</span><span class="v">${{ number_format($financial['outstanding']) }}</span></div>
-            <p class="bk-note">Agreed total covers every booking except cancelled ones. Deposits are the payments already taken against them.</p>
+            {{-- What the figure is made of, and whether the list beneath is the
+                 same set. A money panel above a list is an invitation to add
+                 the list up; the list is filtered, searched and paginated and
+                 the total is not, so the two can only be checked against each
+                 other when the page says so. --}}
+            <p class="bk-note">
+                Across {{ $financial['agreed_count'] }} {{ \Illuminate\Support\Str::plural('booking', $financial['agreed_count']) }}
+                on your account, cancelled ones left out. Deposits are the payments already taken against those same bookings.
+                @unless($financial['listing_all'])
+                    The list on the left is showing part of them.
+                @endunless
+            </p>
             <a href="{{ route('client.payments.index') }}" class="bk-rail-link">
                 See all payments
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>

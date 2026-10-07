@@ -47,7 +47,18 @@ class AiThemeAdvisorController extends Controller
                 'formality'     => ['required', 'string', 'in:casual,semi-formal,formal'],
             ]);
 
-            [$r, $g, $b] = $this->resolveColor($validated['primary_color']);
+            $rgb = $this->resolveColor($validated['primary_color']);
+
+            if ($rgb === null) {
+                // Better to ask than to answer with a colour they did not pick.
+                return response()->json([
+                    'success' => false,
+                    'message' => 'I could not read "' . e($validated['primary_color'])
+                        . '" as a colour. Try a colour name like brown or sage, or a hex code like #8B4513.',
+                ], 422);
+            }
+
+            [$r, $g, $b] = $rgb;
             $primaryHex  = $this->toHex($r, $g, $b);
 
             // Complementary via channel inversion.
@@ -120,24 +131,46 @@ class AiThemeAdvisorController extends Controller
      *
      * @return array{0:int,1:int,2:int}
      */
-    private function resolveColor(string $input): array
+    /**
+     * The colour the client typed, or nothing.
+     *
+     * Issue #119: a client typed "brown" and got a palette built on #7c3aed —
+     * a purple — with the styling tips telling them to "use #7c3aed as your
+     * anchor colour". The list of names it knew had thirteen entries, brown
+     * was not one of them, and anything it could not read fell through to a
+     * hard-coded violet with nothing on the page saying so. The whole output
+     * of a personalisation tool was then built on a colour nobody asked for.
+     *
+     * Two changes. The list is the CSS colour names, which is what someone
+     * typing a colour into a box means by one. And a name it still cannot
+     * read now returns null: the tool says it did not understand, rather than
+     * inventing an answer and presenting it as the client's own choice.
+     *
+     * @return array{0:int,1:int,2:int}|null
+     */
+    private function resolveColor(string $input): ?array
     {
         $input = trim(strtolower($input));
 
+        // Named colours, the way a person writes them. The common event ones
+        // (blush, burgundy, sage, navy) are kept alongside the CSS names.
         $names = [
-            'red'       => '#dc2626',
-            'blue'      => '#2563eb',
-            'navy'      => '#1e3a5f',
-            'blush'     => '#f4c2c2',
-            'emerald'   => '#10b981',
-            'gold'      => '#c9a227',
-            'burgundy'  => '#800020',
-            'sage'      => '#9caf88',
-            'lavender'  => '#b57edc',
-            'coral'     => '#ff6f61',
-            'teal'      => '#14b8a6',
-            'black'     => '#1a1a1a',
-            'white'     => '#f5f5f5',
+            'blush' => '#f4c2c2', 'burgundy' => '#800020', 'sage' => '#9caf88',
+            'navy' => '#1e3a5f', 'emerald' => '#10b981', 'gold' => '#c9a227',
+            'coral' => '#ff6f61', 'lavender' => '#b57edc', 'champagne' => '#f7e7ce',
+            'rust' => '#b7410e', 'mustard' => '#ffdb58', 'dusty rose' => '#dcae96',
+            'terracotta' => '#e2725b', 'charcoal' => '#36454f', 'cream' => '#fffdd0',
+            'brown' => '#8b4513', 'beige' => '#f5f5dc', 'tan' => '#d2b48c',
+            'red' => '#dc2626', 'blue' => '#2563eb', 'green' => '#16a34a',
+            'yellow' => '#eab308', 'orange' => '#f97316', 'purple' => '#9333ea',
+            'violet' => '#7c3aed', 'pink' => '#ec4899', 'teal' => '#14b8a6',
+            'turquoise' => '#40e0d0', 'cyan' => '#06b6d4', 'magenta' => '#d946ef',
+            'maroon' => '#800000', 'olive' => '#808000', 'lime' => '#84cc16',
+            'indigo' => '#4f46e5', 'silver' => '#c0c0c0', 'grey' => '#6b7280',
+            'gray' => '#6b7280', 'black' => '#1a1a1a', 'white' => '#f5f5f5',
+            'ivory' => '#fffff0', 'peach' => '#ffdab9', 'mint' => '#98ff98',
+            'plum' => '#8e4585', 'salmon' => '#fa8072', 'khaki' => '#c3b091',
+            'bronze' => '#cd7f32', 'copper' => '#b87333', 'slate' => '#64748b',
         ];
 
         if (isset($names[$input])) {
@@ -150,8 +183,7 @@ class AiThemeAdvisorController extends Controller
         }
 
         if (! preg_match('/^[0-9a-f]{6}$/', $hex)) {
-            // Fallback to a safe brand-neutral tone.
-            $hex = '7c3aed';
+            return null;
         }
 
         return [

@@ -46,6 +46,10 @@ class ClientTotals
     public static function base(User $client, ?int $eventId = null): \Illuminate\Database\Eloquent\Builder
     {
         return Booking::where('client_id', $client->id)
+            // Issue #117: a booking naming the client as its own professional
+            // is bad data, not money. The lists on Spending and Payments now
+            // leave those rows out, so the totals above them have to as well.
+            ->notSelfSupplied()
             ->when($eventId, fn ($q) => $q->where('event_id', $eventId));
     }
 
@@ -100,6 +104,48 @@ class ClientTotals
     public static function awaiting(User $client, ?int $eventId = null): float
     {
         return (float) self::base($client, $eventId)->where('status', 'requested')->sum('price');
+    }
+
+    /**
+     * How many bookings the agreed total is made of.
+     *
+     * The figure and the count come from the same rows, for the same reason
+     * agreedUnpaidCount does: a money panel sitting above a list invites the
+     * reader to add the list up, and the only honest way to stop that going
+     * wrong is to say how many bookings the figure actually covers. The list
+     * beneath is filtered, searched and paginated; this is not.
+     */
+    public static function agreedCount(User $client, ?int $eventId = null): int
+    {
+        return self::base($client, $eventId)
+            ->whereNotIn('status', self::VOID_STATUSES)
+            ->count();
+    }
+
+    /**
+     * Deposits taken against the bookings that still stand.
+     *
+     * Deposits are Payments carrying the event and supplier they were taken
+     * for; that pair identifies the booking. Bookings summed every completed
+     * deposit on the account against an agreed total that excludes cancelled
+     * bookings — so a deposit paid before a cancellation counted as paid
+     * towards a figure it was no longer part of, and Outstanding (floored at
+     * zero) hid the difference. The two figures now come from the same set.
+     */
+    public static function depositsPaid(User $client, ?int $eventId = null): float
+    {
+        $standing = self::base($client, $eventId)
+            ->whereNotIn('status', self::VOID_STATUSES)
+            ->get(['event_id', 'supplier_id'])
+            ->map(fn ($b) => $b->event_id . ':' . $b->supplier_id)
+            ->flip();
+
+        return (float) \App\Models\Payment::where('user_id', $client->id)
+            ->where('status', 'completed')
+            ->get()
+            ->filter(fn ($p) => ($p->metadata['kind'] ?? null) === 'booking_deposit'
+                && $standing->has(($p->metadata['event_id'] ?? '') . ':' . ($p->metadata['supplier_id'] ?? '')))
+            ->sum('amount');
     }
 
     /**

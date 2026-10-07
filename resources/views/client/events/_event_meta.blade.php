@@ -25,10 +25,8 @@
 
     <div class="ev-meta-row">
         <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>{{ $event->categories->count() }} {{ \Illuminate\Support\Str::plural('service', $event->categories->count()) }}</div>
-        @if($event->budget_min || $event->budget_max)
-            <span class="ev-sep">|</span><div>Budget: ${{ number_format((float) $event->budget_min) }} – ${{ number_format((float) $event->budget_max) }}</div>
-        @elseif($event->budget)
-            <span class="ev-sep">|</span><div>Budget: ${{ number_format((float) $event->budget) }}</div>
+        @if($__budget = $event->budgetLabel())
+            <span class="ev-sep">|</span><div>Budget: {{ $__budget }}</div>
         @endif
         @if($event->guest_count)
             <span class="ev-sep">|</span><div>{{ number_format($event->guest_count) }} guests</div>

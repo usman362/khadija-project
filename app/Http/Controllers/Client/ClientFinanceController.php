@@ -116,6 +116,8 @@ class ClientFinanceController extends Controller
     {
         $col  = $this->priceColumn();
         $base = Booking::where('client_id', $userId)
+            // Issue #117: the same rule as ClientTotals and the lists below.
+            ->notSelfSupplied()
             ->when($eventId, fn ($q) => $q->where('event_id', $eventId));
 
         $amount = fn ($status) => $col
@@ -139,8 +141,16 @@ class ClientFinanceController extends Controller
 
         $s = $this->spend($user->id, $activeEvent?->id);
 
-        // Transaction ledger — every booking is one "transaction" row.
+        /*
+         * Transaction ledger — every booking is one "transaction" row.
+         *
+         * Issue #117: this listed the client as her own professional. The
+         * guard has existed in PaymentTracker since Issue #51 and in its own
+         * query only, so the record disappeared from Bookings and stayed
+         * here and on Spending.
+         */
         $query = Booking::where('client_id', $user->id)
+            ->notSelfSupplied()
             ->with(['event:id,title,starts_at,location', 'supplier:id,name,avatar', 'supplier.profile:id,user_id,headline'])
             ->when($activeEvent, fn ($qr) => $qr->where('event_id', $activeEvent->id))
             ->latest();
@@ -299,6 +309,8 @@ class ClientFinanceController extends Controller
         $filters = $this->filters($request);
 
         $query = Booking::where('client_id', $user->id)
+            // Issue #117, same rule as the ledger and the totals.
+            ->notSelfSupplied()
             ->when($activeEvent, fn ($qr) => $qr->where('event_id', $activeEvent->id))
             ->with(['event:id,title', 'supplier:id,name,avatar', 'supplier.profile:id,user_id,headline'])
             ->when($filters['q'], function ($qr) use ($filters) {
@@ -337,7 +349,7 @@ class ClientFinanceController extends Controller
             'paid'           => $s['settled'],
             'agreed_unpaid'  => $s['inEscrow'],
             'awaiting'       => $s['pending'],
-            'pending_count'  => Booking::where('client_id', $user->id)->where('status', 'confirmed')->count(),
+            'pending_count'  => Booking::where('client_id', $user->id)->notSelfSupplied()->where('status', 'confirmed')->count(),
         ];
 
         /*
@@ -369,6 +381,7 @@ class ClientFinanceController extends Controller
             $weekEnd = now()->subWeeks($i)->endOfWeek();
             $val = $col
                 ? (float) Booking::where('client_id', $user->id)
+                    ->notSelfSupplied()
                     ->where('status', 'completed')
                     ->where('updated_at', '<=', $weekEnd)
                     ->sum($col)

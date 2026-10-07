@@ -445,6 +445,62 @@ class Event extends Model
     }
 
     /**
+     * The time of day, in words, wherever it is shown.
+     *
+     * Issue #116: a booking read "1:04 AM – 1:04 AM" on the Bookings card and
+     * again on My Events' Professional Schedule tab. Appearing identically on
+     * two pages is what ruled out a rendering artifact — but both were in
+     * fact missing the same guard, which a third rendering on the same My
+     * Events page already had. A range needs two different ends; one time is
+     * one time.
+     */
+    public function timeLabel(): ?string
+    {
+        if (! $this->starts_at) {
+            return null;
+        }
+
+        $from = $this->starts_at->format('g:i A');
+
+        return $this->ends_at && $this->ends_at->gt($this->starts_at)
+            ? $from . ' – ' . $this->ends_at->format('g:i A')
+            : $from;
+    }
+
+    /**
+     * The budget, in words, wherever it is shown.
+     *
+     * Issue #113: a client who fills in "Budget from" and leaves "Budget to"
+     * blank had typed one number and got three different answers. The event
+     * page read `budget_min || budget_max` and printed "$425 – $0" — a range
+     * running downhill to nothing, which reads as a willingness to pay zero.
+     * My Events and Proposals by Service required both, fell through, and
+     * said "Not set" about a budget the client had entered. The BSR wizard's
+     * own review step had it right all along, in its own copy of the logic.
+     *
+     * An open-ended budget is a real answer and is written as one.
+     */
+    public function budgetLabel(): ?string
+    {
+        $min = (float) ($this->budget_min ?? 0);
+        $max = (float) ($this->budget_max ?? 0);
+        $one = (float) ($this->budget ?? 0);
+
+        $money = fn (float $n) => '$' . number_format($n);
+
+        return match (true) {
+            $min > 0 && $max > 0 && $max >= $min => $money($min) . ' – ' . $money($max),
+            // Two numbers the wrong way round are still two numbers the client
+            // gave; reading them back in order beats printing them backwards.
+            $min > 0 && $max > 0 => $money($max) . ' – ' . $money($min),
+            $min > 0 => 'From ' . $money($min),
+            $max > 0 => 'Up to ' . $money($max),
+            $one > 0 => $money($one),
+            default  => null,
+        };
+    }
+
+    /**
      * The reference a client can quote: "BR-00118" for a bidding request,
      * "DR-" for a direct one, "ER-" for an emergency. Built from the id, so
      * it never changes and never needs storing.

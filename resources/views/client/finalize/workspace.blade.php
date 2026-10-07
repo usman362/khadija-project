@@ -165,7 +165,7 @@
                     <tbody>
                         <tr>
                             <td>{{ $svc ?? 'This service' }}</td>
-                            <td>{{ $event?->budget_max ? '$' . number_format((float) $event->budget_max) : ($event?->budget_min ? 'From $' . number_format((float) $event->budget_min) : 'Not set') }}</td>
+                            <td>{{ $event?->budgetLabel() ?? 'Not set' }}</td>
                             <td>{!! $fin->agreed_price ? '<b>$' . number_format((float) $fin->agreed_price, 2) . '</b>' : $unset . ' ' . $fix('price') !!}</td>
                         </tr>
                     </tbody>

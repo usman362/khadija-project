@@ -19,6 +19,20 @@
         $aiId_level = $aiId_key ? \App\Domain\AiFeatures\AiAccess::level($aiId_user, $aiId_key) : 'maximum';
         $aiId_lvlLabel = \App\Domain\AiFeatures\AiAccess::label($aiId_level);
         $aiId_lvlColor = ['manual' => '#64748b', 'semi' => '#2563eb', 'maximum' => '#16a34a', 'none' => '#94a3b8'][$aiId_level] ?? '#64748b';
+
+        /*
+         * Issue #118: this badge read "SEMI" on one tool and "MAXIMUM" on the
+         * next with nothing on the page saying why, so it looked like a value
+         * that correlated with nothing. It correlates with the tool: Venue
+         * Compatibility, Guest Capacity and Style & Inspiration stop at Semi,
+         * the rest go to Maximum. The hub's cards already say "(tool max)"
+         * when that is the reason; the tool's own banner did not, and the
+         * banner is what somebody looking at one tool sees.
+         */
+        $aiId_best = collect(\App\Domain\AiFeatures\AiAccess::unlockedLevels($aiId_user))
+            ->sortByDesc(fn ($l) => array_search($l, ['manual', 'semi', 'maximum'], true))
+            ->first() ?? 'manual';
+        $aiId_capped = $aiId_level !== $aiId_best;
     @endphp
     @if($aiId_key && $aiId_key !== '' && $aiId_level !== 'none')
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:0 0 14px;">
@@ -30,8 +44,11 @@
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.6 4.4 9l4.3 3.8L12 6l3.3 6.8L19.6 9 21 17.6a1 1 0 0 1-1 1.2H4a1 1 0 0 1-1-1.2z"/></svg>
                 {{ $aiId_tier }}
             </span>
-            <span style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:800; color:#fff; background:{{ $aiId_lvlColor }}; border-radius:999px; padding:5px 12px;">
-                {{ $aiId_lvlLabel }}
+            <span title="{{ $aiId_capped
+                      ? 'The highest level this tool offers. Your account is unlocked to ' . \App\Domain\AiFeatures\AiAccess::label($aiId_best) . '.'
+                      : 'Your level on this tool' }}"
+                  style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:800; color:#fff; background:{{ $aiId_lvlColor }}; border-radius:999px; padding:5px 12px;">
+                {{ $aiId_lvlLabel }}@if($aiId_capped)<span style="font-weight:600;opacity:.85;">· most this tool offers</span>@endif
             </span>
         </div>
     @endif

@@ -173,9 +173,7 @@
         <div>
             <span>Estimated budget</span>
             <span class="pbs-big">
-                @if($event->budget_min && $event->budget_max) ${{ number_format((float) $event->budget_min) }} – ${{ number_format((float) $event->budget_max) }}
-                @elseif($event->budget) ${{ number_format((float) $event->budget) }}
-                @else Not set @endif
+                {{ $event->budgetLabel() ?? 'Not set' }}
             </span>
         </div>
     </div>

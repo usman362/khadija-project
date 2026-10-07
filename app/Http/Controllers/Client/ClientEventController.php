@@ -379,7 +379,15 @@ class ClientEventController extends Controller
             'description' => ['nullable', 'string'],
             'starts_at' => ['nullable', 'date'],
             'event_time' => ['nullable', 'date_format:H:i'],
-            'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
+            /*
+             * Issue #116: a booking read "1:04 AM – 1:04 AM" on two separate
+             * pages, which ruled out a rendering artifact and pointed at the
+             * stored time. after_or_equal let an end time equal the start, so
+             * a zero-minute event was a thing this form would accept. The
+             * finalize step has required `after` all along; these two did not,
+             * and they are the forms that create the event in the first place.
+             */
+            'ends_at' => ['nullable', 'date', 'after:starts_at'],
             'category_ids' => ['nullable', 'array'],
             'category_ids.*' => ['exists:categories,id'],
             'location' => ['nullable', 'string', 'max:255'],
@@ -649,7 +657,15 @@ class ClientEventController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'starts_at' => ['nullable', 'date'],
-            'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
+            /*
+             * Issue #116: a booking read "1:04 AM – 1:04 AM" on two separate
+             * pages, which ruled out a rendering artifact and pointed at the
+             * stored time. after_or_equal let an end time equal the start, so
+             * a zero-minute event was a thing this form would accept. The
+             * finalize step has required `after` all along; these two did not,
+             * and they are the forms that create the event in the first place.
+             */
+            'ends_at' => ['nullable', 'date', 'after:starts_at'],
             'category_ids' => ['nullable', 'array'],
             'category_ids.*' => ['exists:categories,id'],
             'location' => ['nullable', 'string', 'max:255'],

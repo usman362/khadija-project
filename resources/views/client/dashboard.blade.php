@@ -832,7 +832,26 @@
         ->take(3)
         ->get();
 
-    // Recent activity — merge latest events + bookings into one feed.
+    /*
+     * Recent activity — the latest events and bookings in one feed.
+     *
+     * Issue #114: the booking rows were tagged "New", written into the array
+     * as a constant. Two of them had been sitting on this card wearing that
+     * word since July, through the proposal being accepted and the booking
+     * confirmed, because nothing about the row was ever read from the record
+     * it describes. The pill was worse than stale: its colour was hard-coded
+     * to the confirmed green while the word said New, so it had been showing
+     * two different states at once from the day it was written.
+     *
+     * Both halves now come from the row's own status, which is the only
+     * thing that can go stale honestly.
+     */
+    $activityPill = fn (?string $status) => match ($status) {
+        'confirmed', 'completed', 'published' => 'confirmed',
+        'cancelled', 'declined'               => 'pending',
+        default                               => 'requested',
+    };
+
     $activity = collect();
     foreach ($recentEvents->take(2) as $ev) {
         $activity->push([
@@ -840,8 +859,8 @@
             'title' => 'You posted a new gig',
             'meta'  => $ev->title,
             'when'  => $ev->created_at,
-            'tag'   => ucfirst($ev->status ?? 'Requested'),
-            'tag_class' => 'requested',
+            'tag'   => ucfirst($ev->status ?? 'requested'),
+            'tag_class' => $activityPill($ev->status),
         ]);
     }
     foreach ($recentBookings->take(2) as $bk) {
@@ -850,8 +869,9 @@
             'title' => 'Proposal received',
             'meta'  => 'from ' . ($bk->supplier?->name ?? 'a professional'),
             'when'  => $bk->created_at,
-            'tag'   => 'New',
-            'tag_class' => 'confirmed',
+            // "Requested" is what a booking nobody has answered yet really is.
+            'tag'   => ucfirst($bk->status ?? 'requested'),
+            'tag_class' => $activityPill($bk->status),
         ]);
     }
     $activity = $activity->sortByDesc('when')->take(4);

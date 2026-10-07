@@ -100,15 +100,32 @@ class ClientBookingController extends Controller
             ->filter(fn ($p) => ($p->metadata['kind'] ?? null) === 'booking_deposit')
             ->keyBy(fn ($p) => ($p->metadata['event_id'] ?? '') . ':' . ($p->metadata['supplier_id'] ?? ''));
 
-        // OA-146: the same calculation Spending and Payments use, so the four
-        // finance pages cannot report two different totals again.
+        /*
+         * OA-146: the same calculation Spending and Payments use, so the four
+         * finance pages cannot report two different totals again.
+         *
+         * The count travels with the figure. This panel sits directly above a
+         * list of booking cards, which is an invitation to add the cards up
+         * and check — and the cards are filtered by tab, narrowed by search
+         * and cut to ten a page, while the total is the whole account. On any
+         * tab but All, or any second page, the two cannot agree, and the
+         * reader has no way to know that from looking. Saying how many
+         * bookings the figure covers is what closes that gap.
+         *
+         * Deposits now come from the same bookings as the agreed total: the
+         * page used to sum every completed deposit on the account against a
+         * total that excludes cancelled bookings.
+         */
         $agreedTotal = \App\Domain\Finance\ClientTotals::agreed($user);
-        $depositsPaid = (float) $deposits->sum('amount');
+        $depositsPaid = \App\Domain\Finance\ClientTotals::depositsPaid($user);
 
         $financial = [
             'agreed_total'  => $agreedTotal,
+            'agreed_count'  => \App\Domain\Finance\ClientTotals::agreedCount($user),
             'deposits_paid' => $depositsPaid,
             'outstanding'   => max(0, $agreedTotal - $depositsPaid),
+            // Whether the list beneath is showing all of them.
+            'listing_all'   => $tab === 'all' && ! $request->filled('q') && $bookings->lastPage() === 1,
         ];
 
         // Real rows, not a synthesised schedule: confirmed bookings whose event
@@ -185,9 +202,10 @@ class ClientBookingController extends Controller
     private function base($user)
     {
         // A booking where the client is their own professional is test data,
-        // never a real booking (OA-141 / OA-154); it is not listed.
-        return Booking::where('client_id', $user->id)
-            ->where(fn ($q) => $q->whereNull('supplier_id')->orWhereColumn('supplier_id', '!=', 'client_id'));
+        // never a real booking (OA-141 / OA-154); it is not listed. The rule
+        // moved onto the model as Issue #117 took it to Spending and Payments
+        // too, so the four pages cannot drift apart again.
+        return Booking::where('client_id', $user->id)->notSelfSupplied();
     }
 
     /**
