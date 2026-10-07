@@ -44,7 +44,7 @@ class ClientChatController extends Controller
             ->when($barredRoles, fn ($q) => $q->whereDoesntHave('participants',
                 fn ($p) => $p->where('users.id', '!=', $user->id)->whereIn('primary_role', $barredRoles)))
             ->with([
-                'participants:id,name,email,public_id,avatar,last_active_at',
+                'participants:id,name,email,public_id,avatar,last_active_at,primary_role',
                 'booking:id,event_id,status,price',
                 // Owner and publication too: the details panel's Award needs to
                 // know the event is this client's, and "Posted 1 day ago" is
@@ -72,7 +72,7 @@ class ClientChatController extends Controller
             $activeConv->load([
                 'messages.sender:id,name', 'messages.attachments',
                 'messages.reads:id,message_id,user_id,read_at',
-                'participants:id,name,email,public_id,avatar,last_active_at',
+                'participants:id,name,email,public_id,avatar,last_active_at,primary_role',
             ]);
             $thread = $this->thread($activeConv, $user);
         }
@@ -293,6 +293,23 @@ class ClientChatController extends Controller
             'awaiting' => $last !== null && $last->sender_id !== $user->id,
             'archived' => (bool) optional($c->participants->firstWhere('id', $user->id))->pivot?->archived_at,
             'muted' => (bool) optional($c->participants->firstWhere('id', $user->id))->pivot?->muted_at,
+            /*
+             * The three things the Messages popup puts on a row and this
+             * list did not: who the other person is, what the last message
+             * was marked, and whether the row is a favourite. The pivot and
+             * the column have carried the last two all along — the popup
+             * read them and the page did not, so the same conversation
+             * looked like two different records.
+             */
+            'roleLabel' => $other ? \Illuminate\Support\Str::headline(
+                \App\Support\RoleColours::accountRole($other)
+            ) : null,
+            'roleColour' => $other ? \App\Support\RoleColours::strongFor(
+                \App\Support\RoleColours::accountRole($other)
+            ) : null,
+            'priority' => $last?->priority,
+            'favorite' => (bool) optional($c->participants->firstWhere('id', $user->id))->pivot?->favorited_at,
+            'favoriteUrl' => route('conversations.favorite', $c),
             'event' => $event ? ['id' => $event->id, 'title' => $event->title] : null,
             'sortAt' => optional($last?->created_at)->timestamp ?? optional($c->updated_at)->timestamp ?? 0,
         ];

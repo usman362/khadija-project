@@ -126,7 +126,12 @@
     .cm-conv-name span { font-weight: 500; color: var(--text-muted); font-size: 12px; }
     .cm-conv-subj { font-size: 12px; font-weight: 700; color: var(--text-secondary); margin: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .cm-conv-prev { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .cm-conv-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+    .cm-conv-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 7px; }
+    /* The account's own colour, from the one table that owns them. */
+    .cm-role { color: #fff !important; }
+    .cm-star { border: 0; background: none; cursor: pointer; color: var(--border-color); font-size: 16px;
+        line-height: 1; padding: 0; }
+    .cm-star.is-on, .cm-star:hover { color: #f59e0b; }
     .cm-tag { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
     .cm-conv-meta { text-align: right; flex-shrink: 0; }
     .cm-conv-time { font-size: 11px; color: var(--text-muted); }
@@ -161,10 +166,14 @@
 
     /* The level, in its own colour, above the words it describes. Routine is
        the absence of a chip rather than a badge on every row. */
+    /* The dock's pill, to the pixel: a dot and the word inside a hairline
+       ring of the level's own colour. It was a bare dot and a shouted
+       uppercase word here, so the same message read as two different
+       things depending on which window you were in. */
     .cm-pri { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 800;
-        letter-spacing: .03em; text-transform: uppercase; margin-bottom: 4px; }
+        border: 1px solid currentColor; border-radius: 999px; padding: 1px 8px; margin-bottom: 5px; }
     .cm-pri i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; display: inline-block; }
-    .cm-msg.me .cm-pri { justify-content: flex-end; width: 100%; }
+    .cm-msg.me .cm-pri { margin-left: auto; }
 
     /* The per-message menu. Shown on hover or focus, so a thread is not a
        wall of dots, and always shown once it is open. */
@@ -439,13 +448,33 @@
                             <div class="cm-conv-subj">{{ $c['subject'] }}</div>
                             <div class="cm-conv-prev">{{ $c['preview'] }}</div>
                             <div class="cm-conv-tags">
+                                {{-- Who they are and what the last message was
+                                     marked, the way the Messages popup shows
+                                     them, so one conversation does not read as
+                                     two different records. --}}
+                                @if($c['roleLabel'])
+                                    <span class="cm-tag cm-role" style="background:{{ $c['roleColour'] }};">{{ $c['roleLabel'] }}</span>
+                                @endif
+                                @if($c['priority'] && ($__pl = \App\Domain\Messaging\MessagePriority::label($c['priority'])))
+                                    <span class="cm-pri" style="color:{{ \App\Domain\Messaging\MessagePriority::COLOURS[$c['priority']] ?? 'currentColor' }};"><i></i>{{ $__pl }}</span>
+                                @endif
                                 @if($c['muted'])<span class="cm-tag" style="color:#475569;background:rgba(100,116,139,.14);">Muted</span>@endif
                                 @foreach($c['tags'] as [$tname, $tcol])
                                     <span class="cm-tag" style="color:{{ ($tagColors[$tcol] ?? $tagColors['blue'])[0] }};background:{{ ($tagColors[$tcol] ?? $tagColors['blue'])[1] }};">{{ $tname }}</span>
                                 @endforeach
                             </div>
                         </div>
-                        <div class="cm-conv-meta"><div class="cm-conv-time">{{ $c['time'] }}</div>@if($c['unread'] > 0)<span class="cm-conv-badge">{{ $c['unread'] }}</span>@endif</div>
+                        <div class="cm-conv-meta">
+                            <div class="cm-conv-time">{{ $c['time'] }}</div>
+                            @if($c['unread'] > 0)<span class="cm-conv-badge">{{ $c['unread'] }}</span>@endif
+                            {{-- Inside the row's own link, so it has to say it is
+                                 not one: a star that opened the conversation
+                                 instead of starring it would be worse than none. --}}
+                            <button type="button" class="cm-star {{ $c['favorite'] ? 'is-on' : '' }}"
+                                    data-fav="{{ $c['favoriteUrl'] }}"
+                                    aria-pressed="{{ $c['favorite'] ? 'true' : 'false' }}"
+                                    aria-label="{{ $c['favorite'] ? 'Remove from favourites' : 'Add to favourites' }}">{{ $c['favorite'] ? '★' : '☆' }}</button>
+                        </div>
                     </a>
                 @empty
                     <div style="padding:40px 16px;text-align:center;color:var(--text-muted);font-size:13px;">No conversations yet.</div>
@@ -1436,6 +1465,38 @@ window.CHAT_LIVE = {
     });
 
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+
+    /*
+     * The star sits inside the row, and the row is a link. Without this it
+     * would open the conversation instead of starring it, which is worse
+     * than having no star.
+     */
+    document.addEventListener('click', function (e) {
+        var star = e.target.closest ? e.target.closest('.cm-star') : null;
+        if (! star) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        var on = star.getAttribute('aria-pressed') !== 'true';
+
+        // Answered before the server does, then corrected by what it says.
+        star.textContent = on ? '★' : '☆';
+        star.classList.toggle('is-on', on);
+        star.setAttribute('aria-pressed', on ? 'true' : 'false');
+        star.setAttribute('aria-label', on ? 'Remove from favourites' : 'Add to favourites');
+
+        fetch(star.getAttribute('data-fav'), {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+            credentials: 'same-origin',
+        }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+            if (! d) return;
+            star.textContent = d.favorited ? '★' : '☆';
+            star.classList.toggle('is-on', !! d.favorited);
+            star.setAttribute('aria-pressed', d.favorited ? 'true' : 'false');
+        }).catch(function () {});
+    });
 
     /* Typing: told at most every three seconds while there is something in
        the box, because it is a heartbeat and not a keystroke log. */

@@ -196,6 +196,81 @@ class TheInboxCaughtUpWithTheDockTest extends TestCase
     }
 
     /**
+     * The same chip, not a second way of saying the same thing.
+     *
+     * The dock draws a pill: a dot and the word inside a hairline ring of
+     * the level's own colour. The page was drawing a bare dot and a shouted
+     * uppercase word, so one message read as two different things depending
+     * on which window you were looking at it in.
+     */
+    public function test_the_chip_is_the_same_chip_as_the_dock_draws(): void
+    {
+        $this->message($this->pro, 'The hall is free.', MessagePriority::IMPORTANT);
+
+        $css = $this->inbox();
+
+        $this->assertMatchesRegularExpression(
+            '/\.cm-pri\s*\{[^}]*border:\s*1px solid currentColor[^}]*\}/s',
+            $css,
+            'The level has lost its ring, so it is a dot and a word rather than the pill the dock draws.'
+        );
+        $this->assertMatchesRegularExpression(
+            '/\.cm-pri\s*\{[^}]*border-radius:\s*999px/s',
+            $css,
+            'The level is no longer a pill.'
+        );
+        $this->assertDoesNotMatchRegularExpression(
+            '/\.cm-pri\s*\{[^}]*text-transform:\s*uppercase/s',
+            $css,
+            'The level is shouted here and spoken in the dock.'
+        );
+
+        // And the word itself is the one the dock uses.
+        $this->assertStringContainsString('>Important<', $this->thread($css));
+    }
+
+    /** The row carries who they are and what the last message was marked. */
+    public function test_a_conversation_row_says_what_the_popup_row_says(): void
+    {
+        $this->message($this->pro, 'The hall is free.', MessagePriority::IMPORTANT);
+
+        $html = $this->inbox();
+
+        $this->assertStringContainsString('class="cm-tag cm-role"', $html, 'The row does not say who they are.');
+        $this->assertStringContainsString('Professional', $html);
+
+        // The level of the last message, as a pill, in the list.
+        $this->assertMatchesRegularExpression(
+            '/cm-conv-tags.*?class="cm-pri"[^>]*>\s*<i><\/i>Important/s',
+            $html,
+            'The row does not carry the last message\'s level.'
+        );
+    }
+
+    /** And a star that stars rather than opening the conversation. */
+    public function test_the_row_can_be_favourited_without_opening_it(): void
+    {
+        $this->message($this->pro, 'Hello');
+
+        $html = $this->inbox();
+
+        $this->assertStringContainsString('class="cm-star "', $html);
+        $this->assertStringContainsString('☆', $html);
+        $this->assertStringContainsString('data-fav="' . route('conversations.favorite', $this->conversation) . '"', $html);
+
+        // The row is a link, so the handler has to stop it following one.
+        $this->assertStringContainsString("closest('.cm-star')", $html);
+        $this->assertStringContainsString('e.preventDefault();', $html);
+
+        $this->actingAs($this->client)
+            ->postJson(route('conversations.favorite', $this->conversation))
+            ->assertSuccessful()
+            ->assertJsonPath('favorited', true);
+
+        $this->assertStringContainsString('★', $this->inbox());
+    }
+
+    /**
      * The shared live partial gained an opt-in hook rather than new
      * behaviour, because the professional page includes the same file.
      */
