@@ -209,7 +209,11 @@
             </div>
 
             <div id="vhb-venue" style="display:{{ old('event_format', $draft['event_format'] ?? '') === 'hybrid' ? 'block' : 'none' }};">
-                <label class="vhb-label" for="vhb-loc">Venue for the in-person half *</label>
+                {{-- Required for a hybrid event and not otherwise, which is
+                     what the server says. A bare asterisk on a field that is
+                     only sometimes needed is the kind that teaches people to
+                     ignore asterisks. --}}
+                <label class="vhb-label" for="vhb-loc">Venue for the in-person half <span style="font-weight:500;color:var(--text-muted);font-size:11.5px;">Required for a hybrid event</span></label>
                 <input type="text" id="vhb-loc" name="location" class="vhb-input" maxlength="200"
                        value="{{ old('location', $draft['location'] ?? '') }}" placeholder="e.g. Baltimore, MD">
                 @error('location')<p class="vhb-err">{{ $message }}</p>@enderror

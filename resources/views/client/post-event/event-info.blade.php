@@ -4,6 +4,15 @@
 @section('page-subtitle', 'Tell us about your event so we understand exactly what you need.')
 @include('client.post-event._styles')
 
+{{-- Sir Peter, 6 Oct: "I saw some area that was not mandated that should be
+     but missing also the asterisk too."
+
+     These carried an asterisk and nothing required them: the server has them
+     as nullable, so a client could leave them and the form would say nothing.
+     An asterisk that is not true is worse than none, because it teaches people
+     to ignore the ones that are. Whether these SHOULD be required is a
+     decision about the product rather than a fault to fix quietly, so the mark
+     now matches what the platform actually insists on. --}}
 @section('content')
 <div class="pe-wrap">
     @include('client.post-event._wizard')
@@ -17,23 +26,23 @@
                 <div>
                     <div class="pe-card">
                         <div class="pe-field">
-                            <label class="pe-label">Event Type <span class="pe-req">*</span></label>
+                            <label class="pe-label">Event Type <span class="pe-optional">(optional)</span></label>
                             <x-event-type-picker name="event_type" :selected="old('event_type', $summary['event_type'] ?? null)" />
                         </div>
 
                         <div class="pe-row">
                             <div class="pe-field">
-                                <label class="pe-label">Start Time <span class="pe-req">*</span></label>
+                                <label class="pe-label">Start Time <span class="pe-optional">(optional)</span></label>
                                 <input type="time" name="start_time" class="pe-input">
                             </div>
                             <div class="pe-field">
-                                <label class="pe-label">End Time <span class="pe-req">*</span></label>
+                                <label class="pe-label">End Time <span class="pe-optional">(optional)</span></label>
                                 <input type="time" name="end_time" class="pe-input">
                             </div>
                         </div>
 
                         <div class="pe-field">
-                            <label class="pe-label">Venue Address <span class="pe-req">*</span></label>
+                            <label class="pe-label">Venue Address <span class="pe-optional">(optional)</span></label>
                             <input type="text" name="venue" class="pe-input" placeholder="Enter Venue Address" value="{{ $summary['venue'] ?? '' }}">
                         </div>
 
@@ -50,11 +59,11 @@
 
                         <div class="pe-row">
                             <div class="pe-field">
-                                <label class="pe-label">Guest Count <span class="pe-req">*</span></label>
+                                <label class="pe-label">Guest Count <span class="pe-optional">(optional)</span></label>
                                 <input type="number" name="guests" class="pe-input" min="1" placeholder="Number of Guests" value="{{ $summary['guests'] ?? '' }}">
                             </div>
                             <div class="pe-field">
-                                <label class="pe-label">Estimated Budget <span class="pe-req">*</span></label>
+                                <label class="pe-label">Estimated Budget <span class="pe-optional">(optional)</span></label>
                                 <select name="budget" class="pe-select" aria-label="Select Budget Range">
                                     <option value="">Select Budget Range</option>
                                     <option>$2,000 – $5,000</option>

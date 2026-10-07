@@ -372,14 +372,14 @@
                 <div class="pf-form-grid">
                     <div>
                         <label class="pf-label">Full Name *</label>
-                        <input type="text" name="name" class="pf-input" value="{{ old('name', $user->name) }}" required
+                        <input type="text" name="name" required class="pf-input" value="{{ old('name', $user->name) }}" required
                                data-validate="required|min:2|max:120"
                                data-error-required="Please enter your full name.">
                         @error('name') <div class="pf-error">{{ $message }}</div> @enderror
                     </div>
                     <div>
                         <label class="pf-label">Email Address *</label>
-                        <input type="email" name="email" class="pf-input" value="{{ old('email', $user->email) }}" required
+                        <input type="email" name="email" required class="pf-input" value="{{ old('email', $user->email) }}" required
                                data-validate="required|email"
                                data-error-required="Email is required."
                                data-error-email="Please enter a valid email address.">

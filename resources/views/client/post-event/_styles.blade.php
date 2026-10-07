@@ -46,6 +46,7 @@
     .pe-card h2 { font-size:18px; } .pe-card h3 { font-size:15px; }
     .pe-label { display:block; font-size:12.5px; font-weight:700; color:var(--pe-ink-2); margin-bottom:6px; }
     .pe-req { color:var(--pe-orange); }
+    .pe-optional { font-weight:500; color:var(--text-muted); font-size:11.5px; }
     .pe-input, .pe-select, .pe-textarea { width:100%; border:1px solid var(--pe-line); border-radius:10px; padding:11px 12px;
         font-size:14px; font-family:inherit; color:var(--pe-ink); background:#fff; outline:none; }
     .pe-input:focus, .pe-select:focus, .pe-textarea:focus { border-color:var(--pe-orange); box-shadow:0 0 0 3px rgba(249,115,22,.12); }

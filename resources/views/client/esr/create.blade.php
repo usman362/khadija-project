@@ -81,7 +81,11 @@
     </div>
 
     <div class="esr-layout">
-    <form method="POST" action="{{ route('client.esr.store') }}">
+    {{-- Sir Peter, 6 Oct: a required field should stop you, not let you
+         submit and be told afterwards. A group of checkboxes cannot carry the
+         browser's own required attribute, so the one field here that needed
+         it is checked on the way out. --}}
+    <form method="POST" action="{{ route('client.esr.store') }}" data-needs-service>
         @csrf
 
         {{-- 0. Single or multi. A rush request can be either — one urgent gap to
@@ -253,6 +257,33 @@
     </aside>
     </div>
 </div>
+@push('scripts')
+<script>
+(function () {
+    var form = document.querySelector('form[data-needs-service]');
+    if (! form) return;
+
+    form.addEventListener('submit', function (e) {
+        if (document.querySelector('.svc-item input:checked')) return;
+
+        e.preventDefault();
+
+        var picker = document.querySelector('.svc-picker');
+        var say    = document.querySelector('[data-service-required]');
+
+        if (! say && picker) {
+            say = document.createElement('p');
+            say.setAttribute('data-service-required', '');
+            say.style.cssText = 'color:#dc2626;font-size:12.5px;margin:8px 0 0;font-weight:700;';
+            picker.appendChild(say);
+        }
+
+        if (say) { say.textContent = 'Choose the service you need before sending this.'; }
+        if (picker) { picker.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    });
+})();
+</script>
+@endpush
 @endsection
 
 @push('scripts')

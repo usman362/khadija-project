@@ -496,7 +496,7 @@
 
         <div class="bw-field">
             <label for="bwOrgType">This request is for <span class="req">*</span></label>
-            <select name="organization_type" id="bwOrgType" aria-label="Organization type">
+            <select name="organization_type" id="bwOrgType" aria-label="Organization type" required>
                 @foreach($orgTypes as $k => $l)
                     <option value="{{ $k }}" @selected(($data['organization_type'] ?? 'individual') === $k)>{{ $l }}</option>
                 @endforeach
@@ -612,7 +612,12 @@
                            placeholder="e.g. 1234 Garden Way" data-bw-location>
                     <div class="bw-locpair">
                         <div>
-                            <label class="bw-loclabel" for="bw_city">City <span class="req">*</span></label>
+                            {{-- Not a bare asterisk: the server has this as
+                                 nullable and requires it only once a street has
+                                 been typed, because a client who has not settled
+                                 on a venue has no city to give. An asterisk that
+                                 is not true teaches people to ignore asterisks. --}}
+                            <label class="bw-loclabel" for="bw_city">City <span class="bw-optional">Required once you give a street</span></label>
                             <input type="text" name="city" id="bw_city" value="{{ old('city', $data['city'] ?? '') }}"
                                    placeholder="e.g. Baltimore">
                             @error('city')<p class="bw-err">{{ $message }}</p>@enderror
@@ -812,7 +817,7 @@
         <p class="lede">This is what they read before deciding whether to bid, and what they price against. The more specific, the more accurate the proposals.</p>
         <div class="bw-field">
             <label>Description <span class="req">*</span></label>
-            <textarea name="description" placeholder="What the event is, what you need delivered, anything that would change the price…">{{ $data['description'] ?? '' }}</textarea>
+            <textarea name="description" required placeholder="What the event is, what you need delivered, anything that would change the price…">{{ $data['description'] ?? '' }}</textarea>
             <p class="bw-help">At least a couple of sentences. Include anything that affects scope, access, timings, equipment, dietary needs.</p>
         </div>
 
@@ -845,7 +850,9 @@
 
         <div class="bw-two">
             <div class="bw-field">
-                <label>Budget from <span style="color:#dc2626;">*</span></label>
+                {{-- required_without:budget_max on the server: one of the two
+                     will do. The asterisk said both were compulsory. --}}
+                <label>Budget from <span style="font-weight:500;color:var(--text-muted);font-size:11.5px;">Give this or a maximum</span></label>
                 <input type="number" name="budget_min" min="1" step="1" value="{{ old('budget_min', $data['budget_min'] ?? '') }}" placeholder="e.g. 800">
                 @error('budget_min')<p class="bw-err">{{ $message }}</p>@enderror
             </div>
