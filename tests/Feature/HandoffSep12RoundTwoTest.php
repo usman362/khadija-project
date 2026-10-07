@@ -65,7 +65,10 @@ class HandoffSep12RoundTwoTest extends TestCase
         // Only one reply each way: not enough.
         $say($pro, 0); $say($client, 10);
         $html = $this->actingAs($client)->get(route('client.chat.index'))->getContent();
-        $this->assertStringContainsString('N/A until there are at least 3 replies', $html);
+        // Shortened on 7 October — three sentences in a stat tile is a
+        // paragraph. What it guards is unchanged: the page says WHY the
+        // figure is missing rather than printing a bare N/A.
+        $this->assertStringContainsString('N/A until 3 replies', $html);
 
         // Three replies each way.
         $say($pro, 20); $say($client, 10); $say($pro, 20); $say($client, 10);
@@ -73,7 +76,9 @@ class HandoffSep12RoundTwoTest extends TestCase
 
         $html = $this->actingAs($client)->get(route('client.chat.index'))->getContent();
         $this->assertStringContainsString('<div class="v">10m</div>', $html);
-        $this->assertStringContainsString('Professionals: <b>', $html);
+        // "Professionals:" became "Theirs:" when the tile's caption was cut
+        // down. The comparison is what matters and it is still there.
+        $this->assertStringContainsString('Theirs: <b>', $html);
     }
 
     /** DIR-34: verification is offered at sign-up. */

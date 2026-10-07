@@ -15,18 +15,35 @@
 @push('styles')
 <style>
     .cm { --cm: #ea580c; padding-top: 6px; }
-    .cm-top { display: grid; grid-template-columns: minmax(0,1fr) 210px; gap: 16px; align-items: start; margin-bottom: 18px; }
+    /*
+     * The action used to sit in the tile row as a sixth column of its own:
+     * a 210px block, shorter than the tiles beside it, aligned to nothing.
+     * It goes above them now, on the right, where every other client page
+     * keeps its one action — Proposals puts Post an Event there, and this
+     * row reads as five even tiles instead of five and a half.
+     */
+    .cm-top { margin-bottom: 18px; }
+    .cm-top-bar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
     .cm-stats { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 12px; }
     button.cm-stat, a.cm-stat { font: inherit; color: inherit; text-align: left; text-decoration: none; width: 100%; }
     .cm-stat.is-link { cursor: pointer; transition: border-color .12s ease, box-shadow .12s ease; }
     .cm-stat.is-link:hover { border-color: var(--cm); }
     .cm-stat.is-active { border-color: var(--cm); box-shadow: 0 0 0 3px rgba(234,88,12,.14); }
-    .cm-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; }
-    .cm-stat-h { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 700; color: var(--text-muted); }
+    /*
+     * A column, so the caption can be pinned to the bottom. The figures were
+     * landing at different heights across the row because the labels wrap at
+     * different lengths — "Awaiting your reply" taking two lines pushed its
+     * own number a line lower than the one beside it. The number is the thing
+     * being compared along the row; it has to sit on one line.
+     */
+    .cm-stat { display: flex; flex-direction: column; background: var(--bg-card);
+        border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; }
+    .cm-stat-h { display: flex; align-items: center; gap: 8px; font-size: 11.5px; font-weight: 700;
+        color: var(--text-muted); min-height: 26px; }
     .cm-stat-ico { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .cm-stat-ico svg { width: 14px; height: 14px; }
     .cm-stat .v { font-size: 23px; font-weight: 800; color: var(--text-primary); margin: 7px 0 2px; }
-    .cm-stat .s { font-size: 11px; color: var(--text-muted); }
+    .cm-stat .s { font-size: 11px; color: var(--text-muted); margin-top: auto; line-height: 1.45; }
     .cm-actions { display: flex; flex-direction: column; gap: 10px; }
     .cm-btn-primary { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px; border: none; border-radius: 11px; background: linear-gradient(135deg, #fb923c, #ea580c); color: #fff; font-size: 13.5px; font-weight: 800; cursor: pointer; font-family: inherit; }
     .cm-btn-primary svg { width: 15px; height: 15px; }
@@ -362,7 +379,7 @@
     .cm-send svg { width: 17px; height: 17px; }
     .cm-empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text-muted); padding: 60px; text-align: center; font-size: 13px; }
 
-    @media (max-width: 1100px) { .cm-top { grid-template-columns: 1fr; } .cm-stats { grid-template-columns: repeat(3, minmax(0,1fr)); } .cm-main { grid-template-columns: 1fr; } }
+    @media (max-width: 1100px) { .cm-stats { grid-template-columns: repeat(3, minmax(0,1fr)); } .cm-main { grid-template-columns: 1fr; } }
     @media (max-width: 640px) { .cm-stats { grid-template-columns: repeat(2, minmax(0,1fr)); } }
 </style>
 @endpush
@@ -371,6 +388,9 @@
 <div class="cm">
     {{-- stats + actions --}}
     <div class="cm-top">
+        <div class="cm-top-bar">
+            <button type="button" class="cm-btn-primary" id="cm-create"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Message</button>
+        </div>
         <div class="cm-stats">
             {{-- Every figure counts one kind of thing and says which. Unread and
                  Awaiting narrow the list when pressed; the other two open the
@@ -393,10 +413,16 @@
             <div class="cm-stat">
                 <div class="cm-stat-h"><span class="cm-stat-ico" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Your reply time</div>
                 <div class="v">{{ $stats['reply'] }}</div>
+                {{-- Three sentences in a stat tile is a paragraph. The first
+                     said what the big figure already says. What is left is the
+                     comparison, and the reason a figure may be missing — which
+                     stays on the page rather than hiding in a tooltip, because
+                     an unexplained N/A reads as something broken. --}}
                 <div class="s">
-                    Your average time to answer.
-                    Professionals: <b>{{ $stats['their_reply'] ?? 'N/A' }}</b>
-                    @if(($stats['reply'] ?? '') === 'N/A' || ($stats['their_reply'] ?? '') === 'N/A')<br>N/A until there are at least 3 replies.@endif
+                    Theirs: <b>{{ $stats['their_reply'] ?? 'N/A' }}</b>
+                    @if(($stats['reply'] ?? '') === 'N/A' || ($stats['their_reply'] ?? '') === 'N/A')
+                        <br>N/A until 3 replies.
+                    @endif
                 </div>
             </div>
             <a class="cm-stat is-link" href="{{ route('client.bookings.index') }}">
@@ -405,9 +431,6 @@
                 <div class="v">{{ $money($stats['unpaid']) }}</div>
                 <div class="s">Across {{ $stats['unpaid_bookings'] }} {{ \Illuminate\Support\Str::plural('booking', $stats['unpaid_bookings']) }}</div>
             </a>
-        </div>
-        <div class="cm-actions">
-            <button type="button" class="cm-btn-primary" id="cm-create"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create Message</button>
         </div>
     </div>
 

@@ -65,12 +65,25 @@ class ChatStatsCardsTest extends TestCase
             'client_id' => $owner->id, 'created_by' => $owner->id, 'starts_at' => now()->addMonth()]);
     }
 
+    /**
+     * The tile row, and nothing else.
+     *
+     * It used to end at the action block, which sat in the row as a column
+     * of its own. The action moved above the row, so the landmark went with
+     * it — and strpos returning false would have had this quietly measuring
+     * the rest of the page instead of failing. Both ends are asserted now.
+     */
     private function cards(): string
     {
         $html = $this->actingAs($this->client)->get(route('client.chat.index'))->assertOk()->getContent();
-        $a = strpos($html, '<div class="cm-stats">');
 
-        return substr($html, $a, strpos($html, '<div class="cm-actions">', $a) - $a);
+        $a = strpos($html, '<div class="cm-stats">');
+        $this->assertNotFalse($a, 'The page has no row of figures.');
+
+        $b = strpos($html, '<div class="cm-main', $a);
+        $this->assertNotFalse($b, 'The row of figures has no end to slice at.');
+
+        return substr($html, $a, $b - $a);
     }
 
     private function card(string $label, string $cards): string

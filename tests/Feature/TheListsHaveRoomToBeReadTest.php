@@ -105,6 +105,45 @@ class TheListsHaveRoomToBeReadTest extends TestCase
         );
     }
 
+    /**
+     * The row of figures above the inbox.
+     *
+     * Two things were wrong with it. The action sat in the row as a sixth
+     * column of its own — 210px wide, shorter than the tiles beside it,
+     * aligned to nothing — and the figures landed at different heights along
+     * the row, because a label that wraps to two lines pushes its own number
+     * a line lower than the one next to it. The number is the thing being
+     * compared across the row; it has to sit on one line.
+     */
+    public function test_the_inbox_figures_line_up_and_the_action_is_not_a_tile(): void
+    {
+        $html = $this->actingAs($this->client)->get('/client/messages')->assertSuccessful()->getContent();
+
+        // The action is above the row now, where every other client page
+        // keeps its one action.
+        $this->assertStringContainsString('cm-top-bar', $html);
+        $this->assertStringNotContainsString('class="cm-actions"', $html,
+            'The action is back in the tile row as a column of its own.');
+
+        // A column, with the caption pinned to the bottom: that is what keeps
+        // the figures level however long the captions run.
+        $this->assertMatchesRegularExpression(
+            '/\.cm-stat\s*\{[^}]*flex-direction:\s*column/s',
+            $html,
+            'The tile is no longer a column, so its caption cannot be pinned.'
+        );
+        $this->assertMatchesRegularExpression(
+            '/\.cm-stat\s\.s\s*\{[^}]*margin-top:\s*auto/s',
+            $html,
+            'The caption is no longer pinned, so the figures will drift apart again.'
+        );
+        $this->assertMatchesRegularExpression(
+            '/\.cm-stat-h\s*\{[^}]*min-height:/s',
+            $html,
+            'The label has no floor, so a two-line one still pushes its figure down.'
+        );
+    }
+
     /** A long event name survives to the page instead of being cut to nothing. */
     public function test_a_long_event_name_is_not_cut_to_a_stub(): void
     {
