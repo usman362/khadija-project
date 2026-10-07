@@ -151,4 +151,70 @@ class ClientAvailabilityTest extends TestCase
 
         $this->assertSame(0, AvailabilityDay::count());
     }
+
+    /**
+     * My Availability is a month, whatever the other tab was left on.
+     *
+     * The grid is built to be one — it loops first to last and greys the days
+     * either side — but it took whichever view the calendar tab happened to
+     * carry. Arriving from a day or a week drew a single strip of seven days,
+     * with "Previous month" on an arrow that moved by one week, which is not
+     * a screen for saying which days of the year suit you.
+     */
+    public function test_the_availability_tab_is_always_a_month(): void
+    {
+        foreach (['day', 'week', 'month', null] as $view) {
+            $html = $this->actingAs($this->client)
+                ->get('/client/calendar?tab=availability' . ($view ? '&calview=' . $view : ''))
+                ->assertSuccessful()->getContent();
+
+            $grid = $this->grid($html);
+
+            // A month is five or six rows of seven, never one.
+            $rows = substr_count($grid, '<tr>');
+            $this->assertGreaterThanOrEqual(
+                4,
+                $rows,
+                'Arriving with calview=' . ($view ?? 'none') . ' drew ' . $rows . ' week(s), not a month.'
+            );
+
+            $this->assertStringContainsString(now()->format('F Y'), $html, 'The heading does not name the month.');
+        }
+    }
+
+    /** And its arrows move by a month, which is what they say they do. */
+    public function test_the_availability_arrows_move_a_month(): void
+    {
+        $html = $this->actingAs($this->client)
+            ->get('/client/calendar?tab=availability&calview=day')
+            ->assertSuccessful()->getContent();
+
+        $this->assertStringContainsString(
+            'cal=' . now()->copy()->addMonthNoOverflow()->startOfMonth()->format('Y-m-d'),
+            $html,
+            'Next month does not go to the next month.'
+        );
+    }
+
+    /** The rail says the range in words rather than naming the view. */
+    public function test_the_rail_describes_the_range_in_english(): void
+    {
+        $html = $this->actingAs($this->client)
+            ->get('/client/calendar?calview=day')
+            ->assertSuccessful()->getContent();
+
+        $this->assertStringNotContainsString('any days this day', $html);
+        $this->assertStringContainsString('any days today', $html);
+    }
+
+    /** The availability grid, without the month calendar on the other tab. */
+    private function grid(string $html): string
+    {
+        $start = strpos($html, 'class="av-grid"');
+        $this->assertNotFalse($start, 'No availability grid on the page.');
+
+        $end = strpos($html, '</table>', $start);
+
+        return substr($html, $start, $end - $start);
+    }
 }

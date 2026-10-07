@@ -154,16 +154,25 @@
 
         <div class="cal-card">
             <div class="cal-rail-h"><h3>Your availability</h3></div>
+            {{-- The range in words. It used to print the view's own name, so
+                 a day view said "you have not marked any days this day". --}}
+            @php
+                $__span = match ($calendar['view']) {
+                    'day'  => 'today',
+                    'week' => 'this week',
+                    default => 'this month',
+                };
+            @endphp
             @if($tally[\App\Domain\Calendar\Availability::AVAILABLE] || $tally[\App\Domain\Calendar\Availability::UNAVAILABLE])
                 <p class="cal-wait">
-                    This {{ $calendar['view'] }}: <b>{{ $tally[\App\Domain\Calendar\Availability::AVAILABLE] }}</b>
+                    {{ ucfirst($__span) }}: <b>{{ $tally[\App\Domain\Calendar\Availability::AVAILABLE] }}</b>
                     {{ \Illuminate\Support\Str::plural('day', $tally[\App\Domain\Calendar\Availability::AVAILABLE]) }} marked available,
                     <b>{{ $tally[\App\Domain\Calendar\Availability::UNAVAILABLE] }}</b> blocked.
                     Every other day is simply unanswered.
                 </p>
             @else
                 <p class="cal-wait">
-                    You have not marked any days this {{ $calendar['view'] }}. Open
+                    You have not marked any days {{ $__span }}. Open
                     <a href="{{ route('client.calendar.index', ['tab' => 'availability']) }}">My Availability</a>
                     to say which days suit you.
                 </p>

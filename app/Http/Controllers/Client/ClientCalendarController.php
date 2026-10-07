@@ -50,7 +50,22 @@ class ClientCalendarController extends Controller
                 ? sprintf('%04d-%02d-01', $request->integer('year'), $request->integer('month'))
                 : null);
 
-        $calendar = ClientCalendar::build($user, $request->query('calview'), $anchor);
+        // Which of Sir Peter's four tabs is open. Only two of them answer.
+        $tab = in_array($request->query('tab'), ['availability'], true) ? $request->query('tab') : 'calendar';
+
+        /*
+         * My Availability is a month, always.
+         *
+         * It is built to be one — the grid loops first to last and greys the
+         * days either side — but it was taking whichever view the calendar
+         * tab happened to be left on. Arrive from a day or a week and it drew
+         * a single strip of seven days with "Previous month" on an arrow that
+         * moved by one week, which is not a screen for saying which days of
+         * the year suit you.
+         */
+        $view = $tab === 'availability' ? 'month' : $request->query('calview');
+
+        $calendar = ClientCalendar::build($user, $view, $anchor);
 
         $grid = in_array($calendar['view'], ['day', 'week'], true)
             ? ClientCalendar::timeGrid($calendar)
@@ -84,9 +99,6 @@ class ClientCalendarController extends Controller
             'confirmed' => $inRange->filter(fn ($e) => $e->stage() === 'confirmed')->count(),
             'needs_you' => $inRange->filter(fn ($e) => $e->stage() === 'open')->count(),
         ];
-
-        // Which of Sir Peter's four tabs is open. Only two of them answer.
-        $tab = in_array($request->query('tab'), ['availability'], true) ? $request->query('tab') : 'calendar';
 
         $availability = Availability::between($user, $calendar['first'], $calendar['last']);
         $tally        = Availability::tally($availability);
