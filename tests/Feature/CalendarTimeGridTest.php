@@ -119,7 +119,7 @@ class CalendarTimeGridTest extends TestCase
         $this->event('Garden Party', $day->copy()->setTime(13, 30), $day->copy()->setTime(16, 0));
 
         $html = $this->actingAs($this->client)
-            ->get(route('client.events.index', ['tab' => 'calendar', 'calview' => 'day', 'cal' => $day->format('Y-m-d')]))
+            ->get(route('client.calendar.index', ['calview' => 'day', 'cal' => $day->format('Y-m-d')]))
             ->assertOk()->getContent();
 
         $this->assertStringContainsString('class="tg tg-day"', $html);
@@ -136,10 +136,10 @@ class CalendarTimeGridTest extends TestCase
         $this->travelTo(now()->startOfDay()->setTime(11, 0));
 
         $today = $this->actingAs($this->client)
-            ->get(route('client.events.index', ['tab' => 'calendar', 'calview' => 'day', 'cal' => now()->format('Y-m-d')]))
+            ->get(route('client.calendar.index', ['calview' => 'day', 'cal' => now()->format('Y-m-d')]))
             ->getContent();
         $other = $this->actingAs($this->client)
-            ->get(route('client.events.index', ['tab' => 'calendar', 'calview' => 'day', 'cal' => now()->addDays(2)->format('Y-m-d')]))
+            ->get(route('client.calendar.index', ['calview' => 'day', 'cal' => now()->addDays(2)->format('Y-m-d')]))
             ->getContent();
 
         $this->assertStringContainsString('class="tg-now"', $today);

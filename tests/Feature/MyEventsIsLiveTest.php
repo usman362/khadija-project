@@ -49,19 +49,23 @@ class MyEventsIsLiveTest extends TestCase
     private function calendar(array $query = []): string
     {
         $html = $this->actingAs($this->client)
-            ->get(route('client.events.index', $query + ['tab' => 'calendar']))
+            ->get(route('client.calendar.index', $query))
             ->assertOk()->getContent();
 
         $a = strpos($html, 'id="mgCal"');
         $this->assertNotFalse($a, 'The calendar card is not on the page.');
 
         /*
-         * To the right rail, which is where the tab content ends. It used to
-         * cut at id="tab-details"; Details View was removed on 7 October and
-         * the slice silently became empty, so every assertion about the
-         * calendar passed against nothing.
+         * To the rail beside it, which is where the calendar ends.
+         *
+         * This has moved twice. It cut at id="tab-details" until Details View
+         * was removed, at which point the slice silently became an empty
+         * string and every assertion about the calendar passed against
+         * nothing. Then the calendar itself moved off My Events onto its own
+         * page. Both times the landmark was something next to the calendar
+         * rather than the calendar, which is why it kept going.
          */
-        $b = strpos($html, 'id="mgRail"', $a);
+        $b = strpos($html, 'class="cal-rail"', $a);
 
         $this->assertNotFalse($b, 'The page no longer ends the way this slice expects.');
 
@@ -138,8 +142,8 @@ class MyEventsIsLiveTest extends TestCase
         $opensThatDay = array_filter($m[1], function ($href) use ($day) {
             parse_str((string) parse_url(html_entity_decode($href), PHP_URL_QUERY), $q);
 
-            return ($q['calview'] ?? null) === 'day' && ($q['cal'] ?? null) === $day->format('Y-m-d')
-                && ($q['tab'] ?? null) === 'calendar';
+            // No tab: the calendar is a page now, not a view inside My Events.
+            return ($q['calview'] ?? null) === 'day' && ($q['cal'] ?? null) === $day->format('Y-m-d');
         });
 
         $this->assertGreaterThanOrEqual(2, count($opensThatDay), 'The day number and "+2 more" should both open the day.');
@@ -152,7 +156,9 @@ class MyEventsIsLiveTest extends TestCase
 
         $cal = $this->calendar();
         $this->assertStringNotContainsString('Last Month Job', $cal);
-        $this->assertStringContainsString('tab=calendar', $cal);
+        // The calendar has its own page now, so the arrows keep you on it
+        // rather than carrying a tab back to My Events.
+        $this->assertStringContainsString('/client/calendar', $cal);
 
         $prev = $this->calendar(['cal' => now()->startOfMonth()->subMonth()->format('Y-m-d')]);
         $this->assertStringContainsString('Last Month Job', $prev);
@@ -194,7 +200,9 @@ class MyEventsIsLiveTest extends TestCase
 
         $this->assertStringContainsString('data-live-scope', $html);
         // mgDetails went with Details View on 7 October.
-        foreach (['mgFilters', 'mgListCard', 'mgCal', 'mgRail'] as $id) {
+        // mgDetails went with Details View, and mgCal with the calendar, both
+        // on 7 October. What is left on this page is what changes on it.
+        foreach (['mgFilters', 'mgListCard', 'mgRail'] as $id) {
             $this->assertMatchesRegularExpression('/id="' . $id . '"[^>]*data-live-region|data-live-region[^>]*id="' . $id . '"/', $html, "#{$id} is not a live region.");
         }
 
@@ -230,24 +238,15 @@ class MyEventsIsLiveTest extends TestCase
         $this->assertStringContainsString("closest('[data-filter-toggle]')", $src);
     }
 
-    /**
-     * The rail's period picker keeps where the client is. Found in the
-     * browser: changing it from the calendar dropped tab=calendar from the
-     * address, so a reload opened the list instead.
+    /*
+     * Retired on 7 October, with the thing it was about.
+     *
+     * It held that changing the period in My Events' rail kept you on the
+     * calendar tab and on the month you were looking at. There is no calendar
+     * tab: the calendar has a page of its own, and the period picker in My
+     * Events' rail no longer has a calendar to lose your place in.
      */
-    public function test_the_period_picker_keeps_the_tab_and_the_calendars_place(): void
-    {
-        $html = $this->actingAs($this->client)
-            ->get(route('client.events.index', ['tab' => 'calendar', 'calview' => 'week', 'cal' => '2026-10-04']))
-            ->assertOk()->getContent();
 
-        $rail = substr($html, strpos($html, 'id="mgRail"'));
-        $form = substr($rail, 0, strpos($rail, '</form>'));
-
-        $this->assertStringContainsString('name="tab" value="calendar"', $form);
-        $this->assertStringContainsString('name="calview" value="week"', $form);
-        $this->assertStringContainsString('name="cal" value="2026-10-04"', $form);
-    }
 
     /** What the script fetches is the same page — a region request needs no second endpoint. */
     public function test_a_live_request_returns_the_same_regions(): void

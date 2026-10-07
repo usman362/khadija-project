@@ -36,11 +36,21 @@ class ClientCalendarController extends Controller
     {
         $user = $request->user();
 
-        $calendar = ClientCalendar::build(
-            $user,
-            $request->query('calview'),
-            $request->query('anchor'),
-        );
+        /*
+         * "cal" is what the shared calendar's own controls emit, so that is
+         * what is read. It took the tests moving here to notice: this page
+         * was reading "anchor", which nothing sends, so its next and previous
+         * arrows went nowhere and every month was this one.
+         */
+        $anchor = $request->query('cal')
+            ?: $request->query('anchor')
+            // ?month=&year= links were sent out before the calendar had a page
+            // of its own. They still land on the month they meant.
+            ?: ($request->filled('month') && $request->filled('year')
+                ? sprintf('%04d-%02d-01', $request->integer('year'), $request->integer('month'))
+                : null);
+
+        $calendar = ClientCalendar::build($user, $request->query('calview'), $anchor);
 
         $grid = in_array($calendar['view'], ['day', 'week'], true)
             ? ClientCalendar::timeGrid($calendar)

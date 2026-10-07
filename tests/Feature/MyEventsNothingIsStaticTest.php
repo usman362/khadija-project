@@ -240,8 +240,10 @@ class MyEventsNothingIsStaticTest extends TestCase
 
         $this->assertStringNotContainsString('Rescheduled', $html);
         $this->assertStringNotContainsString('In progress', $html);
-        // Details view Total Budget: the two live events, not the cancelled one.
-        $this->assertStringContainsString('$2,000.00', $html);
+        // Total Budget: the two live events, not the cancelled one. It moved
+        // from Details View onto the tiles on 7 October, where a narrower
+        // tile prints it without the pennies.
+        $this->assertStringContainsString('$2,000', $html);
     }
 
     /** The Events List pane only — the rows the filters act on. */

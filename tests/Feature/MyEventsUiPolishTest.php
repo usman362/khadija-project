@@ -72,11 +72,13 @@ class MyEventsUiPolishTest extends TestCase
         $this->assertDoesNotMatchRegularExpression('/^\s*\[data-live-region\]\s*\{[^}]*position/m', $src);
     }
 
-    /** The address said calview=month over the events list. */
-    public function test_switching_tabs_updates_the_address(): void
-    {
-        $src = $this->source('client/events/index');
+    /*
+     * Retired on 7 October, with the tabs.
+     *
+     * It held that switching between Events List, Calendar View and Details
+     * View put the view's name in the address, so a reload came back to the
+     * same one. There are no view tabs: Details View was removed for counting
+     * the same events twice, and the calendar has a page of its own.
+     */
 
-        $this->assertStringContainsString("u.searchParams.set('tab', this.dataset.tab);", $src);
-    }
 }

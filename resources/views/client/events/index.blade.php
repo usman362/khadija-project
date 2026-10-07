@@ -18,7 +18,6 @@
     .mg-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 18px; }
 
     /* View-mode tab pills */
-    .mg-viewtabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
     .mg-viewtab {
         display: inline-flex; align-items: center; gap: 7px;
         padding: 8px 14px; border-radius: 9px;
@@ -30,7 +29,17 @@
     .mg-viewtab.active { background: rgba(249,115,22,0.10); color: var(--brand-text); border-color: rgba(249,115,22,0.30); }
 
     /* Stat cards */
-    .mg-stats { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 12px; margin-bottom: 16px; }
+    /* Sir Peter, 7 Oct: "can you make them all fit into one row by reducing
+       the width so that they all fit in one row?" Seven across, and the tile
+       gives up padding and icon rather than wrapping. */
+    .mg-stats { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 8px; margin-bottom: 16px; }
+    .mg-stats .mg-stat { padding: 11px 10px; gap: 8px; }
+    .mg-stats .mg-stat-ico { width: 30px; height: 30px; border-radius: 8px; }
+    .mg-stats .mg-stat-ico svg { width: 15px; height: 15px; }
+    .mg-stats .mg-stat-label { font-size: 10.5px; }
+    .mg-stats .mg-stat-value { font-size: 19px; }
+    .mg-stats .mg-stat-delta { font-size: 10px; }
+    @media (max-width: 1500px) { .mg-stats { grid-template-columns: repeat(4, minmax(0,1fr)); } }
     .mg-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start;
         text-decoration: none; transition: border-color .12s, box-shadow .12s; }
     a.mg-stat:hover { border-color: var(--text-muted); }
@@ -453,18 +462,13 @@
 
 
     {{-- View-mode tabs --}}
-    <div class="mg-viewtabs" id="viewTabs">
-        <button class="cl-tab mg-viewtab active" data-tab="list">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-            Events List
-        </button>
-        <button class="cl-tab mg-viewtab" data-tab="calendar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            Calendar View
-        </button>
-    </div>
+    {{-- The view tabs are gone with the views. Details View went on 7 October
+         for counting the same events twice, and Calendar View on the same day,
+         because the calendar is a page of its own in the left menu now. One
+         tab leading to the only thing on the page is not a choice, and an
+         empty row kept only for a script to find is worse: .mg-viewtabs sets
+         display:flex, which overrode the hidden attribute on it. --}}
 
-    {{-- Stat cards --}}
     {{-- The tiles are the status filter.
 
          Sir Peter, 7 Oct: "many duplicated for the same purpose, can you go
@@ -494,6 +498,14 @@
              '<path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/>'],
             ['past', 'Past Events', 'purple', $stats['list_past'], 'Date has passed',
              '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="14" x2="15" y2="20"/><line x1="15" y1="14" x2="9" y2="20"/>'],
+            /*
+             * Upcoming was one of the tiles Details View owned, and Sir Peter
+             * kept it in green when the rest went. It is a date rather than a
+             * stage, so it has no status to filter by: an upcoming event can
+             * be open, booked or in progress.
+             */
+            [null, 'Upcoming', 'green', $stats['upcoming'], 'Still to happen',
+             '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'],
         ];
 
         /*
@@ -503,18 +515,26 @@
          * Cancelled events are left out, because a budget for something that
          * is not happening is not money anyone is planning to spend.
          */
-        $mgBudget = [number_format($stats['total_budget'], 2), 'Total Budget', 'All time, cancelled left out'];
+        $mgBudget = [number_format($stats['total_budget'], 0), 'Total Budget', 'Cancelled left out'];
     @endphp
     <div class="mg-stats">
-        @foreach($mgTiles as [$status, $label, $tone, $value, $caption, $icon])
+        @foreach($mgTiles as $__i => [$status, $label, $tone, $value, $caption, $icon])
+            @php
+                // Upcoming is a figure, not a filter: it is the last entry and
+                // has no status of its own.
+                $isFilter = $__i < count($mgTiles) - 1;
+                $isOn     = $isFilter && (request('status') === $status || (! request('status') && $status === null));
+            @endphp
             {{-- data-no-live: this page swaps its list in place, and a tile
                  is a change of filter rather than a refresh of the same one,
                  so it navigates like a link. --}}
-            <a class="mg-stat {{ request('status') === $status || (! request('status') && $status === null) ? 'is-on' : '' }}"
-               data-no-live
-               href="{{ $mgLink($status) }}"
-               @if(request('status') === $status || (! request('status') && $status === null)) aria-current="page" @endif
-               title="{{ $status === null ? 'Show every event' : 'Show only ' . strtolower($label) }}">
+            <{{ $isFilter ? 'a' : 'div' }} class="mg-stat {{ $isOn ? 'is-on' : '' }}"
+               @if($isFilter)
+                   data-no-live
+                   href="{{ $mgLink($status) }}"
+                   @if($isOn) aria-current="page" @endif
+                   title="{{ $status === null ? 'Show every event' : 'Show only ' . strtolower($label) }}"
+               @endif>
                 <div class="mg-stat-ico {{ $tone }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">{!! $icon !!}</svg>
                 </div>
@@ -523,7 +543,7 @@
                     <div class="mg-stat-value">{{ $value }}</div>
                     <div class="mg-stat-delta flat">{{ $caption }}</div>
                 </div>
-            </a>
+            </{{ $isFilter ? 'a' : 'div' }}>
         @endforeach
 
         <div class="mg-stat">
@@ -853,10 +873,6 @@
     {{-- A day, a week or a month, all in the address. Every control is a link
          to this page, so it changes in place (partials/_live_regions) and
          still works as a plain link. --}}
-    <div class="cl-tab-content" id="tab-calendar">
-        @include('client._calendar', ['calendar' => $calendar, 'calRoute' => 'client.events.index', 'calFixed' => ['tab' => 'calendar']])
-    </div>
-
     {{-- ════════════ DETAILS VIEW ════════════ --}}
     {{-- Details View is gone. Sir Peter, 7 October, agreeing with the
          recommendation: it listed the same events a second time, in a
@@ -987,34 +1003,14 @@
 @push('scripts')
 <script>
 
-    // Tab switching
-    document.querySelectorAll('#viewTabs .cl-tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            document.querySelectorAll('#viewTabs .cl-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.cl-tab-content').forEach(c => c.classList.remove('active'));
-            this.classList.add('active');
-            document.getElementById('tab-' + this.dataset.tab).classList.add('active');
-
-            // The address names the view on screen. Switching tabs left it
-            // alone, so it could say calview=month over the events list.
-            var u = new URL(location.href);
-            u.searchParams.set('tab', this.dataset.tab);
-            history.replaceState({ lv: u.toString() }, '', u.toString());
-        });
-    });
+    // Tab switching went with the tabs.
 
     // Open modal if ?create=1
     if (new URLSearchParams(window.location.search).get('create') === '1') {
         window.location.href='{{ route('client.post-event.choose') }}';
     }
 
-    // Open whichever view the URL names — the calendar's month arrows reload
-    // the page, and used to drop the client back on the list every time.
-    (function () {
-        var want = new URLSearchParams(window.location.search).get('tab');
-        var tab = want && document.querySelector('#viewTabs [data-tab="' + want + '"]');
-        if (tab) tab.click();
-    })();
+    // Opening a named view went with the views; ?tab= means nothing here now.
 
     // Events List / Professional Schedule / Payment Tracker.
     // Delegated: the list card is swapped for a fresh copy on every filter,
@@ -1064,7 +1060,6 @@
     document.addEventListener('live:swapped', scrollGrid);
     // The calendar tab starts hidden, and a hidden box cannot be scrolled.
     document.addEventListener('click', function (e) {
-        if (e.target.closest && e.target.closest('#viewTabs [data-tab="calendar"]')) setTimeout(scrollGrid, 0);
     });
 
     // Close any open multi-select dropdowns on Escape.

@@ -104,17 +104,31 @@ class ClientCalendarPageTest extends TestCase
 
         $this->assertFileExists($partial, 'The shared calendar partial is gone.');
 
+        /*
+         * My Events stopped drawing a calendar on 7 October: Sir Peter asked
+         * for the tab and its subpage to go, since the calendar has a page of
+         * its own in the left menu. What this still holds is that whoever
+         * draws one draws THIS one, and that nobody keeps a second copy of
+         * the month grid.
+         */
+        $this->assertStringContainsString(
+            'client._service_timeline',
+            file_get_contents(base_path('resources/views/client/bsr/wizard.blade.php')),
+            'Unrelated canary: the shared-partial habit is the point of this test.',
+        );
+
+        $this->assertStringContainsString(
+            'client._calendar',
+            file_get_contents(base_path('resources/views/client/calendar/index.blade.php')),
+            'Calendar & Availability no longer draws the shared calendar.',
+        );
+
         foreach ([
             'resources/views/client/events/index.blade.php',
             'resources/views/client/calendar/index.blade.php',
         ] as $view) {
-            $markup = file_get_contents(base_path($view));
-
-            $this->assertStringContainsString("client._calendar", $markup,
-                "{$view} no longer includes the shared calendar.");
-
-            $this->assertStringNotContainsString('cl-calendar-day ', $markup,
-                "{$view} has its own copy of the month grid again.");
+            $this->assertStringNotContainsString('cl-calendar-day ', file_get_contents(base_path($view)),
+                "{$view} has its own copy of the month grid.");
         }
     }
 
