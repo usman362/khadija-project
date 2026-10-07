@@ -185,12 +185,25 @@
     .bk-qa a:hover { background: var(--bg-card-hover); }
     .bk-qa svg { width: 14px; height: 14px; color: var(--text-muted); }
 
-    @media (max-width: 1440px) { .bk-stats { grid-template-columns: repeat(4, minmax(0,1fr)); } }
-    @media (max-width: 1100px) { .bk-stats { grid-template-columns: repeat(3, minmax(0,1fr)); } }
-    @media (max-width: 1100px) {
+    /*
+     * The side panel goes under the cards unless the window can hold both.
+     *
+     * It held its place down to 1100, which left a booking card 632px wide
+     * at a perfectly ordinary 1280: its three columns squeezed, the time
+     * broken across two lines as "5:00 PM – 11:00 PM / EDT", and the seven
+     * tiles above it wrapped onto a second row. A card needs about 900 to
+     * show the event, the money and the record side by side; with the
+     * panel's 340, the gap, the left menu and the page padding that comes to
+     * roughly 1540. The panel is a summary. The bookings are the page.
+     *
+     * The tiles follow it: with the full width to themselves they stay in
+     * the one row Sir Peter asked for well past where they used to break.
+     */
+    @media (max-width: 1540px) {
         .bk-layout { grid-template-columns: 1fr; }
         .bk-rail { position: static; }
     }
+    @media (max-width: 1100px) { .bk-stats { grid-template-columns: repeat(4, minmax(0,1fr)); } }
     @media (max-width: 860px) {
         .bk-body { grid-template-columns: 1fr; }
         .bk-col + .bk-col { border-left: none; border-top: 1px solid var(--border-color); }

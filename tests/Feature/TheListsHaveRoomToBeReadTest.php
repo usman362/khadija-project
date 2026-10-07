@@ -56,6 +56,16 @@ class TheListsHaveRoomToBeReadTest extends TestCase
         ];
     }
 
+    /** Bookings is cards rather than a table, but the panel rule is the same. */
+    public static function panels(): array
+    {
+        return [
+            'My Events' => ['/client/events', '.mg-layout'],
+            'Proposals' => ['/client/proposals', '.pr-layout'],
+            'Bookings'  => ['/client/bookings', '.bk-layout'],
+        ];
+    }
+
     #[DataProvider('lists')]
     public function test_the_table_can_outgrow_its_box(string $path, string $table): void
     {
@@ -76,15 +86,22 @@ class TheListsHaveRoomToBeReadTest extends TestCase
         );
     }
 
-    #[DataProvider('lists')]
-    public function test_the_side_panel_steps_aside_before_the_table_is_crushed(string $path, string $table, string $layout): void
+    #[DataProvider('panels')]
+    public function test_the_side_panel_steps_aside_before_the_content_is_crushed(string $path, string $layout): void
     {
         $html = $this->actingAs($this->client)->get($path)->assertSuccessful()->getContent();
 
+        /*
+         * The exact figure differs per page — a booking card needs about 900
+         * beside the panel, a table about 1120 — so what is asserted is that
+         * the panel steps aside somewhere in the fifteen-hundreds or above,
+         * not at 1100, where it was leaving a card 632px wide on an ordinary
+         * 1280 screen.
+         */
         $this->assertMatchesRegularExpression(
-            '/@media \(max-width: (1[6-9]\d\d|[2-9]\d{3})px\)\s*\{[^}]*' . preg_quote($layout, '/') . '\s*\{\s*grid-template-columns:\s*1fr/s',
+            '/@media \(max-width: (1[5-9]\d\d|[2-9]\d{3})px\)\s*\{[^}]*' . preg_quote($layout, '/') . '\s*\{\s*grid-template-columns:\s*1fr/s',
             $html,
-            'The panel still sits beside the table at widths that cannot hold both.'
+            'The panel still sits beside the content at widths that cannot hold both.'
         );
     }
 

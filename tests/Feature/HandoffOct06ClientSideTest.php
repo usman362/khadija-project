@@ -171,6 +171,38 @@ class HandoffOct06ClientSideTest extends TestCase
         $this->assertStringContainsString(\App\Support\DisplayTimezone::abbreviation(), (string) $r->timeLabel());
     }
 
+    /**
+     * It came back wearing a different disguise: a booking ending thirty
+     * seconds after it starts is not a zero-duration record, so the guard
+     * let it through — and a clock that shows minutes printed
+     * "1:04 AM – 1:04 AM" again. A range needs two different times on the
+     * face of the clock, not two different instants.
+     */
+    public function test_a_range_too_short_to_see_is_not_drawn_as_a_range(): void
+    {
+        $at = now()->addDays(10)->setTime(1, 4);
+
+        $seconds = $this->event([
+            'starts_at' => $at->format('Y-m-d H:i:s'),
+            'ends_at'   => $at->copy()->addSeconds(30)->format('Y-m-d H:i:s'),
+        ]);
+        $this->assertStringNotContainsString('–', (string) $seconds->timeLabel());
+
+        // A minute is visible on the clock, so it is a range.
+        $minute = $this->event([
+            'starts_at' => $at->format('Y-m-d H:i:s'),
+            'ends_at'   => $at->copy()->addMinute()->format('Y-m-d H:i:s'),
+        ]);
+        $this->assertStringContainsString('1:04 AM – 1:05 AM', (string) $minute->timeLabel());
+
+        // And a whole day is still a range, though both ends read the same.
+        $day = $this->event([
+            'starts_at' => $at->copy()->startOfDay()->format('Y-m-d H:i:s'),
+            'ends_at'   => $at->copy()->startOfDay()->addDay()->format('Y-m-d H:i:s'),
+        ]);
+        $this->assertStringContainsString('12:00 AM – 12:00 AM', (string) $day->timeLabel());
+    }
+
     /** And the form stops accepting one in the first place. */
     public function test_an_event_cannot_be_saved_ending_when_it_starts(): void
     {

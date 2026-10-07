@@ -477,9 +477,21 @@ class Event extends Model
          */
         $zone = \App\Support\DisplayTimezone::abbreviation(null, $this->starts_at);
         $from = $this->starts_at->format('g:i A');
+        $to   = $this->ends_at?->format('g:i A');
 
-        return $this->ends_at && $this->ends_at->gt($this->starts_at)
-            ? $from . ' – ' . $this->ends_at->format('g:i A') . ' ' . $zone
+        /*
+         * Compared as printed, not as stored. The guard was ends_at->gt(
+         * starts_at), which is true for a booking that ends thirty seconds
+         * after it begins — and a clock showing minutes then printed
+         * "1:04 AM – 1:04 AM" again, which is the thing Issue #116 was about.
+         * A range needs two different times on the face of the clock, not two
+         * different instants.
+         */
+        $sameMinute = $this->ends_at
+            && $this->ends_at->copy()->startOfMinute()->equalTo($this->starts_at->copy()->startOfMinute());
+
+        return $to !== null && ! $sameMinute && $this->ends_at->gte($this->starts_at)
+            ? $from . ' – ' . $to . ' ' . $zone
             : $from . ' ' . $zone;
     }
 
