@@ -49,7 +49,26 @@
     a.pr-tool-btn { display: inline-flex; align-items: center; text-decoration: none; }
     .pr-tool-btn svg { width: 14px; height: 14px; }
 
-    .pr-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    /*
+     * Seven columns were sharing the width equally, so the ones carrying
+     * sentences got the same room as the one carrying "$80". The event's
+     * name was cut to twenty characters and still wrapped, the date broke
+     * across three lines and the "Has not confirmed a date" chip across two,
+     * and every row stood a hundred pixels tall.
+     *
+     * The columns that hold a name get room, the ones that hold a figure
+     * shrink to it, and nothing that is one phrase is allowed to wrap. The
+     * minimum is what buys the room — a table at width:100% squeezes to
+     * whatever it is given — and the wrapper beside it scrolls when the
+     * page truly cannot give that much.
+     */
+    .pr-table { width: 100%; min-width: 1120px; border-collapse: collapse; font-size: 12.5px; }
+    .pr-table th:first-child, .pr-table td:first-child { width: 250px; }
+    .pr-table th:nth-child(2), .pr-table td:nth-child(2) { width: 180px; }
+    .pr-table th:nth-child(3), .pr-table td:nth-child(3) { width: 190px; }
+    .pr-table th:nth-child(4), .pr-table td:nth-child(4),
+    .pr-table th:nth-child(5), .pr-table td:nth-child(5),
+    .pr-table th:nth-child(6), .pr-table td:nth-child(6) { width: 1%; white-space: nowrap; }
     .pr-table th { text-align: left; padding: 12px 10px; font-size: 10.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--border-color); }
     .pr-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); vertical-align: middle; }
     .pr-table tr:hover td { background: var(--bg-card-hover); }
@@ -58,7 +77,7 @@
     .pr-prop-name { font-weight: 700; color: var(--text-primary); }
     .pr-prop-sub { font-size: 10.5px; color: var(--text-muted); }
     .pr-ec { font-size: 12px; }
-    .pr-ec .ev { color: var(--text-primary); font-weight: 600; display: flex; align-items: center; gap: 4px; }
+    .pr-ec .ev { color: var(--text-primary); font-weight: 600; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
     .pr-ec .loc { color: var(--text-muted); font-size: 10.5px; display: flex; align-items: center; gap: 4px; }
     .pr-amt { font-weight: 800; color: var(--text-primary); }
     .pr-amt-sub { font-size: 10px; color: var(--text-muted); }
@@ -117,12 +136,17 @@
     .pr-cov-link { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 800; color: var(--brand-text, #c2410c); }
     .pr-taken { font-size: 10.5px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
     .pr-svc { font-weight: 700; color: var(--text-primary); }
-    .pr-svcdate { display: inline-block; margin-top: 3px; font-size: 10px; font-weight: 700; border-radius: 999px; padding: 1px 7px; background: var(--bg-muted, #f3f4f6); color: var(--text-muted); }
+    .pr-svcdate { display: inline-block; margin-top: 3px; font-size: 10px; font-weight: 700; border-radius: 999px; padding: 1px 7px; background: var(--bg-muted, #f3f4f6); color: var(--text-muted); white-space: nowrap; }
     .pr-svcdate.is-confirmed { background: #dcfce7; color: #15803d; }
     .pr-svcdate.is-unconfirmed { background: #fef3c7; color: #b45309; }
     .pr-svcdate.is-clash, .pr-svcdate.is-mismatch { background: #fee2e2; color: #b91c1c; }
     .pr-svcdate.is-different { background: #fef3c7; color: #b45309; }
-    @media (max-width: 1200px) { .pr-layout { grid-template-columns: 1fr; } .pr-rail { position: static; } .pr-stats { grid-template-columns: repeat(3, 1fr); } }
+    /* The side panel goes under the table unless the window can hold both:
+       340px of panel beside a table that needs about 1120 comes to roughly
+       1760 once the left menu and the page padding are counted. Everything
+       on the panel is a summary; the list is the page. */
+    @media (max-width: 1760px) { .pr-layout { grid-template-columns: 1fr; } .pr-rail { position: static; } }
+    @media (max-width: 1200px) { .pr-stats { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 700px) { .pr-stats { grid-template-columns: repeat(2, 1fr); } .pr-table { font-size: 11px; } }
 </style>
 @endpush
@@ -255,7 +279,7 @@
                                 <div class="pr-prop">
                                     <div class="pr-prop-ico" style="background:{{ $icoColor }};">{{ $ico }}</div>
                                     <div>
-                                        <div class="pr-prop-name">{{ \Illuminate\Support\Str::limit($p->event?->title ?? 'Proposal', 20) }}</div>
+                                        <div class="pr-prop-name">{{ \Illuminate\Support\Str::limit($p->event?->title ?? 'Proposal', 34) }}</div>
                                         <div class="pr-prop-sub">{{ $p->supplier?->name ?? '—' }}@if($p->supplier?->public_id)<span class="gr-id"> (<a href="{{ route('public.professional.show', $p->supplier->id) }}" class="gr-id-link" title="Open their profile">{{ \App\Support\GigResourceId::display($p->supplier->public_id) }}</a>)</span>@endif</div>
                                     </div>
                                 </div>
@@ -267,8 +291,8 @@
                             </td>
                             <td>
                                 <div class="pr-ec">
-                                    <div class="ev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>{{ \Illuminate\Support\Str::limit($p->event?->title ?? '—', 16) }}</div>
-                                    <div class="loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/></svg>{{ \Illuminate\Support\Str::limit($p->event?->location ?? 'TBD', 16) }}</div>
+                                    <div class="ev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;"><rect x="3" y="4" width="18" height="18" rx="2"/></svg>{{ \Illuminate\Support\Str::limit($p->event?->title ?? '—', 22) }}</div>
+                                    <div class="loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/></svg>{{ \Illuminate\Support\Str::limit($p->event?->location ?? 'TBD', 22) }}</div>
                                     {{-- Titles are cut to 16 characters here, so six rows of one
                                          wedding all read alike. This is what tells them apart. --}}
                                     @if($p->event)<div class="gr-ref">{{ $p->event->reference() }}</div>@endif

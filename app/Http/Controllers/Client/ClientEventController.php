@@ -31,7 +31,22 @@ class ClientEventController extends Controller
             ->with(['categories:id,name,icon', 'supplier:id,name', 'bookings.supplier:id,name'])
             // The Proposals column: how many professionals have bid.
             ->withCount('bids')
-            ->latest();
+            /*
+             * Ordered by the column the reader is looking at.
+             *
+             * This was ->latest(), which is created_at — when the request was
+             * made — while the first column the eye lands on is Date & Time,
+             * the event's own date. So a wedding in November sat between two
+             * September parties and the whole list read as shuffled. A list
+             * sorted by something it does not show looks broken whether or
+             * not it is.
+             *
+             * Undated drafts go last: they have no place on a date order, and
+             * at the top they would push every real event down.
+             */
+            ->orderByRaw('starts_at is null')
+            ->orderByDesc('starts_at')
+            ->orderByDesc('id');
 
         /*
          * The box says "Search events, professionals…" and searched titles

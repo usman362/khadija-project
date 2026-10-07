@@ -94,6 +94,38 @@ class HandoffOct06ClientSideTest extends TestCase
         $this->assertNull($this->event()->budgetLabel());
     }
 
+    /**
+     * The list is ordered by the column it shows.
+     *
+     * It was ordered by created_at — when the request was made — while the
+     * first thing the eye lands on is Date & Time, the event's own date. A
+     * wedding in November sat between two September parties and the whole
+     * page read as shuffled.
+     */
+    public function test_my_events_is_ordered_by_the_date_it_shows(): void
+    {
+        // Created in one order, happening in another.
+        $this->event(['title' => 'Middle', 'starts_at' => now()->addDays(10)->format('Y-m-d H:i:s')]);
+        $this->event(['title' => 'Soonest', 'starts_at' => now()->addDays(2)->format('Y-m-d H:i:s')]);
+        $this->event(['title' => 'Furthest', 'starts_at' => now()->addDays(40)->format('Y-m-d H:i:s')]);
+        $this->event(['title' => 'Undated', 'starts_at' => null, 'status' => 'draft', 'is_published' => false]);
+
+        $html = $this->actingAs($this->client)->get('/client/events')->assertSuccessful()->getContent();
+
+        $order = [];
+        foreach (['Furthest', 'Middle', 'Soonest', 'Undated'] as $title) {
+            $at = strpos($html, '>' . $title . '<');
+            $this->assertNotFalse($at, $title . ' is missing from the list.');
+            $order[$title] = $at;
+        }
+
+        $this->assertTrue($order['Furthest'] < $order['Middle'], 'The list is not in date order.');
+        $this->assertTrue($order['Middle'] < $order['Soonest'], 'The list is not in date order.');
+        // An undated draft has no place on a date order, so it goes last
+        // rather than pushing every real event down.
+        $this->assertTrue($order['Soonest'] < $order['Undated'], 'An undated draft sits among the dated events.');
+    }
+
     // ── Issue #114 — a tag that never changed ─────────────────────────
 
     /**

@@ -39,7 +39,11 @@
     .mg-stats .mg-stat-label { font-size: 10.5px; }
     .mg-stats .mg-stat-value { font-size: 19px; }
     .mg-stats .mg-stat-delta { font-size: 10px; }
-    @media (max-width: 1500px) { .mg-stats { grid-template-columns: repeat(4, minmax(0,1fr)); } }
+    /* Sir Peter asked for the tiles in one row. They fit in one as long as
+       the table beside them is not also competing with the side panel — see
+       the breakpoint below, which drops the panel under the table before
+       either of them has to give anything up. */
+    @media (max-width: 1100px) { .mg-stats { grid-template-columns: repeat(4, minmax(0,1fr)); } }
     .mg-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start;
         text-decoration: none; transition: border-color .12s, box-shadow .12s; }
     a.mg-stat:hover { border-color: var(--text-muted); }
@@ -87,7 +91,29 @@
     .mg-subtab.active { color: var(--brand-text); border-bottom-color: #f97316; }
 
     /* Master-list table */
-    .mg-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    /*
+     * Eight columns were sharing the width equally, so the one carrying a
+     * sentence got the same room as the one carrying "0". "Urgent: Awards &
+     * Trophy Design and BBQ & Grill Catering" wrapped over six lines and the
+     * row stood 170px tall; the reference line and the time zone this week
+     * added to each of them made it worse.
+     *
+     * The title takes the space, the short columns shrink to their content,
+     * and below the point where that stops working the wrapper scrolls
+     * sideways rather than crushing everything. min-width is what makes the
+     * overflow-x on that wrapper mean anything: a table at width:100% has
+     * nothing to overflow with.
+     */
+    .mg-table { width: 100%; min-width: 1120px; border-collapse: collapse; font-size: 12.5px; }
+    /* Enough for a real event name on one or two lines. A table cell's width
+       is only a suggestion — the actions column cannot shrink below its own
+       buttons — so the minimum above is what actually buys the room, and the
+       wrapper scrolls when the page cannot give it. */
+    .mg-table th:first-child, .mg-table td:first-child { width: 280px; min-width: 240px; }
+    .mg-table .num,
+    .mg-table th:nth-child(4), .mg-table th:nth-child(5),
+    .mg-table th:nth-child(6), .mg-table th:nth-child(7) { width: 1%; white-space: nowrap; }
+    .mg-table td:nth-child(2), .mg-table th:nth-child(2) { white-space: nowrap; width: 1%; }
     .mg-table th {
         text-align: left; padding: 12px 10px;
         font-size: 10.5px; font-weight: 700; color: var(--text-muted);
@@ -199,9 +225,19 @@
     .mg-dl-sub { font-size: 10.5px; color: var(--text-muted); }
     .mg-dl-due { font-size: 10.5px; color: var(--warn-text); font-weight: 700; white-space: nowrap; }
 
-    @media (max-width: 1200px) {
+    /*
+     * The side panel moves under the table unless the window can hold both.
+     * The panel is 340px and the table needs about 1120 to show an event's
+     * name, its figures and its buttons at once; with the gap, the left menu
+     * and the page's own padding that comes to roughly 1760. Under that they
+     * were sharing a width that only suits one of them, and the table lost.
+     * Everything on the panel is a summary; the list is the page.
+     */
+    @media (max-width: 1760px) {
         .mg-layout { grid-template-columns: 1fr; }
         .mg-rail { position: static; }
+    }
+    @media (max-width: 1200px) {
         .mg-stats { grid-template-columns: repeat(3, 1fr); }
         .mg-row2 { grid-template-columns: 1fr; }
     }
