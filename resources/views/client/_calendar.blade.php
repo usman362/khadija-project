@@ -229,3 +229,35 @@
         </div>
     @endif
 </div>
+
+{{-- The grid is a whole day tall and the box is twelve hours high, so where
+     it opens decides what the page is. Left alone it opens at midnight: a
+     screenful of empty night with the day below the fold.
+
+     This has to sit outside the card. The card is a live region — the month
+     arrows replace it wholesale — and a script inside replaced markup is not
+     run again, so the listener lives out here and re-places the grid after
+     every swap. The lesson came from My Events, which kept this script after
+     losing the calendar it belonged to. --}}
+<script>
+(function () {
+    function place() {
+        document.querySelectorAll('.tg-body[data-scroll-to]').forEach(function (body) {
+            // Once per rendering of the grid, so it never yanks the page back
+            // from wherever the reader has scrolled to since.
+            if (body.dataset.placed) return;
+            body.dataset.placed = '1';
+            body.scrollTop = parseInt(body.getAttribute('data-scroll-to'), 10) || 0;
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', place);
+    } else {
+        place();
+    }
+
+    // A new day or week arrived: open it at its own first event.
+    document.addEventListener('live:swapped', place);
+})();
+</script>

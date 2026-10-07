@@ -86,9 +86,24 @@ final class ClientCalendar
     /** Height of one hour in the day and week views, in pixels. */
     public const HOUR_PX = 48;
 
-    /** The hours shown when nothing falls outside them. */
-    public const DAY_STARTS = 7;
-    public const DAY_ENDS   = 21;
+    /**
+     * Sir Peter, 7 October: "this a 24 hours around the clock timeline, it
+     * should be not a 7am to 8pm, please review and fix."
+     *
+     * It used to draw 7am to 9pm and stretch only as far as the events on
+     * screen demanded. That is a guess about when a day happens, and events
+     * do not keep office hours: a midnight fireworks slot or a 5am load-in
+     * pulled the whole grid out of shape, and a day with nothing in it said
+     * the night did not exist. Midnight to midnight, always, so the same
+     * hour sits in the same place on every day you look at.
+     *
+     * The cost is a taller grid than fits, which is what OPENS_AT is for.
+     */
+    public const DAY_STARTS = 0;
+    public const DAY_ENDS   = 24;
+
+    /** Where the grid is scrolled to when the day holds nothing. */
+    public const OPENS_AT = 8;
 
     /**
      * The day and week views as a time grid: hours down the side, each event
@@ -112,17 +127,10 @@ final class ClientCalendar
             ? [$c['anchor']->copy()]
             : array_map(fn ($i) => $c['first']->copy()->addDays($i), range(0, 6));
 
-        // Widen the hours to whatever is on screen, never narrow past the day.
+        // The whole day, every time. Nothing is clipped and nothing shifts,
+        // so there is no longer a pair of hours to widen to fit.
         $from = self::DAY_STARTS;
         $to   = self::DAY_ENDS;
-        foreach ($days as $d) {
-            foreach ($c['byDate']->get($d->format('Y-m-d'), collect()) as $e) {
-                $from = min($from, (int) $e->starts_at->format('G'));
-                $end  = self::endOf($e);
-                $to   = max($to, $end->isSameDay($e->starts_at) ? (int) ceil(($end->hour * 60 + $end->minute) / 60) : 24);
-            }
-        }
-        $to = min(24, max($to, $from + 1));
         $span = ($to - $from) * 60;
 
         $cols = [];
@@ -160,6 +168,18 @@ final class ClientCalendar
         $now = Carbon::now();
         $nowMin = $now->hour * 60 + $now->minute - $from * 60;
 
+        /*
+         * Where a twenty-four hour grid opens is the difference between a
+         * usable day and a screenful of empty night. In order of use: the
+         * first event on screen; else the hour it is, when today is one of
+         * the days; else the morning.
+         */
+        $firstEvent = collect($cols)->flatMap(fn ($col) => array_column($col['items'], 'start'))->min();
+        $opensAt = $firstEvent
+            ?? (collect($days)->contains(fn ($d) => $d->isToday())
+                ? max(0, $nowMin)
+                : (self::OPENS_AT - $from) * 60);
+
         return [
             'from'   => $from,
             'to'     => $to,
@@ -168,9 +188,9 @@ final class ClientCalendar
             'cols'   => $cols,
             // Where "now" sits, if today is on screen and inside the hours.
             'nowTop' => $nowMin >= 0 && $nowMin <= $span ? round($nowMin * self::HOUR_PX / 60) : null,
-            // Open scrolled to the first event, or to the morning.
-            'scrollTo' => max(0, (int) round((collect($cols)->flatMap(fn ($col) => array_column($col['items'], 'start'))->min()
-                ?? (8 - $from) * 60) * self::HOUR_PX / 60) - 24),
+            // Minus a little, so whatever it opens on is not flush against
+            // the top edge with its hour label cut off above it.
+            'scrollTo' => max(0, (int) round($opensAt * self::HOUR_PX / 60) - 24),
         ];
     }
 

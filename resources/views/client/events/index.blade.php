@@ -1051,16 +1051,6 @@
         btn.setAttribute('aria-expanded', panel.hidden ? 'false' : 'true');
     });
 
-    // The time grid opens at its first event rather than at 7 AM.
-    function scrollGrid() {
-        var body = document.querySelector('#mgCal .tg-body[data-scroll-to]');
-        if (body) body.scrollTop = parseInt(body.getAttribute('data-scroll-to'), 10) || 0;
-    }
-    scrollGrid();
-    document.addEventListener('live:swapped', scrollGrid);
-    // The calendar tab starts hidden, and a hidden box cannot be scrolled.
-    document.addEventListener('click', function (e) {
-    });
 
     // Close any open multi-select dropdowns on Escape.
     document.addEventListener('keydown', function(e) {
