@@ -63,8 +63,49 @@
     .ws-msgs-f { padding: 12px 14px; border-top: 1px solid var(--border-color); }
     .ws-none { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
 
-    @media (max-width: 1500px) { .ws { grid-template-columns: 180px minmax(0,1fr) 300px; } .ws-pro-col { grid-column: 1 / -1; } }
-    @media (max-width: 1100px) { .ws { grid-template-columns: 1fr; } .ws-msgs { max-height: none; } }
+    /* Folding the conversation away.
+       This is the one screen a client reads line by line before signing, and
+       the chat was taking a third of the width from the terms. Sir Peter asked
+       for a way to put it aside while reading. */
+    .ws-msgs-h { display: flex; align-items: center; gap: 8px; }
+    .ws-fold { margin-left: auto; border: 0; background: none; cursor: pointer; padding: 3px;
+        border-radius: 7px; color: var(--text-muted); display: inline-flex; font-family: inherit; }
+    .ws-fold:hover { background: var(--bg-card-hover, #f1f5f9); color: var(--text-primary); }
+    .ws-fold svg { width: 16px; height: 16px; }
+
+    /* Collapsed: a rail you can still see and still click. Hiding it outright
+       would lose the way back, and the unread mark with it. */
+    .ws.is-folded { grid-template-columns: 210px minmax(0, 1fr) 210px 46px; }
+    .ws.is-folded .ws-msgs { max-height: none; }
+    .ws.is-folded .ws-msgs-b, .ws.is-folded .ws-msgs-f { display: none; }
+    .ws.is-folded .ws-msgs-h { flex-direction: column; gap: 10px; padding: 12px 6px; border-bottom: 0; }
+    .ws-rail { writing-mode: vertical-rl; font-size: 12px; font-weight: 800; letter-spacing: .04em;
+        color: var(--text-muted); display: none; }
+    .ws.is-folded .ws-rail { display: inline-block; }
+    .ws.is-folded .ws-msgs-title { display: none; }
+    .ws.is-folded .ws-fold { margin-left: 0; }
+
+    /* Something was said while it was folded away. */
+    .ws-newdot { display: none; width: 8px; height: 8px; border-radius: 50%;
+        background: var(--accent-orange, #ea580c); }
+    .ws-newdot.is-on { display: block; }
+
+    @media (max-width: 1500px) {
+        .ws { grid-template-columns: 180px minmax(0,1fr) 300px; }
+        .ws.is-folded { grid-template-columns: 180px minmax(0,1fr) 46px; }
+        .ws-pro-col { grid-column: 1 / -1; }
+    }
+    @media (max-width: 1100px) {
+        .ws, .ws.is-folded { grid-template-columns: 1fr; }
+        .ws-msgs { max-height: none; }
+        /* Stacked, the conversation is below the terms rather than beside
+           them, so it is not stealing any width and folding buys nothing. */
+        .ws-fold { display: none; }
+        .ws.is-folded .ws-msgs-b, .ws.is-folded .ws-msgs-f { display: flex; }
+        .ws.is-folded .ws-msgs-h { flex-direction: row; padding: 13px 16px; border-bottom: 1px solid var(--border-color); }
+        .ws.is-folded .ws-rail { display: none; }
+        .ws.is-folded .ws-msgs-title { display: block; }
+    }
 </style>
 @endpush
 
@@ -265,8 +306,25 @@
     </aside>
 
     {{-- ── The conversation, beside the terms ─────────────── --}}
+    @php
+        // The newest message on the page. The fold remembers which one the
+        // reader had in front of them, so "new" means new to them rather than
+        // merely unread somewhere.
+        $__newest = $messages->last()?->id;
+    @endphp
     <aside class="ws-card ws-msgs">
-        <div class="ws-msgs-h">Messages</div>
+        <div class="ws-msgs-h">
+            <span class="ws-msgs-title">Messages</span>
+            <span class="ws-rail">Messages</span>
+            <span class="ws-newdot" data-ws-newdot title="New messages"></span>
+            <button type="button" class="ws-fold" data-ws-fold
+                    aria-expanded="true" aria-label="Hide the conversation">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>
+                </svg>
+            </button>
+        </div>
         <div class="ws-msgs-b">
             @forelse($messages as $m)
                 <div class="ws-m {{ $m->sender_id === auth()->id() ? 'mine' : '' }}">
@@ -284,4 +342,52 @@
         </div>
     </aside>
 </div>
+
+@push('scripts')
+<script>
+(function () {
+    var grid = document.querySelector('.ws');
+    var btn  = grid && grid.querySelector('[data-ws-fold]');
+    if (!grid || !btn) return;
+
+    var dot    = grid.querySelector('[data-ws-newdot]');
+    var newest = {{ $__newest ? (int) $__newest : 'null' }};
+
+    var FOLD = 'gr.agreement.msgs.folded';
+    var SEEN = 'gr.agreement.msgs.seen';
+
+    // Private-window and blocked-storage both throw. The panel has to work
+    // either way; all storage buys here is not asking twice.
+    function get(k)    { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
+    function set(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
+
+    function markSeen() {
+        if (newest !== null) set(SEEN, String(newest));
+        if (dot) dot.classList.remove('is-on');
+    }
+
+    function showNewIfAny() {
+        if (!dot || newest === null) return;
+        var seen = parseInt(get(SEEN) || '0', 10);
+        dot.classList.toggle('is-on', newest > seen);
+    }
+
+    function apply(folded, remember) {
+        grid.classList.toggle('is-folded', folded);
+        btn.setAttribute('aria-expanded', folded ? 'false' : 'true');
+        btn.setAttribute('aria-label', folded ? 'Show the conversation' : 'Hide the conversation');
+        btn.querySelector('svg').style.transform = folded ? 'rotate(180deg)' : '';
+
+        if (folded) { showNewIfAny(); } else { markSeen(); }
+        if (remember) set(FOLD, folded ? '1' : '0');
+    }
+
+    apply(get(FOLD) === '1', false);
+
+    btn.addEventListener('click', function () {
+        apply(!grid.classList.contains('is-folded'), true);
+    });
+})();
+</script>
+@endpush
 @endsection
