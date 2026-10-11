@@ -1363,13 +1363,17 @@
             vertical-align: top;
         }
 
+        /* A square on the Calendar tab is not a control. It showed a pointer
+           and a hover border and then did nothing when clicked, which is what
+           Sir Peter asked about. What opens is the entries inside it, and
+           those are links. My Availability is a different grid (.av-day) made
+           of real buttons, so cycling a date there still works. */
         .cl-calendar-day {
             height: 80px;
             border-radius: var(--radius-sm);
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid transparent;
             padding: 6px;
-            cursor: pointer;
             transition: var(--transition);
         }
 

@@ -290,10 +290,14 @@
         padding: 4px;
         display: flex; flex-direction: column;
         gap: 2px;
-        cursor: pointer;
         transition: border-color 0.15s;
     }
-    .od-cal-day:hover { border-color: rgba(249, 115, 22, 0.40); }
+    /* The square itself is not a button. It used to show a pointer and a
+       hover border and then do nothing when clicked, which is the thing Sir
+       Peter asked about: "if they need to be clicked for any purpose, please
+       make sure that each one actually works". What opens is the date, and
+       the entries inside it, so those are the links. */
+    .od-cal-day:hover { border-color: rgba(249, 115, 22, 0.25); }
     .od-cal-day.muted { opacity: 0.4; }
     .od-cal-day.has-event { background: rgba(249, 115, 22, 0.05); }
     .od-cal-more { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
@@ -345,7 +349,8 @@
     @media (prefers-reduced-motion: reduce) {
         .od-live.is-busy::after { animation: none; background: var(--brand, #f97316); }
     }
-    .od-cal-num { font-weight: 600; color: var(--text-primary); font-size: 11.5px; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; }
+    .od-cal-num { font-weight: 600; color: var(--text-primary); font-size: 11.5px; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; text-decoration: none; }
+    a.od-cal-num:hover { background: rgba(249, 115, 22, 0.15); color: var(--brand-text, #c2410c); }
     /* Today — number sits in a solid orange circle (matches reference). */
     .od-cal-day.today .od-cal-num { background: #c2410c; color: #fff;  /* 2.80 -> 5.18 */ border-radius: 50%; font-weight: 800; }
     a.od-cal-event { text-decoration: none; }
@@ -1252,7 +1257,11 @@
                         if ($dayEvs->count())               $classes .= ' has-event';
                     @endphp
                     <div class="{{ $classes }}">
-                        <div class="od-cal-num">{{ $cursor->day }}</div>
+                        {{-- The date opens the calendar on that day. The square
+                             around it is not a control; see the note on the
+                             hover rule. --}}
+                        <a class="od-cal-num" href="{{ route('client.calendar.index', ['cal' => $key]) }}"
+                           title="Open {{ $cursor->format('F j') }} in the calendar">{{ $cursor->day }}</a>
                         @foreach($dayEvs->take(2) as $ev)
                             @php
                                 $stage = $ev->stage();
