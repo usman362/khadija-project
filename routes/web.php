@@ -867,6 +867,12 @@ Route::middleware('auth')->group(function () {
         Route::delete('/my-professionals/{professional}', [\App\Http\Controllers\Client\ClientSavedProfessionalController::class, 'destroy'])
             ->name('client.saved-professionals.destroy');
 
+        // Hired Talent — who the client has actually engaged, by event. The
+        // Calendar page carried this as a switched-off tab; who you hired is a
+        // booking, and that was never the thing we were waiting on.
+        Route::get('/hired-talent', [\App\Http\Controllers\Client\ClientHiredTalentController::class, 'index'])
+            ->name('client.hired-talent.index');
+
         // Files on a request. Private disk, served only through the
         // controller — a floor plan or a guest list does not go on a
         // guessable public path.

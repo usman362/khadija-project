@@ -133,21 +133,33 @@ class ClientCalendarPageTest extends TestCase
     }
 
     /**
-     * The tabs that have no data say so rather than opening onto nothing.
+     * One tab still waits, and says what for.
      *
-     * My Availability joined the working ones on 2 October, when somewhere to
-     * record it was built. The other two still wait on the sides that would
-     * enter it, and say which.
+     * There used to be two: Hired Professionals and Hired Influencers, both
+     * switched off with "Professionals do not record their available dates
+     * yet" written on them. That is the reason Check Availability waits. Who a
+     * client hired is a booking, which we know completely, so those two became
+     * one working page on 12 October and only Check Availability is left.
      */
-    public function test_the_unbuilt_tabs_are_honest_about_it(): void
+    public function test_the_tab_that_still_waits_is_honest_about_it(): void
     {
         $this->actingAs($this->client)
             ->get(route('client.calendar.index'))
             ->assertOk()
-            ->assertSee('Hired Professionals')
-            ->assertSee('Hired Influencers')
+            ->assertSee('Check Availability')
             ->assertSee('Waiting on their side')
             ->assertSee('already booked, and entering it is theirs to do', false);
+    }
+
+    /** And the one that was never really waiting now opens. */
+    public function test_hired_talent_is_a_tab_that_goes_somewhere(): void
+    {
+        $this->actingAs($this->client)
+            ->get(route('client.calendar.index'))
+            ->assertOk()
+            ->assertSee('Hired Talent')
+            ->assertSee(route('client.hired-talent.index'), false)
+            ->assertDontSee('Hired Influencers');
     }
 
     /** And the one that now works is reachable as a tab of its own. */

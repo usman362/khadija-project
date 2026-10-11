@@ -1561,6 +1561,14 @@
                     </a>
                 </li>
                 <li class="cl-nav-item">
+                    {{-- Hired Talent is who you booked; My Professionals is who
+                         you kept. Different questions, so both are listed. --}}
+                    <a href="{{ route('client.hired-talent.index') }}" class="cl-nav-link {{ request()->routeIs('client.hired-talent.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        Hired Talent
+                    </a>
+                </li>
+                <li class="cl-nav-item">
                     <a href="{{ route('client.saved-professionals.index') }}" class="cl-nav-link {{ request()->routeIs('client.saved-professionals.*') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m22 11-3 3-2-2"/></svg>
                         My Professionals

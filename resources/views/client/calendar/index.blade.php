@@ -79,17 +79,24 @@
                 </span>
                 <span><b>My Availability</b><span>Set your available dates</span></span>
             </a>
-            <span class="cal-tab is-off" title="Professionals do not record their available dates yet.">
+            {{-- These two were switched off, and the reason written on them,
+                 "Professionals do not record their available dates yet", was
+                 the reason Check Availability is waiting rather than this one.
+                 Who you hired is a booking, and we know that completely. They
+                 are now one page, as Sir Peter asked: "once someone is hired,
+                 the Client's purpose is essentially the same regardless of
+                 role". --}}
+            <a href="{{ route('client.hired-talent.index') }}" class="cal-tab">
                 <span class="cal-tab-ico" style="background:rgba(29,78,216,.1);color:#1d4ed8;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 </span>
-                <span><b>Hired Professionals</b><span>Waiting on their side</span></span>
-            </span>
-            <span class="cal-tab is-off" title="The influencer side is not open yet.">
+                <span><b>Hired Talent</b><span>Who you have booked</span></span>
+            </a>
+            <span class="cal-tab is-off" title="Professionals do not record their own free dates yet, so we can show who is booked but never who is free.">
                 <span class="cal-tab-ico" style="background:rgba(109,40,217,.1);color:#6d28d9;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"/></svg>
                 </span>
-                <span><b>Hired Influencers</b><span>Waiting on their side</span></span>
+                <span><b>Check Availability</b><span>Waiting on their side</span></span>
             </span>
         </div>
 
