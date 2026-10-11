@@ -132,4 +132,62 @@ class LongDropdownsAreSearchableTest extends TestCase
         $this->assertStringContainsString('panel.style.bottom', $html);
         $this->assertStringContainsString('maxHeight', $html);
     }
+
+    /**
+     * The control sets the panel's floor, not its width.
+     *
+     * Sir Peter sent a screenshot of the Spending page where every event in
+     * the list had been folded onto four lines. The control there is the
+     * inline "All events" word, about 110px, and the panel was being pinned
+     * to exactly that. Names are longer than the thing you click to see them,
+     * so the width has to come from the content.
+     */
+    public function test_the_panel_is_not_squeezed_into_a_narrow_control(): void
+    {
+        $html = $this->actingAs($this->client)
+            ->get(route('client.direct-offers.create'))
+            ->getContent();
+
+        $this->assertStringContainsString(
+            "panel.style.minWidth = box.width + 'px'",
+            $html,
+            'The control should set the minimum width, not the width.',
+        );
+        $this->assertStringNotContainsString(
+            "panel.style.width = box.width + 'px'",
+            $html,
+            'Pinning the panel to the control is what squashed the Spending list.',
+        );
+
+        // Free to grow, but not off the side of the screen, and not past a
+        // width nobody wants to read across.
+        $this->assertStringContainsString("panel.style.width = 'auto'", $html);
+        $this->assertStringContainsString('window.innerWidth', $html);
+        $this->assertStringContainsString('panel.style.maxWidth', $html);
+    }
+
+    /** A name too long for its row is cut, and still readable on hover. */
+    public function test_a_long_name_is_cut_rather_than_stacked(): void
+    {
+        $html = $this->actingAs($this->client)
+            ->get(route('client.direct-offers.create'))
+            ->getContent();
+
+        $opt = substr($html, strpos($html, '.ss-opt {'));
+        $opt = substr($opt, 0, strpos($opt, '}'));
+
+        foreach (['white-space: nowrap', 'text-overflow: ellipsis'] as $rule) {
+            $this->assertStringContainsString(
+                $rule,
+                $opt,
+                "Without {$rule} a long event name wraps over several lines.",
+            );
+        }
+
+        $this->assertStringContainsString(
+            'row.title = opt.text.trim()',
+            $html,
+            'A cut name has to stay reachable somewhere.',
+        );
+    }
 }

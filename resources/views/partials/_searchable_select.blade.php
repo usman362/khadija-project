@@ -52,7 +52,10 @@
     .ss-list { max-height: 260px; overflow-y: auto; margin-top: 7px; overscroll-behavior: contain; }
     .ss-opt { display: block; width: 100%; text-align: left; font: inherit; font-size: 13.5px;
         padding: 8px 10px; border: 0; background: none; border-radius: 8px; cursor: pointer;
-        color: var(--text-primary, #111827); }
+        color: var(--text-primary, #111827);
+        /* One row, one line. A long event title is cut with an ellipsis rather
+           than stacked four lines deep; the title attribute carries the rest. */
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .ss-opt:hover, .ss-opt.is-cursor { background: var(--bg-card-hover, #f1f5f9); }
     .ss-opt.is-on { background: rgba(249,115,22,.10); color: var(--brand-text, #c2410c); font-weight: 700; }
     .ss-opt mark { background: rgba(249,115,22,.22); color: inherit; border-radius: 3px; padding: 0 1px; }
@@ -160,6 +163,9 @@
                 row.className = 'ss-opt' + (i === select.selectedIndex ? ' is-on' : '');
                 row.setAttribute('role', 'option');
                 row.dataset.index = i;
+                // A long name is cut with an ellipsis in the row, so the full
+                // text has to live somewhere the reader can still reach it.
+                row.title = opt.text.trim();
                 row.innerHTML = highlight(opt.text.trim(), terms);
                 list.appendChild(row);
                 rows.push(row);
@@ -202,7 +208,8 @@
 
             // Nothing moved; nothing to do. This runs every frame while the
             // panel is open, so it has to be cheap when the answer is "same".
-            var key = box.top + ':' + box.left + ':' + box.width + ':' + window.innerHeight;
+            var key = box.top + ':' + box.left + ':' + box.width + ':'
+                + window.innerHeight + ':' + window.innerWidth;
             if (key === lastRect) return;
             lastRect = key;
 
@@ -210,8 +217,26 @@
             var wanted = Math.min(340, Math.max(200, window.innerHeight * 0.5));
             var up = below < wanted && box.top > below;
 
-            panel.style.left = box.left + 'px';
-            panel.style.width = box.width + 'px';
+            // The control is only as wide as its own label, and some of them
+            // are narrow: the Spending page's "All events" is about 110px. A
+            // panel pinned to that width wrapped every event title onto four
+            // lines. So the control sets the FLOOR, the content sets the rest,
+            // and the viewport sets the ceiling.
+            var room = window.innerWidth - box.left - 12;
+            panel.style.minWidth = box.width + 'px';
+            panel.style.width = 'auto';
+            panel.style.maxWidth = Math.max(box.width, Math.min(420, room)) + 'px';
+
+            // Opened near the right edge, growing rightwards would run off the
+            // screen, so it hangs from the right instead.
+            if (room < 240 && box.right > 240) {
+                panel.style.left = 'auto';
+                panel.style.right = (window.innerWidth - box.right) + 'px';
+                panel.style.maxWidth = Math.min(420, box.right - 12) + 'px';
+            } else {
+                panel.style.right = 'auto';
+                panel.style.left = box.left + 'px';
+            }
 
             if (up) {
                 panel.style.top = 'auto';
