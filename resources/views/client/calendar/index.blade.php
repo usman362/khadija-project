@@ -92,12 +92,14 @@
                 </span>
                 <span><b>Hired Talent</b><span>Who you have booked</span></span>
             </a>
-            <span class="cal-tab is-off" title="Professionals do not record their own free dates yet, so we can show who is booked but never who is free.">
+            {{-- It opens, and then it is honest on arrival: we know who is
+                 booked, never who is free, because that is theirs to say. --}}
+            <a href="{{ route('client.check-availability.index') }}" class="cal-tab">
                 <span class="cal-tab-ico" style="background:rgba(109,40,217,.1);color:#6d28d9;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg>
                 </span>
-                <span><b>Check Availability</b><span>Waiting on their side</span></span>
-            </span>
+                <span><b>Check Availability</b><span>Before you hire</span></span>
+            </a>
         </div>
 
         @if($tab === 'calendar')

@@ -1561,6 +1561,12 @@
                     </a>
                 </li>
                 <li class="cl-nav-item">
+                    <a href="{{ route('client.check-availability.index') }}" class="cl-nav-link {{ request()->routeIs('client.check-availability.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg>
+                        Check Availability
+                    </a>
+                </li>
+                <li class="cl-nav-item">
                     {{-- Hired Talent is who you booked; My Professionals is who
                          you kept. Different questions, so both are listed. --}}
                     <a href="{{ route('client.hired-talent.index') }}" class="cl-nav-link {{ request()->routeIs('client.hired-talent.*') ? 'active' : '' }}">

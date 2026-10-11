@@ -133,25 +133,28 @@ class ClientCalendarPageTest extends TestCase
     }
 
     /**
-     * One tab still waits, and says what for.
+     * Every tab opens now, and the honesty moved onto the page itself.
      *
-     * There used to be two: Hired Professionals and Hired Influencers, both
-     * switched off with "Professionals do not record their available dates
-     * yet" written on them. That is the reason Check Availability waits. Who a
-     * client hired is a booking, which we know completely, so those two became
-     * one working page on 12 October and only Check Availability is left.
+     * There used to be two dark ones, Hired Professionals and Hired
+     * Influencers, both labelled "Professionals do not record their available
+     * dates yet". That reason belonged to neither of them. Who a client hired
+     * is a booking, which we know completely, and the availability question is
+     * a different screen. Both now exist: Hired Talent on 12 October, and
+     * Check Availability the same day, which says on arrival that it knows who
+     * is busy and never who is free.
      */
-    public function test_the_tab_that_still_waits_is_honest_about_it(): void
+    public function test_no_tab_is_greyed_out_any_more(): void
     {
         $this->actingAs($this->client)
             ->get(route('client.calendar.index'))
             ->assertOk()
             ->assertSee('Check Availability')
-            ->assertSee('Waiting on their side')
-            ->assertSee('already booked, and entering it is theirs to do', false);
+            ->assertSee('Hired Talent')
+            ->assertDontSee('Waiting on their side')
+            ->assertDontSee('Hired Influencers');
     }
 
-    /** And the one that was never really waiting now opens. */
+    /** Hired Talent is reachable from here. */
     public function test_hired_talent_is_a_tab_that_goes_somewhere(): void
     {
         $this->actingAs($this->client)

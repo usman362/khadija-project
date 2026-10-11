@@ -264,19 +264,28 @@ class HiredTalentIsNotWaitingOnAnybodyTest extends TestCase
     }
 
     /**
-     * Check Availability stays off, and now says why honestly.
+     * Check Availability is its own page now, and carries its own honesty.
      *
-     * The old wording blamed the professional side for the Hired tab too. Only
-     * this one actually waits on it.
+     * The old wording blamed the professional side for the Hired tab as well,
+     * which was never its reason. Only the availability question waits on
+     * them, and it now says so on arrival rather than as a tooltip on a tab
+     * nobody can open.
      */
-    public function test_check_availability_is_still_honestly_switched_off(): void
+    public function test_check_availability_moved_its_honesty_onto_the_page(): void
     {
-        $html = $this->actingAs($this->client)
+        $tab = $this->actingAs($this->client)
             ->get(route('client.calendar.index'))
             ->assertSuccessful()
             ->getContent();
 
-        $this->assertStringContainsString('<b>Check Availability</b>', $html);
-        $this->assertStringContainsString('we can show who is booked but never who is free', $html);
+        $this->assertStringContainsString('<b>Check Availability</b>', $tab);
+        $this->assertStringNotContainsString('Waiting on their side', $tab);
+
+        $page = $this->actingAs($this->client)
+            ->get(route('client.check-availability.index'))
+            ->assertSuccessful()
+            ->getContent();
+
+        $this->assertStringContainsString('We can tell you who is busy, not who is free.', $page);
     }
 }
