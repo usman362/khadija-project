@@ -96,7 +96,13 @@
             }
         }
     } elseif ($eventType) {
-        $type = Category::query()->eventTypes()->where('name', $eventType)->first();
+        // The client picked from config/event-types.php, which words a dozen
+        // occasions differently from the table: "Prom" there is "Prom Night"
+        // here. Looking up the raw pick found nothing for 26 of the 47 and
+        // the whole level 1 to level 3 ordering fell away. See EventTypeAlias.
+        $type = Category::query()->eventTypes()
+            ->where('name', \App\Domain\Taxonomy\EventTypeAlias::resolve($eventType))
+            ->first();
 
         if ($type) {
             $coverage[Str::lower($type->name)] = $type->services()->pluck('categories.id')->all();
@@ -235,6 +241,7 @@
         var none     = root.querySelector('.svc-none');
         var counts   = root.querySelectorAll('[data-svc-count]');
         var coverage = JSON.parse(root.getAttribute('data-svc-coverage') || '{}');
+        var ALIAS    = JSON.parse(root.getAttribute('data-svc-event-alias') || '{}');
         var groups   = Array.prototype.slice.call(grid.querySelectorAll('.svc-group'));
         var cells    = Array.prototype.slice.call(grid.querySelectorAll('.svc-cell'));
 
@@ -408,6 +415,8 @@
 
         function applyRelevance(type) {
             var key   = type ? String(type).toLowerCase() : null;
+            // What the client picked is not always what the taxonomy calls it.
+            if (key && ALIAS[key]) key = ALIAS[key];
             var arche = key ? RELEVANCE.archetypeOf[key] : null;
             var tiers = arche ? RELEVANCE.tiers[arche] : null;
             var fits  = (key && coverage[key]) ? coverage[key] : null;
@@ -478,7 +487,10 @@
 <div class="svc-picker" data-svc-picker
      @if($single) data-svc-single="1" @endif
      @if($eventType) data-svc-event-type="{{ $eventType }}" @endif
-     data-svc-coverage="{{ json_encode($coverage) }}">
+     data-svc-coverage="{{ json_encode($coverage) }}"
+     {{-- The live picker changes the event without a reload, so the script
+          needs the same wording bridge the server used. --}}
+     data-svc-event-alias="{{ json_encode(\App\Domain\Taxonomy\EventTypeAlias::map()) }}">
     <div class="svc-search">
         <svg class="svc-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" placeholder="Search services, or type what you need…" autocomplete="off">

@@ -143,7 +143,11 @@
         </a>
         @php
             // The picture: the event type's artwork, else the first service's.
-            $__evImg = \App\Models\Category::query()->eventTypes()->where('name', $event->event_type)->first()?->imageUrl()
+            // Through the alias, because the event carries the wording the
+            // client picked and the artwork hangs off the table's wording.
+            $__evImg = \App\Models\Category::query()->eventTypes()
+                ->where('name', \App\Domain\Taxonomy\EventTypeAlias::resolve($event->event_type))
+                ->first()?->imageUrl()
                 ?? $event->categories->first(fn ($c) => $c->imageUrl())?->imageUrl();
         @endphp
         <div class="ev-top">
