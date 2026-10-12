@@ -29,8 +29,15 @@
     a.ec-daylink { text-decoration: none; color: inherit; border-radius: 50%; }
     a.ec-daylink:hover { text-decoration: underline; }
     .ec-muted { opacity: .45; }
-    .ec-ev { display: block; margin-top: 3px; padding: 2px 6px; border-radius: 5px; font-size: 11px; font-weight: 700;
-        text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* Sir Peter's calendar shows when, what and where inside the day, not a
+       bare title. The data was already on the event; only the cell was thin. */
+    .ec-ev { display: block; margin-top: 3px; padding: 4px 7px; border-radius: 6px; font-size: 11px; font-weight: 700;
+        text-decoration: none; overflow: hidden; }
+    .ec-ev .ec-ev-t { display: block; font-size: 10px; font-weight: 700; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ec-ev .ec-ev-n { display: block; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ec-ev .ec-ev-w { display: block; font-size: 10px; font-weight: 600; opacity: .75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* Narrow columns cannot carry three lines; the title alone survives. */
+    @media (max-width: 900px) { .ec-ev .ec-ev-t, .ec-ev .ec-ev-w { display: none; } }
     .ec-more { display: block; margin-top: 3px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-decoration: none; }
     .ec-more:hover { color: #c2410c; }
     /* Seven equal columns. With the table's default layout a column widened
@@ -38,6 +45,7 @@
        of the week into slivers. */
     .ec-grid { table-layout: fixed; }
     .ec-grid .cl-calendar-day { min-width: 0; overflow: hidden; }
+    .ec-grid .cl-calendar-day { height: auto; min-height: 92px; }
     /* Day and week — the time grid */
     .tg { border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; background: var(--bg-card); }
     .tg-head { display: grid; border-bottom: 1px solid var(--border-color); background: var(--bg-card); }
@@ -100,7 +108,9 @@
         request()->except(['page', 'month', 'year']), $calFixed, $over
     ));
     $calStages = \App\Support\ClientCalendar::STAGES;
-    $unit = ['day' => 'day', 'week' => 'week', 'month' => 'month'][$c['view']];
+    // What the arrows step by. A list is a month read differently, so it
+    // steps by month like the grid does.
+    $unit = ['day' => 'day', 'week' => 'week', 'month' => 'month', 'list' => 'month'][$c['view']] ?? 'month';
     $perDay = $c['view'] === 'week' ? 6 : 3;
 @endphp
 <div class="cl-card ec-card" id="mgCal" data-live-region>
@@ -117,10 +127,14 @@
                href="{{ $calLink(['calview' => 'week', 'cal' => $c['anchor']->format('Y-m-d')]) }}">Week</a>
             <a class="ec-view {{ $c['view'] === 'month' ? 'is-active' : '' }}"
                href="{{ $calLink(['calview' => 'month', 'cal' => $c['anchor']->format('Y-m-d')]) }}">Month</a>
+            <a class="ec-view {{ $c['view'] === 'list' ? 'is-active' : '' }}"
+               href="{{ $calLink(['calview' => 'list', 'cal' => $c['anchor']->format('Y-m-d')]) }}">List</a>
         </div>
     </div>
 
-    @if($c['view'] !== 'month')
+    @if($c['view'] === 'list')
+        @include('client._calendar_list', ['c' => $c, 'calStages' => $calStages])
+    @elseif($c['view'] !== 'month')
         {{-- Day and week: a time grid. Hours down the side; each event
              at its start, as tall as it lasts; overlaps side by side.
              They used to be month-style boxes with the event as a pill
@@ -199,9 +213,22 @@
                                     @foreach($dayEvs->take($perDay) as $ev)
                                         @php [$stLabel, $stColour] = $calStages[$ev->stage()] ?? ['Event', '#f97316']; @endphp
                                         {{-- Coloured by the stage every other screen reports. --}}
+                                        @php
+                                            $__where = $ev->city
+                                                ? $ev->city . ($ev->state ? ', ' . $ev->state : '')
+                                                : ($ev->location ?: null);
+                                        @endphp
                                         <a href="{{ route('client.events.show', $ev) }}" class="cl-calendar-event ec-ev" data-no-live
                                            style="background:{{ $stColour }}1f;color:{{ $stColour }};border-left:3px solid {{ $stColour }};"
-                                           title="{{ $ev->title }}: {{ $stLabel }}">{{ \Illuminate\Support\Str::limit($ev->title, $c['view'] === 'week' ? 22 : 14) }}</a>
+                                           title="{{ $ev->title }}: {{ $stLabel }}">
+                                            @if($ev->starts_at)
+                                                <span class="ec-ev-t">{{ $ev->timeLabel() ?? $ev->starts_at->format('g:i A') }}</span>
+                                            @endif
+                                            <span class="ec-ev-n">{{ \Illuminate\Support\Str::limit($ev->title, $c['view'] === 'week' ? 26 : 18) }}</span>
+                                            @if($__where)
+                                                <span class="ec-ev-w">{{ \Illuminate\Support\Str::limit($__where, 20) }}</span>
+                                            @endif
+                                        </a>
                                     @endforeach
                                     @if($dayEvs->count() > $perDay)
                                         <a class="ec-more" href="{{ $calLink(['calview' => 'day', 'cal' => $key]) }}">+{{ $dayEvs->count() - $perDay }} more</a>

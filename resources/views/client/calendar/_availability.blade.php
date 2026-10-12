@@ -35,7 +35,11 @@
     .av-btn i { width: 9px; height: 9px; border-radius: 50%; flex: none; display: inline-block;
         background: transparent; border: 1.5px solid var(--border-color); }
 
-    .av-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; font-size: 12px; color: var(--text-secondary); }
+    /* At the top, as a key for the grid below it. It used to sit under
+       the calendar, where it explained colours the reader had already had
+       to guess at. */
+    .av-legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 2px 0 14px; padding-bottom: 12px;
+        border-bottom: 1px solid var(--border-color); font-size: 12px; color: var(--text-secondary); }
     .av-legend span { display: inline-flex; align-items: center; gap: 6px; }
     .av-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 
@@ -95,6 +99,14 @@
             <a href="{{ $avLink(['cal' => now()->format('Y-m-d')]) }}">Today</a>
             <a href="{{ $avLink(['cal' => $c['next']->format('Y-m-d')]) }}" aria-label="Next month">&rsaquo;</a>
         </div>
+    </div>
+
+    <div class="av-legend">
+        @foreach(Availability::STATES as [$label, $colour])
+            <span><i style="background:{{ $colour }};border-color:{{ $colour }};"></i>{{ $label }}</span>
+        @endforeach
+        <span><i style="background:transparent;border:1px solid var(--border-color);"></i>Not set</span>
+        <span style="color:var(--text-muted);">Click a day to change it.</span>
     </div>
 
     @if(session('status'))
@@ -169,15 +181,7 @@
         </tbody>
     </table>
 
-    <div class="av-legend">
-        @foreach(Availability::STATES as [$label, $colour])
-            <span><i style="background:{{ $colour }};border-color:{{ $colour }};"></i>{{ $label }}</span>
-        @endforeach
-        <span><i style="background:transparent;border:1px solid var(--border-color);"></i>Not set</span>
-        <span style="color:var(--text-muted);">Click a day to change it.</span>
-    </div>
-
-    <div class="av-block">
+    <div class="av-block" id="avRange">
         <h3>Block a stretch of dates</h3>
         <p>For a holiday, or a period you know will not work. It is the same thing as marking each day busy, done in one go.</p>
         <form method="POST" action="{{ route('client.calendar.availability.range') }}">

@@ -28,7 +28,12 @@ final class ClientCalendar
         'cancelled' => ['Cancelled', '#ef4444'],
     ];
 
-    public const VIEWS = ['day', 'week', 'month'];
+    /**
+     * 'list' is a month's worth of events read as a list rather than a grid.
+     * Sir Peter's calendar offers it beside Month and Week, and it is the one
+     * that works on a phone, where seven columns never did.
+     */
+    public const VIEWS = ['day', 'week', 'month', 'list'];
 
     /**
      * @return array{view:string, anchor:Carbon, first:Carbon, last:Carbon, title:string,
@@ -46,7 +51,15 @@ final class ClientCalendar
             $at = $now->copy()->startOfDay();
         }
 
-        if ($view === 'day') {
+        if ($view === 'list') {
+            // Same range as the month it is listing, so the two views answer
+            // with the same events and the heading reads the same.
+            $first = $at->copy()->startOfMonth();
+            $last  = $at->copy()->endOfMonth();
+            $title = $at->format('F Y');
+            $prev  = $at->copy()->startOfMonth()->subMonth();
+            $next  = $at->copy()->startOfMonth()->addMonth();
+        } elseif ($view === 'day') {
             $first = $at->copy()->startOfDay();
             $last  = $at->copy()->endOfDay();
             $title = $at->isToday() ? 'Today · ' . $at->format('D, M j') : $at->format('l, M j, Y');
@@ -69,7 +82,10 @@ final class ClientCalendar
         $byDate = Event::where('client_id', $client->id)
             ->whereBetween('starts_at', [$first->copy()->startOfDay(), $last->copy()->endOfDay()])
             ->orderBy('starts_at')
-            ->get(['id', 'title', 'starts_at', 'ends_at', 'status', 'is_published'])
+            // city/state/location come along because the day cell shows where,
+            // the way Sir Peter's calendar does. Selected rather than loading
+            // the whole row: a month can hold a lot of events.
+            ->get(['id', 'title', 'starts_at', 'ends_at', 'status', 'is_published', 'city', 'state', 'location'])
             ->groupBy(fn ($e) => $e->starts_at->format('Y-m-d'));
 
         // Only the stages actually on screen. A legend listing states this

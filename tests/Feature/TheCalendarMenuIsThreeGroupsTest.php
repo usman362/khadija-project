@@ -121,8 +121,22 @@ class TheCalendarMenuIsThreeGroupsTest extends TestCase
     {
         $html = $this->at(route('client.calendar.index'));
 
-        $this->assertStringNotContainsString('Calendar &amp; Availability</a>', $html);
-        $this->assertSame(1, substr_count($html, '>Hired Talent'), 'Hired Talent appears more than once in the menu.');
-        $this->assertSame(1, substr_count($html, '>Check Availability'), 'Check Availability appears more than once.');
+        // The menu, not the page. Both names appear in the page's own copy as
+        // well, and counting those made this fail for the wrong reason.
+        $from = strpos($html, '<nav class="cl-sidebar-nav">');
+        $this->assertNotFalse($from, 'The sidebar nav has moved.');
+        $menu = substr($html, $from, strpos($html, '</nav>', $from) - $from);
+
+        $this->assertStringNotContainsString('Calendar &amp; Availability</a>', $menu);
+
+        // The names themselves. A group heading puts its text on the line
+        // after its icon, so it is not preceded by '>'.
+        foreach (['Hired Talent', 'Check Availability'] as $name) {
+            $this->assertSame(
+                1,
+                substr_count($menu, $name),
+                "\"{$name}\" appears " . substr_count($menu, $name) . ' times in the menu.',
+            );
+        }
     }
 }
