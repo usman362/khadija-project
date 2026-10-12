@@ -206,4 +206,81 @@ class CheckAvailabilitySaysWhatItKnowsTest extends TestCase
         );
         $this->assertStringNotContainsString('Waiting on their side', $html);
     }
+
+    /** The title names which kind you are checking, as his two pages do. */
+    public function test_the_title_names_the_kind(): void
+    {
+        $this->assertStringContainsString('Check Availability &ndash; Professionals', $this->page());
+        $this->assertStringContainsString('Check Availability &ndash; Influencers', $this->page(['who' => 'influencers']));
+    }
+
+    /**
+     * The filters are built from who is actually here.
+     *
+     * A service nobody offers or a town nobody is in would be a filter that
+     * can only ever return nothing.
+     */
+    public function test_the_filters_only_offer_what_exists(): void
+    {
+        $category = Category::create([
+            'name' => 'Wedding DJ', 'slug' => 'wedding-dj',
+            'kind' => Category::SERVICE_CATEGORY, 'is_active' => true,
+        ]);
+        $this->pro->serviceCategories()->sync([$category->id]);
+        $this->pro->getOrCreateProfile()->update(['city' => 'Towson', 'state' => 'MD']);
+
+        $this->assertTrue(CheckAvailability::serviceOptions()->contains('name', 'Wedding DJ'));
+        $this->assertContains('Towson, MD', CheckAvailability::placeOptions()->all());
+    }
+
+    /**
+     * A place reads "Towson, MD", which is neither column on its own.
+     *
+     * The first draft compared the whole string to the city and to the state
+     * and matched nobody, so every location filter came back empty.
+     */
+    public function test_a_city_and_state_together_still_find_the_person(): void
+    {
+        $this->pro->getOrCreateProfile()->update(['city' => 'Towson', 'state' => 'MD']);
+
+        $found = CheckAvailability::suppliers(
+            CheckAvailability::dates($this->event),
+            'professional',
+            false,
+            '',
+            null,
+            'Towson, MD',
+        );
+
+        $this->assertTrue($found->contains('id', $this->pro->id));
+    }
+
+    /** Best match puts the answer to the question first. */
+    public function test_best_match_leads_with_who_is_free_on_your_date(): void
+    {
+        User::factory()->count(3)->create(['primary_role' => 'professional'])
+            ->each(fn ($u) => $u->assignRole('professional'));
+
+        $rows = CheckAvailability::suppliers(
+            CheckAvailability::dates($this->event),
+            'professional',
+            true,            // sample, so there is a spread to sort
+            '',
+            null,
+            '',
+            'match',
+        );
+
+        $states = $rows->pluck('states.primary');
+        $firstBusy = $states->search(CheckAvailability::BUSY);
+
+        if ($firstBusy !== false) {
+            $this->assertFalse(
+                $states->slice($firstBusy)->contains(CheckAvailability::FREE),
+                'Someone free is listed after someone booked.',
+            );
+        }
+
+        $this->addToAssertionCount(1);
+    }
 }

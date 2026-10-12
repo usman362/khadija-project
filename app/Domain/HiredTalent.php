@@ -6,6 +6,7 @@ use App\Domain\Finance\PaymentTracker;
 use App\Models\Booking;
 use App\Models\User;
 use App\Support\SupplierProfile;
+use App\Support\VerifiedBadge;
 use Illuminate\Support\Collection;
 
 /**
@@ -61,10 +62,15 @@ final class HiredTalent
             ->where('supplier_id', '!=', $client->id)
             ->with([
                 'event:id,title,starts_at,ends_at,city,state,venue,location',
-                'supplier:id,name,avatar,public_id,primary_role',
-                'supplier.profile:id,user_id,headline',
+                // withAvg on the relation, because the rating belongs to the
+                // person, not to this booking of them.
+                'supplier' => fn ($q) => $q
+                    ->withAvg(['reviewsReceived as rating' => fn ($r) => $r->where('is_hidden', false)], 'rating')
+                    ->withCount(['reviewsReceived as reviews' => fn ($r) => $r->where('is_hidden', false)]),
+                'supplier.profile',
                 'category:id,name',
             ])
+
             ->get()
             ->map(fn (Booking $b) => self::row($b, $money))
             ->sortByDesc(fn ($r) => $r['event']['at']?->timestamp ?? 0)
@@ -125,6 +131,14 @@ final class HiredTalent
                 // "professional" or "influencer", so the page never calls an
                 // influencer a professional. See SupplierProfile.
                 'noun'     => SupplierProfile::noun($supplier),
+                'where'    => $supplier?->profile
+                    ? (trim(implode(', ', array_filter([$supplier->profile->city, $supplier->profile->state]))) ?: null)
+                    : null,
+                // Shown only where the badge is held and the feature is on.
+                'verified' => VerifiedBadge::shown()
+                    && VerifiedBadge::holds($supplier?->profile, 'trade_license'),
+                'rating'   => $supplier?->rating ? round((float) $supplier->rating, 1) : null,
+                'reviews'  => (int) ($supplier?->reviews ?? 0),
             ],
 
             // Null where the booking never carried money through the platform,
@@ -140,6 +154,11 @@ final class HiredTalent
 
             'urls' => [
                 'event'   => $b->event_id ? route('client.events.show', $b->event_id) : null,
+                // Sending them a fresh request, which is what "book again"
+                // means on a marketplace where every job is its own agreement.
+                'again'   => $supplier
+                    ? route('client.direct-offers.create', ['pro' => $supplier->id])
+                    : null,
                 'profile' => SupplierProfile::url($supplier),
                 // Keyed by the booking, not the event: the two ids happen to
                 // line up on some rows and the route takes the booking.

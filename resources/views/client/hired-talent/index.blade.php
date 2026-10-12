@@ -81,6 +81,20 @@
     .ht-none p { font-size: 13.5px; color: var(--text-muted); margin: 0 0 4px; line-height: 1.6; }
     .ht-none b { color: var(--text-primary); }
 
+    .ht-ev { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; border: 0;
+        background: none; cursor: pointer; font: inherit; padding: 11px 14px 6px; }
+    .ht-ev-mid { flex: 1; min-width: 0; }
+    .ht-ev-n { font-size: 11px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
+    .ht-ev-chev { width: 15px; height: 15px; color: var(--text-muted); flex: none; transition: transform .15s; }
+    .ht-ev[aria-expanded="false"] .ht-ev-chev { transform: rotate(180deg); }
+    .ht-ev[aria-expanded="false"] + .ht-ev-rows { display: none; }
+
+    .ht-ver { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 800;
+        color: var(--info-text, #1d4ed8); background: rgba(37,99,235,.1); padding: 3px 9px; border-radius: 999px;
+        vertical-align: middle; margin-left: 6px; }
+    .ht-ver svg { width: 12px; height: 12px; }
+    .ht-detail-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12.5px; color: var(--text-muted); margin: 5px 0 0; }
+
     .ht-detail { display: none; }
     .ht-detail.is-on { display: block; }
 
@@ -101,7 +115,7 @@
         </svg>
     </span>
     <div>
-        <h1>Hired Talent</h1>
+        <h1>{{ $group === 'influencers' ? 'Hired Influencers' : ($group === 'professionals' ? 'Hired Professionals' : 'Hired Talent') }}</h1>
         <p>Everyone you have booked, by event, with where the money stands.</p>
     </div>
 </div>
@@ -142,23 +156,35 @@
 
         <div class="ht-list">
             @forelse($groups as $g)
-                <div class="ht-ev">
-                    <div class="ht-ev-d">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                        {{ $g['event']['at']?->format('F j, Y') ?? 'Date not set' }}
-                    </div>
-                    <div class="ht-ev-t">{{ $g['event']['title'] ?? 'Untitled event' }}</div>
-                </div>
+                <button type="button" class="ht-ev" data-ht-group aria-expanded="true">
+                    <span class="ht-ev-mid">
+                        <span class="ht-ev-d">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            {{ $g['event']['at']?->format('F j, Y') ?? 'Date not set' }}
+                        </span>
+                        <span class="ht-ev-t">{{ $g['event']['title'] ?? 'Untitled event' }}</span>
+                    </span>
+                    <span class="ht-ev-n">{{ count($g['rows']) }} {{ \Illuminate\Support\Str::plural('provider', count($g['rows'])) }}</span>
+                    <svg class="ht-ev-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                </button>
+                <div class="ht-ev-rows">
                 @foreach($g['rows'] as $r)
                     <button type="button" class="ht-row" data-ht-row="{{ $r['id'] }}">
                         <img class="ht-av" src="{{ $r['supplier']['avatar'] }}" alt="">
                         <span class="ht-row-mid">
                             <span class="ht-row-n">{{ $r['supplier']['name'] }}</span>
-                            <span class="ht-row-s">{{ $r['service'] ?? $r['supplier']['headline'] ?? 'Service not recorded' }}</span>
+                            <span class="ht-row-s">
+                                @if($r['event']['at'])
+                                    {{ $r['event']['at']->format('g:i A') }}@if($r['event']['ends']) &ndash; {{ $r['event']['ends']->format('g:i A') }}@endif
+                                @else
+                                    {{ $r['service'] ?? $r['supplier']['headline'] ?? 'Service not recorded' }}
+                                @endif
+                            </span>
                         </span>
                         <span class="ht-chip {{ $r['tone'] }}">{{ $r['state'] }}</span>
                     </button>
                 @endforeach
+                </div>
             @empty
                 <div class="ht-none">
                     @if($counts['all'] === 0)
@@ -206,8 +232,23 @@
                     <div class="ht-detail-h">
                         <img class="ht-detail-av" src="{{ $r['supplier']['avatar'] }}" alt="">
                         <div>
-                            <h2 class="ht-detail-n">{{ $r['supplier']['name'] }}</h2>
+                            <h2 class="ht-detail-n">
+                                {{ $r['supplier']['name'] }}
+                                @if($r['supplier']['verified'])
+                                    {{-- Only where the badge is actually held. --}}
+                                    <span class="ht-ver" title="Verified {{ $r['supplier']['noun'] }}">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                        Verified {{ ucfirst($r['supplier']['noun']) }}
+                                    </span>
+                                @endif
+                            </h2>
                             <p class="ht-detail-sub">{{ $r['service'] ?? $r['supplier']['headline'] ?? 'Service not recorded' }}</p>
+                            <p class="ht-detail-meta">
+                                @if($r['supplier']['rating'])
+                                    <span>&#9733; {{ $r['supplier']['rating'] }} ({{ $r['supplier']['reviews'] }} {{ \Illuminate\Support\Str::plural('review', $r['supplier']['reviews']) }})</span>
+                                @endif
+                                @if($r['supplier']['where'])<span>{{ $r['supplier']['where'] }}</span>@endif
+                            </p>
                         </div>
                         <span class="ht-detail-sp"></span>
                         <span class="ht-chip {{ $r['tone'] }}">{{ $r['state'] }}</span>
@@ -273,6 +314,9 @@
                         @if($r['urls']['profile'])
                             <a class="ht-btn" href="{{ $r['urls']['profile'] }}">View {{ ucfirst($r['supplier']['noun']) }} Profile</a>
                         @endif
+                        @if($r['urls']['again'])
+                            <a class="ht-btn" href="{{ $r['urls']['again'] }}">Book Again</a>
+                        @endif
                         <a class="ht-btn" href="{{ $r['urls']['payments'] }}">Payments</a>
                         <a class="ht-btn" href="{{ route('client.chat.index') }}">Message {{ ucfirst($r['supplier']['noun']) }}</a>
                     </div>
@@ -303,6 +347,13 @@
 
     rows.forEach(function (r) {
         r.addEventListener('click', function () { show(r.getAttribute('data-ht-row')); });
+    });
+
+    // An event folds away, for a client with a lot of them.
+    document.querySelectorAll('[data-ht-group]').forEach(function (g) {
+        g.addEventListener('click', function () {
+            g.setAttribute('aria-expanded', g.getAttribute('aria-expanded') === 'false' ? 'true' : 'false');
+        });
     });
 
     // The first one, so the right side is never a blank panel on arrival.

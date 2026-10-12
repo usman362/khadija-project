@@ -91,12 +91,36 @@ final class CheckAvailability
         string $kind = 'professional',
         bool $sample = false,
         string $q = '',
+        ?int $serviceId = null,
+        string $place = '',
+        string $sort = 'match',
     ): Collection {
         $role = $kind === 'influencer' ? RoleName::INFLUENCER : RoleName::PROFESSIONAL;
 
-        return User::query()
+        $rows = User::query()
             ->whereHas('roles', fn ($r) => $r->where('name', $role->value))
             ->when($q !== '', fn ($b) => $b->where('name', 'like', '%' . $q . '%'))
+            ->when($serviceId, fn ($b) => $b->whereHas(
+                'serviceCategories',
+                fn ($c) => $c->where('categories.id', $serviceId),
+            ))
+            /*
+             * The options read "Baltimore, MD", which is neither the city
+             * column nor the state column. Split it back apart: the first
+             * draft compared the whole string to each and found nobody.
+             */
+            ->when($place !== '', function ($b) use ($place) {
+                [$city, $state] = array_pad(array_map('trim', explode(',', $place, 2)), 2, null);
+
+                $b->whereHas('profile', function ($pr) use ($city, $state) {
+                    if ($state) {
+                        $pr->where('city', $city)->where('state', $state);
+                    } else {
+                        // A bare value, which is a state on its own.
+                        $pr->where(fn ($w) => $w->where('city', $city)->orWhere('state', $city));
+                    }
+                });
+            })
             ->with(['profile:id,user_id,headline,city,state', 'serviceCategories:id,name'])
             ->withAvg(['reviewsReceived as rating' => fn ($r) => $r->where('is_hidden', false)], 'rating')
             ->withCount(['reviewsReceived as reviews' => fn ($r) => $r->where('is_hidden', false)])
@@ -113,7 +137,54 @@ final class CheckAvailability
                 'reviews'  => (int) $u->reviews,
                 'profile'  => SupplierProfile::url($u),
                 'states'   => self::statesFor($u, $dates, $sample),
-            ])
+            ]);
+
+        /*
+         * "Best match" means free on the date you actually asked about, then
+         * best reviewed. Sorting by name instead would bury the answer to the
+         * question the page exists to ask.
+         */
+        return match ($sort) {
+            'name'   => $rows->sortBy('name')->values(),
+            'rating' => $rows->sortByDesc(fn ($r) => [$r['rating'] ?? 0, $r['reviews']])->values(),
+            default  => $rows->sortBy(fn ($r) => [
+                match ($r['states']['primary'] ?? self::UNKNOWN) {
+                    self::FREE    => 0,
+                    self::UNKNOWN => 1,
+                    default       => 2,
+                },
+                -($r['rating'] ?? 0),
+            ])->values(),
+        };
+    }
+
+    /** The services these suppliers actually offer, for the filter. */
+    public static function serviceOptions(string $kind = 'professional'): Collection
+    {
+        $role = $kind === 'influencer' ? RoleName::INFLUENCER : RoleName::PROFESSIONAL;
+
+        return \App\Models\Category::query()
+            ->whereHas('professionals', fn ($u) => $u->whereHas(
+                'roles',
+                fn ($r) => $r->where('name', $role->value),
+            ))
+            ->orderBy('name')
+            ->get(['id', 'name']);
+    }
+
+    /** The places they are in, for the filter. Nowhere invented. */
+    public static function placeOptions(string $kind = 'professional'): Collection
+    {
+        $role = $kind === 'influencer' ? RoleName::INFLUENCER : RoleName::PROFESSIONAL;
+
+        return User::query()
+            ->whereHas('roles', fn ($r) => $r->where('name', $role->value))
+            ->with('profile:id,user_id,city,state')
+            ->get()
+            ->map(fn ($u) => trim(implode(', ', array_filter([$u->profile?->city, $u->profile?->state]))))
+            ->filter()
+            ->unique()
+            ->sort()
             ->values();
     }
 

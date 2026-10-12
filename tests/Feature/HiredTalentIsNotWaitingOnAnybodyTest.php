@@ -288,4 +288,50 @@ class HiredTalentIsNotWaitingOnAnybodyTest extends TestCase
 
         $this->assertStringContainsString('We can tell you who is busy, not who is free.', $page);
     }
+
+    /** The page names which kind you are looking at, as his two pages do. */
+    public function test_the_title_names_the_kind(): void
+    {
+        $this->book();
+
+        $this->assertStringContainsString('Hired Professionals', $this->page(['who' => 'professionals']));
+        $this->assertStringContainsString('Hired Influencers', $this->page(['who' => 'influencers']));
+        $this->assertStringContainsString('>Hired Talent<', $this->page());
+    }
+
+    /** Each event says how many it holds, and folds away. */
+    public function test_an_event_counts_its_people_and_can_be_folded(): void
+    {
+        $this->book();
+        $this->book();
+
+        $html = $this->page();
+
+        $this->assertStringContainsString('2 providers', $html);
+        $this->assertStringContainsString('data-ht-group', $html);
+        $this->assertStringContainsString('.ht-ev[aria-expanded="false"] + .ht-ev-rows { display: none; }', $html);
+    }
+
+    /** Book Again sends them a fresh request, which is what it means here. */
+    public function test_book_again_goes_to_a_direct_request_for_that_person(): void
+    {
+        $this->book();
+
+        $this->assertStringContainsString(
+            route('client.direct-offers.create', ['pro' => $this->pro->id]),
+            $this->page(),
+        );
+    }
+
+    /**
+     * Release Milestone Payment is on his menu and is not on ours.
+     *
+     * Nothing in the system releases a milestone: there is no route, no model
+     * and no money movement behind it. Drawing the item would be a menu entry
+     * that does nothing.
+     */
+    public function test_no_milestone_release_is_offered(): void
+    {
+        $this->assertStringNotContainsString('Release Milestone', $this->page());
+    }
 }

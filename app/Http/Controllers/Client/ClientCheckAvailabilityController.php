@@ -44,16 +44,31 @@ class ClientCheckAvailabilityController extends Controller
 
         $dates = CheckAvailability::dates($event);
 
+        $q         = trim((string) $request->query('q', ''));
+        $serviceId = (int) $request->query('service') ?: null;
+        $place     = trim((string) $request->query('place', ''));
+        $sort      = in_array($request->query('sort'), ['match', 'name', 'rating'], true)
+            ? $request->query('sort')
+            : 'match';
+
         return view('client.check-availability.index', [
-            'events'  => $events,
-            'event'   => $event,
-            'dates'   => $dates,
-            'kind'    => $kind,
-            'sample'  => $sample,
-            'q'       => trim((string) $request->query('q', '')),
-            'rows'    => $dates->isEmpty()
+            'events'   => $events,
+            'event'    => $event,
+            'dates'    => $dates,
+            'kind'     => $kind,
+            'sample'   => $sample,
+            'q'        => $q,
+            'serviceId' => $serviceId,
+            'place'    => $place,
+            'sort'     => $sort,
+            'services' => CheckAvailability::serviceOptions($kind),
+            'places'   => CheckAvailability::placeOptions($kind),
+            // Anything narrowing the list, so "Clear all" can be offered only
+            // when there is something to clear.
+            'filtered' => $q !== '' || $serviceId !== null || $place !== '' || $sort !== 'match',
+            'rows'     => $dates->isEmpty()
                 ? collect()
-                : CheckAvailability::suppliers($dates, $kind, $sample, trim((string) $request->query('q', ''))),
+                : CheckAvailability::suppliers($dates, $kind, $sample, $q, $serviceId, $place, $sort),
         ]);
     }
 }

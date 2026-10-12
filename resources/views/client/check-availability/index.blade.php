@@ -45,7 +45,20 @@
     .ca-date-t { font-size: 11px; color: var(--text-muted); }
 
     /* Results */
-    .ca-tabs { display: flex; gap: 7px; margin-bottom: 12px; }
+    .ca-filters { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 8px; }
+    .ca-filters select { width: 100%; border: 1px solid var(--border-color); border-radius: 10px;
+        padding: 8px 9px; font: inherit; font-size: 12.5px; color: var(--text-primary); background: var(--bg-card); }
+
+    .ca-bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
+    .ca-sort { display: flex; align-items: center; gap: 9px; margin-left: auto; font-size: 12px; color: var(--text-muted); }
+    .ca-sort-opts { display: flex; gap: 4px; }
+    .ca-sort-opts a { font-size: 12px; font-weight: 700; padding: 6px 11px; border-radius: 999px;
+        color: var(--text-secondary); text-decoration: none; border: 1px solid transparent; }
+    .ca-sort-opts a.is-on { border-color: var(--accent-orange, #ea580c); background: rgba(249,115,22,.1); color: var(--brand-text, #c2410c); }
+    .ca-clear { font-size: 12px; font-weight: 700; color: var(--accent-orange, #ea580c); text-decoration: none; }
+    @media (max-width: 760px) { .ca-sort { margin-left: 0; } .ca-filters { grid-template-columns: 1fr; } }
+
+    .ca-tabs { display: flex; gap: 7px; }
     .ca-tab { font-size: 12.5px; font-weight: 700; padding: 8px 14px; border-radius: 999px;
         border: 1px solid var(--border-color); color: var(--text-secondary); text-decoration: none; }
     .ca-tab.is-on { border-color: var(--accent-orange, #ea580c); background: rgba(249,115,22,.1); color: var(--brand-text, #c2410c); }
@@ -94,8 +107,11 @@
     $link = fn (array $over = []) => route('client.check-availability.index', array_filter(array_merge([
         'event'  => $event?->id,
         'who'    => $kind === 'influencer' ? 'influencers' : null,
-        'q'      => $q ?: null,
-        'sample' => $sample ? 1 : null,
+        'q'       => $q ?: null,
+        'service' => $serviceId,
+        'place'   => $place ?: null,
+        'sort'    => $sort !== 'match' ? $sort : null,
+        'sample'  => $sample ? 1 : null,
     ], $over), fn ($v) => $v !== null && $v !== ''));
 @endphp
 
@@ -106,8 +122,8 @@
         </svg>
     </span>
     <div>
-        <h1>Check Availability</h1>
-        <p>See who is free for your event dates before you hire them.</p>
+        <h1>Check Availability &ndash; {{ $kind === 'influencer' ? 'Influencers' : 'Professionals' }}</h1>
+        <p>See if {{ $kind === 'influencer' ? 'influencers' : 'professionals' }} are available for your event dates before you hire them.</p>
     </div>
 </div>
 
@@ -182,13 +198,44 @@
     <div class="ca-card ca-step">
         <div class="ca-step-h">3. Find {{ $kind === 'influencer' ? 'Influencers' : 'Professionals' }}</div>
         <input type="text" name="q" value="{{ $q }}" placeholder="Search by name…" autocomplete="off">
+        {{-- Both lists are built from who is actually on the site, so neither
+             can offer a service nobody does or a town nobody is in. --}}
+        <div class="ca-filters">
+            <select name="service" onchange="this.form.submit()" aria-label="Service type">
+                <option value="">All service types</option>
+                @foreach($services as $svc)
+                    <option value="{{ $svc->id }}" @selected($serviceId === $svc->id)>{{ $svc->name }}</option>
+                @endforeach
+            </select>
+            <select name="place" onchange="this.form.submit()" aria-label="Location">
+                <option value="">All locations</option>
+                @foreach($places as $pl)
+                    <option value="{{ $pl }}" @selected($place === $pl)>{{ $pl }}</option>
+                @endforeach
+            </select>
+        </div>
         <div class="ca-ev-meta">{{ $rows->count() }} {{ Str::plural($kind, $rows->count()) }} listed</div>
     </div>
 </form>
 
-<div class="ca-tabs">
-    <a href="{{ $link(['who' => null]) }}" class="ca-tab {{ $kind === 'professional' ? 'is-on' : '' }}">Professionals</a>
-    <a href="{{ $link(['who' => 'influencers']) }}" class="ca-tab {{ $kind === 'influencer' ? 'is-on' : '' }}">Influencers</a>
+<div class="ca-bar">
+    <div class="ca-tabs">
+        <a href="{{ $link(['who' => null]) }}" class="ca-tab {{ $kind === 'professional' ? 'is-on' : '' }}">Professionals</a>
+        <a href="{{ $link(['who' => 'influencers']) }}" class="ca-tab {{ $kind === 'influencer' ? 'is-on' : '' }}">Influencers</a>
+    </div>
+    <div class="ca-sort">
+        <span>Sort by</span>
+        <div class="ca-sort-opts">
+            {{-- Best match is free on the date you asked about first, then
+                 best reviewed. Sorting by name would bury the answer. --}}
+            <a href="{{ $link(['sort' => null]) }}" class="{{ $sort === 'match' ? 'is-on' : '' }}">Best match</a>
+            <a href="{{ $link(['sort' => 'rating']) }}" class="{{ $sort === 'rating' ? 'is-on' : '' }}">Rating</a>
+            <a href="{{ $link(['sort' => 'name']) }}" class="{{ $sort === 'name' ? 'is-on' : '' }}">Name</a>
+        </div>
+        @if($filtered)
+            <a class="ca-clear" href="{{ $link(['q' => null, 'service' => null, 'place' => null, 'sort' => null]) }}">Clear all</a>
+        @endif
+    </div>
 </div>
 
 {{-- ── Results ─────────────────────────────────────── --}}
