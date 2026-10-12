@@ -4,6 +4,7 @@ namespace App\Domain;
 
 use App\Domain\Finance\PaymentTracker;
 use App\Models\Booking;
+use App\Models\Finalization;
 use App\Models\User;
 use App\Support\SupplierProfile;
 use App\Support\VerifiedBadge;
@@ -54,6 +55,11 @@ final class HiredTalent
         $money = PaymentTracker::rows($client)
             ->keyBy(fn ($r) => $r['event_id'] . '|' . $r['pro_id']);
 
+        // The agreement behind each booking, which is where readiness lives.
+        $agreements = Finalization::where('client_id', $client->id)
+            ->get()
+            ->keyBy(fn ($f) => $f->event_id . '|' . $f->supplier_id);
+
         return Booking::query()
             ->where('client_id', $client->id)
             ->whereNotNull('supplier_id')
@@ -72,7 +78,7 @@ final class HiredTalent
             ])
 
             ->get()
-            ->map(fn (Booking $b) => self::row($b, $money))
+            ->map(fn (Booking $b) => self::row($b, $money, $agreements))
             ->sortByDesc(fn ($r) => $r['event']['at']?->timestamp ?? 0)
             ->values();
     }
@@ -100,7 +106,7 @@ final class HiredTalent
         ];
     }
 
-    private static function row(Booking $b, Collection $money): array
+    private static function row(Booking $b, Collection $money, Collection $agreements): array
     {
         [$state, $tone] = self::STATES[$b->status] ?? ['Booked', 'ok'];
         $pay = $money->get($b->event_id . '|' . $b->supplier?->public_id);
@@ -152,6 +158,12 @@ final class HiredTalent
                 'overdue' => $pay['overdue'] ?? false,
             ] : null,
 
+            // Readiness is the agreement's own progress, not a guess. Sir
+            // Peter's mockup shows "3 of 5 complete, Next: Sound Check"; the
+            // real steps are the seven the finalize wizard walks, and each
+            // records when it was done.
+            'readiness' => self::readiness($agreements->get($b->event_id . '|' . $b->supplier_id)),
+
             'urls' => [
                 'event'   => $b->event_id ? route('client.events.show', $b->event_id) : null,
                 // Sending them a fresh request, which is what "book again"
@@ -164,6 +176,43 @@ final class HiredTalent
                 // line up on some rows and the route takes the booking.
                 'payments' => route('client.payments.show', $b->id),
             ],
+        ];
+    }
+
+    /**
+     * How far the agreement has got, and what is next.
+     *
+     * Null where there is no agreement: a booking made outside the wizard has
+     * no steps to be part-way through, and an empty bar would read as "not
+     * started" rather than "not applicable".
+     */
+    private static function readiness(?Finalization $f): ?array
+    {
+        if (! $f) {
+            return null;
+        }
+
+        $steps = Finalization::STEPS;
+        $done  = 0;
+        $next  = null;
+
+        foreach ($steps as $key => [$label]) {
+            if ($f->completed($key)) {
+                $done++;
+            } elseif ($next === null) {
+                $next = $label;
+            }
+        }
+
+        return [
+            'done'  => $done,
+            'total' => count($steps),
+            'next'  => $next,
+            // Nothing left to do is on track; anything outstanding on a date
+            // already past is not.
+            'ok'    => $next === null
+                || ! $f->event?->starts_at
+                || $f->event->starts_at->isFuture(),
         ];
     }
 

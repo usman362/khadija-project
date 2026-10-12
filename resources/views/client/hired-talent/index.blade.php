@@ -4,119 +4,173 @@
 
 @push('styles')
 <style>
+    /* ── The banner his mockup opens with ───────────────────── */
+    .ht-banner { display: flex; align-items: center; gap: 16px; padding: 18px 22px; border-radius: 16px;
+        background: linear-gradient(90deg, rgba(249,115,22,.16), rgba(249,115,22,.05)); margin-bottom: 16px; }
+    [data-theme="dark"] .ht-banner { background: linear-gradient(90deg, rgba(249,115,22,.18), rgba(249,115,22,.04)); }
+    .ht-banner > svg { width: 42px; height: 42px; color: var(--accent-orange, #ea580c); flex: none; }
+    .ht-banner h1 { font-size: 27px; font-weight: 800; color: var(--text-primary); margin: 0; line-height: 1.15; }
+    .ht-banner p { font-size: 13.5px; color: var(--text-secondary); margin: 3px 0 0; }
+
     .ht { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 16px; align-items: start; }
     .ht-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; }
-    .ht-pad { padding: 16px 18px; }
 
-    /* Head */
-    .ht-head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
-    .ht-head-ico { width: 54px; height: 54px; border-radius: 15px; background: rgba(249,115,22,.12);
-        display: flex; align-items: center; justify-content: center; flex: none; }
-    .ht-head-ico svg { width: 27px; height: 27px; color: var(--accent-orange, #ea580c); }
-    .ht-head h1 { font-size: 24px; font-weight: 800; color: var(--text-primary); margin: 0; }
-    .ht-head p { font-size: 13px; color: var(--text-muted); margin: 3px 0 0; }
+    /* ── Left ───────────────────────────────────────────────── */
+    .ht-filters { padding: 16px 16px 12px; }
+    .ht-ltitle { font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0 0 11px; }
 
-    /* Left column */
-    .ht-filters { padding: 14px 14px 10px; border-bottom: 1px solid var(--border-color); }
-    .ht-search { position: relative; margin-bottom: 10px; }
+    .ht-srow { display: flex; gap: 8px; margin-bottom: 11px; }
+    .ht-search { position: relative; flex: 1; min-width: 0; }
     .ht-search svg { position: absolute; left: 11px; top: 11px; width: 15px; height: 15px; color: var(--text-muted); }
     .ht-search input { width: 100%; border: 1px solid var(--border-color); border-radius: 10px;
         padding: 9px 11px 9px 33px; font: inherit; font-size: 13px; color: var(--text-primary); background: var(--bg-card); }
     .ht-search input:focus { outline: none; border-color: var(--accent-orange, #ea580c); }
+    .ht-funnel { width: 38px; flex: none; display: flex; align-items: center; justify-content: center;
+        border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); text-decoration: none; }
+    .ht-funnel.is-on { border-color: var(--accent-orange, #ea580c); color: var(--accent-orange, #ea580c); background: rgba(249,115,22,.08); }
+    .ht-funnel svg { width: 15px; height: 15px; }
 
-    .ht-pills { display: flex; flex-wrap: wrap; gap: 6px; }
-    .ht-pill { font-size: 11.5px; font-weight: 700; padding: 6px 11px; border-radius: 999px;
+    .ht-pills { display: flex; gap: 7px; }
+    .ht-pill { flex: 1; text-align: center; font-size: 12.5px; font-weight: 700; padding: 8px 6px; border-radius: 10px;
         border: 1px solid var(--border-color); color: var(--text-secondary); text-decoration: none; white-space: nowrap; }
     .ht-pill.is-on { border-color: var(--accent-orange, #ea580c); background: rgba(249,115,22,.1); color: var(--brand-text, #c2410c); }
-    .ht-pill.is-empty { opacity: .55; }
+    .ht-pill.is-empty { opacity: .5; }
+    .ht-kinds { display: flex; gap: 7px; margin-bottom: 7px; }
 
-    .ht-list { max-height: 640px; overflow-y: auto; }
-    .ht-ev { padding: 11px 14px 4px; }
-    .ht-ev-d { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; color: var(--text-primary); }
-    .ht-ev-d svg { width: 14px; height: 14px; color: var(--accent-orange, #ea580c); flex: none; }
-    .ht-ev-t { font-size: 11.5px; color: var(--text-muted); margin: 2px 0 0 22px; }
+    .ht-list { max-height: 660px; overflow-y: auto; border-top: 1px solid var(--border-color); }
 
-    .ht-row { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
-        padding: 9px 14px; border: 0; background: none; cursor: pointer; font: inherit; border-left: 3px solid transparent; }
+    .ht-ev { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; border: 0;
+        background: none; cursor: pointer; font: inherit; padding: 12px 16px 8px; }
+    .ht-ev-mid { flex: 1; min-width: 0; }
+    .ht-ev-d { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; color: var(--text-primary); }
+    .ht-ev-d svg { width: 15px; height: 15px; color: var(--accent-orange, #ea580c); flex: none; }
+    .ht-ev-t { display: block; font-size: 11.5px; color: var(--text-muted); margin: 1px 0 0 23px; }
+    .ht-ev-n { font-size: 11.5px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
+    .ht-ev-chev { width: 15px; height: 15px; color: var(--text-muted); flex: none; transition: transform .15s; }
+    .ht-ev[aria-expanded="false"] .ht-ev-chev { transform: rotate(180deg); }
+    .ht-ev[aria-expanded="false"] + .ht-ev-rows { display: none; }
+    .ht-ev-rows { padding: 0 10px 8px; }
+
+    .ht-row { display: flex; align-items: center; gap: 11px; width: 100%; text-align: left;
+        padding: 9px 10px; border: 1px solid transparent; border-radius: 12px; background: none; cursor: pointer; font: inherit; }
     .ht-row:hover { background: var(--bg-card-hover, #f1f5f9); }
-    .ht-row.is-on { background: rgba(249,115,22,.07); border-left-color: var(--accent-orange, #ea580c); }
-    .ht-av { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; flex: none; }
+    .ht-row.is-on { background: rgba(249,115,22,.07); border-color: rgba(249,115,22,.3); }
+    .ht-av { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; flex: none; }
     .ht-row-mid { min-width: 0; flex: 1; }
-    .ht-row-n { font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .ht-row-s { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ht-row-n { display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ht-row-s { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--text-muted); white-space: nowrap; }
+    .ht-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+    .ht-dot.ok { background: #10b981; }
+    .ht-dot.warn { background: #f59e0b; }
+    .ht-row-time { display: block; font-size: 11.5px; color: var(--text-muted); white-space: nowrap; }
+    .ht-row-chev { width: 14px; height: 14px; color: var(--text-muted); flex: none; }
 
-    .ht-chip { font-size: 10.5px; font-weight: 800; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+    .ht-chip { font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
     .ht-chip.ok   { background: rgba(16,185,129,.12); color: var(--ok-text, #047857); }
     .ht-chip.wait { background: rgba(249,115,22,.12); color: var(--brand-text, #c2410c); }
     .ht-chip.done { background: rgba(37,99,235,.10); color: var(--info-text, #1d4ed8); }
     .ht-chip.off  { background: var(--bg-card-hover, #f1f5f9); color: var(--text-muted); }
 
-    /* Right column */
-    .ht-detail-h { display: flex; align-items: flex-start; gap: 16px; padding: 20px; border-bottom: 1px solid var(--border-color); }
-    .ht-detail-av { width: 76px; height: 76px; border-radius: 50%; object-fit: cover; flex: none; }
-    .ht-detail-n { font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 0; }
-    .ht-detail-sub { font-size: 13px; color: var(--text-muted); margin: 3px 0 0; }
+    /* ── Right ──────────────────────────────────────────────── */
+    .ht-detail-h { display: flex; align-items: flex-start; gap: 18px; padding: 22px 22px 18px; }
+    .ht-avwrap { position: relative; flex: none; }
+    .ht-detail-av { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; display: block; }
+    .ht-avtick { position: absolute; right: 0; bottom: 0; width: 26px; height: 26px; border-radius: 50%;
+        background: #10b981; border: 3px solid var(--bg-card); display: flex; align-items: center; justify-content: center; }
+    .ht-avtick svg { width: 13px; height: 13px; color: #fff; }
+    .ht-detail-n { font-size: 23px; font-weight: 800; color: var(--text-primary); margin: 0; }
+    .ht-ver { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 800;
+        color: var(--info-text, #1d4ed8); background: rgba(37,99,235,.1); padding: 4px 10px; border-radius: 999px;
+        vertical-align: middle; margin-left: 8px; }
+    .ht-ver svg { width: 13px; height: 13px; }
+    .ht-detail-sub { font-size: 14px; color: var(--text-secondary); margin: 3px 0 0; }
+    .ht-detail-meta { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--text-muted); margin: 7px 0 0; }
+    .ht-detail-meta > span { display: inline-flex; align-items: center; gap: 5px; }
+    .ht-detail-meta svg { width: 14px; height: 14px; }
     .ht-detail-sp { flex: 1; }
 
-    .ht-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; padding: 18px 20px; }
-    .ht-fact-l { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; color: var(--text-muted); }
+    .ht-actions { position: relative; display: flex; align-items: center; gap: 8px; flex: none; }
+    .ht-more { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--border-color);
+        background: var(--bg-card); color: var(--text-secondary); cursor: pointer; font-size: 17px; line-height: 1;
+        display: flex; align-items: center; justify-content: center; }
+    .ht-more:hover { border-color: var(--accent-orange, #ea580c); }
+    .ht-menu { position: absolute; right: 0; top: 46px; z-index: 30; min-width: 212px; padding: 6px;
+        background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px;
+        box-shadow: 0 18px 40px -18px rgba(15,27,53,.4); display: none; }
+    .ht-menu.is-open { display: block; }
+    .ht-menu a { display: block; padding: 9px 12px; border-radius: 8px; font-size: 13px;
+        color: var(--text-primary); text-decoration: none; white-space: nowrap; }
+    .ht-menu a:hover { background: var(--bg-card-hover, #f1f5f9); }
+
+    .ht-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+        margin: 0 22px 18px; border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; }
+    .ht-fact { display: flex; gap: 12px; padding: 16px 18px; border-right: 1px solid var(--border-color); }
+    .ht-fact:last-child { border-right: 0; }
+    .ht-fact-ico { width: 34px; height: 34px; border-radius: 10px; flex: none; display: flex;
+        align-items: center; justify-content: center; background: rgba(249,115,22,.1); color: var(--accent-orange, #ea580c); }
+    .ht-fact-ico svg { width: 17px; height: 17px; }
+    .ht-fact-l { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; color: var(--text-muted); }
     .ht-fact-v { font-size: 13.5px; font-weight: 600; color: var(--text-primary); margin-top: 3px; line-height: 1.45; }
     .ht-fact-v .dim { color: var(--text-muted); font-weight: 500; }
 
-    .ht-money { margin: 0 20px 18px; border: 1px solid var(--border-color); border-radius: 13px; padding: 15px 17px; }
-    .ht-money-h { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; color: var(--text-muted); margin-bottom: 9px; }
-    .ht-money-row { display: flex; gap: 20px; flex-wrap: wrap; }
-    .ht-money-n { font-size: 17px; font-weight: 800; color: var(--text-primary); }
-    .ht-money-n.due { color: var(--accent-orange, #ea580c); }
-    .ht-money-k { font-size: 11px; color: var(--text-muted); }
+    .ht-two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 0 22px 20px; }
+    .ht-panel { border: 1px solid var(--border-color); border-radius: 14px; padding: 16px 18px; }
+    .ht-panel-h { display: flex; align-items: center; gap: 11px; margin-bottom: 12px; }
+    .ht-panel-ico { width: 34px; height: 34px; border-radius: 10px; flex: none; display: flex;
+        align-items: center; justify-content: center; }
+    .ht-panel-ico svg { width: 17px; height: 17px; }
+    .ht-panel-t { font-size: 15px; font-weight: 800; color: var(--text-primary); }
+    .ht-panel-sp { flex: 1; }
+    .ht-panel-n { font-size: 12.5px; color: var(--text-muted); white-space: nowrap; }
 
-    .ht-acts { display: flex; flex-wrap: wrap; gap: 9px; padding: 0 20px 20px; }
-    .ht-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 15px; border-radius: 10px;
-        border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary);
-        font-size: 12.5px; font-weight: 700; text-decoration: none; }
-    .ht-btn:hover { border-color: var(--accent-orange, #ea580c); }
-    .ht-btn.go { background: var(--accent-orange, #ea580c); border-color: transparent; color: #fff; }
+    .ht-bar { height: 9px; border-radius: 999px; background: var(--bg-card-hover, #e5e7eb); overflow: hidden; }
+    .ht-bar i { display: block; height: 100%; background: #10b981; border-radius: 999px; }
+    .ht-next { font-size: 12.5px; color: var(--text-secondary); margin: 9px 0 0; line-height: 1.5; }
+    .ht-next b { color: var(--text-primary); }
+
+    .ht-money-row { display: flex; gap: 22px; flex-wrap: wrap; }
+    .ht-money-n { font-size: 19px; font-weight: 800; color: var(--text-primary); }
+    .ht-money-n.due { color: var(--accent-orange, #ea580c); }
+    .ht-money-k { font-size: 11.5px; color: var(--text-muted); }
 
     .ht-none { padding: 40px 24px; text-align: center; }
     .ht-none p { font-size: 13.5px; color: var(--text-muted); margin: 0 0 4px; line-height: 1.6; }
     .ht-none b { color: var(--text-primary); }
 
-    .ht-ev { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; border: 0;
-        background: none; cursor: pointer; font: inherit; padding: 11px 14px 6px; }
-    .ht-ev-mid { flex: 1; min-width: 0; }
-    .ht-ev-n { font-size: 11px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
-    .ht-ev-chev { width: 15px; height: 15px; color: var(--text-muted); flex: none; transition: transform .15s; }
-    .ht-ev[aria-expanded="false"] .ht-ev-chev { transform: rotate(180deg); }
-    .ht-ev[aria-expanded="false"] + .ht-ev-rows { display: none; }
-
-    .ht-ver { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 800;
-        color: var(--info-text, #1d4ed8); background: rgba(37,99,235,.1); padding: 3px 9px; border-radius: 999px;
-        vertical-align: middle; margin-left: 6px; }
-    .ht-ver svg { width: 12px; height: 12px; }
-    .ht-detail-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12.5px; color: var(--text-muted); margin: 5px 0 0; }
-
     .ht-detail { display: none; }
     .ht-detail.is-on { display: block; }
 
-    @media (max-width: 1000px) { .ht { grid-template-columns: 1fr; } .ht-list { max-height: none; } .ht-facts { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 1100px) {
+        .ht { grid-template-columns: 1fr; }
+        .ht-list { max-height: none; }
+        .ht-facts, .ht-two { grid-template-columns: 1fr; }
+        .ht-fact { border-right: 0; border-bottom: 1px solid var(--border-color); }
+    }
 </style>
 @endpush
 
 @section('content')
 @php
-    $fmtMoney = fn ($n) => $n === null ? null : '$' . number_format((float) $n, 2);
+    $money = fn ($n) => $n === null ? null : '$' . number_format((float) $n, 2);
+    $link = fn (array $over) => route('client.hired-talent.index', array_filter(
+        array_merge(['who' => $group, 'show' => $state, 'q' => $q], $over),
+        fn ($v) => $v !== null && $v !== '' && $v !== 'all',
+    ));
+    $heading = match ($group) {
+        'influencers'   => 'Hired Influencers',
+        'professionals' => 'Hired Professionals',
+        default         => 'Hired Talent',
+    };
 @endphp
 
-<div class="ht-head">
-    <span class="ht-head-ico">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-        </svg>
-    </span>
+<div class="ht-banner">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
     <div>
-        <h1>{{ $group === 'influencers' ? 'Hired Influencers' : ($group === 'professionals' ? 'Hired Professionals' : 'Hired Talent') }}</h1>
-        <p>Everyone you have booked, by event, with where the money stands.</p>
+        <h1>{{ $heading }}</h1>
+        <p>View and manage everyone you have booked, by event, with where the money stands.</p>
     </div>
 </div>
 
@@ -124,33 +178,34 @@
     {{-- ── Who you hired ─────────────────────────────── --}}
     <div class="ht-card">
         <div class="ht-filters">
-            <form method="GET" class="ht-search">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" name="q" value="{{ $q }}" placeholder="Search a name, event or service…" autocomplete="off">
+            <h2 class="ht-ltitle">{{ $group === 'influencers' ? 'Hired Influencers' : ($group === 'professionals' ? 'Hired Providers' : 'Hired Talent') }}</h2>
+
+            <form method="GET" class="ht-srow">
+                <label class="ht-search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" name="q" value="{{ $q }}" placeholder="Search a name, event or service…" autocomplete="off">
+                </label>
                 @if($group !== 'all')<input type="hidden" name="who" value="{{ $group }}">@endif
                 @if($state !== 'all')<input type="hidden" name="show" value="{{ $state }}">@endif
+                {{-- The funnel clears rather than opening a second panel: every
+                     filter this page has is already on screen. --}}
+                <a class="ht-funnel {{ $q !== '' || $state !== 'all' || $group !== 'all' ? 'is-on' : '' }}"
+                   href="{{ route('client.hired-talent.index') }}" title="Clear filters" aria-label="Clear filters">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                </a>
             </form>
 
-            @php
-                $link = fn (array $over) => route('client.hired-talent.index', array_filter(
-                    array_merge(['who' => $group, 'show' => $state, 'q' => $q], $over),
-                    fn ($v) => $v !== null && $v !== '' && $v !== 'all',
-                ));
-            @endphp
-
-            <div class="ht-pills" style="margin-bottom:6px;">
+            <div class="ht-kinds">
                 <a href="{{ $link(['who' => 'all']) }}" class="ht-pill {{ $group === 'all' ? 'is-on' : '' }}">Everyone</a>
                 <a href="{{ $link(['who' => 'professionals']) }}"
                    class="ht-pill {{ $group === 'professionals' ? 'is-on' : '' }} {{ $kinds['professionals'] === 0 ? 'is-empty' : '' }}">Professionals ({{ $kinds['professionals'] }})</a>
-                {{-- Shown at zero rather than hidden: "nobody yet" is a real
-                     answer, and the influencer side is not open to hire from. --}}
                 <a href="{{ $link(['who' => 'influencers']) }}"
                    class="ht-pill {{ $group === 'influencers' ? 'is-on' : '' }} {{ $kinds['influencers'] === 0 ? 'is-empty' : '' }}">Influencers ({{ $kinds['influencers'] }})</a>
             </div>
             <div class="ht-pills">
-                <a href="{{ $link(['show' => 'all']) }}" class="ht-pill {{ $state === 'all' ? 'is-on' : '' }}">All {{ $counts['all'] }}</a>
-                <a href="{{ $link(['show' => 'active']) }}" class="ht-pill {{ $state === 'active' ? 'is-on' : '' }}">Active {{ $counts['active'] }}</a>
-                <a href="{{ $link(['show' => 'past']) }}" class="ht-pill {{ $state === 'past' ? 'is-on' : '' }}">Past {{ $counts['past'] }}</a>
+                <a href="{{ $link(['show' => 'all']) }}" class="ht-pill {{ $state === 'all' ? 'is-on' : '' }}">All ({{ $counts['all'] }})</a>
+                <a href="{{ $link(['show' => 'active']) }}" class="ht-pill {{ $state === 'active' ? 'is-on' : '' }}">Active ({{ $counts['active'] }})</a>
+                <a href="{{ $link(['show' => 'past']) }}" class="ht-pill {{ $state === 'past' ? 'is-on' : '' }}">Past ({{ $counts['past'] }})</a>
             </div>
         </div>
 
@@ -164,26 +219,32 @@
                         </span>
                         <span class="ht-ev-t">{{ $g['event']['title'] ?? 'Untitled event' }}</span>
                     </span>
-                    <span class="ht-ev-n">{{ count($g['rows']) }} {{ \Illuminate\Support\Str::plural('provider', count($g['rows'])) }}</span>
+                    <span class="ht-ev-n">{{ count($g['rows']) }} {{ \Illuminate\Support\Str::plural($group === 'influencers' ? 'influencer' : 'provider', count($g['rows'])) }}</span>
                     <svg class="ht-ev-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
                 </button>
                 <div class="ht-ev-rows">
-                @foreach($g['rows'] as $r)
-                    <button type="button" class="ht-row" data-ht-row="{{ $r['id'] }}">
-                        <img class="ht-av" src="{{ $r['supplier']['avatar'] }}" alt="">
-                        <span class="ht-row-mid">
-                            <span class="ht-row-n">{{ $r['supplier']['name'] }}</span>
-                            <span class="ht-row-s">
+                    @foreach($g['rows'] as $r)
+                        <button type="button" class="ht-row" data-ht-row="{{ $r['id'] }}">
+                            <img class="ht-av" src="{{ $r['supplier']['avatar'] }}" alt="">
+                            <span class="ht-row-mid">
+                                <span class="ht-row-n">{{ $r['supplier']['name'] }}</span>
+                                <span class="ht-row-s">
+                                    {{-- "On track" is the agreement's own progress, not a mood. --}}
+                                    @if($r['readiness'])
+                                        <span class="ht-dot {{ $r['readiness']['ok'] ? 'ok' : 'warn' }}"></span>
+                                        {{ $r['readiness']['ok'] ? 'On track' : 'Action needed' }}
+                                    @else
+                                        {{ $r['service'] ?? 'Service not recorded' }}
+                                    @endif
+                                </span>
                                 @if($r['event']['at'])
-                                    {{ $r['event']['at']->format('g:i A') }}@if($r['event']['ends']) &ndash; {{ $r['event']['ends']->format('g:i A') }}@endif
-                                @else
-                                    {{ $r['service'] ?? $r['supplier']['headline'] ?? 'Service not recorded' }}
+                                    <span class="ht-row-time">{{ $r['event']['at']->format('g:i A') }}@if($r['event']['ends']) &ndash; {{ $r['event']['ends']->format('g:i A') }}@endif</span>
                                 @endif
                             </span>
-                        </span>
-                        <span class="ht-chip {{ $r['tone'] }}">{{ $r['state'] }}</span>
-                    </button>
-                @endforeach
+                            <span class="ht-chip {{ $r['tone'] }}">{{ $r['state'] }}</span>
+                            <svg class="ht-row-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
+                    @endforeach
                 </div>
             @empty
                 <div class="ht-none">
@@ -197,9 +258,6 @@
                         <p><b>Nothing matches that.</b></p>
                         <p>Try a different search, or <a href="{{ route('client.hired-talent.index') }}" style="font-weight:700;">show everyone</a>.</p>
                     @elseif($state === 'active')
-                        {{-- Not the same as a search finding nothing: every
-                             booking they have is finished, which is good news
-                             rather than an empty result. --}}
                         <p><b>Nothing on right now.</b></p>
                         <p>All {{ $counts['past'] }} of your bookings are finished. <a href="{{ $link(['show' => 'past']) }}" style="font-weight:700;">See the past ones</a>.</p>
                     @elseif($state === 'past')
@@ -215,11 +273,9 @@
     </div>
 
     {{-- ── The one you picked ────────────────────────── --}}
-    <div class="ht-card" style="min-height:220px;">
+    <div class="ht-card" style="min-height:260px;">
         @if($shown === 0)
-            <div class="ht-none">
-                <p>Nothing to show on this side yet.</p>
-            </div>
+            <div class="ht-none"><p>Nothing to show on this side yet.</p></div>
         @else
             <div class="ht-none" data-ht-empty>
                 <p>Pick somebody on the left to see their event, their booking and their payments.</p>
@@ -230,13 +286,21 @@
             @foreach($g['rows'] as $r)
                 <div class="ht-detail" data-ht-detail="{{ $r['id'] }}">
                     <div class="ht-detail-h">
-                        <img class="ht-detail-av" src="{{ $r['supplier']['avatar'] }}" alt="">
+                        <span class="ht-avwrap">
+                            <img class="ht-detail-av" src="{{ $r['supplier']['avatar'] }}" alt="">
+                            @if(in_array($r['raw_state'], ['confirmed', 'completed'], true))
+                                {{-- The tick means the booking is settled, which we
+                                     know. It is not a verification mark. --}}
+                                <span class="ht-avtick" title="{{ $r['state'] }}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                </span>
+                            @endif
+                        </span>
                         <div>
                             <h2 class="ht-detail-n">
                                 {{ $r['supplier']['name'] }}
                                 @if($r['supplier']['verified'])
-                                    {{-- Only where the badge is actually held. --}}
-                                    <span class="ht-ver" title="Verified {{ $r['supplier']['noun'] }}">
+                                    <span class="ht-ver">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                                         Verified {{ ucfirst($r['supplier']['noun']) }}
                                     </span>
@@ -245,80 +309,122 @@
                             <p class="ht-detail-sub">{{ $r['service'] ?? $r['supplier']['headline'] ?? 'Service not recorded' }}</p>
                             <p class="ht-detail-meta">
                                 @if($r['supplier']['rating'])
-                                    <span>&#9733; {{ $r['supplier']['rating'] }} ({{ $r['supplier']['reviews'] }} {{ \Illuminate\Support\Str::plural('review', $r['supplier']['reviews']) }})</span>
+                                    <span style="color:#f59e0b;">&#9733;
+                                        <span style="color:var(--text-primary);font-weight:700;">{{ $r['supplier']['rating'] }}</span>
+                                        <span style="color:var(--text-muted);">({{ $r['supplier']['reviews'] }} {{ \Illuminate\Support\Str::plural('review', $r['supplier']['reviews']) }})</span>
+                                    </span>
                                 @endif
-                                @if($r['supplier']['where'])<span>{{ $r['supplier']['where'] }}</span>@endif
+                                @if($r['supplier']['where'])
+                                    <span>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                        {{ $r['supplier']['where'] }}
+                                    </span>
+                                @endif
                             </p>
                         </div>
                         <span class="ht-detail-sp"></span>
-                        <span class="ht-chip {{ $r['tone'] }}">{{ $r['state'] }}</span>
+                        <div class="ht-actions">
+                            <span class="ht-chip {{ $r['tone'] }}" style="font-size:13px;padding:9px 14px;">{{ $r['state'] }}</span>
+                            <button type="button" class="ht-more" data-ht-more aria-haspopup="true" aria-expanded="false" aria-label="More actions">&#8943;</button>
+                            {{-- Release Milestone Payment is on his menu and is not
+                                 here: nothing in the system releases one. --}}
+                            <div class="ht-menu" data-ht-menu>
+                                @if($r['urls']['event'])<a href="{{ $r['urls']['event'] }}">View event details</a>@endif
+                                @if($r['urls']['profile'])<a href="{{ $r['urls']['profile'] }}">View profile</a>@endif
+                                @if($r['urls']['again'])<a href="{{ $r['urls']['again'] }}">Book again</a>@endif
+                                <a href="{{ $r['urls']['payments'] }}">Payments</a>
+                                <a href="{{ route('client.chat.index') }}">Message {{ $r['supplier']['noun'] }}</a>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="ht-facts">
-                        <div>
-                            <div class="ht-fact-l">Event</div>
-                            <div class="ht-fact-v">{{ $r['event']['title'] ?? 'Untitled event' }}</div>
+                        <div class="ht-fact">
+                            <span class="ht-fact-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                            <div>
+                                <div class="ht-fact-l">Event</div>
+                                <div class="ht-fact-v">
+                                    {{ $r['event']['title'] ?? 'Untitled event' }}
+                                    @if($r['event']['at'])<br><span class="dim">{{ $r['event']['at']->format('l, F j, Y') }}</span>@endif
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <div class="ht-fact-l">When</div>
-                            <div class="ht-fact-v">
-                                @if($r['event']['at'])
-                                    {{ $r['event']['at']->format('l, F j, Y') }}<br>
-                                    <span class="dim">{{ $r['event']['at']->format('g:i A') }}@if($r['event']['ends']) &ndash; {{ $r['event']['ends']->format('g:i A') }}@endif</span>
-                                @else
-                                    <span class="dim">Not set</span>
+                        <div class="ht-fact">
+                            <span class="ht-fact-ico" style="background:rgba(37,99,235,.1);color:#1d4ed8;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+                            <div>
+                                <div class="ht-fact-l">Service time</div>
+                                <div class="ht-fact-v">
+                                    @if($r['event']['at'])
+                                        {{ $r['event']['at']->format('g:i A') }}@if($r['event']['ends']) &ndash; {{ $r['event']['ends']->format('g:i A') }}@endif
+                                        @if($r['event']['ends'])
+                                            @php $hrs = max(1, $r['event']['at']->diffInHours($r['event']['ends'])); @endphp
+                                            <br><span class="dim">({{ $hrs }} {{ \Illuminate\Support\Str::plural('hour', $hrs) }})</span>
+                                        @endif
+                                    @else
+                                        <span class="dim">Not set</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ht-fact">
+                            <span class="ht-fact-ico" style="background:rgba(109,40,217,.1);color:#6d28d9;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+                            <div>
+                                <div class="ht-fact-l">Event location</div>
+                                <div class="ht-fact-v">{!! $r['event']['where'] ?: '<span class="dim">Not recorded</span>' !!}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ht-two">
+                        <div class="ht-panel">
+                            <div class="ht-panel-h">
+                                <span class="ht-panel-ico" style="background:rgba(16,185,129,.12);color:#047857;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+                                <span class="ht-panel-t">Readiness</span>
+                                <span class="ht-panel-sp"></span>
+                                @if($r['readiness'])
+                                    <span class="ht-panel-n">{{ $r['readiness']['done'] }} of {{ $r['readiness']['total'] }} complete</span>
                                 @endif
                             </div>
+                            @if($r['readiness'])
+                                {{-- The agreement's own seven steps, each with the
+                                     date it was done. Not a bar drawn from nothing. --}}
+                                <div class="ht-bar"><i style="width:{{ round($r['readiness']['done'] / max($r['readiness']['total'], 1) * 100) }}%;"></i></div>
+                                <p class="ht-next">
+                                    @if($r['readiness']['next'])
+                                        Next: <b>{{ $r['readiness']['next'] }}</b>
+                                    @else
+                                        <b>Every step is done.</b>
+                                    @endif
+                                </p>
+                            @else
+                                <p class="ht-next">This booking was made outside the agreement steps, so there is nothing to track here.</p>
+                            @endif
                         </div>
-                        <div>
-                            <div class="ht-fact-l">Where</div>
-                            <div class="ht-fact-v">{!! $r['event']['where'] ?: '<span class="dim">Not recorded</span>' !!}</div>
-                        </div>
-                    </div>
 
-                    <div class="ht-money">
-                        <div class="ht-money-h">Payment</div>
-                        @if($r['money'])
-                            <div class="ht-money-row">
-                                <div>
-                                    <div class="ht-money-n">{{ $fmtMoney($r['money']['total']) ?? '—' }}</div>
-                                    <div class="ht-money-k">Agreed</div>
-                                </div>
-                                <div>
-                                    <div class="ht-money-n">{{ $fmtMoney($r['money']['paid']) }}</div>
-                                    <div class="ht-money-k">Paid</div>
-                                </div>
-                                <div>
-                                    <div class="ht-money-n {{ $r['money']['balance'] > 0 ? 'due' : '' }}">{{ $fmtMoney($r['money']['balance']) }}</div>
-                                    <div class="ht-money-k">
-                                        {{ $r['money']['balance'] > 0 ? 'Still owed' : 'Nothing owed' }}@if($r['money']['due'] && $r['money']['balance'] > 0), due {{ $r['money']['due']->format('M j') }}@endif
+                        <div class="ht-panel">
+                            <div class="ht-panel-h">
+                                <span class="ht-panel-ico" style="background:rgba(249,115,22,.12);color:#ea580c;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg></span>
+                                <span class="ht-panel-t">Payment</span>
+                            </div>
+                            @if($r['money'])
+                                <div class="ht-money-row">
+                                    <div>
+                                        <div class="ht-money-n">{{ $money($r['money']['total']) ?? '—' }}</div>
+                                        <div class="ht-money-k">Agreed</div>
+                                    </div>
+                                    <div>
+                                        <div class="ht-money-n">{{ $money($r['money']['paid']) }}</div>
+                                        <div class="ht-money-k">Paid</div>
+                                    </div>
+                                    <div>
+                                        <div class="ht-money-n {{ $r['money']['balance'] > 0 ? 'due' : '' }}">{{ $money($r['money']['balance']) }}</div>
+                                        <div class="ht-money-k">{{ $r['money']['balance'] > 0 ? 'Due' : 'Nothing owed' }}@if($r['money']['due'] && $r['money']['balance'] > 0) by {{ $r['money']['due']->format('M j') }}@endif</div>
                                     </div>
                                 </div>
-                                <div>
-                                    <div class="ht-money-n">{{ $r['money']['label'] }}</div>
-                                    <div class="ht-money-k">Status</div>
-                                </div>
-                            </div>
-                        @else
-                            {{-- Not zero. Nothing went through the platform for
-                                 this booking, and saying "$0" would read as
-                                 settled when it is simply unrecorded. --}}
-                            <p style="font-size:13px;color:var(--text-muted);margin:0;">No payment has gone through the site for this booking.</p>
-                        @endif
-                    </div>
-
-                    <div class="ht-acts">
-                        @if($r['urls']['event'])
-                            <a class="ht-btn go" href="{{ $r['urls']['event'] }}">View Event Details</a>
-                        @endif
-                        @if($r['urls']['profile'])
-                            <a class="ht-btn" href="{{ $r['urls']['profile'] }}">View {{ ucfirst($r['supplier']['noun']) }} Profile</a>
-                        @endif
-                        @if($r['urls']['again'])
-                            <a class="ht-btn" href="{{ $r['urls']['again'] }}">Book Again</a>
-                        @endif
-                        <a class="ht-btn" href="{{ $r['urls']['payments'] }}">Payments</a>
-                        <a class="ht-btn" href="{{ route('client.chat.index') }}">Message {{ ucfirst($r['supplier']['noun']) }}</a>
+                            @else
+                                <p class="ht-next">No payment has gone through the site for this booking.</p>
+                            @endif
+                        </div>
                     </div>
                 </div>
             @endforeach
@@ -335,6 +441,16 @@
 
     var empty = document.querySelector('[data-ht-empty]');
 
+    function closeMenus(except) {
+        document.querySelectorAll('[data-ht-menu]').forEach(function (m) {
+            if (m !== except) {
+                m.classList.remove('is-open');
+                var b = m.parentElement.querySelector('[data-ht-more]');
+                if (b) b.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
     function show(id) {
         document.querySelectorAll('[data-ht-detail]').forEach(function (d) {
             d.classList.toggle('is-on', d.getAttribute('data-ht-detail') === id);
@@ -342,6 +458,7 @@
         rows.forEach(function (r) {
             r.classList.toggle('is-on', r.getAttribute('data-ht-row') === id);
         });
+        closeMenus();
         if (empty) empty.style.display = 'none';
     }
 
@@ -355,6 +472,20 @@
             g.setAttribute('aria-expanded', g.getAttribute('aria-expanded') === 'false' ? 'true' : 'false');
         });
     });
+
+    document.querySelectorAll('[data-ht-more]').forEach(function (b) {
+        b.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var menu = b.parentElement.querySelector('[data-ht-menu]');
+            var open = menu.classList.contains('is-open');
+            closeMenus(menu);
+            menu.classList.toggle('is-open', !open);
+            b.setAttribute('aria-expanded', !open ? 'true' : 'false');
+        });
+    });
+
+    document.addEventListener('click', function () { closeMenus(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenus(); });
 
     // The first one, so the right side is never a blank panel on arrival.
     show(rows[0].getAttribute('data-ht-row'));

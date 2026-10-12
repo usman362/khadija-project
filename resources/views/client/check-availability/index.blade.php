@@ -4,12 +4,12 @@
 
 @push('styles')
 <style>
-    .ca-head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-    .ca-head-ico { width: 54px; height: 54px; border-radius: 15px; background: rgba(249,115,22,.12);
-        display: flex; align-items: center; justify-content: center; flex: none; }
-    .ca-head-ico svg { width: 27px; height: 27px; color: var(--accent-orange, #ea580c); }
-    .ca-head h1 { font-size: 24px; font-weight: 800; color: var(--text-primary); margin: 0; }
-    .ca-head p { font-size: 13px; color: var(--text-muted); margin: 3px 0 0; }
+    .ca-banner { display: flex; align-items: center; gap: 16px; padding: 18px 22px; border-radius: 16px;
+        background: linear-gradient(90deg, rgba(249,115,22,.16), rgba(249,115,22,.05)); margin-bottom: 14px; }
+    [data-theme="dark"] .ca-banner { background: linear-gradient(90deg, rgba(249,115,22,.18), rgba(249,115,22,.04)); }
+    .ca-banner > svg { width: 42px; height: 42px; color: var(--accent-orange, #ea580c); flex: none; }
+    .ca-banner h1 { font-size: 27px; font-weight: 800; color: var(--text-primary); margin: 0; line-height: 1.15; }
+    .ca-banner p { font-size: 13.5px; color: var(--text-secondary); margin: 3px 0 0; }
 
     .ca-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; }
 
@@ -40,7 +40,10 @@
     .ca-dates { display: flex; gap: 9px; flex-wrap: wrap; }
     .ca-date { border: 1px solid var(--border-color); border-radius: 11px; padding: 9px 12px; min-width: 112px; }
     .ca-date.is-primary { border-color: var(--accent-orange, #ea580c); background: rgba(249,115,22,.06); }
-    .ca-date-l { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .3px; color: var(--text-muted); }
+    .ca-date-l { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: .3px; color: var(--text-muted); }
+    .ca-date-l svg { width: 12px; height: 12px; flex: none; }
+    .ca-date.is-blank { opacity: .55; border-style: dashed; }
     .ca-date-v { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-top: 2px; }
     .ca-date-t { font-size: 11px; color: var(--text-muted); }
 
@@ -64,6 +67,8 @@
     .ca-tab.is-on { border-color: var(--accent-orange, #ea580c); background: rgba(249,115,22,.1); color: var(--brand-text, #c2410c); }
 
     .ca-table { width: 100%; border-collapse: collapse; }
+    .ca-th-sub { display: block; font-weight: 600; text-transform: none; letter-spacing: 0;
+        font-size: 10.5px; color: var(--text-muted); margin-top: 2px; }
     .ca-table th { text-align: left; font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px;
         color: var(--text-muted); padding: 11px 14px; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
     .ca-table td { padding: 11px 14px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--text-primary); vertical-align: middle; }
@@ -115,15 +120,14 @@
     ], $over), fn ($v) => $v !== null && $v !== ''));
 @endphp
 
-<div class="ca-head">
-    <span class="ca-head-ico">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/>
-        </svg>
-    </span>
+<div class="ca-banner">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
     <div>
         <h1>Check Availability &ndash; {{ $kind === 'influencer' ? 'Influencers' : 'Professionals' }}</h1>
-        <p>See if {{ $kind === 'influencer' ? 'influencers' : 'professionals' }} are available for your event dates before you hire them.</p>
+        <p>See if {{ $kind === 'influencer' ? 'Influencers' : 'Professionals' }} are available for your event dates before you hire them.</p>
     </div>
 </div>
 
@@ -181,17 +185,29 @@
             <div class="ca-dates">
                 @foreach($dates as $d)
                     <div class="ca-date {{ $d['key'] === 'primary' ? 'is-primary' : '' }}">
-                        <div class="ca-date-l">{{ $d['label'] }}</div>
+                        <div class="ca-date-l">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            {{ $d['label'] }}
+                        </div>
                         <div class="ca-date-v">{{ $d['at']->format('M j, Y') }}</div>
-                        <div class="ca-date-t">{{ $d['at']->format('g:i A') }}</div>
+                        <div class="ca-date-t">{{ $d['at']->format('D, g:i A') }}</div>
                     </div>
                 @endforeach
+
+                {{-- The slots his screen has, shown empty rather than filled
+                     in: a backup is a date the client chose, and inventing one
+                     would put a date on the page nobody picked. --}}
+                @for($i = $dates->count(); $i < 3; $i++)
+                    <div class="ca-date is-blank">
+                        <div class="ca-date-l">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            Backup Date {{ $i }}
+                        </div>
+                        <div class="ca-date-v">Not set</div>
+                        <div class="ca-date-t">Add one when you post</div>
+                    </div>
+                @endfor
             </div>
-            @if($dates->count() === 1)
-                {{-- Not filled in with invented dates: a backup is a date the
-                     client chose, and this event has not chosen any. --}}
-                <div class="ca-ev-meta">No backup dates on this event. Add them when you post, and they appear here.</div>
-            @endif
         @endif
     </div>
 
@@ -202,13 +218,13 @@
              can offer a service nobody does or a town nobody is in. --}}
         <div class="ca-filters">
             <select name="service" onchange="this.form.submit()" aria-label="Service type">
-                <option value="">All service types</option>
+                <option value="">All Service Types</option>
                 @foreach($services as $svc)
                     <option value="{{ $svc->id }}" @selected($serviceId === $svc->id)>{{ $svc->name }}</option>
                 @endforeach
             </select>
             <select name="place" onchange="this.form.submit()" aria-label="Location">
-                <option value="">All locations</option>
+                <option value="">All Locations</option>
                 @foreach($places as $pl)
                     <option value="{{ $pl }}" @selected($place === $pl)>{{ $pl }}</option>
                 @endforeach
@@ -256,11 +272,15 @@
         <table class="ca-table">
             <thead>
                 <tr>
-                    <th>{{ $kind === 'influencer' ? 'Influencer' : 'Professional' }}</th>
+                    <th>User</th>
                     <th>Type</th>
                     <th>Service</th>
                     @foreach($dates as $d)
-                        <th>{{ $d['label'] }}<br><span style="font-weight:600;text-transform:none;letter-spacing:0;">{{ $d['at']->format('M j') }}</span></th>
+                        <th>
+                            {{ $d['label'] }}
+                            <span class="ca-th-sub">{{ $d['at']->format('M j, Y') }}</span>
+                            <span class="ca-th-sub">{{ $d['at']->format('g:i A') }}@if($event?->ends_at) &ndash; {{ $event->ends_at->format('g:i A') }}@endif</span>
+                        </th>
                     @endforeach
                     <th>Actions</th>
                 </tr>

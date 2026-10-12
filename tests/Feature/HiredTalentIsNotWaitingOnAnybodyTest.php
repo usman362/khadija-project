@@ -199,7 +199,9 @@ class HiredTalentIsNotWaitingOnAnybodyTest extends TestCase
 
         $html = $this->page();
 
-        $this->assertStringContainsString('Still owed', $html);
+        // The label under the figure. "Due" where there is a balance,
+        // "Nothing owed" where there is not.
+        $this->assertStringContainsString('>Due', $html);
         $this->assertStringNotContainsString('Nothing owed', $html);
     }
 
@@ -231,21 +233,50 @@ class HiredTalentIsNotWaitingOnAnybodyTest extends TestCase
     }
 
     /**
-     * Readiness is not invented.
+     * Readiness is the agreement's own progress, not a guess.
      *
      * Sir Peter's mockup shows "3 of 5 complete, Next: Sound Check". Nothing
-     * records steps towards an event, so the bar is left out rather than
-     * filled with a number nobody could stand behind.
+     * records steps towards an event, so that exact bar would be invented.
+     * What IS recorded is the finalize wizard's seven steps, each with the
+     * date it was completed, so the card is filled from those instead.
      */
-    public function test_it_does_not_invent_a_readiness_figure(): void
+    public function test_readiness_comes_from_the_agreement_steps(): void
+    {
+        $booking = $this->book();
+
+        \App\Models\Finalization::create([
+            'event_id'        => $this->event->id,
+            'booking_id'      => $booking->id,
+            'client_id'       => $this->client->id,
+            'supplier_id'     => $this->pro->id,
+            'bid_reviewed_at' => now(),
+            'scope_agreed_at' => now(),
+        ]);
+
+        $row = HiredTalent::rows($this->client)->first();
+
+        $this->assertSame(2, $row['readiness']['done']);
+        $this->assertSame(count(\App\Models\Finalization::STEPS), $row['readiness']['total']);
+        $this->assertSame('Price & Fees', $row['readiness']['next']);
+
+        $html = $this->page();
+        $this->assertStringContainsString('2 of 7 complete', $html);
+        $this->assertStringContainsString('Next: <b>Price &amp; Fees</b>', $html);
+    }
+
+    /**
+     * And where there is no agreement there is no bar.
+     *
+     * An empty one would read as "not started" rather than "not applicable".
+     */
+    public function test_a_booking_without_an_agreement_has_no_bar(): void
     {
         $this->book();
 
-        $html = $this->page();
+        $row = HiredTalent::rows($this->client)->first();
 
-        foreach (['Readiness', 'of 5 complete', 'On Track'] as $invented) {
-            $this->assertStringNotContainsString($invented, $html);
-        }
+        $this->assertNull($row['readiness']);
+        $this->assertStringContainsString('nothing to track here', $this->page());
     }
 
     /** The calendar's dead tab now goes somewhere. */

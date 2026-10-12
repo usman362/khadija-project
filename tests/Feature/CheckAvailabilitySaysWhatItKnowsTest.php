@@ -172,7 +172,12 @@ class CheckAvailabilitySaysWhatItKnowsTest extends TestCase
         $dates = CheckAvailability::dates($this->event);
 
         $this->assertCount(1, $dates, 'This event has no backups, so only its own date is checked.');
-        $this->assertStringContainsString('No backup dates on this event', $this->page());
+
+        // The two empty slots his screen shows are present and say Not set,
+        // rather than being filled with dates the client never chose.
+        $html = $this->page();
+        $this->assertSame(2, substr_count($html, 'ca-date is-blank'));
+        $this->assertStringContainsString('Add one when you post', $html);
     }
 
     /** Where the client recorded them, they are used. */
