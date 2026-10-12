@@ -810,6 +810,14 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/finalize/{finalization}/{step?}', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'show'])
             ->name('client.finalize.step');
+        /*
+         * Above the {step} wildcard below, for the same reason the overview
+         * GET is above its own: the wildcard would read "edit-agreement" as
+         * the name of a step and the post would 404.
+         */
+        Route::post('/finalize/{finalization}/edit-agreement', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'editAgreement'])
+            ->name('client.finalize.edit');
+
         Route::post('/finalize/{finalization}/{step}', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'save'])
             ->name('client.finalize.save');
         // The return leg from Stripe Checkout. GET, because Stripe sends the
@@ -828,8 +836,6 @@ Route::middleware('auth')->group(function () {
          */
         Route::post('/finalize/{finalization}/approve', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'approveTerms'])
             ->name('client.finalize.approve');
-        Route::post('/finalize/{finalization}/propose-changes', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'proposeChanges'])
-            ->name('client.finalize.propose');
         Route::post('/finalize/{finalization}/decline', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'declineAgreement'])
             ->name('client.finalize.decline');
 

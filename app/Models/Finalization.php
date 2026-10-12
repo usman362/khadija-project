@@ -40,6 +40,10 @@ class Finalization extends Model
         'agreed_price'       => 'decimal:2',
         'deposit_amount'     => 'decimal:2',
         'change_requested_at' => 'datetime',
+        // Unsent edits. Not the agreement, which is why they live apart from
+        // the real columns. See Domain\Agreements\EditAgreement.
+        'draft_terms'        => 'array',
+        'draft_at'           => 'datetime',
         'declined_at'         => 'datetime',
     ];
 

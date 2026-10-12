@@ -90,6 +90,78 @@
         background: var(--accent-orange, #ea580c); }
     .ws-newdot.is-on { display: block; }
 
+
+    /* ── Edit Agreement ─────────────────────────────────── */
+    .ws-dpill { font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 999px;
+        background: rgba(245,158,11,.16); color: #b45309; margin-left: 6px; }
+    .eg-scrim { position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 60; }
+    .eg { position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 100%); z-index: 61;
+        background: var(--bg-card); border-left: 1px solid var(--border-color); overflow-y: auto; }
+    .eg-form { padding: 20px 22px 24px; }
+    .eg-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+    .eg-head h2 { font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0;
+        border-bottom: 3px solid var(--accent-orange, #ea580c); display: inline-block; padding-bottom: 3px; }
+    .eg-head p { font-size: 12.5px; color: var(--text-muted); margin: 8px 0 0; line-height: 1.55; }
+    .eg-x { margin-left: auto; border: 0; background: none; font-size: 26px; line-height: 1;
+        color: var(--text-muted); cursor: pointer; padding: 0 4px; }
+
+    .eg-note { display: flex; gap: 10px; align-items: flex-start; border-radius: 12px; padding: 12px 14px;
+        font-size: 12.5px; line-height: 1.55; color: var(--text-secondary); margin-bottom: 14px;
+        background: rgba(37,99,235,.07); border: 1px solid rgba(37,99,235,.2); }
+    .eg-note svg { width: 17px; height: 17px; color: var(--info-text, #1d4ed8); flex: none; margin-top: 1px; }
+    .eg-note b { color: var(--text-primary); }
+    .eg-note.draft { background: rgba(245,158,11,.1); border-color: rgba(245,158,11,.3); }
+    .eg-note.bad { background: rgba(220,38,38,.08); border-color: rgba(220,38,38,.3); color: #991b1b; }
+    .eg-link { border: 0; background: none; padding: 0; margin-left: auto; font: inherit; font-size: 12.5px;
+        font-weight: 700; color: var(--accent-orange, #ea580c); cursor: pointer; white-space: nowrap; }
+
+    .eg-sections { display: flex; flex-direction: column; gap: 9px; margin-bottom: 14px; }
+    .eg-sec { border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+    .eg-sec > summary { display: flex; align-items: center; gap: 11px; padding: 12px 14px; cursor: pointer; list-style: none; }
+    .eg-sec > summary::-webkit-details-marker { display: none; }
+    .eg-num { width: 28px; height: 28px; border-radius: 9px; flex: none; display: flex; align-items: center;
+        justify-content: center; font-size: 12.5px; font-weight: 800;
+        background: rgba(249,115,22,.12); color: var(--brand-text, #c2410c); }
+    .eg-sec-t { flex: 1; min-width: 0; }
+    .eg-sec-t b { display: block; font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
+    .eg-sec-t span { display: block; font-size: 11.5px; color: var(--text-muted);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .eg-chev { width: 15px; height: 15px; color: var(--text-muted); flex: none; transition: transform .15s; }
+    .eg-sec[open] .eg-chev { transform: rotate(180deg); }
+    .eg-fields { padding: 2px 14px 14px; display: flex; flex-direction: column; gap: 11px; }
+
+    .eg-field { display: block; }
+    .eg-label { display: flex; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 800;
+        color: var(--text-secondary); margin-bottom: 5px; }
+    .eg-moved { font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 999px;
+        background: rgba(245,158,11,.16); color: #b45309; }
+    .eg-field input, .eg-field textarea { width: 100%; border: 1px solid var(--border-color); border-radius: 10px;
+        padding: 9px 11px; font: inherit; font-size: 13px; color: var(--text-primary); background: var(--bg-card); }
+    .eg-field input:focus, .eg-field textarea:focus { outline: none; border-color: var(--accent-orange, #ea580c); }
+    .eg-field.is-moved input, .eg-field.is-moved textarea { border-color: rgba(245,158,11,.6); }
+    .eg-err { display: block; font-size: 11.5px; color: #dc2626; margin-top: 4px; }
+
+    .eg-hist { border-top: 1px solid var(--border-color); margin-top: 16px; padding-top: 14px; }
+    .eg-hist h3 { font-size: 13.5px; font-weight: 800; color: var(--text-primary); margin: 0 0 10px; }
+    .eg-rev { border: 1px solid var(--border-color); border-radius: 11px; padding: 11px 13px; margin-bottom: 8px; }
+    .eg-rev-h { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+    .eg-rev-h b { font-size: 12.5px; color: var(--text-primary); }
+    .eg-rev-h span { font-size: 11.5px; color: var(--text-muted); }
+    .eg-rev-l { margin: 7px 0 0; padding-left: 16px; }
+    .eg-rev-l li { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+    .eg-was { color: var(--text-muted); text-decoration: line-through; }
+    .eg-now { color: var(--text-primary); font-weight: 600; }
+    .eg-rev-s { font-size: 11.5px; color: var(--text-muted); margin: 6px 0 0; }
+
+    .eg-foot { display: flex; gap: 9px; justify-content: flex-end; flex-wrap: wrap;
+        border-top: 1px solid var(--border-color); margin-top: 16px; padding-top: 14px; }
+    .eg-btn { padding: 10px 16px; border-radius: 10px; border: 1px solid var(--border-color);
+        background: var(--bg-card); color: var(--text-primary); font: inherit; font-size: 13px;
+        font-weight: 700; cursor: pointer; }
+    .eg-btn.go { background: var(--accent-orange, #ea580c); border-color: transparent; color: #fff; }
+
+    @media (max-width: 620px) { .eg-foot .eg-btn { flex: 1; } }
+
     @media (max-width: 1500px) {
         .ws { grid-template-columns: 180px minmax(0,1fr) 300px; }
         .ws.is-folded { grid-template-columns: 180px minmax(0,1fr) 46px; }
@@ -276,7 +348,14 @@
                         <button type="submit" class="ws-btn">Accept current terms</button>
                     </form>
                 @endunless
-                <a class="ws-btn" href="{{ route('client.finalize.step', [$fin, 'bid']) }}">Request changes</a>
+                {{-- One button, not two. Sir Peter: "Do not keep both buttons,
+                     because they create overlapping actions and unnecessary
+                     confusion." --}}
+                <button type="button" class="ws-btn" data-ws-edit>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+                    Edit Agreement
+                    @if($draft)<span class="ws-dpill">Draft</span>@endif
+                </button>
             @endif
             <a class="ws-btn go" href="{{ route('client.finalize.step', [$fin, 'bid']) }}">
                 Continue to finalize
@@ -343,6 +422,152 @@
     </aside>
 </div>
 
+{{-- ── Edit Agreement ──────────────────────────────────────
+     His panel slides in from the right. Saving keeps the edits to yourself
+     and leaves every signature standing; sending is what moves the agreement,
+     and therefore what resets them. That split is rule 7. --}}
+<div class="eg-scrim" data-eg-scrim hidden></div>
+<aside class="eg" id="edit" data-eg hidden aria-label="Edit agreement">
+    <form method="POST" action="{{ route('client.finalize.edit', $fin) }}" class="eg-form">
+        @csrf
+        <div class="eg-head">
+            <div>
+                <h2>Edit Agreement</h2>
+                <p>Make changes to the agreement details. Your changes will be sent to the other party for review and approval.</p>
+            </div>
+            <button type="button" class="eg-x" data-eg-close aria-label="Close">&times;</button>
+        </div>
+
+        @if($errors->has('agreement'))
+            <div class="eg-note bad">{{ $errors->first('agreement') }}</div>
+        @endif
+
+        <div class="eg-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span>
+                @if($isAmendment)
+                    Both of you have signed. Sending this creates an <b>amendment</b>: the signed version is kept
+                    whole, and both of you sign the new one.
+                @else
+                    This creates a new version of the agreement. The other party must approve the changes
+                    before the agreement is updated.
+                @endif
+            </span>
+        </div>
+
+        @if($draft)
+            <div class="eg-note draft">
+                <span>
+                    You have unsent edits, saved {{ $fin->draft_at?->humanAgo() }}.
+                    <b>Nobody's signature has changed</b>, because they have not been sent.
+                </span>
+                <button type="submit" name="intent" value="discard" class="eg-link">Discard them</button>
+            </div>
+        @endif
+
+        <div class="eg-sections">
+            @php $n = 0; @endphp
+            @foreach($editGroups as $section => $fields)
+                @php $n++; @endphp
+                <details class="eg-sec" @if($n === 1) open @endif>
+                    <summary>
+                        <span class="eg-num">{{ $n }}</span>
+                        <span class="eg-sec-t">
+                            <b>{{ $section }}</b>
+                            <span>{{ collect($fields)->map(fn ($f) => $editFields[$f])->implode(', ') }}</span>
+                        </span>
+                        <svg class="eg-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </summary>
+                    <div class="eg-fields">
+                        @foreach($fields as $field)
+                            @php
+                                $value = $draft[$field] ?? $terms[$field] ?? null;
+                                $type  = match ($field) {
+                                    'service_start', 'service_end'    => 'datetime-local',
+                                    'balance_due_on'                  => 'date',
+                                    'agreed_price', 'deposit_percent' => 'number',
+                                    default                           => 'text',
+                                };
+                                $long = in_array($field, ['scope', 'payment_terms', 'schedule_notes'], true);
+                                $moved = $draft && array_key_exists($field, $draft)
+                                    && trim((string) ($draft[$field] ?? '')) !== trim((string) ($terms[$field] ?? ''));
+                            @endphp
+                            <label class="eg-field {{ $moved ? 'is-moved' : '' }}">
+                                <span class="eg-label">
+                                    {{ $editFields[$field] }}
+                                    @if($moved)<span class="eg-moved">edited</span>@endif
+                                </span>
+                                @if($long)
+                                    <textarea name="terms[{{ $field }}]" rows="3" maxlength="5000">{{ old('terms.' . $field, $value) }}</textarea>
+                                @elseif($type === 'datetime-local')
+                                    <input type="datetime-local" name="terms[{{ $field }}]"
+                                           value="{{ old('terms.' . $field, $value ? \App\Support\DisplayTimezone::forInput($value) : '') }}">
+                                @else
+                                    <input type="{{ $type }}" name="terms[{{ $field }}]"
+                                           @if($field === 'agreed_price') step="0.01" min="0" @endif
+                                           @if($field === 'deposit_percent') min="0" max="100" @endif
+                                           value="{{ old('terms.' . $field, $value) }}">
+                                @endif
+                                @error('terms.' . $field)<span class="eg-err">{{ $message }}</span>@enderror
+                            </label>
+                        @endforeach
+                    </div>
+                </details>
+            @endforeach
+        </div>
+
+        <label class="eg-field">
+            <span class="eg-label">What changed, and why</span>
+            <textarea name="summary" rows="2" maxlength="2000"
+                      placeholder="A line for the other party, and for the record.">{{ old('summary') }}</textarea>
+        </label>
+
+        @if($history->isNotEmpty())
+            <div class="eg-hist">
+                <h3>Version history</h3>
+                @foreach($history as $rev)
+                    <div class="eg-rev">
+                        <div class="eg-rev-h">
+                            <b>Version {{ $rev->version }}</b>
+                            <span>{{ $rev->author?->name ?? 'Someone' }} &middot; {{ $rev->created_at?->format('M j, Y g:i A') }}</span>
+                        </div>
+                        @if($rev->changed)
+                            <ul class="eg-rev-l">
+                                @foreach($rev->changed as $field => $c)
+                                    <li>
+                                        <b>{{ $c['label'] ?? $field }}</b>
+                                        <span class="eg-was">{{ ($c['from'] ?? '') === '' || $c['from'] === null ? 'not set' : $c['from'] }}</span>
+                                        &rarr;
+                                        <span class="eg-now">{{ ($c['to'] ?? '') === '' || $c['to'] === null ? 'not set' : $c['to'] }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
+                        @if($rev->client_signed_at || $rev->supplier_signed_at)
+                            <p class="eg-rev-s">
+                                Signed on this version:
+                                {{ collect([
+                                    $rev->client_signed_at ? 'you' : null,
+                                    $rev->supplier_signed_at ? $pro->name : null,
+                                ])->filter()->implode(' and ') }}.
+                            </p>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+        <div class="eg-foot">
+            <button type="button" class="eg-btn" data-eg-close>Cancel</button>
+            <button type="submit" name="intent" value="draft" class="eg-btn">Save as draft</button>
+            <button type="submit" name="intent" value="send" class="eg-btn go">
+                {{ $isAmendment ? 'Send amendment' : 'Send changes for review' }}
+            </button>
+        </div>
+    </form>
+</aside>
+
+
 @push('scripts')
 <script>
 (function () {
@@ -386,6 +611,32 @@
 
     btn.addEventListener('click', function () {
         apply(!grid.classList.contains('is-folded'), true);
+    });
+})();
+
+// ── Edit Agreement ───────────────────────────────────────
+(function () {
+    var panel = document.querySelector('[data-eg]');
+    var scrim = document.querySelector('[data-eg-scrim]');
+    if (!panel) return;
+
+    function open()  { panel.hidden = false; scrim.hidden = false; document.body.style.overflow = 'hidden'; }
+    function close() { panel.hidden = true;  scrim.hidden = true;  document.body.style.overflow = ''; }
+
+    document.querySelectorAll('[data-ws-edit]').forEach(function (b) { b.addEventListener('click', open); });
+    document.querySelectorAll('[data-eg-close]').forEach(function (b) { b.addEventListener('click', close); });
+    scrim.addEventListener('click', close);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !panel.hidden) close(); });
+
+    // Arriving on #edit, or coming back from a failed save, opens it rather
+    // than leaving the reader looking at the page they just left.
+    if (location.hash === '#edit' || panel.querySelector('.eg-err, .eg-note.bad')) open();
+
+    // Sending is the thing that resets signatures, so it asks once.
+    panel.querySelector('[value="send"]').addEventListener('click', function (e) {
+        if (!confirm('Send these changes? Any approvals and signatures on the current terms will stop counting, and both of you will need to agree the new version.')) {
+            e.preventDefault();
+        }
     });
 })();
 </script>

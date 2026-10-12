@@ -160,15 +160,11 @@
                 <span class="fz-ws-said">You approved version {{ Workspace::version($fin) }}{{ Workspace::supplierApproved($fin) ? '.' : ', waiting on the professional.' }}</span>
             @endif
 
-            <details class="fz-ws-d">
-                <summary class="fz-btn">Propose changes</summary>
-                <form method="POST" action="{{ route('client.finalize.propose', $fin) }}">
-                    @csrf
-                    <textarea name="reason" rows="3" maxlength="2000" required placeholder="What would you like changed, and why?"></textarea>
-                    <p class="fz-ws-warn">This sends the agreement back to be negotiated. Any approvals or signatures on the current terms stop counting, because they were given to different terms.</p>
-                    <button type="submit" class="fz-btn ok">Send it back</button>
-                </form>
-            </details>
+            {{-- Sir Peter replaced Propose Changes with Edit Agreement, and
+                 asked that both are not kept: "they create overlapping actions
+                 and unnecessary confusion". The editor lives on the agreement
+                 page, where the terms it edits are on screen. --}}
+            <a class="fz-btn" href="{{ route('client.finalize.overview', $fin) }}#edit">Edit agreement</a>
         @endif
 
         @if($fin->status !== 'booked')

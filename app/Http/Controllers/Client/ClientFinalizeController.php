@@ -135,6 +135,15 @@ class ClientFinalizeController extends Controller
             'messages'     => $conversation
                 ? $conversation->messages()->with('sender:id,name,avatar')->latest()->take(12)->get()->reverse()
                 : collect(),
+
+            // The editor and what it has to show: the terms as they stand, any
+            // unsent draft, and every version so far.
+            'editFields'  => \App\Domain\Agreements\EditAgreement::FIELDS,
+            'editGroups'  => \App\Domain\Agreements\EditAgreement::SECTIONS,
+            'terms'       => \App\Domain\Agreements\EditAgreement::current($finalization),
+            'draft'       => \App\Domain\Agreements\EditAgreement::draft($finalization),
+            'history'     => \App\Domain\Agreements\EditAgreement::history($finalization),
+            'isAmendment' => \App\Domain\Agreements\EditAgreement::isAmendment($finalization),
         ]);
     }
 
@@ -253,18 +262,63 @@ class ClientFinalizeController extends Controller
             : 'You approved these terms. It now waits on the professional.');
     }
 
-    /** "Propose Changes" — send it back to be negotiated, with a reason. */
-    public function proposeChanges(Request $request, Finalization $finalization): RedirectResponse
+    /**
+     * "Edit Agreement" — the one way terms change now.
+     *
+     * Sir Peter, 11 October: "Replace the existing Request Changes button with
+     * Edit Agreement. Do not keep both buttons, because they create
+     * overlapping actions and unnecessary confusion."
+     *
+     * Saving keeps the edits to yourself and leaves every signature standing.
+     * Sending is what moves the agreement, and therefore what resets them.
+     */
+    public function editAgreement(Request $request, Finalization $finalization): RedirectResponse
     {
         $this->authorizeClient($request, $finalization);
 
         $data = $request->validate([
-            'reason' => ['required', 'string', 'min:5', 'max:2000'],
-        ], ['reason.required' => 'Say what you would like changed.']);
+            'terms'           => ['required', 'array'],
+            'terms.scope'            => ['nullable', 'string', 'max:5000'],
+            'terms.agreed_price'     => ['nullable', 'numeric', 'min:0', 'max:9999999'],
+            'terms.service_start'    => ['nullable', 'date'],
+            'terms.service_end'      => ['nullable', 'date', 'after_or_equal:terms.service_start'],
+            'terms.schedule_notes'   => ['nullable', 'string', 'max:2000'],
+            'terms.deposit_percent'  => ['nullable', 'integer', 'min:0', 'max:100'],
+            'terms.balance_due_on'   => ['nullable', 'date'],
+            'terms.payment_terms'    => ['nullable', 'string', 'max:2000'],
+            'summary'         => ['nullable', 'string', 'max:2000'],
+            'intent'          => ['required', 'in:draft,send,discard'],
+        ], [
+            'terms.service_end.after_or_equal' => 'The service cannot end before it starts.',
+        ]);
 
-        \App\Domain\Agreements\Workspace::proposeChanges($finalization, $request->user(), $data['reason']);
+        $edit = \App\Domain\Agreements\EditAgreement::class;
 
-        return back()->with('status', 'Sent back for changes. Any approvals and signatures on the old terms no longer stand.');
+        if ($data['intent'] === 'discard') {
+            $edit::discardDraft($finalization);
+
+            return back()->with('status', 'Your unsent edits were discarded. The agreement is unchanged.');
+        }
+
+        if ($data['intent'] === 'draft') {
+            $edit::saveDraft($finalization, $request->user(), $data['terms']);
+
+            return back()->with('status', 'Saved as a draft. Nothing has been sent, so no signature has changed.');
+        }
+
+        $changed = $edit::submit($finalization, $request->user(), $data['terms'], $data['summary'] ?? null);
+
+        if ($changed === []) {
+            return back()->with('status', 'Nothing was different, so the agreement is unchanged.');
+        }
+
+        $what = count($changed) === 1
+            ? reset($changed)['label']
+            : count($changed) . ' things';
+
+        return back()->with('status', $edit::isAmendment($finalization->fresh())
+            ? "Amendment sent: {$what}. The signed version is kept, and both of you must sign the new one."
+            : "Sent for review: {$what}. Any approvals and signatures on the old terms no longer stand.");
     }
 
     /** "Decline" — one party ends this agreement path. */
