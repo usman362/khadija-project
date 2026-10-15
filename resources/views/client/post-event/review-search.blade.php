@@ -93,7 +93,7 @@
 
                 <div class="pe-rail-card">
                     <h4>Your Search Will…</h4>
-                    @foreach(['Match whole packages that fit your needs','Prioritise verified professionals','Stay within your budget range','Suggest smart add-ons where they help'] as $point)
+                    @foreach(['Match whole packages that fit your needs','Prioritise professionals who have passed our checks','Stay within your budget range','Suggest smart add-ons where they help'] as $point)
                         <div class="pe-check">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
                             {{ $point }}

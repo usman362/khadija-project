@@ -233,7 +233,7 @@ class ClientEsrController extends Controller
         return redirect()
             ->route('client.events.show', $event)
             ->with('status', $scope === 'single'
-                ? 'Rush request published. Verified professionals for that service are being notified now, responses will appear under Proposals.'
-                : 'Rush request published. Verified professionals are being notified now. Each service is bid on separately, and responses appear under Proposals.');
+                ? 'Rush request published. Professionals for that service are being notified now, responses will appear under Proposals.'
+                : 'Rush request published. Professionals are being notified now. Each service is bid on separately, and responses appear under Proposals.');
     }
 }

@@ -271,7 +271,7 @@
             btnClass:  'rem-btn-client',
             iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
             features: [
-                'Post events and hire verified professionals',
+                'Post events and hire event professionals',
                 'Manage all your bookings in one place',
                 'Switch back to Professional mode anytime',
             ],

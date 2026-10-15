@@ -519,7 +519,15 @@
 
                                 <div class="pk-main">
                                     <h3 class="pk-title"><a class="pk-title-link" href="{{ route('public.package', $pkg->slug) }}">{{ $pkg->title }}</a></h3>
-                                    <div class="pk-pro">by {{ $company ?? 'Verified Professional' }} <span class="pk-verif">✔</span></div>
+                                    {{-- Two separate faults lived on this line. The name fell back
+                                         to the words "Verified Professional", which is a label for a
+                                         missing company name and never asked any verification rule at
+                                         all; and the tick was unconditional markup, so every card on
+                                         the public page carried one. OA-165 could not switch either
+                                         of them off because neither went through VerifiedBadge. --}}
+                                    <div class="pk-pro">by {{ $company ?: 'A professional' }}
+                                        @if(\App\Support\VerifiedBadge::shown() && $pro?->isVerified())<span class="pk-verif">✔</span>@endif
+                                    </div>
 
                                     {{-- Three facts about the professional, each shown only when
                                          it exists. A new pro is not "0 bookings" — the card just

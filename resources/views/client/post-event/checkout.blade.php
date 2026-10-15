@@ -99,7 +99,7 @@
                 <div class="pe-card" style="margin-top:18px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
                     <span style="display:inline-flex; color:var(--pe-purple);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
                     <div style="font-weight:800; font-size:13px;">Buyer Protection</div>
-                    <div class="pe-muted" style="font-size:12.5px;">Secure Payments · Verified Professionals · Dedicated Customer Support</div>
+                    <div class="pe-muted" style="font-size:12.5px;">Secure Payments · Reviews from completed bookings · Dedicated Customer Support</div>
                 </div>
 
                 {{-- Actions --}}

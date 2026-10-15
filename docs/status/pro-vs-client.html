@@ -1,0 +1,145 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><!--STYLE--></head><body>
+
+<h1>Professional Side: Build Status</h1>
+<div class="sub">Checked against the code on 14 October 2026, and compared with the client side. Prepared by the developer.</div>
+
+<div class="box">
+<b>Headline.</b> The professional side is further along than previously reported. All twenty of its
+controllers read real records, not sample data. What is missing is not a long list of unbuilt screens.
+It is one structural gap, two small defects, and four items that are waiting on a decision or an
+outside service rather than on development time.
+</div>
+
+<table class="stat">
+  <tr>
+    <td><span class="n">20</span><span class="l">professional controllers, all model backed</span></td>
+    <td><span class="n">21</span><span class="l">professional screen areas built</span></td>
+    <td><span class="n">1</span><span class="l">structural gap that matters</span></td>
+  </tr>
+</table>
+
+<h2>1. The one thing that matters most</h2>
+
+<div class="warn">
+<b>A professional cannot open an agreement at all.</b> Every agreement route on the platform begins
+with <span class="k">client/finalize/...</span>. There is no professional route to view an agreement,
+approve a version, or sign one.
+<br><br>
+Today the professional's counter signature is written automatically at the moment the client signs,
+and the code says plainly that this is a pre launch stand in so the flow can be completed in demos.
+It is labelled as such and was a deliberate choice, not an oversight.
+<br><br>
+<b>Why it matters now.</b> The Edit Agreement feature just built sends changes "for review". There is
+currently nobody on the other side to review them. This is the single largest piece of professional
+side work remaining, and it is the one that unlocks the agreement rules already written.
+</div>
+
+<h2>2. What is complete on the professional side</h2>
+
+<p>Each of these reads live records. The note says what drives it.</p>
+
+<table>
+<tr><th>Area</th><th>Status</th><th>What drives it</th></tr>
+<tr><td class="nm">Dashboard</td><td>Complete</td><td>Earnings, bookings, reviews, subscription, opportunity feed</td></tr>
+<tr><td class="nm">Bidding Board</td><td>Complete</td><td>Events and bids, the largest controller on the side</td></tr>
+<tr><td class="nm">Bid Wizard</td><td>Complete</td><td>Guided bid submission</td></tr>
+<tr><td class="nm">Bid Intelligence</td><td>Complete</td><td>Derived from the pro's own bid history</td></tr>
+<tr><td class="nm">Gigs and Gig Hub</td><td>Complete</td><td>Bookings by status</td></tr>
+<tr><td class="nm">Leads</td><td>Complete</td><td>Open published events</td></tr>
+<tr><td class="nm">Proposals</td><td>Complete</td><td>Bookings in the requested state</td></tr>
+<tr><td class="nm">Direct Offers</td><td>Complete</td><td>Offers aimed at this professional</td></tr>
+<tr><td class="nm">Packages</td><td>Complete</td><td>Packages owned by this professional</td></tr>
+<tr><td class="nm">Calendar</td><td>Complete</td><td>Bookings and events by date</td></tr>
+<tr><td class="nm">Chat</td><td>Complete</td><td>Conversations and unread counts</td></tr>
+<tr><td class="nm">Earnings</td><td>Complete</td><td>Earnings source, net of commission</td></tr>
+<tr><td class="nm">Transactions</td><td>Complete</td><td>Real transaction records</td></tr>
+<tr><td class="nm">Reports and CSV</td><td>Complete</td><td>Report layer over bookings, money and reviews</td></tr>
+<tr><td class="nm">Reviews</td><td>Complete</td><td>Reviews received</td></tr>
+<tr><td class="nm">Profile</td><td>Complete</td><td>The largest area by number of screens</td></tr>
+<tr><td class="nm">Team and Staffing</td><td>Complete</td><td>Staff members, shifts, and a labour cost estimate</td></tr>
+<tr><td class="nm">Priority</td><td>Complete</td><td>Priority actions</td></tr>
+<tr><td class="nm">Contracts hub</td><td>Complete</td><td>Bookings pipeline. Note: this is not the agreement</td></tr>
+<tr><td class="nm">Notifications</td><td>Complete</td><td>Notification records</td></tr>
+</table>
+
+<div class="good">
+<b>Correction to an earlier report.</b> An earlier message said about eleven professional screens ran on
+hardcoded data, and an estimate of three to five weeks rested on that. That was wrong. Those arrays
+were drawing coordinates for charts, not invented records. Every one of the twenty controllers reads
+the database. The estimate that followed from it should be set aside.
+</div>
+
+<h2>3. What remains on the professional side</h2>
+
+<table>
+<tr><th>Item</th><th>Kind</th><th>Note</th></tr>
+<tr><td class="nm">Agreement surface for the professional</td><td>Build</td><td>View, approve, sign, and respond to edits. The structural gap above.</td></tr>
+<tr><td class="nm">Response time trend</td><td>Defect</td><td>The Messages page prints a fixed "down 12 percent" under a real figure. Nothing measures it.</td></tr>
+<tr><td class="nm">Lead budget range</td><td>Defect</td><td>One line on the Leads page is written so the page prints code instead of the budget.</td></tr>
+<tr><td class="nm">Map and weather on the dashboard</td><td>Outside service</td><td>Needs a maps and a weather provider. Not a development question.</td></tr>
+<tr><td class="nm">Intro or highlight video on packages</td><td>Decision</td><td>Deliberately left out. Needs upload limits, storage and a retention policy agreed first.</td></tr>
+<tr><td class="nm">Dispute and mediation on reviews</td><td>Decision</td><td>The mockup offers Edit, Hide and Peer Mediate. None exist, so none were shown.</td></tr>
+<tr><td class="nm">Payouts to professionals</td><td>Decision</td><td>The platform pays nobody automatically today. The only payout is a manual request an administrator marks as paid.</td></tr>
+<tr><td class="nm">Verification badge wording</td><td>In progress</td><td>The approved verification corrections touch one professional profile screen as well.</td></tr>
+</table>
+
+<h2>4. Client side and professional side, next to each other</h2>
+
+<table>
+<tr><th>Capability</th><th>Client</th><th>Professional</th></tr>
+<tr><td class="nm">Dashboard</td><td>Yes</td><td>Yes</td></tr>
+<tr><td class="nm">Calendar</td><td>Yes, being split into three pages</td><td>Yes, single page</td></tr>
+<tr><td class="nm">Messages</td><td>Yes</td><td>Yes</td></tr>
+<tr><td class="nm">Profile</td><td>Yes</td><td>Yes, larger</td></tr>
+<tr><td class="nm">Reviews</td><td>Yes</td><td>Yes</td></tr>
+<tr><td class="nm">Reports and CSV</td><td>Yes</td><td>Yes</td></tr>
+<tr><td class="nm">Packages</td><td>Browses and books</td><td>Creates and manages</td></tr>
+<tr><td class="nm">Proposals</td><td>Receives</td><td>Sends</td></tr>
+<tr><td class="nm">Direct offers</td><td>Sends</td><td>Receives</td></tr>
+<tr><td class="nm">Money</td><td>Spending and payments</td><td>Earnings and transactions</td></tr>
+<tr><td class="nm"><b>Agreement</b></td><td><b>Yes, full workspace</b></td><td><b>None at all</b></td></tr>
+<tr><td class="nm">Bidding board</td><td>Not applicable</td><td>Yes</td></tr>
+<tr><td class="nm">Leads and bid intelligence</td><td>Not applicable</td><td>Yes</td></tr>
+<tr><td class="nm">Team and staffing</td><td>Not applicable</td><td>Yes</td></tr>
+<tr><td class="nm">Post an Event, BR, ER</td><td>Yes</td><td>Not applicable</td></tr>
+<tr><td class="nm">Hired Talent, Availability</td><td>Yes</td><td>Not applicable</td></tr>
+<tr><td class="nm">Saved professionals</td><td>Yes</td><td>Not applicable</td></tr>
+<tr><td class="nm">Badges, verification, toolkit</td><td>Yes</td><td>Partly</td></tr>
+</table>
+
+<h2>5. Where the two sides are out of step</h2>
+
+<p>The client side has moved a long way recently. These are the places where the professional side has
+not yet caught up, in the order they affect a real booking.</p>
+
+<ul>
+<li><b>The agreement.</b> A client can now set terms, approve a version, sign, edit the agreement and
+keep a full version history. A professional can do none of these.</li>
+<li><b>Agreement edits.</b> Changes are sent "for review" to a side that cannot review them.</li>
+<li><b>Hired Talent and Availability.</b> The client can see who they hired and check availability. The
+professional has no matching view of who hired them beyond the bookings list.</li>
+<li><b>Influencers.</b> The client side now has influencer entries in several places. A client still
+cannot reach an influencer, because that side is not open.</li>
+</ul>
+
+<h2>6. What is extra, and should stay that way</h2>
+
+<ul>
+<li><b>Team and Staffing</b> is a professional's own crew and shifts. It is not the retired combined
+force feature and should not be confused with it.</li>
+<li><b>Contracts hub</b> is a bookings pipeline, not the agreement. The two names are close enough to
+cause confusion later.</li>
+<li><b>Food truck and multipurpose stands</b> were never started, so there is nothing to remove. The
+ordinary food truck booking, where a client hires and pays, continues to work.</li>
+</ul>
+
+<div class="box">
+<b>Suggested order.</b> First the two small defects, because they are visible and cheap. Then the
+professional agreement surface, because it is what stops an agreement from ever completing honestly.
+The four decision items can be answered at any time and do not block the rest.
+</div>
+
+<div class="foot">Figures counted from the code on 14 October 2026. Anything that could not be confirmed in the code was left out rather than estimated.</div>
+
+</body></html>

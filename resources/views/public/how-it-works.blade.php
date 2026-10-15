@@ -174,7 +174,7 @@
                         '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>'],
                     ['#2563eb', 'blue',   '3', 'Book &amp; Pay Securely', 'Book with confidence using our secure payment system that protects both clients and professionals.',
                         '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/>'],
-                    ['#ea580c', 'orange', '4', 'Get It Done',         'Collaborate, communicate, and bring your event to life with verified professionals you can trust.',
+                    ['#ea580c', 'orange', '4', 'Get It Done',         'Collaborate, communicate, and bring your event to life with the professionals you choose.',
                         '<path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3h.01"/><path d="M22 8h.01"/><path d="M15 2h.01"/><path d="M22 20h.01"/><path d="m22 2-2.24.75a2.9 2.9 0 0 0-1.96 3.12c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L12 10"/><path d="m22 13-.82-.33c-.86-.34-1.82.2-1.98 1.11-.11.7-.72 1.22-1.43 1.22H17"/><path d="m11 2 .33.82c.34.86-.2 1.82-1.11 1.98C9.52 4.9 9 5.52 9 6.23V7"/>'],
                 ];
             @endphp
@@ -225,7 +225,7 @@
         <div class="hw-why">
             <div class="hw-why-item">
                 <span class="hw-why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.5 13.5L17 22l-5-3-5 3 1.5-8.5"/></svg></span>
-                <div><h4>Verified Professionals</h4><p>Only trusted, reviewed, and verified event experts.</p></div>
+                <div><h4>Professional Profiles</h4><p>Browse profiles, reviews and past work before you book.</p></div>
             </div>
             <div class="hw-why-item">
                 <span class="hw-why-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>

@@ -757,7 +757,7 @@
         <section class="br-cta">
             <div>
                 <h3>Can't find what you're looking for?</h3>
-                <p>Post your event and let verified professionals come to you. Describe your needs and receive proposals from top-rated experts.</p>
+                <p>Post your event and let professionals come to you. Describe your needs and receive proposals from top-rated experts.</p>
                 <div class="br-cta-actions">
                     <a href="{{ route('register') }}" class="br-btn-msg" style="padding:11px 20px;">Post an Event</a>
                     <a href="{{ route('register') }}" class="br-btn-ghost" style="padding:11px 20px;">Join as Professional</a>
@@ -774,7 +774,12 @@
             </div>
             <div class="br-strip-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-                <div><h4>Verified Professionals</h4><p>Background &amp; license checks before pros go live.</p></div>
+                {{-- This said "Background & license checks before pros go live", which was
+                     the strongest verification claim on the site and simply untrue: a
+                     professional uploads a document only if they choose to, and most have
+                     not. The signup disclaimer already said background checks are not
+                     guaranteed, so the site contradicted itself. --}}
+                <div><h4>Professional Profiles</h4><p>Credentials are supplied by professionals. Check anything critical before you hire.</p></div>
             </div>
             <div class="br-strip-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9 12 2"/></svg>

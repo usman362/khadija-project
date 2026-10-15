@@ -62,9 +62,22 @@ class ClientBlockersAnswersTest extends TestCase
 
     public function test_a_verified_professional_can_be_accepted(): void
     {
+        /*
+         * The document as well as the approval, on each one. This fixture used
+         * to stamp the three timestamps and upload nothing, which is the shape
+         * ISSUE-1 was about: an approval with its evidence missing. It passed
+         * only because UserProfile::badgeStatus() took the timestamp alone, and
+         * the moment that was tightened on 15 October the fixture stopped
+         * describing a verified professional at all.
+         */
         $pro = $this->user('professional');
         $pro->profile->forceFill([
-            'trade_license_verified_at' => now(), 'liability_insurance_verified_at' => now(), 'workers_comp_verified_at' => now(),
+            'trade_license_doc'       => 'docs/licence.pdf',
+            'trade_license_verified_at' => now(),
+            'liability_insurance_doc' => 'docs/insurance.pdf',
+            'liability_insurance_verified_at' => now(),
+            'workers_comp_doc'        => 'docs/workers-comp.pdf',
+            'workers_comp_verified_at' => now(),
         ])->save();
 
         $this->assertNotNull(Award::openFinalization($this->bid('Security & Crowd Management', $pro->fresh())));

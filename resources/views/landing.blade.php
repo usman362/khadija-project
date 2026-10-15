@@ -392,7 +392,7 @@
     <div class="lp-trust">
         @php
             $trust = [
-                ['#2563eb', '<path d="M9 12l2 2 4-4"/><path d="M21 12c0 1.66-.45 3.2-1.24 4.5C18.5 18.7 15.6 21 12 21s-6.5-2.3-7.76-4.5A8.94 8.94 0 0 1 3 12V5l9-3 9 3z"/>', 'Verified Professionals', 'Profile &amp; business verification'],
+                ['#2563eb', '<path d="M9 12l2 2 4-4"/><path d="M21 12c0 1.66-.45 3.2-1.24 4.5C18.5 18.7 15.6 21 12 21s-6.5-2.3-7.76-4.5A8.94 8.94 0 0 1 3 12V5l9-3 9 3z"/>', 'Professional Profiles', 'Profiles, reviews and past work'],
                 ['#0ea5e9', '<rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>', 'Secure Payments', 'Secure, protected transactions'],
                 ['#8b5cf6', '<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>', 'Guided Support', 'Smart help at every step'],
                 ['#10b981', '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>', 'Privacy Controls', 'You choose what you share'],

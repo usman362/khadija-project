@@ -192,7 +192,10 @@
                     <div class="pk-pro-who">
                         <span class="pk-avatar">{{ \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($pro?->name ?? '?', 0, 2)) }}</span>
                         <span>
-                            <span class="pk-pro-name">{{ $pro?->name }} @if($pro?->isVerified())<span style="color:var(--green-onwhite);">✔</span>@endif</span>
+                            {{-- OA-165 reached the browse and client views but not this one:
+                                 the tick asked isVerified() without asking whether marks are
+                                 shown at all. --}}
+                            <span class="pk-pro-name">{{ $pro?->name }} @if(\App\Support\VerifiedBadge::shown() && $pro?->isVerified())<span style="color:var(--green-onwhite);">✔</span>@endif</span>
                             @if($profile?->headline)<span class="pk-pro-role">{{ $profile->headline }}</span>@endif
                             <a class="pk-pro-link" href="{{ route('public.professional.show', $pro) }}">View full profile →</a>
                         </span>
@@ -224,7 +227,11 @@
                     @if($responds)<span class="dot">•</span><span>{{ $responds }}</span>@endif
                 </div>
 
-                @if(! empty($badges))
+                {{-- Per-credential marks, and the strongest verification claim on the
+                     public site: it names each check and says it passed. It asked the
+                     controller's list without asking whether marks are shown at all, so
+                     OA-165 never reached it either. --}}
+                @if(\App\Support\VerifiedBadge::shown() && ! empty($badges))
                     <div class="pk-badges">
                         @foreach($badges as $b)
                             <span class="pk-badge {{ $b['verified'] ? 'yes' : 'no' }}">

@@ -208,12 +208,30 @@ class UserProfile extends Model
         'workers_comp' => "Workers' Compensation",
     ];
 
+    /**
+     * Where a profile stands on one credential.
+     *
+     * ISSUE-1 again, found 2026-10-12. That issue was fixed in VerifiedBadge,
+     * which requires the document AND the approval, because all ten verified
+     * profiles were demo accounts with a seeded timestamp and nothing uploaded.
+     * The hardening never reached here: this method answered 'verified' on the
+     * timestamp alone, which is the exact half a seeder or a stray UPDATE can
+     * write.
+     *
+     * So the platform carried two definitions of verified, a strict one and a
+     * loose one, and the loose one fed User::isVerified(), the package pages,
+     * AI matchmaking and the rule that decides who may accept regulated work.
+     *
+     * An approval with no document is not a verification; it is a record with
+     * its evidence missing. It reads as 'none' rather than being quietly
+     * honoured, so the admin queue shows it for what it is.
+     */
     public function badgeStatus(string $badge): string
     {
         $docCol = "{$badge}_doc";
         $verifiedCol = "{$badge}_verified_at";
 
-        if ($this->$verifiedCol) {
+        if ($this->$docCol && $this->$verifiedCol) {
             return 'verified';
         }
         if ($this->$docCol) {

@@ -12,7 +12,7 @@
             'tagline'=> 'Discover amazing events, connect with top professionals, and bring your vision to life.',
             'benefits' => [
                 ['cal',   'Find Amazing Events',     'Browse a wide range of events tailored to your interests and needs.'],
-                ['star',  'Verified Professionals',  'Connect with trusted, reviewed, and highly-rated event professionals.'],
+                ['star',  'Professional Profiles',   'Browse profiles, reviews and completed work before you book.'],
                 ['shield','Secure & Reliable',       'Your data and payments are protected with enterprise-grade security.'],
                 ['head',  'Dedicated Support',       'Our support team is here to help you every step of the way.'],
             ],

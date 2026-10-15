@@ -85,14 +85,23 @@ class PackageDetailPageTest extends TestCase
         $this->assertStringNotContainsString('Events Completed', $html);
     }
 
-    public function test_only_verifications_with_documents_behind_them_are_claimed(): void
+    public function test_no_verification_is_claimed_either_way(): void
     {
         $html = $this->page()->assertOk()->getContent();
 
-        // Nothing is verified on this account, and the page says so rather than
-        // showing three green ticks.
-        $this->assertStringContainsString('Trade License not verified', $html);
+        /*
+         * This used to assert the opposite half: that the page printed "Trade
+         * License not verified" rather than a green tick, which was the honest
+         * answer while the per-credential list was shown at all.
+         *
+         * Sir Peter's handoff of 12 October 2026 settles it differently and
+         * more strictly. Generic verification marks are off for V1, so the list
+         * does not render, and the page makes no claim in either direction.
+         * This page never asked VerifiedBadge::shown(), which is how it kept
+         * printing the list after OA-165 switched marks off everywhere else.
+         */
         $this->assertStringNotContainsString('Trade License verified', $html);
+        $this->assertStringNotContainsString('Trade License not verified', $html);
     }
 
     public function test_a_stand_in_photograph_is_labelled_as_one(): void
