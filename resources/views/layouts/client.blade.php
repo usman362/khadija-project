@@ -1534,69 +1534,31 @@
                         My Events
                     </a>
                 </li>
-                {{-- Sir Peter, 24 Sep: "add a left column webtitle as Calendar &
-                     Availability for a full webpage". On 10 October he asked
-                     for it as subpages rather than one page of tabs, and his
-                     sidebar image settles where each one sits: My Availability
-                     belongs with My Calendar, not with the checking. --}}
-                @php
-                    $__onCal   = request()->routeIs('client.calendar.*');
-                    $__calTab  = request()->query('tab');
-                    $__chkWho  = request()->query('who');
-                    $__onChk   = request()->routeIs('client.check-availability.*');
-                    $__onHired = request()->routeIs('client.hired-talent.*');
-                @endphp
-
-                <li class="cl-nav-group">
-                    <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    Calendar
+                {{-- Sir Peter asked for this three times in two days, and this is
+                     where it settled (12 October): "I want the clients calendar,
+                     Availability, and Hired as separate webpages", with the
+                     availabilities and the hires as TABS inside their own page
+                     rather than subpages hanging off the menu. So three plain
+                     links, no nesting. He also corrected the last one: "Use the
+                     'Hired Talent' instead of just 'Hired'." --}}
+                <li class="cl-nav-item">
+                    <a href="{{ route('client.calendar.index') }}" class="cl-nav-link {{ request()->routeIs('client.calendar.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        My Calendar
+                    </a>
                 </li>
-                <ul class="cl-nav-sub">
-                    <li class="cl-nav-item">
-                        <a href="{{ route('client.calendar.index') }}" class="cl-nav-link {{ $__onCal && $__calTab !== 'availability' ? 'active' : '' }}">
-                            <span class="cl-nav-dot"></span> My Calendar
-                        </a>
-                    </li>
-                    <li class="cl-nav-item">
-                        <a href="{{ route('client.calendar.index', ['tab' => 'availability']) }}" class="cl-nav-link {{ $__onCal && $__calTab === 'availability' ? 'active' : '' }}">
-                            <span class="cl-nav-dot"></span> My Availability
-                        </a>
-                    </li>
-                </ul>
-
-                <li class="cl-nav-group">
-                    <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg>
-                    Check Availability
+                <li class="cl-nav-item">
+                    <a href="{{ route('client.check-availability.index') }}" class="cl-nav-link {{ request()->routeIs('client.check-availability.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        Availability
+                    </a>
                 </li>
-                <ul class="cl-nav-sub">
-                    <li class="cl-nav-item">
-                        <a href="{{ route('client.check-availability.index') }}" class="cl-nav-link {{ $__onChk && $__chkWho !== 'influencers' ? 'active' : '' }}">
-                            <span class="cl-nav-dot"></span> Professionals
-                        </a>
-                    </li>
-                    <li class="cl-nav-item">
-                        <a href="{{ route('client.check-availability.index', ['who' => 'influencers']) }}" class="cl-nav-link {{ $__onChk && $__chkWho === 'influencers' ? 'active' : '' }}">
-                            <span class="cl-nav-dot"></span> Influencers
-                        </a>
-                    </li>
-                </ul>
-
-                <li class="cl-nav-group">
-                    <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    Hired Talent
+                <li class="cl-nav-item">
+                    <a href="{{ route('client.hired-talent.index') }}" class="cl-nav-link {{ request()->routeIs('client.hired-talent.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+                        Hired Talent
+                    </a>
                 </li>
-                <ul class="cl-nav-sub">
-                    <li class="cl-nav-item">
-                        <a href="{{ route('client.hired-talent.index', ['who' => 'professionals']) }}" class="cl-nav-link {{ $__onHired && request()->query('who') !== 'influencers' ? 'active' : '' }}">
-                            <span class="cl-nav-dot"></span> Professionals
-                        </a>
-                    </li>
-                    <li class="cl-nav-item">
-                        <a href="{{ route('client.hired-talent.index', ['who' => 'influencers']) }}" class="cl-nav-link {{ $__onHired && request()->query('who') === 'influencers' ? 'active' : '' }}">
-                            <span class="cl-nav-dot"></span> Influencers
-                        </a>
-                    </li>
-                </ul>
                 <li class="cl-nav-item">
                     <a href="{{ route('client.bookings.index') }}" class="cl-nav-link {{ request()->routeIs('client.bookings.*') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>

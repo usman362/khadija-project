@@ -135,7 +135,7 @@ class ClientAvailabilityTest extends TestCase
         $this->mark(now()->addDay()->format('Y-m-d'), Availability::UNAVAILABLE);
 
         $this->actingAs($this->client)
-            ->get(route('client.calendar.index', ['tab' => 'availability']))
+            ->get(route('client.check-availability.index', ['tab' => 'mine']))
             ->assertOk()
             ->assertSee('Available')
             ->assertSee('Unavailable')
@@ -165,7 +165,7 @@ class ClientAvailabilityTest extends TestCase
     {
         foreach (['day', 'week', 'month', null] as $view) {
             $html = $this->actingAs($this->client)
-                ->get('/client/calendar?tab=availability' . ($view ? '&calview=' . $view : ''))
+                ->get('/client/availability?tab=mine' . ($view ? '&calview=' . $view : ''))
                 ->assertSuccessful()->getContent();
 
             $grid = $this->grid($html);
@@ -186,7 +186,7 @@ class ClientAvailabilityTest extends TestCase
     public function test_the_availability_arrows_move_a_month(): void
     {
         $html = $this->actingAs($this->client)
-            ->get('/client/calendar?tab=availability&calview=day')
+            ->get('/client/availability?tab=mine&calview=day')
             ->assertSuccessful()->getContent();
 
         $this->assertStringContainsString(
@@ -196,15 +196,22 @@ class ClientAvailabilityTest extends TestCase
         );
     }
 
-    /** The rail says the range in words rather than naming the view. */
-    public function test_the_rail_describes_the_range_in_english(): void
+    /**
+     * The tally says the range in words rather than naming the view.
+     *
+     * It sat on the calendar's rail and had to describe whichever view was
+     * open, which is where "any days this day" came from. My Availability
+     * moved to its own tab on 12 October and that tab is always a month, so
+     * there is one range and one plain sentence.
+     */
+    public function test_the_tally_describes_the_range_in_english(): void
     {
         $html = $this->actingAs($this->client)
-            ->get('/client/calendar?calview=day')
+            ->get(route('client.check-availability.index', ['tab' => 'mine']))
             ->assertSuccessful()->getContent();
 
         $this->assertStringNotContainsString('any days this day', $html);
-        $this->assertStringContainsString('any days today', $html);
+        $this->assertStringContainsString('any days this month', $html);
     }
 
     /** The availability grid, without the month calendar on the other tab. */

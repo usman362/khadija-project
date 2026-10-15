@@ -8,18 +8,27 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Calendar, Check Availability and Hired Talent, each with its own pages.
+ * Three webpages in the left column, with their tabs inside them.
  *
- * Sir Peter asked for "Calendar & Availability" to become subpages rather than
- * one page of tabs, and his own words and his own bullet list disagreed about
- * where My Availability belonged. His sidebar image settles it: it sits with
- * My Calendar, under Calendar, exactly as his sentence said. "A user looking
- * at their dates should be able to switch between their event schedule and the
- * availability they have personally set without feeling like they left the
- * calendar."
+ * Sir Peter settled this over three messages in two days, and this file has
+ * been rewritten each time, so it is worth recording where it landed and why.
  *
- * Checking somebody else's availability and listing who you hired are the
- * other two, and each lists Professionals and Influencers under it.
+ *  - 10 Oct: "Calendar & Availability" should become subpages rather than one
+ *    page of tabs. Built as three nested menu groups.
+ *  - 12 Oct, 10:21pm, with a sidebar image: My Calendar standing alone, and
+ *    Availability and Hired Talent as groups with subpages under them.
+ *  - 12 Oct, 10:28pm, seven minutes later: "the three availabilities (My
+ *    Availability, Professionals and Influencers) can be setup as tabs instead
+ *    of subpages. The same thing for Hired ... But I want the clients
+ *    calendar, Availability, and Hired as separate webpages."
+ *
+ * So: three plain links, no nesting at all, and the subpages became tabs on
+ * the page they belong to. He then corrected the last label himself: "Use the
+ * 'Hired Talent' instead of just 'Hired'."
+ *
+ * The move that matters underneath the menu: My Availability left the calendar
+ * page, where it had been the second tab, and became the first tab on
+ * Availability. The calendar is now only a calendar.
  */
 class TheCalendarMenuIsThreeGroupsTest extends TestCase
 {
@@ -47,96 +56,112 @@ class TheCalendarMenuIsThreeGroupsTest extends TestCase
         return $this->actingAs($this->client)->get($url)->assertSuccessful()->getContent();
     }
 
-    /** Three headings, and they are headings rather than links. */
-    public function test_the_three_groups_are_there(): void
+    /** The menu itself, never the page copy, which names these pages too. */
+    private function menu(string $url): string
     {
-        $html = $this->at(route('client.calendar.index'));
+        $html = $this->at($url);
 
-        foreach (['Calendar', 'Check Availability', 'Hired Talent'] as $group) {
-            $this->assertMatchesRegularExpression(
-                '/<li class="cl-nav-group">.*?' . preg_quote($group, '/') . '/s',
-                $html,
-                "\"{$group}\" should be a group heading in the menu.",
-            );
+        $from = strpos($html, '<nav class="cl-sidebar-nav">');
+        $this->assertNotFalse($from, 'The sidebar nav has moved.');
+
+        return substr($html, $from, strpos($html, '</nav>', $from) - $from);
+    }
+
+    /** Three links, in his order, and each one goes somewhere. */
+    public function test_the_three_pages_are_plain_links(): void
+    {
+        $menu = $this->menu(route('client.calendar.index'));
+
+        $expected = [
+            'My Calendar'  => route('client.calendar.index'),
+            'Availability' => route('client.check-availability.index'),
+            'Hired Talent' => route('client.hired-talent.index'),
+        ];
+
+        $at = -1;
+        foreach ($expected as $label => $url) {
+            $pos = strpos($menu, '>' . "\n" . str_repeat(' ', 24) . $label);
+            $pos = $pos === false ? strpos($menu, $label) : $pos;
+
+            $this->assertNotFalse($pos, "\"{$label}\" is missing from the menu.");
+            $this->assertGreaterThan($at, $pos, "\"{$label}\" is out of order.");
+            $this->assertStringContainsString($url, $menu, "\"{$label}\" does not link to its page.");
+
+            $at = $pos;
         }
     }
 
-    /**
-     * My Availability lives with My Calendar.
-     *
-     * This is the half of Sir Peter's brief that contradicted itself. His
-     * prose put it here; his bullet list put it under Availability; his
-     * sidebar image agrees with the prose.
-     */
-    public function test_my_availability_sits_under_calendar(): void
+    /** Nothing nests any more. The subpages became tabs. */
+    public function test_the_menu_has_no_nested_groups(): void
     {
-        $html = $this->at(route('client.calendar.index'));
+        $menu = $this->menu(route('client.calendar.index'));
 
-        // The first sub-list on the page is Calendar's, because Calendar is
-        // the first group. Sliced rather than searched for by name: both
-        // entries we are looking for contain the word "Calendar".
-        $block = substr($html, strpos($html, 'cl-nav-group'));
-        $firstSub = substr($block, strpos($block, '<ul class="cl-nav-sub">'));
-        $firstSub = substr($firstSub, 0, strpos($firstSub, '</ul>'));
-
-        $this->assertStringContainsString('My Calendar', $firstSub);
-        $this->assertStringContainsString('My Availability', $firstSub);
+        $this->assertStringNotContainsString('cl-nav-sub', $menu, 'The sub-lists should be gone.');
+        $this->assertStringNotContainsString('Check Availability', $menu, 'It is called Availability now.');
     }
 
     /** One page, one highlighted entry, never two and never none. */
     public function test_each_page_lights_exactly_one_entry(): void
     {
         $pages = [
-            route('client.calendar.index')                                        => 'My Calendar',
-            route('client.calendar.index', ['tab' => 'availability'])             => 'My Availability',
-            route('client.check-availability.index')                              => 'Professionals',
-            route('client.check-availability.index', ['who' => 'influencers'])    => 'Influencers',
-            route('client.hired-talent.index', ['who' => 'professionals'])        => 'Professionals',
-            route('client.hired-talent.index', ['who' => 'influencers'])          => 'Influencers',
+            route('client.calendar.index')                                      => 'My Calendar',
+            route('client.check-availability.index', ['tab' => 'mine'])         => 'Availability',
+            route('client.check-availability.index', ['tab' => 'professionals']) => 'Availability',
+            route('client.check-availability.index', ['tab' => 'influencers'])  => 'Availability',
+            route('client.hired-talent.index', ['who' => 'professionals'])      => 'Hired Talent',
+            route('client.hired-talent.index', ['who' => 'influencers'])        => 'Hired Talent',
         ];
 
         foreach ($pages as $url => $expected) {
-            $html = $this->at($url);
+            $menu = $this->menu($url);
 
-            preg_match_all(
-                '/<a [^>]*class="cl-nav-link active"[^>]*>\s*<span class="cl-nav-dot"><\/span>\s*([^<]+)/',
-                $html,
-                $m,
-            );
+            preg_match_all('/class="cl-nav-link active"[^>]*>\s*<svg.*?<\/svg>\s*([^<]+)/s', $menu, $m);
 
-            $lit = array_map('trim', $m[1] ?? []);
+            $lit = array_values(array_filter(array_map('trim', $m[1] ?? [])));
 
             $this->assertCount(1, $lit, "Exactly one menu entry should be lit on {$url}, not " . count($lit) . '.');
             $this->assertSame($expected, $lit[0], "Wrong entry lit on {$url}.");
         }
     }
 
-    /**
-     * The old single entry is gone, and so are the two loose ones.
-     *
-     * Check Availability and Hired Talent were added as flat items earlier the
-     * same day. Leaving them there as well would list each page twice.
-     */
+    /** Each name once. Listing a page twice is how this went wrong before. */
     public function test_nothing_is_listed_twice(): void
     {
-        $html = $this->at(route('client.calendar.index'));
-
-        // The menu, not the page. Both names appear in the page's own copy as
-        // well, and counting those made this fail for the wrong reason.
-        $from = strpos($html, '<nav class="cl-sidebar-nav">');
-        $this->assertNotFalse($from, 'The sidebar nav has moved.');
-        $menu = substr($html, $from, strpos($html, '</nav>', $from) - $from);
+        $menu = $this->menu(route('client.calendar.index'));
 
         $this->assertStringNotContainsString('Calendar &amp; Availability</a>', $menu);
 
-        // The names themselves. A group heading puts its text on the line
-        // after its icon, so it is not preceded by '>'.
-        foreach (['Hired Talent', 'Check Availability'] as $name) {
+        foreach (['My Calendar', 'Hired Talent'] as $name) {
             $this->assertSame(
                 1,
                 substr_count($menu, $name),
                 "\"{$name}\" appears " . substr_count($menu, $name) . ' times in the menu.',
             );
+        }
+    }
+
+    /** The three availabilities are tabs on one page, as he asked. */
+    public function test_availability_carries_its_three_tabs(): void
+    {
+        $html = $this->at(route('client.check-availability.index'));
+
+        foreach (['My Availability', 'Professionals', 'Influencers'] as $tab) {
+            $this->assertStringContainsString($tab, $html, "The \"{$tab}\" tab is missing.");
+        }
+
+        // Landing on the page with nothing asked for opens the first tab.
+        $this->assertStringContainsString('Say which days suit you', $html);
+    }
+
+    /** And Hired Talent carries its two. */
+    public function test_hired_talent_carries_its_two_tabs(): void
+    {
+        $html = $this->at(route('client.hired-talent.index'));
+
+        $this->assertStringContainsString('ht-tabs', $html);
+
+        foreach (['Professionals', 'Influencers'] as $tab) {
+            $this->assertStringContainsString($tab, $html, "The \"{$tab}\" tab is missing.");
         }
     }
 }

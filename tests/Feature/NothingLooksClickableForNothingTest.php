@@ -124,7 +124,7 @@ class NothingLooksClickableForNothingTest extends TestCase
     public function test_setting_your_own_availability_still_clicks(): void
     {
         $html = $this->actingAs($this->client)
-            ->get(route('client.calendar.index', ['tab' => 'availability']))
+            ->get(route('client.check-availability.index', ['tab' => 'mine']))
             ->assertSuccessful()
             ->getContent();
 

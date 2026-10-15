@@ -64,6 +64,21 @@ class TheCalendarLooksLikeHisCalendarTest extends TestCase
             ->getContent();
     }
 
+    /**
+     * My Availability, which lives on the Availability page since 12 October.
+     *
+     * Sir Peter: "I want the clients calendar, Availability, and Hired as
+     * separate webpages", with the three availabilities as tabs on the second
+     * one. It was the calendar's second tab until then.
+     */
+    private function mine(): string
+    {
+        return $this->actingAs($this->client)
+            ->get(route('client.check-availability.index', ['tab' => 'mine']))
+            ->assertSuccessful()
+            ->getContent();
+    }
+
     /** A header with the one action that belongs on a calendar. */
     public function test_the_page_has_a_header_and_a_way_to_create_an_event(): void
     {
@@ -133,8 +148,7 @@ class TheCalendarLooksLikeHisCalendarTest extends TestCase
         $this->assertStringContainsString('Calendar tips', $this->page());
         $this->assertStringContainsString('the easiest view on a phone', $this->page());
 
-        $avail = $this->page(['tab' => 'availability']);
-        $this->assertStringContainsString('Not set is not the same as free', $avail);
+        $this->assertStringContainsString('Not set is not the same as free', $this->mine());
     }
 
     /** Quick actions, on the tab they belong to and nowhere else. */
@@ -142,7 +156,7 @@ class TheCalendarLooksLikeHisCalendarTest extends TestCase
     {
         $this->assertStringNotContainsString('Quick actions', $this->page());
 
-        $avail = $this->page(['tab' => 'availability']);
+        $avail = $this->mine();
         $this->assertStringContainsString('Quick actions', $avail);
         $this->assertStringContainsString('Set a stretch of dates', $avail);
         $this->assertStringContainsString('View as list', $avail);
@@ -151,7 +165,7 @@ class TheCalendarLooksLikeHisCalendarTest extends TestCase
     /** The key sits above the grid it explains. */
     public function test_the_availability_key_is_above_the_calendar(): void
     {
-        $html = $this->page(['tab' => 'availability']);
+        $html = $this->mine();
 
         // Against the grid ELEMENT, not the string "av-grid", which appears
         // first in the stylesheet at the top of the page.
@@ -176,7 +190,7 @@ class TheCalendarLooksLikeHisCalendarTest extends TestCase
      */
     public function test_no_button_is_drawn_for_a_feature_we_do_not_have(): void
     {
-        foreach ([$this->page(), $this->page(['tab' => 'availability'])] as $html) {
+        foreach ([$this->page(), $this->mine()] as $html) {
             foreach (['Sync to Google', 'Sync Calendar', 'Report Issue'] as $absent) {
                 $this->assertStringNotContainsString($absent, $html);
             }

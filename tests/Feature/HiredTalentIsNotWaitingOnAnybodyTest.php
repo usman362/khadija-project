@@ -166,7 +166,9 @@ class HiredTalentIsNotWaitingOnAnybodyTest extends TestCase
 
         $html = $this->page(['who' => 'influencers']);
 
-        $this->assertStringContainsString('Influencers (0)', $html);
+        // The count moved onto the tab when the duplicate role pills came out
+        // on 15 October: "Influencers" with "0 hired" under it.
+        $this->assertStringContainsString('0 hired', $html);
         $this->assertStringContainsString('No influencers yet', $html);
         $this->assertStringContainsString('cannot be hired through the site yet', $html);
     }
@@ -287,10 +289,9 @@ class HiredTalentIsNotWaitingOnAnybodyTest extends TestCase
             ->assertSuccessful()
             ->getContent();
 
-        $this->assertStringContainsString(
-            '<a href="' . route('client.hired-talent.index') . '" class="cal-tab">',
-            $html,
-        );
+        // It was a tab card on the calendar until 12 October, when Sir Peter
+        // gave it a page of its own. The calendar still links to it.
+        $this->assertStringContainsString(route('client.hired-talent.index'), $html);
         $this->assertStringNotContainsString('<b>Hired Influencers</b>', $html);
     }
 
@@ -309,11 +310,11 @@ class HiredTalentIsNotWaitingOnAnybodyTest extends TestCase
             ->assertSuccessful()
             ->getContent();
 
-        $this->assertStringContainsString('<b>Check Availability</b>', $tab);
+        $this->assertStringContainsString(route('client.check-availability.index', ['tab' => 'mine']), $tab);
         $this->assertStringNotContainsString('Waiting on their side', $tab);
 
         $page = $this->actingAs($this->client)
-            ->get(route('client.check-availability.index'))
+            ->get(route('client.check-availability.index', ['tab' => 'professionals']))
             ->assertSuccessful()
             ->getContent();
 

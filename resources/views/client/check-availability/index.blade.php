@@ -1,6 +1,7 @@
 @extends('layouts.client')
 
-@section('title', 'Check Availability')
+@section('title', 'Availability')
+@section('page-title', 'Availability')
 
 @push('styles')
 <style>
@@ -12,6 +13,19 @@
     .ca-banner p { font-size: 13.5px; color: var(--text-secondary); margin: 3px 0 0; }
 
     .ca-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; }
+
+    /* Sir Peter, 12 October: the three availabilities as tabs on one page
+       rather than three subpages hanging off the left column. */
+    .ca-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .ca-tab { display: inline-flex; align-items: center; gap: 9px; padding: 10px 15px; border-radius: 12px;
+        border: 1px solid var(--border-color); background: var(--bg-card); text-decoration: none; }
+    .ca-tab b { display: block; font-size: 13.5px; font-weight: 800; color: var(--text-primary); line-height: 1.2; }
+    .ca-tab span { font-size: 11.5px; color: var(--text-muted); }
+    .ca-tab.is-on { border-color: var(--accent-orange, #ea580c); background: rgba(249,115,22,.08); }
+    .ca-tab-ico { width: 30px; height: 30px; border-radius: 9px; flex: none; display: flex; align-items: center; justify-content: center;
+        background: rgba(249,115,22,.12); color: #ea580c; }
+    .ca-tab-ico svg { width: 16px; height: 16px; }
+    @media (max-width: 560px) { .ca-tab span { display: none; } }
 
     /* The banner. Loud on purpose: everything under it is invented. */
     .ca-warn { display: flex; gap: 12px; align-items: flex-start; border: 1px solid #fca5a5;
@@ -104,14 +118,108 @@
     .ca-none b { color: var(--text-primary); }
 
     @media (max-width: 1000px) { .ca-steps { grid-template-columns: 1fr; } .ca-wrap { overflow-x: auto; } }
+    .ca-mine-rail { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+    .ca-mine-card { padding: 16px 18px; }
+    .ca-mine-card h3 { font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 10px; }
+    .ca-mine-card ul { margin: 0; padding-left: 17px; }
+    .ca-mine-card li { font-size: 12.5px; color: var(--text-secondary); margin-bottom: 6px; line-height: 1.55; }
+    .ca-mine-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; text-decoration: none; }
+    .ca-mine-row b { display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .ca-mine-row span span { font-size: 11.5px; color: var(--text-muted); }
+    @media (max-width: 760px) { .ca-mine-rail { grid-template-columns: 1fr; } }
+    .ca-tally { font-size: 12.5px; color: var(--text-secondary); margin: 0 0 14px; }
 </style>
 @endpush
 
 @section('content')
+
+{{-- The three tabs, in his order. My Availability moved here off the calendar
+     page on 12 October: "I want the clients calendar, Availability, and Hired
+     as separate webpages", with the availabilities as tabs inside this one. --}}
+@php
+    $tabIcon = [
+        'mine' => '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+        'professionals' => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',
+        'influencers' => '<path d="M12 2 15 9l7 .6-5.3 4.6L18.3 21 12 17.3 5.7 21l1.6-6.8L2 9.6 9 9z"/>',
+    ];
+@endphp
+<div class="ca-tabs">
+    @foreach($tabs as $key => [$label, $blurb])
+        <a class="ca-tab {{ $tab === $key ? 'is-on' : '' }}" href="{{ route('client.check-availability.index', ['tab' => $key]) }}">
+            <span class="ca-tab-ico">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $tabIcon[$key] !!}</svg>
+            </span>
+            <span><b>{{ $label }}</b><span>{{ $blurb }}</span></span>
+        </a>
+    @endforeach
+</div>
+
+@if($tab === 'mine')
+    <div class="ca-banner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <div>
+            <h1>My Availability</h1>
+            <p>Say which days suit you, so your planning and your requests line up.</p>
+        </div>
+    </div>
+
+    @include('client.calendar._availability', [
+        'calendar'     => $calendar,
+        'availability' => $availability,
+        'tally'        => $tally,
+        'avRoute'      => 'client.check-availability.index',
+        'avFixed'      => ['tab' => 'mine'],
+    ])
+    {{-- What has actually been marked this month. It used to sit on the
+         calendar's rail, which is where My Availability lived until 12
+         October. This tab is always a month, so there is only one range to
+         describe. --}}
+    @php $av = \App\Domain\Calendar\Availability::class; @endphp
+    <p class="ca-tally">
+        @if($tally[$av::AVAILABLE] || $tally[$av::UNAVAILABLE])
+            This month: <b>{{ $tally[$av::AVAILABLE] }}</b>
+            {{ \Illuminate\Support\Str::plural('day', $tally[$av::AVAILABLE]) }} marked available,
+            <b>{{ $tally[$av::UNAVAILABLE] }}</b> blocked. Every other day is simply unanswered.
+        @else
+            You have not marked any days this month. Click a day below to say whether it suits you.
+        @endif
+    </p>
+
+    {{-- Quick actions and tips, from his My Availability image. They came over
+         with the tab on 12 October. Each points at something that already
+         works: the range form under the grid, and the month as a list. --}}
+    <div class="ca-mine-rail">
+        <div class="ca-card ca-mine-card">
+            <h3>Quick actions</h3>
+            <a class="ca-mine-row" href="#avRange">
+                <span class="ca-tab-ico">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </span>
+                <span><b>Set a stretch of dates</b><span>Mark a whole run of days in one go.</span></span>
+            </a>
+            <a class="ca-mine-row" href="{{ route('client.calendar.index', ['calview' => 'list', 'cal' => $calendar['anchor']->format('Y-m-d')]) }}">
+                <span class="ca-tab-ico" style="background:rgba(37,99,235,.1);color:#1d4ed8;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                </span>
+                <span><b>View as list</b><span>Your month as a list instead of a grid.</span></span>
+            </a>
+        </div>
+        <div class="ca-card ca-mine-card">
+            <h3>Tips</h3>
+            <ul>
+                <li>Click a day to move it between available, unavailable and not set.</li>
+                <li>Not set is not the same as free. It means nobody has said anything about that day.</li>
+                <li>Use <b>Block a stretch of dates</b> for a holiday, rather than clicking each day.</li>
+            </ul>
+        </div>
+    </div>
+@else
 @php
     $link = fn (array $over = []) => route('client.check-availability.index', array_filter(array_merge([
+        'tab'    => $tab,
         'event'  => $event?->id,
-        'who'    => $kind === 'influencer' ? 'influencers' : null,
         'q'       => $q ?: null,
         'service' => $serviceId,
         'place'   => $place ?: null,
@@ -126,7 +234,7 @@
         <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
     </svg>
     <div>
-        <h1>Check Availability &ndash; {{ $kind === 'influencer' ? 'Influencers' : 'Professionals' }}</h1>
+        <h1>Availability &ndash; {{ $kind === 'influencer' ? 'Influencers' : 'Professionals' }}</h1>
         <p>See if {{ $kind === 'influencer' ? 'Influencers' : 'Professionals' }} are available for your event dates before you hire them.</p>
     </div>
 </div>
@@ -331,4 +439,5 @@
         </div>
     @endif
 </div>
+@endif
 @endsection

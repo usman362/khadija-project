@@ -61,7 +61,10 @@ class ClientCalendarPageTest extends TestCase
         $this->actingAs($this->client)
             ->get(route('client.calendar.index'))
             ->assertOk()
-            ->assertSee('Calendar &amp; Availability', false)
+            // It was headed "Calendar & Availability" until 12 October, when
+            // Sir Peter split the two apart. It is only a calendar now.
+            ->assertSee('My Calendar')
+            ->assertDontSee('Calendar &amp; Availability', false)
             ->assertSee('Rivera Wedding');
     }
 
@@ -143,13 +146,16 @@ class ClientCalendarPageTest extends TestCase
      * Check Availability the same day, which says on arrival that it knows who
      * is busy and never who is free.
      */
-    public function test_no_tab_is_greyed_out_any_more(): void
+    public function test_the_other_two_pages_are_named_and_reachable(): void
     {
+        // They were four tab cards here until 12 October, when Sir Peter made
+        // all three stand alone. The calendar still says where they went.
         $this->actingAs($this->client)
             ->get(route('client.calendar.index'))
             ->assertOk()
-            ->assertSee('Check Availability')
+            ->assertSee('Availability')
             ->assertSee('Hired Talent')
+            ->assertSee(route('client.check-availability.index', ['tab' => 'mine']), false)
             ->assertDontSee('Waiting on their side')
             ->assertDontSee('Hired Influencers');
     }
@@ -166,12 +172,20 @@ class ClientCalendarPageTest extends TestCase
     }
 
     /** And the one that now works is reachable as a tab of its own. */
-    public function test_my_availability_is_a_tab_that_opens(): void
+    public function test_my_availability_moved_to_the_availability_page(): void
     {
         $this->actingAs($this->client)
-            ->get(route('client.calendar.index', ['tab' => 'availability']))
+            ->get(route('client.check-availability.index', ['tab' => 'mine']))
             ->assertOk()
             ->assertSee('Say which days suit you', false)
             ->assertSee('Block a stretch of dates');
+    }
+
+    /** And the old calendar link still lands on it rather than 404ing. */
+    public function test_the_old_availability_tab_link_is_sent_on(): void
+    {
+        $this->actingAs($this->client)
+            ->get(route('client.calendar.index', ['tab' => 'availability']))
+            ->assertRedirect(route('client.check-availability.index', ['tab' => 'mine']));
     }
 }

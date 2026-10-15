@@ -1,6 +1,7 @@
 @extends('layouts.client')
 
 @section('title', 'Hired Talent')
+@section('page-title', 'Hired Talent')
 
 @push('styles')
 <style>
@@ -146,6 +147,20 @@
         .ht-facts, .ht-two { grid-template-columns: 1fr; }
         .ht-fact { border-right: 0; border-bottom: 1px solid var(--border-color); }
     }
+    /* Sir Peter, 12 October: "Hired Talent will be the webpage with tabs for
+       Professionals and Influencers, no longer as subpages." Everyone stays as
+       the landing tab, because most clients hire both and his own page groups
+       them by event, not by role. */
+    .ht-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .ht-tab { display: inline-flex; align-items: center; gap: 9px; padding: 10px 15px; border-radius: 12px;
+        border: 1px solid var(--border-color); background: var(--bg-card); text-decoration: none; }
+    .ht-tab b { display: block; font-size: 13.5px; font-weight: 800; color: var(--text-primary); line-height: 1.2; }
+    .ht-tab span { font-size: 11.5px; color: var(--text-muted); }
+    .ht-tab.is-on { border-color: var(--accent-orange, #ea580c); background: rgba(249,115,22,.08); }
+    .ht-tab-ico { width: 30px; height: 30px; border-radius: 9px; flex: none; display: flex; align-items: center; justify-content: center;
+        background: rgba(249,115,22,.12); color: #ea580c; }
+    .ht-tab-ico svg { width: 16px; height: 16px; }
+    @media (max-width: 560px) { .ht-tab span { display: none; } }
 </style>
 @endpush
 
@@ -174,6 +189,27 @@
     </div>
 </div>
 
+{{-- Tabs rather than subpages, per 12 October. The pills that used to carry
+     this still sit in the filter row with their counts; these are the same
+     three answers raised to the top of the page where he drew them. --}}
+<div class="ht-tabs">
+    @php
+        $htTabs = [
+            'all'           => ['Everyone',      'Both roles, by event', '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/>'],
+            'professionals' => ['Professionals', $kinds['professionals'] . ' hired', '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/>'],
+            'influencers'   => ['Influencers',   $kinds['influencers'] . ' hired', '<path d="M12 2 15 9l7 .6-5.3 4.6L18.3 21 12 17.3 5.7 21l1.6-6.8L2 9.6 9 9z"/>'],
+        ];
+    @endphp
+    @foreach($htTabs as $key => [$label, $blurb, $icon])
+        <a class="ht-tab {{ $group === $key ? 'is-on' : '' }}" href="{{ route('client.hired-talent.index', $key === 'all' ? [] : ['who' => $key]) }}">
+            <span class="ht-tab-ico">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $icon !!}</svg>
+            </span>
+            <span><b>{{ $label }}</b><span>{{ $blurb }}</span></span>
+        </a>
+    @endforeach
+</div>
+
 <div class="ht">
     {{-- ── Who you hired ─────────────────────────────── --}}
     <div class="ht-card">
@@ -195,13 +231,9 @@
                 </a>
             </form>
 
-            <div class="ht-kinds">
-                <a href="{{ $link(['who' => 'all']) }}" class="ht-pill {{ $group === 'all' ? 'is-on' : '' }}">Everyone</a>
-                <a href="{{ $link(['who' => 'professionals']) }}"
-                   class="ht-pill {{ $group === 'professionals' ? 'is-on' : '' }} {{ $kinds['professionals'] === 0 ? 'is-empty' : '' }}">Professionals ({{ $kinds['professionals'] }})</a>
-                <a href="{{ $link(['who' => 'influencers']) }}"
-                   class="ht-pill {{ $group === 'influencers' ? 'is-on' : '' }} {{ $kinds['influencers'] === 0 ? 'is-empty' : '' }}">Influencers ({{ $kinds['influencers'] }})</a>
-            </div>
+            {{-- The role pills that sat here were the same three answers as the
+                 tabs above, with the same counts, one on top of the other.
+                 Tabs are what Sir Peter asked for, so these went. --}}
             <div class="ht-pills">
                 <a href="{{ $link(['show' => 'all']) }}" class="ht-pill {{ $state === 'all' ? 'is-on' : '' }}">All ({{ $counts['all'] }})</a>
                 <a href="{{ $link(['show' => 'active']) }}" class="ht-pill {{ $state === 'active' ? 'is-on' : '' }}">Active ({{ $counts['active'] }})</a>

@@ -32,7 +32,7 @@ use Illuminate\View\View;
  */
 class ClientCalendarController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
         $user = $request->user();
 
@@ -50,20 +50,21 @@ class ClientCalendarController extends Controller
                 ? sprintf('%04d-%02d-01', $request->integer('year'), $request->integer('month'))
                 : null);
 
-        // Which of Sir Peter's four tabs is open. Only two of them answer.
-        $tab = in_array($request->query('tab'), ['availability'], true) ? $request->query('tab') : 'calendar';
-
         /*
-         * My Availability is a month, always.
-         *
-         * It is built to be one — the grid loops first to last and greys the
-         * days either side — but it was taking whichever view the calendar
-         * tab happened to be left on. Arrive from a day or a week and it drew
-         * a single strip of seven days with "Previous month" on an arrow that
-         * moved by one week, which is not a screen for saying which days of
-         * the year suit you.
+         * Sir Peter, 12 October: "I want the clients calendar, Availability,
+         * and Hired as separate webpages", with the three availabilities as
+         * tabs inside Availability. So My Availability left this page, and
+         * this page is a calendar and nothing else. An old ?tab=availability
+         * link is sent on to where that tab lives now.
          */
-        $view = $tab === 'availability' ? 'month' : $request->query('calview');
+        if ($request->query('tab') === 'availability') {
+            return redirect()->route('client.check-availability.index', array_filter([
+                'tab' => 'mine',
+                'cal' => $request->query('cal') ?: $request->query('anchor'),
+            ]));
+        }
+
+        $view = $request->query('calview');
 
         $calendar = ClientCalendar::build($user, $view, $anchor);
 
@@ -100,11 +101,8 @@ class ClientCalendarController extends Controller
             'needs_you' => $inRange->filter(fn ($e) => $e->stage() === 'open')->count(),
         ];
 
-        $availability = Availability::between($user, $calendar['first'], $calendar['last']);
-        $tally        = Availability::tally($availability);
-
         return view('client.calendar.index', compact(
-            'calendar', 'grid', 'upcoming', 'counts', 'tab', 'availability', 'tally',
+            'calendar', 'grid', 'upcoming', 'counts',
         ));
     }
 
@@ -153,7 +151,9 @@ class ClientCalendarController extends Controller
      */
     private function backToCalendar(?string $back): RedirectResponse
     {
-        $fallback = route('client.calendar.index', ['tab' => 'availability']);
+        // My Availability moved to the Availability page on 12 October, so
+        // that is where somebody who just marked a day belongs.
+        $fallback = route('client.check-availability.index', ['tab' => 'mine']);
 
         if (! $back) {
             return redirect()->to($fallback);

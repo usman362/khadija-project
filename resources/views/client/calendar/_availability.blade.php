@@ -83,8 +83,12 @@
 
     $c       = $calendar;
     $back    = request()->fullUrl();
-    $avLink  = fn (array $over) => route('client.calendar.index', array_merge(
-        request()->only(['calview', 'cal', 'anchor']), ['tab' => 'availability'], $over
+    // Where this grid's month arrows point. It used to be hardcoded to the
+    // calendar page, which is where My Availability lived until 12 October.
+    $avRoute = $avRoute ?? 'client.check-availability.index';
+    $avFixed = $avFixed ?? ['tab' => 'mine'];
+    $avLink  = fn (array $over) => route($avRoute, array_merge(
+        request()->only(['cal', 'anchor']), $avFixed, $over
     ));
 @endphp
 

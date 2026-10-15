@@ -56,10 +56,16 @@ class CheckAvailabilitySaysWhatItKnowsTest extends TestCase
         ]);
     }
 
+    /**
+     * The Professionals tab, which is what this whole file is about.
+     *
+     * Sir Peter turned the three availabilities into tabs on 12 October and
+     * put My Availability first, so the bare URL now lands there instead.
+     */
     private function page(array $query = []): string
     {
         return $this->actingAs($this->client)
-            ->get(route('client.check-availability.index', $query))
+            ->get(route('client.check-availability.index', $query + ['tab' => 'professionals']))
             ->assertSuccessful()
             ->getContent();
     }
@@ -197,26 +203,32 @@ class CheckAvailabilitySaysWhatItKnowsTest extends TestCase
         $this->assertSame('Backup Date 2', $dates[2]['label']);
     }
 
-    /** The calendar tab opens it now instead of being greyed out. */
-    public function test_the_calendar_tab_opens_it(): void
+    /**
+     * The calendar points at it, and says so in words.
+     *
+     * This used to assert a tab card on the calendar page. Sir Peter made the
+     * calendar stand alone on 12 October, so the cross-links became a plain
+     * sentence in its rail and the tabs moved onto the Availability page.
+     */
+    public function test_the_calendar_points_at_it(): void
     {
         $html = $this->actingAs($this->client)
             ->get(route('client.calendar.index'))
             ->assertSuccessful()
             ->getContent();
 
-        $this->assertStringContainsString(
-            '<a href="' . route('client.check-availability.index') . '" class="cal-tab">',
-            $html,
-        );
+        $this->assertStringContainsString(route('client.check-availability.index', ['tab' => 'mine']), $html);
         $this->assertStringNotContainsString('Waiting on their side', $html);
+        $this->assertStringNotContainsString('cal-tabs', $html);
     }
 
     /** The title names which kind you are checking, as his two pages do. */
     public function test_the_title_names_the_kind(): void
     {
-        $this->assertStringContainsString('Check Availability &ndash; Professionals', $this->page());
-        $this->assertStringContainsString('Check Availability &ndash; Influencers', $this->page(['who' => 'influencers']));
+        // The page is called Availability since 12 October; the tab says which
+        // of the three you are on.
+        $this->assertStringContainsString('Availability &ndash; Professionals', $this->page());
+        $this->assertStringContainsString('Availability &ndash; Influencers', $this->page(['tab' => 'influencers']));
     }
 
     /**

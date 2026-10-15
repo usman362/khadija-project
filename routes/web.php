@@ -882,7 +882,7 @@ Route::middleware('auth')->group(function () {
         // Check Availability — the other half of Sir Peter's split. This one
         // really does wait on the supplier side: we know who is busy, never
         // who is free, so it says so and offers a sample view.
-        Route::get('/check-availability', [\App\Http\Controllers\Client\ClientCheckAvailabilityController::class, 'index'])
+        Route::get('/availability', [\App\Http\Controllers\Client\ClientCheckAvailabilityController::class, 'index'])
             ->name('client.check-availability.index');
 
         // Files on a request. Private disk, served only through the

@@ -46,7 +46,7 @@ class ADateFieldLooksLikeAFieldTest extends TestCase
     /** The replacement is given a class this site actually styles. */
     public function test_the_visible_box_is_not_handed_bootstraps_class_names(): void
     {
-        $html = $this->page('/client/calendar?tab=availability');
+        $html = $this->page('/client/availability?tab=mine');
 
         $this->assertStringContainsString('altInputClass', $html, 'The picker is back on its default class.');
 
@@ -60,7 +60,7 @@ class ADateFieldLooksLikeAFieldTest extends TestCase
     /** And that class has a style, rather than being a name nothing answers. */
     public function test_the_house_style_for_a_bare_date_field_exists(): void
     {
-        $html = $this->page('/client/calendar?tab=availability');
+        $html = $this->page('/client/availability?tab=mine');
 
         $this->assertMatchesRegularExpression(
             '/\.dp-input\s*\{[^}]*border:[^}]*\}/s',
@@ -90,7 +90,7 @@ class ADateFieldLooksLikeAFieldTest extends TestCase
     /** The range form names its fields, instead of two anonymous boxes. */
     public function test_the_range_form_says_which_day_is_which(): void
     {
-        $html = $this->page('/client/calendar?tab=availability');
+        $html = $this->page('/client/availability?tab=mine');
 
         $this->assertMatchesRegularExpression('/<label for="av-from">\s*First day\s*<\/label>/', $html);
         $this->assertMatchesRegularExpression('/<label for="av-to">\s*Last day\s*<\/label>/', $html);

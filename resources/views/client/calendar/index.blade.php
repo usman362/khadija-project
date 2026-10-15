@@ -1,7 +1,7 @@
 @extends('layouts.client')
 
-@section('title', 'Calendar & Availability')
-@section('page-title', 'Calendar & Availability')
+@section('title', 'My Calendar')
+@section('page-title', 'My Calendar')
 @section('page-subtitle', 'Your events and who is working on them.')
 
 @push('styles')
@@ -44,16 +44,6 @@
 
     /* Sir Peter's four tabs. Three of them are waiting on something, and say
        so on the tab rather than opening onto an empty month. */
-    .cal-tabs { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-bottom: 16px; }
-    .cal-tab { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--border-color);
-        background: var(--bg-card); text-align: left; font-family: inherit; cursor: pointer; width: 100%; }
-    .cal-tab.is-on { border-color: var(--accent-orange, #ea580c); background: rgba(249,115,22,.08); }
-    a.cal-tab { text-decoration: none; }
-    .cal-tab.is-off { cursor: default; opacity: .62; }
-    .cal-tab-ico { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex: none; }
-    .cal-tab-ico svg { width: 17px; height: 17px; }
-    .cal-tab b { display: block; font-size: 13.5px; font-weight: 800; color: var(--text-primary); line-height: 1.2; }
-    .cal-tab span { font-size: 11.5px; color: var(--text-muted); }
 
     .cal-counts { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0; margin-top: 16px;
         border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; }
@@ -80,7 +70,6 @@
     .cal-wait b { color: var(--text-primary); }
 
     @media (max-width: 1024px) { .cal-layout { grid-template-columns: 1fr; } .cal-rail { position: static; } }
-    @media (max-width: 760px)  { .cal-tabs { grid-template-columns: 1fr 1fr; } }
 </style>
 @endpush
 
@@ -94,10 +83,8 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     </span>
     <div class="cal-page-txt">
-        <h1>{{ $tab === 'availability' ? 'My Availability' : 'Calendar' }}</h1>
-        <p>{{ $tab === 'availability'
-            ? 'Say which days suit you, so your planning and your requests line up.'
-            : 'Your events, bookings and the dates that matter, in one place.' }}</p>
+        <h1>My Calendar</h1>
+        <p>Your events, bookings and the dates that matter, in one place.</p>
     </div>
     <a class="cal-page-go" href="{{ route('client.post-event.choose') }}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -106,70 +93,17 @@
 </div>
 <div class="cal-layout">
     <div>
-        {{-- Sir Peter's four tabs, 24 September. Only the first has anything
-             behind it: nothing on this platform records when somebody is
-             free. A professional's calendar is built from their bookings and
-             shifts, which say when they are busy. So the other three say what
-             they are waiting for instead of opening onto a month of invented
-             free days. --}}
-        @php
-            $tabLink = fn (string $t) => route('client.calendar.index', array_merge(
-                request()->only(['calview', 'cal', 'anchor']), ['tab' => $t]
-            ));
-        @endphp
-        <div class="cal-tabs">
-            <a href="{{ $tabLink('calendar') }}" class="cal-tab {{ $tab === 'calendar' ? 'is-on' : '' }}">
-                <span class="cal-tab-ico" style="background:rgba(249,115,22,.14);color:#ea580c;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                </span>
-                <span><b>My Calendar</b><span>My events and schedule</span></span>
-            </a>
-            <a href="{{ $tabLink('availability') }}" class="cal-tab {{ $tab === 'availability' ? 'is-on' : '' }}">
-                <span class="cal-tab-ico" style="background:rgba(16,185,129,.12);color:#059669;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                </span>
-                <span><b>My Availability</b><span>Set your available dates</span></span>
-            </a>
-            {{-- These two were switched off, and the reason written on them,
-                 "Professionals do not record their available dates yet", was
-                 the reason Check Availability is waiting rather than this one.
-                 Who you hired is a booking, and we know that completely. They
-                 are now one page, as Sir Peter asked: "once someone is hired,
-                 the Client's purpose is essentially the same regardless of
-                 role". --}}
-            <a href="{{ route('client.hired-talent.index') }}" class="cal-tab">
-                <span class="cal-tab-ico" style="background:rgba(29,78,216,.1);color:#1d4ed8;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                </span>
-                <span><b>Hired Talent</b><span>Who you have booked</span></span>
-            </a>
-            {{-- It opens, and then it is honest on arrival: we know who is
-                 booked, never who is free, because that is theirs to say. --}}
-            <a href="{{ route('client.check-availability.index') }}" class="cal-tab">
-                <span class="cal-tab-ico" style="background:rgba(109,40,217,.1);color:#6d28d9;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg>
-                </span>
-                <span><b>Check Availability</b><span>Before you hire</span></span>
-            </a>
-        </div>
-
-        @if($tab === 'calendar')
-            @include('client._calendar', [
-                'calendar' => $calendar,
-                'calRoute' => 'client.calendar.index',
-                'calFixed' => [],
-            ])
-        @else
-            @include('client.calendar._availability', [
-                'calendar'     => $calendar,
-                'availability' => $availability,
-                'tally'        => $tally,
-            ])
-        @endif
+        {{-- Sir Peter, 12 October: the calendar stands alone as a webpage. The
+             four cross-links that used to sit here, and the My Availability
+             tab among them, moved into the Availability page's own tabs. --}}
+        @include('client._calendar', [
+            'calendar' => $calendar,
+            'calRoute' => 'client.calendar.index',
+            'calFixed' => [],
+        ])
 
         {{-- Counted from the same events the grid above is drawn from, over
              the range on screen, so the two can never disagree. --}}
-        @if($tab === 'calendar')
         <div class="cal-counts">
             <div class="cal-count">
                 <b>{{ $counts['in_range'] }}</b>
@@ -184,7 +118,6 @@
             <div class="cal-count"><b>{{ $counts['confirmed'] }}</b><span>Booked</span></div>
             <div class="cal-count"><b>{{ $counts['needs_you'] }}</b><span>Taking proposals</span></div>
         </div>
-        @endif
     </div>
 
     <aside class="cal-rail">
@@ -222,58 +155,14 @@
             <div class="cal-rail-h"><h3>Your availability</h3></div>
             {{-- The range in words. It used to print the view's own name, so
                  a day view said "you have not marked any days this day". --}}
-            @php
-                $__span = match ($calendar['view']) {
-                    'day'  => 'today',
-                    'week' => 'this week',
-                    default => 'this month',
-                };
-            @endphp
-            @if($tally[\App\Domain\Calendar\Availability::AVAILABLE] || $tally[\App\Domain\Calendar\Availability::UNAVAILABLE])
-                <p class="cal-wait">
-                    {{ ucfirst($__span) }}: <b>{{ $tally[\App\Domain\Calendar\Availability::AVAILABLE] }}</b>
-                    {{ \Illuminate\Support\Str::plural('day', $tally[\App\Domain\Calendar\Availability::AVAILABLE]) }} marked available,
-                    <b>{{ $tally[\App\Domain\Calendar\Availability::UNAVAILABLE] }}</b> blocked.
-                    Every other day is simply unanswered.
-                </p>
-            @else
-                <p class="cal-wait">
-                    You have not marked any days {{ $__span }}. Open
-                    <a href="{{ route('client.calendar.index', ['tab' => 'availability']) }}">My Availability</a>
-                    to say which days suit you.
-                </p>
-            @endif
-            <p class="cal-wait" style="margin-top:10px;">
-                <b>Who you have hired is on its own page.</b>
-                <a href="{{ route('client.hired-talent.index') }}">Hired Talent</a> lists them by event, and
-                <a href="{{ route('client.check-availability.index') }}">Check Availability</a> says who is
-                already booked on a date. Nothing records when they are free; that is theirs to enter.
+            <p class="cal-wait">
+                <b>Availability and Hired Talent each have their own page.</b>
+                <a href="{{ route('client.check-availability.index', ['tab' => 'mine']) }}">Availability</a>
+                is where you say which days suit you, and where you check whether somebody is already
+                booked. <a href="{{ route('client.hired-talent.index') }}">Hired Talent</a> lists who you
+                have hired, by event.
             </p>
         </div>
-
-        @if($tab === 'availability')
-            {{-- Quick Actions, from his My Availability image. Each one points
-                 at something that already works on this page: the range form
-                 below the grid, the list view, and clearing a month. There is
-                 no fourth button, because there is no fourth thing. --}}
-            <div class="cal-card cal-quick">
-                <div class="cal-rail-h"><h3>Quick actions</h3></div>
-                <a class="cal-quick-row" href="#avRange">
-                    <span class="cal-quick-ico" style="background:rgba(249,115,22,.12);color:#ea580c;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    </span>
-                    <span class="cal-quick-txt"><b>Set a stretch of dates</b><span>Mark a whole run of days in one go.</span></span>
-                    <span class="cal-quick-go">&rsaquo;</span>
-                </a>
-                <a class="cal-quick-row" href="{{ route('client.calendar.index', ['calview' => 'list', 'cal' => $calendar['anchor']->format('Y-m-d')]) }}">
-                    <span class="cal-quick-ico" style="background:rgba(37,99,235,.1);color:#1d4ed8;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                    </span>
-                    <span class="cal-quick-txt"><b>View as list</b><span>Your month as a list instead of a grid.</span></span>
-                    <span class="cal-quick-go">&rsaquo;</span>
-                </a>
-            </div>
-        @endif
 
         {{-- The tips card from Sir Peter's calendar. Plain copy about how the
              page works, which is the one thing on his rail that needs nothing
@@ -282,19 +171,13 @@
             <div class="cal-rail-h">
                 <h3>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                    {{ $tab === 'availability' ? 'Tips' : 'Calendar tips' }}
+                    Calendar tips
                 </h3>
             </div>
             <ul>
-                @if($tab === 'availability')
-                    <li>Click a day to move it between available, unavailable and not set.</li>
-                    <li>Not set is not the same as free. It means nobody has said anything about that day.</li>
-                    <li>Use <b>Block a stretch of dates</b> for a holiday, rather than clicking each day.</li>
-                @else
-                    <li>Every event, booking and date you care about sits on this one page.</li>
-                    <li>A date opens that day. An entry opens the event behind it.</li>
-                    <li><b>List</b> is the same month read as a list, and the easiest view on a phone.</li>
-                @endif
+                <li>Every event, booking and date you care about sits on this one page.</li>
+                <li>A date opens that day. An entry opens the event behind it.</li>
+                <li><b>List</b> is the same month read as a list, and the easiest view on a phone.</li>
             </ul>
         </div>
     </aside>

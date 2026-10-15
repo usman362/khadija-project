@@ -1182,7 +1182,7 @@
     <div class="od-top-right">
         <div class="od-card od-live" id="odCalCard">
             <div class="od-card-head">
-                <span class="od-card-title">My Calendar &amp; Availability</span>
+                <span class="od-card-title">My Calendar</span>
                 {{-- Sir Peter, 7 October: the card had no way out of itself.
                      It carries the month and the view being looked at, so the
                      full page opens where the eye already is, not on today. No
