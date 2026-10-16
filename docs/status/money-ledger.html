@@ -1,0 +1,153 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><!--STYLE--></head><body>
+
+<h1>Money Tracking Model (A1)</h1>
+<div class="sub">Proposal for Owner and PM review | written 22 August 2026, reissued for Khadijah 16 October 2026 | nothing in this area is built until this is approved</div>
+
+<p>Peter's instruction, Decision Log item 7 / A1: before refunds, milestone payments and payouts are
+built, agree ONE financial ledger model that tracks every money event as a discrete, separately
+auditable record, and never represent the picture by editing a single booking total field. This is that
+proposal.</p>
+
+<h2>1. The one idea</h2>
+
+<div class="box">
+<b>A booking total is never stored and edited. It is always the sum of a list of money events.</b>
+Every charge, fee, commission, upgrade, refund and payout is one append-only row. To correct something
+you add a reversing row; you never edit or delete history. The current total is a question we answer by
+adding up the list, so it can never silently drift from what actually happened.
+</div>
+
+<p>This is the opposite of the trap Peter named: one booking total field that gets overwritten, where
+last month's number is gone and nothing reconciles.</p>
+
+<h2>2. What exists today, and why it is not enough</h2>
+
+<table>
+<tr><th>Today</th><th>Why it cannot carry this</th></tr>
+<tr><td class="nm">payments</td><td>A gateway charge, but tied to a subscription, so it cannot cleanly record a booking fee, an upgrade or a refund.</td></tr>
+<tr><td class="nm">payouts</td><td>A professional withdrawal, flat amount and status, with no link to which bookings funded it.</td></tr>
+<tr><td class="nm">Commission</td><td>Calculates the 5 / 3 / 1.5 percent share, but nothing records it.</td></tr>
+</table>
+
+<p>There is no place that ties request fee to booking to commission to payout as auditable line items.
+That is the gap.</p>
+
+<h2>3. Proposed tables</h2>
+
+<h3>3a. ledger_entries, the spine (append-only)</h3>
+
+<p>One row per money event. Never updated after it settles; corrections are new rows.</p>
+
+<table>
+<tr><th>Column</th><th>Purpose</th></tr>
+<tr><td class="nm">event_id (nullable)</td><td>the request this concerns</td></tr>
+<tr><td class="nm">booking_id (nullable)</td><td>the booking this concerns</td></tr>
+<tr><td class="nm">party_user_id</td><td>whose money this entry is about: Client, Professional, or GigResource</td></tr>
+<tr><td class="nm">entry_type</td><td>one of the nine kinds below</td></tr>
+<tr><td class="nm">amount</td><td>decimal(12,2), always positive</td></tr>
+<tr><td class="nm">sign</td><td>money in or money out, from GigResource's books</td></tr>
+<tr><td class="nm">currency</td><td></td></tr>
+<tr><td class="nm">state</td><td>pending, then secured, then released or refunded or failed</td></tr>
+<tr><td class="nm">subject_type / subject_id</td><td>link to a Booking, Upgrade, Milestone, Payment or Payout</td></tr>
+<tr><td class="nm">payment_id (nullable)</td><td>the gateway charge that backs it</td></tr>
+<tr><td class="nm">reverses_id (nullable)</td><td>set when this row corrects an earlier one</td></tr>
+<tr><td class="nm">metadata</td><td>provider references, tax jurisdiction, notes</td></tr>
+<tr><td class="nm">occurred_at</td><td></td></tr>
+</table>
+
+<p><b>The nine records Peter asked for, one entry type each:</b></p>
+
+<ul>
+<li><b>booking_charge</b> the original booking amount</li>
+<li><b>platform_fee</b> the Client platform fee, including the posting fee</li>
+<li><b>commission</b> GigResource's share, at the professional's tier rate</li>
+<li><b>upgrade</b> a mid-event upgrade or change order, each its own row, never merged</li>
+<li><b>provider_fee</b> the Stripe or PayPal fee</li>
+<li><b>tax</b> applicable tax</li>
+<li><b>refund / adjustment</b> a reversal or correction</li>
+<li><b>milestone_funding / milestone_release</b> money parked for, then released to, a stage</li>
+<li><b>payout</b> money sent to the professional</li>
+</ul>
+
+<h3>3b. booking_upgrades, each upgrade its own record (the B3 rule)</h3>
+
+<p>Peter confirmed in B3 that a mid-event upgrade is an amendment to the existing booking, shown to the
+Client as one running total but recorded internally as separate line items, never collapsed. Payment
+must be secured before the upgrade is confirmed.</p>
+
+<table>
+<tr><th>Column</th><th>Purpose</th></tr>
+<tr><td class="nm">booking_id, requested_by</td><td></td></tr>
+<tr><td class="nm">description, amount</td><td>what and how much</td></tr>
+<tr><td class="nm">commission_rate</td><td>the pro's ordinary tier rate. No special upgrade fee, per B3.</td></tr>
+<tr><td class="nm">status</td><td>requested, approved, payment_secured, confirmed, or rejected</td></tr>
+<tr><td class="nm">secured_payment_id</td><td>the charge that gated confirmation</td></tr>
+</table>
+
+<p>The Client-facing booking total is derived: the original charge plus the confirmed upgrade rows.
+There is no modified total field.</p>
+
+<h3>3c. milestones, only when milestone payments are built</h3>
+<p>Label, amount, and a state of planned, then funded, then released. Each funding and release is also a
+ledger row.</p>
+
+<h3>3d. payments, one small change</h3>
+<p>Make the subscription link optional and add a purpose: subscription, request fee, booking, upgrade or
+refund. A payment can then back a ledger entry that is not a subscription. Existing subscription
+payments are unaffected.</p>
+
+<h2>4. The flow, when everything goes right</h2>
+
+<table>
+<tr><th>Step</th><th>What is recorded</th></tr>
+<tr><td class="nm">Client posts a request</td><td>platform_fee entry, pending then secured</td></tr>
+<tr><td class="nm">Client finalises a bid</td><td>booking_charge secured with the deposit held, and commission accrued but not yet taken</td></tr>
+<tr><td class="nm">Mid-event upgrade</td><td>an upgrade row requested then approved by the Client; payment secured, then the upgrade confirmed and the total recomputed</td></tr>
+<tr><td class="nm">Work marked complete</td><td>milestone or final release, provider_fee and tax recorded, then a payout entry of booking plus upgrades less commission and fees</td></tr>
+<tr><td class="nm">Something goes wrong</td><td>a refund entry that reverses the specific entries, by reference</td></tr>
+</table>
+
+<p>Money owed, held, earned and paid are all read by filtering the ledger. None of them is a stored field
+anyone overwrites.</p>
+
+<h2>5. How this satisfies Peter's rule</h2>
+
+<ul>
+<li><b>Discrete and auditable</b> every one of the nine is its own row, with its own state and its own
+provider reference.</li>
+<li><b>Nothing merged</b> upgrades never fold into the booking total; the total is a sum, computed on
+read.</li>
+<li><b>Nothing overwritten</b> corrections are reversing rows, so the history reconciles and an auditor
+can trace every dollar.</li>
+</ul>
+
+<h2>6. Open questions the Owner still needs to settle</h2>
+
+<table>
+<tr><th>#</th><th>Question</th></tr>
+<tr><td class="id">1</td><td><b>Fee timing.</b> The Decision Log confirms the posting fee is charged at publish, not at finalisation, but A1 also lists it as a ledger item to design here first, so the two overlap. Recommendation: build it as a platform_fee entry created at publish, once this model is approved. It is deliberately not moved yet, to avoid building money records ahead of this review.</td></tr>
+<tr><td class="id">2</td><td><b>Who holds the money.</b> Does GigResource hold funds in escrow, or does the provider hold them and we only record? This decides whether "held" is real custody or a bookkeeping state.</td></tr>
+<tr><td class="id">3</td><td><b>Refund policy.</b> Windows, and who can trigger one. Dispute deadlines are reserved for attorney review; no screen states one and this model should not hard-code one either.</td></tr>
+<tr><td class="id">4</td><td><b>Payout timing.</b> On completion, on a schedule, or on request, and any minimum threshold.</td></tr>
+<tr><td class="id">5</td><td><b>Taxes.</b> Do we compute and collect, or record only, and which jurisdictions in version one.</td></tr>
+</table>
+
+<h2>7. Build order once approved</h2>
+
+<ol>
+<li>ledger_entries and the read helpers for money owed, held, earned and paid.</li>
+<li>Backfill the existing request fee and any finalisation charges as entries.</li>
+<li>booking_upgrades and the secure-before-confirm gate, which unblocks the B3 upgrade billing.</li>
+<li>Move the posting fee to publish as a platform_fee entry, per B1.</li>
+<li>Refunds as reversing entries, then milestones, then payout reconciliation.</li>
+</ol>
+
+<div class="warn">
+<b>Nothing above is started until the Owner and PM approve this model.</b> That is why every pricing
+decision taken in October is still waiting: the prices are settled, but there is nowhere to record them.
+</div>
+
+<div class="foot">Written 22 August 2026 as docs/money-ledger-proposal.md in the repository. Reissued unchanged in substance for Khadijah on 16 October 2026, with the pricing context added.</div>
+
+</body></html>

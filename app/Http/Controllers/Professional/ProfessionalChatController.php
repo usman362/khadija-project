@@ -306,6 +306,7 @@ class ProfessionalChatController extends Controller
             'total'      => $conversations->count(),
             'priority'   => $conversations->filter(fn ($c) => $c->booking?->status === 'requested')->count(),
             'response'   => $this->avgResponseTime($conversations, $user),
+            'response_trend' => $this->responseTrend($conversations, $user),
             'compliance' => $needContract,
             'escrow'     => $escrow,
             'escrow_convos' => Booking::where('supplier_id', $user->id)->where('status', 'confirmed')->count(),
@@ -315,32 +316,102 @@ class ProfessionalChatController extends Controller
     /** Average reply latency: mean gap from an inbound message to the pro's next reply. */
     private function avgResponseTime($conversations, User $user): string
     {
-        $ids = $conversations->pluck('id');
-        if ($ids->isEmpty()) {
+        $avg = $this->avgResponseMinutes($conversations, $user);
+
+        if ($avg === null) {
             return '—';
         }
+
+        $avg = (int) round($avg);
+
+        return $avg >= 60 ? round($avg / 60, 1) . 'h' : $avg . 'm';
+    }
+
+    /**
+     * Is replying getting faster or slower?
+     *
+     * The card under this figure read "↓ 12% vs last 30 days" on every
+     * professional's screen, always that number, measured from nothing. The
+     * gaps it would need were already being read, just never over a window,
+     * so this compares the last 30 days with the 30 before them.
+     *
+     * Null when either month has no reply to measure, and the card then says
+     * nothing rather than inventing a direction.
+     *
+     * @return array{direction: string, percent: int}|null
+     */
+    private function responseTrend($conversations, User $user): ?array
+    {
+        $now  = now();
+        $this_ = $this->avgResponseMinutes($conversations, $user, $now->copy()->subDays(30), $now);
+        $prev  = $this->avgResponseMinutes($conversations, $user, $now->copy()->subDays(60), $now->copy()->subDays(30));
+
+        if ($this_ === null || $prev === null || $prev <= 0.0) {
+            return null;
+        }
+
+        $change = (int) round((($this_ - $prev) / $prev) * 100);
+
+        // A couple of percent either way is noise, not news.
+        if (abs($change) < 3) {
+            return null;
+        }
+
+        return [
+            // Down is good here: a smaller gap is a faster reply.
+            'direction' => $change < 0 ? 'down' : 'up',
+            'percent'   => abs($change),
+        ];
+    }
+
+    /**
+     * The mean reply gap in minutes, optionally within a window.
+     *
+     * A gap belongs to the window its REPLY falls in, because that is when the
+     * replying happened. Counting it by the inbound message would move last
+     * month's slow replies into this month's figure.
+     */
+    private function avgResponseMinutes($conversations, User $user, $from = null, $to = null): ?float
+    {
+        $ids = $conversations->pluck('id');
+
+        if ($ids->isEmpty()) {
+            return null;
+        }
+
         $byConv = Message::whereIn('conversation_id', $ids)
             ->orderBy('conversation_id')->orderBy('created_at')
             ->get(['conversation_id', 'sender_id', 'created_at'])
             ->groupBy('conversation_id');
 
         $gaps = [];
+
         foreach ($byConv as $list) {
             $pending = null;
+
             foreach ($list as $m) {
                 if ((int) $m->sender_id !== (int) $user->id) {
                     $pending ??= $m->created_at;
-                } elseif ($pending !== null) {
-                    $gaps[] = $pending->diffInMinutes($m->created_at);
-                    $pending = null;
+
+                    continue;
                 }
+
+                if ($pending === null) {
+                    continue;
+                }
+
+                $inWindow = ($from === null || $m->created_at >= $from)
+                    && ($to === null || $m->created_at < $to);
+
+                if ($inWindow) {
+                    $gaps[] = $pending->diffInMinutes($m->created_at);
+                }
+
+                $pending = null;
             }
         }
-        if (empty($gaps)) {
-            return '—';
-        }
-        $avg = (int) round(array_sum($gaps) / count($gaps));
-        return $avg >= 60 ? round($avg / 60, 1) . 'h' : $avg . 'm';
+
+        return $gaps === [] ? null : array_sum($gaps) / count($gaps);
     }
 
     private function initials(string $name): string

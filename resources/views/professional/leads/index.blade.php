@@ -273,8 +273,20 @@
                     </div>
                 </div>
                 {{-- Row 138 — a range only where the client gave one. Every row
-                     used to print a ±20% band around a single stated figure. --}}
-                <div class="pl-lead-val">@if($lead['valueLow'] === null)Budget not stated@elseif($lead['isRange']){{ $money($lead['valueLow']) }} – {{ $money($lead['valueHigh']) }}@else{{ $money($lead['valueLow']) }}@endif</div>
+                     used to print a ±20% band around a single stated figure.
+
+                     Built in PHP rather than inline directives: "stated@elseif"
+                     puts a directive straight after a letter, which Blade does
+                     not compile, so the page printed the directive itself where
+                     the budget should have been. --}}
+                @php
+                    $budget = $lead['valueLow'] === null
+                        ? 'Budget not stated'
+                        : ($lead['isRange']
+                            ? $money($lead['valueLow']) . ' – ' . $money($lead['valueHigh'])
+                            : $money($lead['valueLow']));
+                @endphp
+                <div class="pl-lead-val">{{ $budget }}</div>
                 {{-- Named, so the pill cannot be mistaken for another stage. --}}
                 <span class="pl-prio" style="color:{{ $pc }};background:{{ $pbg }};">Priority: {{ $lead['priority'] }}</span>
             </div>
