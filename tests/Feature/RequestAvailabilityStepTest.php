@@ -33,6 +33,23 @@ class RequestAvailabilityStepTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        /*
+         * Hold the clock at midday UTC.
+         *
+         * These tests use now()->addMonth() as an event date, which is a
+         * DATETIME in UTC, and compare it against dates read back on the
+         * America/New_York clock the application displays. Between 00:00 and
+         * 04:00 UTC those are different days, so the suite went red every
+         * night and green again by morning.
+         *
+         * The application is not at fault: a real caller passes a calendar
+         * date a client picked, not a UTC instant. It is the fixture that
+         * straddles. Midday UTC is 08:00 in New York, the same day either way.
+         */
+        \Illuminate\Support\Carbon::setTestNow(
+            \Illuminate\Support\Carbon::now()->setTime(12, 0),
+        );
+
         $this->seed(\Database\Seeders\PermissionSeeder::class);
         $this->seed(\Database\Seeders\RolePermissionSeeder::class);
 
@@ -48,6 +65,13 @@ class RequestAvailabilityStepTest extends TestCase
             'name' => 'Full-Service Catering', 'slug' => 'full-service-catering',
             'kind' => Category::SERVICE, 'parent_id' => $parent->id, 'is_active' => true,
         ]);
+    }
+
+    protected function tearDown(): void
+    {
+        \Illuminate\Support\Carbon::setTestNow();
+
+        parent::tearDown();
     }
 
     private function pro(string $state = 'MD'): User
