@@ -818,6 +818,23 @@ Route::middleware('auth')->group(function () {
         Route::post('/finalize/{finalization}/edit-agreement', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'editAgreement'])
             ->name('client.finalize.edit');
 
+        /*
+         * The Agreement Workspace's negotiation controls: "Both Client and
+         * Professional/Influencer should be able to Accept Current Terms,
+         * Propose Changes, or Decline" (Sir Peter's document, section 5).
+         * The client's half; the professional's opens with their side.
+         *
+         * Above the {step} wildcard, like edit-agreement and the overview GET.
+         * These two sat BELOW it and were therefore unreachable: a POST to
+         * /approve matched {step} = "approve", and save() 404s on a step name
+         * it does not recognise. Nothing had ever exercised them end to end,
+         * so it went unnoticed until the notification test tried.
+         */
+        Route::post('/finalize/{finalization}/approve', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'approveTerms'])
+            ->name('client.finalize.approve');
+        Route::post('/finalize/{finalization}/decline', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'declineAgreement'])
+            ->name('client.finalize.decline');
+
         Route::post('/finalize/{finalization}/{step}', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'save'])
             ->name('client.finalize.save');
         // The return leg from Stripe Checkout. GET, because Stripe sends the
@@ -828,16 +845,6 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/finalize/{finalization}-cancel', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'cancel'])
             ->name('client.finalize.cancel');
-        /*
-         * The Agreement Workspace's negotiation controls: "Both Client and
-         * Professional/Influencer should be able to Accept Current Terms,
-         * Propose Changes, or Decline" (Sir Peter's document, section 5).
-         * The client's half; the professional's opens with their side.
-         */
-        Route::post('/finalize/{finalization}/approve', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'approveTerms'])
-            ->name('client.finalize.approve');
-        Route::post('/finalize/{finalization}/decline', [\App\Http\Controllers\Client\ClientFinalizeController::class, 'declineAgreement'])
-            ->name('client.finalize.decline');
 
         Route::post('/proposals/{bid}/accept', [\App\Http\Controllers\Client\ClientProposalController::class, 'accept'])
             ->middleware('permission:bookings.update')->name('client.proposals.accept');

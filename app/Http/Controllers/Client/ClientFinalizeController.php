@@ -261,6 +261,8 @@ class ClientFinalizeController extends Controller
 
         \App\Domain\Agreements\Workspace::approve($finalization, $request->user());
 
+        \App\Domain\Agreements\AgreementNotices::approved($finalization->fresh(), $request->user());
+
         return back()->with('status', \App\Domain\Agreements\Workspace::bothApproved($finalization->fresh())
             ? 'Both of you have approved these terms. The agreement is ready to sign.'
             : 'You approved these terms. It now waits on the professional.');
@@ -316,6 +318,15 @@ class ClientFinalizeController extends Controller
             return back()->with('status', 'Nothing was different, so the agreement is unchanged.');
         }
 
+        // Sir Peter, 17 October: every step goes to the notifications, the
+        // inbox and the email. Only the other side is told; a draft saved or
+        // discarded above tells nobody, because nothing has happened to them.
+        \App\Domain\Agreements\AgreementNotices::changesSent(
+            $finalization->fresh(),
+            $request->user(),
+            $changed,
+        );
+
         $what = count($changed) === 1
             ? reset($changed)['label']
             : count($changed) . ' things';
@@ -331,6 +342,8 @@ class ClientFinalizeController extends Controller
         $this->authorizeClient($request, $finalization);
 
         \App\Domain\Agreements\Workspace::decline($finalization, $request->user());
+
+        \App\Domain\Agreements\AgreementNotices::declined($finalization->fresh(), $request->user());
 
         return back()->with('status', 'You declined this agreement.');
     }
@@ -444,6 +457,8 @@ class ClientFinalizeController extends Controller
             'client_approved_version'   => $f->terms_version,
             'supplier_approved_version' => $f->terms_version,
         ]);
+
+        \App\Domain\Agreements\AgreementNotices::signed($f->fresh(), $request->user());
     }
 
     /**
@@ -595,6 +610,8 @@ class ClientFinalizeController extends Controller
                             : null,
                     ],
                 ]);
+
+                \App\Domain\Agreements\AgreementNotices::funded($f->fresh());
 
                 // And into the ledger, where every money event belongs.
                 \App\Domain\Money\Ledger::record(
