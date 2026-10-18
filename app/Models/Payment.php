@@ -13,6 +13,9 @@ class Payment extends Model
     protected $fillable = [
         'user_id',
         'user_subscription_id',
+        // What this charge was for, now that a payment can back something that
+        // is not a subscription: request_fee, booking, upgrade, refund.
+        'purpose',
         'gateway',
         'status',
         'amount',

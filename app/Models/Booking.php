@@ -253,6 +253,34 @@ class Booking extends Model
     }
 
     /**
+     * Upgrades, each its own line.
+     *
+     * Per B3 the client sees one running total, but it is never stored: the
+     * total is this booking's price plus its CONFIRMED upgrades. There is
+     * deliberately no modified_total column for the two to disagree about.
+     */
+    public function upgrades(): HasMany
+    {
+        return $this->hasMany(BookingUpgrade::class);
+    }
+
+    /** Price plus confirmed upgrades. Computed, never stored. */
+    public function totalWithUpgrades(): float
+    {
+        return round(
+            (float) $this->price
+            + $this->upgrades->where('status', BookingUpgrade::CONFIRMED)->sum(fn ($u) => (float) $u->amount),
+            2,
+        );
+    }
+
+    /** Every money event on this booking. */
+    public function ledgerEntries(): HasMany
+    {
+        return $this->hasMany(LedgerEntry::class);
+    }
+
+    /**
      * The signed money terms — agreed price, deposit percent and amount.
      *
      * The cancellation policy computes its refund on the held balance, which

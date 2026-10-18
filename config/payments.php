@@ -56,5 +56,54 @@ return [
     | never offset against it.
     */
     'client_request_fee' => 2.99,
-    'client_request_fee_collect_at' => 'finalization',
+
+    /*
+     * There was a 'client_request_fee_collect_at' key here. Nothing read it,
+     * so setting it to 'publish' changed nothing while the fee went on being
+     * charged at finalisation. Removed rather than left to mislead the next
+     * reader: where the fee is taken is decided by Event::saved() recording a
+     * platform_fee entry, and held by ThePostingFeeIsOwedAtPublishTest.
+     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | Client pricing, confirmed by Sir Peter 16-17 October 2026
+    |--------------------------------------------------------------------------
+    |
+    | He settled these over two days of chat, so they are written down here
+    | rather than left in a thread. Every one is a figure he confirmed:
+    |
+    |   Posting: $2.99 for the founder cohort, $4.99 once that ends.
+    |   Agreement: $4.99, and CLIENT ONLY. He first asked for it from both
+    |     sides, then withdrew it for providers: "let the commission rate
+    |     override my 4.99". A professional already pays membership for
+    |     exposure and commission on the booking, so a flat fee would be a
+    |     third charge on the same work, heaviest on the smallest jobs.
+    |   Extension: $1.99 for 7, 14 or 21 more days, instead of reposting.
+    |   Expiry: 7 days from publication.
+    |
+    | Founder definition, his words via Khadijah: the first 1,000 verified
+    | Clients, six months counted from their FIRST PUBLISHED POSTING rather
+    | than from signup, so the window is not burned by somebody who registered
+    | early and was not ready to post.
+    */
+    'posting_fee_founder' => 2.99,
+    'posting_fee_regular' => 4.99,
+    'agreement_fee'       => 4.99,
+    'extension_fee'       => 1.99,
+
+    'founder_cohort_size'   => 1000,
+    'founder_months'        => 6,
+
+    'posting_expires_after_days' => 7,
+    'extension_options'          => [7, 14, 21],
+
+    /*
+     * Stripe's published US rate, for the Admin calculator and for showing a
+     * net figure. Only ever used to ESTIMATE: the real fee is read back from
+     * the charge and recorded as a provider_fee ledger entry, because an
+     * estimate and a refund disagree. Stripe keeps its fee on a refund.
+     */
+    'provider_rate_percent' => 2.9,
+    'provider_fee_fixed'    => 0.30,
 ];

@@ -158,6 +158,30 @@ class Event extends Model
             }
         });
 
+        /*
+         * The posting fee, recorded the moment a request becomes public.
+         *
+         * Sir Peter's B1 decision, 22 August: charged at publish, not at
+         * finalisation, and drafts are free. There are five places that can
+         * publish a request — the BSR wizard, ESR, the event controller, the
+         * virtual hub and Post an Event — and a fee charged in five places is
+         * a fee charged twice. So it is recorded here, for the same reason the
+         * state stamp above is: this is the one place that cannot be
+         * forgotten, by today's code or tomorrow's.
+         *
+         * Only on the transition into published. Editing a live posting is
+         * free, which the lifecycle document asks for by name, and
+         * PostingFee::recordFor is idempotent as a second guard.
+         */
+        static::saved(function (self $event) {
+            $justPublished = $event->published_at !== null
+                && ($event->wasRecentlyCreated || $event->wasChanged('published_at'));
+
+            if ($justPublished) {
+                \App\Domain\Money\PostingFee::recordFor($event);
+            }
+        });
+
         static::updated(function (self $event) {
             $changes = $event->getChanges();
 
