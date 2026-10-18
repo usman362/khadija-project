@@ -41,17 +41,16 @@ final class Pricing
         return (float) config('payments.agreement_fee', 4.99);
     }
 
-    /** Extending a live posting rather than starting again. */
-    public static function extensionFee(): float
-    {
-        return (float) config('payments.extension_fee', 1.99);
-    }
-
-    /** @return list<int> the extensions offered, in days */
-    public static function extensionOptions(): array
-    {
-        return config('payments.extension_options', [7, 14, 21]);
-    }
+    /*
+     * There is deliberately no extensionFee() or extensionOptions() here.
+     *
+     * Rule R33 already owns extensions, with its own day and price ladder, its
+     * limit of three paid ones and a free 24-hour grace reopen, and it derives
+     * expiry from the client's own proposal_deadline. A second set of figures
+     * for one feature is the "two definitions" fault this codebase has just
+     * been cleaned of twice. Peter's October numbers conflict with that ladder
+     * and wait for him to reconcile them.
+     */
 
     /**
      * Is this client inside the founder offer?

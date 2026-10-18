@@ -90,13 +90,22 @@ return [
     'posting_fee_founder' => 2.99,
     'posting_fee_regular' => 4.99,
     'agreement_fee'       => 4.99,
-    'extension_fee'       => 1.99,
 
     'founder_cohort_size'   => 1000,
     'founder_months'        => 6,
 
-    'posting_expires_after_days' => 7,
-    'extension_options'          => [7, 14, 21],
+    /*
+     * Extensions and expiry are NOT here. Rule R33 already owns them, with its
+     * own ladder (3 days $1.99, 7 days $2.99, 14 days $4.99, 30 days $7.99),
+     * a limit of three paid extensions and a free 24-hour grace reopen, and it
+     * derives expiry from the client's own proposal_deadline rather than from
+     * a fixed number of days after publication.
+     *
+     * Peter's October figures (7 days flat, extensions of 7/14/21 at a flat
+     * $1.99) conflict with that ladder. Two price lists for one feature is the
+     * fault this codebase has just been cleaned of twice, so his numbers wait
+     * for him to reconcile them with R33 rather than becoming a second set.
+     */
 
     /*
      * Stripe's published US rate, for the Admin calculator and for showing a

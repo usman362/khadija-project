@@ -113,29 +113,22 @@ final class PostingFee
     }
 
     /**
-     * Record an extension instead of a repost.
+     * Put an extension's charge in the ledger.
      *
-     * Peter, 16 October: "If it's extension from the original 7 days then it
-     * additional $1.99." Khadijah's shape, which he agreed: at the 24 hour
-     * mark the client is offered 7, 14 or 21 more days rather than being made
-     * to start again, existing bids stay in place, and nothing renews unless
-     * they choose it.
+     * The amount and the rules belong to Rule R33, which already owns
+     * extensions: its own day/price ladder, a limit of three paid ones, and a
+     * free 24-hour grace reopen. This only records what R33 decided, because a
+     * second price list is how one feature comes to disagree with itself.
      *
-     * A repost is a new posting at the full fee and goes through recordFor on
-     * the new event. An extension keeps the posting it belongs to, which is why
-     * it is not idempotent per event: a client may extend more than once.
+     * Peter's October figures, a flat $1.99 for 7, 14 or 21 days, conflict with
+     * that ladder and are not implemented here. He has to reconcile them with
+     * R33 first.
      */
-    public static function recordExtension(Event $event, int $days): LedgerEntry
+    public static function recordExtension(Event $event, int $days, float $amount): LedgerEntry
     {
-        if (! in_array($days, Pricing::extensionOptions(), true)) {
-            throw new \InvalidArgumentException(
-                'An extension is ' . implode(', ', Pricing::extensionOptions()) . ' days.',
-            );
-        }
-
         return Ledger::record(
             LedgerEntry::PLATFORM_FEE,
-            Pricing::extensionFee(),
+            $amount,
             '+',
             party: $event->client,
             event: $event,

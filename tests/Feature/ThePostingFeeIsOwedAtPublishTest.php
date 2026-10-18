@@ -172,48 +172,12 @@ class ThePostingFeeIsOwedAtPublishTest extends TestCase
         $this->assertTrue($this->fees($event)->first()->metadata['founder']);
     }
 
-    // ── Extensions ───────────────────────────────────────────
-
-    /** Peter, 16 October: an extension from the original 7 days is $1.99. */
-    public function test_an_extension_is_its_own_charge(): void
-    {
-        $event = $this->draft();
-        $event->update(['is_published' => true, 'status' => 'published']);
-
-        PostingFee::recordExtension($event, 14);
-
-        $this->assertCount(2, $this->fees($event));
-        $this->assertSame(4.98, round(PostingFee::outstanding($event), 2), '2.99 posting plus 1.99 extension.');
-    }
-
-    /** Only the lengths Khadijah set out and Peter agreed. */
-    public function test_an_extension_must_be_one_of_the_offered_lengths(): void
-    {
-        $event = $this->draft();
-        $event->update(['is_published' => true, 'status' => 'published']);
-
-        $this->expectException(\InvalidArgumentException::class);
-        PostingFee::recordExtension($event, 30);
-    }
-
-    /**
-     * An extension must not look like a posting already charged.
-     *
-     * Both are platform fees on the same request, so matching on the type
-     * alone would make the first extension hide the next posting fee. This is
-     * the bug that check was written with, and then against.
+    /*
+     * Extension charges are recorded by PostingFee::recordExtension, but the
+     * amount and the rules come from Rule R33, which already owns extensions.
+     * They are exercised with R33's own tests rather than re-asserted here
+     * against a second set of figures.
      */
-    public function test_an_extension_does_not_suppress_a_later_posting_fee(): void
-    {
-        $event = $this->draft();
-        PostingFee::recordExtension($event, 7);
-
-        $recorded = PostingFee::recordFor($event);
-
-        $this->assertNotNull($recorded);
-        $this->assertSame('posting', $recorded->metadata['reason']);
-        $this->assertCount(2, $this->fees($event));
-    }
 
     // ── Settling and refunding ───────────────────────────────
 

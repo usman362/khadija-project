@@ -138,24 +138,15 @@ class WhatAClientPaysTest extends TestCase
         );
     }
 
-    // ── Extensions ───────────────────────────────────────────
-
-    public function test_an_extension_is_cheaper_than_starting_again(): void
-    {
-        $client = $this->client();
-
-        $this->assertSame(1.99, Pricing::extensionFee());
-        $this->assertLessThan(
-            Pricing::postingFee($client),
-            Pricing::extensionFee(),
-            'Extending keeps the posting and its bids, so it must cost less than a new one.',
-        );
-    }
-
-    public function test_the_three_extension_lengths_are_offered(): void
-    {
-        $this->assertSame([7, 14, 21], Pricing::extensionOptions());
-    }
+    /*
+     * Extensions are NOT tested here, and are not in Pricing at all.
+     *
+     * Rule R33 already owns them: its own day and price ladder, a limit of
+     * three paid extensions, a free 24-hour grace reopen, and expiry derived
+     * from the client's own proposal_deadline. Peter's October figures, a flat
+     * $1.99 for 7, 14 or 21 days, conflict with that ladder, so they wait for
+     * him rather than becoming a second price list.
+     */
 
     // ── The processor's cut ──────────────────────────────────
 
