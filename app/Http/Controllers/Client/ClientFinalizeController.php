@@ -82,7 +82,11 @@ class ClientFinalizeController extends Controller
             'bid'       => $finalization->bid,
             // One source for the fee, so the screen can never quote a number the
             // charge does not use.
-            'clientFee' => (float) config('payments.client_request_fee', 0),
+            // The agreement fee, $4.99, CLIENT ONLY. Sir Peter asked for it
+            // from both sides on 17 October and withdrew the provider half the
+            // same day: "let the commission rate override my 4.99". The
+            // posting fee is a separate charge and is taken at publish now.
+            'clientFee' => \App\Domain\Money\Pricing::agreementFee(),
             'proRate'   => Commission::rateFor($finalization->supplier),
             // Which mode a charge would run in right now, so the screen can say
             // so plainly instead of implying real money moved.
@@ -548,26 +552,32 @@ class ClientFinalizeController extends Controller
                 ],
             ]);
 
-            // R10's client fee. The screen has always said "$2.99, charged once
-            // when this finalizes" — it was never actually collected, only
-            // displayed, so the promise was the only thing that existed.
-            //
-            // Its own row, not folded into the deposit: the deposit belongs to
-            // the professional and the fee belongs to GigResource, and the
-            // Bookings page reads deposits by `kind` to work out what a client
-            // still owes. Rolling them together would overstate every deposit
-            // by $2.99.
-            $fee = (float) config('payments.client_request_fee', 0);
+            /*
+             * The agreement fee.
+             *
+             * This used to be R10's $2.99 request fee, charged here because
+             * there was nowhere else to charge it. Since B1 came into force the
+             * posting fee is taken at publish, so what is owed at this moment
+             * is the AGREEMENT fee: $4.99, confirmed by Sir Peter on 17
+             * October, and charged to the client only.
+             *
+             * Its own row, not folded into the deposit: the deposit belongs to
+             * the professional and the fee belongs to GigResource, and the
+             * Bookings page reads deposits by `kind` to work out what a client
+             * still owes. Rolling them together would overstate every deposit.
+             */
+            $fee = \App\Domain\Money\Pricing::agreementFee();
             $alreadyCharged = Payment::where('user_id', $f->client_id)
                 ->where('status', 'completed')
                 ->get()
-                ->contains(fn ($p) => ($p->metadata['kind'] ?? null) === 'client_request_fee'
+                ->contains(fn ($p) => in_array($p->metadata['kind'] ?? null, ['agreement_fee', 'client_request_fee'], true)
                     && (int) ($p->metadata['finalization_id'] ?? 0) === $f->id);
 
             // Once per request instance (A15) — a retried submit must not charge twice.
             if ($fee > 0 && ! $alreadyCharged) {
-                Payment::create([
+                $feePayment = Payment::create([
                     'user_id'        => $f->client_id,
+                    'purpose'        => 'agreement',
                     'gateway'        => $gateway ?? ($mode === 'live' ? 'stripe' : 'test'),
                     'status'         => 'completed',
                     'amount'         => $fee,
@@ -575,16 +585,29 @@ class ClientFinalizeController extends Controller
                     'payment_method' => $mode === 'live' ? 'card' : 'test_card',
                     'completed_at'   => now(),
                     'metadata'       => [
-                        'kind'            => 'client_request_fee',
+                        'kind'            => 'agreement_fee',
                         'mode'            => $mode,
                         'finalization_id' => $f->id,
                         'event_id'        => $f->event_id,
                         'supplier_id'     => $f->supplier_id,
                         'note'            => $mode === 'test'
-                            ? 'Test-mode request fee: no real money moved.'
+                            ? 'Test-mode agreement fee: no real money moved.'
                             : null,
                     ],
                 ]);
+
+                // And into the ledger, where every money event belongs.
+                \App\Domain\Money\Ledger::record(
+                    \App\Models\LedgerEntry::PLATFORM_FEE,
+                    $fee,
+                    '+',
+                    party: $f->client,
+                    event: $f->event,
+                    state: \App\Models\LedgerEntry::SECURED,
+                    payment: $feePayment,
+                    subject: $f,
+                    metadata: ['reason' => 'agreement', 'mode' => $mode],
+                );
             }
 
             // Only now is it a booking, and the proposal is won. The one

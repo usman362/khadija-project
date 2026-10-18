@@ -268,8 +268,8 @@
         </div>
         <div class="fz-note info">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> <span>
-                <b>Your fee: ${{ number_format($clientFee, 2) }}</b>, charged once when this finalizes. Posting was free, and nothing is charged if you don't book.
-                The professional's commission ({{ $proRate }}%) comes out of their payout, not your price.
+                <b>Agreement fee: ${{ number_format($clientFee, 2) }}</b>, charged once when this finalizes. This is separate from the fee you paid to post the request.
+                Nothing further is charged if you do not book. The professional's commission ({{ $proRate }}%) comes out of their payout, not your price, and they pay no agreement fee.
             </span>
         </div>
 
@@ -389,7 +389,7 @@ PAYMENT TERMS
         <div class="fz-row"><span>Agreed price</span><b>${{ number_format((float) $fin->agreed_price) }}</b></div>
         <div class="fz-row"><span>Deposit ({{ $fin->deposit_percent }}%)</span><b>${{ number_format((float) $fin->deposit_amount) }}</b></div>
         <div class="fz-row"><span>Balance</span><b>${{ number_format((float) $fin->agreed_price - (float) $fin->deposit_amount) }} {{ $fin->balance_due_on ? 'due ' . $fin->balance_due_on->format('M j, Y') : 'due before the service' }}</b></div>
-        <div class="fz-row"><span>Service fee</span><b>${{ number_format($clientFee, 2) }}</b></div>
+        <div class="fz-row"><span>Agreement fee</span><b>${{ number_format($clientFee, 2) }}</b></div>
 
         @if($fin->isFunded())
             <div class="fz-note ok" style="margin-top:16px;">
@@ -467,7 +467,7 @@ PAYMENT TERMS
         <div class="fz-rail">
             <h4>Fees</h4>
             <div class="fz-ck"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></i><div><b>Free to post</b><span>Nothing charged to publish a request.</span></div></div>
-            <div class="fz-ck"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></i><div><b>${{ number_format($clientFee, 2) }} service fee</b><span>Once, only when this finalizes.</span></div></div>
+            <div class="fz-ck"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></i><div><b>${{ number_format($clientFee, 2) }} agreement fee</b><span>Once, only when this finalizes. Separate from your posting fee.</span></div></div>
             <div class="fz-ck"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></i><div><b>$0 if nothing books</b><span>Back out before signing and funding and you pay nothing.</span></div></div>
         </div>
 

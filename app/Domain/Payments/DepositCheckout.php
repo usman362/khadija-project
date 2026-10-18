@@ -83,15 +83,19 @@ class DepositCheckout
             'quantity' => 1,
         ]];
 
-        $fee = (float) config('payments.client_request_fee', 0);
+        // The agreement fee. This line used to be the request fee, charged
+        // here because there was nowhere else; the posting fee is taken at
+        // publish since B1 came into force, so what is owed at checkout is the
+        // agreement fee. Client only, per Sir Peter on 17 October.
+        $fee = \App\Domain\Money\Pricing::agreementFee();
 
         if ($fee > 0) {
             $items[] = [
                 'price_data' => [
                     'currency' => 'usd',
                     'product_data' => [
-                        'name' => 'GigResource request fee',
-                        'description' => 'Charged once, when a request finalizes.',
+                        'name' => 'GigResource agreement fee',
+                        'description' => 'Charged once, when the agreement finalizes.',
                     ],
                     'unit_amount' => (int) round($fee * 100),
                 ],

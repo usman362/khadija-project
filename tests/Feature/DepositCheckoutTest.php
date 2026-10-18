@@ -169,15 +169,19 @@ class DepositCheckoutTest extends TestCase
     /* ── What gets recorded ─────────────────────────────────── */
 
     /**
-     * The deposit and the request fee stay separate rows. The deposit belongs
-     * to the professional and the fee to GigResource, and the Bookings page
-     * reads deposits to work out what a client still owes — folded together,
-     * every deposit reads $2.99 too high.
+     * The deposit and the fee stay separate rows. The deposit belongs to the
+     * professional and the fee to GigResource, and the Bookings page reads
+     * deposits to work out what a client still owes. Folded together, every
+     * deposit reads too high by the fee.
+     *
+     * The fee charged here is the AGREEMENT fee since B1 came into force on
+     * 19 October. It used to be the $2.99 request fee, charged at this moment
+     * because there was nowhere else to charge it; the posting fee is now
+     * taken at publish, as Peter decided in August.
      */
     public function test_the_fee_is_its_own_row_not_added_to_the_deposit(): void
     {
         $this->key(null);
-        config(['payments.client_request_fee' => 2.99]);
 
         $f = $this->finalization();
 
@@ -187,6 +191,10 @@ class DepositCheckoutTest extends TestCase
         $kinds = Payment::all()->mapWithKeys(fn ($p) => [$p->metadata['kind'] => (float) $p->amount]);
 
         $this->assertEqualsWithDelta(500.0, $kinds['booking_deposit'], 0.01);
-        $this->assertEqualsWithDelta(2.99, $kinds['client_request_fee'], 0.01);
+        $this->assertEqualsWithDelta(
+            \App\Domain\Money\Pricing::agreementFee(),
+            $kinds['agreement_fee'],
+            0.01,
+        );
     }
 }
