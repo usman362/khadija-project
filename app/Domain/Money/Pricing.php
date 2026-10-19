@@ -28,9 +28,14 @@ final class Pricing
      * The founder rate, or the regular one once their six months are up or the
      * cohort is full.
      */
-    public static function postingFee(User $client): float
+    public static function postingFee(?User $client): float
     {
-        return self::isFounder($client)
+        // Nullable on purpose. The fee wording renders on screens that can be
+        // looked at before signing in, and we cannot know somebody is a founder
+        // without knowing who they are. Quoting the regular rate to an unknown
+        // reader is the safe direction: nobody is promised a discount they turn
+        // out not to have.
+        return $client && self::isFounder($client)
             ? (float) config('payments.posting_fee_founder', 2.99)
             : (float) config('payments.posting_fee_regular', 4.99);
     }
@@ -70,8 +75,12 @@ final class Pricing
      * started, which is why the window is open rather than closed when there is
      * no first posting to count from.
      */
-    public static function isFounder(User $client): bool
+    public static function isFounder(?User $client): bool
     {
+        if (! $client) {
+            return false;
+        }
+
         if (! self::inCohort($client)) {
             return false;
         }
@@ -94,7 +103,7 @@ final class Pricing
      *
      * @return array{founder: bool, position: int|null, cohort: int, expires_on: \Illuminate\Support\Carbon|null}
      */
-    public static function founderStanding(User $client): array
+    public static function founderStanding(?User $client): array
     {
         $first = self::firstPublishedAt($client);
 
@@ -107,9 +116,9 @@ final class Pricing
     }
 
     /** One-based place among Clients by signup order, or null if not a client. */
-    public static function position(User $client): ?int
+    public static function position(?User $client): ?int
     {
-        if ($client->primary_role !== 'client') {
+        if (! $client || $client->primary_role !== 'client') {
             return null;
         }
 
@@ -126,7 +135,7 @@ final class Pricing
             ->count();
     }
 
-    private static function inCohort(User $client): bool
+    private static function inCohort(?User $client): bool
     {
         $position = self::position($client);
 
@@ -134,8 +143,12 @@ final class Pricing
             && $position <= (int) config('payments.founder_cohort_size', 1000);
     }
 
-    private static function firstPublishedAt(User $client): ?\Illuminate\Support\Carbon
+    private static function firstPublishedAt(?User $client): ?\Illuminate\Support\Carbon
     {
+        if (! $client) {
+            return null;
+        }
+
         $at = Event::where('client_id', $client->id)
             ->whereNotNull('published_at')
             ->min('published_at');

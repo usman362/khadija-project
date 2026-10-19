@@ -11,26 +11,45 @@
     controller that receives the form, not only by the browser: a page that
     only says "required" is a page that can be posted around.
 
+    UPDATED 20 October 2026. It said "$0 to post. You only pay a single $2.99
+    when you finalize", which stopped being true when Peter moved the posting
+    fee to publish in his B1 decision and added a separate agreement fee. His
+    words: "If a client creates a post it will be $2.99 but if they finally get
+    an agreement then the clients $4.99 as well as the others ER and DR."
+
+    So there are two fees now, and both are named here rather than one of them
+    arriving as a surprise. The posting figure is read per client, because the
+    founder rate and the regular rate are different numbers and quoting the
+    wrong one on the page somebody ticks is worse than quoting none.
+
     $action — what the button does, in the client's words ("post this request")
     $field  — the checkbox's name; the BR has posted `confirm` since before this
               existed and its controller validates that name, so the name is a
               parameter rather than a rename that would break a live form.
 --}}
-@php $rftField = $field ?? 'fee_agreed'; @endphp
+@php
+    $rftField = $field ?? 'fee_agreed';
+    $rftPost  = \App\Domain\Money\Pricing::postingFee(auth()->user());
+    $rftAgree = \App\Domain\Money\Pricing::agreementFee();
+    $rftMoney = fn (float $n) => '$' . number_format($n, 2);
+@endphp
 <div class="rft">
     <p class="rft-fee">
-        <b>$0</b> to post. You only pay a single <b>$2.99</b> when you finalize
-        with a professional.<br>
-        Nothing is charged to post, and nothing if the request goes unfilled.
-        {{-- D-3, Sir Peter's answer of Sep 5. --}}
-        Once charged, the $2.99 is non-refundable.
+        <b>{{ $rftMoney($rftPost) }}</b> to publish this request, charged when it goes out to
+        professionals. Drafts are free.<br>
+        A further <b>{{ $rftMoney($rftAgree) }}</b> agreement fee applies only if you go on to
+        finalize with somebody, or buy a professional's package. Nothing is charged if the request
+        goes unfilled.
+        {{-- D-3, Sir Peter's answer of Sep 5, and his refund rules of 17 Oct. --}}
+        Once charged, the publishing fee is non-refundable.
     </p>
 
     <label class="rft-agree">
         <input type="checkbox" name="{{ $rftField }}" value="1" required>
         <span>
-            I understand that {{ $action ?? 'posting this request' }} is free, and that a single
-            <b>$2.99</b> fee applies only if I finalize an agreement with a professional.
+            I understand that {{ $action ?? 'posting this request' }} costs
+            <b>{{ $rftMoney($rftPost) }}</b>, and that a further <b>{{ $rftMoney($rftAgree) }}</b>
+            applies only if I finalize an agreement or buy a package.
         </span>
     </label>
 </div>

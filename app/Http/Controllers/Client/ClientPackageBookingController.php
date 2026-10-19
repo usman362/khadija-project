@@ -165,6 +165,35 @@ class ClientPackageBookingController extends Controller
                 'changed_by'   => $client->id,
             ]);
 
+            /*
+             * The agreement fee, $4.99.
+             *
+             * Sir Peter, 18 October: the fee applies "once the client buys a
+             * professional's package" as well. Buying a package IS the
+             * agreement: it is already priced and awarded to one professional,
+             * so there is no negotiation to finalize later and this is the
+             * moment it is owed.
+             *
+             * Recorded as owed rather than taken. Nothing is charged here yet,
+             * the booking opens as 'requested', and PaymentGuard still decides
+             * whether any charge may happen at all. A fee that was owed and
+             * never collected should be visible, not vanish.
+             *
+             * No posting fee: the event above is deliberately unpublished,
+             * because nobody bids on a package.
+             */
+            \App\Domain\Money\Ledger::record(
+                \App\Models\LedgerEntry::PLATFORM_FEE,
+                \App\Domain\Money\Pricing::agreementFee(),
+                '+',
+                party: $client,
+                event: $event,
+                booking: $booking,
+                state: \App\Models\LedgerEntry::PENDING,
+                subject: $package,
+                metadata: ['reason' => 'agreement', 'via' => 'package'],
+            );
+
             return $booking;
         });
 
