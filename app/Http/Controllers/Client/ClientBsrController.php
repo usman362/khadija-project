@@ -382,7 +382,13 @@ class ClientBsrController extends Controller
         $validated = $request->validate($rules, $this->messagesFor($step));
 
         if ($step === 'availability') {
-            $this->assertServicesFitInsideTheEvent($validated);
+            \App\Domain\Requests\ServiceWindow::assertServicesFit(
+                $validated['event_date'] ?? null,
+                $validated['event_start_time'] ?? null,
+                $validated['event_end_time'] ?? null,
+                (array) ($validated['service_times'] ?? []),
+                (array) ($validated['backup_dates'] ?? []),
+            );
         }
 
         /*
@@ -1076,75 +1082,6 @@ class ClientBsrController extends Controller
     }
 
     /** Per-step rules. Only the step being submitted is validated. */
-    /**
-     * A service cannot run past the end of the event it belongs to.
-     *
-     * Sir Peter, 18 October, with a screenshot: an event ending at 11:00 PM,
-     * services set to end at 12:00 AM, and the wizard let him carry on to the
-     * next step. "This system needs to catch that as an error and make the
-     * client not skip or go forward until its fixed."
-     *
-     * Times are resolved against the event day before anything is compared,
-     * because 12:00 AM is numerically smaller than 11:00 PM and means the day
-     * after. Comparing the strings would have said midnight comes first and
-     * passed exactly the case he reported.
-     *
-     * An event with no end time constrains nothing: an open-ended request is
-     * the client saying they do not know yet, and inventing a boundary for it
-     * would reject timings that are perfectly fine.
-     */
-    private function assertServicesFitInsideTheEvent(array $validated): void
-    {
-        if (empty($validated['event_end_time']) || empty($validated['event_date'])) {
-            return;
-        }
-
-        $day   = \App\Support\DisplayTimezone::parse($validated['event_date'])->startOfDay();
-        $start = $day->copy()->setTimeFromTimeString($validated['event_start_time']);
-        $end   = $day->copy()->setTimeFromTimeString($validated['event_end_time']);
-
-        // The same past-midnight roll the event's own hours already use.
-        if ($end->lessThanOrEqualTo($start)) {
-            $end->addDay();
-        }
-
-        $errors = [];
-
-        foreach ((array) ($validated['service_times'] ?? []) as $id => $times) {
-            $from = trim((string) ($times['start'] ?? ''));
-            $to   = trim((string) ($times['end'] ?? ''));
-
-            if ($from === '' && $to === '') {
-                continue;
-            }
-
-            $serviceStart = $from !== '' ? $day->copy()->setTimeFromTimeString($from) : $start->copy();
-            $serviceEnd   = $to !== '' ? $day->copy()->setTimeFromTimeString($to) : $end->copy();
-
-            if ($serviceEnd->lessThanOrEqualTo($serviceStart)) {
-                $serviceEnd->addDay();
-            }
-
-            $name = \App\Models\Category::find((int) $id)?->name ?? 'This service';
-
-            if ($serviceStart->lessThan($start)) {
-                $errors["service_times.{$id}.start"] =
-                    "{$name} starts before your event does. Your event begins at "
-                    . $start->format('g:i A') . '.';
-            }
-
-            if ($serviceEnd->greaterThan($end)) {
-                $errors["service_times.{$id}.end"] =
-                    "{$name} runs past the end of your event. Your event ends at "
-                    . $end->format('g:i A') . ', so change this time or extend the event.';
-            }
-        }
-
-        if ($errors !== []) {
-            throw \Illuminate\Validation\ValidationException::withMessages($errors);
-        }
-    }
-
     private function rulesFor(string $step, Request $request): array
     {
         return match ($step) {

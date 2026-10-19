@@ -105,6 +105,23 @@ class AServiceCannotOutrunItsEventTest extends TestCase
         $this->assertStringContainsString('Uplighting & Ambient Lighting', $errors[0]);
     }
 
+    /**
+     * His second screenshot exactly: outside at BOTH ends.
+     *
+     * "It allowed ... the services to pick times prior and after the event that
+     * went BEFORE and AFTER the initial timeframe." Event 10:00 AM to 11:00 PM,
+     * Country Club Venues 9:00 AM to 12:00 AM. Both edges are wrong and both
+     * are reported, because fixing one would still leave the other.
+     */
+    public function test_a_service_outside_at_both_ends_is_refused_at_both(): void
+    {
+        $this->submit(['start' => '09:00', 'end' => '00:00'])
+            ->assertSessionHasErrors([
+                "service_times.{$this->service->id}.start",
+                "service_times.{$this->service->id}.end",
+            ]);
+    }
+
     /** A service that finishes within the event goes through. */
     public function test_a_service_inside_the_event_is_allowed(): void
     {
@@ -161,6 +178,107 @@ class AServiceCannotOutrunItsEventTest extends TestCase
     {
         $this->submit(['start' => '', 'end' => ''])
             ->assertSessionHasNoErrors();
+    }
+
+    // ── Backup dates, which he asked for separately ──────────
+
+    /**
+     * His second screenshot and his words: "even if its on the optional or
+     * backup dates."
+     *
+     * A backup date carries its own hours. Accepting one whose window the
+     * services do not fit would produce a booking nobody can honour, so it is
+     * checked exactly like the preferred date.
+     */
+    public function test_a_service_outside_a_backup_date_is_refused(): void
+    {
+        $this->actingAs($this->client)->post(route('client.bsr.save', 'availability'), [
+            'event_date'       => now()->addDays(20)->toDateString(),
+            'event_start_time' => '10:00',
+            'event_end_time'   => '23:00',
+            // The backup day is shorter than the main one.
+            'backup_dates'     => [[
+                'date'  => now()->addDays(21)->toDateString(),
+                'start' => '10:00',
+                'end'   => '18:00',
+            ]],
+            'services'      => [$this->service->id],
+            // Fine on the main date, past the end of the backup.
+            'service_times' => [$this->service->id => ['start' => '13:00', 'end' => '22:00']],
+        ])->assertSessionHasErrors("service_times.{$this->service->id}.end");
+    }
+
+    /** And the message says which day it breached. */
+    public function test_the_error_names_the_backup_date(): void
+    {
+        $backup = now()->addDays(21);
+
+        $this->actingAs($this->client)->post(route('client.bsr.save', 'availability'), [
+            'event_date'       => now()->addDays(20)->toDateString(),
+            'event_start_time' => '10:00',
+            'event_end_time'   => '23:00',
+            'backup_dates'     => [['date' => $backup->toDateString(), 'start' => '10:00', 'end' => '18:00']],
+            'services'         => [$this->service->id],
+            'service_times'    => [$this->service->id => ['start' => '13:00', 'end' => '22:00']],
+        ]);
+
+        $message = session('errors')->get("service_times.{$this->service->id}.end")[0];
+
+        $this->assertStringContainsString('backup date of ' . $backup->format('M j'), $message);
+        $this->assertStringContainsString('6:00 PM', $message);
+    }
+
+    /** A backup date the services do fit inside is allowed. */
+    public function test_a_service_inside_every_offered_date_is_allowed(): void
+    {
+        $this->actingAs($this->client)->post(route('client.bsr.save', 'availability'), [
+            'event_date'       => now()->addDays(20)->toDateString(),
+            'event_start_time' => '10:00',
+            'event_end_time'   => '23:00',
+            'backup_dates'     => [['date' => now()->addDays(21)->toDateString(), 'start' => '10:00', 'end' => '23:00']],
+            'services'         => [$this->service->id],
+            'service_times'    => [$this->service->id => ['start' => '13:00', 'end' => '22:00']],
+        ])->assertSessionHasNoErrors();
+    }
+
+    /**
+     * A backup date with blank hours inherits the main ones.
+     *
+     * Which is what the form pre-fills, so most backups are the same window as
+     * the event and must not be reported as a second breach of it.
+     */
+    public function test_a_backup_date_with_no_hours_of_its_own_uses_the_events(): void
+    {
+        $this->actingAs($this->client)->post(route('client.bsr.save', 'availability'), [
+            'event_date'       => now()->addDays(20)->toDateString(),
+            'event_start_time' => '10:00',
+            'event_end_time'   => '23:00',
+            'backup_dates'     => [['date' => now()->addDays(21)->toDateString(), 'start' => '', 'end' => '']],
+            'services'         => [$this->service->id],
+            'service_times'    => [$this->service->id => ['start' => '13:00', 'end' => '22:00']],
+        ])->assertSessionHasNoErrors();
+    }
+
+    /**
+     * One wrong service is one message, however many dates it breaks.
+     *
+     * Three messages under one box reads as three problems to fix.
+     */
+    public function test_a_service_wrong_on_several_dates_is_reported_once(): void
+    {
+        $this->actingAs($this->client)->post(route('client.bsr.save', 'availability'), [
+            'event_date'       => now()->addDays(20)->toDateString(),
+            'event_start_time' => '10:00',
+            'event_end_time'   => '18:00',
+            'backup_dates'     => [
+                ['date' => now()->addDays(21)->toDateString(), 'start' => '10:00', 'end' => '17:00'],
+                ['date' => now()->addDays(22)->toDateString(), 'start' => '10:00', 'end' => '16:00'],
+            ],
+            'services'      => [$this->service->id],
+            'service_times' => [$this->service->id => ['start' => '13:00', 'end' => '22:00']],
+        ]);
+
+        $this->assertCount(1, session('errors')->get("service_times.{$this->service->id}.end"));
     }
 
     // ── The second fault, underneath his report ──────────────
