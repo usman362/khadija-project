@@ -40,6 +40,11 @@ class ServiceTimeline
     public static function fromInput(array $times, array $serviceIds, ?CarbonInterface $eventDay): array
     {
         $day = $eventDay ? Carbon::parse($eventDay)->startOfDay() : null;
+
+        // The event's own start, kept before the day is flattened. A service
+        // given only an end time follows the event's start, and the
+        // past-midnight check below needs something to compare against.
+        $eventStart = $eventDay ? Carbon::parse($eventDay) : null;
         $out = [];
 
         foreach ($serviceIds as $id) {
@@ -49,9 +54,31 @@ class ServiceTimeline
 
             $note = trim((string) ($times[$id]['note'] ?? ''));
 
+            $startsAt = $day && $start !== '' ? $day->copy()->setTimeFromTimeString($start) : null;
+            $endsAt   = $day && $end !== '' ? $day->copy()->setTimeFromTimeString($end) : null;
+
+            /*
+             * A service that ends before it starts runs past midnight.
+             *
+             * "01:00 PM to 12:00 AM" is a lighting rig packing down after the
+             * reception, not a typo, and the event's own end time has rolled
+             * the same way since it was written. This did not, so midnight was
+             * stamped at the START of the event day: an end ten hours before
+             * the service began, which made its duration null and put it
+             * outside the event it belongs to.
+             *
+             * Where only an end was given, the service follows the event's
+             * start, so the comparison is against that instead.
+             */
+            $against = $startsAt ?? $eventStart;
+
+            if ($endsAt && $against && $endsAt->lessThanOrEqualTo($against)) {
+                $endsAt->addDay();
+            }
+
             $out[$id] = [
-                'starts_at'   => $day && $start !== '' ? $day->copy()->setTimeFromTimeString($start) : null,
-                'ends_at'     => $day && $end !== '' ? $day->copy()->setTimeFromTimeString($end) : null,
+                'starts_at'   => $startsAt,
+                'ends_at'     => $endsAt,
                 // Where a rough time goes when the exact one is not settled,
                 // and where "setup can start from 3pm" goes now that the one
                 // box asking it for everything has gone.
