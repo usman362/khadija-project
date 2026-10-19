@@ -69,6 +69,7 @@
      * the layout's own form styling so they look like every other field this
      * client fills in.
      */
+    .av-warn { grid-column: 1 / -1; font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.55; }
     .av-block { margin-top: 18px; padding: 16px 18px; border-radius: 14px;
         border: 1px solid var(--border-color); background: var(--bg-subtle, rgba(0,0,0,.02)); }
     .av-block h3 { margin: 0 0 4px; font-size: 13.5px; font-weight: 800; color: var(--text-primary); }
@@ -269,9 +270,19 @@
     </table>
     @endif
 
+    {{-- Sir Peter, 20 October: "Rename the feature everywhere to Set
+         Availability for Multiple Dates ... 'Block' suggests that dates can
+         only be marked Unavailable, whereas the existing dropdown allows users
+         to select an availability status."
+
+         He is right, and the old name is where the missing third choice came
+         from: it began as blocking, and blocking only ever meant one answer.
+         There was also a second copy of this in the Quick Actions rail, named
+         differently, which he asked to be removed: "we should avoid presenting
+         the same feature multiple times on one webpage." --}}
     <div class="av-block" id="avRange">
-        <h3>Block a stretch of dates</h3>
-        <p>For a holiday, or a period you know will not work. It is the same thing as marking each day busy, done in one go.</p>
+        <h3>Set availability for multiple dates</h3>
+        <p>A holiday, a run of days that already suit you, or a stretch you want to take an answer back off. The same thing as clicking each day, done in one go.</p>
         <form method="POST" action="{{ route('client.calendar.availability.range') }}">
             @csrf
             <input type="hidden" name="back" value="{{ $back }}">
@@ -292,9 +303,18 @@
                 <select id="av-state" name="state">
                     <option value="{{ Availability::UNAVAILABLE }}">Unavailable</option>
                     <option value="{{ Availability::AVAILABLE }}">Available</option>
+                    {{-- The third choice, which the range never had. Not set is
+                         the absence of an answer rather than an answer, so it
+                         clears those days instead of writing to them. --}}
+                    <option value="not_set">Not set</option>
                 </select>
             </div>
-            <button type="submit">Apply to these days</button>
+            {{-- "If a selected date already has an availability status, inform
+                 the user that applying the new status will replace it." Said
+                 once, here, rather than as a confirmation dialog on a form that
+                 is easy to run again. --}}
+            <p class="av-warn">Any day in the range that already has an answer will be replaced. Your events and bookings are not touched.</p>
+            <button type="submit">Apply to selected dates</button>
         </form>
         {{-- The first day fills the second's floor the moment it is chosen, so
              a stretch cannot be asked for backwards. --}}

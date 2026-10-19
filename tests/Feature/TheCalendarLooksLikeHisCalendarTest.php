@@ -152,14 +152,34 @@ class TheCalendarLooksLikeHisCalendarTest extends TestCase
     }
 
     /** Quick actions, on the tab they belong to and nowhere else. */
-    public function test_quick_actions_belong_to_my_availability(): void
+    /**
+     * Quick actions is gone, and its going is the point.
+     *
+     * Sir Peter, 20 October: "Remove the duplicate shortcut from the Quick
+     * Actions sidebar ... we should avoid presenting the same feature multiple
+     * times on one webpage." It held two rows and both were second doors onto
+     * something already on the page: "Set a stretch of dates" onto the form
+     * below the calendar, and "View as list" onto what is now the Grid / List
+     * toggle in the card header. Applying his rule to the row he did not name
+     * left the card empty, so the card went with them.
+     */
+    public function test_the_duplicate_shortcuts_are_gone(): void
     {
-        $this->assertStringNotContainsString('Quick actions', $this->page());
+        foreach ([$this->page(), $this->mine()] as $html) {
+            $this->assertStringNotContainsString('Quick actions', $html);
+            $this->assertStringNotContainsString('Set a stretch of dates', $html);
+        }
+    }
 
+    /** The one way to set a range, under the calendar, named as he asked. */
+    public function test_the_range_form_is_named_for_what_it_does(): void
+    {
         $avail = $this->mine();
-        $this->assertStringContainsString('Quick actions', $avail);
-        $this->assertStringContainsString('Set a stretch of dates', $avail);
-        $this->assertStringContainsString('View as list', $avail);
+
+        $this->assertStringContainsString('Set availability for multiple dates', $avail);
+        $this->assertStringContainsString('Apply to selected dates', $avail);
+        $this->assertStringNotContainsString('Block a stretch of dates', $avail);
+        $this->assertStringNotContainsString('Apply to these days', $avail);
     }
 
     /** The key sits above the grid it explains. */

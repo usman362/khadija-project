@@ -126,22 +126,28 @@ class ClientCalendarController extends Controller
         return $this->backToCalendar($data['back'] ?? null);
     }
 
-    /** Block a stretch of dates in one go. */
+    /** Set availability for a run of dates in one go, including clearing it. */
     public function markRange(Request $request): RedirectResponse
     {
         $data = $request->validate([
             'from'  => ['required', 'date_format:Y-m-d'],
             'to'    => ['required', 'date_format:Y-m-d'],
-            'state' => ['required', 'in:available,unavailable'],
+            // Three choices, per Sir Peter on 20 October. "not_set" is the
+            // absence of an answer rather than an answer, so it clears.
+            'state' => ['required', 'in:available,unavailable,not_set'],
             'back'  => ['nullable', 'string', 'max:300'],
         ]);
 
-        $written = Availability::markRange($request->user(), $data['from'], $data['to'], $data['state']);
+        $state = $data['state'] === 'not_set' ? null : $data['state'];
 
-        [$word] = Availability::STATES[$data['state']];
+        $written = Availability::markRange($request->user(), $data['from'], $data['to'], $state);
+
+        $word = $state ? strtolower(Availability::STATES[$state][0]) : 'back to not set';
 
         return $this->backToCalendar($data['back'] ?? null)
-            ->with('status', $written . ' ' . \Illuminate\Support\Str::plural('day', $written) . ' marked ' . strtolower($word) . '.');
+            ->with('status', $written === 0 && $state === null
+                ? 'Those days had no answer on them already, so nothing changed.'
+                : $written . ' ' . \Illuminate\Support\Str::plural('day', $written) . ' set ' . $word . '.');
     }
 
     /**

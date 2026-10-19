@@ -75,8 +75,13 @@ class CheckAvailabilitySaysWhatItKnowsTest extends TestCase
     {
         $html = $this->page();
 
-        $this->assertStringContainsString('We can tell you who is busy, not who is free.', $html);
+        // The heading was "We can tell you who is busy, not who is free" until
+        // 20 October, when Sir Peter asked for the three answers to be named as
+        // three: "a provider who has no conflicting booking is not necessarily
+        // available."
+        $this->assertStringContainsString('only one of them is a yes', $html);
         $this->assertStringContainsString('Not Answered', $html);
+        $this->assertStringContainsString('not a quiet yes', $html);
 
         $states = CheckAvailability::suppliers(
             CheckAvailability::dates($this->event),

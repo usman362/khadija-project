@@ -178,7 +178,9 @@ class ClientCalendarPageTest extends TestCase
             ->get(route('client.check-availability.index', ['tab' => 'mine']))
             ->assertOk()
             ->assertSee('Say which days suit you', false)
-            ->assertSee('Block a stretch of dates');
+            // Renamed on 20 October, when Sir Peter pointed out that "block"
+            // implies the only answer is Unavailable.
+            ->assertSee('Set availability for multiple dates');
     }
 
     /** And the old calendar link still lands on it rather than 404ing. */

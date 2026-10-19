@@ -318,7 +318,10 @@ class HiredTalentIsNotWaitingOnAnybodyTest extends TestCase
             ->assertSuccessful()
             ->getContent();
 
-        $this->assertStringContainsString('We can tell you who is busy, not who is free.', $page);
+        // The heading became "Three answers, and only one of them is a yes"
+        // on 20 October: "a provider who has no conflicting booking is not
+        // necessarily available."
+        $this->assertStringContainsString('only one of them is a yes', $page);
     }
 
     /** The page names which kind you are looking at, as his two pages do. */

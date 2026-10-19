@@ -119,6 +119,8 @@
 
     @media (max-width: 1000px) { .ca-steps { grid-template-columns: 1fr; } .ca-wrap { overflow-x: auto; } }
     .ca-mine-rail { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+    /* One card left, so it spans rather than leaving a gap beside itself. */
+    .ca-mine-rail-one { grid-template-columns: 1fr; }
     .ca-mine-card { padding: 16px 18px; }
     .ca-mine-card h3 { font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 10px; }
     .ca-mine-card ul { margin: 0; padding-left: 17px; }
@@ -187,35 +189,20 @@
         @endif
     </p>
 
-    {{-- Quick actions and tips, from his My Availability image. They came over
-         with the tab on 12 October. Each points at something that already
-         works: the range form under the grid, and the month as a list. --}}
-    <div class="ca-mine-rail">
-        <div class="ca-card ca-mine-card">
-            <h3>Quick actions</h3>
-            <a class="ca-mine-row" href="#avRange">
-                <span class="ca-tab-ico">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                </span>
-                <span><b>Set a stretch of dates</b><span>Mark a whole run of days in one go.</span></span>
-            </a>
-            {{-- Sir Peter, 20 October: this used to send you to the calendar
-                 page in list view, which is a different page, and left no way
-                 back to this grid. It stays here now and the card above has a
-                 Grid / List toggle. --}}
-            <a class="ca-mine-row" href="{{ route('client.check-availability.index', ['tab' => 'mine', 'avview' => 'list', 'cal' => $calendar['anchor']->format('Y-m-d')]) }}">
-                <span class="ca-tab-ico" style="background:rgba(37,99,235,.1);color:#1d4ed8;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                </span>
-                <span><b>View as list</b><span>Your month as a list instead of a grid. You can switch back.</span></span>
-            </a>
-        </div>
+    {{-- Quick actions is gone entirely, and its going is the same rule he gave.
+         It held two rows. "Set a stretch of dates" was a second door onto the
+         form below the calendar, named differently from it, which is what he
+         asked to be removed. "View as list" is now the Grid / List toggle in
+         the card header, which is a better place for it and leaves a way back.
+         Applying his principle to the one he did not name leaves nothing in the
+         card, so the card went too rather than standing empty. --}}
+    <div class="ca-mine-rail ca-mine-rail-one">
         <div class="ca-card ca-mine-card">
             <h3>Tips</h3>
             <ul>
                 <li>Click a day to move it between available, unavailable and not set.</li>
                 <li>Not set is not the same as free. It means nobody has said anything about that day.</li>
-                <li>Use <b>Block a stretch of dates</b> for a holiday, rather than clicking each day.</li>
+                <li>Use <b>Set availability for multiple dates</b> below for a holiday, rather than clicking each day.</li>
             </ul>
         </div>
     </div>
@@ -256,11 +243,23 @@
         </div>
     </div>
 @else
+    {{-- Sir Peter, 20 October: "Check Availability should distinguish between a
+         provider who is confirmed available, one who is unavailable, and one
+         who has not entered their availability. A provider who has no
+         conflicting booking is not necessarily available. I recommend making
+         that distinction explicit throughout GigResource."
+
+         So the three are named as three, in his order, rather than left as "a
+         red mark and everything else". The middle one is the one that matters:
+         Not Answered is not a quiet yes. --}}
     <div class="ca-note">
-        <b>We can tell you who is busy, not who is free.</b>
+        <b>Three answers, and only one of them is a yes.</b>
         <p>
-            A red mark is a real booking. Everything else reads as Not Answered, because saying "I am free that day" is
-            something {{ $kind === 'influencer' ? 'influencers' : 'professionals' }} record about themselves, and their side cannot record it yet.
+            <b style="display:inline;color:var(--ok-text);">Available</b> means they have said that day suits them.
+            <b style="display:inline;color:var(--bad-text);">Unavailable</b> means they are booked, which we know from their bookings here.
+            <b style="display:inline;">Not Answered</b> means nobody has said anything about that day, and it is not a quiet yes.
+            Saying "I am free" is something {{ $kind === 'influencer' ? 'influencers' : 'professionals' }} record about themselves,
+            and their side cannot record it yet, so today every day that is not booked reads as Not Answered.
             <a href="{{ $link(['sample' => 1]) }}" style="font-weight:700;">See the screen with sample answers</a>.
         </p>
     </div>

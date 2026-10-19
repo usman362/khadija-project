@@ -96,9 +96,21 @@ final class Availability
      *
      * @return int  how many days were written
      */
-    public static function markRange(User $user, string $from, string $to, string $state): int
+    public static function markRange(User $user, string $from, string $to, ?string $state): int
     {
-        if (! self::isState($state)) {
+        /*
+         * Null is the third answer: Not set.
+         *
+         * Sir Peter, 20 October: "The form must support three choices:
+         * Available, Unavailable, and Not Set." It supported two, because it
+         * began as "block a stretch of dates" and blocking only ever meant one
+         * of them. A single day has cleared by click since it was built, so
+         * the range was the odd one out.
+         *
+         * Not set is not a state that gets stored. It is the absence of one, so
+         * clearing is a delete rather than a write, exactly as mark() does it.
+         */
+        if ($state !== null && ! self::isState($state)) {
             return 0;
         }
 
@@ -112,6 +124,14 @@ final class Availability
         // A range is a convenience, not a licence to write a decade of rows.
         if ($start->diffInDays($end) > 366) {
             $end = $start->copy()->addDays(366);
+        }
+
+        if ($state === null) {
+            // One statement rather than a delete per day: the range can be a
+            // year, and this is the same answer either way.
+            return AvailabilityDay::where('user_id', $user->id)
+                ->whereBetween('day', [$start, $end->copy()->endOfDay()])
+                ->delete();
         }
 
         $written = 0;
