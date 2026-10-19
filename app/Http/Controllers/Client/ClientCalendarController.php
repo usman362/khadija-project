@@ -162,10 +162,23 @@ class ClientCalendarController extends Controller
         $path = parse_url($back, PHP_URL_PATH) ?: '';
         $qs   = parse_url($back, PHP_URL_QUERY);
 
-        if ($path !== '/client/calendar') {
+        /*
+         * Two paths, because My Availability moved to its own page on 12
+         * October and this list still named only the calendar. A client who
+         * marked a day from the availability list was sent back to the grid
+         * instead of the list they were reading, which is half of what Sir
+         * Peter reported on 20 October about not being able to stay in the
+         * list view.
+         *
+         * Still an allow-list rather than a redirect to whatever arrived: the
+         * address comes from the page and is therefore theirs to tamper with.
+         */
+        $allowed = ['/client/calendar', '/client/availability'];
+
+        if (! in_array($path, $allowed, true)) {
             return redirect()->to($fallback);
         }
 
-        return redirect()->to('/client/calendar' . ($qs ? '?' . $qs : ''));
+        return redirect()->to($path . ($qs ? '?' . $qs : ''));
     }
 }

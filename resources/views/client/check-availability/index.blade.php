@@ -199,11 +199,15 @@
                 </span>
                 <span><b>Set a stretch of dates</b><span>Mark a whole run of days in one go.</span></span>
             </a>
-            <a class="ca-mine-row" href="{{ route('client.calendar.index', ['calview' => 'list', 'cal' => $calendar['anchor']->format('Y-m-d')]) }}">
+            {{-- Sir Peter, 20 October: this used to send you to the calendar
+                 page in list view, which is a different page, and left no way
+                 back to this grid. It stays here now and the card above has a
+                 Grid / List toggle. --}}
+            <a class="ca-mine-row" href="{{ route('client.check-availability.index', ['tab' => 'mine', 'avview' => 'list', 'cal' => $calendar['anchor']->format('Y-m-d')]) }}">
                 <span class="ca-tab-ico" style="background:rgba(37,99,235,.1);color:#1d4ed8;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
                 </span>
-                <span><b>View as list</b><span>Your month as a list instead of a grid.</span></span>
+                <span><b>View as list</b><span>Your month as a list instead of a grid. You can switch back.</span></span>
             </a>
         </div>
         <div class="ca-card ca-mine-card">

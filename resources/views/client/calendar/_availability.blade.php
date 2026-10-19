@@ -20,6 +20,22 @@
         border: 1px solid var(--border-color); border-radius: 9px; text-decoration: none; color: var(--text-secondary); font-size: 13px; font-weight: 700; }
     .av-nav a:hover { background: var(--bg-card-hover); }
 
+    .av-nav a.is-on { border-color: var(--accent-orange, #ea580c); background: rgba(249,115,22,.1);
+                      color: var(--accent-orange, #ea580c); font-weight: 800; }
+
+    /* The same month as rows. One line per day, in order, with the day's own
+       one-click control at the end of it. */
+    .av-list { display: flex; flex-direction: column; gap: 6px; }
+    .av-row { display: flex; align-items: center; gap: 12px; border: 1px solid var(--border-color);
+              border-radius: 11px; padding: 9px 12px; }
+    .av-row.is-today { border-color: var(--accent-orange, #ea580c); }
+    .av-row-day { font-size: 13px; font-weight: 800; color: var(--text-primary); min-width: 108px; }
+    .av-row-dow { font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
+    .av-row-ev { font-size: 11.5px; color: var(--info-text); }
+    .av-row .av-set { flex: none; margin-left: auto; }
+    .av-row .av-btn { flex: none; }
+    @media (max-width: 560px) { .av-row-day { min-width: 0; } .av-row-dow { display: none; } }
+
     .av-grid { width: 100%; border-collapse: separate; border-spacing: 6px; table-layout: fixed; }
     .av-grid th { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; padding-bottom: 2px; }
     .av-day { border: 1px solid var(--border-color); border-radius: 12px; padding: 7px 8px 8px; min-height: 76px; display: flex; flex-direction: column; gap: 6px; }
@@ -87,9 +103,15 @@
     // calendar page, which is where My Availability lived until 12 October.
     $avRoute = $avRoute ?? 'client.check-availability.index';
     $avFixed = $avFixed ?? ['tab' => 'mine'];
-    $avLink  = fn (array $over) => route($avRoute, array_merge(
-        request()->only(['cal', 'anchor']), $avFixed, $over
+    $avLink  = fn (array $over) => route($avRoute, array_filter(
+        array_merge(request()->only(['cal', 'anchor', 'avview']), $avFixed, $over),
+        fn ($v) => $v !== null && $v !== '',
     ));
+
+    // Grid unless asked otherwise. A month of dates reads as a grid by
+    // default; the list is for a phone, and for anybody who would rather read
+    // thirty one lines than thirty one squares.
+    $avView = request()->query('avview') === 'list' ? 'list' : 'grid';
 @endphp
 
 <div class="cl-card ec-card">
@@ -102,6 +124,16 @@
             <a href="{{ $avLink(['cal' => $c['prev']->format('Y-m-d')]) }}" aria-label="Previous month">&lsaquo;</a>
             <a href="{{ $avLink(['cal' => now()->format('Y-m-d')]) }}">Today</a>
             <a href="{{ $avLink(['cal' => $c['next']->format('Y-m-d')]) }}" aria-label="Next month">&rsaquo;</a>
+            {{-- Sir Peter, 20 October: "once a user uses or clicks this button,
+                 the client can not go back to the original calendar like setup,
+                 but why not?" He was right. View as list was a one-way door: it
+                 sent you to the calendar page in list view and left no way back
+                 to this grid at all. It is a toggle now, and it stays on this
+                 page. --}}
+            <a href="{{ $avLink(['avview' => null]) }}" class="{{ $avView === 'grid' ? 'is-on' : '' }}"
+               aria-current="{{ $avView === 'grid' ? 'true' : 'false' }}">Grid</a>
+            <a href="{{ $avLink(['avview' => 'list']) }}" class="{{ $avView === 'list' ? 'is-on' : '' }}"
+               aria-current="{{ $avView === 'list' ? 'true' : 'false' }}">List</a>
         </div>
     </div>
 
@@ -117,6 +149,57 @@
         <p style="background:rgba(16,163,74,.12);border:1px solid rgba(16,163,74,.35);color:var(--ok-text);padding:9px 14px;border-radius:10px;font-size:13px;margin:0 0 12px;">{{ session('status') }}</p>
     @endif
 
+    @if($avView === 'list')
+        {{-- The same month, read as a list. Only this month's own days: the
+             greyed neighbours either side exist because a grid has to fill its
+             first and last rows, and in a list they read as padding. --}}
+        <div class="av-list">
+            @php $cursor = $c['anchor']->copy()->startOfMonth(); @endphp
+            @while($cursor->month === $c['anchor']->month)
+                @php
+                    $key   = $cursor->format('Y-m-d');
+                    $state = $availability->get($key)?->state;
+                    $evs   = $c['byDate']->get($key, collect());
+
+                    // The same cycle as the grid: an untouched day becomes
+                    // available, anything else becomes unavailable, and posting
+                    // the state a day already holds clears it.
+                    $next = $state === null
+                        ? Availability::AVAILABLE
+                        : Availability::UNAVAILABLE;
+
+                    [$word, $dot] = $state
+                        ? Availability::STATES[$state]
+                        : ['Not set', null];
+                @endphp
+                <div class="av-row {{ $cursor->isToday() ? 'is-today' : '' }}">
+                    <span class="av-row-day">
+                        {{ $cursor->format('M j') }}
+                        <span class="av-row-dow">{{ $cursor->format('D') }}</span>
+                    </span>
+
+                    @if($evs->isNotEmpty())
+                        <span class="av-row-ev" title="{{ $evs->pluck('title')->implode(', ') }}">
+                            {{ $evs->count() }} {{ \Illuminate\Support\Str::plural('event', $evs->count()) }}
+                        </span>
+                    @endif
+
+                    <form method="POST" action="{{ route('client.calendar.availability') }}" class="av-set">
+                        @csrf
+                        <input type="hidden" name="day" value="{{ $key }}">
+                        <input type="hidden" name="state" value="{{ $next }}">
+                        <input type="hidden" name="back" value="{{ $back }}">
+                        <button type="submit" class="av-btn {{ $state ? 'is-set' : '' }}"
+                                title="{{ $cursor->format('M j') }}: {{ strtolower($word) }}. Click to change."
+                                aria-label="{{ $cursor->format('l, F j') }}: {{ strtolower($word) }}. Click to change.">
+                            <i style="{{ $dot ? 'background:' . $dot . ';border-color:' . $dot . ';' : '' }}"></i>{{ $word }}
+                        </button>
+                    </form>
+                </div>
+                @php $cursor->addDay(); @endphp
+            @endwhile
+        </div>
+    @else
     <table class="av-grid">
         <thead><tr>@foreach(['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] as $dow)<th>{{ $dow }}</th>@endforeach</tr></thead>
         <tbody>
@@ -184,6 +267,7 @@
             @endwhile
         </tbody>
     </table>
+    @endif
 
     <div class="av-block" id="avRange">
         <h3>Block a stretch of dates</h3>
