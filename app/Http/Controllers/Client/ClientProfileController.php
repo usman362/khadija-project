@@ -69,7 +69,7 @@ class ClientProfileController extends Controller
             'bio' => ['nullable', 'string', 'max:2000'],
             'date_of_birth' => ['nullable', 'date', 'before:today'],
             'gender' => ['nullable', 'in:male,female,other,prefer_not_to_say'],
-            'address' => ['nullable', 'string', 'max:255'],
+            'address' => ['nullable', 'string', 'max:255', new \App\Rules\PlausibleAddress],
             'city' => ['nullable', 'string', 'max:100'],
             'state' => ['nullable', 'string', 'max:100'],
             'country' => ['nullable', 'string', 'max:100'],
