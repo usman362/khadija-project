@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\UserProfile;
 use App\Support\VerifiedBadge;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
@@ -31,6 +32,11 @@ use Tests\TestCase;
  */
 class VerificationClaimsStayHonestTest extends TestCase
 {
+    // Needed by the two tests at the end, which read stored page copy rather
+    // than scanning views.
+    use RefreshDatabase;
+
+
     /** Developer comments keep whatever wording they like; nobody reads them. */
     private const COMMENTS = '/(\{\{--.*?--\}\}|<!--.*?-->|(?<![\w"\'=\/])\/\*.*?\*\/|(?m:^[ \t]*\/\/[^\n]*$)|(?<=[;{}),])[ \t]*\/\/[^\n]*)/s';
 
@@ -233,6 +239,70 @@ class VerificationClaimsStayHonestTest extends TestCase
         }
 
         $this->assertSame([], $found, "These views show a verification without checking the switch:\n" . implode("\n", $found));
+    }
+
+    // ── Content that is not in a view at all ─────────────────
+
+    /**
+     * The miss that made this section necessary.
+     *
+     * Every view was corrected on 15 October, and the LIVE landing page went on
+     * saying "Verified Professionals / Profile & business verification" for
+     * five more days. That strip is served from `page_sections`; the array in
+     * landing.blade.php is only the fallback for when no row exists, and
+     * locally there was no row, so the view looked like the source.
+     *
+     * The tests above scan resources/views and could not have seen it. Page
+     * copy, policy pages and seeded content are all places a claim can live
+     * where no amount of grepping the views will find it.
+     */
+    public function test_no_stored_page_content_claims_a_verification(): void
+    {
+        $this->seed(\Database\Seeders\PageSectionSeeder::class);
+
+        $found = [];
+
+        foreach (\App\Models\PageSection::all() as $section) {
+            $text = json_encode($section->payload);
+
+            foreach (['Verified Professional', 'Verified Influencer', 'background check', 'licen'] as $claim) {
+                if (stripos($text, $claim) !== false) {
+                    $found[] = "page_sections.{$section->key}: {$claim}";
+                }
+            }
+        }
+
+        $this->assertSame([], $found, "Stored page copy claims a verification:\n" . implode("\n", $found));
+    }
+
+    /**
+     * A policy page may mention these, but only to deny them.
+     *
+     * The Platform Disclaimer says "Background Checks Are Not Guaranteed",
+     * which is the honest direction and must not be swept up by a blunt search
+     * for the words.
+     */
+    public function test_a_policy_page_only_mentions_vetting_to_deny_it(): void
+    {
+        $this->seed(\Database\Seeders\PolicyPageSeeder::class);
+
+        $pages = \App\Models\PolicyPage::all();
+
+        $this->assertNotEmpty($pages, 'No policy pages to check, so this test proves nothing.');
+
+        foreach ($pages as $page) {
+            $text = strip_tags((string) $page->content);
+
+            if (stripos($text, 'background check') === false) {
+                continue;
+            }
+
+            $this->assertMatchesRegularExpression(
+                '/background checks?[^.]{0,80}(not guaranteed|are not|does not)/i',
+                $text,
+                "{$page->slug} mentions background checks without denying them.",
+            );
+        }
     }
 
     /** And the switch is off, which is the V1 decision. */

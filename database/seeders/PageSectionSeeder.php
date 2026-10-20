@@ -56,7 +56,14 @@ class PageSectionSeeder extends Seeder
             [
                 'key'     => 'trust_bar',
                 'payload' => ['items' => [
-                    ['title' => 'Verified Professionals', 'text' => 'Profile & business verification'],
+                    // Renamed 20 October 2026. "Verified Professionals / Profile
+                    // & business verification" claimed a vetting GigResource
+                    // does not perform, which is the same correction made to
+                    // the views on 15 October. This row is why the live site
+                    // kept saying it: the landing trust bar is served from
+                    // page_sections, and the array in landing.blade.php is only
+                    // the fallback for when no row exists.
+                    ['title' => 'Professional Profiles', 'text' => 'Profiles, reviews and past work'],
                     ['title' => 'Secure Payments',        'text' => 'Secure, protected transactions'],
                     ['title' => 'Guided Support',         'text' => 'Smart help at every step'],
                     ['title' => 'Privacy Controls',       'text' => 'You choose what you share'],
