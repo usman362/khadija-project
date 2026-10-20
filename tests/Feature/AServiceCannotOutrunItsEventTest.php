@@ -162,6 +162,87 @@ class AServiceCannotOutrunItsEventTest extends TestCase
     }
 
     /**
+     * And a service held in the small hours of that event passes too.
+     *
+     * Reported 20 October as "why does this error come": an event running
+     * 10:00 PM to 1:13 AM, with a service inside it, refused for starting
+     * before the event began. Every service time was resolved against the day
+     * the event STARTED, so 12:30 AM came out fourteen hours before a 10:00 PM
+     * start rather than two and a half hours after it. The end time already
+     * had this roll; the start never did.
+     */
+    public function test_a_service_in_the_small_hours_of_a_late_event_is_allowed(): void
+    {
+        $this->actingAs($this->client)->post(route('client.bsr.save', 'availability'), [
+            'event_date'       => now()->addDays(20)->toDateString(),
+            'event_start_time' => '22:00',
+            'event_end_time'   => '01:13',
+            'services'         => [$this->service->id],
+            'service_times'    => [$this->service->id => ['start' => '00:30', 'end' => '01:00']],
+        ])->assertSessionHasNoErrors();
+    }
+
+    /** The roll does not excuse a service that genuinely overruns. */
+    public function test_a_service_in_the_small_hours_is_still_refused_when_it_overruns(): void
+    {
+        $this->actingAs($this->client)->post(route('client.bsr.save', 'availability'), [
+            'event_date'       => now()->addDays(20)->toDateString(),
+            'event_start_time' => '22:00',
+            'event_end_time'   => '01:13',
+            'services'         => [$this->service->id],
+            'service_times'    => [$this->service->id => ['start' => '00:30', 'end' => '02:00']],
+        ])->assertSessionHasErrors("service_times.{$this->service->id}.end");
+    }
+
+    /**
+     * And on an event that does NOT cross midnight it is still refused.
+     *
+     * This is the half the roll could easily have broken. A 10:00 AM to 11:00
+     * PM event has no small hours, so a service at 12:30 AM is outside it, and
+     * that is the case Sir Peter reported in the first place.
+     */
+    public function test_a_small_hours_service_is_still_refused_on_a_daytime_event(): void
+    {
+        $this->submit(['start' => '00:30', 'end' => '01:00'])
+            ->assertSessionHasErrors("service_times.{$this->service->id}.start");
+    }
+
+    /**
+     * When the event ends on the following day, the message says so.
+     *
+     * "runs past the end of your event, which ends at 1:13 AM" beside a service
+     * finishing at 11:00 PM reads as a contradiction, because 11 PM is plainly
+     * before 1 AM. The client is then being asked to fix something that looks
+     * already correct.
+     */
+    public function test_the_message_says_when_the_end_is_on_the_next_day(): void
+    {
+        $this->actingAs($this->client)->post(route('client.bsr.save', 'availability'), [
+            'event_date'       => now()->addDays(20)->toDateString(),
+            'event_start_time' => '22:00',
+            'event_end_time'   => '01:13',
+            'services'         => [$this->service->id],
+            'service_times'    => [$this->service->id => ['start' => '00:30', 'end' => '02:00']],
+        ]);
+
+        $this->assertStringContainsString(
+            '1:13 AM the next day',
+            session('errors')->first("service_times.{$this->service->id}.end"),
+        );
+    }
+
+    /** A same-day end is not padded with a day that is not there. */
+    public function test_the_message_does_not_say_next_day_when_it_is_the_same_day(): void
+    {
+        $this->submit(['start' => '13:00', 'end' => '00:00']);
+
+        $this->assertStringNotContainsString(
+            'the next day',
+            session('errors')->first("service_times.{$this->service->id}.end"),
+        );
+    }
+
+    /**
      * No end time on the event constrains nothing.
      *
      * An open-ended request is the client saying they do not know yet.

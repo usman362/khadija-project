@@ -157,6 +157,31 @@ final class ServiceWindow
                 $serviceEnd->addDay();
             }
 
+            /*
+             * The same past-midnight roll, for the service's own start.
+             *
+             * An event running 10:00 PM to 1:13 AM genuinely ends on the next
+             * day, and a setup or teardown at 12:30 AM is INSIDE it as any
+             * person reads it. Without this the time was resolved against the
+             * day the event began, so 12:30 AM came out fourteen hours before
+             * a 10:00 PM start and the client was told a service inside their
+             * own event started before it.
+             *
+             * Only where the day actually crosses midnight, and only where the
+             * shift puts the service inside the window. On a 10:00 AM to 11:00
+             * PM event, a service at 12:30 AM is outside it and still refused,
+             * which is the case Sir Peter reported in the first place.
+             */
+            if ($from !== '' && $day['end'] && $serviceStart->lessThan($day['start'])) {
+                $shiftedStart = $serviceStart->copy()->addDay();
+                $shiftedEnd   = $serviceEnd?->copy()->addDay();
+
+                if ($shiftedStart->lessThanOrEqualTo($day['end'])) {
+                    $serviceStart = $shiftedStart;
+                    $serviceEnd   = $shiftedEnd;
+                }
+            }
+
             $name = Category::find((int) $id)?->name ?? 'This service';
 
             if ($serviceStart->lessThan($day['start'])) {
@@ -168,10 +193,27 @@ final class ServiceWindow
             if ($day['end'] && $serviceEnd && $serviceEnd->greaterThan($day['end'])) {
                 $errors["service_times.{$id}.end"] =
                     "{$name} runs past the end of {$day['label']}, which ends at "
-                    . $day['end']->format('g:i A') . '. Change this time, or extend that day.';
+                    . self::clock($day['end'], $day['start'])
+                    . '. Change this time, or extend that day.';
             }
         }
 
         return $errors;
+    }
+
+    /**
+     * A time, and which day it is on when that is not the obvious one.
+     *
+     * "ends at 1:13 AM" beside a service finishing at 11:00 PM reads as a
+     * contradiction, because 11 PM is plainly before 1 AM. It is not: the
+     * event runs past midnight and ends on the following day. The message has
+     * to say so, or the client is being asked to fix something that looks
+     * already correct.
+     */
+    private static function clock(Carbon $at, Carbon $dayStart): string
+    {
+        $label = $at->format('g:i A');
+
+        return $at->isSameDay($dayStart) ? $label : $label . ' the next day';
     }
 }
