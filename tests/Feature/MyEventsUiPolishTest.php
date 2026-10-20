@@ -35,7 +35,9 @@ class MyEventsUiPolishTest extends TestCase
 
         $this->assertStringNotContainsString('Quick Actions', $html);
         $this->assertStringNotContainsString('mg-qa-grid', $html);
-        $this->assertStringContainsString('Recent Professional Activity', $html);
+        // Renamed on 20 Oct: the rail lists booking activity, and calling it
+        // professional activity filed a booked influencer as a professional.
+        $this->assertStringContainsString('Recent Booking Activity', $html);
         $this->assertStringContainsString('.mg-row2 { display: grid; grid-template-columns: minmax(0, 1fr);', $html);
     }
 

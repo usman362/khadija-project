@@ -167,7 +167,7 @@
     .mg-menu-pop a:hover, .mg-menu-pop button:hover { background: rgba(249,115,22,.10); color: var(--brand-text); }
     .mg-menu-pop form { margin: 0; }
 
-    /* Professional Status Overview bar */
+    /* Booking Status Overview bar */
     .mg-pso { margin-top: 18px; }
     .mg-pso-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; }
     .mg-pso-legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 11.5px; color: var(--text-secondary); margin-bottom: 10px; }
@@ -532,7 +532,7 @@
              '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'],
             ['open', 'Open', 'amber', $stats['list_open'], 'Taking proposals',
              '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'],
-            ['in_progress', 'In Progress', 'green', $stats['list_in_progress'], 'Professionals booked',
+            ['in_progress', 'In Progress', 'green', $stats['list_in_progress'], 'Someone is booked',
              '<polyline points="20 6 9 17 4 12"/>'],
             ['completed', 'Completed', 'indigo', $stats['list_completed'], 'Events finished',
              '<path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/>'],
@@ -668,7 +668,7 @@
                  events, who is booked for when, and what each booking costs. --}}
             <div class="mg-subtabs" style="padding:0 18px;" role="tablist">
                 <button type="button" class="mg-subtab active" data-subtab="events" role="tab" aria-selected="true">Events List</button>
-                <button type="button" class="mg-subtab" data-subtab="schedule" role="tab" aria-selected="false">Professional Schedule</button>
+                <button type="button" class="mg-subtab" data-subtab="schedule" role="tab" aria-selected="false">Booked Schedule</button>
                 <button type="button" class="mg-subtab" data-subtab="payments" role="tab" aria-selected="false">Payment Tracker</button>
             </div>
             <div data-subpane="events">
@@ -778,11 +778,21 @@
             <div data-subpane="schedule" hidden>
                 <div style="overflow-x:auto;">
                     <table class="mg-table">
-                        <thead><tr><th style="padding-left:18px;">Professional</th><th>Event</th><th>Service</th><th>Date</th><th>Time</th><th style="padding-right:18px;">Status</th></tr></thead>
+                        <thead><tr><th style="padding-left:18px;">Booked with</th><th>Event</th><th>Service</th><th>Date</th><th>Time</th><th style="padding-right:18px;">Status</th></tr></thead>
                         <tbody>
                             @forelse($bookings->whereNotIn('status', \App\Domain\Finance\ClientTotals::VOID_STATUSES) as $b)
                                 <tr>
-                                    <td style="padding-left:18px;"><div class="ev-name">{{ $b->supplier?->name ?? 'Professional' }}</div></td>
+                                    {{-- The name, and which kind of account it is.
+                                         Sir Peter, 20 Oct: "Influencer schedule will be
+                                         add on my events like professional schedule."
+                                         The rows were already here -- the table has never
+                                         filtered by role -- but every one of them was filed
+                                         under a column headed Professional, so a booked
+                                         influencer was shown as one. --}}
+                                    <td style="padding-left:18px;">
+                                        <div class="ev-name">{{ $b->supplier?->name ?? 'Account removed' }}</div>
+                                        <x-role-chip :user="$b->supplier" />
+                                    </td>
                                     <td>@if($b->event)<a href="{{ route('client.events.show', $b->event_id) }}">{{ $b->event->title }}</a>@else, @endif</td>
                                     <td>{{ $b->category?->name ?? '—' }}</td>
                                     <td>{{ $b->event?->starts_at?->format('M d, Y') ?? 'Not scheduled' }}</td>
@@ -790,7 +800,7 @@
                                     <td style="padding-right:18px;"><span class="mg-status-pill mg-status-{{ $b->status }}">{{ $b->status === 'requested' ? 'Awaiting reply' : ucfirst($b->status) }}</span></td>
                                 </tr>
                             @empty
-                                <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No professionals booked yet.</td></tr>
+                                <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">Nobody booked yet.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -801,14 +811,18 @@
             <div data-subpane="payments" hidden>
                 <div style="overflow-x:auto;">
                     <table class="mg-table mg-pay-table">
-                        <thead><tr><th style="padding-left:18px;">Professional</th><th>Event</th><th>Service</th><th>Event Date</th><th>Amount</th><th>Payment</th><th>Status</th><th>Due Date</th><th style="padding-right:18px;text-align:right;">Actions</th></tr></thead>
+                        <thead><tr><th style="padding-left:18px;">Booked with</th><th>Event</th><th>Service</th><th>Event Date</th><th>Amount</th><th>Payment</th><th>Status</th><th>Due Date</th><th style="padding-right:18px;text-align:right;">Actions</th></tr></thead>
                         <tbody>
                             @forelse($payRows as $r)
                                 <tr>
                                     <td style="padding-left:18px;">
                                         <div class="mg-pay-pro">
                                             <img src="{{ $r['avatar'] }}" alt="">
-                                            <div><div class="ev-name">{{ $r['professional'] }}</div>@if($r['pro_id'])<div class="ev-sub">{{ $r['pro_id'] }}</div>@endif</div>
+                                            <div>
+                                                <div class="ev-name">{{ $r['professional'] }}</div>
+                                                <x-role-chip :noun="$r['noun']" />
+                                                @if($r['pro_id'])<div class="ev-sub">{{ $r['pro_id'] }}</div>@endif
+                                            </div>
                                         </div>
                                     </td>
                                     <td>{{ $r['event'] ?? '—' }}</td>
@@ -865,9 +879,9 @@
             </div>
         </div>
 
-        {{-- Professional Status Overview bar --}}
+        {{-- Booking Status Overview bar --}}
         <div class="mg-pso">
-            <div class="mg-pso-title">Professional Status Overview</div>
+            <div class="mg-pso-title">Booking Status Overview</div>
             <div class="mg-pso-legend">
                 <span><span class="dot" style="background:#10b981;"></span>Confirmed<b>{{ $proStatus['confirmed'] }}</b></span>
                 <span><span class="dot" style="background:#f59e0b;"></span>Pending<b>{{ $proStatus['pending'] }}</b></span>
@@ -891,7 +905,7 @@
              the sidebar. --}}
         <div class="mg-row2">
             <div class="mg-card">
-                <div class="mg-rail-head"><div class="mg-rail-title">Recent Professional Activity</div></div>
+                <div class="mg-rail-head"><div class="mg-rail-title">Recent Booking Activity</div></div>
                 {{-- Every row is one record that exists, timestamped when that
                      record was written — not "Activity on X" over an updated_at
                      that moves whenever anything at all is saved. --}}
@@ -971,9 +985,9 @@
             <p class="mg-rail-note" style="margin:0;">When an event's date has passed and it was not completed or cancelled, it moves to <b>Past Event</b> automatically.</p>
         </div>
 
-        {{-- Professional Status --}}
+        {{-- Booking Status --}}
         <div class="mg-rail-card">
-            <div class="mg-rail-head"><div class="mg-rail-title">Professional Status</div>@if($period !== 'all')<span class="mg-rail-period">{{ $periods[$period] }}</span>@endif</div>
+            <div class="mg-rail-head"><div class="mg-rail-title">Booking Status</div>@if($period !== 'all')<span class="mg-rail-period">{{ $periods[$period] }}</span>@endif</div>
             <div class="mg-pstat-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Confirmed</span><span class="val">{{ $proStatus['confirmed'] }}</span></div>
             <div class="mg-pstat-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pending</span><span class="val">{{ $proStatus['pending'] }}</span></div>
             <div class="mg-pstat-row"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Not Scheduled</span><span class="val">{{ $proStatus['not_scheduled'] }}</span></div>
@@ -1051,7 +1065,7 @@
 
     // Opening a named view went with the views; ?tab= means nothing here now.
 
-    // Events List / Professional Schedule / Payment Tracker.
+    // Events List / Booked Schedule / Payment Tracker.
     // Delegated: the list card is swapped for a fresh copy on every filter,
     // and a listener bound to the old buttons would die with them.
     document.addEventListener('click', function (e) {

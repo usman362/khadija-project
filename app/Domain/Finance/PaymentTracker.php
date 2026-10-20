@@ -171,7 +171,13 @@ class PaymentTracker
     private static function who($supplier): array
     {
         return [
-            'professional' => $supplier?->name ?? 'Professional',
+            'professional' => $supplier?->name ?? 'Account removed',
+            // "professional" or "influencer". The screen showed everybody under
+            // a column headed Professional, so an influencer the client had
+            // booked was filed as one. Sir Peter, 20 Oct: the influencer
+            // schedule should sit on My Events the way the professional one
+            // does.
+            'noun'         => \App\Support\SupplierProfile::noun($supplier),
             'avatar'       => $supplier?->avatar_url,
             'pro_id'       => $supplier?->public_id ? \App\Support\GigResourceId::display($supplier->public_id) : null,
             // One rule for the link and the words on it, so a row about an
