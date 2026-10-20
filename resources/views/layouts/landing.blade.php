@@ -263,7 +263,7 @@
                 </div>
             </div>
             <div class="lpn-item">
-                <a href="{{ route('landing') }}#pricing" class="lpn-link">Pricing</a>
+                <a href="{{ route('pricing-and-rates') }}" class="lpn-link">Pricing</a>
             </div>
         </div>
 
@@ -317,7 +317,7 @@
         <a href="{{ route('public.browse') }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">Find Professionals</a>
         <a href="{{ route('public.event-types') }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">Event Types</a>
         <a href="{{ route('blog.index') }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-soft);">Resources</a>
-        <a href="{{ route('landing') }}#pricing" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);">Pricing</a>
+        <a href="{{ route('pricing-and-rates') }}" style="display:block;padding:11px 4px;font-weight:600;color:var(--ink-2);">Pricing</a>
     </div>
 </nav>
 
@@ -347,7 +347,7 @@
                     <li><a href="{{ route('public.browse') }}">Find Professionals</a></li>
                     <li><a href="{{ route('public.event-types') }}">Event Types</a></li>
                     <li><a href="{{ url('/dashboard') }}">Tools <span class="lpf-new-badge">NEW</span></a></li>
-                    <li><a href="{{ route('landing') }}#pricing">Pricing</a></li>
+                    <li><a href="{{ route('pricing-and-rates') }}">Pricing</a></li>
                 </ul>
             </div>
             <div class="lpf-col">

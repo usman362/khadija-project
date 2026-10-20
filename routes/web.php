@@ -165,6 +165,15 @@ Route::get('/platform-disclaimer', function () {
     return view('policies.show', ['policy' => $policy, 'fallbackTitle' => 'Platform Disclaimer', 'policyType' => null, 'existingSignature' => null]);
 })->name('platform-disclaimer');
 
+/*
+ * Sir Peter, 20 October: "Maybe we should add a webpage named 'pricing and
+ * rates'?" Every figure on it is read from App\Domain\Money\FeeSchedule, the
+ * same list the request forms and the help rails read, because the reason the
+ * page is worth having is that the same fee went stale in three separate places
+ * this month, each written out by hand.
+ */
+Route::view('/pricing-and-rates', 'pricing-and-rates')->name('pricing-and-rates');
+
 // About Us
 Route::view('/about-us', 'about')->name('about-us');
 

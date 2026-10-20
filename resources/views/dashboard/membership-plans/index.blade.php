@@ -519,6 +519,15 @@
                             </form>
                         </div>
                     </div>
+                    {{-- Sir Peter, 20 October: "No refunds or credits for if the
+                         user cancels their monthly plans ... this needs to be
+                         added everywhere." Beside the button that does it, not
+                         only on the pricing page, because this is the moment
+                         somebody is deciding. --}}
+                    <p class="mp-refund-note">
+                        {{ \App\Domain\Money\FeeSchedule::refundPolicy() }}
+                        <a href="{{ route('pricing-and-rates') }}">Pricing and rates</a>
+                    </p>
                 </div>
             </div>
         </div>
@@ -592,6 +601,10 @@
         background: linear-gradient(135deg, #6366f1, #8b5cf6);
         box-shadow: 0 12px 40px rgba(99,102,241,0.35);
     }
+    .mp-refund-note { font-size: 12px; line-height: 1.55; color: #7f1d1d; background: #fef2f2;
+        border: 1px solid #fca5a5; border-radius: 10px; padding: 9px 13px; margin: 12px 0 0; }
+    .mp-refund-note a { color: #991b1b; font-weight: 700; text-decoration: underline; }
+
     .mpm-icon.cancel-sub {
         background: linear-gradient(135deg, #ef4444, #f97316);
         box-shadow: 0 12px 40px rgba(239,68,68,0.3);

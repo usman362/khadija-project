@@ -29,8 +29,10 @@
 --}}
 @php
     $rftField = $field ?? 'fee_agreed';
-    $rftPost  = \App\Domain\Money\Pricing::postingFee(auth()->user());
-    $rftAgree = \App\Domain\Money\Pricing::agreementFee();
+    // From the schedule, which the Pricing and Rates page reads too, so the
+    // form and the page cannot quote different numbers.
+    $rftPost  = \App\Domain\Money\FeeSchedule::find('posting', auth()->user())['amount'];
+    $rftAgree = \App\Domain\Money\FeeSchedule::find('agreement', auth()->user())['amount'];
     $rftMoney = fn (float $n) => '$' . number_format($n, 2);
 @endphp
 <div class="rft">
@@ -40,8 +42,12 @@
         A further <b>{{ $rftMoney($rftAgree) }}</b> agreement fee applies only if you go on to
         finalize with somebody, or buy a professional's package. Nothing is charged if the request
         goes unfilled.
-        {{-- D-3, Sir Peter's answer of Sep 5, and his refund rules of 17 Oct. --}}
-        Once charged, the publishing fee is non-refundable.
+        {{-- One sentence, from FeeSchedule, so "everywhere" stays the same
+             words everywhere. Sir Peter, 20 October: "No refunds or credits
+             for if the user cancels their monthly plans, especially for their
+             reposts / extension posts, or changes their minds ... this needs to
+             be added everywhere." --}}
+        {{ \App\Domain\Money\FeeSchedule::refundPolicy() }}
     </p>
 
     <label class="rft-agree">

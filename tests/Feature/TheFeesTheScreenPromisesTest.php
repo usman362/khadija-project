@@ -85,13 +85,15 @@ class TheFeesTheScreenPromisesTest extends TestCase
     }
 
     /**
-     * And the posting figure is the one THIS client pays.
+     * The posting figure is still read per client, even though it is flat now.
      *
-     * The founder rate and the regular rate are different numbers. Quoting the
-     * wrong one on the page somebody ticks is the fault this whole file is
-     * about, so it is read per client rather than written into the copy.
+     * Peter made posting a flat $2.99 on 20 October, replacing the founder and
+     * regular split he confirmed on 16 October. The figure is still read rather
+     * than written into the copy, because that split is still a live idea in
+     * his Founding Starter Plan and the page must follow the config the day it
+     * comes back.
      */
-    public function test_a_client_past_the_founder_window_is_quoted_the_regular_rate(): void
+    public function test_the_posting_figure_is_read_from_the_schedule_not_the_copy(): void
     {
         Event::create([
             'title' => 'Old one', 'client_id' => $this->client->id, 'created_by' => $this->client->id,
@@ -99,13 +101,19 @@ class TheFeesTheScreenPromisesTest extends TestCase
             'published_at' => now()->subMonths(8), 'starts_at' => now()->subMonths(7),
         ]);
 
+        // Past the founder window, and still $2.99, because the rates are equal.
+        $this->assertFalse(Pricing::isFounder($this->client->fresh()));
+        $this->assertSame(2.99, Pricing::postingFee($this->client->fresh()));
+
+        // And if the split ever returns, the page follows it.
+        config(['payments.posting_fee_regular' => 6.99]);
+
         $html = $this->actingAs($this->client)
             ->get(route('client.esr.create'))
             ->assertSuccessful()
             ->getContent();
 
-        $this->assertFalse(Pricing::isFounder($this->client->fresh()));
-        $this->assertStringContainsString('$4.99</b> to publish', $html);
+        $this->assertStringContainsString('$6.99</b> to publish', $html);
     }
 
     /** All three request types quote it, because all three use the partial. */

@@ -153,7 +153,11 @@ class ThePostingFeeIsOwedAtPublishTest extends TestCase
 
         $fee = $this->fees($event)->first();
 
-        $this->assertSame('4.99', (string) $fee->amount);
+        // Priced apart on purpose: Peter made posting flat on 20 October, so
+        // the two rates are equal and the boundary would otherwise be
+        // invisible. What is tested is that the WINDOW closes and that the
+        // recorded fee follows config, not that it closes onto any one number.
+        $this->assertSame('2.99', (string) $fee->amount);
         $this->assertFalse($fee->metadata['founder']);
     }
 

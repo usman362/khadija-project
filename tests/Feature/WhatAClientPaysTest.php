@@ -89,7 +89,12 @@ class WhatAClientPaysTest extends TestCase
         ]);
 
         $this->assertFalse(Pricing::isFounder($client->fresh()));
-        $this->assertSame(4.99, Pricing::postingFee($client->fresh()));
+
+        // Both rates are $2.99 since 20 October, so leaving the window no
+        // longer changes the price. What is tested is that the window CLOSES;
+        // the price it closes onto is whatever config says.
+        config(['payments.posting_fee_regular' => 6.99]);
+        $this->assertSame(6.99, Pricing::postingFee($client->fresh()));
     }
 
     /** Past the cohort size, the regular price applies from the start. */
@@ -101,9 +106,13 @@ class WhatAClientPaysTest extends TestCase
         $second = $this->client();
         $third  = $this->client();
 
+        // Priced apart so the cohort boundary is visible at all: Peter made
+        // posting flat on 20 October, which leaves the two rates equal.
+        config(['payments.posting_fee_regular' => 6.99]);
+
         $this->assertSame(2.99, Pricing::postingFee($first));
         $this->assertSame(2.99, Pricing::postingFee($second));
-        $this->assertSame(4.99, Pricing::postingFee($third), 'The third is outside a cohort of two.');
+        $this->assertSame(6.99, Pricing::postingFee($third), 'The third is outside a cohort of two.');
     }
 
     /**

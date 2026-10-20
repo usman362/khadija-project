@@ -27,7 +27,7 @@
                     <li><a href="{{ route('public.event-types') }}">Event Types</a></li>
                     <li><a href="{{ route('blog.index') }}">Blog</a></li>
                     <li><a href="{{ route('public.how-it-works') }}">How It Works</a></li>
-                    <li><a href="{{ route('landing') }}#pricing">Pricing</a></li>
+                    <li><a href="{{ route('pricing-and-rates') }}">Pricing</a></li>
                     <li><a href="{{ route('public.faq') }}">FAQ</a></li>
                 </ul>
             </div>

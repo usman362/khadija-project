@@ -87,9 +87,64 @@ return [
     | than from signup, so the window is not burned by somebody who registered
     | early and was not ready to post.
     */
+    /*
+     * Both $2.99 since 20 October. Peter: "$2.99 to post a new request", and
+     * Khadijah the same day: "Client event posting and reposting should remain
+     * separate at $2.99 each." That replaces the founder/regular split he
+     * confirmed on 16 October, where the regular rate was $4.99.
+     *
+     * The two keys are kept rather than collapsed into one, because the founder
+     * cohort is still a live idea in his Founding Starter Plan and the day it
+     * carries a different posting price again, this is where it goes. While
+     * they are equal, nothing claims a founder discount: FeeSchedule only says
+     * "you are on the founder rate" when the rates actually differ.
+     */
     'posting_fee_founder' => 2.99,
-    'posting_fee_regular' => 4.99,
+    'posting_fee_regular' => 2.99,
     'agreement_fee'       => 4.99,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Requests: extend and repost (Peter, 20 October)
+    |--------------------------------------------------------------------------
+    |
+    | "$1.99 to extend a request for the specified number of additional days.
+    | $2.99 to edit/repost a request."
+    |
+    | A flat $1.99 replaces Rule R33's sliding ladder ($1.99 / $2.99 / $4.99 /
+    | $7.99 by length), which is the conflict flagged on 19 October and which he
+    | has now settled. EDITING a live request stays free: his own event
+    | lifecycle document says "Edit an active event: free", and only a repost is
+    | a new posting.
+    */
+    'request_extension_fee'  => 1.99,
+    'request_extension_days' => [7, 14, 21],
+    'repost_fee'             => 2.99,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Packages, charged to the Professional or Influencer (Peter, 20 October)
+    |--------------------------------------------------------------------------
+    |
+    | "$2.99 to post a new package of services. $4.99 or the applicable
+    | percentage for the agreement fee. $1.99 to extend a request by 30, 60, or
+    | 90 additional days. $2.99 to edit/repost a package of services."
+    |
+    | The extension lengths are deliberately NOT the request ones. He gave 30 /
+    | 60 / 90 for packages and 7 / 14 / 21 for requests, which makes sense: a
+    | package is a standing offer and a request is a dated job.
+    |
+    | "The applicable percentage" is read as the provider's own tier rate, so
+    | the agreement fee on a package is the greater of $4.99 and their
+    | commission. That matches the Founding Starter Plan's "$4.99 or 3% of the
+    | booking, whichever is higher". If he meant something else, FeeSchedule is
+    | the one place to change it.
+    */
+    'package_posting_fee'    => 2.99,
+    'package_agreement_fee'  => 4.99,
+    'package_extension_fee'  => 1.99,
+    'package_extension_days' => [30, 60, 90],
+    'package_repost_fee'     => 2.99,
 
     'founder_cohort_size'   => 1000,
     'founder_months'        => 6,

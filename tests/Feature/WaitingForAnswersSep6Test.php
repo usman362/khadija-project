@@ -112,7 +112,11 @@ class WaitingForAnswersSep6Test extends TestCase
     {
         $html = view('client.partials._request_fee_terms', ['action' => 'posting this request'])->render();
 
-        $this->assertStringContainsString('non-refundable', $html);
+        // The wording moved into FeeSchedule on 20 October so that Peter's
+        // "add it everywhere" is the same sentence everywhere. D-3 still holds:
+        // what is charged is not refunded.
+        $this->assertStringContainsString('not refundable', $html);
+        $this->assertStringContainsString('does not produce a refund', $html);
     }
 
     /** DIR-15: the Cancellations page offers both kinds of cancellation. */

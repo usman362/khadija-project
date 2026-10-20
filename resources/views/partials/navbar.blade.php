@@ -129,7 +129,7 @@
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                             FAQ
                         </a>
-                        <a href="{{ route('landing') }}#pricing" class="mobile-nav-link">
+                        <a href="{{ route('pricing-and-rates') }}" class="mobile-nav-link">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                             Pricing
                         </a>
@@ -213,7 +213,7 @@
             <li><a href="{{ route('public.event-types') }}" class="{{ request()->routeIs('public.event-types') ? 'is-active' : '' }}">Event Types</a></li>
             <li><a href="{{ route('blog.index') }}" class="{{ request()->routeIs('blog.*') ? 'is-active' : '' }}">Blog</a></li>
             <li><a href="{{ route('public.how-it-works') }}" class="{{ request()->routeIs('public.how-it-works') ? 'is-active' : '' }}">How It Works</a></li>
-            <li><a href="{{ route('landing') }}#pricing">Pricing</a></li>
+            <li><a href="{{ route('pricing-and-rates') }}">Pricing</a></li>
             <li><a href="{{ route('public.faq') }}" class="{{ request()->routeIs('public.faq') ? 'is-active' : '' }}">FAQ</a></li>
         </ul>
         </div>
