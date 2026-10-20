@@ -432,10 +432,16 @@ class RequestLifecycleTest extends TestCase
     /** A typo fix must not fire at everyone who priced the job. */
     public function test_a_minor_edit_notifies_nobody(): void
     {
-        Notification::fake();
-
         $event = $this->expired();
         $this->bidOn($event);
+
+        /*
+         * Faked AFTER the setup, not before it. Publishing now notifies the
+         * client that their own request went live, which is their receipt for
+         * the posting fee, so a fake set up first records that and this test
+         * would be asserting about publication rather than about the edit.
+         */
+        Notification::fake();
 
         $event->update(['title' => 'Anniversary dinner (evening)', 'description' => 'Updated wording.']);
 

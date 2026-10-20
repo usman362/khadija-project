@@ -102,6 +102,9 @@ class AppServiceProvider extends ServiceProvider
 
         Event::listen(UserRegistered::class, LogUserRegistered::class);
         Event::listen(MessageInserted::class, LogMessageInserted::class);
+        // Three places create a message and all three dispatch this, so the
+        // notification lives here rather than in one of them.
+        Event::listen(MessageInserted::class, \App\Domain\Messaging\Listeners\TellTheRecipientAboutIt::class);
         // A block stops the message row itself, whichever route wrote it.
         \App\Models\Message::observe(\App\Domain\Messaging\BlockGuard::class);
         Event::subscribe(LogAuthEvents::class);

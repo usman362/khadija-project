@@ -112,15 +112,29 @@ class PostEventChooseLayoutTest extends TestCase
             ->assertDontSee('Philadelphia Fundraiser');
     }
 
-    /** Their own request is not news to them. */
+    /** Their own request is not news to them, in the rail. */
     public function test_the_client_does_not_see_their_own_posting(): void
     {
         $me = $this->client();
         $this->posting($me, 'MD', 'My Own Birthday');
 
-        $this->actingAs($me)->get(route('client.post-event.choose'))
+        $html = $this->actingAs($me)->get(route('client.post-event.choose'))
             ->assertSuccessful()
-            ->assertDontSee('My Own Birthday');
+            ->getContent();
+
+        /*
+         * The RAIL, not the page. Since 20 October a client is notified that
+         * their own request went live, which is their receipt for the posting
+         * fee, so the title now legitimately appears in the notification bell
+         * on every page. Asserting against the whole document made this test
+         * read the bell and call it the rail.
+         */
+        $from = strpos($html, 'rc-rail');
+        $this->assertNotFalse($from, 'The posting rail has moved.');
+
+        $rail = substr($html, $from, strpos($html, '</aside>', $from) - $from);
+
+        $this->assertStringNotContainsString('My Own Birthday', $rail);
     }
 
     /** Nothing yet is a sentence, not an empty box. */

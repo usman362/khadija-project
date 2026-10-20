@@ -201,6 +201,24 @@ class ClientPackageBookingController extends Controller
             $pro->notify(new ProposalReceived($booking));
         }
 
+        /*
+         * And the client's own confirmation, which they had none of.
+         *
+         * Sir Peter, 18 October: notifications must cover "every notification
+         * from whatever the clients do themselves from BR, DR, ER, buying a
+         * package". Buying one told the professional and left the client with a
+         * page, so there was no record of what they bought or what it cost.
+         *
+         * A package purchase IS the agreement, so the fee named here is the
+         * agreement fee rather than a posting fee: the event behind it is
+         * deliberately unpublished and nobody bids on a package.
+         */
+        $client->notify(new \App\Notifications\YouBoughtAPackage(
+            $booking,
+            $package,
+            \App\Domain\Money\Pricing::agreementFee(),
+        ));
+
         return redirect()->route('client.packages.booked', $booking);
     }
 

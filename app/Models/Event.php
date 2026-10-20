@@ -173,12 +173,27 @@ class Event extends Model
          * free, which the lifecycle document asks for by name, and
          * PostingFee::recordFor is idempotent as a second guard.
          */
-        static::saved(function (self $event) {
-            $justPublished = $event->published_at !== null
-                && ($event->wasRecentlyCreated || $event->wasChanged('published_at'));
+        /*
+         * Two hooks rather than one, and the reason is a bug this had.
+         *
+         * It was a single `saved` asking for `wasRecentlyCreated ||
+         * wasChanged('published_at')`. wasRecentlyCreated stays true for the
+         * whole life of the instance, so every later save of a freshly created
+         * published request looked like a fresh publication. The posting fee
+         * survived that, being idempotent; the client's notification did not,
+         * and an ordinary edit sent a second "your request is live".
+         *
+         * `created` fires once. `updated` asks only whether published_at moved.
+         */
+        static::created(function (self $event) {
+            if ($event->published_at !== null) {
+                self::announcePublication($event);
+            }
+        });
 
-            if ($justPublished) {
-                \App\Domain\Money\PostingFee::recordFor($event);
+        static::updated(function (self $event) {
+            if ($event->wasChanged('published_at') && $event->published_at !== null) {
+                self::announcePublication($event);
             }
         });
 
@@ -230,6 +245,31 @@ class Event extends Model
      * Place the request. Free-text location plus the structured state.
      * No coordinates unless precision is exact or zip.
      */
+    /**
+     * The posting fee and the client's own receipt, once per publication.
+     *
+     * Both belong to the moment a request becomes public, and both were in the
+     * model rather than in a controller because five places can publish one:
+     * the BSR wizard, ESR, the event controller, the virtual hub and Post an
+     * Event. A fee charged in five places is a fee charged twice.
+     */
+    private static function announcePublication(self $event): void
+    {
+        $fee = \App\Domain\Money\PostingFee::recordFor($event);
+
+        /*
+         * Sir Peter, 18 October: notifications must cover "every notification
+         * from whatever the clients do themselves from BR, DR, ER, buying a
+         * package". Publishing told the professionals and told the client a
+         * flash message, which is gone the moment they navigate. Since the
+         * posting fee moved to publish there is a charge at this exact moment,
+         * and this is the only record of it they can come back to.
+         */
+        $event->client?->notify(
+            new \App\Notifications\YourRequestIsLive($event, $fee ? (float) $fee->amount : null),
+        );
+    }
+
     public function applyLocationGeocode(): void
     {
         /*

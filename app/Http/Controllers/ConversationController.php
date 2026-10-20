@@ -407,6 +407,7 @@ class ConversationController extends Controller
         broadcast(new MessageSent($message))->toOthers();
         event(new MessageInserted($message));
 
+
         return response()->json($message, 201);
     }
 
