@@ -416,7 +416,7 @@
                      and had to guess the rest -- while the bidding form has
                      always required this. --}}
                 <div class="do-field">
-                    <label>What should the professional know? <span style="color:#dc2626;">*</span></label>
+                    <label>What should the {{ \App\Support\Vocabulary::provider() }} know? <span style="color:#dc2626;">*</span></label>
                     <textarea class="do-input" name="description" maxlength="4000" required
                               placeholder="What the event is, what you need delivered, anything that would change the price…">{{ old('description') }}</textarea>
                     @error('description')<p style="color:#dc2626;font-size:12px;margin-top:5px;">{{ $message }}</p>@enderror

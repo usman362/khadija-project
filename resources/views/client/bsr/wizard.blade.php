@@ -2,7 +2,7 @@
 
 @section('title', 'Create a Bidding Request')
 @section('page-title', 'Create a Bidding Request')
-@section('page-subtitle', 'Tell professionals what you need, when and where. They review it and send you sealed proposals to compare.')
+@section('page-subtitle', 'Tell ' . \App\Support\Vocabulary::providers() . ' what you need, when and where. They review it and send you sealed proposals to compare.')
 
 {{-- Screen 1 of the client BR set — the 7-step create wizard.
 
@@ -330,7 +330,7 @@
     <div class="cl-card" style="background:rgba(37,99,235,.06);border:1px solid rgba(37,99,235,.28);padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--text-secondary);">
         <b style="color:var(--text-primary);">Started from {{ $data['from_tool_name'] }}.</b>
         What you entered there has been filled in below. Every field is still yours to change, and
-        nothing goes out to professionals until you publish.
+        nothing goes out to {{ \App\Support\Vocabulary::providers() }} until you publish.
     </div>
 @endif
 {{-- Validation errors are rendered once, by layouts.client, for every
@@ -417,7 +417,7 @@
             <input type="text" name="event_title" id="bwEventTitle" maxlength="120"
                    value="{{ $data['event_title'] ?? '' }}"
                    placeholder="e.g. Maryland's Horse Show Event">
-            <p class="bw-hint">We keep your wording. Our team reviews it before it goes out to professionals.</p>
+            <p class="bw-hint">We keep your wording. Our team reviews it before it goes out to {{ \App\Support\Vocabulary::providers() }}.</p>
         </div>
 
         @if(! empty($focusNames) && ! $showingAll)
@@ -480,7 +480,7 @@
             <div class="bw-note warn" id="bwNoPros" hidden>
                 <b id="bwNoProsHead"></b>
                 <p>
-                    You can still ask for it: the request stays open and any professional who joins
+                    You can still ask for it: the request stays open and any {{ \App\Support\Vocabulary::provider() }} who joins
                     and offers this will see it. If you would rather not wait, pick something else
                     here, or send a Direct Request to someone you already know.
                 </p>
@@ -546,7 +546,7 @@
         <div class="ed-head">
             <div>
                 <h3>Event Details</h3>
-                <p class="lede" style="margin:0;">Tell us about your event so professionals can provide the best proposals.</p>
+                <p class="lede" style="margin:0;">Tell us about your event so {{ \App\Support\Vocabulary::providers() }} can provide the best proposals.</p>
             </div>
         </div>
 
@@ -555,12 +555,12 @@
                 <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
                 <div>
                     <b>Event Location</b>
-                    <span>Help us understand your location needs. This helps us match you with the right professionals.</span>
+                    <span>Help us understand your location needs. This helps us match you with the right {{ \App\Support\Vocabulary::providers() }}.</span>
                 </div>
             </div>
             @if($__stateName)
                 {{-- The State Boundary Rule, said once, where the location is asked. --}}
-                <div class="ed-info"><span class="ed-info-i">i</span><span>Your request will be visible only to professionals in <b>{{ $__stateName }}</b>, based on your account settings.</span></div>
+                <div class="ed-info"><span class="ed-info-i">i</span><span>Your request will be visible only to {{ \App\Support\Vocabulary::providers() }} in <b>{{ $__stateName }}</b>, based on your account settings.</span></div>
             @endif
 
             <label class="ed-q">Do you already have a venue or event location?</label>
@@ -573,7 +573,7 @@
                 <label class="ed-opt">
                     <input type="radio" name="location_need" value="need_venue" @checked($__need === 'need_venue')>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 21v-4h6v4M8 7h2M14 7h2M8 11h2M14 11h2"/></svg>
-                    <span><b>No, I need to find a venue or space</b><small>I'm looking for a venue and professionals who provide or can help find one.</small></span>
+                    <span><b>No, I need to find a venue or space</b><small>I'm looking for a venue and {{ \App\Support\Vocabulary::providers() }} who provide or can help find one.</small></span>
                 </label>
                 <label class="ed-opt">
                     <input type="radio" name="location_need" value="unsure" @checked($__need === 'unsure')>
@@ -594,7 +594,7 @@
                     @endif
                     <label class="bw-locopt">
                         <input type="radio" name="location_kind" value="exact" @checked($__kind === 'exact')>
-                        <span><b>Enter the address</b><small>Lets us judge how far professionals are from it</small></span>
+                        <span><b>Enter the address</b><small>Lets us judge how far {{ \App\Support\Vocabulary::providers() }} are from it</small></span>
                     </label>
                 </div>
                 {{-- Sir Peter, 27 Sep: "the city and state is vital to make sure
@@ -813,7 +813,7 @@
 
 
     @elseif($step === 'requirements')
-        <h3>What should professionals know?</h3>
+        <h3>What should {{ \App\Support\Vocabulary::providers() }} know?</h3>
         <p class="lede">This is what they read before deciding whether to bid, and what they price against. The more specific, the more accurate the proposals.</p>
         <div class="bw-field">
             <label>Description <span class="req">*</span></label>
@@ -831,7 +831,7 @@
     {{-- ── 4 · Budget ──────────────────────────────────────── --}}
     @elseif($step === 'budget')
         <h3>Budget</h3>
-        <p class="lede">Give your budget, even a rough estimate: a "from", a "to", or both. It helps professionals send accurate proposals, and they may bid above it with an explanation.</p>
+        <p class="lede">Give your budget, even a rough estimate: a "from", a "to", or both. It helps {{ \App\Support\Vocabulary::providers() }} send accurate proposals, and they may bid above it with an explanation.</p>
         @php
             $__svcIds = array_values(array_filter(array_map('intval', (array) ($data['services'] ?? []))));
 
@@ -937,7 +937,7 @@
 
                 @if($__guides)
                     <p class="bw-help" style="margin:4px 0 0;">
-                        The figures beside each service are what professionals have bid on GigResource for that
+                        The figures beside each service are what {{ \App\Support\Vocabulary::providers() }} have bid on GigResource for that
                         work{{ collect($__guides)->contains(fn ($g) => $g['scope'] === 'state') ? ', in your state where there was enough to go on' : '' }}.
                         They are a guide, not a quote.
                     </p>
@@ -1065,7 +1065,7 @@
 
     @elseif($step === 'proposals')
         <h3>How proposals work</h3>
-        <p class="lede">When bidding closes, and what professionals can do while it's open.</p>
+        <p class="lede">When bidding closes, and what {{ \App\Support\Vocabulary::providers() }} can do while it's open.</p>
 
         <div class="bw-field">
             {{-- R37: no window value may be prefilled until GigResource approves
@@ -1086,14 +1086,14 @@
             <label class="bw-opt" style="display:block;">
                 <input type="checkbox" name="sealed_proposals" value="1" @checked((bool) ($data['sealed_proposals'] ?? true))>
                 <b>Sealed proposals</b>
-                <span>Each amount is visible only to you and the professional who sent it. Competitors can't see each other's bids. Recommended.</span>
+                <span>Each amount is visible only to you and the {{ \App\Support\Vocabulary::provider() }} who sent it. Competitors can't see each other's bids. Recommended.</span>
             </label>
         </div>
         <div class="bw-field">
             <label class="bw-opt" style="display:block;">
                 <input type="checkbox" name="questions_enabled" value="1" @checked((bool) ($data['questions_enabled'] ?? true))>
                 <b>Allow clarifying questions</b>
-                <span>Professionals can ask you something before bidding. Answers go only to the person who asked.</span>
+                <span>{{ \App\Support\Vocabulary::providersCapitalised() }} can ask you something before bidding. Answers go only to the person who asked.</span>
             </label>
         </div>
 
