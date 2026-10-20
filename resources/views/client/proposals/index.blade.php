@@ -138,6 +138,11 @@
     .pr-eventpick select { height: 100%; min-height: 38px; border: 1px solid var(--border-color); border-radius: 10px; padding: 0 12px; font-size: 12.5px; font-family: inherit; color: var(--text-primary); background: var(--bg-card); max-width: 240px; }
     .pr-cov { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; font-size: 12px; border-bottom: 1px solid var(--border-color); }
     .pr-cov span { color: var(--text-secondary); }
+    /* A service row that leads somewhere has to look like it does. */
+    a.pr-cov { text-decoration: none; border-radius: 7px; padding: 6px 7px; margin: 0 -7px; }
+    a.pr-cov:hover { background: rgba(249,115,22,.07); }
+    a.pr-cov:hover span { color: var(--accent-orange, #ea580c); }
+
     .pr-cov b { white-space: nowrap; color: #c2410c; }
     .pr-cov b.is-awarded { color: #15803d; }
     .pr-cov b.is-open { color: var(--text-muted); }
@@ -339,6 +344,23 @@
                                             <button type="submit" class="pr-act-btn pr-act-decline" title="Decline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                                         </form>
                                     @endif
+                                    {{-- The comparison was only reachable once the page had
+                                         been narrowed to a single request, which is why it
+                                         looked absent. A row knows its own request and
+                                         service, so it can offer the comparison for exactly
+                                         that service -- and only where there is something to
+                                         compare against. --}}
+                                    @php
+                                        $__rivals = $p->event
+                                            ? \App\Models\Bid::where('event_id', $p->event_id)
+                                                ->when($p->category_id, fn ($q) => $q->where('category_id', $p->category_id))
+                                                ->count()
+                                            : 0;
+                                    @endphp
+                                    @if($__rivals > 1)
+                                        <a class="pr-act-btn" title="Compare the {{ $__rivals }} proposals for {{ $p->category?->name ?? 'this request' }} side by side"
+                                           href="{{ route('client.proposals.compare', array_filter(['event' => $p->event_id, 'service' => $p->category_id])) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></a>
+                                    @endif
                                     <button type="button" class="pr-act-btn" title="Reply / Counter" onclick="var t=document.getElementById('prthread-{{ $p->id }}');t.style.display=t.style.display==='table-row'?'none':'table-row';"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
                                     <div class="pr-menu" data-row-menu>
                                         <button type="button" class="pr-act-btn" title="More actions" aria-haspopup="true" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
@@ -397,8 +419,28 @@
         @endphp
         <div class="pr-rail-card">
             <div class="pr-rail-title">Services on this request</div>
+            {{-- Sir Peter, 21 Oct: "there is not comparison section for the
+                 Proposal's webpage in case the client wants to compare the
+                 professional/influencer against each other for a particular
+                 service."
+
+                 The comparison itself has existed since 17 September and is
+                 already per service. What was missing was the door: this link
+                 opened the request's own page rather than the comparison, and
+                 each service above it was dead text. Now a service with more
+                 than one proposal on it goes straight to those proposals side
+                 by side. --}}
             @foreach($__cov as $c)
-                <div class="pr-cov">
+                @php
+                    $__svcId    = $c['service']->id ?? null;
+                    $__comparable = $c['bids']->count() > 1;
+                    $__compareTo = route('client.proposals.compare', array_filter([
+                        'event'   => $scoped->id,
+                        'service' => $__svcId,
+                    ]));
+                @endphp
+                <{{ $__comparable ? 'a' : 'div' }} class="pr-cov{{ $__comparable ? ' is-live' : '' }}"
+                    @if($__comparable) href="{{ $__compareTo }}" title="Compare the {{ $c['bids']->count() }} proposals for {{ $c['service']->name ?? 'this request' }} side by side" @endif>
                     <span>{{ $c['service']->name ?? 'Whole request' }}</span>
                     <b class="is-{{ $c['state'] }}">
                         @switch($c['state'])
@@ -407,9 +449,9 @@
                             @default None yet
                         @endswitch
                     </b>
-                </div>
+                </{{ $__comparable ? 'a' : 'div' }}>
             @endforeach
-            <a class="pr-cov-link" href="{{ route('client.events.show', [$scoped->id, 'tab' => 'proposals']) }}">Compare by service →</a>
+            <a class="pr-cov-link" href="{{ route('client.proposals.compare', $scoped) }}">Compare all proposals →</a>
         </div>
     @endif
     {{-- Issue #21.
