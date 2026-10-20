@@ -54,7 +54,7 @@ class ClientEventLifecycleController extends Controller
         $this->authorizeOwner($request, $event);
 
         $data = $request->validate([
-            'days'    => ['required', 'integer', 'in:' . implode(',', array_keys(RequestLifecycle::TIERS))],
+            'days'    => ['required', 'integer', 'in:' . implode(',', array_keys(RequestLifecycle::tiers()))],
             'gateway' => ['required', 'in:stripe,paypal'],
         ]);
 
@@ -148,6 +148,16 @@ class ClientEventLifecycleController extends Controller
         $copy->title        = $event->title . ' (copy)';
         $copy->status       = 'pending';
         $copy->is_published = false;
+        /*
+         * Linked to what it came from. Sir Peter's lifecycle document: "Repost
+         * Event: $2.99; create a new posting ID and response round, linked to
+         * the original", and "old history remains read-only/linked".
+         *
+         * Without it there is no way to tell a client's third attempt at one
+         * job from three separate jobs, which matters because each attempt is
+         * charged as a new posting.
+         */
+        $copy->reposted_from_id = $event->id;
         $copy->save();
 
         $copy->categories()->sync($event->categories()->pluck('categories.id')->all());

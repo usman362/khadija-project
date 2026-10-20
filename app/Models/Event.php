@@ -96,6 +96,8 @@ class Event extends Model
         // the listing was reactivated. Expiry itself is derived, never stored.
         'closed_at',
         'reopened_at',
+        // Which posting this is another go at. See repostedFrom().
+        'reposted_from_id',
     ];
 
     /**
@@ -350,6 +352,29 @@ class Event extends Model
     public function lifecycleLabel(): string
     {
         return \App\Domain\Requests\RequestLifecycle::label($this);
+    }
+
+    /**
+     * The posting this one was reposted from, and the reposts made of it.
+     *
+     * A repost is a new posting with its own id, its own response round and its
+     * own fee; the link is so a client can see what the earlier round produced
+     * rather than being shown three unrelated requests for one job.
+     */
+    public function repostedFrom(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'reposted_from_id');
+    }
+
+    public function reposts(): HasMany
+    {
+        return $this->hasMany(self::class, 'reposted_from_id');
+    }
+
+    /** Is this a fresh request, or another go at an earlier one? */
+    public function isRepost(): bool
+    {
+        return $this->reposted_from_id !== null;
     }
 
     /** Rule R60 — this event's guest list. Never queried across events. */

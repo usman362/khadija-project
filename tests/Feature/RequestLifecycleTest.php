@@ -223,12 +223,21 @@ class RequestLifecycleTest extends TestCase
 
     /* ── §2 Paid extension ──────────────────────────────────── */
 
-    public function test_the_four_tiers_are_offered_with_their_prices(): void
+    /**
+     * One price, several lengths.
+     *
+     * §2 offered a ladder, 3/7/14/30 days at $1.99 to $7.99. Sir Peter settled
+     * it flat on 20 October, "$1.99 to extend a request for the specified
+     * number of additional days", and Khadijah set the lengths at 7, 14 and 21.
+     * Both now come from config, so this and the Pricing and Rates page cannot
+     * quote different figures.
+     */
+    public function test_every_length_is_offered_at_the_one_price(): void
     {
         $options = RequestLifecycle::extensionOptions($this->expired());
 
-        $this->assertSame([3, 7, 14, 30], array_column($options, 'days'));
-        $this->assertSame([1.99, 2.99, 4.99, 7.99], array_column($options, 'price'));
+        $this->assertSame([7, 14, 21], array_column($options, 'days'));
+        $this->assertSame([1.99, 1.99, 1.99], array_column($options, 'price'));
     }
 
     /**
@@ -245,9 +254,9 @@ class RequestLifecycleTest extends TestCase
         $days = array_column(RequestLifecycle::extensionOptions($event), 'days');
 
         // Measured from the end of the 24h grace window, so 7 fits and 14 does not.
-        $this->assertContains(3, $days);
         $this->assertContains(7, $days);
         $this->assertNotContains(14, $days);
+        $this->assertNotContains(21, $days);
         $this->assertNotContains(30, $days);
     }
 

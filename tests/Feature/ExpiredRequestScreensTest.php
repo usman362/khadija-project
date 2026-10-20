@@ -95,8 +95,10 @@ class ExpiredRequestScreensTest extends TestCase
 
         $page->assertOk();
         $page->assertSee('This request has expired', false);
-        $page->assertSee('+3 days: $1.99', false);
-        $page->assertSee('+30 days: $7.99', false);
+        // One price, several lengths, since 20 October. It was a ladder of
+        // 3/7/14/30 days at $1.99 to $7.99 until Peter made it flat.
+        $page->assertSee('+7 days: $1.99', false);
+        $page->assertSee('+21 days: $1.99', false);
 
         // §1 — nothing has been deleted, and the page says so.
         $page->assertSee('Nothing has been deleted', false);
@@ -123,8 +125,8 @@ class ExpiredRequestScreensTest extends TestCase
             'proposal_deadline' => now()->subHours(2),
         ]));
 
-        $page->assertSee('+3 days', false);
-        $page->assertDontSee('+30 days', false);
+        $page->assertSee('+7 days', false);
+        $page->assertDontSee('+21 days', false);
     }
 
     /** §5 — an ESR is offered close, copy or convert. Never a day extension. */

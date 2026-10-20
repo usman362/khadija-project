@@ -49,8 +49,28 @@ final class RequestLifecycle
         self::DATE_PASSED => 'Closed, event date passed',
     ];
 
-    /** §2 — the tiers, in days => dollars. */
-    public const TIERS = [3 => 1.99, 7 => 2.99, 14 => 4.99, 30 => 7.99];
+    /**
+     * §2's tiers, which are now one price with several lengths.
+     *
+     * They were [3 => 1.99, 7 => 2.99, 14 => 4.99, 30 => 7.99]: a sliding
+     * ladder by length. Sir Peter settled it on 20 October, flat: "$1.99 to
+     * extend a request for the specified number of additional days", and
+     * Khadijah set the lengths at 7, 14 and 21.
+     *
+     * Kept as a days => price map rather than collapsed to one number, because
+     * §2's cap, its deadline ceiling and the screens all read the lengths from
+     * here, and because a ladder is one config change away if he wants it back.
+     * Both the lengths and the price come from config so this and the Pricing
+     * and Rates page cannot quote different figures.
+     */
+    public static function tiers(): array
+    {
+        $price = (float) config('payments.request_extension_fee', 1.99);
+
+        return collect(config('payments.request_extension_days', [7, 14, 21]))
+            ->mapWithKeys(fn (int $days) => [$days => $price])
+            ->all();
+    }
 
     /** §2 — after the third paid extension it is Close or Duplicate only. */
     public const MAX_PAID_EXTENSIONS = 3;
@@ -209,7 +229,7 @@ final class RequestLifecycle
         $ceiling = $event->starts_at;
         $out     = [];
 
-        foreach (self::TIERS as $days => $price) {
+        foreach (self::tiers() as $days => $price) {
             $newDeadline = $from->copy()->addDays($days);
 
             if ($ceiling !== null && $newDeadline->greaterThan($ceiling)) {

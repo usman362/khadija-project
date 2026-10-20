@@ -152,6 +152,25 @@ final class EventExtensionService
 
             $this->reopen($event, $newDeadline);
 
+            /*
+             * And into the ledger, which is where every money event belongs.
+             *
+             * The amount lived only in `event_extensions` until now, so a paid
+             * extension was real money that the A1 ledger could not see: it
+             * never appeared in what a client owed or in what GigResource
+             * earned. Rule A1's whole point is that money is a list of events
+             * and nothing sits outside it.
+             *
+             * Recorded as secured, because this runs after the gateway has
+             * confirmed the payment, and keyed to the extension itself so the
+             * row can be traced back to the days it bought.
+             */
+            \App\Domain\Money\PostingFee::recordExtension(
+                $event,
+                (int) $extension->days,
+                (float) $extension->amount,
+            );
+
             Log::info('Event extension completed', [
                 'event_id' => $event->id, 'extension_id' => $extension->id, 'days' => $extension->days,
             ]);

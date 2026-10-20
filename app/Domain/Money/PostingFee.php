@@ -124,15 +124,25 @@ final class PostingFee
      * that ladder and are not implemented here. He has to reconcile them with
      * R33 first.
      */
-    public static function recordExtension(Event $event, int $days, float $amount): LedgerEntry
-    {
+    public static function recordExtension(
+        Event $event,
+        int $days,
+        float $amount,
+        string $state = LedgerEntry::SECURED,
+    ): LedgerEntry {
+        /*
+         * Secured by default, because the only caller runs after the gateway
+         * has confirmed the payment. An extension is paid for before it is
+         * granted, unlike a posting fee, which is owed the moment a request
+         * goes public and collected afterwards.
+         */
         return Ledger::record(
             LedgerEntry::PLATFORM_FEE,
             $amount,
             '+',
             party: $event->client,
             event: $event,
-            state: LedgerEntry::PENDING,
+            state: $state,
             metadata: ['reason' => 'extension', 'days' => $days],
         );
     }
