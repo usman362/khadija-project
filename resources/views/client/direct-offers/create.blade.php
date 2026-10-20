@@ -383,10 +383,11 @@
                 @php
                     // Open if the client filled any of them, so a rejected form
                     // does not hide what they typed behind a closed panel.
-                    $doExtra = old('event_type') || old('guests') || old('venue');
+                    $doExtra = old('event_type') || old('guests') || old('venue')
+                        || old('location') || old('city');
                 @endphp
                 <details class="do-more" @if($doExtra) open @endif>
-                    <summary>Add more detail <span>Optional. Event type, guest count, venue.</span></summary>
+                    <summary>Add more detail <span>Optional. Event type, guest count, where it is.</span></summary>
                     <div style="margin-top:12px;">
                         <div class="do-row">
                             <div class="do-field">
@@ -401,9 +402,12 @@
                             </div>
                             <div class="do-field"><label>Guest Count</label><input type="number" class="do-input" name="guests" value="{{ old('guests') }}" placeholder="150"></div>
                         </div>
-                        <div class="do-field"><label>Venue / Location</label><input class="do-input" name="venue" value="{{ old('venue') }}" {{-- Placeholder text is still copy: this one named Chicago on a
-                             seven-jurisdiction marketplace (R9). --}}
-                            placeholder="The Grand Ballroom, Baltimore, MD"></div>
+                        {{-- Sir Peter, 20 Oct: the same checkable address the
+                             bidding request asks for. This was one box labelled
+                             "Venue / Location" with no check on it at all, which
+                             is how the fake address he typed in October went
+                             straight past. --}}
+                        @include('client.partials._event_address', ['cls' => 'do-input', 'label' => 'Street address'])
                     </div>
                 </details>
 

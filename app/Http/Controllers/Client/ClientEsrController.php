@@ -96,7 +96,12 @@ class ClientEsrController extends Controller
             'reason'       => ['required', 'in:' . implode(',', array_keys(self::REASONS))],
             // Asked on every request form now (Peter, 2026-08-20).
             'organization_type' => ['required', 'in:' . implode(',', array_keys(\App\Models\Event::ORGANIZATION_TYPES))],
-            'location'     => ['nullable', 'string', 'max:200', new \App\Rules\PlaceNotALink, new \App\Rules\PlausibleAddress(requireNumber: false)],
+            /*
+             * Street, city and venue, from the one definition the direct
+             * and bidding forms read too. Sir Peter, 20 Oct: the ER and DR
+             * should ask for a checkable location as well, "to make sure
+             * that's not a fake post".
+             */
             // R38 / R71 — the state the work happens in. See
             // StateMatching::requestState for why this is asked, not assumed.
             // Removed from the form on 2026-08-25 — see StateMatching::requestState().
@@ -121,7 +126,8 @@ class ClientEsrController extends Controller
             'fee_agreed'   => ['accepted'],
             'services'     => ['required', 'array', 'min:1'],
             'services.*'   => ['integer', 'exists:categories,id', new \App\Rules\BookableService],
-        ] + \App\Domain\Requests\ServiceDetails::rules()
+        ] + \App\Domain\Requests\EventAddress::rules()
+          + \App\Domain\Requests\ServiceDetails::rules()
           + \App\Domain\Requests\CoreFacts::rules('event_name', 'description', 'needed_by') + [
             // Catering only — the rule is required or nullable depending on
             // what was ticked, which is why it is built rather than written.
@@ -152,6 +158,11 @@ class ClientEsrController extends Controller
                 'services' => 'A single-service rush request takes one service. Pick just one, or switch to a multi-service request.',
             ]);
         }
+
+        // A street with no town is not a location, and that is the fault Sir
+        // Peter reported. Only when a street was actually given: leaving the
+        // address for later is still allowed on a rush request.
+        \App\Domain\Requests\EventAddress::assertCityGiven($data);
 
         // A rush request had no closing time at all, so it stayed open forever
         // — the one request type where that is least defensible. The approved
@@ -200,7 +211,9 @@ class ClientEsrController extends Controller
             'is_published' => true,
             'starts_at'    => $data['needed_by'],
             'budget'       => $data['budget_min'] ?? null,
-            'location'     => $data['location'] ?? null,
+            // location, city and venue, kept together so the three forms
+            // store a location the same way as well as asking for it the same way.
+        ] + \App\Domain\Requests\EventAddress::columns($data) + [
             'state'        => \App\Support\StateMatching::requestState($user),
             'guest_count'  => $data['guest_count'] ?? null,
             'delivery_mode' => \App\Domain\Requests\FoodDelivery::answerFor(

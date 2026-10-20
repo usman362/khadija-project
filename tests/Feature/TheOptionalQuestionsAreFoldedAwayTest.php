@@ -163,7 +163,7 @@ class TheOptionalQuestionsAreFoldedAwayTest extends TestCase
             'organization_type' => 'individual',
             'description'       => 'Full day coverage, two shooters, album included.',
             'budget_min'        => 1500,
-            'venue'             => 'The Grand Ballroom, Baltimore, MD',
+            'venue'             => 'The Grand Ballroom',
             'guests'            => 150,
             'fee_agreed'        => 1,
         ]);
@@ -172,6 +172,6 @@ class TheOptionalQuestionsAreFoldedAwayTest extends TestCase
 
         $this->assertNotNull($event, 'The direct offer was not created at all.');
         $this->assertSame(150, (int) $event->guest_count);
-        $this->assertSame('The Grand Ballroom, Baltimore, MD', $event->location);
+        $this->assertSame('The Grand Ballroom', $event->venue);
     }
 }

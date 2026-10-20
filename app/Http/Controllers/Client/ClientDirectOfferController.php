@@ -141,7 +141,13 @@ class ClientDirectOfferController extends Controller
              * no date at all, and had nowhere to say what was actually wanted.
              */
             'guests'          => ['nullable', 'integer', 'min:1', 'max:1000000'],
-            'venue'           => ['nullable', 'string', 'max:200'],
+            /*
+             * The venue used to be one free-text box with no check on it
+             * at all, so the fake address Sir Peter typed in October went
+             * straight through on this form while the bidding request
+             * refused it. Street, city and venue now come from the one
+             * definition all three forms read.
+             */
             /*
              * One of the two, always.
              *
@@ -156,7 +162,8 @@ class ClientDirectOfferController extends Controller
             'budget_min'      => ['required', 'integer', 'min:1'],
             'event_type'      => ['nullable', 'string', 'max:80'],
             'request_type'    => ['nullable', 'in:SSR,MSR'],
-        ] + \App\Domain\Requests\ServiceDetails::rules()
+        ] + \App\Domain\Requests\EventAddress::rules()
+          + \App\Domain\Requests\ServiceDetails::rules()
           + \App\Domain\Requests\CoreFacts::rules('event_name', 'description', 'event_date') + [
             // Catering only. Required or nullable depending on what was
             // ticked, so the question is only mandatory where it was asked.
@@ -184,6 +191,11 @@ class ClientDirectOfferController extends Controller
             'fee_agreed.accepted' => 'Please confirm you understand the $2.99 fee applies when you finalize with a professional.',
             'delivery_mode.required' => 'Say how the food gets to your event, or that no delivery is needed.',
         ] + \App\Domain\Requests\CoreFacts::messages('event_name', 'description', 'event_date'));
+
+        // A street with no town is not a location: the same street name
+        // exists in several of them, so the professional cannot tell which
+        // one they are being asked to drive to.
+        \App\Domain\Requests\EventAddress::assertCityGiven($data);
 
         $user = $request->user();
         $pro  = User::findOrFail($data['professional_id']);
@@ -252,7 +264,7 @@ class ClientDirectOfferController extends Controller
             'is_published' => false,               // targeted — never hits the open board
             'starts_at'    => $data['event_date'] ?? null,
             'budget'       => $data['budget_min'] ?? null,
-            'location'     => $data['venue'] ?? null,
+        ] + \App\Domain\Requests\EventAddress::columns($data) + [
             'guest_count'  => $data['guests'] ?? null,
             'delivery_mode' => \App\Domain\Requests\FoodDelivery::answerFor(
                 array_map('intval', (array) ($data['services'] ?? [])),

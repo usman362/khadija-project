@@ -179,11 +179,12 @@
                  anything they already typed keeps the panel open so a failed
                  submit never hides their own answers. --}}
             @php
-                $esrExtra = old('event_type') || old('location') || old('guest_count');
+                $esrExtra = old('event_type') || old('location') || old('city')
+                    || old('venue') || old('guest_count');
             @endphp
             <details class="esr-more" @if($esrExtra) open @endif>
-                <summary>Add more detail <span>Optional. Event type, location, guest count.</span></summary>
-                <div class="esr-grid3" style="margin-top:12px;">
+                <summary>Add more detail <span>Optional. Event type, guest count, where it is.</span></summary>
+                <div class="esr-grid2" style="margin-top:12px;">
                     <div class="esr-field">
                         {{-- Sir Peter, 22 Sep: the kind of event, then your own name for it. --}}
                         <label for="esrEventType">Event Type</label>
@@ -195,8 +196,16 @@
                             <option value="Other Event" @selected(old('event_type') === 'Other Event')>Other / not on this list</option>
                         </select>
                     </div>
-                    <div class="esr-field"><label>Location</label><input name="location" class="esr-input" value="{{ old('location') }}" placeholder="Venue or city"></div>
                     <div class="esr-field"><label>Guest count</label><input type="number" name="guest_count" class="esr-input" value="{{ old('guest_count') }}" placeholder="e.g. 150"></div>
+                </div>
+
+                {{-- Sir Peter, 20 Oct: the same checkable address the bidding
+                     request asks for, so a professional racing to an emergency
+                     is given somewhere that exists. It took one box reading
+                     "Venue or city" before this, which is how a street with no
+                     town got through. --}}
+                <div style="margin-top:12px;">
+                    @include('client.partials._event_address', ['cls' => 'esr-input', 'label' => 'Street address'])
                 </div>
             </details>
         </div>

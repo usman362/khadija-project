@@ -439,8 +439,10 @@ class ClientBsrController extends Controller
                  */
                 if ($typed !== '' && trim((string) ($validated['city'] ?? '')) === '') {
                     throw \Illuminate\Validation\ValidationException::withMessages([
-                        'city' => 'Add the city. The same street name exists in several towns, '
-                            . 'and the city is what tells us which one you mean.',
+                        // The same sentence the ER and DR show, from one place,
+                        // so the three forms cannot start explaining this
+                        // differently.
+                        'city' => \App\Domain\Requests\EventAddress::cityMessage(),
                     ]);
                 }
             }
