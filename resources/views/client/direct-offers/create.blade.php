@@ -87,6 +87,16 @@
     .do-empty-acts { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
     .do-empty-acts a { font-size: 12.5px; font-weight: 700; color: var(--brand-text); text-decoration: none; }
 
+    /* The optional questions, folded away. Styled to match the ER's .esr-more
+       so the two forms read the same way. */
+    .do-more { margin-top: 14px; border-top: 1px dashed var(--border-color); padding-top: 12px; }
+    .do-more > summary { cursor: pointer; list-style: none; display: flex; align-items: baseline; gap: 9px;
+        font-size: 13px; font-weight: 700; color: var(--brand-text); }
+    .do-more > summary::-webkit-details-marker { display: none; }
+    .do-more > summary::before { content: '+'; font-size: 15px; line-height: 1; font-weight: 800; }
+    .do-more[open] > summary::before { content: '\2212'; }
+    .do-more > summary span { font-size: 11.5px; font-weight: 500; color: var(--text-muted); }
+
     .do-field { margin-bottom: 13px; }
     .do-field:last-child { margin-bottom: 0; }
     .do-field label { display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; }
@@ -345,38 +355,57 @@
         <div class="do-sec req">
             <x-form-section :n="3" title="Event Details" tag="YOUR INPUT" required />
             <div class="do-sec-bd">
+                {{-- Sir Peter counted the questions on this form: "As for the DR
+                     image, I found the same amount of 11 questions plus the
+                     submission." He asked whether it should become a step by
+                     step process instead. Three of the eleven are optional, and
+                     breaking a direct offer into pages would make a short form
+                     slower rather than simpler, so the optional three are folded
+                     away below instead. What is left on screen is what the
+                     professional actually needs to answer you. --}}
+                <div class="do-field"><label>Event Name <span style="color:#dc2626;">*</span></label><input class="do-input" name="event_name" value="{{ old('event_name') }}" placeholder="e.g. Luxury Wedding Reception" required>@error('event_name')<p style="color:#dc2626;font-size:12px;margin-top:5px;">{{ $message }}</p>@enderror</div>
                 <div class="do-row">
                     <div class="do-field">
-                        <label for="doEventType">Event Type</label>
-                        <select class="do-input" name="event_type" id="doEventType">
-                            <option value="">Choose your event…</option>
-                            @foreach($eventTypes as $__t)
-                                <option value="{{ $__t->name }}" @selected(old('event_type') === $__t->name)>{{ $__t->name }}</option>
+                        <label for="doOrgType">This request is for <span style="color:#dc2626;">*</span></label>
+                        <select class="do-input" name="organization_type" id="doOrgType" required>
+                            @foreach($orgTypes as $key => $label)
+                                <option value="{{ $key }}" @selected(old('organization_type', 'individual') === $key)>{{ $label }}</option>
                             @endforeach
-                            <option value="Other Event" @selected(old('event_type') === 'Other Event')>Other / not on this list</option>
                         </select>
                     </div>
-                    <div class="do-field"><label>Event Name <span style="color:#dc2626;">*</span></label><input class="do-input" name="event_name" value="{{ old('event_name') }}" placeholder="e.g. Luxury Wedding Reception" required>@error('event_name')<p style="color:#dc2626;font-size:12px;margin-top:5px;">{{ $message }}</p>@enderror</div>
-                </div>
-                <div class="do-field">
-                    <label for="doOrgType">This request is for <span style="color:#dc2626;">*</span></label>
-                    <select class="do-input" name="organization_type" id="doOrgType" required>
-                        @foreach($orgTypes as $key => $label)
-                            <option value="{{ $key }}" @selected(old('organization_type', 'individual') === $key)>{{ $label }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="do-row">
                     <div class="do-field">
                         <label>Event Date <span style="color:#dc2626;">*</span></label>
                         <input type="date" class="do-input" name="event_date" value="{{ old('event_date') }}" required>
                         @error('event_date')<p style="color:#dc2626;font-size:12px;margin-top:5px;">{{ $message }}</p>@enderror
                     </div>
-                    <div class="do-field"><label>Guest Count</label><input type="number" class="do-input" name="guests" placeholder="150"></div>
                 </div>
-                <div class="do-field"><label>Venue / Location</label><input class="do-input" name="venue" {{-- Placeholder text is still copy: this one named Chicago on a
-                     seven-jurisdiction marketplace (R9). --}}
-                    placeholder="The Grand Ballroom, Baltimore, MD"></div>
+
+                @php
+                    // Open if the client filled any of them, so a rejected form
+                    // does not hide what they typed behind a closed panel.
+                    $doExtra = old('event_type') || old('guests') || old('venue');
+                @endphp
+                <details class="do-more" @if($doExtra) open @endif>
+                    <summary>Add more detail <span>Optional. Event type, guest count, venue.</span></summary>
+                    <div style="margin-top:12px;">
+                        <div class="do-row">
+                            <div class="do-field">
+                                <label for="doEventType">Event Type</label>
+                                <select class="do-input" name="event_type" id="doEventType">
+                                    <option value="">Choose your event…</option>
+                                    @foreach($eventTypes as $__t)
+                                        <option value="{{ $__t->name }}" @selected(old('event_type') === $__t->name)>{{ $__t->name }}</option>
+                                    @endforeach
+                                    <option value="Other Event" @selected(old('event_type') === 'Other Event')>Other / not on this list</option>
+                                </select>
+                            </div>
+                            <div class="do-field"><label>Guest Count</label><input type="number" class="do-input" name="guests" value="{{ old('guests') }}" placeholder="150"></div>
+                        </div>
+                        <div class="do-field"><label>Venue / Location</label><input class="do-input" name="venue" value="{{ old('venue') }}" {{-- Placeholder text is still copy: this one named Chicago on a
+                             seven-jurisdiction marketplace (R9). --}}
+                            placeholder="The Grand Ballroom, Baltimore, MD"></div>
+                    </div>
+                </details>
 
                 {{-- The form had nowhere to say what was actually wanted. The
                      professional was sent a name, a date and a service list,

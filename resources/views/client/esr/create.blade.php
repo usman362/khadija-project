@@ -24,6 +24,17 @@
     .esr-alert svg { width:22px; height:22px; color:var(--brand-text); flex-shrink:0; margin-top:1px; }
     .esr-alert b { color:var(--brand-text); }
     .esr-alert p { margin:2px 0 0; font-size:13px; color:var(--text-secondary); }
+    /* "Add more detail": the optional half of the form, folded. Styled as a
+       quiet row rather than a button, because opening it is a choice nobody
+       needs to make. */
+    .esr-more { margin-top: 14px; border-top: 1px dashed var(--border-color, #e5e7eb); padding-top: 12px; }
+    .esr-more > summary { cursor: pointer; list-style: none; display: flex; align-items: baseline; gap: 9px;
+        font-size: 13.5px; font-weight: 700; color: var(--accent-orange, #ea580c); }
+    .esr-more > summary::-webkit-details-marker { display: none; }
+    .esr-more > summary::before { content: '+'; font-size: 15px; line-height: 1; font-weight: 800; }
+    .esr-more[open] > summary::before { content: '\2212'; }
+    .esr-more > summary span { font-size: 12px; font-weight: 500; color: var(--text-muted); }
+
     .esr-card { background:var(--bg-card,#fff); border:1px solid var(--border-color,#e5e7eb); border-radius:16px; padding:22px; margin-bottom:16px; }
     .esr-sec-h { font-size:12px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; color:var(--brand-text); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
     .esr-field { margin-bottom:14px; }
@@ -128,24 +139,11 @@
                  picked -- "Urgent: Buffet Catering" -- so the professional saw
                  a label nobody wrote and the client could not correct it. The
                  bidding and direct forms both ask; this one now does too. --}}
-            <div class="esr-grid2">
-                <div class="esr-field">
-                    {{-- Sir Peter, 22 Sep: the kind of event, then your own name for it. --}}
-                    <label for="esrEventType">Event Type</label>
-                    <select name="event_type" id="esrEventType" class="esr-input">
-                        <option value="">Choose your event…</option>
-                        @foreach($eventTypes as $__t)
-                            <option value="{{ $__t->name }}" @selected(old('event_type') === $__t->name)>{{ $__t->name }}</option>
-                        @endforeach
-                        <option value="Other Event" @selected(old('event_type') === 'Other Event')>Other / not on this list</option>
-                    </select>
-                </div>
-                <div class="esr-field">
-                    <label>Event Name <span class="esr-req">*</span></label>
-                    <input name="event_name" class="esr-input" value="{{ old('event_name') }}"
-                           maxlength="200" placeholder="e.g. Corporate Lunch: Friday" required>
-                    @error('event_name')<p class="esr-err">{{ $message }}</p>@enderror
-                </div>
+            <div class="esr-field">
+                <label>Event Name <span class="esr-req">*</span></label>
+                <input name="event_name" class="esr-input" value="{{ old('event_name') }}"
+                       maxlength="200" placeholder="e.g. Corporate Lunch: Friday" required>
+                @error('event_name')<p class="esr-err">{{ $message }}</p>@enderror
             </div>
 
             <div class="esr-grid3">
@@ -160,7 +158,6 @@
                     <p class="esr-hint" id="esr-needed-by-hint">At least {{ $esrBuffer }} hours from now, so professionals have time to reach you.</p>
                     @error('needed_by')<p class="esr-err">{{ $message }}</p>@enderror
                 </div>
-                <div class="esr-field"><label>Location</label><input name="location" class="esr-input" value="{{ old('location') }}" placeholder="Venue or city"></div>
                 {{-- The state selector is gone — see the BR wizard for why.
                      Every request matches on the client's own home state, so
                      choosing one here changed nothing. --}}
@@ -172,8 +169,36 @@
                         </p>
                     </div>
                 @endif
-                <div class="esr-field"><label>Guest count</label><input type="number" name="guest_count" class="esr-input" value="{{ old('guest_count') }}" placeholder="e.g. 150"></div>
             </div>
+
+            {{-- Sir Peter counted the questions on this page and found eleven.
+                 Four of them are optional, and on a rush request that is the
+                 difference between a form you can fill at speed and one that
+                 looks like paperwork. They fold away rather than going: a
+                 client who wants to say where it is can still say so, and
+                 anything they already typed keeps the panel open so a failed
+                 submit never hides their own answers. --}}
+            @php
+                $esrExtra = old('event_type') || old('location') || old('guest_count');
+            @endphp
+            <details class="esr-more" @if($esrExtra) open @endif>
+                <summary>Add more detail <span>Optional. Event type, location, guest count.</span></summary>
+                <div class="esr-grid3" style="margin-top:12px;">
+                    <div class="esr-field">
+                        {{-- Sir Peter, 22 Sep: the kind of event, then your own name for it. --}}
+                        <label for="esrEventType">Event Type</label>
+                        <select name="event_type" id="esrEventType" class="esr-input">
+                            <option value="">Choose your event…</option>
+                            @foreach($eventTypes as $__t)
+                                <option value="{{ $__t->name }}" @selected(old('event_type') === $__t->name)>{{ $__t->name }}</option>
+                            @endforeach
+                            <option value="Other Event" @selected(old('event_type') === 'Other Event')>Other / not on this list</option>
+                        </select>
+                    </div>
+                    <div class="esr-field"><label>Location</label><input name="location" class="esr-input" value="{{ old('location') }}" placeholder="Venue or city"></div>
+                    <div class="esr-field"><label>Guest count</label><input type="number" name="guest_count" class="esr-input" value="{{ old('guest_count') }}" placeholder="e.g. 150"></div>
+                </div>
+            </details>
         </div>
 
         {{-- 2. Services --}}
