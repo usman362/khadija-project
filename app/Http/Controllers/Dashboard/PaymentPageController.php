@@ -26,9 +26,19 @@ class PaymentPageController extends Controller
                 ->with('error', 'This plan is no longer available.');
         }
 
+        /*
+         * A free plan is joined, not paid for.
+         *
+         * This used to return an error, which was harmless while every plan
+         * cost something. Starter became free on 20 October 2026 and the error
+         * became a wall: the Subscribe button told people the plan needs no
+         * payment and then did nothing, so nobody could join it.
+         */
         if ($plan->isFree()) {
+            $this->paymentService->activateFree($request->user(), $plan);
+
             return redirect()->route('app.membership-plans.index')
-                ->with('error', 'Free plans do not require payment.');
+                ->with('status', "You are on the {$plan->name} plan. There is nothing to pay.");
         }
 
         try {

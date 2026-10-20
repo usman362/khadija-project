@@ -17,10 +17,22 @@ class MembershipPlanSeeder extends Seeder
             [
                 'name' => 'Starter',
                 'slug' => 'starter',
-                // Canonical pricing (reconciled workflows 2026-07-19):
-                // Starter $4.99 / Professional $39.99 / Elite $59.99 per month.
-                'description' => 'Perfect for new professionals building their business.',
-                'price' => 4.99,
+                /*
+                 * Starter is FREE, from 20 October 2026.
+                 *
+                 * Khadijah's revised Founding Starter Plan, and Peter's own
+                 * membership guide the day before: "Starter is FREE every month
+                 * for Professionals and Influencers. GigResource keeps 5% of
+                 * their completed paid jobs. This is not just a six-month
+                 * special." It was $4.99 under the July pricing.
+                 *
+                 * Pro at $39.99 and Elite at $59.99 are unchanged, and the same
+                 * document says not to raise them: "GigResource has no
+                 * customers yet. We first need people to sign up, get hired,
+                 * and see that the site helps them."
+                 */
+                'description' => 'Free to join. GigResource takes a share only when you are paid.',
+                'price' => 0,
                 'billing_cycle' => 'monthly',
                 'duration_days' => 30,
                 'max_events' => 3,
@@ -33,6 +45,7 @@ class MembershipPlanSeeder extends Seeder
                 'badge_text' => null,
                 'badge_color' => null,
                 'features' => [
+                    'Free every month, no subscription',
                     '5% booking commission per finalized contract',
                     'Marketplace access',
                     'Up to 3 active events',

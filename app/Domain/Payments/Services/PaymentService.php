@@ -83,6 +83,53 @@ class PaymentService
     /**
      * Complete a payment after gateway confirmation (webhook).
      */
+    /**
+     * Join a free plan, with no gateway and no payment at all.
+     *
+     * Starter became free on 20 October 2026. Before this, `initiate()` saw a
+     * free plan and REFUSED it with "Free plans do not require payment", so
+     * making Starter $0 would have meant nobody could join Starter at all: the
+     * button returned an error. The price was the easy half.
+     *
+     * No Payment row is written, deliberately. The revised plan says it plainly:
+     * "Do not make a monthly Stripe subscription for Starter." A $0 charge
+     * through a gateway is a real API call, a real fee in some configurations,
+     * and a row in the money record that says nothing happened.
+     *
+     * Idempotent: somebody already on the free plan stays on the subscription
+     * they have rather than collecting a second one.
+     */
+    public function activateFree(User $user, MembershipPlan $plan): UserSubscription
+    {
+        if (! $plan->isFree()) {
+            throw new \InvalidArgumentException('That plan is not free.');
+        }
+
+        $existing = $user->subscriptions()->active()->first();
+
+        if ($existing && (int) $existing->membership_plan_id === (int) $plan->id) {
+            return $existing;
+        }
+
+        $expiryDays = $plan->duration_days ?: $plan->cycleDurationDays();
+
+        $subscription = UserSubscription::create([
+            'user_id'            => $user->id,
+            'membership_plan_id' => $plan->id,
+            'status'             => 'active',
+            'starts_at'          => now(),
+            // A free plan that expires is a free plan that quietly stops
+            // working, so it does not expire.
+            'expires_at'         => null,
+            'amount_paid'        => 0,
+        ]);
+
+        // Whatever they were on before is over, the same as a paid switch.
+        $existing?->cancel('Switched to the free Starter plan');
+
+        return $subscription;
+    }
+
     public function completePayment(Payment $payment, ?string $gatewayPaymentId = null, ?string $paymentMethod = null): void
     {
         if ($payment->isCompleted()) {
