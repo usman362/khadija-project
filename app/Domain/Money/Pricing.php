@@ -118,11 +118,11 @@ final class Pricing
     /** One-based place among Clients by signup order, or null if not a client. */
     public static function position(?User $client): ?int
     {
-        if (! $client || $client->primary_role !== 'client') {
+        if (! $client || ! self::isAClient($client)) {
             return null;
         }
 
-        return User::where('primary_role', 'client')
+        return self::clients()
             ->where(function ($q) use ($client) {
                 $q->where('created_at', '<', $client->created_at)
                     ->orWhere(function ($q) use ($client) {
@@ -133,6 +133,40 @@ final class Pricing
                     });
             })
             ->count();
+    }
+
+    /**
+     * Who counts as a client, and why it is the role rather than the column.
+     *
+     * This asked `primary_role === 'client'` until 20 October, when a test
+     * fixture that assigned the role without setting the column turned out to
+     * describe four real accounts: plain clients, client role, primary_role
+     * null. They were outside the cohort entirely, so they were quoted the
+     * regular rate instead of the founder one and everybody else's position was
+     * counted wrong behind them.
+     *
+     * Measured before changing it: every account with primary_role 'client'
+     * also holds the role, with no exceptions, while the role catches four more.
+     * So the role is the complete answer and the column is the leaky one.
+     */
+    private static function isAClient(User $user): bool
+    {
+        return $user->primary_role === 'client' || $user->hasRole('client');
+    }
+
+    /**
+     * Every client, by the SAME definition isAClient() uses.
+     *
+     * Both halves or neither: counting the queue by one rule while deciding
+     * membership by another is how somebody ends up in the cohort with no
+     * position in it, which is what the first version of this did.
+     */
+    private static function clients()
+    {
+        return User::query()->where(function ($q) {
+            $q->where('primary_role', 'client')
+                ->orWhereHas('roles', fn ($r) => $r->where('name', 'client'));
+        });
     }
 
     private static function inCohort(?User $client): bool

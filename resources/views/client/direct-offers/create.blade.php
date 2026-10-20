@@ -32,6 +32,18 @@
     .do-rcard { background: var(--bg-card,#fff); border: 1px solid var(--border-color,#e5e7eb); border-radius: 16px; padding: 18px; }
     .do-rcard h4 { font-size: 13px; font-weight: 800; color: var(--text-primary,#111827); margin-bottom: 13px; display:flex; align-items:center; gap:8px; }
     .do-rcard h4 svg { width:16px; height:16px; color: var(--do); }
+    /* Inert, not hidden. Hiding the rest would leave the client staring at a
+       short page with no sense of what the request involves; dimming says "this
+       is the form, and it is waiting on you". */
+    .do-rest { border: 0; padding: 0; margin: 0; min-width: 0; }
+    .do-rest.is-blocked { opacity: .45; pointer-events: none; filter: grayscale(.35); }
+    .do-blocked-why { font-size: 12.5px; font-weight: 700; color: var(--do-strong, #c2410c);
+        background: rgba(249,115,22,.08); border: 1px solid rgba(249,115,22,.25);
+        border-radius: 10px; padding: 9px 13px; margin: 0 0 14px; }
+    /* The explanation is the one thing in the blocked region that must stay
+       legible, since it is what tells them why the rest is dim. */
+    .do-rest.is-blocked .do-blocked-why { opacity: 1; filter: none; }
+
     .do-step { display: flex; gap: 11px; margin-bottom: 12px; }
     .do-step:last-child { margin-bottom: 0; }
     .do-step-n { flex-shrink:0; width:24px; height:24px; border-radius:50%; background: rgba(249,115,22,.12); color: var(--do-strong); font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; }
@@ -256,6 +268,23 @@
                     // professional in the state, under a heading that promises
                     // "We only show professionals who offer this."
                     $mustPickService = ! $selectedPro && ($serviceId ?? 0) === 0;
+
+                    /*
+                     * Sir Peter, 20 October: "step 3 is confusing bc the
+                     * service is not available in the state so this is a weird
+                     * step, is there anything we can do to make this steps
+                     * actually show that it works".
+                     *
+                     * He is right. Step 2 said there is nobody to send to, and
+                     * then steps 3 to 5 and the Send button carried on asking
+                     * for a full brief as though everything were fine. A page
+                     * that tells you it cannot work and then asks you to fill
+                     * it in anyway is worse than one that simply refuses.
+                     *
+                     * Read once here and used below, so the two halves cannot
+                     * disagree about whether this request can go anywhere.
+                     */
+                    $cannotSend = $mustPickService || $pros->isEmpty();
                 @endphp
 
                 @if($mustPickService || $pros->isEmpty())
@@ -298,6 +327,19 @@
                 @endif
             </div>
         </div>
+
+        {{-- Everything from here needs somebody to send it to. A disabled
+             fieldset is the honest way: its inputs cannot be typed into and do
+             not submit, so the form cannot be half-filled towards a request
+             that has no recipient. --}}
+        <fieldset class="do-rest {{ $cannotSend ? 'is-blocked' : '' }}" @disabled($cannotSend)>
+        @if($cannotSend)
+            <p class="do-blocked-why">
+                {{ $mustPickService
+                    ? 'Choose a service above and these steps open up.'
+                    : 'These steps are waiting on step 2. Pick another service, or post it to the board, and they open up.' }}
+            </p>
+        @endif
 
         {{-- Event Details --}}
         <div class="do-sec req">
@@ -520,6 +562,7 @@
                 Send Direct Request
             </button>
         </div>
+        </fieldset>
     </form>
 
     {{-- Contextual rail — fills large screens, stacks under the form on tablet/mobile --}}

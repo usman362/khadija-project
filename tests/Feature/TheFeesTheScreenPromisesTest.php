@@ -122,6 +122,27 @@ class TheFeesTheScreenPromisesTest extends TestCase
         }
     }
 
+    /**
+     * The help rail carried the old figures too, on all four request pages.
+     *
+     * config/request-help.php said "$0 to post" and "a single $2.99". Being one
+     * config read by four rails is what put one wrong sentence on four pages;
+     * the figures are filled in per client now, so the founder rate and the
+     * regular rate cannot be confused with each other.
+     */
+    public function test_the_help_rail_quotes_the_current_fees(): void
+    {
+        $html = $this->actingAs($this->client)
+            ->get(route('client.direct-offers.create'))
+            ->assertSuccessful()
+            ->getContent();
+
+        $this->assertStringContainsString('$2.99 to publish', $html);
+        $this->assertStringContainsString('$4.99 agreement fee', $html);
+        $this->assertStringNotContainsString('$0 to post', $html);
+        $this->assertStringNotContainsString("it's free to post", $html);
+    }
+
     // ── Buying a package ─────────────────────────────────────
 
     /**

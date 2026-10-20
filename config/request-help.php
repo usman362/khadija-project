@@ -19,13 +19,24 @@
  * not run. Every line here has to be something the system actually does.
  */
 
+/*
+ * UPDATED 20 October 2026. This said "$0 to post" and "a single $2.99", which
+ * stopped being true when Sir Peter moved the posting fee to publish (B1) and
+ * added a separate agreement fee. Being one config read by four rails is what
+ * made that one wrong sentence appear on four pages, and what makes this one
+ * fix cover them.
+ *
+ * :posting and :agreement are filled in by the rail from App\Domain\Money\
+ * Pricing, per client, because the founder rate and the regular rate are
+ * different numbers and a figure written into config cannot know which applies.
+ */
 $pay = [
     'title' => "What it'll cost",
     'icon'  => 'dollar',
     'items' => [
-        ['b' => '$0 to post', 't' => 'Nothing is charged when you send this.'],
-        ['b' => 'A single $2.99', 't' => 'Charged only when you finalize with a professional.'],
-        ['b' => 'Nothing if it goes nowhere', 't' => 'No professional, no charge.'],
+        ['b' => ':posting to publish', 't' => 'Charged when your request goes out to professionals. Drafts are free.'],
+        ['b' => ':agreement agreement fee', 't' => 'Only if you go on to finalize with somebody, or buy a package.'],
+        ['b' => 'Nothing if it goes nowhere', 't' => 'No professional, no agreement fee.'],
     ],
 ];
 
@@ -82,7 +93,7 @@ return [
             'title' => 'How rush requests work',
             'icon'  => 'clock',
             'steps' => [
-                ['b' => 'Publish your request',       't' => "Tell us what you need and by when, it's free to post."],
+                ['b' => 'Publish your request',       't' => 'Tell us what you need and by when.'],
                 ['b' => 'Available pros are notified', 't' => 'It goes out to every professional in your state who offers the service.'],
                 ['b' => 'Respond and finalize',       't' => 'Replies appear on your Proposals page. Pick one and confirm.'],
             ],

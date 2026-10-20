@@ -87,12 +87,18 @@ class RequestHelpRailTest extends TestCase
         foreach ($sending as $flow) {
             $rail = $this->railOf($this->flows()[$flow]);
 
-            $this->assertStringContainsString('$0 to post', $rail, "The {$flow} rail does not say posting is free.");
+            // Updated 20 October. It said "$0 to post", which stopped being
+            // true when Sir Peter moved the posting fee to publish and added a
+            // separate agreement fee. The point of the test is unchanged: one
+            // wording, read by every rail, so the fee cannot be explained four
+            // different ways again.
+            $this->assertStringContainsString('$2.99 to publish', $rail, "The {$flow} rail does not name the posting fee.");
             $this->assertStringContainsString(
-                'Charged only when you finalize with a professional.',
+                'Only if you go on to finalize with somebody, or buy a package.',
                 $rail,
                 "The {$flow} rail explains the fee in its own words.",
             );
+            $this->assertStringNotContainsString('$0 to post', $rail);
         }
     }
 

@@ -15,6 +15,23 @@
 --}}
 @php
     $panels = config('request-help.' . $flow, []);
+
+    /*
+     * The fee figures, filled in per client.
+     *
+     * The config carried "$0 to post" and "a single $2.99" until 20 October,
+     * which stopped being true when the posting fee moved to publish and the
+     * agreement fee was added. Being one config read by four rails is what put
+     * one wrong sentence on four pages; the placeholders keep it one sentence
+     * while letting the number be the one this client actually pays, since the
+     * founder rate and the regular rate differ.
+     */
+    $hrFees = [
+        ':posting'   => '$' . number_format(\App\Domain\Money\Pricing::postingFee(auth()->user()), 2),
+        ':agreement' => '$' . number_format(\App\Domain\Money\Pricing::agreementFee(), 2),
+    ];
+
+    $hrSay = fn (?string $text) => $text === null ? '' : strtr($text, $hrFees);
 @endphp
 
 @include('partials._help_rail_styles')
@@ -46,14 +63,14 @@
                 @foreach($panel['steps'] as $i => $step)
                     <div class="hr-step">
                         <span class="hr-n">{{ $i + 1 }}</span>
-                        <span><b>{{ $step['b'] }}</b><span class="t">{{ $step['t'] }}</span></span>
+                        <span><b>{{ $hrSay($step['b']) }}</b><span class="t">{{ $hrSay($step['t']) }}</span></span>
                     </div>
                 @endforeach
             @else
                 @foreach($panel['items'] ?? [] as $item)
                     <div class="hr-item">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-                        <span><b>{{ $item['b'] }}</b><span class="t">{{ $item['t'] }}</span></span>
+                        <span><b>{{ $hrSay($item['b']) }}</b><span class="t">{{ $hrSay($item['t']) }}</span></span>
                     </div>
                 @endforeach
             @endif

@@ -22,6 +22,10 @@ class WhatAClientPaysTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // Roles, because the founder cohort is counted by role as well as by
+        // the primary_role column since 20 October.
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
 
         // Away from the UTC and New York boundary, which has caught three other
         // test files in this suite. See the note in timezone handling.
@@ -100,6 +104,39 @@ class WhatAClientPaysTest extends TestCase
         $this->assertSame(2.99, Pricing::postingFee($first));
         $this->assertSame(2.99, Pricing::postingFee($second));
         $this->assertSame(4.99, Pricing::postingFee($third), 'The third is outside a cohort of two.');
+    }
+
+    /**
+     * A client whose primary_role was never set is still a client.
+     *
+     * Found by a test fixture that assigned the role without setting the
+     * column, which turned out to describe four real accounts: plain clients,
+     * client role, primary_role null. They were outside the cohort entirely, so
+     * they were quoted the regular rate instead of the founder one, and
+     * everybody behind them was counted into the wrong position.
+     */
+    public function test_a_client_known_only_by_their_role_is_still_a_founder(): void
+    {
+        $byRole = User::factory()->create(['primary_role' => null]);
+        $byRole->assignRole('client');
+
+        $this->assertNotNull(Pricing::position($byRole->fresh()));
+        $this->assertSame(2.99, Pricing::postingFee($byRole->fresh()));
+    }
+
+    /** And they take a place in the queue rather than being skipped. */
+    public function test_a_role_only_client_takes_a_place_in_the_queue(): void
+    {
+        $first = $this->client();
+
+        $second = User::factory()->create(['primary_role' => null]);
+        $second->assignRole('client');
+
+        $third = $this->client();
+
+        $this->assertSame(1, Pricing::position($first));
+        $this->assertSame(2, Pricing::position($second->fresh()));
+        $this->assertSame(3, Pricing::position($third));
     }
 
     /** Position is counted in signup order, and is total. */
