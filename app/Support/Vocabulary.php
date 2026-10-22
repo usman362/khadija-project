@@ -38,42 +38,35 @@ namespace App\Support;
 final class Vocabulary
 {
     /**
-     * WHY THERE IS A SWITCH, and not just the new words.
+     * SETTLED BY KHADIJAH, 21 October 11:37 PM, after reading the three rules:
      *
-     * The approved wording is "professionals and influencers". It is not the
-     * truth yet. Measured on 21 October: there are no influencer accounts on
-     * the platform, no influencer packages, the Direct Request picker lists
-     * professionals only, and the influencer role holds 5 of the 18
-     * permissions the professional role holds. Nothing can send a request to
-     * an influencer.
+     *   "Yes, let's use 'Service Provider' as the defined neutral term. Keep
+     *    Professional and Influencer separate whenever the user is choosing
+     *    between those two roles, and use Service Provider when referring
+     *    generally to whoever was booked or submitted a bid. Please apply this
+     *    consistently in one pass."
      *
-     * So writing "your request will be visible to professionals and
-     * influencers" across the site today would be the same thing as the
-     * verified badge and the landing page's trust bar: a page claiming
-     * something the platform does not do. Sir Peter found both of those
-     * himself, and the second one twice.
+     * Her term replaces the one proposed here first. "professionals and
+     * influencers" had a problem her answer does not: it was not true. Nothing
+     * on the platform can send a request to an influencer yet, so promising
+     * them on 289 screens would have been the verified badge over again.
      *
-     * The answer is therefore the switch rather than the sentence. Every
-     * screen reads these methods, so the wording turns on in ONE edit the day
-     * an influencer can actually receive a request, instead of 277 of them.
-     *
-     * Flip `config('vocabulary.influencers_included')` on that day.
+     * "Service Provider" is true today and stays true tomorrow. A professional
+     * is one; an influencer will be one; neither is promised where it cannot
+     * be delivered. So there is no longer anything to switch on later, and the
+     * flag that stood here has gone with it.
      */
-    public static function includesInfluencers(): bool
-    {
-        return (bool) config('vocabulary.influencers_included', false);
-    }
 
     /** Everyone who might answer a request. */
     public static function providers(): string
     {
-        return static::includesInfluencers() ? 'professionals and influencers' : 'professionals';
+        return 'service providers';
     }
 
     /** One of them, unknown which. */
     public static function provider(): string
     {
-        return static::includesInfluencers() ? 'professional or influencer' : 'professional';
+        return 'service provider';
     }
 
     /**
@@ -88,12 +81,11 @@ final class Vocabulary
     }
 
     /**
-     * The term for rules, policies and agreements.
+     * The same term capitalised, for rules, policies and agreements.
      *
-     * One defined term rather than a list, because a policy that names two
-     * kinds of account has to be amended when a third is added, and because
-     * "Service Provider" is what the agreements already have to call the party
-     * that performs the work.
+     * Khadijah's wording is a DEFINED term, so in a document that defines it,
+     * it is capitalised: "the Service Provider" means the party performing the
+     * work. In ordinary screen copy it is lower case, like any other noun.
      */
     public static function legalTerm(bool $plural = false): string
     {

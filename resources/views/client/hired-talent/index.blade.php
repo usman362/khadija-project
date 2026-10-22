@@ -39,6 +39,18 @@
     .ht-kinds { display: flex; gap: 7px; margin-bottom: 7px; }
 
     .ht-list { max-height: 660px; overflow-y: auto; border-top: 1px solid var(--border-color); }
+    /* Saved people, moved here from My Professionals. */
+    .ht-saved { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid var(--border-color); }
+    .ht-saved-av { width: 40px; height: 40px; border-radius: 11px; object-fit: cover; flex: none; }
+    .ht-saved-who { min-width: 0; flex: 1; }
+    .ht-saved-who b { display: block; font-size: 13.5px; font-weight: 800; color: var(--text-primary); }
+    .ht-saved-who span { display: block; font-size: 11.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ht-saved-acts { display: flex; align-items: center; gap: 7px; flex: none; }
+    .ht-saved-btn { font-size: 11.5px; font-weight: 700; padding: 7px 11px; border-radius: 9px; cursor: pointer;
+        border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary); text-decoration: none; }
+    .ht-saved-btn.is-go { border-color: var(--accent-orange, #ea580c); background: var(--accent-orange, #ea580c); color: #fff; }
+    @media (max-width: 560px) { .ht-saved { flex-wrap: wrap; } .ht-saved-acts { width: 100%; } }
+
 
     .ht-ev { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; border: 0;
         background: none; cursor: pointer; font: inherit; padding: 12px 16px 8px; }
@@ -198,6 +210,9 @@
             'all'           => ['Everyone',      'Both roles, by event', '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/>'],
             'professionals' => ['Professionals', $kinds['professionals'] . ' hired', '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/>'],
             'influencers'   => ['Influencers',   $kinds['influencers'] . ' hired', '<path d="M12 2 15 9l7 .6-5.3 4.6L18.3 21 12 17.3 5.7 21l1.6-6.8L2 9.6 9 9z"/>'],
+            // Moved here when My Professionals was removed. These are people
+            // you saved and have NOT hired, so they appear nowhere else.
+            'saved'         => ['Saved',         $savedCount . ' saved', '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>'],
         ];
     @endphp
     @foreach($htTabs as $key => [$label, $blurb, $icon])
@@ -214,7 +229,7 @@
     {{-- ── Who you hired ─────────────────────────────── --}}
     <div class="ht-card">
         <div class="ht-filters">
-            <h2 class="ht-ltitle">{{ $group === 'influencers' ? 'Hired Influencers' : ($group === 'professionals' ? 'Hired Providers' : 'Hired Talent') }}</h2>
+            <h2 class="ht-ltitle">{{ ['influencers' => 'Hired Influencers', 'professionals' => 'Hired Professionals', 'saved' => 'Saved for later'][$group] ?? 'Hired Talent' }}</h2>
 
             <form method="GET" class="ht-srow">
                 <label class="ht-search">
@@ -242,6 +257,37 @@
         </div>
 
         <div class="ht-list">
+            @if($group === 'saved')
+                {{-- Saved people have no event to group under: that is the
+                     whole point of them. A flat list, with the way to actually
+                     ask one of them for something. --}}
+                @forelse($saved as $pro)
+                    <div class="ht-saved">
+                        <img class="ht-saved-av" src="{{ $pro->avatar_url }}" alt="">
+                        <div class="ht-saved-who">
+                            <b>{{ $pro->name }}</b>
+                            <span>{{ $pro->profile?->headline ?? 'No headline yet' }}</span>
+                            <span>
+                                @if($pro->reviews_count)★ {{ number_format((float) $pro->reviews_avg, 1) }} ({{ $pro->reviews_count }})@endif
+                                {{ $pro->serviceCategories->pluck('name')->take(2)->implode(' · ') }}
+                            </span>
+                        </div>
+                        <div class="ht-saved-acts">
+                            <a class="ht-saved-btn is-go" href="{{ route('client.direct-offers.create', ['professional' => $pro->id]) }}">Request a quote</a>
+                            <form method="POST" action="{{ route('client.saved-professionals.destroy', $pro) }}">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="ht-saved-btn">Remove</button>
+                            </form>
+                        </div>
+                    </div>
+                @empty
+                    <div class="ht-empty" style="padding:34px 18px;">
+                        <b>Nothing saved yet</b>
+                        <p>The heart on a professional's card saves them here, so you can come back without searching again.</p>
+                        <a class="ht-saved-btn is-go" href="{{ route('public.browse') }}">Browse professionals</a>
+                    </div>
+                @endforelse
+            @else
             @forelse($groups as $g)
                 <button type="button" class="ht-ev" data-ht-group aria-expanded="true">
                     <span class="ht-ev-mid">
@@ -301,6 +347,7 @@
                     @endif
                 </div>
             @endforelse
+            @endif
         </div>
     </div>
 

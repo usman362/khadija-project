@@ -1,3 +1,54 @@
+# ──────────────────────────────────────────────────────────────────────
+# Nothing outside public/ is served as a file.
+#
+# Sir Peter, 22 October, after a video claiming a PHP flaw puts most sites at
+# risk: "can you fix any lose ends or issues before we go live". The video is a
+# thumbnail with a number on it. Checking the live site properly found
+# something real, and this is it.
+#
+# The document root on this host IS the Laravel root, with index.php at the top
+# including the application. The rewrite below only sends a request to the
+# front controller when no actual file matches it -- so every real file in the
+# project was being served to anybody who asked for its path:
+#
+#   /storage/logs/laravel.log   1.4 MB of errors, 7,040 full server paths,
+#                               stack traces, user ids and email addresses,
+#                               from 30 April to 19 September
+#   /composer.lock              the exact version of every package, which is a
+#                               list of which published vulnerabilities apply
+#   /composer.json, /artisan, /vendor/autoload.php
+#
+# .env and .git were already refused, which is what made this look covered.
+# They were refused one path at a time; everything nobody thought to name was
+# open.
+#
+# Assets are served from /public/... on this host (/public/gigresource-logos,
+# /public/storage/...), so that prefix is deliberately exempt. Blocking it
+# would take the whole site's images with it.
+# ──────────────────────────────────────────────────────────────────────
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # The application's own directories, unless the path is a public asset.
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(app|bootstrap|config|database|resources|routes|storage|tests|vendor|node_modules|docs)/ - [F,L]
+
+    # Files that sit at the top of the project and describe how it is built.
+    RewriteRule ^(artisan|composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml(\.dist)?|vite\.config\.js|postcss\.config\.js|tailwind\.config\.js)$ - [F,L]
+
+    # Working files by extension. Exempt under /public/ as well: a client's
+    # uploaded PDF lives there, and blocking the extension outright would stop
+    # people downloading their own documents.
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule \.(md|sh|sql|ya?ml|lock|bak|old|orig|save|swp|dist)$ - [F,L]
+</IfModule>
+
+# Dotfiles, and the same refusal again without mod_rewrite, because a server
+# that loses a module should fail closed rather than start serving .env.
+<FilesMatch "^\.|^(artisan|composer\.(json|lock))$">
+    Require all denied
+</FilesMatch>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

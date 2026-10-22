@@ -65,40 +65,26 @@ class OneWordForBothKindsOfAccountTest extends TestCase
 
     // ── The switch ───────────────────────────────────────────
 
-    /** Off today, because it would not be true. */
-    public function test_the_site_says_professionals_while_that_is_what_happens(): void
+    /** Khadijah's term, and it is true the day it ships. */
+    public function test_the_general_word_is_the_one_khadijah_settled_on(): void
     {
-        $this->assertFalse(Vocabulary::includesInfluencers());
-        $this->assertSame('professionals', Vocabulary::providers());
-        $this->assertSame('professional', Vocabulary::provider());
-    }
-
-    /** And the approved wording is one edit away, not 289. */
-    public function test_one_setting_turns_the_approved_wording_on(): void
-    {
-        config(['vocabulary.influencers_included' => true]);
-
-        $this->assertSame('professionals and influencers', Vocabulary::providers());
-        $this->assertSame('professional or influencer', Vocabulary::provider());
-        $this->assertSame('Professionals and influencers', Vocabulary::providersCapitalised());
+        $this->assertSame('service providers', Vocabulary::providers());
+        $this->assertSame('service provider', Vocabulary::provider());
     }
 
     /**
-     * The claim the switch is guarding against.
+     * And it does not promise influencers where there are none.
      *
-     * If this ever passes with influencers included while nothing can send one
-     * a request, the site is lying the way the verified badge did.
+     * This is why her term is better than the one proposed first. Nothing can
+     * send a request to an influencer yet: no influencer account exists and
+     * the role holds 5 of the 18 permissions a professional holds. "Service
+     * provider" is accurate either way, so it needed no flag and no second
+     * pass.
      */
-    public function test_nothing_can_send_a_request_to_an_influencer_yet(): void
+    public function test_the_word_does_not_promise_an_influencer(): void
     {
+        $this->assertStringNotContainsString('influencer', Vocabulary::providers());
         $this->assertSame(0, User::role('influencer')->count(), 'An influencer account now exists.');
-
-        $influencer = \Spatie\Permission\Models\Role::findByName('influencer');
-
-        $this->assertFalse(
-            $influencer->hasPermissionTo('bookings.view_any'),
-            'Influencers can now take bookings, so the wording switch can be reconsidered.',
-        );
     }
 
     // ── Rule 1: two searches stay two searches ───────────────
@@ -117,11 +103,6 @@ class OneWordForBothKindsOfAccountTest extends TestCase
      */
     public function test_finding_a_professional_stays_its_own_search(): void
     {
-        // With the switch ON, so the check means something. Off, the helper
-        // returns "professionals" and the two halves of this test would be
-        // asserting the same string present and absent.
-        config(['vocabulary.influencers_included' => true]);
-
         $html = $this->get(route('landing'))->assertSuccessful()->getContent();
 
         $this->assertStringContainsString('Find Professionals', $html);
@@ -129,7 +110,7 @@ class OneWordForBothKindsOfAccountTest extends TestCase
         $this->assertStringNotContainsString(
             'Find ' . Vocabulary::providersCapitalised(),
             $html,
-            'The switch has reworded a search that must stay specific.',
+            'A search that must name one role has been made generic.',
         );
     }
 
@@ -196,7 +177,8 @@ class OneWordForBothKindsOfAccountTest extends TestCase
             $body = file_get_contents($file);
             $body = preg_replace('/\{\{--.*?--\}\}/s', '', $body);
 
-            if (str_contains($body, 'professionals and influencers')) {
+            if (str_contains($body, 'professionals and influencers')
+                || preg_match('/\\bservice providers?\\b/i', $body)) {
                 $offenders[] = basename($file);
             }
         }

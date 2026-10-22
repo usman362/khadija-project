@@ -881,12 +881,27 @@ Route::middleware('auth')->group(function () {
         Route::post('/reviews/{booking}', [\App\Http\Controllers\Client\ClientReviewController::class, 'store'])
             ->middleware('permission:bookings.view_any')->name('client.reviews.store');
 
-        // My Professionals (Saved Vendors) — the client retention surface.
-        Route::get('/my-professionals', [\App\Http\Controllers\Client\ClientSavedProfessionalController::class, 'index'])
+        /*
+         * My Professionals is gone. Khadijah, 21 October: "You can remove the
+         * My professionals webpage, as per our discussion in the meeting its
+         * the same thing."
+         *
+         * Its "Worked With" tab WAS the same thing as Hired Talent. Its
+         * "Saved" tab was not, and saving somebody is a live feature -- the
+         * heart on Browse and the Favorites icon in the public header -- so
+         * Saved moved to Hired Talent rather than being deleted with the page.
+         *
+         * The route stays as a redirect, under its old name, because the
+         * header, the sidebar and every saved bookmark point at it. Keeping
+         * the NAME is what makes this a one-line removal instead of a hunt
+         * through the views for links to fix.
+         */
+        Route::get('/my-professionals', fn () => redirect()
+            ->route('client.hired-talent.index', ['who' => 'saved']))
             ->name('client.saved-professionals.index');
-        Route::post('/my-professionals', [\App\Http\Controllers\Client\ClientSavedProfessionalController::class, 'store'])
+        Route::post('/my-professionals', [\App\Http\Controllers\Client\ClientHiredTalentController::class, 'save'])
             ->name('client.saved-professionals.store');
-        Route::delete('/my-professionals/{professional}', [\App\Http\Controllers\Client\ClientSavedProfessionalController::class, 'destroy'])
+        Route::delete('/my-professionals/{professional}', [\App\Http\Controllers\Client\ClientHiredTalentController::class, 'unsave'])
             ->name('client.saved-professionals.destroy');
 
         // Hired Talent — who the client has actually engaged, by event. The

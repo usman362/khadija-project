@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Client;
 
 use App\Domain\HiredTalent;
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -25,7 +27,18 @@ use Illuminate\View\View;
  */
 class ClientHiredTalentController extends Controller
 {
-    private const GROUPS = ['all', 'professionals', 'influencers'];
+    /*
+     * Khadijah, 21 October: "You can remove the My professionals webpage, as
+     * per our discussion in the meeting its the same thing."
+     *
+     * Its "Worked With" tab was the same thing: people you have booked, which
+     * is this page. Its "Saved" tab was not. Saving somebody is the heart on
+     * Browse and the Favorites icon in the public header, and those are people
+     * you have NOT hired, so nothing on this page would have shown them. The
+     * page could not simply be deleted without taking a live feature with it,
+     * so Saved moves here as a fourth group and the page goes.
+     */
+    private const GROUPS = ['all', 'professionals', 'influencers', 'saved'];
     private const STATES = ['all', 'active', 'past'];
 
     public function index(Request $request): View
@@ -58,7 +71,23 @@ class ClientHiredTalentController extends Controller
             )))
             ->values();
 
+        /*
+         * Saved people are not hired people, so they are not in rows() and
+         * cannot be filtered out of it. Loaded only for their own tab.
+         */
+        $saved = $group === 'saved'
+            ? $request->user()->savedProfessionals()
+                ->excludingSelf($request->user())
+                ->with(['profile', 'serviceCategories:id,name'])
+                ->withAvg(['reviewsReceived as reviews_avg' => fn ($r) => $r->where('is_hidden', false)], 'rating')
+                ->withCount(['reviewsReceived as reviews_count' => fn ($r) => $r->where('is_hidden', false)])
+                ->when($q !== '', fn ($c) => $c->where('name', 'like', "%{$q}%"))
+                ->get()
+            : collect();
+
         return view('client.hired-talent.index', [
+            'saved'   => $saved,
+            'savedCount' => $request->user()->savedProfessionals()->excludingSelf($request->user())->count(),
             'groups'  => $shown
                 ->groupBy(fn ($r) => $r['event']['id'])
                 ->map(fn ($g) => ['event' => $g->first()['event'], 'rows' => $g->values()])
@@ -71,10 +100,44 @@ class ClientHiredTalentController extends Controller
                 'professionals' => $rows->where('supplier.noun', 'professional')->count(),
                 'influencers'   => $rows->where('supplier.noun', 'influencer')->count(),
             ],
-            'shown'   => $shown->count(),
+            'shown'   => $group === 'saved' ? $saved->count() : $shown->count(),
             'group'   => $group,
             'state'   => $state,
             'q'       => $q,
         ]);
+    }
+
+    /**
+     * Save somebody for later. The heart on Browse posts here.
+     *
+     * Moved from ClientSavedProfessionalController with the page it belonged
+     * to. The route NAME is unchanged, which is why the heart on Browse and
+     * the Favorites icon in the header needed no edit.
+     */
+    public function save(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'professional_id' => ['required', 'exists:users,id'],
+            'note'            => ['nullable', 'string', 'max:200'],
+        ]);
+
+        $pro = User::findOrFail($data['professional_id']);
+
+        // Never yourself: a saved self-reference would offer you a quote from
+        // your own account.
+        abort_if($pro->id === $request->user()->id, 422);
+
+        $request->user()->savedProfessionals()->syncWithoutDetaching([
+            $pro->id => ['note' => $data['note'] ?? null],
+        ]);
+
+        return back()->with('status', $pro->name . ' saved. They are under Saved in Hired Talent.');
+    }
+
+    public function unsave(Request $request, User $professional): RedirectResponse
+    {
+        $request->user()->savedProfessionals()->detach($professional->id);
+
+        return back()->with('status', 'Removed from your saved list.');
     }
 }

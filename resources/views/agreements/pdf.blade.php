@@ -218,7 +218,13 @@
                 <div class="email">{{ $client?->email ?? '' }}</div>
             </td>
             <td>
-                <div class="role">Professional / Service Provider</div>
+                {{-- The defined term, from App\Support\Vocabulary. Khadijah,
+                     21 Oct: "use Service Provider when referring generally to
+                     whoever was booked or submitted a bid." This read
+                     "Professional / Service Provider", naming one of the two
+                     roles beside the term that is meant to cover both -- so an
+                     influencer signing it would be titled a professional. --}}
+                <div class="role">{{ \App\Support\Vocabulary::legalTerm() }}</div>
                 <div class="name">{{ $supplier?->name ?? '—' }}</div>
                 <div class="email">{{ $supplier?->email ?? '' }}</div>
             </td>
