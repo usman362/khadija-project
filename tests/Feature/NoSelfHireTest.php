@@ -40,9 +40,9 @@ class NoSelfHireTest extends TestCase
     }
 
     /** Every professional id offered on a page. */
-    private function idsOn(string $route, string $key): array
+    private function idsOn(string $route, string $key, array $query = []): array
     {
-        $data = $this->actingAs($this->both)->get(route($route))
+        $data = $this->actingAs($this->both)->get(route($route, $query))
             ->assertSuccessful()
             ->viewData($key);
 
@@ -63,7 +63,8 @@ class NoSelfHireTest extends TestCase
         // filters it as well as the write path.
         $this->both->savedProfessionals()->syncWithoutDetaching([$this->both->id, $this->other->id]);
 
-        $ids = $this->idsOn('client.saved-professionals.index', 'saved');
+        // The page moved to Hired Talent's Saved tab on 21 October.
+        $ids = $this->idsOn('client.hired-talent.index', 'saved', ['who' => 'saved']);
 
         $this->assertNotContains($this->both->id, $ids);
         $this->assertContains($this->other->id, $ids);

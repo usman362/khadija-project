@@ -168,7 +168,15 @@ class HandoffOct06ClientSideTest extends TestCase
             'ends_at' => now()->addDays(10)->setTime(4, 4)->format('Y-m-d H:i:s'),
         ]);
         $this->assertStringContainsString('1:04 AM – 4:04 AM', (string) $r->timeLabel());
-        $this->assertStringContainsString(\App\Support\DisplayTimezone::abbreviation(), (string) $r->timeLabel());
+        // The abbreviation of the EVENT'S OWN date, not of today. This read
+        // abbreviation() with no date and started failing in late October:
+        // the event is ten days out, which lands after the clocks change,
+        // so the label correctly said EST while the test demanded EDT. The
+        // application was right; the comparison was taken from the wrong day.
+        $this->assertStringContainsString(
+            \App\Support\DisplayTimezone::abbreviation(null, $r->starts_at),
+            (string) $r->timeLabel(),
+        );
     }
 
     /**

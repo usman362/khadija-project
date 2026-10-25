@@ -128,7 +128,7 @@ class ThePresenceDotIsBackedTest extends TestCase
     }
 
     /** My Professionals shows it, which is where it was already half-built. */
-    public function test_my_professionals_shows_the_dot(): void
+    public function test_the_saved_list_shows_the_dot(): void
     {
         $client = User::factory()->create();
         $client->assignRole('client');
@@ -138,13 +138,14 @@ class ThePresenceDotIsBackedTest extends TestCase
         $pro->assignRole('professional');
         $client->savedProfessionals()->attach($pro->id);
 
-        $html = $this->actingAs($client->fresh())->get('/client/my-professionals')
+        // My Professionals was removed on 21 October (Khadijah). Saved people
+        // moved to Hired Talent, and the dot moved with them.
+        $html = $this->actingAs($client->fresh())
+            ->get(route('client.hired-talent.index', ['who' => 'saved']))
             ->assertSuccessful()->getContent();
 
         $this->assertStringContainsString('pres-dot', $html);
         $this->assertStringContainsString('Online now', $html);
 
-        // And the hand-written rule it replaced is gone.
-        $this->assertStringNotContainsString('mp-on', $html);
     }
 }

@@ -242,6 +242,9 @@ class RequestEventStateTest extends TestCase
         $this->openEventStep($client)
             ->assertOk()
             ->assertSee('Delaware', false)
-            ->assertSee('visible only to professionals in', false);
+            // The word comes from App\Support\Vocabulary, which Khadijah
+            // settled on 21 October, so this reads it rather than
+            // hardcoding a noun that is now defined in one place.
+            ->assertSee('visible only to ' . \App\Support\Vocabulary::providers() . ' in', false);
     }
 }

@@ -55,6 +55,16 @@ final class HiredTalent
         $money = PaymentTracker::rows($client)
             ->keyBy(fn ($r) => $r['event_id'] . '|' . $r['pro_id']);
 
+        /*
+         * Which bookings this client has already reviewed, in one query rather
+         * than one per row. A review is tied to a booking, so the same
+         * professional can be owed a review on one job and not on another.
+         */
+        $reviewed = \App\Models\Review::where('reviewer_id', $client->id)
+            ->pluck('booking_id')
+            ->filter()
+            ->all();
+
         // The agreement behind each booking, which is where readiness lives.
         $agreements = Finalization::where('client_id', $client->id)
             ->get()
@@ -78,7 +88,7 @@ final class HiredTalent
             ])
 
             ->get()
-            ->map(fn (Booking $b) => self::row($b, $money, $agreements))
+            ->map(fn (Booking $b) => self::row($b, $money, $agreements, $reviewed))
             ->sortByDesc(fn ($r) => $r['event']['at']?->timestamp ?? 0)
             ->values();
     }
@@ -106,7 +116,7 @@ final class HiredTalent
         ];
     }
 
-    private static function row(Booking $b, Collection $money, Collection $agreements): array
+    private static function row(Booking $b, Collection $money, Collection $agreements, array $reviewed = []): array
     {
         [$state, $tone] = self::STATES[$b->status] ?? ['Booked', 'ok'];
         $pay = $money->get($b->event_id . '|' . $b->supplier?->public_id);
@@ -114,6 +124,17 @@ final class HiredTalent
 
         return [
             'id'        => $b->id,
+            /*
+             * Whether this booking is still owed a review.
+             *
+             * Khadijah, 30 Sep: "there should be button to add review, then
+             * that review will appear on Reviews page." That button lived on My
+             * Professionals, and when that page was removed on her own
+             * instruction on 21 October it went with it. A review belongs to a
+             * booking rather than to a person, which is why it is resolved per
+             * row here and not per supplier.
+             */
+            'to_review' => $b->status === 'completed' && ! in_array($b->id, $reviewed, true),
             'raw_state' => $b->status,
             'state'     => $state,
             'tone'      => $tone,

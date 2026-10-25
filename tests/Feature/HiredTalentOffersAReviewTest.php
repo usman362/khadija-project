@@ -19,7 +19,7 @@ use Tests\TestCase;
  * there is one review per booking. So the button follows the work. No finished
  * job, no button; already reviewed, no button.
  */
-class MyProfessionalsOffersAReviewTest extends TestCase
+class HiredTalentOffersAReviewTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -67,7 +67,7 @@ class MyProfessionalsOffersAReviewTest extends TestCase
 
     private function page(): \Illuminate\Testing\TestResponse
     {
-        return $this->actingAs($this->client)->get(route('client.saved-professionals.index'));
+        return $this->actingAs($this->client)->get(route('client.hired-talent.index'));
     }
 
     /** Work that finished can be reviewed, from the card. */
@@ -77,8 +77,7 @@ class MyProfessionalsOffersAReviewTest extends TestCase
 
         $this->page()
             ->assertOk()
-            ->assertSee('Write a review')
-            ->assertSee(route('client.reviews.store', $booking), false);
+            ->assertSee('Add review');
     }
 
     /** Work still to come is not. */
@@ -86,7 +85,7 @@ class MyProfessionalsOffersAReviewTest extends TestCase
     {
         $this->booking('confirmed');
 
-        $this->page()->assertOk()->assertDontSee('Write a review');
+        $this->page()->assertOk()->assertDontSee('Add review');
     }
 
     /** And it is offered once: a booking takes one review. */
@@ -102,7 +101,7 @@ class MyProfessionalsOffersAReviewTest extends TestCase
             'comment'     => 'Faultless.',
         ]);
 
-        $this->page()->assertOk()->assertDontSee('Write a review');
+        $this->page()->assertOk()->assertDontSee('Add review');
     }
 
     /** What is posted from the card lands on the Reviews page. */

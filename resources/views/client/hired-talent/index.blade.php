@@ -103,6 +103,11 @@
     .ht-detail-sp { flex: 1; }
 
     .ht-actions { position: relative; display: flex; align-items: center; gap: 8px; flex: none; }
+    .ht-review { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800;
+        padding: 8px 13px; border-radius: 10px; text-decoration: none; white-space: nowrap;
+        background: var(--accent-orange, #ea580c); color: #fff; }
+    .ht-review svg { width: 13px; height: 13px; }
+
     .ht-more { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--border-color);
         background: var(--bg-card); color: var(--text-secondary); cursor: pointer; font-size: 17px; line-height: 1;
         display: flex; align-items: center; justify-content: center; }
@@ -265,11 +270,16 @@
                     <div class="ht-saved">
                         <img class="ht-saved-av" src="{{ $pro->avatar_url }}" alt="">
                         <div class="ht-saved-who">
-                            <b>{{ $pro->name }}</b>
+                            {{-- The dot and its words both come from
+                                 App\Support\Presence, so "Online now" cannot
+                                 disagree with the colour beside it. Moved here
+                                 with the rest of My Professionals. --}}
+                            <b><x-presence-dot :user="$pro" inline />{{ $pro->name }}</b>
                             <span>{{ $pro->profile?->headline ?? 'No headline yet' }}</span>
                             <span>
                                 @if($pro->reviews_count)★ {{ number_format((float) $pro->reviews_avg, 1) }} ({{ $pro->reviews_count }})@endif
                                 {{ $pro->serviceCategories->pluck('name')->take(2)->implode(' · ') }}
+                                @if(\App\Support\Presence::label($pro)) · {{ \App\Support\Presence::label($pro) }}@endif
                             </span>
                         </div>
                         <div class="ht-saved-acts">
@@ -403,6 +413,22 @@
                         </div>
                         <span class="ht-detail-sp"></span>
                         <div class="ht-actions">
+                            {{-- Khadijah, 30 Sep: "there should be button to add
+                                 review, then that review will appear on Reviews
+                                 page." It lived on My Professionals, which came
+                                 out on 21 October on her own instruction, so it
+                                 moves here with everything else that page held.
+
+                                 Only on a finished booking this client has not
+                                 reviewed: a review belongs to the job, so the
+                                 same professional can be owed one on one event
+                                 and not on another. --}}
+                            @if($r['to_review'] ?? false)
+                                <a class="ht-review" href="{{ route('client.reviews.index', ['booking' => $r['id']]) }}">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 15 9l7 .6-5.3 4.6L18.3 21 12 17.3 5.7 21l1.6-6.8L2 9.6 9 9z"/></svg>
+                                    Add review
+                                </a>
+                            @endif
                             <span class="ht-chip {{ $r['tone'] }}" style="font-size:13px;padding:9px 14px;">{{ $r['state'] }}</span>
                             <button type="button" class="ht-more" data-ht-more aria-haspopup="true" aria-expanded="false" aria-label="More actions">&#8943;</button>
                             {{-- Release Milestone Payment is on his menu and is not
