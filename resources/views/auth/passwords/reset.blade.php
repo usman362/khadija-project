@@ -28,7 +28,14 @@
 
                         <div class="mb-3">
                             <label for="password" class="form-label">New password</label>
-                            <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password" placeholder="New Password">
+                            {{-- Somebody resetting a password is typing one they
+                                 have just invented, cannot see, and must then
+                                 retype correctly. This screen had no way to look
+                                 at it. --}}
+                            <div class="position-relative">
+                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password" placeholder="New Password">
+                                <x-password-eye for="password" />
+                            </div>
                             @error('password')
                                 <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                             @enderror
@@ -36,7 +43,10 @@
 
                         <div class="mb-3">
                             <label for="password-confirm" class="form-label">Confirm Password</label>
-                            <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password" placeholder="Confirm Password">
+                            <div class="position-relative">
+                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password" placeholder="Confirm Password">
+                                <x-password-eye for="password-confirm" />
+                            </div>
                         </div>
 
                         <div>
@@ -50,3 +60,5 @@
     </div>
 </div>
 @endsection
+
+@include('partials._password_eye_script')

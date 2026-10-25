@@ -97,8 +97,6 @@
         .rg-input::placeholder { color:#9aa6b8; }
         .rg-input:focus { outline:none; border-color:var(--brand); box-shadow:0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent); }
         .rg-input.is-invalid { border-color:#ef4444; }
-        .rg-eye { position:absolute; right:13px; top:50%; transform:translateY(-50%); background:none; border:none; color:#9aa6b8; cursor:pointer; padding:4px; }
-        .rg-eye:hover { color:var(--ink); }
         .rg-err { color:#ef4444; font-size:12.5px; margin-top:6px; }
 
         .rg-row { display:flex; align-items:center; justify-content:space-between; margin:4px 0 20px; }
@@ -213,7 +211,7 @@
                     <div class="rg-wrap">
                         <svg class="rg-icl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                         <input type="password" name="password" id="rgLoginPw" class="rg-input" placeholder="Enter your password" required>
-                        <button type="button" class="rg-eye" data-eye="rgLoginPw" aria-label="Show or hide password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                        <x-password-eye for="rgLoginPw" />
                     </div>
                 </div>
 
@@ -246,13 +244,9 @@
     </main>
 </div>
 
+@include('partials._password_eye_script')
+
 <script>
-    document.addEventListener('click', function (e) {
-        var b = e.target.closest('[data-eye]');
-        if (!b) return;
-        var inp = document.getElementById(b.getAttribute('data-eye'));
-        if (inp) inp.type = inp.type === 'password' ? 'text' : 'password';
-    });
 
     @if($showRecaptcha && $recaptchaSiteKey && $recaptchaVersion === 'v3')
     document.getElementById('rgLoginSubmit').addEventListener('click', function (e) {

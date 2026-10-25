@@ -20,7 +20,10 @@
 
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password" placeholder="Password">
+                            <div class="position-relative">
+                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password" placeholder="Password">
+                                <x-password-eye for="password" />
+                            </div>
                             @error('password')
                                 <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                             @enderror
@@ -39,3 +42,5 @@
     </div>
 </div>
 @endsection
+
+@include('partials._password_eye_script')
