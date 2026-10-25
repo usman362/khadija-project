@@ -123,20 +123,109 @@ class LoginController extends Controller
      */
     protected function sendLockoutResponse(Request $request)
     {
+        $email = $request->input($this->username());
+
+        /*
+         * Two different situations reached this one message, and only one of
+         * them was true.
+         *
+         * `hasTooManyLoginAttempts` is also satisfied by the rate limiter
+         * alone, and the limiter counts failures against addresses that have
+         * no account, deliberately, so that guessing addresses is throttled.
+         * So anybody who mistyped their email three times was told their
+         * account was paused and to reset their password: there was no account
+         * to pause and no password to reset, and the one instruction given was
+         * a door that opens onto nothing.
+         *
+         * Found on 25 October after a day spent unlocking an admin account
+         * that did not exist on that server. The screen said it was paused, so
+         * we believed it.
+         *
+         * Deliberately accepted: the two messages differ, so three failures
+         * reveal whether an address has an account. That signal costs an
+         * attacker three attempts to obtain and tells them only what the
+         * lockout behaviour already shows. Telling a real person to reset a
+         * password they do not have costs more.
+         */
+        if (LoginLockout::isLocked($email)) {
+            throw ValidationException::withMessages([
+                $this->username() => [
+                    'For your security this account is paused after ' . LoginLockout::MAX_ATTEMPTS
+                    . ' incorrect passwords. Reset your password to sign in again.',
+                ],
+            ])->status(423);
+        }
+
         throw ValidationException::withMessages([
             $this->username() => [
-                'For your security this account is paused after 3 incorrect passwords. '
-                . 'Reset your password to sign in again.',
+                'Too many sign-in attempts from this address. Wait a little and try again, '
+                . 'and check the email address itself as well as the password.',
             ],
-        ])->status(423);
+        ])->status(429);
     }
 
     /**
      * Route affiliate-only accounts to the right place after login:
      * approved → portal, otherwise → application status page.
      */
+    /**
+     * An administrator signs in from the admin portal, and nowhere else.
+     *
+     * Reported 25 October: "yeh simple login wale page se bhi admin me login
+     * ho raha hai, admin sirf admin page se hi hona chahiye."
+     *
+     * Both forms post to this one route, so until now nothing could tell them
+     * apart. The admin form carries a hidden field saying which door was used;
+     * the ordinary form does not and cannot be made to, because a field a
+     * browser sends is a field anybody can send.
+     *
+     * The check runs AFTER the password has been accepted, deliberately. Doing
+     * it before would answer "is this address an administrator?" to anybody who
+     * typed it, which is a question the sign-in page should not answer. After a
+     * correct password the person already holds the account, so being told
+     * where to sign in costs nothing.
+     *
+     * The session is thrown away rather than kept: a half-signed-in
+     * administrator on the client side is the thing being prevented.
+     */
+    private function wrongDoor(Request $request, $user): ?RedirectResponse
+    {
+        $throughAdminPortal = $request->input('portal') === 'admin';
+        $isAdmin            = $user->hasRole(RoleName::ADMIN->value);
+
+        if ($isAdmin && ! $throughAdminPortal) {
+            $this->bounce($request);
+
+            return redirect()->route('admin.login')
+                ->with('status', 'Administrators sign in from the admin portal.');
+        }
+
+        // The admin page says "Not an admin? Go to user login", so it holds
+        // itself to that: it is not a second front door for everybody else.
+        if (! $isAdmin && $throughAdminPortal) {
+            $this->bounce($request);
+
+            return redirect()->route('login')
+                ->with('status', 'This is the admin portal. Sign in here instead.');
+        }
+
+        return null;
+    }
+
+    /** Undo the sign-in that has just happened. */
+    private function bounce(Request $request): void
+    {
+        $this->guard()->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+    }
+
     protected function authenticated(Request $request, $user): ?RedirectResponse
     {
+        if ($elsewhere = $this->wrongDoor($request, $user)) {
+            return $elsewhere;
+        }
+
         $isStandardUser = $user->hasAnyRole([
             RoleName::ADMIN->value,
             RoleName::CLIENT->value,

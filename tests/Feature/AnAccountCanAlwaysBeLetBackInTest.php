@@ -142,4 +142,51 @@ class AnAccountCanAlwaysBeLetBackInTest extends TestCase
     {
         $this->locked();
     }
+
+    // ── What a throttled stranger is told ────────────────────
+
+    /**
+     * An address with no account is not "paused", and has no password to reset.
+     *
+     * The limiter counts failures against unknown addresses on purpose, so
+     * that guessing addresses is throttled. Both situations reached one
+     * message, so anybody who mistyped their email three times was told their
+     * account was paused and to reset their password. There was no account and
+     * no password, and the only instruction given led nowhere.
+     *
+     * This cost a day on 25 October: an admin account was reported locked, an
+     * unlock command was written for it, and the account did not exist on that
+     * server at all. The screen said paused, so it was believed.
+     */
+    public function test_an_address_with_no_account_is_not_told_it_is_paused(): void
+    {
+        $email = 'nobody@gigresource.com';
+
+        for ($i = 0; $i < LoginLockout::MAX_ATTEMPTS; $i++) {
+            LoginLockout::recordFailure($email);
+        }
+
+        $this->assertFalse(LoginLockout::isLocked($email), 'There is nothing to lock.');
+
+        $message = $this->post(route('login'), ['email' => $email, 'password' => 'whatever'])
+            ->assertSessionHasErrors('email')
+            ->getSession()->get('errors')->first('email');
+
+        $this->assertStringNotContainsString('paused', $message);
+        $this->assertStringNotContainsString('Reset your password', $message);
+        $this->assertStringContainsString('Too many sign-in attempts', $message);
+    }
+
+    /** A genuinely locked account still gets told how to get back in. */
+    public function test_a_locked_account_is_still_told_to_reset_its_password(): void
+    {
+        $user = $this->locked();
+
+        $message = $this->post(route('login'), ['email' => $user->email, 'password' => 'whatever'])
+            ->assertSessionHasErrors('email')
+            ->getSession()->get('errors')->first('email');
+
+        $this->assertStringContainsString('paused', $message);
+        $this->assertStringContainsString('Reset your password', $message);
+    }
 }

@@ -110,6 +110,12 @@
         @endif
 
         <form method="POST" action="{{ route('login') }}" id="alForm">
+                {{-- Which door was used. Both forms post to the same route, so
+                     without this the controller cannot tell the admin portal
+                     from the ordinary sign-in page, and an administrator could
+                     sign in from either. It is not a permission: it is only
+                     read after the password has already been accepted. --}}
+                <input type="hidden" name="portal" value="admin">
             @csrf
 
             <div class="al-field">
