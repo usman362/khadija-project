@@ -1,1 +1,6 @@
-{"version":"0.0.1","configurations":[{"name":"khadija-web","runtimeExecutable":"php","runtimeArgs":["artisan","serve","--port=8123"],"port":8123}]}
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "gigresource", "runtimeExecutable": "php", "runtimeArgs": ["artisan", "serve", "--port=8123"], "port": 8123 }
+  ]
+}

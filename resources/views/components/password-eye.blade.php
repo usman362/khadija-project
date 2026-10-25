@@ -37,8 +37,18 @@
     </svg>
 </button>
 
+{{--
+    The style sits HERE, not in a pushed stack.
+
+    First attempt pushed it to @stack('styles'), which is how the rest of the
+    project does it. Sign-in and sign-up have no layout at all: they are
+    standalone HTML documents with no stack to push to, so the CSS was dropped
+    without a word. On screen that showed as both icons at once and the button
+    falling out of the field, because none of the rules below had arrived.
+
+    Rendered once per page by @once, and it needs nothing from the page.
+--}}
 @once
-@push('styles')
 <style>
     .pw-eye { position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
         display: inline-flex; align-items: center; justify-content: center;
@@ -50,6 +60,8 @@
     .pw-eye .pw-eye-off { display: none; }
     .pw-eye[aria-pressed="true"] .pw-eye-on { display: none; }
     .pw-eye[aria-pressed="true"] .pw-eye-off { display: block; }
+    /* The field must be a positioned ancestor or the button lands outside it.
+       Declared here rather than assumed of every page that uses this. */
+    .pw-eye { pointer-events: auto; }
 </style>
-@endpush
 @endonce

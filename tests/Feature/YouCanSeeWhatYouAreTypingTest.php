@@ -127,6 +127,106 @@ class YouCanSeeWhatYouAreTypingTest extends TestCase
         }
     }
 
+    /**
+     * The styling reaches the page, which the first fix did not.
+     *
+     * The rules were pushed to @stack('styles'), the way the rest of the
+     * project does it. Sign-in and sign-up have no layout at all: they are
+     * standalone HTML documents with no stack to push to, so the CSS was
+     * dropped silently. On screen both icons showed at once and the button fell
+     * out of the field, because none of the rules had arrived. Markup
+     * assertions all passed throughout, which is why this one exists.
+     */
+    public function test_the_styling_reaches_every_screen_that_has_an_eye(): void
+    {
+        $user  = User::factory()->create();
+        $token = Password::broker()->createToken($user);
+
+        $screens = [
+            'sign-in'  => route('login'),
+            'sign-up'  => route('register'),
+            'reset'    => route('password.reset', ['token' => $token, 'email' => $user->email]),
+        ];
+
+        foreach ($screens as $name => $url) {
+            $html = $this->get($url)->assertSuccessful()->getContent();
+
+            $this->assertStringContainsString('.pw-eye svg', $html, "No icon sizing on {$name}.");
+            $this->assertStringContainsString(
+                '.pw-eye[aria-pressed="true"] .pw-eye-off',
+                $html,
+                "Nothing hides one of the two icons on {$name}, so both show at once.",
+            );
+        }
+    }
+
+    /**
+     * And the button has something to be positioned against.
+     *
+     * It is absolutely positioned, so without a positioned ancestor it does not
+     * sit in the field; it falls below it, which is exactly how this looked
+     * when the stylesheet went missing.
+     *
+     * Walked with DOMDocument rather than matched with a pattern. The first
+     * version of this test used a regex and caught the OUTER wrapper, then
+     * failed because that one is not the positioned element: the inner one is.
+     * The nearest ancestor is the question, and only a parser answers it.
+     */
+    public function test_each_eye_sits_inside_a_positioned_field(): void
+    {
+        $user  = User::factory()->create();
+        $token = Password::broker()->createToken($user);
+
+        $screens = [
+            route('login'),
+            route('register'),
+            route('password.reset', ['token' => $token, 'email' => $user->email]),
+        ];
+
+        foreach ($screens as $url) {
+            $html = $this->get($url)->assertSuccessful()->getContent();
+
+            $dom = new \DOMDocument();
+            @$dom->loadHTML($html, LIBXML_NOERROR | LIBXML_NOWARNING);
+
+            $buttons = (new \DOMXPath($dom))->query('//button[@data-eye]');
+
+            $this->assertGreaterThan(0, $buttons->length, "No eye button on {$url}.");
+
+            foreach ($buttons as $button) {
+                $parent  = $button->parentNode;
+                $classes = $parent instanceof \DOMElement ? $parent->getAttribute('class') : '';
+
+                $this->assertTrue(
+                    $this->isPositioned($classes, $html),
+                    "The eye on {$url} sits in \"{$classes}\", which is not positioned, so it falls outside the field.",
+                );
+            }
+        }
+    }
+
+    /** Is an element with these classes a positioned ancestor? */
+    private function isPositioned(string $classes, string $html): bool
+    {
+        foreach (preg_split('/\s+/', trim($classes)) as $class) {
+            if ($class === '') {
+                continue;
+            }
+
+            // Bootstrap's own utility, used on the reset screens.
+            if ($class === 'position-relative') {
+                return true;
+            }
+
+            // Or a rule for it in the page's own stylesheet.
+            if (preg_match('/\.' . preg_quote($class, '/') . '\s*\{[^}]*position\s*:\s*relative/i', $html)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /** It starts hidden. An eye that opens shown is not a password field. */
     public function test_the_field_starts_hidden(): void
     {
