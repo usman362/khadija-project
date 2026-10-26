@@ -88,10 +88,19 @@
     .do-empty-acts a { font-size: 12.5px; font-weight: 700; color: var(--brand-text); text-decoration: none; }
 
     /* The optional questions, folded away. Styled to match the ER's .esr-more
-       so the two forms read the same way. */
-    .do-more { margin-top: 14px; border-top: 1px dashed var(--border-color); padding-top: 12px; }
+       so the two forms read the same way.
+
+       The dashed rule above this used to be the only one. It opened a band
+       that never closed, so the row sat directly on top of the next field's
+       label with no air between them, and "Add more detail" read as the
+       heading for the textarea underneath rather than as the end of Event
+       Details. In the ER the fold is the last thing in its card and the card
+       padding does this job; here something follows it. */
+    .do-more { margin: 14px 0 18px; border-top: 1px dashed var(--border-color); border-bottom: 1px dashed var(--border-color);
+        padding: 12px 0; }
+    .do-more[open] { padding-bottom: 16px; }
     .do-more > summary { cursor: pointer; list-style: none; display: flex; align-items: baseline; gap: 9px;
-        font-size: 13px; font-weight: 700; color: var(--brand-text); }
+        flex-wrap: wrap; font-size: 13px; font-weight: 700; color: var(--brand-text); }
     .do-more > summary::-webkit-details-marker { display: none; }
     .do-more > summary::before { content: '+'; font-size: 15px; line-height: 1; font-weight: 800; }
     .do-more[open] > summary::before { content: '\2212'; }

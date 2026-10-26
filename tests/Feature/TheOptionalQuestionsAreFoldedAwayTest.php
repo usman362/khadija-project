@@ -120,6 +120,47 @@ class TheOptionalQuestionsAreFoldedAwayTest extends TestCase
         }
     }
 
+    /**
+     * The fold is a closed band, not a heading for the field below it.
+     *
+     * Ali, 27 October: "yeh Add more detail ... boht ziada conjusted hai."
+     * The row had a dashed rule above it and nothing below, so it sat directly
+     * on the label of the question that follows it. On the emergency form the
+     * fold is the last thing in its card and the card's own padding does this
+     * job; on the direct form a required question comes straight after.
+     *
+     * Asserting the CSS rather than the pixels, because a rule that is deleted
+     * is the way this comes back.
+     */
+    public function test_the_direct_forms_fold_is_closed_off_from_what_follows(): void
+    {
+        $css = $this->actingAs($this->client)
+            ->get(route('client.direct-offers.create'))
+            ->assertSuccessful()
+            ->getContent();
+
+        $rule = $this->ruleFor($css, '.do-more');
+
+        $this->assertStringContainsString('border-bottom', $rule, 'The fold opens a band it never closes.');
+        $this->assertMatchesRegularExpression(
+            '/margin:\s*\d+px\s+0\s+1[0-9]px/',
+            $rule,
+            'There is no room between the fold and the question under it.',
+        );
+    }
+
+    /** One CSS rule's body, by selector. */
+    private function ruleFor(string $html, string $selector): string
+    {
+        $this->assertSame(
+            1,
+            preg_match('/' . preg_quote($selector, '/') . '\s*\{([^}]*)\}/', $html, $m),
+            "No {$selector} rule on the page.",
+        );
+
+        return $m[1];
+    }
+
     // ── What the fold must not cost ──────────────────────────
 
     /**
