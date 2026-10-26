@@ -64,7 +64,7 @@ class EnsureServiceArea
 
         // Saving a professional for later, and a tool result saved onto an
         // event — both are private notes to self.
-        'client.saved-professionals.',
+        'client.hired-talent.',
         'client.ai-artifacts.',
     ];
 

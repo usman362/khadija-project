@@ -137,11 +137,11 @@ class BrowseControlsAreLiveTest extends TestCase
     {
         $html = $this->page();
 
-        $this->assertStringContainsString(route('client.saved-professionals.store'), $html,
+        $this->assertStringContainsString(route('client.hired-talent.save'), $html,
             'The heart still posts nowhere.');
 
         $this->actingAs($this->client)
-            ->post(route('client.saved-professionals.store'), ['professional_id' => $this->pro->id])
+            ->post(route('client.hired-talent.save'), ['professional_id' => $this->pro->id])
             ->assertSessionHasNoErrors();
 
         $this->assertTrue($this->client->savedProfessionals()->where('users.id', $this->pro->id)->exists());
@@ -149,7 +149,7 @@ class BrowseControlsAreLiveTest extends TestCase
         // Saved, the card shows it and offers the way back out.
         $saved = $this->page();
         $this->assertStringContainsString('br-fav is-on', $saved);
-        $this->assertStringContainsString(route('client.saved-professionals.destroy', $this->pro), $saved);
+        $this->assertStringContainsString(route('client.hired-talent.unsave', $this->pro), $saved);
     }
 
     /** A visitor who is not signed in is not offered a control that needs an account. */

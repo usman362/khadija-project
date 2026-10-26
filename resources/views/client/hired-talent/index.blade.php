@@ -284,7 +284,7 @@
                         </div>
                         <div class="ht-saved-acts">
                             <a class="ht-saved-btn is-go" href="{{ route('client.direct-offers.create', ['professional' => $pro->id]) }}">Request a quote</a>
-                            <form method="POST" action="{{ route('client.saved-professionals.destroy', $pro) }}">
+                            <form method="POST" action="{{ route('client.hired-talent.unsave', $pro) }}">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="ht-saved-btn">Remove</button>
                             </form>

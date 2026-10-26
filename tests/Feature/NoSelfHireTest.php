@@ -98,7 +98,7 @@ class NoSelfHireTest extends TestCase
     public function test_you_cannot_save_yourself_to_my_professionals(): void
     {
         $this->actingAs($this->both)
-            ->post(route('client.saved-professionals.store'), [
+            ->post(route('client.hired-talent.save'), [
                 'professional_id' => $this->both->id,
             ])
             ->assertStatus(422);

@@ -896,13 +896,21 @@ Route::middleware('auth')->group(function () {
          * the NAME is what makes this a one-line removal instead of a hunt
          * through the views for links to fix.
          */
+        /*
+         * Saving somebody for later belongs to Hired Talent, where the Saved
+         * tab lives. It kept the old page's name and URL for a week after that
+         * page was deleted, so "My Professionals" was still in the address bar
+         * and in every route name, for a module that no longer existed.
+         */
+        Route::post('/hired-talent/save', [\App\Http\Controllers\Client\ClientHiredTalentController::class, 'save'])
+            ->name('client.hired-talent.save');
+        Route::delete('/hired-talent/save/{professional}', [\App\Http\Controllers\Client\ClientHiredTalentController::class, 'unsave'])
+            ->name('client.hired-talent.unsave');
+
+        // The old address, kept so nobody's bookmark breaks. Unnamed on
+        // purpose: nothing in the application should be pointing at it.
         Route::get('/my-professionals', fn () => redirect()
-            ->route('client.hired-talent.index', ['who' => 'saved']))
-            ->name('client.saved-professionals.index');
-        Route::post('/my-professionals', [\App\Http\Controllers\Client\ClientHiredTalentController::class, 'save'])
-            ->name('client.saved-professionals.store');
-        Route::delete('/my-professionals/{professional}', [\App\Http\Controllers\Client\ClientHiredTalentController::class, 'unsave'])
-            ->name('client.saved-professionals.destroy');
+            ->route('client.hired-talent.index', ['who' => 'saved']));
 
         // Hired Talent — who the client has actually engaged, by event. The
         // Calendar page carried this as a switched-off tab; who you hired is a

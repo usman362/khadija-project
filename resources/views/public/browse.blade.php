@@ -565,8 +565,8 @@
                                     @php $isSaved = in_array($pro->id, $savedIds, true); @endphp
                                     <form method="POST" class="br-fav-form"
                                           action="{{ $isSaved
-                                              ? route('client.saved-professionals.destroy', $pro)
-                                              : route('client.saved-professionals.store') }}">
+                                              ? route('client.hired-talent.unsave', $pro)
+                                              : route('client.hired-talent.save') }}">
                                         @csrf
                                         @if($isSaved)
                                             @method('DELETE')
