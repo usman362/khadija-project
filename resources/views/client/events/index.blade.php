@@ -82,13 +82,25 @@
     .mg-filter-btn.coral { background: #c2410c; color: #fff; border-color: #c2410c; }  /* 2.80 -> 5.18 */
 
     /* Sub-tabs */
-    .mg-subtabs { display: flex; gap: 22px; border-bottom: 1px solid var(--border-color); margin-bottom: 4px; }
+    /* Four tabs now, and on a phone they were stacking three lines deep:
+       "Professional" / "Schedule" / "2". They stay on one line and the row
+       scrolls sideways instead, which is what a phone does with a tab bar. */
+    .mg-subtabs { display: flex; gap: 22px; border-bottom: 1px solid var(--border-color); margin-bottom: 4px;
+        overflow-x: auto; scrollbar-width: none; }
+    .mg-subtabs::-webkit-scrollbar { display: none; }
     .mg-subtab {
+        flex: 0 0 auto; white-space: nowrap;
         padding: 10px 2px; font-size: 13px; font-weight: 600;
         color: var(--text-muted); cursor: pointer;
         border-bottom: 2px solid transparent; margin-bottom: -1px;
     }
     .mg-subtab.active { color: var(--brand-text); border-bottom-color: #f97316; }
+    /* How many rows are behind a tab, so the client knows before clicking.
+       The influencer tab is empty on every account today and saying so on
+       the tab itself is kinder than making them open it to find out. */
+    .mg-subtab-count { display: inline-block; margin-left: 7px; padding: 1px 7px; border-radius: 999px;
+        background: var(--border-color); color: var(--text-muted); font-size: 11px; font-weight: 700; line-height: 1.6; }
+    .mg-subtab.active .mg-subtab-count { background: rgba(249,115,22,0.12); color: var(--brand-text); }
 
     /* Master-list table */
     /*
@@ -668,7 +680,8 @@
                  events, who is booked for when, and what each booking costs. --}}
             <div class="mg-subtabs" style="padding:0 18px;" role="tablist">
                 <button type="button" class="mg-subtab active" data-subtab="events" role="tab" aria-selected="true">Events List</button>
-                <button type="button" class="mg-subtab" data-subtab="schedule" role="tab" aria-selected="false">Booked Schedule</button>
+                <button type="button" class="mg-subtab" data-subtab="schedule" role="tab" aria-selected="false">Professional Schedule<span class="mg-subtab-count">{{ $schedule['professional']->count() }}</span></button>
+                <button type="button" class="mg-subtab" data-subtab="influencers" role="tab" aria-selected="false">Influencer Schedule<span class="mg-subtab-count">{{ $schedule['influencer']->count() }}</span></button>
                 <button type="button" class="mg-subtab" data-subtab="payments" role="tab" aria-selected="false">Payment Tracker</button>
             </div>
             <div data-subpane="events">
@@ -774,37 +787,16 @@
             @endif
             </div>{{-- /events subpane --}}
 
-            {{-- Who is booked, for which event, when. --}}
+            {{-- Who is booked, for which event, when. Two tabs, because the
+                 two kinds of account are two different jobs to a client:
+                 Peter, 20 Oct, and Ali, 27 Oct. ?sub=schedule still lands on
+                 the professional half, which is where it always landed. --}}
             <div data-subpane="schedule" hidden>
-                <div style="overflow-x:auto;">
-                    <table class="mg-table">
-                        <thead><tr><th style="padding-left:18px;">Booked with</th><th>Event</th><th>Service</th><th>Date</th><th>Time</th><th style="padding-right:18px;">Status</th></tr></thead>
-                        <tbody>
-                            @forelse($bookings->whereNotIn('status', \App\Domain\Finance\ClientTotals::VOID_STATUSES) as $b)
-                                <tr>
-                                    {{-- The name, and which kind of account it is.
-                                         Sir Peter, 20 Oct: "Influencer schedule will be
-                                         add on my events like professional schedule."
-                                         The rows were already here -- the table has never
-                                         filtered by role -- but every one of them was filed
-                                         under a column headed Professional, so a booked
-                                         influencer was shown as one. --}}
-                                    <td style="padding-left:18px;">
-                                        <div class="ev-name">{{ $b->supplier?->name ?? 'Account removed' }}</div>
-                                        <x-role-chip :user="$b->supplier" />
-                                    </td>
-                                    <td>@if($b->event)<a href="{{ route('client.events.show', $b->event_id) }}">{{ $b->event->title }}</a>@else, @endif</td>
-                                    <td>{{ $b->category?->name ?? '—' }}</td>
-                                    <td>{{ $b->event?->starts_at?->format('M d, Y') ?? 'Not scheduled' }}</td>
-                                    <td>{{ $b->event?->timeLabel() ?? '—' }}</td>
-                                    <td style="padding-right:18px;"><span class="mg-status-pill mg-status-{{ $b->status }}">{{ $b->status === 'requested' ? 'Awaiting reply' : ucfirst($b->status) }}</span></td>
-                                </tr>
-                            @empty
-                                <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">Nobody booked yet.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                @include('client.events._schedule', ['rows' => $schedule['professional'], 'noun' => 'professional'])
+            </div>
+
+            <div data-subpane="influencers" hidden>
+                @include('client.events._schedule', ['rows' => $schedule['influencer'], 'noun' => 'influencer'])
             </div>
 
             {{-- What each booking costs and where the money stands. --}}
@@ -1065,7 +1057,7 @@
 
     // Opening a named view went with the views; ?tab= means nothing here now.
 
-    // Events List / Booked Schedule / Payment Tracker.
+    // Events List / the two schedules / Payment Tracker.
     // Delegated: the list card is swapped for a fresh copy on every filter,
     // and a listener bound to the old buttons would die with them.
     document.addEventListener('click', function (e) {

@@ -260,16 +260,45 @@ class ClientEventController extends Controller
             ->get(['id', 'title', 'starts_at']);
 
         /*
-         * The two sub-tabs beside the list — "Professional Schedule" and
-         * "Payment Tracker" — were plain text that did nothing when clicked.
-         * They are the same bookings seen two ways: who is booked for when,
-         * and what each one costs and whether it is paid.
+         * The sub-tabs beside the list were plain text that did nothing when
+         * clicked. They are the same bookings seen two ways: who is booked for
+         * when, and what each one costs and whether it is paid.
+         *
+         * primary_role is selected because the schedule is split on it below.
+         * Without it SupplierProfile falls back to the roles resolver, which is
+         * a permissions query per row of the table.
          */
         $bookings = (clone $bookingBase)
-            ->with(['supplier:id,name', 'event:id,title,starts_at,ends_at', 'category:id,name'])
+            ->with(['supplier:id,name,primary_role', 'event:id,title,starts_at,ends_at', 'category:id,name'])
             ->get()
             ->sortBy(fn ($b) => $b->event?->starts_at?->timestamp ?? PHP_INT_MAX)
             ->values();
+
+        /*
+         * Peter, 20 October: "Influencer schedule will be add on my events like
+         * professional schedule." That was answered in October by naming each
+         * kind on its row, which stopped the screen calling an influencer a
+         * professional but left both kinds in one list. A client holding both
+         * reads past one to find the other, so the schedule is now two tabs.
+         *
+         * Split on SupplierProfile::noun, the same source the role chip, the
+         * profile link and the message button read, so a booking cannot sit
+         * under Influencer Schedule and offer a professional profile. noun()
+         * answers "professional" for anything that is not an influencer, which
+         * is also where a booking whose account was deleted lands: the two
+         * buckets together are always the whole schedule.
+         *
+         * Cancelled and declined bookings are left out of both, as they were
+         * left out of the single table before them.
+         */
+        $booked = $bookings->reject(
+            fn ($b) => in_array($b->status, \App\Domain\Finance\ClientTotals::VOID_STATUSES, true)
+        );
+
+        $schedule = [
+            'professional' => $booked->filter(fn ($b) => \App\Support\SupplierProfile::noun($b->supplier) !== 'influencer')->values(),
+            'influencer'   => $booked->filter(fn ($b) => \App\Support\SupplierProfile::noun($b->supplier) === 'influencer')->values(),
+        ];
 
         /*
          * The calendar tab: a day, a week or a month, in the address so it
@@ -329,7 +358,7 @@ class ClientEventController extends Controller
         return view('client.events.index', compact(
             'events', 'stats', 'calendar', 'categories',
             'totalSpent', 'proStatus', 'payment', 'deadlines', 'activity',
-            'overview', 'bookings', 'period', 'payRows', 'upcomingPayments'
+            'overview', 'schedule', 'period', 'payRows', 'upcomingPayments'
         ) + [
             'statuses' => \App\Models\Event::LIST_STAGES,
             'eventTypeOptions' => Event::where('client_id', $request->user()->id)->whereNotNull('event_type')

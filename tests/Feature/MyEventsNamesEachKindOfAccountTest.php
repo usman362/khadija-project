@@ -116,11 +116,23 @@ class MyEventsNamesEachKindOfAccountTest extends TestCase
     // ── What the screen calls things ─────────────────────────
 
     /**
-     * No heading on the page claims everyone booked is a professional.
+     * No heading covering everybody calls everybody a professional.
      *
      * The screen as a whole, not one string: the tab, the column headers, the
      * status rails and the empty state each said it in their own words, which
      * is why fixing one of them would have left the screen still saying it.
+     *
+     * Two of the strings this test used to ban came back on 27 October, and
+     * came back correct. "Professional Schedule" and "No professionals booked
+     * yet" were lies when one tab held both kinds of account; they are now the
+     * name and the empty state of the professional-only tab, sitting beside an
+     * influencer-only tab with its own. A word under a heading that filters to
+     * that role is not a claim about anybody else.
+     *
+     * What is still banned is a heading that covers the whole screen, or the
+     * whole of one tab, and names one role for all of it. The real invariant
+     * is tested below: an influencer must not appear under the professional
+     * tab, which no string ban can check.
      */
     public function test_no_heading_files_everybody_as_a_professional(): void
     {
@@ -129,14 +141,124 @@ class MyEventsNamesEachKindOfAccountTest extends TestCase
         $html = $this->page();
 
         foreach ([
-            'Professional Schedule',
             'Professional Status',
             'Recent Professional Activity',
-            'No professionals booked yet',
             'Professionals booked',
         ] as $claim) {
             $this->assertStringNotContainsString($claim, $html, "The screen still says \"{$claim}\".");
         }
+    }
+
+    // ── Two schedules, one kind each ─────────────────────────
+
+    /**
+     * Both tabs exist, and each is labelled for the kind it holds.
+     *
+     * Ali, 27 October: "yahan 2 tabs hone chaiye influencer schedule and
+     * professional schedule".
+     */
+    public function test_the_schedule_is_two_tabs_one_for_each_kind(): void
+    {
+        $html = $this->page();
+
+        $this->assertStringContainsString('data-subtab="schedule"', $html);
+        $this->assertStringContainsString('Professional Schedule', $html);
+        $this->assertStringContainsString('data-subtab="influencers"', $html);
+        $this->assertStringContainsString('Influencer Schedule', $html);
+
+        foreach (['schedule', 'influencers'] as $pane) {
+            $this->assertStringContainsString(
+                'data-subpane="' . $pane . '"',
+                $html,
+                "The {$pane} tab has no panel behind it.",
+            );
+        }
+    }
+
+    /**
+     * An influencer booking sits under Influencer Schedule and nowhere else.
+     *
+     * This is the assertion the string bans were standing in for. A tab headed
+     * "Professional Schedule" is only honest while nothing but professionals is
+     * inside it.
+     */
+    public function test_an_influencer_is_not_filed_under_the_professional_tab(): void
+    {
+        $influencer = $this->person('influencer');
+        $pro        = $this->person('professional');
+
+        $this->bookingWith($influencer);
+        $this->bookingWith($pro);
+
+        $html = $this->page();
+
+        $professionalPane = $this->pane($html, 'schedule');
+        $influencerPane   = $this->pane($html, 'influencers');
+
+        $this->assertStringContainsString($this->asShown($pro->name), $professionalPane);
+        $this->assertStringNotContainsString($this->asShown($influencer->name), $professionalPane);
+
+        $this->assertStringContainsString($this->asShown($influencer->name), $influencerPane);
+        $this->assertStringNotContainsString($this->asShown($pro->name), $influencerPane);
+    }
+
+    /** Each tab says how many rows are behind it before you open it. */
+    public function test_each_tab_carries_its_own_count(): void
+    {
+        $this->bookingWith($this->person('professional'));
+        $this->bookingWith($this->person('professional'));
+        $this->bookingWith($this->person('influencer'));
+
+        $html = $this->page();
+
+        $this->assertSame('2', $this->countOn($html, 'schedule'));
+        $this->assertSame('1', $this->countOn($html, 'influencers'));
+    }
+
+    /**
+     * A cancelled booking is on neither schedule.
+     *
+     * The single table excluded them; two tables that between them hold more
+     * than the one did would be a change nobody asked for.
+     */
+    public function test_a_cancelled_booking_is_on_neither_schedule(): void
+    {
+        $pro = $this->person('professional');
+
+        $this->bookingWith($pro)->update(['status' => 'cancelled']);
+
+        $html = $this->page();
+
+        $this->assertStringNotContainsString($this->asShown($pro->name), $this->pane($html, 'schedule'));
+        $this->assertSame('0', $this->countOn($html, 'schedule'));
+    }
+
+    /** The markup of one named sub-pane, from its opening tag to the next one. */
+    private function pane(string $html, string $name): string
+    {
+        $start = strpos($html, 'data-subpane="' . $name . '"');
+
+        $this->assertNotFalse($start, "There is no \"{$name}\" pane on the page.");
+
+        $next = strpos($html, 'data-subpane="', $start + 20);
+
+        return $next === false ? substr($html, $start) : substr($html, $start, $next - $start);
+    }
+
+    /** The number printed on one tab. */
+    private function countOn(string $html, string $name): string
+    {
+        $this->assertSame(
+            1,
+            preg_match(
+                '/data-subtab="' . preg_quote($name, '/') . '"[^>]*>[^<]*<span class="mg-subtab-count">\s*(\d+)\s*<\/span>/',
+                $html,
+                $m,
+            ),
+            "The \"{$name}\" tab is not showing a count.",
+        );
+
+        return $m[1];
     }
 
     /** An influencer the client booked is named as an influencer. */
