@@ -69,7 +69,7 @@ class LoginController extends Controller
     /** R56: three, not Laravel's five. */
     public function maxAttempts(): int
     {
-        return LoginLockout::MAX_ATTEMPTS;
+        return LoginLockout::maxAttempts();
     }
 
     /** R56: a rolling 24 hours, not Laravel's one minute. */
@@ -150,7 +150,7 @@ class LoginController extends Controller
         if (LoginLockout::isLocked($email)) {
             throw ValidationException::withMessages([
                 $this->username() => [
-                    'For your security this account is paused after ' . LoginLockout::MAX_ATTEMPTS
+                    'For your security this account is paused after ' . LoginLockout::maxAttempts()
                     . ' incorrect passwords. Reset your password to sign in again.',
                 ],
             ])->status(423);

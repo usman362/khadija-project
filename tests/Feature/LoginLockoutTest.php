@@ -57,36 +57,48 @@ class LoginLockoutTest extends TestCase
         ]);
     }
 
-    public function test_two_wrong_passwords_do_not_lock_the_account(): void
+    /**
+     * Use up every attempt but one.
+     *
+     * Written as "wrong-one, wrong-two" when the limit was three. Sir Peter
+     * raised it to ten on 26 October, and these tests went red while the
+     * behaviour they describe was unchanged: they had the number baked in
+     * rather than reading the rule. They count from the rule now.
+     */
+    private function nearlyLockIt(): void
+    {
+        foreach (range(1, LoginLockout::maxAttempts() - 1) as $i) {
+            $this->attempt('wrong-' . $i);
+        }
+    }
+
+    public function test_using_all_but_one_attempt_does_not_lock_the_account(): void
     {
         $user = $this->account();
 
-        $this->attempt('wrong-one');
-        $this->attempt('wrong-two');
+        $this->nearlyLockIt();
 
         $this->assertNull($user->fresh()->login_locked_at);
         $this->assertSame(1, LoginLockout::remaining('someone@example.com'));
     }
 
-    public function test_the_right_password_still_works_after_two_failures(): void
+    public function test_the_right_password_still_works_with_one_attempt_left(): void
     {
         $user = $this->account();
 
-        $this->attempt('wrong-one');
-        $this->attempt('wrong-two');
+        $this->nearlyLockIt();
         $this->attempt(self::PASSWORD);
 
         $this->assertAuthenticatedAs($user);
         $this->assertNull($user->fresh()->login_locked_at);
     }
 
-    public function test_the_third_wrong_password_locks_the_account(): void
+    public function test_the_last_wrong_password_locks_the_account(): void
     {
         $user = $this->account();
 
-        $this->attempt('wrong-one');
-        $this->attempt('wrong-two');
-        $this->attempt('wrong-three');
+        $this->nearlyLockIt();
+        $this->attempt('one-too-many');
 
         $this->assertNotNull($user->fresh()->login_locked_at);
     }
@@ -97,9 +109,8 @@ class LoginLockoutTest extends TestCase
         // the lock would be a speed bump rather than a lock.
         $user = $this->account();
 
-        $this->attempt('wrong-one');
-        $this->attempt('wrong-two');
-        $this->attempt('wrong-three');
+        $this->nearlyLockIt();
+        $this->attempt('one-too-many');
         $this->attempt(self::PASSWORD);
 
         $this->assertGuest();
@@ -111,9 +122,8 @@ class LoginLockoutTest extends TestCase
         // limiter's own 24-hour window has expired here; the lock has not.
         $user = $this->account();
 
-        $this->attempt('wrong-one');
-        $this->attempt('wrong-two');
-        $this->attempt('wrong-three');
+        $this->nearlyLockIt();
+        $this->attempt('one-too-many');
 
         $this->travel(25)->hours();
         RateLimiter::clear('login-lock:someone@example.com');
@@ -148,8 +158,7 @@ class LoginLockoutTest extends TestCase
         // account whose message omits it is a dead end.
         $this->account();
 
-        $this->attempt('wrong-one');
-        $this->attempt('wrong-two');
+        $this->nearlyLockIt();
         $response = $this->attempt('wrong-three');
 
         $response->assertSessionHasErrors('email');
@@ -179,8 +188,7 @@ class LoginLockoutTest extends TestCase
         // Two failures today and one tomorrow is not three in a day.
         $user = $this->account();
 
-        $this->attempt('wrong-one');
-        $this->attempt('wrong-two');
+        $this->nearlyLockIt();
 
         $this->travel(25)->hours();
         RateLimiter::clear('login-lock:someone@example.com');   // the window has passed

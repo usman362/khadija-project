@@ -112,4 +112,22 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Sign-in lockout (rule R56)
+    |--------------------------------------------------------------------------
+    |
+    | How many incorrect passwords an email address may collect in a rolling
+    | 24 hours before the account is shut until somebody lifts it.
+    |
+    | R56 said three. Sir Peter raised it to ten on 26 October, after being
+    | locked out of the shared client account twice in one afternoon: the count
+    | is kept per address rather than per person, so several people sharing one
+    | login have the whole allowance between them.
+    |
+    */
+    'lockout' => [
+        'attempts' => (int) env('LOGIN_LOCKOUT_ATTEMPTS', \App\Support\LoginLockout::DEFAULT_ATTEMPTS),
+    ],
+
 ];

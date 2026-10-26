@@ -50,7 +50,7 @@ class AnAdminCanLetSomebodyBackInTest extends TestCase
     {
         $user = User::factory()->create(['email' => $email, 'password' => 'their-password']);
 
-        for ($i = 0; $i < LoginLockout::MAX_ATTEMPTS; $i++) {
+        for ($i = 0; $i < LoginLockout::maxAttempts(); $i++) {
             LoginLockout::recordFailure($email);
         }
 

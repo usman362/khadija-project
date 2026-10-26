@@ -6,8 +6,21 @@ use App\Models\User;
 use Illuminate\Support\Facades\RateLimiter;
 
 /**
- * Rule R56 — max 3 incorrect password attempts per rolling 24 hours; the third
- * failure locks the account until a password reset is completed.
+ * Rule R56 — a run of incorrect passwords within a rolling 24 hours locks the
+ * account until a password reset is completed.
+ *
+ * R56 SAID THREE. It is ten now, on Sir Peter's instruction of 26 October,
+ * after he was shut out of the shared client account twice in an afternoon:
+ * "there are many users trying to access it so 3 incorrect passwords limits
+ * should not be the issue". He is right about this account. The count is kept
+ * per address, not per person, so several people sharing one login have three
+ * attempts between them, and one of them mistyping twice spends most of it.
+ *
+ * Ten still stops guessing: a password worth having is not found in ten tries,
+ * and the lock after them is permanent until somebody lifts it rather than
+ * expiring on a timer.
+ *
+ * The figure is a setting now, so the next revision of it needs no code.
  *
  * Two halves that have to work together:
  *
@@ -26,8 +39,21 @@ use Illuminate\Support\Facades\RateLimiter;
  */
 final class LoginLockout
 {
-    public const MAX_ATTEMPTS = 3;
+    /** The agreed default. `config('auth.lockout.attempts')` overrides it. */
+    public const DEFAULT_ATTEMPTS = 10;
     public const WINDOW_HOURS = 24;
+
+    /**
+     * How many wrong passwords an address gets before it is shut.
+     *
+     * Read through a method rather than used as a constant so the number can
+     * be changed without a deploy. Everything that shows it to a person reads
+     * this too, so the screen and the rule cannot disagree.
+     */
+    public static function maxAttempts(): int
+    {
+        return max(1, (int) config('auth.lockout.attempts', self::DEFAULT_ATTEMPTS));
+    }
 
     /** Is this account locked out until it resets its password? */
     public static function isLocked(?string $email): bool
@@ -45,7 +71,7 @@ final class LoginLockout
     {
         RateLimiter::hit(self::key($email), self::WINDOW_HOURS * 3600);
 
-        if (RateLimiter::attempts(self::key($email)) < self::MAX_ATTEMPTS) {
+        if (RateLimiter::attempts(self::key($email)) < self::maxAttempts()) {
             return false;
         }
 
@@ -82,7 +108,7 @@ final class LoginLockout
     /** How many tries are left before the account locks. */
     public static function remaining(?string $email): int
     {
-        return max(0, self::MAX_ATTEMPTS - RateLimiter::attempts(self::key($email)));
+        return max(0, self::maxAttempts() - RateLimiter::attempts(self::key($email)));
     }
 
     private static function key(?string $email): string

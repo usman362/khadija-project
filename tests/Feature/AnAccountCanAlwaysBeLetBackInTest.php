@@ -31,7 +31,7 @@ class AnAccountCanAlwaysBeLetBackInTest extends TestCase
     {
         $user = User::factory()->create(['email' => $email]);
 
-        for ($i = 0; $i < LoginLockout::MAX_ATTEMPTS; $i++) {
+        for ($i = 0; $i < LoginLockout::maxAttempts(); $i++) {
             LoginLockout::recordFailure($email);
         }
 
@@ -123,6 +123,63 @@ class AnAccountCanAlwaysBeLetBackInTest extends TestCase
         $this->artisan('login:unlock', ['email' => 'nobody@gigresource.com'])->assertFailed();
     }
 
+    // ── How many tries somebody gets ─────────────────────────
+
+    /**
+     * Ten, which is Sir Peter's revision of R56 on 26 October.
+     *
+     * He was shut out of the shared client account twice in an afternoon:
+     * "there are many users trying to access it so 3 incorrect passwords
+     * limits should not be the issue". The count is per address, not per
+     * person, so several people sharing one login had three attempts between
+     * them.
+     */
+    public function test_the_limit_is_the_one_he_asked_for(): void
+    {
+        $this->assertSame(10, LoginLockout::maxAttempts());
+    }
+
+    /** Nine wrong passwords is still nine chances, not a lock. */
+    public function test_it_does_not_lock_before_the_limit(): void
+    {
+        $email = 'nearly@gigresource.com';
+        User::factory()->create(['email' => $email]);
+
+        foreach (range(1, LoginLockout::maxAttempts() - 1) as $i) {
+            LoginLockout::recordFailure($email);
+
+            $this->assertFalse(LoginLockout::isLocked($email), "Locked on attempt {$i}.");
+        }
+
+        LoginLockout::recordFailure($email);
+
+        $this->assertTrue(LoginLockout::isLocked($email), 'It never locked at all.');
+    }
+
+    /**
+     * And the screen quotes the real figure.
+     *
+     * The message was written with the number spelled into it once. A rule
+     * that changes and a sentence that does not is how a screen starts lying.
+     */
+    public function test_the_message_quotes_the_real_limit(): void
+    {
+        $user = $this->locked();
+
+        $message = $this->post(route('login'), ['email' => $user->email, 'password' => 'whatever'])
+            ->getSession()->get('errors')->first('email');
+
+        $this->assertStringContainsString((string) LoginLockout::maxAttempts(), $message);
+    }
+
+    /** It is a setting, so the next revision needs no code. */
+    public function test_the_limit_can_be_changed_without_touching_code(): void
+    {
+        config(['auth.lockout.attempts' => 4]);
+
+        $this->assertSame(4, LoginLockout::maxAttempts());
+    }
+
     // ── The lock itself is unchanged ─────────────────────────
 
     /**
@@ -188,7 +245,7 @@ class AnAccountCanAlwaysBeLetBackInTest extends TestCase
     {
         $email = 'nobody@gigresource.com';
 
-        for ($i = 0; $i < LoginLockout::MAX_ATTEMPTS; $i++) {
+        for ($i = 0; $i < LoginLockout::maxAttempts(); $i++) {
             LoginLockout::recordFailure($email);
         }
 
