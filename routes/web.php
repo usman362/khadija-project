@@ -631,7 +631,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // ── Admin Influencer Management ───────────────────────────────
-    Route::prefix('app/influencers')->name('app.influencers.')->middleware('role:admin')->group(function () {
+    Route::prefix('admin/influencers')->name('app.influencers.')->middleware('role:admin')->group(function () {
         Route::get('/', [\App\Http\Controllers\Dashboard\AdminInfluencerController::class, 'index'])
             ->middleware('permission:influencers.view_any')->name('index');
         Route::get('/payouts', [\App\Http\Controllers\Dashboard\AdminInfluencerController::class, 'payouts'])
@@ -649,7 +649,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // ── Admin AI Tools Control ────────────────────────────────────
-    Route::prefix('app/ai-tools')->name('app.ai-tools-admin.')->middleware('role:admin')->group(function () {
+    Route::prefix('admin/ai-tools')->name('app.ai-tools-admin.')->middleware('role:admin')->group(function () {
         Route::get('/', [\App\Http\Controllers\Dashboard\AdminAiToolController::class, 'index'])->name('index');
         Route::post('/{key}', [\App\Http\Controllers\Dashboard\AdminAiToolController::class, 'update'])->name('update');
     });
@@ -1307,7 +1307,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/app/membership-plans/history', [MembershipPlanPageController::class, 'history'])->middleware('permission:membership_plans.view_any')->name('app.membership-plans.history');
 
     // ── Admin Panel (role:admin required) ──────────────────────────────
-    Route::prefix('app/admin')->middleware('role:admin')->group(function () {
+    Route::prefix('admin')->middleware('role:admin')->group(function () {
         // Admin Profile
         Route::get('/profile', [AdminProfileController::class, 'index'])->name('app.admin.profile.index');
         Route::patch('/profile/general', [AdminProfileController::class, 'updateGeneral'])->name('app.admin.profile.update.general');
@@ -1458,18 +1458,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/app/agreement-log', [AgreementLogPageController::class, 'index'])->middleware('permission:agreement_log.view_any')->name('app.agreement-log.index');
 
     // ── Admin Deletion Requests ──────────────────────────────
-    Route::prefix('app/admin/deletion-requests')->name('app.admin.deletion-requests.')->middleware('role:admin')->group(function () {
+    Route::prefix('admin/deletion-requests')->name('app.admin.deletion-requests.')->middleware('role:admin')->group(function () {
         Route::get('/', [\App\Http\Controllers\Dashboard\AdminUserDeletionController::class, 'index'])->name('index');
         Route::post('/{user}/cancel', [\App\Http\Controllers\Dashboard\AdminUserDeletionController::class, 'cancel'])->name('cancel');
     });
 
     // ── Admin Activity Log ──────────────────────────────────
-    Route::get('/app/admin/activity-logs', [\App\Http\Controllers\Dashboard\AdminActivityLogController::class, 'index'])
+    Route::get('/admin/activity-logs', [\App\Http\Controllers\Dashboard\AdminActivityLogController::class, 'index'])
         ->middleware('role:admin')
         ->name('app.admin.activity-logs.index');
 
     // ── Admin Blog Management ───────────────────────────────
-    Route::prefix('app/admin/blog')->name('app.admin.blog.')->middleware('role:admin')->group(function () {
+    Route::prefix('admin/blog')->name('app.admin.blog.')->middleware('role:admin')->group(function () {
         // Categories
         Route::get('/categories',             [AdminBlogCategoryController::class, 'index'])->name('categories.index');
         Route::post('/categories',            [AdminBlogCategoryController::class, 'store'])->name('categories.store');
@@ -1485,27 +1485,27 @@ Route::middleware('auth')->group(function () {
         Route::delete('/posts/{post}',        [AdminBlogPostController::class, 'destroy'])->name('posts.destroy');
     });
 
-    Route::get('/app/users', [UserAccessPageController::class, 'index'])->middleware(['role:admin', 'permission:users.view_any'])->name('app.users.index');
-    Route::post('/app/users', [UserAccessPageController::class, 'store'])->middleware(['role:admin', 'permission:users.create'])->name('app.users.store');
-    Route::patch('/app/users/{user}', [UserAccessPageController::class, 'update'])->middleware(['role:admin', 'permission:users.update'])->name('app.users.update');
-    Route::delete('/app/users/{user}', [UserAccessPageController::class, 'destroy'])->middleware(['role:admin', 'permission:users.delete'])->name('app.users.destroy');
+    Route::get('/admin/users', [UserAccessPageController::class, 'index'])->middleware(['role:admin', 'permission:users.view_any'])->name('app.users.index');
+    Route::post('/admin/users', [UserAccessPageController::class, 'store'])->middleware(['role:admin', 'permission:users.create'])->name('app.users.store');
+    Route::patch('/admin/users/{user}', [UserAccessPageController::class, 'update'])->middleware(['role:admin', 'permission:users.update'])->name('app.users.update');
+    Route::delete('/admin/users/{user}', [UserAccessPageController::class, 'destroy'])->middleware(['role:admin', 'permission:users.delete'])->name('app.users.destroy');
     /*
      * Lift an R56 login lock. Admin only, behind the same permission as every
      * other change on that screen: somebody who can already set this user's
      * password and delete them is not gaining anything by also being able to
      * unlock them. See UserAccessPageController::unlock.
      */
-    Route::post('/app/users/{user}/unlock', [UserAccessPageController::class, 'unlock'])->middleware(['role:admin', 'permission:users.update'])->name('app.users.unlock');
+    Route::post('/admin/users/{user}/unlock', [UserAccessPageController::class, 'unlock'])->middleware(['role:admin', 'permission:users.update'])->name('app.users.unlock');
 
-    Route::get('/app/roles', [RolePageController::class, 'index'])->middleware(['role:admin', 'permission:roles.view_any'])->name('app.roles.index');
-    Route::post('/app/roles', [RolePageController::class, 'store'])->middleware(['role:admin', 'permission:roles.create'])->name('app.roles.store');
-    Route::patch('/app/roles/{role}', [RolePageController::class, 'update'])->middleware(['role:admin', 'permission:roles.update'])->name('app.roles.update');
-    Route::delete('/app/roles/{role}', [RolePageController::class, 'destroy'])->middleware(['role:admin', 'permission:roles.delete'])->name('app.roles.destroy');
+    Route::get('/admin/roles', [RolePageController::class, 'index'])->middleware(['role:admin', 'permission:roles.view_any'])->name('app.roles.index');
+    Route::post('/admin/roles', [RolePageController::class, 'store'])->middleware(['role:admin', 'permission:roles.create'])->name('app.roles.store');
+    Route::patch('/admin/roles/{role}', [RolePageController::class, 'update'])->middleware(['role:admin', 'permission:roles.update'])->name('app.roles.update');
+    Route::delete('/admin/roles/{role}', [RolePageController::class, 'destroy'])->middleware(['role:admin', 'permission:roles.delete'])->name('app.roles.destroy');
 
-    Route::get('/app/permissions', [PermissionPageController::class, 'index'])->middleware(['role:admin', 'permission:permissions.view_any'])->name('app.permissions.index');
-    Route::post('/app/permissions', [PermissionPageController::class, 'store'])->middleware(['role:admin', 'permission:permissions.create'])->name('app.permissions.store');
-    Route::patch('/app/permissions/{permission}', [PermissionPageController::class, 'update'])->middleware(['role:admin', 'permission:permissions.update'])->name('app.permissions.update');
-    Route::delete('/app/permissions/{permission}', [PermissionPageController::class, 'destroy'])->middleware(['role:admin', 'permission:permissions.delete'])->name('app.permissions.destroy');
+    Route::get('/admin/permissions', [PermissionPageController::class, 'index'])->middleware(['role:admin', 'permission:permissions.view_any'])->name('app.permissions.index');
+    Route::post('/admin/permissions', [PermissionPageController::class, 'store'])->middleware(['role:admin', 'permission:permissions.create'])->name('app.permissions.store');
+    Route::patch('/admin/permissions/{permission}', [PermissionPageController::class, 'update'])->middleware(['role:admin', 'permission:permissions.update'])->name('app.permissions.update');
+    Route::delete('/admin/permissions/{permission}', [PermissionPageController::class, 'destroy'])->middleware(['role:admin', 'permission:permissions.delete'])->name('app.permissions.destroy');
 
     // Core APIs
     Route::resource('events', EventController::class)
@@ -1516,6 +1516,34 @@ Route::middleware('auth')->group(function () {
     Route::resource('bookings', BookingController::class)->only(['index', 'store', 'show', 'update']);
     Route::resource('messages', MessageController::class)->only(['index', 'store', 'show']);
 });
+
+/*
+ * ── The admin pages moved from /app to /admin ───────────────────────────
+ *
+ * Ali, 27 October: "admin portal me prefix check kro sahi se admin/ hona
+ * chiaye". /app/users and /app/admin/categories were the admin dashboard
+ * wearing the name of the source directory, which is also how a deny rule
+ * written for that directory took 135 admin pages down in October.
+ *
+ * Only the admin-gated routes moved. /app/agreements, /app/bookings,
+ * /app/chat, /app/events, /app/membership-plans and /app/payments are
+ * reachable by clients and professionals as well, so filing them under
+ * /admin would have been a second wrong name rather than a fix.
+ *
+ * Route NAMES did not change. They are what the 317 route() calls in the
+ * views use, so the whole application followed the move without an edit.
+ *
+ * Registered after the real /app routes so those still win, and a redirect
+ * rather than a permanent one: a 301 would sit in every admin's browser
+ * cache and outlive a change of mind.
+ */
+Route::get('/app/{moved}', function (string $moved) {
+    // app/admin/categories -> admin/categories, app/users -> admin/users.
+    $path = preg_replace('#^admin/?#', '', $moved);
+
+    return redirect('/admin' . ($path === '' ? '' : '/' . $path));
+})->where('moved', '(admin|users|roles|permissions|influencers|ai-tools)(/.*)?')
+  ->name('app.moved-to-admin');
 
 // Payment Webhooks (no auth, no CSRF — verified via gateway signatures)
 Route::post('/webhooks/stripe', [PaymentWebhookController::class, 'stripe'])->name('webhooks.stripe');

@@ -33,10 +33,14 @@
     # of the block below, and leaving it out took the site down.
     #
     # The first version of these rules matched on the URL alone. The admin
-    # dashboard lives under /app/users, /app/admin/... and so on, which is the
-    # same first path segment as the app/ source directory, so 135 routes
-    # started answering 403 from the web server. The application never saw
-    # them.
+    # dashboard lived under /app/users, /app/admin/... and so on, the same
+    # first path segment as the app/ source directory, so 135 routes started
+    # answering 403 from the web server. The application never saw them.
+    #
+    # Those pages moved to /admin on 27 October, which takes the admin portal
+    # out of this rule's way for good. The condition still matters: /app
+    # remains the address of the agreements, bookings, chat, events,
+    # membership-plan and payment pages, which clients and professionals use.
     #
     # A source file exists on disk and is refused. A route does not exist on
     # disk and falls through to the front controller, which is what the rewrite

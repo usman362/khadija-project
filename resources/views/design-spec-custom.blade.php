@@ -309,7 +309,7 @@
             'title' => 'Reusable Design Systems',
             'desc' => 'One design serves many pages, high leverage deliverables.',
             'pages' => [
-                ['id' => 'D-20', 'title' => 'Profile Editor (1 design, 3 roles)', 'url' => '/client/profile · /professional/profile · /app/admin/profile',
+                ['id' => 'D-20', 'title' => 'Profile Editor (1 design, 3 roles)', 'url' => '/client/profile · /professional/profile · /admin/profile',
                     'purpose' => 'Personal info, password, notifications. Reused by client / professional / admin.',
                     'elements' => 'Sidebar tab nav (Basic · Address · Company · Social · Notifications · Security · Account), avatar card with upload, form grid per tab, danger zone (account deletion), cover banner for pro variant.'],
                 ['id' => 'D-21', 'title' => 'Messages / Chat (1 design, 2 roles)', 'url' => '/client/messages · /professional/messages',

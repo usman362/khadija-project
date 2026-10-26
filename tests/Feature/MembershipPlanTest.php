@@ -174,7 +174,7 @@ class MembershipPlanTest extends TestCase
     public function test_admin_can_create_plan(): void
     {
         $response = $this->actingAs($this->admin)
-            ->post('/app/admin/membership-plans', [
+            ->post('/admin/membership-plans', [
                 'name' => 'New Plan',
                 'price' => 9.99,
                 'billing_cycle' => '12_month',
@@ -198,7 +198,7 @@ class MembershipPlanTest extends TestCase
     public function test_admin_can_update_plan(): void
     {
         $response = $this->actingAs($this->admin)
-            ->patch("/app/admin/membership-plans/{$this->plan->id}", [
+            ->patch("/admin/membership-plans/{$this->plan->id}", [
                 'name' => 'Updated Plan',
                 'price' => 29.99,
                 'billing_cycle' => '18_month',
@@ -219,7 +219,7 @@ class MembershipPlanTest extends TestCase
     public function test_admin_can_delete_plan_without_subscribers(): void
     {
         $response = $this->actingAs($this->admin)
-            ->delete("/app/admin/membership-plans/{$this->plan->id}");
+            ->delete("/admin/membership-plans/{$this->plan->id}");
 
         $response->assertRedirect();
         $this->assertDatabaseMissing('membership_plans', ['id' => $this->plan->id]);
@@ -236,7 +236,7 @@ class MembershipPlanTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->admin)
-            ->delete("/app/admin/membership-plans/{$this->plan->id}");
+            ->delete("/admin/membership-plans/{$this->plan->id}");
 
         $response->assertRedirect();
         $response->assertSessionHas('error');
@@ -246,7 +246,7 @@ class MembershipPlanTest extends TestCase
     public function test_client_cannot_access_admin_management(): void
     {
         $response = $this->actingAs($this->client)
-            ->get('/app/admin/membership-plans');
+            ->get('/admin/membership-plans');
 
         $response->assertForbidden();
     }
@@ -254,7 +254,7 @@ class MembershipPlanTest extends TestCase
     public function test_admin_management_page_loads(): void
     {
         $response = $this->actingAs($this->admin)
-            ->get('/app/admin/membership-plans');
+            ->get('/admin/membership-plans');
 
         $response->assertOk();
         $response->assertViewIs('dashboard.membership-plans.admin');
