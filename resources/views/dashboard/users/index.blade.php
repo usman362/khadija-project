@@ -25,12 +25,33 @@
             @forelse($users as $user)
                 <tr>
                     <td>{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
+                    <td>
+                        {{ $user->email }}
+                        {{-- R56 locks an account after three wrong passwords and
+                             keeps it locked until a password reset is completed.
+                             Nothing on this screen said so, so an administrator
+                             could set a working password and watch the person stay
+                             shut out with no explanation anywhere. --}}
+                        @if($user->login_locked_at)
+                            <span class="badge bg-warning text-dark ms-1"
+                                  title="Locked after 3 incorrect passwords on {{ $user->login_locked_at->format('M j, Y g:i A') }}">Locked out</span>
+                        @endif
+                    </td>
                     <td>@forelse($user->roles as $role)<span class="badge bg-primary me-1">{{ $role->name }}</span>@empty<span class="text-muted">No role</span>@endforelse</td>
                     <td>@forelse($user->permissions as $permission)<span class="badge bg-secondary me-1">{{ $permission->name }}</span>@empty<span class="text-muted">Inherited only</span>@endforelse</td>
                     <td class="text-end">
                         @can('users.update')
                             <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editUserModal{{ $user->id }}">Edit</button>
+                            @if($user->login_locked_at)
+                                {{-- The only way out of an R56 lock was a password
+                                     reset email. On an address that cannot receive
+                                     mail, which the demo and admin accounts are,
+                                     that reset never arrives and the account is
+                                     simply shut. --}}
+                                <form method="POST" action="{{ route('app.users.unlock', $user) }}" class="d-inline">@csrf
+                                    <button class="btn btn-sm btn-outline-warning">Unlock</button>
+                                </form>
+                            @endif
                         @endcan
                         @can('users.delete')
                             @if(auth()->id() !== $user->id)

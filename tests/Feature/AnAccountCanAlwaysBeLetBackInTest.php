@@ -125,16 +125,42 @@ class AnAccountCanAlwaysBeLetBackInTest extends TestCase
 
     // ── The lock itself is unchanged ─────────────────────────
 
-    /** No web route lifts a lock, because that would be a way around it. */
-    public function test_nothing_on_the_web_can_lift_a_lock(): void
+    /**
+     * Nothing unlocks an account without being an administrator.
+     *
+     * This test used to demand that NO web route could lift a lock at all,
+     * which was the wrong rule written down too strongly. The objection is to
+     * a way AROUND the lock, and that is about who can reach it, not about
+     * HTTP. On 26 October the owner was locked out of an account whose address
+     * accepts no mail, so R56's only exit did not exist and neither did a
+     * screen: the console was the sole way back into his own site.
+     *
+     * An administrator can already set this user's password, change their
+     * email, alter their roles and delete them from the same page, so
+     * unlocking gives them nothing new. What must stay true is that nobody
+     * else can reach it.
+     */
+    public function test_only_an_admin_can_lift_a_lock_over_the_web(): void
     {
-        $offenders = collect(app('router')->getRoutes()->getRoutes())
-            ->filter(fn ($r) => str_contains(strtolower($r->uri()), 'unlock'))
-            ->map(fn ($r) => $r->uri())
-            ->values()
-            ->all();
+        $unlocks = collect(app('router')->getRoutes()->getRoutes())
+            ->filter(fn ($r) => str_contains(strtolower($r->uri()), 'unlock'));
 
-        $this->assertSame([], $offenders, 'These routes expose unlocking over HTTP.');
+        foreach ($unlocks as $route) {
+            $guards = $route->gatherMiddleware();
+
+            $this->assertContains('role:admin', $guards, $route->uri() . ' is not admin only.');
+            $this->assertContains('permission:users.update', $guards, $route->uri() . ' has no permission on it.');
+        }
+    }
+
+    /** And a signed-out stranger gets nowhere near it. */
+    public function test_a_stranger_cannot_reach_the_unlock_route(): void
+    {
+        $user = $this->locked();
+
+        $this->post(route('app.users.unlock', $user))->assertRedirect(route('login'));
+
+        $this->assertTrue(LoginLockout::isLocked($user->email), 'It unlocked for nobody in particular.');
     }
 
     /** Three wrong passwords still lock an account. */

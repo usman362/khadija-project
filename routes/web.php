@@ -1481,6 +1481,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/app/users', [UserAccessPageController::class, 'store'])->middleware(['role:admin', 'permission:users.create'])->name('app.users.store');
     Route::patch('/app/users/{user}', [UserAccessPageController::class, 'update'])->middleware(['role:admin', 'permission:users.update'])->name('app.users.update');
     Route::delete('/app/users/{user}', [UserAccessPageController::class, 'destroy'])->middleware(['role:admin', 'permission:users.delete'])->name('app.users.destroy');
+    /*
+     * Lift an R56 login lock. Admin only, behind the same permission as every
+     * other change on that screen: somebody who can already set this user's
+     * password and delete them is not gaining anything by also being able to
+     * unlock them. See UserAccessPageController::unlock.
+     */
+    Route::post('/app/users/{user}/unlock', [UserAccessPageController::class, 'unlock'])->middleware(['role:admin', 'permission:users.update'])->name('app.users.unlock');
 
     Route::get('/app/roles', [RolePageController::class, 'index'])->middleware(['role:admin', 'permission:roles.view_any'])->name('app.roles.index');
     Route::post('/app/roles', [RolePageController::class, 'store'])->middleware(['role:admin', 'permission:roles.create'])->name('app.roles.store');
