@@ -92,6 +92,19 @@ class MyEventsNamesEachKindOfAccountTest extends TestCase
         ]);
     }
 
+    /**
+     * A name as the page renders it.
+     *
+     * Blade escapes, so a faker name carrying an apostrophe ("Rod O'Hara")
+     * appears as Rod O&#039;Hara and a raw comparison fails on correct output.
+     * It passed alone for weeks and failed in the full suite the first time
+     * faker picked such a name.
+     */
+    private function asShown(string $name): string
+    {
+        return e($name);
+    }
+
     private function page(): string
     {
         return $this->actingAs($this->client)
@@ -135,7 +148,7 @@ class MyEventsNamesEachKindOfAccountTest extends TestCase
 
         $html = $this->page();
 
-        $this->assertStringContainsString($influencer->name, $html, 'The influencer is not on the schedule at all.');
+        $this->assertStringContainsString($this->asShown($influencer->name), $html, 'The influencer is not on the schedule at all.');
         $this->assertStringContainsString('Influencer', $html, 'They are on it, but not named as one.');
     }
 
@@ -148,7 +161,7 @@ class MyEventsNamesEachKindOfAccountTest extends TestCase
 
         $html = $this->page();
 
-        $this->assertStringContainsString($pro->name, $html);
+        $this->assertStringContainsString($this->asShown($pro->name), $html);
         $this->assertStringContainsString('Professional', $html);
     }
 
@@ -168,8 +181,8 @@ class MyEventsNamesEachKindOfAccountTest extends TestCase
 
         $html = $this->page();
 
-        $this->assertStringContainsString($pro->name, $html);
-        $this->assertStringContainsString($influencer->name, $html);
+        $this->assertStringContainsString($this->asShown($pro->name), $html);
+        $this->assertStringContainsString($this->asShown($influencer->name), $html);
 
         $this->assertSame(
             ['Influencer', 'Professional'],

@@ -29,17 +29,34 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # ONLY WHEN A REAL FILE IS THERE. This condition is the whole correctness
+    # of the block below, and leaving it out took the site down.
+    #
+    # The first version of these rules matched on the URL alone. The admin
+    # dashboard lives under /app/users, /app/admin/... and so on, which is the
+    # same first path segment as the app/ source directory, so 135 routes
+    # started answering 403 from the web server. The application never saw
+    # them.
+    #
+    # A source file exists on disk and is refused. A route does not exist on
+    # disk and falls through to the front controller, which is what the rewrite
+    # at the bottom of this file is for. Directory listings are already off
+    # through Options -Indexes.
+
     # The application's own directories, unless the path is a public asset.
     RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^(app|bootstrap|config|database|resources|routes|storage|tests|vendor|node_modules|docs)/ - [F,L]
 
     # Files that sit at the top of the project and describe how it is built.
+    RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^(artisan|composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml(\.dist)?|vite\.config\.js|postcss\.config\.js|tailwind\.config\.js)$ - [F,L]
 
     # Working files by extension. Exempt under /public/ as well: a client's
     # uploaded PDF lives there, and blocking the extension outright would stop
     # people downloading their own documents.
     RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule \.(md|sh|sql|ya?ml|lock|bak|old|orig|save|swp|dist)$ - [F,L]
 </IfModule>
 
