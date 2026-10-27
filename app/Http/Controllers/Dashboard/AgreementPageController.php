@@ -16,17 +16,40 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class AgreementPageController extends Controller
 {
     /**
+     * Only the two people the agreement is between, or an admin.
+     *
+     * The route middleware asks whether the account may use agreements at
+     * all, which client, professional and admin may. It cannot ask whether
+     * THIS agreement is theirs, and download() was the only method here that
+     * went on to ask. show(), reject(), generate() and regenerate() did not,
+     * so any signed-in account could read, or tear up, a contract between two
+     * strangers by changing the number in the address. reject() even logged
+     * their name against it as the party who refused.
+     */
+    private function assertParty(Request $request, Booking $booking): void
+    {
+        $user = $request->user();
+
+        abort_unless(
+            $user->isAdmin()
+                || $booking->client_id === $user->id
+                || $booking->supplier_id === $user->id,
+            403,
+            'Not your agreement',
+        );
+    }
+
+    /**
      * Stream the agreement as a downloadable PDF contract.
      * Only allowed once the agreement is fully accepted by both parties.
      */
     public function download(Request $request, Agreement $agreement, AgreementPdfService $pdf): StreamedResponse|RedirectResponse
     {
-        $user = $request->user();
+        abort_unless((bool) $agreement->booking, 404);
 
-        // Authorization — admin OR a party on the booking
-        $isParty = $agreement->booking
-            && ($agreement->booking->client_id === $user->id || $agreement->booking->supplier_id === $user->id);
-        abort_unless($user->isAdmin() || $isParty, 403, 'Not your agreement');
+        $this->assertParty($request, $agreement->booking);
+
+        $user = $request->user();
 
         // Block PDF until both sides have accepted
         if (! $agreement->isFullyAccepted()) {
@@ -80,6 +103,10 @@ class AgreementPageController extends Controller
     {
         $agreement->load(['booking.event', 'booking.client', 'booking.supplier', 'generator']);
 
+        abort_unless((bool) $agreement->booking, 404);
+
+        $this->assertParty($request, $agreement->booking);
+
         // Determine if current user is client or supplier
         $user = $request->user();
         $isClient = $agreement->booking->client_id === $user->id;
@@ -99,6 +126,8 @@ class AgreementPageController extends Controller
      */
     public function generate(Request $request, Booking $booking): RedirectResponse
     {
+        $this->assertParty($request, $booking);
+
         $booking->load(['event', 'client', 'supplier', 'conversation']);
 
         // Client controls whether the chat transcript is fed to the AI.
@@ -200,6 +229,10 @@ class AgreementPageController extends Controller
      */
     public function reject(Request $request, Agreement $agreement): RedirectResponse
     {
+        abort_unless((bool) $agreement->booking, 404);
+
+        $this->assertParty($request, $agreement->booking);
+
         $validated = $request->validate([
             'rejection_reason' => ['nullable', 'string', 'max:1000'],
         ]);
