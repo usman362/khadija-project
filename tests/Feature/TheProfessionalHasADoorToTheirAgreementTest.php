@@ -220,25 +220,28 @@ class TheProfessionalHasADoorToTheirAgreementTest extends TestCase
     // ── Honest about what is not built ───────────────────────
 
     /**
-     * The screen does not offer a pen it cannot use.
+     * The pen is not held out before there is something settled to sign.
      *
-     * On Monday this asserted the opposite half: that nothing was offered at
-     * all and the page said so. Tuesday built approving and declining, so what
-     * is left to be honest about is signing, which lands Thursday. A button
-     * that posts nowhere is worse than no button.
+     * This assertion has been rewritten twice as the week built under it, and
+     * both earlier versions were right at the time. On Monday it checked that
+     * nothing was offered at all and the page said so. On Tuesday, that
+     * approving and declining were offered and signing was not. Now signing is
+     * built, so what it checks is the rule that governs it: signing opens only
+     * once both sides approved the same version, and this agreement has no
+     * approvals on it at all.
      */
-    public function test_the_screen_does_not_offer_what_is_not_wired_yet(): void
+    public function test_the_screen_does_not_hold_out_the_pen_too_early(): void
     {
         $html = $this->actingAs($this->professional)
             ->get(route('professional.agreements.show', $this->agreement))
             ->assertSuccessful()
-            ->assertSee('Signing lands later this week', false)
+            ->assertSee('Not ready to sign', false)
             ->getContent();
 
         $this->assertSame(
             0,
-            preg_match_all('/action="[^"]*professional\/agreements\/\d+\/sign/i', $html),
-            'The screen is offering a signature that is not built yet.',
+            preg_match_all('/action="[^"]*professional\/agreements\/\d+\/sign"/i', $html),
+            'The screen is offering a signature on terms nobody has approved.',
         );
     }
 }

@@ -96,6 +96,29 @@ class Finalization extends Model
 
     public function completed(string $step): bool
     {
+        /*
+         * The contract step is the one a column cannot answer.
+         *
+         * It was answered by supplier_signed_at alone, which was true while
+         * the client's own signing stamped that column in the professional's
+         * name: both signatures arrived together, so either one stood for the
+         * pair. The professional signs for themselves from 28 October, and the
+         * two no longer arrive together.
+         *
+         * Read as one column it leaves a real hole. Once the professional has
+         * signed, the step counts as done and the deposit step opens, even
+         * where the CLIENT has not signed: they could pay for an agreement
+         * they never put their name to. Sir Peter, 27 October: "the client
+         * should never paid them directly before the agreement".
+         *
+         * Workspace::bothSigned is also version-aware, so terms changed after
+         * signing reopen this step rather than leaving the deposit open on a
+         * signature given to terms nobody saw.
+         */
+        if ($step === 'contract') {
+            return \App\Domain\Agreements\Workspace::bothSigned($this);
+        }
+
         $col = self::STEPS[$step][1] ?? null;
 
         return $col ? (bool) $this->{$col} : false;

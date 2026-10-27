@@ -1107,8 +1107,9 @@ Route::middleware('auth')->group(function () {
          * their signature was being stamped for them when the client signed.
          * The columns and the Workspace rules for their side already exist.
          *
-         * Approving and declining are here. Asking for a change is Wednesday
-         * and signing for themselves is Thursday.
+         * Reading, approving, declining, counter-proposing and signing. The
+         * last of those replaces the stand-in counter-signature the client's
+         * own signing used to stamp in the professional's name.
          */
         Route::get('/agreements', [ProfessionalAgreementController::class, 'index'])
             ->name('professional.agreements.index');
@@ -1118,6 +1119,10 @@ Route::middleware('auth')->group(function () {
             ->name('professional.agreements.approve');
         Route::post('/agreements/{finalization}/decline', [ProfessionalAgreementController::class, 'decline'])
             ->name('professional.agreements.decline');
+        Route::post('/agreements/{finalization}/request-changes', [ProfessionalAgreementController::class, 'requestChanges'])
+            ->name('professional.agreements.request-changes');
+        Route::post('/agreements/{finalization}/sign', [ProfessionalAgreementController::class, 'sign'])
+            ->name('professional.agreements.sign');
 
         // Contracts hub (contracts, proposals, earnings, gig opportunities, bids pipeline)
         // Merged into the Gig Operations Hub as its Contracts tab (R42,

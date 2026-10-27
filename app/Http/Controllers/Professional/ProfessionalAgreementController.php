@@ -124,6 +124,99 @@ class ProfessionalAgreementController extends Controller
     }
 
     /**
+     * Counter-propose: change the terms and send them back.
+     *
+     * Wednesday's item, "responding to an Edit Agreement request from the
+     * client". A professional who can only say "please change something"
+     * without saying what is not responding, they are asking the client to
+     * guess, so this is the same edit the client makes and goes through the
+     * same EditAgreement::submit. That raises the version, which takes every
+     * approval and signature on the old terms out of play, including their
+     * own: they are proposing terms nobody has agreed to yet.
+     */
+    public function requestChanges(Request $request, Finalization $finalization): RedirectResponse
+    {
+        $this->assertTheirs($request, $finalization);
+
+        $this->refuseIfSettled($finalization);
+
+        $data = $request->validate([
+            'terms'                 => ['required', 'array'],
+            'terms.scope'           => ['nullable', 'string', 'max:5000'],
+            'terms.agreed_price'    => ['nullable', 'numeric', 'min:0', 'max:9999999'],
+            'terms.service_start'   => ['nullable', 'date'],
+            'terms.service_end'     => ['nullable', 'date', 'after_or_equal:terms.service_start'],
+            'terms.schedule_notes'  => ['nullable', 'string', 'max:2000'],
+            'terms.deposit_percent' => ['nullable', 'integer', 'min:0', 'max:100'],
+            'terms.balance_due_on'  => ['nullable', 'date'],
+            'terms.payment_terms'   => ['nullable', 'string', 'max:2000'],
+            'summary'               => ['required', 'string', 'max:2000'],
+        ], [
+            'terms.service_end.after_or_equal' => 'The service cannot end before it starts.',
+            'summary.required' => 'Say what you are asking for and why. The client sees this.',
+        ]);
+
+        $changed = EditAgreement::submit($finalization, $request->user(), $data['terms'], $data['summary']);
+
+        if ($changed === []) {
+            return back()->with('status', 'Nothing was different, so the agreement is unchanged.');
+        }
+
+        AgreementNotices::changesSent($finalization->fresh(), $request->user(), $changed);
+
+        return redirect()
+            ->route('professional.agreements.show', $finalization)
+            ->with('status', 'Your changes were sent. The client has to approve them before anyone signs.');
+    }
+
+    /**
+     * Sign, as themselves.
+     *
+     * Thursday's item. Until now the client's own signing stamped a
+     * counter-signature in the professional's name, because the professional
+     * had no way to sign; that stand-in is gone and this is what replaces it.
+     *
+     * Two guards that are not formalities. Signing opens only once both sides
+     * approved the SAME version, because before that there is nothing settled
+     * to sign. And the version signed is recorded, so a price changed
+     * afterwards cannot leave a signature sitting under terms nobody saw.
+     */
+    public function sign(Request $request, Finalization $finalization): RedirectResponse
+    {
+        $this->assertTheirs($request, $finalization);
+
+        $this->refuseIfSettled($finalization);
+
+        abort_unless(
+            Workspace::signingOpen($finalization),
+            409,
+            'This agreement is not ready to sign: you both have to approve the same version first.',
+        );
+
+        $data = $request->validate([
+            'supplier_signature' => ['required', 'string', 'max:120'],
+            'agree'              => ['accepted'],
+        ], [
+            'supplier_signature.required' => 'Type your full name to sign.',
+            'agree.accepted'              => 'You need to accept the agreement to sign it.',
+        ]);
+
+        $finalization->forceFill([
+            'supplier_signature'      => $data['supplier_signature'],
+            'supplier_signed_at'      => now(),
+            'supplier_signed_version' => Workspace::version($finalization),
+        ])->save();
+
+        AgreementNotices::signed($finalization->fresh(), $request->user());
+
+        return redirect()
+            ->route('professional.agreements.show', $finalization)
+            ->with('status', Workspace::bothSigned($finalization->fresh())
+                ? 'Signed. Both signatures are in, and the client pays the deposit next.'
+                : 'Signed. It now waits on the client to sign.');
+    }
+
+    /**
      * Neither action applies to an agreement that is already over.
      *
      * Workspace quietly does nothing in both cases, which is right for the

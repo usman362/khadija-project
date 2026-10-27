@@ -57,6 +57,29 @@
     .pa-btn.off { color: #b91c1c; }
     .pa-acts-note { font-size: 12.5px; color: var(--text-muted); }
 
+    .pa-sign-f { display: block; margin-top: 10px; }
+    .pa-sign-f span { display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 5px; }
+    .pa-sign-f input { width: 100%; max-width: 360px; }
+    .pa-sign-ok { display: flex; gap: 9px; align-items: flex-start; margin-top: 12px; cursor: pointer;
+        font-size: 12.5px; line-height: 1.6; color: var(--text-secondary); }
+    .pa-sign-ok input { margin-top: 3px; flex-shrink: 0; }
+    .pa-err { margin: 6px 0 0; font-size: 12px; color: #dc2626; }
+
+    .pa-edit { margin-top: 18px; border-top: 1px dashed var(--border-color); padding-top: 14px; }
+    .pa-edit > summary { cursor: pointer; list-style: none; font-size: 13px; font-weight: 700; color: var(--text-secondary); }
+    .pa-edit > summary::-webkit-details-marker { display: none; }
+    .pa-edit > summary::before { content: '+ '; font-weight: 800; }
+    .pa-edit[open] > summary::before { content: '\2212 '; }
+    .pa-edit-note { margin: 12px 0 14px; font-size: 12.5px; line-height: 1.6; color: var(--text-muted); }
+    .pa-edit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px 16px; }
+    .pa-edit label, .pa-edit-wide { display: block; margin-bottom: 12px; }
+    .pa-edit label span { display: block; font-size: 11.5px; font-weight: 700; letter-spacing: .2px;
+        text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; }
+    .pa-edit input, .pa-edit textarea { width: 100%; padding: 9px 11px; font: inherit; font-size: 13px;
+        color: var(--text-primary); background: var(--bg-input, var(--bg-card-hover, rgba(255,255,255,.04)));
+        border: 1px solid var(--border-color); border-radius: var(--radius-sm); }
+    .pa-edit textarea { resize: vertical; }
+
 </style>
 @endpush
 
@@ -237,15 +260,118 @@
                     </form>
 
                     @if(! $canApprove)
-                        <span class="pa-acts-note">You approved version {{ $version }}. It waits on {{ $f->client?->name ?? 'the client' }}.</span>
+                        {{-- "It waits on the client" was said here whenever the
+                             professional had approved, which stopped being true
+                             the moment the client approved as well: it then
+                             waits on the signatures, and the pen is right
+                             below. --}}
+                        <span class="pa-acts-note">
+                            You approved version {{ $version }}.
+                            @if(! $ws::clientApproved($f))
+                                It waits on {{ $f->client?->name ?? 'the client' }} to approve it too.
+                            @endif
+                        </span>
                     @endif
                 </div>
 
-                <div class="pa-soon" style="margin-top:14px;">
-                    <b>Signing lands later this week.</b>
-                    Once you both approve the same version the pen opens here. To ask for a different
-                    price or date, message {{ $f->client?->name ?? 'the client' }} for now.
-                </div>
+                {{-- The pen, and only once there is something settled to sign.
+
+                     "E-signature should unlock only after both parties approve
+                     the same agreement version" (Sir Peter, 27 September).
+                     Before that, holding out the pen says the terms are
+                     settled when they are not. --}}
+                @if($ws::supplierSigned($f))
+                    <div class="pa-soon" style="margin-top:14px;">
+                        <b>You signed on {{ $f->supplier_signed_at->format('M j, Y · g:i A') }}</b>
+                        as {{ $f->supplier_signature }}.
+                        @if($ws::clientSigned($f))
+                            {{ $f->client?->name ?? 'The client' }} has signed too. The deposit is theirs to pay next.
+                        @else
+                            It waits on {{ $f->client?->name ?? 'the client' }} to sign.
+                        @endif
+                    </div>
+                @elseif($ws::signingOpen($f))
+                    <form method="POST" action="{{ route('professional.agreements.sign', $f) }}" style="margin-top:16px;">
+                        @csrf
+                        <div class="pa-card-h">Sign this agreement</div>
+                        <label class="pa-sign-f">
+                            <span>Type your full name to sign</span>
+                            <input type="text" name="supplier_signature" value="{{ old('supplier_signature') }}"
+                                   placeholder="{{ auth()->user()->name }}" maxlength="120">
+                        </label>
+                        @error('supplier_signature')<p class="pa-err">{{ $message }}</p>@enderror
+
+                        <label class="pa-sign-ok">
+                            <input type="checkbox" name="agree" value="1">
+                            <span>I have read the terms above and accept them. Signing charges nothing: the client pays the deposit next.</span>
+                        </label>
+                        @error('agree')<p class="pa-err">{{ $message }}</p>@enderror
+
+                        <button type="submit" class="pa-btn go" style="margin-top:12px;">Sign as version {{ $version }}</button>
+                    </form>
+                @else
+                    <div class="pa-soon" style="margin-top:14px;">
+                        <b>Not ready to sign.</b>
+                        @if(! $ws::supplierApproved($f) && ! $ws::clientApproved($f))
+                            Neither of you has approved these terms yet.
+                        @elseif(! $ws::supplierApproved($f))
+                            {{ $f->client?->name ?? 'The client' }} approved these terms. Approve them yourself to open signing.
+                        @else
+                            You approved these terms. It waits on {{ $f->client?->name ?? 'the client' }}.
+                        @endif
+                        Signing opens once you have both approved the same version.
+                    </div>
+                @endif
+
+                {{-- Counter-proposing. The same edit the client makes, so a
+                     professional answering a change request can say what they
+                     want rather than asking the client to guess. --}}
+                <details class="pa-edit">
+                    <summary>Ask for different terms</summary>
+                    <form method="POST" action="{{ route('professional.agreements.request-changes', $f) }}">
+                        @csrf
+                        <p class="pa-edit-note">
+                            Sending these raises the version, so every approval and signature on the
+                            current terms stops counting, including your own. {{ $f->client?->name ?? 'The client' }}
+                            has to approve the new terms before anyone signs.
+                        </p>
+
+                        @php
+                            $terms = \App\Domain\Agreements\EditAgreement::current($f);
+                        @endphp
+
+                        <div class="pa-edit-grid">
+                            <label><span>Agreed price</span>
+                                <input type="number" step="0.01" min="0" name="terms[agreed_price]"
+                                       value="{{ old('terms.agreed_price', $terms['agreed_price']) }}"></label>
+                            <label><span>Deposit percentage</span>
+                                <input type="number" min="0" max="100" name="terms[deposit_percent]"
+                                       value="{{ old('terms.deposit_percent', $terms['deposit_percent']) }}"></label>
+                            <label><span>Service start</span>
+                                <input type="datetime-local" name="terms[service_start]"
+                                       value="{{ old('terms.service_start', $f->service_start?->format('Y-m-d\TH:i')) }}"></label>
+                            <label><span>Service end</span>
+                                <input type="datetime-local" name="terms[service_end]"
+                                       value="{{ old('terms.service_end', $f->service_end?->format('Y-m-d\TH:i')) }}"></label>
+                            <label><span>Balance due on</span>
+                                <input type="date" name="terms[balance_due_on]"
+                                       value="{{ old('terms.balance_due_on', $f->balance_due_on?->format('Y-m-d')) }}"></label>
+                        </div>
+
+                        <label class="pa-edit-wide"><span>Scope and deliverables</span>
+                            <textarea name="terms[scope]" rows="3" maxlength="5000">{{ old('terms.scope', $terms['scope']) }}</textarea></label>
+                        <label class="pa-edit-wide"><span>Schedule notes</span>
+                            <textarea name="terms[schedule_notes]" rows="2" maxlength="2000">{{ old('terms.schedule_notes', $terms['schedule_notes']) }}</textarea></label>
+                        <label class="pa-edit-wide"><span>Payment terms</span>
+                            <textarea name="terms[payment_terms]" rows="2" maxlength="2000">{{ old('terms.payment_terms', $terms['payment_terms']) }}</textarea></label>
+                        <label class="pa-edit-wide"><span>What you are asking for, and why</span>
+                            <textarea name="summary" rows="2" maxlength="2000" required
+                                      placeholder="{{ $f->client?->name ?? 'The client' }} reads this.">{{ old('summary') }}</textarea></label>
+                        @error('summary')<p class="pa-err">{{ $message }}</p>@enderror
+
+                        <button type="submit" class="pa-btn" style="margin-top:12px;">Send these terms back</button>
+                    </form>
+                </details>
             </div>
         @endif
     </div>

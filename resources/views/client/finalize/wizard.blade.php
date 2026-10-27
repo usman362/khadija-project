@@ -351,7 +351,17 @@ PAYMENT TERMS
 
         @if($fin->client_signed_at)
             <div class="fz-note ok" style="margin-top:14px;">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> <span><b>Signed.</b> You signed as {{ $fin->client_signature }} on {{ $fin->client_signed_at->format('M j, Y · g:i A') }}. {{ $pro->name }} counter-signed on {{ $fin->supplier_signed_at?->format('M j, Y · g:i A') }}.</span>
+                {{-- The professional signs from their own side now. Before
+                     28 October this read "counter-signed on ..." under every
+                     client signature, because the client's own signing
+                     stamped one in their name. --}}
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> <span><b>Signed.</b> You signed as {{ $fin->client_signature }} on {{ $fin->client_signed_at->format('M j, Y · g:i A') }}.
+                    @if($fin->supplier_signed_at)
+                        {{ $pro->name }} signed on {{ $fin->supplier_signed_at->format('M j, Y · g:i A') }}.
+                    @else
+                        It now waits on {{ $pro->name }} to sign. The deposit opens once they have.
+                    @endif
+                </span>
             </div>
         @elseif(! Workspace::signingOpen($fin))
             {{-- "E-signature should unlock only after both parties approve the

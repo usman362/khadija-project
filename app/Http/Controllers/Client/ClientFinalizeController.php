@@ -441,21 +441,27 @@ class ClientFinalizeController extends Controller
              * the one thing that must never happen.
              */
             'client_signed_version' => $f->terms_version,
-            // The professional signs from their own side. Demo and test
-            // environments need the flow to complete, so pre-launch their
-            // counter-signature is recorded here and labelled as such.
-            'supplier_signature' => $f->supplier->name,
-            'supplier_signed_at' => now(),
-            'supplier_signed_version' => $f->terms_version,
             /*
-             * Pre-launch, the professional's side is not open, so their
-             * approval is recorded with their stand-in signature rather than
-             * left blank: an agreement that shows "awaiting signatures"
-             * forever is not a truer picture than this one, and this is
-             * labelled as what it is.
+             * The client's own approval, because signing terms is approving
+             * them. Theirs only.
+             *
+             * Until 28 October this also stamped supplier_signature,
+             * supplier_signed_at, supplier_signed_version AND
+             * supplier_approved_version in the professional's name. The
+             * comment explaining it was honest: the professional's side was
+             * not open, and an agreement stuck on "awaiting signatures"
+             * forever was not a truer picture.
+             *
+             * Their side opened this week, so the stand-in became the lie it
+             * was standing in for. It told the professional on their own
+             * screen that they had approved terms they had never seen, and it
+             * opened the deposit step on a signature nobody gave. Sir Peter,
+             * 27 October: "the client should never paid them directly before
+             * the agreement". The gate for that was already here, in
+             * Finalization::STEPS, where the payment step waits on
+             * supplier_signed_at. This is what made the gate real.
              */
-            'client_approved_version'   => $f->terms_version,
-            'supplier_approved_version' => $f->terms_version,
+            'client_approved_version' => $f->terms_version,
         ]);
 
         \App\Domain\Agreements\AgreementNotices::signed($f->fresh(), $request->user());
