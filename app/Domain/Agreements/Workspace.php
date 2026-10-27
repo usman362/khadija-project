@@ -200,6 +200,38 @@ final class Workspace
         $f->forceFill(['declined_at' => now(), 'declined_by' => $by->id])->save();
     }
 
+    /**
+     * Whether this agreement is waiting on a particular person.
+     *
+     * Asked by both sides' screens, so it lives here rather than in either
+     * controller. Two things make it their move: they have not approved the
+     * version in front of them, or the terms are settled, the pen is out and
+     * they have not signed it.
+     *
+     * Approved but unsigned is NOT their move while the other side has yet to
+     * approve. Signing opens only once both approved the same version, so
+     * before that an unsigned agreement is waiting on the other side, and
+     * saying otherwise sends somebody to a screen with nothing to do on it.
+     */
+    public static function waitingOn(Finalization $f, User $person): bool
+    {
+        $side = self::sideOf($f, $person);
+
+        if ($side === null || $f->declined_at || $f->funded_at) {
+            return false;
+        }
+
+        $approved = $side === 'client' ? self::clientApproved($f) : self::supplierApproved($f);
+
+        if (! $approved) {
+            return true;
+        }
+
+        $signed = $side === 'client' ? self::clientSigned($f) : self::supplierSigned($f);
+
+        return self::signingOpen($f) && ! $signed;
+    }
+
     /** Which side of this agreement somebody is on. */
     public static function sideOf(Finalization $f, User $user): ?string
     {

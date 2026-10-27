@@ -1045,6 +1045,15 @@
                      same jobs (R42, amended 2026-08-05). Their routes still
                      work and land on the right tab. --}}
                 <li class="cl-nav-label">Operations</li>
+                {{-- Week of 26 October: the professional had no address for an
+                     agreement at all, which is why the client's signing was
+                     stamping a counter-signature on their behalf. --}}
+                <li class="cl-nav-item">
+                    <a href="{{ route('professional.agreements.index') }}" class="cl-nav-link {{ request()->routeIs('professional.agreements.*') ? 'active' : '' }}">
+                        <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        Agreements
+                    </a>
+                </li>
                 <li class="cl-nav-item">
                     <a href="{{ route('professional.packages.create') }}" class="cl-nav-link {{ request()->routeIs('professional.packages.create') ? 'active' : '' }}">
                         <svg class="cl-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4a2 2 0 0 1-1.1-1.8V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z"/><polyline points="2.32 6.16 12 11 21.68 6.16"/><line x1="12" y1="22.76" x2="12" y2="11"/></svg>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Client\ClientChatController;
 use App\Http\Controllers\Client\ClientDashboardController;
 use App\Http\Controllers\Client\ClientEventController;
 use App\Http\Controllers\Client\ClientProfileController;
+use App\Http\Controllers\Professional\ProfessionalAgreementController;
 use App\Http\Controllers\Professional\ProfessionalChatController;
 use App\Http\Controllers\Professional\ProfessionalDashboardController;
 use App\Http\Controllers\Professional\ProfessionalEarningsController;
@@ -1097,6 +1098,22 @@ Route::middleware('auth')->group(function () {
     // ── Professional Panel ──────────────────────────────────────────
     Route::prefix('professional')->middleware('permission:dashboard.view')->group(function () {
         Route::get('/dashboard', [ProfessionalDashboardController::class, 'index'])->name('professional.dashboard');
+
+        /*
+         * The professional's agreements. Week of 26 October, day one.
+         *
+         * The client has had /client/finalize since the wizard was built and
+         * the professional had no address for the same record, which is why
+         * their signature was being stamped for them when the client signed.
+         * The columns and the Workspace rules for their side already exist.
+         *
+         * Reading only today: approving and declining are Tuesday, asking for
+         * a change is Wednesday, signing for themselves is Thursday.
+         */
+        Route::get('/agreements', [ProfessionalAgreementController::class, 'index'])
+            ->name('professional.agreements.index');
+        Route::get('/agreements/{finalization}', [ProfessionalAgreementController::class, 'show'])
+            ->name('professional.agreements.show');
 
         // Contracts hub (contracts, proposals, earnings, gig opportunities, bids pipeline)
         // Merged into the Gig Operations Hub as its Contracts tab (R42,
