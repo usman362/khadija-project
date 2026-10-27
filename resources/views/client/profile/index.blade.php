@@ -456,7 +456,6 @@
                         </p>
                     </div>
                 </div>
-                </div>
                 <div style="margin-top: 20px; display: flex; gap: 12px;">
                     <button type="submit" class="pf-btn">Save Changes</button>
                 </div>
