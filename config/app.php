@@ -43,6 +43,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Deploy Key
+    |--------------------------------------------------------------------------
+    |
+    | The shared secret for the /deploy/* endpoints, which pull code, migrate,
+    | seed and clear caches. App\Http\Middleware\DeployKey has always read
+    | config('app.deploy_key') and nothing ever defined it, so every one of
+    | those routes answered 404 to everybody, including us. The guard was
+    | right to fail closed; the setting behind it was simply missing.
+    |
+    | Empty means closed, which is the only safe default: an empty secret
+    | matching an empty parameter is how this kind of guard quietly lets
+    | everybody through.
+    |
+    */
+
+    'deploy_key' => (string) env('DEPLOY_KEY', ''),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application URL
     |--------------------------------------------------------------------------
     |
