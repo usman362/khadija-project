@@ -220,32 +220,25 @@ class TheProfessionalHasADoorToTheirAgreementTest extends TestCase
     // ── Honest about what is not built ───────────────────────
 
     /**
-     * Today's screen reads. It does not offer a pen it cannot use.
+     * The screen does not offer a pen it cannot use.
      *
-     * Approving and declining are Tuesday, asking for a change is Wednesday,
-     * signing is Thursday. A button that posts nowhere is worse than no
-     * button, so the page says so instead.
+     * On Monday this asserted the opposite half: that nothing was offered at
+     * all and the page said so. Tuesday built approving and declining, so what
+     * is left to be honest about is signing, which lands Thursday. A button
+     * that posts nowhere is worse than no button.
      */
     public function test_the_screen_does_not_offer_what_is_not_wired_yet(): void
     {
         $html = $this->actingAs($this->professional)
             ->get(route('professional.agreements.show', $this->agreement))
             ->assertSuccessful()
+            ->assertSee('Signing lands later this week', false)
             ->getContent();
 
-        $this->assertStringContainsString('Reading only for now', $html);
-
-        /*
-         * And nothing on it submits an agreement action. Looking for "<form"
-         * was the first attempt and it failed against a correct page: the
-         * layout's own search and sign-out forms sit below the content, so
-         * the page will always contain one. What must not exist is a form
-         * aimed at this section.
-         */
         $this->assertSame(
             0,
-            preg_match_all('/action="[^"]*professional\/agreements/i', $html),
-            'The screen is posting an agreement action that is not built yet.',
+            preg_match_all('/action="[^"]*professional\/agreements\/\d+\/sign/i', $html),
+            'The screen is offering a signature that is not built yet.',
         );
     }
 }

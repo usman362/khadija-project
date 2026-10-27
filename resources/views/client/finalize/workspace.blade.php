@@ -536,9 +536,12 @@
                                 @foreach($rev->changed as $field => $c)
                                     <li>
                                         <b>{{ $c['label'] ?? $field }}</b>
-                                        <span class="eg-was">{{ ($c['from'] ?? '') === '' || $c['from'] === null ? 'not set' : $c['from'] }}</span>
+                                        {{-- Formatted at the point of reading: the stored value
+                                             is whatever the revision was given, so a service time
+                                             sits in there as a UTC instant beside a wall clock. --}}
+                                        <span class="eg-was">{{ \App\Domain\Agreements\EditAgreement::readable($field, $c['from'] ?? null) }}</span>
                                         &rarr;
-                                        <span class="eg-now">{{ ($c['to'] ?? '') === '' || $c['to'] === null ? 'not set' : $c['to'] }}</span>
+                                        <span class="eg-now">{{ \App\Domain\Agreements\EditAgreement::readable($field, $c['to'] ?? null) }}</span>
                                     </li>
                                 @endforeach
                             </ul>

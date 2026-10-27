@@ -31,10 +31,39 @@
         background: var(--bg-card-hover, rgba(255,255,255,.03)); border: 1px dashed var(--border-color);
         font-size: 13px; color: var(--text-muted); }
     .pa-soon b { color: var(--text-primary); }
+
+    /* What moved, old value beside new. */
+    .pa-moves { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+    .pa-moves li { font-size: 13px; line-height: 1.6; }
+    .pa-moves b { display: block; font-size: 12px; font-weight: 700; letter-spacing: .2px;
+        text-transform: uppercase; color: var(--text-muted); }
+    .pa-was { color: var(--text-muted); text-decoration: line-through; }
+    .pa-now { color: var(--text-primary); font-weight: 600; }
+
+    .pa-rev { padding: 12px 0; border-top: 1px solid var(--border-color); }
+    .pa-rev:first-of-type { border-top: 0; padding-top: 0; }
+    .pa-rev-h { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+        font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
+    .pa-rev-h b { color: var(--text-primary); }
+    .pa-rev-h span { font-size: 12px; color: var(--text-muted); }
+    .pa-rev-why { margin: 8px 0 0; font-size: 12.5px; color: var(--text-muted); font-style: italic; }
+
+    .pa-acts { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 4px; }
+    .pa-btn { appearance: none; border: 1px solid var(--border-color); background: var(--bg-card);
+        color: var(--text-primary); font: inherit; font-size: 13px; font-weight: 700;
+        padding: 10px 18px; border-radius: var(--radius-sm); cursor: pointer; }
+    .pa-btn:hover { border-color: var(--border-glow); }
+    .pa-btn.go { background: var(--accent-blue, #2563eb); border-color: var(--accent-blue, #2563eb); color: #fff; }
+    .pa-btn.off { color: #b91c1c; }
+    .pa-acts-note { font-size: 12.5px; color: var(--text-muted); }
+
 </style>
 @endpush
 
 @section('content')
+    {{-- No flash message here: layouts/professional already draws
+         session('status'), and saying it twice is how one approval looked
+         like two. --}}
     <div class="pa-card">
         <div class="pa-top">
             <div>
@@ -50,6 +79,29 @@
             </div>
         </div>
     </div>
+
+    @if($since !== [])
+        {{-- The narrow question, answered first and on its own. Somebody
+             looking at an agreement that came back to them wants to know what
+             is different from the version they said yes to, not everything
+             that has ever changed. --}}
+        <div class="pa-card" style="border-color: var(--accent-blue, #2563eb);">
+            <div class="pa-card-h">Changed since you approved</div>
+            <ul class="pa-moves">
+                @foreach($since as $field => $move)
+                    <li>
+                        <b>{{ $move['label'] ?? $field }}</b>
+                        <span class="pa-was">{{ \App\Domain\Agreements\EditAgreement::readable($field, $move['from'] ?? null) }}</span>
+                        &rarr;
+                        <span class="pa-now">{{ \App\Domain\Agreements\EditAgreement::readable($field, $move['to'] ?? null) }}</span>
+                    </li>
+                @endforeach
+            </ul>
+            <p class="pa-rev-why" style="font-style:normal;">
+                Your approval was given to the earlier terms, so it no longer counts. Read these and approve again if they suit you.
+            </p>
+        </div>
+    @endif
 
     @if($f->change_request)
         <div class="pa-card">
@@ -146,15 +198,98 @@
             </div>
         </div>
 
-        {{-- Honest about what this screen cannot do yet, rather than showing
-             buttons that are not wired. Approving and declining land Tuesday,
-             asking for a change Wednesday, signing Thursday. --}}
-        <div class="pa-soon">
-            <b>Reading only for now.</b>
-            Approving, declining and signing from your side are being built this week.
-            Until then, talk to {{ $f->client?->name ?? 'the client' }} in Messages about anything you want changed.
-        </div>
+        {{-- The two actions, and only where they mean something.
+
+             Approving is approval OF A VERSION, so the button says which.
+             Declining ends the agreement, so it asks twice and says so: a
+             professional who wants a date moved should not reach for it, and
+             asking for a change is a separate action that lands Wednesday. --}}
+        @php
+            $ws         = \App\Domain\Agreements\Workspace::class;
+            $over       = $f->declined_at || $f->funded_at;
+            $canApprove = ! $over && ! $ws::supplierApproved($f);
+        @endphp
+
+        @if($over)
+            <div class="pa-soon">
+                @if($f->declined_at)
+                    <b>This agreement was ended.</b>
+                    {{ $f->declined_by === $f->supplier_id ? 'You ended it' : ($f->client?->name ?? 'The client') . ' ended it' }}
+                    on {{ $f->declined_at->format('M j, Y') }}.
+                @else
+                    <b>This agreement is funded.</b> The terms are closed. Anything further goes through support.
+                @endif
+            </div>
+        @else
+            <div style="margin-top:18px;">
+                <div class="pa-acts">
+                    @if($canApprove)
+                        <form method="POST" action="{{ route('professional.agreements.approve', $f) }}">
+                            @csrf
+                            <button type="submit" class="pa-btn go">Approve version {{ $version }}</button>
+                        </form>
+                    @endif
+
+                    <form method="POST" action="{{ route('professional.agreements.decline', $f) }}"
+                          onsubmit="return confirm('Ending this agreement cannot be undone, and the client will be told. If you only want something changed, close this and message {{ $f->client?->name ?? 'the client' }} instead. End it?');">
+                        @csrf
+                        <button type="submit" class="pa-btn off">End this agreement</button>
+                    </form>
+
+                    @if(! $canApprove)
+                        <span class="pa-acts-note">You approved version {{ $version }}. It waits on {{ $f->client?->name ?? 'the client' }}.</span>
+                    @endif
+                </div>
+
+                <div class="pa-soon" style="margin-top:14px;">
+                    <b>Signing lands later this week.</b>
+                    Once you both approve the same version the pen opens here. To ask for a different
+                    price or date, message {{ $f->client?->name ?? 'the client' }} for now.
+                </div>
+            </div>
+        @endif
     </div>
+
+    @if($history->isNotEmpty())
+        <div class="pa-card">
+            <div class="pa-card-h">Version history</div>
+            @foreach($history as $rev)
+                <div class="pa-rev">
+                    <div class="pa-rev-h">
+                        <b>Version {{ $rev->version }}</b>
+                        <span>
+                            {{ $rev->created_by === $f->supplier_id ? 'You' : ($rev->author?->name ?? 'Someone') }}
+                            &middot; {{ $rev->created_at?->format('M j, Y · g:i A') }}
+                        </span>
+                    </div>
+                    @if($rev->changed)
+                        <ul class="pa-moves">
+                            @foreach($rev->changed as $field => $move)
+                                <li>
+                                    <b>{{ $move['label'] ?? $field }}</b>
+                                    <span class="pa-was">{{ \App\Domain\Agreements\EditAgreement::readable($field, $move['from'] ?? null) }}</span>
+                                    &rarr;
+                                    <span class="pa-now">{{ \App\Domain\Agreements\EditAgreement::readable($field, $move['to'] ?? null) }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                    @if($rev->summary)
+                        <p class="pa-rev-why">{{ $rev->summary }}</p>
+                    @endif
+                    @if($rev->supplier_signed_at || $rev->client_signed_at)
+                        <p class="pa-rev-why" style="font-style:normal;">
+                            Signed on this version:
+                            {{ collect([
+                                $rev->supplier_signed_at ? 'you' : null,
+                                $rev->client_signed_at ? ($f->client?->name ?? 'the client') : null,
+                            ])->filter()->implode(' and ') }}.
+                        </p>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+    @endif
 
     @if($f->contract_body)
         <div class="pa-card">

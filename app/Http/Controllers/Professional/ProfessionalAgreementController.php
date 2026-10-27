@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Professional;
 
+use App\Domain\Agreements\AgreementNotices;
+use App\Domain\Agreements\EditAgreement;
 use App\Domain\Agreements\Workspace;
 use App\Http\Controllers\Controller;
 use App\Models\Finalization;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -67,7 +70,70 @@ class ProfessionalAgreementController extends Controller
             'state'   => Workspace::STATES[$finalization->workspaceStatus()],
             'version' => Workspace::version($finalization),
             'waiting' => Workspace::waitingOn($finalization, $request->user()),
+            // Every version, and the narrower question: what is different
+            // from the version this professional said yes to.
+            'history' => EditAgreement::history($finalization),
+            'since'   => EditAgreement::changesSince($finalization, $request->user()),
         ]);
+    }
+
+    /**
+     * Approve the version in front of them.
+     *
+     * The same two calls the client's own approval makes. Workspace::approve
+     * works out which side the person is on and records the version, and the
+     * notice goes to the other party, so neither needed a professional's
+     * copy written beside it.
+     */
+    public function approve(Request $request, Finalization $finalization): RedirectResponse
+    {
+        $this->assertTheirs($request, $finalization);
+
+        $this->refuseIfSettled($finalization);
+
+        Workspace::approve($finalization, $request->user());
+
+        AgreementNotices::approved($finalization->fresh(), $request->user());
+
+        return back()->with('status', Workspace::bothApproved($finalization->fresh())
+            ? 'Both of you have approved these terms. The agreement is ready to sign.'
+            : 'You approved these terms. It now waits on the client.');
+    }
+
+    /**
+     * End the agreement.
+     *
+     * Terminal, which is why the screen asks twice and says what it costs.
+     * Asking for a change instead is a different action and lands Wednesday;
+     * until it does, the screen points at Messages rather than letting a
+     * professional end a job because a date needs moving.
+     */
+    public function decline(Request $request, Finalization $finalization): RedirectResponse
+    {
+        $this->assertTheirs($request, $finalization);
+
+        $this->refuseIfSettled($finalization);
+
+        Workspace::decline($finalization, $request->user());
+
+        AgreementNotices::declined($finalization->fresh(), $request->user());
+
+        return redirect()
+            ->route('professional.agreements.show', $finalization)
+            ->with('status', 'You declined this agreement. The client has been told.');
+    }
+
+    /**
+     * Neither action applies to an agreement that is already over.
+     *
+     * Workspace quietly does nothing in both cases, which is right for the
+     * domain and wrong for a person: a button that reports success and
+     * changes nothing is worse than one that says why not.
+     */
+    private function refuseIfSettled(Finalization $finalization): void
+    {
+        abort_if((bool) $finalization->declined_at, 409, 'This agreement was already ended.');
+        abort_if((bool) $finalization->funded_at, 409, 'This agreement is funded and can no longer be changed here.');
     }
 
     /**

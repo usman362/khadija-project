@@ -5,6 +5,8 @@ namespace App\Domain\Agreements;
 use App\Models\AgreementRevision;
 use App\Models\Finalization;
 use App\Models\User;
+use App\Support\DisplayTimezone;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
@@ -57,6 +59,16 @@ final class EditAgreement
 
     /** Fields that move money, which is why funding closes them. */
     private const FINANCIAL = ['agreed_price', 'deposit_percent', 'balance_due_on', 'payment_terms'];
+
+    /**
+     * Fields holding a moment, and fields holding a calendar date.
+     *
+     * They are apart because they compare differently. A moment is the same
+     * moment whatever clock it is written on; a date has no clock at all and
+     * belongs to nobody's timezone.
+     */
+    private const MOMENTS = ['service_start', 'service_end'];
+    private const DATES   = ['balance_due_on'];
 
     /** The terms as they stand, for filling the form. */
     public static function current(Finalization $f): array
@@ -144,6 +156,67 @@ final class EditAgreement
     }
 
     /**
+     * What moved since this person last approved, and that they have not
+     * approved yet.
+     *
+     * The history answers "what has ever changed". Somebody looking at an
+     * agreement that came back to them is asking a narrower question: what is
+     * different from the version I said yes to. Answering the wide question
+     * instead makes them read edits they already accepted to find the one
+     * they have not.
+     *
+     * A revision row describes the version it LEFT: its terms, whether this
+     * side had approved it, and what was about to move. So the changes since
+     * their last approval are the moves recorded from that version onward,
+     * and where a field moved twice only the net matters: the value they
+     * approved, beside the value in front of them now.
+     *
+     * @return array<string, array{label?: string, from: mixed, to: mixed}>
+     */
+    public static function changesSince(Finalization $f, User $person): array
+    {
+        $side = Workspace::sideOf($f, $person);
+
+        if ($side === null) {
+            return [];
+        }
+
+        // Approved what is in front of them: nothing is pending their look.
+        if ($side === 'client' ? Workspace::clientApproved($f) : Workspace::supplierApproved($f)) {
+            return [];
+        }
+
+        $column = $side === 'client' ? 'client_approved' : 'supplier_approved';
+
+        $revisions = AgreementRevision::where('finalization_id', $f->id)
+            ->orderBy('version')
+            ->get();
+
+        $approvedVersion = $revisions->last(fn (AgreementRevision $r) => (bool) $r->{$column})?->version;
+
+        // They have never approved anything, so nothing CHANGED on them. The
+        // whole agreement is new to them and the screen shows it in full.
+        if ($approvedVersion === null) {
+            return [];
+        }
+
+        $changed = [];
+
+        foreach ($revisions->where('version', '>=', $approvedVersion) as $rev) {
+            foreach ((array) $rev->changed as $field => $move) {
+                $changed[$field] = [
+                    'label' => $move['label'] ?? ($changed[$field]['label'] ?? $field),
+                    // The oldest "from" is the value they approved.
+                    'from'  => array_key_exists($field, $changed) ? $changed[$field]['from'] : ($move['from'] ?? null),
+                    'to'    => $move['to'] ?? null,
+                ];
+            }
+        }
+
+        return $changed;
+    }
+
+    /**
      * Once both have signed, an ordinary edit is an amendment.
      *
      * Rule 3. It is still allowed, and still keeps the signed version whole,
@@ -200,7 +273,7 @@ final class EditAgreement
             // Loose on purpose: "1800" typed into a form and 1800.00 out of a
             // decimal column are the same agreement, and recording a change
             // nobody made would reset signatures for nothing.
-            if (self::same($was, $now)) {
+            if (self::same($field, $was, $now)) {
                 continue;
             }
 
@@ -210,10 +283,45 @@ final class EditAgreement
         return $changed;
     }
 
-    private static function same(mixed $a, mixed $b): bool
+    /**
+     * Whether two values are the same agreement term.
+     *
+     * The numeric case was here from the start, for the right reason: "1800"
+     * typed into a form and 1800.00 out of a decimal column are the same
+     * agreement, and recording a change nobody made resets signatures for
+     * nothing.
+     *
+     * Dates had exactly that problem and were not covered. The old value
+     * arrives as a Carbon and the new one as the string a person typed, so
+     * comparing them as text put "2026-10-31 17:00:00" beside
+     * "2026-10-31 17:00" and called the same instant a change. One real
+     * agreement in this database has a recorded "Service start" move from
+     * 2026-10-31T21:00:00Z to 2026-10-31 17:00, which are the same moment on
+     * two different clocks. The version was raised and both sides' approvals
+     * stopped counting, over nothing.
+     */
+    private static function same(string $field, mixed $a, mixed $b): bool
     {
         if ($a === null xor $b === null) {
             return false;
+        }
+
+        if (in_array($field, self::MOMENTS, true)) {
+            $ia = self::instant($a);
+            $ib = self::instant($b);
+
+            if ($ia !== null && $ib !== null) {
+                return $ia === $ib;
+            }
+        }
+
+        if (in_array($field, self::DATES, true)) {
+            $da = self::calendarDay($a);
+            $db = self::calendarDay($b);
+
+            if ($da !== null && $db !== null) {
+                return $da === $db;
+            }
         }
 
         if (is_numeric($a) && is_numeric($b)) {
@@ -221,6 +329,101 @@ final class EditAgreement
         }
 
         return trim((string) $a) === trim((string) $b);
+    }
+
+    /**
+     * Whether a written time carries its own timezone.
+     *
+     * The two values being compared come from different places and are
+     * written differently. The stored one is serialised from a Carbon and
+     * carries a zone. The new one is what somebody typed into a form, which
+     * is a wall clock reading in their own zone and carries nothing. Reading
+     * a wall clock as UTC, or a UTC instant as a wall clock, moves a time
+     * nobody moved.
+     */
+    private static function carriesAZone(string $text): bool
+    {
+        return (bool) preg_match('/(Z|z|[+-]\d{2}:?\d{2})$/', trim($text));
+    }
+
+    /** One moment, as a UTC timestamp, or null when it will not parse. */
+    private static function instant(mixed $value): ?int
+    {
+        if ($value instanceof \DateTimeInterface) {
+            return $value->getTimestamp();
+        }
+
+        $text = trim((string) $value);
+
+        if ($text === '') {
+            return null;
+        }
+
+        try {
+            return self::carriesAZone($text)
+                ? Carbon::parse($text)->getTimestamp()
+                : Carbon::parse($text, DisplayTimezone::current())->getTimestamp();
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * One calendar day, as Y-m-d.
+     *
+     * Never shifted onto a clock. A balance due on the 23rd is the 23rd
+     * wherever it is read, and converting it is how the 23rd became seven in
+     * the evening on the 22nd elsewhere in this application.
+     */
+    private static function calendarDay(mixed $value): ?string
+    {
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format('Y-m-d');
+        }
+
+        $text = trim((string) $value);
+
+        if ($text === '') {
+            return null;
+        }
+
+        try {
+            return Carbon::parse($text)->format('Y-m-d');
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * One recorded value, as a person should read it.
+     *
+     * A revision stores whatever it was given, so a service time sits in the
+     * history as "2026-10-31T21:00:00.000000Z" beside "2026-10-31 17:00".
+     * Rows already written cannot be fixed by changing what is stored, so
+     * this formats at the point of reading and the old rows read correctly
+     * too.
+     */
+    public static function readable(string $field, mixed $value): string
+    {
+        if ($value === null || (is_string($value) && trim($value) === '')) {
+            return 'not set';
+        }
+
+        if (in_array($field, self::DATES, true)) {
+            $day = self::calendarDay($value);
+
+            return $day === null ? (string) $value : Carbon::parse($day)->format('M j, Y');
+        }
+
+        if (! in_array($field, self::MOMENTS, true)) {
+            return (string) $value;
+        }
+
+        $at = self::instant($value);
+
+        return $at === null
+            ? (string) $value
+            : Carbon::createFromTimestamp($at, DisplayTimezone::current())->format('M j, Y · g:i A');
     }
 
     /** Only the fields we edit, and nothing blank pretending to be a change. */

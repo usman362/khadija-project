@@ -1107,13 +1107,17 @@ Route::middleware('auth')->group(function () {
          * their signature was being stamped for them when the client signed.
          * The columns and the Workspace rules for their side already exist.
          *
-         * Reading only today: approving and declining are Tuesday, asking for
-         * a change is Wednesday, signing for themselves is Thursday.
+         * Approving and declining are here. Asking for a change is Wednesday
+         * and signing for themselves is Thursday.
          */
         Route::get('/agreements', [ProfessionalAgreementController::class, 'index'])
             ->name('professional.agreements.index');
         Route::get('/agreements/{finalization}', [ProfessionalAgreementController::class, 'show'])
             ->name('professional.agreements.show');
+        Route::post('/agreements/{finalization}/approve', [ProfessionalAgreementController::class, 'approve'])
+            ->name('professional.agreements.approve');
+        Route::post('/agreements/{finalization}/decline', [ProfessionalAgreementController::class, 'decline'])
+            ->name('professional.agreements.decline');
 
         // Contracts hub (contracts, proposals, earnings, gig opportunities, bids pipeline)
         // Merged into the Gig Operations Hub as its Contracts tab (R42,
