@@ -48,13 +48,29 @@ final class EditAgreement
         'deposit_percent' => 'Deposit percentage',
         'balance_due_on'  => 'Balance due on',
         'payment_terms'   => 'Payment terms',
+        // Sir Peter, 28 October: the professional may say up front that a
+        // staff member might come instead of them, so a later swap is
+        // expected rather than a surprise. It is a term, so it travels with
+        // the rest: changing it moves the version and both sides look again.
+        'staff_may_attend' => 'A staff member may attend',
     ];
+
+    /**
+     * Terms that are yes or no rather than a value.
+     *
+     * They need their own handling in three places: a cleared text box means
+     * "not set", but an unticked box means "no", and the two must not be
+     * confused. The form sends a hidden 0 before the checkbox so the answer
+     * is always present.
+     */
+    private const FLAGS = ['staff_may_attend'];
 
     /** Sections, as his edit panel groups them. */
     public const SECTIONS = [
         'Event details & requirements' => ['service_start', 'service_end', 'schedule_notes'],
         'Services & deliverables'      => ['scope'],
         'Budget & payment terms'       => ['agreed_price', 'deposit_percent', 'balance_due_on', 'payment_terms'],
+        'Who attends'                  => ['staff_may_attend'],
     ];
 
     /** Fields that move money, which is why funding closes them. */
@@ -144,6 +160,12 @@ final class EditAgreement
         ])->save();
 
         return $changed;
+    }
+
+    /** Is this term a yes-or-no rather than a value? Asked by the edit panels. */
+    public static function isFlag(string $field): bool
+    {
+        return in_array($field, self::FLAGS, true);
     }
 
     /** Every version so far, newest first. */
@@ -302,6 +324,12 @@ final class EditAgreement
      */
     private static function same(string $field, mixed $a, mixed $b): bool
     {
+        // A flag has no "not set". Null and false are the same answer, and
+        // comparing them as values would report a change nobody made.
+        if (in_array($field, self::FLAGS, true)) {
+            return (bool) $a === (bool) $b;
+        }
+
         if ($a === null xor $b === null) {
             return false;
         }
@@ -405,6 +433,10 @@ final class EditAgreement
      */
     public static function readable(string $field, mixed $value): string
     {
+        if (in_array($field, self::FLAGS, true)) {
+            return $value ? 'yes' : 'no';
+        }
+
         if ($value === null || (is_string($value) && trim($value) === '')) {
             return 'not set';
         }
@@ -432,10 +464,20 @@ final class EditAgreement
         $out = [];
 
         foreach (array_keys(self::FIELDS) as $field) {
-            if (array_key_exists($field, $terms)) {
-                $value = is_string($terms[$field]) ? trim($terms[$field]) : $terms[$field];
-                $out[$field] = $value === '' ? null : $value;
+            if (! array_key_exists($field, $terms)) {
+                continue;
             }
+
+            if (in_array($field, self::FLAGS, true)) {
+                // "0" is the hidden input the form sends when the box is not
+                // ticked, and (bool) "0" is false, which is the answer meant.
+                $out[$field] = (bool) $terms[$field];
+
+                continue;
+            }
+
+            $value = is_string($terms[$field]) ? trim($terms[$field]) : $terms[$field];
+            $out[$field] = $value === '' ? null : $value;
         }
 
         return $out;

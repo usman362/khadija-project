@@ -1238,6 +1238,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/gigs', fn () => redirect()->route('professional.gig-hub.index', ['tab' => 'gigs']))
             ->middleware('permission:events.view_any')->name('professional.gigs.index');
         Route::get('/gigs/{event}', [ProfessionalGigController::class, 'show'])->middleware('permission:events.view')->name('professional.gigs.show');
+        /*
+         * Who the client will meet at the site. Sir Peter, 28 October: a
+         * worker or supervisor may go as the main point of contact. Nothing
+         * is transferred by it — the professional still owes the work, and
+         * the agreement says so.
+         */
+        Route::post('/gigs/{event}/point-of-contact', [ProfessionalGigController::class, 'setPointOfContact'])
+            ->middleware('permission:events.view')->name('professional.gigs.point-of-contact');
 
         // Proposals (Bookings from professional's perspective)
         // Direct Offers (SSR / MSR / ESR) — client sends a direct request to this pro

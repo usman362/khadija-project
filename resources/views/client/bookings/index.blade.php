@@ -321,6 +321,35 @@
                         <span class="bk-pill {{ $booking->status }}">{{ $booking->status }}</span>
                     </div>
 
+                    {{-- Who you will actually meet, where somebody else is
+                         coming. Printed only when a crew member is named:
+                         a line that always says somebody cannot be read, and
+                         the client could not tell the day a different person
+                         was sent from the day nobody was.
+
+                         The responsibility line goes with it every time. The
+                         professional is still the one who owes the work, and
+                         without saying so this card reads as being handed
+                         off to a stranger. --}}
+                    @php $poc = \App\Domain\PointOfContact::forClient($booking); @endphp
+                    @if($poc)
+                        <div style="padding:12px 18px;border-top:1px solid var(--border-color);
+                                    background:rgba(37,99,235,0.05);font-size:12.5px;line-height:1.6;">
+                            {{-- Role in brackets, not after a divider: a divider
+                                 reads as the end of the name and the next words
+                                 then run into the sentence. --}}
+                            <b style="color:var(--text-primary);">{{ $poc['name'] }}</b><span
+                                style="color:var(--text-secondary);">@if($poc['role']) ({{ $poc['role'] }})@endif will
+                                be your point of contact on the day.</span>
+                            @if($poc['phone'])
+                                <a href="tel:{{ $poc['phone'] }}" style="color:var(--info-text);">{{ $poc['phone'] }}</a>
+                            @endif
+                            <span style="display:block;color:var(--text-muted);margin-top:3px;">
+                                {{ $pro?->name ?? 'The professional' }} is still responsible for the work.
+                            </span>
+                        </div>
+                    @endif
+
                     <div class="bk-body">
                         {{-- Event --}}
                         <div class="bk-col">

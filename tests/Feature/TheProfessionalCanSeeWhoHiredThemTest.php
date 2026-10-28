@@ -38,9 +38,17 @@ class TheProfessionalCanSeeWhoHiredThemTest extends TestCase
         $this->professional = $this->person('professional');
     }
 
-    private function person(string $role): User
+    /**
+     * Names are given rather than left to the generator where a test asserts
+     * one is absent: two random names can collide, and a collision reads as
+     * a leak that never happened.
+     */
+    private function person(string $role, ?string $name = null): User
     {
-        $u = User::factory()->create(['primary_role' => $role]);
+        $u = User::factory()->create(array_filter([
+            'primary_role' => $role,
+            'name'         => $name,
+        ]));
         $u->assignRole($role);
         $u->getOrCreateProfile()->update([
             'country' => 'US', 'state' => 'MD', 'city' => 'Baltimore',
@@ -137,7 +145,7 @@ class TheProfessionalCanSeeWhoHiredThemTest extends TestCase
     /** And only this professional's own clients. */
     public function test_another_professionals_clients_are_not_here(): void
     {
-        $stranger = $this->person('client');
+        $stranger = $this->person('client', 'Marguerite Vaskov');
         $other    = $this->person('professional');
 
         $event = Event::create([
@@ -254,7 +262,7 @@ class TheProfessionalCanSeeWhoHiredThemTest extends TestCase
 
     public function test_the_came_back_filter_holds_only_returning_clients(): void
     {
-        $once = $this->person('client');
+        $once = $this->person('client', 'Hollis Tremaine');
         $this->booking($once, 'One Off', now()->subMonth(), 'completed', 1000);
         $this->booking($this->client, 'First', now()->subYear(), 'completed', 2000);
         $this->booking($this->client, 'Second', now()->subMonth(), 'completed', 2000);

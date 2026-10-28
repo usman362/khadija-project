@@ -311,6 +311,8 @@ class ClientFinalizeController extends Controller
             'terms.deposit_percent'  => ['nullable', 'integer', 'min:0', 'max:100'],
             'terms.balance_due_on'   => ['nullable', 'date'],
             'terms.payment_terms'    => ['nullable', 'string', 'max:2000'],
+            // A yes-or-no term. The form always sends it, as 0 or 1.
+            'terms.staff_may_attend' => ['nullable', 'boolean'],
             'summary'         => ['nullable', 'string', 'max:2000'],
             'intent'          => ['required', 'in:draft,send,discard'],
         ], [
@@ -725,6 +727,18 @@ class ClientFinalizeController extends Controller
             '',
             'PAYMENT TERMS',
             (string) $f->payment_terms,
+            '',
+            /*
+             * Who turns up, and who is still answerable for the work.
+             *
+             * Sir Peter, 28 October: "The Professional remains responsible
+             * for fulfilling the agreement, even when a staff member attends
+             * instead." That is a term, not a note on a screen, so it goes on
+             * the document both sides sign. It is here unconditionally: an
+             * agreement silent on the question leaves open exactly the thing
+             * people argue about afterwards.
+             */
+            ...\App\Domain\PointOfContact::contractLines($f),
         ];
 
         return implode("\n", array_filter($lines, fn ($l) => $l !== ''));

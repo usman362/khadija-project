@@ -5,6 +5,16 @@
 
 @push('styles')
 <style>
+    /* The point-of-contact card. Its own rules because there was no shared
+       input style on this page: the class first reached for did not exist,
+       so the select rendered in the browser's own white. */
+    .poc-select {
+        width: 100%; padding: 9px 11px; font: inherit; font-size: 13.5px;
+        color: var(--text-primary); background: var(--bg-input, var(--bg-card));
+        border: 1px solid var(--border-color); border-radius: var(--radius-sm, 8px);
+    }
+    .poc-select:focus { outline: none; border-color: var(--accent-blue, #2563eb); }
+
     .gig-proposal-modal-overlay {
         display: none;
         position: fixed; inset: 0; z-index: 1000;
@@ -206,6 +216,61 @@
 
         {{-- Sidebar Info --}}
         <div style="display: flex; flex-direction: column; gap: 20px;">
+            {{-- Who the client will meet on the day.
+
+                 Sir Peter, 28 October: a worker or supervisor may go as the
+                 main point of contact at the site. Nothing is handed over by
+                 it, and the card says so: the professional still owes the
+                 work, and the agreement both sides sign carries that line. --}}
+            @if($booking)
+                <div class="cl-card">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">Point of contact</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); line-height: 1.55; margin: 0 0 14px;">
+                        Who {{ $event->client?->name ?? 'the client' }} should look for at the site. You stay
+                        responsible for the work whoever goes.
+                    </p>
+
+                    @if($crew->isEmpty())
+                        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.55; margin: 0;">
+                            You have nobody on your team yet.
+                            <a href="{{ route('professional.team.index') }}" style="color: var(--accent-blue);">Add your crew</a>
+                            and you can send one of them instead.
+                        </p>
+                    @else
+                        <form method="POST" action="{{ route('professional.gigs.point-of-contact', $event) }}">
+                            @csrf
+                            <select name="staff_id" class="poc-select"
+                                    aria-label="Who the client should look for at the site"
+                                    onchange="this.form.submit()">
+                                <option value="">{{ auth()->user()->name }} (you)</option>
+                                @foreach($crew as $member)
+                                    <option value="{{ $member->id }}"
+                                        {{ (int) $booking->point_of_contact_id === $member->id ? 'selected' : '' }}>
+                                        {{ $member->name }}@if($member->role) &middot; {{ $member->role }}@endif
+                                    </option>
+                                @endforeach
+                            </select>
+                            <noscript><button type="submit" class="poc-select" style="margin-top:10px;cursor:pointer;">Save</button></noscript>
+                        </form>
+
+                        @if($booking->pointOfContact)
+                            <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.55; margin: 10px 0 0;">
+                                @if(\App\Domain\PointOfContact::tellTheClient($booking))
+                                    {{ $event->client?->name ?? 'The client' }} is told when this changes, because the
+                                    agreement does not say a staff member may attend.
+                                @else
+                                    The agreement says a staff member may attend, so this is not a surprise to
+                                    {{ $event->client?->name ?? 'the client' }}.
+                                @endif
+                            </p>
+                        @endif
+                        @error('point_of_contact')
+                            <p style="font-size:12.5px;color:var(--accent-red);margin:10px 0 0;">{{ $message }}</p>
+                        @enderror
+                    @endif
+                </div>
+            @endif
+
             <div class="cl-card">
                 <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Event Details</h3>
                 <div>

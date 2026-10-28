@@ -113,6 +113,24 @@
     <tr><td class="k">Payment terms</td><td class="v">{!! $fin->payment_terms ?: $unset() !!}</td></tr>
 </table>
 
+{{-- Who turns up, and who still owes the work. Printed whichever way it is
+     answered: a document silent on it leaves open the thing people argue
+     about afterwards. --}}
+<h2>Who attends</h2>
+<table>
+    <tr>
+        <td class="k">Attendance</td>
+        <td class="v">{{ $fin->staff_may_attend
+            ? 'A member of the Professional\'s staff may attend in their place, as agreed.'
+            : 'The Professional is expected to attend. The Client is told if a staff member attends instead.' }}</td>
+    </tr>
+    <tr>
+        <td class="k">Responsibility</td>
+        <td class="v">The Professional remains responsible for fulfilling this agreement, even when a
+            staff member attends instead.</td>
+    </tr>
+</table>
+
 @if($fin->contract_body)
     <h2>Contract terms</h2>
     <div class="scope">{{ $fin->contract_body }}</div>

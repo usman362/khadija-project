@@ -20,6 +20,10 @@ class Booking extends Model
         'category_id',
         'client_id',
         'supplier_id',
+        // The crew member the client will actually meet, where the
+        // professional is sending one. See App\Domain\PointOfContact.
+        'point_of_contact_id',
+        'point_of_contact_set_at',
         'created_by',
         'status',
         'notes',
@@ -199,6 +203,7 @@ class Booking extends Model
     {
         return [
             'booked_at' => 'datetime',
+            'point_of_contact_set_at' => 'datetime',
             'price' => 'decimal:2',
         ];
     }
@@ -206,6 +211,18 @@ class Booking extends Model
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
+    }
+
+    /**
+     * The crew member the client will actually meet, where one is named.
+     *
+     * Not the supplier, and never a replacement for them. See
+     * App\Domain\PointOfContact: the professional stays responsible for the
+     * work whoever turns up.
+     */
+    public function pointOfContact(): BelongsTo
+    {
+        return $this->belongsTo(StaffMember::class, 'point_of_contact_id');
     }
 
     /**

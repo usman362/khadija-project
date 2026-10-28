@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Professional;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Event;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -166,11 +167,63 @@ class ProfessionalGigController extends Controller
             ->filter(fn ($row) => $row['name'] !== null)
             ->values();
 
+        /*
+         * Who will be at the site for this job, and the crew to pick from.
+         *
+         * Only on a gig that is actually theirs: naming a point of contact on
+         * an event they merely bid on would put a name in front of a client
+         * who has not hired them.
+         */
+        $booking = $isOwnGig
+            ? $event->bookings()->where('supplier_id', $user->id)
+                ->whereNotIn('status', ['cancelled'])
+                ->with('pointOfContact')
+                ->latest('id')
+                ->first()
+            : null;
+
         return view('professional.gigs.show', [
             'myServiceBudgets' => $myServiceBudgets,
             'event'       => $event,
             'attendees'   => $attendees,
             'clientFiles' => $clientFiles,
+            'booking'     => $booking,
+            'crew'        => $booking
+                ? \App\Models\StaffMember::where('supplier_id', $user->id)
+                    ->where('status', 'active')->orderBy('name')->get()
+                : collect(),
         ]);
+    }
+
+    /**
+     * Name the crew member the client will meet, or clear it.
+     *
+     * Sir Peter, 28 October: a worker or supervisor may go as the main point
+     * of contact at the site. The rules about who may be named and when the
+     * client is told live in App\Domain\PointOfContact, because they are the
+     * same rules wherever this is set from.
+     */
+    public function setPointOfContact(Request $request, Event $event): RedirectResponse
+    {
+        $user = $request->user();
+
+        $booking = $event->bookings()->where('supplier_id', $user->id)
+            ->whereNotIn('status', ['cancelled'])
+            ->latest('id')
+            ->firstOrFail();
+
+        $data = $request->validate([
+            'staff_id' => ['nullable', 'integer', 'exists:staff_members,id'],
+        ]);
+
+        $staff = $data['staff_id']
+            ? \App\Models\StaffMember::find($data['staff_id'])
+            : null;
+
+        \App\Domain\PointOfContact::set($booking, $staff, $user);
+
+        return back()->with('status', $staff
+            ? $staff->name . ' is now the point of contact for this job.'
+            : 'You are the point of contact for this job again.');
     }
 }
