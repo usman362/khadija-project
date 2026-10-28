@@ -67,6 +67,15 @@ class DepositCheckoutTest extends TestCase
             'created_by' => $this->client->id, 'status' => 'open',
         ]);
 
+        /*
+         * An agreement that is really ready to fund.
+         *
+         * This used to be the bare row and post straight at the payment step,
+         * which worked only because save() did not check the step order. It
+         * does now: a deposit cannot be taken on a contract nobody signed.
+         * These tests are about which checkout route is taken, not about how
+         * the wizard is walked, so the walking is done here in one go.
+         */
         return Finalization::create([
             'event_id' => $event->id,
             'client_id' => $this->client->id,
@@ -74,6 +83,23 @@ class DepositCheckoutTest extends TestCase
             'status' => 'in_progress',
             'deposit_amount' => 500,
             'total_amount' => 2000,
+
+            'bid_reviewed_at'    => now(),
+            'scope_agreed_at'    => now(),
+            'price_agreed_at'    => now(),
+            'schedule_agreed_at' => now(),
+            'terms_agreed_at'    => now(),
+
+            'terms_version'             => 1,
+            'client_approved_version'   => 1,
+            'supplier_approved_version' => 1,
+
+            'client_signature'        => $this->client->name,
+            'client_signed_at'        => now(),
+            'client_signed_version'   => 1,
+            'supplier_signature'      => $pro->name,
+            'supplier_signed_at'      => now(),
+            'supplier_signed_version' => 1,
         ]);
     }
 

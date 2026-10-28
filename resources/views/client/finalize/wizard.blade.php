@@ -451,9 +451,21 @@ PAYMENT TERMS
             <div>
                 @if($prev)<a class="fz-btn" href="{{ route('client.finalize.step', [$fin, $prev]) }}">Back</a>@endif
             </div>
-            <button type="submit" class="fz-btn {{ $step === 'payment' ? 'pay' : 'go' }}">
+            {{-- The pen is not held out before there is something settled to
+                 sign. This button used to render whatever the state, so a
+                 client pressing it on a page that had just told them "Not
+                 ready to sign" was answered with "Type your full name to
+                 sign" about a field the page does not draw in that state. --}}
+            @php
+                $__cannotSign = $step === 'contract'
+                    && ! $fin->client_signed_at
+                    && ! Workspace::signingOpen($fin);
+            @endphp
+            <button type="submit" class="fz-btn {{ $step === 'payment' ? 'pay' : 'go' }}"
+                    @if($__cannotSign) disabled title="You both have to accept the same version first."
+                        style="opacity:.55;cursor:not-allowed;" @endif>
                 @if($step === 'payment') {{ \App\Domain\Payments\DepositCheckout::isConfigured() ? 'Continue to payment' : 'Secure deposit & book' }}
-                @elseif($step === 'contract') {{ $fin->client_signed_at ? 'Continue' : 'Sign agreement' }}
+                @elseif($step === 'contract') {{ $fin->client_signed_at ? 'Continue' : ($__cannotSign ? 'Both of you must accept first' : 'Sign agreement') }}
                 @elseif($step === 'bid') Looks right, continue
                 @else Confirm &amp; continue @endif
             </button>

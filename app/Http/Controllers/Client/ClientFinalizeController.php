@@ -198,6 +198,26 @@ class ClientFinalizeController extends Controller
         abort_unless(array_key_exists($step, Finalization::STEPS), 404);
         abort_if($finalization->status === 'cancelled', 410, 'This finalization was cancelled.');
 
+        /*
+         * A step is reached by finishing the ones before it.
+         *
+         * show() has always enforced this and save() never did, so the order
+         * was a property of the screens rather than of the agreement: posting
+         * straight at the payment step took the deposit on a contract nobody
+         * had signed. Sir Peter, 27 October: "the client should never paid
+         * them directly before the agreement."
+         */
+        $keys  = array_keys(Finalization::STEPS);
+        $index = array_search($step, $keys, true);
+
+        foreach (array_slice($keys, 0, $index) as $earlier) {
+            if (! $finalization->completed($earlier)) {
+                return redirect()
+                    ->route('client.finalize.step', [$finalization, $earlier])
+                    ->withErrors(['step' => 'Complete this step first.']);
+            }
+        }
+
         // The payment step is the one that can hand back a destination of its
         // own: with Stripe keys configured, the deposit is paid on Stripe's
         // page rather than simulated here.
@@ -220,8 +240,7 @@ class ClientFinalizeController extends Controller
             return redirect()->route('client.finalize.step', [$finalization, 'payment']);
         }
 
-        $keys = array_keys(Finalization::STEPS);
-        $next = $keys[min(array_search($step, $keys, true) + 1, count($keys) - 1)];
+        $next = $keys[min($index + 1, count($keys) - 1)];
 
         return redirect()->route('client.finalize.step', [$finalization, $next]);
     }
@@ -422,6 +441,25 @@ class ClientFinalizeController extends Controller
 
     private function saveContract(Request $request, Finalization $f): void
     {
+        /*
+         * "E-signature should unlock only after both parties approve the same
+         * agreement version" (Sir Peter, 27 September).
+         *
+         * The screen has always said so and the server never checked. The
+         * step drew its submit button whatever the state, so a client who
+         * pressed Sign on a page reading "Not ready to sign" was answered
+         * with "Type your full name to sign" about a field that page does not
+         * render. The professional's own signing route has had this guard
+         * since it was built; this is the same one.
+         */
+        if (! \App\Domain\Agreements\Workspace::signingOpen($f)) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'client_signature' => $f->declined_at
+                    ? 'This agreement was ended, so it cannot be signed.'
+                    : 'You both have to accept the same version of these terms before either of you can sign.',
+            ]);
+        }
+
         $d = $request->validate([
             'client_signature' => ['required', 'string', 'max:120'],
             'agree'            => ['accepted'],

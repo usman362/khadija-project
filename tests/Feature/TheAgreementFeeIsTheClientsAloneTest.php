@@ -70,13 +70,31 @@ class TheAgreementFeeIsTheClientsAloneTest extends TestCase
             'scope' => 'DJ for the reception',
         ]);
 
-        // The wizard sends you back to the first incomplete step, so the ones
-        // before Deposit & Terms are marked done.
+        /*
+         * Every step before the deposit, finished.
+         *
+         * This used to stop at the schedule and post straight at the payment
+         * step, which worked only because save() did not check the order.
+         * It does now, so the fixture has to be an agreement that really is
+         * ready to fund: both sides approved the same version and both
+         * signed it. This test is about who pays the fee, not about how the
+         * wizard is walked.
+         */
         $this->fin->forceFill([
             'bid_reviewed_at'    => now(),
             'scope_agreed_at'    => now(),
             'price_agreed_at'    => now(),
             'schedule_agreed_at' => now(),
+            'terms_agreed_at'    => now(),
+            'terms_version'      => 1,
+            'client_approved_version'   => 1,
+            'supplier_approved_version' => 1,
+            'client_signature'        => $this->client->name,
+            'client_signed_at'        => now(),
+            'client_signed_version'   => 1,
+            'supplier_signature'      => $this->pro->name,
+            'supplier_signed_at'      => now(),
+            'supplier_signed_version' => 1,
         ])->save();
     }
 

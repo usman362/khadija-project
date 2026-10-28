@@ -159,9 +159,44 @@ class ClientJourneyWalkTest extends TestCase
             'service_end'   => now()->addMonths(3)->addHours(8)->format('Y-m-d\TH:i'),
         ]));
         $this->step('21e. Finalize: deposit & terms', fn () => $fsave('terms', ['deposit_percent' => 25]));
+
+        /*
+         * Both sides accept before either signs, and both sign before the
+         * money moves. The walk used to go straight from the terms to the
+         * signature to the deposit, which the application allowed: the client
+         * signing stamped a counter-signature in the professional's name, and
+         * save() never checked the step order. Neither is true now, so the
+         * walk has to do what a real pair of people would.
+         */
+        $this->step('21e-i. Professional accepts the terms', function () use ($pro, &$fin) {
+            \App\Domain\Agreements\Workspace::approve($fin->fresh(), $pro);
+            $fin->refresh();
+
+            return \App\Domain\Agreements\Workspace::supplierApproved($fin) ? 'accepted' : 'DID NOT ACCEPT';
+        });
+
+        $this->step('21e-ii. Client accepts the terms', function () use ($client, &$fin) {
+            $r = $this->actingAs($client)->post(route('client.finalize.approve', $fin));
+            $fin->refresh();
+
+            return \App\Domain\Agreements\Workspace::clientApproved($fin)
+                ? 'accepted, signing is open'
+                : 'DID NOT ACCEPT, status ' . $r->baseResponse->getStatusCode();
+        });
+
         $this->step('21f. Finalize: contract', fn () => $fsave('contract', [
             'client_signature' => 'Client User', 'agree' => 1,
         ]));
+
+        $this->step('21f-i. Professional signs for themselves', function () use ($pro, &$fin) {
+            $this->actingAs($pro)->post(route('professional.agreements.sign', $fin), [
+                'supplier_signature' => $pro->name, 'agree' => '1',
+            ]);
+            $fin->refresh();
+
+            return $fin->supplier_signed_at ? 'signed' : 'DID NOT SIGN';
+        });
+
         $this->step('21g. Finalize: payment', fn () => $fsave('payment', ['confirm_payment' => 1]));
 
         $this->step('21h. Booking exists', function () use ($client) {
