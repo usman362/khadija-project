@@ -769,6 +769,21 @@ class ProfessionalBiddingBoardController extends Controller
      */
     private static function timeLeft(Event $e): string
     {
+        /*
+         * A listing whose own date has passed is closed, whatever its
+         * proposal deadline says.
+         *
+         * These were two questions asked of two columns. The button reads
+         * starts_at and disables itself on a past date; this read
+         * proposal_deadline and answered "Open" whenever none was set. A
+         * request dated three months ago therefore sat on the board saying
+         * "Time Left: Open" beside a greyed-out "Bidding Closed", which reads
+         * as a broken page rather than an old gig.
+         */
+        if ($e->starts_at && $e->starts_at->isPast()) {
+            return 'Closed';
+        }
+
         $seconds = self::secondsLeft($e);
 
         if ($seconds === null) {
