@@ -244,6 +244,32 @@ Route::middleware('auth')->group(function () {
         ->name('public.package.save');
 });
 
+/*
+ * robots.txt, served by the application rather than left as a file.
+ *
+ * It had never been served at all. The document root is public_html and the
+ * rewrite there sends anything that is not a real file to index.php, so
+ * /robots.txt reached Laravel and got a 404 page, while the file itself sat
+ * readable at /public/robots.txt, which is not an address any crawler looks
+ * at. Every robots rule this site has ever had was invisible.
+ *
+ * A route rather than a copy at the document root, for the same reason
+ * /sitemap.xml is one: two copies of a file are two answers to one question,
+ * and the day they differ nobody knows which was read.
+ */
+Route::get('/robots.txt', function () {
+    $file = public_path('robots.txt');
+
+    abort_unless(is_file($file), 404);
+
+    // The contents rather than response()->file(): a BinaryFileResponse
+    // streams, and a streamed body cannot be read back, so nothing could
+    // assert that what is served is this file.
+    return response((string) file_get_contents($file), 200, [
+        'Content-Type' => 'text/plain; charset=UTF-8',
+    ]);
+})->name('robots');
+
 // XML sitemap — generated on the fly so newly-added pros / blog posts show
 // up the next time a crawler hits /sitemap.xml. Cached for an hour to keep
 // the DB query out of every robot ping.

@@ -252,16 +252,29 @@ class WhichRobotsMayReadTheSiteTest extends TestCase
     }
 
     /**
-     * The file sits where the web server serves it from.
+     * It is actually served at /robots.txt, which is the only address a
+     * crawler ever asks for.
      *
-     * Checked as a file rather than by requesting /robots.txt: in a feature
-     * test nothing serves the public directory, so that request is a 404
-     * against a perfectly good file. The live URL is the other half of this
-     * and has to be looked at on the site itself.
+     * This is the half that had never been true. The document root is
+     * public_html and its rewrite sends anything that is not a real file to
+     * index.php, so /robots.txt reached the application and got a 404 page
+     * while the file sat readable at /public/robots.txt, where nothing looks.
+     * Every robots rule this site has ever had was invisible, including the
+     * ones it had before this change.
      */
-    public function test_the_file_sits_at_the_document_root(): void
+    public function test_it_is_served_at_the_address_crawlers_ask_for(): void
     {
-        $this->assertFileExists(public_path('robots.txt'));
-        $this->assertStringContainsString('meta-externalagent', self::robots());
+        $response = $this->get('/robots.txt')->assertSuccessful();
+
+        $this->assertStringContainsString('text/plain', (string) $response->headers->get('content-type'));
+        $this->assertStringContainsString('meta-externalagent', $response->getContent());
+    }
+
+    /** And it is the one file, not a copy that can drift from it. */
+    public function test_what_is_served_is_the_file_in_the_repository(): void
+    {
+        $served = $this->get('/robots.txt');
+
+        $this->assertSame(self::robots(), $served->getContent());
     }
 }
