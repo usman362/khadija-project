@@ -951,7 +951,26 @@
         <div class="pf-card">
             <div class="pf-card-title">Trust & Verification Badges</div>
             <div class="pf-card-desc">
-                Upload proof of your credentials. Verified badges appear on your public profile and in search results, helping clients trust you faster, inspired by platforms like BestPickPro.
+                {{-- What this page promised was not true any more. It said a
+                     verified badge appears on the public profile and in search
+                     results, and OA-165 took every check-mark off the live site
+                     on 23 September. So a professional was being asked to send
+                     in licence and insurance documents for a mark nobody can
+                     see. It also named a competitor and claimed what clients
+                     would feel, neither of which belongs in our own copy.
+
+                     It now says what uploading actually does, and it asks the
+                     one switch that decides whether the badge is shown, rather
+                     than assuming an answer that can change. --}}
+                Upload proof of your credentials. We check each document and record the result on your
+                account.
+                @if(\App\Support\VerifiedBadge::shown())
+                    A verified credential is shown on your public profile.
+                @else
+                    Verified marks are not shown anywhere on the site at the moment, so nothing here
+                    changes what a client sees yet. The record is still worth having: it is what the
+                    insurance requirement below is checked against.
+                @endif
             </div>
 
             @php
@@ -1022,7 +1041,10 @@
                         <div style="background:rgba(239,68,68,0.08); border-left:3px solid #ef4444; padding:10px 14px; border-radius:6px; margin-top:10px; font-size:13px;">
                             <b>This policy has expired.</b>
                             It ran out on {{ $profile->liability_insurance_expires_on->format('M d, Y') }}.
-                            Clients no longer see you as insured. Upload the renewed certificate below.
+                            {{-- The old line said clients no longer see you as insured. They see no
+                                 verification marks at all today, so that was not the consequence. --}}
+                            You no longer count as insured for the services that require it. Upload the
+                            renewed certificate below.
                         </div>
                     @elseif($key === 'liability_insurance' && $insuranceExpiringSoon)
                         <div style="background:rgba(245,158,11,0.08); border-left:3px solid #f59e0b; padding:10px 14px; border-radius:6px; margin-top:10px; font-size:13px;">
