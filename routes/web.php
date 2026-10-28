@@ -1180,6 +1180,15 @@ Route::middleware('auth')->group(function () {
         // Lead Pipeline (Leads CRM — inquiry → proposal → negotiation → booked)
         Route::get('/leads', [\App\Http\Controllers\Professional\ProfessionalLeadController::class, 'index'])->name('professional.leads.index');
 
+        /*
+         * Who hired me. Hired Talent read from the other end: the client has
+         * had that page since October and the professional on the other end
+         * of the same bookings had nothing that answered who comes back.
+         *
+         * Leads above is who MIGHT hire them. This is who already has.
+         */
+        Route::get('/clients', [\App\Http\Controllers\Professional\ProfessionalClientsController::class, 'index'])->name('professional.clients.index');
+
         // My Calendar (schedule home — agenda + month grid + availability)
         Route::get('/calendar', [\App\Http\Controllers\Professional\ProfessionalCalendarController::class, 'index'])->name('professional.calendar.index');
 
