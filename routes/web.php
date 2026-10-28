@@ -1141,6 +1141,13 @@ Route::middleware('auth')->group(function () {
             ->name('professional.agreements.index');
         Route::get('/agreements/{finalization}', [ProfessionalAgreementController::class, 'show'])
             ->name('professional.agreements.show');
+        /*
+         * The same document the client can already download, from the side
+         * that has to sign it. The extra segment keeps it clear of the
+         * {finalization} route above, which matches one segment only.
+         */
+        Route::get('/agreements/{finalization}/draft/download', [ProfessionalAgreementController::class, 'download'])
+            ->name('professional.agreements.draft');
         Route::post('/agreements/{finalization}/approve', [ProfessionalAgreementController::class, 'approve'])
             ->name('professional.agreements.approve');
         Route::post('/agreements/{finalization}/decline', [ProfessionalAgreementController::class, 'decline'])

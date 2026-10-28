@@ -53,6 +53,9 @@
         color: var(--text-primary); font: inherit; font-size: 13px; font-weight: 700;
         padding: 10px 18px; border-radius: var(--radius-sm); cursor: pointer; }
     .pa-btn:hover { border-color: var(--border-glow); }
+    /* The same class on a link: it has to carry the button's own look back. */
+    a.pa-btn { display: inline-flex; align-items: center; gap: 7px; text-decoration: none;
+        padding: 8px 14px; font-size: 12.5px; }
     .pa-btn.go { background: var(--accent-blue, #2563eb); border-color: var(--accent-blue, #2563eb); color: #fff; }
     .pa-btn.off { color: #b91c1c; }
     .pa-acts-note { font-size: 12.5px; color: var(--text-muted); }
@@ -96,9 +99,16 @@
                     Version {{ $version }} of these terms.
                 </div>
             </div>
-            <div style="text-align:right;">
+            <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
                 <span class="pa-state" style="background:{{ $state[1] }}1f;color:{{ $state[1] }};">{{ $state[0] }}</span>
                 <div class="pa-state-note">{{ $state[2] }}</div>
+                {{-- The terms as a document, to read away from the screen or
+                     keep on file. It says "draft" on every page until both
+                     signatures are on it. --}}
+                <a class="pa-btn" href="{{ route('professional.agreements.draft', $f) }}" style="white-space:nowrap;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download a copy
+                </a>
             </div>
         </div>
     </div>

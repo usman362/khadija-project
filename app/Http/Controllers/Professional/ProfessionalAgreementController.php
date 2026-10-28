@@ -7,8 +7,11 @@ use App\Domain\Agreements\EditAgreement;
 use App\Domain\Agreements\Workspace;
 use App\Http\Controllers\Controller;
 use App\Models\Finalization;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 /**
@@ -214,6 +217,49 @@ class ProfessionalAgreementController extends Controller
             ->with('status', Workspace::bothSigned($finalization->fresh())
                 ? 'Signed. Both signatures are in, and the client pays the deposit next.'
                 : 'Signed. It now waits on the client to sign.');
+    }
+
+    /**
+     * The agreement as a document, at whatever stage it has reached.
+     *
+     * The client has had this since Sir Peter asked for it beside their
+     * workspace; the professional signing the same terms had no copy of them
+     * to keep. It is the same view, so neither side can be handed a document
+     * that says something the other's does not.
+     *
+     * Not the signed contract: app.agreements.download refuses anything both
+     * sides have not accepted, and that file is the record of a booking. This
+     * one says "draft" on every page until both signatures are on it, so a
+     * professional reading it away from the screen cannot mistake where the
+     * terms have reached.
+     */
+    public function download(Request $request, Finalization $finalization): Response
+    {
+        $this->assertTheirs($request, $finalization);
+
+        $finalization->load(['event', 'supplier', 'bid.category', 'client']);
+
+        $pdf = Pdf::loadView('client.finalize.draft-pdf', [
+            'fin'         => $finalization,
+            'event'       => $finalization->event,
+            'pro'         => $finalization->supplier,
+            // The client named in the agreement, not whoever is reading it.
+            // The client's own copy passes the signed-in user, which is the
+            // same person there and would be the wrong one here.
+            'client'      => $finalization->client,
+            'service'     => $finalization->bid?->category?->name,
+            'generatedAt' => now(),
+        ])->setPaper('a4');
+
+        // Named from the client's side of the booking, because that is what
+        // tells one of these apart in a professional's folder.
+        $name = trim(($finalization->event?->reference() ?? 'agreement') . '-'
+            . Str::slug($finalization->client?->name ?? 'client') . '-draft') . '.pdf';
+
+        return response($pdf->output(), 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $name . '"',
+        ]);
     }
 
     /**
