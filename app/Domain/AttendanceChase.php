@@ -152,7 +152,7 @@ final class AttendanceChase
             return null;
         }
 
-        $confirmBy = $starts->copy()->subHours(PointOfContact::CONFIRM_HOURS);
+        $confirmBy = $starts->copy()->subHours(PointOfContact::confirmHours());
         $sent      = AttendanceReminder::where('booking_id', $booking->id)->pluck('stage')->all();
 
         $stage = match (true) {

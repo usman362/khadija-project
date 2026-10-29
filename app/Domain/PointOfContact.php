@@ -67,8 +67,16 @@ final class PointOfContact
      * How long before the event an open answer has to be settled.
      *
      * Sir Peter: "require confirmation at least 24 hours before the event".
+     * In config so he can move it; the constant stays as the fallback and as
+     * the thing the copy quotes.
      */
     public const CONFIRM_HOURS = 24;
+
+    /** The window he set, read where it is set. */
+    public static function confirmHours(): int
+    {
+        return (int) config('staff.confirm_hours', self::CONFIRM_HOURS);
+    }
 
     /**
      * Name the person who will be there, or clear it.
@@ -177,7 +185,7 @@ final class PointOfContact
 
         $starts = $booking->event?->starts_at;
 
-        return $starts?->copy()->subHours(self::CONFIRM_HOURS);
+        return $starts?->copy()->subHours(self::confirmHours());
     }
 
     /**
@@ -222,18 +230,106 @@ final class PointOfContact
             return null;
         }
 
+        // Once the job is over and the window has run out, the contact
+        // details go and the record of who attended stays. See
+        // contactWindowClosed, and config/staff.php for why.
+        $reachable = ! self::contactWindowClosed($booking);
+
         return [
             'name'  => $staff->name,
             'role'  => $staff->role,
             // Sir Peter: the client sees the worker's photo, name, role and
             // number. A name alone is not much use to somebody looking round
             // a venue for a stranger.
-            'photo' => $staff->photoUrl(),
+            'photo' => $reachable ? $staff->photoUrl() : null,
             // The reason the client is told at all: somebody to reach on the
             // day. A name with no number is half an answer.
-            'phone' => $staff->phone,
+            'phone' => $reachable ? $staff->phone : null,
             'since' => $booking->point_of_contact_set_at,
+            // So a screen can say why the number is gone rather than looking
+            // as though it was never given.
+            'closed' => ! $reachable,
         ];
+    }
+
+    /**
+     * Has this client's reason to reach the crew member run out?
+     *
+     * Sir Peter, 29 October: "restricting Client access to staff contact
+     * information after the booking has been completed, with a proposed
+     * 30-day access period unless an active dispute or another legitimate
+     * requirement calls for longer."
+     *
+     * Three things decide it.
+     *
+     * THE JOB IS OVER. Completed, and also cancelled: he named completion,
+     * but a cancelled job has no day for anybody to turn up to either, and
+     * leaving a number reachable for ever on a booking that never happened
+     * is the thing the restriction is against. A booking still running is
+     * never closed off.
+     *
+     * THE WINDOW. From config, so he can move it without a release. No
+     * window configured leaves access open rather than cutting it off on a
+     * number nobody chose.
+     *
+     * A DISPUTE. His own exception, and the one that matters: an argument
+     * about what happened at the event is exactly when a client needs to say
+     * who was there and how they were reached.
+     */
+    public static function contactWindowClosed(Booking $booking): bool
+    {
+        if (! in_array($booking->status, ['completed', 'cancelled'], true)) {
+            return false;
+        }
+
+        $days = (int) config('staff.client_access_days', 30);
+
+        if ($days < 0) {
+            return false;
+        }
+
+        $ended = self::endedAt($booking);
+
+        // No date to count from. Guessing one and cutting somebody off on the
+        // guess is worse than leaving it open; the window is a courtesy
+        // limit, not a security boundary.
+        if (! $ended) {
+            return false;
+        }
+
+        if (now()->lessThan($ended->copy()->addDays($days))) {
+            return false;
+        }
+
+        return ! self::disputeIsOpen($booking);
+    }
+
+    /**
+     * When the job stopped.
+     *
+     * The status log first, because that is the moment somebody recorded it.
+     * Then the event's own end or start, which is when it was going to
+     * happen. Null when neither is known.
+     */
+    private static function endedAt(Booking $booking): ?\Illuminate\Support\Carbon
+    {
+        $logged = \App\Models\AgreementLog::where('subject_type', 'booking')
+            ->where('subject_id', $booking->id)
+            ->whereIn('to_status', ['completed', 'cancelled'])
+            ->latest('created_at')
+            ->value('created_at');
+
+        return $logged
+            ?? $booking->event?->ends_at
+            ?? $booking->event?->starts_at;
+    }
+
+    /** An argument about this job that nobody has closed. */
+    private static function disputeIsOpen(Booking $booking): bool
+    {
+        return \App\Models\DisputeCase::where('booking_id', $booking->id)
+            ->get(['state'])
+            ->contains(fn ($case) => $case->isOpen());
     }
 
     /**
@@ -279,7 +375,7 @@ final class PointOfContact
                 . 'place. The Client has agreed to this.',
             self::LATER => 'The Professional has not yet said whether they will attend personally '
                 . 'or send a member of their staff. They will tell the Client at least '
-                . self::CONFIRM_HOURS . ' hours before the service begins.',
+                . self::confirmHours() . ' hours before the service begins.',
             default     => 'The Professional will attend personally. A member of their staff may '
                 . 'not be sent in their place without the Client agreeing to it.',
         };

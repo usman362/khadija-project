@@ -253,7 +253,7 @@
                                 You said you would decide nearer the time. Tell
                                 {{ $event->client?->name ?? 'the client' }} by
                                 {{ $confirmBy->format('M j, g:i A') }}, which is
-                                {{ \App\Domain\PointOfContact::CONFIRM_HOURS }} hours before it starts.
+                                {{ \App\Domain\PointOfContact::confirmHours() }} hours before it starts.
                                 Choosing below counts as telling them, including choosing yourself.
                             @endif
                         </p>

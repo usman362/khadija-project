@@ -211,7 +211,7 @@
                 $attendance = match ($f->attendance) {
                     \App\Domain\PointOfContact::STAFF => "A member of your staff may attend instead of you, and {$them} has agreed to that.",
                     \App\Domain\PointOfContact::LATER => 'You have not said yet whether you are coming or sending somebody. Tell '
-                        . $them . ' at least ' . \App\Domain\PointOfContact::CONFIRM_HOURS . ' hours before it starts.',
+                        . $them . ' at least ' . \App\Domain\PointOfContact::confirmHours() . ' hours before it starts.',
                     default => "You attend personally. Sending somebody from your team instead needs {$them} to agree to the change first.",
                 };
             @endphp
@@ -416,7 +416,7 @@
                             <p class="pa-edit-note" style="margin:2px 0 0;">
                                 You stay responsible for the work whoever goes. Deciding nearer the time means you
                                 tell {{ $f->client?->name ?? 'the client' }} at least
-                                {{ \App\Domain\PointOfContact::CONFIRM_HOURS }} hours before it starts.
+                                {{ \App\Domain\PointOfContact::confirmHours() }} hours before it starts.
                             </p>
                         </div>
                         <label class="pa-edit-wide"><span>What you are asking for, and why</span>

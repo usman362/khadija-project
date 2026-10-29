@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\PointOfContact;
 use App\Models\Booking;
 use App\Models\StaffMember;
 use Illuminate\Http\Request;
@@ -64,10 +65,19 @@ class StaffPhotoController extends Controller
             return true;
         }
 
-        // A client, on a booking of their own where this person is the one
-        // they have been told to look for.
+        /*
+         * A client, on a booking of their own where this person is the one
+         * they have been told to look for, and whose access has not run out.
+         *
+         * Sir Peter, 29 October: the client's access to contact details ends
+         * some days after the job, unless a dispute is open. Enforced here
+         * and not only on the page, because he asked for exactly that: "on
+         * the backend, including image URLs".
+         */
         return Booking::where('client_id', $user->id)
             ->where('point_of_contact_id', $staff->id)
-            ->exists();
+            ->with('event:id,starts_at,ends_at')
+            ->get()
+            ->contains(fn (Booking $b) => ! PointOfContact::contactWindowClosed($b));
     }
 }

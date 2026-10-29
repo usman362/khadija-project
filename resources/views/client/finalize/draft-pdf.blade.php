@@ -123,7 +123,7 @@
         <td class="v">{{ match ($fin->attendance) {
             \App\Domain\PointOfContact::STAFF => 'A member of the Professional\'s staff may attend in their place, as agreed.',
             \App\Domain\PointOfContact::LATER => 'Not yet decided. The Professional will say who is attending at least '
-                . \App\Domain\PointOfContact::CONFIRM_HOURS . ' hours before the service begins.',
+                . \App\Domain\PointOfContact::confirmHours() . ' hours before the service begins.',
             default => 'The Professional will attend personally.',
         } }}</td>
     </tr>

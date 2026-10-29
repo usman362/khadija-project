@@ -354,7 +354,15 @@
                                     <a href="tel:{{ $poc['phone'] }}" style="color:var(--info-text);">{{ $poc['phone'] }}</a>
                                 @endif
                                 <span style="display:block;color:var(--text-muted);margin-top:3px;">
-                                    {{ $pro?->name ?? 'The professional' }} is still responsible for the work.
+                                    @if($poc['closed'])
+                                        {{-- Said, rather than left blank. A number that
+                                             vanishes without explanation reads as one
+                                             that was never given. --}}
+                                        Their contact details are no longer shown now the booking is over.
+                                        Message {{ $pro?->name ?? 'the professional' }} if you need to reach them.
+                                    @else
+                                        {{ $pro?->name ?? 'The professional' }} is still responsible for the work.
+                                    @endif
                                 </span>
                             </div>
                         </div>
