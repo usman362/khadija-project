@@ -148,13 +148,14 @@ class ACrewMemberHasAFaceARankAndAReferenceTest extends TestCase
 
         $shown = PointOfContact::forClient($this->booking->fresh());
 
-        $this->assertSame($staff->photoUrl(), $shown['photo']);
-        $this->assertStringContainsString('staff/dana.jpg', $shown['photo']);
+        // A route, not a storage path: the file is private and the
+        // controller decides who may look. See StaffPhotoController.
+        $this->assertSame(route('staff.photo', $staff), $shown['photo']);
     }
 
     public function test_the_professional_can_upload_one(): void
     {
-        Storage::fake('public');
+        Storage::fake('private');
 
         $this->actingAs($this->professional)
             ->post(route('professional.team.staff.store'), [
@@ -167,7 +168,7 @@ class ACrewMemberHasAFaceARankAndAReferenceTest extends TestCase
         $staff = StaffMember::where('name', 'Sam Okafor')->firstOrFail();
 
         $this->assertNotNull($staff->photo);
-        Storage::disk('public')->assertExists($staff->photo);
+        Storage::disk('private')->assertExists($staff->photo);
     }
 
     // ── A rank, kept apart from the job ──────────────────────

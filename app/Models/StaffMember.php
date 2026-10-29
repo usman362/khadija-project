@@ -80,14 +80,21 @@ class StaffMember extends Model
     }
 
     /**
-     * Their photo, or null.
+     * Where their photo is read from, or null when there is none.
      *
      * Null rather than a placeholder, so a screen can decide between a face
-     * and initials for itself. A placeholder image returned from here would
-     * make "has a photo" unanswerable everywhere it matters.
+     * and initials for itself. A placeholder returned from here would make
+     * "has a photo" unanswerable everywhere it matters.
+     *
+     * A ROUTE, not a storage path. Khadijah, 29 October: headshots and phone
+     * numbers are "scoped strictly to the client holding the booking". A file
+     * under public/storage is readable by anybody who has the address, and
+     * addresses leak — so the file lives on the private disk and
+     * StaffPhotoController decides, per request, whether the person asking is
+     * allowed to see this particular crew member's face.
      */
     public function photoUrl(): ?string
     {
-        return $this->photo ? asset('storage/' . $this->photo) : null;
+        return $this->photo ? route('staff.photo', $this) : null;
     }
 }

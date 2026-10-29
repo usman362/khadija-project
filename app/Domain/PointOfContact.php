@@ -2,11 +2,14 @@
 
 namespace App\Domain;
 
+use App\Mail\YourOnSiteContactIsSet;
 use App\Models\Booking;
 use App\Models\Finalization;
 use App\Models\StaffMember;
 use App\Models\User;
 use App\Notifications\SomebodyElseIsComing;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -350,5 +353,28 @@ final class PointOfContact
         }
 
         $client->notify(new SomebodyElseIsComing($booking, $staff, $by->name));
+
+        /*
+         * And Khadijah's confirmation email, 29 October, when there is
+         * somebody named to confirm. Nothing is emailed for a professional
+         * saying they are coming themselves: the client was never told
+         * otherwise, so there is nothing to correct.
+         *
+         * A failure here does not undo the notice. The in-app alert has
+         * already been delivered, and throwing would turn a mail outage into
+         * a point of contact that cannot be set.
+         */
+        if (! $staff || ! filter_var($client->email ?? '', FILTER_VALIDATE_EMAIL)) {
+            return;
+        }
+
+        try {
+            Mail::to($client->email)->send(new YourOnSiteContactIsSet($booking->load('pointOfContact', 'supplier', 'event')));
+        } catch (\Throwable $e) {
+            Log::warning('On-site contact email failed', [
+                'booking' => $booking->id,
+                'error'   => $e->getMessage(),
+            ]);
+        }
     }
 }

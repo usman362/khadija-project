@@ -2,11 +2,14 @@
 
 namespace App\Domain;
 
+use App\Mail\AssignYourOnSiteContact;
 use App\Models\AttendanceReminder;
 use App\Models\Booking;
 use App\Models\Finalization;
 use App\Notifications\NobodyHasSaidWhoIsComing;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * Chasing the answer a professional promised to come back with.
@@ -68,7 +71,9 @@ final class AttendanceChase
             ->whereIn('id', $open)
             ->whereNull('attendance_confirmed_at')
             ->whereNotIn('status', ['cancelled', 'completed'])
-            ->with(['event:id,title,starts_at', 'supplier:id,name'])
+            // The email column too: the reminder is emailed as well as
+            // shown, and a column left out of the select reads as null.
+            ->with(['event:id,title,starts_at', 'supplier:id,name,email'])
             ->get()
             ->map(fn (Booking $b) => self::stageFor($b))
             ->filter()
@@ -109,6 +114,19 @@ final class AttendanceChase
             }
 
             $booking->supplier?->notify(new NobodyHasSaidWhoIsComing($booking, $stage, $confirmBy));
+
+            /*
+             * And Khadijah's email, at the stages where it earns its place.
+             *
+             * Not at FIRST: a week out, the dashboard alert is enough, and an
+             * email that arrives for every stage trains people to filter the
+             * sender. The ones that matter are the last comfortable moment
+             * and the moment it is late.
+             */
+            if ($stage !== self::FIRST) {
+                self::email($booking);
+            }
+
             $sent++;
         }
 
@@ -149,6 +167,32 @@ final class AttendanceChase
         }
 
         return ['booking' => $booking, 'stage' => $stage, 'confirmBy' => $confirmBy];
+    }
+
+    /**
+     * The reminder email, where there is somebody to send it to.
+     *
+     * A failure here does not undo the reminder. The record is already
+     * written and the dashboard alert is already delivered, so throwing would
+     * turn a mail outage into a reminder that never arrives at all — and into
+     * a stage that can never be retried, because the record says it went.
+     */
+    private static function email(Booking $booking): void
+    {
+        $email = $booking->supplier?->email;
+
+        if (! filter_var($email ?? '', FILTER_VALIDATE_EMAIL)) {
+            return;
+        }
+
+        try {
+            Mail::to($email)->send(new AssignYourOnSiteContact($booking));
+        } catch (\Throwable $e) {
+            Log::warning('Attendance reminder email failed', [
+                'booking' => $booking->id,
+                'error'   => $e->getMessage(),
+            ]);
+        }
     }
 
     /** Has this booking blown its deadline? Asked by the screens. */

@@ -83,8 +83,14 @@ class ProfessionalTeamController extends Controller
             'photo'         => ['nullable', 'image', 'max:4096'],
         ]);
 
+        /*
+         * The private disk, not the public one. Khadijah, 29 October:
+         * headshots are scoped strictly to the client holding the booking,
+         * and a file under public/storage is readable by anybody who has the
+         * address. StaffPhotoController decides who may look.
+         */
         $photo = $request->hasFile('photo')
-            ? $request->file('photo')->store('staff', 'public')
+            ? $request->file('photo')->store('staff', 'private')
             : null;
 
         StaffMember::create([

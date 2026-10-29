@@ -257,6 +257,16 @@ Route::middleware('auth')->group(function () {
  * /sitemap.xml is one: two copies of a file are two answers to one question,
  * and the day they differ nobody knows which was read.
  */
+/*
+ * A crew member's photo, to whoever is entitled to see it.
+ *
+ * Signed in only, and the controller decides per request: the professional
+ * whose crew member it is, a client on a booking of theirs where this person
+ * is the point of contact, or an administrator. See StaffPhotoController.
+ */
+Route::middleware('auth')->get('/staff/{staffMember}/photo', \App\Http\Controllers\StaffPhotoController::class)
+    ->name('staff.photo');
+
 Route::get('/robots.txt', function () {
     $file = public_path('robots.txt');
 

@@ -38,29 +38,42 @@ class NobodyHasSaidWhoIsComing extends Notification
             'type'       => 'attendance_unconfirmed',
             'booking_id' => $this->booking->id,
             'event_id'   => $this->booking->event_id,
-            'title'      => $this->booking->event?->title,
+            // Khadijah's wording, 29 October, for the dashboard alert.
+            'title'      => $this->headline(),
+            'event'      => $this->booking->event?->title,
             'stage'      => $this->stage,
             'confirm_by' => $this->confirmBy?->toIso8601String(),
             'message'    => $this->sentence(),
+            'cta'        => 'Assign Contact Now',
             'url'        => $this->booking->event_id
                 ? route('professional.gigs.show', $this->booking->event_id)
                 : route('professional.gigs.index'),
         ];
     }
 
+    /** The alert's own line, as Khadijah wrote it. */
+    public function headline(): string
+    {
+        return $this->stage === 'missed'
+            ? 'Overdue: Assign On-Site Contact'
+            : 'Action Required: Assign On-Site Contact';
+    }
+
     public function sentence(): string
     {
-        $event = $this->booking->event?->title ?? 'your booking';
+        $event = $this->booking->event?->title ?? 'your event';
 
         if ($this->stage === 'missed') {
             return 'You have not said who is attending ' . $event . ', and the deadline has passed. '
-                . 'Say now, including if it is you.';
+                . 'Please assign your primary on-site contact now so the client knows who will be '
+                . 'arriving. Choosing yourself counts.';
         }
 
         $by = $this->confirmBy?->format('M j, g:i A');
 
-        return 'Say who is attending ' . $event
-            . ($by ? ' by ' . $by : '')
+        return 'Your event ' . $event . ' starts soon. Please assign your primary on-site contact so '
+            . 'the client knows who will be arriving'
+            . ($by ? ', by ' . $by : '')
             . '. Choosing yourself counts.';
     }
 }
