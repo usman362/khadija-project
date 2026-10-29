@@ -1246,6 +1246,14 @@ Route::middleware('auth')->group(function () {
          */
         Route::post('/gigs/{event}/point-of-contact', [ProfessionalGigController::class, 'setPointOfContact'])
             ->middleware('permission:events.view')->name('professional.gigs.point-of-contact');
+        /*
+         * Who is in charge on site, which is a different question. Sir
+         * Peter's point 9 keeps the rank and the job apart: the supervisor
+         * is often not the person the client rings, so this reaches no
+         * client and sends no notice.
+         */
+        Route::post('/gigs/{event}/supervisor', [ProfessionalGigController::class, 'setSupervisor'])
+            ->middleware('permission:events.view')->name('professional.gigs.supervisor');
 
         // Proposals (Bookings from professional's perspective)
         // Direct Offers (SSR / MSR / ESR) — client sends a direct request to this pro

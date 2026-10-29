@@ -70,17 +70,34 @@ class ProfessionalTeamController extends Controller
     public function storeStaff(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'name'        => ['required', 'string', 'max:120'],
-            'role'        => ['nullable', 'string', 'max:80'],
-            'phone'       => ['nullable', 'string', 'max:40'],
-            'email'       => ['nullable', 'email', 'max:160'],
-            'hourly_rate' => ['nullable', 'numeric', 'min:0', 'max:9999'],
+            'name'          => ['required', 'string', 'max:120'],
+            'role'          => ['nullable', 'string', 'max:80'],
+            'phone'         => ['nullable', 'string', 'max:40'],
+            'email'         => ['nullable', 'email', 'max:160'],
+            'hourly_rate'   => ['nullable', 'numeric', 'min:0', 'max:9999'],
+            // A rank the person holds, not a job for one event. See the
+            // migration: Sir Peter asked for the two to stay apart.
+            'is_supervisor' => ['nullable', 'boolean'],
+            // The client is shown this, so it is the one upload here that
+            // leaves the professional's own screens.
+            'photo'         => ['nullable', 'image', 'max:4096'],
         ]);
 
+        $photo = $request->hasFile('photo')
+            ? $request->file('photo')->store('staff', 'public')
+            : null;
+
         StaffMember::create([
-            'supplier_id' => $request->user()->id,
-            'status'      => 'active',
-        ] + $data);
+            'supplier_id'   => $request->user()->id,
+            'status'        => 'active',
+            'name'          => $data['name'],
+            'role'          => $data['role'] ?? null,
+            'phone'         => $data['phone'] ?? null,
+            'email'         => $data['email'] ?? null,
+            'hourly_rate'   => $data['hourly_rate'] ?? null,
+            'is_supervisor' => (bool) ($data['is_supervisor'] ?? false),
+            'photo'         => $photo,
+        ]);
 
         return back()->with('status', 'Team member added.');
     }

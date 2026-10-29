@@ -177,7 +177,7 @@ class ProfessionalGigController extends Controller
         $booking = $isOwnGig
             ? $event->bookings()->where('supplier_id', $user->id)
                 ->whereNotIn('status', ['cancelled'])
-                ->with('pointOfContact')
+                ->with(['pointOfContact', 'supervisor'])
                 ->latest('id')
                 ->first()
             : null;
@@ -225,5 +225,36 @@ class ProfessionalGigController extends Controller
         return back()->with('status', $staff
             ? $staff->name . ' is now the point of contact for this job.'
             : 'You are the point of contact for this job again.');
+    }
+
+    /**
+     * Put one of their supervisors in charge of this job.
+     *
+     * Sir Peter's point 9: kept apart from the point of contact, because a
+     * rank and a job for one event are different questions. Nothing about
+     * this reaches the client, which is why it sends no notice.
+     */
+    public function setSupervisor(Request $request, Event $event): RedirectResponse
+    {
+        $user = $request->user();
+
+        $booking = $event->bookings()->where('supplier_id', $user->id)
+            ->whereNotIn('status', ['cancelled'])
+            ->latest('id')
+            ->firstOrFail();
+
+        $data = $request->validate([
+            'staff_id' => ['nullable', 'integer', 'exists:staff_members,id'],
+        ]);
+
+        $staff = $data['staff_id']
+            ? \App\Models\StaffMember::find($data['staff_id'])
+            : null;
+
+        \App\Domain\PointOfContact::putInCharge($booking, $staff, $user);
+
+        return back()->with('status', $staff
+            ? $staff->name . ' is in charge on site for this job.'
+            : 'Nobody is marked as in charge on site for this job.');
     }
 }

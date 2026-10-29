@@ -23,6 +23,7 @@ class Booking extends Model
         // The crew member the client will actually meet, where the
         // professional is sending one. See App\Domain\PointOfContact.
         'point_of_contact_id',
+        'supervisor_id',
         'point_of_contact_set_at',
         'attendance_confirmed_at',
         'created_by',
@@ -225,6 +226,19 @@ class Booking extends Model
     public function pointOfContact(): BelongsTo
     {
         return $this->belongsTo(StaffMember::class, 'point_of_contact_id');
+    }
+
+    /**
+     * Who is in charge on site for this job.
+     *
+     * A different question from the point of contact, and kept apart on Sir
+     * Peter's instruction. A supervisor is a rank; the point of contact is a
+     * job for one event, and the supervisor is often not the one the client
+     * rings.
+     */
+    public function supervisor(): BelongsTo
+    {
+        return $this->belongsTo(StaffMember::class, 'supervisor_id');
     }
 
     /**

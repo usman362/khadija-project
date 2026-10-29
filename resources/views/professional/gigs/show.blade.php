@@ -305,6 +305,39 @@
                     @error('point_of_contact')
                         <p style="font-size:12.5px;color:var(--accent-red);margin:10px 0 0;">{{ $message }}</p>
                     @enderror
+
+                    {{-- Who is in charge on site, which is a different
+                         question and stays a different control. A supervisor
+                         is a rank the person holds; the point of contact is a
+                         job for this one event, and the supervisor is often
+                         not the one the client rings. --}}
+                    @php $supervisors = $crew->where('is_supervisor', true); @endphp
+                    @if($supervisors->isNotEmpty())
+                        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border-color);">
+                            <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">In charge on site</div>
+                            <p style="font-size:12.5px;color:var(--text-muted);line-height:1.55;margin:0 0 10px;">
+                                Your own record of who runs this job. {{ $event->client?->name ?? 'The client' }} does not see it.
+                            </p>
+                            <form method="POST" action="{{ route('professional.gigs.supervisor', $event) }}">
+                                @csrf
+                                <select name="staff_id" class="poc-select"
+                                        aria-label="Which supervisor runs this job"
+                                        onchange="this.form.submit()">
+                                    <option value="">Nobody</option>
+                                    @foreach($supervisors as $member)
+                                        <option value="{{ $member->id }}"
+                                            {{ (int) $booking->supervisor_id === $member->id ? 'selected' : '' }}>
+                                            {{ $member->name }}@if($member->role) &middot; {{ $member->role }}@endif
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <noscript><button type="submit" class="poc-select" style="margin-top:10px;cursor:pointer;">Save</button></noscript>
+                            </form>
+                            @error('supervisor')
+                                <p style="font-size:12.5px;color:var(--accent-red);margin:10px 0 0;">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    @endif
                 </div>
             @endif
 

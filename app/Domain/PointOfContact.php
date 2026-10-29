@@ -222,11 +222,39 @@ final class PointOfContact
         return [
             'name'  => $staff->name,
             'role'  => $staff->role,
+            // Sir Peter: the client sees the worker's photo, name, role and
+            // number. A name alone is not much use to somebody looking round
+            // a venue for a stranger.
+            'photo' => $staff->photoUrl(),
             // The reason the client is told at all: somebody to reach on the
             // day. A name with no number is half an answer.
             'phone' => $staff->phone,
             'since' => $booking->point_of_contact_set_at,
         ];
+    }
+
+    /**
+     * Put a supervisor in charge of this job, or take them off it.
+     *
+     * Sir Peter's point 9: supervisor status is kept SEPARATE from on-site
+     * contact status. They answer different questions. A supervisor is a rank
+     * the person holds; a point of contact is a job for one event. The
+     * supervisor is often not the one the client rings, so naming one tells
+     * the client nothing and sends no notice.
+     *
+     * @throws ValidationException when the crew member is not theirs, or holds no rank
+     */
+    public static function putInCharge(Booking $booking, ?StaffMember $staff, User $by): void
+    {
+        self::assertTheirs($booking, $staff, $by);
+
+        if ($staff && ! $staff->is_supervisor) {
+            throw ValidationException::withMessages([
+                'supervisor' => $staff->name . ' is not marked as a supervisor on your team.',
+            ]);
+        }
+
+        $booking->forceFill(['supervisor_id' => $staff?->id])->save();
     }
 
     /**

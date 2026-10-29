@@ -191,13 +191,56 @@
         </div>
     </div>
 
+    {{-- The crew itself.
+
+         The page could add people and never show them. On-shift avatars
+         answered "who is working now", which is a different question from
+         "who is on my team", and that second one is the list a professional
+         picks a point of contact from. --}}
+    <div class="pt-card" style="margin-top:20px;">
+        <div class="pt-sec-h"><span class="dot" style="background:#2563eb;"></span><b>Your Crew ({{ $staff->count() }})</b></div>
+        @forelse($staff as $i => $member)
+            @php $avColors = ['#be185d','#1d4ed8','#047857','#6d28d9','#b45309','#c2410c','#475569','#0e7490']; @endphp
+            <div style="display:flex;align-items:center;gap:13px;padding:12px 0;border-top:{{ $i ? '1px solid var(--border-color)' : '0' }};">
+                @if($member->photoUrl())
+                    <img src="{{ $member->photoUrl() }}" alt=""
+                         style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;">
+                @else
+                    <div style="width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;
+                                justify-content:center;font-size:13px;font-weight:700;color:#fff;
+                                background:{{ $avColors[$i % count($avColors)] }};">{{ $member->initials() }}</div>
+                @endif
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:14px;font-weight:700;color:var(--text-primary);">
+                        {{ $member->name }}
+                        @if($member->is_supervisor)
+                            <span style="margin-left:6px;padding:2px 8px;border-radius:999px;font-size:10.5px;
+                                         font-weight:800;letter-spacing:.3px;text-transform:uppercase;
+                                         background:rgba(37,99,235,0.14);color:var(--info-text);">Supervisor</span>
+                        @endif
+                    </div>
+                    {{-- Joined in PHP: Blade ignores a directive that follows
+                         a word character, so "@endif@if" prints rather than
+                         compiles. --}}
+                    <div style="font-size:12.5px;color:var(--text-muted);margin-top:2px;">
+                        {{ implode(' · ', array_filter([$member->public_id, $member->role, $member->phone])) }}
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="pt-empty">Nobody on your team yet. Add your crew below, and you can send one of them to a job in your place.</div>
+        @endforelse
+    </div>
+
     {{-- Manage staffing --}}
     <button class="pt-manage-btn" type="button" onclick="document.getElementById('pt-manage').classList.toggle('open')">Manage Staffing <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
 
     <div class="pt-manage-panel" id="pt-manage">
         <div class="pt-card">
             <div class="pt-form-h">Add Team Member</div>
-            <form method="POST" action="{{ route('professional.team.staff.store') }}">@csrf
+            {{-- enctype, because the photo is a file. Without it the form
+                 posts the filename and the upload silently never arrives. --}}
+            <form method="POST" action="{{ route('professional.team.staff.store') }}" enctype="multipart/form-data">@csrf
                 <div class="pt-field"><label>Name</label><input class="pt-input" name="name" required placeholder="e.g. Emma Martinez"></div>
                 <div class="pt-grid2">
                     <div class="pt-field"><label>Role</label><input class="pt-input" name="role" placeholder="Server"></div>
@@ -206,6 +249,26 @@
                 <div class="pt-grid2">
                     <div class="pt-field"><label>Phone</label><input class="pt-input" name="phone" placeholder="Optional"></div>
                     <div class="pt-field"><label>Email</label><input class="pt-input" name="email" type="email" placeholder="Optional"></div>
+                </div>
+                {{-- The one thing here a client ever sees, so it says so. --}}
+                <div class="pt-field">
+                    <label for="pt-photo">Photo</label>
+                    <input class="pt-input" id="pt-photo" name="photo" type="file" accept="image/*">
+                    <span style="display:block;font-size:11.5px;color:var(--text-muted);margin-top:5px;line-height:1.5;">
+                        Shown to a client when this person is the point of contact for their event.
+                    </span>
+                </div>
+                {{-- A rank the person holds, not a job for one event: the
+                     supervisor is often not the one the client rings. --}}
+                <div class="pt-field">
+                    <label style="display:flex;gap:9px;align-items:flex-start;cursor:pointer;font-weight:400;">
+                        <input type="checkbox" name="is_supervisor" value="1" style="margin-top:3px;flex-shrink:0;">
+                        <span>Supervisor
+                            <span style="display:block;font-size:11.5px;color:var(--text-muted);margin-top:3px;line-height:1.5;">
+                                Can be put in charge on site. Separate from who the client contacts.
+                            </span>
+                        </span>
+                    </label>
                 </div>
                 <button class="pt-form-btn" type="submit">+ Add Member</button>
             </form>

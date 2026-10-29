@@ -333,20 +333,30 @@
                          off to a stranger. --}}
                     @php $poc = \App\Domain\PointOfContact::forClient($booking); @endphp
                     @if($poc)
-                        <div style="padding:12px 18px;border-top:1px solid var(--border-color);
+                        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 18px;
+                                    border-top:1px solid var(--border-color);
                                     background:rgba(37,99,235,0.05);font-size:12.5px;line-height:1.6;">
-                            {{-- Role in brackets, not after a divider: a divider
-                                 reads as the end of the name and the next words
-                                 then run into the sentence. --}}
-                            <b style="color:var(--text-primary);">{{ $poc['name'] }}</b><span
-                                style="color:var(--text-secondary);">@if($poc['role']) ({{ $poc['role'] }})@endif will
-                                be your point of contact on the day.</span>
-                            @if($poc['phone'])
-                                <a href="tel:{{ $poc['phone'] }}" style="color:var(--info-text);">{{ $poc['phone'] }}</a>
+                            {{-- Their face, where the professional supplied one.
+                                 A name alone is not much use to somebody looking
+                                 round a venue for a stranger. --}}
+                            @if($poc['photo'])
+                                <img src="{{ $poc['photo'] }}" alt=""
+                                     style="width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;">
                             @endif
-                            <span style="display:block;color:var(--text-muted);margin-top:3px;">
-                                {{ $pro?->name ?? 'The professional' }} is still responsible for the work.
-                            </span>
+                            <div style="min-width:0;">
+                                {{-- Role in brackets, not after a divider: a divider
+                                     reads as the end of the name and the next words
+                                     then run into the sentence. --}}
+                                <b style="color:var(--text-primary);">{{ $poc['name'] }}</b><span
+                                    style="color:var(--text-secondary);">@if($poc['role']) ({{ $poc['role'] }})@endif will
+                                    be your point of contact on the day.</span>
+                                @if($poc['phone'])
+                                    <a href="tel:{{ $poc['phone'] }}" style="color:var(--info-text);">{{ $poc['phone'] }}</a>
+                                @endif
+                                <span style="display:block;color:var(--text-muted);margin-top:3px;">
+                                    {{ $pro?->name ?? 'The professional' }} is still responsible for the work.
+                                </span>
+                            </div>
                         </div>
                     @endif
 

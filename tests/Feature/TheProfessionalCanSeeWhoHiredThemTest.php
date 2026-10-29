@@ -34,7 +34,13 @@ class TheProfessionalCanSeeWhoHiredThemTest extends TestCase
         $this->seed(\Database\Seeders\PermissionSeeder::class);
         $this->seed(\Database\Seeders\RolePermissionSeeder::class);
 
-        $this->client       = $this->person('client');
+        /*
+         * Named rather than generated, because these tests assert the name
+         * on a rendered page. A generated name with an apostrophe in it
+         * comes back as &#039; and an unescaped assertion then fails on a
+         * page that is perfectly correct.
+         */
+        $this->client       = $this->person('client', 'Imogen Hartwell');
         $this->professional = $this->person('professional');
     }
 

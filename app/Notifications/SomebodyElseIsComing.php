@@ -45,6 +45,7 @@ class SomebodyElseIsComing extends Notification
             'staff'      => $this->staff?->name,
             'role'       => $this->staff?->role,
             'phone'      => $this->staff?->phone,
+            'photo'      => $this->staff?->photoUrl(),
             'message'    => $this->sentence(),
             'url'        => route('client.bookings.index'),
         ];
