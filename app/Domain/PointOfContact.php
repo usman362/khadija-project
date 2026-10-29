@@ -38,6 +38,36 @@ use Illuminate\Validation\ValidationException;
 final class PointOfContact
 {
     /**
+     * The three answers to "who is coming", as Sir Peter set them out.
+     *
+     * PROFESSIONAL is a promise, not a default. It is the answer that stops a
+     * staff member being named afterwards, because his rule for changing the
+     * contact after signing is "provided this does not change an agreed
+     * personal-attendance obligation".
+     *
+     * LATER is the one a checkbox could not hold, and the one that creates an
+     * obligation of its own: somebody has to say who is coming before the
+     * day. It is not "no" and it is not "yes".
+     */
+    public const PROFESSIONAL = 'professional';
+    public const STAFF        = 'staff';
+    public const LATER        = 'later';
+
+    /** @var array<string, string> How each answer reads on a screen. */
+    public const ANSWERS = [
+        self::PROFESSIONAL => 'I will attend personally',
+        self::STAFF        => 'A member of my staff may attend',
+        self::LATER        => 'I will decide nearer the time',
+    ];
+
+    /**
+     * How long before the event an open answer has to be settled.
+     *
+     * Sir Peter: "require confirmation at least 24 hours before the event".
+     */
+    public const CONFIRM_HOURS = 24;
+
+    /**
      * Name the person who will be there, or clear it.
      *
      * @throws ValidationException when the crew member is not this professional's
@@ -45,23 +75,106 @@ final class PointOfContact
     public static function set(Booking $booking, ?StaffMember $staff, User $by): void
     {
         self::assertTheirs($booking, $staff, $by);
+        self::assertNotPromisedInPerson($booking, $staff);
 
         $was = $booking->point_of_contact_id;
 
-        if ($staff?->id === $was) {
-            return;
-        }
+        // Naming nobody is still an answer where the agreement left it open,
+        // so the confirmation is stamped before this returns.
+        $alreadyThem = $staff?->id === $was;
 
         $booking->forceFill([
             'point_of_contact_id'     => $staff?->id,
             // Null when cleared: the question "when was this decided" has no
             // answer once there is nothing decided.
             'point_of_contact_set_at' => $staff ? now() : null,
+            'attendance_confirmed_at' => now(),
         ])->save();
+
+        if ($alreadyThem) {
+            return;
+        }
 
         if (self::tellTheClient($booking)) {
             self::announce($booking->fresh(), $staff, $by);
         }
+    }
+
+    /**
+     * A promise to attend personally cannot be undone by picking a name.
+     *
+     * Sir Peter: the contact may be changed after signing "provided this does
+     * not change an agreed personal-attendance obligation". This is that
+     * proviso. The professional is not stuck with it — they ask for the term
+     * to change through Edit Agreement, which raises the version and puts the
+     * question back to the client, where it belongs.
+     *
+     * Only once the client has signed. Before that the terms are still being
+     * built and the whole agreement is in motion.
+     */
+    private static function assertNotPromisedInPerson(Booking $booking, ?StaffMember $staff): void
+    {
+        if (! $staff) {
+            return;
+        }
+
+        $agreement = self::agreementFor($booking);
+
+        if (! $agreement || ! $agreement->client_signed_at) {
+            return;
+        }
+
+        if ($agreement->attendance === self::PROFESSIONAL) {
+            throw ValidationException::withMessages([
+                'point_of_contact' => 'This agreement says you will attend personally. '
+                    . 'Ask for that term to change before sending somebody else.',
+            ]);
+        }
+    }
+
+    /**
+     * Has the open answer been settled, for an agreement that left it open?
+     *
+     * True for any other answer: there is nothing left to settle.
+     */
+    public static function settled(Booking $booking): bool
+    {
+        $agreement = self::agreementFor($booking);
+
+        if (! $agreement || $agreement->attendance !== self::LATER) {
+            return true;
+        }
+
+        /*
+         * The obligation starts at the signature, not at the draft. Until the
+         * client signs, the terms are still being argued over and "later" is
+         * a position in that argument rather than a promise to come back with
+         * an answer. Chasing somebody over an agreement nobody has agreed to
+         * is how a reminder becomes noise.
+         */
+        if (! $agreement->client_signed_at) {
+            return true;
+        }
+
+        return $booking->attendance_confirmed_at !== null;
+    }
+
+    /**
+     * An open answer that is running out of time.
+     *
+     * Null when there is nothing owed, or when the event has no date to count
+     * back from. A deadline invented from a missing date would chase people
+     * over an event that may not be happening.
+     */
+    public static function confirmBy(Booking $booking): ?\Illuminate\Support\Carbon
+    {
+        if (self::settled($booking)) {
+            return null;
+        }
+
+        $starts = $booking->event?->starts_at;
+
+        return $starts?->copy()->subHours(self::CONFIRM_HOURS);
     }
 
     /**
@@ -83,7 +196,9 @@ final class PointOfContact
             return false;
         }
 
-        return ! $agreement->staff_may_attend;
+        // Agreed that staff may come: this is exactly what the client said
+        // yes to, so it is not news. Left open: they are owed the answer.
+        return $agreement->attendance !== self::STAFF;
     }
 
     /**
@@ -128,11 +243,15 @@ final class PointOfContact
     {
         $lines = ['WHO ATTENDS'];
 
-        $lines[] = $f->staff_may_attend
-            ? 'The Professional may send a member of their staff to attend in their place. '
-              . 'The Client has agreed to this.'
-            : 'The Professional is expected to attend. If a member of their staff attends '
-              . 'instead, the Client will be told.';
+        $lines[] = match ($f->attendance) {
+            self::STAFF => 'The Professional may send a member of their staff to attend in their '
+                . 'place. The Client has agreed to this.',
+            self::LATER => 'The Professional has not yet said whether they will attend personally '
+                . 'or send a member of their staff. They will tell the Client at least '
+                . self::CONFIRM_HOURS . ' hours before the service begins.',
+            default     => 'The Professional will attend personally. A member of their staff may '
+                . 'not be sent in their place without the Client agreeing to it.',
+        };
 
         // The rule itself, in his words, on the document rather than merely
         // understood.
@@ -140,6 +259,27 @@ final class PointOfContact
             . 'even when a staff member attends instead.';
 
         return $lines;
+    }
+
+    /**
+     * Which of the three answers this booking's agreement carries.
+     *
+     * Null when there is no agreement behind it yet. Asked by the screens, so
+     * that none of them has to find the agreement for itself and reach a
+     * different one.
+     */
+    public static function termFor(Booking $booking): ?string
+    {
+        return self::agreementFor($booking)?->attendance;
+    }
+
+    /** Is the professional held to coming in person? */
+    public static function promisedInPerson(Booking $booking): bool
+    {
+        $agreement = self::agreementFor($booking);
+
+        return (bool) $agreement?->client_signed_at
+            && $agreement->attendance === self::PROFESSIONAL;
     }
 
     /** The agreement behind a booking, where there is one. */

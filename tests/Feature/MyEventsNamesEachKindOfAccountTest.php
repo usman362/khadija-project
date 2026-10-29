@@ -390,6 +390,9 @@ class MyEventsNamesEachKindOfAccountTest extends TestCase
         // the fix was the words rather than the query.
         $this->bookingWith($influencer);
 
-        $this->assertStringContainsString($influencer->name, $this->page());
+        // Escaped, because the page escapes it. A generated name with an
+        // apostrophe in it comes back as &#039; and the raw string then
+        // fails on a page that is perfectly correct.
+        $this->assertStringContainsString(e($influencer->name), $this->page());
     }
 }

@@ -120,9 +120,12 @@
 <table>
     <tr>
         <td class="k">Attendance</td>
-        <td class="v">{{ $fin->staff_may_attend
-            ? 'A member of the Professional\'s staff may attend in their place, as agreed.'
-            : 'The Professional is expected to attend. The Client is told if a staff member attends instead.' }}</td>
+        <td class="v">{{ match ($fin->attendance) {
+            \App\Domain\PointOfContact::STAFF => 'A member of the Professional\'s staff may attend in their place, as agreed.',
+            \App\Domain\PointOfContact::LATER => 'Not yet decided. The Professional will say who is attending at least '
+                . \App\Domain\PointOfContact::CONFIRM_HOURS . ' hours before the service begins.',
+            default => 'The Professional will attend personally.',
+        } }}</td>
     </tr>
     <tr>
         <td class="k">Responsibility</td>

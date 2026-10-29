@@ -48,10 +48,10 @@ final class Workspace
     public const MATERIAL = [
         'scope', 'agreed_price', 'service_start', 'service_end',
         'deposit_percent', 'deposit_amount', 'balance_due_on', 'payment_terms',
-        // Whether a staff member may come instead of the professional. It
-        // changes what the client is agreeing to, so an approval given
-        // without it does not carry over to terms that have it.
-        'staff_may_attend',
+        // Who attends: the professional, a staff member, or not decided
+        // yet. It changes what the client is agreeing to, so an approval
+        // given on one answer does not carry over to another.
+        'attendance',
     ];
 
     /**

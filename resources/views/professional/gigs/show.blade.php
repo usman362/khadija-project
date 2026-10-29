@@ -230,7 +230,35 @@
                         responsible for the work whoever goes.
                     </p>
 
-                    @if($crew->isEmpty())
+                    @php
+                        $promised = \App\Domain\PointOfContact::promisedInPerson($booking);
+                        $confirmBy = \App\Domain\PointOfContact::confirmBy($booking);
+                    @endphp
+
+                    @if($confirmBy)
+                        {{-- The agreement left it open, so somebody is owed an
+                             answer and there is a day by which they get it. --}}
+                        <p style="font-size: 12.5px; line-height: 1.55; margin: 0 0 12px; padding: 10px 12px;
+                                  border-radius: 8px; background: rgba(245,158,11,0.10); color: var(--warn-text);">
+                            You said you would decide nearer the time. Tell
+                            {{ $event->client?->name ?? 'the client' }} by
+                            {{ $confirmBy->format('M j, g:i A') }}, which is
+                            {{ \App\Domain\PointOfContact::CONFIRM_HOURS }} hours before it starts.
+                            Choosing below counts as telling them, including choosing yourself.
+                        </p>
+                    @endif
+
+                    @if($promised)
+                        {{-- A promise to attend personally is a term, so it is
+                             not undone by picking a name off a list. They can
+                             still ask for the term to change, which puts the
+                             question back to the client where it belongs. --}}
+                        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.55; margin: 0;">
+                            This agreement says you attend personally.
+                            <a href="{{ route('professional.agreements.index') }}" style="color: var(--accent-blue);">Ask for that term to change</a>
+                            before sending somebody else.
+                        </p>
+                    @elseif($crew->isEmpty())
                         <p style="font-size: 13px; color: var(--text-muted); line-height: 1.55; margin: 0;">
                             You have nobody on your team yet.
                             <a href="{{ route('professional.team.index') }}" style="color: var(--accent-blue);">Add your crew</a>
@@ -254,20 +282,29 @@
                         </form>
 
                         @if($booking->pointOfContact)
+                            {{-- Said from the agreement's own answer, not from
+                                 whether a notice goes out. An unsigned
+                                 agreement sends no notice either, and reading
+                                 that as "they agreed to staff" told the
+                                 professional something that was not true. --}}
                             <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.55; margin: 10px 0 0;">
-                                @if(\App\Domain\PointOfContact::tellTheClient($booking))
+                                @if(\App\Domain\PointOfContact::termFor($booking) === \App\Domain\PointOfContact::STAFF)
+                                    The agreement says a staff member may attend, so this is not a surprise to
+                                    {{ $event->client?->name ?? 'the client' }}.
+                                @elseif(\App\Domain\PointOfContact::tellTheClient($booking))
                                     {{ $event->client?->name ?? 'The client' }} is told when this changes, because the
                                     agreement does not say a staff member may attend.
                                 @else
-                                    The agreement says a staff member may attend, so this is not a surprise to
-                                    {{ $event->client?->name ?? 'the client' }}.
+                                    {{ $event->client?->name ?? 'The client' }} sees this on their booking once the
+                                    agreement is signed.
                                 @endif
                             </p>
                         @endif
-                        @error('point_of_contact')
-                            <p style="font-size:12.5px;color:var(--accent-red);margin:10px 0 0;">{{ $message }}</p>
-                        @enderror
                     @endif
+
+                    @error('point_of_contact')
+                        <p style="font-size:12.5px;color:var(--accent-red);margin:10px 0 0;">{{ $message }}</p>
+                    @enderror
                 </div>
             @endif
 

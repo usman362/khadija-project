@@ -24,6 +24,7 @@ class Booking extends Model
         // professional is sending one. See App\Domain\PointOfContact.
         'point_of_contact_id',
         'point_of_contact_set_at',
+        'attendance_confirmed_at',
         'created_by',
         'status',
         'notes',
@@ -204,6 +205,7 @@ class Booking extends Model
         return [
             'booked_at' => 'datetime',
             'point_of_contact_set_at' => 'datetime',
+            'attendance_confirmed_at' => 'datetime',
             'price' => 'decimal:2',
         ];
     }

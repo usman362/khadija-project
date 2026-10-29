@@ -489,36 +489,30 @@
                                     default                           => 'text',
                                 };
                                 $long = in_array($field, ['scope', 'payment_terms', 'schedule_notes'], true);
-                                // A yes-or-no term. Compared as a boolean,
-                                // because null and false are the same answer
-                                // and comparing them as text reports a change
-                                // nobody made.
-                                $flag  = \App\Domain\Agreements\EditAgreement::isFlag($field);
+                                // A term that is one of a fixed set of answers
+                                // rather than a value, drawn as a choice.
+                                $options = \App\Domain\Agreements\EditAgreement::optionsFor($field);
                                 $moved = $draft && array_key_exists($field, $draft)
-                                    && ($flag
-                                        ? (bool) ($draft[$field] ?? false) !== (bool) ($terms[$field] ?? false)
-                                        : trim((string) ($draft[$field] ?? '')) !== trim((string) ($terms[$field] ?? '')));
+                                    && trim((string) ($draft[$field] ?? '')) !== trim((string) ($terms[$field] ?? ''));
                             @endphp
                             <label class="eg-field {{ $moved ? 'is-moved' : '' }}">
                                 <span class="eg-label">
                                     {{ $editFields[$field] }}
                                     @if($moved)<span class="eg-moved">edited</span>@endif
                                 </span>
-                                @if($flag)
-                                    {{-- The hidden 0 goes with the box: an
-                                         unticked checkbox sends nothing, and
-                                         nothing would read as unchanged
-                                         rather than as the no it means. --}}
-                                    <input type="hidden" name="terms[{{ $field }}]" value="0">
-                                    <span style="display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.55;">
-                                        <input type="checkbox" name="terms[{{ $field }}]" value="1"
-                                               style="margin-top:3px;flex-shrink:0;"
-                                               {{ old('terms.' . $field, $value) ? 'checked' : '' }}>
-                                        <span>
-                                            Yes. {{ $fin->supplier?->name ?? 'The professional' }} may send a member of
-                                            their staff instead of coming themselves. They stay responsible for the work
-                                            either way.
+                                @if($options)
+                                    @php $chosen = old('terms.' . $field, $value); @endphp
+                                    @foreach($options as $option => $label)
+                                        <span style="display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.55;margin-bottom:6px;">
+                                            <input type="radio" name="terms[{{ $field }}]" value="{{ $option }}"
+                                                   style="margin-top:3px;flex-shrink:0;"
+                                                   {{ $chosen === $option ? 'checked' : '' }}>
+                                            <span>{{ $label }}</span>
                                         </span>
+                                    @endforeach
+                                    <span style="display:block;font-size:12px;color:var(--text-muted);line-height:1.55;">
+                                        {{ $fin->supplier?->name ?? 'The professional' }} stays responsible for the work
+                                        whoever attends.
                                     </span>
                                 @elseif($long)
                                     <textarea name="terms[{{ $field }}]" rows="3" maxlength="5000">{{ old('terms.' . $field, $value) }}</textarea>

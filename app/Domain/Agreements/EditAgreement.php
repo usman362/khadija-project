@@ -48,29 +48,31 @@ final class EditAgreement
         'deposit_percent' => 'Deposit percentage',
         'balance_due_on'  => 'Balance due on',
         'payment_terms'   => 'Payment terms',
-        // Sir Peter, 28 October: the professional may say up front that a
-        // staff member might come instead of them, so a later swap is
-        // expected rather than a surprise. It is a term, so it travels with
-        // the rest: changing it moves the version and both sides look again.
-        'staff_may_attend' => 'A staff member may attend',
+        // Sir Peter, 29 October: the professional says up front whether they
+        // will attend personally, send a staff member, or decide nearer the
+        // time. It is a term, so it travels with the rest: changing it moves
+        // the version and both sides look again.
+        'attendance' => 'Who attends',
     ];
 
     /**
-     * Terms that are yes or no rather than a value.
+     * Terms that are one of a fixed set of answers rather than a value.
      *
-     * They need their own handling in three places: a cleared text box means
-     * "not set", but an unticked box means "no", and the two must not be
-     * confused. The form sends a hidden 0 before the checkbox so the answer
-     * is always present.
+     * They need their own handling because the usual rules do not fit. A
+     * cleared text box means "not set"; a choice always has an answer, and an
+     * unrecognised one is not an empty one, it is wrong. The options and what
+     * each means live with the rule they serve, in PointOfContact.
+     *
+     * @var array<string, array<string, string>>
      */
-    private const FLAGS = ['staff_may_attend'];
+    private const CHOICES = ['attendance' => \App\Domain\PointOfContact::ANSWERS];
 
     /** Sections, as his edit panel groups them. */
     public const SECTIONS = [
         'Event details & requirements' => ['service_start', 'service_end', 'schedule_notes'],
         'Services & deliverables'      => ['scope'],
         'Budget & payment terms'       => ['agreed_price', 'deposit_percent', 'balance_due_on', 'payment_terms'],
-        'Who attends'                  => ['staff_may_attend'],
+        'Who attends'                  => ['attendance'],
     ];
 
     /** Fields that move money, which is why funding closes them. */
@@ -162,10 +164,27 @@ final class EditAgreement
         return $changed;
     }
 
-    /** Is this term a yes-or-no rather than a value? Asked by the edit panels. */
-    public static function isFlag(string $field): bool
+    /**
+     * The options for a term that is a choice, or null when it is not one.
+     *
+     * Asked by the edit panels, which draw a choice as radio buttons rather
+     * than a text box.
+     *
+     * @return array<string, string>|null
+     */
+    public static function optionsFor(string $field): ?array
     {
-        return in_array($field, self::FLAGS, true);
+        return self::CHOICES[$field] ?? null;
+    }
+
+    /** One of the offered answers, whatever arrived. */
+    private static function answer(string $field, mixed $value): string
+    {
+        $options = self::CHOICES[$field];
+
+        return is_string($value) && array_key_exists($value, $options)
+            ? $value
+            : array_key_first($options);
     }
 
     /** Every version so far, newest first. */
@@ -324,10 +343,10 @@ final class EditAgreement
      */
     private static function same(string $field, mixed $a, mixed $b): bool
     {
-        // A flag has no "not set". Null and false are the same answer, and
-        // comparing them as values would report a change nobody made.
-        if (in_array($field, self::FLAGS, true)) {
-            return (bool) $a === (bool) $b;
+        // A choice always has an answer. Nothing submitted is the default
+        // rather than a change, which is what the ?? carries.
+        if (array_key_exists($field, self::CHOICES)) {
+            return self::answer($field, $a) === self::answer($field, $b);
         }
 
         if ($a === null xor $b === null) {
@@ -433,8 +452,8 @@ final class EditAgreement
      */
     public static function readable(string $field, mixed $value): string
     {
-        if (in_array($field, self::FLAGS, true)) {
-            return $value ? 'yes' : 'no';
+        if (array_key_exists($field, self::CHOICES)) {
+            return self::CHOICES[$field][self::answer($field, $value)];
         }
 
         if ($value === null || (is_string($value) && trim($value) === '')) {
@@ -468,10 +487,11 @@ final class EditAgreement
                 continue;
             }
 
-            if (in_array($field, self::FLAGS, true)) {
-                // "0" is the hidden input the form sends when the box is not
-                // ticked, and (bool) "0" is false, which is the answer meant.
-                $out[$field] = (bool) $terms[$field];
+            if (array_key_exists($field, self::CHOICES)) {
+                // An answer nobody offered is not an answer. It falls back to
+                // the first option rather than being written to the column,
+                // so a tampered form cannot put an unknown word in a term.
+                $out[$field] = self::answer($field, $terms[$field]);
 
                 continue;
             }

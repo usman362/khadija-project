@@ -45,10 +45,9 @@ class Finalization extends Model
         'draft_terms'        => 'array',
         'draft_at'           => 'datetime',
         'declined_at'         => 'datetime',
-        // A term of the agreement: did the client agree up front that a
-        // staff member may come instead of the professional. False by
-        // default, because silence is not consent.
-        'staff_may_attend'    => 'boolean',
+        // 'attendance' is a string with three answers rather than a cast:
+        // see App\Domain\PointOfContact for what each one means and which
+        // one creates an obligation.
     ];
 
     /**

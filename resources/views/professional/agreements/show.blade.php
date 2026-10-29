@@ -202,16 +202,20 @@
              silent about who turns up is where the argument starts. --}}
         <div style="margin-top:20px;">
             <div class="pa-card-h" style="margin-bottom:8px;">Who attends</div>
-            <div class="pa-body">
-                @if($f->staff_may_attend)
-                    A member of your staff may attend instead of you, and {{ $f->client?->name ?? 'the client' }}
-                    has agreed to that.
-                @else
-                    You are expected to attend. If you send somebody from your team instead,
-                    {{ $f->client?->name ?? 'the client' }} is told.
-                @endif
-                You remain responsible for fulfilling this agreement either way.
-            </div>
+            @php
+                // Built as one string. .pa-body keeps whitespace as written,
+                // so a sentence assembled across indented Blade branches
+                // arrives on screen with the indentation in it.
+                $them = $f->client?->name ?? 'the client';
+
+                $attendance = match ($f->attendance) {
+                    \App\Domain\PointOfContact::STAFF => "A member of your staff may attend instead of you, and {$them} has agreed to that.",
+                    \App\Domain\PointOfContact::LATER => 'You have not said yet whether you are coming or sending somebody. Tell '
+                        . $them . ' at least ' . \App\Domain\PointOfContact::CONFIRM_HOURS . ' hours before it starts.',
+                    default => "You attend personally. Sending somebody from your team instead needs {$them} to agree to the change first.",
+                };
+            @endphp
+            <div class="pa-body">{{ $attendance }} You remain responsible for fulfilling this agreement whoever attends.</div>
         </div>
     </div>
 
@@ -391,26 +395,29 @@
                         <label class="pa-edit-wide"><span>Payment terms</span>
                             <textarea name="terms[payment_terms]" rows="2" maxlength="2000">{{ old('terms.payment_terms', $terms['payment_terms']) }}</textarea></label>
 
-                        {{-- Sir Peter, 28 October: say up front that a staff
-                             member may come, so a later swap is expected
-                             rather than a surprise. The hidden 0 goes with
-                             the box: an unticked checkbox sends nothing, and
-                             "nothing" would read as "unchanged" rather than
-                             as the no it means. --}}
+                        {{-- Sir Peter, 29 October: attend personally, send a
+                             staff member, or decide nearer the time. Three
+                             answers rather than a checkbox, because the third
+                             is the honest one months ahead of an event and it
+                             is the one that carries its own deadline. --}}
                         <div class="pa-edit-wide">
-                            <input type="hidden" name="terms[staff_may_attend]" value="0">
-                            <label class="pa-sign-ok" style="margin-top:0;">
-                                <input type="checkbox" name="terms[staff_may_attend]" value="1"
-                                       {{ old('terms.staff_may_attend', $terms['staff_may_attend']) ? 'checked' : '' }}>
-                                <span style="font-weight:600;">
-                                    A member of my staff may attend instead of me.
-                                    <span style="display:block;font-weight:400;color:var(--text-muted);margin-top:3px;">
-                                        You stay responsible for the work either way. Agreeing this now means
-                                        {{ $f->client?->name ?? 'the client' }} is not surprised if you send somebody
-                                        on the day.
-                                    </span>
-                                </span>
-                            </label>
+                            <span style="display:block;font-size:11.5px;font-weight:700;letter-spacing:.2px;
+                                         text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">
+                                Who attends
+                            </span>
+                            @php $chosen = old('terms.attendance', $terms['attendance'] ?? \App\Domain\PointOfContact::PROFESSIONAL); @endphp
+                            @foreach(\App\Domain\PointOfContact::ANSWERS as $value => $label)
+                                <label class="pa-sign-ok" style="margin-top:0;margin-bottom:8px;">
+                                    <input type="radio" name="terms[attendance]" value="{{ $value }}"
+                                           {{ $chosen === $value ? 'checked' : '' }}>
+                                    <span style="font-weight:600;">{{ $label }}</span>
+                                </label>
+                            @endforeach
+                            <p class="pa-edit-note" style="margin:2px 0 0;">
+                                You stay responsible for the work whoever goes. Deciding nearer the time means you
+                                tell {{ $f->client?->name ?? 'the client' }} at least
+                                {{ \App\Domain\PointOfContact::CONFIRM_HOURS }} hours before it starts.
+                            </p>
                         </div>
                         <label class="pa-edit-wide"><span>What you are asking for, and why</span>
                             <textarea name="summary" rows="2" maxlength="2000" required

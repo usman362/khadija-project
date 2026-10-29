@@ -153,8 +153,9 @@ class ProfessionalAgreementController extends Controller
             'terms.deposit_percent' => ['nullable', 'integer', 'min:0', 'max:100'],
             'terms.balance_due_on'  => ['nullable', 'date'],
             'terms.payment_terms'   => ['nullable', 'string', 'max:2000'],
-            // A yes-or-no term. The form always sends it, as 0 or 1.
-            'terms.staff_may_attend' => ['nullable', 'boolean'],
+            // One of three answers. Anything else falls back to the first
+            // rather than reaching the column; see EditAgreement::answer.
+            'terms.attendance' => ['nullable', 'string', 'in:professional,staff,later'],
             'summary'               => ['required', 'string', 'max:2000'],
         ], [
             'terms.service_end.after_or_equal' => 'The service cannot end before it starts.',
