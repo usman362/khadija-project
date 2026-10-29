@@ -237,15 +237,40 @@
 
                     @if($confirmBy)
                         {{-- The agreement left it open, so somebody is owed an
-                             answer and there is a day by which they get it. --}}
+                             answer and there is a day by which they get it.
+                             After that day it stops being a note and starts
+                             being a thing that has gone wrong. --}}
+                        @php $overdue = \App\Domain\AttendanceChase::overdue($booking); @endphp
                         <p style="font-size: 12.5px; line-height: 1.55; margin: 0 0 12px; padding: 10px 12px;
-                                  border-radius: 8px; background: rgba(245,158,11,0.10); color: var(--warn-text);">
-                            You said you would decide nearer the time. Tell
-                            {{ $event->client?->name ?? 'the client' }} by
-                            {{ $confirmBy->format('M j, g:i A') }}, which is
-                            {{ \App\Domain\PointOfContact::CONFIRM_HOURS }} hours before it starts.
-                            Choosing below counts as telling them, including choosing yourself.
+                                  border-radius: 8px;
+                                  background: {{ $overdue ? 'rgba(239,68,68,0.10)' : 'rgba(245,158,11,0.10)' }};
+                                  color: {{ $overdue ? 'var(--bad-text)' : 'var(--warn-text)' }};">
+                            @if($overdue)
+                                <b>You have not said who is attending.</b>
+                                The deadline was {{ $confirmBy->format('M j, g:i A') }}.
+                                Choose below now, including yourself.
+                            @else
+                                You said you would decide nearer the time. Tell
+                                {{ $event->client?->name ?? 'the client' }} by
+                                {{ $confirmBy->format('M j, g:i A') }}, which is
+                                {{ \App\Domain\PointOfContact::CONFIRM_HOURS }} hours before it starts.
+                                Choosing below counts as telling them, including choosing yourself.
+                            @endif
                         </p>
+
+                        {{-- With nobody to send, the answer is still owed, and
+                             it is answerable: the professional says it is
+                             them. Without this the only way to settle it
+                             would be to hire somebody. --}}
+                        @if($crew->isEmpty())
+                            <form method="POST" action="{{ route('professional.gigs.point-of-contact', $event) }}">
+                                @csrf
+                                <input type="hidden" name="staff_id" value="">
+                                <button type="submit" class="poc-select" style="cursor:pointer;text-align:left;">
+                                    I am attending myself
+                                </button>
+                            </form>
+                        @endif
                     @endif
 
                     @if($promised)

@@ -35,6 +35,21 @@ Schedule::command('subscriptions:renewal-notices')
     ->onOneServer();
 
 /*
+ * Who is attending, for agreements that left it open.
+ *
+ * Sir Peter, 29 October: a professional who says they will decide nearer the
+ * time has to confirm at least 24 hours before the event. Twice a day rather
+ * than every minute, because a reminder that is a few hours early or late is
+ * the same reminder, and a chaser that can arrive at 3 in the morning is one
+ * people learn to ignore. Each stage is written down before it is sent, so
+ * two runs in a day send nothing twice.
+ */
+Schedule::command('attendance:chase')
+    ->twiceDaily(9, 17)
+    ->withoutOverlapping()
+    ->onOneServer();
+
+/*
  * The scheduler saying it is alive.
  *
  * Every minute, because that is how often the host is meant to call it. Anything
