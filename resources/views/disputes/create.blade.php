@@ -60,7 +60,10 @@
                         <option value="">Choose a booking…</option>
                         @foreach($bookings as $booking)
                             @php $other = $booking->client_id === auth()->id() ? $booking->supplier : $booking->client; @endphp
-                            <option value="{{ $booking->id }}" @selected(old('booking_id') == $booking->id)>
+                            {{-- Preselected when they came from the booking
+                                 itself, so arriving from a job does not ask
+                                 them which job. --}}
+                            <option value="{{ $booking->id }}" @selected(old('booking_id', $from ?? null) == $booking->id)>
                                 {{ $booking->event?->title ?? 'Booking #' . $booking->id }}
                                : {{ $other?->name ?? 'Unknown' }}
                                 ({{ $booking->booked_at?->format('M j, Y') ?? $booking->created_at?->format('M j, Y') }})

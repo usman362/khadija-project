@@ -216,6 +216,26 @@
 
         {{-- Sidebar Info --}}
         <div style="display: flex; flex-direction: column; gap: 20px;">
+            {{-- Raising a problem from the job it is about.
+
+                 Sir Peter, 30 October: the dispute page existed and the menu
+                 reached it, but there was no way in from the job, so somebody
+                 with a problem had to find their own booking in a dropdown.
+                 Only on a booking a case can be filed against. --}}
+            @if($booking && in_array($booking->status, ['confirmed', 'completed'], true))
+                <div class="cl-card">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">Something wrong?</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); line-height: 1.55; margin: 0 0 12px;">
+                        Raise it here and it arrives already knowing which job you mean.
+                    </p>
+                    <a href="{{ route('disputes.create', ['booking' => $booking->id]) }}" class="poc-select"
+                       style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;width:auto;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        Report a problem
+                    </a>
+                </div>
+            @endif
+
             {{-- Who the client will meet on the day.
 
                  Sir Peter, 28 October: a worker or supervisor may go as the

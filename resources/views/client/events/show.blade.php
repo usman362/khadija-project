@@ -506,8 +506,20 @@
                                 <td style="color: var(--text-primary); font-weight: 500;">{{ $booking->supplier?->name ?? '—' }}</td>
                                 <td><span class="cl-badge cl-badge-{{ $booking->status }}">{{ ucfirst($booking->status) }}</span></td>
                                 <td style="color:var(--text-muted);">{{ $booking->created_at->format('M d, Y') }}</td>
-                                <td style="text-align:right;">
+                                <td style="text-align:right;white-space:nowrap;">
                                     <a href="{{ route('client.bookings.index') }}" style="color:var(--accent-orange,#f97316);font-size:12.5px;font-weight:600;text-decoration:none;">View →</a>
+                                    {{-- Sir Peter, 30 October: a way into a
+                                         dispute from the job itself, so
+                                         nobody has to find their own booking
+                                         in a dropdown. On the row of the
+                                         professional it is about, because an
+                                         event with five of them needs to know
+                                         which one. --}}
+                                    @if(in_array($booking->status, ['confirmed', 'completed'], true))
+                                        <a href="{{ route('disputes.create', ['booking' => $booking->id]) }}"
+                                           style="margin-left:12px;color:var(--text-muted);font-size:12.5px;font-weight:600;text-decoration:none;"
+                                           title="Report a problem with this professional">Report a problem</a>
+                                    @endif
                                 </td>
                             </tr>
                             @endforeach

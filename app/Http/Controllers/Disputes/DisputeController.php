@@ -195,9 +195,24 @@ class DisputeController extends Controller
             ->latest('id')
             ->get();
 
+        /*
+         * Arrived from the booking it is about.
+         *
+         * Sir Peter, 30 October: "I had a big issue trying to file my own
+         * dispute... can we make it easier somewhere logical to get to". The
+         * page existed and the menu reached it; what was missing was any way
+         * in from the job, so somebody had to come here cold and find their
+         * own booking in a dropdown.
+         *
+         * Read from the list already built, so a booking nobody may file on
+         * cannot be preselected by putting its number in the address.
+         */
+        $from = $bookings->firstWhere('id', (int) $request->query('booking'))?->id;
+
         return view('disputes.create', [
             'layout'   => $this->layout($user),
             'bookings' => $bookings,
+            'from'     => $from,
             // The person filing picks from PM-4's six; staff classify further.
             'taxonomy' => DisputeClassification::FILING_TYPES,
             'filing'   => $user->isProfessionalMode() ? 'professional' : 'client',

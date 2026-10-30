@@ -556,6 +556,24 @@
                                 Leave a review
                             </a>
                         @endif
+                        {{-- Raising a problem from the job it is about.
+
+                             Sir Peter, 30 October: "I had a big issue trying
+                             to file my own dispute... can we make it easier
+                             somewhere logical to get to". The page and the
+                             menu entry both existed; what was missing was any
+                             way in from the booking, so somebody with a
+                             problem had to go and find their own booking in a
+                             dropdown. This arrives knowing which one it is.
+
+                             Only on a booking a case can actually be filed
+                             against — the same two states the form offers. --}}
+                        @if(in_array($booking->status, ['confirmed', 'completed'], true))
+                            <a href="{{ route('disputes.create', ['booking' => $booking->id]) }}" class="bk-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                Report a problem
+                            </a>
+                        @endif
                         {{-- Only the transitions the state machine will actually accept
                              from this client on this booking. --}}
                         @foreach($moves as $to)
