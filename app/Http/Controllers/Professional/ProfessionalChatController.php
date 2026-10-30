@@ -95,6 +95,9 @@ class ProfessionalChatController extends Controller
         return [
             'currentUser' => $user,
             'conversations' => $list,
+            // Gathered under the event each thread is about, the same way the
+            // client's column is. Sir Peter, 30 October.
+            'grouped' => \App\Domain\Messaging\GroupedByEvent::of($list),
             'thread' => $thread,
             'categories' => $categories,
             'info' => $info,
@@ -161,6 +164,12 @@ class ProfessionalChatController extends Controller
             'lastFromMe' => $last && $last->sender_id === $user->id,
             // Message Center category: 1-on-1 chat, gig bid (event-linked), or a direct offer/request.
             'category' => ($c->type ?? 'direct') === 'direct' ? 'chats' : ($event ? 'bidding' : 'offers'),
+            // The event this thread is about, and when it last moved: what
+            // GroupedByEvent gathers the column by. The client's own list has
+            // carried both since it was built.
+            'event'   => $event ? ['id' => $event->id, 'title' => $event->title] : null,
+            'archived' => (bool) optional($c->participants->firstWhere('id', $user->id))->pivot?->archived_at,
+            'sortAt'  => optional($last?->created_at)->timestamp ?? optional($c->updated_at)->timestamp ?? 0,
         ];
     }
 
@@ -287,6 +296,13 @@ class ProfessionalChatController extends Controller
             'sendUrl'  => route('conversations.messages.store', $c->id),
             'showUrl'  => route('conversations.show', $c->id),
             'readUrl'  => route('conversations.mark-read', $c->id),
+            // Archiving, which this side could never do. The tab was here
+            // from the start and showed nothing whatever was in it, so a
+            // professional had a drawer they could not open and could not
+            // put anything into. It matters more now that finished jobs
+            // archive themselves.
+            'archived'   => (bool) optional($c->participants->firstWhere('id', $user->id))->pivot?->archived_at,
+            'archiveUrl' => route('conversations.archive', $c),
             'meId'     => $user->id,
         ];
     }

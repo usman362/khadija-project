@@ -97,6 +97,17 @@
     .pm-subbar { display: flex; align-items: center; justify-content: space-between; padding: 0 14px 10px; font-size: 11.5px; color: var(--text-muted); }
     .pm-subbar select { border: 1px solid var(--border-color); border-radius: 7px; background: var(--bg-card); color: var(--text-secondary); font-size: 11.5px; padding: 4px 8px; font-family: inherit; }
     .pm-list { flex: 1; min-height: 0; overflow-y: auto; }
+
+    /* The event each run of conversations is about. Sticky, because the
+       heading is only useful while its own rows are on screen. */
+    .pm-ev-h { position: sticky; top: 0; z-index: 2; display: flex; align-items: baseline;
+        justify-content: space-between; gap: 10px; padding: 7px 14px;
+        background: var(--bg-card-hover, rgba(127,127,127,.08));
+        border-top: 1px solid var(--border-color);
+        font-size: 11.5px; font-weight: 800; letter-spacing: .35px; text-transform: uppercase;
+        color: var(--text-secondary); }
+    .pm-ev-h span { font-weight: 700; letter-spacing: 0; color: var(--text-muted); }
+
     .pm-conv { display: flex; gap: 11px; padding: 13px 14px; border-top: 1px solid var(--border-color); cursor: pointer; text-decoration: none; }
     .pm-conv:hover { background: var(--bg-card-hover); }
     .pm-conv.active { background: rgba(37,99,235,0.06); border-left: 3px solid var(--pm); padding-left: 11px; }
@@ -211,13 +222,20 @@
                 <div class="pm-search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="pm-search" placeholder="Search messages..."></div>
                 <span class="pm-filter"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></span>
             </div>
+            {{-- The dropdown here offered one option, "All Events", and the
+                 sort was a word rather than a control. Grouping the list by
+                 event does what the dropdown was drawn to do, so the decoration
+                 goes rather than sitting there looking clickable. --}}
             <div class="pm-subbar">
-                <select aria-label="All Events"><option>All Events</option></select>
-                <span>Sort: Latest</span>
+                <span>Grouped by event &middot; newest first</span>
             </div>
             <div class="pm-list" id="pm-list">
-                @forelse($conversations as $c)
-                    <a href="{{ route('professional.chat.show', $c['id']) }}" class="pm-conv {{ ($thread && $thread['id'] === $c['id']) ? 'active' : '' }}" data-name="{{ \Illuminate\Support\Str::lower($c['name'].' '.$c['subject']) }}" data-lastfrom="{{ ($c['lastFromMe'] ?? false) ? 'me' : 'them' }}">
+                @forelse($grouped as $g)
+                <div class="pm-ev">
+                    <div class="pm-ev-h">{{ $g['title'] }}<span>{{ count($g['rows']) }}</span></div>
+                    <div class="pm-ev-rows">
+                    @foreach($g['rows'] as $c)
+                    <a href="{{ route('professional.chat.show', $c['id']) }}" class="pm-conv {{ ($thread && $thread['id'] === $c['id']) ? 'active' : '' }}" data-name="{{ \Illuminate\Support\Str::lower($c['name'].' '.$c['subject']) }}" data-lastfrom="{{ ($c['lastFromMe'] ?? false) ? 'me' : 'them' }}" data-archived="{{ ($c['archived'] ?? false) ? '1' : '0' }}">
                         <span class="pm-conv-av" style="background:{{ $typeColor[$c['type']] ?? '#2563eb' }};">{{ $c['initials'] }}</span>
                         <div class="pm-conv-mid">
                             <div class="pm-conv-name">{{ $c['name'] }} <span>({{ $c['role'] }})</span></div>
@@ -234,6 +252,9 @@
                             @if($c['unread'] > 0)<span class="pm-conv-badge">{{ $c['unread'] }}</span>@endif
                         </div>
                     </a>
+                    @endforeach
+                    </div>
+                </div>
                 @empty
                     <div style="padding:40px 16px;text-align:center;color:var(--text-muted);font-size:13px;">No conversations yet.</div>
                 @endforelse
@@ -255,6 +276,16 @@
                         <span class="pm-icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
                         <span class="pm-icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></span>
                         <span class="pm-icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></span>
+                        {{-- A real control among the decoration: this side
+                             could not archive or restore anything. --}}
+                        <form method="POST" action="{{ $thread['archiveUrl'] }}" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="pm-icon-btn" style="border:0;cursor:pointer;"
+                                    title="{{ $thread['archived'] ? 'Move back to inbox' : 'Archive conversation' }}"
+                                    aria-label="{{ $thread['archived'] ? 'Move back to inbox' : 'Archive conversation' }}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/>@if($thread['archived'])<polyline points="9 15 12 12 15 15"/><line x1="12" y1="12" x2="12" y2="18"/>@else<polyline points="9 13 12 16 15 13"/><line x1="12" y1="10" x2="12" y2="16"/>@endif</svg>
+                            </button>
+                        </form>
                     </div>
                 </div>
 
@@ -383,14 +414,31 @@
         let shown = 0;
         document.querySelectorAll('#pm-list .pm-conv').forEach((el) => {
             let ok = (el.dataset.name || '').includes(q);
-            if (activeTab === 'sent') ok = ok && el.dataset.lastfrom === 'me';
-            else if (activeTab === 'drafts' || activeTab === 'archived') ok = false;
+            // The Archived tab used to hide every row, whatever was in it, so
+            // this side had a drawer that could not be opened. It shows what
+            // this person has archived, and the other tabs leave those out.
+            const archived = el.dataset.archived === '1';
+            if (activeTab === 'archived') ok = ok && archived;
+            else {
+                ok = ok && ! archived;
+                if (activeTab === 'sent') ok = ok && el.dataset.lastfrom === 'me';
+                else if (activeTab === 'drafts') ok = false;
+            }
             el.style.display = ok ? '' : 'none';
             if (ok) shown++;
         });
+        // A heading with nothing under it reads as an event whose
+        // conversations have gone missing.
+        document.querySelectorAll('#pm-list .pm-ev').forEach((g) => {
+            const any = Array.from(g.querySelectorAll('.pm-conv')).some((r) => r.style.display !== 'none');
+            g.style.display = any ? '' : 'none';
+        });
         const empty = $('pm-list-empty');
+        // Nothing at all is already said by the server's own line;
+        // adding this one under it said it twice, differently.
+        const any = document.querySelectorAll('#pm-list .pm-conv').length > 0;
         if (empty) {
-            if (shown === 0) { empty.style.display = ''; empty.textContent = activeTab === 'drafts' ? 'No drafts.' : (activeTab === 'archived' ? 'No archived conversations.' : 'No matching conversations.'); }
+            if (shown === 0 && any) { empty.style.display = ''; empty.textContent = activeTab === 'drafts' ? 'No drafts.' : (activeTab === 'archived' ? 'No archived conversations.' : 'No matching conversations.'); }
             else empty.style.display = 'none';
         }
     }

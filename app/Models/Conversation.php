@@ -28,6 +28,10 @@ class Conversation extends Model
 
     protected $casts = [
         'include_in_contract' => 'boolean',
+        // When the platform put this away by itself. Set once, by
+        // App\Domain\Messaging\TidyFinishedThreads, so a thread somebody
+        // restores by hand is never archived again behind their back.
+        'auto_archived_at'    => 'datetime',
     ];
 
     // ----- Relationships -----

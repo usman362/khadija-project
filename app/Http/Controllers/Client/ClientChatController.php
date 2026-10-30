@@ -80,6 +80,10 @@ class ClientChatController extends Controller
         return [
             'currentUser' => $user,
             'conversations' => $list,
+            // The same conversations under the event each is about. Sir
+            // Peter, 30 October: the column fills with threads about one
+            // project. See App\Domain\Messaging\GroupedByEvent.
+            'grouped' => \App\Domain\Messaging\GroupedByEvent::of($list),
             'thread' => $thread,
             'info' => $activeConv ? $this->info($activeConv, $user) : null,
             'stats' => $this->stats($conversations, $user, $list),

@@ -50,6 +50,20 @@ Schedule::command('attendance:chase')
     ->onOneServer();
 
 /*
+ * Conversations about jobs that are over.
+ *
+ * Khadijah, 30 October: archived once the event is completed or the booking
+ * is closed or cancelled, and only when no dispute is outstanding. Daily,
+ * because nothing here is urgent — a thread that stays in the inbox until
+ * morning costs somebody one glance. Each conversation is marked when the
+ * sweep deals with it, so a thread somebody restores by hand stays restored.
+ */
+Schedule::command('conversations:tidy')
+    ->dailyAt('04:10')
+    ->withoutOverlapping()
+    ->onOneServer();
+
+/*
  * The scheduler saying it is alive.
  *
  * Every minute, because that is how often the host is meant to call it. Anything

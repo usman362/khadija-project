@@ -140,6 +140,17 @@
     .cm-search-box svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--text-muted); }
     .cm-search-box input { width: 100%; box-sizing: border-box; padding: 9px 12px 9px 34px; border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-card); color: var(--text-primary); font-size: 13px; font-family: inherit; }
     .cm-list { flex: 1; min-height: 0; overflow-y: auto; }
+
+    /* The event each run of conversations is about. Sticky, because the
+       heading is only useful while its own rows are on screen. */
+    .cm-ev-h { position: sticky; top: 0; z-index: 2; display: flex; align-items: baseline;
+        justify-content: space-between; gap: 10px; padding: 7px 14px;
+        background: var(--bg-card-hover, rgba(127,127,127,.08));
+        border-top: 1px solid var(--border-color);
+        font-size: 11.5px; font-weight: 800; letter-spacing: .35px; text-transform: uppercase;
+        color: var(--text-secondary); }
+    .cm-ev-h span { font-weight: 700; letter-spacing: 0; color: var(--text-muted); }
+
     .cm-conv { display: flex; gap: 11px; padding: 13px 14px; border-top: 1px solid var(--border-color); cursor: pointer; text-decoration: none; }
     .cm-conv:hover { background: var(--bg-card-hover); }
     .cm-conv.active { background: rgba(234,88,12,0.06); border-left: 3px solid var(--cm); padding-left: 11px; }
@@ -473,7 +484,20 @@
                 </select>
             </div>
             <div class="cm-list" id="cm-list">
-                @forelse($conversations as $c)
+                {{-- Under the event each thread is about. Sir Peter, 30
+                     October: the column fills with conversations about one
+                     project and they interleave with every other project's.
+                     The dropdown above narrows to one event; this answers the
+                     question people were actually using it for, which is what
+                     is going on with each of them. --}}
+                @forelse($grouped as $g)
+                {{-- cm-ev, not cm-group: cm-group-box and cm-group-pick
+                     below belong to starting a group chat, and two features
+                     sharing a prefix is how a selector ends up doing both. --}}
+                <div class="cm-ev" data-ev="{{ $g['id'] ?? '' }}">
+                    <div class="cm-ev-h">{{ $g['title'] }}<span>{{ count($g['rows']) }}</span></div>
+                    <div class="cm-ev-rows">
+                    @foreach($g['rows'] as $c)
                     <a href="{{ route('client.chat.show', $c['id']) }}" class="cm-conv {{ ($thread && $thread['id'] === $c['id']) ? 'active' : '' }}" data-archived="{{ $c['archived'] ? '1' : '0' }}" data-awaiting="{{ $c['awaiting'] ? '1' : '0' }}" data-muted="{{ $c['muted'] ? '1' : '0' }}" data-name="{{ \Illuminate\Support\Str::lower($c['name'].' '.$c['subject']) }}" data-lastfrom="{{ $c['lastFromMe'] ? 'me' : 'them' }}" data-event="{{ $c['event']['id'] ?? '' }}" data-unread="{{ $c['unread'] }}" data-at="{{ $c['sortAt'] }}" data-sortname="{{ \Illuminate\Support\Str::lower($c['name']) }}">
                         <span class="cm-conv-av">{{ $c['initials'] }}</span>
                         <div class="cm-conv-mid">
@@ -509,6 +533,9 @@
                                     aria-label="{{ $c['favorite'] ? 'Remove from favourites' : 'Add to favourites' }}">{{ $c['favorite'] ? '★' : '☆' }}</button>
                         </div>
                     </a>
+                    @endforeach
+                    </div>
+                </div>
                 @empty
                     <div style="padding:40px 16px;text-align:center;color:var(--text-muted);font-size:13px;">No conversations yet.</div>
                 @endforelse
@@ -950,21 +977,32 @@
             el.style.display = ok ? '' : 'none';
             if (ok) shown++;
         });
+        // A heading with nothing under it is worse than no heading: it reads
+        // as an event whose conversations have gone missing.
+        document.querySelectorAll('#cm-list .cm-ev').forEach((g) => {
+            const any = Array.from(g.querySelectorAll('.cm-conv')).some((r) => r.style.display !== 'none');
+            g.style.display = any ? '' : 'none';
+        });
         const empty = $('cm-list-empty');
+        // Nothing at all is already said by the server's own line;
+        // adding this one under it said it twice, differently.
+        const any = document.querySelectorAll('#cm-list .cm-conv').length > 0;
         if (empty) {
-            if (shown === 0) { empty.style.display = ''; empty.textContent = cardFilter === 'awaiting' ? 'Nothing is waiting on your reply.' : (cardFilter === 'unread' ? 'No unread conversations.' : (activeTab === 'drafts' ? 'No drafts.' : (activeTab === 'archived' ? 'No archived conversations.' : 'No matching conversations.'))); }
+            if (shown === 0 && any) { empty.style.display = ''; empty.textContent = cardFilter === 'awaiting' ? 'Nothing is waiting on your reply.' : (cardFilter === 'unread' ? 'No unread conversations.' : (activeTab === 'drafts' ? 'No drafts.' : (activeTab === 'archived' ? 'No archived conversations.' : 'No matching conversations.'))); }
             else empty.style.display = 'none';
         }
     }
 
     // Reordering the rows in place, rather than reloading, so the sort keeps
     // whatever the search and event filter have already narrowed to.
+    // Reordering within each event rather than across the whole list: the
+    // rows are grouped now, and lifting one out of its heading to satisfy a
+    // sort would file it under somebody else's event.
     function applySort() {
         const list = $('cm-list');
         if (!list || !sortSel) return;
-        const rows = Array.from(list.querySelectorAll('.cm-conv'));
         const by = sortSel.value;
-        rows.sort((a, b) => {
+        const order = (a, b) => {
             if (by === 'oldest') return (+a.dataset.at) - (+b.dataset.at);
             if (by === 'name') return (a.dataset.sortname || '').localeCompare(b.dataset.sortname || '');
             if (by === 'unread') {
@@ -972,9 +1010,10 @@
                 return d !== 0 ? d : (+b.dataset.at) - (+a.dataset.at);
             }
             return (+b.dataset.at) - (+a.dataset.at);
+        };
+        list.querySelectorAll('.cm-ev-rows').forEach((box) => {
+            Array.from(box.querySelectorAll('.cm-conv')).sort(order).forEach((r) => box.appendChild(r));
         });
-        const anchor = $('cm-list-empty');
-        rows.forEach((r) => list.insertBefore(r, anchor));
     }
 
     if (s) s.addEventListener('input', applyFilters);
